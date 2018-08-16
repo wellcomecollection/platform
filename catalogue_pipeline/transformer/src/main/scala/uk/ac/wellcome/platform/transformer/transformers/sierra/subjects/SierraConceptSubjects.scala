@@ -1,10 +1,17 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra.subjects
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
-import uk.ac.wellcome.platform.transformer.transformers.sierra.{MarcUtils, SierraConcepts}
+import uk.ac.wellcome.platform.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
+import uk.ac.wellcome.platform.transformer.transformers.sierra.{
+  MarcUtils,
+  SierraConcepts
+}
 
-trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
+trait SierraConceptSubjects extends MarcUtils with SierraConcepts {
 
   // Populate wwork:subject
   //
@@ -41,12 +48,15 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
   //      Note that only concepts from subfield $a are identified; everything
   //      else is unidentified.
   //
-  def getSubjectswithAbstractConcepts(bibData: SierraBibData): List[Subject[MaybeDisplayable[AbstractConcept]]] =
+  def getSubjectswithAbstractConcepts(
+    bibData: SierraBibData): List[Subject[MaybeDisplayable[AbstractConcept]]] =
     getSubjectsForMarcTag(bibData, "650") ++
       getSubjectsForMarcTag(bibData, "648") ++
       getSubjectsForMarcTag(bibData, "651")
 
-  private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
+  private def getSubjectsForMarcTag(
+    bibData: SierraBibData,
+    marcTag: String): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
     // Second indicator 7 means that the subject authority is something other
@@ -79,8 +89,8 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
   }
 
   private def getPrimaryConcept(
-                                                primarySubfields: List[MarcSubfield],
-                                                varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
+    primarySubfields: List[MarcSubfield],
+    varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
       varField.marcTag.get match {
         case "650" =>

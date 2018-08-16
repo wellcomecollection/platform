@@ -5,7 +5,10 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraConceptSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
+class SierraConceptSubjectsTest
+    extends FunSpec
+    with Matchers
+    with SierraDataUtil {
   private val transformer = new SierraConceptSubjects {}
 
   it("returns zero subjects if there are none") {
@@ -15,11 +18,13 @@ class SierraConceptSubjectsTest extends FunSpec with Matchers with SierraDataUti
 
   it("returns subjects for tag 650 with only subfield a") {
 
-    transformer.getSubjectswithAbstractConcepts(bibData(
-      "650",
-      List(
-        MarcSubfield(tag = "a", content = "A Content")
-      ))) shouldBe List(Subject(
+    transformer.getSubjectswithAbstractConcepts(
+      bibData(
+        "650",
+        List(
+          MarcSubfield(tag = "a", content = "A Content")
+        ))) shouldBe List(
+      Subject(
         label = "A Content",
         concepts = List(Unidentifiable(Concept(label = "A Content")))))
 
@@ -180,7 +185,6 @@ class SierraConceptSubjectsTest extends FunSpec with Matchers with SierraDataUti
         MarcSubfield(tag = "a", content = "A Content"),
         MarcSubfield(tag = "v", content = "V Content")
       ))
-
 
     transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(

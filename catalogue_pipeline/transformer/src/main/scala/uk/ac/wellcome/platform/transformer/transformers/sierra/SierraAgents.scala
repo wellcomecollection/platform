@@ -24,10 +24,10 @@ trait SierraAgents {
       if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
     Person(
-        label = label,
-        prefix = prefixString,
-        numeration = numeration
-      )
+      label = label,
+      prefix = prefixString,
+      numeration = numeration
+    )
   }
 
   def getOrganisation(subfields: List[MarcSubfield]) = {
@@ -42,8 +42,8 @@ trait SierraAgents {
    * as appropriate.
    */
   def identify[T](subfields: List[MarcSubfield],
-                          agent: T,
-                          ontologyType: String): MaybeDisplayable[T] = {
+                  agent: T,
+                  ontologyType: String): MaybeDisplayable[T] = {
 
     // We take the contents of subfield $0.  They may contain inconsistent
     // spacing and punctuation, such as:

@@ -1,8 +1,20 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra.subjects
 
-import uk.ac.wellcome.models.work.internal.{MaybeDisplayable, Person, Subject, Unidentifiable}
-import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
-import uk.ac.wellcome.platform.transformer.transformers.sierra.{MarcUtils, SierraAgents}
+import uk.ac.wellcome.models.work.internal.{
+  MaybeDisplayable,
+  Person,
+  Subject,
+  Unidentifiable
+}
+import uk.ac.wellcome.platform.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
+import uk.ac.wellcome.platform.transformer.transformers.sierra.{
+  MarcUtils,
+  SierraAgents
+}
 
 trait SierraPersonSubjects extends MarcUtils with SierraAgents {
 
@@ -21,7 +33,8 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   // The person can be identified if there is an identifier in subfield $0 and the second indicator is "0".
   // If second indicator is anything other than 0, we don't expose the identifier for now
   //
-  def getSubjectsWithPerson(bibData: SierraBibData): List[Subject[MaybeDisplayable[Person]]] = {
+  def getSubjectsWithPerson(
+    bibData: SierraBibData): List[Subject[MaybeDisplayable[Person]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = "600")
 
     // Second indicator 7 means that the subject authority is something other
@@ -33,7 +46,8 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
       val subfields = varField.subfields
 
       val person = getPerson(subfields)
-      val label = getPersonSubjectLabel(person, getRoles(subfields), getDates(subfields))
+      val label =
+        getPersonSubjectLabel(person, getRoles(subfields), getDates(subfields))
       Subject(
         label = label,
         concepts = List(identifyPersonConcept(person, varField))
@@ -41,18 +55,25 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
     }
   }
 
-  private def getPersonSubjectLabel(person: Person, roles: List[String], dates: Option[String]) = {
-    val spaceSeparated = (person.prefix ++ List(person.label) ++ person.numeration).mkString(" ")
+  private def getPersonSubjectLabel(person: Person,
+                                    roles: List[String],
+                                    dates: Option[String]) = {
+    val spaceSeparated =
+      (person.prefix ++ List(person.label) ++ person.numeration).mkString(" ")
     (List(spaceSeparated) ++ dates ++ roles).mkString(", ")
   }
 
-  private def identifyPersonConcept(person: Person, varfield: VarField): MaybeDisplayable[Person] = {
+  private def identifyPersonConcept(
+    person: Person,
+    varfield: VarField): MaybeDisplayable[Person] = {
     varfield.indicator2 match {
       case Some("0") => identify(varfield.subfields, person, "Person")
-      case _ => Unidentifiable(person)
+      case _         => Unidentifiable(person)
     }
   }
 
-  private def getRoles(secondarySubfields: List[MarcSubfield]) = secondarySubfields.collect{case MarcSubfield("e", role) => role}
-  private def getDates(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "d").map(_.content)
+  private def getRoles(secondarySubfields: List[MarcSubfield]) =
+    secondarySubfields.collect { case MarcSubfield("e", role) => role }
+  private def getDates(secondarySubfields: List[MarcSubfield]) =
+    secondarySubfields.find(_.tag == "d").map(_.content)
 }

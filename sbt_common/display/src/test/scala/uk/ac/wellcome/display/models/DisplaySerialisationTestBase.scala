@@ -162,15 +162,15 @@ trait DisplaySerialisationTestBase { this: Suite =>
 
   def ontologyType(concept: AbstractRootConcept) =
     concept match {
-    case _:Concept => "Concept"
-    case _:Place => "Place"
-    case _:Period => "Period"
-    case _:Agent => "Agent"
-    case _:Organisation => "Organisation"
-    case _:Person => "Person"
-  }
+      case _: Concept      => "Concept"
+      case _: Place        => "Place"
+      case _: Period       => "Period"
+      case _: Agent        => "Agent"
+      case _: Organisation => "Organisation"
+      case _: Person       => "Person"
+    }
 
-  def concept(concept: AbstractRootConcept) ={
+  def concept(concept: AbstractRootConcept) = {
     s"""
     {
       "type": "${ontologyType(concept)}",
