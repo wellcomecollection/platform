@@ -1,9 +1,10 @@
-package uk.ac.wellcome.platform.transformer.transformers.sierra
+package uk.ac.wellcome.platform.transformer.transformers.sierra.subjects
 
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.platform.transformer.transformers.sierra.{MarcUtils, SierraConcepts}
 
-trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
+trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
 
   // Populate wwork:subject
   //
@@ -40,15 +41,10 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
   //      Note that only concepts from subfield $a are identified; everything
   //      else is unidentified.
   //
-  def getSubjects(bibData: SierraBibData)
-    : List[Subject[MaybeDisplayable[AbstractConcept]]] = {
-    getSubjectswithAbstractConcepts(bibData, "650") ++
-      getSubjectswithAbstractConcepts(bibData, "648") ++
-      getSubjectswithAbstractConcepts(bibData, "651") ++
-      getSubjectsWithPerson(bibData, "600")
-  }
+  def getSubjectswithAbstractConcepts(bibData: SierraBibData): List[Subject[MaybeDisplayable[AbstractConcept]]] =
+    getSubjectswithAbstractConcepts(bibData, "650") ++ getSubjectswithAbstractConcepts(bibData, "648") ++ getSubjectswithAbstractConcepts(bibData, "651")
 
-  private def getSubjectswithAbstractConcepts(bibData: SierraBibData, marcTag: String) = {
+  private def getSubjectswithAbstractConcepts(bibData: SierraBibData, marcTag: String): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
     // Second indicator 7 means that the subject authority is something other
@@ -74,31 +70,6 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
     }
   }
 
-  private def getSubjectsWithPerson(bibData: SierraBibData, marcTag: String) = {
-    val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
-
-    // Second indicator 7 means that the subject authority is something other
-    // than library of congress or mesh. Some MARC records have duplicated subjects
-    // when the same subject has more than one authority (for example mesh and FAST),
-    // which causes duplicated subjects to appear in the API.
-    // So let's filter anything that is from another authority for now.
-    marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
-      val subfields = varField.subfields
-
-      val person = getPerson(subfields)
-      val label = getPersonSubjectLabel(person, getRoles(subfields), getDates(subfields))
-      Subject(
-        label = label,
-        concepts = List(identifyPerson(person, varField))
-      )
-    }
-  }
-
-  private def getPersonSubjectLabel(person: Person, roles: List[String], dates: Option[String]) = {
-    val spaceSeparated = (person.prefix ++ List(person.label) ++ person.numeration).mkString(" ")
-    (List(spaceSeparated) ++ dates ++ roles).mkString(", ")
-  }
-
   private def filterSubfields(varField: VarField, subfields: List[String]) = {
     varField.subfields.filter { subfield =>
       subfields.contains(subfield.tag)
@@ -106,8 +77,8 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
   }
 
   private def getAbstractConceptPrimaryConcept(
-    primarySubfields: List[MarcSubfield],
-    varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
+                                                primarySubfields: List[MarcSubfield],
+                                                varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
       varField.marcTag.get match {
         case "650" =>
@@ -129,14 +100,4 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
 
     }
   }
-
-  private def identifyPerson(person: Person, varfield: VarField): MaybeDisplayable[Person] = {
-    varfield.indicator2 match {
-      case Some("0") => identify(varfield.subfields, person, "Person")
-      case _ => Unidentifiable(person)
-    }
-  }
-
-  private def getRoles(secondarySubfields: List[MarcSubfield]) = secondarySubfields.collect{case MarcSubfield("e", role) => role}
-  private def getDates(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "d").map(_.content)
 }

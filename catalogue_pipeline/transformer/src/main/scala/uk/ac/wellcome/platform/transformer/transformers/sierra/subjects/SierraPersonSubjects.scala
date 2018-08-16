@@ -1,0 +1,58 @@
+package uk.ac.wellcome.platform.transformer.transformers.sierra.subjects
+
+import uk.ac.wellcome.models.work.internal.{MaybeDisplayable, Person, Subject, Unidentifiable}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.platform.transformer.transformers.sierra.{MarcUtils, SierraAgents}
+
+trait SierraPersonSubjects extends MarcUtils with SierraAgents {
+
+  // Populate wwork:subject
+  //
+  // Use MARC field "600" where the second indicator is not 7.
+  //
+  // Within this MARC tag we have one concept which we always type as a Person:
+  //  - subfield $a populates the person label
+  //  - subfield $b populates the person numeration
+  //  - subfield $c populates the person prefixes
+  //
+  // The label is constructed concatenating subfields $a, $b, $c, $d, $e,
+  // where $d and $e represent the persons dates and roles respectively
+  //
+  // The person can be identified if there is an identifier in subfield $0 and the second indicator is "0".
+  // If second indicator is "2" we don't expose the identifier for now
+  //
+  def getSubjectsWithPerson(bibData: SierraBibData): List[Subject[MaybeDisplayable[Person]]] = {
+    val marcVarFields = getMatchingVarFields(bibData, marcTag = "600")
+
+    // Second indicator 7 means that the subject authority is something other
+    // than library of congress or mesh. Some MARC records have duplicated subjects
+    // when the same subject has more than one authority (for example mesh and FAST),
+    // which causes duplicated subjects to appear in the API.
+    // So let's filter anything that is from another authority for now.
+    marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
+      val subfields = varField.subfields
+
+      val person = getPerson(subfields)
+      val label = getPersonSubjectLabel(person, getRoles(subfields), getDates(subfields))
+      Subject(
+        label = label,
+        concepts = List(identifyPersonConcept(person, varField))
+      )
+    }
+  }
+
+  private def getPersonSubjectLabel(person: Person, roles: List[String], dates: Option[String]) = {
+    val spaceSeparated = (person.prefix ++ List(person.label) ++ person.numeration).mkString(" ")
+    (List(spaceSeparated) ++ dates ++ roles).mkString(", ")
+  }
+
+  private def identifyPersonConcept(person: Person, varfield: VarField): MaybeDisplayable[Person] = {
+    varfield.indicator2 match {
+      case Some("0") => identify(varfield.subfields, person, "Person")
+      case _ => Unidentifiable(person)
+    }
+  }
+
+  private def getRoles(secondarySubfields: List[MarcSubfield]) = secondarySubfields.collect{case MarcSubfield("e", role) => role}
+  private def getDates(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "d").map(_.content)
+}

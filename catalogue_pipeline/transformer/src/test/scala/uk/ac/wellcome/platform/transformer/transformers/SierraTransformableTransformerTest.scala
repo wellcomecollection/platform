@@ -522,6 +522,37 @@ class SierraTransformableTransformerTest
       Subject(content, List(Unidentifiable(Concept(content)))))
   }
 
+  it("extracts person subjects if present") {
+    val id = createSierraBibNumber
+    val content = "Nostradamus"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Dastardly Danish dogs draw dubious doughnuts",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "600",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "a",
+         |           "content": "$content"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val work = transformDataToUnidentifiedWork(id = id, data = data)
+    work.subjects shouldBe List(
+      Subject(content, List(Unidentifiable(Person(content)))))
+  }
+
   it("adds production events if possible") {
     val id = createSierraBibNumber
     val placeLabel = "London"
