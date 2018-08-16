@@ -6,6 +6,14 @@ import settings
 import json
 from boto3.dynamodb.conditions import Key
 
+
+def main(event, context):
+
+    dynamodb = boto3.resource('dynamodb', region_name=settings.REGION)
+    s3 = boto3.resource('s3', region_name=settings.REGION)
+    lookup(dynamodb, s3, event)
+
+
 def wrapResult(message, success, status=500):
 
     statusCode = 200
@@ -29,11 +37,8 @@ def wrapResult(message, success, status=500):
         'body': body
     }
 
-def main(event, context):
 
-    dynamodb = boto3.resource('dynamodb', region_name=settings.REGION)
-    s3 = boto3.resource('s3', region_name=settings.REGION)
-
+def lookup(dynamodb, s3, event):
     print('got event{}'.format(event))
 
     # validate event - check if we have an id
