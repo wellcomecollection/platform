@@ -75,4 +75,48 @@ class DisplaySubjectV2SerialisationTest
           """.stripMargin
     )
   }
+
+  it("serialises a DisplaySubject from a Subject with a Agent concept") {
+    val agent = Agent("Dolly Parton")
+    val subject = Subject(
+      label = "subjectLabel",
+      concepts = List(Unidentifiable(agent))
+    )
+    assertObjectMapsToJson(
+      DisplaySubject(subject, includesIdentifiers = true),
+      expectedJson = s"""
+                        |  {
+                        |    "label" : "${subject.label}",
+                        |    "concepts" : [
+                        |      {
+                        |        "label" : "${agent.label}",
+                        |        "type" : "${ontologyType(agent)}"
+                        |      }],
+                        |    "type" : "${subject.ontologyType}"
+                        |  }
+          """.stripMargin
+    )
+  }
+
+  it("serialises a DisplaySubject from a Subject with a Organisation concept") {
+    val organisation = Organisation("Dolly Parton")
+    val subject = Subject(
+      label = "subjectLabel",
+      concepts = List(Unidentifiable(organisation))
+    )
+    assertObjectMapsToJson(
+      DisplaySubject(subject, includesIdentifiers = true),
+      expectedJson = s"""
+                        |  {
+                        |    "label" : "${subject.label}",
+                        |    "concepts" : [
+                        |      {
+                        |        "label" : "${organisation.label}",
+                        |        "type" : "${ontologyType(organisation)}"
+                        |      }],
+                        |    "type" : "${subject.ontologyType}"
+                        |  }
+          """.stripMargin
+    )
+  }
 }

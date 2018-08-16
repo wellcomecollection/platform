@@ -1,24 +1,23 @@
 package uk.ac.wellcome.models.work.internal
 
-sealed trait AbstractConcept {
+
+sealed trait AbstractRootConcept {
   val label: String
 }
 
-sealed trait Bah extends AbstractConcept
+sealed trait AbstractConcept extends AbstractRootConcept
 
 case class Concept(label: String)
-  extends Bah
+  extends AbstractConcept
 
 case class Period(label: String)
-  extends Bah
+  extends AbstractConcept
 
 case class Place(label: String)
-  extends Bah
+  extends AbstractConcept
 
 
-sealed trait AbstractAgent extends AbstractConcept {
-  val label: String
-}
+sealed trait AbstractAgent extends AbstractRootConcept
 
 case class Agent(
   label: String

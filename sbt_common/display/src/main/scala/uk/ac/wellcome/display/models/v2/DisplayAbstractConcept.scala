@@ -7,18 +7,12 @@ import uk.ac.wellcome.models.work.internal._
 @ApiModel(
   value = "Concept"
 )
-trait DisplayAbstractConcept {
-  val id: Option[String]
-  val identifiers: Option[List[DisplayIdentifierV2]]
-  val label: String
-}
+sealed trait DisplayAbstractConcept extends DisplayAbstractRootConcept
 
 case object DisplayAbstractConcept {
   def apply(abstractConcept: Displayable[AbstractConcept],
             includesIdentifiers: Boolean): DisplayAbstractConcept =
     abstractConcept match {
-      case agentConcept @ Unidentifiable(_: AbstractAgent) =>  DisplayAbstractAgentV2.apply(agentConcept.asInstanceOf[Displayable[AbstractAgent]], includesIdentifiers)
-      case agentConcept @ Identified(_: AbstractAgent, _, _, _) =>  DisplayAbstractAgentV2.apply(agentConcept.asInstanceOf[Displayable[AbstractAgent]], includesIdentifiers)
       case Unidentifiable(concept: Concept) =>
         DisplayConcept(
           id = None,

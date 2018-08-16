@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.work.internal._
 @ApiModel(
   value = "Agent"
 )
-sealed trait DisplayAbstractAgentV2 extends DisplayAbstractConcept{
+sealed trait DisplayAbstractAgentV2 extends DisplayAbstractRootConcept{
   val id: Option[String]
   val identifiers: Option[List[DisplayIdentifierV2]]
   val label: String

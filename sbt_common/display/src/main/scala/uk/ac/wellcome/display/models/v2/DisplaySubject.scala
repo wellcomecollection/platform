@@ -2,11 +2,7 @@ package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Displayable,
-  Subject
-}
+import uk.ac.wellcome.models.work.internal.{AbstractRootConcept, Displayable, Subject}
 
 @ApiModel(
   value = "Subject",
@@ -15,16 +11,16 @@ import uk.ac.wellcome.models.work.internal.{
 case class DisplaySubject(
   @ApiModelProperty(value = "A label given to a thing.") label: String,
   @ApiModelProperty(value = "Relates a subject to a list of concepts.") concepts: List[
-    DisplayAbstractConcept],
+    DisplayAbstractRootConcept],
   @JsonProperty("type") ontologyType: String = "Subject")
 
 object DisplaySubject {
-  def apply(subject: Subject[Displayable[AbstractConcept]],
+  def apply(subject: Subject[Displayable[AbstractRootConcept]],
             includesIdentifiers: Boolean): DisplaySubject =
     DisplaySubject(
       label = subject.label,
       concepts = subject.concepts.map {
-        DisplayAbstractConcept(_, includesIdentifiers = includesIdentifiers)
+        DisplayAbstractRootConcept(_, includesIdentifiers = includesIdentifiers)
       },
       ontologyType = subject.ontologyType
     )

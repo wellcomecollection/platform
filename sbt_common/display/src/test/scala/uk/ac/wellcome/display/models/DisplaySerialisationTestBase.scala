@@ -160,7 +160,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
       "label": "${p.label}"
     }"""
 
-  def ontologyType(concept: AbstractConcept) =
+  def ontologyType(concept: AbstractRootConcept) =
     concept match {
     case _:Concept => "Concept"
     case _:Place => "Place"
@@ -170,7 +170,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
     case _:Person => "Person"
   }
 
-  def concept(concept: AbstractConcept) ={
+  def concept(concept: AbstractRootConcept) ={
     s"""
     {
       "type": "${ontologyType(concept)}",
@@ -179,14 +179,14 @@ trait DisplaySerialisationTestBase { this: Suite =>
     """
   }
 
-  def concepts(concepts: List[Displayable[AbstractConcept]]) =
+  def concepts(concepts: List[Displayable[AbstractRootConcept]]) =
     concepts
       .map { c =>
         identifiedOrUnidentifiable(c, concept)
       }
       .mkString(",")
 
-  def subject(s: Subject[Displayable[AbstractConcept]]) =
+  def subject(s: Subject[Displayable[AbstractRootConcept]]) =
     s"""
     {
       "label": "${s.label}",
@@ -195,7 +195,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def subjects(subjects: List[Subject[Displayable[AbstractConcept]]]) =
+  def subjects(subjects: List[Subject[Displayable[AbstractRootConcept]]]) =
     subjects
       .map { subject(_) }
       .mkString(",")
