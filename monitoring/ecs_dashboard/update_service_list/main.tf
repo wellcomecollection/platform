@@ -9,7 +9,7 @@ module "lambda_update_service_list" {
 
   # We've seen timeouts at 60 seconds on these Lambdas, so set the max
   # timeout to make a timeout as unlikely as possible.
-  timeout     = 300
+  timeout = 300
 
   environment_variables = {
     BUCKET_NAME     = "${var.dashboard_bucket}"
