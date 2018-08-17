@@ -51,7 +51,7 @@ object StorageManifestFactory extends Logging {
 
     val bagInfoTupleFuture = getTuples("bag-info.txt", ": +")
     val manifestTupleFuture = getTuples(s"manifest-$algorithm.txt", " +")
-    val tagManifestTupleFuture = getTuples(s"tagmanifest-$algorithm.txt", " +")
+//    val tagManifestTupleFuture = getTuples(s"tagmanifest-$algorithm.txt", " +")
 
     val sourceIdentifier = SourceIdentifier(
       IdentifierType("source", "Label"),
@@ -70,10 +70,10 @@ object StorageManifestFactory extends Logging {
         ChecksumAlgorithm(algorithm),
         createBagDigestFiles(manifestTuples).toList
       )
-      tagManifestTuples <- tagManifestTupleFuture
+      //tagManifestTuples <- tagManifestTupleFuture
       tagManifest = TagManifest(
         ChecksumAlgorithm(algorithm),
-        createBagDigestFiles(tagManifestTuples).toList
+        Nil //createBagDigestFiles(tagManifestTuples).toList
       )
     } yield
       StorageManifest(
