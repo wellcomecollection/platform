@@ -25,7 +25,7 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
       createUnidentifiedWork
     }
 
-    val works = (works +: otherWorks).map { Some(_) }.toList
+    val works = (work +: otherWorks).map { Some(_) }.toList
 
     val result = mergerManager.applyMerge(maybeWorks = works)
 

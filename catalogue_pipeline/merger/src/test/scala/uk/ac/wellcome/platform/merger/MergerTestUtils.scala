@@ -54,7 +54,7 @@ trait MergerTestUtils
       throw new RuntimeException("Not possible, VHS is empty!"))
 
     eventually {
-      whenReady(vhs.getRecord(id = id(work))) { result =>
+      whenReady(vhs.getRecord(id = work.sourceIdentifier.toString)) { result =>
         result.get shouldBe work
       }
     }
