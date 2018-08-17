@@ -49,7 +49,7 @@ module "api_romulus_delta" {
   host_name = "${local.romulus_hostname}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
-  es_config              = "${var.es_config_romulus}"
+  es_config              = "${local.es_config_romulus}"
 
   task_desired_count         = "${local.romulus_task_number}"
   enable_alb_alarm           = "${local.romulus_enable_alb_alarm}"
@@ -77,7 +77,7 @@ module "api_remus_delta" {
   host_name = "${local.remus_hostname}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
-  es_config              = "${var.es_config_remus}"
+  es_config              = "${local.es_config_remus}"
 
   task_desired_count         = "${local.remus_task_number}"
   alb_cloudwatch_id          = "${module.load_balancer.cloudwatch_id}"
