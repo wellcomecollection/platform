@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.merger.services
 
 import com.google.inject.Inject
-import uk.ac.wellcome.models.work.internal.{BaseWork, TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  BaseWork,
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 
 class MergerManager @Inject()(
   mergerRules: MergerRules

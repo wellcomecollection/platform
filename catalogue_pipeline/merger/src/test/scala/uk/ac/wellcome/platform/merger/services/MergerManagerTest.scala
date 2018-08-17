@@ -21,7 +21,9 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
 
   it("performs a merge with multiple works") {
     val work = createUnidentifiedWork
-    val otherWorks = (1 to 3).map { _ => createUnidentifiedWork }
+    val otherWorks = (1 to 3).map { _ =>
+      createUnidentifiedWork
+    }
 
     val works = (works +: otherWorks).map { Some(_) }.toList
 
@@ -41,7 +43,9 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
 
   it("returns the works unmerged if any of the work entries are None") {
     val works = (1 to 3)
-      .map { _ => createUnidentifiedWork }
+      .map { _ =>
+        createUnidentifiedWork
+      }
       .map { Some(_) }
       .toList
 

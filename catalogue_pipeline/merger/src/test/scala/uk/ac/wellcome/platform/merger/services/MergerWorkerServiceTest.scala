@@ -48,10 +48,8 @@ class MergerWorkerServiceTest
         val work2 = createUnidentifiedWork
         val work3 = createUnidentifiedWork
 
-        val matcherResult = matcherResultWith(
-          Set(
-            Set(work3),
-            Set(work1, work2)))
+        val matcherResult =
+          matcherResultWith(Set(Set(work3), Set(work1, work2)))
 
         storeInVHS(vhs, entries = List(work1, work2, work3))
 
@@ -284,32 +282,33 @@ class MergerWorkerServiceTest
     withLocalS3Bucket { storageBucket =>
       withLocalS3Bucket { messageBucket =>
         withLocalDynamoDbTable { table =>
-          withTypeVHS[TransformedBaseWork, EmptyMetadata, R](storageBucket, table) {
-            vhs =>
-              withActorSystem { actorSystem =>
-                withLocalSqsQueueAndDlq {
-                  case queuePair @ QueuePair(queue, dlq) =>
-                    withLocalSnsTopic { topic =>
-                      withMockMetricSender { metricsSender =>
-                        withSQSStream[NotificationMessage, R](
-                          actorSystem,
-                          queue,
-                          metricsSender) { sqsStream =>
-                          withMessageWriter[BaseWork, R](messageBucket, topic) {
-                            snsWriter =>
-                              withMergerWorkerService(
-                                actorSystem,
-                                sqsStream,
-                                vhs,
-                                snsWriter) { _ =>
-                                testWith((vhs, queuePair, topic, metricsSender))
-                              }
-                          }
+          withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
+            storageBucket,
+            table) { vhs =>
+            withActorSystem { actorSystem =>
+              withLocalSqsQueueAndDlq {
+                case queuePair @ QueuePair(queue, dlq) =>
+                  withLocalSnsTopic { topic =>
+                    withMockMetricSender { metricsSender =>
+                      withSQSStream[NotificationMessage, R](
+                        actorSystem,
+                        queue,
+                        metricsSender) { sqsStream =>
+                        withMessageWriter[BaseWork, R](messageBucket, topic) {
+                          snsWriter =>
+                            withMergerWorkerService(
+                              actorSystem,
+                              sqsStream,
+                              vhs,
+                              snsWriter) { _ =>
+                              testWith((vhs, queuePair, topic, metricsSender))
+                            }
                         }
                       }
                     }
-                }
+                  }
               }
+            }
           }
         }
       }

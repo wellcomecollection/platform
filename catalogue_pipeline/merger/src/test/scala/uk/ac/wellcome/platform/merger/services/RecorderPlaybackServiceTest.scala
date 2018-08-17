@@ -28,9 +28,7 @@ class RecorderPlaybackServiceTest
 
       val service = new RecorderPlaybackService(vhs)
 
-      whenReady(
-        service.fetchAllWorks(
-          getWorkIdentifiers(work))) { result =>
+      whenReady(service.fetchAllWorks(getWorkIdentifiers(work))) { result =>
         result shouldBe List(Some(work))
       }
     }
@@ -58,9 +56,7 @@ class RecorderPlaybackServiceTest
     withRecorderVHS { vhs =>
       val service = new RecorderPlaybackService(vhs)
 
-      whenReady(
-        service.fetchAllWorks(
-          getWorkIdentifiers(work))) { result =>
+      whenReady(service.fetchAllWorks(getWorkIdentifiers(work))) { result =>
         result shouldBe List(None)
       }
     }
@@ -79,9 +75,7 @@ class RecorderPlaybackServiceTest
 
       val service = new RecorderPlaybackService(vhs)
 
-      whenReady(
-        service.fetchAllWorks(
-          getWorkIdentifiers(work))) { result =>
+      whenReady(service.fetchAllWorks(getWorkIdentifiers(work))) { result =>
         result shouldBe List(None)
       }
     }
@@ -108,18 +102,17 @@ class RecorderPlaybackServiceTest
 
       val service = new RecorderPlaybackService(vhs)
 
-      whenReady(
-        service.fetchAllWorks(
-          getWorkIdentifiers(allWorks: _*))) { result =>
-        result shouldBe (allWorks.map { Some(_) } ++ (4 to 7).map {
-          _ =>
+      whenReady(service.fetchAllWorks(getWorkIdentifiers(allWorks: _*))) {
+        result =>
+          result shouldBe (allWorks.map { Some(_) } ++ (4 to 7).map { _ =>
             None
-        }).toList
+          }).toList
       }
     }
   }
 
-  private def getWorkIdentifiers(works: TransformedBaseWork*): List[WorkIdentifier] =
+  private def getWorkIdentifiers(
+    works: TransformedBaseWork*): List[WorkIdentifier] =
     works.map { work =>
       WorkIdentifier(
         identifier = work.sourceIdentifier.toString,
@@ -134,8 +127,9 @@ class RecorderPlaybackServiceTest
                        R]): R = {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[TransformedBaseWork, EmptyMetadata, R](bucket, table) { vhs =>
-          testWith(vhs)
+        withTypeVHS[TransformedBaseWork, EmptyMetadata, R](bucket, table) {
+          vhs =>
+            testWith(vhs)
         }
       }
     }

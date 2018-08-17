@@ -2,8 +2,16 @@ package uk.ac.wellcome.platform.merger
 
 import org.scalatest.{Assertion, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork, WorkType}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork,
+  WorkType
+}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -18,8 +26,8 @@ trait MergerTestUtils
 
   def matcherResultWith(matchedEntries: Set[Set[TransformedBaseWork]]) =
     MatcherResult(
-      matchedEntries.map {
-        works => MatchedIdentifiers(worksToWorkIdentifiers(works))
+      matchedEntries.map { works =>
+        MatchedIdentifiers(worksToWorkIdentifiers(works))
       }
     )
 
@@ -28,7 +36,8 @@ trait MergerTestUtils
     worksToWorkIdentifiers(works.toSet)
 
   def worksToWorkIdentifiers(
-    works: Set[TransformedBaseWork]): Set[WorkIdentifier] = works
+    works: Set[TransformedBaseWork]): Set[WorkIdentifier] =
+    works
       .map { work =>
         WorkIdentifier(
           identifier = work.sourceIdentifier.toString,
