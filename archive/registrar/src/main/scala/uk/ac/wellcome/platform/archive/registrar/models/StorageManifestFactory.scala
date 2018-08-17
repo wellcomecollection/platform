@@ -20,8 +20,11 @@ object StorageManifestFactory extends Logging {
     def createBagItMetaFileLocation(name: String) =
       ObjectLocation(
         bagLocation.storageNamespace,
-        List(bagLocation.bagName.value, bagLocation.storagePath, name)
-          .mkString("/")
+        List(
+          bagLocation.storagePath, 
+          bagLocation.bagName.value,
+          name
+        ).mkString("/")
       )
 
     def s3LocationToSource(location: ObjectLocation) = {
