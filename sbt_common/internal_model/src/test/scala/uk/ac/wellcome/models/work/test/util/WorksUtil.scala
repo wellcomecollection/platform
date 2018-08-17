@@ -120,7 +120,7 @@ trait WorksUtil extends ItemsUtil {
     extent: Option[String] = None,
     lettering: Option[String] = None,
     createdDate: Option[Period] = None,
-    subjects: List[Subject[Displayable[AbstractConcept]]] = List(),
+    subjects: List[Subject[Displayable[AbstractRootConcept]]] = List(),
     genres: List[Genre[Displayable[AbstractConcept]]] = List(),
     contributors: List[Contributor[Displayable[AbstractAgent]]] = List(),
     thumbnail: Option[Location] = None,
