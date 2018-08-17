@@ -10,17 +10,25 @@ import daiquiri
 from urllib.parse import urlparse
 
 from wellcome_aws_utils.sns_utils import publish_sns_message
-from wellcome_aws_utils.lambda_utils import log_on_error
+# from wellcome_aws_utils.lambda_utils import log_on_error
 
 daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 
-def archive_bag_message(bagURL):
+def ensure_valid_request(event):
+    required_key = 'bagURL'
+    if not type(event) is dict:
+        raise ValueError(f"Invalid request not json dict: {event}")
+    if not required_key in event:
+        raise ValueError(f"Invalid request missing {required_key}")
+
+
+def archive_bag_message(bag_url):
     """
     Generates bag archive messages.
     """
-    url = urlparse(bagURL)
+    url = urlparse(bag_url)
     if url.scheme == 's3':
         bucket = url.netloc
         key = url.path.lstrip('/')
@@ -29,17 +37,17 @@ def archive_bag_message(bagURL):
             'key': key
         }
     else:
-        raise ValueError(
-            f"Unrecognised url scheme: {bagURL}"
-    )
+        raise ValueError(f"Unrecognised url scheme: {bag_url}")
 
-@log_on_error
-def main(event, _ctx=None, sns_client=None):
+# @log_on_error TODO: replace when bug fix is released
+def handler(event, _ctx=None, sns_client=None):
     logger.info(f"received {event}")
 
-    bagUrl = event['bagURL']
+    ensure_valid_request(event)
 
-    message = archive_bag_message(bagUrl)
+    bag_url = event['bagURL']
+
+    message = archive_bag_message(bag_url)
     logger.debug(f"sns-message: {message}")
 
     topic_arn = os.environ['INGEST_TOPIC_ARN']
@@ -54,3 +62,7 @@ def main(event, _ctx=None, sns_client=None):
             subject=f'source: archive_ingest ({topic_name})'
     )
     logger.debug(f"published: {message} to {topic_arn}")
+
+    response = {'received' : 'OK'}
+    return response
+
