@@ -3,8 +3,8 @@ module "reindex_request_creator" {
   service_name = "reindex_request_creator"
 
   task_desired_count = "0"
-  source_queue_name  = "${module.reindexer_queue.name}"
-  source_queue_arn   = "${module.reindexer_queue.arn}"
+  source_queue_name  = "${module.reindex_request_creator_queue.name}"
+  source_queue_arn   = "${module.reindex_request_creator_queue.arn}"
 
   container_image    = "${local.reindex_request_creator_container_image}"
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}"]
@@ -13,12 +13,18 @@ module "reindex_request_creator" {
   memory = 2048
 
   env_vars = {
-    reindex_jobs_queue_id      = "${module.reindexer_queue.id}"
+    reindex_jobs_queue_id      = "${module.reindex_request_creator_queue.id}"
     reindex_requests_topic_arn = "${module.reindex_requests_topic.arn}"
     metrics_namespace          = "reindex_request_creator"
+
+    # The reindex request creator has to send lots of SNS notifications,
+    # and we've seen issues where we exhaust the HTTP connection pool.
+    # Turning down the parallelism is an attempt to reduce the number of
+    # SNS messages in flight, and avoid these errors.
+    sqs_parallelism = 7
   }
 
-  env_vars_length = 3
+  env_vars_length = 4
 
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
   ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
