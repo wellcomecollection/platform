@@ -3,13 +3,14 @@ package uk.ac.wellcome.platform.archive.registrar.models
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.flows.FileSplitterFlow
 import uk.ac.wellcome.platform.archive.common.models.BagLocation
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.ExecutionContext
 
-object StorageManifestFactory {
+object StorageManifestFactory extends Logging {
   def create(bagLocation: BagLocation)(implicit s3Client: AmazonS3,
                                        materializer: Materializer,
                                        executionContext: ExecutionContext) = {
@@ -24,6 +25,7 @@ object StorageManifestFactory {
       )
 
     def s3LocationToSource(location: ObjectLocation) = {
+      debug(s"Attempting to get ${location.namespace}/${location.key}")
       val s3Object = s3Client.getObject(location.namespace, location.key)
       StreamConverters.fromInputStream(() => s3Object.getObjectContent)
     }
@@ -34,6 +36,7 @@ object StorageManifestFactory {
       s3LocationToSource(location)
         .via(FileSplitterFlow(delimiter))
         .runWith(Sink.seq)
+
     }
 
     def createBagDigestFiles(digestLines: Seq[(String, String)]) = {
