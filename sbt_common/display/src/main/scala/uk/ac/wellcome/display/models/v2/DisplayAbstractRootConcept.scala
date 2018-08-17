@@ -1,7 +1,11 @@
 package uk.ac.wellcome.display.models.v2
 
+import io.swagger.annotations.ApiModel
 import uk.ac.wellcome.models.work.internal._
 
+@ApiModel(
+  value = "Concept"
+)
 trait DisplayAbstractRootConcept {
   val id: Option[String]
   val identifiers: Option[List[DisplayIdentifierV2]]
