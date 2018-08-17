@@ -59,8 +59,15 @@ object StorageManifestFactory extends Logging {
     )
 
     val location = DigitalLocation(
-      "http://www.example.com/file",
-      LocationType("fake", "Fake digital location")
+      List(
+        s"http://${bagLocation.storageNamespace}.s3.amazonaws.com",
+        bagLocation.storagePath,
+        bagLocation.bagName
+      ).mkString("/"),
+      LocationType(
+        "aws-s3-standard-ia",
+        "AWS S3 Standard IA"
+      )
     )
 
     for {
