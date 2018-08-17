@@ -40,8 +40,6 @@ class MatcherFeatureTest
                   graphTable,
                   lockTable) { _ =>
                   val work = createUnidentifiedWork
-                  val workId =
-                    s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}"
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
@@ -62,7 +60,7 @@ class MatcherFeatureTest
 
                       identifiersList shouldBe
                         MatcherResult(Set(MatchedIdentifiers(
-                          Set(WorkIdentifier(identifier = workId, version = 1))
+                          Set(WorkIdentifier(identifier = work.sourceIdentifier.toString, version = 1))
                         )))
                     }
                   }
