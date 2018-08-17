@@ -277,7 +277,13 @@ endef
 #	$3 - Is this a public-facing stack?  (true/false)
 #
 define __terraform_target_template
-$(1)-terraform-plan:
+
+# Note the use of double colon (::) -- you can declare other tasks with
+# the same name and a double colon elsewhere, and Make runs both of them.
+#
+# See, for example, data_api-terraform-plan.
+#
+$(1)-terraform-plan::
 	$(call terraform_plan,$(2),$(3))
 
 $(1)-terraform-apply:
