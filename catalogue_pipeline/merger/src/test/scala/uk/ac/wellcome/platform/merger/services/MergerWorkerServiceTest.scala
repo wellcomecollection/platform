@@ -13,7 +13,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult}
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -54,7 +53,7 @@ class MergerWorkerServiceTest
             Set(work3),
             Set(work1, work2)))
 
-        storeInVHS(vhs, entries = List[TransformedBaseWork](work1, work2, work3))
+        storeInVHS(vhs, entries = List(work1, work2, work3))
 
         sendNotificationToSQS(
           queue = queue,
@@ -275,9 +274,9 @@ class MergerWorkerServiceTest
   }
 
   def withMergerWorkerServiceFixtures[R](
-    testWith: TestWith[(VersionedHybridStore[RecorderWorkEntry,
+    testWith: TestWith[(VersionedHybridStore[TransformedBaseWork,
                                              EmptyMetadata,
-                                             ObjectStore[RecorderWorkEntry]],
+                                             ObjectStore[TransformedBaseWork]],
                         QueuePair,
                         Topic,
                         MetricsSender),
@@ -285,7 +284,7 @@ class MergerWorkerServiceTest
     withLocalS3Bucket { storageBucket =>
       withLocalS3Bucket { messageBucket =>
         withLocalDynamoDbTable { table =>
-          withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](storageBucket, table) {
+          withTypeVHS[TransformedBaseWork, EmptyMetadata, R](storageBucket, table) {
             vhs =>
               withActorSystem { actorSystem =>
                 withLocalSqsQueueAndDlq {
@@ -320,9 +319,9 @@ class MergerWorkerServiceTest
   private def withMergerWorkerService[R](
     actorSystem: ActorSystem,
     sqsStream: SQSStream[NotificationMessage],
-    vhs: VersionedHybridStore[RecorderWorkEntry,
+    vhs: VersionedHybridStore[TransformedBaseWork,
                               EmptyMetadata,
-                              ObjectStore[RecorderWorkEntry]],
+                              ObjectStore[TransformedBaseWork]],
     messageWriter: MessageWriter[BaseWork])(
     testWith: TestWith[MergerWorkerService, R]) = {
     testWith(

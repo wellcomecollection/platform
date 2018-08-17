@@ -31,7 +31,7 @@ class MergerWorkerService @Inject()(
 
   private def applyMerge(matchedIdentifiers: MatchedIdentifiers): Future[Unit] =
     for {
-      maybeWorkEntries <- playbackService.fetchAllRecorderWorkEntries(
+      maybeWorkEntries <- playbackService.fetchAllWorks(
         matchedIdentifiers.identifiers.toList)
       works: Seq[BaseWork] = mergerManager.applyMerge(
         maybeWorkEntries = maybeWorkEntries)
