@@ -140,3 +140,8 @@ resource "aws_iam_role_policy" "archive_asset_lookup_dynamo_permission" {
 }
 EOF
 }
+
+resource "aws_iam_role_policy" "lambda_archive_ingest_sns" {
+  role   = "${module.lambda_archive_ingest.role_name}"
+  policy = "${module.archivist_topic.publish_policy}"
+}
