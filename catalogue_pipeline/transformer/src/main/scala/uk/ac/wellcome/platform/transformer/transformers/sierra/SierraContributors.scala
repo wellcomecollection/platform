@@ -7,19 +7,11 @@ trait SierraContributors extends MarcUtils with SierraAgents {
 
   /* Populate wwork:contributors. Rules:
    *
-   * For bib records with MARC tag 100 or 700, create a "Person" with:
-   *  - Subfield $b as "numeration"
-   *  - Subfield $c as "prefix", joined with spaces into a single string
-   *
-   * TODO: Check this is the correct way to construct the prefix.
+   * For bib records with MARC tag 100 or 700, create a "Person":
    *
    * For bib records with MARC tag 110 or 710, create an "Organisation".
    *
-   * For all entries:
-   *  - Subfield $a is "label"
-   *  - Subfield $0 is used to populate "identifiers".  The identifier scheme
-   *    is lc-names.
-   *  - Subfield $e is used for the labels in "roles"
+   * For Persons and Organisations, subfield $e is used for the labels in "roles"
    *
    * Order by MARC tag (100, 110, 700, 710), then by order of appearance
    * in the MARC data.

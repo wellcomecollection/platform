@@ -22,10 +22,7 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   //
   // Use MARC field "600" where the second indicator is not 7.
   //
-  // Within this MARC tag we have one concept which we always type as a Person:
-  //  - subfield $a populates the person label
-  //  - subfield $b populates the person numeration
-  //  - subfield $c populates the person prefixes
+  // Within this MARC tag we have one concept which we always type as a Person
   //
   // The label is constructed concatenating subfields $a, $b, $c, $d, $e,
   // where $d and $e represent the person's dates and roles respectively

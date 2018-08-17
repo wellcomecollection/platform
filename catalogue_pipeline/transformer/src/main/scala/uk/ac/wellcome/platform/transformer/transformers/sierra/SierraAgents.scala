@@ -6,6 +6,11 @@ import uk.ac.wellcome.platform.transformer.source.MarcSubfield
 
 trait SierraAgents {
 
+  // This is used to construct a Person from MARc tags 100, 700 and 600.
+  // For all these cases:
+  //  - subfield $a populates the person label
+  //  - subfield $b populates the person numeration
+  //  - subfield $c populates the person prefixes
   def getPerson(subfields: List[MarcSubfield]) = {
     val label = getLabel(subfields)
 
@@ -30,6 +35,10 @@ trait SierraAgents {
     )
   }
 
+  // This is used to construct a Person from MARc tags 110 and 710.
+  // For all entries:
+  //  - Subfield $a is "label"
+  //  - Subfield $0 is used to populate "identifiers". The identifier scheme is lc-names.
   def getOrganisation(subfields: List[MarcSubfield]) = {
     val label = getLabel(subfields)
     Organisation(label = label)
