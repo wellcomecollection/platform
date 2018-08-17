@@ -6,6 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal._
@@ -38,19 +39,21 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
-            val work = createUnidentifiedWork
-            sendMessage[TransformedBaseWork](
-              bucket = messagesBucket,
-              queue = queue,
-              obj = work
-            )
-            withRecorderWorkerService(
-              table,
-              storageBucket,
-              messagesBucket,
-              queue) { _ =>
-              eventually {
-                assertStoredSingleWork(storageBucket, table, work)
+            withLocalSnsTopic { topic =>
+              val work = createUnidentifiedWork
+              sendMessage[TransformedBaseWork](
+                bucket = messagesBucket,
+                queue = queue,
+                obj = work
+              )
+              withRecorderWorkerService(
+                table,
+                storageBucket,
+                messagesBucket,
+                queue) { _ =>
+                eventually {
+                  assertStoredSingleWork(storageBucket, topic, table, work)
+                }
               }
             }
           }
@@ -64,19 +67,21 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
-            withRecorderWorkerService(
-              table,
-              storageBucket,
-              messagesBucket,
-              queue) { service =>
-              val invisibleWork = createUnidentifiedInvisibleWork
-              sendMessage[TransformedBaseWork](
-                bucket = messagesBucket,
-                queue = queue,
-                obj = invisibleWork
-              )
-              eventually {
-                assertStoredSingleWork(storageBucket, table, invisibleWork)
+            withLocalSnsTopic { topic =>
+              withRecorderWorkerService(
+                table,
+                storageBucket,
+                messagesBucket,
+                queue) { service =>
+                val invisibleWork = createUnidentifiedInvisibleWork
+                sendMessage[TransformedBaseWork](
+                  bucket = messagesBucket,
+                  queue = queue,
+                  obj = invisibleWork
+                )
+                eventually {
+                  assertStoredSingleWork(storageBucket, topic, table, invisibleWork)
+                }
               }
             }
           }
@@ -93,25 +98,27 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
-            withRecorderWorkerService(
-              table,
-              storageBucket,
-              messagesBucket,
-              queue) { service =>
-              sendMessage[TransformedBaseWork](
-                bucket = messagesBucket,
-                queue = queue,
-                obj = newerWork
-              )
-              eventually {
-                assertStoredSingleWork(storageBucket, table, newerWork)
-                sendMessage(
+            withLocalSnsTopic { topic =>
+              withRecorderWorkerService(
+                table,
+                storageBucket,
+                messagesBucket,
+                queue) { service =>
+                sendMessage[TransformedBaseWork](
                   bucket = messagesBucket,
                   queue = queue,
-                  obj = olderWork
+                  obj = newerWork
                 )
                 eventually {
-                  assertStoredSingleWork(storageBucket, table, newerWork)
+                  assertStoredSingleWork(storageBucket, topic, table, newerWork)
+                  sendMessage(
+                    bucket = messagesBucket,
+                    queue = queue,
+                    obj = olderWork
+                  )
+                  eventually {
+                    assertStoredSingleWork(storageBucket, topic, table, newerWork)
+                  }
                 }
               }
             }
@@ -129,29 +136,32 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
-            withRecorderWorkerService(
-              table,
-              storageBucket,
-              messagesBucket,
-              queue) { service =>
-              sendMessage[TransformedBaseWork](
-                bucket = messagesBucket,
-                queue = queue,
-                obj = olderWork
-              )
-              eventually {
-                assertStoredSingleWork(storageBucket, table, olderWork)
+            withLocalSnsTopic { topic =>
+              withRecorderWorkerService(
+                table,
+                storageBucket,
+                messagesBucket,
+                queue) { service =>
                 sendMessage[TransformedBaseWork](
                   bucket = messagesBucket,
                   queue = queue,
-                  obj = newerWork
+                  obj = olderWork
                 )
                 eventually {
-                  assertStoredSingleWork(
-                    storageBucket,
-                    table,
-                    newerWork,
-                    expectedVhsVersion = 2)
+                  assertStoredSingleWork(storageBucket, topic, table, olderWork)
+                  sendMessage[TransformedBaseWork](
+                    bucket = messagesBucket,
+                    queue = queue,
+                    obj = newerWork
+                  )
+                  eventually {
+                    assertStoredSingleWork(
+                      storageBucket,
+                      topic,
+                      table,
+                      newerWork,
+                      expectedVhsVersion = 2)
+                  }
                 }
               }
             }
@@ -214,6 +224,7 @@ class RecorderWorkerServiceTest
 
   private def assertStoredSingleWork[T <: TransformedBaseWork](
     bucket: Bucket,
+    topic: Topic,
     table: Table,
     expectedWork: T,
     expectedVhsVersion: Int = 1)(implicit decoder: Decoder[T]) = {
@@ -232,7 +243,9 @@ class RecorderWorkerServiceTest
       bucket = bucket,
       key = hybridRecord.s3key
     )
+
     actualEntry shouldBe expectedWork
+    getMessages[T](topic).distinct shouldBe List(expectedWork)
   }
 
   private def withRecorderWorkerService[R](
