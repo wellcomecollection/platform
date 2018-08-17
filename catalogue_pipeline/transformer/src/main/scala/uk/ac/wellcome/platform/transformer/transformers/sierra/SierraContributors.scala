@@ -1,27 +1,17 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData}
 
-trait SierraContributors extends MarcUtils {
+trait SierraContributors extends MarcUtils with SierraAgents {
 
   /* Populate wwork:contributors. Rules:
    *
-   * For bib records with MARC tag 100 or 700, create a "Person" with:
-   *  - Subfield $b as "numeration"
-   *  - Subfield $c as "prefix", joined with spaces into a single string
-   *
-   * TODO: Check this is the correct way to construct the prefix.
+   * For bib records with MARC tag 100 or 700, create a "Person":
    *
    * For bib records with MARC tag 110 or 710, create an "Organisation".
    *
-   * For all entries:
-   *  - Subfield $a is "label"
-   *  - Subfield $0 is used to populate "identifiers".  The identifier scheme
-   *    is lc-names.
-   *  - Subfield $e is used for the labels in "roles"
+   * For Persons and Organisations, subfield $e is used for the labels in "roles"
    *
    * Order by MARC tag (100, 110, 700, 710), then by order of appearance
    * in the MARC data.
@@ -34,16 +24,16 @@ trait SierraContributors extends MarcUtils {
    */
   def getContributors(bibData: SierraBibData)
     : List[Contributor[MaybeDisplayable[AbstractAgent]]] = {
-    getPersons(bibData, marcTag = "100") ++
-      getOrganisations(bibData, marcTag = "110") ++
-      getPersons(bibData, marcTag = "700") ++
-      getOrganisations(bibData, marcTag = "710")
+    getPersonContributors(bibData, marcTag = "100") ++
+      getOrganisationContributors(bibData, marcTag = "110") ++
+      getPersonContributors(bibData, marcTag = "700") ++
+      getOrganisationContributors(bibData, marcTag = "710")
   }
 
   /* For a given MARC tag (100 or 700), return a list of all the Contributor[Person] instances
    * this MARC tag represents.
    */
-  private def getPersons(
+  private def getPersonContributors(
     bibData: SierraBibData,
     marcTag: String): List[Contributor[MaybeDisplayable[Person]]] = {
     val persons = getMatchingSubfields(
@@ -53,35 +43,11 @@ trait SierraContributors extends MarcUtils {
     )
 
     persons.map { subfields =>
-      val label = getLabel(subfields)
       val roles = getContributionRoles(subfields)
+      val agent = getPerson(subfields)
 
-      // Extract the numeration from subfield $b.  This is also non-repeatable
-      // in the MARC spec.
-      val numeration = subfields.collectFirst {
-        case MarcSubfield("b", content) => content
-      }
-
-      // Extract the prefix from subfield $c.  This is a repeatable field, so
-      // we take all instances and join them.
-      val prefixes = subfields.collect {
-        case MarcSubfield("c", content) => content
-      }
-      val prefixString =
-        if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
-
-      val agent = identify[Person](
-        subfields = subfields,
-        agent = Person(
-          label = label,
-          prefix = prefixString,
-          numeration = numeration
-        ),
-        ontologyType = "Person"
-      )
-
-      internal.Contributor[MaybeDisplayable[Person]](
-        agent = agent,
+      Contributor(
+        agent = identify(subfields, agent, "Person"),
         roles = roles
       )
     }
@@ -90,7 +56,7 @@ trait SierraContributors extends MarcUtils {
   /* For a given MARC tag (110 or 710), return a list of all the Contributor[Organisation] instances
    * this MARC tag represents.
    */
-  private def getOrganisations(
+  private def getOrganisationContributors(
     bibData: SierraBibData,
     marcTag: String): List[Contributor[MaybeDisplayable[Organisation]]] = {
     val organisations = getMatchingSubfields(
@@ -100,35 +66,13 @@ trait SierraContributors extends MarcUtils {
     )
 
     organisations.map { subfields =>
-      val label = getLabel(subfields)
       val roles = getContributionRoles(subfields)
+      val agent = getOrganisation(subfields)
 
-      val agent = identify[Organisation](
-        subfields = subfields,
-        agent = Organisation(label = label),
-        ontologyType = "Organisation"
-      )
-
-      internal.Contributor[MaybeDisplayable[Organisation]](
-        agent = agent,
+      Contributor(
+        agent = identify(subfields, agent, "Organisation"),
         roles = roles
       )
-    }
-  }
-
-  private def getLabel(subfields: List[MarcSubfield]): String = {
-    // Extract the label from subfield $a.  This is a non-repeatable
-    // field in the MARC spec, but we have seen records where it
-    // doesn't appear.
-    val maybeSubfieldA = subfields.collectFirst {
-      case MarcSubfield("a", content) => content
-    }
-
-    maybeSubfieldA match {
-      case Some(content) => content
-      case None =>
-        throw TransformerException(
-          s"Unable to find subfield $$a? <<$subfields>>")
     }
   }
 
@@ -137,50 +81,6 @@ trait SierraContributors extends MarcUtils {
     // Extract the roles from subfield $e.  This is a repeatable field.
     subfields.collect {
       case MarcSubfield("e", content) => ContributionRole(content)
-    }
-  }
-
-  /* Given an agent and the associated MARC subfields, look for instances of subfield $0,
-   * which are used for identifiers.
-   *
-   * This methods them (if present) and wraps the agent in Unidentifiable or Identifiable
-   * as appropriate.
-   */
-  private def identify[T](subfields: List[MarcSubfield],
-                          agent: T,
-                          ontologyType: String): MaybeDisplayable[T] = {
-
-    // We take the contents of subfield $0.  They may contain inconsistent
-    // spacing and punctuation, such as:
-    //
-    //    " nr 82270463"
-    //    "nr 82270463"
-    //    "nr 82270463.,"
-    //
-    // which all refer to the same identifier.
-    //
-    // For consistency, we remove all whitespace and some punctuation
-    // before continuing.
-    val codes = subfields.collect {
-      case MarcSubfield("0", content) => content.replaceAll("[.,\\s]", "")
-    }
-
-    // If we get exactly one value, we can use it to identify the record.
-    // Some records have multiple instances of subfield $0 (it's a repeatable
-    // field in the MARC spec).
-    codes.distinct match {
-      case Seq(code) => {
-        val sourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("lc-names"),
-          value = code,
-          ontologyType = ontologyType
-        )
-        Identifiable(
-          agent = agent,
-          sourceIdentifier = sourceIdentifier
-        )
-      }
-      case _ => Unidentifiable(agent)
     }
   }
 }

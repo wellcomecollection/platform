@@ -9,7 +9,6 @@ class ConceptTest extends FunSpec with Matchers with JsonAssertions {
   val concept = Concept(label = "Woodwork")
   val expectedJson =
     s"""{
-        "ontologyType": "Concept",
         "label": "Woodwork"
       }"""
 

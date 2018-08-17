@@ -35,17 +35,17 @@ class DisplayGenreV2SerialisationTest
          |    "concepts" : [
          |      {
          |        "label" : "${concept0.agent.label}",
-         |        "type" : "${concept0.agent.ontologyType}"
+         |        "type" : "${ontologyType(concept0.agent)}"
          |      },
          |      {
          |        "label" : "${concept1.agent.label}",
-         |        "type" : "${concept1.agent.ontologyType}"
+         |        "type" : "${ontologyType(concept1.agent)}"
          |      },
          |      {
          |        "id": "${concept2.canonicalId}",
          |        "identifiers": [${identifier(concept2.identifiers(0))}],
          |        "label" : "${concept2.agent.label}",
-         |        "type" : "${concept2.agent.ontologyType}"
+         |        "type" : "${ontologyType(concept2.agent)}"
          |      }
          |    ],
          |    "type" : "${genre.ontologyType}"

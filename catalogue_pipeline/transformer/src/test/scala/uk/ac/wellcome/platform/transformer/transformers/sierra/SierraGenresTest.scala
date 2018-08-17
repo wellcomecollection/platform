@@ -241,18 +241,4 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataUtil {
     expected: List[Genre[MaybeDisplayable[AbstractConcept]]]) = {
     transformer.getGenres(bibData) shouldBe expected
   }
-
-  private def bibData(marcTag: String, marcSubfields: List[MarcSubfield]) = {
-    createSierraBibDataWith(
-      varFields = List(
-        VarField(
-          fieldTag = "p",
-          marcTag = marcTag,
-          indicator1 = "",
-          indicator2 = "",
-          subfields = marcSubfields
-        )
-      )
-    )
-  }
 }

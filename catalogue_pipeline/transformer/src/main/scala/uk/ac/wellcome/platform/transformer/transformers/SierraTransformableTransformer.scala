@@ -5,6 +5,10 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
 import uk.ac.wellcome.platform.transformer.transformers.sierra._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.transformer.transformers.sierra.subjects.{
+  SierraConceptSubjects,
+  SierraPersonSubjects
+}
 
 import scala.util.{Success, Try}
 
@@ -23,7 +27,8 @@ class SierraTransformableTransformer
     with SierraLocation
     with SierraProduction
     with SierraDimensions
-    with SierraSubjects
+    with SierraConceptSubjects
+    with SierraPersonSubjects
     with SierraGenres
     with SierraMergeCandidates {
 
@@ -55,7 +60,8 @@ class SierraTransformableTransformer
                   extent = getExtent(sierraBibData),
                   lettering = getLettering(sierraBibData),
                   createdDate = None,
-                  subjects = getSubjects(sierraBibData),
+                  subjects = getSubjectswithAbstractConcepts(sierraBibData) ++ getSubjectsWithPerson(
+                    sierraBibData),
                   genres = getGenres(sierraBibData),
                   contributors = getContributors(sierraBibData),
                   thumbnail = None,

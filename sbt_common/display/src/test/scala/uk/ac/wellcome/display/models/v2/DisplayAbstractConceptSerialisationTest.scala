@@ -75,7 +75,7 @@ class DisplayAbstractConceptSerialisationTest
          |    "id": "${concept.canonicalId}",
          |    "identifiers": [${identifier(concept.identifiers(0))}],
          |    "label" : "${concept.agent.label}",
-         |    "type"  : "${concept.agent.ontologyType}"
+         |    "type"  : "Concept"
          |  }
           """.stripMargin
     )
