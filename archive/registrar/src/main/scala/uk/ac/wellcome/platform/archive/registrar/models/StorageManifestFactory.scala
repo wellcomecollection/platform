@@ -21,7 +21,7 @@ object StorageManifestFactory extends Logging {
       ObjectLocation(
         bagLocation.storageNamespace,
         List(
-          bagLocation.storagePath, 
+          bagLocation.storagePath,
           bagLocation.bagName.value,
           name
         ).mkString("/")
