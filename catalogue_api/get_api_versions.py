@@ -132,33 +132,19 @@ def check_staging_api():
 
 def print_new_tfvars(new_prod_api, romulus_api, remus_api):
     print('If you want to switch the prod/staging API, copy the following')
-    print('Terraform into variables.tf:')
+    print('Terraform into api_pins.tf:')
     print('')
 
     print(f'''
-\033[32mvariable "production_api" {{
-  description = "Which version of the API is production? (romulus | remus)"
-  default     = "{new_prod_api}"
-}}
+\033[32mlocals {{
+  # Which version of the API is production? (romulus | remus)
+  production_api = "{new_prod_api}"
 
-variable "pinned_romulus_api" {{
-  description = "Which version of the API image to pin romulus to, if any"
-  default     = "{romulus_api.api}"
-}}
+  pinned_romulus_api             = "{romulus_api.api}"
+  pinned_romulus_api_nginx-delta = "{romulus_api.nginx}"
 
-variable "pinned_romulus_api_nginx-delta" {{
-  description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "{romulus_api.nginx}"
-}}
-
-variable "pinned_remus_api" {{
-  description = "Which version of the API image to pin remus to, if any"
-  default     = "{remus_api.api}"
-}}
-
-variable "pinned_remus_api_nginx-delta" {{
-  description = "Which version of the nginx API image to pin remus to, if any"
-  default     = "{remus_api.nginx}"
+  pinned_remus_api             = "{remus_api.api}"
+  pinned_remus_api_nginx-delta = "{remus_api.nginx}"
 }}\033[0m
     '''.strip())
 
@@ -167,10 +153,10 @@ variable "pinned_remus_api_nginx-delta" {{
 
 
 if __name__ == '__main__':
-    with open(os.path.join(API_TF, 'variables.tf')) as var_tf:
-        variables = hcl.load(var_tf)['variable']
+    with open(os.path.join(API_TF, 'api_pins.tf')) as var_tf:
+        tf_locals = hcl.load(var_tf)['locals']
 
-    prod_api = variables['production_api']['default']
+    prod_api = tf_locals['production_api']
     prod_api_info = get_ecs_api_info(prod_api)
 
     staging_api = 'remus' if prod_api == 'romulus' else 'romulus'
