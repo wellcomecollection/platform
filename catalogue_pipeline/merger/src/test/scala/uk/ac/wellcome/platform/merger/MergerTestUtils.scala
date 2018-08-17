@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.merger
 import org.scalatest.{Assertion, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork, WorkType}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectStore
@@ -32,7 +31,7 @@ trait MergerTestUtils
     works: Set[TransformedBaseWork]): Set[WorkIdentifier] = works
       .map { work =>
         WorkIdentifier(
-          identifier = id(work),
+          identifier = work.sourceIdentifier.toString,
           version = work.version
         )
       }
@@ -41,7 +40,7 @@ trait MergerTestUtils
                                            EmptyMetadata,
                                            ObjectStore[TransformedBaseWork]],
                  work: TransformedBaseWork): Assertion = {
-    vhs.updateRecord(id(work))(
+    vhs.updateRecord(work.sourceIdentifier.toString)(
       ifNotExisting = (work, EmptyMetadata()))((_, _) =>
       throw new RuntimeException("Not possible, VHS is empty!"))
 
@@ -59,15 +58,6 @@ trait MergerTestUtils
     entries.map { work =>
       storeInVHS(vhs = vhs, work = work)
     }
-
-  private def id(work: TransformedBaseWork) =
-    s"${work.sourceIdentifier.identifierType.label}/${work.sourceIdentifier.value}"
-
-  def createRecorderWorkEntryWith(version: Int): RecorderWorkEntry =
-    RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
-
-  def createRecorderWorkEntry: RecorderWorkEntry =
-    createRecorderWorkEntryWith(version = 1)
 
   def createDigitalWork: UnidentifiedWork = {
     createUnidentifiedWorkWith(

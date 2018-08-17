@@ -10,6 +10,7 @@ import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -20,47 +21,47 @@ class RecorderPlaybackServiceTest
     with LocalVersionedHybridStore
     with MergerTestUtils {
 
-  it("fetches a single RecorderWorkEntry") {
-    val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
+  it("fetches a single Work") {
+    val work = createUnidentifiedWork
 
     withRecorderVHS { vhs =>
-      storeInVHS(vhs, recorderWorkEntry = recorderWorkEntry)
+      storeInVHS(vhs, work)
 
       val service = new RecorderPlaybackService(vhs)
 
       whenReady(
         service.fetchAllRecorderWorkEntries(
-          getWorkIdentifiers(recorderWorkEntry))) { result =>
-        result shouldBe List(Some(recorderWorkEntry))
+          getWorkIdentifiers(work))) { result =>
+        result shouldBe List(Some(work))
       }
     }
   }
 
   it("throws an error if asked to fetch a missing entry") {
-    val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
+    val work = createUnidentifiedWork
 
     withRecorderVHS { vhs =>
       val service = new RecorderPlaybackService(vhs)
 
       whenReady(
         service
-          .fetchAllRecorderWorkEntries(getWorkIdentifiers(recorderWorkEntry))
+          .fetchAllRecorderWorkEntries(getWorkIdentifiers(work))
           .failed) { result =>
         result shouldBe a[NoSuchElementException]
-        result.getMessage shouldBe s"Work ${recorderWorkEntry.id} is not in VHS!"
+        result.getMessage shouldBe s"Work ${work.sourceIdentifier} is not in VHS!"
       }
     }
   }
 
-  it("returns None if asked to fetch a RecorderWorkEntry with version 0") {
-    val recorderWorkEntry = createRecorderWorkEntryWith(version = 0)
+  it("returns None if asked to fetch a Work with version 0") {
+    val work = createUnidentifiedWorkWith(version = 0)
 
     withRecorderVHS { vhs =>
       val service = new RecorderPlaybackService(vhs)
 
       whenReady(
         service.fetchAllRecorderWorkEntries(
-          getWorkIdentifiers(recorderWorkEntry))) { result =>
+          getWorkIdentifiers(work))) { result =>
         result shouldBe List(None)
       }
     }
@@ -89,43 +90,30 @@ class RecorderPlaybackServiceTest
   }
 
   it("gets a mixture of works as appropriate") {
-    val workEntriesToFetch = (1 to 3).map { _ =>
-      createRecorderWorkEntryWith(version = 1)
+    val worksToFetch = (1 to 3).map { _ =>
+      createUnidentifiedWork
     }
-
     val outdatedWorks = (4 to 5).map { _ =>
-      createUnidentifiedWorkWith(version = 1)
-    }
-    val outdatedWorkEntriesToFetch = outdatedWorks.map { work =>
-      RecorderWorkEntry(work)
+      createUnidentifiedWork
     }
     val updatedWorks = outdatedWorks.map { work =>
       work.copy(version = work.version + 1)
     }
-    val updatedWorkEntriesToStore = updatedWorks.map { work =>
-      RecorderWorkEntry(work)
+    val zeroWorks = (6 to 7).map { _ =>
+      createUnidentifiedWorkWith(version = 0)
     }
 
-    val zeroWorkEntries = (6 to 7).map { _ =>
-      createRecorderWorkEntryWith(version = 0)
-    }
-
-    val allWorkEntries =
-      (workEntriesToFetch ++ outdatedWorkEntriesToFetch ++ zeroWorkEntries).toList
+    val allWorks = (worksToFetch ++ outdatedWorks ++ zeroWorks).toList
 
     withRecorderVHS { vhs =>
-      storeInVHS(
-        vhs,
-        entries =
-          (workEntriesToFetch ++ updatedWorkEntriesToStore ++ zeroWorkEntries).toList
-      )
+      storeInVHS(vhs, allWorks)
 
       val service = new RecorderPlaybackService(vhs)
 
       whenReady(
         service.fetchAllRecorderWorkEntries(
-          getWorkIdentifiers(allWorkEntries: _*))) { result =>
-        result shouldBe (workEntriesToFetch.map { Some(_) } ++ (4 to 7).map {
+          getWorkIdentifiers(allWorks: _*))) { result =>
+        result shouldBe (allWorks.map { Some(_) } ++ (4 to 7).map {
           _ =>
             None
         }).toList
@@ -133,12 +121,11 @@ class RecorderPlaybackServiceTest
     }
   }
 
-  private def getWorkIdentifiers(
-    entries: RecorderWorkEntry*): List[WorkIdentifier] =
-    entries.map { entry =>
+  private def getWorkIdentifiers(works: TransformedBaseWork*): List[WorkIdentifier] =
+    works.map { work =>
       WorkIdentifier(
-        identifier = entry.id,
-        version = entry.work.version
+        identifier = work.sourceIdentifier.toString,
+        version = work.version
       )
     }.toList
 
