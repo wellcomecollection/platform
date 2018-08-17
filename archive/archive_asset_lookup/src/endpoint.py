@@ -1,29 +1,54 @@
 import os
 import tempfile
-import logging
 import boto3
 import botocore
 import settings
+import json
 from boto3.dynamodb.conditions import Key
 
 
 def main(event, context):
 
-    # setup logging and AWS clients
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
     dynamodb = boto3.resource('dynamodb', region_name=settings.REGION)
     s3 = boto3.resource('s3', region_name=settings.REGION)
+    lookup(dynamodb, s3, event)
 
-    logger.info('got event{}'.format(event))
+
+def wrapResult(message, success, status=500):
+
+    statusCode = 200
+    if success and status != 500:
+        statusCode = status
+
+    if not success:
+        statusCode = status
+
+    body = None
+    if success and statusCode == 200:
+        body = json.dumps(message)
+    else:
+        print(message)
+        body = json.dumps({
+            'message': message
+        })
+
+    return {
+        'statusCode': statusCode,
+        'body': body
+    }
+
+
+def lookup(dynamodb, s3, event):
+    print('got event{}'.format(event))
 
     # validate event - check if we have an id
     if not event_is_valid(event):
-        logger.info('invalid event')
-        return "invalid request"
+        return wrapResult("invalid request", False, 400)
 
-    identifier = event["id"]
+    identifier = event["pathParameters"]["id"]
+
+    if identifier == "":
+        return wrapResult("invalid request", False, 400)
 
     # query our asset lookup table and get a response
 
@@ -41,21 +66,18 @@ def main(event, context):
 
     # validate if we have any items in our response
     if not data_items_populated(data_items):
-        logger.info('no data for id')
-        return "no data for id"
+        return wrapResult("no data for id", True, 404)
 
     # we are just expecting to use a single row
     if len(data_items) > 1:
-        logger.info('multiple results for id')
-        return "multiple results for id"
+        return wrapResult("multiple results for id", False)
 
     # should just have a single item
     data = data_items[0]
 
     # validate if the item has the fields we are expecting to use
     if not data_is_valid(data):
-        logger.info('invalid data')
-        return "invalid data"
+        return wrapResult("invalid data", False)
 
     # get a temporary file name to use (usage is safe for windows too)
     # the file is created and requested not to be deleted, then we close it
@@ -73,8 +95,7 @@ def main(event, context):
     except botocore.exceptions.ClientError as e:
         # check for 404 or something worse
         if e.response['Error']['Code'] == "404":
-            logger.info("object does not exist.")
-            return "could not load storage manifest from s3"
+            return wrapResult("could not load storage manifest from s3", False)
         else:
             raise
 
@@ -87,11 +108,13 @@ def main(event, context):
     # remove the file (we asked for this not to be automatically done)
     os.unlink(temp_file.name)
 
-    return file_contents
+    return wrapResult(file_contents, True)
 
 
 def event_is_valid(event):
-    return 'id' in event
+    return 'pathParameters' in event \
+        and event['pathParameters'] is not None \
+        and 'id' in event['pathParameters']
 
 
 def data_items_populated(data_items):
