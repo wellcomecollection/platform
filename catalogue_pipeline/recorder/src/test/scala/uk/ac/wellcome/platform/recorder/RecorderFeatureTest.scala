@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.recorder
 
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
@@ -8,7 +9,6 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -39,14 +39,12 @@ class RecorderFeatureTest
                 queue = queue,
                 obj = work)
 
-              val workEntry = RecorderWorkEntry(work)
-
               eventually {
-                assertStored[RecorderWorkEntry](
+                assertStored[TransformedBaseWork](
                   bucket,
                   table,
-                  id = workEntry.id,
-                  record = workEntry)
+                  id = s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}",
+                  record = work)
               }
             }
           }

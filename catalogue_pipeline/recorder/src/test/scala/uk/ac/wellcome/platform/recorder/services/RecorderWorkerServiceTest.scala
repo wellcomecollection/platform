@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.recorder.services
 
 import com.gu.scanamo.Scanamo
+import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -16,7 +17,6 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -212,10 +212,10 @@ class RecorderWorkerServiceTest
     }
   }
 
-  private def assertStoredSingleWork(bucket: Bucket,
+  private def assertStoredSingleWork[T <: TransformedBaseWork](bucket: Bucket,
                                      table: Table,
-                                     expectedWork: TransformedBaseWork,
-                                     expectedVhsVersion: Int = 1) = {
+                                     expectedWork: T,
+                                     expectedVhsVersion: Int = 1)(implicit decoder: Decoder[T]) = {
     val actualRecords: List[HybridRecord] =
       Scanamo
         .scan[HybridRecord](dynamoDbClient)(table.name)
@@ -227,11 +227,11 @@ class RecorderWorkerServiceTest
     hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierType.id}/${expectedWork.sourceIdentifier.value}"
     hybridRecord.version shouldBe expectedVhsVersion
 
-    val actualEntry = getObjectFromS3[RecorderWorkEntry](
+    val actualEntry = getObjectFromS3[T](
       bucket = bucket,
       key = hybridRecord.s3key
     )
-    actualEntry shouldBe RecorderWorkEntry(expectedWork)
+    actualEntry shouldBe expectedWork
   }
 
   private def withRecorderWorkerService[R](
@@ -241,7 +241,7 @@ class RecorderWorkerServiceTest
     queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
+        withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
           bucket = storageBucket,
           table = table) { versionedHybridStore =>
           withMessageStream[TransformedBaseWork, R](
