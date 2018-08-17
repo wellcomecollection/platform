@@ -17,16 +17,8 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{
-  DynamoClientModule,
-  DynamoConfigModule,
-  S3ClientModule,
-  S3ConfigModule
-}
-import uk.ac.wellcome.platform.matcher.modules.{
-  DynamoLockingServiceConfigModule,
-  MatcherModule
-}
+import uk.ac.wellcome.finatra.storage.{DynamoClientModule, DynamoConfigModule, S3ClientModule, S3ConfigModule}
+import uk.ac.wellcome.platform.matcher.modules.{DynamoLockingServiceConfigModule, MatcherModule, TransformedBaseWorkModule}
 
 object ServerMain extends Server
 
@@ -43,6 +35,7 @@ class Server extends HttpServer {
     DynamoConfigModule,
     DynamoClientModule,
     MatcherModule,
+    TransformedBaseWorkModule,
     AkkaModule,
     ExecutionContextModule,
     DynamoLockingServiceConfigModule
