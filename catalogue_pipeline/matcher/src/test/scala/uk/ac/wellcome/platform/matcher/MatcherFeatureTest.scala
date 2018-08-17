@@ -59,9 +59,13 @@ class MatcherFeatureTest
                         fromJson[MatcherResult](snsMessage.message).get
 
                       identifiersList shouldBe
-                        MatcherResult(Set(MatchedIdentifiers(
-                          Set(WorkIdentifier(identifier = work.sourceIdentifier.toString, version = 1))
-                        )))
+                        MatcherResult(
+                          Set(
+                            MatchedIdentifiers(
+                              Set(WorkIdentifier(
+                                identifier = work.sourceIdentifier.toString,
+                                version = 1))
+                            )))
                     }
                   }
                 }
