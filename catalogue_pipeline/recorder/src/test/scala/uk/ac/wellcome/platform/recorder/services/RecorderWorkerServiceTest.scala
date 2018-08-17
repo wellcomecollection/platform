@@ -212,10 +212,11 @@ class RecorderWorkerServiceTest
     }
   }
 
-  private def assertStoredSingleWork[T <: TransformedBaseWork](bucket: Bucket,
-                                     table: Table,
-                                     expectedWork: T,
-                                     expectedVhsVersion: Int = 1)(implicit decoder: Decoder[T]) = {
+  private def assertStoredSingleWork[T <: TransformedBaseWork](
+    bucket: Bucket,
+    table: Table,
+    expectedWork: T,
+    expectedVhsVersion: Int = 1)(implicit decoder: Decoder[T]) = {
     val actualRecords: List[HybridRecord] =
       Scanamo
         .scan[HybridRecord](dynamoDbClient)(table.name)

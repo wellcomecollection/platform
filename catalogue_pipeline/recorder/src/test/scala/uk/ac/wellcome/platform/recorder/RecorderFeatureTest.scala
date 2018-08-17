@@ -43,7 +43,8 @@ class RecorderFeatureTest
                 assertStored[TransformedBaseWork](
                   bucket,
                   table,
-                  id = s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}",
+                  id =
+                    s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}",
                   record = work)
               }
             }
