@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.merger.services
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
   BaseWork,
   IdentifiableRedirect,
@@ -13,29 +12,26 @@ import uk.ac.wellcome.platform.merger.MergerTestUtils
 class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
 
   it("performs a merge with a single work") {
-    val workEntry = createRecorderWorkEntry
+    val work = createUnidentifiedWork
 
-    val result =
-      mergerManager.applyMerge(maybeWorkEntries = List(Some(workEntry)))
+    val result = mergerManager.applyMerge(maybeWorks = List(Some(work)))
 
-    result shouldBe List(workEntry.work)
+    result shouldBe List(work)
   }
 
   it("performs a merge with multiple works") {
-    val workEntry = createRecorderWorkEntry
-    val otherEntries = (1 to 3).map { _ =>
-      createRecorderWorkEntry
-    }
+    val work = createUnidentifiedWork
+    val otherWorks = (1 to 3).map { _ => createUnidentifiedWork }
 
-    val workEntries = (workEntry +: otherEntries).map { Some(_) }.toList
+    val works = (works +: otherWorks).map { Some(_) }.toList
 
-    val result = mergerManager.applyMerge(maybeWorkEntries = workEntries)
+    val result = mergerManager.applyMerge(maybeWorks = works)
 
-    result.head shouldBe workEntry.work
+    result.head shouldBe work
 
-    result.tail.zip(otherEntries).map {
-      case (baseWork: BaseWork, workEntry: RecorderWorkEntry) =>
-        baseWork.sourceIdentifier shouldBe workEntry.work.sourceIdentifier
+    result.tail.zip(otherWorks).map {
+      case (baseWork: BaseWork, unmergedWork: UnidentifiedWork) =>
+        baseWork.sourceIdentifier shouldBe unmergedWork.sourceIdentifier
 
         val redirect = baseWork.asInstanceOf[UnidentifiedRedirectedWork]
         val redirectTarget = result.head.asInstanceOf[UnidentifiedWork]
@@ -44,15 +40,14 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
   }
 
   it("returns the works unmerged if any of the work entries are None") {
-    val workEntries = (1 to 3).map { _ =>
-      createRecorderWorkEntry
-    }
+    val works = (1 to 3)
+      .map { _ => createUnidentifiedWork }
+      .map { Some(_) }
+      .toList
 
-    val result = mergerManager.applyMerge(maybeWorkEntries = workEntries.map {
-      Some(_)
-    }.toList ++ List(None))
+    val result = mergerManager.applyMerge(maybeWorks = works ++ List(None))
 
-    result should contain theSameElementsAs workEntries.map { _.work }
+    result should contain theSameElementsAs works
   }
 
   val mergerRules: MergerRules = new MergerRules {

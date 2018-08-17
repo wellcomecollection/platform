@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.merger.services
 
 import com.google.inject.Inject
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{BaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{BaseWork, TransformedBaseWork, UnidentifiedWork}
 
 class MergerManager @Inject()(
   mergerRules: MergerRules
@@ -15,13 +14,12 @@ class MergerManager @Inject()(
     * wrong versions), we skip the merge and return the original works.
     */
   def applyMerge(
-    maybeWorkEntries: List[Option[RecorderWorkEntry]]): Seq[BaseWork] = {
-    val workEntries = maybeWorkEntries.flatten
-    val works = workEntries.map { _.work }
+    maybeWorks: List[Option[TransformedBaseWork]]): Seq[BaseWork] = {
+    val works = maybeWorks.flatten
     val unidentifiedWorks = works
       .collect { case unidentifiedWork: UnidentifiedWork => unidentifiedWork }
 
-    if (unidentifiedWorks.size == maybeWorkEntries.size) {
+    if (unidentifiedWorks.size == works.size) {
       mergerRules.merge(unidentifiedWorks)
     } else {
       works
