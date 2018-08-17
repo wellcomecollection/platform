@@ -10,22 +10,12 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
-import uk.ac.wellcome.platform.matcher.locking.{
-  DynamoLockingService,
-  DynamoLockingServiceConfig,
-  DynamoRowLockDao,
-  RowLock
-}
+import uk.ac.wellcome.platform.matcher.locking.{DynamoLockingService, DynamoLockingServiceConfig, DynamoRowLockDao, RowLock}
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
@@ -93,7 +83,7 @@ trait MatcherFixtures
     queue: SQS.Queue,
     storageBucket: Bucket,
     topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R])(
-    implicit objectStore: ObjectStore[RecorderWorkEntry]): R = {
+    implicit objectStore: ObjectStore[TransformedBaseWork]): R = {
     val storageS3Config = S3Config(storageBucket.name)
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { actorSystem =>

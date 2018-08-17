@@ -11,7 +11,6 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier,
   WorkNode
 }
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -46,7 +45,7 @@ class MatcherFeatureTest
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
-                      message = toJson(RecorderWorkEntry(work = work)).get,
+                      message = toJson(work).get,
                       version = 1,
                       s3Client = s3Client,
                       bucket = storageBucket
@@ -108,7 +107,7 @@ class MatcherFeatureTest
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
-                      message = toJson(RecorderWorkEntry(workAv1)).get,
+                      message = toJson(workAv1).get,
                       version = updatedWorkVersion,
                       s3Client = s3Client,
                       bucket = storageBucket)
