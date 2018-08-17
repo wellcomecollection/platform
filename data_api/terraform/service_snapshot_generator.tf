@@ -23,9 +23,9 @@ module "snapshot_generator" {
     es_username       = "${var.es_cluster_credentials["username"]}"
     es_password       = "${var.es_cluster_credentials["password"]}"
     es_protocol       = "${var.es_cluster_credentials["protocol"]}"
-    es_index_v1       = "${var.es_config_snapshot["index_v1"]}"
-    es_index_v2       = "${var.es_config_snapshot["index_v2"]}"
-    es_doc_type       = "${var.es_config_snapshot["doc_type"]}"
+    es_index_v1       = "${local.es_config["index_v1"]}"
+    es_index_v2       = "${local.es_config["index_v2"]}"
+    es_doc_type       = "${local.es_config["doc_type"]}"
     metrics_namespace = "snapshot_generator"
   }
 

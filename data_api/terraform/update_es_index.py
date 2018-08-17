@@ -15,15 +15,28 @@ ROOT = subprocess.check_output(
     ['git', 'rev-parse', '--show-toplevel']).decode('utf8').strip()
 
 
-def api_terraform(name):
+def get_api_terraform_locals(name):
     path = os.path.join(ROOT, 'catalogue_api', 'terraform', name)
-    return hcl.loads(open(path).read())
+    return hcl.loads(open(path).read())['locals']
 
 
 if __name__ == '__main__':
-    api_config = api_terraform('api_config.tf')
-    index_config = api_index_config('index_config.tf')
+    api_config = get_api_terraform_locals('api_pins.tf')
+    index_config = get_api_terraform_locals('index_config.tf')
 
-    from pprint import *
-    pprint(api_config)
-    pprint(index_config)
+    es_config = index_config[f'es_config_{api_config["production_api"]}']
+
+    outpath = os.path.join(ROOT, 'data_api', 'terraform', 'es_config.tf')
+
+    contents = f'''
+locals {{
+  es_config = {{
+    index_v1 = "{es_config["index_v1"]}"
+    index_v2 = "{es_config["index_v2"]}"
+    doc_type = "{es_config["doc_type"]}"
+  }}
+}}
+'''.lstrip()
+
+    with open(outpath, 'w') as f:
+        f.write(contents)
