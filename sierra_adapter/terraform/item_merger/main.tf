@@ -30,9 +30,15 @@ module "sierra_merger_service" {
     dynamo_table_name   = "${var.merged_dynamo_table_name}"
     bucket_name         = "${var.bucket_name}"
     sierra_items_bucket = "${var.sierra_items_bucket}"
+
+    # The item merger has to write lots of S3 objects, and we've seen issues
+    # where we exhaust the HTTP connection pool.  Turning down the parallelism
+    # is an attempt to reduce the number of S3 objects in flight, and avoid
+    # these errors.
+    sqs_parallelism = 7
   }
 
-  env_vars_length = 5
+  env_vars_length = 6
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"
