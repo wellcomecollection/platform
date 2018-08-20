@@ -56,8 +56,8 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
                                     roles: List[String],
                                     dates: Option[String]) = {
     val spaceSeparated =
-      (person.prefix ++ List(person.label) ++ person.numeration).mkString(" ")
-    (List(spaceSeparated) ++ dates ++ roles).mkString(", ")
+      (List(person.label) ++ person.numeration ++ person.prefix ++ dates).mkString(" ")
+    (List(spaceSeparated) ++ roles).mkString(", ")
   }
 
   private def identifyPersonConcept(

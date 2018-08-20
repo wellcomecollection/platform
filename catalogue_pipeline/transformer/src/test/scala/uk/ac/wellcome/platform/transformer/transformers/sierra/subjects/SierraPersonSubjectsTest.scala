@@ -41,7 +41,7 @@ class SierraPersonSubjectsTest
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
       Subject(
-        label = "Sir David Attenborough",
+        label = "David Attenborough Sir",
         concepts = List(Unidentifiable(
           Person(label = "David Attenborough", prefix = Some("Sir"))))))
   }
@@ -57,7 +57,7 @@ class SierraPersonSubjectsTest
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
       Subject(
-        label = "Sir Doctor David Attenborough",
+        label = "David Attenborough Sir Doctor",
         concepts = List(Unidentifiable(
           Person(label = "David Attenborough", prefix = Some("Sir Doctor"))))))
   }
@@ -100,7 +100,7 @@ class SierraPersonSubjectsTest
       ))
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(Subject(
-      label = "Rita Levi Montalcini, 22 April 1909 – 30 December 2012",
+      label = "Rita Levi Montalcini 22 April 1909 – 30 December 2012",
       concepts = List(Unidentifiable(Person(label = "Rita Levi Montalcini")))))
   }
 
