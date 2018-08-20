@@ -15,18 +15,22 @@ class DynamoInserter @Inject()(
                                              ObjectStore[SierraItemRecord]]) {
 
   def insertIntoDynamo(record: SierraItemRecord): Future[Unit] =
-    versionedHybridStore.updateRecord(
-      id = record.id.withoutCheckDigit
-    )(
-      ifNotExisting = (record, EmptyMetadata())
-    )(
-      ifExisting = (existingRecord, existingMetadata) =>
-        (
-          SierraItemRecordMerger
-            .mergeItems(
-              existingRecord = existingRecord,
-              updatedRecord = record),
-          existingMetadata
+    versionedHybridStore
+      .updateRecord(
+        id = record.id.withoutCheckDigit
+      )(
+        ifNotExisting = (record, EmptyMetadata())
+      )(
+        ifExisting = (existingRecord, existingMetadata) =>
+          (
+            SierraItemRecordMerger
+              .mergeItems(
+                existingRecord = existingRecord,
+                updatedRecord = record),
+            existingMetadata
+        )
       )
-    ).map { _ => () }
+      .map { _ =>
+        ()
+      }
 }

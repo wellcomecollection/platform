@@ -20,12 +20,16 @@ trait SierraVHSUtil extends LocalVersionedHybridStore {
                                       SourceMetadata,
                                       ObjectStore[SierraTransformable]])
     : Future[Unit] =
-    hybridStore.updateRecord(id = transformable.sierraId.withoutCheckDigit)(
-      ifNotExisting = (transformable, SourceMetadata("sierra")))(
-      ifExisting = (t, m) =>
-        throw new RuntimeException(
-          s"Found record ${transformable.sierraId}, but VHS should be empty")
-    ).map { _ => () }
+    hybridStore
+      .updateRecord(id = transformable.sierraId.withoutCheckDigit)(
+        ifNotExisting = (transformable, SourceMetadata("sierra")))(
+        ifExisting = (t, m) =>
+          throw new RuntimeException(
+            s"Found record ${transformable.sierraId}, but VHS should be empty")
+      )
+      .map { _ =>
+        ()
+      }
 
   def storeInVHS(
     transformables: List[SierraTransformable],

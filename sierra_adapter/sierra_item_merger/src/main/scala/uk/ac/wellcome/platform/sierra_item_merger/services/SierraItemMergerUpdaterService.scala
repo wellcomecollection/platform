@@ -25,30 +25,39 @@ class SierraItemMergerUpdaterService @Inject()(
   def update(itemRecord: SierraItemRecord): Future[Unit] = {
 
     val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>
-      versionedHybridStore.updateRecord(id = bibId.withoutCheckDigit)(
-        ifNotExisting = (
-          SierraTransformable(
-            sierraId = bibId,
-            itemRecords = Map(itemRecord.id -> itemRecord)),
-          SourceMetadata("sierra")))(
-        ifExisting = (existingTransformable, existingMetadata) => {
-          (
-            ItemLinker.linkItemRecord(existingTransformable, itemRecord),
-            existingMetadata)
-        }).map { _ => () }
+      versionedHybridStore
+        .updateRecord(id = bibId.withoutCheckDigit)(
+          ifNotExisting = (
+            SierraTransformable(
+              sierraId = bibId,
+              itemRecords = Map(itemRecord.id -> itemRecord)),
+            SourceMetadata("sierra")))(ifExisting =
+          (existingTransformable, existingMetadata) => {
+            (
+              ItemLinker.linkItemRecord(existingTransformable, itemRecord),
+              existingMetadata)
+          })
+        .map { _ =>
+          ()
+        }
     }
 
     val unlinkUpdateFutures: Seq[Future[Unit]] =
       itemRecord.unlinkedBibIds.map { unlinkedBibId =>
-        versionedHybridStore.updateRecord(id = unlinkedBibId.withoutCheckDigit)(
-          ifNotExisting = throw SierraItemMergerException(
-            s"Missing Bib record to unlink: $unlinkedBibId")
-        )(
-          ifExisting = (existingTransformable, existingMetadata) =>
-            (
-              ItemUnlinker.unlinkItemRecord(existingTransformable, itemRecord),
-              existingMetadata)
-        ).map { _ => () }
+        versionedHybridStore
+          .updateRecord(id = unlinkedBibId.withoutCheckDigit)(
+            ifNotExisting = throw SierraItemMergerException(
+              s"Missing Bib record to unlink: $unlinkedBibId")
+          )(
+            ifExisting = (existingTransformable, existingMetadata) =>
+              (
+                ItemUnlinker
+                  .unlinkItemRecord(existingTransformable, itemRecord),
+                existingMetadata)
+          )
+          .map { _ =>
+            ()
+          }
       }
 
     Future.sequence(mergeUpdateFutures ++ unlinkUpdateFutures).map(_ => ())
