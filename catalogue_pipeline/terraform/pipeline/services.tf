@@ -16,9 +16,11 @@ module "recorder" {
 
     vhs_recorder_dynamo_table_name = "${module.vhs_recorder.table_name}"
     vhs_recorder_bucket_name       = "${module.vhs_recorder.bucket_name}"
+
+    sns_topic = "${module.recorded_works_topic.arn}"
   }
 
-  env_vars_length = 5
+  env_vars_length = 6
 
   container_image   = "${var.recorder_container_image}"
   source_queue_name = "${module.recorder_queue.name}"

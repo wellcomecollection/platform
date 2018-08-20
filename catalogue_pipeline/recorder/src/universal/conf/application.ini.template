@@ -4,3 +4,4 @@
 -aws.vhs.s3.bucketName=${vhs_recorder_bucket_name}
 -aws.vhs.s3.globalPrefix=recorder
 -aws.metrics.namespace=${metrics_namespace}
+-aws.sns.topic.arn=${sns_topic}
