@@ -41,6 +41,8 @@ variable "es_cluster_credentials" {
   type        = "map"
 }
 
+variable "infra_bucket" {}
+
 # These variables will change fairly regularly, whenever we want to swap the
 # staging and production APIs.
 
@@ -89,4 +91,8 @@ variable "es_config_remus" {
     index_v2 = "v2-2018-07-30-merging"
     doc_type = "work"
   }
+}
+
+variable "data_acm_cert_arn" {
+  description = "ARN for the data ssl cert"
 }
