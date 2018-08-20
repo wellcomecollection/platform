@@ -2,7 +2,9 @@ package uk.ac.wellcome.platform.recorder.services
 
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.{MessagePointer, MessageStream}
+import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -15,6 +17,7 @@ class RecorderWorkerService @Inject()(
                                              EmptyMetadata,
                                              ObjectStore[TransformedBaseWork]],
   messageStream: MessageStream[TransformedBaseWork],
+  snsWriter: SNSWriter,
   system: ActorSystem) {
 
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
@@ -24,7 +27,8 @@ class RecorderWorkerService @Inject()(
   private def processMessage(work: TransformedBaseWork): Future[Unit] =
     for {
       (hybridRecord, _) <- storeInVhs(work)
-    } yield MessagePointer(hybridRecord.location)
+      _ <- snsWriter.writeMessage(toJson(MessagePointer(hybridRecord.location)).get, s"Sent from ${this.getClass.getSimpleName}")
+    } yield ()
 
   private def storeInVhs(work: TransformedBaseWork) = {
     versionedHybridStore.updateRecord(work.sourceIdentifier.toString)((work, EmptyMetadata()))(
