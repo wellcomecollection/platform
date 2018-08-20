@@ -17,6 +17,7 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 
 class MatcherFeatureTest
     extends FunSpec
@@ -43,7 +44,7 @@ class MatcherFeatureTest
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
-                      message = toJson(work).get,
+                      message = toJson[TransformedBaseWork](work).get,
                       version = 1,
                       s3Client = s3Client,
                       bucket = storageBucket
@@ -109,7 +110,7 @@ class MatcherFeatureTest
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
-                      message = toJson(workAv1).get,
+                      message = toJson[TransformedBaseWork](workAv1).get,
                       version = updatedWorkVersion,
                       s3Client = s3Client,
                       bucket = storageBucket)
