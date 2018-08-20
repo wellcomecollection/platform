@@ -1,5 +1,9 @@
 locals {
-  prod_es_config = "${var.production_api == "romulus" ? var.es_config_romulus : var.es_config_remus}"
+  prod_es_config = {
+    index_v1 = "${var.production_api == "romulus" ? var.es_config_romulus["index_v1"] : var.es_config_remus["index_v1"]}"
+    index_v2 = "${var.production_api == "romulus" ? var.es_config_romulus["index_v2"] : var.es_config_remus["index_v2"]}"
+    doc_type = "${var.production_api == "romulus" ? var.es_config_romulus["doc_type"] : var.es_config_remus["doc_type"]}"
+  }
 }
 
 module "data_api" {
