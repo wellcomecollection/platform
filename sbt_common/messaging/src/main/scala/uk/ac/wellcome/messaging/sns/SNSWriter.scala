@@ -32,7 +32,8 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)(
           throw e
       }
 
-  def writeMessage[T](message: T, subject: String)(implicit encoder: Encoder[T]): Future[PublishAttempt] =
+  def writeMessage[T](message: T, subject: String)(
+    implicit encoder: Encoder[T]): Future[PublishAttempt] =
     writeMessage(
       message = toJson(message).get,
       subject = subject
