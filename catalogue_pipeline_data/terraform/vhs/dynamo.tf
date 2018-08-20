@@ -4,7 +4,7 @@ resource "aws_dynamodb_table" "table" {
   write_capacity   = 1
   hash_key         = "id"
   stream_enabled   = "${var.table_stream_enabled}"
-  stream_view_type = "NEW_AND_OLD_IMAGES"
+  stream_view_type = "${var.table_stream_enabled ? "NEW_AND_OLD_IMAGES": ""}"
 
   attribute {
     name = "id"
