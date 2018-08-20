@@ -55,7 +55,8 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   private def getPersonSubjectLabel(person: Person,
                                     roles: List[String],
                                     dates: Option[String]) = {
-      (List(person.label) ++ person.numeration ++ person.prefix ++ dates ++ roles).mkString(" ")
+    (List(person.label) ++ person.numeration ++ person.prefix ++ dates ++ roles)
+      .mkString(" ")
   }
 
   private def identifyPersonConcept(
