@@ -1,12 +1,11 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 
 class SierraItemsToDynamoFeatureTest
@@ -16,7 +15,7 @@ class SierraItemsToDynamoFeatureTest
     with fixtures.Server
     with Matchers
     with Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with SierraUtil {
 
   it("reads items from Sierra and adds them to DynamoDB") {

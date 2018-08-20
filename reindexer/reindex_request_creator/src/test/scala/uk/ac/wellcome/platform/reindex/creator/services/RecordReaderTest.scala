@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.reindex.creator.services
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.Scanamo
 import javax.naming.ConfigurationException
-import org.scalatest.concurrent.ScalaFutures
+
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
 import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
@@ -11,7 +12,6 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -20,7 +20,7 @@ class RecordReaderTest
     with ScalaFutures
     with Matchers
     with LocalDynamoDbVersioned
-    with ExtendedPatience
+    with IntegrationPatience
     with ReindexFixtures {
 
   val shardName = "shard"

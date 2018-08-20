@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
 import com.amazonaws.services.sqs.model.SendMessageResult
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
@@ -12,7 +12,6 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
 
@@ -22,7 +21,7 @@ class SierraItemMergerFeatureTest
     extends FunSpec
     with Matchers
     with Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with fixtures.Server
     with SQS
     with S3

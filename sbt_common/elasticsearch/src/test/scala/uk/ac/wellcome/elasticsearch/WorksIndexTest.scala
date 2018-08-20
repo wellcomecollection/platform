@@ -3,13 +3,12 @@ package uk.ac.wellcome.elasticsearch
 import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search, _}
 import org.elasticsearch.client.ResponseException
 import org.scalacheck.Shrink
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Person, Subject, Unidentifiable}
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -24,8 +23,9 @@ class WorksIndexTest
     with Matchers
     with JsonAssertions
     with BeforeAndAfterEach
-    with ExtendedPatience
-    with PropertyChecks with WorksUtil {
+    with IntegrationPatience
+    with PropertyChecks
+    with WorksUtil {
 
   // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
   // With IdentifiedWork, that means that it never actually completes.

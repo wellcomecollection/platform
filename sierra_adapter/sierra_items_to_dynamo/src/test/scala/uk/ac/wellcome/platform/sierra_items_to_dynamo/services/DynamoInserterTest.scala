@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
@@ -17,7 +17,6 @@ import uk.ac.wellcome.storage.vhs.{
   VHSConfig,
   VersionedHybridStore
 }
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -28,7 +27,7 @@ class DynamoInserterTest
     with ScalaFutures
     with MockitoSugar
     with DynamoInserterFixture
-    with ExtendedPatience
+    with IntegrationPatience
     with SierraUtil {
 
   it("inserts an ItemRecord into the VHS") {

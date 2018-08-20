@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer
 
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
@@ -12,7 +12,6 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork
 }
 import uk.ac.wellcome.storage.fixtures.S3
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.json.JsonUtil._
 
@@ -25,7 +24,7 @@ class SierraTransformerFeatureTest
     with Messaging
     with fixtures.Server
     with Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with SierraUtil
     with TransformableMessageUtils {
 

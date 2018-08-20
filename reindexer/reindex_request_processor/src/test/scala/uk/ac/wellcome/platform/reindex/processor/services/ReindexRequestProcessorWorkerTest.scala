@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.reindex.processor.services
 
 import org.scalatest.FunSpec
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
@@ -10,7 +10,6 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 
 class ReindexRequestProcessorWorkerTest
@@ -21,7 +20,7 @@ class ReindexRequestProcessorWorkerTest
     with ScalaFutures
     with Messaging
     with MetricsSenderFixture
-    with ExtendedPatience {
+    with IntegrationPatience {
 
   val id = "sierra/2371838"
   val data = "data"
