@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.matcher.models
 
-import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 
 case class WorkUpdate(workId: String,
                       version: Int,
