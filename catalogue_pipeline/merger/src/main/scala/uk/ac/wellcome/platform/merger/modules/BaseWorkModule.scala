@@ -22,7 +22,8 @@ object BaseWorkModule extends TwitterModule {
   }
   @Provides
   @Singleton
-  def provideTransformedBaseWorkStore(injector: Injector): ObjectStore[TransformedBaseWork] = {
+  def provideTransformedBaseWorkStore(
+    injector: Injector): ObjectStore[TransformedBaseWork] = {
     implicit val storageBackend: S3StorageBackend =
       injector.instance[S3StorageBackend]
     implicit val executionContext: ExecutionContext =
