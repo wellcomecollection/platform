@@ -8,17 +8,14 @@ case class WorkUpdate(workId: String,
 
 case object WorkUpdate {
   def apply(work: UnidentifiedWork): WorkUpdate = {
-    val id = identifierToString(work.sourceIdentifier)
+    val id = work.sourceIdentifier.toString
     val referencedWorkIds = work.mergeCandidates
       .map { mergeCandidate =>
-        identifierToString(mergeCandidate.identifier)
+        mergeCandidate.identifier.toString
       }
       .filterNot { _ == id }
       .toSet
 
     WorkUpdate(id, work.version, referencedWorkIds)
   }
-
-  private def identifierToString(sourceIdentifier: SourceIdentifier): String =
-    s"${sourceIdentifier.identifierType.id}/${sourceIdentifier.value}"
 }

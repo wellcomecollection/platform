@@ -31,8 +31,8 @@ class RecorderWorkerService @Inject()(
       }
     )
 
-  def id(work: TransformedBaseWork) =
-    s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}"
+  def id(work: TransformedBaseWork) = work.sourceIdentifier.toString
+
   def stop(): Future[Terminated] = {
     system.terminate()
   }

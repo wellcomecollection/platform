@@ -5,12 +5,7 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier,
-  WorkNode
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -97,14 +92,12 @@ class MatcherFeatureTest
                   val workAv1 = createUnidentifiedWorkWith(
                     version = updatedWorkVersion
                   )
-                  val workId =
-                    s"${workAv1.sourceIdentifier.identifierType.id}/${workAv1.sourceIdentifier.value}"
 
                   val existingWorkAv2 = WorkNode(
-                    id = workId,
+                    id = workAv1.sourceIdentifier.toString,
                     version = existingWorkVersion,
                     linkedIds = Nil,
-                    componentId = workId
+                    componentId = workAv1.sourceIdentifier.toString
                   )
                   Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 

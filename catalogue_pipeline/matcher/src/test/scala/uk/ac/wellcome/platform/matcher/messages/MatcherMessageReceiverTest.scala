@@ -63,8 +63,7 @@ class MatcherMessageReceiverTest
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             val invisibleWork = createUnidentifiedInvisibleWork
-            val workId =
-              s"${invisibleWork.sourceIdentifier.identifierType.id}/${invisibleWork.sourceIdentifier.value}"
+            val workId = invisibleWork.sourceIdentifier.toString
             val expectedMatchedWorks =
               MatcherResult(
                 Set(
