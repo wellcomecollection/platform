@@ -96,6 +96,7 @@ class RecorderPlaybackServiceTest
     }
 
     val allWorks = (worksToFetch ++ outdatedWorks ++ zeroWorks).toList
+    val expectedWorks = (worksToFetch ++ updatedWorks ++ zeroWorks).toList
 
     withRecorderVHS { vhs =>
       storeInVHS(vhs, allWorks)
@@ -104,9 +105,9 @@ class RecorderPlaybackServiceTest
 
       whenReady(service.fetchAllWorks(getWorkIdentifiers(allWorks: _*))) {
         result =>
-          result shouldBe (allWorks.map { Some(_) } ++ (4 to 7).map { _ =>
+          result shouldBe (worksToFetch.map { Some(_) } ++ (4 to 7).map { _ =>
             None
-          }).toList
+          })
       }
     }
   }
