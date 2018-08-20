@@ -95,8 +95,7 @@ class RecorderPlaybackServiceTest
       createUnidentifiedWorkWith(version = 0)
     }
 
-    val allWorks = (worksToFetch ++ outdatedWorks ++ zeroWorks).toList
-    val expectedWorks = (worksToFetch ++ updatedWorks ++ zeroWorks).toList
+    val allWorks = (worksToFetch ++ updatedWorks ++ zeroWorks).toList
 
     withRecorderVHS { vhs =>
       storeInVHS(vhs, allWorks)
