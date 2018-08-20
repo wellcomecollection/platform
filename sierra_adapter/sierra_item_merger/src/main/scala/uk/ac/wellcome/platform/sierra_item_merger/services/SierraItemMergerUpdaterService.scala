@@ -35,7 +35,7 @@ class SierraItemMergerUpdaterService @Inject()(
           (
             ItemLinker.linkItemRecord(existingTransformable, itemRecord),
             existingMetadata)
-        })
+        }).map { _ => () }
     }
 
     val unlinkUpdateFutures: Seq[Future[Unit]] =
@@ -48,8 +48,9 @@ class SierraItemMergerUpdaterService @Inject()(
             (
               ItemUnlinker.unlinkItemRecord(existingTransformable, itemRecord),
               existingMetadata)
-        )
+        ).map { _ => () }
       }
+
     Future.sequence(mergeUpdateFutures ++ unlinkUpdateFutures).map(_ => ())
   }
 }

@@ -28,5 +28,5 @@ class DynamoInserter @Inject()(
               updatedRecord = record),
           existingMetadata
       )
-    )
+    ).map { _ => () }
 }

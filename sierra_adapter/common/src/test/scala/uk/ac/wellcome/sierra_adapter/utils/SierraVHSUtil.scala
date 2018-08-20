@@ -25,7 +25,7 @@ trait SierraVHSUtil extends LocalVersionedHybridStore {
       ifExisting = (t, m) =>
         throw new RuntimeException(
           s"Found record ${transformable.sierraId}, but VHS should be empty")
-    )
+    ).map { _ => () }
 
   def storeInVHS(
     transformables: List[SierraTransformable],

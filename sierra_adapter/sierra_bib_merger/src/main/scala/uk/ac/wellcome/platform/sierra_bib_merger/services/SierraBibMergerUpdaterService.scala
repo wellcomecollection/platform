@@ -25,5 +25,5 @@ class SierraBibMergerUpdaterService @Inject()(
           BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord),
           existingMetadata)
       }
-    )
+    ).map { _ => () }
 }

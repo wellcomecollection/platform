@@ -29,7 +29,7 @@ class RecorderWorkerService @Inject()(
         } else {
           (work, EmptyMetadata())
       }
-    )
+    ).map { _ => () }
 
   def id(work: TransformedBaseWork) = work.sourceIdentifier.toString
 
