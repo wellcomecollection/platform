@@ -12,7 +12,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class DynamoInserter @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraItemRecord,
                                              EmptyMetadata,
-                                             ObjectStore[SierraItemRecord]])(implicit ec: ExecutionContext) {
+                                             ObjectStore[SierraItemRecord]])(
+  implicit ec: ExecutionContext) {
 
   def insertIntoDynamo(record: SierraItemRecord): Future[Unit] =
     versionedHybridStore

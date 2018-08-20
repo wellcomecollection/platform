@@ -15,7 +15,8 @@ class SierraBibMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              SourceMetadata,
                                              ObjectStore[SierraTransformable]]
-)(implicit ec: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def update(bibRecord: SierraBibRecord): Future[Unit] =
     versionedHybridStore
