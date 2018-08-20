@@ -10,11 +10,6 @@ resource "aws_iam_role_policy" "ecs_snapshot_generator_task_s3_public" {
   policy = "${data.aws_iam_policy_document.public_data_bucket_full_access_policy.json}"
 }
 
-resource "aws_iam_role_policy" "ecs_snapshot_generator_task_s3_private" {
-  role   = "${module.snapshot_generator.task_role_name}"
-  policy = "${data.aws_iam_policy_document.private_data_bucket_full_access_policy.json}"
-}
-
 resource "aws_iam_role_policy" "snapshot_generator_cloudwatch" {
   role   = "${module.snapshot_generator.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
