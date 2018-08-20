@@ -11,13 +11,13 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier,
   WorkNode
 }
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 
 class MatcherFeatureTest
     extends FunSpec
@@ -41,12 +41,10 @@ class MatcherFeatureTest
                   graphTable,
                   lockTable) { _ =>
                   val work = createUnidentifiedWork
-                  val workId =
-                    s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}"
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
-                      message = toJson(RecorderWorkEntry(work = work)).get,
+                      message = toJson[TransformedBaseWork](work).get,
                       version = 1,
                       s3Client = s3Client,
                       bucket = storageBucket
@@ -62,9 +60,13 @@ class MatcherFeatureTest
                         fromJson[MatcherResult](snsMessage.message).get
 
                       identifiersList shouldBe
-                        MatcherResult(Set(MatchedIdentifiers(
-                          Set(WorkIdentifier(identifier = workId, version = 1))
-                        )))
+                        MatcherResult(
+                          Set(
+                            MatchedIdentifiers(
+                              Set(WorkIdentifier(
+                                identifier = work.sourceIdentifier.toString,
+                                version = 1))
+                            )))
                     }
                   }
                 }
@@ -95,20 +97,18 @@ class MatcherFeatureTest
                   val workAv1 = createUnidentifiedWorkWith(
                     version = updatedWorkVersion
                   )
-                  val workId =
-                    s"${workAv1.sourceIdentifier.identifierType.id}/${workAv1.sourceIdentifier.value}"
 
                   val existingWorkAv2 = WorkNode(
-                    id = workId,
+                    id = workAv1.sourceIdentifier.toString,
                     version = existingWorkVersion,
                     linkedIds = Nil,
-                    componentId = workId
+                    componentId = workAv1.sourceIdentifier.toString
                   )
                   Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
-                      message = toJson(RecorderWorkEntry(workAv1)).get,
+                      message = toJson[TransformedBaseWork](workAv1).get,
                       version = updatedWorkVersion,
                       s3Client = s3Client,
                       bucket = storageBucket)

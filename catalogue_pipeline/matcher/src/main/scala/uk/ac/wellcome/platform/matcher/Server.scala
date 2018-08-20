@@ -26,14 +26,13 @@ import uk.ac.wellcome.finatra.storage.{
 import uk.ac.wellcome.platform.matcher.modules.{
   DynamoLockingServiceConfigModule,
   MatcherModule,
-  RecorderWorkEntryModule
+  TransformedBaseWorkModule
 }
 
 object ServerMain extends Server
 
 class Server extends HttpServer {
-  override val name =
-    "uk.ac.wellcome.platform.matcher Matcher"
+  override val name = "uk.ac.wellcome.platform.matcher Matcher"
   override val modules = Seq(
     MetricsSenderModule,
     SQSConfigModule,
@@ -45,7 +44,7 @@ class Server extends HttpServer {
     DynamoConfigModule,
     DynamoClientModule,
     MatcherModule,
-    RecorderWorkEntryModule,
+    TransformedBaseWorkModule,
     AkkaModule,
     ExecutionContextModule,
     DynamoLockingServiceConfigModule

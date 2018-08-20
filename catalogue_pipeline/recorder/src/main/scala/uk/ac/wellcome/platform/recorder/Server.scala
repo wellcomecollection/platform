@@ -23,7 +23,6 @@ import uk.ac.wellcome.finatra.storage.{
 }
 import uk.ac.wellcome.platform.recorder.modules.{
   RecorderModule,
-  RecorderWorkEntryModule,
   TransformedBaseWorkModule
 }
 
@@ -39,7 +38,6 @@ class Server extends HttpServer {
     DynamoClientModule,
     RecorderModule,
     MetricsSenderModule,
-    RecorderWorkEntryModule,
     TransformedBaseWorkModule,
     SQSConfigModule,
     SQSClientModule,

@@ -7,8 +7,11 @@ import uk.ac.wellcome.models.matcher.{
   MatcherResult,
   WorkIdentifier
 }
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{UnidentifiedWork, WorkType}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork,
+  WorkType
+}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -21,58 +24,49 @@ trait MergerTestUtils
     with LocalVersionedHybridStore
     with WorksUtil { this: Suite =>
 
-  def matcherResultWith(matchedEntries: Set[Set[RecorderWorkEntry]]) =
+  def matcherResultWith(matchedEntries: Set[Set[TransformedBaseWork]]) =
     MatcherResult(
-      matchedEntries.map(
-        recorderWorkEntries =>
-          MatchedIdentifiers(
-            recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries)
-        )
-      )
+      matchedEntries.map { works =>
+        MatchedIdentifiers(worksToWorkIdentifiers(works))
+      }
     )
 
-  def recorderWorkEntriesToWorkIdentifiers(
-    workEntries: Seq[RecorderWorkEntry]): Set[WorkIdentifier] =
-    recorderWorkEntriesToWorkIdentifiers(workEntries.toSet)
+  def worksToWorkIdentifiers(
+    works: Seq[TransformedBaseWork]): Set[WorkIdentifier] =
+    worksToWorkIdentifiers(works.toSet)
 
-  def recorderWorkEntriesToWorkIdentifiers(
-    workEntries: Set[RecorderWorkEntry]): Set[WorkIdentifier] =
-    workEntries
-      .map { workEntry =>
+  def worksToWorkIdentifiers(
+    works: Set[TransformedBaseWork]): Set[WorkIdentifier] =
+    works
+      .map { work =>
         WorkIdentifier(
-          identifier = workEntry.id,
-          version = workEntry.work.version
+          identifier = work.sourceIdentifier.toString,
+          version = work.version
         )
       }
 
-  def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
+  def storeInVHS(vhs: VersionedHybridStore[TransformedBaseWork,
                                            EmptyMetadata,
-                                           ObjectStore[RecorderWorkEntry]],
-                 recorderWorkEntry: RecorderWorkEntry): Assertion = {
-    vhs.updateRecord(recorderWorkEntry.id)(
-      ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
+                                           ObjectStore[TransformedBaseWork]],
+                 work: TransformedBaseWork): Assertion = {
+    vhs.updateRecord(work.sourceIdentifier.toString)(
+      ifNotExisting = (work, EmptyMetadata()))((_, _) =>
       throw new RuntimeException("Not possible, VHS is empty!"))
 
     eventually {
-      whenReady(vhs.getRecord(id = recorderWorkEntry.id)) { result =>
-        result.get shouldBe recorderWorkEntry
+      whenReady(vhs.getRecord(id = work.sourceIdentifier.toString)) { result =>
+        result.get shouldBe work
       }
     }
   }
 
-  def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
+  def storeInVHS(vhs: VersionedHybridStore[TransformedBaseWork,
                                            EmptyMetadata,
-                                           ObjectStore[RecorderWorkEntry]],
-                 entries: List[RecorderWorkEntry]): List[Assertion] =
-    entries.map { recorderWorkEntry =>
-      storeInVHS(vhs = vhs, recorderWorkEntry = recorderWorkEntry)
+                                           ObjectStore[TransformedBaseWork]],
+                 entries: List[TransformedBaseWork]): List[Assertion] =
+    entries.map { work =>
+      storeInVHS(vhs = vhs, work = work)
     }
-
-  def createRecorderWorkEntryWith(version: Int): RecorderWorkEntry =
-    RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
-
-  def createRecorderWorkEntry: RecorderWorkEntry =
-    createRecorderWorkEntryWith(version = 1)
 
   def createDigitalWork: UnidentifiedWork = {
     createUnidentifiedWorkWith(
