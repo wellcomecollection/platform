@@ -110,6 +110,7 @@ lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.recorderDependencies)
 
 lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
   .dependsOn(common % "compile->compile;test->test")

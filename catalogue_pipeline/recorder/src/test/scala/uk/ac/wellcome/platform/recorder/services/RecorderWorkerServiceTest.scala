@@ -52,7 +52,7 @@ class RecorderWorkerServiceTest
                 messagesBucket,
                 queue) { _ =>
                 eventually {
-                  assertStoredSingleWork(storageBucket, topic, table, work)
+                  assertStoredSingleWork(topic, table, work)
                 }
               }
             }
@@ -80,7 +80,7 @@ class RecorderWorkerServiceTest
                   obj = invisibleWork
                 )
                 eventually {
-                  assertStoredSingleWork(storageBucket, topic, table, invisibleWork)
+                  assertStoredSingleWork(topic, table, invisibleWork)
                 }
               }
             }
@@ -110,14 +110,14 @@ class RecorderWorkerServiceTest
                   obj = newerWork
                 )
                 eventually {
-                  assertStoredSingleWork(storageBucket, topic, table, newerWork)
+                  assertStoredSingleWork(topic, table, newerWork)
                   sendMessage(
                     bucket = messagesBucket,
                     queue = queue,
                     obj = olderWork
                   )
                   eventually {
-                    assertStoredSingleWork(storageBucket, topic, table, newerWork)
+                    assertStoredSingleWork(topic, table, newerWork)
                   }
                 }
               }
@@ -148,7 +148,7 @@ class RecorderWorkerServiceTest
                   obj = olderWork
                 )
                 eventually {
-                  assertStoredSingleWork(storageBucket, topic, table, olderWork)
+                  assertStoredSingleWork(topic, table, olderWork)
                   sendMessage[TransformedBaseWork](
                     bucket = messagesBucket,
                     queue = queue,
@@ -156,7 +156,6 @@ class RecorderWorkerServiceTest
                   )
                   eventually {
                     assertStoredSingleWork(
-                      storageBucket,
                       topic,
                       table,
                       newerWork,
@@ -223,7 +222,6 @@ class RecorderWorkerServiceTest
   }
 
   private def assertStoredSingleWork[T <: TransformedBaseWork](
-    bucket: Bucket,
     topic: Topic,
     table: Table,
     expectedWork: T,
@@ -240,8 +238,8 @@ class RecorderWorkerServiceTest
     hybridRecord.version shouldBe expectedVhsVersion
 
     val actualEntry = getObjectFromS3[T](
-      bucket = bucket,
-      key = hybridRecord.s3key
+      bucket = Bucket(hybridRecord.location.namespace),
+      key = hybridRecord.location.key
     )
 
     actualEntry shouldBe expectedWork
