@@ -22,14 +22,18 @@ class RecorderWorkerService @Inject()(
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 
   private def processMessage(work: TransformedBaseWork): Future[Unit] =
-    versionedHybridStore.updateRecord(id(work))((work, EmptyMetadata()))(
-      (existingWork, existingMetadata) =>
-        if (existingWork.version > work.version) {
-          (existingWork, existingMetadata)
-        } else {
-          (work, EmptyMetadata())
+    versionedHybridStore
+      .updateRecord(id(work))((work, EmptyMetadata()))(
+        (existingWork, existingMetadata) =>
+          if (existingWork.version > work.version) {
+            (existingWork, existingMetadata)
+          } else {
+            (work, EmptyMetadata())
+        }
+      )
+      .map { _ =>
+        ()
       }
-    ).map { _ => () }
 
   def id(work: TransformedBaseWork) = work.sourceIdentifier.toString
 
