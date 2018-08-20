@@ -35,7 +35,7 @@ class NotificationSender @Inject()(snsWriter: SNSWriter)(
 
     for {
       _ <- snsWriter.writeMessage(
-        message = toJson(request).get,
+        message = request,
         subject = this.getClass.getSimpleName
       )
     } yield ()

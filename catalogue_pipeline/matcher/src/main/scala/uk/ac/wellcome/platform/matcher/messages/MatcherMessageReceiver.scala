@@ -34,7 +34,7 @@ class MatcherMessageReceiver @Inject()(
         ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       identifiersList <- workMatcher.matchWork(work)
       _ <- snsWriter.writeMessage(
-        message = toJson(identifiersList).get,
+        message = identifiersList,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()).recover {
