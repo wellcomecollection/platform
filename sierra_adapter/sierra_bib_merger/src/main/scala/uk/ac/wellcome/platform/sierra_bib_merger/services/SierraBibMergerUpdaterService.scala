@@ -9,13 +9,13 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.ObjectStore
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SierraBibMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              SourceMetadata,
                                              ObjectStore[SierraTransformable]]
-) extends Logging {
+)(implicit ec: ExecutionContext) extends Logging {
 
   def update(bibRecord: SierraBibRecord): Future[Unit] =
     versionedHybridStore
