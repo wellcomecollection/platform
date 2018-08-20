@@ -82,7 +82,7 @@ class RecorderPlaybackServiceTest
   }
 
   it("gets a mixture of works as appropriate") {
-    val worksToFetch = (1 to 3).map { _ =>
+    val unchangedWorks = (1 to 3).map { _ =>
       createUnidentifiedWork
     }
     val outdatedWorks = (4 to 5).map { _ =>
@@ -95,16 +95,17 @@ class RecorderPlaybackServiceTest
       createUnidentifiedWorkWith(version = 0)
     }
 
-    val allWorks = (worksToFetch ++ updatedWorks ++ zeroWorks).toList
+    val lookupWorks = (unchangedWorks ++ outdatedWorks ++ zeroWorks).toList
+    val storedWorks = (unchangedWorks ++ updatedWorks ++ zeroWorks).toList
 
     withRecorderVHS { vhs =>
-      storeInVHS(vhs, allWorks)
+      storeInVHS(vhs, storedWorks)
 
       val service = new RecorderPlaybackService(vhs)
 
-      whenReady(service.fetchAllWorks(getWorkIdentifiers(allWorks: _*))) {
+      whenReady(service.fetchAllWorks(getWorkIdentifiers(lookupWorks: _*))) {
         result =>
-          result shouldBe (worksToFetch.map { Some(_) } ++ (4 to 7).map { _ =>
+          result shouldBe (unchangedWorks.map { Some(_) } ++ (4 to 7).map { _ =>
             None
           })
       }

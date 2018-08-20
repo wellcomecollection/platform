@@ -42,16 +42,18 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
   }
 
   it("returns the works unmerged if any of the work entries are None") {
-    val works = (1 to 3)
+    val expectedWorks = (1 to 3)
       .map { _ =>
         createUnidentifiedWork
       }
+
+    val maybeWorks = expectedWorks
       .map { Some(_) }
-      .toList
+      .toList  ++ List(None)
 
-    val result = mergerManager.applyMerge(maybeWorks = works ++ List(None))
+    val result = mergerManager.applyMerge(maybeWorks = maybeWorks)
 
-    result should contain theSameElementsAs works
+    result should contain theSameElementsAs expectedWorks
   }
 
   val mergerRules: MergerRules = new MergerRules {

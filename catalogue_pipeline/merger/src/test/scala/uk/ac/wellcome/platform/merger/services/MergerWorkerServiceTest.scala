@@ -126,7 +126,7 @@ class MergerWorkerServiceTest
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val work = createUnidentifiedWork
         val olderWork = createUnidentifiedWork
-        val newerWork = work.copy(version = 2)
+        val newerWork = olderWork.copy(version = 2)
 
         val matcherResult = matcherResultWith(Set(Set(work, olderWork)))
 

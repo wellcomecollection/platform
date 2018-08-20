@@ -19,14 +19,13 @@ class MergerManager @Inject()(
     */
   def applyMerge(
     maybeWorks: List[Option[TransformedBaseWork]]): Seq[BaseWork] = {
-    val works = maybeWorks.flatten
-    val unidentifiedWorks = works
-      .collect { case unidentifiedWork: UnidentifiedWork => unidentifiedWork }
+    val unidentifiedWorks = maybeWorks
+      .collect { case Some(unidentifiedWork: UnidentifiedWork) => unidentifiedWork }
 
-    if (unidentifiedWorks.size == works.size) {
+    if (unidentifiedWorks.size == maybeWorks.size) {
       mergerRules.merge(unidentifiedWorks)
     } else {
-      works
+      maybeWorks.flatten
     }
   }
 }

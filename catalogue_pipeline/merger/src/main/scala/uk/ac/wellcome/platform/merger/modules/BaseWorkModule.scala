@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.merger.modules
 
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.models.work.internal.BaseWork
+import uk.ac.wellcome.models.work.internal.{BaseWork, TransformedBaseWork}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.json.JsonUtil._
@@ -19,5 +19,15 @@ object BaseWorkModule extends TwitterModule {
       injector.instance[ExecutionContext]
 
     ObjectStore[BaseWork]
+  }
+  @Provides
+  @Singleton
+  def provideTransformedBaseWorkStore(injector: Injector): ObjectStore[TransformedBaseWork] = {
+    implicit val storageBackend: S3StorageBackend =
+      injector.instance[S3StorageBackend]
+    implicit val executionContext: ExecutionContext =
+      injector.instance[ExecutionContext]
+
+    ObjectStore[TransformedBaseWork]
   }
 }
