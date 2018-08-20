@@ -7,7 +7,7 @@ import akka.event.Logging
 import akka.stream.scaladsl.Flow
 import org.mockito.Matchers.endsWith
 import org.mockito.Mockito.{atLeastOnce, never, times, verify}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
@@ -16,7 +16,6 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.fixtures.AkkaS3
-import uk.ac.wellcome.storage.utils.ExtendedPatience
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.duration._
@@ -27,7 +26,7 @@ class MessageStreamTest
     with ScalaFutures
     with Messaging
     with MockitoSugar
-    with ExtendedPatience
+    with IntegrationPatience
     with AkkaS3 {
 
   it("does not delete failing messages") {

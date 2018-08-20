@@ -1,9 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist
 
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.utils.ExtendedPatience
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
@@ -22,7 +21,7 @@ class ArchivistFeatureTest
     with ScalaFutures
     with MetricsSenderFixture
     with ArchivistFixture
-    with ExtendedPatience {
+    with IntegrationPatience {
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
