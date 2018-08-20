@@ -4,6 +4,7 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{blocking, ExecutionContext, Future}
 
@@ -30,6 +31,12 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)(
           error("Failed to publish message", e)
           throw e
       }
+
+  def writeMessage[T](message: T, subject: String)(implicit encoder: Encoder[T]): Future[PublishAttempt] =
+    writeMessage(
+      message = toJson(message).get,
+      subject = subject
+    )
 
   private def toPublishRequest(message: String, subject: String) =
     new PublishRequest(snsConfig.topicArn, message, subject)
