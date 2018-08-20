@@ -3,21 +3,18 @@ package uk.ac.wellcome.platform.matcher.messages
 import com.amazonaws.services.s3.AmazonS3
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.message.MessagePointer
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -388,7 +385,7 @@ class MatcherMessageReceiverTest
                       storageBucket: Bucket,
                       work: TransformedBaseWork) = {
     val workSqsMessage: NotificationMessage =
-      hybridRecordNotificationMessage(
+      messagePointerNotificationMessage(
         message = toJson(work).get,
         version = 1,
         s3Client = s3Client,
@@ -398,19 +395,15 @@ class MatcherMessageReceiverTest
     sendMessage(queue = queue, obj = workSqsMessage)
   }
 
-  private def hybridRecordNotificationMessage(message: String,
+  private def messagePointerNotificationMessage(message: String,
                                               version: Int,
                                               s3Client: AmazonS3,
                                               bucket: Bucket) = {
     val key = "recorder/1/testId/dshg548.json"
     s3Client.putObject(bucket.name, key, message)
 
-    val hybridRecord = HybridRecord(
-      id = "testId",
-      version = version,
-      s3key = key
-    )
+    val messagePointer = MessagePointer(ObjectLocation(bucket.name, key))
 
-    createNotificationMessageWith(message = hybridRecord)
+    createNotificationMessageWith(message = messagePointer)
   }
 }
