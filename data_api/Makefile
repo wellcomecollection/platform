@@ -15,5 +15,7 @@ TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = true
 
 
+data_api-terraform-plan::
+	python $(ROOT)/data_api/terraform/update_es_index.py
 
 $(val $(call stack_setup))
