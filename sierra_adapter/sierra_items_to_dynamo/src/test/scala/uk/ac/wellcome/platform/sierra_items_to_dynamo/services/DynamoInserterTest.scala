@@ -225,7 +225,6 @@ class DynamoInserterTest
 
             whenReady(futureUnit) { _ =>
               val actualContents = getContentFor(
-                bucket = bucket,
                 table = table,
                 id = oldRecord.id.withoutCheckDigit
               )

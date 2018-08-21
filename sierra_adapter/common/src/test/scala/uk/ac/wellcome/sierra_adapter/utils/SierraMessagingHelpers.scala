@@ -1,5 +1,6 @@
 package uk.ac.wellcome.sierra_adapter.utils
 
+import io.circe.Decoder
 import org.scalatest.Assertion
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -12,6 +13,7 @@ import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -56,13 +58,33 @@ trait SierraMessagingHelpers extends LocalVersionedHybridStore with Messaging {
     transformable: SierraTransformable,
     topic: Topic,
     bucket: Bucket,
-    table: Table): Assertion = {
-    val id = transformable.sierraId.withoutCheckDigit
+    table: Table): Assertion =
+    assertStoredAndSent[SierraTransformable](
+      id = transformable.sierraId.withoutCheckDigit,
+      t = transformable,
+      topic = topic,
+      bucket = bucket,
+      table = table
+    )
 
+  def assertStoredAndSent(
+    itemRecord: SierraItemRecord,
+    topic: Topic,
+    bucket: Bucket,
+    table: Table): Assertion =
+    assertStoredAndSent[SierraItemRecord](
+      id = itemRecord.id.withoutCheckDigit,
+      t = itemRecord,
+      topic = topic,
+      bucket = bucket,
+      table = table
+    )
+
+  private def assertStoredAndSent[T](id: String, t: T, topic: Topic, bucket: Bucket, table: Table)(implicit decoder: Decoder[T]): Assertion = {
     val hybridRecord = getHybridRecord(table, id)
 
-    val storedTransformable = getObjectFromS3[SierraTransformable](Bucket(hybridRecord.location.namespace), hybridRecord.location.key)
-    storedTransformable shouldBe transformable
-    getMessages[SierraTransformable](topic) should contain(transformable)
+    val storedTransformable = getObjectFromS3[T](Bucket(hybridRecord.location.namespace), hybridRecord.location.key)
+    storedTransformable shouldBe t
+    getMessages[T](topic) should contain(t)
   }
 }
