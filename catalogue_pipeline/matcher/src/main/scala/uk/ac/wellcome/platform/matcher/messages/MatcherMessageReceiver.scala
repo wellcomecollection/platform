@@ -25,7 +25,7 @@ class MatcherMessageReceiver @Inject()(
     (for {
       identifiersList <- workMatcher.matchWork(work)
       _ <- snsWriter.writeMessage(
-        message = toJson(identifiersList).get,
+        message = identifiersList,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()).recover {

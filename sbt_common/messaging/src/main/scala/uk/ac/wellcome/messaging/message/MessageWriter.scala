@@ -46,8 +46,10 @@ class MessageWriter[T] @Inject()(
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
       _ = debug(s"Successfully stored message $message in location: $location")
-      pointer <- Future.fromTry(toJson(MessagePointer(location)))
-      publishAttempt <- sns.writeMessage(pointer, subject)
+      publishAttempt <- sns.writeMessage(
+        message = MessagePointer(location),
+        subject = subject
+      )
       _ = debug(publishAttempt)
     } yield publishAttempt
 

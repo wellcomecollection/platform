@@ -23,10 +23,9 @@ class SnapshotGeneratorWorkerService @Inject()(
       snapshotJob <- Future.fromTry(fromJson[SnapshotJob](message.Message))
       completedSnapshotJob <- snapshotService.generateSnapshot(
         snapshotJob = snapshotJob)
-      message <- Future.fromTry(toJson(completedSnapshotJob))
       _ <- snsWriter.writeMessage(
         subject = s"source: ${this.getClass.getSimpleName}.processMessage",
-        message = message
+        message = completedSnapshotJob
       )
     } yield ()
 
