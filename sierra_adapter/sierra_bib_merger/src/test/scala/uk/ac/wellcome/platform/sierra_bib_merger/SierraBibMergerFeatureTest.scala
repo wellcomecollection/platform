@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.sierra_adapter.utils.SierraMergerHelpers
+import uk.ac.wellcome.sierra_adapter.utils.SierraMessagingHelpers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -27,7 +27,7 @@ class SierraBibMergerFeatureTest
     with fixtures.Server
     with LocalVersionedHybridStore
     with SierraUtil
-    with SierraMergerHelpers {
+    with SierraMessagingHelpers {
 
   it("stores a bib in the hybrid store") {
     withLocalSqsQueue { queue =>
