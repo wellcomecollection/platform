@@ -33,7 +33,6 @@ class Server extends HttpServer {
     SNSClientModule,
     TransformerWorkerModule,
     ExecutionContextModule,
-    TransformerModule,
     TransformablesModule,
     S3ClientModule,
     S3ConfigModule,
