@@ -17,8 +17,8 @@ resource "aws_s3_bucket" "public_data" {
 resource "aws_s3_bucket_object" "index_page" {
   bucket = "${aws_s3_bucket.public_data.id}"
   key    = "index.html"
-  source = "data_wc_index.html"
-  etag   = "${md5(file("data_wc_index.html"))}"
+  source = "${path.module}/data_wc_index.html"
+  etag   = "${md5(file("${path.module}/data_wc_index.html"))}"
 
   content_type = "text/html"
 }

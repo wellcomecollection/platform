@@ -4,11 +4,6 @@ variable "aws_region" {
 
 variable "infra_bucket" {}
 
-variable "release_ids" {
-  description = "Release tags for platform apps"
-  type        = "map"
-}
-
 variable "key_name" {
   description = "Name of AWS key pair"
 }
@@ -36,3 +31,5 @@ variable "es_config_snapshot" {
 variable "namespace" {
   default = "data_api"
 }
+
+variable "snapshot_generator_release_id" {}
