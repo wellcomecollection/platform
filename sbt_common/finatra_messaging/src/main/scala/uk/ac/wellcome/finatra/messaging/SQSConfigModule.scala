@@ -7,8 +7,10 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import scala.concurrent.duration._
 
 object SQSConfigModule extends TwitterModule {
-  private val queueUrl =
-    flag[String]("aws.sqs.queue.url", "", "URL of the SQS Queue")
+  private val queueUrl = flag[String](
+    name = "aws.sqs.queue.url",
+    help = "URL of the SQS Queue"
+  )
   val waitTime = flag(
     "aws.sqs.waitTime",
     20,
