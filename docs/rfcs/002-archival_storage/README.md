@@ -142,18 +142,16 @@ Digitised content will be ingested using Goobi, which should provide the bag lay
 ```
 b22036593/
 |-- data
-|   |-- b22036593.xml      // mets file
-|  [|-- bb22036593_001.xml // multiple manifestations]
-|  [|-- bb22036593_002.xml // multiple manifestations]
+|   |-- b22036593.xml      // mets "anchor" file for multiple manifestation
+|  [|-- bb22036593_001.xml // mets file for vol 1]
+|  [|-- bb22036593_002.xml // mets file for vol 2]
 |   \-- objects
-|       \-- b22036593_001.jp2
-|      [\-- b22036593_001_001.jp2 // multiple manifestations]
-|      [\-- b22036593_002_001.jp2 // multiple manifestations]
+|      [\-- b22036593_001_001.jp2 // first image for vol 1]
+|      [\-- b22036593_002_001.jp2 // first image for vol 2]
 |           ...
 |   \-- alto
-|       \-- b22036593_001.xml
-|      [\-- b22036593_001_001.xml // multiple manifestations]
-|      [\-- b22036593_002_001.xml // multiple manifestations]
+|      [\-- b22036593_001_001.xml // text for image 1 vol 1]
+|      [\-- b22036593_002_001.xml // text for image 1 vol 2]
 |           ...
 |-- manifest-sha256.txt
 |     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b22036593.xml
