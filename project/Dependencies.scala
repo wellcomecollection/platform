@@ -173,8 +173,6 @@ object Dependencies {
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
-  val recorderDependencies = WellcomeDependencies.newStorageLibrary
-
   val snapshotGeneratorDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka
   )
