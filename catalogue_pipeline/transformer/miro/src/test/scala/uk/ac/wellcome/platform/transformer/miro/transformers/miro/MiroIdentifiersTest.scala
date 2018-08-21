@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.transformer.miro.transformers.miro
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.transformers.MiroIdentifiers
 
 class MiroIdentifiersTest extends FunSpec with Matchers {
 

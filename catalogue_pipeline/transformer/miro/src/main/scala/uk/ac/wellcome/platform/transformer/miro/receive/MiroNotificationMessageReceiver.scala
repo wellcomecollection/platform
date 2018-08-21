@@ -4,16 +4,16 @@ import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.ParsingFailure
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -21,9 +21,9 @@ import scala.util.Try
 class MiroNotificationMessageReceiver @Inject()(
   messageWriter: MessageWriter[TransformedBaseWork],
   s3Client: AmazonS3,
-  s3Config: S3Config)(
+  s3Config: S3Config,
+  miroTransformableTransformer: MiroTransformableTransformer)(
   implicit miroTransformableStore: ObjectStore[MiroTransformable],
-  sierraTransformableStore: ObjectStore[SierraTransformable],
   ec: ExecutionContext
 ) extends Logging {
 
@@ -32,9 +32,7 @@ class MiroNotificationMessageReceiver @Inject()(
 
     val futurePublishAttempt = for {
       hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
-      sourceMetadata <- Future.fromTry(
-        fromJson[SourceMetadata](message.Message))
-      transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
+      transformableRecord <- getTransformable(hybridRecord)
       work <- Future.fromTry(
         transformTransformable(transformableRecord, hybridRecord.version))
       publishResult <- publishMessage(work)
@@ -53,26 +51,21 @@ class MiroNotificationMessageReceiver @Inject()(
   }
 
   private def getTransformable(
-    hybridRecord: HybridRecord,
-    sourceMetadata: SourceMetadata
+    hybridRecord: HybridRecord
   ) = {
     val s3ObjectLocation = ObjectLocation(
       namespace = s3Config.bucketName,
       key = hybridRecord.s3key
     )
 
-    sourceMetadata.sourceName match {
-      case "miro"   => miroTransformableStore.get(s3ObjectLocation)
-      case "sierra" => sierraTransformableStore.get(s3ObjectLocation)
-    }
+    miroTransformableStore.get(s3ObjectLocation)
   }
 
   private def transformTransformable(
-    transformable: Transformable,
+    transformable: MiroTransformable,
     version: Int
   ): Try[TransformedBaseWork] = {
-    val transformableTransformer = chooseTransformer(transformable)
-    transformableTransformer.transform(transformable, version) map {
+    miroTransformableTransformer.transform(transformable, version) map {
       transformed =>
         debug(s"Transformed record to $transformed")
         transformed
@@ -80,13 +73,6 @@ class MiroNotificationMessageReceiver @Inject()(
       case e: Throwable =>
         error("Failed to perform transform to unified item", e)
         throw e
-    }
-  }
-
-  private def chooseTransformer(transformable: Transformable) = {
-    transformable match {
-      case _: MiroTransformable   => new MiroTransformableTransformer
-      case _: SierraTransformable => new SierraTransformableTransformer
     }
   }
 

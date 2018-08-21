@@ -2,8 +2,6 @@ package uk.ac.wellcome.platform.transformer.miro.source
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
-import uk.ac.wellcome.platform.transformer.sierra.source.MiroTransformableData
 
 class MiroTransformableDataTest extends FunSpec with Matchers {
 

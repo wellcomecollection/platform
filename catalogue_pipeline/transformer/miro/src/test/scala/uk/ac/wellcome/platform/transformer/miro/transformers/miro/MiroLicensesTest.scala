@@ -2,6 +2,8 @@ package uk.ac.wellcome.platform.transformer.miro.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.License_CC0
+import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.miro.transformers.MiroLicenses
 
 class MiroLicensesTest extends FunSpec with Matchers {
   val miroId = "V00001"

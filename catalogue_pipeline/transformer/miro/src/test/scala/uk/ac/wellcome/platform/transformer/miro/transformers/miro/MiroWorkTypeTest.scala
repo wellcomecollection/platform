@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.transformer.miro.transformers.MiroWorkType
 
 class MiroWorkTypeTest extends FunSpec with Matchers {
   it("sets a WorkType of 'Digital images'") {
@@ -8,5 +9,5 @@ class MiroWorkTypeTest extends FunSpec with Matchers {
     transformer.getWorkType.get.label shouldBe "Digital images"
   }
 
-  val transformer: transformers.MiroWorkType = new transformers.MiroWorkType {}
+  val transformer = new MiroWorkType {}
 }

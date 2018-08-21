@@ -1,13 +1,8 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Concept,
-  Genre,
-  MaybeDisplayable,
-  Unidentifiable
-}
+import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Genre, MaybeDisplayable, Unidentifiable}
+import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
 
 class MiroGenresTest
     extends FunSpec

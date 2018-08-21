@@ -1,15 +1,15 @@
 package uk.ac.wellcome.platform.transformer.miro
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.models.transformable.{MiroTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 
 import scala.util.Try
 
 class MiroTransformableTransformer
-    extends TransformableTransformer[MiroTransformable]
-    with transformers.MiroContributors
+    extends transformers.MiroContributors
     with transformers.MiroItems
     with transformers.MiroGenres
     with transformers.MiroIdentifiers
@@ -20,9 +20,7 @@ class MiroTransformableTransformer
     with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
-  override def transformForType
-    : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
-    case (miroTransformable: MiroTransformable, version: Int) =>
+  def transform(miroTransformable: MiroTransformable, version: Int) = {
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("miro-image-number"),
         ontologyType = "Work",
