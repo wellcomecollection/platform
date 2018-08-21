@@ -12,12 +12,12 @@ import uk.ac.wellcome.json.JsonUtil._
 
 trait SierraDataGenerators extends IdentifiersGenerators with SierraGenerators {
   def createSierraBibDataWith(
-    title: Option[String] = Some(randomAlphanumeric(25)),
-    lang: Option[SierraLanguage] = None,
-    materialType: Option[SierraMaterialType] = None,
-    locations: Option[List[SierraLocation]] = None,
-    varFields: List[VarField] = List()
-  ): SierraBibData =
+                               title: Option[String] = Some(randomAlphanumeric(25)),
+                               lang: Option[SierraLanguage] = None,
+                               materialType: Option[SierraMaterialType] = None,
+                               locations: Option[List[SierraLocation]] = None,
+                               varFields: List[VarField] = List()
+                             ): SierraBibData =
     SierraBibData(
       title = title,
       lang = lang,
@@ -43,9 +43,9 @@ trait SierraDataGenerators extends IdentifiersGenerators with SierraGenerators {
   }
 
   def createSierraItemDataWith(
-    deleted: Boolean = false,
-    location: Option[SierraLocation] = None
-  ): SierraItemData =
+                                deleted: Boolean = false,
+                                location: Option[SierraLocation] = None
+                              ): SierraItemData =
     SierraItemData(
       deleted = deleted,
       location = location

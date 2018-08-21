@@ -5,8 +5,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 
 trait TransformableMessageUtils extends IdentifiersGenerators with SQS {
   def createValidMiroTransformableJson(MiroID: String,
@@ -31,32 +31,8 @@ trait TransformableMessageUtils extends IdentifiersGenerators with SQS {
     val key = s"testSource/1/testId/${randomAlphanumeric(10)}.json"
     s3Client.putObject(bucket.name, key, message)
 
-    val hybridRecord = HybridRecord(
-      id = "testId",
-      version = version,
-      s3key = key
-    )
-
-    val sourceMetadata = SourceMetadata(
-      sourceName = sourceName
-    )
-
-    case class JoinedCaseClass(
-      id: String,
-      version: Int,
-      s3key: String,
-      sourceName: String
-    )
-
-    val joinedCaseClass = JoinedCaseClass(
-      id = hybridRecord.id,
-      version = hybridRecord.version,
-      s3key = hybridRecord.s3key,
-      sourceName = sourceMetadata.sourceName
-    )
-
     createNotificationMessageWith(
-      message = joinedCaseClass
+      ObjectLocation(namespace = bucket.name, key = key)
     )
   }
 }
