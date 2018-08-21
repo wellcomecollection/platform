@@ -26,24 +26,26 @@ class RecorderFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          withTypeVHS[TransformedBaseWork, EmptyMetadata, Assertion](
-            bucket = bucket,
-            table = table) { _ =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
-              bucket,
-              queue)
-            withServer(flags) { _ =>
-              sendMessage[TransformedBaseWork](
-                bucket = bucket,
-                queue = queue,
-                obj = work)
+          withLocalSnsTopic { topic =>
+            withTypeVHS[TransformedBaseWork, EmptyMetadata, Assertion](
+              bucket = bucket,
+              table = table) { _ =>
+              val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
+                bucket,
+                queue) ++ snsLocalFlags(topic)
+              withServer(flags) { _ =>
+                sendMessage[TransformedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
 
-              eventually {
-                assertStored[TransformedBaseWork](
-                  bucket,
-                  table,
-                  id = work.sourceIdentifier.toString,
-                  record = work)
+                eventually {
+                  assertStored[TransformedBaseWork](
+                    bucket,
+                    table,
+                    id = work.sourceIdentifier.toString,
+                    record = work)
+                }
               }
             }
           }
