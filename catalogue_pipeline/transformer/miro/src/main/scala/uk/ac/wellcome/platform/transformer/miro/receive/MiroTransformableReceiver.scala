@@ -18,7 +18,7 @@ import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class MiroNotificationMessageReceiver @Inject()(
+class MiroTransformableReceiver @Inject()(
   messageWriter: MessageWriter[TransformedBaseWork],
   s3Client: AmazonS3,
   s3Config: S3Config,

@@ -27,7 +27,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class MiroNotificationMessageReceiverTest
+class MiroTransformableReceiverTest
     extends FunSpec
     with Matchers
     with SQS
@@ -44,7 +44,7 @@ class MiroNotificationMessageReceiverTest
     topic: Topic,
     bucket: Bucket,
     maybeSnsClient: Option[AmazonSNS] = None
-  )(testWith: TestWith[MiroNotificationMessageReceiver, R]) = {
+  )(testWith: TestWith[MiroTransformableReceiver, R]) = {
     val s3Config = S3Config(bucket.name)
 
     val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
@@ -56,7 +56,7 @@ class MiroNotificationMessageReceiverTest
         s3Client = s3Client
       )
 
-    val recordReceiver = new MiroNotificationMessageReceiver(
+    val recordReceiver = new MiroTransformableReceiver(
       messageWriter = messageWriter,
       s3Client = s3Client,
       s3Config = S3Config(bucket.name),
