@@ -7,7 +7,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.platform.transformer.miro.utils.MiroTransformableMessageUtils
-import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageUtils
+import uk.ac.wellcome.platform.transformer.utils.MessagePointerUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -22,7 +22,7 @@ class MiroTransformerFeatureTest
     with Eventually
     with ExtendedPatience
     with MiroTransformableWrapper
-    with HybridRecordMessageUtils
+    with MessagePointerUtils
     with MiroTransformableMessageUtils {
 
   it("transforms miro records and publishes the result to the given topic") {
@@ -34,7 +34,7 @@ class MiroTransformerFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
             val miroHybridRecordMessage =
-              hybridRecordNotificationMessage(
+              messagePointerNotificationMessage(
                 message = createValidMiroTransformableJson(
                   MiroID = miroID,
                   MiroCollection = "foo",
@@ -90,7 +90,7 @@ class MiroTransformerFeatureTest
 
             withServer(flags) { _ =>
               val miroHybridRecordMessage1 =
-                hybridRecordNotificationMessage(
+                messagePointerNotificationMessage(
                   message = createValidMiroTransformableJson(
                     MiroID = "L0011975",
                     MiroCollection = "images-L",
@@ -117,7 +117,7 @@ class MiroTransformerFeatureTest
                   bucket = storageBucket
                 )
               val miroHybridRecordMessage2 =
-                hybridRecordNotificationMessage(
+                messagePointerNotificationMessage(
                   message = createValidMiroTransformableJson(
                     MiroID = "L0023034",
                     MiroCollection = "images-L",

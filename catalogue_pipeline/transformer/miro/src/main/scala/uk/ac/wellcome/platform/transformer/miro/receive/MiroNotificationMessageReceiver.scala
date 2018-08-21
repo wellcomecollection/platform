@@ -27,14 +27,12 @@ class MiroNotificationMessageReceiver @Inject()(
   ec: ExecutionContext
 ) extends Logging {
 
-  def receiveMessage(message: NotificationMessage): Future[Unit] = {
+  def receiveMessage(message: MiroTransformable): Future[Unit] = {
     debug(s"Starting to process message $message")
 
     val futurePublishAttempt = for {
-      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
-      transformableRecord <- getTransformable(hybridRecord)
       work <- Future.fromTry(
-        transformTransformable(transformableRecord, hybridRecord.version))
+        transformTransformable(message, hybridRecord.version))
       publishResult <- publishMessage(work)
       _ = debug(
         s"Published work: ${work.sourceIdentifier} with message $publishResult")
