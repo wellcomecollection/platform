@@ -16,7 +16,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait SierraMergerHelpers extends LocalVersionedHybridStore with Messaging {
+trait SierraMessagingHelpers extends LocalVersionedHybridStore with Messaging {
   def storeInVHS(
     transformable: SierraTransformable,
     hybridStore: VersionedHybridStore[SierraTransformable,
