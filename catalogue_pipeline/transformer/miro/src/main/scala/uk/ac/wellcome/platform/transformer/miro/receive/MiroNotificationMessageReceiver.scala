@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
+import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 
 import scala.concurrent.{ExecutionContext, Future}
