@@ -25,12 +25,14 @@ trait SierraMessagingHelpers extends LocalVersionedHybridStore with Messaging {
                                       SourceMetadata,
                                       ObjectStore[SierraTransformable]])
     : Future[Unit] =
-    hybridStore.updateRecord(id = transformable.sierraId.withoutCheckDigit)(
-      ifNotExisting = (transformable, SourceMetadata("sierra")))(
-      ifExisting = (t, m) =>
-        throw new RuntimeException(
-          s"Found record ${transformable.sierraId}, but VHS should be empty")
-    ).map(_ => ())
+    hybridStore
+      .updateRecord(id = transformable.sierraId.withoutCheckDigit)(
+        ifNotExisting = (transformable, SourceMetadata("sierra")))(
+        ifExisting = (t, m) =>
+          throw new RuntimeException(
+            s"Found record ${transformable.sierraId}, but VHS should be empty")
+      )
+      .map(_ => ())
 
   def storeInVHS(
     transformables: List[SierraTransformable],
@@ -44,21 +46,19 @@ trait SierraMessagingHelpers extends LocalVersionedHybridStore with Messaging {
       }
     )
 
-  def assertStored(
-    transformable: SierraTransformable,
-    bucket: Bucket,
-    table: Table): Assertion =
+  def assertStored(transformable: SierraTransformable,
+                   bucket: Bucket,
+                   table: Table): Assertion =
     assertStored[SierraTransformable](
       bucket,
       table,
       id = transformable.sierraId.withoutCheckDigit,
       record = transformable)
 
-  def assertStoredAndSent(
-    transformable: SierraTransformable,
-    topic: Topic,
-    bucket: Bucket,
-    table: Table): Assertion =
+  def assertStoredAndSent(transformable: SierraTransformable,
+                          topic: Topic,
+                          bucket: Bucket,
+                          table: Table): Assertion =
     assertStoredAndSent[SierraTransformable](
       id = transformable.sierraId.withoutCheckDigit,
       t = transformable,
@@ -67,11 +67,10 @@ trait SierraMessagingHelpers extends LocalVersionedHybridStore with Messaging {
       table = table
     )
 
-  def assertStoredAndSent(
-    itemRecord: SierraItemRecord,
-    topic: Topic,
-    bucket: Bucket,
-    table: Table): Assertion =
+  def assertStoredAndSent(itemRecord: SierraItemRecord,
+                          topic: Topic,
+                          bucket: Bucket,
+                          table: Table): Assertion =
     assertStoredAndSent[SierraItemRecord](
       id = itemRecord.id.withoutCheckDigit,
       t = itemRecord,
@@ -80,10 +79,17 @@ trait SierraMessagingHelpers extends LocalVersionedHybridStore with Messaging {
       table = table
     )
 
-  private def assertStoredAndSent[T](id: String, t: T, topic: Topic, bucket: Bucket, table: Table)(implicit decoder: Decoder[T]): Assertion = {
+  private def assertStoredAndSent[T](
+    id: String,
+    t: T,
+    topic: Topic,
+    bucket: Bucket,
+    table: Table)(implicit decoder: Decoder[T]): Assertion = {
     val hybridRecord = getHybridRecord(table, id)
 
-    val storedTransformable = getObjectFromS3[T](Bucket(hybridRecord.location.namespace), hybridRecord.location.key)
+    val storedTransformable = getObjectFromS3[T](
+      Bucket(hybridRecord.location.namespace),
+      hybridRecord.location.key)
     storedTransformable shouldBe t
     getMessages[T](topic) should contain(t)
   }

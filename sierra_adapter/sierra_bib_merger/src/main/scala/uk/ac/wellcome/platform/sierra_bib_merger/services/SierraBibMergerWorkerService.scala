@@ -23,7 +23,9 @@ class SierraBibMergerWorkerService @Inject()(
     for {
       bibRecord <- Future.fromTry(fromJson[SierraBibRecord](message.Message))
       hybridRecord <- sierraBibMergerUpdaterService.update(bibRecord)
-      _ <- snsWriter.writeMessage(MessagePointer(hybridRecord.location), s"Sent from ${this.getClass.getSimpleName}")
+      _ <- snsWriter.writeMessage(
+        MessagePointer(hybridRecord.location),
+        s"Sent from ${this.getClass.getSimpleName}")
     } yield ()
 
   def stop() = system.terminate()

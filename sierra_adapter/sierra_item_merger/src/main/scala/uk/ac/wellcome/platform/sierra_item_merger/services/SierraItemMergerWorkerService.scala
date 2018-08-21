@@ -21,7 +21,8 @@ class SierraItemMergerWorkerService @Inject()(
 
   private def process(itemRecord: SierraItemRecord): Future[Unit] =
     for {
-      hybridRecords: Seq[HybridRecord] <- sierraItemMergerUpdaterService.update(itemRecord)
+      hybridRecords: Seq[HybridRecord] <- sierraItemMergerUpdaterService.update(
+        itemRecord)
       _ <- Future.sequence(
         hybridRecords.map { record =>
           snsWriter.writeMessage(

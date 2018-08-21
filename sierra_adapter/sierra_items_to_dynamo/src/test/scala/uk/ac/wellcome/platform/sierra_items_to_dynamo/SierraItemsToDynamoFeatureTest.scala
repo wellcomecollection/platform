@@ -24,7 +24,8 @@ class SierraItemsToDynamoFeatureTest
       withLocalS3Bucket { bucket =>
         withLocalSqsQueue { queue =>
           withLocalSnsTopic { topic =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ snsLocalFlags(topic)
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ snsLocalFlags(
+              topic)
 
             withServer(flags) { server =>
               val itemRecord = createSierraItemRecordWith(

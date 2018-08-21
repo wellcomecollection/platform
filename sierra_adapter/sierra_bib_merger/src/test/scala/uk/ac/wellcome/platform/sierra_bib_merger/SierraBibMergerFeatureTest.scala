@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore, S3}
+import uk.ac.wellcome.storage.fixtures.{
+  LocalDynamoDb,
+  LocalVersionedHybridStore,
+  S3
+}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
@@ -186,7 +190,7 @@ class SierraBibMergerFeatureTest
 
                 assertStoredAndSent(
                   transformable = expectedTransformable,
-                  topic= topic,
+                  topic = topic,
                   bucket = bucket,
                   table = table
                 )
@@ -240,7 +244,10 @@ class SierraBibMergerFeatureTest
     }
   }
 
-  private def flags(queue: SQS.Queue, topic: Topic, bucket: S3.Bucket, table: LocalDynamoDb.Table) = {
+  private def flags(queue: SQS.Queue,
+                    topic: Topic,
+                    bucket: S3.Bucket,
+                    table: LocalDynamoDb.Table) = {
     sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ snsLocalFlags(topic)
   }
 }

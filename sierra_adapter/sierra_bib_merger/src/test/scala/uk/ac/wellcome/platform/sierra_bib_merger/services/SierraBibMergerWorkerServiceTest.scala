@@ -53,33 +53,35 @@ class SierraBibMergerWorkerServiceTest
   }
 
   def withWorkerServiceFixtures[R](
-                                    testWith: TestWith[(MetricsSender, QueuePair, SierraBibMergerWorkerService),
-                                      R]) =
+    testWith: TestWith[(MetricsSender, QueuePair, SierraBibMergerWorkerService),
+                       R]) =
     withActorSystem { system =>
       withMockMetricSender { metricsSender =>
         withLocalSnsTopic { topic =>
           withLocalSqsQueueAndDlq {
-            case queuePair@QueuePair(queue, dlq) =>
+            case queuePair @ QueuePair(queue, dlq) =>
               withSNSWriter[R](topic) { snsWriter =>
-                withSQSStream[NotificationMessage, R](system, queue, metricsSender) {
-                  sqsStream =>
-                    withLocalDynamoDbTable { table =>
-                      withLocalS3Bucket { storageBucket =>
-                        withTypeVHS[SierraTransformable, SourceMetadata, R](
-                          storageBucket,
-                          table) { vhs =>
-                          val mergerUpdaterService =
-                            new SierraBibMergerUpdaterService(vhs)
+                withSQSStream[NotificationMessage, R](
+                  system,
+                  queue,
+                  metricsSender) { sqsStream =>
+                  withLocalDynamoDbTable { table =>
+                    withLocalS3Bucket { storageBucket =>
+                      withTypeVHS[SierraTransformable, SourceMetadata, R](
+                        storageBucket,
+                        table) { vhs =>
+                        val mergerUpdaterService =
+                          new SierraBibMergerUpdaterService(vhs)
 
-                          val worker = new SierraBibMergerWorkerService(
-                            system,
-                            sqsStream = sqsStream,
-                            snsWriter,
-                            mergerUpdaterService)
-                          testWith((metricsSender, queuePair, worker))
-                        }
+                        val worker = new SierraBibMergerWorkerService(
+                          system,
+                          sqsStream = sqsStream,
+                          snsWriter,
+                          mergerUpdaterService)
+                        testWith((metricsSender, queuePair, worker))
                       }
                     }
+                  }
                 }
               }
           }

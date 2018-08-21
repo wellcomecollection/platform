@@ -38,7 +38,10 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(topic) ++ messageReaderLocalFlags(sierraItemsToDynamoBucket, queue)
+              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
+                topic) ++ messageReaderLocalFlags(
+                sierraItemsToDynamoBucket,
+                queue)
               withServer(flags) { _ =>
                 withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
                   sierraDataBucket,
@@ -55,11 +58,12 @@ class SierraItemMergerFeatureTest
                     itemRecord = itemRecord
                   )
 
-                  val expectedSierraTransformable = createSierraTransformableWith(
-                    sierraId = bibId,
-                    maybeBibRecord = None,
-                    itemRecords = List(itemRecord)
-                  )
+                  val expectedSierraTransformable =
+                    createSierraTransformableWith(
+                      sierraId = bibId,
+                      maybeBibRecord = None,
+                      itemRecords = List(itemRecord)
+                    )
 
                   eventually {
                     assertStoredAndSent(
@@ -84,7 +88,10 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(topic) ++ messageReaderLocalFlags(sierraItemsToDynamoBucket, queue)
+              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
+                topic) ++ messageReaderLocalFlags(
+                sierraItemsToDynamoBucket,
+                queue)
               withServer(flags) { _ =>
                 withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
                   sierraDataBucket,
@@ -154,11 +161,15 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(topic) ++ messageReaderLocalFlags(sierraItemsToDynamoBucket, queue)
+              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
+                topic) ++ messageReaderLocalFlags(
+                sierraItemsToDynamoBucket,
+                queue)
               withServer(flags) { _ =>
-                withTypeVHS[SierraTransformable, SourceMetadata, List[Assertion]](
-                  sierraDataBucket,
-                  table) { hybridStore =>
+                withTypeVHS[
+                  SierraTransformable,
+                  SourceMetadata,
+                  List[Assertion]](sierraDataBucket, table) { hybridStore =>
                   val bibIds = createSierraBibNumbers(3)
                   val itemRecord = createSierraItemRecordWith(
                     bibIds = bibIds
@@ -196,7 +207,6 @@ class SierraItemMergerFeatureTest
       }
     }
   }
-
 
   private def sendNotification(
     bucket: Bucket,
