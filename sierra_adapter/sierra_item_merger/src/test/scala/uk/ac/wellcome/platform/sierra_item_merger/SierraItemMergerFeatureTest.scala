@@ -14,7 +14,7 @@ import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
+import uk.ac.wellcome.sierra_adapter.utils.SierraMergerHelpers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -28,7 +28,7 @@ class SierraItemMergerFeatureTest
     with S3
     with LocalVersionedHybridStore
     with SierraUtil
-    with SierraVHSUtil {
+    with SierraMergerHelpers {
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>

@@ -13,7 +13,7 @@ import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
+import uk.ac.wellcome.sierra_adapter.utils.SierraMergerHelpers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -23,7 +23,7 @@ class SierraItemMergerUpdaterServiceTest
     with ScalaFutures
     with LocalVersionedHybridStore
     with SQS
-    with SierraVHSUtil
+    with SierraMergerHelpers
     with SierraUtil {
 
   def withSierraUpdaterService(

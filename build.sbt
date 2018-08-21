@@ -145,6 +145,8 @@ lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common"
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
+  .dependsOn(finatra_messaging % "compile->compile;test->test")
+  .settings(libraryDependencies ++= WellcomeDependencies.newStorageLibrary)
 
 lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_reader")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
