@@ -6,10 +6,9 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.apache.commons.codec.digest.DigestUtils
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   SourceIdentifier,
@@ -31,7 +30,6 @@ import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -41,7 +39,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait MatcherFixtures
     extends Akka
-    with SQS
+    with Messaging
     with SNS
     with LocalWorkGraphDynamoDb
     with MetricsSenderFixture
@@ -68,8 +66,7 @@ trait MatcherFixtures
         new Server(),
         flags =
           cloudWatchLocalFlags ++
-            s3LocalFlags(bucket) ++
-            sqsLocalFlags(queue) ++
+            messageReaderLocalFlags(bucket, queue) ++
             snsLocalFlags(topic) ++
             dynamoDbLocalEndpointFlags(table) ++
             dynamoLockingServiceLocalFlags(lockTable)
@@ -93,8 +90,7 @@ trait MatcherFixtures
     queue: SQS.Queue,
     storageBucket: Bucket,
     topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R])(
-    implicit objectStore: ObjectStore[TransformedBaseWork]): R = {
-    val storageS3Config = S3Config(storageBucket.name)
+    implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { actorSystem =>
         withMockMetricSender { metricsSender =>
@@ -104,17 +100,17 @@ trait MatcherFixtures
                 withWorkGraphStore(graphTable) { workGraphStore =>
                   withWorkMatcher(workGraphStore, lockTable, metricsSender) {
                     workMatcher =>
-                      withSQSStream[NotificationMessage, R](
-                        actorSystem,
-                        queue,
-                        metricsSender) { sqsStream =>
+                      withMessageStream[TransformedBaseWork, R](
+                        actorSystem = actorSystem,
+                        bucket = storageBucket,
+                        queue = queue,
+                        metricsSender = metricsSender
+                      ) { messageStream =>
                         val matcherMessageReceiver = new MatcherMessageReceiver(
-                          sqsStream,
-                          snsWriter,
-                          objectStore,
-                          storageS3Config,
-                          actorSystem,
-                          workMatcher)
+                          messageStream = messageStream,
+                          snsWriter = snsWriter,
+                          actorSystem = actorSystem,
+                          workMatcher = workMatcher)
                         testWith(matcherMessageReceiver)
                       }
                   }
@@ -124,7 +120,6 @@ trait MatcherFixtures
         }
       }
     }
-  }
 
   def withWorkMatcher[R](
     workGraphStore: WorkGraphStore,

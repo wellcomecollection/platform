@@ -1,5 +1,5 @@
--aws.sqs.queue.url=${queue_url}
--aws.s3.bucketName=${vhs_bucket_name}
+-aws.message.reader.sqs.queue.url=${queue_url}
+-aws.message.reader.s3.bucketName=${vhs_bucket_name}
 -aws.metrics.namespace=${metrics_namespace}
 -aws.sns.topic.arn=${topic_arn}
 -aws.dynamo.tableName=${dynamo_table}
