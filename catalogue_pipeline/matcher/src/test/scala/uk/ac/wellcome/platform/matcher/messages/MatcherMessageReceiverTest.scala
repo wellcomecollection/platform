@@ -9,7 +9,11 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.ObjectLocation
@@ -396,9 +400,9 @@ class MatcherMessageReceiverTest
   }
 
   private def messagePointerNotificationMessage(message: String,
-                                              version: Int,
-                                              s3Client: AmazonS3,
-                                              bucket: Bucket) = {
+                                                version: Int,
+                                                s3Client: AmazonS3,
+                                                bucket: Bucket) = {
     val key = "recorder/1/testId/dshg548.json"
     s3Client.putObject(bucket.name, key, message)
 

@@ -142,39 +142,39 @@ class RecorderWorkerServiceTest
     val newerWork = olderWork.copy(version = 10, title = "A nice new thing")
 
     withLocalDynamoDbTable { table =>
-        withLocalS3Bucket { storageBucket =>
-          withLocalS3Bucket { messagesBucket =>
-            withLocalSqsQueue { queue =>
-              withLocalSnsTopic { topic =>
-                withRecorderWorkerService(
-                  table,
-                  storageBucket,
-                  messagesBucket,
-                  topic,
-                  queue) { _ =>
+      withLocalS3Bucket { storageBucket =>
+        withLocalS3Bucket { messagesBucket =>
+          withLocalSqsQueue { queue =>
+            withLocalSnsTopic { topic =>
+              withRecorderWorkerService(
+                table,
+                storageBucket,
+                messagesBucket,
+                topic,
+                queue) { _ =>
+                sendMessage[TransformedBaseWork](
+                  bucket = messagesBucket,
+                  queue = queue,
+                  obj = olderWork
+                )
+                eventually {
+                  assertStoredSingleWork(topic, table, olderWork)
                   sendMessage[TransformedBaseWork](
                     bucket = messagesBucket,
                     queue = queue,
-                    obj = olderWork
+                    obj = newerWork
                   )
                   eventually {
-                    assertStoredSingleWork(topic, table, olderWork)
-                    sendMessage[TransformedBaseWork](
-                      bucket = messagesBucket,
-                      queue = queue,
-                      obj = newerWork
-                    )
-                    eventually {
-                      assertStoredSingleWork(
-                        topic,
-                        table,
-                        newerWork,
-                        expectedVhsVersion = 2)
-                    }
+                    assertStoredSingleWork(
+                      topic,
+                      table,
+                      newerWork,
+                      expectedVhsVersion = 2)
                   }
                 }
               }
             }
+          }
         }
       }
     }
@@ -187,18 +187,22 @@ class RecorderWorkerServiceTest
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueueAndDlq {
             case QueuePair(queue, dlq) =>
-              withRecorderWorkerService(table, badBucket, messagesBucket, topic, queue) {
-                service =>
-                  val work = createUnidentifiedWork
-                  sendMessage[TransformedBaseWork](
-                    bucket = messagesBucket,
-                    queue = queue,
-                    obj = work
-                  )
-                  eventually {
-                    assertQueueEmpty(queue)
-                    assertQueueHasSize(dlq, 1)
-                  }
+              withRecorderWorkerService(
+                table,
+                badBucket,
+                messagesBucket,
+                topic,
+                queue) { service =>
+                val work = createUnidentifiedWork
+                sendMessage[TransformedBaseWork](
+                  bucket = messagesBucket,
+                  queue = queue,
+                  obj = work
+                )
+                eventually {
+                  assertQueueEmpty(queue)
+                  assertQueueHasSize(dlq, 1)
+                }
               }
           }
         }
@@ -237,10 +241,10 @@ class RecorderWorkerServiceTest
   }
 
   private def assertStoredSingleWork[T <: TransformedBaseWork](
-                                                                topic: Topic,
-                                                                table: Table,
-                                                                expectedWork: T,
-                                                                expectedVhsVersion: Int = 1)(implicit decoder: Decoder[T]) = {
+    topic: Topic,
+    table: Table,
+    expectedWork: T,
+    expectedVhsVersion: Int = 1)(implicit decoder: Decoder[T]) = {
     val actualRecords: List[HybridRecord] =
       Scanamo
         .scan[HybridRecord](dynamoDbClient)(table.name)
@@ -262,11 +266,11 @@ class RecorderWorkerServiceTest
   }
 
   private def withRecorderWorkerService[R](
-                                            table: Table,
-                                            storageBucket: Bucket,
-                                            messagesBucket: Bucket,
-                                            topic: Topic,
-                                            queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
+    table: Table,
+    storageBucket: Bucket,
+    messagesBucket: Bucket,
+    topic: Topic,
+    queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withSNSWriter(topic) { snsWriter =>

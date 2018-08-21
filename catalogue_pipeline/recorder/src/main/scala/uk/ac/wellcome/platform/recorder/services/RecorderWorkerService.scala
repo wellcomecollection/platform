@@ -27,17 +27,20 @@ class RecorderWorkerService @Inject()(
   private def processMessage(work: TransformedBaseWork): Future[Unit] =
     for {
       (hybridRecord, _) <- storeInVhs(work)
-      _ <- snsWriter.writeMessage(toJson(MessagePointer(hybridRecord.location)).get, s"Sent from ${this.getClass.getSimpleName}")
+      _ <- snsWriter.writeMessage(
+        toJson(MessagePointer(hybridRecord.location)).get,
+        s"Sent from ${this.getClass.getSimpleName}")
     } yield ()
 
   private def storeInVhs(work: TransformedBaseWork) = {
-    versionedHybridStore.updateRecord(work.sourceIdentifier.toString)((work, EmptyMetadata()))(
+    versionedHybridStore.updateRecord(work.sourceIdentifier.toString)(
+      (work, EmptyMetadata()))(
       (existingWork, existingMetadata) =>
         if (existingWork.version > work.version) {
           (existingWork, existingMetadata)
         } else {
           (work, EmptyMetadata())
-        }
+      }
     )
   }
 
