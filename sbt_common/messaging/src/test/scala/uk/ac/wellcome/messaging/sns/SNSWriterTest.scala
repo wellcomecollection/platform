@@ -51,7 +51,6 @@ class SNSWriterTest
         whenReady(futurePublishAttempt) { publishAttempt =>
           val messages = listMessagesReceivedFromSNS(topic)
           messages should have size 1
-          messages.head.message shouldBe message
 
           assertJsonStringsAreEqual(
             messages.head.message,
