@@ -31,7 +31,9 @@ cache:
     - catalogue_pipeline/matcher/target
     - catalogue_pipeline/merger/target
     - catalogue_pipeline/recorder/target
-    - catalogue_pipeline/transformer/target
+    - catalogue_pipeline/transformer/common/target
+    - catalogue_pipeline/transformer/miro/target
+    - catalogue_pipeline/transformer/sierra/target
 
     - data_api/snapshot_generator/target
 
@@ -136,7 +138,9 @@ jobs:
     # - env: TASK=api_docs-build
 
     # Catalogue pipeline stack
-    - env: TASK=transformer-test
+    - env: TASK=transformer_common-test
+    - env: TASK=transformer_miro-test
+    - env: TASK=transformer_sierra-test
     - env: TASK=ingestor-test
     - env: TASK=recorder-test
     - env: TASK=matcher-test
