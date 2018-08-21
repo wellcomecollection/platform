@@ -7,12 +7,12 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier
 }
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
-import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
+import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
 class SierraMergeCandidatesTest
     extends FunSpec
     with Matchers
-    with SierraDataUtil {
+    with SierraDataGenerators {
 
   val transformer = new SierraMergeCandidates {}
   it("extracts the bib number in 776$$w and adds it as a mergeCandidate") {

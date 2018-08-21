@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.sierra_bib_merger.merger
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 
-class BibMergerTest extends FunSpec with Matchers with SierraUtil {
+class BibMergerTest extends FunSpec with Matchers with SierraGenerators {
 
   describe("merging with a SierraBibRecord") {
     it("merges data from a bibRecord when empty") {

@@ -8,7 +8,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
@@ -29,7 +29,7 @@ class SierraItemMergerFeatureTest
     with SQS
     with S3
     with LocalVersionedHybridStore
-    with SierraUtil
+    with SierraGenerators
     with SierraMessagingHelpers {
 
   it("stores an item from SQS") {

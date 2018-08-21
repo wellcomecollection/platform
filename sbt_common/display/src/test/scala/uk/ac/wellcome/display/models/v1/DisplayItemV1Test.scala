@@ -1,9 +1,9 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.test.util.ItemsUtil
+import uk.ac.wellcome.models.work.test.util.ItemsGenerators
 
-class DisplayItemV1Test extends FunSpec with Matchers with ItemsUtil {
+class DisplayItemV1Test extends FunSpec with Matchers with ItemsGenerators {
 
   it("reads an Item as a DisplayItemV1") {
     val item = createIdentifiedItem()

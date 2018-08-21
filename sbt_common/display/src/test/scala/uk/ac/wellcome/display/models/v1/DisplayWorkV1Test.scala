@@ -3,9 +3,9 @@ package uk.ac.wellcome.display.models.v1
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
-class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
+class DisplayWorkV1Test extends FunSpec with Matchers with WorksGenerators {
 
   it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(

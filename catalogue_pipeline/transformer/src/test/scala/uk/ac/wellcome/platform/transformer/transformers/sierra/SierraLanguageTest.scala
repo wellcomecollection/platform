@@ -5,9 +5,9 @@ import uk.ac.wellcome.models.work.internal.Language
 import uk.ac.wellcome.platform.transformer.source.sierra.{
   Language => SierraLanguageField
 }
-import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
+import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraLanguageTest extends FunSpec with Matchers with SierraDataUtil {
+class SierraLanguageTest extends FunSpec with Matchers with SierraDataGenerators {
 
   val transformer = new SierraLanguage {}
 

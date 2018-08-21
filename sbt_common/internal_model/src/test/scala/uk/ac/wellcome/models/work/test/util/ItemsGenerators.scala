@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.work.test.util
 
 import uk.ac.wellcome.models.work.internal.{DigitalLocation, _}
 
-trait ItemsUtil extends IdentifiersUtil {
+trait ItemsGenerators extends IdentifiersGenerators {
   def createIdentifiedItem(
     canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,

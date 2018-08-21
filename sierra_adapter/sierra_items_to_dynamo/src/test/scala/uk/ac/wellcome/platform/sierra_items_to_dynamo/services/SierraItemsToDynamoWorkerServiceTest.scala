@@ -8,7 +8,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
@@ -36,7 +36,7 @@ class SierraItemsToDynamoWorkerServiceTest
     with Akka
     with MetricsSenderFixture
     with ScalaFutures
-    with SierraUtil {
+    with SierraGenerators {
 
   it("reads a sierra record from SQS and inserts it into DynamoDB") {
     val bibIds = createSierraBibNumbers(count = 5)

@@ -4,7 +4,7 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -18,7 +18,7 @@ class RecorderFeatureTest
     with fixtures.Server
     with LocalVersionedHybridStore
     with Messaging
-    with WorksUtil {
+    with WorksGenerators {
 
   it("receives a transformed Work, and saves it to the VHS") {
     val work = createUnidentifiedWork

@@ -13,7 +13,7 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
   SierraTransformable
@@ -44,7 +44,7 @@ class NotificationMessageReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
-    with SierraUtil
+    with SierraGenerators
     with TransformableMessageUtils {
 
   def withNotificationMessageReceiver[R](

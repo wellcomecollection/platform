@@ -6,7 +6,7 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.storage.fixtures.{
   LocalDynamoDb,
   LocalVersionedHybridStore,
@@ -30,7 +30,7 @@ class SierraBibMergerFeatureTest
     with SQS
     with fixtures.Server
     with LocalVersionedHybridStore
-    with SierraUtil
+    with SierraGenerators
     with SierraMessagingHelpers {
 
   it("stores a bib in the hybrid store") {

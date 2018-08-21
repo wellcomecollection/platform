@@ -2,9 +2,9 @@ package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
-class DisplayConceptTest extends FunSpec with Matchers with IdentifiersUtil {
+class DisplayConceptTest extends FunSpec with Matchers with IdentifiersGenerators {
 
   it("reads an unidentified generic Concept as a DisplayConcept") {
     assertDisplayConceptIsCorrect(

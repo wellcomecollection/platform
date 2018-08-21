@@ -1,9 +1,9 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.merger
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 
-class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
+class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraGenerators {
 
   it("combines the bibIds in the final result") {
     val bibIds = createSierraBibNumbers(count = 5)

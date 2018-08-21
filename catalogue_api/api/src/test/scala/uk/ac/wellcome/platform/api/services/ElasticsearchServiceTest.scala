@@ -6,7 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
 
 import scala.concurrent.Future
@@ -16,7 +16,7 @@ class ElasticsearchServiceTest
     with ElasticsearchServiceFixture
     with Matchers
     with ScalaFutures
-    with WorksUtil {
+    with WorksGenerators {
 
   val itemType = "work"
 

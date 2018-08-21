@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
-import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
+import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraDimensionsTest extends FunSpec with Matchers with SierraDataUtil {
+class SierraDimensionsTest extends FunSpec with Matchers with SierraDataGenerators {
 
   val transformer = new SierraDimensions {}
 

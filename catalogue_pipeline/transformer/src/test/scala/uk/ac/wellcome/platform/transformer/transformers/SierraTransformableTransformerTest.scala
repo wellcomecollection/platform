@@ -7,18 +7,18 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.json.JsonUtil._
 
 class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
-    with SierraUtil
+    with SierraGenerators
     with TransformableTestBase[SierraTransformable]
-    with WorksUtil {
+    with WorksGenerators {
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with physical items") {

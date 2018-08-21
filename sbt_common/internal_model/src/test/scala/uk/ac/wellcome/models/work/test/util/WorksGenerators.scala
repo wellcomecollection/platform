@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.work.test.util
 
 import uk.ac.wellcome.models.work.internal._
 
-trait WorksUtil extends ItemsUtil {
+trait WorksGenerators extends ItemsGenerators {
   private def createTitle: String = randomAlphanumeric(length = 100)
 
   def createUnidentifiedRedirectedWork: UnidentifiedRedirectedWork =

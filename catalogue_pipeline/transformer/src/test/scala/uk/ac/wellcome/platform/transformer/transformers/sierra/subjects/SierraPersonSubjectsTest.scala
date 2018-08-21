@@ -4,12 +4,12 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
-import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
+import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
 class SierraPersonSubjectsTest
     extends FunSpec
     with Matchers
-    with SierraDataUtil {
+    with SierraDataGenerators {
   private val transformer = new SierraPersonSubjects {}
 
   it("returns zero subjects if there are none") {

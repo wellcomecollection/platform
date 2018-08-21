@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.WorkType
 import uk.ac.wellcome.platform.transformer.source.SierraMaterialType
-import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
+import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraWorkTypeTest extends FunSpec with Matchers with SierraDataUtil {
+class SierraWorkTypeTest extends FunSpec with Matchers with SierraDataGenerators {
 
   val transformer = new SierraWorkType {}
 
