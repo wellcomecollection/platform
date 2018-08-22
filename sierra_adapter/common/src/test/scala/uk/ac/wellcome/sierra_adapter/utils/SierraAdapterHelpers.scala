@@ -97,6 +97,7 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       Bucket(hybridRecord.location.namespace),
       hybridRecord.location.key)
     storedTransformable shouldBe t
+
     getMessages[T](topic) should contain(t)
   }
 }

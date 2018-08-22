@@ -4,11 +4,9 @@ import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -70,11 +68,11 @@ class SierraBibMergerWorkerServiceTest
                         val mergerUpdaterService =
                           new SierraBibMergerUpdaterService(vhs)
 
-                        val worker = new SierraBibMergerWorkerService(
-                          system,
+                        new SierraBibMergerWorkerService(
+                          system = system,
                           sqsStream = sqsStream,
-                          snsWriter,
-                          mergerUpdaterService)
+                          snsWriter = snsWriter,
+                          sierraBibMergerUpdaterService = mergerUpdaterService)
                         testWith((metricsSender, queuePair))
                       }
                     }
