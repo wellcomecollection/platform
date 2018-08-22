@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
+import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.sierra.source.SierraBibData
+
 trait SierraTitle {
 
   // Populate wwork:title.  The rules are as follows:

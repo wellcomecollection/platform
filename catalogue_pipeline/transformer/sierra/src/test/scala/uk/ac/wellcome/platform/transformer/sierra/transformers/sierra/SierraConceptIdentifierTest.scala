@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.sierra.source.VarField
 
 class SierraConceptIdentifierTest extends FunSpec with Matchers {
 

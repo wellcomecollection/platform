@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
+import uk.ac.wellcome.platform.transformer.sierra.source.SierraBibData
+
 trait SierraPhysicalDescription extends MarcUtils {
 
   // Populate wwork:physicalDescription.

@@ -1,20 +1,20 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.transformer.miro.transformers.TransformableTestBase
 import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
 
 class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
     with SierraGenerators
-    with TransformableTestBase[SierraTransformable]
+    with SierraTransformableTestBase
     with WorksGenerators {
   val transformer = new SierraTransformableTransformer
 

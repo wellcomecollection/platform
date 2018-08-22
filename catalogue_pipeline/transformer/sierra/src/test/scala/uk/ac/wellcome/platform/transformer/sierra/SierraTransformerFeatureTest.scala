@@ -2,16 +2,15 @@ package uk.ac.wellcome.platform.transformer.sierra
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageHelper
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.platform.transformer.miro.utils.TransformableMessageUtils
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.transformer.sierra.fixtures.Server
 
 class SierraTransformerFeatureTest
     extends FunSpec
@@ -20,11 +19,11 @@ class SierraTransformerFeatureTest
     with SNS
     with S3
     with Messaging
-    with Server
+    with fixtures.Server
     with Eventually
     with ExtendedPatience
     with SierraGenerators
-    with TransformableMessageUtils {
+    with HybridRecordMessageHelper{
 
   it("transforms sierra records and publishes the result to the given topic") {
     val id = createSierraBibNumber

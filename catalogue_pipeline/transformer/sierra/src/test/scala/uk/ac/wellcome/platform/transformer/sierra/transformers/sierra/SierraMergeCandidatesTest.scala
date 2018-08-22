@@ -1,12 +1,9 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  MergeCandidate,
-  SourceIdentifier
-}
-import uk.ac.wellcome.platform.transformer.miro.utils.SierraDataGenerators
+import uk.ac.wellcome.models.work.internal.{IdentifierType, MergeCandidate, SourceIdentifier}
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
 class SierraMergeCandidatesTest
     extends FunSpec

@@ -1,11 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Concept,
-  Genre,
-  MaybeDisplayable
-}
+import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Genre, MaybeDisplayable}
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData, VarField}
 
 trait SierraGenres extends MarcUtils with SierraConcepts {
 

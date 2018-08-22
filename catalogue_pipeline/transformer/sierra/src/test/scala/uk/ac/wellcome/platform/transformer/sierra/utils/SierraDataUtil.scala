@@ -1,23 +1,20 @@
-package uk.ac.wellcome.platform.transformer.utils
+package uk.ac.wellcome.platform.transformer.sierra.utils
 
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
-import uk.ac.wellcome.platform.transformer.source._
-import uk.ac.wellcome.platform.transformer.source.sierra.{
-  Language => SierraLanguage,
-  Location => SierraLocation
-}
-import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.transformer.sierra.source._
+import uk.ac.wellcome.platform.transformer.sierra.source.sierra.{SierraSourceLanguage, SierraSourceLocation}
 
 trait SierraDataGenerators extends IdentifiersGenerators with SierraGenerators {
   def createSierraBibDataWith(
                                title: Option[String] = Some(randomAlphanumeric(25)),
-                               lang: Option[SierraLanguage] = None,
+                               lang: Option[SierraSourceLanguage] = None,
                                materialType: Option[SierraMaterialType] = None,
-                               locations: Option[List[SierraLocation]] = None,
+                               locations: Option[List[SierraSourceLocation]] = None,
                                varFields: List[VarField] = List()
-                             ): SierraBibData =
+  ): SierraBibData =
     SierraBibData(
       title = title,
       lang = lang,
@@ -43,9 +40,9 @@ trait SierraDataGenerators extends IdentifiersGenerators with SierraGenerators {
   }
 
   def createSierraItemDataWith(
-                                deleted: Boolean = false,
-                                location: Option[SierraLocation] = None
-                              ): SierraItemData =
+    deleted: Boolean = false,
+    location: Option[SierraSourceLocation] = None
+  ): SierraItemData =
     SierraItemData(
       deleted = deleted,
       location = location

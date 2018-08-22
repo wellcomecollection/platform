@@ -9,6 +9,8 @@ import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{MessageWriterConfigModule, SNSClientModule, SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
+import uk.ac.wellcome.platform.transformer.modules.TransformedBaseWorkModule
+import uk.ac.wellcome.platform.transformer.sierra.modules.{SierraTransformableModule, SierraTransformerWorkerModule}
 
 object ServerMain extends Server
 

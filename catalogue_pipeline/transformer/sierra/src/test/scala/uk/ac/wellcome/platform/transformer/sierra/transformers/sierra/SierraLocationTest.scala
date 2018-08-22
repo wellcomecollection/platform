@@ -1,13 +1,10 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{
-  DigitalLocation,
-  LocationType,
-  PhysicalLocation
-}
+import uk.ac.wellcome.models.work.internal.{DigitalLocation, LocationType, PhysicalLocation}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.miro.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLocation
+import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
 class SierraLocationTest
     extends FunSpec
@@ -22,7 +19,7 @@ class SierraLocationTest
       val locationType = LocationType("sgmed")
       val label = "A museum of mermaids"
       val itemData = createSierraItemDataWith(
-        location = Some(SierraLocationField(locationTypeCode, label))
+        location = Some(SierraSourceLocation(locationTypeCode, label))
       )
       val expectedLocation = PhysicalLocation(locationType, label)
 
@@ -32,7 +29,7 @@ class SierraLocationTest
 
     it("returns None if the location field only contains empty strings") {
       val itemData = createSierraItemDataWith(
-        location = Some(SierraLocationField("", ""))
+        location = Some(SierraSourceLocation("", ""))
       )
 
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
@@ -40,7 +37,7 @@ class SierraLocationTest
 
     it("returns None if the location field only contains the string 'none'") {
       val itemData = createSierraItemDataWith(
-        location = Some(SierraLocationField("none", "none"))
+        location = Some(SierraSourceLocation("none", "none"))
       )
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
     }

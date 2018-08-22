@@ -14,20 +14,15 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.models.transformable.{
-  MiroTransformable,
-  SierraTransformable
-}
+import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
 import uk.ac.wellcome.models.transformable.SierraTransformable._
-import uk.ac.wellcome.models.work.internal.{
-  TransformedBaseWork,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.platform.transformer.miro.utils.TransformableMessageUtils
+import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
+import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageHelper
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -45,7 +40,7 @@ class SierraNotificationMessageReceiverTest
     with MockitoSugar
     with ScalaFutures
     with SierraGenerators
-    with TransformableMessageUtils {
+    with HybridRecordMessageHelper{
 
   def withNotificationMessageReceiver[R](
     topic: Topic,
@@ -66,7 +61,8 @@ class SierraNotificationMessageReceiverTest
     val recordReceiver = new SierraNotificationMessageReceiver(
       messageWriter = messageWriter,
       s3Client = s3Client,
-      s3Config = S3Config(bucket.name)
+      s3Config = S3Config(bucket.name),
+      sierraTransformableTransformer = new SierraTransformableTransformer
     )
 
     testWith(recordReceiver)

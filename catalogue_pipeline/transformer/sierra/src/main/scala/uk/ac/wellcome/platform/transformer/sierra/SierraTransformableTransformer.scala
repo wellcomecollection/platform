@@ -1,16 +1,17 @@
 package uk.ac.wellcome.platform.transformer.sierra
 
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.sierra.source.SierraBibData
 import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra._
 import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects.{SierraConceptSubjects, SierraPersonSubjects}
 
 import scala.util.{Success, Try}
 
 class SierraTransformableTransformer
-    extends TransformableTransformer[SierraTransformable]
-    with SierraIdentifiers
+    extends SierraIdentifiers
     with SierraContributors
     with SierraDescription
     with SierraPhysicalDescription
@@ -28,10 +29,8 @@ class SierraTransformableTransformer
     with SierraGenres
     with SierraMergeCandidates {
 
-  override def transformForType
-    : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
-    case (sierraTransformable: SierraTransformable, version: Int) =>
-      val bibId = sierraTransformable.sierraId
+  def transform(sierraTransformable: SierraTransformable, version: Int): Try[TransformedBaseWork] = {
+    val bibId = sierraTransformable.sierraId
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",

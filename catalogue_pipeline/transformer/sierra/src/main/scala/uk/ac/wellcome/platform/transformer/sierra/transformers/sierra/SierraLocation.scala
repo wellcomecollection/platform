@@ -2,6 +2,8 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.sierra.source.SierraItemData
+import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLocation
 
 trait SierraLocation {
   def getPhysicalLocation(itemData: SierraItemData): Option[PhysicalLocation] =
@@ -10,10 +12,10 @@ trait SierraLocation {
       // the JSON, but the code and name are both empty strings or "none".
       // We can't do anything useful with this, so don't return a location.
       // TODO: Find out if we can populate location from other fields.
-      case Some(SierraLocationField("", ""))         => None
-      case Some(SierraLocationField("none", "none")) => None
+      case Some(SierraSourceLocation("", ""))         => None
+      case Some(SierraSourceLocation("none", "none")) => None
 
-      case Some(loc: SierraLocationField) =>
+      case Some(loc: SierraSourceLocation) =>
         Some(
           PhysicalLocation(
             locationType = LocationType(loc.code),

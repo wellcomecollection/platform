@@ -2,7 +2,8 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.Language
-import uk.ac.wellcome.platform.transformer.miro.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLanguage
+import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
 class SierraLanguageTest
     extends FunSpec
@@ -19,7 +20,7 @@ class SierraLanguageTest
   it("picks up the language from the lang field") {
     val bibData = createSierraBibDataWith(
       lang = Some(
-        SierraLanguageField(
+        SierraSourceLanguage(
           code = "eng",
           name = "English"
         ))

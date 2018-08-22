@@ -18,7 +18,7 @@ import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWor
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 import uk.ac.wellcome.platform.transformer.miro.utils.MiroTransformableMessageUtils
-import uk.ac.wellcome.platform.transformer.utils.MessagePointerUtils
+import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageHelper
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.s3.S3Config
@@ -38,7 +38,7 @@ class MiroTransformableReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
-    with MiroTransformableMessageUtils with MessagePointerUtils {
+    with MiroTransformableMessageUtils with HybridRecordMessageHelper {
 
   def withNotificationMessageReceiver[R](
     topic: Topic,
@@ -70,7 +70,7 @@ class MiroTransformableReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sqsMessage = messagePointerNotificationMessage(
+          val sqsMessage = hybridRecordNotificationMessage(
             message = createValidMiroTransformableJson(),
             sourceName = "miro",
             s3Client = s3Client,
@@ -100,7 +100,7 @@ class MiroTransformableReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sierraMessage = messagePointerNotificationMessage(
+          val sierraMessage = hybridRecordNotificationMessage(
             message = createValidMiroTransformableJson(),
             sourceName = "sierra",
             version = version,
@@ -132,7 +132,7 @@ class MiroTransformableReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val invalidSqsMessage =
-            messagePointerNotificationMessage(
+            hybridRecordNotificationMessage(
               message = "not a json string",
               sourceName = "miro",
               s3Client = s3Client,
@@ -162,7 +162,7 @@ class MiroTransformableReceiverTest
           )
 
           val failingSqsMessage =
-            messagePointerNotificationMessage(
+            hybridRecordNotificationMessage(
               message = toJson(miroTransformable).get,
               sourceName = "miro",
               s3Client = s3Client,
@@ -192,7 +192,7 @@ class MiroTransformableReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val message = messagePointerNotificationMessage(
+          val message = hybridRecordNotificationMessage(
             message = toJson(sierraTransformable).get,
             sourceName = "sierra",
             s3Client = s3Client,

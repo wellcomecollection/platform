@@ -1,3 +1,3 @@
 package uk.ac.wellcome.platform.transformer.sierra.source.sierra
 
-case class Location(code: String, name: String)
+case class SierraSourceLocation(code: String, name: String)

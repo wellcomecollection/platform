@@ -1,7 +1,8 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.miro.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
 class SierraPhysicalDescriptionTest
     extends FunSpec

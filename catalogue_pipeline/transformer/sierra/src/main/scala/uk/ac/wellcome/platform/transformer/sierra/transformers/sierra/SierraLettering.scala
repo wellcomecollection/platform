@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData}
+
 trait SierraLettering {
 
   // Populate wwork:lettering.
@@ -27,10 +29,12 @@ trait SierraLettering {
   //
   def getLettering(bibData: SierraBibData): Option[String] = {
     val matchingSubfields = bibData.varFields
-      .filter { _.marcTag == Some("246") }
-      .filter { _.indicator2 == Some("6") }
-      .map { _.subfields }
-      .flatten
+      .filter {
+        _.marcTag.contains("246")
+      }
+      .filter {
+        _.indicator2.contains("6")
+      }.flatMap(_.subfields)
       .filter { subfield: MarcSubfield =>
         subfield.tag == "a"
       }

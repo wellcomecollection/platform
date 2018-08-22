@@ -1,18 +1,18 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers
 
 import org.scalatest.Matchers
-import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.miro.transformers.TransformableTransformer
+import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
 
 import scala.util.Try
 
-trait TransformableTestBase[T <: Transformable] extends Matchers {
+trait SierraTransformableTestBase extends Matchers {
 
-  val transformer: TransformableTransformer[T]
+  val transformer: SierraTransformableTransformer
 
-  def transformToWork(transformable: T): TransformedBaseWork = {
+  def transformToWork(transformable: SierraTransformable): TransformedBaseWork = {
     val triedWork: Try[TransformedBaseWork] =
       transformer.transform(transformable, version = 1)
 
@@ -26,7 +26,7 @@ trait TransformableTestBase[T <: Transformable] extends Matchers {
     triedWork.get
   }
 
-  def assertTransformToWorkFails(transformable: T): Unit = {
+  def assertTransformToWorkFails(transformable: SierraTransformable): Unit = {
     transformer
       .transform(transformable, version = 1)
       .isSuccess shouldBe false
