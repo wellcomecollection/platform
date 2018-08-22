@@ -8,15 +8,13 @@ import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.storage.s3.S3Config
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class HybridRecordReceiver[T] @Inject()(
-  s3Config: S3Config,
   messageWriter: MessageWriter[TransformedBaseWork],
   objectsStore: ObjectStore[T])(implicit ec: ExecutionContext)
     extends Logging {
@@ -46,14 +44,7 @@ class HybridRecordReceiver[T] @Inject()(
 
   }
 
-  private def getTransformable(hybridRecord: HybridRecord): Future[T] = {
-    val s3ObjectLocation = ObjectLocation(
-      namespace = s3Config.bucketName,
-      key = hybridRecord.s3key
-    )
-
-    objectsStore.get(s3ObjectLocation)
-  }
+  private def getTransformable(hybridRecord: HybridRecord): Future[T] = objectsStore.get(hybridRecord.location)
 
   private def publishMessage(
     work: TransformedBaseWork): Future[PublishAttempt] =

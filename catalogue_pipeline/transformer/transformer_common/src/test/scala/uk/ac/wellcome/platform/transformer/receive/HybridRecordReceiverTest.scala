@@ -199,7 +199,6 @@ class HybridRecordReceiverTest
       )
 
     val recordReceiver = new HybridRecordReceiver[TestTransformable](
-      s3Config = S3Config(bucket.name),
       messageWriter = messageWriter,
       objectsStore = objectStore
     )
