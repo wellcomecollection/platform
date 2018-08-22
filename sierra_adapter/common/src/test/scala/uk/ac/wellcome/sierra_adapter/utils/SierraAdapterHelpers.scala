@@ -24,16 +24,16 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
                                         EmptyMetadata,
                                         ObjectStore[SierraTransformable]]
 
-  def withSierraVHS[R](bucket: Bucket, table: Table)(testWith: TestWith[SierraVHS, R]): R =
-    withTypeVHS[SierraTransformable,
-                EmptyMetadata,
-                R](bucket = bucket, table = table) { vhs =>
+  def withSierraVHS[R](bucket: Bucket, table: Table)(
+    testWith: TestWith[SierraVHS, R]): R =
+    withTypeVHS[SierraTransformable, EmptyMetadata, R](
+      bucket = bucket,
+      table = table) { vhs =>
       testWith(vhs)
     }
 
-  def storeInVHS(
-    transformable: SierraTransformable,
-    hybridStore: SierraVHS): Future[Unit] =
+  def storeInVHS(transformable: SierraTransformable,
+                 hybridStore: SierraVHS): Future[Unit] =
     hybridStore
       .updateRecord(id = transformable.sierraId.withoutCheckDigit)(
         ifNotExisting = (transformable, EmptyMetadata()))(
@@ -43,9 +43,8 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       )
       .map(_ => ())
 
-  def storeInVHS(
-    transformables: List[SierraTransformable],
-    hybridStore: SierraVHS): Future[List[Unit]] =
+  def storeInVHS(transformables: List[SierraTransformable],
+                 hybridStore: SierraVHS): Future[List[Unit]] =
     Future.sequence(
       transformables.map { t =>
         storeInVHS(t, hybridStore = hybridStore)
