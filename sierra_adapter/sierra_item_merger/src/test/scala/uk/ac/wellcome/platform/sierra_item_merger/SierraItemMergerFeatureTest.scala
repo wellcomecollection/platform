@@ -4,8 +4,7 @@ import com.amazonaws.services.sqs.model.SendMessageResult
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.transformable.SierraTransformable._
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue_
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -15,8 +14,6 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessagePointer
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 import uk.ac.wellcome.storage.ObjectLocation
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraItemMergerFeatureTest
     extends FunSpec
