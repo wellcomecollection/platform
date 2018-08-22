@@ -2,7 +2,6 @@ ROOT = $(shell git rev-parse --show-toplevel)
 STACK_ROOT 	= catalogue_pipeline
 
 include $(ROOT)/functions.Makefile
-include $(ROOT)/$(STACK_ROOT)/transformer/Makefile
 
 SBT_APPS 	= id_minter ingestor recorder matcher merger
 SBT_DOCKER_LIBRARIES =
@@ -17,3 +16,5 @@ TF_PATH 	= $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))
+
+include $(ROOT)/$(STACK_ROOT)/transformer/Makefile
