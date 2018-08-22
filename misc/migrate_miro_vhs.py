@@ -2,6 +2,7 @@
 # -*- encoding: utf-8
 
 import json
+import os
 
 from botocore.exceptions import ClientError
 import boto3
@@ -26,8 +27,7 @@ def get_existing_records(dynamodb_client):
     """
     Generates existing Miro records from the SourceData table.
     """
-    for line in tqdm.tqdm(open('sourcedata.txt'), total=2039416):
-        item = json.loads(line)
+    for item in tqdm.tqdm(all_records(dynamodb_client), total=2039416):
         if 'reindexShard' not in item:
             print(item)
 
@@ -36,11 +36,20 @@ def get_existing_records(dynamodb_client):
         yield item
 
 
+os.makedirs('_miro', exist_ok=True)
+
 if __name__ == '__main__':
     dynamodb_client = boto3.client('dynamodb')
     s3_client = boto3.client('s3')
 
     for item in get_existing_records(dynamodb_client):
+
+        item['id']['S'] = item['id']['S'].replace('miro/', '')
+        marker = os.path.join('_miro', item['id']['S'])
+
+        if os.path.exists(marker):
+            continue
+
         del item['sourceName']
         del item['sourceId']
         del item['reindexVersion']
@@ -53,7 +62,7 @@ if __name__ == '__main__':
         try:
             s3_client.head_object(
                 Bucket=NEW_BUCKET,
-                Key=new_key + 'xxx'
+                Key=new_key
             )
         except ClientError as err:
             if err.response['Error']['Code'] == '404':
@@ -89,4 +98,13 @@ if __name__ == '__main__':
                 TableName=NEW_TABLE,
                 Key={'id': item['id']}
             )
-            assert 'Item' in resp
+            if 'Item' not in resp:
+                import time
+                time.sleep(1)
+                resp = dynamodb_client.get_item(
+                    TableName=NEW_TABLE,
+                    Key={'id': item['id']}
+                )
+                assert 'Item' in resp
+
+        open(marker, 'wb').write(b'')
