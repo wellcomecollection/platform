@@ -37,7 +37,7 @@ class SierraBibMergerWorkerServiceTest
   it(
     "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {
     withWorkerServiceFixtures {
-      case (metricsSender, QueuePair(queue, dlq), _) =>
+      case (metricsSender, QueuePair(queue, dlq)) =>
         sendNotificationToSQS(
           queue = queue,
           body = "null"
@@ -52,9 +52,8 @@ class SierraBibMergerWorkerServiceTest
     }
   }
 
-  def withWorkerServiceFixtures[R](
-    testWith: TestWith[(MetricsSender, QueuePair, SierraBibMergerWorkerService),
-                       R]) =
+  private def withWorkerServiceFixtures[R](
+    testWith: TestWith[(MetricsSender, QueuePair), R]) =
     withActorSystem { system =>
       withMockMetricSender { metricsSender =>
         withLocalSnsTopic { topic =>
@@ -78,7 +77,7 @@ class SierraBibMergerWorkerServiceTest
                           sqsStream = sqsStream,
                           snsWriter,
                           mergerUpdaterService)
-                        testWith((metricsSender, queuePair, worker))
+                        testWith((metricsSender, queuePair))
                       }
                     }
                   }
