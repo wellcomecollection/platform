@@ -13,9 +13,9 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
+import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
@@ -136,7 +136,7 @@ class SierraNotificationMessageReceiverTest
           val invalidSqsMessage =
             hybridRecordNotificationMessage(
               message = "not a json string",
-              sourceName = "miro",
+              sourceName = "sierra",
               s3Client = s3Client,
               bucket = bucket
             )
@@ -157,16 +157,12 @@ class SierraNotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val miroTransformable = MiroTransformable(
-            sourceId = "B1234567",
-            MiroCollection = "Images-B",
-            data = "not a json string"
-          )
+          val sierraTransformable = createSierraTransformableWith(maybeBibRecord = Some(createSierraBibRecordWith(data = "not a json string")))
 
           val failingSqsMessage =
             hybridRecordNotificationMessage(
-              message = toJson(miroTransformable).get,
-              sourceName = "miro",
+              message = toJson(sierraTransformable).get,
+              sourceName = "sierra",
               s3Client = s3Client,
               bucket = bucket
             )
