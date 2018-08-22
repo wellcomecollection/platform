@@ -19,12 +19,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
+  type SierraVHS = VersionedHybridStore[SierraTransformable,
+                                        EmptyMetadata,
+                                        ObjectStore[SierraTransformable]]
+
   def storeInVHS(
     transformable: SierraTransformable,
-    hybridStore: VersionedHybridStore[SierraTransformable,
-                                      SourceMetadata,
-                                      ObjectStore[SierraTransformable]])
-    : Future[Unit] =
+    hybridStore: SierraVHS): Future[Unit] =
     hybridStore
       .updateRecord(id = transformable.sierraId.withoutCheckDigit)(
         ifNotExisting = (transformable, SourceMetadata("sierra")))(
@@ -36,10 +37,7 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
 
   def storeInVHS(
     transformables: List[SierraTransformable],
-    hybridStore: VersionedHybridStore[SierraTransformable,
-                                      SourceMetadata,
-                                      ObjectStore[SierraTransformable]])
-    : Future[List[Unit]] =
+    hybridStore: SierraVHS): Future[List[Unit]] =
     Future.sequence(
       transformables.map { t =>
         storeInVHS(t, hybridStore = hybridStore)
