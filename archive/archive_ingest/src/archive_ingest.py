@@ -18,7 +18,7 @@ logger = daiquiri.getLogger()
 
 def ensure_valid_request(event):
     required_key = 'bagURL'
-    if not type(event) is dict:
+    if type(event) is not dict:
         raise ValueError(f"Invalid request not json dict: {event}")
     if required_key not in event:
         raise ValueError(f"Invalid request missing {required_key}")
