@@ -105,25 +105,11 @@ Content-Type: application/json
 {
   "type": "Ingest",
   "ingestType": {
-    "id": "digitised",
+    "id": "create",
     "type": "IngestType"
   },
-  "location": {
-    "type": "DigitalLocation",
-    "locationType": {
-      "id": "aws-s3-standard",
-      "type": "LocationType"
-    },
-    "url": "s3://source-bucket/source-path/source-bag.zip"
-  },
-  "callback": {
-    "type": "DigitalLocation",
-    "locationType": {
-      "id": "callback-url",
-      "type": "LocationType"
-    },
-    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567"
-  }
+  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
 }
 ```
 
@@ -132,6 +118,38 @@ Response:
 ```http
 202 ACCEPTED
 ```
+
+Request:
+
+```http
+GET /ingests/xx-xx-xx-xx
+```
+
+Response:
+
+```json
+{
+  "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+  "id": "{guid}",
+  "type": "Ingest",
+  "ingestType": {
+    "id": "create",
+    "type": "IngestType"
+  },
+  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+  "bag": {
+    "id": "{id}",
+    "type": "Bag"
+  },
+  "result": {
+    "id": "success",
+    "type": "IngestResult"
+  },
+  "events": [ ... ]
+}
+```
+
 
 ### Digitised content
 
