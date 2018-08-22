@@ -20,7 +20,7 @@ def ensure_valid_request(event):
     required_key = 'bagURL'
     if not type(event) is dict:
         raise ValueError(f"Invalid request not json dict: {event}")
-    if not required_key in event:
+    if required_key not in event:
         raise ValueError(f"Invalid request missing {required_key}")
 
 
@@ -38,6 +38,7 @@ def archive_bag_message(bag_url):
         }
     else:
         raise ValueError(f"Unrecognised url scheme: {bag_url}")
+
 
 # @log_on_error TODO: replace when bug fix is released
 def handler(event, _ctx=None, sns_client=None):
@@ -63,6 +64,5 @@ def handler(event, _ctx=None, sns_client=None):
     )
     logger.debug(f"published: {message} to {topic_arn}")
 
-    response = {'received' : 'OK'}
+    response = {'received': 'OK'}
     return response
-
