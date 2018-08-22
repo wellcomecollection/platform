@@ -1,40 +1,27 @@
-package uk.ac.wellcome.platform.transformer.sierra.receive
+package uk.ac.wellcome.platform.transformer.receive
 
-import com.amazonaws.services.s3.AmazonS3
-import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
-class SierraNotificationMessageReceiver @Inject()(
-  messageWriter: MessageWriter[TransformedBaseWork],
-  s3Client: AmazonS3,
-  s3Config: S3Config,
-  sierraTransformableTransformer: SierraTransformableTransformer)(
-  implicit sierraTransformableStore: ObjectStore[SierraTransformable],
-  ec: ExecutionContext
-) extends Logging {
+class HybridRecordReceiver[T](s3Config: S3Config, messageWriter: MessageWriter[TransformedBaseWork],objectsStore: ObjectStore[T])(implicit ec: ExecutionContext) extends Logging {
 
-  def receiveMessage(message: NotificationMessage): Future[Unit] = {
+  def receiveMessage(message: NotificationMessage, transformToWork: (T, Int) => Future[TransformedBaseWork]): Future[Unit] = {
     debug(s"Starting to process message $message")
 
     val futurePublishAttempt = for {
       hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
       transformableRecord <- getTransformable(hybridRecord)
-      work <- Future.fromTry(
-        transformTransformable(transformableRecord, hybridRecord.version))
+      work <- transformToWork(transformableRecord, hybridRecord.version)
       publishResult <- publishMessage(work)
       _ = debug(
         s"Published work: ${work.sourceIdentifier} with message $publishResult")
@@ -58,22 +45,7 @@ class SierraNotificationMessageReceiver @Inject()(
       key = hybridRecord.s3key
     )
 
-    sierraTransformableStore.get(s3ObjectLocation)
-  }
-
-  private def transformTransformable(
-    transformable: SierraTransformable,
-    version: Int
-  ): Try[TransformedBaseWork] = {
-    sierraTransformableTransformer.transform(transformable, version) map {
-      transformed =>
-        debug(s"Transformed record to $transformed")
-        transformed
-    } recover {
-      case e: Throwable =>
-        error("Failed to perform transform to unified item", e)
-        throw e
-    }
+    objectsStore.get(s3ObjectLocation)
   }
 
   private def publishMessage(

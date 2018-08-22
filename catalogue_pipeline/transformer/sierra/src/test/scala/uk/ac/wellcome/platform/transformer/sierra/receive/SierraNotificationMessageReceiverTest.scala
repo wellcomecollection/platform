@@ -46,7 +46,7 @@ class SierraNotificationMessageReceiverTest
     topic: Topic,
     bucket: Bucket,
     maybeSnsClient: Option[AmazonSNS] = None
-  )(testWith: TestWith[SierraNotificationMessageReceiver, R]) = {
+  )(testWith: TestWith[SierraTransformerWrapper, R]) = {
     val s3Config = S3Config(bucket.name)
 
     val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
@@ -58,7 +58,7 @@ class SierraNotificationMessageReceiverTest
         s3Client = s3Client
       )
 
-    val recordReceiver = new SierraNotificationMessageReceiver(
+    val recordReceiver = new SierraTransformerWrapper(
       messageWriter = messageWriter,
       s3Client = s3Client,
       s3Config = S3Config(bucket.name),
