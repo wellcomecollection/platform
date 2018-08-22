@@ -2,7 +2,8 @@ module "catalogue_pipeline" {
   source = "pipeline"
 
   namespace                   = "catalogue_pipeline"
-  transformer_container_image = "${local.transformer_container_image}"
+  transformer_miro_container_image = "${local.transformer_miro_container_image}"
+  transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
   recorder_container_image    = "${local.recorder_container_image}"
   matcher_container_image     = "${local.matcher_container_image}"
   merger_container_image      = "${local.merger_container_image}"
