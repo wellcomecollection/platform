@@ -6,7 +6,10 @@ import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraProductionTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraProductionTest
+    extends FunSpec
+    with Matchers
+    with SierraDataGenerators {
 
   it("returns an empty list if neither 260 nor 264 are present") {
     transformToProduction(varFields = List()) shouldBe List()

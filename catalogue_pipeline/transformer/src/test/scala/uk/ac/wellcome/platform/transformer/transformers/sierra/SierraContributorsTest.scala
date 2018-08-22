@@ -6,7 +6,10 @@ import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraContributorsTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraContributorsTest
+    extends FunSpec
+    with Matchers
+    with SierraDataGenerators {
 
   val transformer = new SierraContributors {}
 

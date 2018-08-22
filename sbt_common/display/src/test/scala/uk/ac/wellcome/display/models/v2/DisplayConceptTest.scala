@@ -4,7 +4,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
-class DisplayConceptTest extends FunSpec with Matchers with IdentifiersGenerators {
+class DisplayConceptTest
+    extends FunSpec
+    with Matchers
+    with IdentifiersGenerators {
 
   it("reads an unidentified generic Concept as a DisplayConcept") {
     assertDisplayConceptIsCorrect(

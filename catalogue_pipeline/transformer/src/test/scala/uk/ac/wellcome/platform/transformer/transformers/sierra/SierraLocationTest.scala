@@ -12,7 +12,10 @@ import uk.ac.wellcome.platform.transformer.source.sierra.{
 }
 import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraLocationTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraLocationTest
+    extends FunSpec
+    with Matchers
+    with SierraDataGenerators {
 
   private val transformer = new SierraLocation {}
 

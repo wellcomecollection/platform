@@ -7,7 +7,10 @@ import uk.ac.wellcome.platform.transformer.source.sierra.{
 }
 import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraLanguageTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraLanguageTest
+    extends FunSpec
+    with Matchers
+    with SierraDataGenerators {
 
   val transformer = new SierraLanguage {}
 

@@ -4,7 +4,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraDimensionsTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraDimensionsTest
+    extends FunSpec
+    with Matchers
+    with SierraDataGenerators {
 
   val transformer = new SierraDimensions {}
 

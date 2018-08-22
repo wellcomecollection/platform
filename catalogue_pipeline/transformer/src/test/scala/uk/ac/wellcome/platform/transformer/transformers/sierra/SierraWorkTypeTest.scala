@@ -5,7 +5,10 @@ import uk.ac.wellcome.models.work.internal.WorkType
 import uk.ac.wellcome.platform.transformer.source.SierraMaterialType
 import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraWorkTypeTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraWorkTypeTest
+    extends FunSpec
+    with Matchers
+    with SierraDataGenerators {
 
   val transformer = new SierraWorkType {}
 
