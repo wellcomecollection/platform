@@ -180,26 +180,24 @@ endef
 # Run docker-compose up.
 #
 # Args:
-#   $1 - Name of the project.
+#   $1 - Path to the docker-compose file.
 #
 define docker_compose_up
     $(ROOT)/docker_run.py --dind --sbt --root -- \
     		--net host \
-    		wellcome/sbt_wrapper \
-            "project $(1)" ";dockerComposeUp"
+    		docker/compose:1.21.0 -f /repo/$(1) up
 endef
 
 
 # Run docker-compose down.
 #
 # Args:
-#   $1 - Name of the project.
+#   $1 - Path to the docker-compose file.
 #
 define docker_compose_down
     $(ROOT)/docker_run.py --dind --sbt --root -- \
         		--net host \
-        		wellcome/sbt_wrapper \
-                "project $(1)" ";dockerComposeDown"
+        		docker/compose:1.21.0 -f /repo/$(1) down
 endef
 
 
@@ -210,7 +208,7 @@ endef
 #	$2 - Root of the project's source code.
 #
 define __sbt_target_template
-$(eval $(call __sbt_base_docker_template,$(1)))
+$(eval $(call __sbt_base_docker_template,$(1),$(2)))
 
 $(1)-build:
 	$(call sbt_build,$(1))
@@ -225,9 +223,10 @@ endef
 #
 # Args:
 #	$1 - Name of the project in sbt.
+#	$2 - Root of the project's source code.
 #
 define __sbt_library_docker_template
-$(eval $(call __sbt_base_docker_template,$(1)))
+$(eval $(call __sbt_base_docker_template,$(1),$(2)))
 
 $(1)-publish:
 	echo "Nothing to do!"
@@ -239,13 +238,14 @@ endef
 #
 # Args:
 #	$1 - Name of the project in sbt.
+#	$2 - Root of the project's source code.
 #
 define __sbt_base_docker_template
 $(1)-docker_compose_up:
-	$(call docker_compose_up,$(1))
+	$(call docker_compose_up,$(2)/docker-compose.yml)
 
 $(1)-docker_compose_down:
-	$(call docker_compose_down,$(1))
+	$(call docker_compose_down,$(2)/docker-compose.yml)
 
 $(1)-test:
 	$(call sbt_test,$(1))
