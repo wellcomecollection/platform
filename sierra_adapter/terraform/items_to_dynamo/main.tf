@@ -28,8 +28,8 @@ module "sierra_to_dynamo_service" {
     demultiplexer_queue_url = "${module.demultiplexer_queue.id}"
     metrics_namespace       = "sierra_items_to_dynamo"
 
-    vhs_table_name  = "${module.vhs_sierra_items.table_name}"
-    vhs_bucket_name = "${module.vhs_sierra_items.bucket_name}"
+    vhs_table_name  = "${local.vhs_sierra_items_table_name}"
+    vhs_bucket_name = "${local.vhs_sierra_items_bucket_name}"
 
     topic_arn = "${module.sierra_to_dynamo_updates_topic.arn}"
   }

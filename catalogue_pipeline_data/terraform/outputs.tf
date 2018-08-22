@@ -46,6 +46,18 @@ output "vhs_sierra_bucket_name" {
   value = "${module.vhs_sierra.bucket_name}"
 }
 
+output "vhs_sierra_items_full_access_policy" {
+  value = "${module.vhs_sierra_items.full_access_policy}"
+}
+
+output "vhs_sierra_items_table_name" {
+  value = "${module.vhs_sierra_items.table_name}"
+}
+
+output "vhs_sierra_items_bucket_name" {
+  value = "${module.vhs_sierra_items.bucket_name}"
+}
+
 output "vhs_goobi_full_access_policy" {
   value = "${module.vhs_goobi_mets.full_access_policy}"
 }
