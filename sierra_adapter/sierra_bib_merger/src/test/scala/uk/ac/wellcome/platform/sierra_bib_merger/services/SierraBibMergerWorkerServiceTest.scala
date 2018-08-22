@@ -4,9 +4,10 @@ import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
@@ -16,7 +17,6 @@ import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -29,6 +29,7 @@ class SierraBibMergerWorkerServiceTest
     with MetricsSenderFixture
     with Akka
     with S3
+    with Messaging
     with LocalVersionedHybridStore
     with ExtendedPatience
     with SierraUtil {
@@ -56,27 +57,34 @@ class SierraBibMergerWorkerServiceTest
                        R]) =
     withActorSystem { system =>
       withMockMetricSender { metricsSender =>
-        withLocalSqsQueueAndDlq {
-          case queuePair @ QueuePair(queue, dlq) =>
-            withSQSStream[NotificationMessage, R](system, queue, metricsSender) {
-              sqsStream =>
-                withLocalDynamoDbTable { table =>
-                  withLocalS3Bucket { storageBucket =>
-                    withTypeVHS[SierraTransformable, SourceMetadata, R](
-                      storageBucket,
-                      table) { vhs =>
-                      val mergerUpdaterService =
-                        new SierraBibMergerUpdaterService(vhs)
+        withLocalSnsTopic { topic =>
+          withLocalSqsQueueAndDlq {
+            case queuePair @ QueuePair(queue, dlq) =>
+              withSNSWriter[R](topic) { snsWriter =>
+                withSQSStream[NotificationMessage, R](
+                  system,
+                  queue,
+                  metricsSender) { sqsStream =>
+                  withLocalDynamoDbTable { table =>
+                    withLocalS3Bucket { storageBucket =>
+                      withTypeVHS[SierraTransformable, SourceMetadata, R](
+                        storageBucket,
+                        table) { vhs =>
+                        val mergerUpdaterService =
+                          new SierraBibMergerUpdaterService(vhs)
 
-                      val worker = new SierraBibMergerWorkerService(
-                        system,
-                        sqsStream = sqsStream,
-                        mergerUpdaterService)
-                      testWith((metricsSender, queuePair, worker))
+                        val worker = new SierraBibMergerWorkerService(
+                          system,
+                          sqsStream = sqsStream,
+                          snsWriter,
+                          mergerUpdaterService)
+                        testWith((metricsSender, queuePair, worker))
+                      }
                     }
                   }
                 }
-            }
+              }
+          }
         }
       }
     }

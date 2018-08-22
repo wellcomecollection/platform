@@ -12,3 +12,8 @@ resource "aws_iam_role_policy" "push_cloudwatch_metric" {
   role   = "${module.sierra_merger_service.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
+
+resource "aws_iam_role_policy" "publish_to_sns_topic" {
+  role   = "${module.sierra_merger_service.task_role_name}"
+  policy = "${module.sierra_bib_merger_results.publish_policy}"
+}

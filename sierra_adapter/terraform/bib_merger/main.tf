@@ -29,9 +29,10 @@ module "sierra_merger_service" {
     metrics_namespace = "sierra_${local.resource_type_singular}_merger"
     dynamo_table_name = "${var.merged_dynamo_table_name}"
     bucket_name       = "${var.bucket_name}"
+    topic_arn         = "${module.sierra_bib_merger_results.arn}"
   }
 
-  env_vars_length = 4
+  env_vars_length = 5
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"

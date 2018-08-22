@@ -9,7 +9,12 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
-import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
+import uk.ac.wellcome.finatra.messaging.{
+  SNSClientModule,
+  SNSConfigModule,
+  SQSClientModule,
+  SQSConfigModule
+}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.storage.{
@@ -35,6 +40,8 @@ class Server extends HttpServer {
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,
+    SNSClientModule,
+    SNSConfigModule,
     AkkaModule,
   )
 

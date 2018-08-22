@@ -30,9 +30,11 @@ module "sierra_to_dynamo_service" {
 
     vhs_table_name  = "${module.vhs_sierra_items.table_name}"
     vhs_bucket_name = "${module.vhs_sierra_items.bucket_name}"
+
+    topic_arn = "${module.sierra_to_dynamo_updates_topic.arn}"
   }
 
-  env_vars_length = 4
+  env_vars_length = 5
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"
