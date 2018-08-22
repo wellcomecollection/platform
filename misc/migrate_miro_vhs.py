@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8
 
+import json
+
+from botocore.exceptions import ClientError
 import boto3
 import tqdm
 
@@ -23,7 +26,8 @@ def get_existing_records(dynamodb_client):
     """
     Generates existing Miro records from the SourceData table.
     """
-    for item in tqdm.tqdm(all_records(dynamodb_client), total=2039416):
+    for line in tqdm.tqdm(open('sourcedata.txt'), total=2039416):
+        item = json.loads(line)
         if 'reindexShard' not in item:
             print(item)
 
@@ -46,14 +50,23 @@ if __name__ == '__main__':
         new_key = old_key.replace('miro/', '')
         del item['s3key']
 
-        s3_client.copy_object(
-            Bucket=NEW_BUCKET,
-            Key=new_key,
-            CopySource={
-                'Bucket': OLD_BUCKET,
-                'Key': old_key
-            }
-        )
+        try:
+            s3_client.head_object(
+                Bucket=NEW_BUCKET,
+                Key=new_key + 'xxx'
+            )
+        except ClientError as err:
+            if err.response['Error']['Code'] == '404':
+                s3_client.copy_object(
+                    Bucket=NEW_BUCKET,
+                    Key=new_key,
+                    CopySource={
+                        'Bucket': OLD_BUCKET,
+                        'Key': old_key
+                    }
+                )
+            else:
+                raise
 
         item['location'] = {
             'M': {
@@ -62,7 +75,18 @@ if __name__ == '__main__':
             }
         }
 
-        dynamodb_client.put_item(
+        resp = dynamodb_client.get_item(
             TableName=NEW_TABLE,
-            Item=item
+            Key={'id': item['id']}
         )
+        if 'Item' not in resp:
+            dynamodb_client.put_item(
+                TableName=NEW_TABLE,
+                Item=item
+            )
+
+            resp = dynamodb_client.get_item(
+                TableName=NEW_TABLE,
+                Key={'id': item['id']}
+            )
+            assert 'Item' in resp
