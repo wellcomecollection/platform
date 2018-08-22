@@ -54,10 +54,6 @@ output "vhs_sierra_items_table_name" {
   value = "${module.vhs_sierra_items.table_name}"
 }
 
-output "vhs_sierra_items_table_stream_arn" {
-  value = "${module.vhs_sierra_items.table_stream_arn}"
-}
-
 output "vhs_sierra_items_bucket_name" {
   value = "${module.vhs_sierra_items.bucket_name}"
 }
