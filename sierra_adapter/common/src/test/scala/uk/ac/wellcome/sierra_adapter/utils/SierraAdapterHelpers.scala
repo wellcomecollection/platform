@@ -2,7 +2,7 @@ package uk.ac.wellcome.sierra_adapter.utils
 
 import io.circe.Decoder
 import org.scalatest.Assertion
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
@@ -11,7 +11,7 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.test.fixtures._
@@ -97,6 +97,8 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       hybridRecord.location.key)
     storedTransformable shouldBe t
 
-    getMessages[T](topic) should contain(t)
+    listMessagesReceivedFromSNS(topic).map { info: MessageInfo =>
+      fromJson[HybridRecord](info.message).get
+    } should contain(hybridRecord)
   }
 }
