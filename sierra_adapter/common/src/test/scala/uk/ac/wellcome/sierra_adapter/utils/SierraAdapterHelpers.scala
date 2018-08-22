@@ -18,7 +18,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait SierraMessagingHelpers extends LocalVersionedHybridStore with Messaging {
+trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
   def storeInVHS(
     transformable: SierraTransformable,
     hybridStore: VersionedHybridStore[SierraTransformable,
