@@ -10,7 +10,7 @@ import daiquiri
 from urllib.parse import urlparse
 
 from wellcome_aws_utils.sns_utils import publish_sns_message
-# from wellcome_aws_utils.lambda_utils import log_on_error
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
@@ -40,7 +40,7 @@ def archive_bag_message(bag_url):
         raise ValueError(f"Unrecognised url scheme: {bag_url}")
 
 
-# @log_on_error TODO: replace when bug fix is released
+@log_on_error
 def handler(event, _ctx=None, sns_client=None):
     logger.info(f"received {event}")
 
