@@ -20,7 +20,23 @@ class MiroTransformableTransformer
     with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
-  def transform(miroTransformable: MiroTransformable, version: Int) = {
+
+  def transform(
+                                      transformable: MiroTransformable,
+                                      version: Int
+                                    ): Try[TransformedBaseWork] = {
+    doTransform(transformable, version) map {
+      transformed =>
+        debug(s"Transformed record to $transformed")
+        transformed
+    } recover {
+      case e: Throwable =>
+        error("Failed to perform transform to unified item", e)
+        throw e
+    }
+  }
+
+  def doTransform(miroTransformable: MiroTransformable, version: Int) = {
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("miro-image-number"),
         ontologyType = "Work",

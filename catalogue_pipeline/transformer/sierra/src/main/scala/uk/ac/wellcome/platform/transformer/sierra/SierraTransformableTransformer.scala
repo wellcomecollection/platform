@@ -29,7 +29,22 @@ class SierraTransformableTransformer
     with SierraGenres
     with SierraMergeCandidates {
 
-  def transform(sierraTransformable: SierraTransformable, version: Int): Try[TransformedBaseWork] = {
+  def transform(
+                                      transformable: SierraTransformable,
+                                      version: Int
+                                    ): Try[TransformedBaseWork] = {
+    doTransform(transformable, version) map {
+      transformed =>
+        debug(s"Transformed record to $transformed")
+        transformed
+    } recover {
+      case e: Throwable =>
+        error("Failed to perform transform to unified item", e)
+        throw e
+    }
+  }
+
+  private def doTransform(sierraTransformable: SierraTransformable, version: Int): Try[TransformedBaseWork] = {
     val bibId = sierraTransformable.sierraId
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
