@@ -1,6 +1,5 @@
 package uk.ac.wellcome.sierra_adapter.utils
 
-import io.circe.Decoder
 import org.scalatest.Assertion
 import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -63,42 +62,30 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
   def assertStoredAndSent(transformable: SierraTransformable,
                           topic: Topic,
                           bucket: Bucket,
-                          table: Table): Assertion =
-    assertStoredAndSent[SierraTransformable](
-      id = transformable.sierraId.withoutCheckDigit,
-      t = transformable,
-      topic = topic,
-      bucket = bucket,
-      table = table
-    )
+                          table: Table): Assertion = {
+    val hybridRecord = getHybridRecord(table, id = transformable.sierraId.withoutCheckDigit)
 
-  def assertStoredAndSent(itemRecord: SierraItemRecord,
-                          topic: Topic,
-                          bucket: Bucket,
-                          table: Table): Assertion =
-    assertStoredAndSent[SierraItemRecord](
-      id = itemRecord.id.withoutCheckDigit,
-      t = itemRecord,
-      topic = topic,
-      bucket = bucket,
-      table = table
-    )
-
-  private def assertStoredAndSent[T](
-    id: String,
-    t: T,
-    topic: Topic,
-    bucket: Bucket,
-    table: Table)(implicit decoder: Decoder[T]): Assertion = {
-    val hybridRecord = getHybridRecord(table, id)
-
-    val storedTransformable = getObjectFromS3[T](
+    val storedTransformable = getObjectFromS3[SierraTransformable](
       Bucket(hybridRecord.location.namespace),
       hybridRecord.location.key)
-    storedTransformable shouldBe t
+    storedTransformable shouldBe transformable
 
     listMessagesReceivedFromSNS(topic).map { info: MessageInfo =>
       fromJson[HybridRecord](info.message).get
     } should contain(hybridRecord)
+  }
+
+  def assertStoredAndSent(itemRecord: SierraItemRecord,
+                          topic: Topic,
+                          bucket: Bucket,
+                          table: Table): Assertion = {
+    val hybridRecord = getHybridRecord(table, id = itemRecord.id.withoutCheckDigit)
+
+    val storedItemRecord = getObjectFromS3[SierraItemRecord](
+      Bucket(hybridRecord.location.namespace),
+      hybridRecord.location.key)
+    storedItemRecord shouldBe itemRecord
+
+    getMessages[SierraItemRecord](topic) should contain(itemRecord)
   }
 }
