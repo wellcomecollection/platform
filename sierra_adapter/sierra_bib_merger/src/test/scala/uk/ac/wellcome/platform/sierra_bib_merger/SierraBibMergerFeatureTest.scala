@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_bib_merger
 
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
@@ -12,7 +12,6 @@ import uk.ac.wellcome.storage.fixtures.{
   LocalVersionedHybridStore,
   S3
 }
-import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -39,9 +38,7 @@ class SierraBibMergerFeatureTest
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
             withServer(flags(queue, topic, bucket, table)) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-                bucket,
-                table) { hybridStore =>
+              withSierraVHS(bucket, table) { _ =>
                 val bibRecord = createSierraBibRecord
 
                 sendNotificationToSQS(queue = queue, message = bibRecord)
@@ -71,9 +68,7 @@ class SierraBibMergerFeatureTest
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
             withServer(flags(queue, topic, bucket, table)) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-                bucket,
-                table) { hybridStore =>
+              withSierraVHS(bucket, table) { _ =>
                 val record1 = createSierraBibRecord
                 sendNotificationToSQS(queue = queue, message = record1)
 
@@ -115,9 +110,7 @@ class SierraBibMergerFeatureTest
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
             withServer(flags(queue, topic, bucket, table)) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-                bucket,
-                table) { hybridStore =>
+              withSierraVHS(bucket, table) { hybridStore =>
                 val oldBibRecord = createSierraBibRecordWith(
                   modifiedDate = olderDate
                 )
@@ -162,9 +155,7 @@ class SierraBibMergerFeatureTest
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
             withServer(flags(queue, topic, bucket, table)) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-                bucket,
-                table) { hybridStore =>
+              withSierraVHS(bucket, table) { hybridStore =>
                 val newBibRecord = createSierraBibRecordWith(
                   modifiedDate = newerDate
                 )
@@ -208,9 +199,7 @@ class SierraBibMergerFeatureTest
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
             withServer(flags(queue, topic, bucket, table)) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Unit](
-                bucket,
-                table) { hybridStore =>
+              withSierraVHS(bucket, table) { hybridStore =>
                 val transformable = createSierraTransformableWith(
                   maybeBibRecord = None
                 )
