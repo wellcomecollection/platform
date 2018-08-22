@@ -3,5 +3,5 @@ output "topic_name" {
 }
 
 output "vhs_bucket_name" {
-  value = "${module.vhs_sierra_items.bucket_name}"
+  value = "${local.vhs_sierra_items_bucket_name}"
 }
