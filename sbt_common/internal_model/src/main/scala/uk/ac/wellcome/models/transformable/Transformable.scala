@@ -27,7 +27,7 @@ case class SierraTransformable(
   val sourceName = "sierra"
 }
 
-case object SierraTransformable {
+object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
     SierraTransformable(
       sierraId = bibRecord.id,

@@ -3,9 +3,14 @@ module "ecr_repository_nginx_services" {
   name   = "nginx_services"
 }
 
-module "ecr_repository_transformer" {
+module "ecr_repository_transformer_miro" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "transformer"
+  name   = "transformer_miro"
+}
+
+module "ecr_repository_transformer_sierra" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "transformer_sierra"
 }
 
 module "ecr_repository_id_minter" {
