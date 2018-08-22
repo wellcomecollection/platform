@@ -70,12 +70,7 @@ class MiroTransformableReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sqsMessage = hybridRecordNotificationMessage(
-            message = createValidMiroTransformableJson(),
-            sourceName = "miro",
-            s3Client = s3Client,
-            bucket = bucket
-          )
+          val sqsMessage = hybridRecordNotificationMessage(message = createValidMiroTransformableJson(), s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sqsMessage)
@@ -100,16 +95,10 @@ class MiroTransformableReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sierraMessage = hybridRecordNotificationMessage(
-            message = createValidMiroTransformableJson(),
-            sourceName = "sierra",
-            version = version,
-            s3Client = s3Client,
-            bucket = bucket
-          )
+          val miroMessage = hybridRecordNotificationMessage(message = createValidMiroTransformableJson(), version = version, s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(sierraMessage)
+            val future = recordReceiver.receiveMessage(miroMessage)
 
             whenReady(future) { _ =>
               val works = getMessages[TransformedBaseWork](topic)
@@ -132,12 +121,7 @@ class MiroTransformableReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val invalidSqsMessage =
-            hybridRecordNotificationMessage(
-              message = "not a json string",
-              sourceName = "miro",
-              s3Client = s3Client,
-              bucket = bucket
-            )
+            hybridRecordNotificationMessage(message = "not a json string", s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(invalidSqsMessage)
@@ -162,12 +146,7 @@ class MiroTransformableReceiverTest
           )
 
           val failingSqsMessage =
-            hybridRecordNotificationMessage(
-              message = toJson(miroTransformable).get,
-              sourceName = "miro",
-              s3Client = s3Client,
-              bucket = bucket
-            )
+            hybridRecordNotificationMessage(message = toJson(miroTransformable).get, s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future =
@@ -183,21 +162,12 @@ class MiroTransformableReceiverTest
   }
 
   it("fails if it's unable to publish the work") {
-    val sierraTransformable = MiroTransformable(
-      sourceId = "B1234567",
-      MiroCollection = "Images-B",
-      data = "not a json string"
-    )
+    val miroTransformable = createValidMiroTransformableJson()
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val message = hybridRecordNotificationMessage(
-            message = toJson(sierraTransformable).get,
-            sourceName = "sierra",
-            s3Client = s3Client,
-            bucket = bucket
-          )
+          val message = hybridRecordNotificationMessage(message = miroTransformable, s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(
             topic,

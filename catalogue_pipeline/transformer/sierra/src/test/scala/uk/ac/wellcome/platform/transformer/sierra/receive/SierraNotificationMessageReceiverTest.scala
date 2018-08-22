@@ -72,12 +72,7 @@ class SierraNotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sqsMessage = hybridRecordNotificationMessage(
-            message = toJson(createSierraTransformable).get,
-            sourceName = "sierra",
-            s3Client = s3Client,
-            bucket = bucket
-          )
+          val sqsMessage = hybridRecordNotificationMessage(message = toJson(createSierraTransformable).get, s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sqsMessage)
@@ -102,13 +97,7 @@ class SierraNotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sierraMessage = hybridRecordNotificationMessage(
-            message = toJson(createSierraTransformable).get,
-            sourceName = "sierra",
-            version = version,
-            s3Client = s3Client,
-            bucket = bucket
-          )
+          val sierraMessage = hybridRecordNotificationMessage(message = toJson(createSierraTransformable).get, version = version, s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sierraMessage)
@@ -134,12 +123,7 @@ class SierraNotificationMessageReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val invalidSqsMessage =
-            hybridRecordNotificationMessage(
-              message = "not a json string",
-              sourceName = "sierra",
-              s3Client = s3Client,
-              bucket = bucket
-            )
+            hybridRecordNotificationMessage(message = "not a json string", s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(invalidSqsMessage)
@@ -160,12 +144,7 @@ class SierraNotificationMessageReceiverTest
           val sierraTransformable = createSierraTransformableWith(maybeBibRecord = Some(createSierraBibRecordWith(data = "not a json string")))
 
           val failingSqsMessage =
-            hybridRecordNotificationMessage(
-              message = toJson(sierraTransformable).get,
-              sourceName = "sierra",
-              s3Client = s3Client,
-              bucket = bucket
-            )
+            hybridRecordNotificationMessage(message = toJson(sierraTransformable).get, s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future =
@@ -188,12 +167,7 @@ class SierraNotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val message = hybridRecordNotificationMessage(
-            message = toJson(sierraTransformable).get,
-            sourceName = "sierra",
-            s3Client = s3Client,
-            bucket = bucket
-          )
+          val message = hybridRecordNotificationMessage(message = toJson(sierraTransformable).get, s3Client = s3Client, bucket = bucket)
 
           withNotificationMessageReceiver(
             topic,

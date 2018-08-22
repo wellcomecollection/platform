@@ -8,7 +8,15 @@ import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 trait MiroTransformableMessageUtils extends IdentifiersUtil with SQS {
   def createValidMiroTransformableJson(MiroID: String= "MiroId",
                                        MiroCollection: String = "Collection-A",
-                                       data: String = "{}"): String = {
+                                       data: String = """{
+      |         "image_cleared": "Y",
+      |        "image_copyright_cleared": "Y",
+      |        "image_tech_file_size": ["1000000"],
+      |        "image_use_restrictions": "CC-BY"
+      |        }
+    """.stripMargin
+
+  ): String = {
     val miroTransformable =
       MiroTransformable(
         sourceId = MiroID,

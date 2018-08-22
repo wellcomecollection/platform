@@ -34,16 +34,11 @@ class MiroTransformerFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
             val miroHybridRecordMessage =
-              hybridRecordNotificationMessage(
-                message = createValidMiroTransformableJson(
-                  MiroID = miroID,
-                  MiroCollection = "foo",
-                  data = buildJSONForWork(s""""image_title": "$title"""")
-                ),
-                sourceName = "miro",
-                s3Client = s3Client,
-                bucket = storageBucket
-              )
+              hybridRecordNotificationMessage(message = createValidMiroTransformableJson(
+                                MiroID = miroID,
+                                MiroCollection = "foo",
+                                data = buildJSONForWork(s""""image_title": "$title"""")
+                              ), s3Client = s3Client, bucket = storageBucket)
 
             sendMessage(
               queue = queue,
@@ -51,7 +46,7 @@ class MiroTransformerFeatureTest
             )
 
             val flags: Map[String, String] = Map(
-              "aws.metrics.namespace" -> "sierra-transformer"
+              "aws.metrics.namespace" -> "miro-transformer"
             ) ++ s3LocalFlags(storageBucket) ++
               sqsLocalFlags(queue) ++ messageWriterLocalFlags(
               messageBucket,
@@ -82,7 +77,7 @@ class MiroTransformerFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
             val flags: Map[String, String] = Map(
-              "aws.metrics.namespace" -> "sierra-transformer"
+              "aws.metrics.namespace" -> "miro-transformer"
             ) ++ s3LocalFlags(storageBucket) ++
               sqsLocalFlags(queue) ++ messageWriterLocalFlags(
               messageBucket,
@@ -90,61 +85,51 @@ class MiroTransformerFeatureTest
 
             withServer(flags) { _ =>
               val miroHybridRecordMessage1 =
-                hybridRecordNotificationMessage(
-                  message = createValidMiroTransformableJson(
-                    MiroID = "L0011975",
-                    MiroCollection = "images-L",
-                    data = """
-                      {
-                          "image_cleared": "Y",
-                          "image_copyright_cleared": "Y",
-                          "image_credit_line": "Wellcome Library, London",
-                          "image_image_desc": "Antonio Dionisi",
-                          "image_innopac_id": "12917175",
-                          "image_library_dept": "General Collections",
-                          "image_no_calc": "L0011975",
-                          "image_phys_format": "Book",
-                          "image_tech_file_size": [
-                              "5247788"
-                          ],
-                          "image_title": "Antonio Dionisi",
-                          "image_use_restrictions": "CC-BY"
-                      }
-                    """
-                  ),
-                  sourceName = "miro",
-                  s3Client = s3Client,
-                  bucket = storageBucket
-                )
+                hybridRecordNotificationMessage(message = createValidMiroTransformableJson(
+                                    MiroID = "L0011975",
+                                    MiroCollection = "images-L",
+                                    data = """
+                                      {
+                                          "image_cleared": "Y",
+                                          "image_copyright_cleared": "Y",
+                                          "image_credit_line": "Wellcome Library, London",
+                                          "image_image_desc": "Antonio Dionisi",
+                                          "image_innopac_id": "12917175",
+                                          "image_library_dept": "General Collections",
+                                          "image_no_calc": "L0011975",
+                                          "image_phys_format": "Book",
+                                          "image_tech_file_size": [
+                                              "5247788"
+                                          ],
+                                          "image_title": "Antonio Dionisi",
+                                          "image_use_restrictions": "CC-BY"
+                                      }
+                                    """
+                                  ), s3Client = s3Client, bucket = storageBucket)
               val miroHybridRecordMessage2 =
-                hybridRecordNotificationMessage(
-                  message = createValidMiroTransformableJson(
-                    MiroID = "L0023034",
-                    MiroCollection = "images-L",
-                    data =
-                      """
-                      {
-                          "image_cleared": "Y",
-                          "image_copyright_cleared": "Y",
-                          "image_image_desc": "Use of the guillotine",
-                          "image_innopac_id": "12074536",
-                          "image_keywords": [
-                              "Surgery"
-                          ],
-                          "image_library_dept": "General Collections",
-                          "image_no_calc": "L0023034",
-                          "image_tech_file_size": [
-                              "5710662"
-                          ],
-                          "image_title": "Greenfield Sluder, Tonsillectomy..., use of guillotine",
-                          "image_use_restrictions": "CC-BY"
-                      }
-                    """
-                  ),
-                  sourceName = "miro",
-                  s3Client = s3Client,
-                  bucket = storageBucket
-                )
+                hybridRecordNotificationMessage(message = createValidMiroTransformableJson(
+                                    MiroID = "L0023034",
+                                    MiroCollection = "images-L",
+                                    data =
+                                      """
+                                      {
+                                          "image_cleared": "Y",
+                                          "image_copyright_cleared": "Y",
+                                          "image_image_desc": "Use of the guillotine",
+                                          "image_innopac_id": "12074536",
+                                          "image_keywords": [
+                                              "Surgery"
+                                          ],
+                                          "image_library_dept": "General Collections",
+                                          "image_no_calc": "L0023034",
+                                          "image_tech_file_size": [
+                                              "5710662"
+                                          ],
+                                          "image_title": "Greenfield Sluder, Tonsillectomy..., use of guillotine",
+                                          "image_use_restrictions": "CC-BY"
+                                      }
+                                    """
+                                  ), s3Client = s3Client, bucket = storageBucket)
 
               sendMessage(queue = queue, obj = miroHybridRecordMessage1)
               sendMessage(queue = queue, obj = miroHybridRecordMessage2)
