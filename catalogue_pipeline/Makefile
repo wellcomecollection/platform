@@ -1,10 +1,11 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-include $(ROOT)/functions.Makefile
-
 STACK_ROOT 	= catalogue_pipeline
 
-SBT_APPS 	= id_minter ingestor transformer_miro transformer_sierra recorder matcher merger
-SBT_DOCKER_LIBRARIES = transformer_common
+include $(ROOT)/functions.Makefile
+include $(ROOT)/$(STACK_ROOT)/transformer/Makefile
+
+SBT_APPS 	= id_minter ingestor recorder matcher merger
+SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
 ECS_TASKS 	=
