@@ -1,6 +1,10 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 trait MarcUtils {
   def getMatchingSubfields(

@@ -1,8 +1,20 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
-import uk.ac.wellcome.models.work.internal.{MaybeDisplayable, Person, Subject, Unidentifiable}
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData, VarField}
-import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.{MarcUtils, SierraAgents}
+import uk.ac.wellcome.models.work.internal.{
+  MaybeDisplayable,
+  Person,
+  Subject,
+  Unidentifiable
+}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
+import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.{
+  MarcUtils,
+  SierraAgents
+}
 
 trait SierraPersonSubjects extends MarcUtils with SierraAgents {
 

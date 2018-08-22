@@ -20,15 +20,13 @@ class MiroTransformableTransformer
     with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
-
   def transform(
-                                      transformable: MiroTransformable,
-                                      version: Int
-                                    ): Try[TransformedBaseWork] = {
-    doTransform(transformable, version) map {
-      transformed =>
-        debug(s"Transformed record to $transformed")
-        transformed
+    transformable: MiroTransformable,
+    version: Int
+  ): Try[TransformedBaseWork] = {
+    doTransform(transformable, version) map { transformed =>
+      debug(s"Transformed record to $transformed")
+      transformed
     } recover {
       case e: Throwable =>
         error("Failed to perform transform to unified item", e)
@@ -37,62 +35,61 @@ class MiroTransformableTransformer
   }
 
   def doTransform(miroTransformable: MiroTransformable, version: Int) = {
-      val sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        ontologyType = "Work",
-        value = miroTransformable.sourceId
+    val sourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      ontologyType = "Work",
+      value = miroTransformable.sourceId
+    )
+
+    Try {
+      val miroData = MiroTransformableData.create(miroTransformable.data)
+
+      // These images should really have been removed from the pipeline
+      // already, but we have at least one instance (B0010525).  It was
+      // throwing a MatchError when we tried to pick a license, so handle
+      // it properly here.
+      if (!miroData.copyrightCleared.contains("Y")) {
+        throw new ShouldNotTransformException(
+          s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
+        )
+      }
+
+      val (title, description) = getTitleAndDescription(miroData)
+
+      UnidentifiedWork(
+        sourceIdentifier = sourceIdentifier,
+        otherIdentifiers =
+          getOtherIdentifiers(miroData, miroTransformable.sourceId),
+        mergeCandidates = List(),
+        title = title,
+        workType = getWorkType,
+        description = description,
+        physicalDescription = None,
+        extent = None,
+        lettering = miroData.suppLettering,
+        createdDate = getCreatedDate(miroData, miroTransformable.MiroCollection),
+        subjects = getSubjects(miroData),
+        genres = getGenres(miroData),
+        contributors = getContributors(
+          miroId = miroTransformable.sourceId,
+          miroData = miroData
+        ),
+        thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+        production = List(),
+        language = None,
+        dimensions = None,
+        items = getItems(miroData, miroTransformable.sourceId),
+        itemsV1 = getItemsV1(miroData, miroTransformable.sourceId),
+        version = version
       )
-
-      Try {
-        val miroData = MiroTransformableData.create(miroTransformable.data)
-
-        // These images should really have been removed from the pipeline
-        // already, but we have at least one instance (B0010525).  It was
-        // throwing a MatchError when we tried to pick a license, so handle
-        // it properly here.
-        if (!miroData.copyrightCleared.contains("Y")) {
-          throw new ShouldNotTransformException(
-            s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
-          )
-        }
-
-        val (title, description) = getTitleAndDescription(miroData)
-
-        UnidentifiedWork(
+    }.recover {
+      case e: ShouldNotTransformException =>
+        info(s"Should not transform: ${e.getMessage}")
+        UnidentifiedInvisibleWork(
           sourceIdentifier = sourceIdentifier,
-          otherIdentifiers =
-            getOtherIdentifiers(miroData, miroTransformable.sourceId),
-          mergeCandidates = List(),
-          title = title,
-          workType = getWorkType,
-          description = description,
-          physicalDescription = None,
-          extent = None,
-          lettering = miroData.suppLettering,
-          createdDate =
-            getCreatedDate(miroData, miroTransformable.MiroCollection),
-          subjects = getSubjects(miroData),
-          genres = getGenres(miroData),
-          contributors = getContributors(
-            miroId = miroTransformable.sourceId,
-            miroData = miroData
-          ),
-          thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
-          production = List(),
-          language = None,
-          dimensions = None,
-          items = getItems(miroData, miroTransformable.sourceId),
-          itemsV1 = getItemsV1(miroData, miroTransformable.sourceId),
           version = version
         )
-      }.recover {
-        case e: ShouldNotTransformException =>
-          info(s"Should not transform: ${e.getMessage}")
-          UnidentifiedInvisibleWork(
-            sourceIdentifier = sourceIdentifier,
-            version = version
-          )
-      }
+    }
   }
 
   /*

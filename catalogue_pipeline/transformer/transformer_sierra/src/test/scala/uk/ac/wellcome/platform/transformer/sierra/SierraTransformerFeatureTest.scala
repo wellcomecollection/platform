@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -23,7 +27,7 @@ class SierraTransformerFeatureTest
     with Eventually
     with ExtendedPatience
     with SierraGenerators
-    with HybridRecordMessageGenerator{
+    with HybridRecordMessageGenerator {
 
   it("transforms sierra records and publishes the result to the given topic") {
     val id = createSierraBibNumber
@@ -50,7 +54,10 @@ class SierraTransformerFeatureTest
             )
 
             val sierraHybridRecordMessage =
-              hybridRecordNotificationMessage(message = toJson(sierraTransformable).get, s3Client = s3Client, bucket = storageBucket)
+              hybridRecordNotificationMessage(
+                message = toJson(sierraTransformable).get,
+                s3Client = s3Client,
+                bucket = storageBucket)
 
             sendMessage(
               queue = queue,

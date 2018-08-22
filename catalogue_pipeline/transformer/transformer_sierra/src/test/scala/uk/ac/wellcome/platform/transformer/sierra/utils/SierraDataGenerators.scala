@@ -5,15 +5,18 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 import uk.ac.wellcome.platform.transformer.sierra.source._
-import uk.ac.wellcome.platform.transformer.sierra.source.sierra.{SierraSourceLanguage, SierraSourceLocation}
+import uk.ac.wellcome.platform.transformer.sierra.source.sierra.{
+  SierraSourceLanguage,
+  SierraSourceLocation
+}
 
 trait SierraDataGenerators extends IdentifiersGenerators with SierraGenerators {
   def createSierraBibDataWith(
-                               title: Option[String] = Some(randomAlphanumeric(25)),
-                               lang: Option[SierraSourceLanguage] = None,
-                               materialType: Option[SierraMaterialType] = None,
-                               locations: Option[List[SierraSourceLocation]] = None,
-                               varFields: List[VarField] = List()
+    title: Option[String] = Some(randomAlphanumeric(25)),
+    lang: Option[SierraSourceLanguage] = None,
+    materialType: Option[SierraMaterialType] = None,
+    locations: Option[List[SierraSourceLocation]] = None,
+    varFields: List[VarField] = List()
   ): SierraBibData =
     SierraBibData(
       title = title,

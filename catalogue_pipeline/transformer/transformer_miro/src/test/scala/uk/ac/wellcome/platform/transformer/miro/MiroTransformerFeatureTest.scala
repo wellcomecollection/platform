@@ -34,11 +34,15 @@ class MiroTransformerFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
             val miroHybridRecordMessage =
-              hybridRecordNotificationMessage(message = createValidMiroTransformableJson(
-                                MiroID = miroID,
-                                MiroCollection = "foo",
-                                data = buildJSONForWork(s""""image_title": "$title"""")
-                              ), s3Client = s3Client, bucket = storageBucket)
+              hybridRecordNotificationMessage(
+                message = createValidMiroTransformableJson(
+                  MiroID = miroID,
+                  MiroCollection = "foo",
+                  data = buildJSONForWork(s""""image_title": "$title"""")
+                ),
+                s3Client = s3Client,
+                bucket = storageBucket
+              )
 
             sendMessage(
               queue = queue,
@@ -85,10 +89,11 @@ class MiroTransformerFeatureTest
 
             withServer(flags) { _ =>
               val miroHybridRecordMessage1 =
-                hybridRecordNotificationMessage(message = createValidMiroTransformableJson(
-                                    MiroID = "L0011975",
-                                    MiroCollection = "images-L",
-                                    data = """
+                hybridRecordNotificationMessage(
+                  message = createValidMiroTransformableJson(
+                    MiroID = "L0011975",
+                    MiroCollection = "images-L",
+                    data = """
                                       {
                                           "image_cleared": "Y",
                                           "image_copyright_cleared": "Y",
@@ -105,13 +110,17 @@ class MiroTransformerFeatureTest
                                           "image_use_restrictions": "CC-BY"
                                       }
                                     """
-                                  ), s3Client = s3Client, bucket = storageBucket)
+                  ),
+                  s3Client = s3Client,
+                  bucket = storageBucket
+                )
               val miroHybridRecordMessage2 =
-                hybridRecordNotificationMessage(message = createValidMiroTransformableJson(
-                                    MiroID = "L0023034",
-                                    MiroCollection = "images-L",
-                                    data =
-                                      """
+                hybridRecordNotificationMessage(
+                  message = createValidMiroTransformableJson(
+                    MiroID = "L0023034",
+                    MiroCollection = "images-L",
+                    data =
+                      """
                                       {
                                           "image_cleared": "Y",
                                           "image_copyright_cleared": "Y",
@@ -129,7 +138,10 @@ class MiroTransformerFeatureTest
                                           "image_use_restrictions": "CC-BY"
                                       }
                                     """
-                                  ), s3Client = s3Client, bucket = storageBucket)
+                  ),
+                  s3Client = s3Client,
+                  bucket = storageBucket
+                )
 
               sendMessage(queue = queue, obj = miroHybridRecordMessage1)
               sendMessage(queue = queue, obj = miroHybridRecordMessage2)

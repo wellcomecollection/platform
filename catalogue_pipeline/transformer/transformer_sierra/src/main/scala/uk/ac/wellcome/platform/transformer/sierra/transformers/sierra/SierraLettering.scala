@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  SierraBibData
+}
 
 trait SierraLettering {
 
@@ -34,7 +37,8 @@ trait SierraLettering {
       }
       .filter {
         _.indicator2.contains("6")
-      }.flatMap(_.subfields)
+      }
+      .flatMap(_.subfields)
       .filter { subfield: MarcSubfield =>
         subfield.tag == "a"
       }

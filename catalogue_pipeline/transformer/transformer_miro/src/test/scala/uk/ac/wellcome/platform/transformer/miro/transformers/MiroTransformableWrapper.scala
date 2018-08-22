@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.models.transformable.MiroTransformable
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 
@@ -15,8 +18,7 @@ import scala.util.Try
   *  fields before transformation, allowing tests to focus on only the fields
   *  that are interesting for that test.
   */
-trait MiroTransformableWrapper
-    extends Matchers { this: Suite =>
+trait MiroTransformableWrapper extends Matchers { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String = {
@@ -63,24 +65,24 @@ trait MiroTransformableWrapper
     assertTransformToWorkFails(miroTransformable)
   }
 
-    def transformToWork(transformable: MiroTransformable): TransformedBaseWork = {
-      val triedWork: Try[TransformedBaseWork] =
-        transformer.transform(transformable, version = 1)
+  def transformToWork(transformable: MiroTransformable): TransformedBaseWork = {
+    val triedWork: Try[TransformedBaseWork] =
+      transformer.transform(transformable, version = 1)
 
-      if (triedWork.isFailure) {
-        triedWork.failed.get.printStackTrace()
-        println(
-          triedWork.failed.get.asInstanceOf[TransformerException].e.getMessage)
-      }
-
-      triedWork.isSuccess shouldBe true
-      triedWork.get
+    if (triedWork.isFailure) {
+      triedWork.failed.get.printStackTrace()
+      println(
+        triedWork.failed.get.asInstanceOf[TransformerException].e.getMessage)
     }
 
-    def assertTransformToWorkFails(transformable: MiroTransformable): Unit = {
-      transformer
-        .transform(transformable, version = 1)
-        .isSuccess shouldBe false
-    }
+    triedWork.isSuccess shouldBe true
+    triedWork.get
+  }
+
+  def assertTransformToWorkFails(transformable: MiroTransformable): Unit = {
+    transformer
+      .transform(transformable, version = 1)
+      .isSuccess shouldBe false
+  }
 
 }

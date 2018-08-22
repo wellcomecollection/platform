@@ -1,6 +1,10 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{IdentifierType, MergeCandidate, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  MergeCandidate,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.transformer.sierra.source.SierraBibData
 
 trait SierraMergeCandidates extends MarcUtils {

@@ -10,7 +10,10 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 trait HybridRecordMessageGenerator extends IdentifiersGenerators with SQS {
 
-  def hybridRecordNotificationMessage(message: String, version: Int = 1, s3Client: AmazonS3, bucket: Bucket): NotificationMessage = {
+  def hybridRecordNotificationMessage(message: String,
+                                      version: Int = 1,
+                                      s3Client: AmazonS3,
+                                      bucket: Bucket): NotificationMessage = {
 
     val key = s"testSource/1/testId/${randomAlphanumeric(10)}.json"
     s3Client.putObject(bucket.name, key, message)

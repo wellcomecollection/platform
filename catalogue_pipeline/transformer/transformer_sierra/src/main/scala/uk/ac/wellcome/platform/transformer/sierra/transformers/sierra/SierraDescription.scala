@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  SierraBibData
+}
 
 trait SierraDescription {
 

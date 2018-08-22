@@ -5,18 +5,19 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
-trait MiroTransformableMessageGenerators extends IdentifiersGenerators with SQS {
-  def createValidMiroTransformableJson(MiroID: String= "MiroId",
-                                       MiroCollection: String = "Collection-A",
-                                       data: String = """{
+trait MiroTransformableMessageGenerators
+    extends IdentifiersGenerators
+    with SQS {
+  def createValidMiroTransformableJson(
+    MiroID: String = "MiroId",
+    MiroCollection: String = "Collection-A",
+    data: String = """{
       |         "image_cleared": "Y",
       |        "image_copyright_cleared": "Y",
       |        "image_tech_file_size": ["1000000"],
       |        "image_use_restrictions": "CC-BY"
       |        }
-    """.stripMargin
-
-  ): String = {
+    """.stripMargin): String = {
     val miroTransformable =
       MiroTransformable(
         sourceId = MiroID,

@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{DigitalLocation, LocationType, PhysicalLocation}
+import uk.ac.wellcome.models.work.internal.{
+  DigitalLocation,
+  LocationType,
+  PhysicalLocation
+}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLocation
 import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators

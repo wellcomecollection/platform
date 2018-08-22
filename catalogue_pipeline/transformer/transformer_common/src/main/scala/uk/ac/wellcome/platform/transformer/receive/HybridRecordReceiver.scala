@@ -15,15 +15,22 @@ import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class HybridRecordReceiver[T] @Inject()(s3Config: S3Config, messageWriter: MessageWriter[TransformedBaseWork],objectsStore: ObjectStore[T])(implicit ec: ExecutionContext) extends Logging {
+class HybridRecordReceiver[T] @Inject()(
+  s3Config: S3Config,
+  messageWriter: MessageWriter[TransformedBaseWork],
+  objectsStore: ObjectStore[T])(implicit ec: ExecutionContext)
+    extends Logging {
 
-  def receiveMessage(message: NotificationMessage, transformToWork: (T, Int) => Try[TransformedBaseWork]): Future[Unit] = {
+  def receiveMessage(
+    message: NotificationMessage,
+    transformToWork: (T, Int) => Try[TransformedBaseWork]): Future[Unit] = {
     debug(s"Starting to process message $message")
 
     val futurePublishAttempt = for {
       hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
       transformableRecord <- getTransformable(hybridRecord)
-      work <- Future.fromTry(transformToWork(transformableRecord, hybridRecord.version))
+      work <- Future.fromTry(
+        transformToWork(transformableRecord, hybridRecord.version))
       publishResult <- publishMessage(work)
       _ = debug(
         s"Published work: ${work.sourceIdentifier} with message $publishResult")

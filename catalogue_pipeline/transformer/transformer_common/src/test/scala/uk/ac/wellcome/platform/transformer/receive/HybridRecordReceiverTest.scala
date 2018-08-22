@@ -12,7 +12,10 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
@@ -27,7 +30,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 class HybridRecordReceiverTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with SQS
     with SNS
@@ -37,21 +40,28 @@ class HybridRecordReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
-    with HybridRecordMessageGenerator with WorksGenerators{
+    with HybridRecordMessageGenerator
+    with WorksGenerators {
 
   case class TestException(message: String) extends Exception(message)
   case class TestTransformable()
-  def transformToWork(transforrmable: TestTransformable, version: Int) = Try(createUnidentifiedWorkWith(version = version))
-  def failingTransformToWork(transforrmable: TestTransformable, version: Int) = Try(throw TestException("BOOOM!"))
+  def transformToWork(transforrmable: TestTransformable, version: Int) =
+    Try(createUnidentifiedWorkWith(version = version))
+  def failingTransformToWork(transforrmable: TestTransformable, version: Int) =
+    Try(throw TestException("BOOOM!"))
 
   it("receives a message and sends it to SNS client") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sqsMessage = hybridRecordNotificationMessage(message = toJson(TestTransformable()).get, s3Client = s3Client, bucket = bucket)
+          val sqsMessage = hybridRecordNotificationMessage(
+            message = toJson(TestTransformable()).get,
+            s3Client = s3Client,
+            bucket = bucket)
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(sqsMessage, transformToWork)
+            val future =
+              recordReceiver.receiveMessage(sqsMessage, transformToWork)
 
             whenReady(future) { _ =>
               val works = getMessages[TransformedBaseWork](topic)
@@ -73,10 +83,15 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sierraMessage = hybridRecordNotificationMessage(message = toJson(TestTransformable()).get, version = version, s3Client = s3Client, bucket = bucket)
+          val sierraMessage = hybridRecordNotificationMessage(
+            message = toJson(TestTransformable()).get,
+            version = version,
+            s3Client = s3Client,
+            bucket = bucket)
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(sierraMessage, transformToWork)
+            val future =
+              recordReceiver.receiveMessage(sierraMessage, transformToWork)
 
             whenReady(future) { _ =>
               val works = getMessages[TransformedBaseWork](topic)
@@ -99,10 +114,14 @@ class HybridRecordReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val invalidSqsMessage =
-            hybridRecordNotificationMessage(message = "not a json string", s3Client = s3Client, bucket = bucket)
+            hybridRecordNotificationMessage(
+              message = "not a json string",
+              s3Client = s3Client,
+              bucket = bucket)
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(invalidSqsMessage, transformToWork)
+            val future =
+              recordReceiver.receiveMessage(invalidSqsMessage, transformToWork)
 
             whenReady(future.failed) { x =>
               x shouldBe a[TransformerException]
@@ -117,13 +136,17 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-
           val failingSqsMessage =
-            hybridRecordNotificationMessage(message = toJson(TestTransformable).get, s3Client = s3Client, bucket = bucket)
+            hybridRecordNotificationMessage(
+              message = toJson(TestTransformable).get,
+              s3Client = s3Client,
+              bucket = bucket)
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
             val future =
-              recordReceiver.receiveMessage(failingSqsMessage, failingTransformToWork)
+              recordReceiver.receiveMessage(
+                failingSqsMessage,
+                failingTransformToWork)
 
             whenReady(future.failed) { x =>
               x shouldBe a[TestException]
@@ -138,7 +161,10 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val message = hybridRecordNotificationMessage(message = toJson(TestTransformable).get, s3Client = s3Client, bucket = bucket)
+          val message = hybridRecordNotificationMessage(
+            message = toJson(TestTransformable).get,
+            s3Client = s3Client,
+            bucket = bucket)
 
           withHybridRecordReceiver(
             topic,
@@ -156,10 +182,11 @@ class HybridRecordReceiverTest
   }
 
   def withHybridRecordReceiver[R](
-                                   topic: Topic,
-                                   bucket: Bucket,
-                                   maybeSnsClient: Option[AmazonSNS] = None
-                                 )(testWith: TestWith[HybridRecordReceiver[TestTransformable], R])(implicit objectStore: ObjectStore[TestTransformable]) = {
+    topic: Topic,
+    bucket: Bucket,
+    maybeSnsClient: Option[AmazonSNS] = None
+  )(testWith: TestWith[HybridRecordReceiver[TestTransformable], R])(
+    implicit objectStore: ObjectStore[TestTransformable]) = {
     val s3Config = S3Config(bucket.name)
 
     val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)

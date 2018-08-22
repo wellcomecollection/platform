@@ -12,7 +12,8 @@ trait SierraTransformableTestBase extends Matchers {
 
   val transformer: SierraTransformableTransformer
 
-  def transformToWork(transformable: SierraTransformable): TransformedBaseWork = {
+  def transformToWork(
+    transformable: SierraTransformable): TransformedBaseWork = {
     val triedWork: Try[TransformedBaseWork] =
       transformer.transform(transformable, version = 1)
 

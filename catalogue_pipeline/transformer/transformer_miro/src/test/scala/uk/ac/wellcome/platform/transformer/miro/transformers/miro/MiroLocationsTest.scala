@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{DigitalLocation, License_CC0, LocationType}
+import uk.ac.wellcome.models.work.internal.{
+  DigitalLocation,
+  License_CC0,
+  LocationType
+}
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroLocations
 

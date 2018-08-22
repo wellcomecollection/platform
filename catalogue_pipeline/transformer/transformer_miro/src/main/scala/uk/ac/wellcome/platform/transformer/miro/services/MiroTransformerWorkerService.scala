@@ -12,10 +12,10 @@ import uk.ac.wellcome.platform.transformer.receive.HybridRecordReceiver
 import scala.concurrent.Future
 
 class MiroTransformerWorkerService @Inject()(
-                                              system: ActorSystem,
-                                              messageReceiver: HybridRecordReceiver[MiroTransformable],
-                                              miroTransformer: MiroTransformableTransformer,
-                                              sqsStream: SQSStream[NotificationMessage]
+  system: ActorSystem,
+  messageReceiver: HybridRecordReceiver[MiroTransformable],
+  miroTransformer: MiroTransformableTransformer,
+  sqsStream: SQSStream[NotificationMessage]
 ) {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)

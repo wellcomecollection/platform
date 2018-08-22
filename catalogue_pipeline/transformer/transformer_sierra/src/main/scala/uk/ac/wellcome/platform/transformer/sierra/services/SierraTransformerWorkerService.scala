@@ -12,10 +12,10 @@ import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
 import scala.concurrent.Future
 
 class SierraTransformerWorkerService @Inject()(
-                                                system: ActorSystem,
-                                                messageReceiver: HybridRecordReceiver[SierraTransformable],
-                                                sierraTransformer: SierraTransformableTransformer,
-                                                sqsStream: SQSStream[NotificationMessage]
+  system: ActorSystem,
+  messageReceiver: HybridRecordReceiver[SierraTransformable],
+  sierraTransformer: SierraTransformableTransformer,
+  sqsStream: SQSStream[NotificationMessage]
 ) {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)

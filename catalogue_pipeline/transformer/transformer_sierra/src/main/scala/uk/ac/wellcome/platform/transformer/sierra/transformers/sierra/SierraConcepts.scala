@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  VarField
+}
 
 trait SierraConcepts extends MarcUtils {
 

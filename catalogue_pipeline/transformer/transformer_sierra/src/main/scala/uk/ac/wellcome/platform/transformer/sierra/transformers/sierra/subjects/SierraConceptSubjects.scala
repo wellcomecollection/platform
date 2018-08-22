@@ -1,8 +1,15 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData, VarField}
-import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.{MarcUtils, SierraConcepts}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
+import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.{
+  MarcUtils,
+  SierraConcepts
+}
 
 trait SierraConceptSubjects extends MarcUtils with SierraConcepts {
 
