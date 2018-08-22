@@ -6,7 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
@@ -23,7 +23,7 @@ class IdEmbedderTests
     with Akka
     with JsonAssertions
     with ExtendedPatience
-    with WorksUtil {
+    with WorksGenerators {
 
   private def withIdEmbedder(
     testWith: TestWith[(IdentifierGenerator, IdEmbedder), Assertion]) = {

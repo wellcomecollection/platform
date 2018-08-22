@@ -7,9 +7,9 @@ import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.source.sierra.{
   Location => SierraLocationField
 }
-import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
+import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
+class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
 
   val transformer = new Object with SierraItems
 

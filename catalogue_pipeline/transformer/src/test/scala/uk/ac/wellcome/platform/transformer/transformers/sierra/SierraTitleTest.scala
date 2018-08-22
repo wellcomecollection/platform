@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
-import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
+import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraTitleTest extends FunSpec with Matchers with SierraDataUtil {
+class SierraTitleTest extends FunSpec with Matchers with SierraDataGenerators {
 
   it("passes through the title from the bib record") {
     val title = "Tickling a tiny turtle in Tenerife"

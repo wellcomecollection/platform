@@ -5,7 +5,7 @@ import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -24,7 +24,7 @@ class SierraItemMergerUpdaterServiceTest
     with LocalVersionedHybridStore
     with SQS
     with SierraMessagingHelpers
-    with SierraUtil {
+    with SierraGenerators {
 
   def withSierraUpdaterService(
     hybridStore: VersionedHybridStore[SierraTransformable,

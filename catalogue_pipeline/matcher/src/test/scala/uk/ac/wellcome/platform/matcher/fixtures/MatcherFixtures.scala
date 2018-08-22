@@ -15,7 +15,7 @@ import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
 }
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
@@ -44,7 +44,7 @@ trait MatcherFixtures
     with LocalWorkGraphDynamoDb
     with MetricsSenderFixture
     with S3
-    with WorksUtil {
+    with WorksGenerators {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](

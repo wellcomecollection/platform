@@ -9,12 +9,12 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemNumber,
   SierraItemRecord
 }
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.util.Random
 
-trait SierraUtil extends IdentifiersUtil {
+trait SierraGenerators extends IdentifiersGenerators {
 
   // A lot of Sierra tests (e.g. mergers) check the behaviour when merging
   // a record with a newer version, or vice versa.  Provide two dates here

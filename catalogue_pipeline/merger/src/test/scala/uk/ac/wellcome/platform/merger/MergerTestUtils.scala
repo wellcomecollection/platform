@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork,
   WorkType
 }
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.dynamo._
@@ -22,7 +22,7 @@ trait MergerTestUtils
     extends Eventually
     with ScalaFutures
     with LocalVersionedHybridStore
-    with WorksUtil { this: Suite =>
+    with WorksGenerators { this: Suite =>
 
   def matcherResultWith(matchedEntries: Set[Set[TransformedBaseWork]]) =
     MatcherResult(

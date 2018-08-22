@@ -10,7 +10,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -32,7 +32,7 @@ class RecorderWorkerServiceTest
     with Messaging
     with MetricsSenderFixture
     with ExtendedPatience
-    with WorksUtil {
+    with WorksGenerators {
 
   it("records an UnidentifiedWork") {
     withLocalDynamoDbTable { table =>

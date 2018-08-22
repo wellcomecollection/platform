@@ -4,11 +4,11 @@ import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.MiroTransformable
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 
-trait TransformableMessageUtils extends IdentifiersUtil with SQS {
+trait TransformableMessageUtils extends IdentifiersGenerators with SQS {
   def createValidMiroTransformableJson(MiroID: String,
                                        MiroCollection: String,
                                        data: String): String = {

@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   SourceIdentifier,
@@ -26,7 +26,7 @@ class SierraTransformerFeatureTest
     with fixtures.Server
     with Eventually
     with ExtendedPatience
-    with SierraUtil
+    with SierraGenerators
     with TransformableMessageUtils {
 
   it("transforms sierra records and publishes the result to the given topic") {

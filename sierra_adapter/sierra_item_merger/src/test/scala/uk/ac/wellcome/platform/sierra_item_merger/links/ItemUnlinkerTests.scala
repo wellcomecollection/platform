@@ -1,9 +1,9 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 
-class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
+class ItemUnlinkerTests extends FunSpec with Matchers with SierraGenerators {
 
   it("removes the item if it already exists") {
     val bibId = createSierraBibNumber

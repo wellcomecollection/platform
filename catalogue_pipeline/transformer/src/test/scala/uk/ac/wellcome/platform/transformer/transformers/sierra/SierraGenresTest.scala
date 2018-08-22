@@ -7,9 +7,9 @@ import uk.ac.wellcome.platform.transformer.source.{
   SierraBibData,
   VarField
 }
-import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
+import uk.ac.wellcome.platform.transformer.utils.SierraDataGenerators
 
-class SierraGenresTest extends FunSpec with Matchers with SierraDataUtil {
+class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
 
   it("returns zero genres if there are none") {
     val bibData = createSierraBibDataWith(varFields = List())

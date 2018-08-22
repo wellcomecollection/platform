@@ -2,12 +2,12 @@ package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
 class DisplayAbstractAgentV2Test
     extends FunSpec
     with Matchers
-    with IdentifiersUtil {
+    with IdentifiersGenerators {
 
   val label: String = randomAlphanumeric(length = 25)
   val sourceIdentifier: SourceIdentifier = createSourceIdentifier

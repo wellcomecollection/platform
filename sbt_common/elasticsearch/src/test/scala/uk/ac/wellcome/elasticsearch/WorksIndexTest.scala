@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Person, Subject,
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.json.utils.JsonAssertions
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -25,7 +25,7 @@ class WorksIndexTest
     with JsonAssertions
     with BeforeAndAfterEach
     with ExtendedPatience
-    with PropertyChecks with WorksUtil {
+    with PropertyChecks with WorksGenerators {
 
   // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
   // With IdentifiedWork, that means that it never actually completes.
