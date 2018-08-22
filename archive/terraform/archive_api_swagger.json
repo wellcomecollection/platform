@@ -4,8 +4,6 @@
     "version": "2018-08-16T14:00:40Z",
     "title": "archive_asset_lookup"
   },
-  "host": "z7wt7o661g.execute-api.eu-west-1.amazonaws.com",
-  "basePath": "/prod",
   "schemes": [
     "https"
   ],
@@ -68,7 +66,7 @@
           }
         },
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:760097843905:function:archive_asset_lookup/invocations",
+          "uri": "${lookup_lambda_invoke_arn}",
           "responses": {
             "default": {
               "statusCode": "200"
@@ -142,7 +140,7 @@
           }
         },
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:760097843905:function:archive_ingest/invocations",
+          "uri": "${ingest_lambda_invoke_arn}",
           "responses": {
             "default": {
               "statusCode": "200"
