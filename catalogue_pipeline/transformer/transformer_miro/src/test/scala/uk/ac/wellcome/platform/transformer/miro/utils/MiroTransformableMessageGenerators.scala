@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.transformer.miro.utils
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.MiroTransformable
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
-trait MiroTransformableMessageUtils extends IdentifiersUtil with SQS {
+trait MiroTransformableMessageGenerators extends IdentifiersGenerators with SQS {
   def createValidMiroTransformableJson(MiroID: String= "MiroId",
                                        MiroCollection: String = "Collection-A",
                                        data: String = """{

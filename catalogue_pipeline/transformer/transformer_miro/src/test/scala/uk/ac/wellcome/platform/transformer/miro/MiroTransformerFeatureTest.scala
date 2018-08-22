@@ -6,8 +6,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.platform.transformer.miro.utils.MiroTransformableMessageUtils
-import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageHelper
+import uk.ac.wellcome.platform.transformer.miro.utils.MiroTransformableMessageGenerators
+import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -22,8 +22,8 @@ class MiroTransformerFeatureTest
     with Eventually
     with ExtendedPatience
     with MiroTransformableWrapper
-    with HybridRecordMessageHelper
-    with MiroTransformableMessageUtils {
+    with HybridRecordMessageGenerator
+    with MiroTransformableMessageGenerators {
 
   it("transforms miro records and publishes the result to the given topic") {
     val miroID = "M0000001"

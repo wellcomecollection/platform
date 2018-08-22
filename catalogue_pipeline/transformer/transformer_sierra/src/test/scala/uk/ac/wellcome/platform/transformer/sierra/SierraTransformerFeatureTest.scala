@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
-import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageHelper
+import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -23,7 +23,7 @@ class SierraTransformerFeatureTest
     with Eventually
     with ExtendedPatience
     with SierraGenerators
-    with HybridRecordMessageHelper{
+    with HybridRecordMessageGenerator{
 
   it("transforms sierra records and publishes the result to the given topic") {
     val id = createSierraBibNumber

@@ -31,9 +31,9 @@ cache:
     - catalogue_pipeline/matcher/target
     - catalogue_pipeline/merger/target
     - catalogue_pipeline/recorder/target
-    - catalogue_pipeline/transformer/common/target
-    - catalogue_pipeline/transformer/miro/target
-    - catalogue_pipeline/transformer/sierra/target
+    - catalogue_pipeline/transformer/transformer_common/target
+    - catalogue_pipeline/transformer/transformer_miro/target
+    - catalogue_pipeline/transformer/transformer_sierra/target
 
     - data_api/snapshot_generator/target
 

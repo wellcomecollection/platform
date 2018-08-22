@@ -142,7 +142,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
     it("ignores a digital item on a bib record without a 'dlnk' location") {
       val bibData = createSierraBibDataWith(
         locations = Some(List(
-          SierraLocationField("digi", "Digitised Collections")
+          SierraSourceLocation("digi", "Digitised Collections")
         ))
       )
 
@@ -157,8 +157,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
       val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
         locations = Some(List(
-          SierraLocationField("digi", "Digitised Collections"),
-          SierraLocationField("dlnk", "Digitised content")
+          SierraSourceLocation("digi", "Digitised Collections"),
+          SierraSourceLocation("dlnk", "Digitised content")
         ))
       )
 

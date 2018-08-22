@@ -39,9 +39,7 @@ class HybridRecordReceiver[T] @Inject()(s3Config: S3Config, messageWriter: Messa
 
   }
 
-  private def getTransformable(
-    hybridRecord: HybridRecord
-  ) = {
+  private def getTransformable(hybridRecord: HybridRecord): Future[T] = {
     val s3ObjectLocation = ObjectLocation(
       namespace = s3Config.bucketName,
       key = hybridRecord.s3key

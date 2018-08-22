@@ -15,7 +15,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageHelper
+import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -37,7 +37,7 @@ class HybridRecordReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
-    with HybridRecordMessageHelper with WorksGenerators{
+    with HybridRecordMessageGenerator with WorksGenerators{
 
   case class TestException(message: String) extends Exception(message)
   case class TestTransformable()
