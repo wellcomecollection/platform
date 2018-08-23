@@ -6,7 +6,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.sierra_adapter.utils.SierraMessagingHelpers
+import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
@@ -16,7 +16,7 @@ class SierraItemsToDynamoFeatureTest
     with Matchers
     with Eventually
     with IntegrationPatience
-    with SierraMessagingHelpers
+    with SierraAdapterHelpers
     with SierraGenerators {
 
   it("reads items from Sierra and adds them to DynamoDB") {

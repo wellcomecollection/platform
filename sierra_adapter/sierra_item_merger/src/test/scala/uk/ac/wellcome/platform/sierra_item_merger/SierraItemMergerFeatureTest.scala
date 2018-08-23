@@ -2,23 +2,18 @@ package uk.ac.wellcome.platform.sierra_item_merger
 
 import com.amazonaws.services.sqs.model.SendMessageResult
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
-import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessagePointer
-import uk.ac.wellcome.sierra_adapter.utils.SierraMessagingHelpers
+import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 import uk.ac.wellcome.storage.ObjectLocation
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraItemMergerFeatureTest
     extends FunSpec
@@ -30,7 +25,7 @@ class SierraItemMergerFeatureTest
     with S3
     with LocalVersionedHybridStore
     with SierraGenerators
-    with SierraMessagingHelpers {
+    with SierraAdapterHelpers {
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
@@ -43,9 +38,7 @@ class SierraItemMergerFeatureTest
                 sierraItemsToDynamoBucket,
                 queue)
               withServer(flags) { _ =>
-                withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-                  sierraDataBucket,
-                  table) { hybridStore =>
+                withSierraVHS(sierraDataBucket, table) { hybridStore =>
                   val bibId = createSierraBibNumber
 
                   val itemRecord = createSierraItemRecordWith(
@@ -93,9 +86,7 @@ class SierraItemMergerFeatureTest
                 sierraItemsToDynamoBucket,
                 queue)
               withServer(flags) { _ =>
-                withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-                  sierraDataBucket,
-                  table) { hybridStore =>
+                withSierraVHS(sierraDataBucket, table) { _ =>
                   val bibId1 = createSierraBibNumber
                   val itemRecord1 = createSierraItemRecordWith(
                     bibIds = List(bibId1)
@@ -166,10 +157,7 @@ class SierraItemMergerFeatureTest
                 sierraItemsToDynamoBucket,
                 queue)
               withServer(flags) { _ =>
-                withTypeVHS[
-                  SierraTransformable,
-                  SourceMetadata,
-                  List[Assertion]](sierraDataBucket, table) { hybridStore =>
+                withSierraVHS(sierraDataBucket, table) { _ =>
                   val bibIds = createSierraBibNumbers(3)
                   val itemRecord = createSierraItemRecordWith(
                     bibIds = bibIds

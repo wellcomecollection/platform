@@ -9,8 +9,8 @@ import uk.ac.wellcome.platform.sierra_item_merger.links.ItemLinker
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemUnlinker
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{
+  EmptyMetadata,
   HybridRecord,
-  SourceMetadata,
   VersionedHybridStore
 }
 import uk.ac.wellcome.storage.ObjectStore
@@ -19,12 +19,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SierraItemMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
-                                             SourceMetadata,
+                                             EmptyMetadata,
                                              ObjectStore[SierraTransformable]]
 )(implicit ec: ExecutionContext)
     extends Logging {
-
-  val sourceName = "sierra"
 
   def update(itemRecord: SierraItemRecord): Future[Seq[HybridRecord]] = {
     val mergeUpdateFutures: Seq[Future[HybridRecord]] = itemRecord.bibIds.map {
@@ -35,7 +33,7 @@ class SierraItemMergerUpdaterService @Inject()(
               SierraTransformable(
                 sierraId = bibId,
                 itemRecords = Map(itemRecord.id -> itemRecord)),
-              SourceMetadata("sierra")))(ifExisting =
+              EmptyMetadata()))(ifExisting =
             (existingTransformable, existingMetadata) => {
               (
                 ItemLinker.linkItemRecord(existingTransformable, itemRecord),

@@ -4,17 +4,14 @@ import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
-import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -32,12 +29,13 @@ class SierraBibMergerWorkerServiceTest
     with Messaging
     with LocalVersionedHybridStore
     with ExtendedPatience
+    with SierraAdapterHelpers
     with SierraGenerators {
 
   it(
     "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {
     withWorkerServiceFixtures {
-      case (metricsSender, QueuePair(queue, dlq), _) =>
+      case (metricsSender, QueuePair(queue, dlq)) =>
         sendNotificationToSQS(
           queue = queue,
           body = "null"
@@ -52,9 +50,8 @@ class SierraBibMergerWorkerServiceTest
     }
   }
 
-  def withWorkerServiceFixtures[R](
-    testWith: TestWith[(MetricsSender, QueuePair, SierraBibMergerWorkerService),
-                       R]) =
+  private def withWorkerServiceFixtures[R](
+    testWith: TestWith[(MetricsSender, QueuePair), R]) =
     withActorSystem { system =>
       withMockMetricSender { metricsSender =>
         withLocalSnsTopic { topic =>
@@ -67,18 +64,16 @@ class SierraBibMergerWorkerServiceTest
                   metricsSender) { sqsStream =>
                   withLocalDynamoDbTable { table =>
                     withLocalS3Bucket { storageBucket =>
-                      withTypeVHS[SierraTransformable, SourceMetadata, R](
-                        storageBucket,
-                        table) { vhs =>
+                      withSierraVHS(storageBucket, table) { vhs =>
                         val mergerUpdaterService =
                           new SierraBibMergerUpdaterService(vhs)
 
-                        val worker = new SierraBibMergerWorkerService(
-                          system,
+                        new SierraBibMergerWorkerService(
+                          system = system,
                           sqsStream = sqsStream,
-                          snsWriter,
-                          mergerUpdaterService)
-                        testWith((metricsSender, queuePair, worker))
+                          snsWriter = snsWriter,
+                          sierraBibMergerUpdaterService = mergerUpdaterService)
+                        testWith((metricsSender, queuePair))
                       }
                     }
                   }
