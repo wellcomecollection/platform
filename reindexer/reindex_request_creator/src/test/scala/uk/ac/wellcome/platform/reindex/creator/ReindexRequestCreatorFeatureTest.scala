@@ -72,8 +72,7 @@ class ReindexRequestCreatorFeatureTest
 
             val reindexJob = createReindexJobWith(
               table = table,
-              shardId = shardName,
-              desiredVersion = desiredVersion
+              shardId = shardName
             )
 
             sendNotificationToSQS(

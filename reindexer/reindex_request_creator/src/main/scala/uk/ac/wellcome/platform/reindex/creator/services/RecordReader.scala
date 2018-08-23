@@ -34,16 +34,14 @@ class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(
         table.index(indexName = reindexJob.dynamoConfig.index)
       })
 
-      // We start by querying DynamoDB for every record in the reindex shard
-      // that has an out-of-date reindexVersion.  If a shard was especially
-      // large, this might cause out-of-memory errors -- in practice, we're
-      // hoping that the shards/individual records are small enough for this
-      // not to be a problem.
+      // We start by querying DynamoDB for every record in the reindex shard.
+      // If a shard was especially large, this might cause out-of-memory errors
+      // -- in practice, we're hoping that the shards/individual records are
+      // small enough for this not to be a problem.
       results: List[Either[DynamoReadError, HybridRecord]] <- Future {
         Scanamo.exec(dynamoDbClient)(
           index.query(
-            'reindexShard -> reindexJob.shardId and
-              KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
+            'reindexShard -> reindexJob.shardId
           )
         )
       }

@@ -50,10 +50,7 @@ class NotificationSenderTest
 
         val future = notificationSender.sendNotifications(
           records = hybridRecords,
-          reindexJob = createReindexJobWith(
-            table = table,
-            desiredVersion = desiredVersion
-          )
+          reindexJob = createReindexJobWith(table = table)
         )
 
         whenReady(future) { _ =>

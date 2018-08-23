@@ -76,8 +76,7 @@ class ReindexRequestCreatorWorkerTest
           case (service, QueuePair(queue, dlq)) =>
             val reindexJob = createReindexJobWith(
               table = table,
-              shardId = "sierra/123",
-              desiredVersion = 6
+              shardId = "sierra/123"
             )
 
             val testRecord = TestRecord(

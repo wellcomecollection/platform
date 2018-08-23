@@ -25,7 +25,6 @@ class RecordReaderTest
     with ReindexFixtures {
 
   val shardName = "shard"
-  val desiredVersion = 2
 
   val exampleRecord = TestRecord(
     id = "id",
@@ -63,8 +62,7 @@ class RecordReaderTest
 
         val reindexJob = createReindexJobWith(
           table = table,
-          shardId = shardName,
-          desiredVersion = desiredVersion
+          shardId = shardName
         )
 
         whenReady(service.findRecordsForReindexing(reindexJob)) {
@@ -91,8 +89,7 @@ class RecordReaderTest
 
         val reindexJob = createReindexJobWith(
           table = table,
-          shardId = shardName,
-          desiredVersion = desiredVersion
+          shardId = shardName
         )
 
         val recordList = inShardRecords ++ notInShardRecords
