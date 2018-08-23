@@ -36,8 +36,8 @@ module "catalogue_pipeline" {
   identifiers_rds_cluster_port     = "${local.identifiers_rds_cluster_port}"
   identifiers_rds_cluster_host     = "${local.identifiers_rds_cluster_host}"
 
-  es_cluster_credentials = "${var.es_cluster_credentials}"
-  dlq_alarm_arn          = "${local.dlq_alarm_arn}"
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-  sierra_adapter_topic_names = ["${local.sierra_merged_bibs_topic_name}","${local.sierra_merged_items_topic_name}"]
+  es_cluster_credentials     = "${var.es_cluster_credentials}"
+  dlq_alarm_arn              = "${local.dlq_alarm_arn}"
+  lambda_error_alarm_arn     = "${local.lambda_error_alarm_arn}"
+  sierra_adapter_topic_names = ["${local.sierra_merged_bibs_topic_name}", "${local.sierra_merged_items_topic_name}"]
 }

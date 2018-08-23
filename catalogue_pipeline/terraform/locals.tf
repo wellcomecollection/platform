@@ -12,7 +12,7 @@ locals {
   ingestor_container_image           = "${module.ecr_repository_ingestor.repository_url}:${var.release_ids["ingestor"]}"
 
   sierra_merged_items_topic_name = "${data.terraform_remote_state.sierra_adapter.merged_items_topic_name}"
-  sierra_merged_bibs_topic_name = "${data.terraform_remote_state.sierra_adapter.merged_bibs_topic_name}"
+  sierra_merged_bibs_topic_name  = "${data.terraform_remote_state.sierra_adapter.merged_bibs_topic_name}"
 
   vhs_sierra_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_read_policy}"
   vhs_sierra_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_bucket_name}"

@@ -44,7 +44,8 @@ class HybridRecordReceiver[T] @Inject()(
 
   }
 
-  private def getTransformable(hybridRecord: HybridRecord): Future[T] = objectsStore.get(hybridRecord.location)
+  private def getTransformable(hybridRecord: HybridRecord): Future[T] =
+    objectsStore.get(hybridRecord.location)
 
   private def publishMessage(
     work: TransformedBaseWork): Future[PublishAttempt] =
