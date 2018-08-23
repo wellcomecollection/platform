@@ -69,3 +69,7 @@ variable "index_v1" {}
 variable "index_v2" {}
 
 variable "rds_access_security_group_id" {}
+
+variable "sierra_adapter_topics" {
+  type = "list"
+}

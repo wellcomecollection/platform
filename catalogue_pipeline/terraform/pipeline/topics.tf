@@ -1,3 +1,8 @@
+module "miro_transformer_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "${var.namespace}_miro_transformables"
+}
+
 module "transformer_dlq_alarm" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
   name   = "${var.namespace}_transformer_dlq_alarm"

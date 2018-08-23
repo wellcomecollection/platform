@@ -37,3 +37,7 @@ variable "transformer_container_image" {}
 
 
 variable "messages_bucket" {}
+
+variable "topic_names" {
+  type = "list"
+}

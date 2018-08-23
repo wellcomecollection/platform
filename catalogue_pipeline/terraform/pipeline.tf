@@ -39,4 +39,5 @@ module "catalogue_pipeline" {
   es_cluster_credentials = "${var.es_cluster_credentials}"
   dlq_alarm_arn          = "${local.dlq_alarm_arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+  sierra_adapter_topics = ["${local.sierra_merged_bibs_topic_arn}","${local.sierra_merged_items_topic_arn}"]
 }
