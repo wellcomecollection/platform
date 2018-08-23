@@ -37,12 +37,12 @@ resource "aws_iam_role_policy" "reindex_processor_task_cloudwatch_metric" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-resource "aws_iam_role_policy" "reindex_processor_allow_sourcedata_table_access" {
+resource "aws_iam_role_policy" "reindex_processor_allow_miro_table_access" {
   role   = "${module.reindex_request_processor.task_role_name}"
-  policy = "${local.vhs_sourcedata_full_access_policy}"
+  policy = "${local.vhs_miro_dynamodb_update_policy}"
 }
 
 resource "aws_iam_role_policy" "reindex_processor_allow_sierra_table_access" {
   role   = "${module.reindex_request_processor.task_role_name}"
-  policy = "${local.vhs_sierra_full_access_policy}"
+  policy = "${local.vhs_sierra_dynamodb_update_policy}"
 }

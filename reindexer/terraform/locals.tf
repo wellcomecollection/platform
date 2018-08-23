@@ -1,13 +1,13 @@
 locals {
-  vhs_sourcedata_full_access_policy     = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_full_access_policy}"
-  vhs_sourcedata_dynamodb_update_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_dynamodb_update_policy}"
-  vhs_sourcedata_table_name             = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_table_name}"
-  vhs_sourcedata_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_table_stream_arn}"
-
-  vhs_sierra_full_access_policy     = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_full_access_policy}"
+  vhs_sierra_read_policy     = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_read_policy}"
   vhs_sierra_table_name             = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_table_name}"
   vhs_sierra_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_table_stream_arn}"
   vhs_sierra_dynamodb_update_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_dynamodb_update_policy}"
+
+  vhs_miro_read_policy     = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_read_policy}"
+  vhs_miro_table_name             = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_table_name}"
+  vhs_miro_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_table_stream_arn}"
+  vhs_miro_dynamodb_update_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_dynamodb_update_policy}"
 
   vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
