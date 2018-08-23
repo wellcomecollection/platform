@@ -51,4 +51,4 @@ def create_reindex_shard(source_name, source_id):
 
     shard_id = ascii_id % number_of_shards
 
-    return f'{source_name}/{shard_id}'
+    return f'{shard_id}'
