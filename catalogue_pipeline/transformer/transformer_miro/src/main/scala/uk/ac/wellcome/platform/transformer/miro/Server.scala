@@ -2,26 +2,14 @@ package uk.ac.wellcome.platform.transformer.miro
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.messaging.{
-  MessageWriterConfigModule,
-  SNSClientModule,
-  SQSClientModule,
-  SQSConfigModule
-}
+import uk.ac.wellcome.finatra.messaging.{MessageWriterConfigModule, SNSClientModule, SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.platform.transformer.miro.modules.{
-  MiroTransformableModule,
-  MiroTransformerWorkerModule
-}
+import uk.ac.wellcome.finatra.storage.S3ClientModule
+import uk.ac.wellcome.platform.transformer.miro.modules.{MiroTransformableModule, MiroTransformerWorkerModule}
 import uk.ac.wellcome.platform.transformer.modules.TransformedBaseWorkModule
 
 object ServerMain extends Server
@@ -39,7 +27,6 @@ class Server extends HttpServer {
     ExecutionContextModule,
     MiroTransformableModule,
     S3ClientModule,
-    S3ConfigModule,
     TransformedBaseWorkModule
   )
   override def configureHttp(router: HttpRouter) {

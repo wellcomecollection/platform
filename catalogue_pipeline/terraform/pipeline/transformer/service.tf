@@ -13,11 +13,10 @@ module "transformer" {
     sns_arn              = "${var.transformed_works_topic_arn}"
     transformer_queue_id = "${module.transformer_queue.id}"
     metrics_namespace    = "${var.namespace}_${var.source_name}_transformer"
-    storage_bucket_name  = "${var.vhs_bucket_name}"
     message_bucket_name  = "${var.messages_bucket}"
   }
 
-  env_vars_length = 5
+  env_vars_length = 4
 
   container_image   = "${var.transformer_container_image}"
   source_queue_name = "${module.transformer_queue.name}"

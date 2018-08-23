@@ -6,9 +6,7 @@ module "miro_transformer" {
   transformed_works_topic_publish_policy = "${module.transformed_works_topic.publish_policy}"
   transformed_works_topic_arn            = "${module.transformed_works_topic.arn}"
 
-  vhs_table_stream_arn = "${var.vhs_miro_table_stream_arn}"
   vhs_read_policy      = "${var.vhs_miro_read_policy}"
-  vhs_bucket_name      = "${var.vhs_miro_bucket_name}"
 
   messages_bucket = "${var.messages_bucket}"
 
@@ -42,9 +40,7 @@ module "sierra_transformer" {
   transformed_works_topic_publish_policy = "${module.transformed_works_topic.publish_policy}"
   transformed_works_topic_arn            = "${module.transformed_works_topic.arn}"
 
-  vhs_table_stream_arn = "${var.vhs_sierra_table_stream_arn}"
   vhs_read_policy      = "${var.vhs_sierra_read_policy}"
-  vhs_bucket_name      = "${var.vhs_sierra_bucket_name}"
 
   messages_bucket = "${var.messages_bucket}"
 

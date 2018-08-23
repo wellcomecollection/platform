@@ -3,8 +3,6 @@ variable "namespace" {}
 variable "namespace_id" {}
 variable "source_name" {}
 
-variable "vhs_table_stream_arn" {}
-
 variable "lambda_error_alarm_arn" {}
 
 variable "infra_bucket" {}
@@ -37,6 +35,5 @@ variable "transformed_works_topic_arn" {}
 
 variable "transformer_container_image" {}
 
-variable "vhs_bucket_name" {}
 
 variable "messages_bucket" {}

@@ -51,7 +51,7 @@ class MiroTransformerFeatureTest
 
             val flags: Map[String, String] = Map(
               "aws.metrics.namespace" -> "miro-transformer"
-            ) ++ s3LocalFlags(storageBucket) ++
+            ) ++ s3ClientLocalFlags ++
               sqsLocalFlags(queue) ++ messageWriterLocalFlags(
               messageBucket,
               topic)
@@ -82,7 +82,7 @@ class MiroTransformerFeatureTest
           withLocalS3Bucket { messageBucket =>
             val flags: Map[String, String] = Map(
               "aws.metrics.namespace" -> "miro-transformer"
-            ) ++ s3LocalFlags(storageBucket) ++
+            ) ++ s3ClientLocalFlags ++
               sqsLocalFlags(queue) ++ messageWriterLocalFlags(
               messageBucket,
               topic)
