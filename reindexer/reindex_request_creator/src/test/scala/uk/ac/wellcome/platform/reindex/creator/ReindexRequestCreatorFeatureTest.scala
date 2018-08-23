@@ -49,7 +49,6 @@ class ReindexRequestCreatorFeatureTest
       )
     })
 
-    //TODO re-factor shared test state here into fixture method
     testRecords.foreach(Scanamo.put(dynamoDbClient)(table.name)(_))
 
     testRecords.map { record =>
