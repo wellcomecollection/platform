@@ -65,5 +65,5 @@ module "sierra_transformer" {
   account_id = "${var.account_id}"
 
   vpc_id = "${var.vpc_id}"
-  topic_names = "${var.sierra_adapter_topics}"
+  topic_names = "${var.sierra_adapter_topic_names}"
 }
