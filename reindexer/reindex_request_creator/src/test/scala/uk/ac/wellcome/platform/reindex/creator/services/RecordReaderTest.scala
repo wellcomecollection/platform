@@ -55,7 +55,7 @@ class RecordReaderTest
         records.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        val expectedRecordIds = List(olderRecord.id)
+        val expectedRecords = List(olderRecord)
 
         val reindexJob = createReindexJobWith(
           table = table,
@@ -64,8 +64,8 @@ class RecordReaderTest
         )
 
         whenReady(service.findRecordsForReindexing(reindexJob)) {
-          actualRecordIds =>
-            actualRecordIds should contain theSameElementsAs expectedRecordIds
+          actualRecords =>
+            actualRecords should contain theSameElementsAs expectedRecords
         }
       }
 
@@ -96,13 +96,9 @@ class RecordReaderTest
         recordList.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        val expectedRecordIds = inShardRecords.map { record =>
-          record.id
-        }
-
         whenReady(service.findRecordsForReindexing(reindexJob)) {
-          actualRecordIds =>
-            actualRecordIds should contain theSameElementsAs expectedRecordIds
+          actualRecords =>
+            actualRecords should contain theSameElementsAs inShardRecords
         }
       }
     }
