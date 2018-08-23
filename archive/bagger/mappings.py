@@ -1,0 +1,12 @@
+
+# to be added to...
+PRONOM = {
+    "JP2 (JPEG 2000 part 1)": "x-fmt/392"
+}
+
+# map of tessella names to premis names
+# also, presence in here means we want it in new version
+SIGNIFICANT_PROPS = {
+    "Image Width": "ImageWidth",
+    "Image Height": "ImageHeight"
+}

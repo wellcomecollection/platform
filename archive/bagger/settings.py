@@ -32,5 +32,3 @@ DLCS_SPACE = os.getenv("DLCS_SPACE")
 DDS_API_KEY = os.getenv("DDS_API_KEY")
 DDS_API_SECRET = os.getenv("DDS_API_SECRET")
 DDS_ASSET_PREFIX = os.getenv("DDS_ASSET_PREFIX")
-
-
