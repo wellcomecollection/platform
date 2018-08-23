@@ -90,6 +90,7 @@ lazy val transformer_common = doServiceSetup(project, "catalogue_pipeline/transf
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= WellcomeDependencies.newStorageLibrary)
 
 lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
   .dependsOn(transformer_common % "compile->compile;test->test")

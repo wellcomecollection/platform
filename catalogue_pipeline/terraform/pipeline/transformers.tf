@@ -6,9 +6,7 @@ module "miro_transformer" {
   transformed_works_topic_publish_policy = "${module.transformed_works_topic.publish_policy}"
   transformed_works_topic_arn            = "${module.transformed_works_topic.arn}"
 
-  vhs_table_stream_arn = "${var.vhs_miro_table_stream_arn}"
-  vhs_read_policy      = "${var.vhs_miro_read_policy}"
-  vhs_bucket_name      = "${var.vhs_miro_bucket_name}"
+  vhs_read_policy = "${var.vhs_miro_read_policy}"
 
   messages_bucket = "${var.messages_bucket}"
 
@@ -31,7 +29,8 @@ module "miro_transformer" {
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"
 
-  vpc_id = "${var.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
+  topic_names = ["${module.miro_transformer_topic.name}"]
 }
 
 module "sierra_transformer" {
@@ -42,9 +41,7 @@ module "sierra_transformer" {
   transformed_works_topic_publish_policy = "${module.transformed_works_topic.publish_policy}"
   transformed_works_topic_arn            = "${module.transformed_works_topic.arn}"
 
-  vhs_table_stream_arn = "${var.vhs_sierra_table_stream_arn}"
-  vhs_read_policy      = "${var.vhs_sierra_read_policy}"
-  vhs_bucket_name      = "${var.vhs_sierra_bucket_name}"
+  vhs_read_policy = "${var.vhs_sierra_read_policy}"
 
   messages_bucket = "${var.messages_bucket}"
 
@@ -67,5 +64,6 @@ module "sierra_transformer" {
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"
 
-  vpc_id = "${var.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
+  topic_names = "${var.sierra_adapter_topic_names}"
 }

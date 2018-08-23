@@ -5,6 +5,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
@@ -21,7 +22,7 @@ trait HybridRecordMessageGenerator extends IdentifiersGenerators with SQS {
     val hybridRecord = HybridRecord(
       id = "testId",
       version = version,
-      s3key = key
+      location = ObjectLocation(namespace = bucket.name, key = key)
     )
 
     createNotificationMessageWith(

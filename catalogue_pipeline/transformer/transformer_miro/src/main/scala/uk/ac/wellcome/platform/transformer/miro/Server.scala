@@ -17,7 +17,7 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
+import uk.ac.wellcome.finatra.storage.S3ClientModule
 import uk.ac.wellcome.platform.transformer.miro.modules.{
   MiroTransformableModule,
   MiroTransformerWorkerModule
@@ -39,7 +39,6 @@ class Server extends HttpServer {
     ExecutionContextModule,
     MiroTransformableModule,
     S3ClientModule,
-    S3ConfigModule,
     TransformedBaseWorkModule
   )
   override def configureHttp(router: HttpRouter) {

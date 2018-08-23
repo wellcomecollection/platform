@@ -35,7 +35,6 @@ class Server extends HttpServer {
     RecorderModule,
     MetricsSenderModule,
     TransformedBaseWorkModule,
-    SQSConfigModule,
     SQSClientModule,
     S3ClientModule,
     SNSConfigModule,
