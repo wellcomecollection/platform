@@ -36,7 +36,6 @@ class NotificationSenderTest
         val expectedRequests = recordIds.map { id =>
           ReindexRequest(
             id = id,
-            desiredVersion = desiredVersion,
             tableName = table.name
           )
         }

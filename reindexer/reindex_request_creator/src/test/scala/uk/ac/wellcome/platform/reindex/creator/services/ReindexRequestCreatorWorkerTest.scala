@@ -92,7 +92,6 @@ class ReindexRequestCreatorWorkerTest
             val expectedRecords = Seq(
               ReindexRequest(
                 id = testRecord.id,
-                desiredVersion = reindexJob.desiredVersion,
                 tableName = table.name
               )
             )

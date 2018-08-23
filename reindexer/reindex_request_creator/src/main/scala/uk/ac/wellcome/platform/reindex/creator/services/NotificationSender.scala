@@ -18,19 +18,16 @@ class NotificationSender @Inject()(snsWriter: SNSWriter)(
       records.map { record: HybridRecord =>
         sendIndividualNotification(
           recordId = record.id,
-          dynamoConfig = reindexJob.dynamoConfig,
-          desiredVersion = reindexJob.desiredVersion
+          dynamoConfig = reindexJob.dynamoConfig
         )
       }
     }
   }
 
   private def sendIndividualNotification(recordId: String,
-                                         dynamoConfig: DynamoConfig,
-                                         desiredVersion: Int): Future[Unit] = {
+                                         dynamoConfig: DynamoConfig): Future[Unit] = {
     val request = ReindexRequest(
       id = recordId,
-      desiredVersion = desiredVersion,
       tableName = dynamoConfig.table
     )
 

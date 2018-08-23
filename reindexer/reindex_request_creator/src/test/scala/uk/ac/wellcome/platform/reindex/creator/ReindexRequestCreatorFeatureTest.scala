@@ -55,7 +55,6 @@ class ReindexRequestCreatorFeatureTest
     testRecords.map { record =>
       ReindexRequest(
         id = record.id,
-        desiredVersion = desiredVersion,
         tableName = table.name
       )
     }
