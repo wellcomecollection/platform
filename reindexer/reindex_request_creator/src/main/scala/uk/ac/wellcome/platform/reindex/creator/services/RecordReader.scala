@@ -23,7 +23,8 @@ class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(
   implicit ec: ExecutionContext)
     extends Logging {
 
-  def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[HybridRecord]] = {
+  def findRecordsForReindexing(
+    reindexJob: ReindexJob): Future[List[HybridRecord]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
 
     val table = Table[HybridRecord](reindexJob.dynamoConfig.table)
