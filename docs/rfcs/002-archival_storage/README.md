@@ -158,25 +158,29 @@ Digitised content will be ingested using Goobi, which should provide the bag lay
 #### Bag
 
 ```
-b22036593/
+b24923333/
 |-- data
-|   |-- b22036593.xml      // mets file
-|  [|-- bb22036593_001.xml // multiple manifestations]
-|  [|-- bb22036593_002.xml // multiple manifestations]
+|   |-- b24923333.xml      // mets "anchor" file for multiple manifestation
+|  [|-- b24923333_001.xml  // mets file for vol 1]
+|  [|-- b24923333_002.xml  // mets file for vol 2]
 |   \-- objects
-|       \-- b22036593_001.jp2
-|      [\-- b22036593_001_001.jp2 // multiple manifestations]
-|      [\-- b22036593_002_001.jp2 // multiple manifestations]
+|      [\-- b24923333_001_001.jp2 // first image for vol 1]
+|      [\-- b24923333_001_002.jp2 // second image for vol 1]
+|           ...
+|      [\-- b24923333_002_001.jp2 // first image for vol 2]
+|      [\-- b24923333_002_002.jp2 // second image for vol 2]
 |           ...
 |   \-- alto
-|       \-- b22036593_001.xml
-|      [\-- b22036593_001_001.xml // multiple manifestations]
-|      [\-- b22036593_002_001.xml // multiple manifestations]
+|      [\-- b24923333_001_001.xml // text for image 1 vol 1]
+|      [\-- b24923333_001_002.xml // text for image 2 vol 1]
+|           ...
+|      [\-- b24923333_002_001.xml // text for image 1 vol 2]
+|      [\-- b24923333_002_002.xml // text for image 2 vol 2]
 |           ...
 |-- manifest-sha256.txt
-|     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b22036593.xml
-|     e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e data/objects/b22036593_001.jp2
-|     17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502 data/alto/b22036593_001.xml
+|     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b24923333.xml
+|     e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e data/objects/b24923333_001.jp2
+|     17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502 data/alto/b24923333_001.xml
 |     ...
 |-- tagmanifest-sha256.txt
 |     791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e manifest-sha256.txt
@@ -187,10 +191,10 @@ b22036593/
 |     Contact-Email: support@intranda.com
 |     External-Description: A account of a voyage to New South Wales    // title
 |     Bagging-Date: 2016-08-07
-|     External-Identifier: b22036593    // b number
+|     External-Identifier: b24923333    // b number
 |     Payload-Oxum: 435255.8
 |     Internal-Sender-Identifier: 170131    // goobi process id
-|     Internal-Sender-Description: 12324_b_b22036593    // goobi process title
+|     Internal-Sender-Description: 12324_b_b24923333    // goobi process title
 \-- bagit.txt
       BagIt-Version: 0.97
       Tag-File-Character-Encoding: UTF-8
@@ -219,7 +223,7 @@ The existing METS structure should be change to reflect the following. The main 
           <premis:object version="3.0" xsi:schemaLocation="http://www.loc.gov/premis/v3 http://www.loc.gov/standards/premis/v3/premis.xsd" xsi:type="premis:file">
             <premis:objectIdentifier>
               <premis:objectIdentifierType>local</premis:objectIdentifierType>
-              <premis:objectIdentifierValue>b22036593_0001.jp2</premis:objectIdentifierValue>
+              <premis:objectIdentifierValue>b24923333_0001.jp2</premis:objectIdentifierValue>
               </premis:objectIdentifier>
             <premis:significantProperties>
               <premis:significantPropertiesType>ImageHeight</premis:significantPropertiesType>
@@ -294,7 +298,7 @@ Response:
         "label": "Sierra system number",
         "type": "IdentifierType"
       },
-      "value": "b22036593"
+      "value": "b24923333"
     },
     {
       "type": "Identifier",
@@ -303,7 +307,7 @@ Response:
         "label": "Goobi process title",
         "type": "IdentifierType"
       },
-      "value": "12324_b_b22036593"
+      "value": "12324_b_b24923333"
     },
     {
       "type": "Identifier",
@@ -322,17 +326,17 @@ Response:
       {
         "type": "File",
         "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "path": "data/b22036593.xml"
+        "path": "data/b24923333.xml"
       },
       {
         "type": "File",
         "checksum": "e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e",
-        "path": "data/objects/b22036593_001.jp2"
+        "path": "data/objects/b24923333_001.jp2"
       },
       {
         "type": "File",
         "checksum": "17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502",
-        "path": "data/alto/b22036593_001.xml"
+        "path": "data/alto/b24923333_001.xml"
       }
     ]
   },
@@ -365,7 +369,7 @@ Response:
         "label": "AWS S3 Glacier",
         "type": "LocationType"
       },
-      "url": "s3://archivebucket/digitised/b22036593/"
+      "url": "s3://archivebucket/digitised/b24923333/"
     },
     {
       "type": "DigitalLocation",
@@ -374,7 +378,7 @@ Response:
         "label": "Azure Blob Storage Archive",
         "type": "LocationType"
       },
-      "url": "https://archivebucket-replica.blob.core.windows.net/digitised/b22036593/"
+      "url": "https://archivebucket-replica.blob.core.windows.net/digitised/b24923333/"
     },
     {
       "type": "DigitalLocation",
@@ -383,7 +387,7 @@ Response:
         "label": "AWS S3 Standard IA",
         "type": "LocationType"
       },
-      "url": "s3://accessbucket/digitised/b22036593/"
+      "url": "s3://accessbucket/digitised/b24923333/"
     }
   ],
   "description": "A account of a voyage to New South Wales",
