@@ -38,9 +38,9 @@ def test_missing_url_fails(sns_client):
 
 
 def test_invalid_json_fails(sns_client):
-    request = "invalid-json"
+    request = "not_json"
 
-    with pytest.raises(TypeError, match="Invalid request not json: invalid-json"):
+    with pytest.raises(TypeError, match="Invalid request not json: not_json"):
         archive_ingest.handler(request=request, sns_client=sns_client)
 
     assert len(sns_client.list_messages()) == 0
