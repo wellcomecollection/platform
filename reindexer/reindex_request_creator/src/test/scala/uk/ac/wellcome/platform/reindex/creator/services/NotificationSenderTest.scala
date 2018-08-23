@@ -29,7 +29,6 @@ class NotificationSenderTest
         )
 
         val recordIds = List("miro/1", "miro/2", "miro/3")
-        val desiredVersion = 5
 
         val table = Table("my-test-table", "my-index")
 

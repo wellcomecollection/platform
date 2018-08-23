@@ -4,7 +4,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.{Scanamo, SecondaryIndex, Table}
 import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.platform.reindex.creator.exceptions.ReindexerException

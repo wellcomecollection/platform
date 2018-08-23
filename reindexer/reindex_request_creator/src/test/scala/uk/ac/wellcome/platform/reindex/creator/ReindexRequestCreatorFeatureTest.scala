@@ -11,6 +11,7 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.vhs.HybridRecord
 
 case class TestRecord(
   id: String,
@@ -31,13 +32,10 @@ class ReindexRequestCreatorFeatureTest
     with SQS
     with ScalaFutures {
 
-  val currentVersion = 1
-  val desiredVersion = 5
-
   val shardName = "shard"
 
   private def createReindexableData(queue: Queue,
-                                    table: Table): Seq[ReindexRequest] = {
+                                    table: Table): Seq[TestRecord] = {
     val numberOfRecords = 4
 
     val testRecords = (1 to numberOfRecords).map(i => {
@@ -49,13 +47,9 @@ class ReindexRequestCreatorFeatureTest
       )
     })
 
-    testRecords.foreach(Scanamo.put(dynamoDbClient)(table.name)(_))
-
-    testRecords.map { record =>
-      ReindexRequest(
-        id = record.id,
-        tableName = table.name
-      )
+    testRecords.map { testRecord =>
+      Scanamo.put(dynamoDbClient)(table.name)(testRecord)
+      testRecord
     }
   }
 
@@ -67,7 +61,15 @@ class ReindexRequestCreatorFeatureTest
             queue)
 
           withServer(flags) { _ =>
-            val expectedRecords = createReindexableData(queue, table)
+            val testRecords = createReindexableData(queue, table)
+
+            val expectedRecords = testRecords.map { testRecord =>
+              HybridRecord(
+                id = testRecord.id,
+                version = testRecord.version,
+                s3key = testRecord.s3key
+              )
+            }
 
             val reindexJob = createReindexJobWith(
               table = table,
