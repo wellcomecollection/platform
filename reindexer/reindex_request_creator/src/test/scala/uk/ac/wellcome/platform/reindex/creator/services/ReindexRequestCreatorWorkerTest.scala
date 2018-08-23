@@ -84,8 +84,7 @@ class ReindexRequestCreatorWorkerTest
               id = "id/111",
               version = 1,
               s3key = "s3://id/111",
-              reindexShard = reindexJob.shardId,
-              reindexVersion = reindexJob.desiredVersion - 1
+              reindexShard = reindexJob.shardId
             )
 
             Scanamo.put(dynamoDbClient)(table.name)(testRecord)

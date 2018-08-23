@@ -16,8 +16,7 @@ case class TestRecord(
   id: String,
   s3key: String,
   version: Int,
-  reindexShard: String,
-  reindexVersion: Int
+  reindexShard: String
 )
 
 class ReindexRequestCreatorFeatureTest
@@ -46,8 +45,7 @@ class ReindexRequestCreatorFeatureTest
         id = s"id$i",
         s3key = s"s3://$i",
         version = 1,
-        reindexShard = shardName,
-        reindexVersion = currentVersion
+        reindexShard = shardName
       )
     })
 

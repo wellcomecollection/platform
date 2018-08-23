@@ -25,23 +25,20 @@ class RecordReaderTest
     with ReindexFixtures {
 
   val shardName = "shard"
-  val currentVersion = 1
   val desiredVersion = 2
 
   val exampleRecord = TestRecord(
     id = "id",
     version = 1,
     s3key = "s3://id",
-    reindexShard = shardName,
-    reindexVersion = currentVersion
+    reindexShard = shardName
   )
 
   it("only selects records with an out-of-date reindex version") {
     withLocalDynamoDbTable { table =>
       withReindexRecordReaderService { service =>
         val newerRecord = exampleRecord.copy(
-          id = "id1",
-          reindexVersion = desiredVersion + 1
+          id = "id1"
         )
 
         val olderRecord = exampleRecord.copy(
