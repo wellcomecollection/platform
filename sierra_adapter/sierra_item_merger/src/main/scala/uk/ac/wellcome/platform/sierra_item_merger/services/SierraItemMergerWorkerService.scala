@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_item_merger.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.{MessagePointer, MessageStream}
+import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -24,9 +24,9 @@ class SierraItemMergerWorkerService @Inject()(
       hybridRecords: Seq[HybridRecord] <- sierraItemMergerUpdaterService.update(
         itemRecord)
       _ <- Future.sequence(
-        hybridRecords.map { record =>
+        hybridRecords.map { hybridRecord =>
           snsWriter.writeMessage(
-            message = MessagePointer(record.location),
+            message = hybridRecord,
             subject = s"Sent from ${this.getClass.getSimpleName}"
           )
         }

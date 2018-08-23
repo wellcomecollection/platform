@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.sierra_bib_merger.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.MessagePointer
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
@@ -24,7 +23,7 @@ class SierraBibMergerWorkerService @Inject()(
       bibRecord <- Future.fromTry(fromJson[SierraBibRecord](message.Message))
       hybridRecord <- sierraBibMergerUpdaterService.update(bibRecord)
       _ <- snsWriter.writeMessage(
-        MessagePointer(hybridRecord.location),
+        hybridRecord,
         s"Sent from ${this.getClass.getSimpleName}")
     } yield ()
 
