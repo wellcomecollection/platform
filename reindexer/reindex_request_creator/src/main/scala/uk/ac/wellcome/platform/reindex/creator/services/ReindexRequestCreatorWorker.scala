@@ -22,11 +22,9 @@ class ReindexRequestCreatorWorker @Inject()(
     for {
       reindexJob: ReindexJob <- Future.fromTry(
         fromJson[ReindexJob](message.Message))
-      outdatedRecords: List[HybridRecord] <- readerService
-        .findRecordsForReindexing(reindexJob)
-      _ <- notificationService.sendNotifications(
-        records = outdatedRecords,
-        reindexJob = reindexJob)
+      outdatedRecords: List[HybridRecord] <- readerService.findRecordsForReindexing(
+        reindexJob)
+      _ <- notificationService.sendNotifications(records = outdatedRecords)
     } yield ()
 
   def stop() = system.terminate()

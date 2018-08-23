@@ -5,10 +5,8 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.models.reindexer.ReindexRequest
-import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
+import uk.ac.wellcome.platform.reindex.creator.fixtures.{ReindexFixtures, ReindexableTable}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
@@ -25,7 +23,7 @@ class ReindexRequestCreatorFeatureTest
     with Eventually
     with IntegrationPatience
     with fixtures.Server
-    with LocalDynamoDbVersioned
+    with ReindexableTable
     with ReindexFixtures
     with SNS
     with SQS
@@ -81,10 +79,10 @@ class ReindexRequestCreatorFeatureTest
             )
 
             eventually {
-              val actualRecords: Seq[ReindexRequest] =
+              val actualRecords: Seq[HybridRecord] =
                 listMessagesReceivedFromSNS(topic)
                   .map { _.message }
-                  .map { fromJson[ReindexRequest](_).get }
+                  .map { fromJson[HybridRecord](_).get }
                   .distinct
 
               actualRecords should contain theSameElementsAs expectedRecords
