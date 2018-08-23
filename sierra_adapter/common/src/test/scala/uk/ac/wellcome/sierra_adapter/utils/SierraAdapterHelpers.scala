@@ -10,7 +10,11 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  EmptyMetadata,
+  HybridRecord,
+  VersionedHybridStore
+}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.test.fixtures._
@@ -63,7 +67,8 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
                           topic: Topic,
                           bucket: Bucket,
                           table: Table): Assertion = {
-    val hybridRecord = getHybridRecord(table, id = transformable.sierraId.withoutCheckDigit)
+    val hybridRecord =
+      getHybridRecord(table, id = transformable.sierraId.withoutCheckDigit)
 
     val storedTransformable = getObjectFromS3[SierraTransformable](
       Bucket(hybridRecord.location.namespace),
@@ -79,7 +84,8 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
                           topic: Topic,
                           bucket: Bucket,
                           table: Table): Assertion = {
-    val hybridRecord = getHybridRecord(table, id = itemRecord.id.withoutCheckDigit)
+    val hybridRecord =
+      getHybridRecord(table, id = itemRecord.id.withoutCheckDigit)
 
     val storedItemRecord = getObjectFromS3[SierraItemRecord](
       Bucket(hybridRecord.location.namespace),
