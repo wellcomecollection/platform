@@ -3,18 +3,18 @@
 """
 Create a request to archive a bag
 
-Usage: trigger_archive_bag.py [sns] <BAG>... [--bucket=<BUCKET_NAME>]  [--topic=<TOPIC_NAME>|--api=<API>]
+Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>] [--topic=<TOPIC_NAME>|--api=<API>] [--sns=(true|false)]
        trigger_archive_bag.py -h | --help
 
 Options:
-  sns                    Send directly to SNS rather than through the API
-                         [default: false]
   --bucket=<BUCKET_NAME> The S3 bucket containing the bags.
                          [default: wellcomecollection-assets-archive-ingest]
   --topic=<TOPIC_NAME>   The archivist topic.
                          [default: archive-storage_archivist]
-   --api=<API>           The API enndpoint to use
+   --api=<API>           The API endpoint to use
                          [default: http://api.wellcomecollection.org/prod/storage/v1/ingest]
+   --sns=(true|false)    Send directly to SNS rather than through the API
+                         [default: false]
   -h --help              Print this help message
 """
 
@@ -41,7 +41,7 @@ def archive_bag_api_messages(bags, bucket):
     """
     for bag in bags:
         yield {
-            'bagURL': f"s3://{bucket}/{bag}"
+            'uploadUrl': f"s3://{bucket}/{bag}"
         }
 
 
@@ -82,19 +82,21 @@ def publish_to_sns(bucket_name, bags, topic_name):
 
 
 def call_ingest_api(bucket_name, bags, api):
+    session = requests.Session()
     for message in archive_bag_api_messages(bags, bucket_name):
-        response = requests.post(api, json=message)
+        response = session.post(api, json=message)
+        print(f'{message} -> {api} [{response.status_code}]')
         if response.status_code != 200:
-            print(f"Error: [{response.status_code}] {response.json()}")
+            raise ValueError(f"Error: [{response.status_code}] {response.json()}")
 
 
 def main():
     args = docopt.docopt(__doc__)
     bags = args['<BAG>']
     bucket_name = args['--bucket']
-    use_sns_directly = args['sns']
+    use_sns_directly = args['--sns']
 
-    if(use_sns_directly):
+    if use_sns_directly.lower() == "true":
         topic_name = args['--topic']
         publish_to_sns(bucket_name, bags, topic_name)
     else:

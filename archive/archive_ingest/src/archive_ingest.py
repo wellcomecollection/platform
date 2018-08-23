@@ -4,24 +4,16 @@ Receives a message to ingest a bag giving the URL and publishes the archive even
 """
 
 import os
+from urllib.parse import urlparse
 
 import boto3
 import daiquiri
-from urllib.parse import urlparse
 
 from wellcome_aws_utils.sns_utils import publish_sns_message
 from wellcome_aws_utils.lambda_utils import log_on_error
 
 daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
-
-
-def ensure_valid_request(event):
-    required_key = 'bagURL'
-    if type(event) is not dict:
-        raise ValueError(f"Invalid request not json dict: {event}")
-    if required_key not in event:
-        raise ValueError(f"Invalid request missing {required_key}")
 
 
 def archive_bag_message(bag_url):
@@ -41,17 +33,22 @@ def archive_bag_message(bag_url):
 
 
 @log_on_error
-def handler(event, _ctx=None, sns_client=None):
-    logger.info(f"received {event}")
+def handler(request, _ctx=None, sns_client=None):
+    logger.debug('received %r', request)
 
-    ensure_valid_request(event)
+    topic_arn = os.environ['TOPIC_ARN']
 
-    bag_url = event['bagURL']
+    try:
+        upload_url = request['uploadUrl']
+    except TypeError:
+        raise TypeError(f"Invalid request not json dict: {request}")
+    except KeyError:
+        raise KeyError(f"Invalid request missing 'uploadUrl' in {request}")
 
-    message = archive_bag_message(bag_url)
+
+    message = archive_bag_message(upload_url)
     logger.debug(f"sns-message: {message}")
 
-    topic_arn = os.environ['INGEST_TOPIC_ARN']
     topic_name = topic_arn.split(":")[-1]
 
     sns_client = sns_client or boto3.client('sns')
