@@ -1,7 +1,7 @@
 module "miro_reindex_shard_generator" {
   source = "reindex_shard_generator"
 
-  source_name = "miro"
+  source_name             = "miro"
   vhs_table_name          = "${local.vhs_miro_table_name}"
   vhs_table_stream_arn    = "${local.vhs_miro_table_stream_arn}"
   vhs_table_update_policy = "${local.vhs_miro_dynamodb_update_policy}"
@@ -13,7 +13,7 @@ module "miro_reindex_shard_generator" {
 module "sierra_reindex_shard_generator" {
   source = "reindex_shard_generator"
 
-  source_name = "sierra"
+  source_name             = "sierra"
   vhs_table_name          = "${local.vhs_sierra_table_name}"
   vhs_table_stream_arn    = "${local.vhs_sierra_table_stream_arn}"
   vhs_table_update_policy = "${local.vhs_sierra_dynamodb_update_policy}"
