@@ -45,7 +45,6 @@ def handler(request, _ctx=None, sns_client=None):
     except KeyError:
         raise KeyError(f"Invalid request missing 'uploadUrl' in {request}")
 
-
     message = archive_bag_message(upload_url)
     logger.debug(f"sns-message: {message}")
 
