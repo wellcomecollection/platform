@@ -147,6 +147,7 @@ def test_updates_shard_on_old_record(dynamodb_client, source_data_table, sierra_
 
     assert item['Item']['reindexShard']['S'] == '1414'
 
+
 def test_does_nothing_if_shard_up_to_date(dynamodb_client, source_data_table, sierra_source_name):
     dynamodb_client.put_item(
         TableName=source_data_table,
