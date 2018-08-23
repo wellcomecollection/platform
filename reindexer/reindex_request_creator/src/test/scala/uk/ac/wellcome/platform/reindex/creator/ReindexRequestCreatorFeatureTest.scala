@@ -14,7 +14,6 @@ import uk.ac.wellcome.json.JsonUtil._
 
 case class TestRecord(
   id: String,
-  someData: String,
   s3key: String,
   version: Int,
   reindexShard: String,
@@ -47,7 +46,6 @@ class ReindexRequestCreatorFeatureTest
         id = s"id$i",
         s3key = s"s3://$i",
         version = 1,
-        someData = "A ghastly gharial ganking a green golem.",
         reindexShard = shardName,
         reindexVersion = currentVersion
       )

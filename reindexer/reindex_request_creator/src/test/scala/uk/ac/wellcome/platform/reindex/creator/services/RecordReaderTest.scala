@@ -32,7 +32,6 @@ class RecordReaderTest
     id = "id",
     version = 1,
     s3key = "s3://id",
-    someData = "A ghastly gharial ganking a green golem.",
     reindexShard = shardName,
     reindexVersion = currentVersion
   )
