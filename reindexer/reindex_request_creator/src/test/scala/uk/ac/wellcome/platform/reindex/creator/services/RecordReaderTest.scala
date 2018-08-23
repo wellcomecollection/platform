@@ -10,6 +10,7 @@ import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
+import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -30,6 +31,7 @@ class RecordReaderTest
   val exampleRecord = TestRecord(
     id = "id",
     version = 1,
+    s3key = "s3://id",
     someData = "A ghastly gharial ganking a green golem.",
     reindexShard = shardName,
     reindexVersion = currentVersion
@@ -55,7 +57,13 @@ class RecordReaderTest
         records.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        val expectedRecords = List(olderRecord)
+        val expectedRecords = List(
+          HybridRecord(
+            id = olderRecord.id,
+            version = olderRecord.version,
+            s3key = olderRecord.s3key
+          )
+        )
 
         val reindexJob = createReindexJobWith(
           table = table,
@@ -93,12 +101,20 @@ class RecordReaderTest
 
         val recordList = inShardRecords ++ notInShardRecords
 
+        val expectedRecords = inShardRecords.map { testRecord =>
+          HybridRecord(
+            id = testRecord.id,
+            version = testRecord.version,
+            s3key = testRecord.s3key
+          )
+        }
+
         recordList.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
         whenReady(service.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
-            actualRecords should contain theSameElementsAs inShardRecords
+            actualRecords should contain theSameElementsAs expectedRecords
         }
       }
     }

@@ -15,6 +15,7 @@ import uk.ac.wellcome.json.JsonUtil._
 case class TestRecord(
   id: String,
   someData: String,
+  s3key: String,
   version: Int,
   reindexShard: String,
   reindexVersion: Int
@@ -44,6 +45,7 @@ class ReindexRequestCreatorFeatureTest
     val testRecords = (1 to numberOfRecords).map(i => {
       TestRecord(
         id = s"id$i",
+        s3key = s"s3://$i",
         version = 1,
         someData = "A ghastly gharial ganking a green golem.",
         reindexShard = shardName,

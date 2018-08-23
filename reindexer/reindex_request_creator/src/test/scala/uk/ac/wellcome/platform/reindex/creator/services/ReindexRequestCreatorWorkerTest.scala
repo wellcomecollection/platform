@@ -83,6 +83,7 @@ class ReindexRequestCreatorWorkerTest
             val testRecord = TestRecord(
               id = "id/111",
               version = 1,
+              s3key = "s3://id/111",
               someData = "A dire daliance directly dancing due down.",
               reindexShard = reindexJob.shardId,
               reindexVersion = reindexJob.desiredVersion - 1
