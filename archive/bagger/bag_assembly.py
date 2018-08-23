@@ -13,7 +13,6 @@ def clean_working_dir():
 
 
 def prepare_bag_dir(b_number):
-
     zip_file_name = "{0}.zip".format(b_number)
     bag_info = {
         "b_number": b_number,

@@ -5,7 +5,7 @@ import settings
 def get_image(image_slug, space=None):
     if space is None:
         space = settings.DLCS_SPACE
-    
+
     url = "{0}spaces/{1}/images/{2}".format(get_customer_url(), space, image_slug)
     response = get(url, auth=get_authorisation())
     return response.json()
