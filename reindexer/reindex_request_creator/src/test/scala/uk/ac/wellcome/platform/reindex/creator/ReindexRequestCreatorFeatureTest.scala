@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.reindex.creator
 
 import com.gu.scanamo.Scanamo
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
@@ -9,7 +9,6 @@ import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
@@ -24,7 +23,7 @@ class ReindexRequestCreatorFeatureTest
     extends FunSpec
     with Matchers
     with Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with fixtures.Server
     with LocalDynamoDbVersioned
     with ReindexFixtures
