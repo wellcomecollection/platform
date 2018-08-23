@@ -41,9 +41,9 @@ def handler(request, _ctx=None, sns_client=None):
     try:
         upload_url = request['uploadUrl']
     except TypeError:
-        raise TypeError(f"Invalid request not json dict: {request}")
+        raise TypeError(f"Invalid request not json: {request}")
     except KeyError:
-        raise KeyError(f"Invalid request missing 'uploadUrl' in {request}")
+        raise KeyError(f"Invalid request missing 'uploadUrl' in {request}")‘“‘“
 
     message = archive_bag_message(upload_url)
     logger.debug(f"sns-message: {message}")
