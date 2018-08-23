@@ -30,7 +30,7 @@ class RecorderFeatureTest
             withTypeVHS[TransformedBaseWork, EmptyMetadata, Assertion](
               bucket = bucket,
               table = table) { _ =>
-              val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
+              val flags = sqsLocalClientFlags ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
                 bucket,
                 queue) ++ snsLocalFlags(topic)
               withServer(flags) { _ =>
