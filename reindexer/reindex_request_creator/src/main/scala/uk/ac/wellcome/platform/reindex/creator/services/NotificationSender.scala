@@ -6,17 +6,18 @@ import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class NotificationSender @Inject()(snsWriter: SNSWriter)(
   implicit ec: ExecutionContext) {
-  def sendNotifications(recordIds: List[String],
+  def sendNotifications(records: List[HybridRecord],
                         reindexJob: ReindexJob): Future[List[Unit]] = {
     Future.sequence {
-      recordIds.map { recordId: String =>
+      records.map { record: HybridRecord =>
         sendIndividualNotification(
-          recordId = recordId,
+          recordId = record.id,
           dynamoConfig = reindexJob.dynamoConfig,
           desiredVersion = reindexJob.desiredVersion
         )
