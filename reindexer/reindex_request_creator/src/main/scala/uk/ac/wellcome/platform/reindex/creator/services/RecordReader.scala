@@ -7,9 +7,9 @@ import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.reindexer.ReindexableRecord
 import uk.ac.wellcome.platform.reindex.creator.exceptions.ReindexerException
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -23,13 +23,14 @@ class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(
   implicit ec: ExecutionContext)
     extends Logging {
 
-  def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[String]] = {
+  def findRecordsForReindexing(
+    reindexJob: ReindexJob): Future[List[HybridRecord]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
 
-    val table = Table[ReindexableRecord](reindexJob.dynamoConfig.table)
+    val table = Table[HybridRecord](reindexJob.dynamoConfig.table)
 
     for {
-      index: SecondaryIndex[ReindexableRecord] <- Future.fromTry(Try {
+      index: SecondaryIndex[HybridRecord] <- Future.fromTry(Try {
         table.index(indexName = reindexJob.dynamoConfig.index)
       })
 
@@ -38,7 +39,7 @@ class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(
       // large, this might cause out-of-memory errors -- in practice, we're
       // hoping that the shards/individual records are small enough for this
       // not to be a problem.
-      results: List[Either[DynamoReadError, ReindexableRecord]] <- Future {
+      results: List[Either[DynamoReadError, HybridRecord]] <- Future {
         Scanamo.exec(dynamoDbClient)(
           index.query(
             'reindexShard -> reindexJob.shardId and
@@ -47,17 +48,17 @@ class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(
         )
       }
 
-      recordIdsToReindex: List[String] = results.map(extractRecordID)
-    } yield recordIdsToReindex
+      recordsToReindex: List[HybridRecord] = results.map(extractRecord)
+    } yield recordsToReindex
   }
 
-  private def extractRecordID(
-    scanamoResult: Either[DynamoReadError, ReindexableRecord]): String =
+  private def extractRecord(
+    scanamoResult: Either[DynamoReadError, HybridRecord]): HybridRecord =
     scanamoResult match {
       case Left(err: DynamoReadError) => {
         warn(s"Failed to read Dynamo records: $err")
         throw ReindexerException(s"Error in the DynamoDB query: $err")
       }
-      case Right(r: ReindexableRecord) => r.id
+      case Right(hr: HybridRecord) => hr
     }
 }

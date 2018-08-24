@@ -10,6 +10,7 @@ import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -40,8 +41,16 @@ class NotificationSenderTest
           )
         }
 
+        val hybridRecords = recordIds.map { id =>
+          HybridRecord(
+            id = id,
+            version = 1,
+            s3key = "s3://example/mykey.txt"
+          )
+        }
+
         val future = notificationSender.sendNotifications(
-          recordIds = recordIds,
+          records = hybridRecords,
           reindexJob = createReindexJobWith(
             table = table,
             desiredVersion = desiredVersion
@@ -70,8 +79,16 @@ class NotificationSenderTest
         snsWriter = snsWriter
       )
 
+      val records = List("1", "2", "3").map { id =>
+        HybridRecord(
+          id = id,
+          version = 1,
+          s3key = "s3://example/mykey.txt"
+        )
+      }
+
       val future = notificationSender.sendNotifications(
-        recordIds = List("1", "2", "3"),
+        records = records,
         reindexJob = createReindexJobWith(
           table = Table("my-test-table", "my-index")
         )
