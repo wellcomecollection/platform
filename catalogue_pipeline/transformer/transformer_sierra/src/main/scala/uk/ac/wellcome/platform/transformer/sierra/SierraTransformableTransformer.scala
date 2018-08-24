@@ -1,17 +1,28 @@
 package uk.ac.wellcome.platform.transformer.sierra
 
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemNumber,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
-import uk.ac.wellcome.platform.transformer.sierra.source.SierraBibData
+import uk.ac.wellcome.platform.transformer.exceptions.{
+  ShouldNotTransformException,
+  TransformerException
+}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  SierraBibData,
+  SierraItemData
+}
 import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra._
 import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects.{
   SierraConceptSubjects,
   SierraPersonSubjects
 }
 
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 class SierraTransformableTransformer
     extends SierraIdentifiers
@@ -61,6 +72,9 @@ class SierraTransformableTransformer
 
         fromJson[SierraBibData](bibRecord.data)
           .map { sierraBibData =>
+            val sierraItemDataMap =
+              extractItemData(sierraTransformable.itemRecords)
+
             if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
               UnidentifiedWork(
                 sourceIdentifier = sourceIdentifier,
@@ -81,11 +95,11 @@ class SierraTransformableTransformer
                 production = getProduction(sierraBibData),
                 language = getLanguage(sierraBibData),
                 dimensions = getDimensions(sierraBibData),
-                items =
-                  getPhysicalItems(sierraTransformable) ++
-                    getDigitalItems(
-                      sourceIdentifier.copy(ontologyType = "Item"),
-                      sierraBibData),
+                items = getItems(
+                  bibId = bibId,
+                  bibData = sierraBibData,
+                  itemDataMap = sierraItemDataMap
+                ),
                 itemsV1 = List(),
                 version = version
               )
@@ -96,6 +110,10 @@ class SierraTransformableTransformer
             }
           }
           .recover {
+            case e: JsonDecodingError =>
+              throw TransformerException(
+                s"Unable to parse bib data for ${bibRecord.id} as JSON: <<${bibRecord.data}>>"
+              )
             case e: ShouldNotTransformException =>
               info(s"Should not transform $bibId: ${e.getMessage}")
               UnidentifiedInvisibleWork(
@@ -118,5 +136,19 @@ class SierraTransformableTransformer
         )
       }
   }
+
+  def extractItemData(itemRecords: Map[SierraItemNumber, SierraItemRecord])
+    : Map[SierraItemNumber, SierraItemData] =
+    itemRecords
+      .map { case (id, itemRecord) => (id, itemRecord.data) }
+      .map {
+        case (id, jsonString) =>
+          fromJson[SierraItemData](jsonString) match {
+            case Success(data) => id -> data
+            case Failure(_) =>
+              throw TransformerException(
+                s"Unable to parse item data for $id as JSON: <<$jsonString>>")
+          }
+      }
 
 }

@@ -11,6 +11,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
@@ -669,6 +670,67 @@ class SierraTransformableTransformerTest
     work.asInstanceOf[UnidentifiedWork].workType shouldBe Some(
       WorkType(id = "k", label = "Pictures")
     )
+  }
+
+  describe("throws a TransformerException when passed invalid data") {
+    it("an item record") {
+      val bibRecord = createSierraBibRecord
+      val transformable = SierraTransformable(
+        sierraId = bibRecord.id,
+        maybeBibRecord = Some(bibRecord),
+        itemRecords = Map(
+          createSierraItemNumber -> createSierraItemRecordWith(
+            data = "Not valid JSON")
+        )
+      )
+
+      val result = transformer.transform(transformable, version = 1)
+      result.isFailure shouldBe true
+      result.failed.get shouldBe a[TransformerException]
+      result.failed.get
+        .asInstanceOf[TransformerException]
+        .e
+        .getMessage should include("Unable to parse item data")
+    }
+
+    it("one of several item records") {
+      val bibRecord = createSierraBibRecord
+      val transformable = SierraTransformable(
+        sierraId = bibRecord.id,
+        maybeBibRecord = Some(bibRecord),
+        itemRecords = Map(
+          createSierraItemNumber -> createSierraItemRecord,
+          createSierraItemNumber -> createSierraItemRecordWith(
+            data = "Not valid JSON"),
+          createSierraItemNumber -> createSierraItemRecord
+        )
+      )
+
+      val result = transformer.transform(transformable, version = 1)
+      result.isFailure shouldBe true
+      result.failed.get shouldBe a[TransformerException]
+      result.failed.get
+        .asInstanceOf[TransformerException]
+        .e
+        .getMessage should include("Unable to parse item data")
+    }
+
+    it("the bib record") {
+      val bibRecord = createSierraBibRecordWith(
+        data = "Not a valid JSON string"
+      )
+      val transformable = SierraTransformable(
+        bibRecord = bibRecord
+      )
+
+      val result = transformer.transform(transformable, version = 1)
+      result.isFailure shouldBe true
+      result.failed.get shouldBe a[TransformerException]
+      result.failed.get
+        .asInstanceOf[TransformerException]
+        .e
+        .getMessage should include("Unable to parse bib data")
+    }
   }
 
   private def transformDataToWork(id: SierraBibNumber,

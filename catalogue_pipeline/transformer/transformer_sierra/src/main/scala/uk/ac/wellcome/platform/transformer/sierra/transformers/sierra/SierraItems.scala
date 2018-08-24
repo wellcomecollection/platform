@@ -1,35 +1,30 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibNumber,
+  SierraItemNumber
+}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
   SierraItemData
 }
 
-import scala.util.{Failure, Success}
-
 trait SierraItems extends Logging with SierraLocation {
-  def extractItemData(sierraTransformable: SierraTransformable)
-    : Map[SierraItemNumber, SierraItemData] =
-    sierraTransformable.itemRecords
-      .map { case (id, itemRecord) => (id, itemRecord.data) }
-      .map {
-        case (id, jsonString) =>
-          fromJson[SierraItemData](jsonString) match {
-            case Success(data) => id -> data
-            case Failure(_) =>
-              throw TransformerException(
-                s"Unable to parse item data for $id as JSON: <<$jsonString>>")
-          }
-      }
+  def getItems(bibId: SierraBibNumber,
+               bibData: SierraBibData,
+               itemDataMap: Map[SierraItemNumber, SierraItemData])
+    : List[MaybeDisplayable[Item]] = {
+    val physicalItems = getPhysicalItems(itemDataMap)
+    val digitalItems = List(getDigitalItem(bibId = bibId, bibData = bibData)).flatten
 
-  def transformItemData(itemId: SierraItemNumber,
-                        itemData: SierraItemData): Identifiable[Item] = {
+    physicalItems ++ digitalItems
+  }
+
+  private def transformItemData(
+    itemId: SierraItemNumber,
+    itemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform $itemId")
     Identifiable(
       sourceIdentifier = SourceIdentifier(
@@ -50,9 +45,10 @@ trait SierraItems extends Logging with SierraLocation {
     )
   }
 
-  def getPhysicalItems(
-    sierraTransformable: SierraTransformable): List[Identifiable[Item]] =
-    extractItemData(sierraTransformable)
+  private def getPhysicalItems(
+    sierraItemDataMap: Map[SierraItemNumber, SierraItemData])
+    : List[Identifiable[Item]] =
+    sierraItemDataMap
       .filterNot {
         case (_: SierraItemNumber, itemData: SierraItemData) => itemData.deleted
       }
@@ -64,15 +60,6 @@ trait SierraItems extends Logging with SierraLocation {
           )
       }
       .toList
-
-  private def getDigitalItem(
-    sourceIdentifier: SourceIdentifier): Unidentifiable[Item] = {
-    Unidentifiable(
-      agent = Item(
-        locations = List(getDigitalLocation(sourceIdentifier.value))
-      )
-    )
-  }
 
   /** Add digital items to a work.
     *
@@ -86,18 +73,24 @@ trait SierraItems extends Logging with SierraLocation {
     * away with this code.
     *
     */
-  def getDigitalItems(
-    sourceIdentifier: SourceIdentifier,
-    sierraBibData: SierraBibData): List[Unidentifiable[Item]] = {
-    val hasDlnkLocation = sierraBibData.locations match {
+  private def getDigitalItem(
+    bibId: SierraBibNumber,
+    bibData: SierraBibData): Option[Unidentifiable[Item]] = {
+    val hasDlnkLocation = bibData.locations match {
       case Some(locations) => locations.map { _.code }.contains("dlnk")
       case None            => false
     }
 
     if (hasDlnkLocation) {
-      List(getDigitalItem(sourceIdentifier))
+      Some(
+        Unidentifiable(
+          agent = Item(
+            locations = List(getDigitalLocation(bibId.withCheckDigit))
+          )
+        )
+      )
     } else {
-      List()
+      None
     }
   }
 }
