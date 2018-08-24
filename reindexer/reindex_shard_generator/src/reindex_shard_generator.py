@@ -51,12 +51,11 @@ def main(event, _ctxt=None, dynamodb_client=None):
             dynamodb_client.update_item(
                 TableName=table_name,
                 Key={'id': {'S': source_id}},
-                UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard, reindexVersion=:reindexVersion',
+                UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard',
                 ConditionExpression='version < :newVersion',
                 ExpressionAttributeValues={
                     ':newVersion': {'N': str(version + 1)},
                     ':reindexShard': {'S': new_reindex_shard},
-                    ':reindexVersion': {'N': str(0)},
                 }
             )
         except botocore.exceptions.ClientError as e:
