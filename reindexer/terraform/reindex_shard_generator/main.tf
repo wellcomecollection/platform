@@ -12,7 +12,8 @@ module "shard_generator_lambda" {
   timeout = 300
 
   environment_variables = {
-    TABLE_NAME = "${var.vhs_table_name}"
+    TABLE_NAME  = "${var.vhs_table_name}"
+    SOURCE_NAME = "${var.source_name}"
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"

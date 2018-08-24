@@ -26,12 +26,28 @@ output "vhs_sierra_full_access_policy" {
   value = "${module.vhs_sierra.full_access_policy}"
 }
 
+output "vhs_miro_dynamodb_update_policy" {
+  value = "${module.vhs_miro.dynamodb_update_policy}"
+}
+
+output "vhs_miro_read_policy" {
+  value = "${module.vhs_miro.read_policy}"
+}
+
 output "vhs_sierra_dynamodb_update_policy" {
   value = "${module.vhs_sierra.dynamodb_update_policy}"
 }
 
 output "vhs_sierra_read_policy" {
   value = "${module.vhs_sierra.read_policy}"
+}
+
+output "vhs_miro_table_name" {
+  value = "${module.vhs_miro.table_name}"
+}
+
+output "vhs_miro_table_stream_arn" {
+  value = "${module.vhs_miro.table_stream_arn}"
 }
 
 output "vhs_sierra_table_name" {

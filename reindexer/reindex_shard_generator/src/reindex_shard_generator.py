@@ -16,6 +16,7 @@ def main(event, _ctxt=None, dynamodb_client=None):
 
     # TODO: Isn't the table name passed in the record?
     table_name = os.environ['TABLE_NAME']
+    source_name = os.environ['SOURCE_NAME']
 
     for record in event['Records']:
         dynamo_event = DynamoEvent(record)
@@ -25,7 +26,6 @@ def main(event, _ctxt=None, dynamodb_client=None):
             print("no NewImage key in dynamo update event, skipping")
             continue
 
-        source_name = row['sourceName']
         source_id = row['id']
         new_reindex_shard = create_reindex_shard(
             source_name=source_name,
@@ -34,7 +34,7 @@ def main(event, _ctxt=None, dynamodb_client=None):
 
         # If the reindex shard doesn't match the current schema, we'll
         # create a new one.
-        if row.get('reindexShard') == new_reindex_shard and 'reindexVersion' in row:
+        if row.get('reindexShard') == new_reindex_shard:
             print(
                 f'{row["id"]} already has an up-to-date reindexShard; skipping'
             )
