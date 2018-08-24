@@ -18,8 +18,8 @@ trait SierraItems extends Logging with SierraLocation {
         bibId = bibId,
         bibData = bibData)
 
-  def transformItemData(itemId: SierraItemNumber,
-                        itemData: SierraItemData): Identifiable[Item] = {
+  private def transformItemData(itemId: SierraItemNumber,
+                                itemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform $itemId")
     Identifiable(
       sourceIdentifier = SourceIdentifier(
@@ -40,7 +40,7 @@ trait SierraItems extends Logging with SierraLocation {
     )
   }
 
-  def getPhysicalItems(sierraItemDataMap: Map[SierraItemNumber, SierraItemData]): List[Identifiable[Item]] =
+  private def getPhysicalItems(sierraItemDataMap: Map[SierraItemNumber, SierraItemData]): List[Identifiable[Item]] =
     sierraItemDataMap
       .filterNot {
         case (_: SierraItemNumber, itemData: SierraItemData) => itemData.deleted
@@ -74,7 +74,7 @@ trait SierraItems extends Logging with SierraLocation {
     * away with this code.
     *
     */
-  def getDigitalItems(
+  private def getDigitalItems(
     bibId: SierraBibNumber,
     bibData: SierraBibData): List[Unidentifiable[Item]] = {
     val hasDlnkLocation = bibData.locations match {
