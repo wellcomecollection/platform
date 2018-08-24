@@ -39,10 +39,10 @@ resource "aws_lambda_permission" "archive_ingest_apigw" {
 module "lambda_archive_ingest" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v11.5.0"
 
-  name          = "archive_ingest"
-  description   = "Receive ingest requests"
-  timeout       = 60
-  memory_size   = 1024
+  name        = "archive_ingest"
+  description = "Receive ingest requests"
+  timeout     = 60
+  memory_size = 1024
 
   environment_variables = {
     TOPIC_ARN = "${module.archivist_topic.arn}"

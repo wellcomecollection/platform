@@ -153,7 +153,7 @@
             "application/json": "{\"body\": $input.json('$'), \"path\":\"$context.path\"}"
           },
           "responses": {
-            "default":{
+            "default": {
               "statusCode": "202",
               "responseParameters": {
                 "method.response.header.Location": "integration.response.body.location"
