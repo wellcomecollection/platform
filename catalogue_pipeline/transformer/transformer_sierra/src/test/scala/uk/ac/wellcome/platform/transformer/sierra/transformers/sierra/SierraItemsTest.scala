@@ -2,55 +2,12 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLocation
 import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
 class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
 
   val transformer = new Object with SierraItems
-
-  describe("extractItemData") {
-    it("parses instances of SierraItemData") {
-      val itemData = (1 to 2).map { _ =>
-        createSierraItemData
-      }
-      val itemRecords = itemData.map { data: SierraItemData =>
-        createSierraItemRecordWith(data = data)
-      }.toList
-
-      val transformable = createSierraTransformableWith(
-        itemRecords = itemRecords
-      )
-
-      transformer
-        .extractItemData(transformable)
-        .values should contain theSameElementsAs itemData
-    }
-
-    it("throws an error if it gets some item data that isn't JSON") {
-      val itemData = createSierraItemData
-      val itemIdBad = createSierraItemNumber
-
-      val notAJsonString = "<xml?>This is not a real 'JSON' string"
-
-      val itemRecords = List(
-        createSierraItemRecordWith(data = itemData),
-        createSierraItemRecordWith(id = itemIdBad, data = notAJsonString)
-      )
-
-      val transformable = createSierraTransformableWith(
-        itemRecords = itemRecords
-      )
-
-      val caught = intercept[TransformerException] {
-        transformer.extractItemData(transformable)
-      }
-
-      caught.e.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
-    }
-  }
 
   describe("transformItemData") {
     it("creates both forms of the Sierra ID in 'identifiers'") {
@@ -103,14 +60,12 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
       val item1 = createSierraItemDataWith(deleted = true)
       val item2 = createSierraItemDataWith(deleted = false)
 
-      val transformable = createSierraTransformableWith(
-        itemRecords = List(
-          createSierraItemRecordWith(data = item1),
-          createSierraItemRecordWith(data = item2)
-        )
+      val itemDataMap = Map(
+        createSierraItemNumber -> item1,
+        createSierraItemNumber -> item2
       )
 
-      transformer.getPhysicalItems(transformable) should have size 1
+      transformer.getPhysicalItems(itemDataMap) should have size 1
     }
 
     // Note: the following two tests are for historical reasons -- an old

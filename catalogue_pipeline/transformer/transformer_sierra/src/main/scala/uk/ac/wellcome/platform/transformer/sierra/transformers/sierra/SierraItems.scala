@@ -1,33 +1,14 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
   SierraItemData
 }
 
-import scala.util.{Failure, Success}
-
 trait SierraItems extends Logging with SierraLocation {
-  def extractItemData(sierraTransformable: SierraTransformable)
-    : Map[SierraItemNumber, SierraItemData] =
-    sierraTransformable.itemRecords
-      .map { case (id, itemRecord) => (id, itemRecord.data) }
-      .map {
-        case (id, jsonString) =>
-          fromJson[SierraItemData](jsonString) match {
-            case Success(data) => id -> data
-            case Failure(_) =>
-              throw TransformerException(
-                s"Unable to parse item data for $id as JSON: <<$jsonString>>")
-          }
-      }
-
   def transformItemData(itemId: SierraItemNumber,
                         itemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform $itemId")
@@ -50,9 +31,8 @@ trait SierraItems extends Logging with SierraLocation {
     )
   }
 
-  def getPhysicalItems(
-    sierraTransformable: SierraTransformable): List[Identifiable[Item]] =
-    extractItemData(sierraTransformable)
+  def getPhysicalItems(sierraItemDataMap: Map[SierraItemNumber, SierraItemData]): List[Identifiable[Item]] =
+    sierraItemDataMap
       .filterNot {
         case (_: SierraItemNumber, itemData: SierraItemData) => itemData.deleted
       }
