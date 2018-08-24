@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.archive.registrar
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
@@ -9,10 +8,12 @@ import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
-import uk.ac.wellcome.platform.archive.common.app.Worker
+import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.BagArchiveCompleteNotification
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagArchiveCompleteNotification,
+  NotificationMessage
+}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
@@ -22,7 +23,7 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
 import scala.util.{Failure, Success}
 
-class RegistrarWorker @Inject()(
+class Registrar @Inject()(
   snsClient: AmazonSNSAsync,
   snsConfig: SNSConfig,
   s3ClientConfig: S3ClientConfig,
@@ -31,8 +32,7 @@ class RegistrarWorker @Inject()(
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
   actorSystem: ActorSystem
-) extends Worker[Done] {
-
+) {
   def run() = {
 
     implicit val client = snsClient

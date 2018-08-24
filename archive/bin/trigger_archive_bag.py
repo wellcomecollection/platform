@@ -3,7 +3,7 @@
 """
 Create a request to archive a bag
 
-Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>]  [--topic=<TOPIC_NAME>]
+Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>] [--topic=<TOPIC_NAME>|--api=<API>] [--sns=(true|false)]
        trigger_archive_bag.py -h | --help
 
 Options:
@@ -11,15 +11,20 @@ Options:
                          [default: wellcomecollection-assets-archive-ingest]
   --topic=<TOPIC_NAME>   The archivist topic.
                          [default: archive-storage_archivist]
+   --api=<API>           The API endpoint to use
+                         [default: http://api.wellcomecollection.org/prod/storage/v1/ingest]
+   --sns=(true|false)    Send directly to SNS rather than through the API
+                         [default: false]
   -h --help              Print this help message
 """
 
 import docopt
 import boto3
+import requests
 import json
 
 
-def archive_bag_messages(bags, bucket):
+def archive_bag_sns_messages(bags, bucket):
     """
     Generates bag archive messages.
     """
@@ -27,6 +32,16 @@ def archive_bag_messages(bags, bucket):
         yield {
             'namespace': bucket,
             'key': bag
+        }
+
+
+def archive_bag_api_messages(bags, bucket):
+    """
+    Generates bag archive messages.
+    """
+    for bag in bags:
+        yield {
+            'uploadUrl': f"s3://{bucket}/{bag}"
         }
 
 
@@ -57,21 +72,36 @@ def publish_messages(topic_arn, messages):
         assert response_status == 200, response
 
 
-def main():
-    args = docopt.docopt(__doc__)
-
-    bags = args['<BAG>']
-    bucket_name = args['--bucket']
-    messages = archive_bag_messages(bags, bucket_name)
-
-    topic_name = args['--topic']
-    # print(f'topic: {topic_name} bucket: {bucket_name}')
+def publish_to_sns(bucket_name, bags, topic_name):
     topic_arn = build_topic_arn(topic_name)
 
     publish_messages(
         topic_arn=topic_arn,
-        messages=messages
+        messages=archive_bag_sns_messages(bags, bucket_name)
     )
+
+
+def call_ingest_api(bucket_name, bags, api):
+    session = requests.Session()
+    for message in archive_bag_api_messages(bags, bucket_name):
+        response = session.post(api, json=message)
+        print(f'{message} -> {api} [{response.status_code}]')
+        if response.status_code != 200:
+            raise ValueError(f"Error: [{response.status_code}] {response.json()}")
+
+
+def main():
+    args = docopt.docopt(__doc__)
+    bags = args['<BAG>']
+    bucket_name = args['--bucket']
+    use_sns_directly = args['--sns']
+
+    if use_sns_directly.lower() == "true":
+        topic_name = args['--topic']
+        publish_to_sns(bucket_name, bags, topic_name)
+    else:
+        api = args['--api']
+        call_ingest_api(bucket_name, bags, api)
 
 
 if __name__ == '__main__':

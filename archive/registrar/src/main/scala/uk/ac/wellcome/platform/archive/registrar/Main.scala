@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.registrar
 
-import akka.Done
-import uk.ac.wellcome.platform.archive.common.app.WellcomeApp
+import com.google.inject.{Guice, Injector}
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   AppConfigModule,
@@ -9,13 +9,12 @@ import uk.ac.wellcome.platform.archive.registrar.modules.{
   VHSModule
 }
 
-object Main extends WellcomeApp[RegistrarWorker, Done] with RegistrarModules {
-  lazy val appConfigModule = new AppConfigModule(args)
-  lazy val worker = injector.getInstance(classOf[RegistrarWorker])
-}
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
-trait RegistrarModules {
-  lazy val configuredModules = List(
+object Main extends App with Logging {
+  val injector: Injector = Guice.createInjector(
+    new AppConfigModule(args),
     ConfigModule,
     VHSModule,
     AkkaModule,
@@ -26,4 +25,19 @@ trait RegistrarModules {
     DynamoClientModule,
     MessageStreamModule
   )
+
+  val app = injector.getInstance(classOf[Registrar])
+
+  try {
+    info(s"Starting worker.")
+
+    val result = app.run()
+
+    Await.result(result, Duration.Inf)
+  } catch {
+    case e: Throwable =>
+      error("Fatal error:", e)
+  } finally {
+    info(s"Terminating worker.")
+  }
 }
