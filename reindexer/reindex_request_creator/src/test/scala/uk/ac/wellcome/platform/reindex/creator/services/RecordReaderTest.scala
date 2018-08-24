@@ -6,7 +6,10 @@ import javax.naming.ConfigurationException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{ReindexFixtures, ReindexableTable}
+import uk.ac.wellcome.platform.reindex.creator.fixtures.{
+  ReindexFixtures,
+  ReindexableTable
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord

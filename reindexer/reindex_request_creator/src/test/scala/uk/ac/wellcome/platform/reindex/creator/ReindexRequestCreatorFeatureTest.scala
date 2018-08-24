@@ -5,7 +5,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{ReindexFixtures, ReindexableTable}
+import uk.ac.wellcome.platform.reindex.creator.fixtures.{
+  ReindexFixtures,
+  ReindexableTable
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.vhs.HybridRecord

@@ -9,7 +9,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class NotificationSender @Inject()(snsWriter: SNSWriter)(
   implicit ec: ExecutionContext) {
-  def sendNotifications(records: List[HybridRecord]): Future[List[PublishAttempt]] = {
+  def sendNotifications(
+    records: List[HybridRecord]): Future[List[PublishAttempt]] = {
     Future.sequence {
       records.map { record: HybridRecord =>
         snsWriter.writeMessage(

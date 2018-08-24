@@ -10,7 +10,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{ReindexFixtures, ReindexableTable}
+import uk.ac.wellcome.platform.reindex.creator.fixtures.{
+  ReindexFixtures,
+  ReindexableTable
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
