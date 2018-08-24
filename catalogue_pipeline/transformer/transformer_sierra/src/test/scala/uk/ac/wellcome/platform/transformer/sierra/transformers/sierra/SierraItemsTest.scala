@@ -151,6 +151,41 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
     )
   }
 
+  it("combines a single physical Item and a single digital Item into a single Item") {
+    val sierraLocation = SierraSourceLocation(
+      code = "scmac",
+      name = "Closed stores Arch. & MSS"
+    )
+    val itemData = createSierraItemDataWith(location = Some(sierraLocation))
+
+    val bibId = createSierraBibNumber
+    val bibData = createSierraBibDataWith(
+      locations = Some(List(
+        SierraSourceLocation("dlnk", "Digitised content")
+      ))
+    )
+
+    val itemDataMap = Map(createSierraItemNumber -> itemData)
+
+    val result = getTransformedItems(
+      bibId = bibId,
+      bibData = bibData,
+      itemDataMap = itemDataMap)
+
+    result.size shouldBe 1
+    result.head.agent.locations shouldBe List(
+      PhysicalLocation(
+        locationType = LocationType(sierraLocation.code),
+        label = sierraLocation.name
+      ),
+      DigitalLocation(
+        url = s"https://wellcomelibrary.org/iiif/${bibId.withCheckDigit}/manifest",
+        license = None,
+        locationType = LocationType("iiif-presentation")
+      )
+    )
+  }
+
   private def getTransformedItems(
     bibId: SierraBibNumber = createSierraBibNumber,
     bibData: SierraBibData = createSierraBibData,
