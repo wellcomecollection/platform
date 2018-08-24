@@ -31,6 +31,13 @@ def test_executing_lambda(dynamodb_client):
     dynamo_write_heartbeat.main(event=None, context=None, dynamodb_client=dynamodb_client)
 
 
+def test_lambda_does_not_error_if_table_does_not_exist(dynamodb_client):
+    os.environ.update({
+        'TABLE_NAMES': ','.join(TABLE_NAMES + ['DoesNotExist'])
+    })
+    dynamo_write_heartbeat.main(dynamodb_client=dynamodb_client)
+
+
 def create_table(dynamodb, table_name):
     try:
         dynamodb.create_table(TableName=table_name,
