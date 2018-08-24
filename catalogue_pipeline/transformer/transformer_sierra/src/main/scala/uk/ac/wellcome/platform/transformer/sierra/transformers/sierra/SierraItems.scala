@@ -17,9 +17,22 @@ trait SierraItems extends Logging with SierraLocation {
                itemDataMap: Map[SierraItemNumber, SierraItemData])
     : List[MaybeDisplayable[Item]] = {
     val physicalItems = getPhysicalItems(itemDataMap)
-    val digitalItems = List(getDigitalItem(bibId = bibId, bibData = bibData)).flatten
+    val maybeDigitalItem = getDigitalItem(bibId = bibId, bibData = bibData)
 
-    physicalItems ++ digitalItems
+    // In the case where we have a single physical item and a single
+    // digital item, we know that the digital item is the digitised version
+    // of the physical item -- so we can combine their locations and present
+    // a single item.
+    (physicalItems, maybeDigitalItem) match {
+      case (Seq(physicalItem), Some(digitalItem)) => List(
+        physicalItem.copy(
+          agent = physicalItem.agent.copy(
+            locations = physicalItem.agent.locations ++ digitalItem.agent.locations
+          )
+        )
+      )
+      case _ => physicalItems ++ List(maybeDigitalItem).flatten
+    }
   }
 
   private def transformItemData(
