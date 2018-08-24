@@ -4,6 +4,7 @@ module "transformer_queue" {
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
   topic_names = "${var.topic_names}"
+  topic_count = 2
 
   visibility_timeout_seconds = 30
   max_receive_count          = 3
