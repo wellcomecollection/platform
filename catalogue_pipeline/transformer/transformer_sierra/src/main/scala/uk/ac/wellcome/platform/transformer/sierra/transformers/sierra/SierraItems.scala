@@ -15,9 +15,12 @@ trait SierraItems extends Logging with SierraLocation {
   def getItems(bibId: SierraBibNumber,
                bibData: SierraBibData,
                itemDataMap: Map[SierraItemNumber, SierraItemData])
-    : List[MaybeDisplayable[Item]] =
-    getPhysicalItems(itemDataMap) ++
-      getDigitalItems(bibId = bibId, bibData = bibData)
+    : List[MaybeDisplayable[Item]] = {
+    val physicalItems = getPhysicalItems(itemDataMap)
+    val digitalItems = List(getDigitalItem(bibId = bibId, bibData = bibData)).flatten
+
+    physicalItems ++ digitalItems
+  }
 
   private def transformItemData(
     itemId: SierraItemNumber,
@@ -58,14 +61,6 @@ trait SierraItems extends Logging with SierraLocation {
       }
       .toList
 
-  private def getDigitalItem(bibId: SierraBibNumber): Unidentifiable[Item] = {
-    Unidentifiable(
-      agent = Item(
-        locations = List(getDigitalLocation(bibId.withCheckDigit))
-      )
-    )
-  }
-
   /** Add digital items to a work.
     *
     * We can add digital items if there's a "dlnk" location in the
@@ -78,18 +73,24 @@ trait SierraItems extends Logging with SierraLocation {
     * away with this code.
     *
     */
-  private def getDigitalItems(
+  private def getDigitalItem(
     bibId: SierraBibNumber,
-    bibData: SierraBibData): List[Unidentifiable[Item]] = {
+    bibData: SierraBibData): Option[Unidentifiable[Item]] = {
     val hasDlnkLocation = bibData.locations match {
       case Some(locations) => locations.map { _.code }.contains("dlnk")
       case None            => false
     }
 
     if (hasDlnkLocation) {
-      List(getDigitalItem(bibId))
+      Some(
+        Unidentifiable(
+          agent = Item(
+            locations = List(getDigitalLocation(bibId.withCheckDigit))
+          )
+        )
+      )
     } else {
-      List()
+      None
     }
   }
 }
