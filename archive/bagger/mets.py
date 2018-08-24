@@ -185,3 +185,8 @@ def get_physical_file_maps(root):
                     alto[file_id] = summary
 
     return assets, alto
+
+
+def get_title(mets_root):
+    title_el = mets_root.findall(".//mods:title", namespaces)
+    return title_el[0].text

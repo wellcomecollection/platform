@@ -15,13 +15,13 @@ ALTO_KEYS = set()
 OBJECT_KEYS = set()
 
 
-def process_alto(root, bag_info, alto, skip_file_download):
+def process_alto(root, bag_details, alto, skip_file_download):
     # TODO use the alto map to verify
-    logging.info("Collecting ALTO for " + bag_info["b_number"])
+    logging.info("Collecting ALTO for " + bag_details["b_number"])
     alto_file_group = root.find("./mets:fileSec/mets:fileGrp[@USE='ALTO']", namespaces)
 
     if alto_file_group is None:
-        logging.info("No ALTO for " + bag_info["b_number"])
+        logging.info("No ALTO for " + bag_details["b_number"])
         return
 
     source_bucket = None
@@ -30,7 +30,7 @@ def process_alto(root, bag_info, alto, skip_file_download):
         source_bucket = aws.get_s3().Bucket(settings.METS_BUCKET_NAME)
 
     for file_element in alto_file_group:
-        current_location, destination = get_flattened_destination(file_element, ALTO_KEYS, "alto", bag_info)
+        current_location, destination = get_flattened_destination(file_element, ALTO_KEYS, "alto", bag_details)
 
         if skip_file_download:
             logging.info("Skipping fetch of alto from {0} to {1}".format(current_location, destination))
@@ -38,16 +38,16 @@ def process_alto(root, bag_info, alto, skip_file_download):
 
         if settings.METS_FILESYSTEM_ROOT:
             # Not likely to be used much, only for running against Windows file share
-            source = os.path.join(settings.METS_FILESYSTEM_ROOT, bag_info["mets_partial_path"], current_location)
+            source = os.path.join(settings.METS_FILESYSTEM_ROOT, bag_details["mets_partial_path"], current_location)
             logging.info("Copying alto from {0} to {1}".format(source, destination))
             shutil.copyfile(source, destination)
         else:
-            source = bag_info["mets_partial_path"] + current_location
+            source = bag_details["mets_partial_path"] + current_location
             logging.info("Downloading S3 ALTO from {0} to {1}".format(source, destination))
             source_bucket.download_file(source, destination)
 
 
-def get_flattened_destination(file_element, keys, folder, bag_info):
+def get_flattened_destination(file_element, keys, folder, bag_details):
     locator = file_element[0]
     current_location = locator.get(expand("xlink", "href"))
     # we want to flatten the multiple manifestation directory structure
@@ -58,19 +58,19 @@ def get_flattened_destination(file_element, keys, folder, bag_info):
     locator.set(expand("xlink", "href"), desired_relative_location)
     logging.info("updated path in METS to " + desired_relative_location)
     # the local temp assembly area
-    destination = os.path.join(bag_info["directory"], folder, file_name)
+    destination = os.path.join(bag_details["directory"], folder, file_name)
     bag_assembly.ensure_directory(destination)
     return current_location, destination
 
 
-def process_assets(root, bag_info, assets, skip_file_download):
-    logging.info("Collecting assets for " + bag_info["b_number"])
+def process_assets(root, bag_details, assets, skip_file_download):
+    logging.info("Collecting assets for " + bag_details["b_number"])
 
     chunk_size = 1024 * 1024
 
     asset_file_group = root.find("./mets:fileSec/mets:fileGrp[@USE='OBJECTS']", namespaces)
     for file_element in asset_file_group:
-        current_location, destination = get_flattened_destination(file_element, OBJECT_KEYS, "objects", bag_info)
+        current_location, destination = get_flattened_destination(file_element, OBJECT_KEYS, "objects", bag_details)
         # current_location is not used for objects - they're not where
         # the METS says they are! They are in Preservica instead.
         # but, when bagged, they _will_ be where the METS says they are.

@@ -30,12 +30,13 @@ def main():
     b_number = identifiers.normalise_b_number(sys.argv[1])
     print(b_number)
 
-    bag_info = bag_assembly.prepare_bag_dir(b_number)
-    mets_path = "{0}{1}.xml".format(bag_info["mets_partial_path"], b_number)
+    bag_details = bag_assembly.prepare_bag_dir(b_number)
+    mets_path = "{0}{1}.xml".format(bag_details["mets_partial_path"], b_number)
     logging.info("process METS or anchor file at %s", mets_path)
     tree = load_xml(mets_path)
     root = tree.getroot()
-
+    title = mets.get_title(root)
+    logging.info("#### {0}: {1}".format(b_number, title))
     logging.info("We will transform xml that involves Preservica, and the tessella namespace")
 
     # Compare the logic here with the METS Repository
@@ -48,7 +49,7 @@ def main():
     struct_label = struct_div.get("LABEL")
     logging.info("Found structDiv with TYPE " + struct_type)
     logging.info("LABEL: " + struct_label)
-    root_mets_file = os.path.join(bag_info["directory"], "{0}.xml".format(b_number))
+    root_mets_file = os.path.join(bag_details["directory"], "{0}.xml".format(b_number))
 
     # There is a huge amount of validation that can be done here.
     # Not just the checksums, but also validating the METS structure,
@@ -78,7 +79,7 @@ def main():
         aws.save_mets_to_side(b_number, root_mets_file)
         # then go through the linked files _0001 etc
         for rel_path in manifestation_relative_paths:
-            full_path = bag_info["mets_partial_path"] + rel_path[0]
+            full_path = bag_details["mets_partial_path"] + rel_path[0]
             logging.info("loading manifestation " + full_path)
             logging.info("ORDER: {0}".format(rel_path[1]))
             mf_tree = load_xml(full_path)
@@ -86,16 +87,16 @@ def main():
             manif_struct_div = mets.get_logical_struct_div(mf_root)
             link_to_anchor = mets.get_file_pointer_link(manif_struct_div)
             logging.info("{0} should be link back to anchor".format(link_to_anchor))
-            process_manifestation(mf_root, bag_info, do_not_bag)
+            process_manifestation(mf_root, bag_details, do_not_bag)
             # not os separator, this is in the METS; always /
             parts = rel_path[0].split("/")
-            manifestation_file = os.path.join(bag_info["directory"], *parts)
+            manifestation_file = os.path.join(bag_details["directory"], *parts)
             logging.info("writing manifestation to bag: " + manifestation_file)
             mf_tree.write(manifestation_file, encoding="utf-8", xml_declaration=True)
             aws.save_mets_to_side(b_number, manifestation_file)
 
     elif mets.is_manifestation(struct_type):
-        process_manifestation(root, bag_info, do_not_bag)
+        process_manifestation(root, bag_details, do_not_bag)
         tree.write(root_mets_file, encoding="utf-8", xml_declaration=True)
         aws.save_mets_to_side(b_number, root_mets_file)
 
@@ -107,18 +108,18 @@ def main():
         logging.info("Finished {0} without bagging".format(b_number))
         return
 
-    bagit.make_bag(bag_info["directory"], settings.BAG_INFO)
-    dispatch_bag(bag_info)
+    bagit.make_bag(bag_details["directory"], get_bag_info(b_number, title))
+    dispatch_bag(bag_details)
     logging.info("Finished {0}".format(b_number))
 
 
-def process_manifestation(root, bag_info, skip_file_download):
+def process_manifestation(root, bag_details, skip_file_download):
     mets.remove_deliverable_unit(root)
     tech_md.remodel_file_technical_metadata(root)
     mets.remodel_file_section(root)
     assets, alto = mets.get_physical_file_maps(root)
-    files.process_assets(root, bag_info, assets, skip_file_download)
-    files.process_alto(root, bag_info, alto, skip_file_download)
+    files.process_assets(root, bag_details, assets, skip_file_download)
+    files.process_alto(root, bag_details, alto, skip_file_download)
 
 
 def load_xml(path):
@@ -131,14 +132,21 @@ def load_xml(path):
     return load_from_string(xml_string)
 
 
-def dispatch_bag(bag_info):
+def dispatch_bag(bag_details):
     # now zip this bag in a way that will be efficient for the archiver
-    logging.info("creating zip file for " + bag_info["b_number"])
-    shutil.make_archive(bag_info["zip_file_path"]
-                        [0:-4], 'zip', bag_info["directory"])
-    logging.info("uploading " + bag_info["zip_file_name"] + " to S3")
-    aws.upload(bag_info["zip_file_path"], bag_info["zip_file_name"])
+    logging.info("creating zip file for " + bag_details["b_number"])
+    shutil.make_archive(bag_details["zip_file_path"]
+                        [0:-4], 'zip', bag_details["directory"])
+    logging.info("uploading " + bag_details["zip_file_name"] + " to S3")
+    aws.upload(bag_details["zip_file_path"], bag_details["zip_file_name"])
     logging.info("upload completed")
+
+
+def get_bag_info(b_number, title):
+    bag_info = dict(settings.BAG_INFO)
+    bag_info["External-Description"] = title
+    bag_info["External-Identifier"] = b_number
+    return bag_info
 
 
 if __name__ == "__main__":

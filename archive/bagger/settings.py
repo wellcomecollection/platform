@@ -35,7 +35,14 @@ DDS_API_SECRET = os.getenv("DDS_API_SECRET")
 DDS_ASSET_PREFIX = os.getenv("DDS_ASSET_PREFIX")
 
 # This is passed to bagit as the general bag metadata
-# TODO: use correct Wellcome bag data
 BAG_INFO = {
-    "Contact-Name": "Tom"
+    "Source-Organization": "Intranda GmbH",
+    "Contact-Email": "support@intranda.com",
+    "External-Description": "[TO BE REPLACED]",
+    "External-Identifier": "[TO BE REPLACED]"
 }
+
+# Possibly to go in bag-info:
+
+# "Internal-Sender-Identifier": "170131",             # goobi process id
+# "Internal-Sender-Description": "12324_b_b24923333"  # goobi process title

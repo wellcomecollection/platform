@@ -16,6 +16,17 @@ b16759230 - Video, expressed as multiple manifestation, but only one manifestati
 
 b16675630 - Video, with transcript (2-part multiple manifestation)
 
+Note that there are many PDF versions in use in Wellcome content
+
+b28462270 - PDF only (born digital but currently in same workflow)
+
+b17307922 - Audio, MP3
+
+b29524404 - Audio Multiple Manifestation (interview with PDF transcript)
+
+
+
+
 
 
 
