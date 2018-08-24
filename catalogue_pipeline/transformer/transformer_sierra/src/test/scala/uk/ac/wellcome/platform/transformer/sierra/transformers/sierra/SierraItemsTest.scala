@@ -151,6 +151,80 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
     )
   }
 
+  it(
+    "combines a single physical Item and a single digital Item into a single Item") {
+    val sierraLocation = SierraSourceLocation(
+      code = "scmac",
+      name = "Closed stores Arch. & MSS"
+    )
+
+    val bibId = createSierraBibNumber
+    val bibData = createSierraBibDataWith(
+      locations = Some(
+        List(
+          SierraSourceLocation("dlnk", "Digitised content")
+        ))
+    )
+
+    val itemDataMap = Map(
+      createSierraItemNumber -> createSierraItemDataWith(
+        location = Some(sierraLocation))
+    )
+
+    val result = getTransformedItems(
+      bibId = bibId,
+      bibData = bibData,
+      itemDataMap = itemDataMap)
+
+    result.size shouldBe 1
+    result.head.agent.locations shouldBe List(
+      PhysicalLocation(
+        locationType = LocationType(sierraLocation.code),
+        label = sierraLocation.name
+      ),
+      DigitalLocation(
+        url =
+          s"https://wellcomelibrary.org/iiif/${bibId.withCheckDigit}/manifest",
+        license = None,
+        locationType = LocationType("iiif-presentation")
+      )
+    )
+  }
+
+  it("doesn't combine Items if there's more than one digital item") {
+    val sierraLocation1 = SierraSourceLocation(
+      code = "sicon",
+      name = "Closed stores Iconographic"
+    )
+
+    val sierraLocation2 = SierraSourceLocation(
+      code = "sepbi",
+      name = "Closed stores EPB Biog p.Vol"
+    )
+
+    val bibId = createSierraBibNumber
+    val bibData = createSierraBibDataWith(
+      locations = Some(
+        List(
+          SierraSourceLocation("dlnk", "Digitised content")
+        ))
+    )
+
+    val itemDataMap = Map(
+      createSierraItemNumber -> createSierraItemDataWith(
+        location = Some(sierraLocation1)),
+      createSierraItemNumber -> createSierraItemDataWith(
+        location = Some(sierraLocation2))
+    )
+
+    val result = getTransformedItems(
+      bibId = bibId,
+      bibData = bibData,
+      itemDataMap = itemDataMap)
+
+    result.size shouldBe 3
+  }
+
   private def getTransformedItems(
     bibId: SierraBibNumber = createSierraBibNumber,
     bibData: SierraBibData = createSierraBibData,
