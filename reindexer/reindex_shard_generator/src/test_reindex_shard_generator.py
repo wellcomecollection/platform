@@ -125,6 +125,7 @@ def test_adds_shard_and_reindex_version_to_new_record(dynamodb_client, source_da
     )
 
     assert item['Item']['reindexShard']['S'] == '1119'
+    assert 'reindexVersion' not in item['Item']
 
 
 def test_updates_shard_on_old_record(dynamodb_client, source_data_table, sierra_source_name):
@@ -152,6 +153,7 @@ def test_does_nothing_if_shard_up_to_date(dynamodb_client, source_data_table, si
     dynamodb_client.put_item(
         TableName=source_data_table,
         Item=_dynamodb_item(id='3333333',
+                            reindex_shard='1709',
                             version=3)
     )
 
