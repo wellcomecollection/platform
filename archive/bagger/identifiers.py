@@ -1,4 +1,5 @@
 def normalise_b_number(b_str):
+    b_str = str(b_str)
     if b_str[0] == "b":
         b_str = b_str[1:]
 

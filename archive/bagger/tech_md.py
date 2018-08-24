@@ -1,6 +1,6 @@
 import logging
-from xml_help import make_child, remove_first_child, namespaces
 import mappings
+from xml_help import make_child, remove_first_child, namespaces
 
 
 def add_premis_identifier(premis_file, p_type, value):
@@ -28,8 +28,7 @@ def remodel_file_technical_metadata(root):
         premis_file = make_child(xmldata, "premis", "object")
 
         premis_file.set("xsi:type", "premis:file")
-        # These v3 schemas conflict with the v2 asserted in the exsiting METS,
-        # but fix that later
+        # These v3 schemas conflict with the v2 asserted in the existing METS, but fix that later
         premis_file.set("xsi:schemaLocation",
                         "http://www.loc.gov/premis/v3 http://www.loc.gov/standards/premis/v3/premis.xsd")
         premis_file.set("version", "3.0")
@@ -39,17 +38,16 @@ def remodel_file_technical_metadata(root):
         checksum = tessella_file.find("tessella:ID", namespaces).text
         add_premis_identifier(premis_file, "uuid", checksum)
 
-        file_properties = tessella_file.findall(
-            "tessella:FileProperty", namespaces)
+        file_properties = tessella_file.findall("tessella:FileProperty", namespaces)
         to_copy = mappings.SIGNIFICANT_PROPS.keys()
         for file_property in file_properties:
-            name = file_property.find(
-                "tessella:FilePropertyName", namespaces).text.strip()
+            name = file_property.find("tessella:FilePropertyName", namespaces).text.strip()
             if name in to_copy:
-                value = file_property.find(
-                    "tessella:Value", namespaces).text.strip()
+                value = file_property.find("tessella:Value", namespaces).text.strip()
                 premis_name = mappings.SIGNIFICANT_PROPS[name]
                 add_premis_significant_prop(premis_file, premis_name, value)
+            else:
+                logging.info("Ignoring property name {0}".format(name))
 
         characteristics = make_child(premis_file, "premis", "objectCharacteristics")
         composition_level = make_child(characteristics, "premis", "compositionLevel")
@@ -69,6 +67,6 @@ def remodel_file_technical_metadata(root):
         format_registry_name = make_child(format_registry, "premis", "formatRegistryName")
         format_registry_name.text = "PRONOM"  # assume this is always used
         format_registry_key = make_child(format_registry, "premis", "formatRegistryKey")
-        format_registry_key.text = mappings.PRONOM[format_name.text]  # allow this to raise error!
+        format_registry_key.text = mappings.PRONOM[format_name.text]  # allow this to raise error if missing key!
 
         remove_first_child(xmldata)

@@ -13,6 +13,7 @@ WORKING_DIRECTORY = os.getenv("WORKING_DIRECTORY")
 
 # Assumes same credentials for reading METS and writing bags
 DROP_BUCKET_NAME = os.getenv("DROP_BUCKET_NAME")
+DROP_BUCKET_NAME_METS_ONLY = os.getenv("DROP_BUCKET_NAME_METS_ONLY")
 
 CURRENT_PRESERVATION_BUCKET = os.getenv("CURRENT_PRESERVATION_BUCKET")
 DLCS_SOURCE_BUCKET = os.getenv("DLCS_SOURCE_BUCKET")
@@ -32,3 +33,9 @@ DLCS_SPACE = os.getenv("DLCS_SPACE")
 DDS_API_KEY = os.getenv("DDS_API_KEY")
 DDS_API_SECRET = os.getenv("DDS_API_SECRET")
 DDS_ASSET_PREFIX = os.getenv("DDS_ASSET_PREFIX")
+
+# This is passed to bagit as the general bag metadata
+# TODO: use correct Wellcome bag data
+BAG_INFO = {
+    "Contact-Name": "Tom"
+}

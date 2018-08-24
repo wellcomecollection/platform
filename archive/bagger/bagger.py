@@ -20,7 +20,16 @@ def main():
         bag_assembly.clean_working_dir()
         return
 
+    print(sys.argv)
+
+    do_not_bag = False
+    if len(sys.argv) == 3 and sys.argv[2] == "no-bag":
+        logging.info("skipping copying and bagging operations, will just process METS")
+        do_not_bag = True
+
     b_number = identifiers.normalise_b_number(sys.argv[1])
+    print(b_number)
+
     bag_info = bag_assembly.prepare_bag_dir(b_number)
     mets_path = "{0}{1}.xml".format(bag_info["mets_partial_path"], b_number)
     logging.info("process METS or anchor file at %s", mets_path)
@@ -66,6 +75,7 @@ def main():
 
         logging.info("writing new anchor file to bag")
         tree.write(root_mets_file, encoding="utf-8", xml_declaration=True)
+        aws.save_mets_to_side(b_number, root_mets_file)
         # then go through the linked files _0001 etc
         for rel_path in manifestation_relative_paths:
             full_path = bag_info["mets_partial_path"] + rel_path[0]
@@ -76,33 +86,39 @@ def main():
             manif_struct_div = mets.get_logical_struct_div(mf_root)
             link_to_anchor = mets.get_file_pointer_link(manif_struct_div)
             logging.info("{0} should be link back to anchor".format(link_to_anchor))
-            process_manifestation(mf_root, bag_info)
+            process_manifestation(mf_root, bag_info, do_not_bag)
             # not os separator, this is in the METS; always /
             parts = rel_path[0].split("/")
             manifestation_file = os.path.join(bag_info["directory"], *parts)
             logging.info("writing manifestation to bag: " + manifestation_file)
             mf_tree.write(manifestation_file, encoding="utf-8", xml_declaration=True)
+            aws.save_mets_to_side(b_number, manifestation_file)
 
     elif mets.is_manifestation(struct_type):
-        process_manifestation(root, bag_info)
+        process_manifestation(root, bag_info, do_not_bag)
         tree.write(root_mets_file, encoding="utf-8", xml_declaration=True)
+        aws.save_mets_to_side(b_number, root_mets_file)
 
     else:
         raise ValueError("Unknown struct type: " + struct_type)
 
-    bagit.make_bag(bag_info["directory"], {"Contact-Name": "Tom"})
+    if do_not_bag:
+        print(b_number)
+        logging.info("Finished {0} without bagging".format(b_number))
+        return
 
+    bagit.make_bag(bag_info["directory"], settings.BAG_INFO)
     dispatch_bag(bag_info)
-    logging.info("Finished " + b_number)
+    logging.info("Finished {0}".format(b_number))
 
 
-def process_manifestation(root, bag_info):
+def process_manifestation(root, bag_info, skip_file_download):
     mets.remove_deliverable_unit(root)
     tech_md.remodel_file_technical_metadata(root)
     mets.remodel_file_section(root)
     assets, alto = mets.get_physical_file_maps(root)
-    files.collect_assets(root, bag_info, assets)
-    files.collect_alto(root, bag_info, alto)
+    files.process_assets(root, bag_info, assets, skip_file_download)
+    files.process_alto(root, bag_info, alto, skip_file_download)
 
 
 def load_xml(path):

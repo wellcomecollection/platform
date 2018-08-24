@@ -3,6 +3,7 @@ export METS_FILESYSTEM_ROOT=''
 export METS_BUCKET_NAME='xxxx'
 export WORKING_DIRECTORY='/tmp/_bagger'
 export DROP_BUCKET_NAME='yyyy'
+export DROP_BUCKET_NAME_METS_ONLY='yyyy-mets-only'
 export CURRENT_PRESERVATION_BUCKET='bbbb'
 export DLCS_SOURCE_BUCKET='dddd'
 # aws

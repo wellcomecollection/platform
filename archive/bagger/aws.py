@@ -1,3 +1,4 @@
+import os
 import boto3
 import settings
 
@@ -28,3 +29,10 @@ def get_mets_xml(s3_path):
     obj = get_s3().Object(settings.METS_BUCKET_NAME, s3_path)
     xml_string = obj.get()["Body"].read().decode("utf-8")
     return xml_string
+
+
+def save_mets_to_side(b_number, local_tmp_file):
+    client = get_boto_session().client("s3")
+    key = "{0}/{1}".format(b_number, os.path.basename(local_tmp_file))
+    client.upload_file(local_tmp_file, settings.DROP_BUCKET_NAME_METS_ONLY, key)
+

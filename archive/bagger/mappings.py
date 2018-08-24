@@ -9,5 +9,7 @@ PRONOM = {
 # also, presence in here means we want it in new version
 SIGNIFICANT_PROPS = {
     "Image Width": "ImageWidth",
-    "Image Height": "ImageHeight"
+    "Image Height": "ImageHeight",
+    "Bitrate (kbps)": "Bitrate",
+    "Length In Seconds": "Duration",
 }
