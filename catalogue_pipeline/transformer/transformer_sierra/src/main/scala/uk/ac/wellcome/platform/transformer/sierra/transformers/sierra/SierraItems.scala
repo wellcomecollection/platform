@@ -28,13 +28,14 @@ trait SierraItems extends Logging with SierraLocation {
     // separate Items.
     //
     (physicalItems, maybeDigitalItem) match {
-      case (Seq(physicalItem), Some(digitalItem)) => List(
-        physicalItem.copy(
-          agent = physicalItem.agent.copy(
-            locations = physicalItem.agent.locations ++ digitalItem.agent.locations
+      case (Seq(physicalItem), Some(digitalItem)) =>
+        List(
+          physicalItem.copy(
+            agent = physicalItem.agent.copy(
+              locations = physicalItem.agent.locations ++ digitalItem.agent.locations
+            )
           )
         )
-      )
       case _ => physicalItems ++ List(maybeDigitalItem).flatten
     }
   }

@@ -151,7 +151,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
     )
   }
 
-  it("combines a single physical Item and a single digital Item into a single Item") {
+  it(
+    "combines a single physical Item and a single digital Item into a single Item") {
     val sierraLocation = SierraSourceLocation(
       code = "scmac",
       name = "Closed stores Arch. & MSS"
@@ -159,13 +160,15 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
 
     val bibId = createSierraBibNumber
     val bibData = createSierraBibDataWith(
-      locations = Some(List(
-        SierraSourceLocation("dlnk", "Digitised content")
-      ))
+      locations = Some(
+        List(
+          SierraSourceLocation("dlnk", "Digitised content")
+        ))
     )
 
     val itemDataMap = Map(
-      createSierraItemNumber -> createSierraItemDataWith(location = Some(sierraLocation))
+      createSierraItemNumber -> createSierraItemDataWith(
+        location = Some(sierraLocation))
     )
 
     val result = getTransformedItems(
@@ -180,7 +183,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
         label = sierraLocation.name
       ),
       DigitalLocation(
-        url = s"https://wellcomelibrary.org/iiif/${bibId.withCheckDigit}/manifest",
+        url =
+          s"https://wellcomelibrary.org/iiif/${bibId.withCheckDigit}/manifest",
         license = None,
         locationType = LocationType("iiif-presentation")
       )
@@ -200,14 +204,17 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
 
     val bibId = createSierraBibNumber
     val bibData = createSierraBibDataWith(
-      locations = Some(List(
-        SierraSourceLocation("dlnk", "Digitised content")
-      ))
+      locations = Some(
+        List(
+          SierraSourceLocation("dlnk", "Digitised content")
+        ))
     )
 
     val itemDataMap = Map(
-      createSierraItemNumber -> createSierraItemDataWith(location = Some(sierraLocation1)),
-      createSierraItemNumber -> createSierraItemDataWith(location = Some(sierraLocation2))
+      createSierraItemNumber -> createSierraItemDataWith(
+        location = Some(sierraLocation1)),
+      createSierraItemNumber -> createSierraItemDataWith(
+        location = Some(sierraLocation2))
     )
 
     val result = getTransformedItems(
