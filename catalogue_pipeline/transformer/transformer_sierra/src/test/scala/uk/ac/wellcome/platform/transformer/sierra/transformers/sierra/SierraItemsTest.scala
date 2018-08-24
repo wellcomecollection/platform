@@ -1,9 +1,15 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibNumber,
+  SierraItemNumber
+}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.sierra.source.{SierraBibData, SierraItemData}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  SierraBibData,
+  SierraItemData
+}
 import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLocation
 import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
@@ -75,7 +81,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
   // location, but I left a modified version of these tests in place to
   // check the old code wasn't left lying around!
 
-  it("does not create any items for an e-book record without the 'dlnk' location") {
+  it(
+    "does not create any items for an e-book record without the 'dlnk' location") {
     val bibData = createSierraBibDataWith(
       materialType = Some(createSierraMaterialTypeWith(code = "v"))
     )
@@ -83,7 +90,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
     getTransformedItems(bibData = bibData) shouldBe List()
   }
 
-  it("does not create any items for a non e-book record without the 'dlnk' location") {
+  it(
+    "does not create any items for a non e-book record without the 'dlnk' location") {
     val bibData = createSierraBibDataWith(
       materialType = Some(createSierraMaterialTypeWith(code = "x"))
     )
@@ -93,9 +101,10 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
 
   it("ignores a digital item on a bib record without a 'dlnk' location") {
     val bibData = createSierraBibDataWith(
-      locations = Some(List(
-        SierraSourceLocation("digi", "Digitised Collections")
-      ))
+      locations = Some(
+        List(
+          SierraSourceLocation("digi", "Digitised Collections")
+        ))
     )
 
     getTransformedItems(bibData = bibData) shouldBe List()
@@ -104,17 +113,18 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
   it("adds a digital item on a bib record with a 'dlnk' location") {
     val bibId = createSierraBibNumber
     val bibData = createSierraBibDataWith(
-      locations = Some(List(
-        SierraSourceLocation("digi", "Digitised Collections"),
-        SierraSourceLocation("dlnk", "Digitised content")
-      ))
+      locations = Some(
+        List(
+          SierraSourceLocation("digi", "Digitised Collections"),
+          SierraSourceLocation("dlnk", "Digitised content")
+        ))
     )
 
     val expectedItems = List(
       Unidentifiable(
-        agent = Item(
-        locations = List(DigitalLocation(
-          url = s"https://wellcomelibrary.org/iiif/${bibId.withCheckDigit}/manifest",
+        agent = Item(locations = List(DigitalLocation(
+          url =
+            s"https://wellcomelibrary.org/iiif/${bibId.withCheckDigit}/manifest",
           license = None,
           locationType = LocationType("iiif-presentation"))))
       )
@@ -144,7 +154,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
   private def getTransformedItems(
     bibId: SierraBibNumber = createSierraBibNumber,
     bibData: SierraBibData = createSierraBibData,
-    itemDataMap: Map[SierraItemNumber, SierraItemData] = Map()): List[MaybeDisplayable[Item]] =
+    itemDataMap: Map[SierraItemNumber, SierraItemData] = Map())
+    : List[MaybeDisplayable[Item]] =
     transformer.getItems(
       bibId = bibId,
       bibData = bibData,

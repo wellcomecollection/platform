@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibNumber,
+  SierraItemNumber
+}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
@@ -9,17 +12,16 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
 }
 
 trait SierraItems extends Logging with SierraLocation {
-  def getItems(
-    bibId: SierraBibNumber,
-    bibData: SierraBibData,
-    itemDataMap: Map[SierraItemNumber, SierraItemData]): List[MaybeDisplayable[Item]] =
+  def getItems(bibId: SierraBibNumber,
+               bibData: SierraBibData,
+               itemDataMap: Map[SierraItemNumber, SierraItemData])
+    : List[MaybeDisplayable[Item]] =
     getPhysicalItems(itemDataMap) ++
-      getDigitalItems(
-        bibId = bibId,
-        bibData = bibData)
+      getDigitalItems(bibId = bibId, bibData = bibData)
 
-  private def transformItemData(itemId: SierraItemNumber,
-                                itemData: SierraItemData): Identifiable[Item] = {
+  private def transformItemData(
+    itemId: SierraItemNumber,
+    itemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform $itemId")
     Identifiable(
       sourceIdentifier = SourceIdentifier(
@@ -40,7 +42,9 @@ trait SierraItems extends Logging with SierraLocation {
     )
   }
 
-  private def getPhysicalItems(sierraItemDataMap: Map[SierraItemNumber, SierraItemData]): List[Identifiable[Item]] =
+  private def getPhysicalItems(
+    sierraItemDataMap: Map[SierraItemNumber, SierraItemData])
+    : List[Identifiable[Item]] =
     sierraItemDataMap
       .filterNot {
         case (_: SierraItemNumber, itemData: SierraItemData) => itemData.deleted

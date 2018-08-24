@@ -3,12 +3,24 @@ package uk.ac.wellcome.platform.transformer.sierra
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemNumber, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemNumber,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.{ShouldNotTransformException, TransformerException}
-import uk.ac.wellcome.platform.transformer.sierra.source.{SierraBibData, SierraItemData}
+import uk.ac.wellcome.platform.transformer.exceptions.{
+  ShouldNotTransformException,
+  TransformerException
+}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  SierraBibData,
+  SierraItemData
+}
 import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra._
-import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects.{SierraConceptSubjects, SierraPersonSubjects}
+import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects.{
+  SierraConceptSubjects,
+  SierraPersonSubjects
+}
 
 import scala.util.{Failure, Success, Try}
 
@@ -60,7 +72,8 @@ class SierraTransformableTransformer
 
         fromJson[SierraBibData](bibRecord.data)
           .map { sierraBibData =>
-            val sierraItemDataMap = extractItemData(sierraTransformable.itemRecords)
+            val sierraItemDataMap =
+              extractItemData(sierraTransformable.itemRecords)
 
             if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
               UnidentifiedWork(
@@ -124,7 +137,8 @@ class SierraTransformableTransformer
       }
   }
 
-  def extractItemData(itemRecords: Map[SierraItemNumber, SierraItemRecord]): Map[SierraItemNumber, SierraItemData] =
+  def extractItemData(itemRecords: Map[SierraItemNumber, SierraItemRecord])
+    : Map[SierraItemNumber, SierraItemData] =
     itemRecords
       .map { case (id, itemRecord) => (id, itemRecord.data) }
       .map {

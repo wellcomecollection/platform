@@ -679,14 +679,18 @@ class SierraTransformableTransformerTest
         sierraId = bibRecord.id,
         maybeBibRecord = Some(bibRecord),
         itemRecords = Map(
-          createSierraItemNumber -> createSierraItemRecordWith(data = "Not valid JSON")
+          createSierraItemNumber -> createSierraItemRecordWith(
+            data = "Not valid JSON")
         )
       )
 
       val result = transformer.transform(transformable, version = 1)
       result.isFailure shouldBe true
       result.failed.get shouldBe a[TransformerException]
-      result.failed.get.asInstanceOf[TransformerException].e.getMessage should include("Unable to parse item data")
+      result.failed.get
+        .asInstanceOf[TransformerException]
+        .e
+        .getMessage should include("Unable to parse item data")
     }
 
     it("one of several item records") {
@@ -696,7 +700,8 @@ class SierraTransformableTransformerTest
         maybeBibRecord = Some(bibRecord),
         itemRecords = Map(
           createSierraItemNumber -> createSierraItemRecord,
-          createSierraItemNumber -> createSierraItemRecordWith(data = "Not valid JSON"),
+          createSierraItemNumber -> createSierraItemRecordWith(
+            data = "Not valid JSON"),
           createSierraItemNumber -> createSierraItemRecord
         )
       )
@@ -704,7 +709,10 @@ class SierraTransformableTransformerTest
       val result = transformer.transform(transformable, version = 1)
       result.isFailure shouldBe true
       result.failed.get shouldBe a[TransformerException]
-      result.failed.get.asInstanceOf[TransformerException].e.getMessage should include("Unable to parse item data")
+      result.failed.get
+        .asInstanceOf[TransformerException]
+        .e
+        .getMessage should include("Unable to parse item data")
     }
 
     it("the bib record") {
@@ -718,7 +726,10 @@ class SierraTransformableTransformerTest
       val result = transformer.transform(transformable, version = 1)
       result.isFailure shouldBe true
       result.failed.get shouldBe a[TransformerException]
-      result.failed.get.asInstanceOf[TransformerException].e.getMessage should include("Unable to parse bib data")
+      result.failed.get
+        .asInstanceOf[TransformerException]
+        .e
+        .getMessage should include("Unable to parse bib data")
     }
   }
 
