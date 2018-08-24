@@ -156,7 +156,6 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
       code = "scmac",
       name = "Closed stores Arch. & MSS"
     )
-    val itemData = createSierraItemDataWith(location = Some(sierraLocation))
 
     val bibId = createSierraBibNumber
     val bibData = createSierraBibDataWith(
@@ -165,7 +164,9 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
       ))
     )
 
-    val itemDataMap = Map(createSierraItemNumber -> itemData)
+    val itemDataMap = Map(
+      createSierraItemNumber -> createSierraItemDataWith(location = Some(sierraLocation))
+    )
 
     val result = getTransformedItems(
       bibId = bibId,
@@ -184,6 +185,37 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
         locationType = LocationType("iiif-presentation")
       )
     )
+  }
+
+  it("doesn't combine Items if there's more than one digital item") {
+    val sierraLocation1 = SierraSourceLocation(
+      code = "sicon",
+      name = "Closed stores Iconographic"
+    )
+
+    val sierraLocation2 = SierraSourceLocation(
+      code = "sepbi",
+      name = "Closed stores EPB Biog p.Vol"
+    )
+
+    val bibId = createSierraBibNumber
+    val bibData = createSierraBibDataWith(
+      locations = Some(List(
+        SierraSourceLocation("dlnk", "Digitised content")
+      ))
+    )
+
+    val itemDataMap = Map(
+      createSierraItemNumber -> createSierraItemDataWith(location = Some(sierraLocation1)),
+      createSierraItemNumber -> createSierraItemDataWith(location = Some(sierraLocation2))
+    )
+
+    val result = getTransformedItems(
+      bibId = bibId,
+      bibData = bibData,
+      itemDataMap = itemDataMap)
+
+    result.size shouldBe 3
   }
 
   private def getTransformedItems(
