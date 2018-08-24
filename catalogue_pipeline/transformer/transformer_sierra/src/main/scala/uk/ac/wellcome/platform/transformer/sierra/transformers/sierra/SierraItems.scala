@@ -19,10 +19,14 @@ trait SierraItems extends Logging with SierraLocation {
     val physicalItems = getPhysicalItems(itemDataMap)
     val maybeDigitalItem = getDigitalItem(bibId = bibId, bibData = bibData)
 
-    // In the case where we have a single physical item and a single
-    // digital item, we know that the digital item is the digitised version
-    // of the physical item -- so we can combine their locations and present
-    // a single item.
+    // If we have a digital Item and a *single* physical Item, we know
+    // the digital Item is the digitised version of the physical Item, so
+    // we can combine their locations and present a single Item.
+    //
+    // If we have a digital Item and *multiple* physical Items, we don't
+    // know which physical Item was digitised, so we leave them as
+    // separate Items.
+    //
     (physicalItems, maybeDigitalItem) match {
       case (Seq(physicalItem), Some(digitalItem)) => List(
         physicalItem.copy(
