@@ -29,14 +29,25 @@ def main(event=None, context=None, dynamodb_client=None):
                 Key={'id': {'S': 'dummy-id-not-there'}}
             )
 
-        # Although in general a ProvisionedThroughputExceededException is
-        # an error, we don't actually need the DeleteItem to succeed in this
-        # case.  We want to keep a minimum level of throughput on the table --
-        # if this exception is thrown, then other services are using
-        # the table and it's okay if we miss a heartbeat.
+        # The purpose of this heartbeat is to bring the provisioned throughput
+        # of a table down to a lower level when it's idle.
+        #
+        # In certain cases, a failure of the DeleteItem call is okay:
+        #
+        # - A ProvisionedThroughputExceededException -- if the table capacity
+        #   is maxed out, then another process is using the table.  We can
+        #   miss a heartbeat here.
+        #
+        # - A ResourceNotFoundException, which means the table has been
+        #   deleted.  In that case, it's unexpected, but we aren't wasting
+        #   capacity, so a failure is fine.
+        #
         except ClientError as err:
-            if err.response['Error']['Code'] == 'ProvisionedThroughputExceededException':
-                pass
+            if err.response['Error']['Code'] in (
+                'ProvisionedThroughputExceededException',
+                'ResourceNotFoundException',
+            ):
+                print(f'Benign error from DynamoDB: {err.response["Error"]["Code"]}')
             else:
                 raise
 
