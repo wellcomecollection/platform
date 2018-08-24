@@ -4,6 +4,7 @@ Receives a message to ingest a bag giving the URL and publishes the archive even
 """
 
 import os
+import uuid
 from urllib.parse import urlparse
 
 import boto3
@@ -16,7 +17,7 @@ daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 
-def archive_bag_message(bag_url):
+def archive_bag_message(ingest_request_id, bag_url, callback_url):
     """
     Generates bag archive messages.
     """
@@ -24,28 +25,43 @@ def archive_bag_message(bag_url):
     if url.scheme == 's3':
         bucket = url.netloc
         key = url.path.lstrip('/')
-        return {
+        msg = {
+            'ingestId': ingest_request_id,
             'namespace': bucket,
             'key': key
         }
+        if callback_url:
+            msg['callbackUrl'] = callback_url
+        return msg
     else:
-        raise ValueError(f"Unrecognised url scheme: {bag_url}")
+        raise ValueError(f"[BadRequest] Unrecognised url scheme: {bag_url}")
+
+
+def join_url(parts):
+    return '/' + '/'.join(part.strip('/') for part in parts)
 
 
 @log_on_error
-def handler(request, _ctx=None, sns_client=None):
-    logger.debug('received %r', request)
+def main(event, context=None, sns_client=None):
+    logger.debug('received %r', event)
 
     topic_arn = os.environ['TOPIC_ARN']
 
+    request = event['body']
+    path = event.get('path', '')
+
     try:
         upload_url = request['uploadUrl']
+        callback_url = request.get('callbackUrl', None)
     except TypeError:
-        raise TypeError(f"Invalid request not json: {request}")
-    except KeyError:
-        raise KeyError(f"Invalid request missing 'uploadUrl' in {request}")
+        raise TypeError(f"[BadRequest] Invalid request not json: {request}")
+    except KeyError as keyError:
+        raise KeyError(f"[BadRequest] Invalid request missing '{keyError.args[0]}' in {request}")
 
-    message = archive_bag_message(upload_url)
+    ingest_request_id = str(uuid.uuid4())
+    logger.debug('ingest_request_id: %r', ingest_request_id)
+
+    message = archive_bag_message(ingest_request_id, upload_url, callback_url)
     logger.debug(f"sns-message: {message}")
 
     topic_name = topic_arn.split(":")[-1]
@@ -56,9 +72,11 @@ def handler(request, _ctx=None, sns_client=None):
             sns_client=sns_client,
             topic_arn=topic_arn,
             message=message,
-            subject=f'source: archive_ingest ({topic_name})'
+            subject=f"source: archive_ingest ({topic_name})"
     )
     logger.debug(f"published: {message} to {topic_arn}")
 
-    response = {'received': 'OK'}
-    return response
+    return {
+        'id': ingest_request_id,
+        'location': join_url((path, ingest_request_id))
+    }
