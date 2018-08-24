@@ -37,8 +37,8 @@ def archive_bag_message(ingest_request_id, bag_url, callback_url):
         raise ValueError(f"[BadRequest] Unrecognised url scheme: {bag_url}")
 
 
-def join_url(parts):
-    return '/' + '/'.join(part.strip('/') for part in parts)
+def join_url(path_segments):
+    return '/' + '/'.join(path_segment.strip('/') for path_segment in path_segments)
 
 
 @log_on_error

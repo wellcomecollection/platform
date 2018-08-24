@@ -54,7 +54,7 @@ def test_invalid_url_fails(sns_client):
 
 
 def test_missing_url_fails(sns_client):
-    request = { "body": {'unknownKey': 'aValue'}}
+    request = {"body": {'unknownKey': 'aValue'}}
 
     with pytest.raises(KeyError, match="\[BadRequest\] Invalid request missing 'uploadUrl' in {'unknownKey': 'aValue'}"):
         archive_ingest.main(event=request, sns_client=sns_client)
@@ -63,7 +63,7 @@ def test_missing_url_fails(sns_client):
 
 
 def test_invalid_json_fails(sns_client):
-    request = { "body": "not_json" }
+    request = {"body": "not_json"}
 
     with pytest.raises(TypeError, match="\[BadRequest\] Invalid request not json: not_json"):
         archive_ingest.main(event=request, sns_client=sns_client)
