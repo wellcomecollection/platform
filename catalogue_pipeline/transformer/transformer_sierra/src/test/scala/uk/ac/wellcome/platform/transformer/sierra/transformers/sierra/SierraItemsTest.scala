@@ -122,6 +122,24 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
     getTransformedItems(bibId = bibId, bibData = bibData) shouldBe expectedItems
   }
 
+  it("creates an item with a physical location") {
+    val sierraLocation = SierraSourceLocation(
+      code = "sghi2",
+      name = "Closed stores Hist. 2"
+    )
+    val itemData = createSierraItemDataWith(location = Some(sierraLocation))
+
+    val itemDataMap = Map(createSierraItemNumber -> itemData)
+
+    val item = getTransformedItems(itemDataMap = itemDataMap).head
+    item.agent.locations shouldBe List(
+      PhysicalLocation(
+        locationType = LocationType(sierraLocation.code),
+        label = sierraLocation.name
+      )
+    )
+  }
+
   private def getTransformedItems(
     bibId: SierraBibNumber = createSierraBibNumber,
     bibData: SierraBibData = createSierraBibData,
