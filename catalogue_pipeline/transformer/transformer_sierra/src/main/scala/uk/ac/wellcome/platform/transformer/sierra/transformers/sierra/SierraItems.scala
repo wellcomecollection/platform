@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemNumber}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
@@ -9,6 +9,15 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
 }
 
 trait SierraItems extends Logging with SierraLocation {
+  def getItems(
+    bibData: SierraBibData,
+    itemDataMap: Map[SierraItemNumber, SierraItemData],
+    bibId: SierraBibNumber): List[MaybeDisplayable[Item]] =
+    getPhysicalItems(itemDataMap) ++
+      getDigitalItems(
+        bibId = bibId,
+        bibData = bibData)
+
   def transformItemData(itemId: SierraItemNumber,
                         itemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform $itemId")
@@ -45,11 +54,10 @@ trait SierraItems extends Logging with SierraLocation {
       }
       .toList
 
-  private def getDigitalItem(
-    sourceIdentifier: SourceIdentifier): Unidentifiable[Item] = {
+  private def getDigitalItem(bibId: SierraBibNumber): Unidentifiable[Item] = {
     Unidentifiable(
       agent = Item(
-        locations = List(getDigitalLocation(sourceIdentifier.value))
+        locations = List(getDigitalLocation(bibId.withCheckDigit))
       )
     )
   }
@@ -67,15 +75,15 @@ trait SierraItems extends Logging with SierraLocation {
     *
     */
   def getDigitalItems(
-    sourceIdentifier: SourceIdentifier,
-    sierraBibData: SierraBibData): List[Unidentifiable[Item]] = {
-    val hasDlnkLocation = sierraBibData.locations match {
+    bibId: SierraBibNumber,
+    bibData: SierraBibData): List[Unidentifiable[Item]] = {
+    val hasDlnkLocation = bibData.locations match {
       case Some(locations) => locations.map { _.code }.contains("dlnk")
       case None            => false
     }
 
     if (hasDlnkLocation) {
-      List(getDigitalItem(sourceIdentifier))
+      List(getDigitalItem(bibId))
     } else {
       List()
     }

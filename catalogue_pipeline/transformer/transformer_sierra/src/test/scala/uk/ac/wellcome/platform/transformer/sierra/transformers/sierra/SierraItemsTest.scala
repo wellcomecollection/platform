@@ -77,21 +77,19 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
     // check the old code wasn't left lying around!
 
     it("does not create any items for an e-book record without the 'dlnk' location") {
-      val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
         materialType = Some(createSierraMaterialTypeWith(code = "v"))
       )
 
-      transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe List()
+      transformer.getDigitalItems(bibId = createSierraBibNumber, bibData = bibData) shouldBe List()
     }
 
     it("does not create any items for a non e-book record without the 'dlnk' location") {
-      val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
         materialType = Some(createSierraMaterialTypeWith(code = "x"))
       )
 
-      transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe List.empty
+      transformer.getDigitalItems(bibId = createSierraBibNumber, bibData = bibData) shouldBe List.empty
     }
 
     it("ignores a digital item on a bib record without a 'dlnk' location") {
@@ -102,14 +100,14 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
       )
 
       val result = transformer.getDigitalItems(
-        sourceIdentifier = createSierraSourceIdentifier,
-        sierraBibData = bibData)
+        bibId = createSierraBibNumber,
+        bibData = bibData)
 
       result shouldBe List()
     }
 
     it("adds a digital item on a bib record with a 'dlnk' location") {
-      val sourceIdentifier = createSierraSourceIdentifier
+      val bibId = createSierraBibNumber
       val bibData = createSierraBibDataWith(
         locations = Some(List(
           SierraSourceLocation("digi", "Digitised Collections"),
@@ -118,14 +116,14 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
       )
 
       val result = transformer.getDigitalItems(
-        sourceIdentifier = sourceIdentifier,
-        sierraBibData = bibData)
+        bibId = bibId,
+        bibData = bibData)
 
       val expectedItems = List(
         Unidentifiable(
         agent = Item(
         locations = List(DigitalLocation(
-          url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
+          url = s"https://wellcomelibrary.org/iiif/${bibId.withCheckDigit}/manifest",
           license = None,
           locationType = LocationType("iiif-presentation"))))
       ))

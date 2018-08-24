@@ -82,11 +82,11 @@ class SierraTransformableTransformer
                 production = getProduction(sierraBibData),
                 language = getLanguage(sierraBibData),
                 dimensions = getDimensions(sierraBibData),
-                items =
-                  getPhysicalItems(sierraItemDataMap) ++
-                    getDigitalItems(
-                      sourceIdentifier.copy(ontologyType = "Item"),
-                      sierraBibData),
+                items = getItems(
+                  bibData = sierraBibData,
+                  itemDataMap = sierraItemDataMap,
+                  bibId = bibId
+                ),
                 itemsV1 = List(),
                 version = version
               )
