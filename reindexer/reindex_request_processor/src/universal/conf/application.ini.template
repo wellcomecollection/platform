@@ -1,2 +1,0 @@
--aws.sqs.queue.url=${reindex_requests_queue_id}
--aws.metrics.namespace=${metrics_namespace}

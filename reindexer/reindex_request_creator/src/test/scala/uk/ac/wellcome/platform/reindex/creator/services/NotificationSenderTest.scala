@@ -5,9 +5,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -21,7 +19,8 @@ class NotificationSenderTest
     with ReindexFixtures
     with ScalaFutures
     with SNS {
-  it("sends ReindexRequests for the provided IDs") {
+
+  it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
       withSNSWriter(topic) { snsWriter =>
         val notificationSender = new NotificationSender(
@@ -29,17 +28,6 @@ class NotificationSenderTest
         )
 
         val recordIds = List("miro/1", "miro/2", "miro/3")
-        val desiredVersion = 5
-
-        val table = Table("my-test-table", "my-index")
-
-        val expectedRequests = recordIds.map { id =>
-          ReindexRequest(
-            id = id,
-            desiredVersion = desiredVersion,
-            tableName = table.name
-          )
-        }
 
         val hybridRecords = recordIds.map { id =>
           HybridRecord(
@@ -50,24 +38,16 @@ class NotificationSenderTest
         }
 
         val future = notificationSender.sendNotifications(
-          records = hybridRecords,
-          reindexJob = createReindexJobWith(
-            table = table,
-            desiredVersion = desiredVersion
-          )
+          records = hybridRecords
         )
 
         whenReady(future) { _ =>
-          val actualRequests = listMessagesReceivedFromSNS(topic)
-            .map {
-              _.message
-            }
-            .map {
-              fromJson[ReindexRequest](_).get
-            }
+          val actualRecords = listMessagesReceivedFromSNS(topic)
+            .map { _.message }
+            .map { fromJson[HybridRecord](_).get }
             .distinct
 
-          actualRequests should contain theSameElementsAs expectedRequests
+          actualRecords should contain theSameElementsAs hybridRecords
         }
       }
     }
@@ -87,12 +67,7 @@ class NotificationSenderTest
         )
       }
 
-      val future = notificationSender.sendNotifications(
-        records = records,
-        reindexJob = createReindexJobWith(
-          table = Table("my-test-table", "my-index")
-        )
-      )
+      val future = notificationSender.sendNotifications(records = records)
       whenReady(future.failed) {
         _ shouldBe a[AmazonSNSException]
       }

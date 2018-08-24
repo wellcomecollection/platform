@@ -24,9 +24,7 @@ class ReindexRequestCreatorWorker @Inject()(
         fromJson[ReindexJob](message.Message))
       outdatedRecords: List[HybridRecord] <- readerService
         .findRecordsForReindexing(reindexJob)
-      _ <- notificationService.sendNotifications(
-        records = outdatedRecords,
-        reindexJob = reindexJob)
+      _ <- notificationService.sendNotifications(records = outdatedRecords)
     } yield ()
 
   def stop() = system.terminate()

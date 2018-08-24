@@ -14,13 +14,11 @@ trait ReindexFixtures {
       table = table.name,
       index = table.index
     ),
-    shardId = shardId,
-    desiredVersion = desiredVersion
+    shardId = shardId
   )
 
   def createReindexJobWith(dynamoConfig: DynamoConfig): ReindexJob = ReindexJob(
     dynamoConfig = dynamoConfig,
-    shardId = "sierra/123",
-    desiredVersion = 5
+    shardId = "sierra/123"
   )
 }

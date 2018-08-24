@@ -40,7 +40,6 @@ cache:
     - goobi_adapter/goobi_reader/target
 
     - reindexer/reindex_request_creator/target
-    - reindexer/reindex_request_processor/target
 
     - sbt_common/common/target
     - sbt_common/display/target
@@ -152,7 +151,6 @@ jobs:
 
     # Reindexer stack
     - env: TASK=reindex_request_creator-test
-    - env: TASK=reindex_request_processor-test
 
     # Goobi adapter stack
     - env: TASK=goobi_reader-test
