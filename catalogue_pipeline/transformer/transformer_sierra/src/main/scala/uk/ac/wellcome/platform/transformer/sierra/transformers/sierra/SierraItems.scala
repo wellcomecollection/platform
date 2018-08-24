@@ -10,9 +10,9 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
 
 trait SierraItems extends Logging with SierraLocation {
   def getItems(
+    bibId: SierraBibNumber,
     bibData: SierraBibData,
-    itemDataMap: Map[SierraItemNumber, SierraItemData],
-    bibId: SierraBibNumber): List[MaybeDisplayable[Item]] =
+    itemDataMap: Map[SierraItemNumber, SierraItemData]): List[MaybeDisplayable[Item]] =
     getPhysicalItems(itemDataMap) ++
       getDigitalItems(
         bibId = bibId,
