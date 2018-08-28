@@ -24,10 +24,9 @@ module "service" {
     # the parallelism is an attempt to reduce the number of SNS messages in
     # flight, and avoid these errors.
     sqs_parallelism = 7
-    log_level = "DEBUG"
   }
 
-  env_vars_length = 7
+  env_vars_length = 6
 
   ecs_cluster_name = "${var.ecs_cluster_name}"
   ecs_cluster_id   = "${var.ecs_cluster_id}"
