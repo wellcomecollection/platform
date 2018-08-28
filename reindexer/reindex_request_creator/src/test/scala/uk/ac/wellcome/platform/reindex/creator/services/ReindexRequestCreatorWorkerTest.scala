@@ -17,6 +17,7 @@ import uk.ac.wellcome.platform.reindex.creator.fixtures.{
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,7 +34,7 @@ class ReindexRequestCreatorWorkerTest
     with SQS
     with ScalaFutures {
 
-  def withReindexWorkerService(topic: Topic)(
+  def withReindexWorkerService(table: Table, topic: Topic)(
     testWith: TestWith[(ReindexRequestCreatorWorker, QueuePair), Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
@@ -44,7 +45,11 @@ class ReindexRequestCreatorWorkerTest
               queue,
               metricsSender) { sqsStream =>
               val readerService = new RecordReader(
-                dynamoDbClient = dynamoDbClient
+                dynamoDbClient = dynamoDbClient,
+                dynamoConfig = DynamoConfig(
+                  table = table.name,
+                  index = table.index
+                )
               )
 
               withSNSWriter(topic) { snsWriter =>
@@ -74,7 +79,7 @@ class ReindexRequestCreatorWorkerTest
   it("completes a reindex") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(topic) {
+        withReindexWorkerService(table, topic) {
           case (service, QueuePair(queue, dlq)) =>
             val reindexJob = createReindexJobWith(
               table = table,
@@ -122,7 +127,7 @@ class ReindexRequestCreatorWorkerTest
   it("fails if it cannot parse the SQS message as a ReindexJob") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(topic) {
+        withReindexWorkerService(table, topic) {
           case (_, QueuePair(queue, dlq)) =>
             sendNotificationToSQS(
               queue = queue,
@@ -139,49 +144,23 @@ class ReindexRequestCreatorWorkerTest
   }
 
   it("fails if the reindex job fails") {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueueAndDlq {
-          case queuePair @ QueuePair(queue, dlq) =>
-            withSQSStream[NotificationMessage, Assertion](
-              actorSystem,
-              queue,
-              metricsSender) { sqsStream =>
-              val readerService = new RecordReader(
-                dynamoDbClient = dynamoDbClient
-              )
+    val badTable = Table(name = "doesnotexist", index = "whatindex")
+    val badTopic = Topic("does-not-exist")
 
-              withSNSWriter(Topic("does-not-exist")) { snsWriter =>
-                val hybridRecordSender = new HybridRecordSender(
-                  snsWriter = snsWriter
-                )
+    withReindexWorkerService(badTable, badTopic) { case (_, QueuePair(queue, dlq)) =>
+      val reindexJob = createReindexJobWith(
+        table = badTable,
+        shardId = "sierra/123"
+      )
 
-                new ReindexRequestCreatorWorker(
-                  readerService = readerService,
-                  hybridRecordSender = hybridRecordSender,
-                  system = actorSystem,
-                  sqsStream = sqsStream
-                )
+      sendNotificationToSQS(
+        queue = queue,
+        message = reindexJob
+      )
 
-                val reindexJob = createReindexJobWith(
-                  dynamoConfig = DynamoConfig(
-                    table = "doesnotexist",
-                    index = "whatindex?"
-                  )
-                )
-
-                sendNotificationToSQS(
-                  queue = queue,
-                  message = reindexJob
-                )
-
-                eventually {
-                  assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 1)
-                }
-              }
-            }
-        }
+      eventually {
+        assertQueueEmpty(queue)
+        assertQueueHasSize(dlq, 1)
       }
     }
   }

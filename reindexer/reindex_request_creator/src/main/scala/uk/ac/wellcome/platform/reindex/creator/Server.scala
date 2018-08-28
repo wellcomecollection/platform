@@ -17,7 +17,11 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{DynamoClientModule, S3ClientModule}
+import uk.ac.wellcome.finatra.storage.{
+  DynamoClientModule,
+  DynamoConfigModule,
+  S3ClientModule
+}
 import uk.ac.wellcome.platform.reindex.creator.modules.ReindexerWorkerModule
 
 object ServerMain extends Server
@@ -30,6 +34,7 @@ class Server extends HttpServer {
     ExecutionContextModule,
     MetricsSenderModule,
     DynamoClientModule,
+    DynamoConfigModule,
     SNSClientModule,
     SNSConfigModule,
     SQSClientModule,

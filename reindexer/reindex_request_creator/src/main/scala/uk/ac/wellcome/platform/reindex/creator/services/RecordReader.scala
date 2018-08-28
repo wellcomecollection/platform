@@ -8,31 +8,30 @@ import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.platform.reindex.creator.exceptions.ReindexerException
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 /** Find IDs for records in the SourceData table that need reindexing.
   *
   * This class should only be doing reading -- deciding how to act on records
   * that need reindexing is the responsibility of another class.
   */
-class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(
-  implicit ec: ExecutionContext)
+class RecordReader @Inject()(
+  dynamoDbClient: AmazonDynamoDB,
+  dynamoConfig: DynamoConfig
+)(implicit ec: ExecutionContext)
     extends Logging {
+
+  val table: Table[HybridRecord] = Table[HybridRecord](dynamoConfig.table)
+  val index: SecondaryIndex[HybridRecord] = table.index(indexName = dynamoConfig.index)
 
   def findRecordsForReindexing(
     reindexJob: ReindexJob): Future[List[HybridRecord]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
 
-    val table = Table[HybridRecord](reindexJob.dynamoConfig.table)
-
     for {
-      index: SecondaryIndex[HybridRecord] <- Future.fromTry(Try {
-        table.index(indexName = reindexJob.dynamoConfig.index)
-      })
-
       // We start by querying DynamoDB for every record in the reindex shard.
       // If a shard was especially large, this might cause out-of-memory errors
       // -- in practice, we're hoping that the shards/individual records are
