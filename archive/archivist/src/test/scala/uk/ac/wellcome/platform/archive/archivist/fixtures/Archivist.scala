@@ -29,15 +29,19 @@ trait Archivist extends AkkaS3 with Messaging with BagIt {
   def sendBag[R](bagName: BagName,
                  file: File,
                  ingestBucket: Bucket,
-                 queuePair: QueuePair)(testWith: TestWith[BagName, R]) = {
+                 callbackUri: Option[URI],
+                 queuePair: QueuePair)(testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
     val uploadKey = s"upload/path/$bagName.zip"
 
     s3Client.putObject(ingestBucket.name, uploadKey, file)
 
-    val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
-    sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
+    val uploadedBagLocation = ObjectLocation(ingestBucket.name, uploadKey)
+    val ingestRequestId = UUID.randomUUID()
+    sendNotificationToSQS(
+      queuePair.queue,
+      IngestBagRequestNotification(ingestRequestId, uploadedBagLocation, callbackUri))
 
-    testWith(bagName)
+    testWith((ingestRequestId, uploadedBagLocation, bagName))
   }
 
   def sendFakeBag[R](ingestBucket: Bucket,

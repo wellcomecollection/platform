@@ -27,7 +27,7 @@ class ArchivistFeatureTest
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
       case (ingestBucket, storageBucket, queuePair, topic, archivist) =>
-        sendFakeBag(ingestBucket, queuePair) { validBag =>
+        sendFakeBag(ingestBucket, Some(callbackUrl), queuePair) { case (requestId, uploadLocation, validBag) =>
           archivist.run()
           eventually {
             listKeysInBucket(storageBucket) should have size 27
@@ -36,7 +36,9 @@ class ArchivistFeatureTest
 
             assertSnsReceivesOnly(
               BagArchiveCompleteNotification(
-                BagLocation(storageBucket.name, "archive", validBag)
+                requestId,
+                BagLocation(storageBucket.name, "archive", validBag),
+                Some(callbackUrl)
               ),
               topic
             )
@@ -48,10 +50,9 @@ class ArchivistFeatureTest
   it("fails when ingesting an invalid bag") {
     withArchivist {
       case (ingestBucket, storageBucket, queuePair, topic, archivist) =>
-        sendFakeBag(ingestBucket, queuePair, false) { invalidBag =>
+        sendFakeBag(ingestBucket, Some(callbackUrl), queuePair, false) { _ =>
           archivist.run()
           eventually {
-
             assertQueuePairSizes(queuePair, 0, 1)
             assertSnsReceivesNothing(topic)
           }
@@ -62,11 +63,11 @@ class ArchivistFeatureTest
   it("continues after failure") {
     withArchivist {
       case (ingestBucket, storageBucket, queuePair, topic, archivist) =>
-        sendFakeBag(ingestBucket, queuePair) { validBag1 =>
+        sendFakeBag(ingestBucket, Some(callbackUrl), queuePair) { case(requestId1, uploadLocation1, validBag1) =>
           archivist.run()
-          sendFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
-            sendFakeBag(ingestBucket, queuePair) { validBag2 =>
-              sendFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
+          sendFakeBag(ingestBucket, Some(callbackUrl), queuePair, false) { _ =>
+            sendFakeBag(ingestBucket, Some(callbackUrl), queuePair) { case(requestId2, uploadLocation2, validBag2) =>
+              sendFakeBag(ingestBucket, Some(callbackUrl), queuePair, false) { _ =>
                 eventually {
 
                   assertQueuePairSizes(queuePair, 0, 2)
@@ -74,10 +75,14 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       BagArchiveCompleteNotification(
-                        BagLocation(storageBucket.name, "archive", validBag1)
+                        requestId1,
+                        BagLocation(storageBucket.name, "archive", validBag1),
+                        Some(callbackUrl)
                       ),
                       BagArchiveCompleteNotification(
-                        BagLocation(storageBucket.name, "archive", validBag2)
+                        requestId2,
+                        BagLocation(storageBucket.name, "archive", validBag2),
+                        Some(callbackUrl)
                       )
                     ),
                     topic

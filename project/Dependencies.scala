@@ -45,7 +45,7 @@ object Dependencies {
     val junitInterface = "0.11"
     val elastic4s = "5.6.5"
     val scanamo = "1.0.0-M3"
-    val circeVersion = "0.9.0"
+    val circeVersion = "0.9.3"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
     val scalaCsv = "1.3.5"

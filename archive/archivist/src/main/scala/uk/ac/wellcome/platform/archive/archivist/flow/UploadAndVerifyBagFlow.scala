@@ -23,9 +23,10 @@ object UploadAndVerifyBagFlow extends Logging {
     materializer: ActorMaterializer,
     s3Client: S3Client,
     executionContext: ExecutionContext
-  ): Flow[ZipFile, BagLocation, NotUsed] = {
+  ): Flow[(ZipFile, IngestRequestContext), (BagLocation, IngestRequestContext), NotUsed] = {
 
-    Flow[ZipFile].flatMapConcat(zipFile => {
+    Flow[(ZipFile, IngestRequestContext)].flatMapConcat {
+      case (zipFile, ingestRequestContext) =>
       Source
         .single(zipFile)
         .mapConcat(bagNames)
@@ -36,7 +37,8 @@ object UploadAndVerifyBagFlow extends Logging {
             materializeArchiveBagFlow(zipFile, bagLocation, config)
         }
         .flatMapConcat(Source.fromFuture)
-    })
+        .map((_, ingestRequestContext))
+    }
   }
 
   private def materializeArchiveBagFlow(

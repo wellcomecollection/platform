@@ -13,8 +13,8 @@ import scala.util.{Failure, Success}
 
 object BagArchiveCompleteFlow {
   def apply(topicArn: String)(implicit snsClient: AmazonSNSAsync) =
-    Flow[BagLocation]
-      .map(createNotification)
+    Flow[(BagLocation, IngestRequestContext)]
+      .map { case (bagLocation, context) => BagArchiveCompleteNotification(context.requestId, bagLocation, context.callbackUrl) }
       .log("created notification")
       .map(toJson(_))
       .map {
@@ -24,8 +24,4 @@ object BagArchiveCompleteFlow {
       .log("notification serialised")
       .via(SnsPublisher.flow(topicArn))
       .log("published notification")
-
-  def createNotification(bagLocation: BagLocation) =
-    BagArchiveCompleteNotification(bagLocation)
-
 }
