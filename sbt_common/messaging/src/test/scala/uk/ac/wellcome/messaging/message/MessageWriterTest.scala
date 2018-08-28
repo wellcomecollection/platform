@@ -36,7 +36,8 @@ class MessageWriterTest
             messages should have size (1)
             messages.head.subject shouldBe subject
 
-            val maybeObjectLocation = fromJson[ObjectLocation](messages.head.message)
+            val maybeObjectLocation =
+              fromJson[ObjectLocation](messages.head.message)
 
             maybeObjectLocation shouldBe a[Success[_]]
             val objectLocation = maybeObjectLocation.get
