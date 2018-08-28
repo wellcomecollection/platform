@@ -1,12 +1,13 @@
 import os
 
 # For running on Windows on the Wellcome network with domain credentials
-# ignored if METS_BUCKET_NAME provided
 METS_FILESYSTEM_ROOT = os.getenv("METS_FILESYSTEM_ROOT")
 
 # for running against AWS using the synced METS bucket
 METS_BUCKET_NAME = os.getenv("METS_BUCKET_NAME")
 METS_ROOT_PREFIX = "mets/"
+
+READ_METS_FROM_FILESHARE = os.getenv("READ_METS_FROM_FILESHARE") == "True"
 
 # Where to assemble bag contents before bagging, e.g., a temp directory
 WORKING_DIRECTORY = os.getenv("WORKING_DIRECTORY")

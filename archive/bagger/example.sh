@@ -1,6 +1,7 @@
 # asset sources
 export METS_FILESYSTEM_ROOT=''
 export METS_BUCKET_NAME='xxxx'
+export READ_METS_FROM_FILESHARE='False'
 export WORKING_DIRECTORY='/tmp/_bagger'
 export DROP_BUCKET_NAME='yyyy'
 export DROP_BUCKET_NAME_METS_ONLY='yyyy-mets-only'

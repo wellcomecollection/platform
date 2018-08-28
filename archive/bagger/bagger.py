@@ -110,7 +110,7 @@ def process_manifestation(root, bag_details, skip_file_download):
 
 
 def load_xml(path):
-    if settings.METS_FILESYSTEM_ROOT:
+    if settings.READ_METS_FROM_FILESHARE:
         logging.info("Reading METS from Windows Fileshare")
         return load_from_disk(settings.METS_FILESYSTEM_ROOT + path)
 

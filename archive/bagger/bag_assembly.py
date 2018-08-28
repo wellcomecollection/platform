@@ -47,7 +47,7 @@ def get_mets_partial_path(b_number):
 
 def get_separator():
     # Not necessarily the OS we're running on!
-    if settings.METS_FILESYSTEM_ROOT:
+    if settings.READ_METS_FROM_FILESHARE:
         return "\\"
     return "/"
 

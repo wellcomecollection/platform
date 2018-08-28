@@ -26,7 +26,7 @@ def process_alto(root, bag_details, alto, skip_file_download):
 
     source_bucket = None
 
-    if not settings.METS_FILESYSTEM_ROOT:
+    if not settings.READ_METS_FROM_FILESHARE:
         source_bucket = aws.get_s3().Bucket(settings.METS_BUCKET_NAME)
 
     for file_element in alto_file_group:
@@ -36,7 +36,7 @@ def process_alto(root, bag_details, alto, skip_file_download):
             logging.info("Skipping fetch of alto from {0} to {1}".format(current_location, destination))
             continue
 
-        if settings.METS_FILESYSTEM_ROOT:
+        if settings.READ_METS_FROM_FILESHARE:
             # Not likely to be used much, only for running against Windows file share
             source = os.path.join(settings.METS_FILESYSTEM_ROOT, bag_details["mets_partial_path"], current_location)
             logging.info("Copying alto from {0} to {1}".format(source, destination))
