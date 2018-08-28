@@ -46,7 +46,7 @@ from reindex_shard_config import get_number_of_shards  # noqa
 TOPIC_NAME = 'reindex_jobs'
 
 DYNAMO_CONFIGS = {
-    'miro': {'table': 'SourceData', 'maybeIndex': 'reindexTracker'},
+    'miro': {'table': 'vhs-sourcedata-miro', 'maybeIndex': 'reindexTracker'},
     'sierra': {'table': 'vhs-sourcedata-sierra', 'maybeIndex': 'reindexTracker'}
 }
 
