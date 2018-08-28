@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.matcher.messages
 
 import com.amazonaws.services.s3.AmazonS3
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessagePointer
@@ -18,16 +18,15 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class MatcherMessageReceiverTest
     extends FunSpec
     with Matchers
-    with ExtendedPatience
-    with MatcherFixtures
-    with Eventually {
+    with Eventually
+    with IntegrationPatience
+    with MatcherFixtures {
 
   private val aIdentifier = aSierraSourceIdentifier("A")
   private val bIdentifier = aSierraSourceIdentifier("B")
