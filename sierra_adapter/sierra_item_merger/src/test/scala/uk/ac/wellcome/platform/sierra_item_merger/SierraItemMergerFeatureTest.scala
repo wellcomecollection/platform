@@ -1,19 +1,13 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
-import com.amazonaws.services.sqs.model.SendMessageResult
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.MessagePointer
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
-import uk.ac.wellcome.storage.ObjectLocation
 
 class SierraItemMergerFeatureTest
     extends FunSpec
@@ -45,10 +39,10 @@ class SierraItemMergerFeatureTest
                     bibIds = List(bibId)
                   )
 
-                  sendNotification(
+                  sendMessage(
                     bucket = sierraItemsToDynamoBucket,
                     queue = queue,
-                    itemRecord = itemRecord
+                    itemRecord
                   )
 
                   val expectedSierraTransformable =
@@ -92,10 +86,10 @@ class SierraItemMergerFeatureTest
                     bibIds = List(bibId1)
                   )
 
-                  sendNotification(
+                  sendMessage(
                     bucket = sierraItemsToDynamoBucket,
                     queue = queue,
-                    itemRecord = itemRecord1
+                    itemRecord1
                   )
 
                   val bibId2 = createSierraBibNumber
@@ -103,10 +97,10 @@ class SierraItemMergerFeatureTest
                     bibIds = List(bibId2)
                   )
 
-                  sendNotification(
+                  sendMessage(
                     bucket = sierraItemsToDynamoBucket,
                     queue = queue,
-                    itemRecord = itemRecord2
+                    itemRecord2
                   )
 
                   eventually {
@@ -163,10 +157,10 @@ class SierraItemMergerFeatureTest
                     bibIds = bibIds
                   )
 
-                  sendNotification(
+                  sendMessage(
                     bucket = sierraItemsToDynamoBucket,
                     queue = queue,
-                    itemRecord = itemRecord
+                    itemRecord
                   )
 
                   val expectedTransformables = bibIds.map { bibId =>
@@ -194,22 +188,5 @@ class SierraItemMergerFeatureTest
         }
       }
     }
-  }
-
-  private def sendNotification(
-    bucket: Bucket,
-    queue: Queue,
-    itemRecord: SierraItemRecord): SendMessageResult = {
-    val key = s"messaging/${randomAlphanumeric(10)}.json"
-    s3Client.putObject(bucket.name, key, toJson(itemRecord).get)
-
-    val messagePointer = MessagePointer(
-      ObjectLocation(
-        namespace = bucket.name,
-        key = key
-      )
-    )
-
-    sendNotificationToSQS(queue = queue, message = messagePointer)
   }
 }
