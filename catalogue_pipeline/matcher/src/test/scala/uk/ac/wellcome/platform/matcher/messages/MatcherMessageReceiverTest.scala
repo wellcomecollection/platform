@@ -303,7 +303,7 @@ class MatcherMessageReceiverTest
                 sourceIdentifier = aIdentifier,
                 version = 1)
 
-              sendMessage(
+              sendMessage[TransformedBaseWork](
                 bucket = storageBucket,
                 queue = queuePair.queue,
                 workAv1)
