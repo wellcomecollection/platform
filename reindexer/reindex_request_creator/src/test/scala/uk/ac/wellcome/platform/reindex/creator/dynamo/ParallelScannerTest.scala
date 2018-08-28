@@ -12,12 +12,17 @@ import uk.ac.wellcome.test.fixtures._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ParallelScannerTest extends FunSpec with Matchers with ScalaFutures with LocalDynamoDbVersioned {
+class ParallelScannerTest
+    extends FunSpec
+    with Matchers
+    with ScalaFutures
+    with LocalDynamoDbVersioned {
 
   it("reads a table with a single record") {
     withLocalDynamoDbTable { table =>
       withParallelScanner(table) { parallelScanner =>
-        val record = TestVersioned(id = "123", data = "hello world", version = 1)
+        val record =
+          TestVersioned(id = "123", data = "hello world", version = 1)
         Scanamo.put(dynamoDbClient)(table.name)(record)
 
         val futureResult = parallelScanner.scan[TestVersioned](
@@ -40,7 +45,8 @@ class ParallelScannerTest extends FunSpec with Matchers with ScalaFutures with L
     runTest(totalRecords = 5, segmentCount = 10)
   }
 
-  it("returns a failed future if asked for a segment that's greater than totalSegments") {
+  it(
+    "returns a failed future if asked for a segment that's greater than totalSegments") {
     withLocalDynamoDbTable { table =>
       withParallelScanner(table) { parallelScanner =>
         val future = parallelScanner.scan[TestVersioned](
@@ -51,7 +57,8 @@ class ParallelScannerTest extends FunSpec with Matchers with ScalaFutures with L
         whenReady(future.failed) { r =>
           r shouldBe a[AmazonDynamoDBException]
           val message = r.asInstanceOf[AmazonDynamoDBException].getMessage
-          message should include("Value '10' at 'segment' failed to satisfy constraint: Member must have value less than or equal to 4")
+          message should include(
+            "Value '10' at 'segment' failed to satisfy constraint: Member must have value less than or equal to 4")
         }
       }
     }
@@ -77,9 +84,7 @@ class ParallelScannerTest extends FunSpec with Matchers with ScalaFutures with L
         }
 
         whenReady(Future.sequence(futureResults)) { results =>
-          val actualRecords: List[TestVersioned] = results
-            .flatten
-            .toList
+          val actualRecords: List[TestVersioned] = results.flatten.toList
             .map {
               _.right.get
             }
@@ -89,7 +94,8 @@ class ParallelScannerTest extends FunSpec with Matchers with ScalaFutures with L
     }
   }
 
-  private def withParallelScanner[R](table: Table)(testWith: TestWith[ParallelScanner, R]): R = {
+  private def withParallelScanner[R](table: Table)(
+    testWith: TestWith[ParallelScanner, R]): R = {
     val scanner = new ParallelScanner(
       dynamoDBClient = dynamoDbClient,
       dynamoConfig = DynamoConfig(

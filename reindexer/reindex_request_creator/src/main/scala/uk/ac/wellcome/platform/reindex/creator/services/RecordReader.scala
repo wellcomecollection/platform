@@ -29,10 +29,11 @@ class RecordReader @Inject()(
       // If a shard was especially large, this might cause out-of-memory errors
       // -- in practice, we're hoping that the shards/individual records are
       // small enough for this not to be a problem.
-      results: List[Either[DynamoReadError, HybridRecord]] <- parallelScanner.scan[HybridRecord](
-        segment = reindexJob.segment,
-        totalSegments = reindexJob.totalSegments
-      )
+      results: List[Either[DynamoReadError, HybridRecord]] <- parallelScanner
+        .scan[HybridRecord](
+          segment = reindexJob.segment,
+          totalSegments = reindexJob.totalSegments
+        )
 
       recordsToReindex: List[HybridRecord] = results.map(extractRecord)
     } yield recordsToReindex

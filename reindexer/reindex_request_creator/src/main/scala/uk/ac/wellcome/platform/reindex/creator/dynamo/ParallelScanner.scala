@@ -26,7 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class ParallelScanner @Inject()(
   dynamoDBClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
-)(implicit ec: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   val dynamoDB = new DynamoDB(dynamoDBClient)
 
@@ -43,8 +44,9 @@ class ParallelScanner @Inject()(
     * Note that this returns a Future[List], so results will be cached in-memory.
     * Choose segment count accordingly.
     */
-  def scan[T](segment: Int,
-              totalSegments: Int)(implicit dynamoFormat: DynamoFormat[T]): Future[List[Either[DynamoReadError, T]]] = {
+  def scan[T](segment: Int, totalSegments: Int)(
+    implicit dynamoFormat: DynamoFormat[T])
+    : Future[List[Either[DynamoReadError, T]]] = {
 
     // Create the ScanSpec configuration and the DynamoDB table.  This is
     // based on the Java example of a Parallel Scan from the AWS docs:
@@ -66,7 +68,6 @@ class ParallelScanner @Inject()(
         .toList
 
       itemCollection.map { item: Item =>
-
         // Convert the "Item" (a collection of attributes) into a map of
         // strings to AttributeValues, which we need for Scanamo.  Here we're
         // using the internal utilities from the AWS DynamoDB SDK.
@@ -74,7 +75,8 @@ class ParallelScanner @Inject()(
         // I got this from SO, although it's an incidental part of the answer:
         // https://stackoverflow.com/a/27538483/1558022
         //
-        val attributeValues: util.Map[String, AttributeValue] = InternalUtils.toAttributeValues(item)
+        val attributeValues: util.Map[String, AttributeValue] =
+          InternalUtils.toAttributeValues(item)
 
         // Take the Map[String, AttributeValue], and convert it into an
         // instance of the case class `T`.  This is using a Scanamo helper --

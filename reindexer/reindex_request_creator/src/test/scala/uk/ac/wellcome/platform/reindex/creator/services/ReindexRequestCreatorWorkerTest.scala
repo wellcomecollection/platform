@@ -141,18 +141,19 @@ class ReindexRequestCreatorWorkerTest
     val badTable = Table(name = "doesnotexist", index = "whatindex")
     val badTopic = Topic("does-not-exist")
 
-    withReindexWorkerService(badTable, badTopic) { case (_, QueuePair(queue, dlq)) =>
-      val reindexJob = ReindexJob(shardId = "sierra/123")
+    withReindexWorkerService(badTable, badTopic) {
+      case (_, QueuePair(queue, dlq)) =>
+        val reindexJob = ReindexJob(shardId = "sierra/123")
 
-      sendNotificationToSQS(
-        queue = queue,
-        message = reindexJob
-      )
+        sendNotificationToSQS(
+          queue = queue,
+          message = reindexJob
+        )
 
-      eventually {
-        assertQueueEmpty(queue)
-        assertQueueHasSize(dlq, 1)
-      }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
+        }
     }
   }
 }
