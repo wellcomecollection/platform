@@ -170,13 +170,13 @@ def main():
     # as it can go -- we've seen issues where the table capacity fails to
     # scale up correctly, which slows down the reindexer.
     max_capacity = get_dynamodb_max_table_capacity(table_name='SourceData')
-    print(f'Setting SourceData table capacity to {max_capacity}')
 
     dynamo_config = DYNAMO_CONFIGS[source_name]
 
     table_name = dynamo_config['table']
     gsi_name = dynamo_config['maybeIndex']
 
+    print(f'Setting {table_name} table capacity to {max_capacity}')
     set_dynamodb_table_capacity(
         table_name=table_name,
         desired_capacity=max_capacity
