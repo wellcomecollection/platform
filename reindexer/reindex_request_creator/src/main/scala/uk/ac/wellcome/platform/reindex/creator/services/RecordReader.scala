@@ -1,14 +1,11 @@
 package uk.ac.wellcome.platform.reindex.creator.services
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
-import com.gu.scanamo.{Scanamo, SecondaryIndex, Table}
 import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
+import uk.ac.wellcome.platform.reindex.creator.dynamo.ParallelScanner
 import uk.ac.wellcome.platform.reindex.creator.exceptions.ReindexerException
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,13 +16,9 @@ import scala.concurrent.{ExecutionContext, Future}
   * that need reindexing is the responsibility of another class.
   */
 class RecordReader @Inject()(
-  dynamoDbClient: AmazonDynamoDB,
-  dynamoConfig: DynamoConfig
+  parallelScanner: ParallelScanner
 )(implicit ec: ExecutionContext)
     extends Logging {
-
-  val table: Table[HybridRecord] = Table[HybridRecord](dynamoConfig.table)
-  val index: SecondaryIndex[HybridRecord] = table.index(indexName = dynamoConfig.index)
 
   def findRecordsForReindexing(
     reindexJob: ReindexJob): Future[List[HybridRecord]] = {
@@ -36,13 +29,10 @@ class RecordReader @Inject()(
       // If a shard was especially large, this might cause out-of-memory errors
       // -- in practice, we're hoping that the shards/individual records are
       // small enough for this not to be a problem.
-      results: List[Either[DynamoReadError, HybridRecord]] <- Future {
-        Scanamo.exec(dynamoDbClient)(
-          index.query(
-            'reindexShard -> reindexJob.shardId
-          )
-        )
-      }
+      results: List[Either[DynamoReadError, HybridRecord]] <- parallelScanner.scan[HybridRecord](
+        segment = reindexJob.segment,
+        totalSegments = reindexJob.totalSegments
+      )
 
       recordsToReindex: List[HybridRecord] = results.map(extractRecord)
     } yield recordsToReindex

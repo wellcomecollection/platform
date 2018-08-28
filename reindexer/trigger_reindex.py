@@ -14,7 +14,6 @@ Options:
 
 """
 
-import datetime as dt
 import json
 import os
 import subprocess
@@ -43,12 +42,14 @@ sys.path.append(os.path.join(ROOT, 'reindexer/reindex_shard_generator/src'))
 from reindex_shard_config import get_number_of_shards  # noqa
 
 
-TOPIC_NAME = 'reindex_jobs'
-
 DYNAMO_CONFIGS = {
     'miro': {'table': 'vhs-sourcedata-miro', 'maybeIndex': 'reindexTracker'},
     'sierra': {'table': 'vhs-sourcedata-sierra', 'maybeIndex': 'reindexTracker'}
 }
+
+
+def get_topic_name(source_name):
+    return f'reindex_jobs-{source_name}'
 
 
 def all_shard_ids(source_name):
@@ -63,15 +64,14 @@ def all_shard_ids(source_name):
         yield f'{source_name}/{shard_index}'
 
 
-def all_messages(shard_ids, desired_version, source_name):
+def all_messages(total_segments):
     """
     Generates all the messages to be sent to SNS.
     """
-    for s_id in shard_ids:
+    for i in range(total_segments):
         yield {
-            'shardId': s_id,
-            'desiredVersion': desired_version,
-            'dynamoConfig': DYNAMO_CONFIGS[source_name]
+            'segment': i,
+            'totalSegments': total_segments
         }
 
 
@@ -145,21 +145,14 @@ def main():
     source_name = args['--source']
     reason = args['--reason']
 
-    # We use the current timestamp for the reindex version -- this allows
-    # us to easily trace when a reindex was triggered.
-    desired_version = int(dt.datetime.utcnow().timestamp())
-    print(f'Updating all shards in {source_name} to {desired_version}')
+    print(f'Triggering a reindex in {source_name}')
 
     post_to_slack(source_name=source_name, reason=reason)
 
     shard_ids = all_shard_ids(source_name=source_name)
-    messages = all_messages(
-        shard_ids=shard_ids,
-        desired_version=desired_version,
-        source_name=source_name
-    )
+    messages = all_messages(total_segments=150)
 
-    topic_arn = build_topic_arn(topic_name=TOPIC_NAME)
+    topic_arn = build_topic_arn(topic_name=get_topic_name(source_name))
 
     publish_messages(
         topic_arn=topic_arn,
@@ -169,9 +162,10 @@ def main():
     # Now we update the write capacity of the SourceData table as high
     # as it can go -- we've seen issues where the table capacity fails to
     # scale up correctly, which slows down the reindexer.
-    max_capacity = get_dynamodb_max_table_capacity(table_name='SourceData')
-
     dynamo_config = DYNAMO_CONFIGS[source_name]
+    max_capacity = get_dynamodb_max_table_capacity(
+        table_name=dynamo_config['table']
+    )
 
     table_name = dynamo_config['table']
     gsi_name = dynamo_config['maybeIndex']

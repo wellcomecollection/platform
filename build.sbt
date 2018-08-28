@@ -135,6 +135,7 @@ lazy val reindex_request_creator = doServiceSetup(project, "reindexer/reindex_re
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= WellcomeDependencies.newStorageLibrary)
 
 lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
