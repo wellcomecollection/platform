@@ -6,10 +6,8 @@ import javax.naming.ConfigurationException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{
-  ReindexFixtures,
-  ReindexableTable
-}
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexableTable
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -23,16 +21,15 @@ class RecordReaderTest
     with ScalaFutures
     with Matchers
     with ReindexableTable
-    with ExtendedPatience
-    with ReindexFixtures {
+    with ExtendedPatience {
 
-  val shardName = "shard"
+  val shardId = "shard"
 
   val exampleRecord = TestRecord(
     id = "id",
     version = 1,
     s3key = "s3://id",
-    reindexShard = shardName
+    reindexShard = shardId
   )
 
   it("finds records in the specified shard") {
@@ -48,10 +45,7 @@ class RecordReaderTest
           exampleRecord.copy(id = "id4", reindexShard = "not_the_same_shard")
         )
 
-        val reindexJob = createReindexJobWith(
-          table = table,
-          shardId = shardName
-        )
+        val reindexJob = ReindexJob(shardId = shardId)
 
         val recordList = inShardRecords ++ notInShardRecords
 
@@ -78,7 +72,7 @@ class RecordReaderTest
     val table = Table("does-not-exist", "no-such-index")
     withRecordReader(table) { reader =>
       val future = reader.findRecordsForReindexing(
-        createReindexJobWith(table))
+        ReindexJob(shardId = shardId))
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }

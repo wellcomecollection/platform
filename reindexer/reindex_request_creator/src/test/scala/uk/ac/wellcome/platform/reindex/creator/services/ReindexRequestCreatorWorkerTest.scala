@@ -10,13 +10,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{
-  ReindexFixtures,
-  ReindexableTable
-}
+import uk.ac.wellcome.platform.reindex.creator.fixtures.{ReindexableTable}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
@@ -29,7 +27,6 @@ class ReindexRequestCreatorWorkerTest
     with Akka
     with ReindexableTable
     with MetricsSenderFixture
-    with ReindexFixtures
     with SNS
     with SQS
     with ScalaFutures {
@@ -81,10 +78,7 @@ class ReindexRequestCreatorWorkerTest
       withLocalSnsTopic { topic =>
         withReindexWorkerService(table, topic) {
           case (service, QueuePair(queue, dlq)) =>
-            val reindexJob = createReindexJobWith(
-              table = table,
-              shardId = "sierra/123"
-            )
+            val reindexJob = ReindexJob(shardId = "sierra/123")
 
             val testRecord = TestRecord(
               id = "id/111",
@@ -148,10 +142,7 @@ class ReindexRequestCreatorWorkerTest
     val badTopic = Topic("does-not-exist")
 
     withReindexWorkerService(badTable, badTopic) { case (_, QueuePair(queue, dlq)) =>
-      val reindexJob = createReindexJobWith(
-        table = badTable,
-        shardId = "sierra/123"
-      )
+      val reindexJob = ReindexJob(shardId = "sierra/123")
 
       sendNotificationToSQS(
         queue = queue,

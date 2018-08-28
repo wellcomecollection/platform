@@ -5,12 +5,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{
-  ReindexFixtures,
-  ReindexableTable
-}
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexableTable
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 case class TestRecord(
@@ -27,7 +25,6 @@ class ReindexRequestCreatorFeatureTest
     with IntegrationPatience
     with fixtures.Server
     with ReindexableTable
-    with ReindexFixtures
     with SNS
     with SQS
     with ScalaFutures {
@@ -71,10 +68,7 @@ class ReindexRequestCreatorFeatureTest
               )
             }
 
-            val reindexJob = createReindexJobWith(
-              table = table,
-              shardId = shardName
-            )
+            val reindexJob = ReindexJob(shardId = shardName)
 
             sendNotificationToSQS(
               queue = queue,
