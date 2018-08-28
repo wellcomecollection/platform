@@ -54,7 +54,7 @@ class ReindexRequestCreatorFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          val flags = snsLocalFlags(topic) ++ dynamoClientLocalFlags ++ sqsLocalFlags(
+          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(
             queue)
 
           withServer(flags) { _ =>
