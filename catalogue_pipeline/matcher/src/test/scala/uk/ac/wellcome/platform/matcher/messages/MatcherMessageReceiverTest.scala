@@ -303,7 +303,10 @@ class MatcherMessageReceiverTest
                 sourceIdentifier = aIdentifier,
                 version = 1)
 
-              sendMessage(bucket = storageBucket, queue = queuePair.queue, workAv1)
+              sendMessage(
+                bucket = storageBucket,
+                queue = queuePair.queue,
+                workAv1)
               eventually {
                 noMessagesAreWaitingIn(queuePair.queue)
                 noMessagesAreWaitingIn(queuePair.dlq)
@@ -375,8 +378,9 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def assertLastMatchedResultIs(topic: Topic,
-                                        expectedMatcherResult: MatcherResult) = {
+  private def assertLastMatchedResultIs(
+    topic: Topic,
+    expectedMatcherResult: MatcherResult) = {
 
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
