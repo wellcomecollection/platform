@@ -1,10 +1,8 @@
 package uk.ac.wellcome.platform.matcher
 
-import com.amazonaws.services.s3.AmazonS3
 import com.gu.scanamo.Scanamo
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
@@ -13,18 +11,14 @@ import uk.ac.wellcome.models.matcher.{
 }
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.MessagePointer
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.storage.ObjectLocation
 
 class MatcherFeatureTest
     extends FunSpec
     with Matchers
-    with ExtendedPatience
     with Eventually
+    with IntegrationPatience
     with MatcherFixtures
     with WorksGenerators {
 
@@ -43,14 +37,11 @@ class MatcherFeatureTest
                   lockTable) { _ =>
                   val work = createUnidentifiedWork
 
-                  val workSqsMessage: NotificationMessage =
-                    messagePointerNotificationMessage(
-                      message = toJson[TransformedBaseWork](work).get,
-                      version = 1,
-                      s3Client = s3Client,
-                      bucket = storageBucket
-                    )
-                  sendMessage(queue = queue, obj = workSqsMessage)
+                  sendMessage[TransformedBaseWork](
+                    bucket = storageBucket,
+                    queue = queue,
+                    work
+                  )
 
                   eventually {
                     val snsMessages = listMessagesReceivedFromSNS(topic)
@@ -107,14 +98,11 @@ class MatcherFeatureTest
                   )
                   Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
-                  val workSqsMessage: NotificationMessage =
-                    messagePointerNotificationMessage(
-                      message = toJson[TransformedBaseWork](workAv1).get,
-                      version = updatedWorkVersion,
-                      s3Client = s3Client,
-                      bucket = storageBucket)
-
-                  sendMessage(queue = queuePair.queue, obj = workSqsMessage)
+                  sendMessage[TransformedBaseWork](
+                    bucket = storageBucket,
+                    queue = queuePair.queue,
+                    workAv1
+                  )
 
                   eventually {
                     noMessagesAreWaitingIn(queuePair.queue)
@@ -128,17 +116,4 @@ class MatcherFeatureTest
       }
     }
   }
-
-  def messagePointerNotificationMessage(message: String,
-                                        version: Int,
-                                        s3Client: AmazonS3,
-                                        bucket: Bucket) = {
-    val key = "recorder/1/testId/dshg548.json"
-    s3Client.putObject(bucket.name, key, message)
-
-    val messagePointer = MessagePointer(ObjectLocation(bucket.name, key))
-
-    createNotificationMessageWith(message = messagePointer)
-  }
-
 }

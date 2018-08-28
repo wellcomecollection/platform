@@ -1,11 +1,8 @@
 package uk.ac.wellcome.platform.matcher.messages
 
-import com.amazonaws.services.s3.AmazonS3
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.MessagePointer
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
@@ -16,18 +13,16 @@ import uk.ac.wellcome.models.matcher.{
 }
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class MatcherMessageReceiverTest
     extends FunSpec
     with Matchers
-    with ExtendedPatience
-    with MatcherFixtures
-    with Eventually {
+    with Eventually
+    with IntegrationPatience
+    with MatcherFixtures {
 
   private val aIdentifier = aSierraSourceIdentifier("A")
   private val bIdentifier = aSierraSourceIdentifier("B")
@@ -73,13 +68,13 @@ class MatcherMessageReceiverTest
                   ))
               )
 
-            sendSQS(queue, storageBucket, invisibleWork)
-            eventually {
-              assertLastMatchedResultIs(
-                topic,
-                expectedMatchedWorks
-              )
-            }
+            processAndAssertMatchedWorkIs(
+              workToMatch = invisibleWork,
+              expectedMatchedWorks = expectedMatchedWorks,
+              queue = queue,
+              storageBucket = storageBucket,
+              topic = topic
+            )
           }
         }
       }
@@ -308,11 +303,17 @@ class MatcherMessageReceiverTest
                 sourceIdentifier = aIdentifier,
                 version = 1)
 
-              sendSQS(queuePair.queue, storageBucket, workAv1)
+              sendMessage[TransformedBaseWork](
+                bucket = storageBucket,
+                queue = queuePair.queue,
+                workAv1)
               eventually {
                 noMessagesAreWaitingIn(queuePair.queue)
                 noMessagesAreWaitingIn(queuePair.dlq)
-                assertLastMatchedResultIs(topic, expectedMatchedWorkAv2)
+                assertLastMatchedResultIs(
+                  topic = topic,
+                  expectedMatcherResult = expectedMatchedWorkAv2
+                )
               }
           }
         }
@@ -348,7 +349,11 @@ class MatcherMessageReceiverTest
                 mergeCandidates = List(MergeCandidate(bIdentifier)),
                 version = 2)
 
-              sendSQS(queue, storageBucket, differentWorkAv2)
+              sendMessage(
+                bucket = storageBucket,
+                queue = queue,
+                differentWorkAv2
+              )
               eventually {
                 assertQueueEmpty(queue)
                 assertQueueHasSize(dlq, 1)
@@ -359,55 +364,30 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def processAndAssertMatchedWorkIs(workToMatch: UnidentifiedWork,
+  private def processAndAssertMatchedWorkIs(workToMatch: TransformedBaseWork,
                                             expectedMatchedWorks: MatcherResult,
                                             queue: SQS.Queue,
                                             storageBucket: Bucket,
                                             topic: Topic): Any = {
-    sendSQS(queue, storageBucket, workToMatch)
+    sendMessage(bucket = storageBucket, queue = queue, workToMatch)
     eventually {
       assertLastMatchedResultIs(
-        topic,
-        expectedMatchedWorks
+        topic = topic,
+        expectedMatcherResult = expectedMatchedWorks
       )
     }
   }
 
-  private def assertLastMatchedResultIs(topic: Topic,
-                                        identifiersList: MatcherResult) = {
+  private def assertLastMatchedResultIs(
+    topic: Topic,
+    expectedMatcherResult: MatcherResult) = {
 
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 
-    val actualMatchedWorkLists = snsMessages.map { snsMessage =>
+    val actualMatcherResults = snsMessages.map { snsMessage =>
       fromJson[MatcherResult](snsMessage.message).get
     }
-    actualMatchedWorkLists.last shouldBe identifiersList
-  }
-
-  private def sendSQS(queue: SQS.Queue,
-                      storageBucket: Bucket,
-                      work: TransformedBaseWork) = {
-    val workSqsMessage: NotificationMessage =
-      messagePointerNotificationMessage(
-        message = toJson(work).get,
-        version = 1,
-        s3Client = s3Client,
-        bucket = storageBucket
-      )
-
-    sendMessage(queue = queue, obj = workSqsMessage)
-  }
-
-  private def messagePointerNotificationMessage(message: String,
-                                                version: Int,
-                                                s3Client: AmazonS3,
-                                                bucket: Bucket) = {
-    val key = "recorder/1/testId/dshg548.json"
-    s3Client.putObject(bucket.name, key, message)
-
-    val messagePointer = MessagePointer(ObjectLocation(bucket.name, key))
-
-    createNotificationMessageWith(message = messagePointer)
+    actualMatcherResults.last shouldBe expectedMatcherResult
   }
 }
