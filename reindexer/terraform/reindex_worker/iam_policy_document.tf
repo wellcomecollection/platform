@@ -17,8 +17,8 @@ data "aws_iam_policy_document" "vhs_read_policy" {
     ]
 
     resources = [
-      "${var.vhs_table_arn}",
-      "${var.vhs_table_arn}/index/reindexTracker",
+      "${data.aws_dynamodb_table.vhs_table.arn}",
+      "${data.aws_dynamodb_table.vhs_table.arn}/index/reindexTracker",
     ]
   }
 }
