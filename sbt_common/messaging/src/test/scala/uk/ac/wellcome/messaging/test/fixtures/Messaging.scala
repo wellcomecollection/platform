@@ -154,11 +154,8 @@ trait Messaging
       serialisedObj
     )
 
-    val examplePointer =
-      MessagePointer(ObjectLocation(location.namespace, location.key))
-
     val exampleNotification = createNotificationMessageWith(
-      message = examplePointer
+      message = location
     )
 
     toJson(exampleNotification).get
@@ -166,14 +163,14 @@ trait Messaging
 
   private def get[T](snsMessage: MessageInfo)(
     implicit decoder: Decoder[T]): T = {
-    val tryMessagePointer = fromJson[MessagePointer](snsMessage.message)
-    tryMessagePointer shouldBe a[Success[_]]
+    val tryObjectLocation = fromJson[ObjectLocation](snsMessage.message)
+    tryObjectLocation shouldBe a[Success[_]]
 
-    val messagePointer = tryMessagePointer.get
+    val objectLocation = tryObjectLocation.get
 
     getObjectFromS3[T](
-      bucket = Bucket(messagePointer.src.namespace),
-      key = messagePointer.src.key
+      bucket = Bucket(objectLocation.namespace),
+      key = objectLocation.key
     )
   }
 
