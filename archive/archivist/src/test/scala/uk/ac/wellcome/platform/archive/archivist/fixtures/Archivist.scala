@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.fixtures
 
 import java.io.{File, FileOutputStream}
+import java.net.URI
+import java.util.UUID
 import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import com.google.inject.Guice
@@ -8,16 +10,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
+import uk.ac.wellcome.platform.archive.archivist.models.IngestBagRequestNotification
+import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  AkkaS3,
-  BagIt,
-  FileEntry
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.BagName
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.storage.ObjectLocation
@@ -45,15 +41,16 @@ trait Archivist extends AkkaS3 with Messaging with BagIt {
   }
 
   def sendFakeBag[R](ingestBucket: Bucket,
+                     callbackUri: Option[URI],
                      queuePair: QueuePair,
-                     valid: Boolean = true)(testWith: TestWith[BagName, R]) = {
+                     valid: Boolean = true)(testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
 
     withBag(12, valid) {
       case (bagName, _, file) =>
-        val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
+        createBagItZip(bagName, 12, valid)
 
-        sendBag(bagName, file, ingestBucket, queuePair) { bag =>
-          testWith(bag)
+        sendBag(bagName, file, ingestBucket, callbackUri, queuePair) { case (requestId, uploadObjectLocation, bag) =>
+          testWith((requestId, uploadObjectLocation, bag))
         }
     }
   }

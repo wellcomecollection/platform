@@ -7,7 +7,9 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.flow.DownloadZipFileFlow
+import uk.ac.wellcome.platform.archive.archivist.models.{IngestRequestContext, IngestRequestContextGenerators}
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._

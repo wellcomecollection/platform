@@ -7,10 +7,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagUploaderConfig,
-  UploadConfig
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestRequestContext, UploadConfig}
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagName}
 
 import scala.concurrent.ExecutionContext

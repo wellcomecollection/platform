@@ -1,3 +1,5 @@
 package uk.ac.wellcome.platform.archive.registrar.models
 
-case class BagRegistrationCompleteNotification(storageManifest: StorageManifest)
+import java.util.UUID
+
+case class BagRegistrationCompleteNotification(archiveRequestId: UUID, storageManifest: StorageManifest)
