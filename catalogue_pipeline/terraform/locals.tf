@@ -16,11 +16,9 @@ locals {
 
   vhs_sierra_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_read_policy}"
   vhs_sierra_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_bucket_name}"
-  vhs_sierra_table_stream_arn = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_table_stream_arn}"
 
-  vhs_sourcedata_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_read_policy}"
-  vhs_sourcedata_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_bucket_name}"
-  vhs_sourcedata_table_stream_arn = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_table_stream_arn}"
+  vhs_miro_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_read_policy}"
+  vhs_miro_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_bucket_name}"
 
   identifiers_rds_cluster_password = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_password}"
   identifiers_rds_cluster_username = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_username}"

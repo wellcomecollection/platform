@@ -14,9 +14,9 @@ module "catalogue_pipeline" {
   vpc_id     = "${local.vpc_id}"
   account_id = "${data.aws_caller_identity.current.account_id}"
 
-  vhs_miro_read_policy      = "${local.vhs_sourcedata_read_policy}"
-  vhs_miro_bucket_name      = "${local.vhs_sourcedata_bucket_name}"
-  vhs_miro_table_stream_arn = "${local.vhs_sourcedata_table_stream_arn}"
+  vhs_miro_read_policy      = "${local.vhs_miro_read_policy}"
+  vhs_miro_bucket_name      = "${local.vhs_miro_bucket_name}"
+  vhs_miro_table_stream_arn = "${local.vhs_miro_table_stream_arn}"
 
   vhs_sierra_read_policy      = "${local.vhs_sierra_read_policy}"
   vhs_sierra_bucket_name      = "${local.vhs_sierra_bucket_name}"
