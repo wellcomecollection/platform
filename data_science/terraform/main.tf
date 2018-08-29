@@ -1,7 +1,7 @@
 module "harrison_pim_notebook" {
   source = "notebooks"
 
-  namespace = "noteboook"
+  namespace = "notebook"
 
   s3_bucket_name = "${aws_s3_bucket.jupyter.id}"
   s3_bucket_arn  = "${aws_s3_bucket.jupyter.arn}"
