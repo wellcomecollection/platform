@@ -18,7 +18,7 @@ module "p2_compute" {
 
 module "t2_compute" {
   source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=v11.0.0"
-  name   = "jupyter-t2"
+  name   = "jupyter-t2-${var.namespace}"
 
   key_name    = "${var.key_name}"
   bucket_name = "${var.s3_bucket_name}"
