@@ -36,20 +36,21 @@ class MessageWriterTest
             messages should have size (1)
             messages.head.subject shouldBe subject
 
-            val pointer = fromJson[MessagePointer](messages.head.message)
+            val maybeObjectLocation =
+              fromJson[ObjectLocation](messages.head.message)
 
-            pointer shouldBe a[Success[_]]
-            val messagePointer = pointer.get
+            maybeObjectLocation shouldBe a[Success[_]]
+            val objectLocation = maybeObjectLocation.get
 
-            inside(messagePointer) {
-              case MessagePointer(ObjectLocation(bucketName, key)) => {
-                bucketName shouldBe bucket.name
-                assertJsonStringsAreEqual(
-                  getContentFromS3(bucket, key),
-                  toJson(message).get
-                )
-              }
-            }
+            objectLocation.namespace shouldBe bucket.name
+
+            assertJsonStringsAreEqual(
+              getContentFromS3(
+                bucket = Bucket(objectLocation.namespace),
+                key = objectLocation.key
+              ),
+              toJson(message).get
+            )
           }
         }
       }
@@ -109,10 +110,10 @@ class MessageWriterTest
               val messages = listMessagesReceivedFromSNS(topic)
               messages should have size (2)
 
-              val pointers = messages.map(message =>
-                fromJson[MessagePointer](message.message))
+              val locations = messages.map(message =>
+                fromJson[ObjectLocation](message.message))
 
-              pointers.distinct should have size 2
+              locations.distinct should have size 2
           }
         }
       }

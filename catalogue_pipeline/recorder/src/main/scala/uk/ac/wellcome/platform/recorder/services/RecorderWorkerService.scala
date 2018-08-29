@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.recorder.services
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.{MessagePointer, MessageStream}
+import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore
@@ -28,8 +28,8 @@ class RecorderWorkerService @Inject()(
     for {
       (hybridRecord, _) <- storeInVhs(work)
       _ <- snsWriter.writeMessage(
-        toJson(MessagePointer(hybridRecord.location)).get,
-        s"Sent from ${this.getClass.getSimpleName}")
+        message = hybridRecord.location,
+        subject = s"Sent from ${this.getClass.getSimpleName}")
     } yield ()
 
   private def storeInVhs(work: TransformedBaseWork) = {

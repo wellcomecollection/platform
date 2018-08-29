@@ -47,7 +47,7 @@ class MessageWriter[T] @Inject()(
       )
       _ = debug(s"Successfully stored message $message in location: $location")
       publishAttempt <- sns.writeMessage(
-        message = MessagePointer(location),
+        message = location,
         subject = subject
       )
       _ = debug(publishAttempt)

@@ -109,13 +109,11 @@ class MessageStreamTest
         val key = "key.json"
 
         // Do NOT put S3 object here
-
-        val examplePointer =
-          MessagePointer(ObjectLocation(bucket.name, key))
+        val objectLocation = ObjectLocation(bucket.name, key)
 
         sendNotificationToSQS(
           queue = queue,
-          message = examplePointer
+          message = objectLocation
         )
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
