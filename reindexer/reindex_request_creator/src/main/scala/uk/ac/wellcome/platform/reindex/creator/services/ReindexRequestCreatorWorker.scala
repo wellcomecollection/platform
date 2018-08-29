@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReindexRequestCreatorWorker @Inject()(
   readerService: RecordReader,
-  notificationService: NotificationSender,
+  hybridRecordSender: HybridRecordSender,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage]
 )(implicit ec: ExecutionContext) {
@@ -24,7 +24,7 @@ class ReindexRequestCreatorWorker @Inject()(
         fromJson[ReindexJob](message.Message))
       outdatedRecords: List[HybridRecord] <- readerService
         .findRecordsForReindexing(reindexJob)
-      _ <- notificationService.sendNotifications(records = outdatedRecords)
+      _ <- hybridRecordSender.sendToSNS(records = outdatedRecords)
     } yield ()
 
   def stop() = system.terminate()

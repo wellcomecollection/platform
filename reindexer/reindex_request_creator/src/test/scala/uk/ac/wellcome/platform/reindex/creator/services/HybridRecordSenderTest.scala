@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class NotificationSenderTest
+class HybridRecordSenderTest
     extends FunSpec
     with Matchers
     with ExtendedPatience
@@ -23,7 +23,7 @@ class NotificationSenderTest
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
       withSNSWriter(topic) { snsWriter =>
-        val notificationSender = new NotificationSender(
+        val hybridRecordSender = new HybridRecordSender(
           snsWriter = snsWriter
         )
 
@@ -37,7 +37,7 @@ class NotificationSenderTest
           )
         }
 
-        val future = notificationSender.sendNotifications(
+        val future = hybridRecordSender.sendToSNS(
           records = hybridRecords
         )
 
@@ -55,7 +55,7 @@ class NotificationSenderTest
 
   it("returns a failed Future if there's an SNS error") {
     withSNSWriter(Topic("no-such-topic")) { snsWriter =>
-      val notificationSender = new NotificationSender(
+      val hybridRecordSender = new HybridRecordSender(
         snsWriter = snsWriter
       )
 
@@ -67,7 +67,7 @@ class NotificationSenderTest
         )
       }
 
-      val future = notificationSender.sendNotifications(records = records)
+      val future = hybridRecordSender.sendToSNS(records = records)
       whenReady(future.failed) {
         _ shouldBe a[AmazonSNSException]
       }
