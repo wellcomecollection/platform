@@ -40,15 +40,15 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the correct Work model for v1") {
-    v1swagger.at("/definitions/Work").isObject shouldBe true
-    v1swagger
+    v1response.at("/definitions/Work").isObject shouldBe true
+    v1response
       .at("/definitions/Work/properties/creators/type")
       .toString shouldBe "\"array\""
   }
 
   it("shows the includes request parameter model for v1") {
-    v1swagger.at("/definitions/Work").isObject shouldBe true
-    val parameters = v1swagger
+    v1response.at("/definitions/Work").isObject shouldBe true
+    val parameters = v1response
       .at("/paths")
       .findPath(s"/catalogue/${ApiVersions.v1.toString}/works")
       .at("/get/parameters")
@@ -59,8 +59,8 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the include request parameter model for v2") {
-    v2swagger.at("/definitions/Work").isObject shouldBe true
-    val parameters = v2swagger
+    v2response.at("/definitions/Work").isObject shouldBe true
+    val parameters = v2response
       .at("/paths")
       .findPath(s"/catalogue/${ApiVersions.v2.toString}/works")
       .at("/get/parameters")
@@ -71,51 +71,51 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the correct Work model for v2") {
-    v2swagger.at("/definitions/Work").isObject shouldBe true
-    v2swagger
+    v2response.at("/definitions/Work").isObject shouldBe true
+    v2response
       .at("/definitions/Work/properties/contributors/type")
       .toString shouldBe "\"array\""
   }
 
   it("shows the correct Subject model for v2") {
-    v2swagger.at("/definitions/Subject").isObject shouldBe true
-    v2swagger
+    v2response.at("/definitions/Subject").isObject shouldBe true
+    v2response
       .at("/definitions/Subject/properties/concepts/type")
       .toString shouldBe "\"array\""
-    v2swagger
+    v2response
       .at("/definitions/Subject/properties/concepts/items/$ref")
       .toString shouldBe "\"#/definitions/Concept\""
   }
 
   it("shows the type of contributors") {
-    v2swagger
+    v2response
       .at("/definitions/Work/properties/contributors/items/$ref")
       .toString shouldBe "\"#/definitions/Contributor\""
   }
 
   it("shows the correct Genre model for v2") {
-    v2swagger.at("/definitions/Genre").isObject shouldBe true
-    v2swagger
+    v2response.at("/definitions/Genre").isObject shouldBe true
+    v2response
       .at("/definitions/Genre/properties/concepts/type")
       .toString shouldBe "\"array\""
-    v2swagger
+    v2response
       .at("/definitions/Genre/properties/concepts/items/$ref")
       .toString shouldBe "\"#/definitions/Concept\""
   }
 
   it("doesn't show DisplayWork in the definitions") {
-    v2swagger
+    v2response
       .at("/definitions").fieldNames.asScala.toList shouldNot contain("DisplayWork")
   }
 
   it("shows Work as the items type in ResultList") {
-    v2swagger
+    v2response
       .at(s"/definitions/ResultList/properties/results/items/$$ref")
       .toString shouldBe "\"#/definitions/Work\""
   }
 
-  val v1swagger: JsonNode = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
-  val v2swagger: JsonNode = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
+  val v1response: JsonNode = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
+  val v2response: JsonNode = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
 
   def readTree(path: String): JsonNode = {
     val flags = Map(
