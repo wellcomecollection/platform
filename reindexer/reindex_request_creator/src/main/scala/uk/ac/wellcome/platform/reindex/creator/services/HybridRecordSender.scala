@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NotificationSender @Inject()(snsWriter: SNSWriter)(
+class HybridRecordSender @Inject()(snsWriter: SNSWriter)(
   implicit ec: ExecutionContext) {
   def sendNotifications(
     records: List[HybridRecord]): Future[List[PublishAttempt]] = {

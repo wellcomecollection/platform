@@ -48,13 +48,13 @@ class ReindexRequestCreatorWorkerTest
               )
 
               withSNSWriter(topic) { snsWriter =>
-                val notificationService = new NotificationSender(
+                val hybridRecordSender = new HybridRecordSender(
                   snsWriter = snsWriter
                 )
 
                 val workerService = new ReindexRequestCreatorWorker(
                   readerService = readerService,
-                  notificationService = notificationService,
+                  hybridRecordSender = hybridRecordSender,
                   sqsStream = sqsStream,
                   system = actorSystem
                 )
@@ -152,13 +152,13 @@ class ReindexRequestCreatorWorkerTest
               )
 
               withSNSWriter(Topic("does-not-exist")) { snsWriter =>
-                val notificationService = new NotificationSender(
+                val hybridRecordSender = new HybridRecordSender(
                   snsWriter = snsWriter
                 )
 
                 new ReindexRequestCreatorWorker(
                   readerService = readerService,
-                  notificationService = notificationService,
+                  hybridRecordSender = hybridRecordSender,
                   system = actorSystem,
                   sqsStream = sqsStream
                 )
