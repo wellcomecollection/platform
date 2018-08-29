@@ -12,9 +12,8 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait ArchiveProgressMonitorFixtures extends LocalProgressMonitorDynamoDb {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException]( str =>
-      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str))
-    )(
+    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
+      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
       DateTimeFormatter.ISO_INSTANT.format(_)
     )
 

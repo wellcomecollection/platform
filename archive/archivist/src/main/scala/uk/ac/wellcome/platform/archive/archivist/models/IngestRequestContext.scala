@@ -9,7 +9,6 @@ case class IngestRequestContext(requestId: UUID,
                                 bagLocation: ObjectLocation,
                                 callbackUrl: Option[URI] = None)
 
-
 object IngestRequestContext {
   def apply(notification: IngestBagRequestNotification) =
     new IngestRequestContext(

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.time.Instant
 
-case class ArchiveIngestProgress (
+case class ArchiveIngestProgress(
   id: String,
   uploadUrl: String,
   callbackUrl: String,

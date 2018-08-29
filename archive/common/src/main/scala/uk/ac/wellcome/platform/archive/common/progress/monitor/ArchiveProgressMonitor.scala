@@ -9,26 +9,28 @@ import com.google.inject.Inject
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{ArchiveIngestProgress, ProgressEvent}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  ArchiveIngestProgress,
+  ProgressEvent
+}
 import uk.ac.wellcome.storage.dynamo.{DynamoConfig, DynamoNonFatalError}
 
-class ArchiveProgressMonitor@Inject()(dynamoDbClient: AmazonDynamoDB,
-                                      dynamoConfig: DynamoConfig)
-  extends Logging {
+class ArchiveProgressMonitor @Inject()(dynamoDbClient: AmazonDynamoDB,
+                                       dynamoConfig: DynamoConfig)
+    extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException]( str =>
-      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str))
-    )(
+    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
+      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
       DateTimeFormatter.ISO_INSTANT.format(_)
     )
 
-  def create(progress: ArchiveIngestProgress)= {
+  def create(progress: ArchiveIngestProgress) = {
     val progressTable = Table[ArchiveIngestProgress](dynamoConfig.table)
 
     val ops = progressTable.given((not(attributeExists('id)))).put(progress)
 
-    Scanamo.exec(dynamoDbClient)(ops)  match {
+    Scanamo.exec(dynamoDbClient)(ops) match {
       case Left(e: ConditionalCheckFailedException) =>
         throw DynamoNonFatalError(e)
       case Left(scanamoError) =>

@@ -9,8 +9,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
-import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{
+  Registrar => RegistrarFixture
+}
+import uk.ac.wellcome.platform.archive.registrar.models.{
+  BagRegistrationCompleteNotification,
+  StorageManifest,
+  StorageManifestFactory
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,7 +43,11 @@ class RegistrarFeatureTest
           hybridTable) =>
         val requestId = UUID.randomUUID()
         val callbackUrl = new URI("http://localhsot/archiove/complete")
-        withBagNotification(requestId, Some(callbackUrl), queuePair, storageBucket) { bagLocation =>
+        withBagNotification(
+          requestId,
+          Some(callbackUrl),
+          queuePair,
+          storageBucket) { bagLocation =>
           registrar.run()
 
           implicit val _ = s3Client
@@ -48,7 +58,9 @@ class RegistrarFeatureTest
 
               eventually {
                 assertSnsReceivesOnly(
-                  BagRegistrationCompleteNotification(requestId, storageManifest),
+                  BagRegistrationCompleteNotification(
+                    requestId,
+                    storageManifest),
                   topic
                 )
 

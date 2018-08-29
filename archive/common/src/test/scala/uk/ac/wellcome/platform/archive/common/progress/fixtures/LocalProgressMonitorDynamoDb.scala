@@ -11,7 +11,8 @@ import scala.util.Random
 trait LocalProgressMonitorDynamoDb extends LocalDynamoDb {
   def createTable(table: LocalDynamoDb.Table): Table = Table("table", "index")
 
-  def createProgressMonitorTable(dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
+  def createProgressMonitorTable(
+    dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
     val tableName = Random.alphanumeric.take(10).mkString
     val tableIndex = Random.alphanumeric.take(10).mkString
     val table = Table(tableName, tableIndex)
@@ -19,9 +20,10 @@ trait LocalProgressMonitorDynamoDb extends LocalDynamoDb {
     dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(table.name)
-        .withKeySchema(new KeySchemaElement()
-          .withAttributeName("id")
-          .withKeyType(KeyType.HASH))
+        .withKeySchema(
+          new KeySchemaElement()
+            .withAttributeName("id")
+            .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
             .withAttributeName("id")

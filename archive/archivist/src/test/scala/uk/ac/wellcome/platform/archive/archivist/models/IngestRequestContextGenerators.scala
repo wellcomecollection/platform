@@ -9,8 +9,10 @@ trait IngestRequestContextGenerators {
 
   def createIngestRequestContext = createIngestRequestContextWith()
 
-  def createIngestRequestContextWith(requestId: UUID = UUID.randomUUID(),
-                                     ingestBagLocation: ObjectLocation = ObjectLocation("testNamespace", "testKey"),
-                                     callBackUrl: Option[URI] = None) =
+  def createIngestRequestContextWith(
+    requestId: UUID = UUID.randomUUID(),
+    ingestBagLocation: ObjectLocation =
+      ObjectLocation("testNamespace", "testKey"),
+    callBackUrl: Option[URI] = None) =
     IngestRequestContext(requestId, ingestBagLocation, callBackUrl)
 }

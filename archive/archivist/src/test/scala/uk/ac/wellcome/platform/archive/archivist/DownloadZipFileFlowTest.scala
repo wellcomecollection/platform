@@ -7,9 +7,14 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.archivist.flow.DownloadZipFileFlow
-import uk.ac.wellcome.platform.archive.archivist.models.{IngestRequestContext, IngestRequestContextGenerators}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  IngestRequestContext,
+  IngestRequestContextGenerators
+}
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -42,11 +47,14 @@ class DownloadZipFileFlowTest
             s3Client.putObject(storageBucket.name, uploadKey, file)
 
             val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
-            val requestContext = createIngestRequestContextWith(ingestBagLocation = objectLocation)
+            val requestContext =
+              createIngestRequestContextWith(ingestBagLocation = objectLocation)
 
             val download: Future[(ZipFile, IngestRequestContext)] =
               downloadZipFlow
-                .runWith(Source.single((objectLocation, requestContext)), Sink.head)
+                .runWith(
+                  Source.single((objectLocation, requestContext)),
+                  Sink.head)
                 ._2
 
             whenReady(download) {
