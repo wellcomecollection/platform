@@ -1,6 +1,6 @@
 module "p2_compute" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=v11.0.0"
-  name   = "jupyter-p2"
+  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=v11.7.1"
+  name   = "jupyter-p2-${var.namespace}"
 
   key_name    = "${var.key_name}"
   bucket_name = "${var.s3_bucket_name}"
@@ -13,11 +13,17 @@ module "p2_compute" {
   vpc_id      = "${var.vpc_id}"
   subnet_list = "${var.subnets}"
 
+  custom_security_groups = [
+    "${aws_security_group.efs_security_group.id}",
+  ]
+
+  efs_mount_id = "${module.efs.efs_id}"
+
   controlled_access_cidr_ingress = ["${var.controlled_access_cidr_ingress}"]
 }
 
 module "t2_compute" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=v11.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=v11.7.1"
   name   = "jupyter-t2-${var.namespace}"
 
   key_name    = "${var.key_name}"
@@ -29,6 +35,12 @@ module "t2_compute" {
 
   vpc_id      = "${var.vpc_id}"
   subnet_list = "${var.subnets}"
+
+  custom_security_groups = [
+    "${aws_security_group.efs_security_group.id}",
+  ]
+
+  efs_mount_id = "${module.efs.efs_id}"
 
   controlled_access_cidr_ingress = ["${var.controlled_access_cidr_ingress}"]
 }
