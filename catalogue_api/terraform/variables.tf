@@ -48,27 +48,27 @@ variable "infra_bucket" {}
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "romulus"
+  default     = "remus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "304a9db0d4db377b953b040386a8cafa9d912d9f"
+  default     = ""
 }
 
 variable "pinned_romulus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
+  default     = ""
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = ""
+  default     = "c2f916cc04a510d08379ea3199fb46268603b60f"
 }
 
 variable "pinned_remus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = ""
+  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
 }
 
 variable "es_config_romulus" {
@@ -87,8 +87,8 @@ variable "es_config_remus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-07-30-merging"
-    index_v2 = "v2-2018-07-30-merging"
+    index_v1 = "v1-2018-08-21-no-dynamo-stream"
+    index_v2 = "v2-2018-08-21-no-dynamo-stream"
     doc_type = "work"
   }
 }
