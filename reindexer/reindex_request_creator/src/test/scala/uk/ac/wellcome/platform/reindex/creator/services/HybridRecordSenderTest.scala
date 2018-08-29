@@ -7,6 +7,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,7 +32,10 @@ class HybridRecordSenderTest
           HybridRecord(
             id = id,
             version = 1,
-            s3key = "s3://example/mykey.txt"
+            location = ObjectLocation(
+              namespace = "s3://example-bukkit",
+              key = "mykey.txt"
+            )
           )
         }
 
@@ -61,7 +65,10 @@ class HybridRecordSenderTest
         HybridRecord(
           id = id,
           version = 1,
-          s3key = "s3://example/mykey.txt"
+          location = ObjectLocation(
+            namespace = "s3://example-bukkit",
+            key = "mykey.txt"
+          )
         )
       }
 

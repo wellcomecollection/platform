@@ -7,6 +7,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.reindex.creator.dynamo.ParallelScanner
 import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexableTable
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -25,7 +26,10 @@ class RecordReaderTest
   val exampleRecord = HybridRecord(
     id = "id",
     version = 1,
-    s3key = "s3://id"
+    location = ObjectLocation(
+      namespace = "s3://example-bukkit",
+      key = "key.json.gz"
+    )
   )
 
   it("finds records in the table") {
@@ -40,20 +44,12 @@ class RecordReaderTest
 
         val recordList = records
 
-        val expectedRecords = records.map { testRecord =>
-          HybridRecord(
-            id = testRecord.id,
-            version = testRecord.version,
-            s3key = testRecord.s3key
-          )
-        }
-
         recordList.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
         whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
-            actualRecords should contain theSameElementsAs expectedRecords
+            actualRecords should contain theSameElementsAs records
         }
       }
     }
