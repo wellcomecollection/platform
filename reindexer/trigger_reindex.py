@@ -15,8 +15,6 @@ Options:
 """
 
 import json
-import os
-import subprocess
 import sys
 
 import boto3
@@ -33,15 +31,6 @@ from dynamodb_capacity_helpers import (
 )
 
 
-# Reindex shards are added by a "reindex_shard_generator" Lambda.
-# Import the utility code that assigns reindex shards.
-ROOT = subprocess.check_output(
-    ['git', 'rev-parse', '--show-toplevel']).decode('utf8').strip()
-sys.path.append(os.path.join(ROOT, 'reindexer/reindex_shard_generator/src'))
-
-from reindex_shard_config import get_number_of_shards  # noqa
-
-
 DYNAMO_CONFIGS = {
     'miro': {'table': 'vhs-sourcedata-miro', 'maybeIndex': 'reindexTracker'},
     'sierra': {'table': 'vhs-sourcedata-sierra', 'maybeIndex': 'reindexTracker'}
@@ -50,18 +39,6 @@ DYNAMO_CONFIGS = {
 
 def get_topic_name(source_name):
     return f'reindex_jobs-{source_name}'
-
-
-def all_shard_ids(source_name):
-    """
-    Generates all the shard IDs in a given source name.
-
-    e.g. miro/1, miro/2, miro/3, ...
-    """
-    count = get_number_of_shards(source_name=source_name)
-
-    for shard_index in range(count):
-        yield f'{source_name}/{shard_index}'
 
 
 def all_messages(total_segments):
@@ -149,7 +126,6 @@ def main():
 
     post_to_slack(source_name=source_name, reason=reason)
 
-    shard_ids = all_shard_ids(source_name=source_name)
     messages = all_messages(total_segments=150)
 
     topic_arn = build_topic_arn(topic_name=get_topic_name(source_name))
@@ -192,5 +168,4 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        import sys
         sys.exit(1)
