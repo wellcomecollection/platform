@@ -37,7 +37,7 @@ class RecordReaderTest
 
   it("finds records in the specified shard") {
     withLocalDynamoDbTable { table =>
-      withReindexRecordReaderService { service =>
+      withRecordReader { reader =>
         val inShardRecords = List(
           exampleRecord.copy(id = "id1"),
           exampleRecord.copy(id = "id2")
@@ -66,7 +66,7 @@ class RecordReaderTest
         recordList.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        whenReady(service.findRecordsForReindexing(reindexJob)) {
+        whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
             actualRecords should contain theSameElementsAs expectedRecords
         }
@@ -75,8 +75,8 @@ class RecordReaderTest
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withReindexRecordReaderService { service =>
-      val future = service.findRecordsForReindexing(
+    withRecordReader { reader =>
+      val future = reader.findRecordsForReindexing(
         createReindexJobWith(Table("does-not-exist", "no-such-index")))
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
@@ -85,7 +85,7 @@ class RecordReaderTest
   }
 
   it("returns a failed Future if you don't specify a DynamoDB index") {
-    val service = new RecordReader(dynamoDbClient = dynamoDbClient)
+    val reader = new RecordReader(dynamoDbClient = dynamoDbClient)
 
     val reindexJob = createReindexJobWith(
       dynamoConfig = DynamoConfig(
@@ -94,13 +94,13 @@ class RecordReaderTest
       )
     )
 
-    val future = service.findRecordsForReindexing(reindexJob)
+    val future = reader.findRecordsForReindexing(reindexJob)
     whenReady(future.failed) {
       _ shouldBe a[ConfigurationException]
     }
   }
 
-  private def withReindexRecordReaderService(
+  private def withRecordReader(
     testWith: TestWith[RecordReader, Assertion]) = {
     val service = new RecordReader(dynamoDbClient = dynamoDbClient)
 
