@@ -40,17 +40,15 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the correct Work model for v1") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
-    tree.at("/definitions/Work").isObject shouldBe true
-    tree
+    v1swagger.at("/definitions/Work").isObject shouldBe true
+    v1swagger
       .at("/definitions/Work/properties/creators/type")
       .toString shouldBe "\"array\""
   }
 
   it("shows the includes request parameter model for v1") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
-    tree.at("/definitions/Work").isObject shouldBe true
-    val parameters = tree
+    v1swagger.at("/definitions/Work").isObject shouldBe true
+    val parameters = v1swagger
       .at("/paths")
       .findPath(s"/catalogue/${ApiVersions.v1.toString}/works")
       .at("/get/parameters")
@@ -61,9 +59,8 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the include request parameter model for v2") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions/Work").isObject shouldBe true
-    val parameters = tree
+    v2swagger.at("/definitions/Work").isObject shouldBe true
+    val parameters = v2swagger
       .at("/paths")
       .findPath(s"/catalogue/${ApiVersions.v2.toString}/works")
       .at("/get/parameters")
@@ -74,55 +71,51 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the correct Work model for v2") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions/Work").isObject shouldBe true
-    tree
+    v2swagger.at("/definitions/Work").isObject shouldBe true
+    v2swagger
       .at("/definitions/Work/properties/contributors/type")
       .toString shouldBe "\"array\""
   }
 
   it("shows the correct Subject model for v2") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions/Subject").isObject shouldBe true
-    tree
+    v2swagger.at("/definitions/Subject").isObject shouldBe true
+    v2swagger
       .at("/definitions/Subject/properties/concepts/type")
       .toString shouldBe "\"array\""
-    tree
+    v2swagger
       .at("/definitions/Subject/properties/concepts/items/$ref")
       .toString shouldBe "\"#/definitions/Concept\""
   }
 
   it("shows the type of contributors") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-
-    tree
+    v2swagger
       .at("/definitions/Work/properties/contributors/items/$ref")
       .toString shouldBe "\"#/definitions/Contributor\""
   }
 
   it("shows the correct Genre model for v2") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions/Genre").isObject shouldBe true
-    tree
+    v2swagger.at("/definitions/Genre").isObject shouldBe true
+    v2swagger
       .at("/definitions/Genre/properties/concepts/type")
       .toString shouldBe "\"array\""
-    tree
+    v2swagger
       .at("/definitions/Genre/properties/concepts/items/$ref")
       .toString shouldBe "\"#/definitions/Concept\""
   }
 
   it("doesn't show DisplayWork in the definitions") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions").fieldNames.asScala.toList shouldNot contain(
-      "DisplayWork")
+    v2swagger
+      .at("/definitions").fieldNames.asScala.toList shouldNot contain("DisplayWork")
   }
 
   it("shows Work as the items type in ResultList") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree
+    v2swagger
       .at(s"/definitions/ResultList/properties/results/items/$$ref")
       .toString shouldBe "\"#/definitions/Work\""
   }
+
+  val v1swagger: JsonNode = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
+  val v2swagger: JsonNode = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
 
   def readTree(path: String): JsonNode = {
     val flags = Map(
