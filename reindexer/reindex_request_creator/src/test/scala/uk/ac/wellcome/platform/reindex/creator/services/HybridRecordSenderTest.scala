@@ -37,7 +37,7 @@ class HybridRecordSenderTest
           )
         }
 
-        val future = hybridRecordSender.sendNotifications(
+        val future = hybridRecordSender.sendToSNS(
           records = hybridRecords
         )
 
@@ -67,7 +67,7 @@ class HybridRecordSenderTest
         )
       }
 
-      val future = hybridRecordSender.sendNotifications(records = records)
+      val future = hybridRecordSender.sendToSNS(records = records)
       whenReady(future.failed) {
         _ shouldBe a[AmazonSNSException]
       }
