@@ -15,7 +15,7 @@ module "miro_reindexer" {
 module "sierra_reindexer" {
   source = "./reindex_worker"
 
-  namespace     = "sierra"
+  namespace      = "sierra"
   vhs_table_name = "${local.vhs_sierra_table_name}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"

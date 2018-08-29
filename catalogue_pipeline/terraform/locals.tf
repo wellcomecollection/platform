@@ -14,11 +14,11 @@ locals {
   sierra_merged_items_topic_name = "${data.terraform_remote_state.sierra_adapter.merged_items_topic_name}"
   sierra_merged_bibs_topic_name  = "${data.terraform_remote_state.sierra_adapter.merged_bibs_topic_name}"
 
-  vhs_sierra_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_read_policy}"
-  vhs_sierra_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_bucket_name}"
+  vhs_sierra_read_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_read_policy}"
+  vhs_sierra_bucket_name = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_bucket_name}"
 
-  vhs_miro_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_read_policy}"
-  vhs_miro_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_bucket_name}"
+  vhs_miro_read_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_read_policy}"
+  vhs_miro_bucket_name = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_bucket_name}"
 
   identifiers_rds_cluster_password = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_password}"
   identifiers_rds_cluster_username = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_username}"
