@@ -11,11 +11,13 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   describe("all API versions") {
     it("returns a valid JSON response") {
-      allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
-        response.at("/host").toString should be("\"test.host\"")
-        response.at("/schemes").toString should be("[\"http\"]")
-        response.at("/info/version").toString should be(s""""${version.toString}"""")
-        response.at("/basePath").toString should be("")
+      allResponses.foreach {
+        case (version: ApiVersions.Value, response: JsonNode) =>
+          response.at("/host").toString should be("\"test.host\"")
+          response.at("/schemes").toString should be("[\"http\"]")
+          response.at("/info/version").toString should be(
+            s""""${version.toString}"""")
+          response.at("/basePath").toString should be("")
       }
     }
 
@@ -26,20 +28,24 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
     }
 
     it("shows only the endpoints for the specified version") {
-      allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
-        response.at("/paths").isObject shouldBe true
-        response
-          .at("/paths")
-          .fieldNames
-          .asScala
-          .toList should contain only (s"/catalogue/${version.toString}/works", s"/catalogue/${version.toString}/works/{id}")
+      allResponses.foreach {
+        case (version: ApiVersions.Value, response: JsonNode) =>
+          response.at("/paths").isObject shouldBe true
+          response
+            .at("/paths")
+            .fieldNames
+            .asScala
+            .toList should contain only (s"/catalogue/${version.toString}/works", s"/catalogue/${version.toString}/works/{id}")
       }
     }
 
     it("doesn't show DisplayWork in the definitions") {
       allResponses.values.foreach { response: JsonNode =>
         response
-          .at("/definitions").fieldNames.asScala.toList shouldNot contain("DisplayWork")
+          .at("/definitions")
+          .fieldNames
+          .asScala
+          .toList shouldNot contain("DisplayWork")
       }
     }
 
@@ -120,8 +126,10 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
     }
   }
 
-  val v1response: JsonNode = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
-  val v2response: JsonNode = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
+  val v1response: JsonNode = readTree(
+    s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
+  val v2response: JsonNode = readTree(
+    s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
 
   val allResponses = Map(
     ApiVersions.v1 -> v1response,
