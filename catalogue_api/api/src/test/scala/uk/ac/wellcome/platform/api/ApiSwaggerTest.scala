@@ -10,28 +10,24 @@ import scala.collection.JavaConverters._
 class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   it("returns a valid JSON response for all api versions") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
-
-      tree.at("/host").toString should be("\"test.host\"")
-      tree.at("/schemes").toString should be("[\"http\"]")
-      tree.at("/info/version").toString should be(s""""${version.toString}"""")
-      tree.at("/basePath").toString should be("")
+    allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
+      response.at("/host").toString should be("\"test.host\"")
+      response.at("/schemes").toString should be("[\"http\"]")
+      response.at("/info/version").toString should be(s""""${version.toString}"""")
+      response.at("/basePath").toString should be("")
     }
   }
 
   it("includes the DisplayError model all api versions") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
-      tree.at("/definitions/Error/type").toString should be("\"object\"")
+    allResponses.values.foreach { response: JsonNode =>
+      response.at("/definitions/Error/type").toString should be("\"object\"")
     }
   }
 
   it("shows only the endpoints for the specified version") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
-      tree.at("/paths").isObject shouldBe true
-      tree
+    allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
+      response.at("/paths").isObject shouldBe true
+      response
         .at("/paths")
         .fieldNames
         .asScala
@@ -116,6 +112,11 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   val v1response: JsonNode = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
   val v2response: JsonNode = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
+
+  val allResponses = Map(
+    ApiVersions.v1 -> v1response,
+    ApiVersions.v2 -> v2response,
+  )
 
   def readTree(path: String): JsonNode = {
     val flags = Map(
