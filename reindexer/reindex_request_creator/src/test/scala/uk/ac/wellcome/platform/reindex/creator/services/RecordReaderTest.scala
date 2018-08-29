@@ -100,8 +100,7 @@ class RecordReaderTest
     }
   }
 
-  private def withRecordReader(
-    testWith: TestWith[RecordReader, Assertion]) = {
+  private def withRecordReader(testWith: TestWith[RecordReader, Assertion]) = {
     val service = new RecordReader(dynamoDbClient = dynamoDbClient)
 
     testWith(service)
