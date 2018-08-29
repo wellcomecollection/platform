@@ -26,6 +26,7 @@ resource "aws_lb_listener" "http" {
 
   default_action {
     type = "redirect"
+
     redirect {
       port        = 443
       protocol    = "HTTPS"
@@ -33,7 +34,6 @@ resource "aws_lb_listener" "http" {
     }
   }
 }
-
 
 data "aws_acm_certificate" "certificate" {
   domain   = "${var.certificate_domain}"
