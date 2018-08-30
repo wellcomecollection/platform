@@ -16,7 +16,7 @@ trait MarcGenerators {
     )
 
   def createVarFieldWith(
-    marcTag: String = "XXX",
+    marcTag: String,
     indicator2: String,
     subfields: List[MarcSubfield] = List()): VarField =
     createVarFieldWith(
