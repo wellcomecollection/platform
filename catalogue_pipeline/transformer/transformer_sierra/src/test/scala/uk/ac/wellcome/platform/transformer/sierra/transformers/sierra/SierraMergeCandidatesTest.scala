@@ -34,12 +34,8 @@ class SierraMergeCandidatesTest
         )
       )
 
-      transformer.getMergeCandidates(sierraData) shouldBe List(
-        MergeCandidate(
-          SourceIdentifier(
-            IdentifierType("sierra-system-number"),
-            "Work",
-            mergeCandidateBibNumber)))
+      transformer.getMergeCandidates(sierraData) shouldBe
+        physicalAndDigitalSierraMergeCandidate(mergeCandidateBibNumber)
     }
 
     it("strips spaces in tag 776$$w and adds it as a mergeCandidate") {
@@ -50,12 +46,8 @@ class SierraMergeCandidatesTest
         )
       )
 
-      transformer.getMergeCandidates(sierraData) shouldBe List(
-        MergeCandidate(
-          SourceIdentifier(
-            IdentifierType("sierra-system-number"),
-            "Work",
-            mergeCandidateBibNumber)))
+      transformer.getMergeCandidates(sierraData) shouldBe
+        physicalAndDigitalSierraMergeCandidate(mergeCandidateBibNumber)
     }
 
     it("returns an empty list if MARC tag 776 does not contain a subfield w") {
@@ -171,18 +163,29 @@ class SierraMergeCandidatesTest
       varFields = varFields
     )
 
-    transformer.getMergeCandidates(sierraData) shouldBe List(
-      MergeCandidate(
-        SourceIdentifier(
-          identifierType = IdentifierType("sierra-system-number"),
-          ontologyType = "Work",
-          value = mergeCandidateBibNumber))) ++ singleMiroMergeCandidate(miroID)
+    val expectedMergeCandidates =
+      physicalAndDigitalSierraMergeCandidate(mergeCandidateBibNumber) ++
+        singleMiroMergeCandidate(miroID)
+
+    transformer.getMergeCandidates(sierraData) shouldBe expectedMergeCandidates
   }
 
   it("returns an empty list if there is no MARC tag 776 or 962") {
     val sierraData = createSierraBibDataWith(varFields = List())
     transformer.getMergeCandidates(sierraData) shouldBe Nil
   }
+
+  private def physicalAndDigitalSierraMergeCandidate(bibNumber: String): List[MergeCandidate] =
+    List(
+      MergeCandidate(
+        identifier = SourceIdentifier(
+          identifierType = IdentifierType("sierra-system-number"),
+          ontologyType = "Work",
+          value = bibNumber
+        ),
+        reason = Some("Physical/digitised Sierra work")
+      )
+    )
 
   private def singleMiroMergeCandidate(miroID: String): List[MergeCandidate] =
     List(

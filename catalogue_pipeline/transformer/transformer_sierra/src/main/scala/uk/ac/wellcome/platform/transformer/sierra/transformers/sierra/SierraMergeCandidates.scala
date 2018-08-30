@@ -42,11 +42,12 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
       case List(MarcSubfield(_, uklwPrefixRegex(bibNumber))) =>
         List(
           MergeCandidate(
-            SourceIdentifier(
+            identifier = SourceIdentifier(
               identifierType = IdentifierType("sierra-system-number"),
               ontologyType = "Work",
               value = bibNumber
-            )
+            ),
+            reason = Some("Physical/digitised Sierra work")
           )
         )
       case _ => List()
