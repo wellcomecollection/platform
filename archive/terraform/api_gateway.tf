@@ -1,5 +1,10 @@
 data "template_file" "archive_api_swagger" {
   template = "${file("${path.module}/archive_api_swagger.json")}"
+
+  vars = {
+    lookup_lambda_invoke_arn = "${module.lambda_archive_asset_lookup.invoke_arn}"
+    ingest_lambda_invoke_arn = "${module.lambda_archive_ingest.invoke_arn}"
+  }
 }
 
 resource "aws_api_gateway_rest_api" "archive_asset_lookup" {

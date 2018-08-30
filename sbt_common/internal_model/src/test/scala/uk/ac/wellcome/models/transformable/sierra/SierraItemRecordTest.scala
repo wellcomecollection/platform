@@ -2,11 +2,11 @@ package uk.ac.wellcome.models.transformable.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 
 import java.time.Instant
 
-class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
+class SierraItemRecordTest extends FunSpec with Matchers with SierraGenerators {
 
   it("can cast a SierraItemRecord to JSON and back again") {
     val originalRecord = createSierraItemRecord

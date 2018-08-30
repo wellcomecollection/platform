@@ -6,10 +6,8 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
   *
   * @param dynamoConfig Table and index configuration for the table to reindex.
   * @param shardId Name of the shard to reindex.
-  * @param desiredVersion Version to reindex everything in this shard to.
   */
 case class ReindexJob(
   dynamoConfig: DynamoConfig,
-  shardId: String,
-  desiredVersion: Int
+  shardId: String
 )

@@ -3,8 +3,7 @@ resource "aws_lambda_permission" "archive_asset_lookup_apigw" {
   action        = "lambda:InvokeFunction"
   function_name = "${module.lambda_archive_asset_lookup.function_name}"
   principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_deployment.test.execution_arn}/*/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.archive_asset_lookup.execution_arn}/prod/*/*"
 }
 
 module "lambda_archive_asset_lookup" {
@@ -34,22 +33,20 @@ resource "aws_lambda_permission" "archive_ingest_apigw" {
   action        = "lambda:InvokeFunction"
   function_name = "${module.lambda_archive_ingest.function_name}"
   principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_deployment.test.execution_arn}/*/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.archive_asset_lookup.execution_arn}/prod/*/*"
 }
 
 module "lambda_archive_ingest" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v11.5.0"
 
   name        = "archive_ingest"
-  module_name = "archive_ingest"
   description = "Receive ingest requests"
   timeout     = 60
   memory_size = 1024
 
   environment_variables = {
-    INGEST_TOPIC_ARN = "${module.archivist_topic.arn}"
-    REGION           = "${var.aws_region}"
+    TOPIC_ARN = "${module.archivist_topic.arn}"
+    REGION    = "${var.aws_region}"
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"

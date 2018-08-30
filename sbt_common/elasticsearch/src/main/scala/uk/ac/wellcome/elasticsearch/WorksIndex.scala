@@ -72,7 +72,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)(
   def subject(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
     keywordField("ontologyType"),
-    identified("concepts", concept)
+    identified("concepts", rootConcept)
   )
 
   def genre(fieldName: String) = objectField(fieldName).fields(
@@ -81,11 +81,21 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)(
     identified("concepts", concept)
   )
 
+  val agent = Seq(
+    textField("label"),
+    keywordField("type"),
+    keywordField("prefix"),
+    keywordField("numeration"),
+    keywordField("ontologyType")
+  )
+
   val concept = Seq(
     textField("label"),
     keywordField("ontologyType"),
     keywordField("type")
   )
+
+  val rootConcept = concept ++ agent
 
   def labelledTextField(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
@@ -102,14 +112,6 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)(
       objectField("sourceIdentifier").fields(sourceIdentifierFields),
       objectField("otherIdentifiers").fields(sourceIdentifierFields)
     )
-
-  val agent = Seq(
-    textField("label"),
-    keywordField("type"),
-    keywordField("prefix"),
-    keywordField("numeration"),
-    keywordField("ontologyType")
-  )
 
   def items(fieldName: String) = objectField(fieldName).fields(
     keywordField("canonicalId"),

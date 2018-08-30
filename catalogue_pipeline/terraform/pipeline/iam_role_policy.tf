@@ -49,6 +49,11 @@ resource "aws_iam_role_policy" "ecs_recorder_task_vhs" {
   policy = "${module.vhs_recorder.full_access_policy}"
 }
 
+resource "aws_iam_role_policy" "recorder_task_sns" {
+  role   = "${module.recorder.task_role_name}"
+  policy = "${module.recorded_works_topic.publish_policy}"
+}
+
 # Role policies for the Matcher
 
 resource "aws_iam_role_policy" "matcher_cloudwatch" {

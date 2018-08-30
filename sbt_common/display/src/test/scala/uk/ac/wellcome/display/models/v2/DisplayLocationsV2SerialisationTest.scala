@@ -4,13 +4,13 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.V2WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
 class DisplayLocationsV2SerialisationTest
     extends FunSpec
     with DisplayV2SerialisationTestBase
     with JsonMapperTestUtil
-    with WorksUtil {
+    with WorksGenerators {
 
   it("serialises a physical location") {
     val physicalLocation = PhysicalLocation(

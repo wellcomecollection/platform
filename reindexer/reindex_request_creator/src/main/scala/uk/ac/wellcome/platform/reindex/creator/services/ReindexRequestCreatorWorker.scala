@@ -6,12 +6,13 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReindexRequestCreatorWorker @Inject()(
   readerService: RecordReader,
-  notificationService: NotificationSender,
+  hybridRecordSender: HybridRecordSender,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage]
 )(implicit ec: ExecutionContext) {
@@ -21,11 +22,9 @@ class ReindexRequestCreatorWorker @Inject()(
     for {
       reindexJob: ReindexJob <- Future.fromTry(
         fromJson[ReindexJob](message.Message))
-      outdatedRecordIds: List[String] <- readerService.findRecordsForReindexing(
-        reindexJob)
-      _ <- notificationService.sendNotifications(
-        recordIds = outdatedRecordIds,
-        reindexJob = reindexJob)
+      outdatedRecords: List[HybridRecord] <- readerService
+        .findRecordsForReindexing(reindexJob)
+      _ <- hybridRecordSender.sendToSNS(records = outdatedRecords)
     } yield ()
 
   def stop() = system.terminate()

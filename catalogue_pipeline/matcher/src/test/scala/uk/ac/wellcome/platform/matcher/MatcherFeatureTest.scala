@@ -1,31 +1,26 @@
 package uk.ac.wellcome.platform.matcher
 
-import com.amazonaws.services.s3.AmazonS3
 import com.gu.scanamo.Scanamo
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
   WorkIdentifier,
   WorkNode
 }
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 
 class MatcherFeatureTest
     extends FunSpec
     with Matchers
-    with ExtendedPatience
     with Eventually
+    with IntegrationPatience
     with MatcherFixtures
-    with WorksUtil {
+    with WorksGenerators {
 
   it("processes a message with a simple UnidentifiedWork with no linked works") {
     withLocalSnsTopic { topic =>
@@ -41,17 +36,12 @@ class MatcherFeatureTest
                   graphTable,
                   lockTable) { _ =>
                   val work = createUnidentifiedWork
-                  val workId =
-                    s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}"
 
-                  val workSqsMessage: NotificationMessage =
-                    hybridRecordNotificationMessage(
-                      message = toJson(RecorderWorkEntry(work = work)).get,
-                      version = 1,
-                      s3Client = s3Client,
-                      bucket = storageBucket
-                    )
-                  sendMessage(queue = queue, obj = workSqsMessage)
+                  sendMessage[TransformedBaseWork](
+                    bucket = storageBucket,
+                    queue = queue,
+                    work
+                  )
 
                   eventually {
                     val snsMessages = listMessagesReceivedFromSNS(topic)
@@ -62,9 +52,13 @@ class MatcherFeatureTest
                         fromJson[MatcherResult](snsMessage.message).get
 
                       identifiersList shouldBe
-                        MatcherResult(Set(MatchedIdentifiers(
-                          Set(WorkIdentifier(identifier = workId, version = 1))
-                        )))
+                        MatcherResult(
+                          Set(
+                            MatchedIdentifiers(
+                              Set(WorkIdentifier(
+                                identifier = work.sourceIdentifier.toString,
+                                version = 1))
+                            )))
                     }
                   }
                 }
@@ -95,25 +89,20 @@ class MatcherFeatureTest
                   val workAv1 = createUnidentifiedWorkWith(
                     version = updatedWorkVersion
                   )
-                  val workId =
-                    s"${workAv1.sourceIdentifier.identifierType.id}/${workAv1.sourceIdentifier.value}"
 
                   val existingWorkAv2 = WorkNode(
-                    id = workId,
+                    id = workAv1.sourceIdentifier.toString,
                     version = existingWorkVersion,
                     linkedIds = Nil,
-                    componentId = workId
+                    componentId = workAv1.sourceIdentifier.toString
                   )
                   Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
-                  val workSqsMessage: NotificationMessage =
-                    hybridRecordNotificationMessage(
-                      message = toJson(RecorderWorkEntry(workAv1)).get,
-                      version = updatedWorkVersion,
-                      s3Client = s3Client,
-                      bucket = storageBucket)
-
-                  sendMessage(queue = queuePair.queue, obj = workSqsMessage)
+                  sendMessage[TransformedBaseWork](
+                    bucket = storageBucket,
+                    queue = queuePair.queue,
+                    workAv1
+                  )
 
                   eventually {
                     noMessagesAreWaitingIn(queuePair.queue)
@@ -127,21 +116,4 @@ class MatcherFeatureTest
       }
     }
   }
-
-  def hybridRecordNotificationMessage(message: String,
-                                      version: Int,
-                                      s3Client: AmazonS3,
-                                      bucket: Bucket) = {
-    val key = "recorder/1/testId/dshg548.json"
-    s3Client.putObject(bucket.name, key, message)
-
-    val hybridRecord = HybridRecord(
-      id = "testId",
-      version = version,
-      s3key = key
-    )
-
-    createNotificationMessageWith(message = hybridRecord)
-  }
-
 }

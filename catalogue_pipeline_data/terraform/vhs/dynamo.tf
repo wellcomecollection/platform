@@ -3,8 +3,8 @@ resource "aws_dynamodb_table" "table" {
   read_capacity    = 1
   write_capacity   = 1
   hash_key         = "id"
-  stream_enabled   = true
-  stream_view_type = "NEW_AND_OLD_IMAGES"
+  stream_enabled   = "${var.table_stream_enabled}"
+  stream_view_type = "${var.table_stream_enabled ? "NEW_AND_OLD_IMAGES": ""}"
 
   attribute {
     name = "id"
@@ -16,15 +16,9 @@ resource "aws_dynamodb_table" "table" {
     type = "S"
   }
 
-  attribute {
-    name = "reindexVersion"
-    type = "N"
-  }
-
   global_secondary_index {
     name            = "reindexTracker"
     hash_key        = "reindexShard"
-    range_key       = "reindexVersion"
     write_capacity  = 1
     read_capacity   = 1
     projection_type = "ALL"

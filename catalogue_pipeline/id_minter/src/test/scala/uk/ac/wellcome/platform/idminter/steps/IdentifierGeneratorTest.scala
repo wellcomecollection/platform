@@ -5,7 +5,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao,
   TableProvisioner
@@ -21,7 +21,7 @@ class IdentifierGeneratorTest
     with fixtures.IdentifiersDatabase
     with Matchers
     with MockitoSugar
-    with IdentifiersUtil {
+    with IdentifiersGenerators {
 
   def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] =
                                    None)(

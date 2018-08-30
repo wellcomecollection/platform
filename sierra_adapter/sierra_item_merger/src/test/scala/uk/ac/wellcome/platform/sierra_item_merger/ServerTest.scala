@@ -2,27 +2,30 @@ package uk.ac.wellcome.platform.sierra_item_merger
 
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 
 class ServerTest
     extends FunSpec
     with LocalVersionedHybridStore
     with fixtures.Server
-    with SQS {
+    with Messaging {
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queue =>
-      withLocalS3Bucket { itemsBucket =>
-        withLocalS3Bucket { vhsBucket =>
+      withLocalS3Bucket { itemsToDynamoBucket =>
+        withLocalS3Bucket { sierraDataBucket =>
           withLocalDynamoDbTable { table =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(
-              itemsBucket)
-            withServer(flags) { server =>
-              server.httpGet(
-                path = "/management/healthcheck",
-                andExpect = Ok,
-                withJsonBody = """{"message": "ok"}""")
+            withLocalSnsTopic { topic =>
+              val flags = messageReaderLocalFlags(itemsToDynamoBucket, queue) ++ vhsLocalFlags(
+                sierraDataBucket,
+                table) ++ snsLocalFlags(topic)
+              withServer(flags) { server =>
+                server.httpGet(
+                  path = "/management/healthcheck",
+                  andExpect = Ok,
+                  withJsonBody = """{"message": "ok"}""")
+              }
             }
           }
         }

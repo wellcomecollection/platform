@@ -3,8 +3,8 @@
 """
 Start/stop all the instances in an autoscaling group.
 
-Usage: toggle_asg.py (--start | --stop | --enable-overnight | --disable-overnight) [--type=(p2 | t2)]
-       toggle_asg.py [--type=(p2 | t2)]
+Usage: toggle_asg.py (--start | --stop | --enable-overnight | --disable-overnight) [--type=(p2 | t2)] [--namespace=<NAMESPACE>]
+       toggle_asg.py [--type=(p2 | t2)] [--namespace=<NAMESPACE>]
 
 
 Actions:
@@ -105,7 +105,8 @@ if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
     instance_type = args['--type'] or 't2'
-    tag_name = 'jupyter-%s' % instance_type
+    namespace = args['--namespace'] or 'notebook'
+    tag_name = 'jupyter-%s-%s' % (instance_type, namespace)
     scheduled_action_name = 'ensure_down'
 
     client = boto3.client('autoscaling')

@@ -2,9 +2,12 @@ package uk.ac.wellcome.models.transformable
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 
-class SierraTransformableTest extends FunSpec with Matchers with SierraUtil {
+class SierraTransformableTest
+    extends FunSpec
+    with Matchers
+    with SierraGenerators {
 
   it("allows creation of SierraTransformable with no data") {
     SierraTransformable(sierraId = createSierraBibNumber)

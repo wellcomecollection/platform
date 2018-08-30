@@ -3,9 +3,9 @@ package uk.ac.wellcome.models.work.internal
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
-class WorkTest extends FunSpec with Matchers with IdentifiersUtil {
+class WorkTest extends FunSpec with Matchers with IdentifiersGenerators {
 
   // This is based on a real failure.  We deployed a version of the API
   // with a newer model than was in Elasticsearch -- in particular, it had

@@ -1,29 +1,17 @@
-output "vhs_sourcedata_full_access_policy" {
-  value = "${module.vhs_sourcedata.full_access_policy}"
+output "vhs_miro_dynamodb_update_policy" {
+  value = "${module.vhs_miro.dynamodb_update_policy}"
 }
 
-output "vhs_sourcedata_dynamodb_update_policy" {
-  value = "${module.vhs_sourcedata.dynamodb_update_policy}"
+output "vhs_miro_read_policy" {
+  value = "${module.vhs_miro.read_policy}"
 }
 
-output "vhs_sourcedata_read_policy" {
-  value = "${module.vhs_sourcedata.read_policy}"
+output "vhs_miro_table_name" {
+  value = "${module.vhs_miro.table_name}"
 }
 
-output "vhs_sourcedata_table_name" {
-  value = "${module.vhs_sourcedata.table_name}"
-}
-
-output "vhs_sourcedata_table_stream_arn" {
-  value = "${module.vhs_sourcedata.table_stream_arn}"
-}
-
-output "vhs_sourcedata_bucket_name" {
-  value = "${module.vhs_sourcedata.bucket_name}"
-}
-
-output "vhs_sierra_full_access_policy" {
-  value = "${module.vhs_sierra.full_access_policy}"
+output "vhs_miro_bucket_name" {
+  value = "${module.vhs_miro.bucket_name}"
 }
 
 output "vhs_sierra_dynamodb_update_policy" {
@@ -38,12 +26,20 @@ output "vhs_sierra_table_name" {
   value = "${module.vhs_sierra.table_name}"
 }
 
-output "vhs_sierra_table_stream_arn" {
-  value = "${module.vhs_sierra.table_stream_arn}"
-}
-
 output "vhs_sierra_bucket_name" {
   value = "${module.vhs_sierra.bucket_name}"
+}
+
+output "vhs_sierra_items_full_access_policy" {
+  value = "${module.vhs_sierra_items.full_access_policy}"
+}
+
+output "vhs_sierra_items_table_name" {
+  value = "${module.vhs_sierra_items.table_name}"
+}
+
+output "vhs_sierra_items_bucket_name" {
+  value = "${module.vhs_sierra_items.bucket_name}"
 }
 
 output "vhs_goobi_full_access_policy" {

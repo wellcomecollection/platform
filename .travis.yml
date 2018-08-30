@@ -31,14 +31,15 @@ cache:
     - catalogue_pipeline/matcher/target
     - catalogue_pipeline/merger/target
     - catalogue_pipeline/recorder/target
-    - catalogue_pipeline/transformer/target
+    - catalogue_pipeline/transformer/transformer_common/target
+    - catalogue_pipeline/transformer/transformer_miro/target
+    - catalogue_pipeline/transformer/transformer_sierra/target
 
     - data_api/snapshot_generator/target
 
     - goobi_adapter/goobi_reader/target
 
     - reindexer/reindex_request_creator/target
-    - reindexer/reindex_request_processor/target
 
     - sbt_common/common/target
     - sbt_common/display/target
@@ -136,7 +137,9 @@ jobs:
     # - env: TASK=api_docs-build
 
     # Catalogue pipeline stack
-    - env: TASK=transformer-test
+    - env: TASK=transformer_common-test
+    - env: TASK=transformer_miro-test
+    - env: TASK=transformer_sierra-test
     - env: TASK=ingestor-test
     - env: TASK=recorder-test
     - env: TASK=matcher-test
@@ -148,7 +151,6 @@ jobs:
 
     # Reindexer stack
     - env: TASK=reindex_request_creator-test
-    - env: TASK=reindex_request_processor-test
 
     # Goobi adapter stack
     - env: TASK=goobi_reader-test

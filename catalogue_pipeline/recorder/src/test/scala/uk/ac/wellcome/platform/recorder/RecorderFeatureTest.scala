@@ -1,14 +1,13 @@
 package uk.ac.wellcome.platform.recorder
 
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -19,7 +18,7 @@ class RecorderFeatureTest
     with fixtures.Server
     with LocalVersionedHybridStore
     with Messaging
-    with WorksUtil {
+    with WorksGenerators {
 
   it("receives a transformed Work, and saves it to the VHS") {
     val work = createUnidentifiedWork
@@ -27,26 +26,26 @@ class RecorderFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          withTypeVHS[RecorderWorkEntry, EmptyMetadata, Assertion](
-            bucket = bucket,
-            table = table) { _ =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
-              bucket,
-              queue)
-            withServer(flags) { _ =>
-              sendMessage[TransformedBaseWork](
-                bucket = bucket,
-                queue = queue,
-                obj = work)
+          withLocalSnsTopic { topic =>
+            withTypeVHS[TransformedBaseWork, EmptyMetadata, Assertion](
+              bucket = bucket,
+              table = table) { _ =>
+              val flags = sqsLocalClientFlags ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
+                bucket,
+                queue) ++ snsLocalFlags(topic)
+              withServer(flags) { _ =>
+                sendMessage[TransformedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
 
-              val workEntry = RecorderWorkEntry(work)
-
-              eventually {
-                assertStored[RecorderWorkEntry](
-                  bucket,
-                  table,
-                  id = workEntry.id,
-                  record = workEntry)
+                eventually {
+                  assertStored[TransformedBaseWork](
+                    bucket,
+                    table,
+                    id = work.sourceIdentifier.toString,
+                    record = work)
+                }
               }
             }
           }

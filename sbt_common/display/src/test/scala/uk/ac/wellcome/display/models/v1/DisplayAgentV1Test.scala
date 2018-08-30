@@ -2,9 +2,12 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{Agent, Identified}
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
-class DisplayAgentV1Test extends FunSpec with Matchers with IdentifiersUtil {
+class DisplayAgentV1Test
+    extends FunSpec
+    with Matchers
+    with IdentifiersGenerators {
   it("errors if you try to serialise from an identified Agent") {
     val agent = Identified(
       agent = Agent(label = "Henry Wellcome"),

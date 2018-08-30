@@ -1,0 +1,5 @@
+<configuration>
+  <include resource="base-logback-test.xml"/>
+
+  <logger name="uk.ac.wellcome.platform.transformer" level="INFO"/>
+</configuration>

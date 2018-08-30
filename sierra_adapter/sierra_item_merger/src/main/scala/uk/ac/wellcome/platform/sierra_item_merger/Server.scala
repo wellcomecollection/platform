@@ -9,13 +9,12 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
-import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
+import uk.ac.wellcome.finatra.messaging._
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.storage.{
   DynamoClientModule,
   S3ClientModule,
-  S3ConfigModule,
   VHSConfigModule
 }
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
@@ -31,10 +30,11 @@ class Server extends HttpServer {
     VHSConfigModule,
     ExecutionContextModule,
     MetricsSenderModule,
-    SQSConfigModule,
+    SNSConfigModule,
+    SNSClientModule,
     SQSClientModule,
-    S3ConfigModule,
     S3ClientModule,
+    MessageReaderConfigModule,
     AkkaModule,
     SierraItemMergerModule,
     SierraTransformableModule

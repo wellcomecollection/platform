@@ -21,7 +21,7 @@ import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
@@ -46,7 +46,7 @@ class SnapshotServiceTest
     with GzipUtils
     with ExtendedPatience
     with ElasticsearchFixtures
-    with WorksUtil {
+    with WorksGenerators {
 
   val mapper = new ObjectMapper with ScalaObjectMapper
 

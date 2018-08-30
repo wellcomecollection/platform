@@ -4,7 +4,7 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibNumber
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.platform.sierra_reader.models.{
   SierraConfig,
   SierraResourceTypes,
@@ -26,7 +26,7 @@ class WindowManagerTest
     with S3
     with ScalaFutures
     with ExtendedPatience
-    with SierraUtil {
+    with SierraGenerators {
 
   private def withWindowManager(bucket: Bucket)(
     testWith: TestWith[WindowManager, Assertion]) = {

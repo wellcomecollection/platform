@@ -13,6 +13,7 @@ import uk.ac.wellcome.platform.archive.archivist.flow.{
 import uk.ac.wellcome.platform.archive.archivist.models.{
   BagItConfig,
   BagUploaderConfig,
+  IngestRequestContextGenerators,
   UploadConfig
 }
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -27,7 +28,8 @@ class UploadAndVerifyBagFlowTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with ArchivistFixture {
+    with ArchivistFixture
+    with IngestRequestContextGenerators {
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
@@ -50,9 +52,9 @@ class UploadAndVerifyBagFlowTest
         val (zipFile, _) = createBagItZip(bagName, 1)
 
         val uploader = UploadAndVerifyBagFlow(bagUploaderConfig)
-
+        val ingestContext = createIngestRequestContextWith()
         val (_, verification) =
-          uploader.runWith(Source.single(zipFile), Sink.ignore)
+          uploader.runWith(Source.single((zipFile, ingestContext)), Sink.ignore)
 
         whenReady(verification) { _ =>
           listKeysInBucket(storageBucket) should have size 5
@@ -71,9 +73,10 @@ class UploadAndVerifyBagFlowTest
         val (zipFile, _) = createBagItZip(bagName, 1, false)
 
         val uploader = UploadAndVerifyBagFlow(bagUploaderConfig)
+        val ingestContext = createIngestRequestContextWith()
 
         val (_, verification) =
-          uploader.runWith(Source.single(zipFile), Sink.ignore)
+          uploader.runWith(Source.single((zipFile, ingestContext)), Sink.ignore)
 
         whenReady(verification.failed) { actualException =>
           val expectedException =

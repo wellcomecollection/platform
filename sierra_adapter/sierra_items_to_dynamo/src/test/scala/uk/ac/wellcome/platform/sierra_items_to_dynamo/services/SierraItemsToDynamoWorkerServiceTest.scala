@@ -5,10 +5,10 @@ import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
@@ -21,12 +21,14 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraItemsToDynamoWorkerServiceTest
     extends FunSpec
     with LocalVersionedHybridStore
+    with SNS
     with SQS
     with Matchers
     with Eventually
@@ -34,7 +36,7 @@ class SierraItemsToDynamoWorkerServiceTest
     with Akka
     with MetricsSenderFixture
     with ScalaFutures
-    with SierraUtil {
+    with SierraGenerators {
 
   it("reads a sierra record from SQS and inserts it into DynamoDB") {
     val bibIds = createSierraBibNumbers(count = 5)
@@ -69,20 +71,23 @@ class SierraItemsToDynamoWorkerServiceTest
           withLocalSqsQueue { queue =>
             withActorSystem { actorSystem =>
               withMetricsSender(actorSystem) { metricsSender =>
-                withSierraWorkerService(
-                  versionedHybridStore,
-                  queue,
-                  actorSystem,
-                  metricsSender) { _ =>
-                  sendNotificationToSQS(queue = queue, message = record2)
+                withLocalSnsTopic { topic =>
+                  withSierraWorkerService(
+                    versionedHybridStore,
+                    topic = topic,
+                    queue,
+                    actorSystem,
+                    metricsSender) { _ =>
+                    sendNotificationToSQS(queue = queue, message = record2)
 
-                  eventually {
-                    assertStored[SierraItemRecord](
-                      bucket = bucket,
-                      table = table,
-                      id = record1.id.withoutCheckDigit,
-                      record = expectedRecord
-                    )
+                    eventually {
+                      assertStored[SierraItemRecord](
+                        bucket = bucket,
+                        table = table,
+                        id = record1.id.withoutCheckDigit,
+                        record = expectedRecord
+                      )
+                    }
                   }
                 }
               }
@@ -101,25 +106,28 @@ class SierraItemsToDynamoWorkerServiceTest
             case queuePair @ QueuePair(queue, dlq) =>
               withActorSystem { actorSystem =>
                 withMockMetricSender { metricsSender =>
-                  withSierraWorkerService(
-                    versionedHybridStore,
-                    queue,
-                    actorSystem,
-                    metricsSender) { _ =>
-                    val body =
-                      """
-                      |{
-                      | "something": "something"
-                      |}
-                    """.stripMargin
+                  withLocalSnsTopic { topic =>
+                    withSierraWorkerService(
+                      versionedHybridStore,
+                      topic = topic,
+                      queue,
+                      actorSystem,
+                      metricsSender) { _ =>
+                      val body =
+                        """
+                          |{
+                          | "something": "something"
+                          |}
+                        """.stripMargin
 
-                    sendNotificationToSQS(queue = queue, body = body)
+                      sendNotificationToSQS(queue = queue, body = body)
 
-                    eventually {
-                      assertQueueEmpty(queue)
-                      assertQueueHasSize(dlq, size = 1)
-                      verify(metricsSender, never()).incrementCount(
-                        "SierraItemsToDynamoWorkerService_ProcessMessage_failure")
+                      eventually {
+                        assertQueueEmpty(queue)
+                        assertQueueHasSize(dlq, size = 1)
+                        verify(metricsSender, never()).incrementCount(
+                          "SierraItemsToDynamoWorkerService_ProcessMessage_failure")
+                      }
                     }
                   }
                 }
@@ -158,6 +166,7 @@ class SierraItemsToDynamoWorkerServiceTest
     versionedHybridStore: VersionedHybridStore[SierraItemRecord,
                                                EmptyMetadata,
                                                ObjectStore[SierraItemRecord]],
+    topic: Topic,
     queue: Queue,
     actorSystem: ActorSystem,
     metricsSender: MetricsSender
@@ -165,13 +174,16 @@ class SierraItemsToDynamoWorkerServiceTest
     withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) {
       sqsStream =>
         val dynamoInserter = new DynamoInserter(versionedHybridStore)
-        val service = new SierraItemsToDynamoWorkerService(
-          system = actorSystem,
-          sqsStream = sqsStream,
-          dynamoInserter = dynamoInserter
-        )
+        withSNSWriter(topic) { snsWriter =>
+          val service = new SierraItemsToDynamoWorkerService(
+            system = actorSystem,
+            sqsStream = sqsStream,
+            dynamoInserter = dynamoInserter,
+            snsWriter = snsWriter
+          )
 
-        testWith(service)
+          testWith(service)
+        }
     }
 
   def withItemRecordVHS[R](table: Table, bucket: Bucket)(

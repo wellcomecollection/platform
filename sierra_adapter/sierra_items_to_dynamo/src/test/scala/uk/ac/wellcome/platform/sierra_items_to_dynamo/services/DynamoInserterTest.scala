@@ -6,7 +6,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -29,7 +29,7 @@ class DynamoInserterTest
     with MockitoSugar
     with DynamoInserterFixture
     with ExtendedPatience
-    with SierraUtil {
+    with SierraGenerators {
 
   it("inserts an ItemRecord into the VHS") {
     withLocalDynamoDbTable { table =>
@@ -225,7 +225,6 @@ class DynamoInserterTest
 
             whenReady(futureUnit) { _ =>
               val actualContents = getContentFor(
-                bucket = bucket,
                 table = table,
                 id = oldRecord.id.withoutCheckDigit
               )

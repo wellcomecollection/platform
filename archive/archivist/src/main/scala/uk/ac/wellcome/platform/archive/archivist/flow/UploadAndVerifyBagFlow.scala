@@ -9,6 +9,7 @@ import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.{
   BagUploaderConfig,
+  IngestRequestContext,
   UploadConfig
 }
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagName}
@@ -23,20 +24,24 @@ object UploadAndVerifyBagFlow extends Logging {
     materializer: ActorMaterializer,
     s3Client: S3Client,
     executionContext: ExecutionContext
-  ): Flow[ZipFile, BagLocation, NotUsed] = {
+  ): Flow[(ZipFile, IngestRequestContext),
+          (BagLocation, IngestRequestContext),
+          NotUsed] = {
 
-    Flow[ZipFile].flatMapConcat(zipFile => {
-      Source
-        .single(zipFile)
-        .mapConcat(bagNames)
-        .map(bagName =>
-          (bagName, createBagLocation(bagName, config.uploadConfig)))
-        .map {
-          case (bagName, bagLocation) =>
-            materializeArchiveBagFlow(zipFile, bagLocation, config)
-        }
-        .flatMapConcat(Source.fromFuture)
-    })
+    Flow[(ZipFile, IngestRequestContext)].flatMapConcat {
+      case (zipFile, ingestRequestContext) =>
+        Source
+          .single(zipFile)
+          .mapConcat(bagNames)
+          .map(bagName =>
+            (bagName, createBagLocation(bagName, config.uploadConfig)))
+          .map {
+            case (bagName, bagLocation) =>
+              materializeArchiveBagFlow(zipFile, bagLocation, config)
+          }
+          .flatMapConcat(Source.fromFuture)
+          .map((_, ingestRequestContext))
+    }
   }
 
   private def materializeArchiveBagFlow(

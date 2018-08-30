@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.{
   ElasticsearchServiceFixture,
   WorksServiceFixture
@@ -14,7 +14,7 @@ class WorksServiceTest
     with WorksServiceFixture
     with Matchers
     with ScalaFutures
-    with WorksUtil {
+    with WorksGenerators {
 
   val itemType = "work"
 

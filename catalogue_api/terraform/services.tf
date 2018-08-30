@@ -40,8 +40,9 @@ module "api_romulus_delta" {
   namespace_id    = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   private_subnets = "${local.private_subnets}"
 
-  alb_id           = "${module.load_balancer.id}"
-  alb_listener_arn = "${module.load_balancer.https_listener_arn}"
+  alb_id                 = "${module.load_balancer.id}"
+  alb_listener_arn_https = "${module.load_balancer.https_listener_arn}"
+  alb_listener_arn_http  = "${module.load_balancer.http_listener_arn}"
 
   sidecar_container_image = "${local.romulus_nginx_uri}"
   app_container_image     = "${local.romulus_app_uri}"
@@ -68,8 +69,9 @@ module "api_remus_delta" {
   namespace_id    = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   private_subnets = "${local.private_subnets}"
 
-  alb_id           = "${module.load_balancer.id}"
-  alb_listener_arn = "${module.load_balancer.https_listener_arn}"
+  alb_id                 = "${module.load_balancer.id}"
+  alb_listener_arn_https = "${module.load_balancer.https_listener_arn}"
+  alb_listener_arn_http  = "${module.load_balancer.http_listener_arn}"
 
   sidecar_container_image = "${local.remus_nginx_uri}"
   app_container_image     = "${local.remus_app_uri}"

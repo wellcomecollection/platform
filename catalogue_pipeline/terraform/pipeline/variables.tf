@@ -51,7 +51,8 @@ variable "es_cluster_credentials" {
   type = "map"
 }
 
-variable "transformer_container_image" {}
+variable "transformer_miro_container_image" {}
+variable "transformer_sierra_container_image" {}
 
 variable "recorder_container_image" {}
 
@@ -68,3 +69,11 @@ variable "index_v1" {}
 variable "index_v2" {}
 
 variable "rds_access_security_group_id" {}
+
+variable "miro_adapter_topic_names" {
+  type = "list"
+}
+
+variable "sierra_adapter_topic_names" {
+  type = "list"
+}

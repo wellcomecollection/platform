@@ -8,14 +8,16 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
+import uk.ac.wellcome.platform.reindex.creator.fixtures.{
+  ReindexFixtures,
+  ReindexableTable
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -24,7 +26,7 @@ class ReindexRequestCreatorWorkerTest
     with Matchers
     with MockitoSugar
     with Akka
-    with LocalDynamoDbVersioned
+    with ReindexableTable
     with MetricsSenderFixture
     with ReindexFixtures
     with SNS
@@ -46,13 +48,13 @@ class ReindexRequestCreatorWorkerTest
               )
 
               withSNSWriter(topic) { snsWriter =>
-                val notificationService = new NotificationSender(
+                val hybridRecordSender = new HybridRecordSender(
                   snsWriter = snsWriter
                 )
 
                 val workerService = new ReindexRequestCreatorWorker(
                   readerService = readerService,
-                  notificationService = notificationService,
+                  hybridRecordSender = hybridRecordSender,
                   sqsStream = sqsStream,
                   system = actorSystem
                 )
@@ -76,25 +78,23 @@ class ReindexRequestCreatorWorkerTest
           case (service, QueuePair(queue, dlq)) =>
             val reindexJob = createReindexJobWith(
               table = table,
-              shardId = "sierra/123",
-              desiredVersion = 6
+              shardId = "sierra/123"
             )
 
             val testRecord = TestRecord(
               id = "id/111",
               version = 1,
-              someData = "A dire daliance directly dancing due down.",
-              reindexShard = reindexJob.shardId,
-              reindexVersion = reindexJob.desiredVersion - 1
+              s3key = "s3://id/111",
+              reindexShard = reindexJob.shardId
             )
 
             Scanamo.put(dynamoDbClient)(table.name)(testRecord)
 
-            val expectedRecords = Seq(
-              ReindexRequest(
+            val expectedRecords = List(
+              HybridRecord(
                 id = testRecord.id,
-                desiredVersion = reindexJob.desiredVersion,
-                tableName = table.name
+                version = testRecord.version,
+                s3key = testRecord.s3key
               )
             )
 
@@ -104,10 +104,10 @@ class ReindexRequestCreatorWorkerTest
             )
 
             eventually {
-              val actualRecords: Seq[ReindexRequest] =
+              val actualRecords: Seq[HybridRecord] =
                 listMessagesReceivedFromSNS(topic)
                   .map { _.message }
-                  .map { fromJson[ReindexRequest](_).get }
+                  .map { fromJson[HybridRecord](_).get }
                   .distinct
 
               actualRecords shouldBe expectedRecords
@@ -152,13 +152,13 @@ class ReindexRequestCreatorWorkerTest
               )
 
               withSNSWriter(Topic("does-not-exist")) { snsWriter =>
-                val notificationService = new NotificationSender(
+                val hybridRecordSender = new HybridRecordSender(
                   snsWriter = snsWriter
                 )
 
                 new ReindexRequestCreatorWorker(
                   readerService = readerService,
-                  notificationService = notificationService,
+                  hybridRecordSender = hybridRecordSender,
                   system = actorSystem,
                   sqsStream = sqsStream
                 )

@@ -4,13 +4,13 @@ import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import org.scalacheck.ScalacheckShapeless._
 
 class DisplayWorkV2Test
     extends FunSpec
     with Matchers
-    with WorksUtil
+    with WorksGenerators
     with PropertyChecks {
 
   it("parses a Work without any items") {

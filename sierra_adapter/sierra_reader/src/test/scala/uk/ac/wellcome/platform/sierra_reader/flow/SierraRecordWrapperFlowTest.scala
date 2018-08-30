@@ -15,7 +15,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
@@ -28,7 +28,7 @@ class SierraRecordWrapperFlowTest
     with ExtendedPatience
     with Matchers
     with JsonAssertions
-    with SierraUtil {
+    with SierraGenerators {
 
   private def withRecordWrapperFlow[T <: AbstractSierraRecord](
     actorSystem: ActorSystem,

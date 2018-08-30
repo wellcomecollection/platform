@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 
@@ -20,7 +20,7 @@ class IngestorFeatureTest
     with ElasticsearchFixtures
     with Messaging
     with SQS
-    with WorksUtil {
+    with WorksGenerators {
 
   val itemType = "work"
 

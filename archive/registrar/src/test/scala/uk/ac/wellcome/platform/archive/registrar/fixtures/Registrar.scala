@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.archive.registrar.fixtures
 
+import java.net.URI
+import java.util.UUID
+
 import com.amazonaws.services.dynamodbv2.model._
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
@@ -39,20 +42,24 @@ trait Registrar
     with BagIt
     with LocalDynamoDb {
 
-  def sendNotification(bagLocation: BagLocation, queuePair: QueuePair) =
+  def sendNotification(requestId: UUID,
+                       bagLocation: BagLocation,
+                       callbackUrl: Option[URI],
+                       queuePair: QueuePair) =
     sendNotificationToSQS(
       queuePair.queue,
-      BagArchiveCompleteNotification(bagLocation)
+      BagArchiveCompleteNotification(requestId, bagLocation, callbackUrl)
     )
 
   def withBagNotification[R](
+    requestId: UUID,
+    callbackUrl: Option[URI],
     queuePair: QueuePair,
     storageBucket: Bucket,
     dataFileCount: Int = 1,
     valid: Boolean = true)(testWith: TestWith[BagLocation, R]) = {
     withBag(storageBucket, dataFileCount, valid) { bagLocation =>
-      sendNotification(bagLocation, queuePair)
-
+      sendNotification(requestId, bagLocation, callbackUrl, queuePair)
       testWith(bagLocation)
     }
   }

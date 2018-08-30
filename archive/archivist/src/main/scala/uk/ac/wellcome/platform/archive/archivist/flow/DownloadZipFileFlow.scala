@@ -8,35 +8,37 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{FileIO, Flow, Source}
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContext
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.util.{Failure, Success}
 
 object DownloadZipFileFlow extends Logging {
-  def apply()(
-    implicit s3Client: S3Client,
-    materializer: ActorMaterializer): Flow[ObjectLocation, ZipFile, NotUsed] = {
+  def apply()(implicit s3Client: S3Client, materializer: ActorMaterializer)
+    : Flow[(ObjectLocation, IngestRequestContext),
+           (ZipFile, IngestRequestContext),
+           NotUsed] = {
 
-    Flow[ObjectLocation]
+    Flow[(ObjectLocation, IngestRequestContext)]
       .log("download location")
-      .flatMapConcat(objectLocation => {
+      .flatMapConcat {
+        case (objectLocation, ingestRequestContext) =>
+          val (downloadStream, _) = s3Client.download(
+            objectLocation.namespace,
+            objectLocation.key
+          )
 
-        val (downloadStream, _) = s3Client.download(
-          objectLocation.namespace,
-          objectLocation.key
-        )
+          val tmpFile = File.createTempFile("archivist", ".tmp")
+          val fileSink = FileIO.toPath(tmpFile.toPath)
 
-        val tmpFile = File.createTempFile("archivist", ".tmp")
-        val fileSink = FileIO.toPath(tmpFile.toPath)
-
-        Source
-          .fromFuture(downloadStream.runWith(fileSink))
-          .map(_.status)
-          .map {
-            case Success(_) => new ZipFile(tmpFile)
-            case Failure(e) => throw e
-          }
-      })
+          Source
+            .fromFuture(downloadStream.runWith(fileSink))
+            .map(_.status)
+            .map {
+              case Success(_) => (new ZipFile(tmpFile), ingestRequestContext)
+              case Failure(e) => throw e
+            }
+      }
       .log("downloaded zipfile")
   }
 }

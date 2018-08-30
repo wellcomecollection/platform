@@ -15,3 +15,7 @@ variable "table_read_max_capacity" {
 variable "table_write_max_capacity" {
   default = 300
 }
+
+variable "table_stream_enabled" {
+  default = true
+}

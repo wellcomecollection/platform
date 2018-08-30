@@ -15,14 +15,16 @@ class ServerTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          val flags = messageReaderLocalFlags(bucket, queue) ++ vhsLocalFlags(
-            bucket,
-            table)
-          withServer(flags) { server =>
-            server.httpGet(
-              path = "/management/healthcheck",
-              andExpect = Ok,
-              withJsonBody = """{"message": "ok"}""")
+          withLocalSnsTopic { topic =>
+            val flags = messageReaderLocalFlags(bucket, queue) ++ vhsLocalFlags(
+              bucket,
+              table) ++ snsLocalFlags(topic)
+            withServer(flags) { server =>
+              server.httpGet(
+                path = "/management/healthcheck",
+                andExpect = Ok,
+                withJsonBody = """{"message": "ok"}""")
+            }
           }
         }
       }

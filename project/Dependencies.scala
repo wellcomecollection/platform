@@ -1,3 +1,4 @@
+import WellcomeDependencies.versions
 import sbt._
 
 object WellcomeDependencies {
@@ -5,21 +6,27 @@ object WellcomeDependencies {
     val json = "1.0.0"
     val monitoring = "1.1.0"
     val storage = "1.5.0"
+    val storage_new = "2.0.0"
   }
 
   val jsonLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" % "json_2.12" % versions.json,
-    "uk.ac.wellcome" % "json_2.12" % versions.json % "test" classifier "tests"
+    "uk.ac.wellcome" %% "json" % versions.json,
+    "uk.ac.wellcome" %% "json" % versions.json % "test" classifier "tests"
   )
 
   val monitoringLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" % "monitoring_2.12" % versions.monitoring,
-    "uk.ac.wellcome" % "monitoring_2.12" % versions.monitoring % "test" classifier "tests"
+    "uk.ac.wellcome" %% "monitoring" % versions.monitoring,
+    "uk.ac.wellcome" %% "monitoring" % versions.monitoring % "test" classifier "tests"
   )
 
   val storageLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" % "storage_2.12" % versions.storage,
-    "uk.ac.wellcome" % "storage_2.12" % versions.storage % "test" classifier "tests"
+    "uk.ac.wellcome" %% "storage" % versions.storage,
+    "uk.ac.wellcome" %% "storage" % versions.storage % "test" classifier "tests"
+  )
+
+  val newStorageLibrary: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" %% "storage" % versions.storage_new,
+    "uk.ac.wellcome" %% "storage" % versions.storage_new % "test" classifier "tests"
   )
 }
 
@@ -38,7 +45,7 @@ object Dependencies {
     val junitInterface = "0.11"
     val elastic4s = "5.6.5"
     val scanamo = "1.0.0-M3"
-    val circeVersion = "0.9.0"
+    val circeVersion = "0.9.3"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
     val scalaCsv = "1.3.5"

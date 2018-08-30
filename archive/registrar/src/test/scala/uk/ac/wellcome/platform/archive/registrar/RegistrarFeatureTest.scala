@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.archive.registrar
 
+import java.net.URI
+import java.util.UUID
+
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
@@ -38,7 +41,13 @@ class RegistrarFeatureTest
           registrar,
           hybridBucket,
           hybridTable) =>
-        withBagNotification(queuePair, storageBucket) { bagLocation =>
+        val requestId = UUID.randomUUID()
+        val callbackUrl = new URI("http://localhsot/archiove/complete")
+        withBagNotification(
+          requestId,
+          Some(callbackUrl),
+          queuePair,
+          storageBucket) { bagLocation =>
           registrar.run()
 
           implicit val _ = s3Client
@@ -49,7 +58,9 @@ class RegistrarFeatureTest
 
               eventually {
                 assertSnsReceivesOnly(
-                  BagRegistrationCompleteNotification(storageManifest),
+                  BagRegistrationCompleteNotification(
+                    requestId,
+                    storageManifest),
                   topic
                 )
 
