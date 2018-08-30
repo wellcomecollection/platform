@@ -8,6 +8,8 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
+  SierraBibData,
+  SierraMaterialType,
   VarField
 }
 import uk.ac.wellcome.platform.transformer.sierra.generators.{
@@ -102,10 +104,8 @@ class SierraMergeCandidatesTest
   describe("single-page Miro/Sierra work") {
     it("extracts a MIRO ID from a URL in MARC tag 962 subfield u") {
       val miroID = "A0123456"
-      val bibData = createSierraBibDataWith(
-        varFields = create962subfieldsWith(
-          urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html")
-        )
+      val bibData = createMiroPictureWith(
+        urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html")
       )
 
       transformer.getMergeCandidates(bibData) shouldBe List(
@@ -120,12 +120,10 @@ class SierraMergeCandidatesTest
     }
 
     it("does not put a merge candidate for multiple distinct instances of 962 subfield u") {
-      val bibData = createSierraBibDataWith(
-        varFields = create962subfieldsWith(
-          urls = List(
-            "http://wellcomeimages.org/indexplus/image/A0000001.html",
-            "http://wellcomeimages.org/ixbin/hixclient?MIROPAC=B0000001"
-          )
+      val bibData = createMiroPictureWith(
+        urls = List(
+          "http://wellcomeimages.org/indexplus/image/A0000001.html",
+          "http://wellcomeimages.org/ixbin/hixclient?MIROPAC=B0000001"
         )
       )
 
@@ -134,12 +132,10 @@ class SierraMergeCandidatesTest
 
     it("creates a merge candidate if multiple URLs point to the same Miro ID") {
       val miroID = "C0000001"
-      val bibData = createSierraBibDataWith(
-        varFields = create962subfieldsWith(
-          urls = List(
-            s"http://wellcomeimages.org/indexplus/image/$miroID.html",
-            s"http://wellcomeimages.org/ixbin/hixclient?MIROPAC=$miroID"
-          )
+      val bibData = createMiroPictureWith(
+        urls = List(
+          s"http://wellcomeimages.org/indexplus/image/$miroID.html",
+          s"http://wellcomeimages.org/ixbin/hixclient?MIROPAC=$miroID"
         )
       )
 
@@ -155,10 +151,8 @@ class SierraMergeCandidatesTest
     }
 
     it("does not create a merge candidate if the URL is unrecognised") {
-      val bibData = createSierraBibDataWith(
-        varFields = create962subfieldsWith(
-          urls = List("http://film.wellcome.ac.uk:15151/mediaplayer.html?fug_7340-1&pw=524ph=600.html")
-        )
+      val bibData = createMiroPictureWith(
+        urls = List("http://film.wellcome.ac.uk:15151/mediaplayer.html?fug_7340-1&pw=524ph=600.html")
       )
 
       transformer.getMergeCandidates(bibData) shouldBe List()
@@ -169,6 +163,12 @@ class SierraMergeCandidatesTest
     val sierraData = createSierraBibDataWith(varFields = List())
     transformer.getMergeCandidates(sierraData) shouldBe Nil
   }
+
+  private def createMiroPictureWith(urls: List[String]): SierraBibData =
+    createSierraBibDataWith(
+      materialType = Some(SierraMaterialType(code = "k")),
+      varFields = create962subfieldsWith(urls = urls)
+    )
 
   private def create962subfieldsWith(urls: List[String]): List[VarField] =
     urls.map { url =>
