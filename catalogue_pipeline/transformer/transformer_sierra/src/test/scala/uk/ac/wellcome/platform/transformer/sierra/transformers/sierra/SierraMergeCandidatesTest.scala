@@ -96,6 +96,35 @@ class SierraMergeCandidatesTest
     }
   }
 
+  describe("single-page Miro/Sierra work") {
+    it("extracts a MIRO ID from a URL in MARC tag 962 subfield u") {
+      val miroID = "A0123456"
+      val bibData = createSierraBibDataWith(
+        varFields = List(
+          createVarFieldWith(
+            marcTag = "962",
+            subfields = List(
+              MarcSubfield(
+                tag = "u",
+                content = s"http://wellcomeimages.org/indexplus/image/$miroID.html"
+              )
+            )
+          )
+        )
+      )
+
+      transformer.getMergeCandidates(bibData) shouldBe List(
+        MergeCandidate(
+          identifier = SourceIdentifier(
+            identifierType = IdentifierType("miro-image-number"),
+            ontologyType = "Work",
+            value = miroID
+          )
+        )
+      )
+    }
+  }
+
   it("returns an empty list if there is no MARC tag 776") {
     val sierraData = createSierraBibDataWith(varFields = List())
     transformer.getMergeCandidates(sierraData) shouldBe Nil
