@@ -88,7 +88,8 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
                 identifierType = IdentifierType("miro-image-number"),
                 ontologyType = "Work",
                 value = miroID
-              )
+              ),
+              reason = Some("Single page Miro/Sierra work")
             )
           )
           case _ => List()

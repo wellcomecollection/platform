@@ -188,7 +188,8 @@ class SierraMergeCandidatesTest
           identifierType = IdentifierType("miro-image-number"),
           ontologyType = "Work",
           value = miroID
-        )
+        ),
+        reason = Some("Single page Miro/Sierra work")
       )
     )
 
