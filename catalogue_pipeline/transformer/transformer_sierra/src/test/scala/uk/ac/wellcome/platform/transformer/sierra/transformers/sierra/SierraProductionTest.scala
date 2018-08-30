@@ -3,15 +3,13 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
-import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
 class SierraProductionTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
 
   it("returns an empty list if neither 260 nor 264 are present") {
@@ -127,9 +125,8 @@ class SierraProductionTest
 
     it("picks up multiple instances of the 260 field") {
       val varFields = List(
-        VarField(
-          marcTag = Some("260"),
-          fieldTag = "a",
+        createVarFieldWith(
+          marcTag = "260",
           subfields = List(
             MarcSubfield(tag = "a", content = "London"),
             MarcSubfield(tag = "b", content = "Arts Council of Great Britain"),
@@ -139,9 +136,8 @@ class SierraProductionTest
             MarcSubfield(tag = "g", content = "1974")
           )
         ),
-        VarField(
-          marcTag = Some("260"),
-          fieldTag = "a",
+        createVarFieldWith(
+          marcTag = "260",
           subfields = List(
             MarcSubfield(tag = "a", content = "Bethesda, Md"),
             MarcSubfield(
@@ -255,10 +251,9 @@ class SierraProductionTest
 
       it("throws an error if the 2nd indicator is unrecognised") {
         val varFields = List(
-          VarField(
-            marcTag = Some("264"),
-            fieldTag = "a",
-            indicator2 = Some("x")
+          createVarFieldWith(
+            marcTag = "264",
+            indicator2 = "x"
           )
         )
 
@@ -273,18 +268,16 @@ class SierraProductionTest
     it(
       "ignores instances of the 264 field related to copyright (2nd indicator 4)") {
       val varFields = List(
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "a",
-          indicator2 = Some("4"),
+        createVarFieldWith(
+          marcTag = "264",
+          indicator2 = "4",
           subfields = List(
             MarcSubfield(tag = "c", content = "copyright 2005")
           )
         ),
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "a",
-          indicator2 = Some("3"),
+        createVarFieldWith(
+          marcTag = "264",
+          indicator2 = "3",
           subfields = List(
             MarcSubfield(tag = "a", content = "Cambridge"),
             MarcSubfield(tag = "b", content = "Kinsey Printing Company")
@@ -306,18 +299,16 @@ class SierraProductionTest
 
     it("ignores instances of the 264 field with an empty 2nd indicator") {
       val varFields = List(
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "a",
-          indicator2 = Some(" "),
+        createVarFieldWith(
+          marcTag = "264",
+          indicator2 = " ",
           subfields = List(
             MarcSubfield(tag = "c", content = "copyright 2005")
           )
         ),
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "a",
-          indicator2 = Some("3"),
+        createVarFieldWith(
+          marcTag = "264",
+          indicator2 = "3",
           subfields = List(
             MarcSubfield(tag = "a", content = "London"),
             MarcSubfield(tag = "b", content = "Wellcome Collection Publishing")
@@ -339,20 +330,18 @@ class SierraProductionTest
 
     it("picks up multiple instances of the 264 field") {
       val varFields = List(
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "a",
-          indicator2 = Some("1"),
+        createVarFieldWith(
+          marcTag = "264",
+          indicator2 = "1",
           subfields = List(
             MarcSubfield(tag = "a", content = "Columbia, S.C."),
             MarcSubfield(tag = "b", content = "H.W. Williams Co."),
             MarcSubfield(tag = "c", content = "1982")
           )
         ),
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "a",
-          indicator2 = Some("2"),
+        createVarFieldWith(
+          marcTag = "264",
+          indicator2 = "2",
           subfields = List(
             MarcSubfield(tag = "a", content = "Washington"),
             MarcSubfield(tag = "b", content = "U.S. G.P.O."),
@@ -384,16 +373,14 @@ class SierraProductionTest
     it("throws an error if both 260 and 264 are present") {
       transformVarFieldsAndAssertIsError(
         varFields = List(
-          VarField(
-            marcTag = Some("260"),
-            fieldTag = "p",
+          createVarFieldWith(
+            marcTag = "260",
             subfields = List(
               MarcSubfield(tag = "a", content = "Paris")
             )
           ),
-          VarField(
-            marcTag = Some("264"),
-            fieldTag = "p",
+          createVarFieldWith(
+            marcTag = "264",
             subfields = List(
               MarcSubfield(tag = "a", content = "London")
             )
@@ -405,18 +392,16 @@ class SierraProductionTest
     it(
       "uses field 260 if field 264 only contains a copyright statement in subfield c") {
       val varFields = List(
-        VarField(
-          marcTag = Some("260"),
-          fieldTag = "p",
+        createVarFieldWith(
+          marcTag = "260",
           subfields = List(
             MarcSubfield(tag = "a", content = "San Francisco"),
             MarcSubfield(tag = "b", content = "Morgan Kaufmann Publishers"),
             MarcSubfield(tag = "c", content = "2004")
           )
         ),
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "p",
+        createVarFieldWith(
+          marcTag = "264",
           subfields = List(
             MarcSubfield(tag = "c", content = "©2004")
           )
@@ -445,14 +430,12 @@ class SierraProductionTest
       )
 
       val varFields = List(
-        VarField(
-          marcTag = Some("260"),
-          fieldTag = "p",
+        createVarFieldWith(
+          marcTag = "260",
           subfields = subfields
         ),
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "p",
+        createVarFieldWith(
+          marcTag = "264",
           subfields = subfields
         )
       )
@@ -476,9 +459,8 @@ class SierraProductionTest
 
   private def transform260ToProduction(subfields: List[MarcSubfield]) = {
     val varFields = List(
-      VarField(
-        marcTag = Some("260"),
-        fieldTag = "a",
+      createVarFieldWith(
+        marcTag = "260",
         subfields = subfields
       )
     )
@@ -488,11 +470,10 @@ class SierraProductionTest
 
   private def transform264ToProduction(subfields: List[MarcSubfield]) = {
     val varFields = List(
-      VarField(
-        marcTag = Some("264"),
-        fieldTag = "a",
-        subfields = subfields,
-        indicator2 = Some("1")
+      createVarFieldWith(
+        marcTag = "264",
+        indicator2 = "1",
+        subfields = subfields
       )
     )
 
@@ -502,10 +483,9 @@ class SierraProductionTest
   private def checkProductionFunctionFor264(indicator2: String,
                                             expectedFunction: String) = {
     val varFields = List(
-      VarField(
-        marcTag = Some("264"),
-        fieldTag = "a",
-        indicator2 = Some(indicator2)
+      createVarFieldWith(
+        marcTag = "264",
+        indicator2 = indicator2
       )
     )
 
