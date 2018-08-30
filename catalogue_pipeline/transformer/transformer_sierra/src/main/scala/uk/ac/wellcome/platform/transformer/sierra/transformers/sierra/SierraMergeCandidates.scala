@@ -12,7 +12,8 @@ import scala.util.matching.Regex
 trait SierraMergeCandidates extends MarcUtils {
 
   def getMergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] =
-    get776mergeCandidates(sierraBibData)
+    get776mergeCandidates(sierraBibData) ++
+      getSinglePageMiroMergeCandidates(sierraBibData)
 
   // This regex matches any string starting with (UkLW), followed by
   // any number of spaces, and then captures everything after the
@@ -46,5 +47,18 @@ trait SierraMergeCandidates extends MarcUtils {
         )
       case _ => List()
     }
+  }
+
+  /** We can merge a single-page Miro and Sierra work if:
+    *
+    *   - The Sierra work has type "Picture" or "Digital images"
+    *   - There's exactly one Miro ID in MARC tag 962 subfield $u
+    *     (if there's more than one Miro ID, we can't do a merge).
+    *   - There's exactly one item on the Sierra record (if there's more
+    *     than one item, we don't know where to put the Miro location).
+    *
+    */
+  private def getSinglePageMiroMergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] = {
+    List()
   }
 }
