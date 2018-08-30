@@ -67,7 +67,7 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
 
     val maybeMiroIDs: List[String] = matchingSubfields
       .map { _.content }
-      .map { maybeGetMiroID(_).get }
+      .flatMap { maybeGetMiroID }
       .distinct
 
     maybeMiroIDs match {
