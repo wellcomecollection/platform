@@ -2,12 +2,10 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.sierra.generators.MarcGenerators
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 
-class SierraConceptsTest extends FunSpec with Matchers {
+class SierraConceptsTest extends FunSpec with Matchers with MarcGenerators {
 
   it("extracts identifiers from subfield 0") {
     val concept =
@@ -15,11 +13,7 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
-      varField = VarField(
-        fieldTag = "p",
-        marcTag = "655",
-        indicator1 = "",
-        indicator2 = "0",
+      varField = createVarFieldWith(
         subfields = List(
           MarcSubfield(tag = "a", content = "pilots"),
           MarcSubfield(tag = "0", content = "lcsh/ppp")
@@ -44,11 +38,7 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
-      varField = VarField(
-        fieldTag = "p",
-        marcTag = "655",
-        indicator1 = "",
-        indicator2 = "0",
+      varField = createVarFieldWith(
         subfields = List(
           MarcSubfield(tag = "a", content = "martians"),
           MarcSubfield(tag = "0", content = "lcsh/bbb"),
@@ -84,11 +74,7 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
-      varField = VarField(
-        fieldTag = "p",
-        marcTag = "655",
-        indicator1 = "",
-        indicator2 = "0",
+      varField = createVarFieldWith(
         subfields = List(
           MarcSubfield(tag = "a", content = "hitchhiking"),
           MarcSubfield(tag = "0", content = "u/xxx"),

@@ -3,15 +3,13 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
-import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
 class SierraContributorsTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
 
   val transformer = new SierraContributors {}
@@ -24,48 +22,33 @@ class SierraContributorsTest
 
   it("extracts a mixture of Person and Organisation contributors") {
     val varFields = List(
-      VarField(
-        fieldTag = "p",
+      createVarFieldWith(
         marcTag = "100",
-        indicator1 = "",
-        indicator2 = "",
         subfields = List(
           MarcSubfield(tag = "a", content = "Sarah the soybean")
         )
       ),
-      VarField(
-        fieldTag = "p",
+      createVarFieldWith(
         marcTag = "100",
-        indicator1 = "",
-        indicator2 = "",
         subfields = List(
           MarcSubfield(tag = "a", content = "Sam the squash"),
           MarcSubfield(tag = "c", content = "Sir")
         )
       ),
-      VarField(
-        fieldTag = "p",
+      createVarFieldWith(
         marcTag = "110",
-        indicator1 = "",
-        indicator2 = "",
         subfields = List(
           MarcSubfield(tag = "a", content = "Spinach Solicitors")
         )
       ),
-      VarField(
-        fieldTag = "p",
+      createVarFieldWith(
         marcTag = "700",
-        indicator1 = "",
-        indicator2 = "",
         subfields = List(
           MarcSubfield(tag = "a", content = "Sebastian the sugarsnap")
         )
       ),
-      VarField(
-        fieldTag = "p",
+      createVarFieldWith(
         marcTag = "710",
-        indicator1 = "",
-        indicator2 = "",
         subfields = List(
           MarcSubfield(tag = "a", content = "Shallot Swimmers")
         )
@@ -90,11 +73,8 @@ class SierraContributorsTest
       val name = "Carol the Carrot"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name))
         )
       )
@@ -112,11 +92,8 @@ class SierraContributorsTest
       val name = "Bertrand the Beetroot"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "700",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name))
         )
       )
@@ -140,25 +117,16 @@ class SierraContributorsTest
       // we deliberately pick an ordering that's different from that for
       // the MARC fields, so we can check it really is applying this rule.
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "700",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name2))
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name1))
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "700",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name3))
         )
       )
@@ -179,11 +147,8 @@ class SierraContributorsTest
       val prefix = "Dr"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "c", content = prefix)
@@ -211,11 +176,8 @@ class SierraContributorsTest
       val prefix = "Rev"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "c", content = prefix)
@@ -244,11 +206,8 @@ class SierraContributorsTest
       val prefix2 = "Mr"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "c", content = prefix1),
@@ -277,11 +236,8 @@ class SierraContributorsTest
       val numeration = "LX"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "b", content = numeration)
@@ -307,11 +263,8 @@ class SierraContributorsTest
       val role2 = "flavour"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "e", content = role1),
@@ -337,11 +290,8 @@ class SierraContributorsTest
       val lcshCode = "lcsh7101607"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = lcshCode)
@@ -380,11 +330,8 @@ class SierraContributorsTest
       val lcshCode4 = "lcsh 2055034.,"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = lcshCode1),
@@ -418,11 +365,8 @@ class SierraContributorsTest
       "does not identify the contributor if there are multiple distinct identifiers in subfield $$0") {
       val name = "Darren the Dill"
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = "lcsh9069541"),
@@ -448,11 +392,8 @@ class SierraContributorsTest
       val name = "Ona the orache"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "110",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name))
         )
       )
@@ -470,11 +411,8 @@ class SierraContributorsTest
       val name = "Karl the kale"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "710",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name))
         )
       )
@@ -498,25 +436,16 @@ class SierraContributorsTest
       // we deliberately pick an ordering that's different from that for
       // the MARC fields, so we can check it really is applying this rule.
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "710",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name2))
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "110",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name1))
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "710",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(MarcSubfield(tag = "a", content = name3))
         )
       )
@@ -538,11 +467,8 @@ class SierraContributorsTest
       val role2 = "colouring"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "110",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "e", content = role1),
@@ -568,11 +494,8 @@ class SierraContributorsTest
       val lcshCode = "lcsh7212"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "110",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = lcshCode)
@@ -607,11 +530,8 @@ class SierraContributorsTest
       val lcshCode3 = " lc sh 6791210"
 
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "110",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = lcshCode1),
@@ -644,11 +564,8 @@ class SierraContributorsTest
       "does not identify the contributor if there are multiple distinct identifiers in subfield $$0") {
       val name = "Luke the lime"
       val varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "110",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = "lcsh3349285"),
@@ -671,11 +588,8 @@ class SierraContributorsTest
 
   it("fails the transform if subfield $$a is missing") {
     val varFields = List(
-      VarField(
-        fieldTag = "p",
+      createVarFieldWith(
         marcTag = "100",
-        indicator1 = "",
-        indicator2 = "",
         subfields = List()
       )
     )
