@@ -44,6 +44,7 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
         case uklwPrefixRegex(bibNumber) => Some(bibNumber)
         case _ => None
       }
+      .distinct
 
     maybeBibNumbers match {
       case List(Some(bibNumber)) => List(

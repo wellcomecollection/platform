@@ -85,6 +85,21 @@ class SierraMergeCandidatesTest
 
       transformer.getMergeCandidates(bibData) shouldBe List()
     }
+
+    it("creates a merge candidate if there are multiple 776$$w for the same value") {
+      val bibData = createSierraBibDataWith(
+        varFields = create776subfieldsWith(
+          ids = List(
+            s"(UkLW)  $mergeCandidateBibNumber",
+            s"(UkLW)  $mergeCandidateBibNumber",
+            s"(UkLW)$mergeCandidateBibNumber",
+          )
+        )
+      )
+
+      transformer.getMergeCandidates(bibData) shouldBe
+        physicalAndDigitalSierraMergeCandidate(mergeCandidateBibNumber)
+    }
   }
 
   describe("single-page Miro/Sierra work") {
