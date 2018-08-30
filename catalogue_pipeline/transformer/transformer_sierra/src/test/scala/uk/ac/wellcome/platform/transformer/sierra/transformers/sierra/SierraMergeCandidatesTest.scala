@@ -25,9 +25,10 @@ class SierraMergeCandidatesTest
 
   val transformer = new SierraMergeCandidates {}
 
+  val mergeCandidateBibNumber = "b21414440"
+
   describe("physical/digital Sierra work") {
     it("extracts the bib number in 776$$w as a mergeCandidate") {
-      val mergeCandidateBibNumber = "b21414440"
       val sierraData = createSierraBibDataWith(
         varFields = create776subfieldsWith(
           ids = List(s"(UkLW)$mergeCandidateBibNumber")
@@ -39,7 +40,6 @@ class SierraMergeCandidatesTest
     }
 
     it("strips spaces in tag 776$$w and adds it as a mergeCandidate") {
-      val mergeCandidateBibNumber = "b21414440"
       val sierraData = createSierraBibDataWith(
         varFields = create776subfieldsWith(
           ids = List(s"(UkLW)  $mergeCandidateBibNumber")
@@ -152,8 +152,6 @@ class SierraMergeCandidatesTest
   }
 
   it("creates merge candidates for both physical/digital Sierra works and Miro works") {
-    val mergeCandidateBibNumber = "b12345678"
-
     val varFields =
       create776subfieldsWith(ids = List(s"(UkLW)$mergeCandidateBibNumber")) ++
       create962subfieldsWith(urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html"))
