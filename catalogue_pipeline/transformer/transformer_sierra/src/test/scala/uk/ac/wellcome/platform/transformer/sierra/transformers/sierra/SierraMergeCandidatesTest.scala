@@ -75,8 +75,17 @@ class SierraMergeCandidatesTest
 
       transformer.getMergeCandidates(sierraData) shouldBe Nil
     }
-  }
 
+    it("does not create a merge candidate if there are multiple distinct instances of 776$$w") {
+      val bibData = createSierraBibDataWith(
+        varFields = create776subfieldsWith(
+          ids = List(s"(UkLW)  $mergeCandidateBibNumber", "(UkLW)b12345678")
+        )
+      )
+
+      transformer.getMergeCandidates(bibData) shouldBe List()
+    }
+  }
 
   describe("single-page Miro/Sierra work") {
     it("extracts a MIRO ID from a URL in MARC tag 962 subfield u") {
