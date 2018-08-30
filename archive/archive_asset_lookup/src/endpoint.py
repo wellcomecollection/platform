@@ -1,21 +1,19 @@
-import os
-import tempfile
 import boto3
 import botocore
-import settings
 import json
+import os
+import settings
+import tempfile
 from boto3.dynamodb.conditions import Key
 
 
 def main(event, context):
-
     dynamodb = boto3.resource('dynamodb', region_name=settings.REGION)
     s3 = boto3.resource('s3', region_name=settings.REGION)
     lookup(dynamodb, s3, event)
 
 
 def wrapResult(message, success, status=500):
-
     statusCode = 200
     if success and status != 500:
         statusCode = status
@@ -113,8 +111,8 @@ def lookup(dynamodb, s3, event):
 
 def event_is_valid(event):
     return 'pathParameters' in event \
-        and event['pathParameters'] is not None \
-        and 'id' in event['pathParameters']
+           and event['pathParameters'] is not None \
+           and 'id' in event['pathParameters']
 
 
 def data_items_populated(data_items):

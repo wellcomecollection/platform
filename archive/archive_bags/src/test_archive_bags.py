@@ -13,11 +13,21 @@ def test_looks_up_manifest(dynamodb_client, s3_client):
     manifest_id = 'b12345678x'
     stored_manifest = { 'manifest': manifest_id }
 
-    given_manifest_in_vhs(manifest_id, stored_manifest, dynamodb_client, s3_client)
+    given_manifest_in_vhs(
+        manifest_id,
+        stored_manifest,
+        dynamodb_client,
+        s3_client
+    )
 
     request = { 'id': manifest_id }
 
-    response = archive_bags.handler(request, None, dynamodb_client, s3_client)
+    response = archive_bags.handler(
+        request,
+        None,
+        dynamodb_client,
+        s3_client
+    )
 
     assert response == stored_manifest
 
