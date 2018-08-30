@@ -26,8 +26,8 @@ module "catalogue_pipeline" {
   messages_bucket = "${aws_s3_bucket.messages.id}"
   infra_bucket    = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-08-21-no-dynamo-stream"
-  index_v2 = "v2-2018-08-21-no-dynamo-stream"
+  index_v1 = "v1-2018-08-30-parallel-scan-reindexer"
+  index_v2 = "v2-2018-08-30-parallel-scan-reindexer"
 
   rds_access_security_group_id = "${local.rds_access_security_group_id}"
 
