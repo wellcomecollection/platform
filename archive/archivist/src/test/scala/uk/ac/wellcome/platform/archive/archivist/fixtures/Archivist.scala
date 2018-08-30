@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.fixtures
 
 import java.io.{File, FileOutputStream}
+import java.net.URI
+import java.util.UUID
 import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import com.google.inject.Guice
@@ -8,6 +10,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.platform.archive.archivist.models.IngestBagRequestNotification
 import uk.ac.wellcome.platform.archive.archivist.modules.{
   ConfigModule,
   TestAppConfigModule
@@ -29,27 +32,38 @@ trait Archivist extends AkkaS3 with Messaging with BagIt {
   def sendBag[R](bagName: BagName,
                  file: File,
                  ingestBucket: Bucket,
-                 queuePair: QueuePair)(testWith: TestWith[BagName, R]) = {
+                 callbackUri: Option[URI],
+                 queuePair: QueuePair)(
+    testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
     val uploadKey = s"upload/path/$bagName.zip"
 
     s3Client.putObject(ingestBucket.name, uploadKey, file)
 
-    val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
-    sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
+    val uploadedBagLocation = ObjectLocation(ingestBucket.name, uploadKey)
+    val ingestRequestId = UUID.randomUUID()
+    sendNotificationToSQS(
+      queuePair.queue,
+      IngestBagRequestNotification(
+        ingestRequestId,
+        uploadedBagLocation,
+        callbackUri))
 
-    testWith(bagName)
+    testWith((ingestRequestId, uploadedBagLocation, bagName))
   }
 
   def sendFakeBag[R](ingestBucket: Bucket,
+                     callbackUri: Option[URI],
                      queuePair: QueuePair,
-                     valid: Boolean = true)(testWith: TestWith[BagName, R]) = {
+                     valid: Boolean = true)(
+    testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
 
     withBag(12, valid) {
       case (bagName, _, file) =>
-        val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
+        createBagItZip(bagName, 12, valid)
 
-        sendBag(bagName, file, ingestBucket, queuePair) { bag =>
-          testWith(bag)
+        sendBag(bagName, file, ingestBucket, callbackUri, queuePair) {
+          case (requestId, uploadObjectLocation, bag) =>
+            testWith((requestId, uploadObjectLocation, bag))
         }
     }
   }

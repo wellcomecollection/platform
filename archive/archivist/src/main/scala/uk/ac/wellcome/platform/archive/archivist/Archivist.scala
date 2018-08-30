@@ -15,10 +15,13 @@ import uk.ac.wellcome.platform.archive.archivist.flow.{
   DownloadZipFileFlow,
   UploadAndVerifyBagFlow
 }
-import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagUploaderConfig,
+  IngestBagRequestNotification,
+  IngestRequestContext
+}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
-import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -46,7 +49,7 @@ trait Archivist extends Logging {
     val workFlow =
       Flow[NotificationMessage]
         .log("notification message")
-        .map(getObjectLocation)
+        .map(parseNotification)
         .log("download location")
         .via(DownloadZipFileFlow())
         .log("download zip")
@@ -57,9 +60,12 @@ trait Archivist extends Logging {
     messageStream.run("archivist", workFlow)
   }
 
-  private def getObjectLocation(message: NotificationMessage) = {
-    fromJson[ObjectLocation](message.Message) match {
-      case Success(location) => location
+  private def parseNotification(message: NotificationMessage) = {
+    fromJson[IngestBagRequestNotification](message.Message) match {
+      case Success(bagRequestNotification: IngestBagRequestNotification) =>
+        (
+          bagRequestNotification.bagLocation,
+          IngestRequestContext(bagRequestNotification))
       case Failure(e) =>
         throw new RuntimeException(
           s"Failed to get object location from notification: ${e.getMessage}"

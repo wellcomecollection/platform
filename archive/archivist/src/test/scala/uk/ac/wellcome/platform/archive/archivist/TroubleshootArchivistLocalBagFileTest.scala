@@ -8,6 +8,7 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
 import uk.ac.wellcome.platform.archive.common.models.BagName
+
 @Ignore
 // Useful test to troubleshoot running the archivist using a local bagfile
 class TroubleshootArchivistLocalBagFileTest
@@ -28,6 +29,7 @@ class TroubleshootArchivistLocalBagFileTest
               "b24923333-b.zip"
             ).mkString("/")),
           ingestBucket,
+          None,
           queuePair) { invalidBag =>
           archivist.run()
 
