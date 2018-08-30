@@ -10,7 +10,6 @@ module "lambda_archive_bags" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v11.5.0"
 
   name        = "archive_bags"
-  module_name = "endpoint"
   description = "Serve requests for storage manifests"
   timeout     = 60
   memory_size = 1024

@@ -16,7 +16,7 @@ logger = daiquiri.getLogger()
 
 
 @log_on_error
-def handler(event, _, dynamodb_client, s3_client):
+def main(event, _, dynamodb_client, s3_client):
     vhs_table_name = os.environ['VHS_TABLE_NAME']
     vhs_bucket_name = os.environ['VHS_BUCKET_NAME']
 
