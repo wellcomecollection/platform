@@ -28,20 +28,6 @@ trait SierraDataGenerators extends IdentifiersGenerators with SierraGenerators {
 
   def createSierraBibData: SierraBibData = createSierraBibDataWith()
 
-  def bibData(marcTag: String, marcSubfields: List[MarcSubfield]) = {
-    createSierraBibDataWith(
-      varFields = List(
-        VarField(
-          fieldTag = "p",
-          marcTag = marcTag,
-          indicator1 = "",
-          indicator2 = "",
-          subfields = marcSubfields
-        )
-      )
-    )
-  }
-
   def createSierraItemDataWith(
     deleted: Boolean = false,
     location: Option[SierraSourceLocation] = None
