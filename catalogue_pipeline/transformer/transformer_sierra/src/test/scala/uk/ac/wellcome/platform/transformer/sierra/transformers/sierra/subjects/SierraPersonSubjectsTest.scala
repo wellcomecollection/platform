@@ -3,10 +3,7 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
 class SierraPersonSubjectsTest
@@ -183,11 +180,8 @@ class SierraPersonSubjectsTest
 
     val sierraBibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "600",
-          indicator1 = "",
-          indicator2 = "0",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = lcshCode)
@@ -211,10 +205,8 @@ class SierraPersonSubjectsTest
     val name = "Gerry the Garlic"
     val sierraBibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "600",
-          indicator1 = "",
           indicator2 = "2",
           subfields = List(
             MarcSubfield(tag = "a", content = name),

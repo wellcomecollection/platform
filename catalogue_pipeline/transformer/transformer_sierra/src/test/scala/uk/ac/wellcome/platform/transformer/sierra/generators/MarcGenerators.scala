@@ -14,4 +14,14 @@ trait MarcGenerators {
       indicator2 = indicator2,
       subfields = subfields
     )
+
+  def createVarFieldWith(
+    marcTag: String = "XXX",
+    indicator2: String,
+    subfields: List[MarcSubfield] = List()): VarField =
+    createVarFieldWith(
+      marcTag = marcTag,
+      indicator2 = Some(indicator2),
+      subfields = subfields
+    )
 }

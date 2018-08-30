@@ -2,10 +2,7 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
 class SierraConceptSubjectsTest
@@ -152,21 +149,15 @@ class SierraConceptSubjectsTest
   it("returns subjects for multiple 650 tags with different subfields") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "650",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = "A1 Content"),
             MarcSubfield(tag = "z", content = "Z1 Content")
           )
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "650",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = "A2 Content"),
             MarcSubfield(tag = "v", content = "V2 Content")
@@ -244,10 +235,8 @@ class SierraConceptSubjectsTest
   it(s"gets identifiers from subfield $$0") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "650",
-          indicator1 = "",
           // LCSH heading
           indicator2 = "0",
           subfields = List(
@@ -255,10 +244,8 @@ class SierraConceptSubjectsTest
             MarcSubfield(tag = "0", content = "lcsh/123")
           )
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "650",
-          indicator1 = "",
           // MESH heading
           indicator2 = "2",
           subfields = List(
@@ -299,20 +286,16 @@ class SierraConceptSubjectsTest
   it("ignores subject with second indicator 7") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "650",
-          indicator1 = "",
           indicator2 = "7",
           subfields = List(
             MarcSubfield(tag = "a", content = "absence"),
             MarcSubfield(tag = "0", content = "lcsh/123")
           )
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "650",
-          indicator1 = "",
           // MESH heading
           indicator2 = "2",
           subfields = List(
@@ -341,10 +324,8 @@ class SierraConceptSubjectsTest
   it("Ignores a subject with second indicator 7 but no subfield 0") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "650",
-          indicator1 = "",
           indicator2 = "7",
           subfields = List(
             MarcSubfield(tag = "a", content = "abolition")
