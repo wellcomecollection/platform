@@ -17,17 +17,26 @@ trait WellcomeImagesURLParser {
   //
   //    L0046161, V0033167F1, V0032544ECL
   //
-  private val miroID: Regex = "[A-Z][0-9]{7}[A-Z]{0,3}[0-9]?".r
+  private val miroIDregex: Regex = "[A-Z][0-9]{7}[A-Z]{0,3}[0-9]?".r
 
-  // One of the forms of a Wellcome Images URL.  Examples:
+  // Examples:
   //
   //    http://wellcomeimages.org/indexplus/image/L0046161.html
   //    http://wellcomeimages.org/indexplus/image/L0041574.html.html
   //
-  private val indexPlusURL: Regex = s"^http://wellcomeimages\\.org/indexplus/image/($miroID)(?:\\.html){0,2}$$".r.anchored
+  private val indexPlusURL: Regex = s"^http://wellcomeimages\\.org/indexplus/image/($miroIDregex)(?:\\.html){0,2}$$".r.anchored
+
+  // Examples:
+  //
+  //    http://wellcomeimages.org/ixbin/hixclient?MIROPAC=L0076330
+  //    http://wellcomeimages.org/ixbin/hixclient?MIROPAC=V0000492EB
+  //    http://wellcomeimages.org/ixbin/hixclient?MIROPAC=V0031553F1
+  //
+  private val hixClientURL: Regex = s"^http://wellcomeimages\\.org/ixbin/hixclient\\?MIROPAC=($miroIDregex)$$".r.anchored
 
   def maybeGetMiroID(url: String): Option[String] = url match {
     case indexPlusURL(miroID) => Some(miroID)
+    case hixClientURL(miroID) => Some(miroID)
     case _ => None
   }
 }

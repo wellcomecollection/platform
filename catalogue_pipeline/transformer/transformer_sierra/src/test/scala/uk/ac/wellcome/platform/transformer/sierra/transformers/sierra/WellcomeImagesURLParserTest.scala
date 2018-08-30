@@ -23,6 +23,12 @@ class WellcomeImagesURLParserTest extends FunSpec with Matchers {
     }
   }
 
+  it("ixbin/hixclient URLs") {
+    assertURLTemplateParsedCorrectly { miroID =>
+      s"http://wellcomeimages.org/ixbin/hixclient?MIROPAC=$miroID"
+    }
+  }
+
   val transformer = new WellcomeImagesURLParser {}
 
   private def assertURLTemplateParsedCorrectly(createURL: (String) => String) = {
