@@ -20,6 +20,11 @@ class WellcomeImagesURLParserTest extends FunSpec with Matchers {
 
   val transformer = new WellcomeImagesURLParser {}
 
-  private def assertURLParsedCorrectly(url: String, miroID: String) =
-    transformer.maybeGetMiroID(url) shouldBe Some(miroID)
+  private def assertURLParsedCorrectly(url: String, miroID: String) = {
+    val result = transformer.maybeGetMiroID(url)
+    if (result.isEmpty) {
+      println(s"$url did not return a Miro ID")
+    }
+    result shouldBe Some(miroID)
+  }
 }
