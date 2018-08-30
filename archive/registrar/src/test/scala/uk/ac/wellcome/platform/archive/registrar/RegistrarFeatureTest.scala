@@ -42,7 +42,8 @@ class RegistrarFeatureTest
           hybridBucket,
           hybridTable) =>
         val requestId = UUID.randomUUID()
-        val callbackUrl = new URI("http://localhsot/archiove/complete")
+        val callbackUrl = new URI("http://localhost/archive/complete")
+
         withBagNotification(
           requestId,
           Some(callbackUrl),

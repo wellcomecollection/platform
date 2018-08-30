@@ -7,10 +7,16 @@ Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>] [--topic=<TOPIC_
        trigger_archive_bag.py -h | --help
 
 Options:
+  sns                    Send directly to SNS rather than through the API
+                         [default: false]
   --bucket=<BUCKET_NAME> The S3 bucket containing the bags.
                          [default: wellcomecollection-assets-archive-ingest]
   --topic=<TOPIC_NAME>   The archivist topic.
                          [default: archive-storage_archivist]
+<<<<<<< HEAD:archive/archivist/trigger_archive_bag.py
+   --api=<API>           The API enndpoint to use
+                         [default: http://api.wellcomecollection.org/prod/storage/v1/ingest]
+=======
    --api=<API>           The API endpoint to use
                          [default: http://api.wellcomecollection.org/prod/storage/v1/ingests]
    --sns=(true|false)    Send directly to SNS rather than through the API
@@ -18,10 +24,10 @@ Options:
   -h --help              Print this help message
 """
 
-import docopt
 import boto3
-import requests
+import docopt
 import json
+import requests
 
 
 def archive_bag_sns_messages(bags, bucket):
@@ -107,4 +113,5 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         import sys
+
         sys.exit(1)

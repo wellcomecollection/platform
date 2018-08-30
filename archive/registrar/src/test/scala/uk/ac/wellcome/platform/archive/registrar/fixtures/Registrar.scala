@@ -6,7 +6,6 @@ import java.util.UUID
 import com.amazonaws.services.dynamodbv2.model._
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
@@ -26,6 +25,7 @@ import uk.ac.wellcome.platform.archive.registrar.modules.{
   TestAppConfigModule,
   VHSModule
 }
+import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{
@@ -33,7 +33,6 @@ import uk.ac.wellcome.storage.fixtures.{
   LocalVersionedHybridStore
 }
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 
 trait Registrar
     extends AkkaS3
@@ -79,7 +78,11 @@ trait Registrar
     fileEntries.map((entry: FileEntry) => {
       List(bagLocation.storagePath, entry.name).mkString("/")
       s3Client
-        .putObject(bagLocation.storageNamespace, entry.name, entry.contents)
+        .putObject(
+          bagLocation.storageNamespace,
+          s"${storagePrefix}/${entry.name}",
+          entry.contents
+        )
     })
 
     testWith(bagLocation)

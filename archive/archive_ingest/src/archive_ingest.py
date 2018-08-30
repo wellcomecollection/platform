@@ -3,15 +3,13 @@
 Receives a message to ingest a bag giving the URL and publishes the archive event to an SNS topic.
 """
 
+import boto3
+import daiquiri
 import os
 import uuid
 from urllib.parse import urlparse
-
-import boto3
-import daiquiri
-
-from wellcome_aws_utils.sns_utils import publish_sns_message
 from wellcome_aws_utils.lambda_utils import log_on_error
+from wellcome_aws_utils.sns_utils import publish_sns_message
 
 daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
@@ -69,10 +67,10 @@ def main(event, context=None, sns_client=None):
     sns_client = sns_client or boto3.client('sns')
 
     publish_sns_message(
-            sns_client=sns_client,
-            topic_arn=topic_arn,
-            message=message,
-            subject=f"source: archive_ingest ({topic_name})"
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        message=message,
+        subject=f"source: archive_ingest ({topic_name})"
     )
     logger.debug(f"published: {message} to {topic_arn}")
 

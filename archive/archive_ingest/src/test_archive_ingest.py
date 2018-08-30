@@ -1,9 +1,8 @@
 # -*- encoding: utf-8 -*-
 
-from uuid import UUID
-
 import archive_ingest
 import pytest
+from uuid import UUID
 
 
 def test_sends_location_to_sns(sns_client, topic_arn):
@@ -56,7 +55,8 @@ def test_invalid_url_fails(sns_client):
 def test_missing_url_fails(sns_client):
     request = {"body": {'unknownKey': 'aValue'}}
 
-    with pytest.raises(KeyError, match="\[BadRequest\] Invalid request missing 'uploadUrl' in {'unknownKey': 'aValue'}"):
+    with pytest.raises(KeyError,
+                       match="\[BadRequest\] Invalid request missing 'uploadUrl' in {'unknownKey': 'aValue'}"):
         archive_ingest.main(event=request, sns_client=sns_client)
 
     assert len(sns_client.list_messages()) == 0
