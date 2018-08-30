@@ -38,18 +38,24 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
       marcSubfieldTag = "w"
     ).flatten
 
-    matchingSubfields match {
-      case List(MarcSubfield(_, uklwPrefixRegex(bibNumber))) =>
-        List(
-          MergeCandidate(
-            identifier = SourceIdentifier(
-              identifierType = IdentifierType("sierra-system-number"),
-              ontologyType = "Work",
-              value = bibNumber
-            ),
-            reason = Some("Physical/digitised Sierra work")
-          )
+    val maybeBibNumbers: List[Option[String]] = matchingSubfields
+      .map { _.content }
+      .map {
+        case uklwPrefixRegex(bibNumber) => Some(bibNumber)
+        case _ => None
+      }
+
+    maybeBibNumbers match {
+      case List(Some(bibNumber)) => List(
+        MergeCandidate(
+          identifier = SourceIdentifier(
+            identifierType = IdentifierType("sierra-system-number"),
+            ontologyType = "Work",
+            value = bibNumber
+          ),
+          reason = Some("Physical/digitised Sierra work")
         )
+      )
       case _ => List()
     }
   }
