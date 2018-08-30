@@ -28,7 +28,7 @@
           "200": {
             "description": "200 response",
             "schema": {
-              "$ref": "#/definitions/Empty"
+              "$ref": "#/definitions/StorageManifest"
             }
           }
         },
@@ -113,7 +113,16 @@
       "type": "object",
       "title": "Empty Schema"
     },
-    "NewModel": {
+    "Error": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "title": "Error Schema"
+    },
+    "StorageManifest": {
       "type": "object",
       "properties": {
         "id": {
@@ -257,7 +266,7 @@
           }
         },
         "description": {
-          "type": "null"
+          "type": "string"
         },
         "createdDate": {
           "type": "string"
@@ -274,15 +283,6 @@
           }
         }
       }
-    },
-    "Error": {
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "string"
-        }
-      },
-      "title": "Error Schema"
     }
   }
 }

@@ -8,7 +8,7 @@ data "template_file" "archive_api_swagger" {
 }
 
 resource "aws_api_gateway_rest_api" "archive_asset_lookup" {
-  name        = "archive_asset_lookup"
+  name        = "archive"
   description = "API"
   body        = "${data.template_file.archive_api_swagger.rendered}"
 
