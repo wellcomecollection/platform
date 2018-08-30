@@ -14,6 +14,10 @@ output "vhs_miro_bucket_name" {
   value = "${module.vhs_miro.bucket_name}"
 }
 
+output "vhs_sierra_full_access_policy" {
+  value = "${module.vhs_sierra.full_access_policy}"
+}
+
 output "vhs_sierra_dynamodb_update_policy" {
   value = "${module.vhs_sierra.dynamodb_update_policy}"
 }
