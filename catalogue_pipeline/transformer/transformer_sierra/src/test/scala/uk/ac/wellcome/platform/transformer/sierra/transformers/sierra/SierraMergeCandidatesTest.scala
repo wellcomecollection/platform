@@ -131,6 +131,28 @@ class SierraMergeCandidatesTest
 
       transformer.getMergeCandidates(bibData) shouldBe List()
     }
+
+    it("creates a merge candidate if multiple URLs point to the same Miro ID") {
+      val miroID = "C0000001"
+      val bibData = createSierraBibDataWith(
+        varFields = create962subfieldsWith(
+          urls = List(
+            s"http://wellcomeimages.org/indexplus/image/$miroID.html",
+            s"http://wellcomeimages.org/ixbin/hixclient?MIROPAC=$miroID"
+          )
+        )
+      )
+
+      transformer.getMergeCandidates(bibData) shouldBe List(
+        MergeCandidate(
+          identifier = SourceIdentifier(
+            identifierType = IdentifierType("miro-image-number"),
+            ontologyType = "Work",
+            value = miroID
+          )
+        )
+      )
+    }
   }
 
   it("returns an empty list if there is no MARC tag 776") {
