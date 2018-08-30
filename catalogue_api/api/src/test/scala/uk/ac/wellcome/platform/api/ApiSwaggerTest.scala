@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.api
 
 import java.util
-import java.util.Map.Entry
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
@@ -70,7 +69,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
     it("does not contain the 410 error response code in the list/search endpoint") {
       allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
         val paths = getFieldMap(response.at("/paths"))
-        val workEndpoint = paths(s"/catalogue/${version.toString}/works/{id}")
+        val workEndpoint = paths(s"/catalogue/${version.toString}/works")
 
         getFieldNames(workEndpoint.at("/get/responses")) shouldNot contain("410")
       }
