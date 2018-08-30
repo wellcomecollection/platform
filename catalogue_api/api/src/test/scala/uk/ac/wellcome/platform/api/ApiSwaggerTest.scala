@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.api
 
+import java.util
+import java.util.Map.Entry
+
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
 import org.scalatest.{FunSpec, Matchers}
@@ -31,21 +34,19 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       allResponses.foreach {
         case (version: ApiVersions.Value, response: JsonNode) =>
           response.at("/paths").isObject shouldBe true
-          response
-            .at("/paths")
-            .fieldNames
-            .asScala
-            .toList should contain only (s"/catalogue/${version.toString}/works", s"/catalogue/${version.toString}/works/{id}")
+
+          val expectedEndpoints = List(
+            s"/catalogue/${version.toString}/works",
+            s"/catalogue/${version.toString}/works/{id}"
+          )
+
+          getFieldNames(response.at("/path")) should contain only expectedEndpoints
       }
     }
 
     it("doesn't show DisplayWork in the definitions") {
       allResponses.values.foreach { response: JsonNode =>
-        response
-          .at("/definitions")
-          .fieldNames
-          .asScala
-          .toList shouldNot contain("DisplayWork")
+        getFieldNames(response.at("/definitions")) shouldNot contain("DisplayWork")
       }
     }
 
@@ -54,6 +55,24 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
         response
           .at(s"/definitions/ResultList/properties/results/items/$$ref")
           .toString shouldBe "\"#/definitions/Work\""
+      }
+    }
+
+    it("includes the 410 error response code in the work endpoint") {
+      allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
+        val paths = getFieldMap(response.at("/paths"))
+        val workEndpoint = paths(s"/catalogue/${version.toString}/works/{id}")
+
+        getFieldNames(workEndpoint.at("/get/responses")) should contain("410")
+      }
+    }
+
+    it("does not contain the 410 error response code in the list/search endpoint") {
+      allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
+        val paths = getFieldMap(response.at("/paths"))
+        val workEndpoint = paths(s"/catalogue/${version.toString}/works/{id}")
+
+        getFieldNames(workEndpoint.at("/get/responses")) shouldNot contain("410")
       }
     }
   }
@@ -161,4 +180,21 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
     mapper.readTree(response.contentString)
   }
+
+  // Utility method for turning the JSON structures into something that's
+  // easier to assert on.
+  def getFieldMap(jsonNode: JsonNode): Map[String, JsonNode] =
+    jsonNode
+      .fields()
+      .asScala
+      .map { entry: util.Map.Entry[String, JsonNode] =>
+        entry.getKey -> entry.getValue
+      }
+      .toMap
+
+  def getFieldNames(jsonNode: JsonNode): List[String] =
+    jsonNode
+      .fieldNames()
+      .asScala
+      .toList
 }
