@@ -14,6 +14,7 @@ class SierraConceptsTest extends FunSpec with Matchers with MarcGenerators {
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
       varField = createVarFieldWith(
+        marcTag = "CCC",
         subfields = List(
           MarcSubfield(tag = "a", content = "pilots"),
           MarcSubfield(tag = "0", content = "lcsh/ppp")
@@ -39,6 +40,7 @@ class SierraConceptsTest extends FunSpec with Matchers with MarcGenerators {
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
       varField = createVarFieldWith(
+        marcTag = "CCC",
         subfields = List(
           MarcSubfield(tag = "a", content = "martians"),
           MarcSubfield(tag = "0", content = "lcsh/bbb"),
@@ -75,6 +77,7 @@ class SierraConceptsTest extends FunSpec with Matchers with MarcGenerators {
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
       varField = createVarFieldWith(
+        marcTag = "CCC",
         subfields = List(
           MarcSubfield(tag = "a", content = "hitchhiking"),
           MarcSubfield(tag = "0", content = "u/xxx"),

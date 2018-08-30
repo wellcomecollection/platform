@@ -253,7 +253,8 @@ class SierraProductionTest
         val varFields = List(
           createVarFieldWith(
             marcTag = "264",
-            indicator2 = "x"
+            indicator2 = "x",
+            subfields = List()
           )
         )
 
@@ -485,7 +486,8 @@ class SierraProductionTest
     val varFields = List(
       createVarFieldWith(
         marcTag = "264",
-        indicator2 = indicator2
+        indicator2 = indicator2,
+        subfields = List()
       )
     )
 
