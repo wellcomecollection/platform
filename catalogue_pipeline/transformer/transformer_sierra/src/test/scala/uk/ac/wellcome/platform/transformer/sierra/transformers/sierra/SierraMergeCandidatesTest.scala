@@ -123,6 +123,33 @@ class SierraMergeCandidatesTest
         )
       )
     }
+
+    it("does not put a merge candidate for multiple instances of 962 subfield u") {
+      val bibData = createSierraBibDataWith(
+        varFields = List(
+          createVarFieldWith(
+            marcTag = "962",
+            subfields = List(
+              MarcSubfield(
+                tag = "u",
+                content = s"http://wellcomeimages.org/indexplus/image/A0000001.html"
+              )
+            )
+          ),
+          createVarFieldWith(
+            marcTag = "962",
+            subfields = List(
+              MarcSubfield(
+                tag = "u",
+                content = s"http://wellcomeimages.org/ixbin/hixclient?MIROPAC=B0000001"
+              )
+            )
+          )
+        )
+      )
+
+      transformer.getMergeCandidates(bibData) shouldBe List()
+    }
   }
 
   it("returns an empty list if there is no MARC tag 776") {
