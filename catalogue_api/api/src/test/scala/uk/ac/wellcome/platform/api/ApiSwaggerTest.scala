@@ -39,7 +39,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
             s"/catalogue/${version.toString}/works/{id}"
           )
 
-          getFieldNames(response.at("/path")) should contain only expectedEndpoints
+          getFieldNames(response.at("/paths")) should contain theSameElementsAs expectedEndpoints
       }
     }
 
@@ -184,7 +184,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   // easier to assert on.
   def getFieldMap(jsonNode: JsonNode): Map[String, JsonNode] =
     jsonNode
-      .fields()
+      .fields
       .asScala
       .map { entry: util.Map.Entry[String, JsonNode] =>
         entry.getKey -> entry.getValue
@@ -193,7 +193,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   def getFieldNames(jsonNode: JsonNode): List[String] =
     jsonNode
-      .fieldNames()
+      .fieldNames
       .asScala
       .toList
 }
