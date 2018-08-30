@@ -40,10 +40,17 @@ trait WellcomeImagesURLParser {
   //
   private val ixbinixClientURL: Regex = s"^http://wellcomeimages\\.org/ixbinixclient\\.exe\\?MIROPAC=($miroIDregex)\\.html\\.html$$".r
 
+  // Examples:
+  //
+  //    http://wellcomeimages.org/ixbinixclient.exe?image=M0009946.html
+  //
+  private val altIxbinixClientURL: Regex = s"^http://wellcomeimages\\.org/ixbinixclient\\.exe\\?image=($miroIDregex)\\.html$$".r
+
   def maybeGetMiroID(url: String): Option[String] = url match {
     case indexPlusURL(miroID) => Some(miroID)
     case hixClientURL(miroID) => Some(miroID)
     case ixbinixClientURL(miroID) => Some(miroID)
+    case altIxbinixClientURL(miroID) => Some(miroID)
     case _ => None
   }
 }

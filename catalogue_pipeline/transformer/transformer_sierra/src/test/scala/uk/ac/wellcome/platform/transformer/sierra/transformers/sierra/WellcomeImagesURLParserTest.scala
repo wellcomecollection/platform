@@ -11,33 +11,41 @@ class WellcomeImagesURLParserTest extends FunSpec with Matchers {
     "V0032544ECL"
   )
 
-  it("indexplus/image URLs with a single '.html'") {
-    assertURLTemplateParsedCorrectly { miroID =>
-      s"http://wellcomeimages.org/indexplus/image/$miroID.html"
+  describe("extracts Miro IDs for known URL patterns") {
+    it("indexplus/image URLs with a single '.html'") {
+      assertURLPatternParsedCorrectly { miroID =>
+        s"http://wellcomeimages.org/indexplus/image/$miroID.html"
+      }
     }
-  }
 
-  it("indexplus/image URLs with a double '.html'") {
-    assertURLTemplateParsedCorrectly { miroID =>
-      s"http://wellcomeimages.org/indexplus/image/$miroID.html.html"
+    it("indexplus/image URLs with a double '.html'") {
+      assertURLPatternParsedCorrectly { miroID =>
+        s"http://wellcomeimages.org/indexplus/image/$miroID.html.html"
+      }
     }
-  }
 
-  it("ixbin/hixclient URLs") {
-    assertURLTemplateParsedCorrectly { miroID =>
-      s"http://wellcomeimages.org/ixbin/hixclient?MIROPAC=$miroID"
+    it("ixbin/hixclient URLs") {
+      assertURLPatternParsedCorrectly { miroID =>
+        s"http://wellcomeimages.org/ixbin/hixclient?MIROPAC=$miroID"
+      }
     }
-  }
 
-  it("ixbinixclient.exe URLs") {
-    assertURLTemplateParsedCorrectly { miroID =>
-      s"http://wellcomeimages.org/ixbinixclient.exe?MIROPAC=$miroID.html.html"
+    it("ixbinixclient.exe URLs") {
+      assertURLPatternParsedCorrectly { miroID =>
+        s"http://wellcomeimages.org/ixbinixclient.exe?MIROPAC=$miroID.html.html"
+      }
+    }
+
+    it("alternative ixbinixclient.exe URLs") {
+      assertURLPatternParsedCorrectly { miroID =>
+        s"http://wellcomeimages.org/ixbinixclient.exe?image=$miroID.html"
+      }
     }
   }
 
   val transformer = new WellcomeImagesURLParser {}
 
-  private def assertURLTemplateParsedCorrectly(createURL: (String) => String) = {
+  private def assertURLPatternParsedCorrectly(createURL: (String) => String) = {
     miroIDexamples.foreach { miroID =>
       val url = createURL(miroID)
       assertURLParsedCorrectly(url, miroID = miroID)
