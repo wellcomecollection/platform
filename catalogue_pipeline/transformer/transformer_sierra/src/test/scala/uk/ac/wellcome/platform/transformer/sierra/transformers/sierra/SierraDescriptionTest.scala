@@ -5,11 +5,12 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   VarField
 }
-import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
 class SierraDescriptionTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
 
   it(
@@ -18,16 +19,10 @@ class SierraDescriptionTest
 
     assertFindsCorrectDescription(
       varFields = List(
-        VarField(
-          fieldTag = "?",
+        createVarFieldWith(
           marcTag = "520",
-          indicator1 = " ",
-          indicator2 = " ",
           subfields = List(
-            MarcSubfield(
-              tag = "a",
-              content = description
-            )
+            MarcSubfield(tag = "a", content = description)
           )
         )
       ),
@@ -44,32 +39,17 @@ class SierraDescriptionTest
 
     assertFindsCorrectDescription(
       varFields = List(
-        VarField(
-          fieldTag = "?",
+        createVarFieldWith(
           marcTag = "520",
-          indicator1 = " ",
-          indicator2 = " ",
           subfields = List(
-            MarcSubfield(
-              tag = "a",
-              content = description1
-            )
+            MarcSubfield(tag = "a", content = description1)
           )
         ),
-        VarField(
-          fieldTag = "?",
+        createVarFieldWith(
           marcTag = "520",
-          indicator1 = " ",
-          indicator2 = " ",
           subfields = List(
-            MarcSubfield(
-              tag = "a",
-              content = description2
-            ),
-            MarcSubfield(
-              tag = "b",
-              content = summaryDescription2
-            )
+            MarcSubfield(tag = "a", content = description2),
+            MarcSubfield(tag = "b", content = summaryDescription2)
           )
         )
       ),
@@ -84,20 +64,11 @@ class SierraDescriptionTest
 
     assertFindsCorrectDescription(
       varFields = List(
-        VarField(
-          fieldTag = "?",
+        createVarFieldWith(
           marcTag = "520",
-          indicator1 = " ",
-          indicator2 = " ",
           subfields = List(
-            MarcSubfield(
-              tag = "a",
-              content = description
-            ),
-            MarcSubfield(
-              tag = "b",
-              content = summaryDescription
-            )
+            MarcSubfield(tag = "a", content = description),
+            MarcSubfield(tag = "b", content = summaryDescription)
           )
         )
       ),
@@ -108,13 +79,7 @@ class SierraDescriptionTest
   it("does not extract a work description where MARC field 520 is absent") {
     assertFindsCorrectDescription(
       varFields = List(
-        VarField(
-          fieldTag = "?",
-          marcTag = "666",
-          indicator1 = " ",
-          indicator2 = " ",
-          subfields = Nil
-        )
+        createVarFieldWith(marcTag = "666")
       ),
       expectedDescription = None
     )
