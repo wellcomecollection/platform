@@ -26,6 +26,7 @@ class SierraMergeCandidatesTest
   val transformer = new SierraMergeCandidates {}
 
   val mergeCandidateBibNumber = "b21414440"
+  val miroID = "A0123456"
 
   describe("physical/digital Sierra work") {
     it("extracts the bib number in 776$$w as a mergeCandidate") {
@@ -76,7 +77,6 @@ class SierraMergeCandidatesTest
     }
   }
 
-  val miroID = "A0123456"
 
   describe("single-page Miro/Sierra work") {
     it("extracts a MIRO ID from a URL in MARC tag 962 subfield u") {
