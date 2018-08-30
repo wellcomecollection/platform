@@ -45,7 +45,8 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
     it("doesn't show DisplayWork in the definitions") {
       allResponses.values.foreach { response: JsonNode =>
-        getFieldNames(response.at("/definitions")) shouldNot contain("DisplayWork")
+        getFieldNames(response.at("/definitions")) shouldNot contain(
+          "DisplayWork")
       }
     }
 
@@ -58,20 +59,24 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
     }
 
     it("includes the 410 error response code in the work endpoint") {
-      allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
-        val paths = getFieldMap(response.at("/paths"))
-        val workEndpoint = paths(s"/catalogue/${version.toString}/works/{id}")
+      allResponses.foreach {
+        case (version: ApiVersions.Value, response: JsonNode) =>
+          val paths = getFieldMap(response.at("/paths"))
+          val workEndpoint = paths(s"/catalogue/${version.toString}/works/{id}")
 
-        getFieldNames(workEndpoint.at("/get/responses")) should contain("410")
+          getFieldNames(workEndpoint.at("/get/responses")) should contain("410")
       }
     }
 
-    it("does not contain the 410 error response code in the list/search endpoint") {
-      allResponses.foreach { case (version: ApiVersions.Value, response: JsonNode) =>
-        val paths = getFieldMap(response.at("/paths"))
-        val workEndpoint = paths(s"/catalogue/${version.toString}/works")
+    it(
+      "does not contain the 410 error response code in the list/search endpoint") {
+      allResponses.foreach {
+        case (version: ApiVersions.Value, response: JsonNode) =>
+          val paths = getFieldMap(response.at("/paths"))
+          val workEndpoint = paths(s"/catalogue/${version.toString}/works")
 
-        getFieldNames(workEndpoint.at("/get/responses")) shouldNot contain("410")
+          getFieldNames(workEndpoint.at("/get/responses")) shouldNot contain(
+            "410")
       }
     }
   }
@@ -183,17 +188,10 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   // Utility method for turning the JSON structures into something that's
   // easier to assert on.
   def getFieldMap(jsonNode: JsonNode): Map[String, JsonNode] =
-    jsonNode
-      .fields
-      .asScala
-      .map { entry: util.Map.Entry[String, JsonNode] =>
-        entry.getKey -> entry.getValue
-      }
-      .toMap
+    jsonNode.fields.asScala.map { entry: util.Map.Entry[String, JsonNode] =>
+      entry.getKey -> entry.getValue
+    }.toMap
 
   def getFieldNames(jsonNode: JsonNode): List[String] =
-    jsonNode
-      .fieldNames
-      .asScala
-      .toList
+    jsonNode.fieldNames.asScala.toList
 }
