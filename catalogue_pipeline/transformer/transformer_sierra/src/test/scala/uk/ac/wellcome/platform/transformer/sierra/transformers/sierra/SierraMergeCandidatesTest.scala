@@ -176,6 +176,30 @@ class SierraMergeCandidatesTest
     }
   }
 
+  it("creates merge candidates for both physical/digital Sierra works and Miro works") {
+    val mergeCandidateBibNumber = "b12345678"
+    val sierraData = createSierraBibDataWith(
+      materialType = Some(SierraMaterialType("k")),
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "776",
+          subfields = List(
+            MarcSubfield(tag = "w", content = s"(UkLW)$mergeCandidateBibNumber")
+          )
+        )
+      ) ++ create962subfieldsWith(
+        urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html")
+      )
+    )
+
+    transformer.getMergeCandidates(sierraData) shouldBe List(
+      MergeCandidate(
+        SourceIdentifier(
+          identifierType = IdentifierType("sierra-system-number"),
+          ontologyType = "Work",
+          value = mergeCandidateBibNumber))) ++ singleMiroMergeCandidate(miroID)
+  }
+
   it("returns an empty list if there is no MARC tag 776 or 962") {
     val sierraData = createSierraBibDataWith(varFields = List())
     transformer.getMergeCandidates(sierraData) shouldBe Nil
