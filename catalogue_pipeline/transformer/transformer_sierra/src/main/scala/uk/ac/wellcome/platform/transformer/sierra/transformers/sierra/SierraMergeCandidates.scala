@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBi
 
 import scala.util.matching.Regex
 
-trait SierraMergeCandidates extends MarcUtils {
+trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
 
   def getMergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] =
     get776mergeCandidates(sierraBibData) ++
@@ -59,6 +59,24 @@ trait SierraMergeCandidates extends MarcUtils {
     *
     */
   private def getSinglePageMiroMergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] = {
-    List()
+    val matchingSubfields: List[MarcSubfield] = getMatchingSubfields(
+      sierraBibData,
+      marcTag = "962",
+      marcSubfieldTag = "u"
+    ).flatten
+
+    val miroID = maybeGetMiroID(matchingSubfields
+      .head
+      .content).get
+
+    List(
+      MergeCandidate(
+        identifier = SourceIdentifier(
+          identifierType = IdentifierType("miro-image-number"),
+          ontologyType = "Work",
+          value = miroID
+        )
+      )
+    )
   }
 }
