@@ -76,7 +76,8 @@ class SierraMergeCandidatesTest
       transformer.getMergeCandidates(sierraData) shouldBe Nil
     }
 
-    it("does not create a merge candidate if there are multiple distinct instances of 776$$w") {
+    it(
+      "does not create a merge candidate if there are multiple distinct instances of 776$$w") {
       val bibData = createSierraBibDataWith(
         varFields = create776subfieldsWith(
           ids = List(s"(UkLW)  $mergeCandidateBibNumber", "(UkLW)b12345678")
@@ -86,7 +87,8 @@ class SierraMergeCandidatesTest
       transformer.getMergeCandidates(bibData) shouldBe List()
     }
 
-    it("creates a merge candidate if there are multiple 776$$w for the same value") {
+    it(
+      "creates a merge candidate if there are multiple 776$$w for the same value") {
       val bibData = createSierraBibDataWith(
         varFields = create776subfieldsWith(
           ids = List(
@@ -108,10 +110,12 @@ class SierraMergeCandidatesTest
         urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html")
       )
 
-      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(miroID)
+      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(
+        miroID)
     }
 
-    it("does not put a merge candidate for multiple distinct instances of 962 subfield u") {
+    it(
+      "does not put a merge candidate for multiple distinct instances of 962 subfield u") {
       val bibData = createMiroPictureWith(
         urls = List(
           s"http://wellcomeimages.org/indexplus/image/$miroID.html",
@@ -130,12 +134,14 @@ class SierraMergeCandidatesTest
         )
       )
 
-      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(miroID)
+      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(
+        miroID)
     }
 
     it("does not create a merge candidate if the URL is unrecognised") {
       val bibData = createMiroPictureWith(
-        urls = List("http://film.wellcome.ac.uk:15151/mediaplayer.html?fug_7340-1&pw=524ph=600.html")
+        urls = List(
+          "http://film.wellcome.ac.uk:15151/mediaplayer.html?fug_7340-1&pw=524ph=600.html")
       )
 
       transformer.getMergeCandidates(bibData) shouldBe List()
@@ -149,7 +155,8 @@ class SierraMergeCandidatesTest
         )
       )
 
-      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(miroID)
+      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(
+        miroID)
     }
 
     it("creates a merge candidate if the material type is 'Digital Images'") {
@@ -160,10 +167,12 @@ class SierraMergeCandidatesTest
         )
       )
 
-      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(miroID)
+      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(
+        miroID)
     }
 
-    it("does not create a merge candidate if the material type is neither 'Picture' nor 'Digital Images'") {
+    it(
+      "does not create a merge candidate if the material type is neither 'Picture' nor 'Digital Images'") {
       val bibData = createSierraBibDataWith(
         materialType = Some(SierraMaterialType(code = "x")),
         varFields = create962subfieldsWith(
@@ -175,10 +184,12 @@ class SierraMergeCandidatesTest
     }
   }
 
-  it("creates merge candidates for both physical/digital Sierra works and Miro works") {
+  it(
+    "creates merge candidates for both physical/digital Sierra works and Miro works") {
     val varFields =
       create776subfieldsWith(ids = List(s"(UkLW)$mergeCandidateBibNumber")) ++
-      create962subfieldsWith(urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html"))
+        create962subfieldsWith(urls =
+          List(s"http://wellcomeimages.org/indexplus/image/$miroID.html"))
 
     val sierraData = createSierraBibDataWith(
       materialType = Some(SierraMaterialType("k")),
@@ -197,7 +208,8 @@ class SierraMergeCandidatesTest
     transformer.getMergeCandidates(sierraData) shouldBe Nil
   }
 
-  private def physicalAndDigitalSierraMergeCandidate(bibNumber: String): List[MergeCandidate] =
+  private def physicalAndDigitalSierraMergeCandidate(
+    bibNumber: String): List[MergeCandidate] =
     List(
       MergeCandidate(
         identifier = SourceIdentifier(

@@ -31,7 +31,8 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
     * bib number as a merge candidate.
     *
     */
-  private def get776mergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] = {
+  private def get776mergeCandidates(
+    sierraBibData: SierraBibData): List[MergeCandidate] = {
     val matchingSubfields: List[MarcSubfield] = getMatchingSubfields(
       sierraBibData,
       marcTag = "776",
@@ -42,21 +43,22 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
       .map { _.content }
       .map {
         case uklwPrefixRegex(bibNumber) => Some(bibNumber)
-        case _ => None
+        case _                          => None
       }
       .distinct
 
     maybeBibNumbers match {
-      case List(Some(bibNumber)) => List(
-        MergeCandidate(
-          identifier = SourceIdentifier(
-            identifierType = IdentifierType("sierra-system-number"),
-            ontologyType = "Work",
-            value = bibNumber
-          ),
-          reason = Some("Physical/digitised Sierra work")
+      case List(Some(bibNumber)) =>
+        List(
+          MergeCandidate(
+            identifier = SourceIdentifier(
+              identifierType = IdentifierType("sierra-system-number"),
+              ontologyType = "Work",
+              value = bibNumber
+            ),
+            reason = Some("Physical/digitised Sierra work")
+          )
         )
-      )
       case _ => List()
     }
   }
@@ -70,7 +72,8 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
     *     than one item, we don't know where to put the Miro location).
     *
     */
-  private def getSinglePageMiroMergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] = {
+  private def getSinglePageMiroMergeCandidates(
+    sierraBibData: SierraBibData): List[MergeCandidate] = {
     sierraBibData.materialType match {
       // The Sierra material type codes we care about are:
       //
@@ -90,16 +93,17 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
           .distinct
 
         maybeMiroIDs match {
-          case List(miroID) => List(
-            MergeCandidate(
-              identifier = SourceIdentifier(
-                identifierType = IdentifierType("miro-image-number"),
-                ontologyType = "Work",
-                value = miroID
-              ),
-              reason = Some("Single page Miro/Sierra work")
+          case List(miroID) =>
+            List(
+              MergeCandidate(
+                identifier = SourceIdentifier(
+                  identifierType = IdentifierType("miro-image-number"),
+                  ontologyType = "Work",
+                  value = miroID
+                ),
+                reason = Some("Single page Miro/Sierra work")
+              )
             )
-          )
           case _ => List()
         }
       }
