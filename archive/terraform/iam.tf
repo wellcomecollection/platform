@@ -38,6 +38,11 @@ resource "aws_iam_role_policy" "archivist_task_sqs" {
   policy = "${data.aws_iam_policy_document.read_from_archivist_queue.json}"
 }
 
+resource "aws_iam_role_policy" "archive_bag_vhs" {
+  role = "${module.lambda_archive_bags.role_name}"
+  policy = "${module.vhs_archive_manifest.read_policy}"
+}
+
 data "aws_iam_policy_document" "archive_get" {
   statement {
     actions = [
