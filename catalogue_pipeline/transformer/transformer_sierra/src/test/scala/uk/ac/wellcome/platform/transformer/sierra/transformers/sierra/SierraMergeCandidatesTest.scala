@@ -108,15 +108,7 @@ class SierraMergeCandidatesTest
         urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html")
       )
 
-      transformer.getMergeCandidates(bibData) shouldBe List(
-        MergeCandidate(
-          identifier = SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            ontologyType = "Work",
-            value = miroID
-          )
-        )
-      )
+      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(miroID)
     }
 
     it("does not put a merge candidate for multiple distinct instances of 962 subfield u") {
@@ -139,15 +131,7 @@ class SierraMergeCandidatesTest
         )
       )
 
-      transformer.getMergeCandidates(bibData) shouldBe List(
-        MergeCandidate(
-          identifier = SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            ontologyType = "Work",
-            value = miroID
-          )
-        )
-      )
+      transformer.getMergeCandidates(bibData) shouldBe singleMiroMergeCandidate(miroID)
     }
 
     it("does not create a merge candidate if the URL is unrecognised") {
@@ -159,10 +143,21 @@ class SierraMergeCandidatesTest
     }
   }
 
-  it("returns an empty list if there is no MARC tag 776") {
+  it("returns an empty list if there is no MARC tag 776 or 962") {
     val sierraData = createSierraBibDataWith(varFields = List())
     transformer.getMergeCandidates(sierraData) shouldBe Nil
   }
+
+  private def singleMiroMergeCandidate(miroID: String): List[MergeCandidate] =
+    List(
+      MergeCandidate(
+        identifier = SourceIdentifier(
+          identifierType = IdentifierType("miro-image-number"),
+          ontologyType = "Work",
+          value = miroID
+        )
+      )
+    )
 
   private def createMiroPictureWith(urls: List[String]): SierraBibData =
     createSierraBibDataWith(
