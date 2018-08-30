@@ -6,27 +6,8 @@ import uk.ac.wellcome.json.utils.JsonAssertions
 
 class MarcFieldTest extends FunSpec with Matchers with JsonAssertions {
 
-  it("converts a long-form VarField to JSON") {
-    val varField = VarField(
-      fieldTag = "y",
-      marcTag = "007",
-      indicator1 = " ",
-      indicator2 = " ",
-      subfields = List()
-    )
-
-    assertJsonStringsAreEqual(
-      toJson(varField).get,
-      s"""{
-        "fieldTag": "${varField.fieldTag}",
-        "marcTag": "${varField.marcTag.get}",
-        "content": null,
-        "ind1": "${varField.indicator1.get}",
-        "ind2": "${varField.indicator2.get}",
-        "subfields": []
-      }"""
-    )
-  }
+  // These tests are intended to check that we can parse a VarField in
+  // both forms sent by Sierra.
 
   it("reads a JSON string as a long-form VarField") {
     val jsonString = s"""{
@@ -64,25 +45,6 @@ class MarcFieldTest extends FunSpec with Matchers with JsonAssertions {
 
     val varField = fromJson[VarField](jsonString).get
     varField shouldBe expectedVarField
-  }
-
-  it("converts a short-form VarField to JSON") {
-    val varField = VarField(
-      fieldTag = "b",
-      content = "A dallying dance of ducks"
-    )
-
-    assertJsonStringsAreEqual(
-      toJson(varField).get,
-      s"""{
-        "fieldTag": "${varField.fieldTag}",
-        "content": "${varField.content.get}",
-        "marcTag": null,
-        "ind1": null,
-        "ind2": null,
-        "subfields": []
-      }"""
-    )
   }
 
   it("reads a JSON string as a short-form VarField") {
