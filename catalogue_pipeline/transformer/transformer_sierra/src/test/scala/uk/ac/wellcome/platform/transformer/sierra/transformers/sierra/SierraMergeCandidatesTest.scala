@@ -29,13 +29,8 @@ class SierraMergeCandidatesTest
     it("extracts the bib number in 776$$w as a mergeCandidate") {
       val mergeCandidateBibNumber = "b21414440"
       val sierraData = createSierraBibDataWith(
-        varFields = List(
-          createVarFieldWith(
-            marcTag = "776",
-            subfields = List(
-              MarcSubfield(tag = "w", content = s"(UkLW)$mergeCandidateBibNumber")
-            )
-          )
+        varFields = create776subfieldsWith(
+          ids = List(s"(UkLW)$mergeCandidateBibNumber")
         )
       )
 
@@ -50,15 +45,8 @@ class SierraMergeCandidatesTest
     it("strips spaces in tag 776$$w and adds it as a mergeCandidate") {
       val mergeCandidateBibNumber = "b21414440"
       val sierraData = createSierraBibDataWith(
-        varFields = List(
-          createVarFieldWith(
-            marcTag = "776",
-            subfields = List(
-              MarcSubfield(
-                tag = "w",
-                content = s"(UkLW)  $mergeCandidateBibNumber")
-            )
-          )
+        varFields = create776subfieldsWith(
+          ids = List(s"(UkLW)  $mergeCandidateBibNumber")
         )
       )
 
@@ -87,13 +75,8 @@ class SierraMergeCandidatesTest
 
     it("ignores values in 776$$w that aren't prefixed with (UkLW)") {
       val sierraData = createSierraBibDataWith(
-        varFields = List(
-          createVarFieldWith(
-            marcTag = "776",
-            subfields = List(
-              MarcSubfield(tag = "w", content = s"(OCoLC)14322288")
-            )
-          )
+        varFields = create776subfieldsWith(
+          ids = List("(OCoLC)14322288")
         )
       )
 
@@ -178,18 +161,14 @@ class SierraMergeCandidatesTest
 
   it("creates merge candidates for both physical/digital Sierra works and Miro works") {
     val mergeCandidateBibNumber = "b12345678"
+
+    val varFields =
+      create776subfieldsWith(ids = List(s"(UkLW)$mergeCandidateBibNumber")) ++
+      create962subfieldsWith(urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html"))
+
     val sierraData = createSierraBibDataWith(
       materialType = Some(SierraMaterialType("k")),
-      varFields = List(
-        createVarFieldWith(
-          marcTag = "776",
-          subfields = List(
-            MarcSubfield(tag = "w", content = s"(UkLW)$mergeCandidateBibNumber")
-          )
-        )
-      ) ++ create962subfieldsWith(
-        urls = List(s"http://wellcomeimages.org/indexplus/image/$miroID.html")
-      )
+      varFields = varFields
     )
 
     transformer.getMergeCandidates(sierraData) shouldBe List(
@@ -216,6 +195,16 @@ class SierraMergeCandidatesTest
         reason = Some("Single page Miro/Sierra work")
       )
     )
+
+  private def create776subfieldsWith(ids: List[String]): List[VarField] =
+    ids.map { idString =>
+      createVarFieldWith(
+        marcTag = "776",
+        subfields = List(
+          MarcSubfield(tag = "w", content = idString)
+        )
+      )
+    }
 
   private def createMiroPictureWith(urls: List[String]): SierraBibData =
     createSierraBibDataWith(
