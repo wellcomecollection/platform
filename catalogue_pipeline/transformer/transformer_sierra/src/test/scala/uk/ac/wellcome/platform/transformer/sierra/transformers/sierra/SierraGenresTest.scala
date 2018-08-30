@@ -4,8 +4,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
-  SierraBibData,
-  VarField
+  SierraBibData
 }
 import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
@@ -171,21 +170,15 @@ class SierraGenresTest extends FunSpec with Matchers with MarcGenerators with Si
   it("returns subjects for multiple 655 tags with different subfields") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "655",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = "A1 Content"),
             MarcSubfield(tag = "z", content = "Z1 Content")
           )
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "655",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = "A2 Content"),
             MarcSubfield(tag = "v", content = "V2 Content")
@@ -215,10 +208,8 @@ class SierraGenresTest extends FunSpec with Matchers with MarcGenerators with Si
   it(s"gets identifiers from subfield $$0") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "655",
-          indicator1 = "",
           // LCSH heading
           indicator2 = "0",
           subfields = List(
@@ -226,10 +217,8 @@ class SierraGenresTest extends FunSpec with Matchers with MarcGenerators with Si
             MarcSubfield(tag = "0", content = "lcsh/123")
           )
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "655",
-          indicator1 = "",
           // MESH heading
           indicator2 = "2",
           subfields = List(
@@ -239,6 +228,8 @@ class SierraGenresTest extends FunSpec with Matchers with MarcGenerators with Si
         )
       )
     )
+
+    // TODO Get rid of the check method??
 
     val expectedSourceIdentifiers = List(
       SourceIdentifier(

@@ -1,20 +1,14 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  MergeCandidate,
-  SourceIdentifier
-}
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
-import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
+import uk.ac.wellcome.models.work.internal.{IdentifierType, MergeCandidate, SourceIdentifier}
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
+import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
 class SierraMergeCandidatesTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
 
   val transformer = new SierraMergeCandidates {}
@@ -22,11 +16,8 @@ class SierraMergeCandidatesTest
     val mergeCandidateBibNumber = "b21414440"
     val sierraData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "776",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "w", content = s"(UkLW)$mergeCandidateBibNumber")
           )
@@ -46,11 +37,8 @@ class SierraMergeCandidatesTest
     val mergeCandidateBibNumber = "b21414440"
     val sierraData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "776",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(
               tag = "w",
@@ -76,11 +64,8 @@ class SierraMergeCandidatesTest
   it("returns an empty list if marc tag 776 does not contain a subfield w") {
     val sierraData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "776",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = s"blah blah")
           )
@@ -94,11 +79,8 @@ class SierraMergeCandidatesTest
   it("ignores values in 776$$w that aren't prefixed with (UkLW)") {
     val sierraData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "776",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "w", content = s"(OCoLC)14322288")
           )
