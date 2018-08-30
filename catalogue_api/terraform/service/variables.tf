@@ -1,7 +1,8 @@
 variable "name" {}
 variable "vpc_id" {}
 variable "aws_region" {}
-variable "alb_listener_arn" {}
+variable "alb_listener_arn_https" {}
+variable "alb_listener_arn_http" {}
 variable "host_name" {}
 
 variable "private_subnets" {
