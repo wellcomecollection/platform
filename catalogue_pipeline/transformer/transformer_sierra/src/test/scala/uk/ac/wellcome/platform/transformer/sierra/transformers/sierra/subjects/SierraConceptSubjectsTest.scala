@@ -6,11 +6,12 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   VarField
 }
-import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
 class SierraConceptSubjectsTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
   private val transformer = new SierraConceptSubjects {}
 
@@ -20,13 +21,18 @@ class SierraConceptSubjectsTest
   }
 
   it("returns subjects for tag 650 with only subfield a") {
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "650",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A Content")
+          )
+        )
+      )
+    )
 
-    transformer.getSubjectswithAbstractConcepts(
-      bibData(
-        "650",
-        List(
-          MarcSubfield(tag = "a", content = "A Content")
-        ))) shouldBe List(
+    transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(
         label = "A Content",
         concepts = List(Unidentifiable(Concept(label = "A Content")))))
@@ -34,12 +40,17 @@ class SierraConceptSubjectsTest
   }
 
   it("returns subjects for tag 650 with only subfields a and v") {
-    val sierraBibData = bibData(
-      "650",
-      List(
-        MarcSubfield(tag = "a", content = "A Content"),
-        MarcSubfield(tag = "v", content = "V Content")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "650",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A Content"),
+            MarcSubfield(tag = "v", content = "V Content")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(
@@ -51,12 +62,17 @@ class SierraConceptSubjectsTest
 
   it(
     "subfield a is always first concept when returning subjects for tag 650 with subfields a, v") {
-    val sierraBibData = bibData(
-      "650",
-      List(
-        MarcSubfield(tag = "v", content = "V Content"),
-        MarcSubfield(tag = "a", content = "A Content")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "650",
+          subfields = List(
+            MarcSubfield(tag = "v", content = "V Content"),
+            MarcSubfield(tag = "a", content = "A Content")
+          )
+        )
+      )
+    )
     transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(
         label = "A Content - V Content",
@@ -66,13 +82,18 @@ class SierraConceptSubjectsTest
   }
 
   it("returns subjects for tag 650 subfields a, v, and x") {
-    val sierraBibData = bibData(
-      "650",
-      List(
-        MarcSubfield(tag = "a", content = "A Content"),
-        MarcSubfield(tag = "x", content = "X Content"),
-        MarcSubfield(tag = "v", content = "V Content")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "650",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A Content"),
+            MarcSubfield(tag = "x", content = "X Content"),
+            MarcSubfield(tag = "v", content = "V Content")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(
@@ -86,12 +107,17 @@ class SierraConceptSubjectsTest
   }
 
   it("returns subjects for tag 650 with subfields a, y") {
-    val sierraBibData = bibData(
-      "650",
-      List(
-        MarcSubfield(tag = "y", content = "Y Content"),
-        MarcSubfield(tag = "a", content = "A Content")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "650",
+          subfields = List(
+            MarcSubfield(tag = "y", content = "Y Content"),
+            MarcSubfield(tag = "a", content = "A Content")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(
@@ -103,12 +129,17 @@ class SierraConceptSubjectsTest
   }
 
   it("returns subjects for tag 650 with subfields a, z") {
-    val sierraBibData = bibData(
-      "650",
-      List(
-        MarcSubfield(tag = "z", content = "Z Content"),
-        MarcSubfield(tag = "a", content = "A Content")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "650",
+          subfields = List(
+            MarcSubfield(tag = "z", content = "Z Content"),
+            MarcSubfield(tag = "a", content = "A Content")
+          )
+        )
+      )
+    )
     transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(
         label = "A Content - Z Content",
@@ -161,13 +192,18 @@ class SierraConceptSubjectsTest
   }
 
   it("returns subjects with primary concept Period for tag 648") {
-    val sierraBibData = bibData(
-      "648",
-      List(
-        MarcSubfield(tag = "a", content = "A Content"),
-        MarcSubfield(tag = "x", content = "X Content"),
-        MarcSubfield(tag = "v", content = "V Content")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "648",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A Content"),
+            MarcSubfield(tag = "x", content = "X Content"),
+            MarcSubfield(tag = "v", content = "V Content")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(
@@ -181,13 +217,18 @@ class SierraConceptSubjectsTest
   }
 
   it("returns subjects with primary concept Place for tag 651") {
-    val sierraBibData = bibData(
-      "651",
-      List(
-        MarcSubfield(tag = "x", content = "X Content"),
-        MarcSubfield(tag = "a", content = "A Content"),
-        MarcSubfield(tag = "v", content = "V Content")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "651",
+          subfields = List(
+            MarcSubfield(tag = "x", content = "X Content"),
+            MarcSubfield(tag = "a", content = "A Content"),
+            MarcSubfield(tag = "v", content = "V Content")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectswithAbstractConcepts(sierraBibData) shouldBe List(
       Subject(
