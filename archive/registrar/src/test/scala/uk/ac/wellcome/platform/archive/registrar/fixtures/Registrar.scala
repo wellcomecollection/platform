@@ -6,37 +6,21 @@ import java.util.UUID
 import com.amazonaws.services.dynamodbv2.model._
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  AkkaS3,
-  BagIt,
-  FileEntry
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
-  BagLocation,
-  BagName
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
+import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, BagLocation, BagName}
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{
-  ConfigModule,
-  TestAppConfigModule,
-  VHSModule
-}
+import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule, VHSModule}
+import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.fixtures.{
-  LocalDynamoDb,
-  LocalVersionedHybridStore
-}
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 
 trait Registrar
-    extends AkkaS3
+  extends AkkaS3
     with Messaging
     with LocalVersionedHybridStore
     with BagIt
@@ -52,12 +36,12 @@ trait Registrar
     )
 
   def withBagNotification[R](
-    requestId: UUID,
-    callbackUrl: Option[URI],
-    queuePair: QueuePair,
-    storageBucket: Bucket,
-    dataFileCount: Int = 1,
-    valid: Boolean = true)(testWith: TestWith[BagLocation, R]) = {
+                              requestId: UUID,
+                              callbackUrl: Option[URI],
+                              queuePair: QueuePair,
+                              storageBucket: Bucket,
+                              dataFileCount: Int = 1,
+                              valid: Boolean = true)(testWith: TestWith[BagLocation, R]) = {
     withBag(storageBucket, dataFileCount, valid) { bagLocation =>
       sendNotification(requestId, bagLocation, callbackUrl, queuePair)
       testWith(bagLocation)
@@ -79,7 +63,11 @@ trait Registrar
     fileEntries.map((entry: FileEntry) => {
       List(bagLocation.storagePath, entry.name).mkString("/")
       s3Client
-        .putObject(bagLocation.storageNamespace, entry.name, entry.contents)
+        .putObject(
+          bagLocation.storageNamespace,
+          s"${storagePrefix}/${entry.name}",
+          entry.contents
+        )
     })
 
     testWith(bagLocation)
@@ -144,8 +132,8 @@ trait Registrar
   }
 
   def withRegistrar[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
-                       R]) = {
+                        testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
+                          R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
         snsTopic =>
