@@ -153,6 +153,16 @@ class SierraMergeCandidatesTest
         )
       )
     }
+
+    it("does not create a merge candidate if the URL is unrecognised") {
+      val bibData = createSierraBibDataWith(
+        varFields = create962subfieldsWith(
+          urls = List("http://film.wellcome.ac.uk:15151/mediaplayer.html?fug_7340-1&pw=524ph=600.html")
+        )
+      )
+
+      transformer.getMergeCandidates(bibData) shouldBe List()
+    }
   }
 
   it("returns an empty list if there is no MARC tag 776") {
