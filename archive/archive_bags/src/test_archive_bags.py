@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 
-import os
 import archive_bags
-import pytest
 import json
+import os
+import pytest
 
 VHS_TABLE_NAME = 'vhs-archive-manifests'
 VHS_BUCKET_NAME = 'wellcomecollection-vhs-archive-manifests'
@@ -11,7 +11,7 @@ VHS_BUCKET_NAME = 'wellcomecollection-vhs-archive-manifests'
 
 def test_looks_up_manifest(dynamodb_client, s3_client):
     manifest_id = 'b12345678x'
-    stored_manifest = { 'manifest': manifest_id }
+    stored_manifest = {'manifest': manifest_id}
 
     given_manifest_in_vhs(
         manifest_id,
@@ -20,7 +20,7 @@ def test_looks_up_manifest(dynamodb_client, s3_client):
         s3_client
     )
 
-    request = { 'id': manifest_id }
+    request = {'id': manifest_id}
 
     response = archive_bags.handler(
         request,
@@ -90,4 +90,3 @@ def given_manifest_in_vhs(manifest_id, stored_manifest, dynamodb_client, s3_clie
             }
         }
     )
-

@@ -165,7 +165,8 @@ jobs:
     - env: TASK=archive_common-test
     - env: TASK=registrar-test
     - env: TASK=archivist-test
-
+    - env: TASK=archive_bags-test
+    - env: TASK=archive_ingest-test
 
     # (not under active development)
 

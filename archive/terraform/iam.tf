@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "read_from_registrar_queue" {
 # lambda
 
 resource "aws_iam_role_policy" "archive_asset_lookup_dynamo_permission" {
-  role = "${module.lambda_archive_asset_lookup.role_name}"
+  role = "${module.lambda_archive_bags.role_name}"
 
   policy = <<EOF
 {
