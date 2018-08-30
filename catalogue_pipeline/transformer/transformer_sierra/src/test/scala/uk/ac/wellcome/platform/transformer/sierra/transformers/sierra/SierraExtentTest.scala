@@ -2,9 +2,16 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
-import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 
-class SierraExtentTest extends FunSpec with Matchers with MarcGenerators with SierraDataGenerators {
+class SierraExtentTest
+    extends FunSpec
+    with Matchers
+    with MarcGenerators
+    with SierraDataGenerators {
 
   val transformer = new SierraExtent {}
 
@@ -50,7 +57,9 @@ class SierraExtentTest extends FunSpec with Matchers with MarcGenerators with Si
         marcTag = "300",
         subfields = List(
           MarcSubfield(tag = "a", content = extent2),
-          MarcSubfield(tag = "b", content = "Endless ecstasy from ecclesiastic echoes")
+          MarcSubfield(
+            tag = "b",
+            content = "Endless ecstasy from ecclesiastic echoes")
         )
       ),
       createVarFieldWith(

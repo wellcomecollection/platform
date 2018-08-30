@@ -1,8 +1,14 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
-import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  VarField
+}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 
 class SierraLetteringTest
     extends FunSpec

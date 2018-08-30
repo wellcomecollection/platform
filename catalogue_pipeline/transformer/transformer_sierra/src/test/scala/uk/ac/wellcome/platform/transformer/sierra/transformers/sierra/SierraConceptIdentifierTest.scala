@@ -5,7 +5,10 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.generators.MarcGenerators
 import uk.ac.wellcome.platform.transformer.sierra.source.VarField
 
-class SierraConceptIdentifierTest extends FunSpec with Matchers with MarcGenerators {
+class SierraConceptIdentifierTest
+    extends FunSpec
+    with Matchers
+    with MarcGenerators {
 
   it("finds an LCSH identifier") {
     val varField = create655VarFieldWith(indicator2 = "0")

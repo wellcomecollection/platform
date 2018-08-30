@@ -4,7 +4,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
-import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 
 class SierraPersonSubjectsTest
     extends FunSpec
@@ -124,7 +127,9 @@ class SierraPersonSubjectsTest
           marcTag = "600",
           subfields = List(
             MarcSubfield(tag = "a", content = "Rita Levi Montalcini,"),
-            MarcSubfield(tag = "d", content = "22 April 1909 – 30 December 2012")
+            MarcSubfield(
+              tag = "d",
+              content = "22 April 1909 – 30 December 2012")
           )
         )
       )

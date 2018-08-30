@@ -184,7 +184,9 @@ class SierraTransformableTransformerTest
       createVarFieldWith(
         marcTag = "520",
         subfields = List(
-          MarcSubfield(tag = "a", content = "A delightful description of a dead daisy."),
+          MarcSubfield(
+            tag = "a",
+            content = "A delightful description of a dead daisy."),
           MarcSubfield(tag = "c", content = "1923.")
         )
       )

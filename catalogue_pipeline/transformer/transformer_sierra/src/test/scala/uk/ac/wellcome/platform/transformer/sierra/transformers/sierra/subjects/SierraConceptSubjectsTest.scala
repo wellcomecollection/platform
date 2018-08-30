@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
-import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 
 class SierraConceptSubjectsTest
     extends FunSpec

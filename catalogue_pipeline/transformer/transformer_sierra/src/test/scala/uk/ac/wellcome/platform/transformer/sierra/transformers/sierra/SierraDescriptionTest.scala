@@ -5,7 +5,10 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   VarField
 }
-import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 
 class SierraDescriptionTest
     extends FunSpec

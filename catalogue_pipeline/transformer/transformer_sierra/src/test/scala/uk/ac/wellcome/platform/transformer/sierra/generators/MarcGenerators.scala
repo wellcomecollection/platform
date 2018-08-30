@@ -1,12 +1,14 @@
 package uk.ac.wellcome.platform.transformer.sierra.generators
 
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  VarField
+}
 
 trait MarcGenerators {
-  def createVarFieldWith(
-    marcTag: String,
-    indicator2: Option[String] = None,
-    subfields: List[MarcSubfield] = List()): VarField =
+  def createVarFieldWith(marcTag: String,
+                         indicator2: Option[String] = None,
+                         subfields: List[MarcSubfield] = List()): VarField =
     VarField(
       fieldTag = "p",
       marcTag = Some(marcTag),
@@ -15,10 +17,9 @@ trait MarcGenerators {
       subfields = subfields
     )
 
-  def createVarFieldWith(
-    marcTag: String,
-    indicator2: String,
-    subfields: List[MarcSubfield]): VarField =
+  def createVarFieldWith(marcTag: String,
+                         indicator2: String,
+                         subfields: List[MarcSubfield]): VarField =
     createVarFieldWith(
       marcTag = marcTag,
       indicator2 = Some(indicator2),
