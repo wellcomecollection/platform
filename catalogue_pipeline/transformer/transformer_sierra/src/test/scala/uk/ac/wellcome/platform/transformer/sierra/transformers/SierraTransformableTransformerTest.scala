@@ -13,14 +13,13 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.sierra.generators.MarcGenerators
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 
 class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraGenerators
     with SierraTransformableTestBase
     with WorksGenerators {
@@ -172,11 +171,8 @@ class SierraTransformableTransformerTest
     val lettering = "An actor's life for me"
 
     val productionFields = List(
-      VarField(
-        fieldTag = "p",
+      createVarFieldWith(
         marcTag = "260",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
           MarcSubfield(tag = "b", content = "Peaceful Poetry"),
           MarcSubfield(tag = "c", content = "1923.")
@@ -185,29 +181,18 @@ class SierraTransformableTransformerTest
     )
 
     val descriptionFields = List(
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "520",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
-          MarcSubfield(
-            tag = "a",
-            content = "A delightful description of a dead daisy."
-          ),
-          MarcSubfield(
-            tag = "c",
-            content = "1923."
-          )
+          MarcSubfield(tag = "a", content = "A delightful description of a dead daisy."),
+          MarcSubfield(tag = "c", content = "1923.")
         )
       )
     )
 
     val letteringFields = List(
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "246",
-        indicator1 = " ",
         indicator2 = "6",
         subfields = List(
           MarcSubfield(tag = "a", content = lettering)
