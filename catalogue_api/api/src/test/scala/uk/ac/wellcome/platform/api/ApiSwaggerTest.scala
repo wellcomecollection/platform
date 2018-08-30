@@ -131,6 +131,9 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   val v2response: JsonNode = readTree(
     s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
 
+  println(s"v1 response = <<${v1response.toString}>>")
+  println(s"v2 response = <<${v2response.toString}>>")
+
   val allResponses = Map(
     ApiVersions.v1 -> v1response,
     ApiVersions.v2 -> v2response,
