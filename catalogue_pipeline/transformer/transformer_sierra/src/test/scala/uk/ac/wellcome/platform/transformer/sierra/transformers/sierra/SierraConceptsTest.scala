@@ -15,6 +15,7 @@ class SierraConceptsTest extends FunSpec with Matchers with MarcGenerators {
       concept = concept,
       varField = createVarFieldWith(
         marcTag = "CCC",
+        indicator2 = "0",
         subfields = List(
           MarcSubfield(tag = "a", content = "pilots"),
           MarcSubfield(tag = "0", content = "lcsh/ppp")
@@ -41,6 +42,7 @@ class SierraConceptsTest extends FunSpec with Matchers with MarcGenerators {
       concept = concept,
       varField = createVarFieldWith(
         marcTag = "CCC",
+        indicator2 = "0",
         subfields = List(
           MarcSubfield(tag = "a", content = "martians"),
           MarcSubfield(tag = "0", content = "lcsh/bbb"),
