@@ -45,7 +45,8 @@ class WellcomeImagesURLParserTest extends FunSpec with Matchers {
 
   it("ignores URLs that are unrelated to Wellcome Images") {
     transformer.maybeGetMiroID(
-      url = "http://film.wellcome.ac.uk:15151/mediaplayer.html?fug_7340-1&pw=524ph=600.html"
+      url =
+        "http://film.wellcome.ac.uk:15151/mediaplayer.html?fug_7340-1&pw=524ph=600.html"
     ) shouldBe None
   }
 

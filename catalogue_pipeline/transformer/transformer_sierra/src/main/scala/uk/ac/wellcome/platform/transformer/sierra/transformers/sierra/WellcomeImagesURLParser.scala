@@ -24,7 +24,8 @@ trait WellcomeImagesURLParser {
   //    http://wellcomeimages.org/indexplus/image/L0046161.html
   //    http://wellcomeimages.org/indexplus/image/L0041574.html.html
   //
-  private val indexPlusURL: Regex = s"^http://wellcomeimages\\.org/indexplus/image/($miroIDregex)(?:\\.html){0,2}$$".r
+  private val indexPlusURL: Regex =
+    s"^http://wellcomeimages\\.org/indexplus/image/($miroIDregex)(?:\\.html){0,2}$$".r
 
   // Examples:
   //
@@ -32,25 +33,28 @@ trait WellcomeImagesURLParser {
   //    http://wellcomeimages.org/ixbin/hixclient?MIROPAC=V0000492EB
   //    http://wellcomeimages.org/ixbin/hixclient?MIROPAC=V0031553F1
   //
-  private val hixClientURL: Regex = s"^http://wellcomeimages\\.org/ixbin/hixclient\\?MIROPAC=($miroIDregex)$$".r
+  private val hixClientURL: Regex =
+    s"^http://wellcomeimages\\.org/ixbin/hixclient\\?MIROPAC=($miroIDregex)$$".r
 
   // Examples:
   //
   //    http://wellcomeimages.org/ixbinixclient.exe?MIROPAC=V0010851.html.html
   //
-  private val ixbinixClientURL: Regex = s"^http://wellcomeimages\\.org/ixbinixclient\\.exe\\?MIROPAC=($miroIDregex)\\.html\\.html$$".r
+  private val ixbinixClientURL: Regex =
+    s"^http://wellcomeimages\\.org/ixbinixclient\\.exe\\?MIROPAC=($miroIDregex)\\.html\\.html$$".r
 
   // Examples:
   //
   //    http://wellcomeimages.org/ixbinixclient.exe?image=M0009946.html
   //
-  private val altIxbinixClientURL: Regex = s"^http://wellcomeimages\\.org/ixbinixclient\\.exe\\?image=($miroIDregex)\\.html$$".r
+  private val altIxbinixClientURL: Regex =
+    s"^http://wellcomeimages\\.org/ixbinixclient\\.exe\\?image=($miroIDregex)\\.html$$".r
 
   def maybeGetMiroID(url: String): Option[String] = url match {
-    case indexPlusURL(miroID) => Some(miroID)
-    case hixClientURL(miroID) => Some(miroID)
-    case ixbinixClientURL(miroID) => Some(miroID)
+    case indexPlusURL(miroID)        => Some(miroID)
+    case hixClientURL(miroID)        => Some(miroID)
+    case ixbinixClientURL(miroID)    => Some(miroID)
     case altIxbinixClientURL(miroID) => Some(miroID)
-    case _ => None
+    case _                           => None
   }
 }
