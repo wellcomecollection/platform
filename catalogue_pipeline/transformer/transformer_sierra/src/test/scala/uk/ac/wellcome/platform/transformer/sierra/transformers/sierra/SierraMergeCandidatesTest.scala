@@ -124,7 +124,7 @@ class SierraMergeCandidatesTest
       )
     }
 
-    it("does not put a merge candidate for multiple instances of 962 subfield u") {
+    it("does not put a merge candidate for multiple distinct instances of 962 subfield u") {
       val bibData = createSierraBibDataWith(
         varFields = List(
           createVarFieldWith(

@@ -65,18 +65,24 @@ trait SierraMergeCandidates extends MarcUtils with WellcomeImagesURLParser {
       marcSubfieldTag = "u"
     ).flatten
 
-    val miroID = maybeGetMiroID(matchingSubfields
-      .head
-      .content).get
+    val contents = matchingSubfields.map { _.content }
 
-    List(
-      MergeCandidate(
-        identifier = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = miroID
+    val maybeMiroID: Option[String] = contents match {
+      case List(url) => Some(maybeGetMiroID(url).get)
+      case _ => None
+    }
+
+    maybeMiroID match {
+      case Some(miroID: String) => List(
+        MergeCandidate(
+          identifier = SourceIdentifier(
+            identifierType = IdentifierType("miro-image-number"),
+            ontologyType = "Work",
+            value = miroID
+          )
         )
       )
-    )
+      case None => List()
+    }
   }
 }
