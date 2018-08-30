@@ -3,13 +3,14 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON>
+Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT>
        trigger_reindex.py -h | --help
 
 Options:
   --source=<SOURCE_NAME>    Name of the source you want to reindex.
   --reason=<REASON>         An explanation of why you're running this reindex.
                             This will be printed in the Slack alert.
+  --total_segments=<COUNT>  How many segments to divide the VHS table into.
   -h --help                 Print this help message
 
 """
@@ -121,12 +122,13 @@ def main():
 
     source_name = args['--source']
     reason = args['--reason']
+    total_segments = int(args['--total_segments'])
 
     print(f'Triggering a reindex in {source_name}')
 
     post_to_slack(source_name=source_name, reason=reason)
 
-    messages = all_messages(total_segments=150)
+    messages = all_messages(total_segments=total_segments)
 
     topic_arn = build_topic_arn(topic_name=get_topic_name(source_name))
 
