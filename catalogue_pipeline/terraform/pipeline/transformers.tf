@@ -30,7 +30,7 @@ module "miro_transformer" {
   account_id = "${var.account_id}"
 
   vpc_id      = "${var.vpc_id}"
-  topic_names = ["${module.miro_transformer_topic.name}"]
+  topic_names = "${var.miro_adapter_topic_names}"
 }
 
 module "sierra_transformer" {

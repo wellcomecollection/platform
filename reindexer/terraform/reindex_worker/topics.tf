@@ -1,9 +1,9 @@
 module "reindex_jobs_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "reindex_jobs"
+  name   = "reindex_jobs-${var.namespace}"
 }
 
-module "reindex_requests_topic" {
+module "hybrid_records_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "reindex_requests"
+  name   = "reindex_records_for_reindexing-${var.namespace}"
 }
