@@ -5,33 +5,46 @@ import uk.ac.wellcome.models.work.internal.{
   MergeCandidate,
   SourceIdentifier
 }
-import uk.ac.wellcome.platform.transformer.sierra.source.SierraBibData
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData}
+
+import scala.util.matching.Regex
 
 trait SierraMergeCandidates extends MarcUtils {
 
-  // Populate mergeCandidates from tag 776 subfield w if starting with (UkLW), ignore otherwise.
-  // Strip the (UkLW) prefix and return the rest as a bibNumber of a merge candidate
   def getMergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] =
-    for {
-      subFields <- getMatchingSubfields(sierraBibData, "776", "w")
-      subField <- subFields
-      mergeCandidate <- extractMergeCandidate(subField.content).toList
-    } yield mergeCandidate
+    get776mergeCandidates(sierraBibData)
 
-  private def extractMergeCandidate(content: String): Option[MergeCandidate] = {
-    // This regex matches any string starting with (UkLW), followed by any number of spaces
-    // and groups everything after that, which is the sierra bib number we're interested in
-    val prefixRegex = """\(UkLW\)[\s]*(.+)""".r.anchored
+  // This regex matches any string starting with (UkLW), followed by
+  // any number of spaces, and then captures everything after the
+  // space, which is the bib number we're interested in.
+  private val uklwPrefixRegex: Regex = """\(UkLW\)[\s]*(.+)""".r.anchored
 
-    content match {
-      case prefixRegex(bibNumber) =>
-        Some(
+  /** We can merge a bib and the digitised version of that bib.  The number
+    * of the other bib comes from MARC tag 776 subfield $w.
+    *
+    * If the identifier starts with (UkLW), we strip the prefix and use the
+    * bib number as a merge candidate.
+    *
+    */
+  private def get776mergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] = {
+    val matchingSubfields: List[MarcSubfield] = getMatchingSubfields(
+      sierraBibData,
+      marcTag = "776",
+      marcSubfieldTag = "w"
+    ).flatten
+
+    matchingSubfields match {
+      case List(MarcSubfield(_, uklwPrefixRegex(bibNumber))) =>
+        List(
           MergeCandidate(
             SourceIdentifier(
-              IdentifierType("sierra-system-number"),
-              "Work",
-              bibNumber)))
-      case _ => None
+              identifierType = IdentifierType("sierra-system-number"),
+              ontologyType = "Work",
+              value = bibNumber
+            )
+          )
+        )
+      case _ => List()
     }
   }
 }
