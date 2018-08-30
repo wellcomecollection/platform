@@ -1,15 +1,16 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
 }
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
 class SierraPhysicalDescriptionTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
 
   val transformer = new SierraPhysicalDescription {}
@@ -24,11 +25,8 @@ class SierraPhysicalDescriptionTest
     val physicalDescription = "Queuing quokkas quarrel about Quirinus Quirrell"
 
     val varFields = List(
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
           MarcSubfield(
             tag = "a",
@@ -58,11 +56,8 @@ class SierraPhysicalDescriptionTest
       s"$physicalDescription1\n\n$physicalDescription2"
 
     val varFields = List(
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
           MarcSubfield(
             tag = "b",
@@ -70,11 +65,8 @@ class SierraPhysicalDescriptionTest
           )
         )
       ),
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
           MarcSubfield(
             tag = "a",

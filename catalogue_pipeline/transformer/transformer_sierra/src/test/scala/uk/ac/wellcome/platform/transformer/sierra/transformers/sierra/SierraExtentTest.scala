@@ -1,13 +1,17 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
 }
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
-class SierraExtentTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraExtentTest
+    extends FunSpec
+    with Matchers
+    with MarcGenerators
+    with SierraDataGenerators {
 
   val transformer = new SierraExtent {}
 
@@ -20,20 +24,11 @@ class SierraExtentTest extends FunSpec with Matchers with SierraDataGenerators {
     val extent = "Eleven elephant etchings"
 
     val varFields = List(
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
-          MarcSubfield(
-            tag = "a",
-            content = extent
-          ),
-          MarcSubfield(
-            tag = "b",
-            content = "Grey, gigantic, graceful (?)"
-          )
+          MarcSubfield(tag = "a", content = extent),
+          MarcSubfield(tag = "b", content = "Grey, gigantic, graceful (?)")
         )
       )
     )
@@ -52,44 +47,25 @@ class SierraExtentTest extends FunSpec with Matchers with SierraDataGenerators {
     val expectedExtent = s"$extent1 $extent2 $extent3"
 
     val varFields = List(
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
-          MarcSubfield(
-            tag = "a",
-            content = extent1
-          )
+          MarcSubfield(tag = "a", content = extent1)
         )
       ),
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
-          MarcSubfield(
-            tag = "a",
-            content = extent2
-          ),
+          MarcSubfield(tag = "a", content = extent2),
           MarcSubfield(
             tag = "b",
-            content = "Endless ecstasy from ecclesiastic echoes"
-          )
+            content = "Endless ecstasy from ecclesiastic echoes")
         )
       ),
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
-          MarcSubfield(
-            tag = "a",
-            content = extent3
-          )
+          MarcSubfield(tag = "a", content = extent3)
         )
       )
     )

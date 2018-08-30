@@ -5,20 +5,22 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   VarField
 }
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 
 class SierraLetteringTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
 
   it("ignores records with the wrong MARC field") {
     assertFindsCorrectLettering(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "300",
-          indicator1 = " ",
           indicator2 = "6",
           subfields = List(
             MarcSubfield(tag = "a", content = "Alas, ailments are annoying")
@@ -32,10 +34,8 @@ class SierraLetteringTest
   it("ignores records with the right MARC field but wrong indicator 2") {
     assertFindsCorrectLettering(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "246",
-          indicator1 = " ",
           indicator2 = "7",
           subfields = List(
             MarcSubfield(tag = "a", content = "Alas, ailments are annoying")
@@ -49,10 +49,8 @@ class SierraLetteringTest
   it("ignores records with the MARC field and 2nd indicator but wrong subfield") {
     assertFindsCorrectLettering(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "246",
-          indicator1 = " ",
           indicator2 = "6",
           subfields = List(
             MarcSubfield(
@@ -68,10 +66,8 @@ class SierraLetteringTest
   it("passes through a single instance of 246 .6 $$a, if present") {
     assertFindsCorrectLettering(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "246",
-          indicator1 = " ",
           indicator2 = "6",
           subfields = List(
             MarcSubfield(
@@ -87,10 +83,8 @@ class SierraLetteringTest
   it("joins multiple instances of 246 .6 $$a, if present") {
     assertFindsCorrectLettering(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "246",
-          indicator1 = " ",
           indicator2 = "6",
           subfields = List(
             MarcSubfield(
@@ -98,10 +92,8 @@ class SierraLetteringTest
               content = "Daring dalmations dance with danger")
           )
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "246",
-          indicator1 = "1",
           indicator2 = "6",
           subfields = List(
             MarcSubfield(

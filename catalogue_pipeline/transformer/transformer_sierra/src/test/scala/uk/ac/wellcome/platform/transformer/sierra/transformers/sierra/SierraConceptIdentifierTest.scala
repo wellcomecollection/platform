@@ -2,12 +2,16 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.sierra.generators.MarcGenerators
 import uk.ac.wellcome.platform.transformer.sierra.source.VarField
 
-class SierraConceptIdentifierTest extends FunSpec with Matchers {
+class SierraConceptIdentifierTest
+    extends FunSpec
+    with Matchers
+    with MarcGenerators {
 
   it("finds an LCSH identifier") {
-    val varField = baseVarField.copy(indicator2 = Some("0"))
+    val varField = create655VarFieldWith(indicator2 = "0")
 
     val expectedSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-subjects"),
@@ -27,7 +31,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
   }
 
   it("finds a MESH identifier") {
-    val varField = baseVarField.copy(indicator2 = Some("2"))
+    val varField = create655VarFieldWith(indicator2 = "2")
 
     val expectedSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("nlm-mesh"),
@@ -47,7 +51,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
   }
 
   it("finds a no-ID identifier if indicator 2 = 4") {
-    val varField = baseVarField.copy(indicator2 = Some("4"))
+    val varField = create655VarFieldWith(indicator2 = "4")
 
     SierraConceptIdentifier.maybeFindIdentifier(
       varField = varField,
@@ -57,7 +61,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
   }
 
   it("returns None if indicator 2 is empty") {
-    val varField = baseVarField.copy(indicator2 = None)
+    val varField = create655VarFieldWith(indicator2 = None)
 
     SierraConceptIdentifier.maybeFindIdentifier(
       varField = varField,
@@ -67,7 +71,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
   }
 
   it("returns None if it sees an unrecognised identifier scheme") {
-    val varField = baseVarField.copy(indicator2 = Some("8"))
+    val varField = create655VarFieldWith(indicator2 = "8")
 
     SierraConceptIdentifier.maybeFindIdentifier(
       varField = varField,
@@ -77,7 +81,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
   }
 
   it("passes through the ontology type") {
-    val varField = baseVarField.copy(indicator2 = Some("2"))
+    val varField = create655VarFieldWith(indicator2 = "2")
 
     val expectedSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("nlm-mesh"),
@@ -98,11 +102,9 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
 
   val ontologyType = "Concept"
 
-  val baseVarField = VarField(
-    fieldTag = "p",
-    marcTag = "655",
-    indicator1 = "",
-    indicator2 = "",
-    subfields = List()
-  )
+  private def create655VarFieldWith(indicator2: Option[String]): VarField =
+    createVarFieldWith(marcTag = "655", indicator2 = indicator2)
+
+  private def create655VarFieldWith(indicator2: String): VarField =
+    create655VarFieldWith(indicator2 = Some(indicator2))
 }

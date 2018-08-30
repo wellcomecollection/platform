@@ -3,15 +3,16 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
 }
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
 class SierraPersonSubjectsTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
   private val transformer = new SierraPersonSubjects {}
 
@@ -21,11 +22,16 @@ class SierraPersonSubjectsTest
   }
 
   it("returns subjects for tag 600 with only subfield a") {
-    val sierraBibData = bibData(
-      "600",
-      List(
-        MarcSubfield(tag = "a", content = "A Content")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A Content")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
       Subject(
@@ -35,12 +41,17 @@ class SierraPersonSubjectsTest
   }
 
   it("returns subjects for tag 600 with only subfields a and c") {
-    val sierraBibData = bibData(
-      "600",
-      List(
-        MarcSubfield(tag = "a", content = "Larrey, D. J."),
-        MarcSubfield(tag = "c", content = "baron")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Larrey, D. J."),
+            MarcSubfield(tag = "c", content = "baron")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
       Subject(
@@ -50,13 +61,18 @@ class SierraPersonSubjectsTest
   }
 
   it("returns subjects for tag 600 with only subfields a and multiple c") {
-    val sierraBibData = bibData(
-      "600",
-      List(
-        MarcSubfield(tag = "a", content = "David Attenborough"),
-        MarcSubfield(tag = "c", content = "sir"),
-        MarcSubfield(tag = "c", content = "doctor")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "David Attenborough"),
+            MarcSubfield(tag = "c", content = "sir"),
+            MarcSubfield(tag = "c", content = "doctor")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
       Subject(
@@ -66,12 +82,17 @@ class SierraPersonSubjectsTest
   }
 
   it("returns subjects for tag 600 with only subfields a and b") {
-    val sierraBibData = bibData(
-      "600",
-      List(
-        MarcSubfield(tag = "a", content = "David Attenborough"),
-        MarcSubfield(tag = "b", content = "II")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "David Attenborough"),
+            MarcSubfield(tag = "b", content = "II")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
       Subject(
@@ -81,12 +102,17 @@ class SierraPersonSubjectsTest
   }
 
   it("returns subjects for tag 600 with subfields a and e") {
-    val sierraBibData = bibData(
-      "600",
-      List(
-        MarcSubfield(tag = "a", content = "David Attenborough,"),
-        MarcSubfield(tag = "e", content = "author")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "David Attenborough,"),
+            MarcSubfield(tag = "e", content = "author")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
       Subject(
@@ -95,12 +121,19 @@ class SierraPersonSubjectsTest
   }
 
   it("returns subjects for tag 600 with subfields a and d") {
-    val sierraBibData = bibData(
-      "600",
-      List(
-        MarcSubfield(tag = "a", content = "Rita Levi Montalcini,"),
-        MarcSubfield(tag = "d", content = "22 April 1909 – 30 December 2012")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Rita Levi Montalcini,"),
+            MarcSubfield(
+              tag = "d",
+              content = "22 April 1909 – 30 December 2012")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(Subject(
       label = "Rita Levi Montalcini, 22 April 1909 – 30 December 2012",
@@ -108,13 +141,18 @@ class SierraPersonSubjectsTest
   }
 
   it("returns subjects for tag 600 with subfields a and multiple e") {
-    val sierraBibData = bibData(
-      "600",
-      List(
-        MarcSubfield(tag = "a", content = "David Attenborough,"),
-        MarcSubfield(tag = "e", content = "author,"),
-        MarcSubfield(tag = "e", content = "editor")
-      ))
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "David Attenborough,"),
+            MarcSubfield(tag = "e", content = "author,"),
+            MarcSubfield(tag = "e", content = "editor")
+          )
+        )
+      )
+    )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
       Subject(
@@ -126,7 +164,14 @@ class SierraPersonSubjectsTest
   // elsewhere. For now, we error in those cases so that we are able
   // to flag cataloguing errors, so error here as well for consistency
   it("errors transforming a subject 600 if subfield a is missing") {
-    val sierraBibData = bibData("600", List())
+    val sierraBibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List()
+        )
+      )
+    )
 
     intercept[TransformerException] {
       transformer.getSubjectsWithPerson(sierraBibData)
@@ -140,10 +185,8 @@ class SierraPersonSubjectsTest
 
     val sierraBibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "600",
-          indicator1 = "",
           indicator2 = "0",
           subfields = List(
             MarcSubfield(tag = "a", content = name),
@@ -168,10 +211,8 @@ class SierraPersonSubjectsTest
     val name = "Gerry the Garlic"
     val sierraBibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "600",
-          indicator1 = "",
           indicator2 = "2",
           subfields = List(
             MarcSubfield(tag = "a", content = name),

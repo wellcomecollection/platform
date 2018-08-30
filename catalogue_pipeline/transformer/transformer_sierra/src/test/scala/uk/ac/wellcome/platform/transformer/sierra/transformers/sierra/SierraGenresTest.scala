@@ -4,12 +4,18 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
-  SierraBibData,
-  VarField
+  SierraBibData
 }
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 
-class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraGenresTest
+    extends FunSpec
+    with Matchers
+    with MarcGenerators
+    with SierraDataGenerators {
 
   it("returns zero genres if there are none") {
     val bibData = createSierraBibDataWith(varFields = List())
@@ -23,9 +29,16 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
           label = "A Content",
           concepts = List(Unidentifiable(Concept(label = "A Content")))))
 
-    assertExtractsGenres(
-      bibData("655", List(MarcSubfield(tag = "a", content = "A Content"))),
-      expectedGenres)
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "655",
+          subfields = List(MarcSubfield(tag = "a", content = "A Content"))
+        )
+      )
+    )
+
+    assertExtractsGenres(bibData, expectedGenres)
   }
 
   it("returns subjects for tag 655 with subfields a and v") {
@@ -40,14 +53,19 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
         )
       )
 
-    assertExtractsGenres(
-      bibData(
-        "655",
-        List(
-          MarcSubfield(tag = "a", content = "A Content"),
-          MarcSubfield(tag = "v", content = "V Content")
-        )),
-      expectedGenres)
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "655",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A Content"),
+            MarcSubfield(tag = "v", content = "V Content")
+          )
+        )
+      )
+    )
+
+    assertExtractsGenres(bibData, expectedGenres)
   }
 
   it(
@@ -63,14 +81,19 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
         )
       )
 
-    assertExtractsGenres(
-      bibData(
-        "655",
-        List(
-          MarcSubfield(tag = "v", content = "V Content"),
-          MarcSubfield(tag = "a", content = "A Content")
-        )),
-      expectedGenres)
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "655",
+          subfields = List(
+            MarcSubfield(tag = "v", content = "V Content"),
+            MarcSubfield(tag = "a", content = "A Content")
+          )
+        )
+      )
+    )
+
+    assertExtractsGenres(bibData, expectedGenres)
   }
 
   it("returns genres for tag 655 subfields a, v, and x") {
@@ -85,16 +108,20 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
           )
         ))
 
-    assertExtractsGenres(
-      bibData(
-        "655",
-        List(
-          MarcSubfield(tag = "a", content = "A Content"),
-          MarcSubfield(tag = "x", content = "X Content"),
-          MarcSubfield(tag = "v", content = "V Content")
-        )),
-      expectedGenres
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "655",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A Content"),
+            MarcSubfield(tag = "x", content = "X Content"),
+            MarcSubfield(tag = "v", content = "V Content")
+          )
+        )
+      )
     )
+
+    assertExtractsGenres(bibData, expectedGenres)
   }
 
   it("returns subjects for tag 655 with subfields a, y") {
@@ -107,14 +134,19 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
             Unidentifiable(Period(label = "Y Content"))
           )))
 
-    assertExtractsGenres(
-      bibData(
-        "655",
-        List(
-          MarcSubfield(tag = "y", content = "Y Content"),
-          MarcSubfield(tag = "a", content = "A Content")
-        )),
-      expectedGenres)
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "655",
+          subfields = List(
+            MarcSubfield(tag = "y", content = "Y Content"),
+            MarcSubfield(tag = "a", content = "A Content")
+          )
+        )
+      )
+    )
+
+    assertExtractsGenres(bibData, expectedGenres)
   }
 
   it("returns subjects for tag 655 with subfields a, z") {
@@ -127,34 +159,33 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
             Unidentifiable(Place(label = "Z Content"))
           )))
 
-    assertExtractsGenres(
-      bibData(
-        "655",
-        List(
-          MarcSubfield(tag = "z", content = "Z Content"),
-          MarcSubfield(tag = "a", content = "A Content")
-        )),
-      expectedGenres)
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "655",
+          subfields = List(
+            MarcSubfield(tag = "z", content = "Z Content"),
+            MarcSubfield(tag = "a", content = "A Content")
+          )
+        )
+      )
+    )
+
+    assertExtractsGenres(bibData, expectedGenres)
   }
 
   it("returns subjects for multiple 655 tags with different subfields") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "655",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = "A1 Content"),
             MarcSubfield(tag = "z", content = "Z1 Content")
           )
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "655",
-          indicator1 = "",
-          indicator2 = "",
           subfields = List(
             MarcSubfield(tag = "a", content = "A2 Content"),
             MarcSubfield(tag = "v", content = "V2 Content")
@@ -184,10 +215,8 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
   it(s"gets identifiers from subfield $$0") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "655",
-          indicator1 = "",
           // LCSH heading
           indicator2 = "0",
           subfields = List(
@@ -195,10 +224,8 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
             MarcSubfield(tag = "0", content = "lcsh/123")
           )
         ),
-        VarField(
-          fieldTag = "p",
+        createVarFieldWith(
           marcTag = "655",
-          indicator1 = "",
           // MESH heading
           indicator2 = "2",
           subfields = List(
@@ -208,6 +235,8 @@ class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
         )
       )
     )
+
+    // TODO Get rid of the check method??
 
     val expectedSourceIdentifiers = List(
       SourceIdentifier(

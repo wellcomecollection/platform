@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLocation
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 
 class SierraLocationTest
     extends FunSpec

@@ -2,12 +2,10 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.sierra.generators.MarcGenerators
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 
-class SierraConceptsTest extends FunSpec with Matchers {
+class SierraConceptsTest extends FunSpec with Matchers with MarcGenerators {
 
   it("extracts identifiers from subfield 0") {
     val concept =
@@ -15,10 +13,8 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
-      varField = VarField(
-        fieldTag = "p",
-        marcTag = "655",
-        indicator1 = "",
+      varField = createVarFieldWith(
+        marcTag = "CCC",
         indicator2 = "0",
         subfields = List(
           MarcSubfield(tag = "a", content = "pilots"),
@@ -44,10 +40,8 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
-      varField = VarField(
-        fieldTag = "p",
-        marcTag = "655",
-        indicator1 = "",
+      varField = createVarFieldWith(
+        marcTag = "CCC",
         indicator2 = "0",
         subfields = List(
           MarcSubfield(tag = "a", content = "martians"),
@@ -84,11 +78,8 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
-      varField = VarField(
-        fieldTag = "p",
-        marcTag = "655",
-        indicator1 = "",
-        indicator2 = "0",
+      varField = createVarFieldWith(
+        marcTag = "CCC",
         subfields = List(
           MarcSubfield(tag = "a", content = "hitchhiking"),
           MarcSubfield(tag = "0", content = "u/xxx"),

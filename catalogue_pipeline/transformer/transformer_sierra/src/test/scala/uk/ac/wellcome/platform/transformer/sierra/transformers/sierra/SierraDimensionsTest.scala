@@ -1,15 +1,16 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
+import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
 }
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
 
 class SierraDimensionsTest
     extends FunSpec
     with Matchers
+    with MarcGenerators
     with SierraDataGenerators {
 
   val transformer = new SierraDimensions {}
@@ -23,20 +24,11 @@ class SierraDimensionsTest
     val dimensions = "23cm"
 
     val varFields = List(
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
-          MarcSubfield(
-            tag = "a",
-            content = "149 p. ;"
-          ),
-          MarcSubfield(
-            tag = "c",
-            content = "23cm"
-          )
+          MarcSubfield(tag = "a", content = "149 p. ;"),
+          MarcSubfield(tag = "c", content = "23cm")
         )
       )
     )
@@ -52,32 +44,17 @@ class SierraDimensionsTest
     val expectedDimensions = s"$dimensions1 $dimensions2"
 
     val varFields = List(
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
-          MarcSubfield(
-            tag = "a",
-            content = "1 print :"
-          ),
-          MarcSubfield(
-            tag = "c",
-            content = dimensions1
-          )
+          MarcSubfield(tag = "a", content = "1 print :"),
+          MarcSubfield(tag = "c", content = dimensions1)
         )
       ),
-      VarField(
-        fieldTag = "?",
+      createVarFieldWith(
         marcTag = "300",
-        indicator1 = " ",
-        indicator2 = " ",
         subfields = List(
-          MarcSubfield(
-            tag = "c",
-            content = dimensions2
-          )
+          MarcSubfield(tag = "c", content = dimensions2)
         )
       )
     )
