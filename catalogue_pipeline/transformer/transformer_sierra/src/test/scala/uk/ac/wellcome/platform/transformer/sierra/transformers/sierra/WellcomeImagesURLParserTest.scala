@@ -12,13 +12,25 @@ class WellcomeImagesURLParserTest extends FunSpec with Matchers {
   )
 
   it("indexplus/image URLs with a single '.html'") {
-    miroIDexamples.foreach { miroID =>
-      val url = s"http://wellcomeimages.org/indexplus/image/$miroID.html"
-      assertURLParsedCorrectly(url, miroID = miroID)
+    assertURLTemplateParsedCorrectly { miroID =>
+      s"http://wellcomeimages.org/indexplus/image/$miroID.html"
+    }
+  }
+
+  it("indexplus/image URLs with a double '.html'") {
+    assertURLTemplateParsedCorrectly { miroID =>
+      s"http://wellcomeimages.org/indexplus/image/$miroID.html.html"
     }
   }
 
   val transformer = new WellcomeImagesURLParser {}
+
+  private def assertURLTemplateParsedCorrectly(createURL: (String) => String) = {
+    miroIDexamples.foreach { miroID =>
+      val url = createURL(miroID)
+      assertURLParsedCorrectly(url, miroID = miroID)
+    }
+  }
 
   private def assertURLParsedCorrectly(url: String, miroID: String) = {
     val result = transformer.maybeGetMiroID(url)
