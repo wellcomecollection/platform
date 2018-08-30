@@ -10,7 +10,7 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   VarField
 }
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 
 class SierraMergeCandidatesTest
     extends FunSpec

@@ -7,7 +7,7 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
   VarField
 }
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 
 class SierraGenresTest extends FunSpec with Matchers with SierraDataGenerators {
 

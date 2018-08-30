@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.sierra.utils
+package uk.ac.wellcome.platform.transformer.sierra.generators
 
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord

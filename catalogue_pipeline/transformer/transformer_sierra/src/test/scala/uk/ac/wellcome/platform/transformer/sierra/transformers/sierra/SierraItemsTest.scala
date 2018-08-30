@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraItemData
 }
 import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLocation
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 
 class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
 

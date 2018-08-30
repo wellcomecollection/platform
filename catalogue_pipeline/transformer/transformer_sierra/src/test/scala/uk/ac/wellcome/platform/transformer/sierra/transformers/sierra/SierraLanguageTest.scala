@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.Language
 import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLanguage
-import uk.ac.wellcome.platform.transformer.sierra.utils.SierraDataGenerators
+import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 
 class SierraLanguageTest
     extends FunSpec
