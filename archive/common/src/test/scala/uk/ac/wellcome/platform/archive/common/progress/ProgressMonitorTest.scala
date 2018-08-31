@@ -48,9 +48,11 @@ class ProgressMonitorTest
 
         givenTableHasItem(archiveIngestProgress, table)
 
-        whenReady(archiveProgressMonitor.initialize(archiveIngestProgress).failed) { failedException =>
-          failedException shouldBe a[IdConstraintError]
-          assertTableOnlyHasItem(archiveIngestProgress, table)
+        whenReady(
+          archiveProgressMonitor.initialize(archiveIngestProgress).failed) {
+          failedException =>
+            failedException shouldBe a[IdConstraintError]
+            assertTableOnlyHasItem(archiveIngestProgress, table)
         }
 
       }
@@ -66,9 +68,11 @@ class ProgressMonitorTest
           "uploadUrl",
           Some("http://localhost/archive/complete"))
 
-        whenReady(Future.sequence(Seq(
-          archiveProgressMonitor.initialize(archiveIngestProgress),
-          archiveProgressMonitor.addEvent(id, "This happened")))) { _ =>
+        whenReady(
+          Future.sequence(
+            Seq(
+              archiveProgressMonitor.initialize(archiveIngestProgress),
+              archiveProgressMonitor.addEvent(id, "This happened")))) { _ =>
           val records =
             Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
           records.size shouldBe 1
@@ -93,11 +97,12 @@ class ProgressMonitorTest
           "uploadUrl",
           Some("http://localhost/archive/complete"))
 
-        whenReady(Future.sequence(Seq(
-          archiveProgressMonitor.initialize(archiveIngestProgress),
-          archiveProgressMonitor.addEvent(id, "This happened"),
-          archiveProgressMonitor.addEvent(id, "And this too")))) { _ =>
-
+        whenReady(
+          Future.sequence(Seq(
+            archiveProgressMonitor.initialize(archiveIngestProgress),
+            archiveProgressMonitor.addEvent(id, "This happened"),
+            archiveProgressMonitor.addEvent(id, "And this too")
+          ))) { _ =>
           val records =
             Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
           records.size shouldBe 1
