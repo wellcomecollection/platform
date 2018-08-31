@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.merger.pairwise
 
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.models.work.internal.{UnidentifiedRedirectedWork, UnidentifiedWork}
 
 /**
   *    +-----------------------+       +-----------------------+
@@ -34,6 +34,23 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
   */
 object MiroSierraWorkPair extends PairwiseMerger {
   def mergeAndRedirectWork(miroWork: UnidentifiedWork,
-                           sierraWork: UnidentifiedWork): Option[PairwiseResult] =
-    None
+                           sierraWork: UnidentifiedWork): Option[PairwiseResult] = {
+
+    // We copy across all the identifiers except those related to Sierra,
+    // as we should already have those.
+    val miroIdentifiersToCopy = miroWork
+      .identifiers
+      .filterNot { sourceIdentifier =>
+        sourceIdentifier.identifierType.id startsWith "sierra-"
+      }
+
+    val mergedWork = sierraWork.copy(
+      otherIdentifiers = sierraWork.otherIdentifiers ++ miroIdentifiersToCopy
+    )
+    val redirectedWork = UnidentifiedRedirectedWork(
+      sourceIdentifier = miroWork.sourceIdentifier,
+      version = miroWork.version,
+      redirect =
+    )
+  }
 }
