@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.merger.services
 
+import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.pairwise_transforms.{PairwiseResult, SierraPhysicalDigitalWorkPair}
@@ -8,7 +9,30 @@ trait MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork]
 }
 
-class Merger extends Logging with MergerRules {
+/** The merger is implemented as a series of "pairwise" merges.
+  *
+  * Each of the pairwise mergers is implemented (and tested) as a separate object.
+  * This class should _only_ contain logic for deciding whether there are any
+  * works which are eligible for merging, and call the pairwise merger to do
+  * the actual logic of merging.
+  *
+  * The merger currently knows about three types of work, in decreasing order
+  * of precedence:
+  *
+  *   - Sierra physical record
+  *   - Sierra digital record
+  *   - Miro record
+  *
+  * We apply the pairwise merges in this order:
+  *
+  *     Miro + Sierra digital
+  *     Miro + Sierra physical
+  *     Sierra digital + Sierra physical
+  *
+  */
+class Merger @Inject() (
+  sierraPhysicalDigitalWorkPair: SierraPhysicalDigitalWorkPair
+) extends Logging with MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
     mergePhysicalDigitalPair(works)
       .getOrElse(works)
@@ -38,7 +62,7 @@ class Merger extends Logging with MergerRules {
 
   private def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
                                    digitalWork: UnidentifiedWork) = {
-    val result = SierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
+    val result = sierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
       physicalWork = physicalWork,
       digitalWork = digitalWork
     )
@@ -48,10 +72,19 @@ class Merger extends Logging with MergerRules {
     }
   }
 
-  private def isDigitalWork(work: UnidentifiedWork): Boolean = {
+  private def isMiroWork(work: UnidentifiedWork): Boolean =
+    work.sourceIdentifier.identifierType == IdentifierType("miro-image-number")
+
+  private def isSierraWork(work: UnidentifiedWork): Boolean =
+    work.sourceIdentifier.identifierType == IdentifierType("sierra-system-number")
+
+
+  private def isDigitalWork(work: UnidentifiedWork): Boolean =
     work.workType match {
       case None    => false
       case Some(t) => t.id == "v" && t.label == "E-books"
     }
-  }
+
+  private def isSierraDigitalWork(work: UnidentifiedWork): Boolean =
+    isSierraWork(work) && isDigitalWork(work)
 }

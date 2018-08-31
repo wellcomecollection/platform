@@ -132,7 +132,7 @@ class SierraPhysicalDigitalWorkPairTest extends FunSpec with MergerTestUtils {
   private def applyMerge(
     physicalWork: UnidentifiedWork,
     digitalWork: UnidentifiedWork): Option[PairwiseResult] =
-    SierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
+    new SierraPhysicalDigitalWorkPair().mergeAndRedirectWork(
       physicalWork = physicalWork,
       digitalWork = digitalWork
     )
