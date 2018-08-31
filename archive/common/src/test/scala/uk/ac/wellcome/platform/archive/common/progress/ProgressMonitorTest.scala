@@ -8,8 +8,12 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
-import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
+import uk.ac.wellcome.platform.archive.common.progress.monitor.IdConstraintError
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
+
+import scala.concurrent.Future
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ProgressMonitorTest
     extends FunSpec
@@ -44,11 +48,11 @@ class ProgressMonitorTest
 
         givenTableHasItem(archiveIngestProgress, table)
 
-        intercept[DynamoNonFatalError] {
-          archiveProgressMonitor.initialize(archiveIngestProgress)
+        whenReady(archiveProgressMonitor.initialize(archiveIngestProgress).failed) { failedException =>
+          failedException shouldBe a[IdConstraintError]
+          assertTableOnlyHasItem(archiveIngestProgress, table)
         }
 
-        assertTableOnlyHasItem(archiveIngestProgress, table)
       }
     }
   }
@@ -62,20 +66,20 @@ class ProgressMonitorTest
           "uploadUrl",
           Some("http://localhost/archive/complete"))
 
-        archiveProgressMonitor.initialize(archiveIngestProgress)
+        whenReady(Future.sequence(Seq(
+          archiveProgressMonitor.initialize(archiveIngestProgress),
+          archiveProgressMonitor.addEvent(id, "This happened")))) { _ =>
+          val records =
+            Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
+          records.size shouldBe 1
+          val progress = records.head.right.get
 
-        archiveProgressMonitor.addEvent(id, "This happened")
-
-        val records =
-          Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
-        records.size shouldBe 1
-        val progress = records.head.right.get
-
-        progress.events.size shouldBe 1
-        progress.events.head.description shouldBe "This happened"
-        Duration
-          .between(progress.events.head.time, Instant.now)
-          .getSeconds should be <= 1L
+          progress.events.size shouldBe 1
+          progress.events.head.description shouldBe "This happened"
+          Duration
+            .between(progress.events.head.time, Instant.now)
+            .getSeconds should be <= 1L
+        }
       }
     }
   }
@@ -89,25 +93,26 @@ class ProgressMonitorTest
           "uploadUrl",
           Some("http://localhost/archive/complete"))
 
-        archiveProgressMonitor.initialize(archiveIngestProgress)
+        whenReady(Future.sequence(Seq(
+          archiveProgressMonitor.initialize(archiveIngestProgress),
+          archiveProgressMonitor.addEvent(id, "This happened"),
+          archiveProgressMonitor.addEvent(id, "And this too")))) { _ =>
 
-        archiveProgressMonitor.addEvent(id, "This happened")
-        archiveProgressMonitor.addEvent(id, "And this too")
+          val records =
+            Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
+          records.size shouldBe 1
+          val progress = records.head.right.get
 
-        val records =
-          Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
-        records.size shouldBe 1
-        val progress = records.head.right.get
-
-        progress.events.size shouldBe 2
-        progress.events.head.description shouldBe "This happened"
-        Duration
-          .between(progress.events.head.time, Instant.now)
-          .getSeconds should be <= 1L
-        progress.events(1).description shouldBe "And this too"
-        Duration
-          .between(progress.events(1).time, Instant.now)
-          .getSeconds should be <= 1L
+          progress.events.size shouldBe 2
+          progress.events.head.description shouldBe "This happened"
+          Duration
+            .between(progress.events.head.time, Instant.now)
+            .getSeconds should be <= 1L
+          progress.events(1).description shouldBe "And this too"
+          Duration
+            .between(progress.events(1).time, Instant.now)
+            .getSeconds should be <= 1L
+        }
       }
     }
   }
