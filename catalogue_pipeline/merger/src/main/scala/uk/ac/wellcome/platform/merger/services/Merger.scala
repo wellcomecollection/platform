@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.merger.services
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.merger.pairwise_transforms.{PairwiseResult, SierraPhysicalDigitalWorkPair}
 
 trait MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork]
@@ -37,42 +38,14 @@ class Merger extends Logging with MergerRules {
 
   private def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
                                    digitalWork: UnidentifiedWork) = {
-    (physicalWork.items, digitalWork.items) match {
-      case (
-          List(physicalItem: Identifiable[Item]),
-          List(digitalItem: Unidentifiable[Item])) =>
-        info(
-          s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
-        Some(
-          List(
-            physicalWork.copy(
-              otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
-              items = mergePhysicalAndDigitalItems(physicalItem, digitalItem)),
-            redirectWork(
-              workToRedirect = digitalWork,
-              redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)
-          ))
-      case _ =>
-        debug(
-          s"Not merging physical ${describeWorkPairWithItems(physicalWork, digitalWork)} as there are multiple items")
-        None
-    }
-  }
-
-  private def mergePhysicalAndDigitalItems(
-    physicalItem: Identifiable[Item],
-    digitalItem: Unidentifiable[Item]) = {
-    List(physicalItem.copy(agent = physicalItem.agent.copy(
-      locations = physicalItem.agent.locations ++ digitalItem.agent.locations)))
-  }
-
-  private def redirectWork(workToRedirect: UnidentifiedWork,
-                           redirectTargetSourceIdentifier: SourceIdentifier) = {
-    UnidentifiedRedirectedWork(
-      sourceIdentifier = workToRedirect.sourceIdentifier,
-      version = workToRedirect.version,
-      redirect = IdentifiableRedirect(redirectTargetSourceIdentifier)
+    val result = SierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
+      physicalWork = physicalWork,
+      digitalWork = digitalWork
     )
+
+    result.map { case PairwiseResult(mergedWork, redirectedWork) =>
+      List(mergedWork, redirectedWork)
+    }
   }
 
   private def isDigitalWork(work: UnidentifiedWork): Boolean = {
@@ -81,14 +54,4 @@ class Merger extends Logging with MergerRules {
       case Some(t) => t.id == "v" && t.label == "E-books"
     }
   }
-
-  private def describeWorkPair(physicalWork: UnidentifiedWork,
-                               digitalWork: UnidentifiedWork) =
-    s"physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value})"
-
-  private def describeWorkPairWithItems(physicalWork: UnidentifiedWork,
-                                        digitalWork: UnidentifiedWork) =
-    s"physical (id=${physicalWork.sourceIdentifier.value}, itemsCount=${physicalWork.items.size}) and " +
-      s"digital (id=${digitalWork.sourceIdentifier.value}, itemsCount=${digitalWork.items.size}) work"
-
 }
