@@ -23,7 +23,10 @@ object UploadVerificationFlow extends Logging {
 
     Flow[(BagLocation, BagContentItem, ZipFile)]
       .flatMapConcat {
-        case (bagLocation, BagContentItem(maybeChecksum, itemLocation), zipFile) =>
+        case (
+            bagLocation,
+            BagContentItem(maybeChecksum, itemLocation),
+            zipFile) =>
           val uploadLocation = createUploadLocation(bagLocation, itemLocation)
           val uploadSink = s3Client.multipartUpload(
             uploadLocation.namespace,
@@ -31,8 +34,8 @@ object UploadVerificationFlow extends Logging {
           )
 
           val extraction = Source
-              .single((itemLocation, zipFile))
-              .via(FileExtractorFlow())
+            .single((itemLocation, zipFile))
+            .via(FileExtractorFlow())
 
           val maybeVerify = maybeChecksum
             .map(DigestCalculatorFlow("SHA-256", _))
@@ -40,15 +43,13 @@ object UploadVerificationFlow extends Logging {
             .getOrElse(extraction)
 
           val uploadResult = maybeVerify
-              .runWith(uploadSink)
+            .runWith(uploadSink)
 
           Source
             .fromFuture(uploadResult)
             .log("upload result")
       }
   }
-
-
 
   private def createUploadLocation(
     bagLocation: BagLocation,
