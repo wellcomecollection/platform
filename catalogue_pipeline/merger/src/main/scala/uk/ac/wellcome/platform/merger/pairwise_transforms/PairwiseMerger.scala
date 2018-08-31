@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.merger.pairwise_transforms
 
-import uk.ac.wellcome.models.work.internal.{UnidentifiedRedirectedWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  UnidentifiedRedirectedWork,
+  UnidentifiedWork
+}
 
 /** Represents the outcome of a pairwise merge.
   *
@@ -18,5 +21,6 @@ case class PairwiseResult(
   * This base trait is used for all pairwise mergers.
   */
 trait PairwiseMerger {
-  def mergeAndRedirectWork(work1: UnidentifiedWork, work2: UnidentifiedWork): Option[PairwiseResult]
+  def mergeAndRedirectWork(work1: UnidentifiedWork,
+                           work2: UnidentifiedWork): Option[PairwiseResult]
 }

@@ -40,7 +40,8 @@ class Merger extends Logging with MergerRules {
   /** If we have a single physical Sierra work and a single digital Sierra work,
     * we can merge them into a single work.
     */
-  def maybeMergePhysicalDigitalWorkPair(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
+  def maybeMergePhysicalDigitalWorkPair(
+    works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
     val physicalWorks = works.filter { isSierraPhysicalWork }
     val digitalWorks = works.filter { isSierraDigitalWork }
 
@@ -54,7 +55,7 @@ class Merger extends Logging with MergerRules {
           case Some(result) => {
             val remainingWorks = works.filterNot { w =>
               w.sourceIdentifier == physicalWork.sourceIdentifier ||
-                w.sourceIdentifier == digitalWork.sourceIdentifier
+              w.sourceIdentifier == digitalWork.sourceIdentifier
             }
             remainingWorks ++ List(result.mergedWork, result.redirectedWork)
           }
@@ -65,7 +66,8 @@ class Merger extends Logging with MergerRules {
   }
 
   private def isSierraWork(work: UnidentifiedWork): Boolean =
-    work.sourceIdentifier.identifierType == IdentifierType("sierra-system-number")
+    work.sourceIdentifier.identifierType == IdentifierType(
+      "sierra-system-number")
 
   private def isDigitalWork(work: UnidentifiedWork): Boolean =
     work.workType match {

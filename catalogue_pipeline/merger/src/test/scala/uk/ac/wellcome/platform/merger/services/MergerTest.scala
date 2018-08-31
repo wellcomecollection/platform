@@ -19,7 +19,8 @@ class MergerTest extends FunSpec with MergerTestUtils {
 
       result.size shouldBe 2
 
-      val physicalItem = physicalWork.items.head.asInstanceOf[Identifiable[Item]]
+      val physicalItem =
+        physicalWork.items.head.asInstanceOf[Identifiable[Item]]
       val digitalItem = digitalWork.items.head
 
       val expectedMergedWork = physicalWork.copy(
@@ -39,7 +40,9 @@ class MergerTest extends FunSpec with MergerTestUtils {
         redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)
       )
 
-      result should contain theSameElementsAs List(expectedMergedWork, expectedRedirectedWork)
+      result should contain theSameElementsAs List(
+        expectedMergedWork,
+        expectedRedirectedWork)
     }
 
     it("merges a physical and digital work, even if there are extra works") {
@@ -59,12 +62,10 @@ class MergerTest extends FunSpec with MergerTestUtils {
       )
 
       result.size shouldBe 3
-      result
-        .collect { case r: UnidentifiedRedirectedWork => r}
-        .size shouldBe 1
+      result.collect { case r: UnidentifiedRedirectedWork => r }.size shouldBe 1
     }
 
-    it("ignores a single physical work")  {
+    it("ignores a single physical work") {
       val works = Seq(createPhysicalWork)
       merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
     }
@@ -75,22 +76,30 @@ class MergerTest extends FunSpec with MergerTestUtils {
     }
 
     it("ignores multiple physical works") {
-      val works = (1 to 3).map { _ => createPhysicalWork }
+      val works = (1 to 3).map { _ =>
+        createPhysicalWork
+      }
       merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
     }
 
     it("ignores multiple digital works") {
-      val works = (1 to 3).map { _ => createDigitalWork }
+      val works = (1 to 3).map { _ =>
+        createDigitalWork
+      }
       merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
     }
 
     it("ignores multiple physical works with a single digital work") {
-      val works = (1 to 3).map { _ => createPhysicalWork } ++ Seq(createDigitalWork)
+      val works = (1 to 3).map { _ =>
+        createPhysicalWork
+      } ++ Seq(createDigitalWork)
       merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
     }
 
     it("ignores multiple digital works with a single physical work") {
-      val works = (1 to 3).map { _ => createDigitalWork } ++ Seq(createPhysicalWork)
+      val works = (1 to 3).map { _ =>
+        createDigitalWork
+      } ++ Seq(createPhysicalWork)
       merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
     }
 
@@ -145,7 +154,9 @@ class MergerTest extends FunSpec with MergerTestUtils {
       redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)
     )
 
-    result should contain theSameElementsAs List(expectedMergedWork, expectedRedirectedWork)
+    result should contain theSameElementsAs List(
+      expectedMergedWork,
+      expectedRedirectedWork)
   }
 
   private def createPhysicalItem: Identifiable[Item] =

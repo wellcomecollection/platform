@@ -16,7 +16,8 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
   *
   */
 object MiroSierraWorkPair extends PairwiseMerger {
-  def mergeAndRedirectWork(miroWork: UnidentifiedWork,
-                           sierraWork: UnidentifiedWork): Option[PairwiseResult] =
+  def mergeAndRedirectWork(
+    miroWork: UnidentifiedWork,
+    sierraWork: UnidentifiedWork): Option[PairwiseResult] =
     None
 }

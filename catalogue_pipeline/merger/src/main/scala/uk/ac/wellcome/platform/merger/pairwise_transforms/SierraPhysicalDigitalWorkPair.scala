@@ -13,11 +13,15 @@ import uk.ac.wellcome.models.work.internal._
   *
   */
 object SierraPhysicalDigitalWorkPair extends PairwiseMerger with Logging {
-  def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
-                           digitalWork: UnidentifiedWork): Option[PairwiseResult] =
+  def mergeAndRedirectWork(
+    physicalWork: UnidentifiedWork,
+    digitalWork: UnidentifiedWork): Option[PairwiseResult] =
     (physicalWork.items, digitalWork.items) match {
-      case (List(physicalItem: Identifiable[Item]), List(digitalItem: Unidentifiable[Item])) => {
-        info(s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
+      case (
+          List(physicalItem: Identifiable[Item]),
+          List(digitalItem: Unidentifiable[Item])) => {
+        info(
+          s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
 
         // Copy the identifiers and locations from the physical work on to
         // the digital work.  We know both works only have a single item,
@@ -39,10 +43,11 @@ object SierraPhysicalDigitalWorkPair extends PairwiseMerger with Logging {
           redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)
         )
 
-        Some(PairwiseResult(
-          mergedWork = mergedWork,
-          redirectedWork = redirectedWork
-        ))
+        Some(
+          PairwiseResult(
+            mergedWork = mergedWork,
+            redirectedWork = redirectedWork
+          ))
       }
       case _ =>
         debug(

@@ -79,7 +79,8 @@ trait MergerTestUtils
 
   def createPhysicalWorkWith(
     items: List[Identifiable[Item]] = List(
-      createIdentifiableItemWith(locations = List(createPhysicalLocation)))): UnidentifiedWork =
+      createIdentifiableItemWith(locations = List(createPhysicalLocation))))
+    : UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
         createSourceIdentifierWith(identifierType = "sierra-system-number"),

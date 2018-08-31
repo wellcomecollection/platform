@@ -59,8 +59,7 @@ class SierraPhysicalDigitalWorkPairTest extends FunSpec with MergerTestUtils {
       physicalWorkWithOneItem.items.head.agent.locations ++
         digitalWorkWithOneItem.items.head.agent.locations
 
-    val expectedItem = physicalWorkWithOneItem
-      .items.head
+    val expectedItem = physicalWorkWithOneItem.items.head
       .asInstanceOf[Identifiable[Item]]
       .copy(
         agent = physicalWorkWithOneItem.items.head.agent.copy(
