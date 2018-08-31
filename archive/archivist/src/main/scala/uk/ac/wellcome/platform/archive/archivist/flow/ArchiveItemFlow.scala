@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Flow, Source}
 import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.models.{
-  BagDigestItem,
+  BagContentItem,
   BagLocation
 }
 import uk.ac.wellcome.storage.ObjectLocation
@@ -17,25 +17,33 @@ object ArchiveItemFlow extends Logging {
   def apply()(
     implicit s3Client: S3Client,
     materializer: ActorMaterializer
-  ): Flow[(BagLocation, BagDigestItem, ZipFile), Done, NotUsed] = {
+  ): Flow[(BagLocation, BagContentItem, ZipFile), Done, NotUsed] = {
 
     val uploadVerificationFlow = UploadVerificationFlow()
     val downloadVerification = DownloadVerificationFlow()
 
-    Flow[(BagLocation, BagDigestItem, ZipFile)].flatMapConcat {
-      case (bagLocation, bagDigestItem, zipFile) =>
-        Source
-          .single((bagLocation, bagDigestItem, zipFile))
+    Flow[(BagLocation, BagContentItem, ZipFile)].flatMapConcat {
+      case (bagLocation, bagContentItem, zipFile) => {
+        val archiveFlow: Source[ObjectLocation, NotUsed] = Source
+          .single((bagLocation, bagContentItem, zipFile))
           .log("uploading and verifying")
           .via(uploadVerificationFlow)
           .log("upload verified")
           .map {
             case MultipartUploadResult(_, bucket, key, _, _) =>
-              (ObjectLocation(bucket, key), bagDigestItem.checksum)
+              ObjectLocation(bucket, key)
           }
           .log("upload location")
-          .via(downloadVerification)
-          .log("download verified")
+
+        bagContentItem.checksum
+          .map(checksum => {
+            archiveFlow
+              .map(location => (location, checksum))
+              .via(downloadVerification)
+              .log("download verified")
+          })
+          .getOrElse(archiveFlow.map(_ => Done))
+      }
     }
   }
 }

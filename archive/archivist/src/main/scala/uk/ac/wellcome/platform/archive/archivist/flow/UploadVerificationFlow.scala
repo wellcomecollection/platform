@@ -8,7 +8,7 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Flow, Source}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.models.{
-  BagDigestItem,
+  BagContentItem,
   BagLocation
 }
 import uk.ac.wellcome.storage.ObjectLocation
@@ -17,28 +17,33 @@ object UploadVerificationFlow extends Logging {
   def apply()(
     implicit s3Client: S3Client,
     materializer: ActorMaterializer
-  ): Flow[(BagLocation, BagDigestItem, ZipFile),
+  ): Flow[(BagLocation, BagContentItem, ZipFile),
           MultipartUploadResult,
           NotUsed] = {
 
-    Flow[(BagLocation, BagDigestItem, ZipFile)]
+    Flow[(BagLocation, BagContentItem, ZipFile)]
       .flatMapConcat {
-        case (bagLocation, BagDigestItem(checksum, itemLocation), zipFile) =>
-          val extract = FileExtractorFlow()
-          val verify = DigestCalculatorFlow("SHA-256", checksum)
-
+        case (
+            bagLocation,
+            BagContentItem(maybeChecksum, itemLocation),
+            zipFile) =>
           val uploadLocation = createUploadLocation(bagLocation, itemLocation)
           val uploadSink = s3Client.multipartUpload(
             uploadLocation.namespace,
             uploadLocation.key
           )
 
-          val uploadResult =
-            Source
-              .single((itemLocation, zipFile))
-              .via(extract)
-              .via(verify)
-              .runWith(uploadSink)
+          val extraction = Source
+            .single((itemLocation, zipFile))
+            .via(FileExtractorFlow())
+
+          val maybeVerify = maybeChecksum
+            .map(DigestCalculatorFlow("SHA-256", _))
+            .map(extraction.via(_))
+            .getOrElse(extraction)
+
+          val uploadResult = maybeVerify
+            .runWith(uploadSink)
 
           Source
             .fromFuture(uploadResult)
