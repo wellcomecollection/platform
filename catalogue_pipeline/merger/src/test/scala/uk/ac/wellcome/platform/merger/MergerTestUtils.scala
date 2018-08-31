@@ -7,11 +7,7 @@ import uk.ac.wellcome.models.matcher.{
   MatcherResult,
   WorkIdentifier
 }
-import uk.ac.wellcome.models.work.internal.{
-  TransformedBaseWork,
-  UnidentifiedWork,
-  WorkType
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -70,7 +66,7 @@ trait MergerTestUtils
 
   def createDigitalWorkWith(
     items: List[Unidentifiable[Item]] = List(
-      createUnidentifiableItemWith(locations = List(createDigitalLocation))
+      createUnidentifiableItemWith(locations = List(createDigitalLocation)))
   ): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
@@ -85,13 +81,13 @@ trait MergerTestUtils
 
   def createPhysicalWorkWith(
     items: List[Identifiable[Item]] = List(
-      createIdentifiableItemWith(locations = List(createPhysicalLocation))): UnidentifiedWork =
+      createIdentifiableItemWith(locations = List(createPhysicalLocation)))): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
         createSourceIdentifierWith(identifierType = "sierra-system-number"),
       otherIdentifiers =
         List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
-      items = items)
+      items = items
     )
 
   def createPhysicalWork: UnidentifiedWork =
