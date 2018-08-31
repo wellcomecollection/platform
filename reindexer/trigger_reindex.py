@@ -53,10 +53,10 @@ def all_messages(total_segments):
         }
 
 
-def publish_messages(topic_arn, messages):
+def publish_messages(topic_arn, messages, total_segments):
     """Publish a sequence of messages to an SNS topic."""
     sns_client = boto3.client('sns')
-    for m in tqdm.tqdm(messages):
+    for m in tqdm.tqdm(messages, total=total_segments):
         resp = sns_client.publish(
             TopicArn=topic_arn,
             MessageStructure='json',
@@ -134,7 +134,8 @@ def main():
 
     publish_messages(
         topic_arn=topic_arn,
-        messages=messages
+        messages=messages,
+        total_segments=total_segments
     )
 
     # Now we update the write capacity of the SourceData table as high
