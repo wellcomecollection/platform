@@ -39,7 +39,7 @@ resource "aws_iam_role_policy" "archivist_task_sqs" {
 }
 
 resource "aws_iam_role_policy" "archive_bag_vhs" {
-  role = "${module.lambda_archive_bags.role_name}"
+  role   = "${module.lambda_archive_bags.role_name}"
   policy = "${module.vhs_archive_manifest.read_policy}"
 }
 
