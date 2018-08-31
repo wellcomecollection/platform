@@ -3,10 +3,12 @@
 Receives a message to ingest a bag giving the URL and publishes the archive event to an SNS topic.
 """
 
-import boto3
-import daiquiri
 import os
 import uuid
+
+import boto3
+import daiquiri
+
 from urllib.parse import urlparse
 from wellcome_aws_utils.lambda_utils import log_on_error
 from wellcome_aws_utils.sns_utils import publish_sns_message
@@ -52,6 +54,7 @@ def post_ingest_request(event, sns_client):
         'location': join_url((path, ingest_request_id))
     }
 
+
 def get_ingest_status(event, dynamodb_resource):
     dynamodb_resource = dynamodb_resource or boto3.resource('dynamodb')
     table_name = os.environ['TABLE_NAME']
@@ -64,6 +67,7 @@ def get_ingest_status(event, dynamodb_resource):
     )
     return item['Item']
 
+
 def archive_bag_message(archive_request_id, bag_url, callback_url):
     """
     Generates bag archive messages.
@@ -74,7 +78,7 @@ def archive_bag_message(archive_request_id, bag_url, callback_url):
         key = url.path.lstrip('/')
         msg = {
             'archiveRequestId': archive_request_id,
-            'bagLocation' : {
+            'bagLocation': {
                 'namespace': bucket,
                 'key': key
             }

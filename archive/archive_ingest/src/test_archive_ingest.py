@@ -1,12 +1,15 @@
 # -*- encoding: utf-8 -*-
 
-import archive_ingest
-import pytest
 import os
 from uuid import UUID
 
+import pytest
+
+import archive_ingest
+
 
 TABLE_NAME = 'archive-storage-progress-table'
+
 
 def test_post_sends_location_to_sns(sns_client, topic_arn):
     request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip')
@@ -28,12 +31,13 @@ def test_post_sends_location_to_sns(sns_client, topic_arn):
         }
     }
 
+
 def test_get_returns_status(dynamodb_resource):
     os.environ['TABLE_NAME'] = TABLE_NAME
 
     id = '245e3de7-5453-4ce1-a3ce-bd111753b1cf'
-    table= dynamodb_resource.Table(TABLE_NAME)
-    table.put_item(Item={'id': id, 'a':'b'})
+    table = dynamodb_resource.Table(TABLE_NAME)
+    table.put_item(Item={'id': id, 'a': 'b'})
 
     request = {
         'request_method': 'GET',
@@ -42,6 +46,7 @@ def test_get_returns_status(dynamodb_resource):
 
     response = archive_ingest.main(event=request, dynamodb_resource=dynamodb_resource)
     assert response['a'] == 'b'
+
 
 def test_sends_request_to_sns_with_callback(sns_client, topic_arn):
     request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip',
@@ -103,6 +108,7 @@ def ingest_request(upload_url, callback_url=None):
         'path': '/ingests/'
     }
 
+
 @pytest.yield_fixture(autouse=True)
 def run_around_tests(dynamodb_client):
     os.environ['TABLE_NAME'] = TABLE_NAME
@@ -110,6 +116,7 @@ def run_around_tests(dynamodb_client):
     create_table(dynamodb_client, TABLE_NAME)
     yield
     dynamodb_client.delete_table(TableName=TABLE_NAME)
+
 
 def create_table(dynamodb_client, table_name):
     try:
