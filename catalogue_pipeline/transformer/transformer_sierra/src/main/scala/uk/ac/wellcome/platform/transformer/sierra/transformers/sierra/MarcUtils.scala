@@ -13,7 +13,7 @@ trait MarcUtils {
     marcSubfieldTags: List[String]): List[List[MarcSubfield]] =
     bibData.varFields
       .collect {
-        case VarField(_, _, Some(m), _, _, subfields) if m == marcTag =>
+        case VarField(_, Some(m), _, _, subfields) if m == marcTag =>
           subfields.filter { subfield =>
             marcSubfieldTags.contains(subfield.tag)
           }

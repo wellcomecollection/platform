@@ -32,7 +32,6 @@ class MarcFieldTest extends FunSpec with Matchers with JsonAssertions {
     }"""
 
     val expectedVarField = VarField(
-      fieldTag = "n",
       marcTag = "008",
       indicator1 = " ",
       indicator2 = " ",
@@ -54,7 +53,6 @@ class MarcFieldTest extends FunSpec with Matchers with JsonAssertions {
     }"""
 
     val expectedVarField = VarField(
-      fieldTag = "c",
       content = "Enjoying an event with enormous eagles"
     )
 
