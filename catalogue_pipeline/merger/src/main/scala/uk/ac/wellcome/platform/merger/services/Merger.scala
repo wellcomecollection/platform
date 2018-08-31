@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.merger.services
 
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.pairwise_transforms.{PairwiseResult, SierraPhysicalDigitalWorkPair}
@@ -30,12 +29,34 @@ trait MergerRules {
   *     Sierra digital + Sierra physical
   *
   */
-class Merger @Inject() (
-  sierraPhysicalDigitalWorkPair: SierraPhysicalDigitalWorkPair
-) extends Logging with MergerRules {
+class Merger extends Logging with MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
     mergePhysicalDigitalPair(works)
       .getOrElse(works)
+  }
+
+  /** If we have a single physical Sierra work and a single digital Sierra work,
+    * we can merge them into a single work.
+    */
+  def maybeMergePhysicalDigitalWorkPair(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
+    val physicalWorks = works.filter { isSierraPhysicalWork }
+    val digitalWorks = works.filter { isSierraDigitalWork }
+
+    (physicalWorks, digitalWorks) match {
+      case (List(physicalWork), List(digitalWork)) =>
+        val maybeResult = SierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
+          physicalWork = physicalWork,
+          digitalWork = digitalWork
+        )
+        maybeResult match {
+          case Some(result) => {
+            val remainingWorks = works.filterNot { isSierraWork }
+            remainingWorks ++ List(result.mergedWork, result.redirectedWork)
+          }
+          case None => works
+        }
+      case _ => works
+    }
   }
 
   private def mergePhysicalDigitalPair(works: Seq[UnidentifiedWork]) = {
@@ -62,7 +83,7 @@ class Merger @Inject() (
 
   private def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
                                    digitalWork: UnidentifiedWork) = {
-    val result = sierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
+    val result = SierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
       physicalWork = physicalWork,
       digitalWork = digitalWork
     )
@@ -71,9 +92,6 @@ class Merger @Inject() (
       List(mergedWork, redirectedWork)
     }
   }
-
-  private def isMiroWork(work: UnidentifiedWork): Boolean =
-    work.sourceIdentifier.identifierType == IdentifierType("miro-image-number")
 
   private def isSierraWork(work: UnidentifiedWork): Boolean =
     work.sourceIdentifier.identifierType == IdentifierType("sierra-system-number")
@@ -87,4 +105,7 @@ class Merger @Inject() (
 
   private def isSierraDigitalWork(work: UnidentifiedWork): Boolean =
     isSierraWork(work) && isDigitalWork(work)
+
+  private def isSierraPhysicalWork(work: UnidentifiedWork): Boolean =
+    isSierraWork(work) && !isDigitalWork(work)
 }

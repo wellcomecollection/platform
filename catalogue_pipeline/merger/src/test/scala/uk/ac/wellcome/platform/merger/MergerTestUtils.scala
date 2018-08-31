@@ -68,26 +68,32 @@ trait MergerTestUtils
       storeInVHS(vhs = vhs, work = work)
     }
 
-  def createDigitalWork: UnidentifiedWork = {
+  def createDigitalWorkWith(
+    items: List[Unidentifiable[Item]] = List(
+      createUnidentifiableItemWith(locations = List(createDigitalLocation))
+  ): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
         createSourceIdentifierWith(identifierType = "miro-image-number"),
       otherIdentifiers = List(
         createSourceIdentifierWith(identifierType = "miro-library-reference")),
       workType = Some(WorkType("v", "E-books")),
-      items = List(
-        createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+      items = items
     )
-  }
 
-  def createPhysicalWork: UnidentifiedWork = {
+  def createDigitalWork: UnidentifiedWork = createDigitalWorkWith()
+
+  def createPhysicalWorkWith(
+    items: List[Identifiable[Item]] = List(
+      createIdentifiableItemWith(locations = List(createPhysicalLocation))): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
         createSourceIdentifierWith(identifierType = "sierra-system-number"),
       otherIdentifiers =
         List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
-      items = List(
-        createIdentifiableItemWith(locations = List(createPhysicalLocation)))
+      items = items)
     )
-  }
+
+  def createPhysicalWork: UnidentifiedWork =
+    createPhysicalWorkWith()
 }

@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.work.internal._
   * work, and redirect the digital work to the physical work.
   *
   */
-class SierraPhysicalDigitalWorkPair extends PairwiseMerger with Logging {
+object SierraPhysicalDigitalWorkPair extends PairwiseMerger with Logging {
   def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
                            digitalWork: UnidentifiedWork): Option[PairwiseResult] =
     (physicalWork.items, digitalWork.items) match {
