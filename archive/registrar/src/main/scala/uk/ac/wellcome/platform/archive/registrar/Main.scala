@@ -3,11 +3,8 @@ package uk.ac.wellcome.platform.archive.registrar
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{
-  AppConfigModule,
-  ConfigModule,
-  VHSModule
-}
+import uk.ac.wellcome.platform.archive.common.progress.modules.ArchiveProgressMonitorModule
+import uk.ac.wellcome.platform.archive.registrar.modules.{AppConfigModule, ConfigModule, VHSModule}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -23,6 +20,7 @@ object Main extends App with Logging {
     SQSClientModule,
     SNSAsyncClientModule,
     DynamoClientModule,
+    ArchiveProgressMonitorModule,
     MessageStreamModule
   )
 

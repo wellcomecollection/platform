@@ -6,29 +6,29 @@ import java.util.UUID
 import com.gu.scanamo.Scanamo
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixtures
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveIngestProgress
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
 import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 class ProgressMonitorTest
     extends FunSpec
     with LocalDynamoDb
-    with ArchiveProgressMonitorFixtures
+    with ArchiveProgressMonitorFixture
     with ScalaFutures {
 
   it("creates a progress monitor") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withArchiveProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
-        val archiveIngestProgress = ArchiveIngestProgress(
+        val archiveProgress = ArchiveProgress(
           id,
           "uploadUrl",
-          "http://localhost/archive/complete")
+          Some("http://localhost/archive/complete"))
 
-        archiveProgressMonitor.create(archiveIngestProgress)
+        archiveProgressMonitor.initialize(archiveProgress)
 
-        assertTableOnlyHasItem(archiveIngestProgress, table)
+        assertTableOnlyHasItem(archiveProgress, table)
       }
     }
   }
@@ -37,15 +37,15 @@ class ProgressMonitorTest
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withArchiveProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
-        val archiveIngestProgress = ArchiveIngestProgress(
+        val archiveIngestProgress = ArchiveProgress(
           id,
           "uploadUrl",
-          "http://localhost/archive/complete")
+          Some("http://localhost/archive/complete"))
 
         givenTableHasItem(archiveIngestProgress, table)
 
         intercept[DynamoNonFatalError] {
-          archiveProgressMonitor.create(archiveIngestProgress)
+          archiveProgressMonitor.initialize(archiveIngestProgress)
         }
 
         assertTableOnlyHasItem(archiveIngestProgress, table)
@@ -57,17 +57,17 @@ class ProgressMonitorTest
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withArchiveProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
-        val archiveIngestProgress = ArchiveIngestProgress(
+        val archiveIngestProgress = ArchiveProgress(
           id,
           "uploadUrl",
-          "http://localhost/archive/complete")
+          Some("http://localhost/archive/complete"))
 
-        archiveProgressMonitor.create(archiveIngestProgress)
+        archiveProgressMonitor.initialize(archiveIngestProgress)
 
         archiveProgressMonitor.addEvent(id, "This happened")
 
         val records =
-          Scanamo.scan[ArchiveIngestProgress](dynamoDbClient)(table.name)
+          Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
         records.size shouldBe 1
         val progress = records.head.right.get
 
@@ -84,18 +84,18 @@ class ProgressMonitorTest
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withArchiveProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
-        val archiveIngestProgress = ArchiveIngestProgress(
+        val archiveIngestProgress = ArchiveProgress(
           id,
           "uploadUrl",
-          "http://localhost/archive/complete")
+          Some("http://localhost/archive/complete"))
 
-        archiveProgressMonitor.create(archiveIngestProgress)
+        archiveProgressMonitor.initialize(archiveIngestProgress)
 
         archiveProgressMonitor.addEvent(id, "This happened")
         archiveProgressMonitor.addEvent(id, "And this too")
 
         val records =
-          Scanamo.scan[ArchiveIngestProgress](dynamoDbClient)(table.name)
+          Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
         records.size shouldBe 1
         val progress = records.head.right.get
 

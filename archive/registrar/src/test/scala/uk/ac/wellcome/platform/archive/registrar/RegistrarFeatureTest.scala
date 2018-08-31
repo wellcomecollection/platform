@@ -9,25 +9,22 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{
-  Registrar => RegistrarFixture
-}
-import uk.ac.wellcome.platform.archive.registrar.models.{
-  BagRegistrationCompleteNotification,
-  StorageManifest,
-  StorageManifestFactory
-}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
+import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrarFeatureTest
     extends FunSpec
-    with Matchers
-    with ScalaFutures
-    with MetricsSenderFixture
-    with ExtendedPatience
-    with RegistrarFixture {
+      with Matchers
+      with ScalaFutures
+      with MetricsSenderFixture
+      with ExtendedPatience
+      with ArchiveProgressMonitorFixture
+      with RegistrarFixture {
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
@@ -40,15 +37,13 @@ class RegistrarFeatureTest
           topic,
           registrar,
           hybridBucket,
-          hybridTable) =>
+          hybridTable,
+          progressTable) =>
         val requestId = UUID.randomUUID()
         val callbackUrl = new URI("http://localhost/archive/complete")
+        withBagNotification(requestId, Some(callbackUrl), queuePair, storageBucket) { bagLocation =>
+          givenArchiveProgressRecord(requestId.toString, "upLoadUrl", Some(callbackUrl.toString), progressTable)
 
-        withBagNotification(
-          requestId,
-          Some(callbackUrl),
-          queuePair,
-          storageBucket) { bagLocation =>
           registrar.run()
 
           implicit val _ = s3Client
@@ -59,9 +54,7 @@ class RegistrarFeatureTest
 
               eventually {
                 assertSnsReceivesOnly(
-                  BagRegistrationCompleteNotification(
-                    requestId,
-                    storageManifest),
+                  BagRegistrationCompleteNotification(requestId, storageManifest),
                   topic
                 )
 
@@ -71,6 +64,13 @@ class RegistrarFeatureTest
                   storageManifest.id.value,
                   storageManifest
                 )
+
+                assertProgressRecordedRecentEvents(requestId.toString,
+                  Seq(
+                    "registered"),
+                  progressTable)
+                assertProgressStatus(requestId.toString, ArchiveProgress.Completed, progressTable)
+
               }
           }
         }

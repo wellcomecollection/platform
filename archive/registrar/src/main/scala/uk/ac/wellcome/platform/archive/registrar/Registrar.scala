@@ -11,11 +11,11 @@ import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, NotificationMessage}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
+import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.registrar.flows.RecordArchiveProgressEventFlow
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -33,19 +33,20 @@ class Registrar @Inject()(
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
+  archiveProgressMonitor: ArchiveProgressMonitor,
   actorSystem: ActorSystem
 ) {
   def run() = {
 
     implicit val client = snsClient
     implicit val system = actorSystem
+    implicit val progressMonitor = archiveProgressMonitor
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
     implicit val materializer: ActorMaterializer = ActorMaterializer()
-    implicit val executionContext: ExecutionContextExecutor =
-      actorSystem.dispatcher
+    implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
 
     implicit val s3Client: AmazonS3 = S3ClientFactory.create(
       region = s3ClientConfig.region,
@@ -58,13 +59,9 @@ class Registrar @Inject()(
       .log("notification message")
       .map(parseNotification)
       .flatMapConcat(createStorageManifest)
-      .map {
-        case (manifest, context) => updateStoredManifest(manifest, context)
-      }
-      .map {
-        case (manifest, context) =>
-          BagRegistrationCompleteNotification(context.requestId, manifest)
-      }
+      .map { case (manifest, context) => updateStoredManifest(manifest, context) }
+      .via(RecordArchiveProgressEventFlow("registered", Some(ArchiveProgress.Completed)))
+      .map { case (manifest, context) => BagRegistrationCompleteNotification(context.requestId, manifest) }
       .log("created notification")
       .map(serializeCompletedNotification)
       .log("notification serialised")
@@ -76,8 +73,7 @@ class Registrar @Inject()(
 
   private def parseNotification(message: NotificationMessage) = {
     fromJson[BagArchiveCompleteNotification](message.Message) match {
-      case Success(
-          bagArchiveCompleteNotification: BagArchiveCompleteNotification) =>
+      case Success(bagArchiveCompleteNotification: BagArchiveCompleteNotification) =>
         RegisterRequestContext(bagArchiveCompleteNotification)
       case Failure(e) =>
         throw new RuntimeException(
@@ -86,18 +82,14 @@ class Registrar @Inject()(
     }
   }
 
-  private def createStorageManifest(requestContext: RegisterRequestContext)(
-    implicit s3Client: AmazonS3,
-    materializer: ActorMaterializer,
-    executionContext: ExecutionContextExecutor) = {
+  private def createStorageManifest(requestContext: RegisterRequestContext)(implicit s3Client: AmazonS3, materializer: ActorMaterializer, executionContext: ExecutionContextExecutor) = {
     Source.fromFuture(
-      for (manifest <- StorageManifestFactory
-             .create(requestContext.bagLocation))
-        yield (manifest, requestContext))
+      for (
+        manifest <- StorageManifestFactory.create(requestContext.bagLocation)
+      ) yield (manifest, requestContext))
   }
 
-  private def updateStoredManifest(storageManifest: StorageManifest,
-                                   requestContext: RegisterRequestContext) = {
+  private def updateStoredManifest(storageManifest: StorageManifest, requestContext: RegisterRequestContext) = {
     dataStore.updateRecord(storageManifest.id.value)(
       ifNotExisting = (storageManifest, EmptyMetadata()))(
       ifExisting = (_, _) => (storageManifest, EmptyMetadata())
@@ -105,11 +97,11 @@ class Registrar @Inject()(
     (storageManifest, requestContext)
   }
 
-  private def serializeCompletedNotification(
-    bagRegistrationCompleteNotification: BagRegistrationCompleteNotification) = {
+  private def serializeCompletedNotification(bagRegistrationCompleteNotification: BagRegistrationCompleteNotification) = {
     toJson(bagRegistrationCompleteNotification) match {
-      case Success(json) => json
-      case Failure(e)    => throw e
-    }
+        case Success(json) => json
+        case Failure(e)    => throw e
+      }
   }
 }
+

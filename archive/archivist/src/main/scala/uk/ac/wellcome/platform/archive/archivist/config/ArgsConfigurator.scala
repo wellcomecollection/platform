@@ -5,12 +5,9 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.archivist.models._
-import uk.ac.wellcome.platform.archive.common.modules.{
-  CloudwatchClientConfig,
-  S3ClientConfig,
-  SQSClientConfig,
-  SnsClientConfig
-}
+import uk.ac.wellcome.platform.archive.common.modules._
+import uk.ac.wellcome.platform.archive.common.progress.modules.ArchiveProgressMonitorConfig
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.duration._
 
@@ -47,6 +44,13 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   val uploadNamespace = opt[String](required = true)
   val uploadPrefix = opt[String](default = Some("archive"))
   val digestDelimiterRegexp = opt[String](default = Some(" +"))
+
+  val archiveProgressMonitorTableName = opt[String](required = true)
+
+  val archiveProgressMonitorDynamoAccessKey = opt[String]()
+  val archiveProgressMonitorDynamoSecretKey = opt[String]()
+  val archiveProgressMonitorDynamoRegion = opt[String](default = Some("eu-west-1"))
+  val archiveProgressMonitorDynamoEndpoint = opt[String]()
 
   verify()
 
@@ -97,12 +101,24 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     topicArn(),
   )
 
+  val archiveProgressMonitorConfig = ArchiveProgressMonitorConfig(
+    DynamoConfig(
+      table = archiveProgressMonitorTableName(),
+      maybeIndex = None
+    ),
+    DynamoClientConfig(
+      accessKey = archiveProgressMonitorDynamoAccessKey.toOption,
+      secretKey = archiveProgressMonitorDynamoSecretKey.toOption,
+      region = archiveProgressMonitorDynamoRegion(),
+      endpoint = archiveProgressMonitorDynamoEndpoint.toOption
+    ))
+
   val metricsConfig = MetricsConfig(
     namespace = metricsNamespace(),
     flushInterval = metricsFlushIntervalSeconds() seconds
   )
 
-  val appConfig = AppConfig(
+  val appConfig = ArchivistConfig(
     s3ClientConfig,
     bagUploaderConfig,
     cloudwatchClientConfig,
@@ -110,6 +126,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     sqsConfig,
     snsClientConfig,
     snsConfig,
+    archiveProgressMonitorConfig,
     metricsConfig
   )
 }

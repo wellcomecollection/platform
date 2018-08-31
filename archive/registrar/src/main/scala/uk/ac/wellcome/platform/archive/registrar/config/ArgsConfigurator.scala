@@ -5,6 +5,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
+import uk.ac.wellcome.platform.archive.common.progress.modules.ArchiveProgressMonitorConfig
 import uk.ac.wellcome.platform.archive.registrar.models.RegistrarConfig
 import uk.ac.wellcome.platform.archive.registrar.modules.HybridStoreConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -59,6 +60,13 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   val hybridGlobalS3Prefix = opt[String](default = Some("archive"))
   val hybridDynamoTableName = opt[String]()
   val hybridS3BucketName = opt[String]()
+
+  val archiveProgressMonitorTableName = opt[String](required = true)
+
+  val archiveProgressMonitorDynamoAccessKey = opt[String]()
+  val archiveProgressMonitorDynamoSecretKey = opt[String]()
+  val archiveProgressMonitorDynamoRegion = opt[String](default = Some("eu-west-1"))
+  val archiveProgressMonitorDynamoEndpoint = opt[String]()
 
   verify()
 
@@ -127,6 +135,18 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     flushInterval = metricsFlushIntervalSeconds() seconds
   )
 
+  val archiveProgressMonitorConfig = ArchiveProgressMonitorConfig(
+    DynamoConfig(
+      table = archiveProgressMonitorTableName(),
+      maybeIndex = None
+    ),
+    DynamoClientConfig(
+      accessKey = archiveProgressMonitorDynamoAccessKey.toOption,
+      secretKey = archiveProgressMonitorDynamoSecretKey.toOption,
+      region = archiveProgressMonitorDynamoRegion(),
+      endpoint = archiveProgressMonitorDynamoEndpoint.toOption
+    ))
+
   val appConfig = RegistrarConfig(
     s3ClientConfig,
     cloudwatchClientConfig,
@@ -135,6 +155,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     snsClientConfig,
     snsConfig,
     hybridStoreConfig,
+    archiveProgressMonitorConfig,
     metricsConfig
   )
 }

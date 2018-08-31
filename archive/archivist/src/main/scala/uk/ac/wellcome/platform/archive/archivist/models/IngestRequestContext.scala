@@ -5,7 +5,7 @@ import java.util.UUID
 
 import uk.ac.wellcome.storage.ObjectLocation
 
-case class IngestRequestContext(requestId: UUID,
+case class IngestRequestContext(id: UUID,
                                 bagLocation: ObjectLocation,
                                 callbackUrl: Option[URI] = None)
 
