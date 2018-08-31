@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.merger.services
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.MergerTestUtils
-import uk.ac.wellcome.platform.merger.pairwise_transforms.SierraPhysicalDigitalWorkPair
 
 class MergerTest extends FunSpec with MergerTestUtils {
 
