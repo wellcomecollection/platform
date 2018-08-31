@@ -34,10 +34,8 @@ trait MergerRules {
   *
   */
 class Merger extends Logging with MergerRules {
-  def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
-    mergePhysicalDigitalPair(works)
-      .getOrElse(works)
-  }
+  def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] =
+    maybeMergePhysicalDigitalWorkPair(works)
 
   /** If we have a single physical Sierra work and a single digital Sierra work,
     * we can merge them into a single work.
@@ -63,43 +61,8 @@ class Merger extends Logging with MergerRules {
     }
   }
 
-  private def mergePhysicalDigitalPair(works: Seq[UnidentifiedWork]) = {
-    if (works.size == 2) {
-      val (digitalWorks, physicalWorks) = works.partition(isDigitalWork)
-      mergePhysicalAndDigitalWorks(physicalWorks, digitalWorks)
-    } else {
-      None
-    }
-  }
-
-  private def mergePhysicalAndDigitalWorks(
-    physicalWorks: Seq[UnidentifiedWork],
-    digitalWorks: Seq[UnidentifiedWork]) = {
-    (physicalWorks, digitalWorks) match {
-      // As the works are supplied by the matcher these are trusted to refer to the same work without verification.
-      // However, it may be prudent to add extra checks before making the merge here.
-      case (List(physicalWork), List(digitalWork)) =>
-        mergeAndRedirectWork(physicalWork, digitalWork)
-      case _ =>
-        None
-    }
-  }
-
-  private def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
-                                   digitalWork: UnidentifiedWork) = {
-    val result = SierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
-      physicalWork = physicalWork,
-      digitalWork = digitalWork
-    )
-
-    result.map { case PairwiseResult(mergedWork, redirectedWork) =>
-      List(mergedWork, redirectedWork)
-    }
-  }
-
   private def isSierraWork(work: UnidentifiedWork): Boolean =
     work.sourceIdentifier.identifierType == IdentifierType("sierra-system-number")
-
 
   private def isDigitalWork(work: UnidentifiedWork): Boolean =
     work.workType match {
