@@ -28,6 +28,10 @@ trait MergerRules {
   *     Miro + Sierra physical
   *     Sierra digital + Sierra physical
   *
+  * Each of these pairwise merges is implemented as a single method on
+  * this class, and each method should take the list of current works,
+  * and return the remaining works after applying this transformation.
+  *
   */
 class Merger extends Logging with MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
