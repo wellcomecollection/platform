@@ -42,6 +42,28 @@ class MergerTest extends FunSpec with MergerTestUtils {
       result should contain theSameElementsAs List(expectedMergedWork, expectedRedirectedWork)
     }
 
+    it("merges a physical and digital work, even if there are extra works") {
+      val physicalWork = createPhysicalWork
+      val digitalWork = createDigitalWork
+
+      val result = merger.maybeMergePhysicalDigitalWorkPair(
+        works = Seq(
+          physicalWork,
+          digitalWork,
+          createUnidentifiedWorkWith(
+            sourceIdentifier = createSourceIdentifierWith(
+              identifierType = "miro-image-number"
+            )
+          )
+        )
+      )
+
+      result.size shouldBe 3
+      result
+        .collect { case r: UnidentifiedRedirectedWork => r}
+        .size shouldBe 1
+    }
+
     it("ignores a single physical work")  {
       val works = Seq(createPhysicalWork)
       merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works

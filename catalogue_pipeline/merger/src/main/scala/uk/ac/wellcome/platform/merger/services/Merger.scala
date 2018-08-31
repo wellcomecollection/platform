@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.merger.services
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.merger.pairwise_transforms.{PairwiseResult, SierraPhysicalDigitalWorkPair}
+import uk.ac.wellcome.platform.merger.pairwise_transforms.SierraPhysicalDigitalWorkPair
 
 trait MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork]
@@ -52,7 +52,10 @@ class Merger extends Logging with MergerRules {
         )
         maybeResult match {
           case Some(result) => {
-            val remainingWorks = works.filterNot { isSierraWork }
+            val remainingWorks = works.filterNot { w =>
+              w.sourceIdentifier == physicalWork.sourceIdentifier ||
+                w.sourceIdentifier == digitalWork.sourceIdentifier
+            }
             remainingWorks ++ List(result.mergedWork, result.redirectedWork)
           }
           case None => works

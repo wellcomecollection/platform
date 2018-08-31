@@ -70,9 +70,7 @@ trait MergerTestUtils
   ): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "miro-image-number"),
-      otherIdentifiers = List(
-        createSourceIdentifierWith(identifierType = "miro-library-reference")),
+        createSourceIdentifierWith(identifierType = "sierra-system-number"),
       workType = Some(WorkType("v", "E-books")),
       items = items
     )
