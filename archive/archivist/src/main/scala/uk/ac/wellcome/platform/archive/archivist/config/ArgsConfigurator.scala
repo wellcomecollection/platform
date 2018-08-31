@@ -49,7 +49,8 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   val archiveProgressMonitorDynamoAccessKey = opt[String]()
   val archiveProgressMonitorDynamoSecretKey = opt[String]()
-  val archiveProgressMonitorDynamoRegion = opt[String](default = Some("eu-west-1"))
+  val archiveProgressMonitorDynamoRegion =
+    opt[String](default = Some("eu-west-1"))
   val archiveProgressMonitorDynamoEndpoint = opt[String]()
 
   verify()
@@ -111,7 +112,8 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
       secretKey = archiveProgressMonitorDynamoSecretKey.toOption,
       region = archiveProgressMonitorDynamoRegion(),
       endpoint = archiveProgressMonitorDynamoEndpoint.toOption
-    ))
+    )
+  )
 
   val metricsConfig = MetricsConfig(
     namespace = metricsNamespace(),

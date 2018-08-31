@@ -5,10 +5,21 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.flow.{BadChecksum, FailedArchivingException, UploadAndVerifyBagFlow}
-import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, IngestRequestContextGenerators, UploadConfig}
+import uk.ac.wellcome.platform.archive.archivist.flow.{
+  BadChecksum,
+  FailedArchivingException,
+  UploadAndVerifyBagFlow
+}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagItConfig,
+  BagUploaderConfig,
+  IngestRequestContextGenerators,
+  UploadConfig
+}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.common.models.BagName
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -45,7 +56,9 @@ class UploadAndVerifyBagFlowTest
           val uploader = UploadAndVerifyBagFlow(bagUploaderConfig)
           val ingestContext = createIngestRequestContextWith()
           val (_, verification) =
-            uploader.runWith(Source.single((zipFile, ingestContext)), Sink.ignore)
+            uploader.runWith(
+              Source.single((zipFile, ingestContext)),
+              Sink.ignore)
 
           whenReady(verification) { _ =>
             listKeysInBucket(storageBucket) should have size 5
@@ -70,7 +83,9 @@ class UploadAndVerifyBagFlowTest
           val ingestContext = createIngestRequestContextWith()
 
           val (_, verification) =
-            uploader.runWith(Source.single((zipFile, ingestContext)), Sink.ignore)
+            uploader.runWith(
+              Source.single((zipFile, ingestContext)),
+              Sink.ignore)
 
           whenReady(verification.failed) { actualException =>
             val expectedException =

@@ -11,9 +11,16 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.models.IngestBagRequestNotification
-import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.archivist.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
-import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  AkkaS3,
+  BagIt,
+  FileEntry
+}
 import uk.ac.wellcome.platform.archive.common.models.BagName
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
@@ -25,7 +32,7 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Archivist
-  extends AkkaS3
+    extends AkkaS3
     with LocalDynamoDb
     with ArchiveProgressMonitorFixture
     with Messaging
@@ -35,7 +42,8 @@ trait Archivist
                  file: File,
                  ingestBucket: Bucket,
                  callbackUri: Option[URI],
-                 queuePair: QueuePair)(testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
+                 queuePair: QueuePair)(
+    testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
     val uploadKey = s"upload/path/$bagName.zip"
 
     s3Client.putObject(ingestBucket.name, uploadKey, file)
@@ -44,7 +52,10 @@ trait Archivist
     val ingestRequestId = UUID.randomUUID()
     sendNotificationToSQS(
       queuePair.queue,
-      IngestBagRequestNotification(ingestRequestId, uploadedBagLocation, callbackUri))
+      IngestBagRequestNotification(
+        ingestRequestId,
+        uploadedBagLocation,
+        callbackUri))
 
     testWith((ingestRequestId, uploadedBagLocation, bagName))
   }
@@ -52,14 +63,16 @@ trait Archivist
   def sendFakeBag[R](ingestBucket: Bucket,
                      callbackUri: Option[URI],
                      queuePair: QueuePair,
-                     valid: Boolean = true)(testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
+                     valid: Boolean = true)(
+    testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
 
     withBag(12, valid) {
       case (bagName, _, file) =>
         createBagItZip(bagName, 12, valid)
 
-        sendBag(bagName, file, ingestBucket, callbackUri, queuePair) { case (requestId, uploadObjectLocation, bag) =>
-          testWith((requestId, uploadObjectLocation, bag))
+        sendBag(bagName, file, ingestBucket, callbackUri, queuePair) {
+          case (requestId, uploadObjectLocation, bag) =>
+            testWith((requestId, uploadObjectLocation, bag))
         }
     }
   }
@@ -77,8 +90,10 @@ trait Archivist
     file.delete()
   }
 
-  def withApp[R](storageBucket: Bucket, queuePair: QueuePair, topicArn: Topic, progressTable: Table)(
-    testWith: TestWith[ArchivistApp, R]) = {
+  def withApp[R](storageBucket: Bucket,
+                 queuePair: QueuePair,
+                 topicArn: Topic,
+                 progressTable: Table)(testWith: TestWith[ArchivistApp, R]) = {
     val archivist = new ArchivistApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(
@@ -99,19 +114,31 @@ trait Archivist
   }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Table, ArchivistApp), R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Table, ArchivistApp),
+                       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalSnsTopic { snsTopic =>
-        withLocalS3Bucket { ingestBucket =>
-          withLocalS3Bucket { storageBucket =>
-            withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { progressTable =>
-              withApp(storageBucket, queuePair, snsTopic, progressTable) { archivist =>
-                testWith(
-                  (ingestBucket, storageBucket, queuePair, snsTopic, progressTable, archivist))
+      withLocalSnsTopic {
+        snsTopic =>
+          withLocalS3Bucket {
+            ingestBucket =>
+              withLocalS3Bucket {
+                storageBucket =>
+                  withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) {
+                    progressTable =>
+                      withApp(storageBucket, queuePair, snsTopic, progressTable) {
+                        archivist =>
+                          testWith(
+                            (
+                              ingestBucket,
+                              storageBucket,
+                              queuePair,
+                              snsTopic,
+                              progressTable,
+                              archivist))
+                      }
+                  }
               }
-            }
           }
-        }
       }
     })
   }

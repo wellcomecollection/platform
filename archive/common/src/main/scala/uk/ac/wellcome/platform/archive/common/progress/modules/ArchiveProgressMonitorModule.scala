@@ -9,8 +9,9 @@ import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
 object ArchiveProgressMonitorModule extends AbstractModule {
 
   @Provides
-  def providesArchiveProgressMonitor(actorSystem: ActorSystem,
-                                     progressMonitorConfig: ArchiveProgressMonitorConfig) = {
+  def providesArchiveProgressMonitor(
+    actorSystem: ActorSystem,
+    progressMonitorConfig: ArchiveProgressMonitorConfig) = {
     val dynamoClientConfig = progressMonitorConfig.dynamoClientConfig
 
     val dynamoClient = DynamoClientFactory.create(
@@ -20,7 +21,9 @@ object ArchiveProgressMonitorModule extends AbstractModule {
       secretKey = dynamoClientConfig.secretKey.getOrElse("")
     )
     implicit val executionContext = actorSystem.dispatcher
-    new ArchiveProgressMonitor(dynamoClient, progressMonitorConfig.dynamoConfig)(executionContext)
+    new ArchiveProgressMonitor(
+      dynamoClient,
+      progressMonitorConfig.dynamoConfig)(executionContext)
   }
 }
 

@@ -9,19 +9,22 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{ArchiveProgress, ProgressEvent}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  ArchiveProgress,
+  ProgressEvent
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ArchiveProgressMonitor(dynamoDbClient: AmazonDynamoDB,
-                             dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
-  extends Logging {
+class ArchiveProgressMonitor(
+  dynamoDbClient: AmazonDynamoDB,
+  dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
+    extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException]( str =>
-      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str))
-    )(
+    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
+      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
       DateTimeFormatter.ISO_INSTANT.format(_)
     )
 
@@ -35,9 +38,12 @@ class ArchiveProgressMonitor(dynamoDbClient: AmazonDynamoDB,
 
     Scanamo.exec(dynamoDbClient)(ops) match {
       case Left(e: ConditionalCheckFailedException) =>
-        throw IdConstraintError(s"There is already a monitor with id:${progress.id}", e)
+        throw IdConstraintError(
+          s"There is already a monitor with id:${progress.id}",
+          e)
       case Left(scanamoError) =>
-        val exception = new RuntimeException(s"Failed to create progress ${scanamoError.toString}")
+        val exception = new RuntimeException(
+          s"Failed to create progress ${scanamoError.toString}")
         warn(s"Failed to update Dynamo record: ${progress.id}", exception)
         throw exception
       case Right(a) =>
@@ -46,12 +52,13 @@ class ArchiveProgressMonitor(dynamoDbClient: AmazonDynamoDB,
     progress
   }
 
-  def addEvent(id: String, description: String, status: Option[ArchiveProgress.Status] = None) = Future {
+  def addEvent(id: String,
+               description: String,
+               status: Option[ArchiveProgress.Status] = None) = Future {
     val event = ProgressEvent(description, Instant.now())
 
-
     val update = status match {
-      case None => append('events -> event)
+      case None    => append('events -> event)
       case Some(s) => append('events -> event) and set('result -> s)
     }
 
@@ -76,4 +83,4 @@ class ArchiveProgressMonitor(dynamoDbClient: AmazonDynamoDB,
 
 final case class IdConstraintError(private val message: String,
                                    private val cause: Throwable)
-  extends Exception(message, cause)
+    extends Exception(message, cause)

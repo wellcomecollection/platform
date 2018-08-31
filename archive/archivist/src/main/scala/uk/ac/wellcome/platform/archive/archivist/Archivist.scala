@@ -11,7 +11,11 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
-import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestBagRequestNotification, IngestRequestContext}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagUploaderConfig,
+  IngestBagRequestNotification,
+  IngestRequestContext
+}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
@@ -32,7 +36,8 @@ trait Archivist extends Logging {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
-    implicit val progressMonitor: ArchiveProgressMonitor = injector.getInstance(classOf[ArchiveProgressMonitor])
+    implicit val progressMonitor: ArchiveProgressMonitor =
+      injector.getInstance(classOf[ArchiveProgressMonitor])
 
     val messageStream =
       injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
@@ -57,7 +62,9 @@ trait Archivist extends Logging {
   private def parseNotification(message: NotificationMessage) = {
     fromJson[IngestBagRequestNotification](message.Message) match {
       case Success(bagRequestNotification: IngestBagRequestNotification) =>
-        (bagRequestNotification.bagLocation, IngestRequestContext(bagRequestNotification))
+        (
+          bagRequestNotification.bagLocation,
+          IngestRequestContext(bagRequestNotification))
       case Failure(e) =>
         throw new RuntimeException(
           s"Failed to get object location from notification: ${e.getMessage}"

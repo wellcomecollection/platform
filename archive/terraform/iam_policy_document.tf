@@ -1,4 +1,3 @@
-
 data "aws_iam_policy_document" "archive_get" {
   statement {
     actions = [

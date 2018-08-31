@@ -20,13 +20,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 trait ArchiveProgressMonitorFixture
-  extends LocalProgressMonitorDynamoDb
+    extends LocalProgressMonitorDynamoDb
     with MockitoSugar {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException]( str =>
-      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str))
-    )(
+    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
+      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
       DateTimeFormatter.ISO_INSTANT.format(_)
     )
 
@@ -45,17 +44,28 @@ trait ArchiveProgressMonitorFixture
     testWith(archiveProgressMonitor)
   }
 
-  def givenArchiveProgressCreatedWith(uploadUrl: String, callbackUrl: String, archiveProgressMonitor: ArchiveProgressMonitor): ArchiveProgress = {
+  def givenArchiveProgressCreatedWith(
+    uploadUrl: String,
+    callbackUrl: String,
+    archiveProgressMonitor: ArchiveProgressMonitor): ArchiveProgress = {
     val id = UUID.randomUUID().toString
-    val eventualProgress = archiveProgressMonitor.initialize(ArchiveProgress(id, uploadUrl, Some(callbackUrl)))
+    val eventualProgress = archiveProgressMonitor.initialize(
+      ArchiveProgress(id, uploadUrl, Some(callbackUrl)))
     Await.result(eventualProgress, 500 millis)
   }
 
-  def givenArchiveProgressRecord(id:String, uploadUrl: String, maybeCallbackUrl: Option[String], table: Table) = {
+  def givenArchiveProgressRecord(id: String,
+                                 uploadUrl: String,
+                                 maybeCallbackUrl: Option[String],
+                                 table: Table) = {
     givenTableHasItem(ArchiveProgress(id, uploadUrl, maybeCallbackUrl), table)
   }
 
-  def assertProgressCreated(id: String, expectedUploadUrl: String, expectedCallbackUrl: Option[String], table: Table, recentSeconds: Int=45): Assertion = {
+  def assertProgressCreated(id: String,
+                            expectedUploadUrl: String,
+                            expectedCallbackUrl: Option[String],
+                            table: Table,
+                            recentSeconds: Int = 45): Assertion = {
     val progress = getExistingTableItem[ArchiveProgress](id, table)
     progress.uploadUrl shouldBe expectedUploadUrl
     progress.callbackUrl shouldBe expectedCallbackUrl
@@ -64,7 +74,10 @@ trait ArchiveProgressMonitorFixture
     assertRecent(progress.updatedAt, recentSeconds)
   }
 
-  def assertProgressRecordedRecentEvents(id: String, expectedEventDescriptions: Seq[String], table: LocalDynamoDb.Table, recentSeconds: Int=45) = {
+  def assertProgressRecordedRecentEvents(id: String,
+                                         expectedEventDescriptions: Seq[String],
+                                         table: LocalDynamoDb.Table,
+                                         recentSeconds: Int = 45) = {
     val progress = getExistingTableItem[ArchiveProgress](id, table)
 
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
@@ -72,12 +85,16 @@ trait ArchiveProgressMonitorFixture
     progress
   }
 
-  def assertProgressStatus(id: String, expectedStatus: Status, table: LocalDynamoDb.Table) = {
+  def assertProgressStatus(id: String,
+                           expectedStatus: Status,
+                           table: LocalDynamoDb.Table) = {
     val progress = getExistingTableItem[ArchiveProgress](id, table)
 
     progress.result shouldBe expectedStatus
   }
 
-  def assertRecent(instant: Instant, recentSeconds: Int=1): Assertion =
-      Duration.between(instant, Instant.now).getSeconds should be <= recentSeconds.toLong
+  def assertRecent(instant: Instant, recentSeconds: Int = 1): Assertion =
+    Duration
+      .between(instant, Instant.now)
+      .getSeconds should be <= recentSeconds.toLong
 }

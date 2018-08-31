@@ -7,15 +7,15 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ArchiveProgressMonitorConfig
 
 case class ArchivistConfig(
-                      s3ClientConfig: S3ClientConfig,
-                      bagUploaderConfig: BagUploaderConfig,
-                      cloudwatchClientConfig: CloudwatchClientConfig,
-                      sqsClientConfig: SQSClientConfig,
-                      sqsConfig: SQSConfig,
-                      snsClientConfig: SnsClientConfig,
-                      snsConfig: SNSConfig,
-                      progressMonitorConfig: ArchiveProgressMonitorConfig,
-                      metricsConfig: MetricsConfig
+  s3ClientConfig: S3ClientConfig,
+  bagUploaderConfig: BagUploaderConfig,
+  cloudwatchClientConfig: CloudwatchClientConfig,
+  sqsClientConfig: SQSClientConfig,
+  sqsConfig: SQSConfig,
+  snsClientConfig: SnsClientConfig,
+  snsConfig: SNSConfig,
+  progressMonitorConfig: ArchiveProgressMonitorConfig,
+  metricsConfig: MetricsConfig
 )
 
 case class UploadConfig(uploadNamespace: String,

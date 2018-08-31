@@ -13,17 +13,17 @@ resource "aws_dynamodb_table" "archive_progress_table" {
     type = "S"
   }
 
-//  ttl {
-//    attribute_name = "expires"
-//    enabled        = true
-//  }
+  //  ttl {
+  //    attribute_name = "expires"
+  //    enabled        = true
+  //  }
 
   lifecycle {
     prevent_destroy = true
 
     ignore_changes = [
       "read_capacity",
-      "write_capacity"
+      "write_capacity",
     ]
   }
 }
