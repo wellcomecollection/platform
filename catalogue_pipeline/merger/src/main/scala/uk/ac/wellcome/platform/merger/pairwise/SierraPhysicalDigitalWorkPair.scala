@@ -3,7 +3,22 @@ package uk.ac.wellcome.platform.merger.pairwise
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 
-/** If we have a pair of Sierra records:
+/**
+  *    +-----------------------+       +-----------------------+
+  *    | Sierra work           |       | Sierra work           |
+  *    | 1 item, phys location |       | 1 item, digi location |
+  *    +-----------------------+       +-----------------------+
+  *                |                            |
+  *                +---------------+------------+
+  *                                |
+  *                                v
+  *              +--------------------------------+
+  *              | Physical work ++               |
+  *              |    digital work identifiers ++ |
+  *              |    digital location            |
+  *              +--------------------------------+
+  *
+  * If we have a pair of Sierra records:
   *
   *   - One of which has a single item with a Physical location ("physical work")
   *   - The other of which has a single item with a Digital location ("digital work")
