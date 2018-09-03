@@ -30,9 +30,9 @@ class ProgressMonitorTest
           "uploadUrl",
           Some("http://localhost/archive/complete"))
 
-        archiveProgressMonitor.initialize(archiveProgress)
-
-        assertTableOnlyHasItem(archiveProgress, table)
+        whenReady(archiveProgressMonitor.initialize(archiveProgress)) { _ =>
+          assertTableOnlyHasItem(archiveProgress, table)
+        }
       }
     }
   }
