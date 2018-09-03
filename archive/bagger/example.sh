@@ -8,9 +8,9 @@ export DROP_BUCKET_NAME_METS_ONLY='yyyy-mets-only'
 export CURRENT_PRESERVATION_BUCKET='bbbb'
 export DLCS_SOURCE_BUCKET='dddd'
 # aws
-export AWS_PUBLIC_KEY='xxxx'
-export AWS_SECRET_KEY='xxxx'
-export AWS_REGION='eu-west-1'
+export AWS_ACCESS_KEY_ID='xxxx'
+export AWS_SECRET_ACCESS_KEY='xxxx'
+export AWS_DEFAULT_REGION='eu-west-1'
 # DLCS config
 export DLCS_ENTRY='https://api.dlcs.io/'
 export DLCS_API_KEY='xxxx'

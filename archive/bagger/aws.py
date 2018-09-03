@@ -8,11 +8,7 @@ boto_session = None
 def get_boto_session():
     global boto_session
     if boto_session is None:
-        boto_session = boto3.Session(
-            aws_access_key_id=settings.AWS_PUBLIC_KEY,
-            aws_secret_access_key=settings.AWS_SECRET_KEY,
-            region_name=settings.AWS_REGION
-        )
+        boto_session = boto3.Session(region_name=settings.AWS_DEFAULT_REGION)
     return boto_session
 
 
