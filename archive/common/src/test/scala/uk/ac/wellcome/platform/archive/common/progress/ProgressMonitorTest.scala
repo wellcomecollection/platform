@@ -97,20 +97,23 @@ class ProgressMonitorTest
           "uploadUrl",
           Some("http://localhost/archive/complete"))
 
-        whenReady(archiveProgressMonitor.initialize(archiveIngestProgress)) { _ =>
-          whenReady(Future.sequence(Seq(
-            archiveProgressMonitor.addEvent(id, "This happened"),
-            archiveProgressMonitor.addEvent(id, "And this too")
-          ))) { _ =>
-            val records =
-              Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
-            records.size shouldBe 1
+        whenReady(archiveProgressMonitor.initialize(archiveIngestProgress)) {
+          _ =>
+            whenReady(
+              Future.sequence(
+                Seq(
+                  archiveProgressMonitor.addEvent(id, "This happened"),
+                  archiveProgressMonitor.addEvent(id, "And this too")
+                ))) { _ =>
+              val records =
+                Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
+              records.size shouldBe 1
 
-            val progress = records.head.right.get
-            progress.events.size shouldBe 2
-            progress.events.map(_.description) should contain only("This happened", "And this too")
-            progress.events.foreach(event => assertRecent(event.time))
-          }
+              val progress = records.head.right.get
+              progress.events.size shouldBe 2
+              progress.events.map(_.description) should contain only ("This happened", "And this too")
+              progress.events.foreach(event => assertRecent(event.time))
+            }
         }
       }
     }
