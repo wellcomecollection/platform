@@ -1,4 +1,3 @@
-
 # to be added to...
 # bagger will throw an exception if the format in METS is not a key in this dictionary.
 PRONOM = {

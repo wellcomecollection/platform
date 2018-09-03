@@ -16,7 +16,7 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 
 def bag_from_identifier(identifier, skip_file_download):
-    b_number = identifiers.normalise_b_number(sys.argv[1])
+    b_number = identifiers.normalise_b_number(identifier)
     bag_details = bag_assembly.prepare_bag_dir(b_number)
     mets_path = "{0}{1}.xml".format(bag_details["mets_partial_path"], b_number)
     logging.info("process METS or anchor file at %s", mets_path)

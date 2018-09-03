@@ -1,10 +1,10 @@
 import logging
-import settings
 import aws
 import shutil
 import os
 import requests
 from botocore.exceptions import ClientError
+import settings
 import bag_assembly
 import dlcs
 import storage
