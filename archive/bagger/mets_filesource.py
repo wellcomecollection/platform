@@ -3,8 +3,8 @@ import re
 import settings
 from s3_keys import get_matching_s3_keys
 
-# Unlike the DDS implementation of this, only get b numbers that are correctly arranged 
-# in their 4-level file structure
+# Unlike the DDS implementation of this, only get b numbers that are correctly arranged
+#  in their 4-level file structure
 
 # provide "/" to enumerate all, or be more selective and pass "/5/5..." etc.
 
@@ -24,15 +24,15 @@ def b_numbers_from_fileshare(start_at):
 
 
 def b_numbers_from_s3():
-    # We don't just want to enumerate all the keys in the bucket, as the majority of 
+    # We don't just want to enumerate all the keys in the bucket, as the majority of
     # keys will be for ALTO files (one per image), with multiple manifestations as well.
 
-    # options: 
+    # options:
     # 1: Issue a prefix query for each level 4 directory, from mets/0/0/0/0 to mets/x/9/9/9
     # - this will yield a lot of missing keys, involves 11000 queries
     # 2: make a prefix query for mets/ and just keep iterating. Can we skip ahead when we find ALTO?
     #  underlying AWS API query has page size of 1000, so will involve 20,000 queries to S3 if we do that
-    # 3. use the /nets_only prefix. This "folder" omits the ALTO files, so will only contain 
+    # 3. use the /nets_only prefix. This "folder" omits the ALTO files, so will only contain
     # METS for b numbers and multiple manifestations. Although we don't need the MMs, they will only make
     # up a third or so of the total keys, and we can skip them.
 
@@ -40,7 +40,7 @@ def b_numbers_from_s3():
     prefix = settings.METS_ONLY_ROOT_PREFIX
     b_number_pattern = re.compile(r"\A" + prefix + r"[0-9ax/]*/(b[0-9ax]{8}).xml\Z")
     for key in get_matching_s3_keys(
-        bucket=settings.METS_BUCKET_NAME, prefix=prefix):
+            bucket=settings.METS_BUCKET_NAME, prefix=prefix):
         m = b_number_pattern.match(key)
         if m:
             yield m.group(1)

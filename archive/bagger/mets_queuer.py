@@ -15,7 +15,7 @@ def print_from_s3():
     counter = 1
     for b in b_numbers_from_s3():
         print("{0: <6} | {1}".format(counter, b))
-        counter = counter + 1    
+        counter = counter + 1
     end = time.time()
     time_taken = end - start
     print("retrieved {0} b numbers in {1} seconds".format(counter, time_taken))
