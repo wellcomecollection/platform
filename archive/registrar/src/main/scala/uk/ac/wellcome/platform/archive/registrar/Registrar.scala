@@ -10,11 +10,18 @@ import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagArchiveCompleteNotification,
+  NotificationMessage
+}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
-import uk.ac.wellcome.platform.archive.registrar.flows.{CallbackFlow, RecordArchiveProgressEventFlow, SnsPublishFlow}
+import uk.ac.wellcome.platform.archive.registrar.flows.{
+  CallbackFlow,
+  RecordArchiveProgressEventFlow,
+  SnsPublishFlow
+}
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._

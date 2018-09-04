@@ -29,14 +29,14 @@ object CallbackFlow extends Logging {
     val jsonBody = toJson(CallbackPayload(context.requestId.toString)).get
     val entity = HttpEntity(contentJson, jsonBody)
 
-    (HttpRequest(
-      method = HttpMethods.POST,
-      uri = Uri(callbackUri.toString),
-      entity = entity
-    ), context)
+    (
+      HttpRequest(
+        method = HttpMethods.POST,
+        uri = Uri(callbackUri.toString),
+        entity = entity
+      ),
+      context)
   }
 }
 
 case class CallbackPayload(id: String)
-
-
