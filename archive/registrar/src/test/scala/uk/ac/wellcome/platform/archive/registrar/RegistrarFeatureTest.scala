@@ -7,18 +7,14 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlPathEqualTo}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{
-  Registrar => RegistrarFixture
-}
-import uk.ac.wellcome.platform.archive.registrar.models.{
-  BagRegistrationCompleteNotification,
-  StorageManifest,
-  StorageManifestFactory
-}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{LocalWireMockFixture, Registrar => RegistrarFixture}
+import uk.ac.wellcome.platform.archive.registrar.flows.CallbackPayload
+import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,13 +26,18 @@ class RegistrarFeatureTest
     with MetricsSenderFixture
     with ExtendedPatience
     with ArchiveProgressMonitorFixture
+    with LocalWireMockFixture
     with RegistrarFixture {
 
-  implicit val system = ActorSystem("test")
-  implicit val materializer = ActorMaterializer()
+  implicit val system: ActorSystem = ActorSystem("test")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
+
+  private val callbackHost = "localhost"
+  private val callbackPort = 8080
 
   it("registers an archived BagIt bag from S3") {
-    withRegistrar {
+    withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
+      withRegistrar {
       case (
           storageBucket,
           queuePair,
@@ -46,7 +47,7 @@ class RegistrarFeatureTest
           hybridTable,
           progressTable) =>
         val requestId = UUID.randomUUID()
-        val callbackUrl = new URI("http://localhost/archive/complete")
+        val callbackUrl = new URI(s"http://$callbackHost:$callbackPort/callback/$requestId")
         withBagNotification(
           requestId,
           Some(callbackUrl),
@@ -90,9 +91,15 @@ class RegistrarFeatureTest
                   ArchiveProgress.Completed,
                   progressTable)
 
+                wireMock.verifyThat(1,
+                  postRequestedFor(urlPathEqualTo(callbackUrl.getPath))
+                    .withRequestBody(equalToJson(toJson(CallbackPayload(requestId.toString)).get))
+                )
               }
           }
         }
+      }
     }
   }
 }
+

@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 
 import java.util.zip.ZipFile
 
+import akka.{Done, NotUsed}
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Source
@@ -15,7 +16,7 @@ object ArchiveBagFlow {
     implicit
     materializer: ActorMaterializer,
     s3Client: S3Client
-  ) = {
+  ): Source[Done, NotUsed] = {
 
     val bagDigestItemFlow = BagDigestItemFlow(config.digestDelimiterRegexp)
     val archiveItemFlow = ArchiveItemFlow()
