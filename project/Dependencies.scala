@@ -6,7 +6,7 @@ object WellcomeDependencies {
     val json = "1.0.0"
     val monitoring = "1.1.0"
     val storage = "1.5.0"
-    val storage_new = "2.0.0"
+    val storage_new = "2.2.0"
   }
 
   val jsonLibrary: Seq[ModuleID] = Seq(
