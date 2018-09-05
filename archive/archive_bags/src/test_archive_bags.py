@@ -22,7 +22,7 @@ def test_looks_up_manifest(dynamodb_client, s3_client):
 
     request = {'id': manifest_id}
 
-    response = archive_bags.handler(
+    response = archive_bags.main(
         request,
         None,
         dynamodb_client,
