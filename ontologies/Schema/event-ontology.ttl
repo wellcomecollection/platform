@@ -5,28 +5,28 @@
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 
-<http://wellcomecollection.org/ontologies/event>
+<http://wellcomecollection.org/ontologies/public-event>
     rdf:type owl:Ontology ;
-    dcterms:title "Event"@en ;
+    dcterms:title "Public event ontology"@en ;
     dcterms:created "2018-01-15"^^xsd:date ;
     dcterms:description "An ontology describing museum and library events, exhibitions and installations."@en .
 
 ###### classes ###  
     
-wev:Event rdf:type owl:Class ;
-    rdfs:label "Event"@en ;
-    rdfs:comment "An event."@en ;
+wev:PublicEvent rdf:type owl:Class ;
+    rdfs:label "PublicEvent"@en ;
+    rdfs:comment "An attentable event."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
     
 wev:Exhibition rdf:type owl:Class ;
-    rdfs:subClassOf wev:Event ;
+    rdfs:subClassOf wev:PublicEvent ;
     rdfs:label "Exhibition"@en ;
     rdfs:comment "An organised presention and display of items."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .  
             
 wev:EventFormat rdf:type owl:Class ;
     rdfs:label "EventFormat"@en ;
-    rdfs:comment "What an attendee might expect from the strcuture of an event and the level of participation. For example tour, discussion, workshop or study day."@en ;
+    rdfs:comment "What an attendee might expect from the structure of an event and the level of participation. For example tour, discussion, workshop or study day."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
     
 wev:EventSeries rdf:type owl:Class ;
@@ -53,77 +53,76 @@ wev:Season rdf:type owl:Class ;
     rdfs:label "Season"@en ;
     rdfs:comment "A season of thematic content and events."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
+
+wev:Programme rdf:type owl:Class ;
+    rdfs:label "Programme"@en ;
+    rdfs:comment "A programme of thematic content and events."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .          
         
 wev:Exhibit rdf:type owl:Class ;
     rdfs:label "Exhibit"@en ;
     rdfs:comment "Display a work of art or item of interest in an art gallery or museum. Here the empahsis is on the story that is told by placing the work in the context of the exhibition."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .         
 
+wev:EventSchedule rdf:type owl:Class ;
+    rdfs:label "EventSchedule"@en ;
+    rdfs:comment "A schedule for a series of public events."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
+
 wev:Work rdf:type owl:Class ;
     rdfs:label "Work"@en ;
     rdfs:comment "A physically or digitally held work."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .  
-    
-wev:Article rdf:type owl:Class ;
-    rdfs:label "Article"@en ;
-    rdfs:comment "A editorially created peice of content."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .              
+                
       
 #### object properties ####
 
 wev:eventFormat rdf:type owl:ObjectProperty ;
     rdfs:label "eventFormat"@en ;
     rdfs:comment "Relates an event to its format."@en ;
-    rdfs:domain wev:Event ;
+    rdfs:domain wev:PublicEvent ;
     rdfs:range wev:EventFormat ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
     
 wev:interpretations rdf:type owl:ObjectProperty ;
     rdfs:label "interpretations"@en ;
     rdfs:comment "Relates an event to its interpretations."@en ;
-    rdfs:domain wev:Event ;
+    rdfs:domain wev:PublicEvent ;
     rdfs:range wev:Interpretations ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
     
-wev:places rdf:type owl:ObjectProperty ;
+wev:venues rdf:type owl:ObjectProperty ;
     rdfs:label "places"@en ;
-    rdfs:comment "Relates an event to a place."@en ;
-    rdfs:domain wev:Event ;
+    rdfs:comment "Relates an event to a venue."@en ;
+    rdfs:domain wev:PublicEvent ;
     rdfs:range wev:Place ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
-
-wev:agents rdf:type owl:ObjectProperty ;
-    rdfs:label "agents"@en ;
-    rdfs:comment "Relates an event to its agents."@en ;
-    rdfs:domain wev:Event ;
-    rdfs:range wev:Agent ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
-
-wev:venue rdf:type owl:ObjectProperty ;
-    rdfs:label "venue"@en ;
-    rdfs:comment "Relates an event to its venue."@en ;
-    rdfs:domain wev:Event ;
-    rdfs:range wev:Place ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
     
 wev:audience rdf:type owl:ObjectProperty ;
     rdfs:label "audience"@en ;
     rdfs:comment "Relates an event to its inteded audience."@en ;
-    rdfs:domain wev:Event ;
+    rdfs:domain wev:PublicEvent ;
     rdfs:range wev:Audience ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .            
 
 wev:eventSeries rdf:type owl:ObjectProperty ;
     rdfs:label "eventSeries"@en ;
     rdfs:comment "Relates an event to a branded series."@en ;
-    rdfs:domain wev:Event ;
+    rdfs:domain wev:PublicEvent ;
+    rdfs:range wev:EventSeries ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
+
+wev:exhibitionSeries rdf:type owl:ObjectProperty ;
+    rdfs:label "eventSeries"@en ;
+    rdfs:comment "Relates an event to a branded series."@en ;
+    rdfs:domain wev:PublicEvent ;
     rdfs:range wev:EventSeries ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
 
 wev:exhibits rdf:type owl:ObjectProperty ;
     rdfs:label "exhibits"@en ;
     rdfs:comment "Relates an exhibition to an exhibited work."@en ;
-    rdfs:domain wev:Exhibtion ;
+    rdfs:domain wev:Exhibition ;
     rdfs:range wev:Exhibit ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> . 
 
@@ -133,13 +132,20 @@ wev:exhibitedWork rdf:type owl:ObjectProperty ;
     rdfs:domain wev:Exhibit ;
     rdfs:range wev:Work ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
-
-wev:physicalDescription rdf:type owl:ObjectProperty ;
-    rdfs:label "physicalDescription"@en ;
-    rdfs:comment "Relates an exhibtion to its physical description."@en ;
+ 
+wev:schedules rdf:type owl:ObjectProperty ;
+    rdfs:label "schedules"@en ;
+    rdfs:comment "Relates an schedule to the public event it schedules."@en ;
+    rdfs:domain wev:EventSchedule ;
+    rdfs:range wev:PublicEvent ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
+    
+wev:hasEvents rdf:type owl:ObjectProperty ;
+    rdfs:label "hasEvents"@en ;
+    rdfs:comment "Relates an exhibition to its associated public events."@en ;
     rdfs:domain wev:Exhibition ;
-    rdfs:range wev:Article ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
+    rdfs:range wev:PublicEvent ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .    
 
 ####### data properties #####
 
@@ -147,8 +153,20 @@ wev:physicalDescription rdf:type owl:ObjectProperty ;
 wev:positionInEventSeries rdf:type owl:DatatypeProperty ;
     rdfs:label "positionInEventSeries"@en ;
     rdfs:comment "Indicates the position of the event in an event series."@en ;
-    rdfs:domain wev:Event ;
+    rdfs:domain wev:PublicEvent ;
     rdfs:range xsd:integer ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .    
                      
+wev:positionInExhibitionSeries rdf:type owl:DatatypeProperty ;
+    rdfs:label "positionInExhibitionSeries"@en ;
+    rdfs:comment "Indicates the position of the exhibition in an exhibition series."@en ;
+    rdfs:domain wev:Exhibition ;
+    rdfs:range xsd:integer ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .                       
     
+wev:level rdf:type owl:DatatypeProperty ;
+    rdfs:label "level"@en ;
+    rdfs:comment "The floor level of the venue."@en ;
+    rdfs:domain wev:Place ;
+    rdfs:range xsd:integer ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .      
