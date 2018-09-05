@@ -64,7 +64,7 @@ war:articleSeries rdf:type owl:ObjectProperty ;
 
 war:about rdf:type owl:ObjectProperty ;
     rdfs:label "about"@en ;
-    rdfs:comment "Relates an article to its primary subject that it has been created for. Examples would be articles specifically created to support an exhibition, public event or exhibited item."@en ;
+    rdfs:comment "Relates an article to its primary focus that it has been created to support. Examples would be articles specifically created to support an exhibition, public event or exhibited item."@en ;
     rdfs:domain war:Article ;
     rdfs:range war:Thing ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .            
