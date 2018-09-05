@@ -48,27 +48,27 @@ variable "infra_bucket" {}
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "remus"
+  default     = "romulus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = ""
+  default     = "2cccf98f0dd22b4d2156e8fad175928e58ebbec9"
 }
 
 variable "pinned_romulus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = ""
+  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = "c2f916cc04a510d08379ea3199fb46268603b60f"
+  default     = ""
 }
 
 variable "pinned_remus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
+  default     = ""
 }
 
 variable "es_config_romulus" {
@@ -76,8 +76,8 @@ variable "es_config_romulus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-08-10-sierra-reharvest-take-2"
-    index_v2 = "v2-2018-08-10-sierra-reharvest-take-2"
+    index_v1 = "v1-2018-08-30-parallel-scan-reindexer"
+    index_v2 = "v2-2018-08-30-parallel-scan-reindexer"
     doc_type = "work"
   }
 }
