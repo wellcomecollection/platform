@@ -14,3 +14,18 @@ resource "aws_security_group" "service_egress_security_group" {
     Name = "${var.namespace}-egress"
   }
 }
+
+data "aws_vpc_endpoint_service" "sns" {
+  service = "sns"
+}
+
+resource "aws_vpc_endpoint" "sns" {
+  vpc_id            = "${var.vpc_id}"
+  vpc_endpoint_type = "Interface"
+
+  security_group_ids = [
+    "${aws_security_group.service_egress_security_group.id}"
+  ]
+
+  service_name      = "${data.aws_vpc_endpoint_service.sns.service_name}"
+}
