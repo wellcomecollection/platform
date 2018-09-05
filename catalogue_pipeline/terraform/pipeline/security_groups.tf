@@ -24,12 +24,11 @@ resource "aws_vpc_endpoint" "logs" {
   vpc_endpoint_type = "Interface"
 
   security_group_ids = [
-    "${aws_security_group.service_egress_security_group.id}"
+    "${aws_security_group.service_egress_security_group.id}",
   ]
 
-  service_name      = "${data.aws_vpc_endpoint_service.logs.service_name}"
+  service_name = "${data.aws_vpc_endpoint_service.logs.service_name}"
 }
-
 
 data "aws_vpc_endpoint_service" "sns" {
   service = "sns"
@@ -40,8 +39,8 @@ resource "aws_vpc_endpoint" "sns" {
   vpc_endpoint_type = "Interface"
 
   security_group_ids = [
-    "${aws_security_group.service_egress_security_group.id}"
+    "${aws_security_group.service_egress_security_group.id}",
   ]
 
-  service_name      = "${data.aws_vpc_endpoint_service.sns.service_name}"
+  service_name = "${data.aws_vpc_endpoint_service.sns.service_name}"
 }
