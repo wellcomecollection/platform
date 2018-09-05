@@ -15,7 +15,7 @@
     
 wig:Bag rdf:type owl:Class ;
     rdfs:label "Bag"@en ;
-    rdfs:comment "A set of opaque files contained within the structure defined by this document."@en ;
+    rdfs:comment "A set of opaque files contained within a specified structure defined by the BagIt packaging format."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
     
 wig:Ingest rdf:type owl:Class ;
@@ -25,7 +25,7 @@ wig:Ingest rdf:type owl:Class ;
     
 wig:IngestType rdf:type owl:Class ;
     rdfs:label "IngestType"@en ;
-    rdfs:comment "The type of ingest."@en ;
+    rdfs:comment "The type of ingest. For example creation of a bag, updating a bags metadata, deleting a bag."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
     
 wig:Manifest rdf:type owl:Class ;
@@ -35,12 +35,12 @@ wig:Manifest rdf:type owl:Class ;
             
 wig:File rdf:type owl:Class ;
     rdfs:label "File"@en ;
-    rdfs:comment "A named and ordered sequence of bytes that is known to an operating system."@en ;
+    rdfs:comment "A file. A named and ordered sequence of bytes that is known to an operating system."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
                   
 wig:Location rdf:type owl:Class ;
     rdfs:label "Location"@en ;
-    rdfs:comment "A location at which archival materials is stored."@en ;
+    rdfs:comment "A location at which the archival materials is stored."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
          
 wig:Source rdf:type owl:Class ;
