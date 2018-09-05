@@ -27,8 +27,7 @@ import tqdm
 from dynamodb_capacity_helpers import (
     get_dynamodb_max_table_capacity,
     get_dynamodb_max_gsi_capacity,
-    set_dynamodb_table_capacity,
-    set_dynamodb_gsi_capacity
+    set_dynamodb_table_capacity
 )
 
 
@@ -158,12 +157,6 @@ def main():
     max_capacity = get_dynamodb_max_gsi_capacity(
         table_name=table_name,
         gsi_name=gsi_name
-    )
-    print(f'Setting {table_name} GSI {gsi_name} capacity to {max_capacity}')
-    set_dynamodb_gsi_capacity(
-        table_name=table_name,
-        gsi_name=gsi_name,
-        desired_capacity=max_capacity
     )
 
 

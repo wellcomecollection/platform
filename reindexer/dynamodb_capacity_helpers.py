@@ -72,30 +72,3 @@ def set_dynamodb_table_capacity(table_name, desired_capacity):
             pass
         else:
             raise
-
-
-def set_dynamodb_gsi_capacity(table_name, gsi_name, desired_capacity):
-    dynamodb = boto3.client('dynamodb')
-    try:
-        dynamodb.update_table(
-            TableName=table_name,
-            GlobalSecondaryIndexUpdates=[
-                {
-                    'Update': {
-                        'IndexName': gsi_name,
-                        'ProvisionedThroughput': {
-                            'ReadCapacityUnits': desired_capacity.read,
-                            'WriteCapacityUnits': desired_capacity.write,
-                        }
-                    }
-                }
-            ]
-        )
-    except ClientError as err:
-        if err.response['Error']['Message'].startswith(
-            f'The provisioned throughput for the index {gsi_name} will not '
-            f'change. The requested value equals the current value.'
-        ):
-            pass
-        else:
-            raise
