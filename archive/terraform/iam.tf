@@ -20,6 +20,24 @@ resource "aws_iam_role_policy" "archivist_task_sqs" {
   policy = "${data.aws_iam_policy_document.read_from_archivist_queue.json}"
 }
 
+resource "aws_iam_role_policy" "archive_bag_vhs" {
+  role   = "${module.lambda_archive_bags.role_name}"
+  policy = "${module.vhs_archive_manifest.read_policy}"
+}
+
+data "aws_iam_policy_document" "archive_get" {
+  statement {
+    actions = [
+      "s3:GetObject*",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.archive_bucket_name}",
+      "arn:aws:s3:::${local.archive_bucket_name}/*",
+    ]
+  }
+}
+
 resource "aws_iam_role_policy" "archivist_task_archive_progress_table" {
   role   = "${module.archivist.task_role_name}"
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
@@ -69,7 +87,7 @@ data "aws_iam_policy_document" "read_from_registrar_queue" {
 }
 
 resource "aws_iam_role_policy" "archive_asset_lookup_dynamo_permission" {
-  role = "${module.lambda_archive_asset_lookup.role_name}"
+  role = "${module.lambda_archive_bags.role_name}"
 
   policy = <<EOF
 {
