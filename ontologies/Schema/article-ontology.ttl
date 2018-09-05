@@ -20,7 +20,7 @@ war:Article rdf:type owl:Class ;
     
 war:ArticleType rdf:type owl:Class ;
     rdfs:label "ArticleType"@en ;
-    rdfs:comment "The editoiral intent or form used by the creator. This is seperate from format. Example would be analysis or interview that could be a video or text based transcript."@en ;
+    rdfs:comment "The editorial intent or form used by the creator. This is seperate from format. Example would be analysis or interview that could be a video or text based transcript."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
     
 war:ArticleSeries rdf:type owl:Class ;
@@ -31,6 +31,11 @@ war:ArticleSeries rdf:type owl:Class ;
 war:ArticleFormat rdf:type owl:Class ;
     rdfs:label "ArticleFormat"@en ;
     rdfs:comment "The primary format or document type of the article. For example video, text or audio."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .  
+
+war:Thing rdf:type owl:Class ;
+    rdfs:label "Thing"@en ;
+    rdfs:comment "Any thing that an article can be about."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .  
 
     
@@ -55,7 +60,14 @@ war:articleSeries rdf:type owl:ObjectProperty ;
     rdfs:comment "Relates an article to an article series."@en ;
     rdfs:domain war:Article ;
     rdfs:range war:ArticleSeries ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .        
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .  
+
+war:about rdf:type owl:ObjectProperty ;
+    rdfs:label "about"@en ;
+    rdfs:comment "Relates an article to its primary subject that it has been created for. Examples would be articles specifically created to support an exhibition, public event or exhibited item."@en ;
+    rdfs:domain war:Article ;
+    rdfs:range war:Thing ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .            
     
 ####### data properties #####
 
