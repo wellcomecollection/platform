@@ -19,7 +19,13 @@ class TroubleshootArchivistLocalBagFileTest
 
   it("downloads, uploads and verifies a known BagIt bag") {
     withArchivist {
-      case (ingestBucket, storageBucket, queuePair, _, archivist) =>
+      case (
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          _,
+          progressTable,
+          archivist) =>
         sendBag(
           BagName(randomAlphanumeric()),
           new File(

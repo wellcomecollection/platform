@@ -10,11 +10,7 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.flow.{
-  BagArchiveCompleteFlow,
-  DownloadZipFileFlow,
-  UploadAndVerifyBagFlow
-}
+import uk.ac.wellcome.platform.archive.archivist.flow._
 import uk.ac.wellcome.platform.archive.archivist.models.{
   BagUploaderConfig,
   IngestBagRequestNotification,
@@ -22,6 +18,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 }
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -30,10 +27,6 @@ trait Archivist extends Logging {
   val injector: Injector
 
   def run() = {
-    val messageStream =
-      injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
-    val bagUploaderConfig = injector.getInstance(classOf[BagUploaderConfig])
-
     implicit val s3Client: S3Client = injector.getInstance(classOf[S3Client])
     implicit val snsClient: AmazonSNSAsync =
       injector.getInstance(classOf[AmazonSNSAsync])
@@ -43,13 +36,19 @@ trait Archivist extends Logging {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
+    implicit val progressMonitor: ArchiveProgressMonitor =
+      injector.getInstance(classOf[ArchiveProgressMonitor])
 
+    val messageStream =
+      injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
+    val bagUploaderConfig = injector.getInstance(classOf[BagUploaderConfig])
     val snsConfig = injector.getInstance(classOf[SNSConfig])
 
     val workFlow =
       Flow[NotificationMessage]
         .log("notification message")
         .map(parseNotification)
+        .via(InitialiseArchiveProgressFlow("started archiving"))
         .log("download location")
         .via(DownloadZipFileFlow())
         .log("download zip")
