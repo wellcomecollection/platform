@@ -24,17 +24,6 @@ import hcl
 import requests
 import tqdm
 
-from dynamodb_capacity_helpers import (
-    get_dynamodb_max_table_capacity,
-    set_dynamodb_table_capacity
-)
-
-
-TABLE_NAMES = {
-    'miro': 'vhs-sourcedata-miro',
-    'sierra': 'vhs-sourcedata-sierra',
-}
-
 
 def get_topic_name(source_name):
     return f'reindex_jobs-{source_name}'
@@ -134,20 +123,6 @@ def main():
         topic_arn=topic_arn,
         messages=messages,
         total_segments=total_segments
-    )
-
-    # Now we update the write capacity of the SourceData table as high
-    # as it can go -- we've seen issues where the table capacity fails to
-    # scale up correctly, which slows down the reindexer.
-    table_name = TABLE_NAMES[source_name]
-    max_capacity = get_dynamodb_max_table_capacity(
-        table_name=table_name
-    )
-
-    print(f'Setting {table_name} table capacity to {max_capacity}')
-    set_dynamodb_table_capacity(
-        table_name=table_name,
-        desired_capacity=max_capacity
     )
 
 
