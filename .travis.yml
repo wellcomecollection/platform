@@ -117,7 +117,6 @@ jobs:
     - stage: test
       env:
         - TRAVIS_LAMBDAS="snapshot_scheduler \
-          reindex_shard_generator \
           sierra_window_generator \
           s3_demultiplexer \
           drain_ecs_container_instance \
