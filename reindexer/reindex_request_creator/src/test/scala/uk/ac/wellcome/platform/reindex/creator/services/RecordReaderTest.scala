@@ -2,14 +2,12 @@ package uk.ac.wellcome.platform.reindex.creator.services
 
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
-import javax.naming.ConfigurationException
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{
-  ReindexFixtures,
-  ReindexableTable
-}
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.reindex.creator.dynamo.ParallelScanner
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexableTable
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -23,86 +21,68 @@ class RecordReaderTest
     with ScalaFutures
     with Matchers
     with ReindexableTable
-    with ExtendedPatience
-    with ReindexFixtures {
+    with ExtendedPatience {
 
-  val shardName = "shard"
-
-  val exampleRecord = TestRecord(
+  val exampleRecord = HybridRecord(
     id = "id",
     version = 1,
-    s3key = "s3://id",
-    reindexShard = shardName
+    location = ObjectLocation(
+      namespace = "s3://example-bukkit",
+      key = "key.json.gz"
+    )
   )
 
-  it("finds records in the specified shard") {
+  it("finds records in the table") {
     withLocalDynamoDbTable { table =>
-      withRecordReader { reader =>
-        val inShardRecords = List(
+      withRecordReader(table) { reader =>
+        val records = List(
           exampleRecord.copy(id = "id1"),
           exampleRecord.copy(id = "id2")
         )
 
-        val notInShardRecords = List(
-          exampleRecord.copy(id = "id3", reindexShard = "not_the_same_shard"),
-          exampleRecord.copy(id = "id4", reindexShard = "not_the_same_shard")
-        )
+        val reindexJob = ReindexJob(segment = 0, totalSegments = 1)
 
-        val reindexJob = createReindexJobWith(
-          table = table,
-          shardId = shardName
-        )
-
-        val recordList = inShardRecords ++ notInShardRecords
-
-        val expectedRecords = inShardRecords.map { testRecord =>
-          HybridRecord(
-            id = testRecord.id,
-            version = testRecord.version,
-            s3key = testRecord.s3key
-          )
-        }
+        val recordList = records
 
         recordList.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
         whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
-            actualRecords should contain theSameElementsAs expectedRecords
+            actualRecords should contain theSameElementsAs records
         }
       }
     }
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withRecordReader { reader =>
+    val table = Table("does-not-exist", "no-such-index")
+    withRecordReader(table) { reader =>
       val future = reader.findRecordsForReindexing(
-        createReindexJobWith(Table("does-not-exist", "no-such-index")))
+        ReindexJob(segment = 5, totalSegments = 10))
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }
     }
   }
 
-  it("returns a failed Future if you don't specify a DynamoDB index") {
-    val reader = new RecordReader(dynamoDbClient = dynamoDbClient)
+  private def withRecordReader[R](table: Table)(
+    testWith: TestWith[RecordReader, R]): R = {
 
-    val reindexJob = createReindexJobWith(
-      dynamoConfig = DynamoConfig(
-        table = "mytable",
-        maybeIndex = None
-      )
+    val dynamoConfig = DynamoConfig(
+      table = table.name,
+      index = table.index
     )
 
-    val future = reader.findRecordsForReindexing(reindexJob)
-    whenReady(future.failed) {
-      _ shouldBe a[ConfigurationException]
-    }
-  }
+    val parallelScanner = new ParallelScanner(
+      dynamoDBClient = dynamoDbClient,
+      dynamoConfig = dynamoConfig
+    )
 
-  private def withRecordReader(testWith: TestWith[RecordReader, Assertion]) = {
-    val service = new RecordReader(dynamoDbClient = dynamoDbClient)
+    val reader = new RecordReader(
+      parallelScanner = parallelScanner
+    )
 
-    testWith(service)
+    testWith(reader)
   }
 }

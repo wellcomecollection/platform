@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
 data "aws_iam_policy_document" "vhs_read_policy" {
   statement {
     actions = [
-      "dynamodb:Query",
+      "dynamodb:Scan",
     ]
 
     resources = [

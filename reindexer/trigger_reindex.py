@@ -3,21 +3,19 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON>
+Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT>
        trigger_reindex.py -h | --help
 
 Options:
   --source=<SOURCE_NAME>    Name of the source you want to reindex.
   --reason=<REASON>         An explanation of why you're running this reindex.
                             This will be printed in the Slack alert.
+  --total_segments=<COUNT>  How many segments to divide the VHS table into.
   -h --help                 Print this help message
 
 """
 
-import datetime as dt
 import json
-import os
-import subprocess
 import sys
 
 import boto3
@@ -34,51 +32,31 @@ from dynamodb_capacity_helpers import (
 )
 
 
-# Reindex shards are added by a "reindex_shard_generator" Lambda.
-# Import the utility code that assigns reindex shards.
-ROOT = subprocess.check_output(
-    ['git', 'rev-parse', '--show-toplevel']).decode('utf8').strip()
-sys.path.append(os.path.join(ROOT, 'reindexer/reindex_shard_generator/src'))
-
-from reindex_shard_config import get_number_of_shards  # noqa
-
-
-TOPIC_NAME = 'reindex_jobs'
-
 DYNAMO_CONFIGS = {
-    'miro': {'table': 'SourceData', 'maybeIndex': 'reindexTracker'},
+    'miro': {'table': 'vhs-sourcedata-miro', 'maybeIndex': 'reindexTracker'},
     'sierra': {'table': 'vhs-sourcedata-sierra', 'maybeIndex': 'reindexTracker'}
 }
 
 
-def all_shard_ids(source_name):
-    """
-    Generates all the shard IDs in a given source name.
-
-    e.g. miro/1, miro/2, miro/3, ...
-    """
-    count = get_number_of_shards(source_name=source_name)
-
-    for shard_index in range(count):
-        yield f'{source_name}/{shard_index}'
+def get_topic_name(source_name):
+    return f'reindex_jobs-{source_name}'
 
 
-def all_messages(shard_ids, desired_version, source_name):
+def all_messages(total_segments):
     """
     Generates all the messages to be sent to SNS.
     """
-    for s_id in shard_ids:
+    for i in range(total_segments):
         yield {
-            'shardId': s_id,
-            'desiredVersion': desired_version,
-            'dynamoConfig': DYNAMO_CONFIGS[source_name]
+            'segment': i,
+            'totalSegments': total_segments
         }
 
 
-def publish_messages(topic_arn, messages):
+def publish_messages(topic_arn, messages, total_segments):
     """Publish a sequence of messages to an SNS topic."""
     sns_client = boto3.client('sns')
-    for m in tqdm.tqdm(messages):
+    for m in tqdm.tqdm(messages, total=total_segments):
         resp = sns_client.publish(
             TopicArn=topic_arn,
             MessageStructure='json',
@@ -144,39 +122,34 @@ def main():
 
     source_name = args['--source']
     reason = args['--reason']
+    total_segments = int(args['--total_segments'])
 
-    # We use the current timestamp for the reindex version -- this allows
-    # us to easily trace when a reindex was triggered.
-    desired_version = int(dt.datetime.utcnow().timestamp())
-    print(f'Updating all shards in {source_name} to {desired_version}')
+    print(f'Triggering a reindex in {source_name}')
 
     post_to_slack(source_name=source_name, reason=reason)
 
-    shard_ids = all_shard_ids(source_name=source_name)
-    messages = all_messages(
-        shard_ids=shard_ids,
-        desired_version=desired_version,
-        source_name=source_name
-    )
+    messages = all_messages(total_segments=total_segments)
 
-    topic_arn = build_topic_arn(topic_name=TOPIC_NAME)
+    topic_arn = build_topic_arn(topic_name=get_topic_name(source_name))
 
     publish_messages(
         topic_arn=topic_arn,
-        messages=messages
+        messages=messages,
+        total_segments=total_segments
     )
 
     # Now we update the write capacity of the SourceData table as high
     # as it can go -- we've seen issues where the table capacity fails to
     # scale up correctly, which slows down the reindexer.
-    max_capacity = get_dynamodb_max_table_capacity(table_name='SourceData')
-    print(f'Setting SourceData table capacity to {max_capacity}')
-
     dynamo_config = DYNAMO_CONFIGS[source_name]
+    max_capacity = get_dynamodb_max_table_capacity(
+        table_name=dynamo_config['table']
+    )
 
     table_name = dynamo_config['table']
     gsi_name = dynamo_config['maybeIndex']
 
+    print(f'Setting {table_name} table capacity to {max_capacity}')
     set_dynamodb_table_capacity(
         table_name=table_name,
         desired_capacity=max_capacity
@@ -198,5 +171,4 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        import sys
         sys.exit(1)
