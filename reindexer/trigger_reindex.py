@@ -30,9 +30,9 @@ from dynamodb_capacity_helpers import (
 )
 
 
-DYNAMO_CONFIGS = {
-    'miro': {'table': 'vhs-sourcedata-miro'},
-    'sierra': {'table': 'vhs-sourcedata-sierra'},
+TABLE_NAMES = {
+    'miro': 'vhs-sourcedata-miro',
+    'sierra': 'vhs-sourcedata-sierra',
 }
 
 
@@ -139,12 +139,10 @@ def main():
     # Now we update the write capacity of the SourceData table as high
     # as it can go -- we've seen issues where the table capacity fails to
     # scale up correctly, which slows down the reindexer.
-    dynamo_config = DYNAMO_CONFIGS[source_name]
+    table_name = TABLE_NAMES[source_name]
     max_capacity = get_dynamodb_max_table_capacity(
-        table_name=dynamo_config['table']
+        table_name=table_name
     )
-
-    table_name = dynamo_config['table']
 
     print(f'Setting {table_name} table capacity to {max_capacity}')
     set_dynamodb_table_capacity(
