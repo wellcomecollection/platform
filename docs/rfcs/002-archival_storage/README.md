@@ -99,7 +99,7 @@ The Versioned Hybrid Store also includes the ability to "reindex" the entire dat
 Request:
 
 ```http
-POST /bags
+POST /ingests
 Content-Type: application/json
 
 {
