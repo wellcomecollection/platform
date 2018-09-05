@@ -40,20 +40,6 @@ def get_dynamodb_max_table_capacity(table_name):
     return DynamoDBCapacity(write=write_capacity, read=read_capacity)
 
 
-def get_dynamodb_max_gsi_capacity(table_name, gsi_name):
-    write_capacity = _get_max_dynamodb_capacity(
-        resource_id=f'table/{table_name}/index/{gsi_name}',
-        dimension='index:WriteCapacityUnits'
-    )
-
-    read_capacity = _get_max_dynamodb_capacity(
-        resource_id=f'table/{table_name}/index/{gsi_name}',
-        dimension='index:ReadCapacityUnits'
-    )
-
-    return DynamoDBCapacity(write=write_capacity, read=read_capacity)
-
-
 def set_dynamodb_table_capacity(table_name, desired_capacity):
     dynamodb = boto3.client('dynamodb')
     try:
