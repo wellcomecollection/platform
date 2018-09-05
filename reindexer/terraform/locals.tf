@@ -5,7 +5,7 @@ locals {
   vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
 
-  dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   reindex_worker_container_image = "${module.ecr_repository_reindex_request_creator.repository_url}:${var.release_ids["reindex_request_creator"]}"
 }
