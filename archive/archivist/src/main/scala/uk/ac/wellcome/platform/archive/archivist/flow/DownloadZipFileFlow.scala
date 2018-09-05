@@ -35,8 +35,10 @@ object DownloadZipFileFlow extends Logging {
             .fromFuture(downloadStream.runWith(fileSink))
             .map(_.status)
             .map {
-              case Success(_) => (new ZipFile(tmpFile), ingestRequestContext)
-              case Failure(e) => throw e
+              case Success(_) =>
+                (new ZipFile(tmpFile), ingestRequestContext)
+              case Failure(e) =>
+                throw e
             }
       }
       .log("downloaded zipfile")

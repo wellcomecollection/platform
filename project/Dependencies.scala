@@ -6,7 +6,7 @@ object WellcomeDependencies {
     val json = "1.0.0"
     val monitoring = "1.1.0"
     val storage = "1.5.0"
-    val storage_new = "2.0.0"
+    val storage_new = "2.2.0"
   }
 
   val jsonLibrary: Seq[ModuleID] = Seq(
@@ -52,6 +52,7 @@ object Dependencies {
     val sierraStreamsSourceVersion = "0.4"
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
+    val wiremockVersion = "2.18.0"
   }
 
   // External Library dependency groups
@@ -128,7 +129,11 @@ object Dependencies {
   val testDependencies = Seq(
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
-    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion
+    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion % "test"
+  )
+
+  val wiremockDependencies = Seq(
+    "com.github.tomakehurst" % "wiremock" % versions.wiremockVersion % "test"
   )
 
   // Internal Library dependency groups

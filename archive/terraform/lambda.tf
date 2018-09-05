@@ -44,8 +44,9 @@ module "lambda_archive_ingest" {
   memory_size = 1024
 
   environment_variables = {
-    TOPIC_ARN = "${module.archivist_topic.arn}"
-    REGION    = "${var.aws_region}"
+    TOPIC_ARN  = "${module.archivist_topic.arn}"
+    TABLE_NAME = "${aws_dynamodb_table.archive_progress_table.name}"
+    REGION     = "${var.aws_region}"
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"

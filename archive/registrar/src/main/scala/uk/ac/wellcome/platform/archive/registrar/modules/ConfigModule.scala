@@ -40,4 +40,7 @@ object ConfigModule extends AbstractModule {
   def providesHybridStoreDynamoClientConfig(appConfig: RegistrarConfig) =
     appConfig.hybridStoreConfig.dynamoClientConfig
 
+  @Provides
+  def providesProgressMonitorConfig(appConfig: RegistrarConfig) =
+    appConfig.archiveProgressMonitorConfig
 }

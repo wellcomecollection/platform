@@ -9,14 +9,14 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{
-  ReindexFixtures,
-  ReindexableTable
-}
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexableTable
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.reindex.creator.dynamo.ParallelScanner
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -28,12 +28,20 @@ class ReindexRequestCreatorWorkerTest
     with Akka
     with ReindexableTable
     with MetricsSenderFixture
-    with ReindexFixtures
     with SNS
     with SQS
     with ScalaFutures {
 
-  def withReindexWorkerService(topic: Topic)(
+  val exampleRecord = HybridRecord(
+    id = "id",
+    version = 1,
+    location = ObjectLocation(
+      namespace = "s3://example-bukkit",
+      key = "key.json.gz"
+    )
+  )
+
+  def withReindexWorkerService(table: Table, topic: Topic)(
     testWith: TestWith[(ReindexRequestCreatorWorker, QueuePair), Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
@@ -43,8 +51,16 @@ class ReindexRequestCreatorWorkerTest
               actorSystem,
               queue,
               metricsSender) { sqsStream =>
+              val parallelScanner = new ParallelScanner(
+                dynamoDBClient = dynamoDbClient,
+                dynamoConfig = DynamoConfig(
+                  table = table.name,
+                  index = table.index
+                )
+              )
+
               val readerService = new RecordReader(
-                dynamoDbClient = dynamoDbClient
+                parallelScanner = parallelScanner
               )
 
               withSNSWriter(topic) { snsWriter =>
@@ -74,29 +90,11 @@ class ReindexRequestCreatorWorkerTest
   it("completes a reindex") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(topic) {
+        withReindexWorkerService(table, topic) {
           case (service, QueuePair(queue, dlq)) =>
-            val reindexJob = createReindexJobWith(
-              table = table,
-              shardId = "sierra/123"
-            )
+            val reindexJob = ReindexJob(segment = 0, totalSegments = 1)
 
-            val testRecord = TestRecord(
-              id = "id/111",
-              version = 1,
-              s3key = "s3://id/111",
-              reindexShard = reindexJob.shardId
-            )
-
-            Scanamo.put(dynamoDbClient)(table.name)(testRecord)
-
-            val expectedRecords = List(
-              HybridRecord(
-                id = testRecord.id,
-                version = testRecord.version,
-                s3key = testRecord.s3key
-              )
-            )
+            Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
 
             sendNotificationToSQS(
               queue = queue,
@@ -110,7 +108,7 @@ class ReindexRequestCreatorWorkerTest
                   .map { fromJson[HybridRecord](_).get }
                   .distinct
 
-              actualRecords shouldBe expectedRecords
+              actualRecords shouldBe List(exampleRecord)
               assertQueueEmpty(queue)
               assertQueueEmpty(dlq)
             }
@@ -122,7 +120,7 @@ class ReindexRequestCreatorWorkerTest
   it("fails if it cannot parse the SQS message as a ReindexJob") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(topic) {
+        withReindexWorkerService(table, topic) {
           case (_, QueuePair(queue, dlq)) =>
             sendNotificationToSQS(
               queue = queue,
@@ -139,50 +137,22 @@ class ReindexRequestCreatorWorkerTest
   }
 
   it("fails if the reindex job fails") {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueueAndDlq {
-          case queuePair @ QueuePair(queue, dlq) =>
-            withSQSStream[NotificationMessage, Assertion](
-              actorSystem,
-              queue,
-              metricsSender) { sqsStream =>
-              val readerService = new RecordReader(
-                dynamoDbClient = dynamoDbClient
-              )
+    val badTable = Table(name = "doesnotexist", index = "whatindex")
+    val badTopic = Topic("does-not-exist")
 
-              withSNSWriter(Topic("does-not-exist")) { snsWriter =>
-                val hybridRecordSender = new HybridRecordSender(
-                  snsWriter = snsWriter
-                )
+    withReindexWorkerService(badTable, badTopic) {
+      case (_, QueuePair(queue, dlq)) =>
+        val reindexJob = ReindexJob(segment = 5, totalSegments = 10)
 
-                new ReindexRequestCreatorWorker(
-                  readerService = readerService,
-                  hybridRecordSender = hybridRecordSender,
-                  system = actorSystem,
-                  sqsStream = sqsStream
-                )
+        sendNotificationToSQS(
+          queue = queue,
+          message = reindexJob
+        )
 
-                val reindexJob = createReindexJobWith(
-                  dynamoConfig = DynamoConfig(
-                    table = "doesnotexist",
-                    index = "whatindex?"
-                  )
-                )
-
-                sendNotificationToSQS(
-                  queue = queue,
-                  message = reindexJob
-                )
-
-                eventually {
-                  assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 1)
-                }
-              }
-            }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
         }
-      }
     }
   }
 }

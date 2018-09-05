@@ -32,7 +32,6 @@ case class MarcSubfield(
 )
 
 case class VarField(
-  fieldTag: String,
   content: Option[String] = None,
   marcTag: Option[String] = None,
   @JsonKey("ind1") indicator1: Option[String] = None,
@@ -41,9 +40,8 @@ case class VarField(
 )
 
 case object VarField {
-  def apply(fieldTag: String, content: String): VarField =
+  def apply(content: String): VarField =
     VarField(
-      fieldTag = fieldTag,
       content = Some(content),
       marcTag = None,
       indicator1 = None,
@@ -51,13 +49,11 @@ case object VarField {
       subfields = Nil
     )
 
-  def apply(fieldTag: String,
-            marcTag: String,
+  def apply(marcTag: String,
             indicator1: String,
             indicator2: String,
             subfields: List[MarcSubfield]): VarField =
     VarField(
-      fieldTag = fieldTag,
       content = None,
       marcTag = Some(marcTag),
       indicator1 = Some(indicator1),

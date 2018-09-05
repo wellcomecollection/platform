@@ -6,6 +6,7 @@ import uk.ac.wellcome.platform.archive.archivist.modules.{
   ConfigModule
 }
 import uk.ac.wellcome.platform.archive.common.modules._
+import uk.ac.wellcome.platform.archive.common.progress.modules.ArchiveProgressMonitorModule
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -19,6 +20,7 @@ object Main extends App with Archivist {
     CloudWatchClientModule,
     SQSClientModule,
     SNSAsyncClientModule,
+    ArchiveProgressMonitorModule,
     MessageStreamModule
   )
 

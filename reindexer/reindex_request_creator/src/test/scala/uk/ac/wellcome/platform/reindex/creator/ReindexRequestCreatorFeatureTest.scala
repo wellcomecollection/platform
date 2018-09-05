@@ -3,22 +3,13 @@ package uk.ac.wellcome.platform.reindex.creator
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.platform.reindex.creator.fixtures.{
-  ReindexFixtures,
-  ReindexableTable
-}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.storage.vhs.HybridRecord
-
-case class TestRecord(
-  id: String,
-  s3key: String,
-  version: Int,
-  reindexShard: String
-)
 
 class ReindexRequestCreatorFeatureTest
     extends FunSpec
@@ -26,24 +17,22 @@ class ReindexRequestCreatorFeatureTest
     with Eventually
     with IntegrationPatience
     with fixtures.Server
-    with ReindexableTable
-    with ReindexFixtures
+    with LocalDynamoDbVersioned
     with SNS
     with SQS
     with ScalaFutures {
 
-  val shardName = "shard"
-
-  private def createReindexableData(queue: Queue,
-                                    table: Table): Seq[TestRecord] = {
+  private def createReindexableData(table: Table): Seq[HybridRecord] = {
     val numberOfRecords = 4
 
     val testRecords = (1 to numberOfRecords).map(i => {
-      TestRecord(
+      HybridRecord(
         id = s"id$i",
-        s3key = s"s3://$i",
-        version = 1,
-        reindexShard = shardName
+        location = ObjectLocation(
+          namespace = "s3://example-bukkit",
+          key = s"id$i"
+        ),
+        version = 1
       )
     })
 
@@ -57,24 +46,13 @@ class ReindexRequestCreatorFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          val flags = snsLocalFlags(topic) ++ dynamoClientLocalFlags ++ sqsLocalFlags(
+          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(
             queue)
 
           withServer(flags) { _ =>
-            val testRecords = createReindexableData(queue, table)
+            val testRecords = createReindexableData(table)
 
-            val expectedRecords = testRecords.map { testRecord =>
-              HybridRecord(
-                id = testRecord.id,
-                version = testRecord.version,
-                s3key = testRecord.s3key
-              )
-            }
-
-            val reindexJob = createReindexJobWith(
-              table = table,
-              shardId = shardName
-            )
+            val reindexJob = ReindexJob(segment = 0, totalSegments = 1)
 
             sendNotificationToSQS(
               queue = queue,
@@ -88,7 +66,7 @@ class ReindexRequestCreatorFeatureTest
                   .map { fromJson[HybridRecord](_).get }
                   .distinct
 
-              actualRecords should contain theSameElementsAs expectedRecords
+              actualRecords should contain theSameElementsAs testRecords
             }
           }
         }

@@ -610,10 +610,14 @@ class SierraTransformableTransformerTest
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.mergeCandidates shouldBe List(
       MergeCandidate(
-        SourceIdentifier(
-          IdentifierType("sierra-system-number"),
-          "Work",
-          mergeCandidateBibNumber)))
+        identifier = SourceIdentifier(
+          identifierType = IdentifierType("sierra-system-number"),
+          ontologyType = "Work",
+          value = mergeCandidateBibNumber
+        ),
+        reason = Some("Physical/digitised Sierra work")
+      )
+    )
   }
 
   it("returns an InvisibleWork if bibData has no title") {

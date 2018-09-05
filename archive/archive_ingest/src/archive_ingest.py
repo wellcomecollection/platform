@@ -3,10 +3,12 @@
 Receives a message to ingest a bag giving the URL and publishes the archive event to an SNS topic.
 """
 
-import boto3
-import daiquiri
 import os
 import uuid
+
+import boto3
+import daiquiri
+
 from urllib.parse import urlparse
 from wellcome_aws_utils.lambda_utils import log_on_error
 from wellcome_aws_utils.sns_utils import publish_sns_message
@@ -15,34 +17,7 @@ daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 
-def archive_bag_message(ingest_request_id, bag_url, callback_url):
-    """
-    Generates bag archive messages.
-    """
-    url = urlparse(bag_url)
-    if url.scheme == 's3':
-        bucket = url.netloc
-        key = url.path.lstrip('/')
-        msg = {
-            'ingestId': ingest_request_id,
-            'namespace': bucket,
-            'key': key
-        }
-        if callback_url:
-            msg['callbackUrl'] = callback_url
-        return msg
-    else:
-        raise ValueError(f"[BadRequest] Unrecognised url scheme: {bag_url}")
-
-
-def join_url(path_segments):
-    return '/' + '/'.join(path_segment.strip('/') for path_segment in path_segments)
-
-
-@log_on_error
-def main(event, context=None, sns_client=None):
-    logger.debug('received %r', event)
-
+def post_ingest_request(event, sns_client):
     topic_arn = os.environ['TOPIC_ARN']
 
     request = event['body']
@@ -78,3 +53,54 @@ def main(event, context=None, sns_client=None):
         'id': ingest_request_id,
         'location': join_url((path, ingest_request_id))
     }
+
+
+def get_ingest_status(event, dynamodb_resource):
+    dynamodb_resource = dynamodb_resource or boto3.resource('dynamodb')
+    table_name = os.environ['TABLE_NAME']
+    id = event['id']
+
+    table = dynamodb_resource.Table(table_name)
+
+    item = table.get_item(
+        Key={'id': id}
+    )
+    return item['Item']
+
+
+def archive_bag_message(archive_request_id, bag_url, callback_url):
+    """
+    Generates bag archive messages.
+    """
+    url = urlparse(bag_url)
+    if url.scheme == 's3':
+        bucket = url.netloc
+        key = url.path.lstrip('/')
+        msg = {
+            'archiveRequestId': archive_request_id,
+            'bagLocation': {
+                'namespace': bucket,
+                'key': key
+            }
+        }
+        if callback_url:
+            msg['callbackUrl'] = callback_url
+        return msg
+    else:
+        raise ValueError(f"[BadRequest] Unrecognised url scheme: {bag_url}")
+
+
+def join_url(path_segments):
+    return '/' + '/'.join(path_segment.strip('/') for path_segment in path_segments)
+
+
+@log_on_error
+def main(event, context=None, dynamodb_resource=None, sns_client=None):
+    logger.debug('received %r', event)
+
+    request_method = event.get('request_method', 'POST')
+
+    if request_method.upper() == 'POST':
+        return post_ingest_request(event, sns_client)
+    elif request_method.upper() == 'GET':
+        return get_ingest_status(event, dynamodb_resource)

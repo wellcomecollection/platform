@@ -18,7 +18,7 @@ object BagArchiveCompleteFlow {
       .map {
         case (bagLocation, context) =>
           BagArchiveCompleteNotification(
-            context.requestId,
+            context.id,
             bagLocation,
             context.callbackUrl)
       }

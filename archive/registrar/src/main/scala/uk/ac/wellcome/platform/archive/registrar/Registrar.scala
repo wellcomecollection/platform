@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archive.registrar
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.alpakka.sns.scaladsl.SnsPublisher
 import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNSAsync
@@ -16,6 +15,13 @@ import uk.ac.wellcome.platform.archive.common.models.{
   NotificationMessage
 }
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
+import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.registrar.flows.{
+  CallbackFlow,
+  RecordArchiveProgressEventFlow,
+  SnsPublishFlow
+}
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -33,12 +39,14 @@ class Registrar @Inject()(
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
+  archiveProgressMonitor: ArchiveProgressMonitor,
   actorSystem: ActorSystem
 ) {
   def run() = {
 
     implicit val client = snsClient
     implicit val system = actorSystem
+    implicit val progressMonitor = archiveProgressMonitor
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
@@ -61,15 +69,16 @@ class Registrar @Inject()(
       .map {
         case (manifest, context) => updateStoredManifest(manifest, context)
       }
-      .map {
-        case (manifest, context) =>
-          BagRegistrationCompleteNotification(context.requestId, manifest)
-      }
-      .log("created notification")
-      .map(serializeCompletedNotification)
-      .log("notification serialised")
-      .via(SnsPublisher.flow(snsConfig.topicArn))
+      .via(RecordArchiveProgressEventFlow(
+        "registered",
+        Some(ArchiveProgress.Completed)))
+      .via(SnsPublishFlow(snsConfig))
       .log("published notification")
+      .filter {
+        case (_, context) => context.callbackUrl.isDefined
+      }
+      .via(CallbackFlow())
+      .log("executed callback")
 
     messageStream.run("registrar", workFlow)
   }
@@ -103,13 +112,5 @@ class Registrar @Inject()(
       ifExisting = (_, _) => (storageManifest, EmptyMetadata())
     )
     (storageManifest, requestContext)
-  }
-
-  private def serializeCompletedNotification(
-    bagRegistrationCompleteNotification: BagRegistrationCompleteNotification) = {
-    toJson(bagRegistrationCompleteNotification) match {
-      case Success(json) => json
-      case Failure(e)    => throw e
-    }
   }
 }
