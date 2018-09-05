@@ -31,8 +31,8 @@ from dynamodb_capacity_helpers import (
 
 
 DYNAMO_CONFIGS = {
-    'miro': {'table': 'vhs-sourcedata-miro', 'maybeIndex': 'reindexTracker'},
-    'sierra': {'table': 'vhs-sourcedata-sierra', 'maybeIndex': 'reindexTracker'}
+    'miro': {'table': 'vhs-sourcedata-miro'},
+    'sierra': {'table': 'vhs-sourcedata-sierra'},
 }
 
 
@@ -145,7 +145,6 @@ def main():
     )
 
     table_name = dynamo_config['table']
-    gsi_name = dynamo_config['maybeIndex']
 
     print(f'Setting {table_name} table capacity to {max_capacity}')
     set_dynamodb_table_capacity(
