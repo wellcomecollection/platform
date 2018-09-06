@@ -91,11 +91,11 @@ class MessageWriterTest
     }
   }
 
-  it("returns a failed future if it fails to store message") {
+  it("returns a failed future if it fails to store a large message in S3") {
     withLocalSnsTopic { topic =>
       val bucket = Bucket(name = "invalid-bucket")
       withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-        val eventualAttempt = messageWriter.write(smallMessage, subject)
+        val eventualAttempt = messageWriter.write(largeMessage, subject)
 
         whenReady(eventualAttempt.failed) { ex =>
           ex shouldBe a[Throwable]
@@ -104,11 +104,11 @@ class MessageWriterTest
     }
   }
 
-  it("does not publish message pointer if it fails to store message") {
+  it("does not publish a RemoteNotification if it fails to store the message in S3") {
     withLocalSnsTopic { topic =>
       val bucket = Bucket(name = "invalid-bucket")
       withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-        val eventualAttempt = messageWriter.write(smallMessage, subject)
+        val eventualAttempt = messageWriter.write(largeMessage, subject)
 
         whenReady(eventualAttempt.failed) { _ =>
           listMessagesReceivedFromSNS(topic) should be('empty)
@@ -117,14 +117,15 @@ class MessageWriterTest
     }
   }
 
-  it("gives distinct s3 keys when sending the same message twice") {
+  it("gives distinct S3 keys when sending the same message twice") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-          val eventualAttempt1 = messageWriter.write(smallMessage, subject)
+          val eventualAttempt1 = messageWriter.write(largeMessage, subject)
+
           // Wait before sending the next message to increase likelihood they get processed at different timestamps
           Thread.sleep(2)
-          val eventualAttempt2 = messageWriter.write(smallMessage, subject)
+          val eventualAttempt2 = messageWriter.write(largeMessage, subject)
 
           whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) {
             _ =>
