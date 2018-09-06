@@ -39,15 +39,18 @@ def remodel_file_technical_metadata(root):
         add_premis_identifier(premis_file, "uuid", checksum)
 
         file_properties = tessella_file.findall("tessella:FileProperty", namespaces)
-        to_copy = mappings.SIGNIFICANT_PROPS.keys()
+        to_copy = mappings.SIGNIFICANT_PROPERTIES.keys()
         for file_property in file_properties:
             name = file_property.find("tessella:FilePropertyName", namespaces).text.strip()
             if name in to_copy:
                 value = file_property.find("tessella:Value", namespaces).text.strip()
-                premis_name = mappings.SIGNIFICANT_PROPS[name]
+                premis_name = mappings.SIGNIFICANT_PROPERTIES[name]
                 add_premis_significant_prop(premis_file, premis_name, value)
-            else:
+            elif name in mappings.IGNORED_PROPERTIES:
                 logging.info("Ignoring property name {0}".format(name))
+            else:
+                message = "Unknown file property: {0}".format(name)
+                raise ValueError(message)
 
         characteristics = make_child(premis_file, "premis", "objectCharacteristics")
         composition_level = make_child(characteristics, "premis", "compositionLevel")

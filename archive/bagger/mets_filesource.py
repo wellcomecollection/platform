@@ -23,7 +23,7 @@ def b_numbers_from_fileshare(start_at):
                     yield m.group(1)
 
 
-def b_numbers_from_s3():
+def b_numbers_from_s3(filter=""):
     # We don't just want to enumerate all the keys in the bucket, as the majority of
     # keys will be for ALTO files (one per image), with multiple manifestations as well.
 
@@ -40,7 +40,7 @@ def b_numbers_from_s3():
     prefix = settings.METS_ONLY_ROOT_PREFIX
     b_number_pattern = re.compile(r"\A" + prefix + r"[0-9ax/]*/(b[0-9ax]{8}).xml\Z")
     for key in get_matching_s3_keys(
-            bucket=settings.METS_BUCKET_NAME, prefix=prefix):
+            bucket=settings.METS_BUCKET_NAME, prefix=prefix + filter):
         m = b_number_pattern.match(key)
         if m:
             yield m.group(1)

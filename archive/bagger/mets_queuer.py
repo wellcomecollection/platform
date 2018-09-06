@@ -7,13 +7,16 @@ def main():
     if len(sys.argv) == 2 and sys.argv[1] == "filesystem":
         print_from_filesystem()
     else:
-        print_from_s3()
+        filter = ""
+        if len(sys.argv) > 1:
+            filter = sys.argv[1]
+        print_from_s3(filter)
 
 
-def print_from_s3():
+def print_from_s3(filter):
     start = time.time()
     counter = 1
-    for b in b_numbers_from_s3():
+    for b in b_numbers_from_s3(filter):
         print("{0: <6} | {1}".format(counter, b))
         counter = counter + 1
     end = time.time()

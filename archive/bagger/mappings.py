@@ -16,7 +16,7 @@ PRONOM = {
 
 # map of tessella names to premis names
 # also, presence in here means we want it in new version
-SIGNIFICANT_PROPS = {
+SIGNIFICANT_PROPERTIES = {
     "Image Width": "ImageWidth",
     "Image Height": "ImageHeight",
     "Bitrate (kbps)": "Bitrate",
@@ -24,9 +24,14 @@ SIGNIFICANT_PROPS = {
     "Number of Pages": "PageNumber"  # this is a property of PDFs
 }
 
-# Ignored properties observed so far:
+# Do not transform any of these file properties.
+# If a file property is encountered that isn't in either list, an error will be raised.
+IGNORED_PROPERTIES = [
+    "Creation Date",
+    "Number of Images",
+    "Bits Per Sample",
+    "Samples Per Pixel"
+]
 
-# "Creation Date"
-# "Number of Images"
-# "Bits Per Sample"
-# "Samples Per Pixel"
+
+
