@@ -21,14 +21,14 @@ class MessageWriterTest
     with Inside
     with JsonAssertions {
 
-  val message = ExampleObject("A message sent in the MessageWriterTest")
+  val smallMessage = ExampleObject("A message sent in the MessageWriterTest")
   val subject = "message-writer-test-subject"
 
   it("sends a raw SNS notification for a small message") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-          val eventualAttempt = messageWriter.write(message, subject)
+          val eventualAttempt = messageWriter.write(smallMessage, subject)
 
           whenReady(eventualAttempt) { pointer =>
             val messages = listMessagesReceivedFromSNS(topic)
@@ -43,7 +43,7 @@ class MessageWriterTest
             val inlineNotification = maybeNotification.get
               .asInstanceOf[InlineNotification[ExampleObject]]
 
-            inlineNotification.t shouldBe message
+            inlineNotification.t shouldBe smallMessage
 
             listKeysInBucket(bucket) shouldBe List()
           }
@@ -56,7 +56,7 @@ class MessageWriterTest
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-          val eventualAttempt = messageWriter.write(message, subject)
+          val eventualAttempt = messageWriter.write(smallMessage, subject)
 
           whenReady(eventualAttempt) { pointer =>
             val messages = listMessagesReceivedFromSNS(topic)
@@ -79,7 +79,7 @@ class MessageWriterTest
                 bucket = Bucket(objectLocation.namespace),
                 key = objectLocation.key
               ),
-              toJson(message).get
+              toJson(smallMessage).get
             )
           }
         }
@@ -91,7 +91,7 @@ class MessageWriterTest
     withLocalS3Bucket { bucket =>
       val topic = Topic(arn = "invalid-topic-arn")
       withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-        val eventualAttempt = messageWriter.write(message, subject)
+        val eventualAttempt = messageWriter.write(smallMessage, subject)
 
         whenReady(eventualAttempt.failed) { ex =>
           ex shouldBe a[Throwable]
@@ -104,7 +104,7 @@ class MessageWriterTest
     withLocalSnsTopic { topic =>
       val bucket = Bucket(name = "invalid-bucket")
       withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-        val eventualAttempt = messageWriter.write(message, subject)
+        val eventualAttempt = messageWriter.write(smallMessage, subject)
 
         whenReady(eventualAttempt.failed) { ex =>
           ex shouldBe a[Throwable]
@@ -117,7 +117,7 @@ class MessageWriterTest
     withLocalSnsTopic { topic =>
       val bucket = Bucket(name = "invalid-bucket")
       withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-        val eventualAttempt = messageWriter.write(message, subject)
+        val eventualAttempt = messageWriter.write(smallMessage, subject)
 
         whenReady(eventualAttempt.failed) { _ =>
           listMessagesReceivedFromSNS(topic) should be('empty)
@@ -130,10 +130,10 @@ class MessageWriterTest
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-          val eventualAttempt1 = messageWriter.write(message, subject)
+          val eventualAttempt1 = messageWriter.write(smallMessage, subject)
           // Wait before sending the next message to increase likelihood they get processed at different timestamps
           Thread.sleep(2)
-          val eventualAttempt2 = messageWriter.write(message, subject)
+          val eventualAttempt2 = messageWriter.write(smallMessage, subject)
 
           whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) {
             _ =>
