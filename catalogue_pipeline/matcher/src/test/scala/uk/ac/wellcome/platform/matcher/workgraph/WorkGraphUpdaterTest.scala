@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.matcher.workgraph
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models._
@@ -219,7 +220,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
       val existingVersion = 2
       val updateVersion = 2
 
-      val thrown = intercept[VersionUnexpectedConflictException] {
+      val thrown = intercept[GracefulFailureException] {
         WorkGraphUpdater
           .update(
             workUpdate = WorkUpdate("A", updateVersion, Set("A")),

@@ -349,7 +349,7 @@ class MatcherMessageReceiverTest
                 mergeCandidates = List(MergeCandidate(bIdentifier)),
                 version = 2)
 
-              sendMessage(
+              sendMessage[TransformedBaseWork](
                 bucket = storageBucket,
                 queue = queue,
                 differentWorkAv2
