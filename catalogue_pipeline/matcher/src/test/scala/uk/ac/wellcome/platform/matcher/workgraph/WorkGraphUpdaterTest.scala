@@ -184,7 +184,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
       val existingVersion = 3
       val updateVersion = 1
 
-      intercept[VersionExpectedConflictException] {
+      val thrown = intercept[VersionExpectedConflictException] {
         WorkGraphUpdater
           .update(
             workUpdate = WorkUpdate("A", updateVersion, Set("B")),
@@ -192,6 +192,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
               WorkGraph(Set(WorkNode("A", existingVersion, Nil, "A")))
           )
       }
+      thrown.message shouldBe "update failed, work:A v1 is not newer than existing work v3"
     }
 
     it(
@@ -218,7 +219,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
       val existingVersion = 2
       val updateVersion = 2
 
-      intercept[VersionUnexpectedConflictException] {
+      val thrown = intercept[VersionUnexpectedConflictException] {
         WorkGraphUpdater
           .update(
             workUpdate = WorkUpdate("A", updateVersion, Set("A")),
@@ -228,6 +229,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
                 WorkNode("B", 0, List(), hashed_AB)))
           )
       }
+      thrown.message shouldBe "update failed, work:A v2 already exists with different content! update-ids:Set(A) != existing-ids:Set(B)"
     }
   }
 
