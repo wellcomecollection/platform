@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
-import uk.ac.wellcome.platform.matcher.models.VersionExpectedConflictException
+import uk.ac.wellcome.platform.matcher.models.{VersionExpectedConflictException, VersionUnexpectedConflictException}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
@@ -29,8 +29,8 @@ class MatcherMessageReceiver @Inject()(
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()).recover {
-      case e: VersionExpectedConflictException =>
-        debug(s"Not matching work due to version: ${e.getMessage}")
+      case e @ (_: VersionExpectedConflictException | _: VersionUnexpectedConflictException)  =>
+        debug(s"Not matching work due to version conflict exception: ${e.getMessage}")
     }
   }
 
