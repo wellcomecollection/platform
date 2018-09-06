@@ -3,6 +3,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 import akka.actor.ActorSystem
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
+import grizzled.slf4j.Logging
 import io.circe.Encoder
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -13,7 +14,7 @@ import uk.ac.wellcome.test.fixtures._
 import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 import scala.util.Random
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 object SQS {
 
@@ -25,7 +26,7 @@ object SQS {
 
 }
 
-trait SQS extends Matchers {
+trait SQS extends Matchers with Logging {
 
   import SQS._
 
@@ -171,12 +172,22 @@ trait SQS extends Matchers {
 
   def sendNotificationToSQS(queue: Queue, body: String): SendMessageResult = {
     val message = createNotificationMessageWith(body = body)
-    sqsClient.sendMessage(queue.url, toJson(message).get)
+    sendMessage(queue = queue, obj = message)
   }
 
   def sendNotificationToSQS[T](queue: Queue, message: T)(
     implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS(queue = queue, body = toJson(message).get)
+
+  def sendMessage[T](queue: Queue, obj: T)(
+    implicit encoder: Encoder[T]): SendMessageResult =
+    sendMessage(queue = queue, body = toJson(obj).get)
+
+  def sendMessage(queue: Queue, body: String): SendMessageResult =
+    sqsClient.sendMessage(queue.url, body)
+
+  def sendInvalidJSONto(queue: Queue): SendMessageResult =
+    sendMessage(queue = queue, body = Random.alphanumeric take 50 mkString)
 
   def noMessagesAreWaitingIn(queue: Queue) = {
     // No messages in flight
@@ -219,12 +230,29 @@ trait SQS extends Matchers {
     messages should not be empty
   }
 
+  def assertQueuePairSizes(queue: QueuePair, qSize: Int, dlqSize: Int) = {
+    waitVisibilityTimeoutExipiry()
+
+    val messagesDlq = getMessages(queue.dlq)
+    val messagesDlqSize = messagesDlq.size
+
+    val messagesQ = getMessages(queue.queue)
+    val messagesQSize = messagesQ.size
+
+    debug(
+      s"\ndlq: ${queue.dlq.url}, ${messagesDlqSize}\nqueue: ${queue.queue.url}, ${messagesQSize}")
+
+    messagesQSize shouldBe qSize
+    messagesDlqSize shouldBe dlqSize
+  }
+
   def assertQueueHasSize(queue: Queue, size: Int) = {
     waitVisibilityTimeoutExipiry()
 
     val messages = getMessages(queue)
+    val messagesSize = messages.size
 
-    messages should have size size
+    messagesSize shouldBe size
   }
 
   def waitVisibilityTimeoutExipiry() = {
@@ -234,7 +262,7 @@ trait SQS extends Matchers {
     Thread.sleep(1500)
   }
 
-  private def getMessages(queue: Queue) = {
+  def getMessages(queue: Queue) = {
     val messages = sqsClient
       .receiveMessage(
         new ReceiveMessageRequest(queue.url)

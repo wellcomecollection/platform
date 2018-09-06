@@ -3,9 +3,8 @@ package uk.ac.wellcome.platform.merger.services
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.MergerTestUtils
-import uk.ac.wellcome.platform.merger.fixtures.MergerFixtures
 
-class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
+class MergerTest extends FunSpec with MergerTestUtils {
 
   private val merger = new Merger()
 
@@ -38,16 +37,30 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
     val physicalWork = createPhysicalWork
     val digitalWork = createDigitalWork
 
-    val expectedMergedWork =
-      physicalWork.copy(items = physicalWork.items ++ digitalWork.items)
+    val actualMergedWorks = merger.merge(List(physicalWork, digitalWork))
 
-    val expectedRedirectedWork = UnidentifiedRedirectedWork(
+    actualMergedWorks.size shouldBe 2
+
+    val actualMergedWork = actualMergedWorks.head
+
+    val physicalItem = physicalWork.items.head.asInstanceOf[Identifiable[Item]]
+    val digitalItem = digitalWork.items.head
+
+    val expectedLocations = physicalItem.agent.locations ++ digitalItem.agent.locations
+
+    val expectedItem = physicalItem.copy(
+      agent = physicalItem.agent.copy(locations = expectedLocations))
+
+    val expectedItems = List(expectedItem)
+
+    actualMergedWork shouldBe physicalWork.copy(
+      otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
+      items = expectedItems)
+
+    actualMergedWorks.last shouldBe UnidentifiedRedirectedWork(
       sourceIdentifier = digitalWork.sourceIdentifier,
       version = digitalWork.version,
-      redirect = IdentifiableRedirect(expectedMergedWork.sourceIdentifier))
-
-    merger.merge(List(physicalWork, digitalWork)) should
-      contain theSameElementsAs List(expectedMergedWork, expectedRedirectedWork)
+      redirect = IdentifiableRedirect(physicalWork.sourceIdentifier))
   }
 
   it("does not merge a physical work having multiple items with a digital work") {
@@ -64,28 +77,12 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
   it("does not merge a physical work with a digital work having multiple items") {
     val works = List(
       createPhysicalWork,
-      createDigitalWork.copy(
-        items = List(
-          createIdentifiableItemWith(locations = List(createDigitalLocation)),
-          createIdentifiableItemWith(locations = List(createDigitalLocation))))
+      createDigitalWork.copy(items = List(
+        createUnidentifiableItemWith(locations = List(createDigitalLocation)),
+        createUnidentifiableItemWith(locations = List(createDigitalLocation))))
     )
 
     assertDoesNotMerge(works)
-  }
-
-  private def createDigitalWork = {
-    createUnidentifiedWorkWith(
-      workType = Some(WorkType("v", "E-books")),
-      items = List(
-        createIdentifiableItemWith(locations = List(createDigitalLocation)))
-    )
-  }
-
-  private def createPhysicalWork = {
-    createUnidentifiedWorkWith(
-      items = List(
-        createIdentifiableItemWith(locations = List(createPhysicalLocation)))
-    )
   }
 
   private def assertDoesNotMerge(works: List[UnidentifiedWork]) = {

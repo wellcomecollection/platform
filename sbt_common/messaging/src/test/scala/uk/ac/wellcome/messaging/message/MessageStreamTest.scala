@@ -4,20 +4,20 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 import akka.stream.QueueOfferResult
 import akka.stream.scaladsl.Flow
-import org.mockito.Matchers.{any, endsWith, eq => equalTo}
+import org.mockito.Matchers.{endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class MessageStreamTest
     extends FunSpec
@@ -60,8 +60,8 @@ class MessageStreamTest
   }
 
   it("increments *_ProcessMessage metric when successful") {
-    withMessageStreamFixtures[ExampleObject, Future[Unit]] {
-      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+    withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
+      case (bucket, messageStream, QueuePair(queue, _), metricsSender) =>
         val exampleObject = ExampleObject("some value")
 
         sendMessage(bucket, queue, exampleObject)
@@ -73,8 +73,7 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(1))
-            .count(equalTo("test-stream_ProcessMessage"), any[Future[Unit]]())(
-              any[ExecutionContext])
+            .countSuccess(equalTo("test-stream_ProcessMessage"))
         }
     }
   }
@@ -82,10 +81,7 @@ class MessageStreamTest
   it("fails gracefully when NotificationMessage cannot be deserialised") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
       case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
-        sqsClient.sendMessage(
-          queue.url,
-          "not valid json"
-        )
+        sendInvalidJSONto(queue)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
 
@@ -113,13 +109,11 @@ class MessageStreamTest
         val key = "key.json"
 
         // Do NOT put S3 object here
-
-        val examplePointer =
-          MessagePointer(ObjectLocation(bucket.name, key))
+        val objectLocation = ObjectLocation(bucket.name, key)
 
         sendNotificationToSQS(
           queue = queue,
-          message = examplePointer
+          message = objectLocation
         )
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
@@ -130,7 +124,7 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(3))
-            .incrementCount(metricName = "test-stream_ProcessMessage_failure")
+            .countFailure(metricName = "test-stream_ProcessMessage")
 
           received shouldBe empty
 
@@ -146,18 +140,10 @@ class MessageStreamTest
         val exampleObject1 = ExampleObject("some value 1")
         val exampleObject2 = ExampleObject("some value 2")
 
-        sqsClient.sendMessage(
-          queue.url,
-          "not valid json"
-        )
-
+        sendInvalidJSONto(queue)
         sendMessage(bucket, queue, exampleObject1)
 
-        sqsClient.sendMessage(
-          queue.url,
-          "another not valid json"
-        )
-
+        sendInvalidJSONto(queue)
         sendMessage(bucket, queue, exampleObject2)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
@@ -204,7 +190,7 @@ class MessageStreamTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
             verify(metricsSender, times(2))
-              .incrementCount("test-stream_ProcessMessage_success")
+              .countSuccess("test-stream_ProcessMessage")
           }
       }
     }
@@ -226,7 +212,7 @@ class MessageStreamTest
             assertQueueHasSize(dlq, 1)
 
             verify(metricsSender, times(3))
-              .incrementCount("test-stream_ProcessMessage_failure")
+              .countFailure("test-stream_ProcessMessage")
           }
       }
     }
@@ -237,18 +223,10 @@ class MessageStreamTest
           val exampleObject1 = ExampleObject("some value 1")
           val exampleObject2 = ExampleObject("some value 2")
 
-          sqsClient.sendMessage(
-            queue.url,
-            "not valid json"
-          )
-
+          sendInvalidJSONto(queue)
           sendMessage(bucket, queue, exampleObject1)
 
-          sqsClient.sendMessage(
-            queue.url,
-            "another not valid json"
-          )
-
+          sendInvalidJSONto(queue)
           sendMessage(bucket, queue, exampleObject2)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()

@@ -12,9 +12,9 @@ object ItemLinker {
     */
   def linkItemRecord(sierraTransformable: SierraTransformable,
                      itemRecord: SierraItemRecord): SierraTransformable = {
-    if (!itemRecord.bibIds.contains(sierraTransformable.sourceId)) {
+    if (!itemRecord.bibIds.contains(sierraTransformable.sierraId)) {
       throw new RuntimeException(
-        s"Non-matching bib id ${sierraTransformable.sourceId} in item bib ${itemRecord.bibIds}")
+        s"Non-matching bib id ${sierraTransformable.sierraId} in item bib ${itemRecord.bibIds}")
     }
 
     // We can decide whether to insert the new data in two steps:
@@ -25,15 +25,15 @@ object ItemLinker {
     //    just received?  If the existing data is older, we need to merge the
     //    new record.
     //
-    val isNewerData = sierraTransformable.itemData.get(itemRecord.id) match {
+    val isNewerData = sierraTransformable.itemRecords.get(itemRecord.id) match {
       case Some(existing) =>
         itemRecord.modifiedDate.isAfter(existing.modifiedDate)
       case None => true
     }
 
     if (isNewerData) {
-      val itemData = sierraTransformable.itemData + (itemRecord.id -> itemRecord)
-      sierraTransformable.copy(itemData = itemData)
+      val itemData = sierraTransformable.itemRecords + (itemRecord.id -> itemRecord)
+      sierraTransformable.copy(itemRecords = itemData)
     } else {
       sierraTransformable
     }

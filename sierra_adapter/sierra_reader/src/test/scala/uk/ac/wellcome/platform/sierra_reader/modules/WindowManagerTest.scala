@@ -1,22 +1,22 @@
 package uk.ac.wellcome.platform.sierra_reader.modules
 
-import java.time.Instant
-
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.transformable.sierra.SierraBibNumber
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.platform.sierra_reader.models.{
   SierraConfig,
-  SierraResourceTypes
+  SierraResourceTypes,
+  WindowStatus
 }
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -25,7 +25,8 @@ class WindowManagerTest
     with Matchers
     with S3
     with ScalaFutures
-    with ExtendedPatience {
+    with ExtendedPatience
+    with SierraGenerators {
 
   private def withWindowManager(bucket: Bucket)(
     testWith: TestWith[WindowManager, Assertion]) = {
@@ -58,6 +59,9 @@ class WindowManagerTest
     }
   }
 
+  // This test isn't actually testing the correct behaviour (see issue 2422:
+  // https://github.com/wellcometrust/platform/issues/2422); it's due to be
+  // replaced when we fix this behaviour.
   it("finds the ID if there is a window in progress") {
     withLocalS3Bucket { bucket =>
       withWindowManager(bucket) { windowManager =>
@@ -66,11 +70,9 @@ class WindowManagerTest
         // We pre-populate S3 with files as if they'd come from a prior run of the reader.
         s3Client.putObject(bucket.name, s"$prefix/0000.json", "[]")
 
-        val record =
-          SierraRecord(
-            id = "b1794165",
-            data = "{}",
-            modifiedDate = Instant.now())
+        val record = createSierraBibRecordWith(
+          id = SierraBibNumber("1794165")
+        )
 
         s3Client.putObject(
           bucket.name,
@@ -81,7 +83,7 @@ class WindowManagerTest
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
         whenReady(result) {
-          _ shouldBe WindowStatus(id = Some("1794166"), offset = 2)
+          _ shouldBe WindowStatus(id = "1794166", offset = 2)
         }
       }
     }
@@ -96,7 +98,7 @@ class WindowManagerTest
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
         whenReady(result.failed) {
-          _ shouldBe a[GracefulFailureException]
+          _ shouldBe a[SierraReaderException]
         }
       }
     }
@@ -112,7 +114,7 @@ class WindowManagerTest
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
         whenReady(result.failed) {
-          _ shouldBe a[GracefulFailureException]
+          _ shouldBe a[SierraReaderException]
         }
       }
     }
@@ -128,7 +130,7 @@ class WindowManagerTest
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
         whenReady(result.failed) {
-          _ shouldBe a[GracefulFailureException]
+          _ shouldBe a[SierraReaderException]
         }
       }
     }

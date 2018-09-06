@@ -16,15 +16,15 @@ def guess_cloudwatch_log_group(alarm_name):
     if alarm_name.startswith('loris-'):
         return 'platform/loris'
 
-    if alarm_name.startswith('api_romulus_v1-'):
-        return 'platform/api_romulus_v1'
+    if alarm_name.startswith('catalogue-api-romulus'):
+        return 'ecs/catalogue-api-romulus'
 
-    if alarm_name.startswith('api_remus_v1-'):
-        return 'platform/api_remus_v1'
+    if alarm_name.startswith('catalogue-api-remus'):
+        return 'ecs/catalogue-api-remus'
 
-    if alarm_name.startswith('lambda-'):
+    if alarm_name.startswith('lambda-') and alarm_name.endswith('-errors'):
         # e.g. lambda-ecs_ec2_instance_tagger-errors
-        lambda_name = alarm_name.split('-')[1]
+        lambda_name = alarm_name[len('lambda-'):-len('-errors')]
         return f'/aws/lambda/{lambda_name}'
 
     raise ValueError(
@@ -40,23 +40,10 @@ def guess_cloudwatch_search_terms(alarm_name):
     if alarm_name.startswith('lambda'):
         return ['Traceback', 'Task timed out after']
 
-    if alarm_name.startswith('api_') and alarm_name.endswith('-500-errors'):
+    if alarm_name.startswith('catalogue-api') and alarm_name.endswith('-500-errors'):
         return ['"HTTP 500"']
 
     return []
-
-
-def should_be_sent_to_main_channel(alarm_name):
-    """Should this alarm be sent to the main channel?"""
-    # Alarms for the API or Loris always go the main channel.
-    if any(p in alarm_name for p in ['api_remus', 'api_romulus', 'loris']):
-        return True
-
-    if alarm_name.endswith('_dlq_not_empty'):
-        return True
-
-    # Otherwise default to False, because we don't know what this alarm is.
-    return False
 
 
 def is_critical_error(alarm_name):

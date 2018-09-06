@@ -1,3 +1,5 @@
 <configuration>
   <include resource="base-logback-test.xml"/>
+
+  <logger name="uk.ac.wellcome.platform.goobi_reader.Server" level="WARN"/>
 </configuration>

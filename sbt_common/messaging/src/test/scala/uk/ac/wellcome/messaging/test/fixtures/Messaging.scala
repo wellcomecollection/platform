@@ -16,7 +16,7 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
@@ -25,7 +25,7 @@ import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.duration._
 import scala.util.{Random, Success}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -154,11 +154,8 @@ trait Messaging
       serialisedObj
     )
 
-    val examplePointer =
-      MessagePointer(ObjectLocation(location.namespace, location.key))
-
     val exampleNotification = createNotificationMessageWith(
-      message = examplePointer
+      message = location
     )
 
     toJson(exampleNotification).get
@@ -166,14 +163,14 @@ trait Messaging
 
   private def get[T](snsMessage: MessageInfo)(
     implicit decoder: Decoder[T]): T = {
-    val tryMessagePointer = fromJson[MessagePointer](snsMessage.message)
-    tryMessagePointer shouldBe a[Success[_]]
+    val tryObjectLocation = fromJson[ObjectLocation](snsMessage.message)
+    tryObjectLocation shouldBe a[Success[_]]
 
-    val messagePointer = tryMessagePointer.get
+    val objectLocation = tryObjectLocation.get
 
     getObjectFromS3[T](
-      bucket = Bucket(messagePointer.src.namespace),
-      key = messagePointer.src.key
+      bucket = Bucket(objectLocation.namespace),
+      key = objectLocation.key
     )
   }
 
@@ -199,6 +196,6 @@ trait Messaging
       location = ObjectLocation(namespace = bucket.name, key = s3key)
     )
 
-    sqsClient.sendMessage(queue.url, notificationJson)
+    sendMessage(queue = queue, body = notificationJson)
   }
 }

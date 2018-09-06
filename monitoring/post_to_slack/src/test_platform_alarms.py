@@ -8,7 +8,6 @@ from platform_alarms import (
     guess_cloudwatch_log_group,
     guess_cloudwatch_search_terms,
     is_critical_error,
-    should_be_sent_to_main_channel,
     simplify_message
 )
 
@@ -21,10 +20,11 @@ class Alarm:
 @pytest.mark.parametrize('alarm_name, expected_log_group_name', [
     ('loris-alb-target-500-errors', 'platform/loris'),
     ('loris-alb-not-enough-healthy-hosts', 'platform/loris'),
-    ('api_romulus_v1-alb-target-400-errors', 'platform/api_romulus_v1'),
-    ('api_remus_v1-alb-target-500-errors', 'platform/api_remus_v1'),
+    ('catalogue-api-romulus-alb-target-400-errors', 'ecs/catalogue-api-romulus'),
+    ('catalogue-api-remus-alb-target-500-errors', 'ecs/catalogue-api-remus'),
     ('lambda-ecs_ec2_instance_tagger-errors', '/aws/lambda/ecs_ec2_instance_tagger'),
     ('lambda-post_to_slack-errors', '/aws/lambda/post_to_slack'),
+    ('lambda-reindex_shard_generator_vhs-sourcedata-sierra-errors', '/aws/lambda/reindex_shard_generator_vhs-sourcedata-sierra'),
 ])
 def test_guess_cloudwatch_log_group(alarm_name, expected_log_group_name):
     assert guess_cloudwatch_log_group(alarm_name) == expected_log_group_name
@@ -42,8 +42,8 @@ def test_unrecognised_log_group_name_is_valueerror(bad_alarm_name):
 @pytest.mark.parametrize('alarm_name, expected_search_terms', [
     ('loris-alb-target-500-errors', ['"HTTP/1.0 500"']),
     ('loris-alb-not-enough-healthy-hosts', []),
-    ('api_romulus_v1-alb-target-400-errors', []),
-    ('api_remus_v1-alb-target-500-errors', ['"HTTP 500"']),
+    ('catalogue-api-romulus-alb-target-400-errors', []),
+    ('catalogue-api-remus-alb-target-500-errors', ['"HTTP 500"']),
     ('lambda-ecs_ec2_instance_tagger-errors', ['Traceback', 'Task timed out after']),
     ('lambda-post_to_slack-errors', ['Traceback', 'Task timed out after']),
 ])
@@ -51,26 +51,9 @@ def test_guess_cloudwatch_search_terms(alarm_name, expected_search_terms):
     assert guess_cloudwatch_search_terms(alarm_name) == expected_search_terms
 
 
-@pytest.mark.parametrize('alarm_name, should_send_to_main', [
-    ('api_romulus_v1-alb-target-400-errors', True),
-    ('api_remus_v1-alb-target-500-errors', True),
-    ('loris-alb-not-enough-healthy-hosts', True),
-    ('id_minter-alb-unhealthy-hosts', False),
-    ('ingestor-alb-unhealthy-hosts', False),
-    ('transformer-alb-not-enough-healthy-hosts', False),
-    ('grafana-alb-target-500-errors', False),
-    ('IngestorWorkerService_TerminalFailure', False),
-    ('sierra_items_windows_dlq_not_empty', True),
-    ('lambda-post_to_slack-errors', False),
-    ('unknown-alarm-type', False),
-])
-def test_should_be_sent_to_main_channel(alarm_name, should_send_to_main):
-    assert should_be_sent_to_main_channel(alarm_name) == should_send_to_main
-
-
 @pytest.mark.parametrize('alarm_name, expected_is_critical_error', [
-    ('api_romulus_v1-alb-target-400-errors', True),
-    ('api_remus_v1-alb-target-500-errors', True),
+    ('catalogue-api-romulus-alb-target-400-errors', True),
+    ('catalogue-api-remus-alb-target-500-errors', True),
     ('loris-alb-not-enough-healthy-hosts', True),
     ('id_minter-alb-unhealthy-hosts', True),
     ('ingestor-alb-unhealthy-hosts', True),

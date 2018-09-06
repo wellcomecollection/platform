@@ -2,7 +2,10 @@ package uk.ac.wellcome.models.work.internal
 
 sealed trait IdentityState[+T]
 
-sealed trait MaybeDisplayable[+T] extends IdentityState[T]
+sealed trait MaybeDisplayable[+T] extends IdentityState[T] {
+  val agent: T
+}
+
 sealed trait Displayable[+T] extends IdentityState[T]
 
 case class Identified[T](agent: T,

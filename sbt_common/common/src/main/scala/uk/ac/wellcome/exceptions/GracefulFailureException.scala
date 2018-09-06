@@ -1,4 +1,5 @@
 package uk.ac.wellcome.exceptions
 
-case class GracefulFailureException(e: Throwable)
-    extends Exception(e.getMessage)
+trait GracefulFailureException extends Exception { self: Throwable =>
+  val message: String = self.getMessage
+}

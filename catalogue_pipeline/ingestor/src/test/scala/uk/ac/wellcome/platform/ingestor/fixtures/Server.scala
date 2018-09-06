@@ -5,7 +5,7 @@ import org.scalatest.Suite
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
+import uk.ac.wellcome.monitoring.fixtures.CloudWatch
 import uk.ac.wellcome.platform.ingestor.{Server => AppServer}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith

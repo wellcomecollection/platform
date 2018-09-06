@@ -5,22 +5,22 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.collection.JavaConverters._
 
 class IngestorFeatureTest
     extends FunSpec
     with Matchers
-    with JsonTestUtil
+    with JsonAssertions
     with ScalaFutures
     with fixtures.Server
     with ElasticsearchFixtures
     with Messaging
     with SQS
-    with WorksUtil {
+    with WorksGenerators {
 
   val itemType = "work"
 
@@ -83,7 +83,7 @@ class IngestorFeatureTest
                 body = "not a json string -- this will fail parsing"
               )
 
-              // After a message is read, it stays invisible for 1 second and then it gets sent again.
+              // After a message is read, it stays invisible for 1 second and then it gets sent again.		               assertQueueHasSize(queue, size = 1)
               // So we wait for longer than the visibility timeout and then we assert that it has become
               // invisible again, which means that the ingestor picked it up again,
               // and so it wasn't deleted as part of the first run.

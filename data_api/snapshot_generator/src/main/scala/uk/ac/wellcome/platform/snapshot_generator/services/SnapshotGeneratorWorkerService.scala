@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.snapshot_generator.models.SnapshotJob
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,10 +23,9 @@ class SnapshotGeneratorWorkerService @Inject()(
       snapshotJob <- Future.fromTry(fromJson[SnapshotJob](message.Message))
       completedSnapshotJob <- snapshotService.generateSnapshot(
         snapshotJob = snapshotJob)
-      message <- Future.fromTry(toJson(completedSnapshotJob))
       _ <- snsWriter.writeMessage(
         subject = s"source: ${this.getClass.getSimpleName}.processMessage",
-        message = message
+        message = completedSnapshotJob
       )
     } yield ()
 

@@ -1,29 +1,3 @@
-module "transformer" {
-  source = "service"
-
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${var.subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}_transformer"
-  aws_region                       = "${var.aws_region}"
-
-  env_vars = {
-    sns_arn              = "${module.transformed_works_topic.arn}"
-    transformer_queue_id = "${module.transformer_queue.id}"
-    metrics_namespace    = "${var.namespace}_transformer"
-    storage_bucket_name  = "${var.vhs_sourcedata_bucket_name}"
-    message_bucket_name  = "${var.messages_bucket}"
-  }
-
-  env_vars_length = 5
-
-  container_image   = "${var.transformer_container_image}"
-  source_queue_name = "${module.transformer_queue.name}"
-  source_queue_arn  = "${module.transformer_queue.arn}"
-}
-
 module "recorder" {
   source = "service"
 
@@ -42,9 +16,11 @@ module "recorder" {
 
     vhs_recorder_dynamo_table_name = "${module.vhs_recorder.table_name}"
     vhs_recorder_bucket_name       = "${module.vhs_recorder.bucket_name}"
+
+    sns_topic = "${module.recorded_works_topic.arn}"
   }
 
-  env_vars_length = 5
+  env_vars_length = 6
 
   container_image   = "${var.recorder_container_image}"
   source_queue_name = "${module.recorder_queue.name}"
@@ -141,7 +117,7 @@ module "id_minter" {
   // two values in a way that their product doesn't exceed 45
   max_capacity = 5
 
-  security_group_ids = ["${aws_security_group.rds_access_security_group.id}"]
+  security_group_ids = ["${var.rds_access_security_group_id}"]
 }
 
 data "template_file" "es_cluster_host_ingestor" {

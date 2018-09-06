@@ -8,8 +8,6 @@ variable "release_ids" {
   type        = "map"
 }
 
-variable "infra_bucket" {}
-
 variable "namespace" {
   default = "reindexer"
 }

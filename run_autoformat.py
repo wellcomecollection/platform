@@ -48,6 +48,14 @@ if __name__ == '__main__':
     for extension, format_task in extension_to_format_task:
         _run_task_for_extension(extension, format_task)
 
+    # Make any required changes to RFCs.
+    relevant_paths = [
+        f
+        for f in changed_paths
+        if f.endswith('README.md') and f.startswith('docs/rfcs')]
+    if relevant_paths:
+        make('format-rfcs')
+
     # If there are any changes, push to GitHub immediately and fail the
     # build.  This will abort the remaining jobs, and trigger a new build
     # with the reformatted code.
@@ -88,11 +96,3 @@ if __name__ == '__main__':
 
     for extension, lint_task in extension_to_lint_task:
         _run_task_for_extension(extension, lint_task)
-
-    # And look for changes to RFCs.
-    relevant_paths = [
-        f
-        for f in changed_paths
-        if f.endswith('README.md') and f.startswith('docs/rfcs')]
-    if relevant_paths:
-        make('lint-rfcs')

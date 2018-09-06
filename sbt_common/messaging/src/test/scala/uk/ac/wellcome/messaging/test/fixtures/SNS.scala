@@ -1,14 +1,17 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.services.sns.AmazonSNS
+import grizzled.slf4j.Logging
+import io.circe.generic.extras.JsonKey
 import io.circe.{yaml, Decoder, Json, ParsingFailure}
+import org.scalatest.Matchers
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Random
+import scala.util.{Random, Success, Try}
 
 object SNS {
 
@@ -22,7 +25,7 @@ object SNS {
 
 }
 
-trait SNS {
+trait SNS extends Matchers with Logging {
 
   import SNS._
 
@@ -120,9 +123,81 @@ trait SNS {
       .get
 
     snsResponse.messages
-      .filter { _.topicArn == topic.arn }
+      .filter {
+        _.topicArn == topic.arn
+      }
+  }
+
+  def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic)(
+    implicit decoderT: Decoder[T]) = {
+    assertSnsReceives(Set(expectedMessage), topic)
+  }
+
+  def assertSnsReceivesNothing(topic: SNS.Topic) = {
+    notificationCount(topic) shouldBe 0
+  }
+
+  def assertSnsReceives[T](expectedMessage: Set[T], topic: SNS.Topic)(
+    implicit decoderT: Decoder[T]) = {
+    val triedReceiptsT = listNotifications[T](topic).toSet
+
+    debug(s"SNS $topic received $triedReceiptsT")
+    triedReceiptsT should have size expectedMessage.size
+
+    val maybeT = triedReceiptsT collect {
+      case Success(t) => t
+    }
+
+    maybeT should not be empty
+    maybeT shouldBe expectedMessage
+  }
+
+  private def getMessages(topic: Topic) = {
+    val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
+    val json = yaml.parser.parse(string)
+
+    json.right
+      .flatMap(_.as[SNSNotificationResponse])
+      .right
+      .map {
+        _.messages.filter(_.topicArn == topic.arn)
+      }
+  }
+
+  def notificationCount(topic: Topic): Int = {
+    val messages = getMessages(topic)
+
+    messages match {
+      case Left(e)  => throw (e)
+      case Right(t) => t.size
+    }
+  }
+
+  def listNotifications[T](topic: Topic)(
+    implicit decoderT: Decoder[T]): Seq[Try[T]] = {
+    val messages = getMessages(topic)
+
+    val eitherT = messages.right
+      .map(_.map(m => fromJson[T](m.message)))
+
+    eitherT match {
+      case Left(e)  => throw (e)
+      case Right(t) => t
+    }
   }
 }
+
+case class SNSNotificationMessage(
+  @JsonKey(":id") id: String,
+  @JsonKey(":subject") subject: Option[String],
+  @JsonKey(":message") message: String,
+  @JsonKey(":topic_arn") topicArn: String
+)
+
+case class SNSNotificationResponse(
+  topics: List[TopicInfo],
+  messages: List[SNSNotificationMessage]
+)
 
 case class SNSResponse(
   topics: List[TopicInfo],

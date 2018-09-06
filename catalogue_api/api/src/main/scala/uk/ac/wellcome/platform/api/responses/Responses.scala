@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.responses
 
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
-import uk.ac.wellcome.display.models.DisplayWork
+import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.platform.api.models.DisplayResultList
 import uk.ac.wellcome.platform.api.requests.{ApiRequest, MultipleResultsRequest}
 
@@ -22,10 +22,12 @@ case class ResultListResponse(
 )
 
 object ResultListResponse {
-  def create[T <: DisplayWork](
+  def create[T <: DisplayWork,
+             M <: MultipleResultsRequest[W],
+             W <: WorksIncludes](
     contextUri: String,
     displayResultList: DisplayResultList[T],
-    multipleResultsRequest: MultipleResultsRequest,
+    multipleResultsRequest: M,
     requestBaseUri: String
   ): ResultListResponse = {
 

@@ -42,8 +42,8 @@ def get_ecs_api_info(name):
 
     ecs = boto3.client('ecs')
     resp = ecs.describe_services(
-        cluster='api_cluster',
-        services=[f'api_{name}_v1']
+        cluster='catalogue-api',
+        services=[f'catalogue-api-{name}']
     )
     assert len(resp['services']) == 1, resp
     task_definition = resp['services'][0]['taskDefinition']
@@ -66,7 +66,7 @@ def get_ecs_api_info(name):
     return ApiConfiguration(
         name=name,
         api=data['api'],
-        nginx=data['nginx_api']
+        nginx=data['nginx_api-delta']
     )
 
 
@@ -146,7 +146,7 @@ variable "pinned_romulus_api" {{
   default     = "{romulus_api.api}"
 }}
 
-variable "pinned_romulus_api_nginx" {{
+variable "pinned_romulus_api_nginx-delta" {{
   description = "Which version of the nginx API image to pin romulus to, if any"
   default     = "{romulus_api.nginx}"
 }}
@@ -156,7 +156,7 @@ variable "pinned_remus_api" {{
   default     = "{remus_api.api}"
 }}
 
-variable "pinned_remus_api_nginx" {{
+variable "pinned_remus_api_nginx-delta" {{
   description = "Which version of the nginx API image to pin remus to, if any"
   default     = "{remus_api.nginx}"
 }}\033[0m
@@ -180,7 +180,10 @@ if __name__ == '__main__':
 
     print('\n---\n')
 
-    check_staging_api()
+    if '--force' in sys.argv:
+        print('Skipping check of staging/prod API...')
+    else:
+        check_staging_api()
 
     print('\n---\n')
 

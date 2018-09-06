@@ -41,6 +41,8 @@ variable "es_cluster_credentials" {
   type        = "map"
 }
 
+variable "infra_bucket" {}
+
 # These variables will change fairly regularly, whenever we want to swap the
 # staging and production APIs.
 
@@ -51,12 +53,12 @@ variable "production_api" {
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "3e731d10c993c7a2bce109835439dbb0b1b7f467"
+  default     = "2cccf98f0dd22b4d2156e8fad175928e58ebbec9"
 }
 
-variable "pinned_romulus_api_nginx" {
+variable "pinned_romulus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
+  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
 }
 
 variable "pinned_remus_api" {
@@ -64,7 +66,7 @@ variable "pinned_remus_api" {
   default     = ""
 }
 
-variable "pinned_remus_api_nginx" {
+variable "pinned_remus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin remus to, if any"
   default     = ""
 }
@@ -74,8 +76,8 @@ variable "es_config_romulus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
-    index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
+    index_v1 = "v1-2018-08-30-parallel-scan-reindexer"
+    index_v2 = "v2-2018-08-30-parallel-scan-reindexer"
     doc_type = "work"
   }
 }
@@ -85,8 +87,12 @@ variable "es_config_remus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
-    index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
+    index_v1 = "v1-2018-08-21-no-dynamo-stream"
+    index_v2 = "v2-2018-08-21-no-dynamo-stream"
     doc_type = "work"
   }
+}
+
+variable "data_acm_cert_arn" {
+  description = "ARN for the data ssl cert"
 }

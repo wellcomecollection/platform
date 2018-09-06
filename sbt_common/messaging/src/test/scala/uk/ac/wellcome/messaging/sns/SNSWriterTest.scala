@@ -2,6 +2,8 @@ package uk.ac.wellcome.messaging.sns
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 
@@ -10,7 +12,8 @@ class SNSWriterTest
     with ScalaFutures
     with Matchers
     with SNS
-    with IntegrationPatience {
+    with IntegrationPatience
+    with JsonAssertions {
 
   it("sends a message to SNS and returns a PublishAttempt") {
     withLocalSnsTopic { topic =>
@@ -28,6 +31,31 @@ class SNSWriterTest
           messages.head.message shouldBe message
           messages.head.subject shouldBe subject
           publishAttempt.id should be(Right(messages.head.message))
+        }
+      }
+    }
+  }
+
+  case class Shape(sides: Int, colour: String)
+
+  it("encodes a case class as JSON before sending it to SNS") {
+    withLocalSnsTopic { topic =>
+      withSNSWriter(topic) { snsWriter =>
+        val message = Shape(sides = 5, colour = "red")
+
+        val futurePublishAttempt = snsWriter.writeMessage(
+          message = message,
+          subject = "shape sorter subject"
+        )
+
+        whenReady(futurePublishAttempt) { publishAttempt =>
+          val messages = listMessagesReceivedFromSNS(topic)
+          messages should have size 1
+
+          assertJsonStringsAreEqual(
+            messages.head.message,
+            toJson(message).get
+          )
         }
       }
     }

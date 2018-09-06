@@ -28,10 +28,13 @@ module "sierra_to_dynamo_service" {
     demultiplexer_queue_url = "${module.demultiplexer_queue.id}"
     metrics_namespace       = "sierra_items_to_dynamo"
 
-    dynamo_table_name = "${aws_dynamodb_table.sierra_table.id}"
+    vhs_table_name  = "${local.vhs_sierra_items_table_name}"
+    vhs_bucket_name = "${local.vhs_sierra_items_bucket_name}"
+
+    topic_arn = "${module.sierra_to_dynamo_updates_topic.arn}"
   }
 
-  env_vars_length = 3
+  env_vars_length = 5
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"

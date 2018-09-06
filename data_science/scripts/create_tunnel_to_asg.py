@@ -3,7 +3,7 @@
 """
 Connect to the first instance in an autoscaling group.
 
-Usage: create_tunnel_to_asg.py [--key=<KEY>] [--port=<PORT>] [--type=(p2 | t2)]
+Usage: create_tunnel_to_asg.py [--key=<KEY>] [--port=<PORT>] [--type=(p2 | t2)] [--namespace=<NAMESPACE>]
 
 Actions:
   --key=<KEY>             Path to an SSH key with access to the instances in the ASG.
@@ -39,6 +39,7 @@ def main():
     args = docopt.docopt(__doc__)
 
     key_path = args['--key'] or _default_ssh_key_path()
+    namespace = args['--namespace'] or 'notebook'
 
     print('Using SSH key at path %r' % key_path)
 
@@ -47,7 +48,7 @@ def main():
     port = args['--port'] or '8888'
 
     instance_type = args['--type'] or 't2'
-    tag_name = 'jupyter-%s' % instance_type
+    tag_name = 'jupyter-%s-%s' % (instance_type, namespace)
 
     asg_client = boto3.client('autoscaling')
 

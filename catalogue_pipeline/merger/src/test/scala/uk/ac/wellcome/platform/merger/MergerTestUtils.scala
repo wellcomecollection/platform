@@ -1,49 +1,93 @@
 package uk.ac.wellcome.platform.merger
 
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import org.scalatest.{Assertion, Suite}
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
   WorkIdentifier
 }
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork,
+  WorkType
+}
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+trait MergerTestUtils
+    extends Eventually
+    with ScalaFutures
+    with LocalVersionedHybridStore
+    with WorksGenerators { this: Suite =>
 
-trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
-
-  def matcherResultWith(matchedEntries: Set[Set[RecorderWorkEntry]]) =
+  def matcherResultWith(matchedEntries: Set[Set[TransformedBaseWork]]) =
     MatcherResult(
-      matchedEntries.map(
-        recorderWorkEntries =>
-          MatchedIdentifiers(
-            recorderWorkEntries.map(workEntry =>
-              WorkIdentifier(
-                identifier = workEntry.id,
-                version = workEntry.work.version)))))
+      matchedEntries.map { works =>
+        MatchedIdentifiers(worksToWorkIdentifiers(works))
+      }
+    )
 
-  def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
+  def worksToWorkIdentifiers(
+    works: Seq[TransformedBaseWork]): Set[WorkIdentifier] =
+    worksToWorkIdentifiers(works.toSet)
+
+  def worksToWorkIdentifiers(
+    works: Set[TransformedBaseWork]): Set[WorkIdentifier] =
+    works
+      .map { work =>
+        WorkIdentifier(
+          identifier = work.sourceIdentifier.toString,
+          version = work.version
+        )
+      }
+
+  def storeInVHS(vhs: VersionedHybridStore[TransformedBaseWork,
                                            EmptyMetadata,
-                                           ObjectStore[RecorderWorkEntry]],
-                 recorderWorkEntry: RecorderWorkEntry): Future[Unit] =
-    vhs.updateRecord(recorderWorkEntry.id)(
-      ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
+                                           ObjectStore[TransformedBaseWork]],
+                 work: TransformedBaseWork): Assertion = {
+    vhs.updateRecord(work.sourceIdentifier.toString)(
+      ifNotExisting = (work, EmptyMetadata()))((_, _) =>
       throw new RuntimeException("Not possible, VHS is empty!"))
 
-  def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
-                                           EmptyMetadata,
-                                           ObjectStore[RecorderWorkEntry]],
-                 entries: List[RecorderWorkEntry]): Future[List[Unit]] = {
-    Future.sequence(entries.map { recorderWorkEntry =>
-      storeInVHS(vhs = vhs, recorderWorkEntry = recorderWorkEntry)
-    })
+    eventually {
+      whenReady(vhs.getRecord(id = work.sourceIdentifier.toString)) { result =>
+        result.get shouldBe work
+      }
+    }
   }
 
-  def createRecorderWorkEntryWith(version: Int) =
-    RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
+  def storeInVHS(vhs: VersionedHybridStore[TransformedBaseWork,
+                                           EmptyMetadata,
+                                           ObjectStore[TransformedBaseWork]],
+                 entries: List[TransformedBaseWork]): List[Assertion] =
+    entries.map { work =>
+      storeInVHS(vhs = vhs, work = work)
+    }
+
+  def createDigitalWork: UnidentifiedWork = {
+    createUnidentifiedWorkWith(
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number"),
+      otherIdentifiers = List(
+        createSourceIdentifierWith(identifierType = "miro-library-reference")),
+      workType = Some(WorkType("v", "E-books")),
+      items = List(
+        createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+    )
+  }
+
+  def createPhysicalWork: UnidentifiedWork = {
+    createUnidentifiedWorkWith(
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number"),
+      otherIdentifiers =
+        List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
+      items = List(
+        createIdentifiableItemWith(locations = List(createPhysicalLocation)))
+    )
+  }
 }

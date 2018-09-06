@@ -1,16 +1,3 @@
-module "transformer_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${var.namespace}_transformer_queue"
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.account_id}"
-  topic_names = ["${module.transformer_topic.name}"]
-
-  visibility_timeout_seconds = 30
-  max_receive_count          = 3
-
-  alarm_topic_arn = "${var.dlq_alarm_arn}"
-}
-
 module "es_ingest_queue" {
   source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v9.1.0"
   queue_name  = "${var.namespace}_es_ingest_queue"
@@ -75,7 +62,7 @@ module "merger_queue" {
   topic_names = ["${module.matched_works_topic.name}"]
 
   visibility_timeout_seconds = 30
-  max_receive_count          = 3
+  max_receive_count          = 4
 
   alarm_topic_arn = "${var.dlq_alarm_arn}"
 }

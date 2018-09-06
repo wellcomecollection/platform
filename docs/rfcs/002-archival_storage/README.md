@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 08 June 2018.**
+**Last updated: 16 August 2018.**
 
 ## Problem statement
 
@@ -37,24 +37,24 @@ We will build a storage service based on Amazon S3 and DynamoDB.
 
 ### Ingest
 
-We'll need to consider integrations with other services such as:
+We'll need to integrate with other services such as:
 
 - [Archivematica](https://www.archivematica.org/en/) - for born-digital workflow
 - [Goobi](https://www.intranda.com/en/digiverso/goobi/goobi-overview/) - for digitisation workflow
 
-These services will need to provide accessions in the BagIt bag format, gzip-compressed and uploaded to an S3 bucket.
+These services will need to provide accessions in the BagIt bag format, gzip-compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
 
 ### Storage
 
-Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to a second AWS region, using cross-region replication. All asset storage will have S3 versioning enabled.
+Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to Azure Blob Storage with the Archive storage class. All AWS storage will have versioning enabled, but we will only keep the most recent version in Azure as it is intended only for worst case disaster recovery following a complete failure of AWS.
 
 #### Locations
 
 The storage service will use three S3 buckets:
 
-- Archival asset storage (S3 Glacier, Dublin)
-- Archival asset storage replica (S3 Glacier, Frankfurt)
-- Access asset storage (S3 IA, Dublin)
+- Archival asset storage (AWS S3 Glacier, Dublin)
+- Archival asset storage replica (Azure Blob Storage Archive, Netherlands)
+- Access asset storage (AWS S3 IA, Dublin)
 
 Within each bucket, assets will be namespaced by source and shard, e.g.:
 
@@ -63,7 +63,7 @@ Within each bucket, assets will be namespaced by source and shard, e.g.:
 
 #### Assets
 
-Assets will be stored in the above S3 locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed in S3. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
+Assets will be stored in the above locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
 
 > The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
 >
@@ -77,7 +77,7 @@ Access copies may be in the same format as the archival copy, or a derivative fo
 
 #### Storage manifest
 
-The storage manifest provides a pointer to the stored accession and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession. It is defined using types from a new Storage ontology and serialised using JSON-LD. We may provide an API on top of storage manifests in the future, as part of an authenticated storage API.
+The storage manifest provides a pointer to the stored accession and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession. It is defined using types from a new Storage ontology and serialised using JSON-LD. We will use this to provide resources that describe stored bags, as part of the authenticated storage API.
 
 The manifest does not contain metadata from the METS files within a bag, it is purely a storage level index. It will contain data from the `bag-info.txt` file and information about where the assets have been stored. METS files will be separately ingested in the catalogue and reporting pipelines.
 
@@ -94,26 +94,93 @@ The Versioned Hybrid Store also includes the ability to "reindex" the entire dat
 
 ## Examples
 
+### Ingest
+
+Request:
+
+```http
+POST /bags
+Content-Type: application/json
+
+{
+  "type": "Ingest",
+  "ingestType": {
+    "id": "create",
+    "type": "IngestType"
+  },
+  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+}
+```
+
+Response:
+
+```http
+202 ACCEPTED
+```
+
+Request:
+
+```http
+GET /ingests/xx-xx-xx-xx
+```
+
+Response:
+
+```json
+{
+  "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+  "id": "{guid}",
+  "type": "Ingest",
+  "ingestType": {
+    "id": "create",
+    "type": "IngestType"
+  },
+  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+  "bag": {
+    "id": "{id}",
+    "type": "Bag"
+  },
+  "result": {
+    "id": "success",
+    "type": "IngestResult"
+  },
+  "events": [ ... ]
+}
+```
+
+
 ### Digitised content
 
-Digitised content will be ingested using Goobi, which will provide a bag layout that we define.
+Digitised content will be ingested using Goobi, which should provide the bag layout defined below.
 
 #### Bag
 
 ```
-b22036593/
+b24923333/
 |-- data
-|   |-- b22036593.xml    // mets file
+|   |-- b24923333.xml      // mets "anchor" file for multiple manifestation
+|  [|-- b24923333_001.xml  // mets file for vol 1]
+|  [|-- b24923333_002.xml  // mets file for vol 2]
 |   \-- objects
-|       \-- b22036593_001.jp2
+|      [\-- b24923333_001_001.jp2 // first image for vol 1]
+|      [\-- b24923333_001_002.jp2 // second image for vol 1]
+|           ...
+|      [\-- b24923333_002_001.jp2 // first image for vol 2]
+|      [\-- b24923333_002_002.jp2 // second image for vol 2]
 |           ...
 |   \-- alto
-|       \-- b22036593_001.xml
+|      [\-- b24923333_001_001.xml // text for image 1 vol 1]
+|      [\-- b24923333_001_002.xml // text for image 2 vol 1]
+|           ...
+|      [\-- b24923333_002_001.xml // text for image 1 vol 2]
+|      [\-- b24923333_002_002.xml // text for image 2 vol 2]
 |           ...
 |-- manifest-sha256.txt
-|     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b22036593.xml
-|     e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e data/objects/b22036593_001.jp2
-|     17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502 data/alto/b22036593_001.xml
+|     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b24923333.xml
+|     e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e data/objects/b24923333_001.jp2
+|     17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502 data/alto/b24923333_001.xml
 |     ...
 |-- tagmanifest-sha256.txt
 |     791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e manifest-sha256.txt
@@ -124,18 +191,96 @@ b22036593/
 |     Contact-Email: support@intranda.com
 |     External-Description: A account of a voyage to New South Wales    // title
 |     Bagging-Date: 2016-08-07
-|     External-Identifier: b22036593    // b number
+|     External-Identifier: b24923333    // b number
 |     Payload-Oxum: 435255.8
 |     Internal-Sender-Identifier: 170131    // goobi process id
-|     Internal-Sender-Description: 12324_b_b22036593    // goobi process title
+|     Internal-Sender-Description: 12324_b_b24923333    // goobi process title
 \-- bagit.txt
       BagIt-Version: 0.97
       Tag-File-Character-Encoding: UTF-8
 ```
 
-#### Storage manifest
+#### METS
 
+The existing METS structure should be change to reflect the following. The main change is removing data from Preservica and replacing it with PREMIS object metadata.
+
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<mets:mets xmlns:dv="http://dfg-viewer.de/" xmlns:mets="http://www.loc.gov/METS/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:premis="http://www.loc.gov/premis/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/standards/premis/ http://www.loc.gov/standards/premis/v2/premis-v2-0.xsd http://www.loc.gov/standards/mix/ http://www.loc.gov/standards/mix/mix.xsd">
+  <mets:metsHdr CREATEDATE="2016-01-06T07:36:48">
+    <mets:agent OTHERTYPE="SOFTWARE" ROLE="CREATOR" TYPE="OTHER">
+      <mets:name>Goobi - ugh-1.10-ugh-2.0.0-18-g99df876 - 21−May−2015</mets:name>
+      <mets:note>Goobi</mets:note>
+    </mets:agent>
+  </mets:metsHdr>
+  <mets:dmdSec ID="DMDLOG_0000">
+    <mets:mdWrap MDTYPE="MODS"><!-- no change --></mets:dmdSec>
+  <mets:dmdSec ID="DMDPHYS_0000"><!-- no change --></mets:dmdSec>
+  <mets:amdSec ID="AMD"><!-- remove techMD for deliverable unit, so first file is now AMD_0001 -->
+    <mets:techMD ID="AMD_0001">
+      <mets:mdWrap MDTYPE="OTHER" MIMETYPE="text/xml">
+        <mets:xmlData><!-- replace Preservica data with PREMIS object as below -->
+          <premis:object version="3.0" xsi:schemaLocation="http://www.loc.gov/premis/v3 http://www.loc.gov/standards/premis/v3/premis.xsd" xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>b24923333_0001.jp2</premis:objectIdentifierValue>
+              </premis:objectIdentifier>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>ImageHeight</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>4378</premis:significantPropertiesValue>
+              </premis:significantProperties>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>ImageWidth</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>2816</premis:significantPropertiesValue>
+              </premis:significantProperties>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel />
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>SHA-256</premis:messageDigestAlgorithm>
+                <premis:messageDigest>0adcae8b53ba8af8d6fef0c1517ef822f0d0c3a7</premis:messageDigest>
+                </premis:fixity>
+              <premis:size>310448</premis:size>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>JP2 (JPEG 2000 part 1)</premis:formatName>
+                  </premis:formatDesignation>
+                <premis:formatRegistry>
+                  <premis:formatRegistryName>PRONOM</premis:formatRegistryName>
+                  <premis:formatRegistryKey>x-fmt/392</premis:formatRegistryKey>
+                  </premis:formatRegistry>
+                </premis:format>
+              </premis:objectCharacteristics>
+            </premis:object>
+          </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="RIGHTS"><!-- no change --></mets:rightsMD>
+    <mets:digiprovMD ID="DIGIPROV"><!-- no change --></mets:digiprovMD>
+  </mets:amdSec>
+  <mets:fileSec>
+    <mets:fileGrp USE="OBJECTS"><!-- change USE from SDB to OBJECTS -->
+      <mets:file ID="FILE_0001_OBJECTS" MIMETYPE="image/jp2"><!-- change SDB suffix to OBJECTS -->
+        <mets:FLocat LOCTYPE="URL" xlink:href="objects/b22454408_0001.jp2" /><!-- remove CHECKSUM -->
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+  <mets:structMap TYPE="LOGICAL"><!-- no change --></mets:structMap>
+  <mets:structMap TYPE="PHYSICAL"><!-- no change other than reflecting new IDs --></mets:structMap>
+  <mets:structLink><!-- no change --></mets:structLink>
+</mets:mets>
 ```
+
+#### API
+
+Request:
+
+```http
+GET /bags/xx-xx-xx-xx
+```
+
+Response:
+
+```json
 {
   "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
   "type": "Bag",
@@ -148,17 +293,29 @@ b22036593/
   "identifiers": [
     {
       "type": "Identifier",
-      "scheme": "sierra-system-number",
-      "value": "b22036593"
+      "identifierType": {
+        "id": "sierra-system-number",
+        "label": "Sierra system number",
+        "type": "IdentifierType"
+      },
+      "value": "b24923333"
     },
     {
       "type": "Identifier",
-      "scheme": "goobi-process-title",
-      "value": "12324_b_b22036593"
+      "identifierType": {
+        "id": "goobi-process-title",
+        "label": "Goobi process title",
+        "type": "IdentifierType"
+      },
+      "value": "12324_b_b24923333"
     },
     {
       "type": "Identifier",
-      "scheme": "goobi-process-id",
+      "identifierType": {
+        "id": "goobi-process-id",
+        "label": "Goobi process identifier",
+        "type": "IdentifierType"
+      },
       "value": "170131"
     }
   ],
@@ -169,17 +326,17 @@ b22036593/
       {
         "type": "File",
         "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "path": "data/b22036593.xml"
+        "path": "data/b24923333.xml"
       },
       {
         "type": "File",
         "checksum": "e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e",
-        "path": "data/objects/b22036593_001.jp2"
+        "path": "data/objects/b24923333_001.jp2"
       },
       {
         "type": "File",
         "checksum": "17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502",
-        "path": "data/alto/b22036593_001.xml"
+        "path": "data/alto/b24923333_001.xml"
       }
     ]
   },
@@ -204,21 +361,33 @@ b22036593/
       }
     ]
   },
-  locations: [
+  "locations": [
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive",
-      "url": "s3://archivebucket/digitised/b22036593/"
+      "locationType": {
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 Glacier",
+        "type": "LocationType"
+      },
+      "url": "s3://archivebucket/digitised/b24923333/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive-replica",
-      "url": "s3://archivebucket-replica/digitised/b22036593/"
+      "locationType": {
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage Archive",
+        "type": "LocationType"
+      },
+      "url": "https://archivebucket-replica.blob.core.windows.net/digitised/b24923333/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-access",
-      "url": "s3://accessbucket/digitised/b22036593/"
+      "locationType": {
+        "id": "aws-s3-standard-ia",
+        "label": "AWS S3 Standard IA",
+        "type": "LocationType"
+      },
+      "url": "s3://accessbucket/digitised/b24923333/"
     }
   ],
   "description": "A account of a voyage to New South Wales",
@@ -260,9 +429,21 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
       Tag-File-Character-Encoding: UTF-8
 ```
 
-#### Storage manifest
+#### METS
 
+The METS file will be as provided out of the box by Archivematica.
+
+#### API
+
+Request:
+
+```http
+GET /bags/yy-yy-yy-yy
 ```
+
+Response:
+
+```json
 {
   "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
   "type": "Bag",
@@ -275,17 +456,29 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
   "identifiers": [
     {
       "type": "Identifier",
-      "scheme": "archivematica-aip-identifier",
+      "identifierType": {
+        "id": "archivematica-aip-identifier",
+        "label": "Archivematica AIP identifier",
+        "type": "IdentifierType"
+      },
       "value": "GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Identifier",
-      "scheme": "archivematica-aip-guid",
+      "identifierType": {
+        "id": "archivematica-aip-guid",
+        "label": "Archivematica AIP GUID",
+        "type": "IdentifierType"
+      },
       "value": "a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Identifier",
-      "scheme": "calm-alt-ref-no",
+      "identifierType": {
+        "id": "calm-alt-ref-no",
+        "label": "Calm Alt Ref No",
+        "type": "IdentifierType"
+      },
       "value": "GC253/1046"
     }
   ],
@@ -326,20 +519,32 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
       }
     ]
   },
-  locations: [
+  "locations": [
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive",
+      "locationType": {
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 Glacier",
+        "type": "LocationType"
+      },
       "url": "s3://archivebucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive-replica",
-      "url": "s3://archivebucket-replica/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+      "locationType": {
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage Archive",
+        "type": "LocationType"
+      },
+      "url": "https://archivebucket-replica.blob.core.windows.net/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-access",
+      "locationType": {
+        "id": "aws-s3-standard-ia",
+        "label": "AWS S3 Standard IA",
+        "type": "LocationType"
+      },
       "url": "s3://accessbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     }
   ],

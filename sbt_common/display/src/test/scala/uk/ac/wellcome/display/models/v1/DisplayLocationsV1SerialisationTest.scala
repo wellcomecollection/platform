@@ -1,30 +1,30 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.WorksIncludes
+import uk.ac.wellcome.display.models.V1WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
 class DisplayLocationsV1SerialisationTest
     extends FunSpec
     with DisplayV1SerialisationTestBase
     with JsonMapperTestUtil
-    with WorksUtil {
+    with WorksGenerators {
 
-  it("serialises a physical location correctly") {
+  it("serialises a physical location") {
     val physicalLocation = PhysicalLocation(
       locationType = LocationType("sgmed"),
       label = "a stack of slick slimes"
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(
-        createItem(locations = List(physicalLocation))
+      itemsV1 = List(
+        createIdentifiedItem(locations = List(physicalLocation))
       )
     )
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -33,7 +33,7 @@ class DisplayLocationsV1SerialisationTest
                             |  "id": "${work.canonicalId}",
                             |  "title": "${work.title}",
                             |  "creators": [ ],
-                            |  "items": [ ${items(work.items)} ],
+                            |  "items": [ ${items(work.itemsV1)} ],
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [],
@@ -43,18 +43,18 @@ class DisplayLocationsV1SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("serialises a digital location correctly") {
+  it("serialises a digital location") {
     val digitalLocation = DigitalLocation(
       url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
       locationType = LocationType("iiif-image")
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(createItem(locations = List(digitalLocation)))
+      itemsV1 = List(createIdentifiedItem(locations = List(digitalLocation)))
     )
 
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -63,7 +63,7 @@ class DisplayLocationsV1SerialisationTest
                           |  "id": "${work.canonicalId}",
                           |  "title": "${work.title}",
                           |  "creators": [ ],
-                          |  "items": [ ${items(work.items)} ],
+                          |  "items": [ ${items(work.itemsV1)} ],
                           |  "subjects": [ ],
                           |  "genres": [ ],
                           |  "publishers": [],
@@ -72,7 +72,7 @@ class DisplayLocationsV1SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("serialises a digital location with a license correctly") {
+  it("serialises a digital location with a license") {
     val digitalLocation = DigitalLocation(
       url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
       locationType = LocationType("iiif-image"),
@@ -80,11 +80,11 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(createItem(locations = List(digitalLocation)))
+      itemsV1 = List(createIdentifiedItem(locations = List(digitalLocation)))
     )
 
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
 
@@ -94,7 +94,7 @@ class DisplayLocationsV1SerialisationTest
                           |  "id": "${work.canonicalId}",
                           |  "title": "${work.title}",
                           |  "creators": [ ],
-                          |  "items": [ ${items(work.items)} ],
+                          |  "items": [ ${items(work.itemsV1)} ],
                           |  "subjects": [ ],
                           |  "genres": [ ],
                           |  "publishers": [],

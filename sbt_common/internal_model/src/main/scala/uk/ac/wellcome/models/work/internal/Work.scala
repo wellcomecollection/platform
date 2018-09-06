@@ -23,7 +23,7 @@ sealed trait Work extends BaseWork with MultipleSourceIdentifiers {
   val extent: Option[String]
   val lettering: Option[String]
   val createdDate: Option[Period]
-  val subjects: List[Subject[IdentityState[AbstractConcept]]]
+  val subjects: List[Subject[IdentityState[AbstractRootConcept]]]
   val genres: List[Genre[IdentityState[AbstractConcept]]]
   val contributors: List[Contributor[IdentityState[AbstractAgent]]]
   val thumbnail: Option[Location]
@@ -32,6 +32,7 @@ sealed trait Work extends BaseWork with MultipleSourceIdentifiers {
   val dimensions: Option[String]
 
   val items: List[IdentityState[Item]]
+  val itemsV1: List[IdentityState[Item]]
 
   val version: Int
 
@@ -49,14 +50,15 @@ case class UnidentifiedWork(
   extent: Option[String],
   lettering: Option[String],
   createdDate: Option[Period],
-  subjects: List[Subject[MaybeDisplayable[AbstractConcept]]],
+  subjects: List[Subject[MaybeDisplayable[AbstractRootConcept]]],
   genres: List[Genre[MaybeDisplayable[AbstractConcept]]],
   contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]],
   thumbnail: Option[Location],
   production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]],
   language: Option[Language],
   dimensions: Option[String],
-  items: List[Identifiable[Item]],
+  items: List[MaybeDisplayable[Item]],
+  itemsV1: List[Identifiable[Item]],
   version: Int,
   ontologyType: String = "Work",
   identifiedType: String = classOf[IdentifiedWork].getSimpleName)
@@ -75,14 +77,15 @@ case class IdentifiedWork(
   extent: Option[String],
   lettering: Option[String],
   createdDate: Option[Period],
-  subjects: List[Subject[Displayable[AbstractConcept]]],
+  subjects: List[Subject[Displayable[AbstractRootConcept]]],
   genres: List[Genre[Displayable[AbstractConcept]]],
   contributors: List[Contributor[Displayable[AbstractAgent]]],
   thumbnail: Option[Location],
   production: List[ProductionEvent[Displayable[AbstractAgent]]],
   language: Option[Language],
   dimensions: Option[String],
-  items: List[Identified[Item]],
+  items: List[Displayable[Item]],
+  itemsV1: List[Identified[Item]],
   version: Int,
   ontologyType: String = "Work")
     extends Work

@@ -6,8 +6,8 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.concurrent.Future
 import scala.util.Success
@@ -20,7 +20,7 @@ class MessageWriterTest
     with Messaging
     with IntegrationPatience
     with Inside
-    with JsonTestUtil {
+    with JsonAssertions {
 
   val message = ExampleObject("A message sent in the MessageWriterTest")
   val subject = "message-writer-test-subject"
@@ -36,20 +36,21 @@ class MessageWriterTest
             messages should have size (1)
             messages.head.subject shouldBe subject
 
-            val pointer = fromJson[MessagePointer](messages.head.message)
+            val maybeObjectLocation =
+              fromJson[ObjectLocation](messages.head.message)
 
-            pointer shouldBe a[Success[_]]
-            val messagePointer = pointer.get
+            maybeObjectLocation shouldBe a[Success[_]]
+            val objectLocation = maybeObjectLocation.get
 
-            inside(messagePointer) {
-              case MessagePointer(ObjectLocation(bucketName, key)) => {
-                bucketName shouldBe bucket.name
-                assertJsonStringsAreEqual(
-                  getContentFromS3(bucket, key),
-                  toJson(message).get
-                )
-              }
-            }
+            objectLocation.namespace shouldBe bucket.name
+
+            assertJsonStringsAreEqual(
+              getContentFromS3(
+                bucket = Bucket(objectLocation.namespace),
+                key = objectLocation.key
+              ),
+              toJson(message).get
+            )
           }
         }
       }
@@ -109,10 +110,10 @@ class MessageWriterTest
               val messages = listMessagesReceivedFromSNS(topic)
               messages should have size (2)
 
-              val pointers = messages.map(message =>
-                fromJson[MessagePointer](message.message))
+              val locations = messages.map(message =>
+                fromJson[ObjectLocation](message.message))
 
-              pointers.distinct should have size 2
+              locations.distinct should have size 2
           }
         }
       }

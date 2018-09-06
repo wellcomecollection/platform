@@ -6,10 +6,9 @@ import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,7 +37,7 @@ class ElasticsearchIndexTest
     with ScalaFutures
     with Eventually
     with Matchers
-    with JsonTestUtil
+    with JsonAssertions
     with BeforeAndAfterEach {
 
   val testType = "thing"
@@ -74,7 +73,7 @@ class ElasticsearchIndexTest
     val indexName = "working-index"
     withLocalElasticsearchIndex(TestIndex, indexName = indexName) { indexName =>
       val testObject = TestObject("id", "description", true)
-      val testObjectJson = JsonUtil.toJson(testObject).get
+      val testObjectJson = toJson(testObject).get
 
       eventually {
         for {
@@ -96,7 +95,7 @@ class ElasticsearchIndexTest
     val indexName = "unexpected-type-index"
     withLocalElasticsearchIndex(TestIndex, indexName = indexName) { indexName =>
       val badTestObject = BadTestObject("id", 5)
-      val badTestObjectJson = JsonUtil.toJson(badTestObject).get
+      val badTestObjectJson = toJson(badTestObject).get
 
       val eventuallyResponse =
         for {
@@ -117,8 +116,7 @@ class ElasticsearchIndexTest
         testIndexName =>
           val compatibleTestObject =
             CompatibleTestObject("id", "description", 5, visible = true)
-          val compatibleTestObjectJson =
-            JsonUtil.toJson(compatibleTestObject).get
+          val compatibleTestObjectJson = toJson(compatibleTestObject).get
 
           val futureInsert = elasticClient.execute(
             indexInto(testIndexName / testType) doc compatibleTestObjectJson)

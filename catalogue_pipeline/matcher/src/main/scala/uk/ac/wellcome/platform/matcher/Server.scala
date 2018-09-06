@@ -10,42 +10,34 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.messaging.{
-  SNSClientModule,
-  SNSConfigModule,
-  SQSClientModule,
-  SQSConfigModule
-}
+import uk.ac.wellcome.finatra.messaging._
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{
   DynamoClientModule,
   DynamoConfigModule,
-  S3ClientModule,
-  S3ConfigModule
+  S3ClientModule
 }
 import uk.ac.wellcome.platform.matcher.modules.{
   DynamoLockingServiceConfigModule,
   MatcherModule,
-  RecorderWorkEntryModule
+  TransformedBaseWorkModule
 }
 
 object ServerMain extends Server
 
 class Server extends HttpServer {
-  override val name =
-    "uk.ac.wellcome.platform.matcher Matcher"
+  override val name = "uk.ac.wellcome.platform.matcher Matcher"
   override val modules = Seq(
-    MetricsSenderModule,
-    SQSConfigModule,
     SQSClientModule,
-    S3ConfigModule,
     S3ClientModule,
     SNSConfigModule,
     SNSClientModule,
+    MessageReaderConfigModule,
+    MetricsSenderModule,
     DynamoConfigModule,
     DynamoClientModule,
     MatcherModule,
-    RecorderWorkEntryModule,
+    TransformedBaseWorkModule,
     AkkaModule,
     ExecutionContextModule,
     DynamoLockingServiceConfigModule

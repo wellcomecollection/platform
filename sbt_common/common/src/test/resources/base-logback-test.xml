@@ -27,6 +27,7 @@
   <logger name="org.elasticsearch.client.RestClient" level="INFO"/>
   <logger name="uk.ac.wellcome.test.fixtures" level="INFO"/>
 
+
   <root level="debug">
     <appender-ref ref="STDOUT" />
   </root>

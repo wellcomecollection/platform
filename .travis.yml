@@ -31,14 +31,15 @@ cache:
     - catalogue_pipeline/matcher/target
     - catalogue_pipeline/merger/target
     - catalogue_pipeline/recorder/target
-    - catalogue_pipeline/transformer/target
+    - catalogue_pipeline/transformer/transformer_common/target
+    - catalogue_pipeline/transformer/transformer_miro/target
+    - catalogue_pipeline/transformer/transformer_sierra/target
 
     - data_api/snapshot_generator/target
 
     - goobi_adapter/goobi_reader/target
 
     - reindexer/reindex_request_creator/target
-    - reindexer/reindex_request_processor/target
 
     - sbt_common/common/target
     - sbt_common/display/target
@@ -51,13 +52,17 @@ cache:
     - sbt_common/finatra_storage/target
     - sbt_common/internal_model/target
     - sbt_common/messaging/target
-    - sbt_common/monitoring/target
 
     - sierra_adapter/common/target
     - sierra_adapter/sierra_reader/target
     - sierra_adapter/sierra_items_to_dynamo/target
     - sierra_adapter/sierra_bib_merger/target
     - sierra_adapter/sierra_item_merger/target
+
+    - archive/commmon/target
+    - archive/archivist/target
+    - archive/registrar/target
+
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
@@ -94,7 +99,6 @@ jobs:
     - stage: sbt-common-test
       env: TASK=elasticsearch-test
     - env: TASK=messaging-test
-    - env: TASK=monitoring-test
     - env: TASK=internal_model-test
     - env: TASK=display-test
 
@@ -113,7 +117,6 @@ jobs:
     - stage: test
       env:
         - TRAVIS_LAMBDAS="snapshot_scheduler \
-          reindex_shard_generator \
           sierra_window_generator \
           s3_demultiplexer \
           drain_ecs_container_instance \
@@ -128,13 +131,14 @@ jobs:
         - TASK=travis-lambda-test
 
     # Catalogue API stack
-    - stage: test
-      env: TASK=api-test
+    - env: TASK=api-test
     # (not under active development)
     # - env: TASK=api_docs-build
 
     # Catalogue pipeline stack
-    - env: TASK=transformer-test
+    - env: TASK=transformer_common-test
+    - env: TASK=transformer_miro-test
+    - env: TASK=transformer_sierra-test
     - env: TASK=ingestor-test
     - env: TASK=recorder-test
     - env: TASK=matcher-test
@@ -146,17 +150,22 @@ jobs:
 
     # Reindexer stack
     - env: TASK=reindex_request_creator-test
-    - env: TASK=reindex_request_processor-test
 
     # Goobi adapter stack
     - env: TASK=goobi_reader-test
 
     # Sierra adapter stack
-    - env: TASK=sierra_adapter_common-test
     - env: TASK=sierra_reader-test
     - env: TASK=sierra_items_to_dynamo-test
     - env: TASK=sierra_bib_merger-test
     - env: TASK=sierra_item_merger-test
+
+    # Archive
+    - env: TASK=archive_common-test
+    - env: TASK=registrar-test
+    - env: TASK=archivist-test
+    - env: TASK=archive_bags-test
+    - env: TASK=archive_ingest-test
 
     # (not under active development)
 

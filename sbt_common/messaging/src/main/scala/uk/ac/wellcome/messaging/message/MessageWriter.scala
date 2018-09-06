@@ -10,7 +10,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectStore}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,8 +46,10 @@ class MessageWriter[T] @Inject()(
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
       _ = debug(s"Successfully stored message $message in location: $location")
-      pointer <- Future.fromTry(toJson(MessagePointer(location)))
-      publishAttempt <- sns.writeMessage(pointer, subject)
+      publishAttempt <- sns.writeMessage(
+        message = location,
+        subject = subject
+      )
       _ = debug(publishAttempt)
     } yield publishAttempt
 

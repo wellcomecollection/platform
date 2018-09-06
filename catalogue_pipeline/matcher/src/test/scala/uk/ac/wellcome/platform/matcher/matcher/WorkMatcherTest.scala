@@ -7,7 +7,6 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
@@ -15,6 +14,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkNode
 }
 import uk.ac.wellcome.models.work.internal.MergeCandidate
+import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.locking.{
   DynamoRowLockDao,
@@ -73,8 +73,7 @@ class WorkMatcherTest
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
                 val invisibleWork = createUnidentifiedInvisibleWork
-                val workId =
-                  s"${invisibleWork.sourceIdentifier.identifierType.id}/${invisibleWork.sourceIdentifier.value}"
+                val workId = invisibleWork.sourceIdentifier.toString
                 whenReady(workMatcher.matchWork(invisibleWork)) {
                   matcherResult =>
                     matcherResult shouldBe
@@ -212,7 +211,7 @@ class WorkMatcherTest
     }
   }
 
-  it("throws GracefulFailureException if it fails to lock primary works") {
+  it("throws MatcherException if it fails to lock primary works") {
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
@@ -232,7 +231,7 @@ class WorkMatcherTest
                     } yield result
 
                     whenReady(failedLock.failed) { failedMatch =>
-                      failedMatch shouldBe a[GracefulFailureException]
+                      failedMatch shouldBe a[MatcherException]
                     }
 
                   }
@@ -244,7 +243,7 @@ class WorkMatcherTest
     }
   }
 
-  it("throws GracefulFailureException if it fails to lock secondary works") {
+  it("throws MatcherException if it fails to lock secondary works") {
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
@@ -285,7 +284,7 @@ class WorkMatcherTest
                     } yield result
 
                     whenReady(failedLock.failed) { failedMatch =>
-                      failedMatch shouldBe a[GracefulFailureException]
+                      failedMatch shouldBe a[MatcherException]
                     }
                   }
               }
@@ -296,7 +295,7 @@ class WorkMatcherTest
     }
   }
 
-  it("throws GracefulFailureException if it fails to unlock") {
+  it("throws MatcherException if it fails to unlock") {
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
@@ -318,7 +317,7 @@ class WorkMatcherTest
                   whenReady(
                     workMatcher.matchWork(anUnidentifiedSierraWork).failed) {
                     failedMatch =>
-                      failedMatch shouldBe a[GracefulFailureException]
+                      failedMatch shouldBe a[MatcherException]
                   }
                 }
             }

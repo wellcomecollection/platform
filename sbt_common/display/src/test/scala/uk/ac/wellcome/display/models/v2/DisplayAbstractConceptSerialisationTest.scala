@@ -3,13 +3,13 @@ package uk.ac.wellcome.display.models.v2
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
 class DisplayAbstractConceptSerialisationTest
     extends FunSpec
     with DisplayV2SerialisationTestBase
     with JsonMapperTestUtil
-    with IdentifiersUtil {
+    with IdentifiersGenerators {
 
   it("serialises an unidentified DisplayConcept") {
     assertObjectMapsToJson(
@@ -75,14 +75,13 @@ class DisplayAbstractConceptSerialisationTest
          |    "id": "${concept.canonicalId}",
          |    "identifiers": [${identifier(concept.identifiers(0))}],
          |    "label" : "${concept.agent.label}",
-         |    "type"  : "${concept.agent.ontologyType}"
+         |    "type"  : "Concept"
          |  }
           """.stripMargin
     )
   }
 
-  it(
-    "serialises AbstractDisplayConcepts constructed from AbstractConcepts correctly") {
+  it("serialises AbstractDisplayConcepts constructed from AbstractConcepts") {
     assertObjectMapsToJson(
       List[Displayable[AbstractConcept]](
         Unidentifiable(Concept("conceptLabel")),

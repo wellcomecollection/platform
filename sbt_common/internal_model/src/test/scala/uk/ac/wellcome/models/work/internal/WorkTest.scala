@@ -1,11 +1,11 @@
 package uk.ac.wellcome.models.work.internal
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
-class WorkTest extends FunSpec with Matchers with IdentifiersUtil {
+class WorkTest extends FunSpec with Matchers with IdentifiersGenerators {
 
   // This is based on a real failure.  We deployed a version of the API
   // with a newer model than was in Elasticsearch -- in particular, it had
@@ -56,9 +56,10 @@ class WorkTest extends FunSpec with Matchers with IdentifiersUtil {
         |}
       """.stripMargin
 
-    val caught = intercept[GracefulFailureException] {
+    val caught = intercept[JsonDecodingError] {
       fromJson[IdentifiedWork](jsonString).get
     }
-    caught.getMessage shouldBe "Attempt to decode value on failed cursor: DownField(agent),DownArray,DownField(items)"
+    caught.getMessage should startWith(
+      "Attempt to decode value on failed cursor")
   }
 }

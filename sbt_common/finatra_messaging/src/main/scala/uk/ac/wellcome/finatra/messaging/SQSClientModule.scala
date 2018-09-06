@@ -6,7 +6,6 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.messaging.sqs.SQSClientFactory
 
 object SQSClientModule extends TwitterModule {
-  override val modules = Seq(SQSConfigModule)
 
   val sqsEndpoint = flag[String](
     "aws.sqs.endpoint",

@@ -1,39 +1,48 @@
 package uk.ac.wellcome.models.transformable
 
+import io.circe.{KeyDecoder, KeyEncoder}
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibNumber,
   SierraBibRecord,
+  SierraItemNumber,
   SierraItemRecord
 }
 
 sealed trait Transformable extends Sourced
 
 case class MiroTransformable(sourceId: String,
-                             sourceName: String = "miro",
                              MiroCollection: String,
                              data: String)
-    extends Transformable
+    extends Transformable {
+  val sourceName = "miro"
+}
 
-/** Represents a row in the DynamoDB database of "merged" Sierra records;
-  * that is, records that contain data for both bibs and
-  * their associated items.
-  *
-  * Fields:
-  *
-  *   - `id`: the ID of the associated bib record
-  *   - `maybeBibData`: data from the associated bib.  This may be None if
-  *     we've received an item but haven't had the bib yet.
-  *   - `itemData`: a map from item IDs to item records
-  *
-  */
 case class SierraTransformable(
-  sourceId: String,
-  sourceName: String = "sierra",
-  maybeBibData: Option[SierraBibRecord] = None,
-  itemData: Map[String, SierraItemRecord] = Map()
-) extends Transformable
+  sierraId: SierraBibNumber,
+  maybeBibRecord: Option[SierraBibRecord] = None,
+  itemRecords: Map[SierraItemNumber, SierraItemRecord] = Map()
+) extends Transformable {
+  val sourceId: String = sierraId.withoutCheckDigit
+  val sourceName = "sierra"
+}
 
 object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(sourceId = bibRecord.id, maybeBibData = Some(bibRecord))
+    SierraTransformable(
+      sierraId = bibRecord.id,
+      maybeBibRecord = Some(bibRecord))
+
+  // Because the [[SierraTransformable.itemRecords]] field is keyed by
+  // [[SierraItemNumber]] in our case class, but JSON only supports string
+  // keys, we need to turn the ID into a string when storing as JSON.
+  //
+  // This is based on the "Custom key types" section of the Circe docs:
+  // https://circe.github.io/circe/codecs/custom-codecs.html#custom-key-types
+  //
+  implicit val keyEncoder: KeyEncoder[SierraItemNumber] =
+    (key: SierraItemNumber) => key.withoutCheckDigit
+
+  implicit val keyDecoder: KeyDecoder[SierraItemNumber] =
+    (key: String) => Some(SierraItemNumber(key))
 }

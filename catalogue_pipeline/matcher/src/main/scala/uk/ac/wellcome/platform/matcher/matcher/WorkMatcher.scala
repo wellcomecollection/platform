@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
@@ -15,6 +14,7 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedInvisibleWork,
   UnidentifiedWork
 }
+import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.platform.matcher.locking.{
   DynamoLockingService,
   FailedLockException,
@@ -52,7 +52,7 @@ class WorkMatcher @Inject()(
         case e @ (_: FailedLockException | _: FailedUnlockException) =>
           debug(
             s"Locking failed while matching work ${work.sourceIdentifier} ${e.getClass.getSimpleName} ${e.getMessage}")
-          throw GracefulFailureException(e)
+          throw MatcherException(e)
       }
   }
 

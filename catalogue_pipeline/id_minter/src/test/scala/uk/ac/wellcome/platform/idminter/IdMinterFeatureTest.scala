@@ -2,13 +2,13 @@ package uk.ac.wellcome.platform.idminter
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.collection.JavaConverters._
 
@@ -23,7 +23,7 @@ class IdMinterFeatureTest
     with ExtendedPatience
     with Eventually
     with Matchers
-    with WorksUtil {
+    with WorksGenerators {
 
   it("mints the same IDs where source identifiers match") {
     withLocalSqsQueue { queue =>
@@ -153,9 +153,7 @@ class IdMinterFeatureTest
                 messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>
-              sqsClient.sendMessage(
-                queue.url,
-                "Not a valid JSON string or UnidentifiedWork")
+              sendInvalidJSONto(queue)
 
               val work = createUnidentifiedWork
 

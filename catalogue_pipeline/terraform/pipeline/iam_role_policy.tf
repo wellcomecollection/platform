@@ -1,25 +1,3 @@
-# Role policies for the transformer
-
-resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
-  role   = "${module.transformer.task_role_name}"
-  policy = "${module.transformed_works_topic.publish_policy}"
-}
-
-resource "aws_iam_role_policy" "ecs_transformer_task_vhs" {
-  role   = "${module.transformer.task_role_name}"
-  policy = "${var.vhs_sourcedata_read_policy}"
-}
-
-resource "aws_iam_role_policy" "transformer_task_cloudwatch_metric" {
-  role   = "${module.transformer.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
-}
-
-resource "aws_iam_role_policy" "transformer_s3_messages" {
-  role   = "${module.transformer.task_role_name}"
-  policy = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
-}
-
 # Role policies for the Elasticsearch ingestor
 
 resource "aws_iam_role_policy" "ecs_ingestor_task_cloudwatch_metric" {
@@ -69,6 +47,11 @@ resource "aws_iam_role_policy" "recorder_s3_messages_get" {
 resource "aws_iam_role_policy" "ecs_recorder_task_vhs" {
   role   = "${module.recorder.task_role_name}"
   policy = "${module.vhs_recorder.full_access_policy}"
+}
+
+resource "aws_iam_role_policy" "recorder_task_sns" {
+  role   = "${module.recorder.task_role_name}"
+  policy = "${module.recorded_works_topic.publish_policy}"
 }
 
 # Role policies for the Matcher

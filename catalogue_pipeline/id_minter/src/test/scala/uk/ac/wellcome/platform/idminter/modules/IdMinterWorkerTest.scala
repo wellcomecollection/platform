@@ -27,7 +27,7 @@ class IdMinterWorkerTest
     with Matchers
     with MockitoSugar {
 
-  it("should create the Identifiers table in MySQL upon startup") {
+  it("creates the Identifiers table in MySQL upon startup") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { identifiersTableConfig =>

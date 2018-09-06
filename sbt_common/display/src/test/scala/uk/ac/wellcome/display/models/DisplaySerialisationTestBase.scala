@@ -3,16 +3,14 @@ package uk.ac.wellcome.display.models
 import io.circe.Json
 import io.circe.parser._
 import org.scalatest.Suite
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.utils.JsonUtil._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 
   def optionalString(fieldName: String, maybeStringValue: Option[String]) =
-    maybeStringValue match {
-      case None => ""
-      case Some(p) =>
-        s"""
+    maybeStringValue map { p =>
+      s"""
            "$fieldName": "$p"
          """
     }
@@ -29,18 +27,34 @@ trait DisplaySerialisationTestBase { this: Suite =>
          """
     }
 
-  def items(identifiedItems: List[Identified[Item]]) =
+  def items(identifiedItems: List[Displayable[Item]]) =
     identifiedItems
-      .map { it =>
-        s"""{
+      .map {
+        case it: Identified[Item] =>
+          identifiedItem(it)
+        case it: Unidentifiable[Item] =>
+          unidentifiableItem(it)
+      }
+      .mkString(",")
+
+  def unidentifiableItem(it: Unidentifiable[Item]) = {
+    s"""{
+          "type": "${it.agent.ontologyType}",
+          "locations": [
+            ${locations(it.agent.locations)}
+          ]
+        }"""
+  }
+
+  def identifiedItem(it: Identified[Item]) = {
+    s"""{
           "id": "${it.canonicalId}",
           "type": "${it.agent.ontologyType}",
           "locations": [
             ${locations(it.agent.locations)}
           ]
         }"""
-      }
-      .mkString(",")
+  }
 
   def locations(locations: List[Location]) =
     locations
@@ -110,8 +124,12 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def person(p: Person) = {
     s"""{
         "type": "Person",
-        ${optionalString("prefix", p.prefix)},
-        ${optionalString("numeration", p.numeration)},
+        ${optionalString("prefix", p.prefix)
+      .map(str => s"$str, ")
+      .getOrElse("")}
+        ${optionalString("numeration", p.numeration)
+      .map(str => s"$str, ")
+      .getOrElse("")}
         "label": "${p.label}"
       }"""
   }
@@ -136,22 +154,39 @@ trait DisplaySerialisationTestBase { this: Suite =>
       "label": "${p.label}"
     }"""
 
-  def concept(concept: AbstractConcept) =
+  def place(p: Place) =
+    s"""{
+      "type": "Place",
+      "label": "${p.label}"
+    }"""
+
+  def ontologyType(concept: AbstractRootConcept) =
+    concept match {
+      case _: Concept      => "Concept"
+      case _: Place        => "Place"
+      case _: Period       => "Period"
+      case _: Agent        => "Agent"
+      case _: Organisation => "Organisation"
+      case _: Person       => "Person"
+    }
+
+  def concept(concept: AbstractRootConcept) = {
     s"""
     {
-      "type": "${concept.ontologyType}",
+      "type": "${ontologyType(concept)}",
       "label": "${concept.label}"
     }
     """
+  }
 
-  def concepts(concepts: List[Displayable[AbstractConcept]]) =
+  def concepts(concepts: List[Displayable[AbstractRootConcept]]) =
     concepts
       .map { c =>
         identifiedOrUnidentifiable(c, concept)
       }
       .mkString(",")
 
-  def subject(s: Subject[Displayable[AbstractConcept]]) =
+  def subject(s: Subject[Displayable[AbstractRootConcept]]) =
     s"""
     {
       "label": "${s.label}",
@@ -160,7 +195,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def subjects(subjects: List[Subject[Displayable[AbstractConcept]]]) =
+  def subjects(subjects: List[Subject[Displayable[AbstractRootConcept]]]) =
     subjects
       .map { subject(_) }
       .mkString(",")
@@ -179,12 +214,33 @@ trait DisplaySerialisationTestBase { this: Suite =>
       .map { genre(_) }
       .mkString(",")
 
-  def contributor(c: Contributor[Displayable[AbstractAgent]]) =
+  def contributor(contributors: Contributor[Displayable[AbstractAgent]]) =
     s"""
        |{
-       |  "agent": ${identifiedOrUnidentifiable(c.agent, abstractAgent)},
-       |  "roles": ${toJson(c.roles).get},
+       |  "agent": ${identifiedOrUnidentifiable(
+         contributors.agent,
+         abstractAgent)},
+       |  "roles": ${toJson(contributors.roles).get},
        |  "type": "Contributor"
+       |}
+     """.stripMargin
+
+  def contributors(c: List[Contributor[Displayable[AbstractAgent]]]) =
+    c.map(contributor).mkString(",")
+
+  def production(
+    production: List[ProductionEvent[Displayable[AbstractAgent]]]) =
+    production.map(productionEvent).mkString(",")
+
+  def productionEvent(event: ProductionEvent[Displayable[AbstractAgent]]) =
+    s"""
+       |{
+       |  "dates": [${event.dates.map(period).mkString(",")}],
+       |  "agents": [${event.agents
+         .map(identifiedOrUnidentifiable(_, abstractAgent))
+         .mkString(",")}],
+       |  "places": [${event.places.map(place).mkString(",")}],
+       |  "type": "ProductionEvent"
        |}
      """.stripMargin
 

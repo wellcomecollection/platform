@@ -9,86 +9,132 @@ import scala.collection.JavaConverters._
 
 class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
-  it("returns a valid JSON response for all api versions") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
+  describe("all API versions") {
+    it("returns a valid JSON response") {
+      allResponses.foreach {
+        case (version: ApiVersions.Value, response: JsonNode) =>
+          response.at("/host").toString should be("\"test.host\"")
+          response.at("/schemes").toString should be("[\"http\"]")
+          response.at("/info/version").toString should be(
+            s""""${version.toString}"""")
+          response.at("/basePath").toString should be("")
+      }
+    }
 
-      tree.at("/host").toString should be("\"test.host\"")
-      tree.at("/schemes").toString should be("[\"http\"]")
-      tree.at("/info/version").toString should be(s""""${version.toString}"""")
-      tree.at("/basePath").toString should be("")
+    it("includes the DisplayError model") {
+      allResponses.values.foreach { response: JsonNode =>
+        response.at("/definitions/Error/type").toString should be("\"object\"")
+      }
+    }
+
+    it("shows only the endpoints for the specified version") {
+      allResponses.foreach {
+        case (version: ApiVersions.Value, response: JsonNode) =>
+          response.at("/paths").isObject shouldBe true
+          response
+            .at("/paths")
+            .fieldNames
+            .asScala
+            .toList should contain only (s"/catalogue/${version.toString}/works", s"/catalogue/${version.toString}/works/{id}")
+      }
+    }
+
+    it("doesn't show DisplayWork in the definitions") {
+      allResponses.values.foreach { response: JsonNode =>
+        response
+          .at("/definitions")
+          .fieldNames
+          .asScala
+          .toList shouldNot contain("DisplayWork")
+      }
+    }
+
+    it("shows Work as the items type in ResultList") {
+      allResponses.values.foreach { response: JsonNode =>
+        response
+          .at(s"/definitions/ResultList/properties/results/items/$$ref")
+          .toString shouldBe "\"#/definitions/Work\""
+      }
     }
   }
 
-  it("includes the DisplayError model all api versions") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
-      tree.at("/definitions/Error/type").toString should be("\"object\"")
+  describe("v1") {
+    it("shows the correct Work model") {
+      v1response.at("/definitions/Work").isObject shouldBe true
+      v1response
+        .at("/definitions/Work/properties/creators/type")
+        .toString shouldBe "\"array\""
     }
-  }
 
-  it("shows only the endpoints for the specified version") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
-      tree.at("/paths").isObject shouldBe true
-      tree
+    it("shows the includes request parameter model") {
+      v1response.at("/definitions/Work").isObject shouldBe true
+      val parameters = v1response
         .at("/paths")
-        .fieldNames
+        .findPath(s"/catalogue/${ApiVersions.v1.toString}/works")
+        .at("/get/parameters")
         .asScala
-        .toList should contain only (s"/catalogue/${version.toString}/works", s"/catalogue/${version.toString}/works/{id}")
+        .map(_.findPath("name").asText())
+      parameters should contain("includes")
+      parameters should not contain "include"
     }
   }
 
-  it("shows the correct Work model for v1") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
-    tree.at("/definitions/Work").isObject shouldBe true
-    tree
-      .at("/definitions/Work/properties/creators/type")
-      .toString shouldBe "\"array\""
+  describe("v2") {
+    it("shows the correct Work model") {
+      v2response.at("/definitions/Work").isObject shouldBe true
+      v2response
+        .at("/definitions/Work/properties/contributors/type")
+        .toString shouldBe "\"array\""
+    }
+
+    it("shows the include request parameter model") {
+      v2response.at("/definitions/Work").isObject shouldBe true
+      val parameters = v2response
+        .at("/paths")
+        .findPath(s"/catalogue/${ApiVersions.v2.toString}/works")
+        .at("/get/parameters")
+        .asScala
+        .map(_.findPath("name").asText())
+      parameters should contain("include")
+      parameters should not contain "includes"
+    }
+
+    it("shows the correct Subject model") {
+      v2response.at("/definitions/Subject").isObject shouldBe true
+      v2response
+        .at("/definitions/Subject/properties/concepts/type")
+        .toString shouldBe "\"array\""
+      v2response
+        .at("/definitions/Subject/properties/concepts/items/$ref")
+        .toString shouldBe "\"#/definitions/Concept\""
+    }
+
+    it("shows the type of contributors") {
+      v2response
+        .at("/definitions/Work/properties/contributors/items/$ref")
+        .toString shouldBe "\"#/definitions/Contributor\""
+    }
+
+    it("shows the correct Genre model") {
+      v2response.at("/definitions/Genre").isObject shouldBe true
+      v2response
+        .at("/definitions/Genre/properties/concepts/type")
+        .toString shouldBe "\"array\""
+      v2response
+        .at("/definitions/Genre/properties/concepts/items/$ref")
+        .toString shouldBe "\"#/definitions/Concept\""
+    }
   }
 
-  it("shows the correct Work model for v2") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions/Work").isObject shouldBe true
-    tree
-      .at("/definitions/Work/properties/contributors/type")
-      .toString shouldBe "\"array\""
-  }
+  val v1response: JsonNode = readTree(
+    s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
+  val v2response: JsonNode = readTree(
+    s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
 
-  it("shows the correct Subject model for v2") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions/Subject").isObject shouldBe true
-    tree
-      .at("/definitions/Subject/properties/concepts/type")
-      .toString shouldBe "\"array\""
-    tree
-      .at("/definitions/Subject/properties/concepts/items/$ref")
-      .toString shouldBe "\"#/definitions/Concept\""
-  }
-
-  it("shows the correct Genre model for v2") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions/Genre").isObject shouldBe true
-    tree
-      .at("/definitions/Genre/properties/concepts/type")
-      .toString shouldBe "\"array\""
-    tree
-      .at("/definitions/Genre/properties/concepts/items/$ref")
-      .toString shouldBe "\"#/definitions/Concept\""
-  }
-
-  it("doesn't show DisplayWork in the definitions") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions").fieldNames.asScala.toList shouldNot contain(
-      "DisplayWork")
-  }
-
-  it("shows Work as the items type in ResultList") {
-    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
-    tree
-      .at(s"/definitions/ResultList/properties/results/items/$$ref")
-      .toString shouldBe "\"#/definitions/Work\""
-  }
+  val allResponses = Map(
+    ApiVersions.v1 -> v1response,
+    ApiVersions.v2 -> v2response,
+  )
 
   def readTree(path: String): JsonNode = {
     val flags = Map(

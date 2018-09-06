@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.idminter.database
 
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
+import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
+import uk.ac.wellcome.platform.idminter.database.exceptions.IdMinterException
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -14,7 +14,7 @@ class IdentifiersDaoTest
     extends FunSpec
     with fixtures.IdentifiersDatabase
     with Matchers
-    with IdentifiersUtil {
+    with IdentifiersGenerators {
 
   def withIdentifiersDao[R](
     testWith: TestWith[(IdentifiersDao, IdentifiersTable), R]): R =
@@ -122,7 +122,7 @@ class IdentifiersDaoTest
           val triedSave = identifiersDao.saveIdentifier(duplicateIdentifier)
 
           triedSave shouldBe a[Failure[_]]
-          triedSave.failed.get shouldBe a[GracefulFailureException]
+          triedSave.failed.get shouldBe a[IdMinterException]
       }
     }
 
@@ -198,7 +198,7 @@ class IdentifiersDaoTest
           val triedSave = identifiersDao.saveIdentifier(identifier2)
 
           triedSave shouldBe a[Failure[_]]
-          triedSave.failed.get shouldBe a[GracefulFailureException]
+          triedSave.failed.get shouldBe a[IdMinterException]
       }
     }
   }
