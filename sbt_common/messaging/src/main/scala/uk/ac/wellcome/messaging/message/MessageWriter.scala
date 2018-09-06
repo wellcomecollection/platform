@@ -57,10 +57,10 @@ class MessageWriter[T] @Inject()(
       // Max SNS message size:
       // https://aws.amazon.com/sns/faqs/
       //
-      notification: MessageNotification[T] <- if (encodedString.length > 250 * 1000) {
-        writeToS3(encodedString)
+      notification: MessageNotification[T] <- if (encodedString.getBytes("UTF-8").length > 250 * 1000) {
+        createRemoteNotification(encodedString)
       } else {
-        Future.successful(InlineNotification(message))
+        createInlineNotification(message)
       }
 
       publishAttempt <- sns.writeMessage(
@@ -70,7 +70,10 @@ class MessageWriter[T] @Inject()(
       _ = debug(publishAttempt)
     } yield publishAttempt
 
-  private def writeToS3(encodedString: String): Future[RemoteNotification[T]] =
+  private def createInlineNotification(message: T): Future[InlineNotification[T]] =
+    Future.successful(InlineNotification(message))
+
+  private def createRemoteNotification(encodedString: String): Future[RemoteNotification[T]] =
     for {
       location <- objectStore.put(messageConfig.s3Config.bucketName)(
         encodedString,
