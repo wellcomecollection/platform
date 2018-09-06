@@ -32,4 +32,11 @@ if __name__ == '__main__':
         assert header[0].startswith('# RFC %03d: ' % int(number))
         assert header[1] == ''
         expected_date_str = '**Last updated: %s.**' % last_updated.strftime('%d %B %Y')
-        assert header[2] == expected_date_str, (header[2], expected_date_str)
+
+        if header[2] != expected_date_str:
+            print('*** Fixing date string in RFC')
+            with open(f, 'w') as outfile:
+                outfile.write(header[0] + '\n')
+                outfile.write(header[1] + '\n')
+                outfile.write(expected_date_str + '\n')
+                outfile.write('\n'.join(contents.splitlines()[3:]))
