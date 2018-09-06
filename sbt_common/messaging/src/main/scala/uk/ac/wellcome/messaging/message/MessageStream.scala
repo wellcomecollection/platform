@@ -7,10 +7,11 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
+import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,35 +33,38 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
 
   def runStream(
     streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(implicit decoder: Decoder[MessageNotification[T]])
     : Future[Done] =
     sqsStream.runStream(
       streamName,
       source => modifySource(messageFromS3Source(source)))
 
-  def foreach(streamName: String, process: T => Future[Unit]): Future[Done] =
+  def foreach(streamName: String, process: T => Future[Unit])(implicit decoder: Decoder[MessageNotification[T]]): Future[Done] =
     sqsStream.foreach(
       streamName = streamName,
       process = (notification: NotificationMessage) =>
         for {
-          obj <- readFromS3(notification.Message)
+          obj <- getBody(notification.Message)
           result <- process(obj)
         } yield result
     )
 
   private def messageFromS3Source(
-    source: Source[(Message, NotificationMessage), NotUsed]) = {
+    source: Source[(Message, NotificationMessage), NotUsed])(implicit decoder: Decoder[MessageNotification[T]]) = {
     source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
       case (message, notification) =>
         for {
-          deserialisedObject <- readFromS3(notification.Message)
+          deserialisedObject <- getBody(notification.Message)
         } yield (message, deserialisedObject)
     }
   }
 
-  private def readFromS3(messageString: String): Future[T] =
+  private def getBody(messageString: String)(implicit decoder: Decoder[MessageNotification[T]]): Future[T] =
     for {
-      objectLocation <- Future.fromTry(fromJson[ObjectLocation](messageString))
-      deserialisedObject <- objectStore.get(objectLocation)
-    } yield deserialisedObject
+      notification <- Future.fromTry(fromJson[MessageNotification[T]](messageString))
+      body <- notification match {
+        case inlineNotification: InlineNotification[T] => Future.successful(inlineNotification.t)
+        case remoteNotification: RemoteNotification[T] => objectStore.get(remoteNotification.location)
+      }
+    } yield body
 }
