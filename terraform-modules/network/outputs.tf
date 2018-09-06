@@ -1,4 +1,5 @@
 output "private_subnets" {
+  type  = "list"
   value = ["${aws_subnet.private.*.id}"]
 }
 

@@ -10,9 +10,8 @@ module "catalogue_pipeline" {
   id_minter_container_image          = "${local.id_minter_container_image}"
   ingestor_container_image           = "${local.ingestor_container_image}"
 
-  subnets                 = ["${local.private_subnets}"]
-  vpc_id                  = "${local.vpc_id}"
-  private_route_table_ids = "${local.private_route_table_ids}"
+  subnets = ["${local.private_subnets}"]
+  vpc_id  = "${local.vpc_id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 
