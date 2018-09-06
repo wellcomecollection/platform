@@ -27,6 +27,8 @@ resource "aws_vpc_endpoint" "logs" {
     "${aws_security_group.security_group.id}",
   ]
 
+  subnet_ids = "${var.subnet_ids}"
+
   service_name = "${data.aws_vpc_endpoint_service.logs.service_name}"
 }
 
@@ -41,6 +43,8 @@ resource "aws_vpc_endpoint" "sns" {
   security_group_ids = [
     "${aws_security_group.security_group.id}",
   ]
+
+  subnet_ids = "${var.subnet_ids}"
 
   service_name = "${data.aws_vpc_endpoint_service.sns.service_name}"
 }

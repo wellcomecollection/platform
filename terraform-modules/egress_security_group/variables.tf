@@ -1,8 +1,8 @@
 variable "name" {}
 variable "description" {}
 
-variable "vpc_id" {}
-
-variable "private_route_table_ids" {
+variable "subnet_ids" {
   type = "list"
 }
+
+variable "vpc_id" {}
