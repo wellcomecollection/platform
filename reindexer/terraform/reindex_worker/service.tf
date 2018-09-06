@@ -23,7 +23,7 @@ module "service" {
     # seen issues where we exhaust the HTTP connection pool.  Turning down
     # the parallelism is an attempt to reduce the number of SNS messages in
     # flight, and avoid these errors.
-    sqs_parallelism = 7
+    sqs_parallelism = 5
   }
 
   env_vars_length = 6
