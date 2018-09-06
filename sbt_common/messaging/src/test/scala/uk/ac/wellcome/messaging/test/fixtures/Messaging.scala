@@ -92,7 +92,7 @@ trait Messaging
       snsConfig = snsConfig
     )
 
-    val messageWriter = new MessageWriter(
+    val messageWriter = new MessageWriter[T](
       messageConfig = messageConfig,
       snsClient = writerSnsClient,
       s3Client = s3Client
