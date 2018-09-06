@@ -25,19 +25,6 @@ resource "aws_iam_role_policy" "archive_bag_vhs" {
   policy = "${module.vhs_archive_manifest.read_policy}"
 }
 
-data "aws_iam_policy_document" "archive_get" {
-  statement {
-    actions = [
-      "s3:GetObject*",
-    ]
-
-    resources = [
-      "arn:aws:s3:::${local.archive_bucket_name}",
-      "arn:aws:s3:::${local.archive_bucket_name}/*",
-    ]
-  }
-}
-
 resource "aws_iam_role_policy" "archivist_task_archive_progress_table" {
   role   = "${module.archivist.task_role_name}"
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
