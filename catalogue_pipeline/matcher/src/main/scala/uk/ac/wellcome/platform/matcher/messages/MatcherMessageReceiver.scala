@@ -30,7 +30,8 @@ class MatcherMessageReceiver @Inject()(
       )
     } yield ()).recover {
       case e: VersionExpectedConflictException =>
-        debug(s"Not matching work due to version conflict exception: ${e.getMessage}")
+        debug(
+          s"Not matching work due to version conflict exception: ${e.getMessage}")
     }
   }
 
