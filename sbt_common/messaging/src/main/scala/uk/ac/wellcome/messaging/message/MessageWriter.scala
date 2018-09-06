@@ -23,7 +23,7 @@ class MessageWriter[T] @Inject()(
   messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3
-)(implicit objectStore: ObjectStore[T], ec: ExecutionContext)
+)(implicit objectStore: ObjectStore[String], ec: ExecutionContext)
     extends Logging {
 
   private val sns = new SNSWriter(
@@ -39,16 +39,25 @@ class MessageWriter[T] @Inject()(
     s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
-  def write(message: T, subject: String): Future[PublishAttempt] = {
+  def write(message: T, subject: String): Future[PublishAttempt] =
     for {
-      location <- objectStore.put(messageConfig.s3Config.bucketName)(
-        message,
-        keyPrefix = KeyPrefix(getKeyPrefix())
-      )
-      _ = debug(s"Successfully stored message in location: $location")
-      notification = RemoteNotification(
-        location = location
-      )
+      encodedString <- Future.fromTry(toJson(message))
+
+      // If the encoded message is less than 250KB, we can send it inline
+      // in SNS/SQS (although the limit is 256KB, there's a bit of overhead
+      // caused by the notification wrapper, so we're conservative).
+      //
+      // Max SQS message size:
+      // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-limits.html#limits-messages
+      //
+      // Max SNS message size:
+      // https://aws.amazon.com/sns/faqs/
+      notification <- if (encodedString.size > 250 * 1000) {
+        writeToS3(encodedString)
+      } else {
+        Future.successful(InlineNotification(message))
+      }
+
       publishAttempt <- sns.writeMessage(
         message = notification,
         subject = subject
@@ -56,5 +65,12 @@ class MessageWriter[T] @Inject()(
       _ = debug(publishAttempt)
     } yield publishAttempt
 
-  }
+  private def writeToS3(encodedString: String): Future[RemoteNotification] =
+    for {
+      location <- objectStore.put(messageConfig.s3Config.bucketName)(
+        encodedString,
+        keyPrefix = KeyPrefix(getKeyPrefix())
+      )
+      _ = debug(s"Successfully stored message <<$encodedString>> in location: $location")
+    } yield RemoteNotification(location = location)
 }
