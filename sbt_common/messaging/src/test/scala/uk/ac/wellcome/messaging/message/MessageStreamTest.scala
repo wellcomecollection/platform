@@ -9,12 +9,13 @@ import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -32,6 +33,43 @@ class MessageStreamTest
     list.add(o)
     Future.successful(())
   }
+
+  describe("small messages (<256KB)") {
+    it("reads messages off a queue, processes them and deletes them") {
+      withMessageStreamFixtures[ExampleObject, Assertion] {
+        case (bucket, messageStream, QueuePair(queue, dlq), _) =>
+          val messages = createMessages(count = 3)
+
+          messages.foreach { msg =>
+            sendInlineNotification(bucket, queue, msg)
+          }
+
+          val received = new ConcurrentLinkedQueue[ExampleObject]()
+
+          messageStream.foreach(
+            streamName = "test-stream",
+            process = process(received))
+
+          eventually {
+            received should contain theSameElementsAs messages
+
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+          }
+      }
+    }
+  }
+
+  private def sendInlineNotification(bucket: Bucket, queue: Queue, msg: ExampleObject): Unit =
+    sendMessage[MessageNotification[ExampleObject]](
+      queue = queue,
+      obj = InlineNotification(msg)
+    )
+
+  private def createMessages(count: Int): List[ExampleObject] =
+    (1 to count)
+      .map { idx => ExampleObject("a" * idx) }
+      .toList
 
   it("reads messages off a queue, processes them and deletes them") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
