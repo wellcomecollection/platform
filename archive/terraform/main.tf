@@ -57,7 +57,7 @@ module "registrar" {
 }
 
 module "bagger" {
-  source = "bagger"
+  source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
