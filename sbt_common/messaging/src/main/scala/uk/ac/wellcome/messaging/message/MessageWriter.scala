@@ -55,7 +55,7 @@ class MessageWriter[T] @Inject()(
       // https://aws.amazon.com/sns/faqs/
       //
       notification: MessageNotification[T] <- if (encodedString.length > 250 * 1000) {
-        writeToS3[T](encodedString)
+        writeToS3(encodedString)
       } else {
         Future.successful(InlineNotification(message))
       }
@@ -67,7 +67,7 @@ class MessageWriter[T] @Inject()(
       _ = debug(publishAttempt)
     } yield publishAttempt
 
-  private def writeToS3[T](encodedString: String): Future[RemoteNotification[T]] =
+  private def writeToS3(encodedString: String): Future[RemoteNotification[T]] =
     for {
       location <- objectStore.put(messageConfig.s3Config.bucketName)(
         encodedString,
