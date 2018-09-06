@@ -53,7 +53,12 @@ class MessageWriter @Inject()(
       //
       // Max SNS message size:
       // https://aws.amazon.com/sns/faqs/
-      notification: MessageNotification[T] <- writeToS3[T](encodedString)
+      //
+      notification: MessageNotification[T] <- if (encodedString.length > 250 * 1000) {
+        writeToS3[T](encodedString)
+      } else {
+        Future.successful(InlineNotification(message))
+      }
 
       publishAttempt <- sns.writeMessage(
         message = notification,
