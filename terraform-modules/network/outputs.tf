@@ -14,6 +14,6 @@ output "num_subnets" {
   value = "${var.az_count}"
 }
 
-output "route_table_id" {
-  value = "${aws_route_table.private_route_table.id}"
+output "private_route_table_ids" {
+  value = ["${aws_route_table.private_route_table.*.id}"]
 }
