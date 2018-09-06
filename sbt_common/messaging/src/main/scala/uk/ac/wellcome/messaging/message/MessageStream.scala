@@ -45,8 +45,8 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
       streamName = streamName,
       process = (notification: NotificationMessage) =>
         for {
-          obj <- getBody(notification.Message)
-          result <- process(obj)
+          body <- getBody(notification.Message)
+          result <- process(body)
         } yield result
     )
 
