@@ -21,7 +21,11 @@ class MessageWriterTest
     with Inside
     with JsonAssertions {
 
-  val smallMessage = ExampleObject("A message sent in the MessageWriterTest")
+  def createMessage(size: Int) = ExampleObject("a" * size)
+
+  val smallMessage: ExampleObject = createMessage(size = 100)
+  val largeMessage: ExampleObject = createMessage(size = 300000)
+
   val subject = "message-writer-test-subject"
 
   it("sends a raw SNS notification for a small message") {
@@ -52,15 +56,15 @@ class MessageWriterTest
     }
   }
 
-  it("sends messages") {
+  it("sends a large message as an S3 pointer") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-          val eventualAttempt = messageWriter.write(smallMessage, subject)
+          val eventualAttempt = messageWriter.write(largeMessage, subject)
 
           whenReady(eventualAttempt) { pointer =>
             val messages = listMessagesReceivedFromSNS(topic)
-            messages should have size (1)
+            messages should have size 1
             messages.head.subject shouldBe subject
 
             val maybeNotification =
@@ -79,7 +83,7 @@ class MessageWriterTest
                 bucket = Bucket(objectLocation.namespace),
                 key = objectLocation.key
               ),
-              toJson(smallMessage).get
+              toJson(largeMessage).get
             )
           }
         }
