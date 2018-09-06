@@ -24,6 +24,34 @@ class MessageWriterTest
   val message = ExampleObject("A message sent in the MessageWriterTest")
   val subject = "message-writer-test-subject"
 
+  it("sends a raw SNS notification for a small message") {
+    withLocalSnsTopic { topic =>
+      withLocalS3Bucket { bucket =>
+        withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
+          val eventualAttempt = messageWriter.write(message, subject)
+
+          whenReady(eventualAttempt) { pointer =>
+            val messages = listMessagesReceivedFromSNS(topic)
+            messages should have size 1
+            messages.head.subject shouldBe subject
+
+            val maybeNotification =
+              fromJson[MessageNotification[ExampleObject]](messages.head.message)
+
+            maybeNotification shouldBe a[Success[_]]
+            maybeNotification.get shouldBe a[InlineNotification[_]]
+            val inlineNotification = maybeNotification.get
+              .asInstanceOf[InlineNotification[ExampleObject]]
+
+            inlineNotification.t shouldBe message
+
+            listKeysInBucket(bucket) shouldBe List()
+          }
+        }
+      }
+    }
+  }
+
   it("sends messages") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
