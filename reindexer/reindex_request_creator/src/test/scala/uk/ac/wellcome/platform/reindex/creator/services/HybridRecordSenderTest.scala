@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.reindex.creator.services
 
-import com.amazonaws.services.sns.model.AmazonSNSException
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.reindex.creator.exceptions.ReindexerException
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
@@ -16,8 +17,20 @@ class HybridRecordSenderTest
     extends FunSpec
     with Matchers
     with ExtendedPatience
+    with MockitoSugar
     with ScalaFutures
     with SNS {
+
+  val hybridRecords = List("miro/1", "miro/2", "miro/3").map { id =>
+    HybridRecord(
+      id = id,
+      version = 1,
+      location = ObjectLocation(
+        namespace = "s3://example-bukkit",
+        key = "mykey.txt"
+      )
+    )
+  }
 
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
@@ -25,19 +38,6 @@ class HybridRecordSenderTest
         val hybridRecordSender = new HybridRecordSender(
           snsWriter = snsWriter
         )
-
-        val recordIds = List("miro/1", "miro/2", "miro/3")
-
-        val hybridRecords = recordIds.map { id =>
-          HybridRecord(
-            id = id,
-            version = 1,
-            location = ObjectLocation(
-              namespace = "s3://example-bukkit",
-              key = "mykey.txt"
-            )
-          )
-        }
 
         val future = hybridRecordSender.sendToSNS(
           records = hybridRecords
@@ -55,26 +55,15 @@ class HybridRecordSenderTest
     }
   }
 
-  it("returns a failed Future if there's an SNS error") {
+  it("returns a failed Future[ReindexerException] if there's an SNS error") {
     withSNSWriter(Topic("no-such-topic")) { snsWriter =>
       val hybridRecordSender = new HybridRecordSender(
         snsWriter = snsWriter
       )
 
-      val records = List("1", "2", "3").map { id =>
-        HybridRecord(
-          id = id,
-          version = 1,
-          location = ObjectLocation(
-            namespace = "s3://example-bukkit",
-            key = "mykey.txt"
-          )
-        )
-      }
-
-      val future = hybridRecordSender.sendToSNS(records = records)
+      val future = hybridRecordSender.sendToSNS(records = hybridRecords)
       whenReady(future.failed) {
-        _ shouldBe a[AmazonSNSException]
+        _ shouldBe a[ReindexerException]
       }
     }
   }
