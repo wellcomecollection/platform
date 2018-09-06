@@ -1,3 +1,7 @@
+variable "aws_region" {
+  description = "The AWS region to create things in."
+}
+
 variable "cidr_block" {
   description = "CIDR block for VPC"
 }
