@@ -2,7 +2,7 @@ package uk.ac.wellcome.messaging.message
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.json.JsonUtil._
@@ -39,14 +39,7 @@ class MessageWriterTest
             messages should have size 1
             messages.head.subject shouldBe subject
 
-            val maybeNotification =
-              fromJson[MessageNotification[ExampleObject]](messages.head.message)
-
-            maybeNotification shouldBe a[Success[_]]
-            maybeNotification.get shouldBe a[InlineNotification[_]]
-            val inlineNotification = maybeNotification.get
-              .asInstanceOf[InlineNotification[ExampleObject]]
-
+            val inlineNotification = getInlineNotification(messages.head)
             inlineNotification.t shouldBe smallMessage
 
             listKeysInBucket(bucket) shouldBe List()
@@ -67,14 +60,8 @@ class MessageWriterTest
             messages should have size 1
             messages.head.subject shouldBe subject
 
-            val maybeNotification =
-              fromJson[MessageNotification[ExampleObject]](messages.head.message)
-
-            maybeNotification shouldBe a[Success[_]]
-            maybeNotification.get shouldBe a[RemoteNotification[_]]
-            val objectLocation = maybeNotification.get
-              .asInstanceOf[RemoteNotification[ExampleObject]]
-              .location
+            val remoteNotification = getRemoteNotification(messages.head)
+            val objectLocation = remoteNotification.location
 
             objectLocation.namespace shouldBe bucket.name
 
@@ -156,4 +143,24 @@ class MessageWriterTest
     }
   }
 
+  private def getInlineNotification(info: MessageInfo): InlineNotification[ExampleObject] = {
+    val maybeNotification =
+      fromJson[MessageNotification[ExampleObject]](info.message)
+
+    maybeNotification shouldBe a[Success[_]]
+    maybeNotification.get shouldBe a[InlineNotification[_]]
+
+    maybeNotification.get
+      .asInstanceOf[InlineNotification[ExampleObject]]
+  }
+
+  private def getRemoteNotification(info: MessageInfo): RemoteNotification[ExampleObject] = {
+    val maybeNotification =
+      fromJson[MessageNotification[ExampleObject]](info.message)
+
+    maybeNotification shouldBe a[Success[_]]
+    maybeNotification.get shouldBe a[RemoteNotification[_]]
+    maybeNotification.get
+      .asInstanceOf[RemoteNotification[ExampleObject]]
+  }
 }
