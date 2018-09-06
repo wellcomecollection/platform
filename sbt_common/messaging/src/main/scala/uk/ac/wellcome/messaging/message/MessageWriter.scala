@@ -24,7 +24,7 @@ class MessageWriter[T] @Inject()(
   messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3
-)(implicit objectStore: ObjectStore[String], ec: ExecutionContext)
+)(implicit objectStore: ObjectStore[T], ec: ExecutionContext)
     extends Logging {
 
   private val sns = new SNSWriter(
@@ -45,7 +45,9 @@ class MessageWriter[T] @Inject()(
     notificationEncoder: Encoder[MessageNotification[T]])
     : Future[PublishAttempt] =
     for {
-      encodedString <- Future.fromTry(toJson(message))
+      encodedNotification <- Future.fromTry(
+        toJson(InlineNotification(message))
+      )
 
       // If the encoded message is less than 250KB, we can send it inline
       // in SNS/SQS (although the limit is 256KB, there's a bit of overhead
@@ -57,10 +59,10 @@ class MessageWriter[T] @Inject()(
       // Max SNS message size:
       // https://aws.amazon.com/sns/faqs/
       //
-      notification: MessageNotification[T] <- if (encodedString.getBytes("UTF-8").length > 250 * 1000) {
-        createRemoteNotification(encodedString)
+      notification: String <- if (encodedNotification.getBytes("UTF-8").length > 250 * 1000) {
+        createRemoteNotification(message)
       } else {
-        createInlineNotification(message)
+        Future.successful(encodedNotification)
       }
 
       publishAttempt <- sns.writeMessage(
@@ -70,16 +72,14 @@ class MessageWriter[T] @Inject()(
       _ = debug(publishAttempt)
     } yield publishAttempt
 
-  private def createInlineNotification(message: T): Future[InlineNotification[T]] =
-    Future.successful(InlineNotification(message))
-
-  private def createRemoteNotification(encodedString: String): Future[RemoteNotification[T]] =
+  private def createRemoteNotification(message: T): Future[String] =
     for {
       location <- objectStore.put(messageConfig.s3Config.bucketName)(
-        encodedString,
+        message,
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
-      _ = debug(
-        s"Successfully stored message <<$encodedString>> in location: $location")
-    } yield RemoteNotification(location = location)
+      _ = info(s"Successfully stored message $message in location: $location")
+      notification <- RemoteNotification(location = location)
+      jsonString <- Future.fromTry(toJson(notification))
+    } yield jsonString
 }
