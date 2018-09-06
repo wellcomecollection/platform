@@ -46,8 +46,11 @@ class MessageWriter[T] @Inject()(
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
       _ = debug(s"Successfully stored message in location: $location")
+      notification = RemoteNotification(
+        location = location
+      )
       publishAttempt <- sns.writeMessage(
-        message = location,
+        message = notification,
         subject = subject
       )
       _ = debug(publishAttempt)
