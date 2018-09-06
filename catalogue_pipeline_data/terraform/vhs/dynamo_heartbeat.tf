@@ -1,7 +1,7 @@
 module "heartbeat" {
   source = "../../../shared_infra/dynamo_write_heartbeat"
 
-  name               = "locktable_heartbeat-${aws_dynamodb_table.table.name}"
+  name               = "${aws_dynamodb_table.table.name}-heartbeat"
   dynamo_table_names = ["${aws_dynamodb_table.table.name}"]
 
   infra_bucket           = "${var.infra_bucket}"

@@ -1,6 +1,10 @@
 variable "namespace" {}
 variable "vpc_id" {}
 
+variable "private_route_table_ids" {
+  type = "list"
+}
+
 variable "subnets" {
   type = "list"
 }
