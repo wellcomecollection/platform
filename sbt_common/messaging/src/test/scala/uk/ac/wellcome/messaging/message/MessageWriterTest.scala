@@ -28,116 +28,120 @@ class MessageWriterTest
 
   val subject = "message-writer-test-subject"
 
-  it("sends a raw SNS notification for a small message") {
-    withLocalSnsTopic { topic =>
+  describe("small messages (<256KB)") {
+    it("sends a raw SNS notification") {
+      withLocalSnsTopic { topic =>
+        withLocalS3Bucket { bucket =>
+          withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
+            val eventualAttempt = messageWriter.write(smallMessage, subject)
+
+            whenReady(eventualAttempt) { pointer =>
+              val messages = listMessagesReceivedFromSNS(topic)
+              messages should have size 1
+              messages.head.subject shouldBe subject
+
+              val inlineNotification = getInlineNotification(messages.head)
+              inlineNotification.t shouldBe smallMessage
+
+              listKeysInBucket(bucket) shouldBe List()
+            }
+          }
+        }
+      }
+    }
+
+    it("returns a failed future if it fails to publish to SNS") {
       withLocalS3Bucket { bucket =>
+        val topic = Topic(arn = "invalid-topic-arn")
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
           val eventualAttempt = messageWriter.write(smallMessage, subject)
 
-          whenReady(eventualAttempt) { pointer =>
-            val messages = listMessagesReceivedFromSNS(topic)
-            messages should have size 1
-            messages.head.subject shouldBe subject
-
-            val inlineNotification = getInlineNotification(messages.head)
-            inlineNotification.t shouldBe smallMessage
-
-            listKeysInBucket(bucket) shouldBe List()
+          whenReady(eventualAttempt.failed) { ex =>
+            ex shouldBe a[Throwable]
           }
         }
       }
     }
   }
 
-  it("sends a large message as an S3 pointer") {
-    withLocalSnsTopic { topic =>
-      withLocalS3Bucket { bucket =>
+  describe("large messages (>256KB)") {
+    it("sends an S3 pointer") {
+      withLocalSnsTopic { topic =>
+        withLocalS3Bucket { bucket =>
+          withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
+            val eventualAttempt = messageWriter.write(largeMessage, subject)
+
+            whenReady(eventualAttempt) { pointer =>
+              val messages = listMessagesReceivedFromSNS(topic)
+              messages should have size 1
+              messages.head.subject shouldBe subject
+
+              val remoteNotification = getRemoteNotification(messages.head)
+              val objectLocation = remoteNotification.location
+
+              objectLocation.namespace shouldBe bucket.name
+
+              assertJsonStringsAreEqual(
+                getContentFromS3(
+                  bucket = Bucket(objectLocation.namespace),
+                  key = objectLocation.key
+                ),
+                toJson(largeMessage).get
+              )
+            }
+          }
+        }
+      }
+    }
+
+    it("returns a failed future if it fails to store the S3 pointer") {
+      withLocalSnsTopic { topic =>
+        val bucket = Bucket(name = "invalid-bucket")
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
           val eventualAttempt = messageWriter.write(largeMessage, subject)
 
-          whenReady(eventualAttempt) { pointer =>
-            val messages = listMessagesReceivedFromSNS(topic)
-            messages should have size 1
-            messages.head.subject shouldBe subject
-
-            val remoteNotification = getRemoteNotification(messages.head)
-            val objectLocation = remoteNotification.location
-
-            objectLocation.namespace shouldBe bucket.name
-
-            assertJsonStringsAreEqual(
-              getContentFromS3(
-                bucket = Bucket(objectLocation.namespace),
-                key = objectLocation.key
-              ),
-              toJson(largeMessage).get
-            )
+          whenReady(eventualAttempt.failed) { ex =>
+            ex shouldBe a[Throwable]
           }
         }
       }
     }
-  }
 
-  it("returns a failed future if it fails to publish to SNS") {
-    withLocalS3Bucket { bucket =>
-      val topic = Topic(arn = "invalid-topic-arn")
-      withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-        val eventualAttempt = messageWriter.write(smallMessage, subject)
-
-        whenReady(eventualAttempt.failed) { ex =>
-          ex shouldBe a[Throwable]
-        }
-      }
-    }
-  }
-
-  it("returns a failed future if it fails to store a large message in S3") {
-    withLocalSnsTopic { topic =>
-      val bucket = Bucket(name = "invalid-bucket")
-      withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-        val eventualAttempt = messageWriter.write(largeMessage, subject)
-
-        whenReady(eventualAttempt.failed) { ex =>
-          ex shouldBe a[Throwable]
-        }
-      }
-    }
-  }
-
-  it("does not publish a RemoteNotification if it fails to store the message in S3") {
-    withLocalSnsTopic { topic =>
-      val bucket = Bucket(name = "invalid-bucket")
-      withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-        val eventualAttempt = messageWriter.write(largeMessage, subject)
-
-        whenReady(eventualAttempt.failed) { _ =>
-          listMessagesReceivedFromSNS(topic) should be('empty)
-        }
-      }
-    }
-  }
-
-  it("gives distinct S3 keys when sending the same message twice") {
-    withLocalSnsTopic { topic =>
-      withLocalS3Bucket { bucket =>
+    it("does not publish a RemoteNotification if it fails to store the S3 pointer") {
+      withLocalSnsTopic { topic =>
+        val bucket = Bucket(name = "invalid-bucket")
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
-          val eventualAttempt1 = messageWriter.write(largeMessage, subject)
+          val eventualAttempt = messageWriter.write(largeMessage, subject)
 
-          // Wait before sending the next message to increase likelihood they get processed at different timestamps
-          Thread.sleep(2)
-          val eventualAttempt2 = messageWriter.write(largeMessage, subject)
+          whenReady(eventualAttempt.failed) { _ =>
+            listMessagesReceivedFromSNS(topic) should be('empty)
+          }
+        }
+      }
+    }
 
-          whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) {
-            _ =>
-              val messages = listMessagesReceivedFromSNS(topic)
-              messages should have size (2)
+    it("gives distinct S3 keys when sending the same message twice") {
+      withLocalSnsTopic { topic =>
+        withLocalS3Bucket { bucket =>
+          withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
+            val eventualAttempt1 = messageWriter.write(largeMessage, subject)
 
-              val locations = messages
-                .map { msg => fromJson[MessageNotification[ExampleObject]](msg.message).get }
-                .map { _.asInstanceOf[RemoteNotification[ExampleObject]] }
-                .map { _.location }
+            // Wait before sending the next message to increase likelihood they get processed at different timestamps
+            Thread.sleep(2)
+            val eventualAttempt2 = messageWriter.write(largeMessage, subject)
 
-              locations.distinct should have size 2
+            whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) {
+              _ =>
+                val messages = listMessagesReceivedFromSNS(topic)
+                messages should have size (2)
+
+                val locations = messages
+                  .map { msg => fromJson[MessageNotification[ExampleObject]](msg.message).get }
+                  .map { _.asInstanceOf[RemoteNotification[ExampleObject]] }
+                  .map { _.location }
+
+                locations.distinct should have size 2
+            }
           }
         }
       }
