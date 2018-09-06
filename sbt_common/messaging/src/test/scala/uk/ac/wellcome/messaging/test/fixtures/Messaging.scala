@@ -75,14 +75,14 @@ trait Messaging
   def withExampleObjectMessageWriter[R](bucket: Bucket,
                                         topic: Topic,
                                         writerSnsClient: AmazonSNS = snsClient)(
-    testWith: TestWith[MessageWriter, R]) = {
-    withMessageWriter[R](bucket, topic, writerSnsClient)(testWith)
+    testWith: TestWith[MessageWriter[ExampleObject], R]) = {
+    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient)(testWith)
   }
 
-  def withMessageWriter[R](bucket: Bucket,
+  def withMessageWriter[T, R](bucket: Bucket,
                               topic: Topic,
                               writerSnsClient: AmazonSNS = snsClient)(
-    testWith: TestWith[MessageWriter, R])(implicit store: ObjectStore[String]) = {
+    testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[String]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageWriterConfig(

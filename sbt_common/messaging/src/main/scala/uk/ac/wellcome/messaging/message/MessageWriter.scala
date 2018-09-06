@@ -20,7 +20,7 @@ case class MessageWriterConfig(
   s3Config: S3Config
 )
 
-class MessageWriter @Inject()(
+class MessageWriter[T] @Inject()(
   messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3
@@ -40,7 +40,7 @@ class MessageWriter @Inject()(
     s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
-  def write[T](message: T, subject: String)(implicit encoder: Encoder[T], notificationEncoder: Encoder[MessageNotification[T]]): Future[PublishAttempt] =
+  def write(message: T, subject: String)(implicit encoder: Encoder[T], notificationEncoder: Encoder[MessageNotification[T]]): Future[PublishAttempt] =
     for {
       encodedString <- Future.fromTry(toJson(message))
 
