@@ -4,7 +4,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
@@ -36,11 +35,14 @@ class MessageWriterTest
             messages should have size (1)
             messages.head.subject shouldBe subject
 
-            val maybeObjectLocation =
-              fromJson[ObjectLocation](messages.head.message)
+            val maybeNotification =
+              fromJson[MessageNotification[ExampleObject]](messages.head.message)
 
-            maybeObjectLocation shouldBe a[Success[_]]
-            val objectLocation = maybeObjectLocation.get
+            maybeNotification shouldBe a[Success[_]]
+            maybeNotification.get shouldBe a[RemoteNotification[_]]
+            val objectLocation = maybeNotification.get
+              .asInstanceOf[RemoteNotification[ExampleObject]]
+              .location
 
             objectLocation.namespace shouldBe bucket.name
 
@@ -110,8 +112,10 @@ class MessageWriterTest
               val messages = listMessagesReceivedFromSNS(topic)
               messages should have size (2)
 
-              val locations = messages.map(message =>
-                fromJson[ObjectLocation](message.message))
+              val locations = messages
+                .map { msg => fromJson[MessageNotification[ExampleObject]](msg.message).get }
+                .map { _.asInstanceOf[RemoteNotification[ExampleObject]] }
+                .map { _.location }
 
               locations.distinct should have size 2
           }

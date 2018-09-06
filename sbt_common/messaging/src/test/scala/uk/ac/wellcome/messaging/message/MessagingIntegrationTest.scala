@@ -39,9 +39,7 @@ class MessagingIntegrationTest
   }
 
   private def withLocalStackMessageWriterMessageStream[R](
-    testWith: TestWith[(MessageStream[ExampleObject],
-                        MessageWriter[ExampleObject]),
-                       R]) = {
+    testWith: TestWith[(MessageStream[ExampleObject], MessageWriter), R]): R = {
     withLocalStackMessageStreamFixtures[R] {
       case (queue, bucket, messageStream) =>
         withLocalStackSnsTopic { topic =>
