@@ -40,7 +40,10 @@ class MessageWriter[T] @Inject()(
     s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
-  def write(message: T, subject: String)(implicit encoder: Encoder[T], notificationEncoder: Encoder[MessageNotification[T]]): Future[PublishAttempt] =
+  def write(message: T, subject: String)(
+    implicit encoder: Encoder[T],
+    notificationEncoder: Encoder[MessageNotification[T]])
+    : Future[PublishAttempt] =
     for {
       encodedString <- Future.fromTry(toJson(message))
 
@@ -73,6 +76,7 @@ class MessageWriter[T] @Inject()(
         encodedString,
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
-      _ = debug(s"Successfully stored message <<$encodedString>> in location: $location")
+      _ = debug(
+        s"Successfully stored message <<$encodedString>> in location: $location")
     } yield RemoteNotification(location = location)
 }

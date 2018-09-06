@@ -33,13 +33,14 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
 
   def runStream(
     streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(implicit decoder: Decoder[MessageNotification[T]])
-    : Future[Done] =
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(
+    implicit decoder: Decoder[MessageNotification[T]]): Future[Done] =
     sqsStream.runStream(
       streamName,
       source => modifySource(messageFromS3Source(source)))
 
-  def foreach(streamName: String, process: T => Future[Unit])(implicit decoder: Decoder[MessageNotification[T]]): Future[Done] =
+  def foreach(streamName: String, process: T => Future[Unit])(
+    implicit decoder: Decoder[MessageNotification[T]]): Future[Done] =
     sqsStream.foreach(
       streamName = streamName,
       process = (notification: NotificationMessage) =>
@@ -50,7 +51,8 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     )
 
   private def messageFromS3Source(
-    source: Source[(Message, NotificationMessage), NotUsed])(implicit decoder: Decoder[MessageNotification[T]]) = {
+    source: Source[(Message, NotificationMessage), NotUsed])(
+    implicit decoder: Decoder[MessageNotification[T]]) = {
     source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
       case (message, notification) =>
         for {
@@ -59,12 +61,16 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     }
   }
 
-  private def getBody(messageString: String)(implicit decoder: Decoder[MessageNotification[T]]): Future[T] =
+  private def getBody(messageString: String)(
+    implicit decoder: Decoder[MessageNotification[T]]): Future[T] =
     for {
-      notification <- Future.fromTry(fromJson[MessageNotification[T]](messageString))
+      notification <- Future.fromTry(
+        fromJson[MessageNotification[T]](messageString))
       body <- notification match {
-        case inlineNotification: InlineNotification[T] => Future.successful(inlineNotification.t)
-        case remoteNotification: RemoteNotification[T] => objectStore.get(remoteNotification.location)
+        case inlineNotification: InlineNotification[T] =>
+          Future.successful(inlineNotification.t)
+        case remoteNotification: RemoteNotification[T] =>
+          objectStore.get(remoteNotification.location)
       }
     } yield body
 }

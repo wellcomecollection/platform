@@ -107,7 +107,8 @@ class MessageWriterTest
       }
     }
 
-    it("does not publish a RemoteNotification if it fails to store the S3 pointer") {
+    it(
+      "does not publish a RemoteNotification if it fails to store the S3 pointer") {
       withLocalSnsTopic { topic =>
         val bucket = Bucket(name = "invalid-bucket")
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
@@ -136,7 +137,9 @@ class MessageWriterTest
                 messages should have size (2)
 
                 val locations = messages
-                  .map { msg => fromJson[MessageNotification[ExampleObject]](msg.message).get }
+                  .map { msg =>
+                    fromJson[MessageNotification[ExampleObject]](msg.message).get
+                  }
                   .map { _.asInstanceOf[RemoteNotification[ExampleObject]] }
                   .map { _.location }
 
@@ -148,7 +151,8 @@ class MessageWriterTest
     }
   }
 
-  private def getInlineNotification(info: MessageInfo): InlineNotification[ExampleObject] = {
+  private def getInlineNotification(
+    info: MessageInfo): InlineNotification[ExampleObject] = {
     val maybeNotification =
       fromJson[MessageNotification[ExampleObject]](info.message)
 
@@ -159,7 +163,8 @@ class MessageWriterTest
       .asInstanceOf[InlineNotification[ExampleObject]]
   }
 
-  private def getRemoteNotification(info: MessageInfo): RemoteNotification[ExampleObject] = {
+  private def getRemoteNotification(
+    info: MessageInfo): RemoteNotification[ExampleObject] = {
     val maybeNotification =
       fromJson[MessageNotification[ExampleObject]](info.message)
 

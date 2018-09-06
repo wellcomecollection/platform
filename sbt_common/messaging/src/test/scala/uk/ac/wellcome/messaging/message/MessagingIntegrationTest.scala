@@ -43,7 +43,8 @@ class MessagingIntegrationTest
     )
   }
 
-  private def assertMessagesCanBeSentAndReceived(messages: List[ExampleObject]) =
+  private def assertMessagesCanBeSentAndReceived(
+    messages: List[ExampleObject]) =
     withLocalStackMessageWriterMessageStream {
       case (messageStream, messageWriter) =>
         val receivedMessages = new ConcurrentLinkedDeque[ExampleObject]()
@@ -56,7 +57,7 @@ class MessagingIntegrationTest
           "integration-test-stream",
           obj => Future { receivedMessages.push(obj) })
         eventually {
-          receivedMessages should contain theSameElementsAs(messages)
+          receivedMessages should contain theSameElementsAs (messages)
         }
     }
 

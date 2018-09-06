@@ -87,13 +87,16 @@ class MessageStreamTest
     }
   }
 
-  private def sendInlineNotification(queue: Queue, exampleObject: ExampleObject): Unit =
+  private def sendInlineNotification(queue: Queue,
+                                     exampleObject: ExampleObject): Unit =
     sendNotificationToSQS[MessageNotification[ExampleObject]](
       queue = queue,
       message = InlineNotification(exampleObject)
     )
 
-  private def sendRemoteNotification(bucket: Bucket, queue: Queue, exampleObject: ExampleObject): Unit = {
+  private def sendRemoteNotification(bucket: Bucket,
+                                     queue: Queue,
+                                     exampleObject: ExampleObject): Unit = {
     val s3key = Random.alphanumeric take 10 mkString
     val location = ObjectLocation(namespace = bucket.name, key = s3key)
 
@@ -112,9 +115,9 @@ class MessageStreamTest
   }
 
   private def createMessages(count: Int): List[ExampleObject] =
-    (1 to count)
-      .map { idx => ExampleObject("a" * idx) }
-      .toList
+    (1 to count).map { idx =>
+      ExampleObject("a" * idx)
+    }.toList
 
   it("increments *_ProcessMessage metric when successful") {
     withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
