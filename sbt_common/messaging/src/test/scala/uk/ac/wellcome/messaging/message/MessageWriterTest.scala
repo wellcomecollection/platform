@@ -41,7 +41,7 @@ class MessageWriterTest
               messages.head.subject shouldBe subject
 
               val inlineNotification = getInlineNotification(messages.head)
-              inlineNotification.t shouldBe smallMessage
+              inlineNotification.body shouldBe smallMessage
 
               listKeysInBucket(bucket) shouldBe List()
             }

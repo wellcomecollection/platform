@@ -14,4 +14,4 @@ case class RemoteNotification[T](location: ObjectLocation)
   * The type [[T]] is the type of the case class that was originally
   * serialised.
   */
-case class InlineNotification[T](t: T) extends MessageNotification[T]
+case class InlineNotification[T](body: T) extends MessageNotification[T]

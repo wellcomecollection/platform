@@ -68,7 +68,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
         fromJson[MessageNotification[T]](messageString))
       body <- notification match {
         case inlineNotification: InlineNotification[T] =>
-          Future.successful(inlineNotification.t)
+          Future.successful(inlineNotification.body)
         case remoteNotification: RemoteNotification[T] =>
           objectStore.get(remoteNotification.location)
       }
