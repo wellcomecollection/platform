@@ -56,7 +56,7 @@ module "registrar" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
-module "registrar" {
+module "bagger" {
   source = "bagger"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
@@ -76,7 +76,7 @@ module "registrar" {
 
   env_vars_length = 1
 
-  container_image   = "hello-worlg"
+  container_image   = "hello-world"
   source_queue_name = "${module.bagger_queue.name}"
   source_queue_arn  = "${module.bagger_queue.arn}"
 }

@@ -10,3 +10,5 @@ variable "release_ids" {
 variable "infra_bucket" {
   default = "wellcomecollection-platform-infra"
 }
+
+variable "bagger_source_bucket_name" {}
