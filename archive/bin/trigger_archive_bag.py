@@ -13,10 +13,6 @@ Options:
                          [default: wellcomecollection-assets-archive-ingest]
   --topic=<TOPIC_NAME>   The archivist topic.
                          [default: archive-storage_archivist]
-<<<<<<< HEAD:archive/archivist/trigger_archive_bag.py
-   --api=<API>           The API enndpoint to use
-                         [default: http://api.wellcomecollection.org/prod/storage/v1/ingest]
-=======
    --api=<API>           The API endpoint to use
                          [default: http://api.wellcomecollection.org/prod/storage/v1/ingests]
    --sns=(true|false)    Send directly to SNS rather than through the API

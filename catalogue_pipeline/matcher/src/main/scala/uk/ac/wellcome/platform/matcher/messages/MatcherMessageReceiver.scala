@@ -3,12 +3,12 @@ package uk.ac.wellcome.platform.matcher.messages
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import uk.ac.wellcome.messaging.sns.SNSWriter
-import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
-import uk.ac.wellcome.platform.matcher.models.VersionExpectedConflictException
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
+import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
+import uk.ac.wellcome.platform.matcher.models.VersionExpectedConflictException
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,7 +30,8 @@ class MatcherMessageReceiver @Inject()(
       )
     } yield ()).recover {
       case e: VersionExpectedConflictException =>
-        debug(s"Not matching work due to version: ${e.getMessage}")
+        debug(
+          s"Not matching work due to version conflict exception: ${e.getMessage}")
     }
   }
 
