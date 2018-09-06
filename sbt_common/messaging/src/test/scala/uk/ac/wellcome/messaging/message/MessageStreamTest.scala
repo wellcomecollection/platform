@@ -254,7 +254,7 @@ class MessageStreamTest
       withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
         case (_, messageStream, QueuePair(queue, dlq), metricsSender) =>
           val exampleObject = ExampleObject("some value")
-          sendInlineNotification(queue = queue, exampleObject = exampleObject1)
+          sendInlineNotification(queue = queue, exampleObject = exampleObject)
 
           messageStream.runStream(
             "test-stream",
