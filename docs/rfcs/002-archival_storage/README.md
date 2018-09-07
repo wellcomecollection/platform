@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 16 August 2018.**
+**Last updated: 07 September 2018.**
 
 ## Problem statement
 
@@ -99,7 +99,7 @@ The Versioned Hybrid Store also includes the ability to "reindex" the entire dat
 Request:
 
 ```http
-POST /bags
+POST /ingests
 Content-Type: application/json
 
 {

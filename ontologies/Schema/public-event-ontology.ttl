@@ -56,7 +56,7 @@ wev:Season rdf:type owl:Class ;
 
 wev:Programme rdf:type owl:Class ;
     rdfs:label "Programme"@en ;
-    rdfs:comment "A programme of thematic content and events."@en ;
+    rdfs:comment "A programme pulls together a set of events and content with an intended outcome. This often involves engaging the public in conversations about science and health research."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/public-event> .          
         
 wev:Exhibit rdf:type owl:Class ;
