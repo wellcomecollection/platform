@@ -144,25 +144,18 @@ trait Messaging
     }
   }
 
-  private def get[T](snsMessage: MessageInfo)(
-    implicit decoder: Decoder[T]): T = {
-    val tryMessageNotification = fromJson[MessageNotification](snsMessage.message)
-    tryMessageNotification shouldBe a[Success[_]]
-
-    val messageNotification = tryMessageNotification.get
-    messageNotification shouldBe a[RemoteNotification]
-
-    val remoteNotification = messageNotification.asInstanceOf[RemoteNotification]
-
-    getObjectFromS3[T](location = remoteNotification.location)
-  }
-
   /** Given a topic ARN which has received notifications containing pointers
     * to objects in S3, return the unpacked objects.
     */
   def getMessages[T](topic: Topic)(implicit decoder: Decoder[T]): List[T] =
     listMessagesReceivedFromSNS(topic).map { snsMessage =>
-      get[T](snsMessage)
+      fromJson[MessageNotification](snsMessage.message) match {
+        case Success(RemoteNotification(location)) => getObjectFromS3[T](location)
+        case Success(InlineNotification(jsonString)) => fromJson[T](jsonString).get
+        case _ => throw new RuntimeException(
+          s"Unrecognised message: $snsMessage"
+        )
+      }
     }.toList
 
   /** Store an object in S3 and send the notification to SQS.
