@@ -100,5 +100,5 @@ def main(event, _):
     ops = run_operations(operations, table)
 
     for result_list in ops.values():
-        for result in results:
+        for result in result_list:
             assert result['ResponseMetadata']['HTTPStatusCode'] == 200, ops
