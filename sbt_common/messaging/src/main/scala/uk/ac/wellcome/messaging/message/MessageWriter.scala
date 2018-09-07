@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
+import io.circe.Encoder
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectStore}
@@ -39,10 +40,10 @@ class MessageWriter[T] @Inject()(
     s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
-  def write(message: T, subject: String): Future[PublishAttempt] =
+  def write(message: T, subject: String)(implicit encoder: Encoder[MessageNotification[T]]): Future[PublishAttempt] =
     for {
       encodedNotification <- Future.fromTry(
-        toJson(InlineNotification(message))
+        toJson[MessageNotification[T]](InlineNotification(message))
       )
 
       // If the encoded message is less than 250KB, we can send it inline
@@ -68,14 +69,14 @@ class MessageWriter[T] @Inject()(
       _ = debug(publishAttempt)
     } yield publishAttempt
 
-  private def createRemoteNotification(message: T): Future[String] =
+  private def createRemoteNotification(message: T)(implicit encoder: Encoder[MessageNotification[T]]): Future[String] =
     for {
       location <- objectStore.put(messageConfig.s3Config.bucketName)(
         message,
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
       _ = info(s"Successfully stored message $message in location: $location")
-      notification = RemoteNotification(location = location)
-      jsonString <- Future.fromTry(toJson(notification))
+      notification = RemoteNotification[T](location = location)
+      jsonString <- Future.fromTry(toJson[MessageNotification[T]](notification))
     } yield jsonString
 }
