@@ -8,84 +8,160 @@ class MergerTest extends FunSpec with MergerTestUtils {
 
   private val merger = new Merger()
 
-  it("does not merge a single physical work") {
-    assertDoesNotMerge(List(createPhysicalWork))
-  }
+  describe("maybeMergePhysicalDigitalWorkPair") {
+    it("merges a physical and digital work") {
+      val physicalWork = createPhysicalWork
+      val digitalWork = createDigitalWork
 
-  it("does not merge a single digital work") {
-    assertDoesNotMerge(List(createDigitalWork))
-  }
+      val result = merger.maybeMergePhysicalDigitalWorkPair(
+        works = Seq(physicalWork, digitalWork)
+      )
 
-  it("does not merge multiple physical works") {
-    assertDoesNotMerge(List.fill(3)(createPhysicalWork))
-  }
+      result.size shouldBe 2
 
-  it("does not merge multiple digital works") {
-    assertDoesNotMerge(List.fill(3)(createDigitalWork))
-  }
+      val physicalItem =
+        physicalWork.items.head.asInstanceOf[Identifiable[Item]]
+      val digitalItem = digitalWork.items.head
 
-  it("does not merge multiple physical works with a single digital work") {
-    assertDoesNotMerge(List.fill(3)(createPhysicalWork) :+ createDigitalWork)
-  }
+      val expectedMergedWork = physicalWork.copy(
+        otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
+        items = List(
+          physicalItem.copy(
+            agent = physicalItem.agent.copy(
+              locations = physicalItem.agent.locations ++ digitalItem.agent.locations
+            )
+          )
+        )
+      )
 
-  it("does not merge a single physical work with multiple digital works") {
-    assertDoesNotMerge(
-      List(createPhysicalWork) ++ List.fill(3)(createDigitalWork))
+      val expectedRedirectedWork = UnidentifiedRedirectedWork(
+        sourceIdentifier = digitalWork.sourceIdentifier,
+        version = digitalWork.version,
+        redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)
+      )
+
+      result should contain theSameElementsAs List(
+        expectedMergedWork,
+        expectedRedirectedWork)
+    }
+
+    it("merges a physical and digital work, even if there are extra works") {
+      val physicalWork = createPhysicalWork
+      val digitalWork = createDigitalWork
+
+      val result = merger.maybeMergePhysicalDigitalWorkPair(
+        works = Seq(
+          physicalWork,
+          digitalWork,
+          createUnidentifiedWorkWith(
+            sourceIdentifier = createSourceIdentifierWith(
+              identifierType = "miro-image-number"
+            )
+          )
+        )
+      )
+
+      result.size shouldBe 3
+      result.collect { case r: UnidentifiedRedirectedWork => r }.size shouldBe 1
+    }
+
+    it("ignores a single physical work") {
+      val works = Seq(createPhysicalWork)
+      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
+    }
+
+    it("ignores a single digital work") {
+      val works = Seq(createDigitalWork)
+      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
+    }
+
+    it("ignores multiple physical works") {
+      val works = (1 to 3).map { _ =>
+        createPhysicalWork
+      }
+      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
+    }
+
+    it("ignores multiple digital works") {
+      val works = (1 to 3).map { _ =>
+        createDigitalWork
+      }
+      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
+    }
+
+    it("ignores multiple physical works with a single digital work") {
+      val works = (1 to 3).map { _ =>
+        createPhysicalWork
+      } ++ Seq(createDigitalWork)
+      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
+    }
+
+    it("ignores multiple digital works with a single physical work") {
+      val works = (1 to 3).map { _ =>
+        createDigitalWork
+      } ++ Seq(createPhysicalWork)
+      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
+    }
+
+    it("ignores a physical work with multiple items") {
+      val works = List(
+        createPhysicalWorkWith(
+          items = List(createPhysicalItem, createPhysicalItem)
+        ),
+        createDigitalWork
+      )
+      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
+    }
+
+    it("ignores a digital work with multiple items") {
+      val works = List(
+        createPhysicalWork,
+        createDigitalWorkWith(
+          items = List(createDigitalItem, createDigitalItem)
+        )
+      )
+      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
+    }
   }
 
   it("merges a physical and digital work") {
     val physicalWork = createPhysicalWork
     val digitalWork = createDigitalWork
 
-    val actualMergedWorks = merger.merge(List(physicalWork, digitalWork))
+    val result = merger.merge(
+      works = Seq(physicalWork, digitalWork)
+    )
 
-    actualMergedWorks.size shouldBe 2
-
-    val actualMergedWork = actualMergedWorks.head
+    result.size shouldBe 2
 
     val physicalItem = physicalWork.items.head.asInstanceOf[Identifiable[Item]]
     val digitalItem = digitalWork.items.head
 
-    val expectedLocations = physicalItem.agent.locations ++ digitalItem.agent.locations
-
-    val expectedItem = physicalItem.copy(
-      agent = physicalItem.agent.copy(locations = expectedLocations))
-
-    val expectedItems = List(expectedItem)
-
-    actualMergedWork shouldBe physicalWork.copy(
+    val expectedMergedWork = physicalWork.copy(
       otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
-      items = expectedItems)
+      items = List(
+        physicalItem.copy(
+          agent = physicalItem.agent.copy(
+            locations = physicalItem.agent.locations ++ digitalItem.agent.locations
+          )
+        )
+      )
+    )
 
-    actualMergedWorks.last shouldBe UnidentifiedRedirectedWork(
+    val expectedRedirectedWork = UnidentifiedRedirectedWork(
       sourceIdentifier = digitalWork.sourceIdentifier,
       version = digitalWork.version,
-      redirect = IdentifiableRedirect(physicalWork.sourceIdentifier))
-  }
-
-  it("does not merge a physical work having multiple items with a digital work") {
-    val works = List(
-      createPhysicalWork.copy(items = List(
-        createIdentifiableItemWith(locations = List(createPhysicalLocation)),
-        createIdentifiableItemWith(locations = List(createPhysicalLocation)))),
-      createDigitalWork
+      redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)
     )
 
-    assertDoesNotMerge(works)
+    result should contain theSameElementsAs List(
+      expectedMergedWork,
+      expectedRedirectedWork)
   }
 
-  it("does not merge a physical work with a digital work having multiple items") {
-    val works = List(
-      createPhysicalWork,
-      createDigitalWork.copy(items = List(
-        createUnidentifiableItemWith(locations = List(createDigitalLocation)),
-        createUnidentifiableItemWith(locations = List(createDigitalLocation))))
-    )
+  private def createPhysicalItem: Identifiable[Item] =
+    createIdentifiableItemWith(locations = List(createPhysicalLocation))
 
-    assertDoesNotMerge(works)
-  }
-
-  private def assertDoesNotMerge(works: List[UnidentifiedWork]) = {
-    merger.merge(works) should contain theSameElementsAs works
-  }
+  private def createDigitalItem: Unidentifiable[Item] =
+    createUnidentifiableItemWith(locations = List(createDigitalLocation))
 }
