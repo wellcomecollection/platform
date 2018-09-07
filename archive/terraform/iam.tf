@@ -1,4 +1,4 @@
-# archivist
+# Archivist
 
 resource "aws_iam_role_policy" "archivist_task_store_s3" {
   role   = "${module.archivist.task_role_name}"
@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "archivist_task_archive_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
-# registrar
+# Registrar
 
 resource "aws_iam_role_policy" "registrar_task_get_s3" {
   role   = "${module.registrar.task_role_name}"
@@ -115,4 +115,21 @@ resource "aws_iam_role_policy" "lambda_archive_ingest_sns" {
 resource "aws_iam_role_policy" "lambda_archive_ingest_archive_progress_table" {
   role   = "${module.lambda_archive_ingest.role_name}"
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
+}
+
+# Bagger
+
+resource "aws_iam_role_policy" "bagger_task_get_s3" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.bagger_get.json}"
+}
+
+resource "aws_iam_role_policy" "bagger_task_put_s3" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.bagger_store.json}"
+}
+
+resource "aws_iam_role_policy" "bagger_task_sqs" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.read_from_bagger_queue.json}"
 }

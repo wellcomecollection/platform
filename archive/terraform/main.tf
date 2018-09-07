@@ -55,3 +55,28 @@ module "registrar" {
   source_queue_name = "${module.registrar_queue.name}"
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
+
+module "bagger" {
+  source = "service"
+
+  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets                          = "${local.private_subnets}"
+  vpc_id                           = "${local.vpc_id}"
+  service_name                     = "${local.namespace}_bagger"
+  aws_region                       = "${var.aws_region}"
+
+  min_capacity = 1
+  max_capacity = 1
+
+  env_vars = {
+    my_var = "some_value"
+  }
+
+  env_vars_length = 1
+
+  container_image   = "hello-world"
+  source_queue_name = "${module.bagger_queue.name}"
+  source_queue_arn  = "${module.bagger_queue.arn}"
+}
