@@ -53,7 +53,8 @@ class MessageWriterTest
       }
     }
 
-    it("sends a raw SNS notification if the message is just under the threshold") {
+    it(
+      "sends a raw SNS notification if the message is just under the threshold") {
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withExampleObjectMessageWriter(bucket, topic) { messageWriter =>

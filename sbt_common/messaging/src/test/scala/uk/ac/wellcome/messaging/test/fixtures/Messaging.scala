@@ -83,7 +83,8 @@ trait Messaging
   def withMessageWriter[T, R](bucket: Bucket,
                               topic: Topic,
                               writerSnsClient: AmazonSNS = snsClient)(
-    testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[T], encoder: Encoder[T]): R = {
+    testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[T],
+                                             encoder: Encoder[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageWriterConfig(
@@ -105,7 +106,8 @@ trait Messaging
     bucket: Bucket,
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
-    implicit objectStore: ObjectStore[T], decoder: Decoder[T]) = {
+    implicit objectStore: ObjectStore[T],
+    decoder: Decoder[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val sqsConfig =
       SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
@@ -150,14 +152,17 @@ trait Messaging
   def getMessages[T](topic: Topic)(implicit decoder: Decoder[T]): List[T] =
     listMessagesReceivedFromSNS(topic).map { snsMessage =>
       fromJson[MessageNotification](snsMessage.message) match {
-        case Success(RemoteNotification(location)) => getObjectFromS3[T](
-          bucket = Bucket(location.namespace),
-          key = location.key
-        )
-        case Success(InlineNotification(jsonString)) => fromJson[T](jsonString).get
-        case _ => throw new RuntimeException(
-          s"Unrecognised message: $snsMessage"
-        )
+        case Success(RemoteNotification(location)) =>
+          getObjectFromS3[T](
+            bucket = Bucket(location.namespace),
+            key = location.key
+          )
+        case Success(InlineNotification(jsonString)) =>
+          fromJson[T](jsonString).get
+        case _ =>
+          throw new RuntimeException(
+            s"Unrecognised message: $snsMessage"
+          )
       }
     }.toList
 

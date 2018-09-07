@@ -24,7 +24,9 @@ class MessageWriter[T] @Inject()(
   messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3
-)(implicit objectStore: ObjectStore[T], encoder: Encoder[T], ec: ExecutionContext)
+)(implicit objectStore: ObjectStore[T],
+  encoder: Encoder[T],
+  ec: ExecutionContext)
     extends Logging {
 
   private val sns = new SNSWriter(
@@ -57,7 +59,9 @@ class MessageWriter[T] @Inject()(
       // Max SNS message size:
       // https://aws.amazon.com/sns/faqs/
       //
-      notification: String <- if (encodedNotification.getBytes("UTF-8").length > 250 * 1000) {
+      notification: String <- if (encodedNotification
+                                    .getBytes("UTF-8")
+                                    .length > 250 * 1000) {
         createRemoteNotification(message)
       } else {
         Future.successful(encodedNotification)

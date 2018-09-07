@@ -14,6 +14,7 @@ import uk.ac.wellcome.storage.ObjectLocation
   */
 sealed trait MessageNotification
 
-case class RemoteNotification(location: ObjectLocation) extends MessageNotification
+case class RemoteNotification(location: ObjectLocation)
+    extends MessageNotification
 
 case class InlineNotification(jsonString: String) extends MessageNotification
