@@ -21,9 +21,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  s3Client: AmazonS3,
                                  messageReaderConfig: MessageReaderConfig,
                                  metricsSender: MetricsSender)(
-  implicit objectStore: ObjectStore[T],
-  decoder: Decoder[T],
-  ec: ExecutionContext) {
+  implicit objectStore: ObjectStore[T], ec: ExecutionContext) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
     actorSystem = actorSystem,
@@ -34,13 +32,13 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
 
   def runStream(
     streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(implicit decoder: Decoder[T])
     : Future[Done] =
     sqsStream.runStream(
       streamName,
       source => modifySource(messageFromS3Source(source)))
 
-  def foreach(streamName: String, process: T => Future[Unit]): Future[Done] =
+  def foreach(streamName: String, process: T => Future[Unit])(implicit decoder: Decoder[T]): Future[Done] =
     sqsStream.foreach(
       streamName = streamName,
       process = (notification: NotificationMessage) =>
