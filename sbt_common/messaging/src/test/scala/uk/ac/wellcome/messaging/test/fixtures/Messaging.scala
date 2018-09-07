@@ -105,7 +105,7 @@ trait Messaging
     bucket: Bucket,
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
-    implicit objectStore: ObjectStore[T]) = {
+    implicit objectStore: ObjectStore[T], decoder: Decoder[MessageNotification[T]]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val sqsConfig =
       SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
@@ -126,7 +126,7 @@ trait Messaging
 
   def withMessageStreamFixtures[T, R](
     testWith: TestWith[(Bucket, MessageStream[T], QueuePair, MetricsSender), R]
-  )(implicit objectStore: ObjectStore[T]) = {
+  )(implicit objectStore: ObjectStore[T], decoder: Decoder[MessageNotification[T]]) = {
 
     withActorSystem { actorSystem =>
       withLocalS3Bucket { bucket =>
