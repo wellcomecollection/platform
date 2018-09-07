@@ -144,34 +144,17 @@ trait Messaging
     }
   }
 
-  private def put[T](obj: T, location: ObjectLocation)(
-    implicit encoder: Encoder[T]) = {
-    val serialisedObj = toJson[T](obj).get
-
-    s3Client.putObject(
-      location.namespace,
-      location.key,
-      serialisedObj
-    )
-
-    val exampleNotification = createNotificationMessageWith(
-      message = location
-    )
-
-    toJson(exampleNotification).get
-  }
-
   private def get[T](snsMessage: MessageInfo)(
     implicit decoder: Decoder[T]): T = {
-    val tryObjectLocation = fromJson[ObjectLocation](snsMessage.message)
-    tryObjectLocation shouldBe a[Success[_]]
+    val tryMessageNotification = fromJson[MessageNotification](snsMessage.message)
+    tryMessageNotification shouldBe a[Success[_]]
 
-    val objectLocation = tryObjectLocation.get
+    val messageNotification = tryMessageNotification.get
+    messageNotification shouldBe a[RemoteNotification]
 
-    getObjectFromS3[T](
-      bucket = Bucket(objectLocation.namespace),
-      key = objectLocation.key
-    )
+    val remoteNotification = messageNotification.asInstanceOf[RemoteNotification]
+
+    getObjectFromS3[T](location = remoteNotification.location)
   }
 
   /** Given a topic ARN which has received notifications containing pointers
@@ -187,15 +170,27 @@ trait Messaging
     * As if another application had used a MessageWriter to send the message
     * to an SNS topic, which was forwarded to the queue.  We don't use a
     * MessageWriter instance because that sends to SNS, not SQS.
+    *
+    * Also, MessageWriter contains some extra logic for sending some messages
+    * over S3, some over SNS, which is tested separately -- and which we don't
+    * need to replicate here.
+    *
     */
   def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(
     implicit encoder: Encoder[T]): SendMessageResult = {
     val s3key = Random.alphanumeric take 10 mkString
-    val notificationJson = put[T](
-      obj = obj,
-      location = ObjectLocation(namespace = bucket.name, key = s3key)
+
+    val location = ObjectLocation(namespace = bucket.name, key = s3key)
+
+    s3Client.putObject(
+      location.namespace,
+      location.key,
+      toJson(obj).get
     )
 
-    sendMessage(queue = queue, body = notificationJson)
+    sendMessage[MessageNotification](
+      queue = queue,
+      obj = RemoteNotification(location)
+    )
   }
 }
