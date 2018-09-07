@@ -144,8 +144,6 @@ def main(event, _):
         'lastUpdated': str(datetime.datetime.utcnow())
     }
 
-    print(f'service_snapshot = {service_snapshot!r}')
-
     s3_client = boto3.client('s3')
 
     response = send_ecs_status_to_s3(
@@ -154,5 +152,4 @@ def main(event, _):
         bucket_name,
         object_key
     )
-
-    print(f'response = {response}')
+    assert response['HTTPStatusCode'] == 200, (service_snapshot, response)
