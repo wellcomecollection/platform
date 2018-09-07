@@ -1,6 +1,6 @@
 # RFC 004: METS Adapter
 
-**Last updated: 22 August 2018.**
+**Last updated: 07 September 2018.**
 
 ## Background
 
