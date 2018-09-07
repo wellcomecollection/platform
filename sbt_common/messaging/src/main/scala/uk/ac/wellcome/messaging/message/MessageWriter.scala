@@ -76,7 +76,7 @@ class MessageWriter[T] @Inject()(
         message,
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
-      _ = info(s"Successfully stored message $message in location: $location")
+      _ = info(s"Successfully stored message in location: $location")
       notification = RemoteNotification(location = location)
       jsonString <- Future.fromTry(toJson[MessageNotification](notification))
     } yield jsonString
