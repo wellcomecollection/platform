@@ -24,7 +24,7 @@ class MessageWriter[T] @Inject()(
   messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3
-)(implicit objectStore: ObjectStore[T], ec: ExecutionContext)
+)(implicit objectStore: ObjectStore[T], encoder: Encoder[MessageNotification[T]], ec: ExecutionContext)
     extends Logging {
 
   private val sns = new SNSWriter(
@@ -40,7 +40,7 @@ class MessageWriter[T] @Inject()(
     s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
-  def write(message: T, subject: String)(implicit encoder: Encoder[MessageNotification[T]]): Future[PublishAttempt] =
+  def write(message: T, subject: String): Future[PublishAttempt] =
     for {
       encodedNotification <- Future.fromTry(
         toJson[MessageNotification[T]](InlineNotification(message))
@@ -69,7 +69,7 @@ class MessageWriter[T] @Inject()(
       _ = debug(publishAttempt)
     } yield publishAttempt
 
-  private def createRemoteNotification(message: T)(implicit encoder: Encoder[MessageNotification[T]]): Future[String] =
+  private def createRemoteNotification(message: T): Future[String] =
     for {
       location <- objectStore.put(messageConfig.s3Config.bucketName)(
         message,
