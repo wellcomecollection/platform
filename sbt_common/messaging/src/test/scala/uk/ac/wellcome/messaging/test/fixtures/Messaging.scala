@@ -83,7 +83,7 @@ trait Messaging
   def withMessageWriter[T, R](bucket: Bucket,
                               topic: Topic,
                               writerSnsClient: AmazonSNS = snsClient)(
-    testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[T], encoder: Encoder[MessageNotification[T]]): R = {
+    testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[T], encoder: Encoder[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageWriterConfig(
@@ -105,7 +105,7 @@ trait Messaging
     bucket: Bucket,
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
-    implicit objectStore: ObjectStore[T], decoder: Decoder[MessageNotification[T]]) = {
+    implicit objectStore: ObjectStore[T], decoder: Decoder[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val sqsConfig =
       SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
@@ -126,7 +126,7 @@ trait Messaging
 
   def withMessageStreamFixtures[T, R](
     testWith: TestWith[(Bucket, MessageStream[T], QueuePair, MetricsSender), R]
-  )(implicit objectStore: ObjectStore[T], decoder: Decoder[MessageNotification[T]]) = {
+  )(implicit objectStore: ObjectStore[T], decoder: Decoder[T]) = {
 
     withActorSystem { actorSystem =>
       withLocalS3Bucket { bucket =>

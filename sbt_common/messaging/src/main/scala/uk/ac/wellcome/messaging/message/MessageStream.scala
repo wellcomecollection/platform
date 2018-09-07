@@ -22,7 +22,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  messageReaderConfig: MessageReaderConfig,
                                  metricsSender: MetricsSender)(
   implicit objectStore: ObjectStore[T],
-  decoder: Decoder[MessageNotification[T]],
+  decoder: Decoder[T],
   ec: ExecutionContext) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
@@ -62,11 +62,11 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
   private def getBody(messageString: String): Future[T] =
     for {
       notification <- Future.fromTry(
-        fromJson[MessageNotification[T]](messageString))
+        fromJson[MessageNotification](messageString))
       body <- notification match {
-        case inlineNotification: InlineNotification[T] =>
-          Future.successful(inlineNotification.body)
-        case remoteNotification: RemoteNotification[T] =>
+        case inlineNotification: InlineNotification =>
+          Future.fromTry(fromJson[T](inlineNotification.jsonString))
+        case remoteNotification: RemoteNotification =>
           objectStore.get(remoteNotification.location)
       }
     } yield body

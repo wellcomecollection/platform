@@ -24,7 +24,7 @@ class MessageWriter[T] @Inject()(
   messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3
-)(implicit objectStore: ObjectStore[T], encoder: Encoder[MessageNotification[T]], ec: ExecutionContext)
+)(implicit objectStore: ObjectStore[T], encoder: Encoder[T], ec: ExecutionContext)
     extends Logging {
 
   private val sns = new SNSWriter(
@@ -42,8 +42,9 @@ class MessageWriter[T] @Inject()(
 
   def write(message: T, subject: String): Future[PublishAttempt] =
     for {
+      jsonString <- Future.fromTry(toJson(message))
       encodedNotification <- Future.fromTry(
-        toJson[MessageNotification[T]](InlineNotification(message))
+        toJson[MessageNotification](InlineNotification(jsonString))
       )
 
       // If the encoded message is less than 250KB, we can send it inline
@@ -76,7 +77,7 @@ class MessageWriter[T] @Inject()(
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
       _ = info(s"Successfully stored message $message in location: $location")
-      notification = RemoteNotification[T](location = location)
-      jsonString <- Future.fromTry(toJson[MessageNotification[T]](notification))
+      notification = RemoteNotification(location = location)
+      jsonString <- Future.fromTry(toJson[MessageNotification](notification))
     } yield jsonString
 }

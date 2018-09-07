@@ -89,9 +89,9 @@ class MessageStreamTest
 
   private def sendInlineNotification(queue: Queue,
                                      exampleObject: ExampleObject): Unit =
-    sendNotificationToSQS[MessageNotification[ExampleObject]](
+    sendNotificationToSQS[MessageNotification](
       queue = queue,
-      message = InlineNotification(exampleObject)
+      message = InlineNotification(toJson(exampleObject).get)
     )
 
   private def sendRemoteNotification(bucket: Bucket,
@@ -108,7 +108,7 @@ class MessageStreamTest
       serialisedObj
     )
 
-    sendNotificationToSQS[MessageNotification[ExampleObject]](
+    sendNotificationToSQS[MessageNotification](
       queue = queue,
       message = RemoteNotification(location)
     )
@@ -169,7 +169,7 @@ class MessageStreamTest
         // Do NOT put S3 object here
         val objectLocation = ObjectLocation(bucket.name, key)
 
-        sendNotificationToSQS[MessageNotification[ExampleObject]](
+        sendNotificationToSQS[MessageNotification](
           queue = queue,
           message = RemoteNotification(objectLocation)
         )

@@ -41,7 +41,10 @@ class MessageWriterTest
               messages.head.subject shouldBe subject
 
               val inlineNotification = getInlineNotification(messages.head)
-              inlineNotification.body shouldBe smallMessage
+              assertJsonStringsAreEqual(
+                inlineNotification.jsonString,
+                toJson(smallMessage).get
+              )
 
               listKeysInBucket(bucket) shouldBe List()
             }
@@ -63,7 +66,10 @@ class MessageWriterTest
               messages.head.subject shouldBe subject
 
               val inlineNotification = getInlineNotification(messages.head)
-              inlineNotification.body shouldBe message
+              assertJsonStringsAreEqual(
+                inlineNotification.jsonString,
+                toJson(message).get
+              )
 
               listKeysInBucket(bucket) shouldBe List()
             }
@@ -190,9 +196,9 @@ class MessageWriterTest
 
                 val locations = messages
                   .map { msg =>
-                    fromJson[MessageNotification[ExampleObject]](msg.message).get
+                    fromJson[MessageNotification](msg.message).get
                   }
-                  .map { _.asInstanceOf[RemoteNotification[ExampleObject]] }
+                  .map { _.asInstanceOf[RemoteNotification] }
                   .map { _.location }
 
                 locations.distinct should have size 2
@@ -203,26 +209,24 @@ class MessageWriterTest
     }
   }
 
-  private def getInlineNotification(
-    info: MessageInfo): InlineNotification[ExampleObject] = {
+  private def getInlineNotification(info: MessageInfo): InlineNotification = {
     val maybeNotification =
-      fromJson[MessageNotification[ExampleObject]](info.message)
+      fromJson[MessageNotification](info.message)
 
     maybeNotification shouldBe a[Success[_]]
-    maybeNotification.get shouldBe a[InlineNotification[_]]
+    maybeNotification.get shouldBe a[InlineNotification]
 
     maybeNotification.get
-      .asInstanceOf[InlineNotification[ExampleObject]]
+      .asInstanceOf[InlineNotification]
   }
 
-  private def getRemoteNotification(
-    info: MessageInfo): RemoteNotification[ExampleObject] = {
+  private def getRemoteNotification(info: MessageInfo): RemoteNotification = {
     val maybeNotification =
-      fromJson[MessageNotification[ExampleObject]](info.message)
+      fromJson[MessageNotification](info.message)
 
     maybeNotification shouldBe a[Success[_]]
-    maybeNotification.get shouldBe a[RemoteNotification[_]]
+    maybeNotification.get shouldBe a[RemoteNotification]
     maybeNotification.get
-      .asInstanceOf[RemoteNotification[ExampleObject]]
+      .asInstanceOf[RemoteNotification]
   }
 }
