@@ -1,6 +1,6 @@
 # RFC 006: Reindexer architecture
 
-**Last updated: 15 June 2018.**
+**Last updated: 22 August 2018.**
 
 ## Problem statement
 
