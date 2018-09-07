@@ -7,7 +7,6 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-import io.circe.Encoder
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectStore}
@@ -40,10 +39,7 @@ class MessageWriter[T] @Inject()(
     s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
-  def write(message: T, subject: String)(
-    implicit encoder: Encoder[T],
-    notificationEncoder: Encoder[MessageNotification[T]])
-    : Future[PublishAttempt] =
+  def write(message: T, subject: String): Future[PublishAttempt] =
     for {
       encodedNotification <- Future.fromTry(
         toJson(InlineNotification(message))
@@ -79,7 +75,7 @@ class MessageWriter[T] @Inject()(
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
       _ = info(s"Successfully stored message $message in location: $location")
-      notification <- RemoteNotification(location = location)
+      notification = RemoteNotification(location = location)
       jsonString <- Future.fromTry(toJson(notification))
     } yield jsonString
 }
