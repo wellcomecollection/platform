@@ -15,6 +15,23 @@ resource "aws_security_group" "security_group" {
   }
 }
 
+data "aws_vpc_endpoint_service" "events" {
+  service = "events"
+}
+
+resource "aws_vpc_endpoint" "events" {
+  vpc_id            = "${var.vpc_id}"
+  vpc_endpoint_type = "Interface"
+
+  security_group_ids = [
+    "${aws_security_group.security_group.id}",
+  ]
+
+  subnet_ids = ["${var.subnet_ids}"]
+
+  service_name = "${data.aws_vpc_endpoint_service.events.service_name}"
+}
+
 data "aws_vpc_endpoint_service" "logs" {
   service = "logs"
 }
