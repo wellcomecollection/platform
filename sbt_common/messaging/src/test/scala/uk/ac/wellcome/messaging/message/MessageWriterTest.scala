@@ -50,6 +50,28 @@ class MessageWriterTest
       }
     }
 
+    it("sends a raw SNS notification if the message is just under the threshold") {
+      withLocalSnsTopic { topic =>
+        withLocalS3Bucket { bucket =>
+          withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
+            val message = createMessage(size = 248000)
+            val eventualAttempt = messageWriter.write(message, subject)
+
+            whenReady(eventualAttempt) { pointer =>
+              val messages = listMessagesReceivedFromSNS(topic)
+              messages should have size 1
+              messages.head.subject shouldBe subject
+
+              val inlineNotification = getInlineNotification(messages.head)
+              inlineNotification.body shouldBe message
+
+              listKeysInBucket(bucket) shouldBe List()
+            }
+          }
+        }
+      }
+    }
+
     it("returns a failed future if it fails to publish to SNS") {
       withLocalS3Bucket { bucket =>
         val topic = Topic(arn = "invalid-topic-arn")
@@ -87,6 +109,36 @@ class MessageWriterTest
                   key = objectLocation.key
                 ),
                 toJson(largeMessage).get
+              )
+            }
+          }
+        }
+      }
+    }
+
+    it("sends an S3 pointer if the message is just larger than the threshold") {
+      withLocalSnsTopic { topic =>
+        withLocalS3Bucket { bucket =>
+          withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
+            val message = createMessage(size = 250001)
+            val eventualAttempt = messageWriter.write(message, subject)
+
+            whenReady(eventualAttempt) { pointer =>
+              val messages = listMessagesReceivedFromSNS(topic)
+              messages should have size 1
+              messages.head.subject shouldBe subject
+
+              val remoteNotification = getRemoteNotification(messages.head)
+              val objectLocation = remoteNotification.location
+
+              objectLocation.namespace shouldBe bucket.name
+
+              assertJsonStringsAreEqual(
+                getContentFromS3(
+                  bucket = Bucket(objectLocation.namespace),
+                  key = objectLocation.key
+                ),
+                toJson(message).get
               )
             }
           }
