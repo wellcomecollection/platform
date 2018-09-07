@@ -7,3 +7,8 @@ module "ecr_repository_registrar" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "registrar"
 }
+
+module "ecr_repository_bagger" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "bagger"
+}

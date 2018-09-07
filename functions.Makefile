@@ -346,6 +346,9 @@ define __ecs_target_template
 $(1)-build:
 	$(call build_image,$(1),$(2))
 
+$(1)-test:
+	$(call test_lambda,$(STACK_ROOT)/$(1))
+
 $(1)-publish: $(1)-build
 	$(call publish_service,$(1))
 endef

@@ -76,7 +76,7 @@ module "bagger" {
 
   env_vars_length = 1
 
-  container_image   = "hello-world"
+  container_image   = "${local.bagger_container_image}"
   source_queue_name = "${module.bagger_queue.name}"
   source_queue_arn  = "${module.bagger_queue.arn}"
 }
