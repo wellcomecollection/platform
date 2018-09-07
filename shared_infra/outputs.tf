@@ -50,6 +50,10 @@ output "catalogue_public_subnets" {
   value = ["${module.catalogue_vpc.public_subnets}"]
 }
 
+output "catalogue_vpc_private_route_table_ids" {
+  value = "${module.catalogue_vpc.private_route_table_ids}"
+}
+
 output "catalogue_vpc_id" {
   value = "${module.catalogue_vpc.vpc_id}"
 }

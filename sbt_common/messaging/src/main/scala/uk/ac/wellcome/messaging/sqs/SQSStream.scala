@@ -111,6 +111,8 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
         logger.warn(s"Graceful failure: ${exception.getMessage}")
       case exception: DynamoNonFatalError =>
         logger.warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
+      case exception: JsonDecodingError =>
+        logger.warn(s"JSON decoding error: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(
           s"Unrecognised failure while: ${exception.getMessage}",

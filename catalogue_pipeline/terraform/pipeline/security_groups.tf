@@ -1,16 +1,9 @@
-resource "aws_security_group" "service_egress_security_group" {
-  name        = "${var.namespace}_service_egress_security_group"
+module "service_egress_security_group" {
+  source = "../../../terraform-modules/egress_security_group"
+
+  name        = "${var.namespace}_service_egress"
   description = "Allow traffic between services"
-  vpc_id      = "${var.vpc_id}"
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags {
-    Name = "${var.namespace}-egress"
-  }
+  vpc_id     = "${var.vpc_id}"
+  subnet_ids = "${var.subnets}"
 }
