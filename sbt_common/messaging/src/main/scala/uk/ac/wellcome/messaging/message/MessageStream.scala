@@ -58,7 +58,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     }
   }
 
-  private def getBody(messageString: String): Future[T] =
+  private def getBody(messageString: String)(implicit decoder: Decoder[T]): Future[T] =
     for {
       notification <- Future.fromTry(
         fromJson[MessageNotification](messageString))
