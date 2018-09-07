@@ -49,7 +49,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     )
 
   private def messageFromS3Source(
-    source: Source[(Message, NotificationMessage), NotUsed]) = {
+    source: Source[(Message, NotificationMessage), NotUsed])(implicit decoder: Decoder[T]) = {
     source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
       case (message, notification) =>
         for {
