@@ -55,7 +55,7 @@ def publish_messages(topic_arn, messages, total_segments):
         assert resp['ResponseMetadata']['HTTPStatusCode'] == 200, resp
 
 
-def post_to_slack(source_name, reason):
+def post_to_slack(source_name, reason, total_segments):
     """
     Posts a message about the reindex in Slack, so we can track them.
     """
@@ -76,7 +76,8 @@ def post_to_slack(source_name, reason):
 
     message = (
         f'*{username}* started a reindex in *{source_name}*\n'
-        f'Reason: *{reason}*'
+        f'Reason: *{reason}* '
+        f'({total_segments} segment{"s" if total_segments != 1 else ""})'
     )
 
     slack_data = {
@@ -113,7 +114,11 @@ def main():
 
     print(f'Triggering a reindex in {source_name}')
 
-    post_to_slack(source_name=source_name, reason=reason)
+    post_to_slack(
+        source_name=source_name,
+        reason=reason,
+        total_segments=total_segments
+    )
 
     messages = all_messages(total_segments=total_segments)
 
