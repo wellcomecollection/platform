@@ -256,10 +256,7 @@ class RecorderWorkerServiceTest
     hybridRecord.id shouldBe expectedWork.sourceIdentifier.toString
     hybridRecord.version shouldBe expectedVhsVersion
 
-    val actualEntry = getObjectFromS3[T](
-      bucket = Bucket(hybridRecord.location.namespace),
-      key = hybridRecord.location.key
-    )
+    val actualEntry = getObjectFromS3[T](location = hybridRecord.location)
 
     actualEntry shouldBe expectedWork
     getMessages[T](topic) should contain(expectedWork)
