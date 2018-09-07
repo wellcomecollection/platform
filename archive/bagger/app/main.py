@@ -1,11 +1,5 @@
-import sys
 import json
 import time
-import logging
-import boto3
-import settings
-import bagger
-import aws
 
 """
     Listens to a queue for b numbers to bag.
