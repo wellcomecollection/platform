@@ -71,8 +71,8 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       getHybridRecord(table, id = transformable.sierraId.withoutCheckDigit)
 
     val storedTransformable = getObjectFromS3[SierraTransformable](
-      location = hybridRecord.location
-    )
+      Bucket(hybridRecord.location.namespace),
+      hybridRecord.location.key)
     storedTransformable shouldBe transformable
 
     listMessagesReceivedFromSNS(topic).map { info: MessageInfo =>
@@ -88,8 +88,8 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       getHybridRecord(table, id = itemRecord.id.withoutCheckDigit)
 
     val storedItemRecord = getObjectFromS3[SierraItemRecord](
-      location = hybridRecord.location
-    )
+      Bucket(hybridRecord.location.namespace),
+      hybridRecord.location.key)
     storedItemRecord shouldBe itemRecord
 
     getMessages[SierraItemRecord](topic) should contain(itemRecord)
