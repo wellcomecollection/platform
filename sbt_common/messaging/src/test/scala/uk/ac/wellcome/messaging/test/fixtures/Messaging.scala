@@ -150,7 +150,10 @@ trait Messaging
   def getMessages[T](topic: Topic)(implicit decoder: Decoder[T]): List[T] =
     listMessagesReceivedFromSNS(topic).map { snsMessage =>
       fromJson[MessageNotification](snsMessage.message) match {
-        case Success(RemoteNotification(location)) => getObjectFromS3[T](location)
+        case Success(RemoteNotification(location)) => getObjectFromS3[T](
+          bucket = Bucket(location.namespace),
+          key = location.key
+        )
         case Success(InlineNotification(jsonString)) => fromJson[T](jsonString).get
         case _ => throw new RuntimeException(
           s"Unrecognised message: $snsMessage"
