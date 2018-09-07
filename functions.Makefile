@@ -91,10 +91,10 @@ endef
 # Args:
 #   $1 - Path to the Lambda directory, relative to the root of the repo.
 #
-define test_lambda
+define test_python
 	$(ROOT)/docker_run.py --aws --dind -- \
 		--volume $(ROOT):/repo \
-		wellcome/build_test_lambda $(1)
+		wellcome/build_test_python $(1)
 
 	$(ROOT)/docker_run.py --aws --dind -- \
 		--net=host \
@@ -102,7 +102,7 @@ define test_lambda
 		--volume $(ROOT)/shared_conftest.py:/conftest.py \
 		--env INSTALL_DEPENDENCIES=false \
 		--env FIND_MATCH_PATHS="/data" --tty \
-		wellcome/test_lambda_$(shell basename $(1)):latest
+		wellcome/test_python_$(shell basename $(1)):latest
 endef
 
 
@@ -320,7 +320,7 @@ endef
 #
 define __lambda_target_template
 $(1)-test:
-	$(call test_lambda,$(2))
+	$(call test_python,$(2))
 
 $(1)-publish:
 	$(call publish_lambda,$(2))
@@ -347,7 +347,7 @@ $(1)-build:
 	$(call build_image,$(1),$(2))
 
 $(1)-test:
-	$(call test_lambda,$(STACK_ROOT)/$(1))
+	$(call test_python,$(STACK_ROOT)/$(1))
 
 $(1)-publish: $(1)-build
 	$(call publish_service,$(1))
