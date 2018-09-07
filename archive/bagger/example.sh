@@ -5,6 +5,7 @@ export READ_METS_FROM_FILESHARE='False'
 export WORKING_DIRECTORY='/tmp/_bagger'
 export DROP_BUCKET_NAME='yyyy'
 export DROP_BUCKET_NAME_METS_ONLY='yyyy-mets-only'
+export DROP_BUCKET_NAME_ERRORS='yyyy-errors'
 export CURRENT_PRESERVATION_BUCKET='bbbb'
 export DLCS_SOURCE_BUCKET='dddd'
 # aws
@@ -22,4 +23,4 @@ export DDS_API_KEY='xxxx'
 export DDS_API_SECRET='xxxx'
 export DDS_ASSET_PREFIX='...'
 
-python bagger.py $1
+python app/bagger.py $1

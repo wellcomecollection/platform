@@ -7,7 +7,7 @@ SBT_APPS    = archivist registrar
 SBT_DOCKER_LIBRARIES = archive_common
 SBT_NO_DOCKER_LIBRARIES =
 
-ECS_TASKS   =
+ECS_TASKS   = bagger
 LAMBDAS     = archive_bags archive_ingest
 
 TF_NAME     = archive

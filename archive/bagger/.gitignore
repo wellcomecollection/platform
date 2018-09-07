@@ -106,6 +106,7 @@ venv.bak/
 *.bat
 bag.sh
 bnums.sh
+local_run.sh
 .vscode
 
 
