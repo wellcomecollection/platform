@@ -32,10 +32,7 @@ class SierraItemsToDynamoFeatureTest
                 bibIds = List(createSierraBibNumber)
               )
 
-              sendMessage(
-                queue = queue,
-                message = itemRecord
-              )
+              sendMessage(queue = queue, obj = itemRecord)
 
               eventually {
                 assertStoredAndSent(
