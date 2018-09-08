@@ -83,7 +83,8 @@ trait Messaging
   def withMessageWriter[T, R](bucket: Bucket,
                               topic: Topic,
                               writerSnsClient: AmazonSNS = snsClient)(
-    testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[T]): R = {
+    testWith: TestWith[MessageWriter[T], R])(
+    implicit store: ObjectStore[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageWriterConfig(

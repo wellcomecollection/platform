@@ -40,7 +40,8 @@ class MessageWriter[T] @Inject()(
     s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
-  def write(message: T, subject: String)(implicit encoder: Encoder[T]): Future[PublishAttempt] =
+  def write(message: T, subject: String)(
+    implicit encoder: Encoder[T]): Future[PublishAttempt] =
     for {
       jsonString <- Future.fromTry(toJson(message))
       encodedNotification <- Future.fromTry(

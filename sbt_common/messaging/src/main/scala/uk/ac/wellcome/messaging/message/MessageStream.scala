@@ -21,7 +21,8 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  s3Client: AmazonS3,
                                  messageReaderConfig: MessageReaderConfig,
                                  metricsSender: MetricsSender)(
-  implicit objectStore: ObjectStore[T], ec: ExecutionContext) {
+  implicit objectStore: ObjectStore[T],
+  ec: ExecutionContext) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
     actorSystem = actorSystem,
@@ -32,13 +33,14 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
 
   def runStream(
     streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(implicit decoder: Decoder[T])
-    : Future[Done] =
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(
+    implicit decoder: Decoder[T]): Future[Done] =
     sqsStream.runStream(
       streamName,
       source => modifySource(messageFromS3Source(source)))
 
-  def foreach(streamName: String, process: T => Future[Unit])(implicit decoder: Decoder[T]): Future[Done] =
+  def foreach(streamName: String, process: T => Future[Unit])(
+    implicit decoder: Decoder[T]): Future[Done] =
     sqsStream.foreach(
       streamName = streamName,
       process = (notification: NotificationMessage) =>
@@ -49,7 +51,8 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     )
 
   private def messageFromS3Source(
-    source: Source[(Message, NotificationMessage), NotUsed])(implicit decoder: Decoder[T]) = {
+    source: Source[(Message, NotificationMessage), NotUsed])(
+    implicit decoder: Decoder[T]) = {
     source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
       case (message, notification) =>
         for {
@@ -58,7 +61,8 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     }
   }
 
-  private def getBody(messageString: String)(implicit decoder: Decoder[T]): Future[T] =
+  private def getBody(messageString: String)(
+    implicit decoder: Decoder[T]): Future[T] =
     for {
       notification <- Future.fromTry(
         fromJson[MessageNotification](messageString))
