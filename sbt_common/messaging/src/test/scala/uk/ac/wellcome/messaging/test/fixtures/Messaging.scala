@@ -187,9 +187,9 @@ trait Messaging
       toJson(obj).get
     )
 
-    sendNotificationToSQS[MessageNotification](
+    sendMessage[MessageNotification](
       queue = queue,
-      message = RemoteNotification(location)
+      obj = RemoteNotification(location)
     )
   }
 }
