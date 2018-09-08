@@ -177,11 +177,11 @@ trait SQS extends Matchers with Logging {
 
   def sendNotificationToSQS[T](queue: Queue, message: T)(
     implicit encoder: Encoder[T]): SendMessageResult =
-    sendNotificationToSQS(queue = queue, body = toJson(message).get)
+    sendNotificationToSQS(queue = queue, body = toJson[T](message).get)
 
   def sendMessage[T](queue: Queue, obj: T)(
     implicit encoder: Encoder[T]): SendMessageResult =
-    sendMessage(queue = queue, body = toJson(obj).get)
+    sendMessage(queue = queue, body = toJson[T](obj).get)
 
   def sendMessage(queue: Queue, body: String): SendMessageResult =
     sqsClient.sendMessage(queue.url, body)
