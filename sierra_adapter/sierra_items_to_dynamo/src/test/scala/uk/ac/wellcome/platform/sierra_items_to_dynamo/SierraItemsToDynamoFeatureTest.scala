@@ -32,7 +32,7 @@ class SierraItemsToDynamoFeatureTest
                 bibIds = List(createSierraBibNumber)
               )
 
-              sendNotificationToSQS(
+              sendMessage(
                 queue = queue,
                 message = itemRecord
               )
