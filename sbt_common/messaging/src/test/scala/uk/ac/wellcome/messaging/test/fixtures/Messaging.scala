@@ -159,7 +159,7 @@ trait Messaging
           fromJson[T](jsonString).get
         case _ =>
           throw new RuntimeException(
-            s"Unrecognised message: $snsMessage"
+            s"Unrecognised message: ${messageInfo.message}"
           )
       }
     }.toList
