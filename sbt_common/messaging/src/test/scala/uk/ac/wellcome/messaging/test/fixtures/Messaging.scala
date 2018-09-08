@@ -148,8 +148,8 @@ trait Messaging
     * to objects in S3, return the unpacked objects.
     */
   def getMessages[T](topic: Topic)(implicit decoder: Decoder[T]): List[T] =
-    listMessagesReceivedFromSNS(topic).map { snsMessage =>
-      fromJson[MessageNotification](snsMessage.message) match {
+    listMessagesReceivedFromSNS(topic).map { messageInfo =>
+      fromJson[MessageNotification](messageInfo.message) match {
         case Success(RemoteNotification(location)) =>
           getObjectFromS3[T](
             bucket = Bucket(location.namespace),
