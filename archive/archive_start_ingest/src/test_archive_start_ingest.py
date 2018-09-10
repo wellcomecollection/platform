@@ -5,7 +5,7 @@ from uuid import UUID
 
 import pytest
 
-import archive_start_ingest as archive_ingest
+import archive_start_ingest as start_ingest
 
 
 TABLE_NAME = 'archive-storage-progress-table'
@@ -14,7 +14,7 @@ TABLE_NAME = 'archive-storage-progress-table'
 def test_post_sends_location_to_sns(sns_client, topic_arn):
     request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip')
 
-    response = archive_ingest.main(event=request, sns_client=sns_client)
+    response = start_ingest.main(event=request, sns_client=sns_client)
 
     id = str(UUID(response['id']))
     assert id
@@ -36,7 +36,7 @@ def test_sends_request_to_sns_with_callback(sns_client, topic_arn):
     request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip',
                              callback_url='https://workflow.wellcomecollection.org/callback?id=b1234567')
 
-    response = archive_ingest.main(event=request, sns_client=sns_client)
+    response = start_ingest.main(event=request, sns_client=sns_client)
 
     actual_id = str(UUID(response['id']))
     assert actual_id
@@ -57,7 +57,7 @@ def test_invalid_url_fails(sns_client):
     request = ingest_request('invalidUrl')
 
     with pytest.raises(ValueError, match="\[BadRequest\] Unrecognised url scheme: invalid"):
-        archive_ingest.main(event=request, sns_client=sns_client)
+        start_ingest.main(event=request, sns_client=sns_client)
 
     assert len(sns_client.list_messages()) == 0
 
@@ -67,7 +67,7 @@ def test_missing_url_fails(sns_client):
 
     with pytest.raises(KeyError,
                        match="\[BadRequest\] Invalid request missing 'uploadUrl' in {'unknownKey': 'aValue'}"):
-        archive_ingest.main(event=request, sns_client=sns_client)
+        start_ingest.main(event=request, sns_client=sns_client)
 
     assert len(sns_client.list_messages()) == 0
 
@@ -76,7 +76,7 @@ def test_invalid_json_fails(sns_client):
     request = {"body": "not_json"}
 
     with pytest.raises(TypeError, match="\[BadRequest\] Invalid request not json: not_json"):
-        archive_ingest.main(event=request, sns_client=sns_client)
+        start_ingest.main(event=request, sns_client=sns_client)
 
     assert len(sns_client.list_messages()) == 0
 
