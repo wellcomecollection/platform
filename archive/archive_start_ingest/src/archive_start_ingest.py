@@ -1,6 +1,27 @@
 # -*- encoding: utf-8 -*-
 """
-Receives a message to ingest a bag giving the URL and publishes the archive event to an SNS topic.
+Receives a POST request to ingest a bag giving the URL and publishes the
+archive event to an SNS topic.
+
+Quoting from RFC 002 at commit ea310c1 on master:
+
+    POST /ingests
+    Content-Type: application/json
+
+    {
+      "type": "Ingest",
+      "ingestType": {
+        "id": "create",
+        "type": "IngestType"
+      },
+      "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+      "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+    }
+
+    Response:
+
+    202 ACCEPTED
+
 """
 
 import os
