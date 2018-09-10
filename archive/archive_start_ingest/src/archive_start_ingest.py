@@ -55,19 +55,6 @@ def post_ingest_request(event, sns_client):
     }
 
 
-def get_ingest_status(event, dynamodb_resource):
-    dynamodb_resource = dynamodb_resource or boto3.resource('dynamodb')
-    table_name = os.environ['TABLE_NAME']
-    id = event['id']
-
-    table = dynamodb_resource.Table(table_name)
-
-    item = table.get_item(
-        Key={'id': id}
-    )
-    return item['Item']
-
-
 def archive_bag_message(archive_request_id, bag_url, callback_url):
     """
     Generates bag archive messages.
@@ -95,7 +82,7 @@ def join_url(path_segments):
 
 
 @log_on_error
-def main(event, context=None, dynamodb_resource=None, sns_client=None):
+def main(event, context=None, sns_client=None):
     logger.debug('received %r', event)
 
     request_method = event['request_method']
@@ -104,7 +91,4 @@ def main(event, context=None, dynamodb_resource=None, sns_client=None):
              'Expected request_method=POST, got %r' % request_method
          )
 
-    if request_method.upper() == 'POST':
-        return post_ingest_request(event, sns_client)
-    elif request_method.upper() == 'GET':
-        return get_ingest_status(event, dynamodb_resource)
+    return post_ingest_request(event, sns_client)

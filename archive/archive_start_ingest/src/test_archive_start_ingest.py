@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-import os
 from uuid import UUID
 
 import pytest
@@ -107,38 +106,3 @@ def ingest_request(upload_url, callback_url=None):
         'request_method': 'POST',
         'path': '/ingests/'
     }
-
-
-@pytest.yield_fixture(autouse=True)
-def run_around_tests(dynamodb_client):
-    os.environ['TABLE_NAME'] = TABLE_NAME
-
-    create_table(dynamodb_client, TABLE_NAME)
-    yield
-    dynamodb_client.delete_table(TableName=TABLE_NAME)
-
-
-def create_table(dynamodb_client, table_name):
-    try:
-        dynamodb_client.create_table(
-            TableName=table_name,
-            KeySchema=[
-                {
-                    'AttributeName': 'id',
-                    'KeyType': 'HASH'
-                }
-            ],
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'id',
-                    'AttributeType': 'S'
-                }
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            }
-        )
-        dynamodb_client.get_waiter('table_exists').wait(TableName=table_name)
-    except dynamodb_client.exceptions.ResourceInUseException:
-        pass
