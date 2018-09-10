@@ -17,9 +17,7 @@ daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 
-def post_ingest_request(event, sns_client):
-    topic_arn = os.environ['TOPIC_ARN']
-
+def post_ingest_request(event, sns_client, topic_arn):
     request = event['body']
     path = event.get('path', '')
 
@@ -38,8 +36,6 @@ def post_ingest_request(event, sns_client):
     logger.debug(f"sns-message: {message}")
 
     topic_name = topic_arn.split(":")[-1]
-
-    sns_client = sns_client or boto3.client('sns')
 
     publish_sns_message(
         sns_client=sns_client,
@@ -91,4 +87,11 @@ def main(event, context=None, sns_client=None):
             'Expected request_method=POST, got %r' % request_method
         )
 
-    return post_ingest_request(event, sns_client)
+    topic_arn = os.environ['TOPIC_ARN']
+    sns_client = sns_client or boto3.client('sns')
+
+    return post_ingest_request(
+        event,
+        sns_client=sns_client,
+        topic_arn=topic_arn
+    )
