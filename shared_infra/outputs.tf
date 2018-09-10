@@ -65,3 +65,7 @@ output "catalogue_ssh_controlled_ingress_sg" {
 output "infra_bucket_arn" {
   value = "${aws_s3_bucket.platform_infra.arn}"
 }
+
+output "infra_bucket" {
+  value = "${var.infra_bucket}"
+}
