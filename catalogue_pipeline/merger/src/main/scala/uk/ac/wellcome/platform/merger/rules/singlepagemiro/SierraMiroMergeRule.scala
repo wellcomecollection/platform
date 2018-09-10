@@ -19,26 +19,31 @@ import uk.ac.wellcome.models.work.internal._
   */
 object SierraMiroMergeRule extends SierraMiroMerger with SierraMiroPartitioner {
   def mergeAndRedirectWork(works: Seq[BaseWork]): Seq[BaseWork] = {
-    partitionWorks(works).map {
-      case Partition(sierraWork, miroWork, otherWorks) =>
-        val maybeResult = mergeAndRedirectWork(
-          sierraWork = sierraWork,
-          miroWork = miroWork
-        )
-        maybeResult match {
-          case Some(result) =>
-            result ++ otherWorks
-          case _ => works
-        }
-    }.getOrElse(works)
+    partitionWorks(works)
+      .map {
+        case Partition(sierraWork, miroWork, otherWorks) =>
+          val maybeResult = mergeAndRedirectWork(
+            sierraWork = sierraWork,
+            miroWork = miroWork
+          )
+          maybeResult match {
+            case Some(result) =>
+              result ++ otherWorks
+            case _ => works
+          }
+      }
+      .getOrElse(works)
   }
 }
 
 trait SierraMiroMerger extends Logging {
-  def mergeAndRedirectWork(sierraWork: UnidentifiedWork,
-                           miroWork: UnidentifiedWork): Option[List[BaseWork]] = {
+  def mergeAndRedirectWork(
+    sierraWork: UnidentifiedWork,
+    miroWork: UnidentifiedWork): Option[List[BaseWork]] = {
     (sierraWork.items, miroWork.items) match {
-      case (List(sierraItem: Identifiable[Item]), List(miroItem: Unidentifiable[Item])) => {
+      case (
+          List(sierraItem: Identifiable[Item]),
+          List(miroItem: Unidentifiable[Item])) => {
 
         val mergedWork = sierraWork.copy(
           otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers,
@@ -68,4 +73,3 @@ trait SierraMiroMerger extends Logging {
     }
   }
 }
-

@@ -5,10 +5,15 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.merger.rules.singlepagemiro.SierraMiroMergeRule.mergeAndRedirectWork
 
-class SierraMiroMergeRuleTest extends FunSpec with Matchers with WorksGenerators {
+class SierraMiroMergeRuleTest
+    extends FunSpec
+    with Matchers
+    with WorksGenerators {
 
   it("merges a single-page miro work into a Sierra work") {
-    val sierraWork =  createSierraWorkWith(items= List(createIdentifiableItemWith(locations = List(createPhysicalLocation))))
+    val sierraWork = createSierraWorkWith(
+      items = List(
+        createIdentifiableItemWith(locations = List(createPhysicalLocation))))
     val miroWork = createMiroWork
 
     println(miroWork.items)
@@ -22,14 +27,15 @@ class SierraMiroMergeRuleTest extends FunSpec with Matchers with WorksGenerators
 
     val expectedMergedWork = sierraWork.copy(
       otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers,
-      items = List(sierraWork.items.head
-        .asInstanceOf[Identifiable[Item]]
-        .copy(
-          agent = sierraWork.items.head.agent.copy(
-            locations = sierraWork.items.head.agent.locations ++
-              miroWork.items.head.agent.locations
-          )
-        ))
+      items = List(
+        sierraWork.items.head
+          .asInstanceOf[Identifiable[Item]]
+          .copy(
+            agent = sierraWork.items.head.agent.copy(
+              locations = sierraWork.items.head.agent.locations ++
+                miroWork.items.head.agent.locations
+            )
+          ))
     )
 
     val expectedRedirectedWork = UnidentifiedRedirectedWork(

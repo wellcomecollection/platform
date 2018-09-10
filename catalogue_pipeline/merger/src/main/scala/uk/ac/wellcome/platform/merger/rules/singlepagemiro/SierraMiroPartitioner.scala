@@ -1,9 +1,15 @@
 package uk.ac.wellcome.platform.merger.rules.singlepagemiro
 
-import uk.ac.wellcome.models.work.internal.{BaseWork, IdentifierType, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  BaseWork,
+  IdentifierType,
+  UnidentifiedWork
+}
 
 trait SierraMiroPartitioner {
-  case class Partition(sierraWork: UnidentifiedWork, miroWork: UnidentifiedWork, otherWorks: Seq[BaseWork])
+  case class Partition(sierraWork: UnidentifiedWork,
+                       miroWork: UnidentifiedWork,
+                       otherWorks: Seq[BaseWork])
 
   private object workType extends Enumeration {
     val SierraWork, MiroWork, OtherWork = Value
@@ -23,7 +29,9 @@ trait SierraMiroPartitioner {
     val otherWorks = groupedWorks.get(workType.OtherWork).toList.flatten
 
     (sierraWorks, miroWorks) match {
-      case (List(sierraWork: UnidentifiedWork), List(miroWork: UnidentifiedWork)) =>
+      case (
+          List(sierraWork: UnidentifiedWork),
+          List(miroWork: UnidentifiedWork)) =>
         Some(Partition(sierraWork, miroWork, otherWorks))
       case _ => None
     }
@@ -34,6 +42,5 @@ trait SierraMiroPartitioner {
       "sierra-system-number")
 
   private def isMiroWork(work: UnidentifiedWork): Boolean =
-    work.sourceIdentifier.identifierType == IdentifierType(
-      "miro-image-number")
+    work.sourceIdentifier.identifierType == IdentifierType("miro-image-number")
 }

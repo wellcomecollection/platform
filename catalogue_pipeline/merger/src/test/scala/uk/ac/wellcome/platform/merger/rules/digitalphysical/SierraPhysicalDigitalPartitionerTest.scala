@@ -3,7 +3,9 @@ package uk.ac.wellcome.platform.merger.rules.digitalphysical
 import org.scalatest.FunSpec
 import uk.ac.wellcome.platform.merger.MergerTestUtils
 
-class SierraPhysicalDigitalPartitionerTest extends FunSpec with MergerTestUtils {
+class SierraPhysicalDigitalPartitionerTest
+    extends FunSpec
+    with MergerTestUtils {
 
   val partitioner = new SierraPhysicalDigitalPartitioner {}
 
@@ -14,7 +16,8 @@ class SierraPhysicalDigitalPartitionerTest extends FunSpec with MergerTestUtils 
 
       val result = partitioner.partitionWorks(Seq(physicalWork, digitalWork))
 
-      result shouldBe Some(partitioner.Partition(physicalWork, digitalWork, Nil))
+      result shouldBe Some(
+        partitioner.Partition(physicalWork, digitalWork, Nil))
     }
 
     it("extracts a physical, digital and other works") {
@@ -22,9 +25,11 @@ class SierraPhysicalDigitalPartitionerTest extends FunSpec with MergerTestUtils 
       val digitalWork = createDigitalSierraWork
       val otherWorks = createUnidentifiedWorks(4)
 
-      val result = partitioner.partitionWorks(Seq(physicalWork, digitalWork) ++ otherWorks)
+      val result =
+        partitioner.partitionWorks(Seq(physicalWork, digitalWork) ++ otherWorks)
 
-      result shouldBe Some(partitioner.Partition(physicalWork, digitalWork, otherWorks))
+      result shouldBe Some(
+        partitioner.Partition(physicalWork, digitalWork, otherWorks))
     }
 
     it("ignores a single physical work") {

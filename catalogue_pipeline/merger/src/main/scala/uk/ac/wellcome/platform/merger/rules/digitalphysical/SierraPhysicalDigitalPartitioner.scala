@@ -1,9 +1,15 @@
 package uk.ac.wellcome.platform.merger.rules.digitalphysical
 
-import uk.ac.wellcome.models.work.internal.{BaseWork, IdentifierType, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  BaseWork,
+  IdentifierType,
+  UnidentifiedWork
+}
 
 trait SierraPhysicalDigitalPartitioner {
-  case class Partition(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork, otherWorks: Seq[BaseWork])
+  case class Partition(physicalWork: UnidentifiedWork,
+                       digitalWork: UnidentifiedWork,
+                       otherWorks: Seq[BaseWork])
 
   private object workType extends Enumeration {
     val SierraDigitalWork, SierraPhysicalWork, OtherWork = Value
@@ -11,9 +17,11 @@ trait SierraPhysicalDigitalPartitioner {
 
   def partitionWorks(works: Seq[BaseWork]): Option[Partition] = {
     val groupedWorks = works.groupBy {
-      case work: UnidentifiedWork if isSierraPhysicalWork(work) => workType.SierraPhysicalWork
-      case work: UnidentifiedWork if isSierraDigitalWork(work)  => workType.SierraDigitalWork
-      case _                                  => workType.OtherWork
+      case work: UnidentifiedWork if isSierraPhysicalWork(work) =>
+        workType.SierraPhysicalWork
+      case work: UnidentifiedWork if isSierraDigitalWork(work) =>
+        workType.SierraDigitalWork
+      case _ => workType.OtherWork
     }
 
     val physicalWorks =
@@ -23,7 +31,9 @@ trait SierraPhysicalDigitalPartitioner {
     val otherWorks = groupedWorks.get(workType.OtherWork).toList.flatten
 
     (physicalWorks, digitalWorks) match {
-      case (List(physicalWork: UnidentifiedWork), List(digitalWork: UnidentifiedWork)) =>
+      case (
+          List(physicalWork: UnidentifiedWork),
+          List(digitalWork: UnidentifiedWork)) =>
         Some(Partition(physicalWork, digitalWork, otherWorks))
       case _ => None
     }

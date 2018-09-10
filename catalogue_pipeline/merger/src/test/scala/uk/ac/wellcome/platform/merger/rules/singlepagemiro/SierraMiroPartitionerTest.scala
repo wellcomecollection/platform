@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.merger.rules.singlepagemiro
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
-class SierraMiroPartitionerTest extends FunSpec with Matchers with WorksGenerators {
+class SierraMiroPartitionerTest
+    extends FunSpec
+    with Matchers
+    with WorksGenerators {
 
   val partitioner = new SierraMiroPartitioner {}
 
