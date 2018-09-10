@@ -55,3 +55,24 @@ module "lambda_archive_ingest" {
 
   log_retention_in_days = 30
 }
+
+module "lambda_archive_start_ingest" {
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v11.5.0"
+
+  name        = "lambda_archive_start_ingest"
+  description = "Receives POST messages that start the ingest process"
+  timeout     = 60
+  memory_size = 1024
+
+  environment_variables = {
+    TOPIC_ARN  = "${module.archivist_topic.arn}"
+    TABLE_NAME = "${aws_dynamodb_table.archive_progress_table.name}"
+    REGION     = "${var.aws_region}"
+  }
+
+  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+  s3_bucket       = "${var.infra_bucket}"
+  s3_key          = "lambdas/archive/archive_start_ingest.zip"
+
+  log_retention_in_days = 30
+}
