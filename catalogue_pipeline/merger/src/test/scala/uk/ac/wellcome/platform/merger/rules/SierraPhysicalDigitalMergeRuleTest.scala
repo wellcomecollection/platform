@@ -7,10 +7,12 @@ import uk.ac.wellcome.platform.merger.rules.SierraPhysicalDigitalMergeRule.merge
 
 class SierraPhysicalDigitalMergeRuleTest extends FunSpec with MergerTestUtils {
   val physicalWorkWithOneItem: UnidentifiedWork = createPhysicalWork
-  val digitalWorkWithOneItem: UnidentifiedWork = createDigitalWorkWith(otherIdentifiers = List(createSourceIdentifier))
+  val digitalWorkWithOneItem: UnidentifiedWork = createDigitalWorkWith(
+    otherIdentifiers = List(createSourceIdentifier))
 
   it("merges a physical and a digital work") {
-    val result = mergeAndRedirectWork(List(physicalWorkWithOneItem, digitalWorkWithOneItem))
+    val result = mergeAndRedirectWork(
+      List(physicalWorkWithOneItem, digitalWorkWithOneItem))
 
     val expectedLocations =
       physicalWorkWithOneItem.items.head.agent.locations ++
@@ -27,15 +29,15 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with MergerTestUtils {
     val expectedIdentifiers = physicalWorkWithOneItem.otherIdentifiers ++ digitalWorkWithOneItem.identifiers
 
     val expectedMergedWork = physicalWorkWithOneItem.copy(
-      otherIdentifiers =
-        expectedIdentifiers,
+      otherIdentifiers = expectedIdentifiers,
       items = List(expectedItem)
     )
 
     val expectedRedirectedWork = UnidentifiedRedirectedWork(
       sourceIdentifier = digitalWorkWithOneItem.sourceIdentifier,
       version = digitalWorkWithOneItem.version,
-      redirect = IdentifiableRedirect(physicalWorkWithOneItem.sourceIdentifier))
+      redirect = IdentifiableRedirect(physicalWorkWithOneItem.sourceIdentifier)
+    )
 
     result shouldBe List(expectedMergedWork, expectedRedirectedWork)
   }
@@ -44,7 +46,8 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with MergerTestUtils {
     val physicalWork = createPhysicalWork
     val digitalWork = createDigitalWork
 
-    val result = mergeAndRedirectWork(Seq(
+    val result = mergeAndRedirectWork(
+      Seq(
         physicalWork,
         digitalWork,
         createUnidentifiedWorkWith(
@@ -52,8 +55,7 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with MergerTestUtils {
             identifierType = "miro-image-number"
           )
         )
-      )
-    )
+      ))
 
     result.size shouldBe 3
     result.collect { case r: UnidentifiedRedirectedWork => r }.size shouldBe 1
@@ -93,7 +95,6 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with MergerTestUtils {
         expectedMergedWork,
         expectedRedirectedWork)
     }
-
 
     it("ignores a single physical work") {
       val works = Seq(createPhysicalWork)
@@ -153,7 +154,7 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with MergerTestUtils {
       mergeAndRedirectWork(works) shouldBe works
     }
   }
-  
+
   describe("returns works unchanged if item counts are wrong") {
     it("does not merge if physical work has 0 items") {
       val physicalWork = createUnidentifiedWorkWith(
@@ -197,5 +198,5 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with MergerTestUtils {
 
   private def createDigitalItem: Unidentifiable[Item] =
     createUnidentifiableItemWith(locations = List(createDigitalLocation))
-  
+
 }

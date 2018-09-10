@@ -21,12 +21,14 @@ object SierraPhysicalDigitalMergeRule extends Logging {
   def mergeAndRedirectWork(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
     val groupedWorks = works.groupBy {
       case work if isSierraPhysicalWork(work) => workType.SierraPhysicalWork
-      case work if isSierraDigitalWork(work) => workType.SierraDigitalWork
-      case _ => workType.OtherWork
+      case work if isSierraDigitalWork(work)  => workType.SierraDigitalWork
+      case _                                  => workType.OtherWork
     }
 
-    val physicalWorks = groupedWorks.get(workType.SierraPhysicalWork).toList.flatten
-    val digitalWorks = groupedWorks.get(workType.SierraDigitalWork).toList.flatten
+    val physicalWorks =
+      groupedWorks.get(workType.SierraPhysicalWork).toList.flatten
+    val digitalWorks =
+      groupedWorks.get(workType.SierraDigitalWork).toList.flatten
 
     (physicalWorks, digitalWorks) match {
       case (List(physicalWork), List(digitalWork)) =>
@@ -35,7 +37,8 @@ object SierraPhysicalDigitalMergeRule extends Logging {
           digitalWork = digitalWork
         )
         maybeResult match {
-          case Some(result) => result ++ groupedWorks.get(workType.OtherWork).toList.flatten
+          case Some(result) =>
+            result ++ groupedWorks.get(workType.OtherWork).toList.flatten
           case _ => works
         }
       case _ => works
@@ -84,23 +87,23 @@ object SierraPhysicalDigitalMergeRule extends Logging {
         None
     }
 
-    private def isSierraWork(work: UnidentifiedWork): Boolean =
+  private def isSierraWork(work: UnidentifiedWork): Boolean =
     work.sourceIdentifier.identifierType == IdentifierType(
       "sierra-system-number")
 
-    private def isDigitalWork(work: UnidentifiedWork): Boolean =
+  private def isDigitalWork(work: UnidentifiedWork): Boolean =
     work.workType match {
       case None    => false
       case Some(t) => t.id == "v" && t.label == "E-books"
     }
 
-    private def isSierraDigitalWork(work: UnidentifiedWork): Boolean =
+  private def isSierraDigitalWork(work: UnidentifiedWork): Boolean =
     isSierraWork(work) && isDigitalWork(work)
 
-    private def isSierraPhysicalWork(work: UnidentifiedWork): Boolean =
+  private def isSierraPhysicalWork(work: UnidentifiedWork): Boolean =
     isSierraWork(work) && !isDigitalWork(work)
 
-    private def describeWorkPair(physicalWork: UnidentifiedWork,
+  private def describeWorkPair(physicalWork: UnidentifiedWork,
                                digitalWork: UnidentifiedWork) =
     s"physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value})"
 
