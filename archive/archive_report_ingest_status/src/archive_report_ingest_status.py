@@ -14,16 +14,6 @@ daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 
-def get_ingest_status(event, dynamodb_resource, table_name):
-    guid = event['id']
-    table = dynamodb_resource.Table(table_name)
-
-    item = table.get_item(
-        Key={'id': guid}
-    )
-    return item['Item']
-
-
 @log_on_error
 def main(event, context=None, dynamodb_resource=None, sns_client=None):
     logger.debug('received %r', event)
@@ -37,4 +27,23 @@ def main(event, context=None, dynamodb_resource=None, sns_client=None):
             'Expected request_method=GET, got %r' % request_method
         )
 
-    return get_ingest_status(event, dynamodb_resource, table_name=table_name)
+    try:
+        guid = event['id']
+    except KeyError:
+        raise ValueError(
+            'Expected "id" in request, got %r' % event
+        )
+
+    table = dynamodb_resource.Table(table_name)
+    item = table.get_item(
+        Key={'id': guid}
+    )
+
+    # TODO: @@AWLC The correct response is surely a 404 if the item isn't
+    # found, but this will throw a KeyError.  How do we get a 404 to be
+    # emitted by API Gateway?
+    #
+    # Similarly above, the absence of an 'id' should be a 400, and doing
+    # something other than a GET should be a 405, not a 500.
+    #
+    return item['Item']

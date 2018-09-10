@@ -14,10 +14,14 @@ def table_name():
 @pytest.yield_fixture(autouse=True)
 def run_around_tests(dynamodb_client, table_name):
     os.environ.update({'TABLE_NAME': table_name})
-
     create_table(dynamodb_client, table_name)
     yield
     dynamodb_client.delete_table(TableName=table_name)
+
+    try:
+        del os.environ['TABLE_NAME']
+    except KeyError:
+        pass
 
 
 def create_table(dynamodb_client, table_name):
