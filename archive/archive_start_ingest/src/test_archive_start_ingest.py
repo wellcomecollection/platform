@@ -81,6 +81,15 @@ def test_invalid_json_fails(sns_client):
     assert len(sns_client.list_messages()) == 0
 
 
+def test_throws_valueerror_if_called_with_get_event():
+    event = {
+        'request_method': 'GET'
+    }
+
+    with pytest.raises(ValueError, match='Expected request_method=POST'):
+        start_ingest.main(event=event)
+
+
 def ingest_request(upload_url, callback_url=None):
     body = {
         'uploadUrl': upload_url
