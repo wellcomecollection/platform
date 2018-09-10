@@ -1,5 +1,5 @@
-package uk.ac.wellcome.platform.merger.pairwise_transforms
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+package uk.ac.wellcome.platform.merger.rules
+import uk.ac.wellcome.models.work.internal.{BaseWork, UnidentifiedWork}
 
 /** If we have a Miro work and a Sierra work with a single item,
   * the Sierra work replaces the Miro work (because this is metadata
@@ -15,9 +15,6 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
   *     from Miro.
   *
   */
-object MiroSierraWorkPair extends PairwiseMerger {
-  def mergeAndRedirectWork(
-    miroWork: UnidentifiedWork,
-    sierraWork: UnidentifiedWork): Option[PairwiseResult] =
-    None
+object MiroSierraMergeRule {
+  def mergeAndRedirectWork(works: List[BaseWork]): List[BaseWork] = ???
 }

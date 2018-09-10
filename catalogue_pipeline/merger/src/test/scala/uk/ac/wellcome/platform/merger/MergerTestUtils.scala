@@ -66,13 +66,15 @@ trait MergerTestUtils
 
   def createDigitalWorkWith(
     items: List[Unidentifiable[Item]] = List(
-      createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+      createUnidentifiableItemWith(locations = List(createDigitalLocation))),
+    otherIdentifiers: List[SourceIdentifier] = List.empty
   ): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
         createSourceIdentifierWith(identifierType = "sierra-system-number"),
       workType = Some(WorkType("v", "E-books")),
-      items = items
+      items = items,
+      otherIdentifiers = otherIdentifiers
     )
 
   def createDigitalWork: UnidentifiedWork = createDigitalWorkWith()
