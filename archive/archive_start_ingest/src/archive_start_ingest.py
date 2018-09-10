@@ -33,7 +33,7 @@ def post_ingest_request(event, sns_client, topic_arn):
     logger.debug('ingest_request_id: %r', ingest_request_id)
 
     message = archive_bag_message(ingest_request_id, upload_url, callback_url)
-    logger.debug(f"sns-message: {message}")
+    logger.debug("sns-message: %r", message)
 
     topic_name = topic_arn.split(":")[-1]
 
@@ -43,7 +43,7 @@ def post_ingest_request(event, sns_client, topic_arn):
         message=message,
         subject=f"source: archive_ingest ({topic_name})"
     )
-    logger.debug(f"published: {message} to {topic_arn}")
+    logger.debug("published: %r to %r", message, topic_arn)
 
     return {
         'id': ingest_request_id,
