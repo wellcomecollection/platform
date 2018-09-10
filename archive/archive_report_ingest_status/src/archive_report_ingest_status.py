@@ -98,6 +98,12 @@ def join_url(path_segments):
 def main(event, context=None, dynamodb_resource=None, sns_client=None):
     logger.debug('received %r', event)
 
+    request_method = event['request_method']
+    if request_method != 'GET':
+        raise ValueError(
+            'Expected request_method=GET, got %r' % request_method
+        )
+
     request_method = event.get('request_method', 'POST')
 
     if request_method.upper() == 'POST':

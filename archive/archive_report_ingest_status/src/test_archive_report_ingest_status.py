@@ -49,5 +49,5 @@ def test_fails_if_called_with_post_event():
         'request_method': 'POST'
     }
 
-    with pytest.raises(AssertionError, match='Expected request_method=GET'):
+    with pytest.raises(ValueError, match='Expected request_method=GET'):
         report_ingest_status.main(event=event)
