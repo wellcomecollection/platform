@@ -32,4 +32,15 @@ trait IdentifiersGenerators {
       value = value,
       ontologyType = ontologyType
     )
+
+  def createMiroSourceIdentifier = createMiroSourceIdentifierWith()
+
+  def createMiroSourceIdentifierWith(
+                                        value: String = randomAlphanumeric(length = 10),
+                                        ontologyType: String = "Work"): SourceIdentifier =
+    SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      value = value,
+      ontologyType = ontologyType
+    )
 }

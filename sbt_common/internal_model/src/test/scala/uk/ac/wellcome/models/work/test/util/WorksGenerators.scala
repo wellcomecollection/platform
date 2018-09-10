@@ -160,4 +160,36 @@ trait WorksGenerators extends ItemsGenerators {
     (1 to count).map { _ =>
       createIdentifiedWork
     }
+
+  def createSierraWorkWith(workType: Option[WorkType] = None,
+                           items: List[MaybeDisplayable[Item]] = List())
+  : UnidentifiedWork =
+    createUnidentifiedWorkWith(
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number"),
+      workType = workType,
+      otherIdentifiers = List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
+      items = items
+    )
+
+  def createSierraWork: UnidentifiedWork =
+    createSierraWorkWith()
+
+  def createPhysicalSierraWork: UnidentifiedWork =
+    createSierraWorkWith(items= List(
+      createIdentifiableItemWith(locations = List(createPhysicalLocation))))
+
+  def createDigitalSierraWork: UnidentifiedWork = createSierraWorkWith(
+    workType = Some(WorkType("v", "E-books")),
+    items = List(createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+  )
+
+  def createMiroWorkWith(): UnidentifiedWork =
+    createUnidentifiedWorkWith(
+      sourceIdentifier = createMiroSourceIdentifier,
+      items = List(createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+    )
+
+  def createMiroWork: UnidentifiedWork =
+    createMiroWorkWith()
 }

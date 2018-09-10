@@ -9,8 +9,8 @@ class MergerTest extends FunSpec with MergerTestUtils {
   private val merger = new Merger()
 
   it("merges a physical and digital work") {
-    val physicalWork = createPhysicalWork
-    val digitalWork = createDigitalWork
+    val physicalWork = createPhysicalSierraWork
+    val digitalWork = createDigitalSierraWork
 
     val result = merger.merge(
       works = Seq(physicalWork, digitalWork)
@@ -42,10 +42,4 @@ class MergerTest extends FunSpec with MergerTestUtils {
       expectedMergedWork,
       expectedRedirectedWork)
   }
-
-  private def createPhysicalItem: Identifiable[Item] =
-    createIdentifiableItemWith(locations = List(createPhysicalLocation))
-
-  private def createDigitalItem: Unidentifiable[Item] =
-    createUnidentifiableItemWith(locations = List(createDigitalLocation))
 }

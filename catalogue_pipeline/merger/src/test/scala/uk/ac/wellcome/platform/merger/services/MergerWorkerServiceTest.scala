@@ -176,8 +176,8 @@ class MergerWorkerServiceTest
   }
 
   it("sends a merged work and a redirected work to SQS") {
-    val physicalWork = createPhysicalWork
-    val digitalWork = createDigitalWork
+    val physicalWork = createPhysicalSierraWork
+    val digitalWork = createDigitalSierraWork
 
     val works = List(physicalWork, digitalWork)
 
@@ -219,8 +219,8 @@ class MergerWorkerServiceTest
   }
 
   it("splits the received works into multiple merged works if required") {
-    val workPair1 = List(createPhysicalWork, createDigitalWork)
-    val workPair2 = List(createPhysicalWork, createDigitalWork)
+    val workPair1 = List(createPhysicalSierraWork, createDigitalSierraWork)
+    val workPair2 = List(createPhysicalSierraWork, createDigitalSierraWork)
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>

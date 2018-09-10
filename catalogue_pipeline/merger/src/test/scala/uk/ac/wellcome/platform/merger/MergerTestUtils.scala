@@ -63,34 +63,4 @@ trait MergerTestUtils
     entries.map { work =>
       storeInVHS(vhs = vhs, work = work)
     }
-
-  def createDigitalWorkWith(
-    items: List[Unidentifiable[Item]] = List(
-      createUnidentifiableItemWith(locations = List(createDigitalLocation))),
-    otherIdentifiers: List[SourceIdentifier] = List.empty
-  ): UnidentifiedWork =
-    createUnidentifiedWorkWith(
-      sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number"),
-      workType = Some(WorkType("v", "E-books")),
-      items = items,
-      otherIdentifiers = otherIdentifiers
-    )
-
-  def createDigitalWork: UnidentifiedWork = createDigitalWorkWith()
-
-  def createPhysicalWorkWith(
-    items: List[Identifiable[Item]] = List(
-      createIdentifiableItemWith(locations = List(createPhysicalLocation))))
-    : UnidentifiedWork =
-    createUnidentifiedWorkWith(
-      sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number"),
-      otherIdentifiers =
-        List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
-      items = items
-    )
-
-  def createPhysicalWork: UnidentifiedWork =
-    createPhysicalWorkWith()
 }

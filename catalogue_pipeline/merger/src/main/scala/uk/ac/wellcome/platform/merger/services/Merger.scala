@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.merger.services
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.merger.rules.SierraPhysicalDigitalMergeRule
+import uk.ac.wellcome.platform.merger.rules.digitalphysical.SierraPhysicalDigitalMergeRule
 
 trait MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork]
