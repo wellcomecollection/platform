@@ -87,8 +87,8 @@ def main(event, context=None, sns_client=None):
 
     request_method = event['request_method']
     if request_method != 'POST':
-         raise ValueError(
-             'Expected request_method=POST, got %r' % request_method
-         )
+        raise ValueError(
+            'Expected request_method=POST, got %r' % request_method
+        )
 
     return post_ingest_request(event, sns_client)
