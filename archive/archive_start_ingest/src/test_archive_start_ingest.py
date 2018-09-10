@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+import os
 from uuid import UUID
 
 import pytest
@@ -52,7 +53,7 @@ def test_sends_request_to_sns_with_callback(sns_client, topic_arn):
     }
 
 
-def test_invalid_url_fails(sns_client):
+def test_invalid_url_fails(sns_client, topic_arn):
     request = ingest_request('invalidUrl')
 
     with pytest.raises(ValueError, match="\[BadRequest\] Unrecognised url scheme: invalid"):
@@ -61,7 +62,7 @@ def test_invalid_url_fails(sns_client):
     assert len(sns_client.list_messages()) == 0
 
 
-def test_missing_url_fails(sns_client):
+def test_missing_url_fails(sns_client, topic_arn):
     request = {
         'body': {'unknownKey': 'aValue'},
         'request_method': 'POST'
@@ -74,7 +75,7 @@ def test_missing_url_fails(sns_client):
     assert len(sns_client.list_messages()) == 0
 
 
-def test_invalid_json_fails(sns_client):
+def test_invalid_json_fails(sns_client, topic_arn):
     request = {
         'body': 'not_json',
         'request_method': 'POST'
@@ -92,6 +93,15 @@ def test_throws_valueerror_if_called_with_get_event():
     }
 
     with pytest.raises(ValueError, match='Expected request_method=POST'):
+        start_ingest.main(event=event)
+
+
+def test_throws_keyerror_if_no_topic_arn_set():
+    assert 'TOPIC_ARN' not in os.environ
+
+    event = ingest_request(upload_url='s3://bukkit/example.zip')
+
+    with pytest.raises(KeyError, match='TOPIC_ARN'):
         start_ingest.main(event=event)
 
 
