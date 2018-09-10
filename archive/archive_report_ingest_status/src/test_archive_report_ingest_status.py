@@ -2,6 +2,8 @@
 
 import uuid
 
+import pytest
+
 import archive_report_ingest_status as report_ingest_status
 
 
@@ -40,3 +42,12 @@ def test_get_includes_other_dynamodb_metadata(dynamodb_resource, table_name):
         dynamodb_resource=dynamodb_resource
     )
     assert response == item
+
+
+def test_fails_if_called_with_post_event():
+    event = {
+        'request_method': 'POST'
+    }
+
+    with pytest.raises(AssertionError, match='Expected request_method=GET'):
+        report_ingest_status.main(event=event)
