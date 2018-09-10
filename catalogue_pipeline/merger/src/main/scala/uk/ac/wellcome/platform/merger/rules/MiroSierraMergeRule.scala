@@ -1,5 +1,5 @@
 package uk.ac.wellcome.platform.merger.rules
-import uk.ac.wellcome.models.work.internal.{BaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.BaseWork
 
 /** If we have a Miro work and a Sierra work with a single item,
   * the Sierra work replaces the Miro work (because this is metadata
