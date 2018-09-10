@@ -12,16 +12,35 @@ import uk.ac.wellcome.models.work.internal._
   * work, and redirect the digital work to the physical work.
   *
   */
-object SierraPhysicalDigitalMergeRule extends Logging {
+object SierraPhysicalDigitalMergeRule extends Logging with SierraPhysicalDigitalMerger with SierraPhysicalDigitalPartitioner {
+
+  def mergeAndRedirectWork(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
+    partitionWorks(works).map {
+      case WorkPartition(physicalWork, digitalWork, otherWorks) =>
+        val maybeResult = mergeAndRedirectWork(
+          physicalWork = physicalWork,
+          digitalWork = digitalWork
+        )
+        maybeResult match {
+          case Some(result) =>
+            result ++ otherWorks
+          case _ => works
+        }
+    }.getOrElse(works)
+  }
+}
+
+trait SierraPhysicalDigitalPartitioner {
+  case class WorkPartition(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork, otherWorks: Seq[BaseWork])
 
   private object workType extends Enumeration {
     val SierraDigitalWork, SierraPhysicalWork, OtherWork = Value
   }
 
-  def mergeAndRedirectWork(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
+  def partitionWorks(works: Seq[BaseWork]): Option[WorkPartition] = {
     val groupedWorks = works.groupBy {
-      case work if isSierraPhysicalWork(work) => workType.SierraPhysicalWork
-      case work if isSierraDigitalWork(work)  => workType.SierraDigitalWork
+      case work: UnidentifiedWork if isSierraPhysicalWork(work) => workType.SierraPhysicalWork
+      case work: UnidentifiedWork if isSierraDigitalWork(work)  => workType.SierraDigitalWork
       case _                                  => workType.OtherWork
     }
 
@@ -29,29 +48,40 @@ object SierraPhysicalDigitalMergeRule extends Logging {
       groupedWorks.get(workType.SierraPhysicalWork).toList.flatten
     val digitalWorks =
       groupedWorks.get(workType.SierraDigitalWork).toList.flatten
+    val otherWorks = groupedWorks.get(workType.OtherWork).toList.flatten
 
     (physicalWorks, digitalWorks) match {
-      case (List(physicalWork), List(digitalWork)) =>
-        val maybeResult = mergeAndRedirectWork(
-          physicalWork = physicalWork,
-          digitalWork = digitalWork
-        )
-        maybeResult match {
-          case Some(result) =>
-            result ++ groupedWorks.get(workType.OtherWork).toList.flatten
-          case _ => works
-        }
-      case _ => works
+      case (List(physicalWork: UnidentifiedWork), List(digitalWork: UnidentifiedWork)) =>
+        Some(WorkPartition(physicalWork, digitalWork, otherWorks))
+      case _ => None
     }
   }
 
-  private def mergeAndRedirectWork(
-    physicalWork: UnidentifiedWork,
-    digitalWork: UnidentifiedWork): Option[List[BaseWork]] =
+  private def isSierraWork(work: UnidentifiedWork): Boolean =
+    work.sourceIdentifier.identifierType == IdentifierType(
+      "sierra-system-number")
+
+  private def isDigitalWork(work: UnidentifiedWork): Boolean =
+    work.workType match {
+      case None    => false
+      case Some(t) => t.id == "v" && t.label == "E-books"
+    }
+
+  private def isSierraDigitalWork(work: UnidentifiedWork): Boolean =
+    isSierraWork(work) && isDigitalWork(work)
+
+  private def isSierraPhysicalWork(work: UnidentifiedWork): Boolean =
+    isSierraWork(work) && !isDigitalWork(work)
+}
+
+trait SierraPhysicalDigitalMerger extends Logging {
+  def mergeAndRedirectWork(
+                                    physicalWork: UnidentifiedWork,
+                                    digitalWork: UnidentifiedWork): Option[List[BaseWork]] =
     (physicalWork.items, digitalWork.items) match {
       case (
-          List(physicalItem: Identifiable[Item]),
-          List(digitalItem: Unidentifiable[Item])) => {
+        List(physicalItem: Identifiable[Item]),
+        List(digitalItem: Unidentifiable[Item])) => {
         info(
           s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
 
@@ -87,22 +117,6 @@ object SierraPhysicalDigitalMergeRule extends Logging {
         None
     }
 
-  private def isSierraWork(work: UnidentifiedWork): Boolean =
-    work.sourceIdentifier.identifierType == IdentifierType(
-      "sierra-system-number")
-
-  private def isDigitalWork(work: UnidentifiedWork): Boolean =
-    work.workType match {
-      case None    => false
-      case Some(t) => t.id == "v" && t.label == "E-books"
-    }
-
-  private def isSierraDigitalWork(work: UnidentifiedWork): Boolean =
-    isSierraWork(work) && isDigitalWork(work)
-
-  private def isSierraPhysicalWork(work: UnidentifiedWork): Boolean =
-    isSierraWork(work) && !isDigitalWork(work)
-
   private def describeWorkPair(physicalWork: UnidentifiedWork,
                                digitalWork: UnidentifiedWork) =
     s"physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value})"
@@ -111,4 +125,5 @@ object SierraPhysicalDigitalMergeRule extends Logging {
                                         digitalWork: UnidentifiedWork) =
     s"physical (id=${physicalWork.sourceIdentifier.value}, itemsCount=${physicalWork.items.size}) and " +
       s"digital (id=${digitalWork.sourceIdentifier.value}, itemsCount=${digitalWork.items.size}) work"
+
 }
