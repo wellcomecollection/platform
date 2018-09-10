@@ -34,7 +34,7 @@ class SierraItemsToDynamoFeatureTest
 
               sendNotificationToSQS(
                 queue = queue,
-                obj = itemRecord
+                message = itemRecord
               )
 
               eventually {
