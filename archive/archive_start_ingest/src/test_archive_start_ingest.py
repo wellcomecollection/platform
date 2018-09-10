@@ -32,22 +32,6 @@ def test_post_sends_location_to_sns(sns_client, topic_arn):
     }
 
 
-def test_get_returns_status(dynamodb_resource):
-    os.environ['TABLE_NAME'] = TABLE_NAME
-
-    id = '245e3de7-5453-4ce1-a3ce-bd111753b1cf'
-    table = dynamodb_resource.Table(TABLE_NAME)
-    table.put_item(Item={'id': id, 'a': 'b'})
-
-    request = {
-        'request_method': 'GET',
-        'id': id
-    }
-
-    response = archive_ingest.main(event=request, dynamodb_resource=dynamodb_resource)
-    assert response['a'] == 'b'
-
-
 def test_sends_request_to_sns_with_callback(sns_client, topic_arn):
     request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip',
                              callback_url='https://workflow.wellcomecollection.org/callback?id=b1234567')
