@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.recorder.services
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.{MessageNotification, MessageStream, RemoteNotification}
+import uk.ac.wellcome.messaging.message.{
+  MessageNotification,
+  MessageStream,
+  RemoteNotification
+}
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore

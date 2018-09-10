@@ -184,9 +184,12 @@ trait SQS extends Matchers with Logging {
     sendMessageToSqsClient(queue = queue, body = toJson[T](obj).get)
 
   def sendInvalidJSONto(queue: Queue): SendMessageResult =
-    sendMessageToSqsClient(queue = queue, body = Random.alphanumeric take 50 mkString)
+    sendMessageToSqsClient(
+      queue = queue,
+      body = Random.alphanumeric take 50 mkString)
 
-  private def sendMessageToSqsClient(queue: Queue, body: String): SendMessageResult =
+  private def sendMessageToSqsClient(queue: Queue,
+                                     body: String): SendMessageResult =
     sqsClient.sendMessage(queue.url, body)
 
   def noMessagesAreWaitingIn(queue: Queue) = {
