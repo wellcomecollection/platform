@@ -1,6 +1,36 @@
 # -*- encoding: utf-8 -*-
 """
-Receives a message to ingest a bag giving the URL and publishes the archive event to an SNS topic.
+This Lambda receives a GET request to return the state of an ingest.
+
+Quoting from RFC 002 at commit ea310c1 on master:
+
+    Request:
+
+    GET /ingests/xx-xx-xx-xx
+
+    Response:
+
+    {
+      "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+      "id": "{guid}",
+      "type": "Ingest",
+      "ingestType": {
+        "id": "create",
+        "type": "IngestType"
+      },
+      "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+      "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+      "bag": {
+        "id": "{id}",
+        "type": "Bag"
+      },
+      "result": {
+        "id": "success",
+        "type": "IngestResult"
+      },
+      "events": [ ... ]
+    }
+
 """
 
 import os
