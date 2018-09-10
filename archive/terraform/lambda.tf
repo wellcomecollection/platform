@@ -35,11 +35,11 @@ resource "aws_lambda_permission" "archive_ingest_apigw" {
   source_arn    = "${aws_api_gateway_rest_api.archive_asset_lookup.execution_arn}/prod/*/*"
 }
 
-module "lambda_archive_ingest" {
+module "lambda_archive_report_ingest_status" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v11.5.0"
 
-  name        = "archive_ingest"
-  description = "Receive ingest requests"
+  name        = "archive_report_ingest_status"
+  description = "Report the status of ingest requests"
   timeout     = 60
   memory_size = 1024
 
@@ -51,7 +51,7 @@ module "lambda_archive_ingest" {
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
   s3_bucket       = "${var.infra_bucket}"
-  s3_key          = "lambdas/archive/archive_ingest.zip"
+  s3_key          = "lambdas/archive/archive_report_ingest_status.zip"
 
   log_retention_in_days = 30
 }

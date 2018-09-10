@@ -73,7 +73,7 @@
           }
         },
         "x-amazon-apigateway-integration": {
-          "uri": "${ingest_lambda_invoke_arn}",
+          "uri": "${report_ingest_status_lambda_invoke_arn}",
           "requestTemplates": {
             "application/json": "{\"body\": $input.json('$'), \"path\":\"$context.path\"}"
           },
@@ -132,7 +132,7 @@
           }
         },
         "x-amazon-apigateway-integration": {
-          "uri": "${start_ingest_lambda_arn}",
+          "uri": "${start_ingest_lambda_invoke_arn}",
           "responses": {
             "default": {
               "statusCode": "200"
