@@ -99,7 +99,7 @@ class SQSStreamTest
       case (messageStream, QueuePair(queue, dlq), metricsSender) =>
         val exampleObject = ExampleObject("some value 1")
 
-        sendMessage(queue, exampleObject)
+        sendSqsMessage(queue, exampleObject)
         def processFailing(o: ExampleObject) = {
           Future.failed(new RuntimeException("BOOOOM!"))
         }
@@ -230,7 +230,7 @@ class SQSStreamTest
 
   private def sendExampleObjects(queue: Queue, start: Int = 1, count: Int = 1) =
     createExampleObjects(start = start, count = count).map { exampleObject =>
-      sendMessage(queue = queue, obj = exampleObject)
+      sendSqsMessage(queue = queue, obj = exampleObject)
     }
 
   def withSQSStreamFixtures[R](

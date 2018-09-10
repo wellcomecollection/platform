@@ -172,22 +172,22 @@ trait SQS extends Matchers with Logging {
 
   def sendNotificationToSQS(queue: Queue, body: String): SendMessageResult = {
     val message = createNotificationMessageWith(body = body)
-    sendMessage(queue = queue, obj = message)
+    sendSqsMessage(queue = queue, obj = message)
   }
 
   def sendNotificationToSQS[T](queue: Queue, message: T)(
     implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS(queue = queue, body = toJson[T](message).get)
 
-  def sendMessage[T](queue: Queue, obj: T)(
+  def sendSqsMessage[T](queue: Queue, obj: T)(
     implicit encoder: Encoder[T]): SendMessageResult =
-    sendMessage(queue = queue, body = toJson[T](obj).get)
-
-  def sendMessage(queue: Queue, body: String): SendMessageResult =
-    sqsClient.sendMessage(queue.url, body)
+    sendMessageToSqsClient(queue = queue, body = toJson[T](obj).get)
 
   def sendInvalidJSONto(queue: Queue): SendMessageResult =
-    sendMessage(queue = queue, body = Random.alphanumeric take 50 mkString)
+    sendMessageToSqsClient(queue = queue, body = Random.alphanumeric take 50 mkString)
+
+  private def sendMessageToSqsClient(queue: Queue, body: String): SendMessageResult =
+    sqsClient.sendMessage(queue.url, body)
 
   def noMessagesAreWaitingIn(queue: Queue) = {
     // No messages in flight
