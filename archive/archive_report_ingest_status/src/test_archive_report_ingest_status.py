@@ -5,7 +5,7 @@ from uuid import UUID
 
 import pytest
 
-import archive_ingest
+import archive_report_ingest_status as archive_ingest
 
 
 TABLE_NAME = 'archive-storage-progress-table'
