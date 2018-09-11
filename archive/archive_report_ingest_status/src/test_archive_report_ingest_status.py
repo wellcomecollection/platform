@@ -6,6 +6,11 @@ import uuid
 import pytest
 
 import archive_report_ingest_status as report_ingest_status
+from archive_report_ingest_status import (
+    BadRequestError,
+    MethodNotAllowedError,
+    NotFoundError
+)
 
 
 def test_get_returns_status(dynamodb_resource, table_name):
@@ -45,12 +50,13 @@ def test_get_includes_other_dynamodb_metadata(dynamodb_resource, table_name):
     assert response == item
 
 
-def test_throws_valueerror_if_called_with_post_event():
+def test_throws_error_if_called_with_post_event():
     event = {
         'request_method': 'POST'
     }
 
-    with pytest.raises(ValueError, match='Expected request_method=GET'):
+    with pytest.raises(MethodNotAllowedError,
+                       match='Expected request_method=GET'):
         report_ingest_status.main(event=event)
 
 
@@ -69,10 +75,23 @@ def test_throws_keyerror_if_no_table_name_set():
         report_ingest_status.main(event=event)
 
 
-def test_throws_valueerror_if_no_id_in_request():
+def test_throws_error_if_no_id_in_request():
     event = {
         'request_method': 'GET'
     }
 
-    with pytest.raises(ValueError, match='Expected "id" in request'):
+    with pytest.raises(BadRequestError, match='Expected "id" in request'):
         report_ingest_status.main(event=event)
+
+
+def test_throws_notfounderror_if_looking_up_missing_item(dynamodb_resource):
+    event = {
+        'request_method': 'GET',
+        'id': str(uuid.uuid4())
+    }
+
+    with pytest.raises(NotFoundError, match='No ingest process with id='):
+        report_ingest_status.main(
+            event=event,
+            dynamodb_resource=dynamodb_resource
+        )

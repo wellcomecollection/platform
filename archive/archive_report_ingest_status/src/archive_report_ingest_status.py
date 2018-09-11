@@ -37,8 +37,13 @@ import os
 
 import boto3
 import daiquiri
-
 from wellcome_aws_utils.lambda_utils import log_on_error
+
+from api_gateway_errors import (
+    BadRequestError,
+    MethodNotAllowedError,
+    NotFoundError
+)
 
 daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
@@ -53,27 +58,21 @@ def main(event, context=None, dynamodb_resource=None, sns_client=None):
 
     request_method = event['request_method']
     if request_method != 'GET':
-        raise ValueError(
-            'Expected request_method=GET, got %r' % request_method
+        raise MethodNotAllowedError(
+            'Expected request_method=GET, got {request_method!r}'
         )
 
     try:
         guid = event['id']
     except KeyError:
-        raise ValueError(
-            'Expected "id" in request, got %r' % event
-        )
+        raise BadRequestError('Expected "id" in request, got {event!r}')
 
     table = dynamodb_resource.Table(table_name)
     item = table.get_item(
         Key={'id': guid}
     )
 
-    # TODO: @@AWLC The correct response is surely a 404 if the item isn't
-    # found, but this will throw a KeyError.  How do we get a 404 to be
-    # emitted by API Gateway?
-    #
-    # Similarly above, the absence of an 'id' should be a 400, and doing
-    # something other than a GET should be a 405, not a 500.
-    #
-    return item['Item']
+    try:
+        return item['Item']
+    except KeyError:
+        raise NotFoundError('No ingest process with id={guid!r}')

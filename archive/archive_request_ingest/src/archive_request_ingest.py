@@ -25,14 +25,16 @@ Quoting from RFC 002 at commit ea310c1 on master:
 """
 
 import os
+from urllib.parse import urlparse
 import uuid
 
 import boto3
 import daiquiri
-
-from urllib.parse import urlparse
 from wellcome_aws_utils.lambda_utils import log_on_error
 from wellcome_aws_utils.sns_utils import publish_sns_message
+
+from api_gateway_errors import BadRequestError, MethodNotAllowedError
+
 
 daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
@@ -44,11 +46,12 @@ def post_ingest_request(event, sns_client, topic_arn):
 
     try:
         upload_url = request['uploadUrl']
-        callback_url = request.get('callbackUrl', None)
     except TypeError:
-        raise TypeError(f"[BadRequest] Invalid request not json: {request}")
+        raise BadRequestError(f"Invalid request not json: {request!r}")
     except KeyError as keyError:
-        raise KeyError(f"[BadRequest] Invalid request missing '{keyError.args[0]}' in {request}")
+        raise BadRequestError(f"Invalid request missing 'uploadUrl' in {request!r}")
+
+    callback_url = request.get('callbackUrl', None)
 
     ingest_request_id = str(uuid.uuid4())
     logger.debug('ingest_request_id: %r', ingest_request_id)
@@ -91,7 +94,7 @@ def archive_bag_message(archive_request_id, bag_url, callback_url):
             msg['callbackUrl'] = callback_url
         return msg
     else:
-        raise ValueError(f"[BadRequest] Unrecognised url scheme: {bag_url}")
+        raise BadRequestError(f"Unrecognised url scheme: {bag_url!r}")
 
 
 def join_url(path_segments):
@@ -104,8 +107,8 @@ def main(event, context=None, sns_client=None):
 
     request_method = event['request_method']
     if request_method != 'POST':
-        raise ValueError(
-            'Expected request_method=POST, got %r' % request_method
+        raise MethodNotAllowedError(
+            f'Expected request_method=POST, got {request_method!r}'
         )
 
     topic_arn = os.environ['TOPIC_ARN']

@@ -1,3 +1,9 @@
+locals {
+  error_bad_request        = "BadRequest"
+  error_method_not_allowed = "MethodNotAllowed"
+  error_not_found          = "NotFound"
+}
+
 data "template_file" "archive_api_swagger" {
   template = "${file("${path.module}/archive_api_swagger.json")}"
 
@@ -5,6 +11,10 @@ data "template_file" "archive_api_swagger" {
     lookup_lambda_invoke_arn               = "${module.lambda_archive_bags.invoke_arn}"
     report_ingest_status_lambda_invoke_arn = "${module.lambda_archive_report_ingest_status.invoke_arn}"
     request_ingest_lambda_invoke_arn       = "${module.lambda_archive_request_ingest.invoke_arn}"
+
+    error_bad_request        = "${local.error_bad_request}"
+    error_method_not_allowed = "${local.error_method_not_allowed}"
+    error_not_found          = "${local.error_not_found}"
   }
 }
 

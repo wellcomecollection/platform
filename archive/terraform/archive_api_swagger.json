@@ -87,8 +87,14 @@
                 "application/json": "{\"id\": \"$input.path('$.id')\"}"
               }
             },
-            ".*[BadRequest].*": {
+            ".*[${error_bad_request}].*": {
               "statusCode": "400",
+              "responseTemplates": {
+                "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
+              }
+            },
+            ".*[${error_method_not_allowed}].*": {
+              "statusCode": "405",
               "responseTemplates": {
                 "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
               }
@@ -136,6 +142,30 @@
           "responses": {
             "default": {
               "statusCode": "200"
+            },
+            ".*[${error_bad_request}].*": {
+              "statusCode": "400",
+              "responseTemplates": {
+                "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
+              }
+            },
+            ".*[${error_not_found}].*": {
+              "statusCode": "404",
+              "responseTemplates": {
+                "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
+              }
+            },
+            ".*[${error_method_not_allowed}].*": {
+              "statusCode": "405",
+              "responseTemplates": {
+                "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
+              }
+            },
+            ".+": {
+              "statusCode": "500",
+              "responseTemplates": {
+                "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
+              }
             }
           },
           "requestParameters": {
