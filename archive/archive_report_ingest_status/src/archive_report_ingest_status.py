@@ -44,6 +44,15 @@ daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 
+class BadRequestError(ValueError):
+    """
+    Raised if the user makes a malformed request.  Becomes an HTTP 400 error.
+    """
+    prefix = os.environ.get('error_bad_request', 'BadRequest')
+    def __init__(self, message):
+        super().__init__(f'[{self.prefix}] {message}')
+
+
 @log_on_error
 def main(event, context=None, dynamodb_resource=None, sns_client=None):
     logger.debug('received %r', event)
@@ -60,9 +69,7 @@ def main(event, context=None, dynamodb_resource=None, sns_client=None):
     try:
         guid = event['id']
     except KeyError:
-        raise ValueError(
-            'Expected "id" in request, got %r' % event
-        )
+        raise BadRequestError('Expected "id" in request, got {event!r}')
 
     table = dynamodb_resource.Table(table_name)
     item = table.get_item(

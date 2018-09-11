@@ -6,6 +6,7 @@ import uuid
 import pytest
 
 import archive_report_ingest_status as report_ingest_status
+from archive_report_ingest_status import BadRequestError
 
 
 def test_get_returns_status(dynamodb_resource, table_name):
@@ -74,5 +75,5 @@ def test_throws_valueerror_if_no_id_in_request():
         'request_method': 'GET'
     }
 
-    with pytest.raises(ValueError, match='Expected "id" in request'):
+    with pytest.raises(BadRequestError, match='Expected "id" in request'):
         report_ingest_status.main(event=event)
