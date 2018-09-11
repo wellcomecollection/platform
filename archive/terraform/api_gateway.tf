@@ -4,7 +4,7 @@ data "template_file" "archive_api_swagger" {
   vars = {
     lookup_lambda_invoke_arn               = "${module.lambda_archive_bags.invoke_arn}"
     report_ingest_status_lambda_invoke_arn = "${module.lambda_archive_report_ingest_status.invoke_arn}"
-    start_ingest_lambda_invoke_arn         = "${module.lambda_archive_start_ingest.invoke_arn}"
+    request_ingest_lambda_invoke_arn       = "${module.lambda_archive_request_ingest.invoke_arn}"
   }
 }
 
