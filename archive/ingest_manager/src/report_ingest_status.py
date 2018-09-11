@@ -14,4 +14,4 @@ def report_ingest_status(dynamodb_resource, table_name, guid):
     try:
         return item['Item']
     except KeyError:
-        raise NotFoundError(f'No ingest found for id={guid}')
+        raise NotFoundError(f'No ingest found for id={guid!r}')
