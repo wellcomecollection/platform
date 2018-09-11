@@ -3,7 +3,7 @@
 import os
 
 
-class _PrefixedError(ValueError):
+class _PrefixedError(Exception):
 
     def __init__(self, message):
         prefix = os.environ.get(self.var_name, self.default)
