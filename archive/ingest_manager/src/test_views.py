@@ -37,6 +37,11 @@ class TestRequestNewIngest:
         })
         assert resp.status_code == 202
 
+    def test_no_uploadurl_is_badrequest(self, client):
+        resp = client.post(f'/ingests')
+        assert resp.status_code == 400
+        assert b'No uploadUrl parameter' in resp.data
+
     def test_get_against_request_endpoint_is_405(self, client):
         resp = client.get('/ingests')
         assert resp.status_code == 405

@@ -1,6 +1,7 @@
 # -*- encoding: utf-8
 
-from flask import jsonify
+from flask import jsonify, request
+from werkzeug.exceptions import BadRequest as BadRequestError
 
 from ingest_manager import app
 from report_ingest_status import report_ingest_status
@@ -19,4 +20,9 @@ def route_report_ingest_status(guid):
 
 @app.route('/ingests', methods=['POST'])
 def route_request_new_ingest():
+    try:
+        upload_url = request.form['uploadUrl']
+    except KeyError:
+        raise BadRequestError('No uploadUrl parameter in request')
+
     return '', 202
