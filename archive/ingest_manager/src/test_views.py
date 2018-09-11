@@ -21,3 +21,10 @@ class TestReportIngestStatus:
     def test_post_against_lookup_endpoint_is_405(self, client, guid):
         resp = client.post(f'/ingests/{guid}')
         assert resp.status_code == 405
+
+
+class TestRequestNewIngest:
+
+    def test_get_against_request_endpoint_is_405(self, client):
+        resp = client.get('/ingests')
+        assert resp.status_code == 405

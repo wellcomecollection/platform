@@ -14,3 +14,8 @@ def route_report_ingest_status(guid):
         guid=guid
     )
     return jsonify(result)
+
+
+@app.route('/ingests', methods=['POST'])
+def route_request_new_ingest():
+    return ''
