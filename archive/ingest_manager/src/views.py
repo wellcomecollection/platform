@@ -4,6 +4,7 @@ from flask import jsonify
 
 from ingest_manager import app
 from report_ingest_status import report_ingest_status
+from request_new_ingest import send_new_ingest_request
 
 
 @app.route('/ingests/<guid>')
@@ -18,4 +19,4 @@ def route_report_ingest_status(guid):
 
 @app.route('/ingests', methods=['POST'])
 def route_request_new_ingest():
-    return ''
+    return '', 202

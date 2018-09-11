@@ -25,6 +25,12 @@ class TestReportIngestStatus:
 
 class TestRequestNewIngest:
 
+    def test_request_new_ingest_is_202(self, client):
+        resp = client.post(f'/ingests', data={
+            'uploadUrl': 's3://example-bukkit/helloworld.zip',
+        })
+        assert resp.status_code == 202
+
     def test_get_against_request_endpoint_is_405(self, client):
         resp = client.get('/ingests')
         assert resp.status_code == 405
