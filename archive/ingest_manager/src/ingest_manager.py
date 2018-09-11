@@ -15,8 +15,3 @@ daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 from views import *
-
-
-@app.route('/')
-def hello_world():
-    return 'Hello world'
