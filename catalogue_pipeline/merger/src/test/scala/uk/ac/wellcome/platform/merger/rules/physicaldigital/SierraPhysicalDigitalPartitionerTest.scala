@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.merger.rules.physicaldigital
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
-class SierraPhysicalDigitalPartitionerTest extends FunSpec with WorksGenerators with Matchers {
+class SierraPhysicalDigitalPartitionerTest
+    extends FunSpec
+    with WorksGenerators
+    with Matchers {
 
   private val partitioner = new SierraPhysicalDigitalPartitioner {}
 
@@ -14,7 +17,8 @@ class SierraPhysicalDigitalPartitionerTest extends FunSpec with WorksGenerators 
 
       val result = partitioner.partitionWorks(Seq(physicalWork, digitalWork))
 
-      result shouldBe Some(partitioner.Partition(physicalWork, digitalWork, Nil))
+      result shouldBe Some(
+        partitioner.Partition(physicalWork, digitalWork, Nil))
     }
 
     it("extracts a physical, digital and other works") {
@@ -22,9 +26,11 @@ class SierraPhysicalDigitalPartitionerTest extends FunSpec with WorksGenerators 
       val digitalWork = createSierraDigitalWork
       val otherWorks = createUnidentifiedWorks(4)
 
-      val result = partitioner.partitionWorks(Seq(physicalWork, digitalWork) ++ otherWorks)
+      val result =
+        partitioner.partitionWorks(Seq(physicalWork, digitalWork) ++ otherWorks)
 
-      result shouldBe Some(partitioner.Partition(physicalWork, digitalWork, otherWorks))
+      result shouldBe Some(
+        partitioner.Partition(physicalWork, digitalWork, otherWorks))
     }
 
     it("ignores a single physical work") {

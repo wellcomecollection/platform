@@ -164,13 +164,15 @@ trait WorksGenerators extends ItemsGenerators {
       createIdentifiedWork
     }
 
-  def createSierraWorkWith(workType: Option[WorkType] = None,
-                           items: List[MaybeDisplayable[Item]] = List()): UnidentifiedWork =
+  def createSierraWorkWith(
+    workType: Option[WorkType] = None,
+    items: List[MaybeDisplayable[Item]] = List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
         createSourceIdentifierWith(identifierType = "sierra-system-number"),
       workType = workType,
-      otherIdentifiers = List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
+      otherIdentifiers =
+        List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
       items = items
     )
 
@@ -178,20 +180,24 @@ trait WorksGenerators extends ItemsGenerators {
     createSierraWorkWith()
 
   def createSierraPhysicalWork: UnidentifiedWork =
-    createSierraWorkWith(items= List(
-      createIdentifiableItemWith(locations = List(createPhysicalLocation))))
+    createSierraWorkWith(
+      items = List(
+        createIdentifiableItemWith(locations = List(createPhysicalLocation))))
 
   def createSierraDigitalWork: UnidentifiedWork = createSierraWorkWith(
     workType = Some(WorkType("v", "E-books")),
-    items = List(createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+    items = List(
+      createUnidentifiableItemWith(locations = List(createDigitalLocation)))
   )
 
-  def createMiroWorkWith(otherIdentifiers: List[SourceIdentifier] = List()): UnidentifiedWork =
+  def createMiroWorkWith(
+    otherIdentifiers: List[SourceIdentifier] = List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier = createMiroSourceIdentifier,
       otherIdentifiers = otherIdentifiers,
-      items = List(createUnidentifiableItemWith(locations =
-        List(createDigitalLocationWith(locationType = createImageLocationType))))
+      items = List(
+        createUnidentifiableItemWith(locations = List(
+          createDigitalLocationWith(locationType = createImageLocationType))))
     )
 
   def createIsbnWork: UnidentifiedWork =
@@ -200,7 +206,8 @@ trait WorksGenerators extends ItemsGenerators {
   def createIsbnWorks(count: Int): List[UnidentifiedWork] =
     List.fill(count)(createIsbnWork)
 
-  def createIsbnWorkWith(otherIdentifiers: List[SourceIdentifier] = List()): UnidentifiedWork =
+  def createIsbnWorkWith(
+    otherIdentifiers: List[SourceIdentifier] = List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier = createIsbnSourceIdentifier,
     )

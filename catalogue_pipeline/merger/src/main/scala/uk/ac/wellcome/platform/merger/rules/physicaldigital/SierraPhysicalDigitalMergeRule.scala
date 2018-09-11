@@ -15,35 +15,36 @@ import uk.ac.wellcome.platform.merger.logging.MergerLogging
   *
   */
 object SierraPhysicalDigitalMergeRule
-  extends Logging
+    extends Logging
     with SierraPhysicalDigitalMerger
     with SierraPhysicalDigitalPartitioner {
 
   def mergeAndRedirectWork(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
-    partitionWorks(works).map {
-      case Partition(physicalWork, digitalWork, otherWorks) =>
-        val maybeResult = mergeAndRedirectWork(
-          physicalWork = physicalWork,
-          digitalWork = digitalWork
-        )
-        maybeResult match {
-          case Some(result) =>
-            result ++ otherWorks
-          case _ => works
-        }
-    }.getOrElse(works)
+    partitionWorks(works)
+      .map {
+        case Partition(physicalWork, digitalWork, otherWorks) =>
+          val maybeResult = mergeAndRedirectWork(
+            physicalWork = physicalWork,
+            digitalWork = digitalWork
+          )
+          maybeResult match {
+            case Some(result) =>
+              result ++ otherWorks
+            case _ => works
+          }
+      }
+      .getOrElse(works)
   }
 }
 
-trait SierraPhysicalDigitalMerger
-  extends Logging
-    with MergerLogging {
-  def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
-                           digitalWork: UnidentifiedWork): Option[List[BaseWork]] =
+trait SierraPhysicalDigitalMerger extends Logging with MergerLogging {
+  def mergeAndRedirectWork(
+    physicalWork: UnidentifiedWork,
+    digitalWork: UnidentifiedWork): Option[List[BaseWork]] =
     (physicalWork.items, digitalWork.items) match {
       case (
-        List(physicalItem: Identifiable[Item]),
-        List(digitalItem: Unidentifiable[Item])) =>
+          List(physicalItem: Identifiable[Item]),
+          List(digitalItem: Unidentifiable[Item])) =>
         info(
           s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
 
@@ -78,4 +79,3 @@ trait SierraPhysicalDigitalMerger
         None
     }
 }
-

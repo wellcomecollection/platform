@@ -9,14 +9,15 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.dynamo._
 
 trait LocalWorksVhs
-  extends LocalVersionedHybridStore
+    extends LocalVersionedHybridStore
     with Eventually
     with ScalaFutures {
 
-  def givenStoredInVhs(vhs: VersionedHybridStore[TransformedBaseWork,
-    EmptyMetadata,
-    ObjectStore[TransformedBaseWork]],
-                       work: TransformedBaseWork): Assertion = {
+  def givenStoredInVhs(
+    vhs: VersionedHybridStore[TransformedBaseWork,
+                              EmptyMetadata,
+                              ObjectStore[TransformedBaseWork]],
+    work: TransformedBaseWork): Assertion = {
     vhs.updateRecord(work.sourceIdentifier.toString)(
       ifNotExisting = (work, EmptyMetadata()))((_, _) =>
       throw new RuntimeException("Not possible, VHS is empty!"))
@@ -28,10 +29,11 @@ trait LocalWorksVhs
     }
   }
 
-  def givenStoredInVhs(vhs: VersionedHybridStore[TransformedBaseWork,
-    EmptyMetadata,
-    ObjectStore[TransformedBaseWork]],
-                 entries: List[TransformedBaseWork]): List[Assertion] =
+  def givenStoredInVhs(
+    vhs: VersionedHybridStore[TransformedBaseWork,
+                              EmptyMetadata,
+                              ObjectStore[TransformedBaseWork]],
+    entries: List[TransformedBaseWork]): List[Assertion] =
     entries.map { work =>
       givenStoredInVhs(vhs = vhs, work = work)
     }

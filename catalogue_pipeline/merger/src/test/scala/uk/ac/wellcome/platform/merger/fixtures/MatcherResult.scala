@@ -1,6 +1,10 @@
 package uk.ac.wellcome.platform.merger.fixtures
 
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 
 trait MatcherResultFixture {
@@ -12,11 +16,11 @@ trait MatcherResultFixture {
     )
 
   def worksToWorkIdentifiers(
-                                      works: Seq[TransformedBaseWork]): Set[WorkIdentifier] =
+    works: Seq[TransformedBaseWork]): Set[WorkIdentifier] =
     worksToWorkIdentifiers(works.toSet)
 
   def worksToWorkIdentifiers(
-                                      works: Set[TransformedBaseWork]): Set[WorkIdentifier] =
+    works: Set[TransformedBaseWork]): Set[WorkIdentifier] =
     works
       .map { work =>
         WorkIdentifier(

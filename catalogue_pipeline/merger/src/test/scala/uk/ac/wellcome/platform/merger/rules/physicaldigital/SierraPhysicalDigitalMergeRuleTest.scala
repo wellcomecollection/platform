@@ -5,7 +5,10 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.merger.rules.physicaldigital.SierraPhysicalDigitalMergeRule.mergeAndRedirectWork
 
-class SierraPhysicalDigitalMergeRuleTest extends FunSpec with WorksGenerators with Matchers {
+class SierraPhysicalDigitalMergeRuleTest
+    extends FunSpec
+    with WorksGenerators
+    with Matchers {
   val sierraPhysicalWorkWithOneItem: UnidentifiedWork = createSierraPhysicalWork
 
   val sierraDigitalWorkWithOneItem: UnidentifiedWork = createSierraDigitalWork
@@ -46,7 +49,8 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with WorksGenerators wi
     val expectedRedirectedWork = UnidentifiedRedirectedWork(
       sourceIdentifier = sierraDigitalWorkWithOneItem.sourceIdentifier,
       version = sierraDigitalWorkWithOneItem.version,
-      redirect = IdentifiableRedirect(sierraPhysicalWorkWithOneItem.sourceIdentifier)
+      redirect =
+        IdentifiableRedirect(sierraPhysicalWorkWithOneItem.sourceIdentifier)
     )
 
     result shouldBe List(expectedMergedWork, expectedRedirectedWork)
@@ -57,11 +61,8 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with WorksGenerators wi
     val digitalWork = createSierraDigitalWork
     val anotherWork = createIsbnWork
 
-    val result = mergeAndRedirectWork(
-      Seq(
-        physicalWork,
-        digitalWork,
-        anotherWork))
+    val result =
+      mergeAndRedirectWork(Seq(physicalWork, digitalWork, anotherWork))
 
     result.size shouldBe 3
     println(result)
@@ -83,7 +84,8 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with WorksGenerators wi
     }
 
     it("does not merge if physical work has >1 items") {
-      val works = List(sierraWorkWithTwoPhysicalItems, sierraDigitalWorkWithOneItem)
+      val works =
+        List(sierraWorkWithTwoPhysicalItems, sierraDigitalWorkWithOneItem)
       mergeAndRedirectWork(works) shouldBe works
     }
 
@@ -93,7 +95,8 @@ class SierraPhysicalDigitalMergeRuleTest extends FunSpec with WorksGenerators wi
     }
 
     it("does not merge if digital work has >1 items") {
-      val works = List(sierraPhysicalWorkWithOneItem, sierraWorkWithTwoDigitalItems)
+      val works =
+        List(sierraPhysicalWorkWithOneItem, sierraWorkWithTwoDigitalItems)
       mergeAndRedirectWork(works) shouldBe works
     }
   }

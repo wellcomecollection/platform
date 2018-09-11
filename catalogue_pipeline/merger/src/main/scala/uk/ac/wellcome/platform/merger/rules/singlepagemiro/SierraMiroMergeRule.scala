@@ -20,28 +20,31 @@ import uk.ac.wellcome.platform.merger.logging.MergerLogging
   */
 object SierraMiroMergeRule extends SierraMiroMerger with SierraMiroPartitioner {
   def mergeAndRedirectWork(works: Seq[BaseWork]): Seq[BaseWork] = {
-    partitionWorks(works).map {
-      case Partition(sierraWork, miroWork, otherWorks) =>
-        val maybeResult = mergeAndRedirectWork(
-          sierraWork = sierraWork,
-          miroWork = miroWork
-        )
-        maybeResult match {
-          case Some(result) =>
-            result ++ otherWorks
-          case _ => works
-        }
-    }.getOrElse(works)
+    partitionWorks(works)
+      .map {
+        case Partition(sierraWork, miroWork, otherWorks) =>
+          val maybeResult = mergeAndRedirectWork(
+            sierraWork = sierraWork,
+            miroWork = miroWork
+          )
+          maybeResult match {
+            case Some(result) =>
+              result ++ otherWorks
+            case _ => works
+          }
+      }
+      .getOrElse(works)
   }
 }
 
-trait SierraMiroMerger
-  extends Logging
-    with MergerLogging {
-  def mergeAndRedirectWork(sierraWork: UnidentifiedWork,
-                           miroWork: UnidentifiedWork): Option[List[BaseWork]] = {
+trait SierraMiroMerger extends Logging with MergerLogging {
+  def mergeAndRedirectWork(
+    sierraWork: UnidentifiedWork,
+    miroWork: UnidentifiedWork): Option[List[BaseWork]] = {
     (sierraWork.items, miroWork.items) match {
-      case (List(sierraItem: MaybeDisplayable[Item]), List(miroItem: Unidentifiable[Item])) => {
+      case (
+          List(sierraItem: MaybeDisplayable[Item]),
+          List(miroItem: Unidentifiable[Item])) => {
 
         info(s"Merging ${describeWorkPair(sierraWork, miroWork)}.")
 
@@ -56,12 +59,14 @@ trait SierraMiroMerger
             )
             List(copyItem(sierraItem, agent))
           case _ =>
-            debug(s"Sierra work already has digital location $sierraDigitalLocations takes precedence over Miro location.")
+            debug(
+              s"Sierra work already has digital location $sierraDigitalLocations takes precedence over Miro location.")
             List(sierraItem)
         }
 
         val mergedWork = sierraWork.copy(
-          otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers.filterNot(identifier => identifier == sierraWork.sourceIdentifier),
+          otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers
+            .filterNot(identifier => identifier == sierraWork.sourceIdentifier),
           items = items
         )
 
@@ -88,9 +93,9 @@ trait SierraMiroMerger
     */
   private def copyItem(item: MaybeDisplayable[Item], agent: Item) = {
     item match {
-      case unidentifiable: Unidentifiable[_] => unidentifiable.copy(agent = agent)
+      case unidentifiable: Unidentifiable[_] =>
+        unidentifiable.copy(agent = agent)
       case identifiable: Identifiable[_] => identifiable.copy(agent = agent)
     }
   }
 }
-

@@ -22,28 +22,32 @@ trait IdentifiersGenerators {
       ontologyType = ontologyType
     )
 
-  def createSierraSourceIdentifier: SourceIdentifier = createSierraSourceIdentifierWith()
+  def createSierraSourceIdentifier: SourceIdentifier =
+    createSierraSourceIdentifierWith()
 
   def createSierraSourceIdentifierWith(
     value: String = randomAlphanumeric(length = 10),
-  ontologyType: String = "Work"): SourceIdentifier =
+    ontologyType: String = "Work"): SourceIdentifier =
     SourceIdentifier(
       identifierType = createSierraSourceIdentifierType,
       value = value,
       ontologyType = ontologyType
     )
 
-  def createIsbnSourceIdentifier: SourceIdentifier = createIsbnSourceIdentifierWith()
+  def createIsbnSourceIdentifier: SourceIdentifier =
+    createIsbnSourceIdentifierWith()
 
-  def createIsbnSourceIdentifierWith(value: String = randomAlphanumeric(length = 10),
-                                     ontologyType: String = "Work"): SourceIdentifier =
+  def createIsbnSourceIdentifierWith(
+    value: String = randomAlphanumeric(length = 10),
+    ontologyType: String = "Work"): SourceIdentifier =
     SourceIdentifier(
       identifierType = createIsbnSourceIdentifierType,
       value = value,
       ontologyType = ontologyType
     )
 
-  def createMiroSourceIdentifier: SourceIdentifier = createMiroSourceIdentifierWith()
+  def createMiroSourceIdentifier: SourceIdentifier =
+    createMiroSourceIdentifierWith()
 
   def createMiroSourceIdentifierWith(
     value: String = randomAlphanumeric(length = 10),
@@ -54,11 +58,12 @@ trait IdentifiersGenerators {
       ontologyType = ontologyType
     )
 
-  def createMiroLibraryReferenceIdentifier: SourceIdentifier = createMiroLibraryReferenceIdentifierWith()
+  def createMiroLibraryReferenceIdentifier: SourceIdentifier =
+    createMiroLibraryReferenceIdentifierWith()
 
   def createMiroLibraryReferenceIdentifierWith(
-                                      value: String = randomAlphanumeric(length = 10),
-                                      ontologyType: String = "Work"): SourceIdentifier =
+    value: String = randomAlphanumeric(length = 10),
+    ontologyType: String = "Work"): SourceIdentifier =
     SourceIdentifier(
       identifierType = IdentifierType("miro-library-reference"),
       value = value,

@@ -18,7 +18,10 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.merger.fixtures.{LocalWorksVhs, MatcherResultFixture}
+import uk.ac.wellcome.platform.merger.fixtures.{
+  LocalWorksVhs,
+  MatcherResultFixture
+}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -134,7 +137,9 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(work, olderWork)))
 
-        givenStoredInVhs(vhs, entries = List[TransformedBaseWork](work, newerWork))
+        givenStoredInVhs(
+          vhs,
+          entries = List[TransformedBaseWork](work, newerWork))
 
         sendNotificationToSQS(
           queue = queue,
