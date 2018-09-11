@@ -169,6 +169,7 @@ jobs:
           archive_report_ingest_status \
           archive_start_ingest"
         - TASK=travis-lambda-test
+    - env: TASK=ingest_manager-test
 
     # (not under active development)
 
