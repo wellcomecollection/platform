@@ -36,7 +36,13 @@ def create_archive_bag_message(guid, bag_url, callback_url):
     return message
 
 
-def send_new_ingest_request(sns_client, topic_arn, upload_url, callback_url):
+def send_new_ingest_request(
+    sns_client,
+    topic_arn,
+    upload_url,
+    callback_url,
+    path=''
+):
     """
     Create a new ingest request, and send a notification to SNS.
     """
@@ -59,3 +65,16 @@ def send_new_ingest_request(sns_client, topic_arn, upload_url, callback_url):
         subject=f'source: ingest_manager ({topic_name})'
     )
     logger.debug('Published %r to %r', message, topic_arn)
+
+    return {
+        'id': ingest_request_id,
+        'location': _create_url(path, ingest_request_id)
+    }
+
+
+def _create_url(*path_segments):
+    return '/' + '/'.join(
+        segment.strip('/')
+        for segment in path_segments
+        if segment.strip('/')
+    )

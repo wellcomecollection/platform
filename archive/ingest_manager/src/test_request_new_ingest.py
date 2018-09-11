@@ -72,3 +72,30 @@ def test_sends_notification_to_sns_with_callback_url(sns_client, topic_arn):
     assert 'callbackUrl' in sns_messages[0][':message']
     assert sns_messages[0][':message']['callbackUrl'] == callback_url
 
+
+def test_returns_new_location_no_path(sns_client, topic_arn):
+    resp = send_new_ingest_request(
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        upload_url='s3://example-bukkit/foo/bar.zip',
+        callback_url=None
+    )
+
+    assert isinstance(resp, dict)
+    assert resp.keys() == {'id', 'location'}
+    assert resp['location'] == f'/{resp["id"]}'
+
+
+def test_returns_new_location_with_path(sns_client, topic_arn):
+    resp = send_new_ingest_request(
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        upload_url='s3://example-bukkit/foo/bar.zip',
+        callback_url=None,
+        path='/foo/bar/baz'
+    )
+
+    assert isinstance(resp, dict)
+    assert resp.keys() == {'id', 'location'}
+    assert resp['location'] == f'/foo/bar/baz/{resp["id"]}'
+
