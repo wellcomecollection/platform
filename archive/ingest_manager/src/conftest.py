@@ -1,9 +1,23 @@
 # -*- encoding: utf-8
 
+import os
 import random
 import uuid
 
 import pytest
+
+
+@pytest.fixture
+def client(table_name):
+    os.environ.update({'TABLE_NAME': table_name})
+    from ingest_manager import app as flask_app
+
+    yield flask_app.test_client()
+
+    try:
+        del os.environ['TABLE_NAME']
+    except KeyError:
+        pass
 
 
 @pytest.fixture
