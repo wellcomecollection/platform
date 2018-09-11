@@ -93,7 +93,7 @@
                 "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
               }
             },
-            ".*[${error_disallowed_method}].*": {
+            ".*[${error_method_not_allowed}].*": {
               "statusCode": "405",
               "responseTemplates": {
                 "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
@@ -155,7 +155,7 @@
                 "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
               }
             },
-            ".*[${error_disallowed_method}].*": {
+            ".*[${error_method_not_allowed}].*": {
               "statusCode": "405",
               "responseTemplates": {
                 "application/json": "#set($inputRoot = $input.path('$')){\"message\" : \"$inputRoot.errorMessage\"}"
