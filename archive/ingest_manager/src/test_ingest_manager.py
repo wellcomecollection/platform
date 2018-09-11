@@ -1,12 +1,13 @@
 # -*- encoding: utf-8
 
 import pytest
-import main as flaskr
+
+import ingest_manager
 
 
 @pytest.fixture
 def client():
-    client = flaskr.app.test_client()
+    client = ingest_manager.app.test_client()
     yield client
 
 
