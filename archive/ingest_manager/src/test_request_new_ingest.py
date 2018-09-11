@@ -3,7 +3,10 @@
 import pytest
 from werkzeug.exceptions import BadRequest as BadRequestError
 
-from request_new_ingest import create_archive_bag_message
+from request_new_ingest import (
+    create_archive_bag_message,
+    send_new_ingest_request
+)
 
 
 def test_bad_bag_url_is_badrequest_error(guid):
@@ -41,3 +44,31 @@ def test_creates_bag_message_includes_callback_url(guid):
         callback_url=callback_url
     )
     assert resp['callbackUrl'] == callback_url
+
+
+def test_sends_notification_to_sns(sns_client, topic_arn):
+    send_new_ingest_request(
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        upload_url='s3://example-bukkit/foo/bar.zip',
+        callback_url=None
+    )
+
+    assert len(sns_client.list_messages()) == 1
+
+
+def test_sends_notification_to_sns_with_callback_url(sns_client, topic_arn):
+    callback_url = 'https://callback.com/?example'
+
+    send_new_ingest_request(
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        upload_url='s3://example-bukkit/foo/bar.zip',
+        callback_url=callback_url
+    )
+
+    sns_messages = sns_client.list_messages()
+    assert len(sns_messages) == 1
+    assert 'callbackUrl' in sns_messages[0][':message']
+    assert sns_messages[0][':message']['callbackUrl'] == callback_url
+
