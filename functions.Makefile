@@ -346,10 +346,8 @@ define __ecs_target_template
 $(1)-build:
 	$(call build_image,$(1),$(2))
 
-ifneq ($(1),ingest_manager)
 $(1)-test:
 	$(call test_python,$(STACK_ROOT)/$(1))
-endif
 
 $(1)-publish: $(1)-build
 	$(call publish_service,$(1))

@@ -9,4 +9,4 @@ RUN pip3 install -r /requirements.txt -r /test_requirements.txt
 
 WORKDIR /src
 
-ENTRYPOINT ["py.test", "tests"]
+ENTRYPOINT ["py.test"]

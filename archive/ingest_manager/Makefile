@@ -17,7 +17,7 @@ $(ROOT)/.docker/ingest_manager_tests: $(INGEST_MANAGER)/test.Dockerfile $(INGEST
 	touch $(ROOT)/.docker/ingest_manager_tests
 
 ingest_manager-test: $(ROOT)/.docker/ingest_manager_tests
-	docker run --rm --volume $(INGEST_MANAGER):/src ingest_manager_tests
+	docker run --rm --volume $(INGEST_MANAGER)/src:/src ingest_manager_tests
 
 
 ingest_manager-run:
