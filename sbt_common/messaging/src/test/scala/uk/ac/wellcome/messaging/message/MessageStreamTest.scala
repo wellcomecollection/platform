@@ -9,15 +9,17 @@ import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Random
 
 class MessageStreamTest
     extends FunSpec
@@ -33,38 +35,95 @@ class MessageStreamTest
     Future.successful(())
   }
 
-  it("reads messages off a queue, processes them and deletes them") {
-    withMessageStreamFixtures[ExampleObject, Assertion] {
-      case (bucket, messageStream, QueuePair(queue, dlq), _) =>
-        val exampleObject1 = ExampleObject("some value 1")
-        sendMessage(bucket, queue, exampleObject1)
-        val exampleObject2 = ExampleObject("some value 2")
-        sendMessage(bucket, queue, exampleObject2)
+  describe("small messages (<256KB)") {
+    it("reads messages off a queue, processes them and deletes them") {
+      withMessageStreamFixtures[ExampleObject, Assertion] {
+        case (_, messageStream, QueuePair(queue, dlq), _) =>
+          val messages = createMessages(count = 3)
 
-        val received = new ConcurrentLinkedQueue[ExampleObject]()
+          messages.foreach { exampleObject =>
+            sendInlineNotification(queue = queue, exampleObject = exampleObject)
+          }
 
-        messageStream.foreach(
-          streamName = "test-stream",
-          process = process(received))
+          val received = new ConcurrentLinkedQueue[ExampleObject]()
 
-        eventually {
-          received should contain theSameElementsAs List(
-            exampleObject1,
-            exampleObject2)
+          messageStream.foreach(
+            streamName = "test-stream",
+            process = process(received))
 
-          assertQueueEmpty(queue)
-          assertQueueEmpty(dlq)
-        }
+          eventually {
+            received should contain theSameElementsAs messages
+
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+          }
+      }
     }
-
   }
+
+  describe("large messages (>256KB)") {
+    it("reads messages off a queue, processes them and deletes them") {
+      withMessageStreamFixtures[ExampleObject, Assertion] {
+        case (bucket, messageStream, QueuePair(queue, dlq), _) =>
+          val messages = createMessages(count = 3)
+
+          messages.foreach { exampleObject =>
+            sendRemoteNotification(bucket, queue, exampleObject)
+          }
+
+          val received = new ConcurrentLinkedQueue[ExampleObject]()
+
+          messageStream.foreach(
+            streamName = "test-stream",
+            process = process(received))
+
+          eventually {
+            received should contain theSameElementsAs messages
+
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+          }
+      }
+    }
+  }
+
+  private def sendInlineNotification(queue: Queue,
+                                     exampleObject: ExampleObject): Unit =
+    sendNotificationToSQS[MessageNotification](
+      queue = queue,
+      message = InlineNotification(toJson(exampleObject).get)
+    )
+
+  private def sendRemoteNotification(bucket: Bucket,
+                                     queue: Queue,
+                                     exampleObject: ExampleObject): Unit = {
+    val s3key = Random.alphanumeric take 10 mkString
+    val location = ObjectLocation(namespace = bucket.name, key = s3key)
+
+    val serialisedObj = toJson[ExampleObject](exampleObject).get
+
+    s3Client.putObject(
+      location.namespace,
+      location.key,
+      serialisedObj
+    )
+
+    sendNotificationToSQS[MessageNotification](
+      queue = queue,
+      message = RemoteNotification(location)
+    )
+  }
+
+  private def createMessages(count: Int): List[ExampleObject] =
+    (1 to count).map { idx =>
+      ExampleObject("a" * idx)
+    }.toList
 
   it("increments *_ProcessMessage metric when successful") {
     withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
       case (bucket, messageStream, QueuePair(queue, _), metricsSender) =>
         val exampleObject = ExampleObject("some value")
-
-        sendMessage(bucket, queue, exampleObject)
+        sendInlineNotification(queue = queue, exampleObject = exampleObject)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
         messageStream.foreach(
@@ -90,7 +149,6 @@ class MessageStreamTest
           process = process(received))
 
         eventually {
-
           verify(metricsSender, never())
             .incrementCount(endsWith("_ProcessMessage_failure"))
           received shouldBe empty
@@ -111,9 +169,9 @@ class MessageStreamTest
         // Do NOT put S3 object here
         val objectLocation = ObjectLocation(bucket.name, key)
 
-        sendNotificationToSQS(
+        sendNotificationToSQS[MessageNotification](
           queue = queue,
-          message = objectLocation
+          message = RemoteNotification(objectLocation)
         )
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
@@ -136,15 +194,15 @@ class MessageStreamTest
 
   it("continues reading if processing of some messages fails ") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
-      case (bucket, messageStream, QueuePair(queue, dlq), _) =>
+      case (_, messageStream, QueuePair(queue, dlq), _) =>
         val exampleObject1 = ExampleObject("some value 1")
         val exampleObject2 = ExampleObject("some value 2")
 
         sendInvalidJSONto(queue)
-        sendMessage(bucket, queue, exampleObject1)
+        sendInlineNotification(queue = queue, exampleObject = exampleObject1)
 
         sendInvalidJSONto(queue)
-        sendMessage(bucket, queue, exampleObject2)
+        sendInlineNotification(queue = queue, exampleObject = exampleObject2)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
         messageStream.foreach(
@@ -165,11 +223,11 @@ class MessageStreamTest
   describe("runStream") {
     it("processes messages off a queue") {
       withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
-        case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+        case (_, messageStream, QueuePair(queue, dlq), metricsSender) =>
           val exampleObject1 = ExampleObject("some value 1")
-          sendMessage(bucket, queue, exampleObject1)
+          sendInlineNotification(queue = queue, exampleObject = exampleObject1)
           val exampleObject2 = ExampleObject("some value 2")
-          sendMessage(bucket, queue, exampleObject2)
+          sendInlineNotification(queue = queue, exampleObject = exampleObject2)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
 
@@ -197,9 +255,9 @@ class MessageStreamTest
 
     it("does not delete failed messages and sends a failure metric") {
       withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
-        case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+        case (_, messageStream, QueuePair(queue, dlq), metricsSender) =>
           val exampleObject = ExampleObject("some value")
-          sendMessage(bucket, queue, exampleObject)
+          sendInlineNotification(queue = queue, exampleObject = exampleObject)
 
           messageStream.runStream(
             "test-stream",
@@ -219,15 +277,15 @@ class MessageStreamTest
 
     it("continues reading if processing of some messages fails") {
       withMessageStreamFixtures[ExampleObject, Assertion] {
-        case (bucket, messageStream, QueuePair(queue, dlq), _) =>
+        case (_, messageStream, QueuePair(queue, dlq), _) =>
           val exampleObject1 = ExampleObject("some value 1")
           val exampleObject2 = ExampleObject("some value 2")
 
           sendInvalidJSONto(queue)
-          sendMessage(bucket, queue, exampleObject1)
+          sendInlineNotification(queue = queue, exampleObject = exampleObject1)
 
           sendInvalidJSONto(queue)
-          sendMessage(bucket, queue, exampleObject2)
+          sendInlineNotification(queue = queue, exampleObject = exampleObject2)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
           messageStream.runStream(

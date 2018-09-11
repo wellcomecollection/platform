@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.ingestor.services
 import akka.actor.{ActorSystem, Terminated}
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType}
 import uk.ac.wellcome.platform.ingestor.IngestorConfig

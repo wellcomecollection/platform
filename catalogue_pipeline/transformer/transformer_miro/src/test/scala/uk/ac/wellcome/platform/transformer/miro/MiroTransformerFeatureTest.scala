@@ -44,7 +44,7 @@ class MiroTransformerFeatureTest
                 bucket = storageBucket
               )
 
-            sendMessage(
+            sendSqsMessage(
               queue = queue,
               obj = miroHybridRecordMessage
             )
@@ -143,8 +143,8 @@ class MiroTransformerFeatureTest
                   bucket = storageBucket
                 )
 
-              sendMessage(queue = queue, obj = miroHybridRecordMessage1)
-              sendMessage(queue = queue, obj = miroHybridRecordMessage2)
+              sendSqsMessage(queue = queue, obj = miroHybridRecordMessage1)
+              sendSqsMessage(queue = queue, obj = miroHybridRecordMessage2)
 
               eventually {
                 val works = getMessages[UnidentifiedWork](topic)

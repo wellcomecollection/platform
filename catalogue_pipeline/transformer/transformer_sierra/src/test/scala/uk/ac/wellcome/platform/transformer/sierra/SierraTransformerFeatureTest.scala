@@ -59,7 +59,7 @@ class SierraTransformerFeatureTest
                 s3Client = s3Client,
                 bucket = storageBucket)
 
-            sendMessage(
+            sendSqsMessage(
               queue = queue,
               obj = sierraHybridRecordMessage
             )

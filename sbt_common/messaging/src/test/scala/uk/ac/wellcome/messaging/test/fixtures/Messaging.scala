@@ -83,7 +83,8 @@ trait Messaging
   def withMessageWriter[T, R](bucket: Bucket,
                               topic: Topic,
                               writerSnsClient: AmazonSNS = snsClient)(
-    testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[T]) = {
+    testWith: TestWith[MessageWriter[T], R])(
+    implicit store: ObjectStore[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageWriterConfig(
@@ -144,42 +145,24 @@ trait Messaging
     }
   }
 
-  private def put[T](obj: T, location: ObjectLocation)(
-    implicit encoder: Encoder[T]) = {
-    val serialisedObj = toJson[T](obj).get
-
-    s3Client.putObject(
-      location.namespace,
-      location.key,
-      serialisedObj
-    )
-
-    val exampleNotification = createNotificationMessageWith(
-      message = location
-    )
-
-    toJson(exampleNotification).get
-  }
-
-  private def get[T](snsMessage: MessageInfo)(
-    implicit decoder: Decoder[T]): T = {
-    val tryObjectLocation = fromJson[ObjectLocation](snsMessage.message)
-    tryObjectLocation shouldBe a[Success[_]]
-
-    val objectLocation = tryObjectLocation.get
-
-    getObjectFromS3[T](
-      bucket = Bucket(objectLocation.namespace),
-      key = objectLocation.key
-    )
-  }
-
   /** Given a topic ARN which has received notifications containing pointers
     * to objects in S3, return the unpacked objects.
     */
   def getMessages[T](topic: Topic)(implicit decoder: Decoder[T]): List[T] =
-    listMessagesReceivedFromSNS(topic).map { snsMessage =>
-      get[T](snsMessage)
+    listMessagesReceivedFromSNS(topic).map { messageInfo =>
+      fromJson[MessageNotification](messageInfo.message) match {
+        case Success(RemoteNotification(location)) =>
+          getObjectFromS3[T](
+            bucket = Bucket(location.namespace),
+            key = location.key
+          )
+        case Success(InlineNotification(jsonString)) =>
+          fromJson[T](jsonString).get
+        case _ =>
+          throw new RuntimeException(
+            s"Unrecognised message: ${messageInfo.message}"
+          )
+      }
     }.toList
 
   /** Store an object in S3 and send the notification to SQS.
@@ -187,15 +170,27 @@ trait Messaging
     * As if another application had used a MessageWriter to send the message
     * to an SNS topic, which was forwarded to the queue.  We don't use a
     * MessageWriter instance because that sends to SNS, not SQS.
+    *
+    * Also, MessageWriter contains some extra logic for sending some messages
+    * over S3, some over SNS, which is tested separately -- and which we don't
+    * need to replicate here.
+    *
     */
   def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(
     implicit encoder: Encoder[T]): SendMessageResult = {
     val s3key = Random.alphanumeric take 10 mkString
-    val notificationJson = put[T](
-      obj = obj,
-      location = ObjectLocation(namespace = bucket.name, key = s3key)
+
+    val location = ObjectLocation(namespace = bucket.name, key = s3key)
+
+    s3Client.putObject(
+      location.namespace,
+      location.key,
+      toJson(obj).get
     )
 
-    sendMessage(queue = queue, body = notificationJson)
+    sendNotificationToSQS[MessageNotification](
+      queue = queue,
+      message = RemoteNotification(location)
+    )
   }
 }
