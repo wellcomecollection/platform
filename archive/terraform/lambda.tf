@@ -20,7 +20,6 @@ module "lambda_archive_report_ingest_status" {
   description = "Report the status of ingest requests"
 
   environment_variables = {
-    TOPIC_ARN  = "${module.archivist_topic.arn}"
     TABLE_NAME = "${aws_dynamodb_table.archive_progress_table.name}"
     REGION     = "${var.aws_region}"
   }
@@ -36,7 +35,6 @@ module "lambda_archive_request_ingest" {
 
   environment_variables = {
     TOPIC_ARN  = "${module.archivist_topic.arn}"
-    TABLE_NAME = "${aws_dynamodb_table.archive_progress_table.name}"
     REGION     = "${var.aws_region}"
   }
 
