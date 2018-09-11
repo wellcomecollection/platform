@@ -25,4 +25,14 @@ def route_request_new_ingest():
     except KeyError:
         raise BadRequestError('No uploadUrl parameter in request')
 
+    callback_url = request.form.get('callbackUrl')
+
+    ingest_request_id = send_new_ingest_request(
+        sns_client=app.config['sns_client'],
+        topic_arn=app.config['sns_topic_arn'],
+        upload_url=upload_url,
+        callback_url=callback_url
+    )
+    print(ingest_request_id)
+
     return '', 202

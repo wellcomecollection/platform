@@ -8,7 +8,7 @@ import pytest
 
 
 @pytest.fixture
-def client(dynamodb_resource, table_name):
+def client(dynamodb_resource, table_name, sns_client, topic_arn):
     os.environ.update({'TABLE_NAME': table_name})
 
     from ingest_manager import app
@@ -19,6 +19,8 @@ def client(dynamodb_resource, table_name):
     # and I don't have time to debug it more thoroughly.
     app.config['dynamodb_table_name'] = table_name
     app.config['dynamodb_resource'] = dynamodb_resource
+    app.config['sns_client'] = sns_client
+    app.config['sns_topic_arn'] = topic_arn
 
     yield app.test_client()
 

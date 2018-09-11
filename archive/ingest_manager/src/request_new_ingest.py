@@ -45,6 +45,8 @@ def send_new_ingest_request(
 ):
     """
     Create a new ingest request, and send a notification to SNS.
+
+    Returns the ID of the new ingest request.
     """
     ingest_request_id = str(uuid.uuid4())
     logger.debug('ingest_request_id=%r', ingest_request_id)
