@@ -1,6 +1,6 @@
 # -*- encoding: utf-8
 
-from flask import jsonify, request
+from flask import jsonify, request, url_for
 from werkzeug.exceptions import BadRequest as BadRequestError
 
 from ingest_manager import app
@@ -33,6 +33,12 @@ def route_request_new_ingest():
         upload_url=upload_url,
         callback_url=callback_url
     )
-    print(ingest_request_id)
+
+    # Construct the URL where the user will be able to get the status
+    # of their ingest request.
+    location = url_for(
+        'route_report_ingest_status',
+        guid=ingest_request_id
+    )
 
     return '', 202
