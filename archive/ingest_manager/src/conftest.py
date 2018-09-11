@@ -13,6 +13,11 @@ def client(dynamodb_resource, table_name):
 
     from ingest_manager import app
 
+    # @@AWLC: I feel like there should be a better way to configure the
+    # test app config than setting it directly here.  For some reason it's
+    # ignoring the ``app.config.from_object("config")`` call in the main file,
+    # and I don't have time to debug it more thoroughly.
+    app.config['dynamodb_table_name'] = table_name
     app.config['dynamodb_resource'] = dynamodb_resource
 
     yield app.test_client()
