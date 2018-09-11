@@ -28,11 +28,11 @@ module "lambda_archive_report_ingest_status" {
   api_gateway_execution_arn = "${aws_api_gateway_rest_api.archive_asset_lookup.execution_arn}"
 }
 
-module "lambda_archive_start_ingest" {
+module "lambda_archive_request_ingest" {
   source = "apigw_lambda"
 
-  name        = "archive_start_ingest"
-  description = "Receives POST messages that start the ingest process"
+  name        = "archive_request_ingest"
+  description = "Receives POST messages that request a new ingest process"
 
   environment_variables = {
     TOPIC_ARN  = "${module.archivist_topic.arn}"

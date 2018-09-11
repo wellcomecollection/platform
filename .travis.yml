@@ -167,7 +167,7 @@ jobs:
     - env:
         - TRAVIS_LAMBDAS="archive_bags \
           archive_report_ingest_status \
-          archive_start_ingest"
+          archive_request_ingest"
         - TASK=travis-lambda-test
 
     # (not under active development)
