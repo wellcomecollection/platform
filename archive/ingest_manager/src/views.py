@@ -1,6 +1,6 @@
 # -*- encoding: utf-8
 
-from flask import jsonify, request, url_for
+from flask import jsonify, make_response, request, url_for
 from werkzeug.exceptions import BadRequest as BadRequestError
 
 from ingest_manager import app
@@ -41,4 +41,10 @@ def route_request_new_ingest():
         guid=ingest_request_id
     )
 
-    return '', 202
+    # Now we set the Location response header.  There's no way to do this
+    # without constructing our own Response object, so that's what we do
+    # here.  See https://stackoverflow.com/q/25860304/1558022
+    resp = make_response(location, 202)
+    resp.headers['Location'] = location
+
+    return resp

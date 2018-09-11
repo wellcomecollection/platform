@@ -42,6 +42,15 @@ class TestRequestNewIngest:
         assert resp.status_code == 400
         assert b'No uploadUrl parameter' in resp.data
 
+    def test_request_new_ingest_has_location_header(self, client):
+        resp = client.post(f'/ingests', data={
+            'uploadUrl': 's3://example-bukkit/helloworld.zip',
+        })
+        assert 'Location' in resp.headers
+
+        location_header = resp.headers['Location'].decode('ascii')
+        assert location_header.startswith('/ingests/')
+
     def test_get_against_request_endpoint_is_405(self, client):
         resp = client.get('/ingests')
         assert resp.status_code == 405
