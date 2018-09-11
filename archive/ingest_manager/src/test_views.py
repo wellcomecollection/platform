@@ -48,8 +48,9 @@ class TestRequestNewIngest:
         })
         assert 'Location' in resp.headers
 
-        location_header = resp.headers['Location'].encode('ascii')
-        assert location_header.startswith('/ingests/')
+        # TODO: This might need revisiting when we deploy the app behind
+        # an ALB and these paths are no longer correct.
+        assert resp.headers['Location'].startswith('http://localhost/ingests/')
 
     def test_get_against_request_endpoint_is_405(self, client):
         resp = client.get('/ingests')
