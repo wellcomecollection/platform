@@ -14,8 +14,8 @@ module "recorder" {
     metrics_namespace   = "${var.namespace}_recorder"
     message_bucket_name = "${var.messages_bucket}"
 
-    vhs_recorder_dynamo_table_name = "${module.vhs_recorder.table_name}"
-    vhs_recorder_bucket_name       = "${module.vhs_recorder.bucket_name}"
+    vhs_recorder_dynamo_table_name = "${var.vhs_recorder_table_name}"
+    vhs_recorder_bucket_name       = "${var.vhs_recorder_bucket_name}"
 
     sns_topic = "${module.recorded_works_topic.arn}"
   }
@@ -40,7 +40,7 @@ module "matcher" {
   env_vars = {
     queue_url               = "${module.matcher_queue.id}"
     metrics_namespace       = "${var.namespace}_matcher"
-    vhs_bucket_name         = "${module.vhs_recorder.bucket_name}"
+    vhs_bucket_name         = "${var.vhs_recorder_bucket_name}"
     topic_arn               = "${module.matched_works_topic.arn}"
     dynamo_table            = "${aws_dynamodb_table.matcher_graph_table.id}"
     dynamo_index            = "${var.matcher_graph_table_index}"
@@ -71,8 +71,8 @@ module "merger" {
     topic_arn                = "${module.matched_works_topic.arn}"
     merger_queue_id          = "${module.merger_queue.id}"
     merger_topic_arn         = "${module.merged_works_topic.arn}"
-    vhs_recorder_bucket_name = "${module.vhs_recorder.bucket_name}"
-    vhs_recorder_table_name  = "${module.vhs_recorder.table_name}"
+    vhs_recorder_bucket_name = "${var.vhs_recorder_bucket_name}"
+    vhs_recorder_table_name  = "${var.vhs_recorder_table_name}"
   }
 
   env_vars_length = 7

@@ -1,7 +1,8 @@
 module "catalogue_pipeline" {
   source = "pipeline"
 
-  namespace                          = "catalogue_pipeline"
+  namespace = "catalogue_pipeline2"
+
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
   recorder_container_image           = "${local.recorder_container_image}"
@@ -23,12 +24,17 @@ module "catalogue_pipeline" {
   vhs_sierra_bucket_name      = "${local.vhs_sierra_bucket_name}"
   vhs_sierra_table_stream_arn = "${local.vhs_sierra_table_stream_arn}"
 
+  vhs_recorder_table_name         = "${module.vhs_recorder.table_name}"
+  vhs_recorder_bucket_name        = "${module.vhs_recorder.bucket_name}"
+  vhs_recorder_read_policy        = "${module.vhs_recorder.read_policy}"
+  vhs_recorder_full_access_policy = "${module.vhs_recorder.full_access_policy}"
+
   aws_region      = "${var.aws_region}"
   messages_bucket = "${aws_s3_bucket.messages.id}"
   infra_bucket    = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-08-30-parallel-scan-reindexer"
-  index_v2 = "v2-2018-08-30-parallel-scan-reindexer"
+  index_v1 = "v1-2018-09-11-s3-sns-maybe"
+  index_v2 = "v2-2018-09-11-s3-sns-maybe"
 
   rds_access_security_group_id = "${local.rds_access_security_group_id}"
 

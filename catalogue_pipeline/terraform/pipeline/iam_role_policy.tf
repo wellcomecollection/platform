@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "recorder_s3_messages_get" {
 
 resource "aws_iam_role_policy" "ecs_recorder_task_vhs" {
   role   = "${module.recorder.task_role_name}"
-  policy = "${module.vhs_recorder.full_access_policy}"
+  policy = "${var.vhs_recorder_full_access_policy}"
 }
 
 resource "aws_iam_role_policy" "recorder_task_sns" {
@@ -63,7 +63,7 @@ resource "aws_iam_role_policy" "matcher_cloudwatch" {
 
 resource "aws_iam_role_policy" "matcher_task_vhs" {
   role   = "${module.matcher.task_role_name}"
-  policy = "${module.vhs_recorder.read_policy}"
+  policy = "${var.vhs_recorder_read_policy}"
 }
 
 resource "aws_iam_role_policy" "matcher_task_sns" {
@@ -95,7 +95,7 @@ resource "aws_iam_role_policy" "merger_task_sns" {
 
 resource "aws_iam_role_policy" "merger_task_read_recorder_vhs" {
   role   = "${module.merger.task_role_name}"
-  policy = "${module.vhs_recorder.read_policy}"
+  policy = "${var.vhs_recorder_read_policy}"
 }
 
 resource "aws_iam_role_policy" "merger_s3_messages" {

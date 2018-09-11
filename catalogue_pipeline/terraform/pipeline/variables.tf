@@ -77,3 +77,8 @@ variable "miro_adapter_topic_names" {
 variable "sierra_adapter_topic_names" {
   type = "list"
 }
+
+variable "vhs_recorder_table_name" {}
+variable "vhs_recorder_bucket_name" {}
+variable "vhs_recorder_read_policy" {}
+variable "vhs_recorder_full_access_policy" {}
