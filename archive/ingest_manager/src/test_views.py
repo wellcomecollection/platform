@@ -4,6 +4,9 @@ import json
 
 
 class TestReportIngestStatus:
+    """
+    Tests for the GET /ingests/<guid> endpoint.
+    """
 
     def test_lookup_item(self, client, dynamodb_resource, table_name, guid):
         table = dynamodb_resource.Table(table_name)
@@ -24,6 +27,9 @@ class TestReportIngestStatus:
 
 
 class TestRequestNewIngest:
+    """
+    Tests for the POST /ingests endpoint.
+    """
 
     def test_request_new_ingest_is_202(self, client):
         resp = client.post(f'/ingests', data={
