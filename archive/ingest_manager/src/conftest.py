@@ -8,11 +8,16 @@ import pytest
 
 
 @pytest.fixture
-def client(table_name):
+def client(dynamodb_resource, table_name):
     os.environ.update({'TABLE_NAME': table_name})
-    from ingest_manager import app as flask_app
 
-    yield flask_app.test_client()
+    # Set up test config.  We have to do this before we import the app,
+    # so the monkey-patched resources are in place when the app is created.
+    import config
+    config.dynamodb_resource = dynamodb_resource
+
+    from ingest_manager import app
+    yield app.test_client()
 
     try:
         del os.environ['TABLE_NAME']
