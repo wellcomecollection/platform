@@ -48,7 +48,7 @@ class TestRequestNewIngest:
         })
         assert 'Location' in resp.headers
 
-        location_header = resp.headers['Location'].decode('ascii')
+        location_header = resp.headers['Location'].encode('ascii')
         assert location_header.startswith('/ingests/')
 
     def test_get_against_request_endpoint_is_405(self, client):
