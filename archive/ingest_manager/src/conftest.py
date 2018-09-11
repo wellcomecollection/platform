@@ -11,12 +11,10 @@ import pytest
 def client(dynamodb_resource, table_name):
     os.environ.update({'TABLE_NAME': table_name})
 
-    # Set up test config.  We have to do this before we import the app,
-    # so the monkey-patched resources are in place when the app is created.
-    import config
-    config.dynamodb_resource = dynamodb_resource
-
     from ingest_manager import app
+
+    app.config['dynamodb_resource'] = dynamodb_resource
+
     yield app.test_client()
 
     try:
