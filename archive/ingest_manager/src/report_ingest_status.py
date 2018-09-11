@@ -1,6 +1,6 @@
 # -*- encoding: utf-8
 
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound as NotFoundError
 
 
 def report_ingest_status(dynamodb_resource, table_name, guid):
@@ -14,4 +14,4 @@ def report_ingest_status(dynamodb_resource, table_name, guid):
     try:
         return item['Item']
     except KeyError:
-        return NotFound(f'No ingest found for id={guid}')
+        raise NotFoundError(f'No ingest found for id={guid}')
