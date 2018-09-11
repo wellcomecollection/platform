@@ -22,25 +22,58 @@ trait IdentifiersGenerators {
       ontologyType = ontologyType
     )
 
-  def createSierraSourceIdentifier = createSierraSourceIdentifierWith()
+  def createSierraSourceIdentifier: SourceIdentifier = createSierraSourceIdentifierWith()
 
   def createSierraSourceIdentifierWith(
     value: String = randomAlphanumeric(length = 10),
-    ontologyType: String = "Work"): SourceIdentifier =
+  ontologyType: String = "Work"): SourceIdentifier =
     SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
+      identifierType = createSierraSourceIdentifierType,
       value = value,
       ontologyType = ontologyType
     )
 
-  def createMiroSourceIdentifier = createMiroSourceIdentifierWith()
+  def createIsbnSourceIdentifier: SourceIdentifier = createIsbnSourceIdentifierWith()
+
+  def createIsbnSourceIdentifierWith(value: String = randomAlphanumeric(length = 10),
+                                     ontologyType: String = "Work"): SourceIdentifier =
+    SourceIdentifier(
+      identifierType = createIsbnSourceIdentifierType,
+      value = value,
+      ontologyType = ontologyType
+    )
+
+  def createMiroSourceIdentifier: SourceIdentifier = createMiroSourceIdentifierWith()
 
   def createMiroSourceIdentifierWith(
     value: String = randomAlphanumeric(length = 10),
     ontologyType: String = "Work"): SourceIdentifier =
     SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
+      identifierType = createMiroSourceIdentifierType,
       value = value,
       ontologyType = ontologyType
     )
+
+  def createMiroLibraryReferenceIdentifier: SourceIdentifier = createMiroLibraryReferenceIdentifierWith()
+
+  def createMiroLibraryReferenceIdentifierWith(
+                                      value: String = randomAlphanumeric(length = 10),
+                                      ontologyType: String = "Work"): SourceIdentifier =
+    SourceIdentifier(
+      identifierType = IdentifierType("miro-library-reference"),
+      value = value,
+      ontologyType = ontologyType
+    )
+
+  def createIsbnSourceIdentifierType: IdentifierType = {
+    IdentifierType("isbn")
+  }
+
+  def createSierraSourceIdentifierType: IdentifierType = {
+    IdentifierType("sierra-system-number")
+  }
+
+  def createMiroSourceIdentifierType: IdentifierType = {
+    IdentifierType("miro-image-number")
+  }
 }

@@ -3,7 +3,7 @@ package uk.ac.wellcome.models.work.test.util
 import uk.ac.wellcome.models.work.internal._
 
 trait WorksGenerators extends ItemsGenerators {
-  private def createTitle: String = randomAlphanumeric(length = 100)
+  private def createRandomTitle: String = randomAlphanumeric(length = 100)
 
   def createUnidentifiedRedirectedWork: UnidentifiedRedirectedWork =
     UnidentifiedRedirectedWork(
@@ -68,7 +68,7 @@ trait WorksGenerators extends ItemsGenerators {
   def createUnidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     version: Int = 1,
-    title: String = createTitle,
+    title: String = createRandomTitle,
     otherIdentifiers: List[SourceIdentifier] = List(),
     mergeCandidates: List[MergeCandidate] = List(),
     description: Option[String] = None,
@@ -102,6 +102,9 @@ trait WorksGenerators extends ItemsGenerators {
       version = version
     )
 
+  def createUnidentifiedWorkOfRandomType: UnidentifiedWork =
+    createUnidentifiedWorkWith(sourceIdentifier = createSourceIdentifier)
+
   def createUnidentifiedWork: UnidentifiedWork = createUnidentifiedWorkWith()
 
   def createUnidentifiedWorks(count: Int): Seq[UnidentifiedWork] =
@@ -113,7 +116,7 @@ trait WorksGenerators extends ItemsGenerators {
     canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     otherIdentifiers: List[SourceIdentifier] = List(),
-    title: String = createTitle,
+    title: String = createRandomTitle,
     workType: Option[WorkType] = None,
     description: Option[String] = None,
     physicalDescription: Option[String] = None,
@@ -161,37 +164,45 @@ trait WorksGenerators extends ItemsGenerators {
       createIdentifiedWork
     }
 
-  def createSierraWorkWith(
-    workType: Option[WorkType] = None,
-    items: List[MaybeDisplayable[Item]] = List()): UnidentifiedWork =
+  def createSierraWorkWith(workType: Option[WorkType] = None,
+                           items: List[MaybeDisplayable[Item]] = List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
         createSourceIdentifierWith(identifierType = "sierra-system-number"),
       workType = workType,
-      otherIdentifiers =
-        List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
+      otherIdentifiers = List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
       items = items
     )
 
   def createSierraWork: UnidentifiedWork =
     createSierraWorkWith()
 
-  def createPhysicalSierraWork: UnidentifiedWork =
-    createSierraWorkWith(
-      items = List(
-        createIdentifiableItemWith(locations = List(createPhysicalLocation))))
+  def createSierraPhysicalWork: UnidentifiedWork =
+    createSierraWorkWith(items= List(
+      createIdentifiableItemWith(locations = List(createPhysicalLocation))))
 
-  def createDigitalSierraWork: UnidentifiedWork = createSierraWorkWith(
+  def createSierraDigitalWork: UnidentifiedWork = createSierraWorkWith(
     workType = Some(WorkType("v", "E-books")),
-    items = List(
-      createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+    items = List(createUnidentifiableItemWith(locations = List(createDigitalLocation)))
   )
 
-  def createMiroWorkWith(): UnidentifiedWork =
+  def createMiroWorkWith(otherIdentifiers: List[SourceIdentifier] = List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier = createMiroSourceIdentifier,
-      items = List(
-        createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+      otherIdentifiers = otherIdentifiers,
+      items = List(createUnidentifiableItemWith(locations =
+        List(createDigitalLocationWith(locationType = createImageLocationType))))
+    )
+
+  def createIsbnWork: UnidentifiedWork =
+    createIsbnWorkWith()
+
+  def createIsbnWorks(count: Int): List[UnidentifiedWork] =
+    List.fill(count)(createIsbnWork)
+
+  def createIsbnWorkWith(otherIdentifiers: List[SourceIdentifier] = List()): UnidentifiedWork =
+    createUnidentifiedWorkWith(
+      sourceIdentifier = createIsbnSourceIdentifier,
     )
 
   def createMiroWork: UnidentifiedWork =

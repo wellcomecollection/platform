@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.merger.rules.digitalphysical
+package uk.ac.wellcome.platform.merger.rules.physicaldigital
 
 import uk.ac.wellcome.models.work.internal.{
   BaseWork,

@@ -2,13 +2,15 @@ package uk.ac.wellcome.platform.merger
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
+import uk.ac.wellcome.platform.merger.fixtures.{LocalWorksVhs, MatcherResultFixture}
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -19,7 +21,9 @@ class MergerFeatureTest
     with ExtendedPatience
     with LocalVersionedHybridStore
     with ScalaFutures
-    with MergerTestUtils {
+    with LocalWorksVhs
+    with MatcherResultFixture
+    with WorksGenerators {
 
   it("reads matcher result messages off a queue and deletes them") {
     withLocalSnsTopic { topic =>
@@ -37,9 +41,9 @@ class MergerFeatureTest
                     storageBucket = storageBucket,
                     messageBucket = messagesBucket,
                     table = table) { _ =>
-                    val work = createUnidentifiedWorkWith(version = 1)
+                    val work = createUnidentifiedWork
 
-                    storeInVHS(vhs, work)
+                    givenStoredInVhs(vhs, work)
 
                     val matcherResult = matcherResultWith(Set(Set(work)))
                     sendNotificationToSQS(queue, matcherResult)

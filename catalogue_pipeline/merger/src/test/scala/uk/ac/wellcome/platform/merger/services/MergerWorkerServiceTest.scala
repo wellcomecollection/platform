@@ -3,9 +3,10 @@ package uk.ac.wellcome.platform.merger.services
 import akka.actor.ActorSystem
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{atLeastOnce, times, verify}
-import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -14,15 +15,15 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.merger.MergerTestUtils
+import uk.ac.wellcome.platform.merger.fixtures.{LocalWorksVhs, MatcherResultFixture}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -36,7 +37,10 @@ class MergerWorkerServiceTest
     with LocalVersionedHybridStore
     with SNS
     with Messaging
-    with MergerTestUtils
+    with WorksGenerators
+    with LocalWorksVhs
+    with MatcherResultFixture
+    with Matchers
     with MockitoSugar {
   case class TestObject(something: String)
 
@@ -51,7 +55,7 @@ class MergerWorkerServiceTest
         val matcherResult =
           matcherResultWith(Set(Set(work3), Set(work1, work2)))
 
-        storeInVHS(vhs, entries = List(work1, work2, work3))
+        givenStoredInVhs(vhs, entries = List(work1, work2, work3))
 
         sendNotificationToSQS(
           queue = queue,
@@ -78,7 +82,7 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(work)))
 
-        storeInVHS(vhs, work)
+        givenStoredInVhs(vhs, work)
 
         sendNotificationToSQS(
           queue = queue,
@@ -130,7 +134,7 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(work, olderWork)))
 
-        storeInVHS(vhs, entries = List[TransformedBaseWork](work, newerWork))
+        givenStoredInVhs(vhs, entries = List[TransformedBaseWork](work, newerWork))
 
         sendNotificationToSQS(
           queue = queue,
@@ -155,7 +159,7 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(work, versionZeroWork)))
 
-        storeInVHS(vhs, work)
+        givenStoredInVhs(vhs, work)
 
         sendNotificationToSQS(
           queue = queue,
@@ -176,14 +180,14 @@ class MergerWorkerServiceTest
   }
 
   it("sends a merged work and a redirected work to SQS") {
-    val physicalWork = createPhysicalSierraWork
-    val digitalWork = createDigitalSierraWork
+    val physicalWork = createSierraPhysicalWork
+    val digitalWork = createSierraDigitalWork
 
     val works = List(physicalWork, digitalWork)
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        storeInVHS(vhs, works)
+        givenStoredInVhs(vhs, works)
 
         val matcherResult = MatcherResult(
           Set(
@@ -219,12 +223,12 @@ class MergerWorkerServiceTest
   }
 
   it("splits the received works into multiple merged works if required") {
-    val workPair1 = List(createPhysicalSierraWork, createDigitalSierraWork)
-    val workPair2 = List(createPhysicalSierraWork, createDigitalSierraWork)
+    val workPair1 = List(createSierraPhysicalWork, createSierraDigitalWork)
+    val workPair2 = List(createSierraPhysicalWork, createSierraDigitalWork)
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        storeInVHS(vhs, entries = workPair1 ++ workPair2)
+        givenStoredInVhs(vhs, entries = workPair1 ++ workPair2)
 
         val matcherResult = MatcherResult(
           Set(

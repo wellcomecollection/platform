@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.merger.rules.singlepagemiro
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.merger.logging.MergerLogging
 
 /** If we have a Miro work and a Sierra work with a single item,
   * the Sierra work replaces the Miro work (because this is metadata
@@ -19,41 +20,49 @@ import uk.ac.wellcome.models.work.internal._
   */
 object SierraMiroMergeRule extends SierraMiroMerger with SierraMiroPartitioner {
   def mergeAndRedirectWork(works: Seq[BaseWork]): Seq[BaseWork] = {
-    partitionWorks(works)
-      .map {
-        case Partition(sierraWork, miroWork, otherWorks) =>
-          val maybeResult = mergeAndRedirectWork(
-            sierraWork = sierraWork,
-            miroWork = miroWork
-          )
-          maybeResult match {
-            case Some(result) =>
-              result ++ otherWorks
-            case _ => works
-          }
-      }
-      .getOrElse(works)
+    partitionWorks(works).map {
+      case Partition(sierraWork, miroWork, otherWorks) =>
+        val maybeResult = mergeAndRedirectWork(
+          sierraWork = sierraWork,
+          miroWork = miroWork
+        )
+        maybeResult match {
+          case Some(result) =>
+            result ++ otherWorks
+          case _ => works
+        }
+    }.getOrElse(works)
   }
 }
 
-trait SierraMiroMerger extends Logging {
-  def mergeAndRedirectWork(
-    sierraWork: UnidentifiedWork,
-    miroWork: UnidentifiedWork): Option[List[BaseWork]] = {
+trait SierraMiroMerger
+  extends Logging
+    with MergerLogging {
+  def mergeAndRedirectWork(sierraWork: UnidentifiedWork,
+                           miroWork: UnidentifiedWork): Option[List[BaseWork]] = {
     (sierraWork.items, miroWork.items) match {
-      case (
-          List(sierraItem: Identifiable[Item]),
-          List(miroItem: Unidentifiable[Item])) => {
+      case (List(sierraItem: MaybeDisplayable[Item]), List(miroItem: Unidentifiable[Item])) => {
+
+        info(s"Merging ${describeWorkPair(sierraWork, miroWork)}.")
+
+        val sierraDigitalLocations = sierraItem.agent.locations.collect {
+          case location: DigitalLocation => location
+        }
+
+        val items = sierraDigitalLocations match {
+          case Nil =>
+            val agent: Item = sierraItem.agent.copy(
+              locations = sierraItem.agent.locations ++ miroItem.agent.locations
+            )
+            List(copyItem(sierraItem, agent))
+          case _ =>
+            debug(s"Sierra work already has digital location $sierraDigitalLocations takes precedence over Miro location.")
+            List(sierraItem)
+        }
 
         val mergedWork = sierraWork.copy(
-          otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers,
-          items = List(
-            sierraItem.copy(
-              agent = sierraItem.agent.copy(
-                locations = sierraItem.agent.locations ++ miroItem.agent.locations
-              )
-            )
-          )
+          otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers.filterNot(identifier => identifier == sierraWork.sourceIdentifier),
+          items = items
         )
 
         val redirectedWork = UnidentifiedRedirectedWork(
@@ -72,4 +81,16 @@ trait SierraMiroMerger extends Logging {
         None
     }
   }
+
+  /**
+    * Need to wrap this to allow copying of an item for both Unidentifiable and Identifiable types
+    * because MaybeDisplayable doesn't have a copy method defined.
+    */
+  private def copyItem(item: MaybeDisplayable[Item], agent: Item) = {
+    item match {
+      case unidentifiable: Unidentifiable[_] => unidentifiable.copy(agent = agent)
+      case identifiable: Identifiable[_] => identifiable.copy(agent = agent)
+    }
+  }
 }
+
