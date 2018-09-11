@@ -5,6 +5,10 @@ data "template_file" "archive_api_swagger" {
     lookup_lambda_invoke_arn               = "${module.lambda_archive_bags.invoke_arn}"
     report_ingest_status_lambda_invoke_arn = "${module.lambda_archive_report_ingest_status.invoke_arn}"
     request_ingest_lambda_invoke_arn       = "${module.lambda_archive_request_ingest.invoke_arn}"
+
+    error_bad_request       = "BadRequest"
+    error_disallowed_method = "DisallowedMethod"
+    error_not_found         = "NotFound"
   }
 }
 
