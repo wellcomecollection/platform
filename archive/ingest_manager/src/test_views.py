@@ -17,3 +17,7 @@ class TestReportIngestStatus:
         resp = client.get(f'/ingests/{guid}')
         assert resp.status_code == 404
         assert (b'No ingest found for id=%r' % guid) in resp.data
+
+    def test_post_against_lookup_endpoint_is_405(self, client, guid):
+        resp = client.post(f'/ingests/{guid}')
+        assert resp.status_code == 405
