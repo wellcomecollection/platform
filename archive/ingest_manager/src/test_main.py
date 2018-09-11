@@ -12,5 +12,5 @@ def client():
 
 def test_hello_world(client):
     rv = client.get('/')
-    print(rv)
-    assert False
+    assert rv.status_code == 200
+    assert rv.data == b'Hello world'
