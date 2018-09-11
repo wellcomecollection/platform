@@ -1,144 +1,78 @@
 # -*- encoding: utf-8 -*-
 
 import os
-from uuid import UUID
+import uuid
 
 import pytest
 
-import archive_report_ingest_status as archive_ingest
+import archive_report_ingest_status as report_ingest_status
 
 
-TABLE_NAME = 'archive-storage-progress-table'
+def test_get_returns_status(dynamodb_resource, table_name):
+    guid = str(uuid.uuid4())
 
+    table = dynamodb_resource.Table(table_name)
+    table.put_item(Item={'id': guid})
 
-def test_post_sends_location_to_sns(sns_client, topic_arn):
-    request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip')
-
-    response = archive_ingest.main(event=request, sns_client=sns_client)
-
-    id = str(UUID(response['id']))
-    assert id
-
-    assert response['location'] == f"/ingests/{id}"
-
-    messages = sns_client.list_messages()
-    assert len(messages) == 1
-    assert messages[0][':message'] == {
-        'archiveRequestId': id,
-        'bagLocation': {
-            'namespace': 'wellcomecollection-assets-archive-ingest',
-            'key': 'test-bag.zip'
-        }
-    }
-
-
-def test_get_returns_status(dynamodb_resource):
-    os.environ['TABLE_NAME'] = TABLE_NAME
-
-    id = '245e3de7-5453-4ce1-a3ce-bd111753b1cf'
-    table = dynamodb_resource.Table(TABLE_NAME)
-    table.put_item(Item={'id': id, 'a': 'b'})
-
-    request = {
+    event = {
         'request_method': 'GET',
-        'id': id
+        'id': guid
     }
 
-    response = archive_ingest.main(event=request, dynamodb_resource=dynamodb_resource)
-    assert response['a'] == 'b'
+    response = report_ingest_status.main(
+        event=event,
+        dynamodb_resource=dynamodb_resource
+    )
+    assert response['id'] == guid
 
 
-def test_sends_request_to_sns_with_callback(sns_client, topic_arn):
-    request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip',
-                             callback_url='https://workflow.wellcomecollection.org/callback?id=b1234567')
+def test_get_includes_other_dynamodb_metadata(dynamodb_resource, table_name):
+    guid = str(uuid.uuid4())
+    item = {'id': guid, 'fooKey': 'barValue'}
 
-    response = archive_ingest.main(event=request, sns_client=sns_client)
+    table = dynamodb_resource.Table(table_name)
+    table.put_item(Item=item)
 
-    actual_id = str(UUID(response['id']))
-    assert actual_id
-
-    messages = sns_client.list_messages()
-    assert len(messages) == 1
-    assert messages[0][':message'] == {
-        'archiveRequestId': actual_id,
-        'bagLocation': {
-            'namespace': 'wellcomecollection-assets-archive-ingest',
-            'key': 'test-bag.zip'
-        },
-        'callbackUrl': 'https://workflow.wellcomecollection.org/callback?id=b1234567'
+    event = {
+        'request_method': 'GET',
+        'id': guid
     }
 
-
-def test_invalid_url_fails(sns_client):
-    request = ingest_request('invalidUrl')
-
-    with pytest.raises(ValueError, match="\[BadRequest\] Unrecognised url scheme: invalid"):
-        archive_ingest.main(event=request, sns_client=sns_client)
-
-    assert len(sns_client.list_messages()) == 0
+    response = report_ingest_status.main(
+        event=event,
+        dynamodb_resource=dynamodb_resource
+    )
+    assert response == item
 
 
-def test_missing_url_fails(sns_client):
-    request = {"body": {'unknownKey': 'aValue'}}
-
-    with pytest.raises(KeyError,
-                       match="\[BadRequest\] Invalid request missing 'uploadUrl' in {'unknownKey': 'aValue'}"):
-        archive_ingest.main(event=request, sns_client=sns_client)
-
-    assert len(sns_client.list_messages()) == 0
-
-
-def test_invalid_json_fails(sns_client):
-    request = {"body": "not_json"}
-
-    with pytest.raises(TypeError, match="\[BadRequest\] Invalid request not json: not_json"):
-        archive_ingest.main(event=request, sns_client=sns_client)
-
-    assert len(sns_client.list_messages()) == 0
-
-
-def ingest_request(upload_url, callback_url=None):
-    body = {
-        'uploadUrl': upload_url
-    }
-    if callback_url:
-        body['callbackUrl'] = callback_url
-    return {
-        'body': body,
-        'path': '/ingests/'
+def test_throws_valueerror_if_called_with_post_event():
+    event = {
+        'request_method': 'POST'
     }
 
-
-@pytest.yield_fixture(autouse=True)
-def run_around_tests(dynamodb_client):
-    os.environ['TABLE_NAME'] = TABLE_NAME
-
-    create_table(dynamodb_client, TABLE_NAME)
-    yield
-    dynamodb_client.delete_table(TableName=TABLE_NAME)
+    with pytest.raises(ValueError, match='Expected request_method=GET'):
+        report_ingest_status.main(event=event)
 
 
-def create_table(dynamodb_client, table_name):
-    try:
-        dynamodb_client.create_table(
-            TableName=table_name,
-            KeySchema=[
-                {
-                    'AttributeName': 'id',
-                    'KeyType': 'HASH'
-                }
-            ],
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'id',
-                    'AttributeType': 'S'
-                }
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            }
-        )
-        dynamodb_client.get_waiter('table_exists').wait(TableName=table_name)
-    except dynamodb_client.exceptions.ResourceInUseException:
-        pass
+def test_throws_keyerror_if_no_table_name_set():
+    # This environment variable is populated by the run_around_tests()
+    # fixture, which has autouse=True.
+    del os.environ['TABLE_NAME']
+    assert 'TABLE_NAME' not in os.environ
+
+    event = {
+        'request_method': 'GET',
+        'id': str(uuid.uuid4())
+    }
+
+    with pytest.raises(KeyError, match='TABLE_NAME'):
+        report_ingest_status.main(event=event)
+
+
+def test_throws_valueerror_if_no_id_in_request():
+    event = {
+        'request_method': 'GET'
+    }
+
+    with pytest.raises(ValueError, match='Expected "id" in request'):
+        report_ingest_status.main(event=event)
