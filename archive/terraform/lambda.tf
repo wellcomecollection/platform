@@ -23,9 +23,9 @@ module "lambda_archive_report_ingest_status" {
     TABLE_NAME = "${aws_dynamodb_table.archive_progress_table.name}"
     REGION     = "${var.aws_region}"
 
-    error_bad_request        = "${local.error_bad_request}"
-    error_method_not_allowed = "${local.error_method_not_allowed}"
-    error_not_found          = "${local.error_not_found}"
+    ERROR_BAD_REQUEST        = "${local.error_bad_request}"
+    ERROR_METHOD_NOT_ALLOWED = "${local.error_method_not_allowed}"
+    ERROR_NOT_FOUND          = "${local.error_not_found}"
   }
 
   api_gateway_execution_arn = "${aws_api_gateway_rest_api.archive_asset_lookup.execution_arn}"
@@ -40,6 +40,10 @@ module "lambda_archive_request_ingest" {
   environment_variables = {
     TOPIC_ARN  = "${module.archivist_topic.arn}"
     REGION     = "${var.aws_region}"
+
+    ERROR_BAD_REQUEST        = "${local.error_bad_request}"
+    ERROR_METHOD_NOT_ALLOWED = "${local.error_method_not_allowed}"
+    ERROR_NOT_FOUND          = "${local.error_not_found}"
   }
 
   api_gateway_execution_arn = "${aws_api_gateway_rest_api.archive_asset_lookup.execution_arn}"
