@@ -4,7 +4,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
 class UnidentifiedRedirectedWorkTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with WorksGenerators {
 

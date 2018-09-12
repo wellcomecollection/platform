@@ -14,7 +14,8 @@ class SierraMiroMergeRuleTest
     it("merges a minimal Miro work") {
       val sierraItem =
         createIdentifiableItemWith(locations = List(createPhysicalLocation))
-      val sierraWork = createUnidentifiedSierraWorkWith(items = List(sierraItem))
+      val sierraWork =
+        createUnidentifiedSierraWorkWith(items = List(sierraItem))
       val miroWork = createMiroWork
 
       val result = mergeAndRedirectWorks(
@@ -43,17 +44,19 @@ class SierraMiroMergeRuleTest
     }
 
     it("does not merge any Sierra identifiers from the Miro work") {
-      val sierraItem = createIdentifiableItemWith(locations = List(createPhysicalLocation))
-      val sierraWork = createUnidentifiedSierraWorkWith(items = List(sierraItem))
+      val sierraItem =
+        createIdentifiableItemWith(locations = List(createPhysicalLocation))
+      val sierraWork =
+        createUnidentifiedSierraWorkWith(items = List(sierraItem))
 
-      val miroLibraryReferenceSourceIdentifier = createMiroLibraryReferenceSourceIdentifier
+      val miroLibraryReferenceSourceIdentifier =
+        createMiroLibraryReferenceSourceIdentifier
       val miroWork = createMiroWorkWith(
-        otherIdentifiers =
-          List(
-            miroLibraryReferenceSourceIdentifier,
-            sierraWork.sourceIdentifier,
-            createSierraIdentifierSourceIdentifier,
-            createSierraSystemSourceIdentifier))
+        otherIdentifiers = List(
+          miroLibraryReferenceSourceIdentifier,
+          sierraWork.sourceIdentifier,
+          createSierraIdentifierSourceIdentifier,
+          createSierraSystemSourceIdentifier))
 
       val result = mergeAndRedirectWorks(
         Seq(
@@ -86,7 +89,8 @@ class SierraMiroMergeRuleTest
       "does not merge Miro DigitalLocation if the Sierra work already has a DigitalLocation") {
       val sierraItem =
         createIdentifiableItemWith(locations = List(createDigitalLocation))
-      val sierraWork = createUnidentifiedSierraWorkWith(items = List(sierraItem))
+      val sierraWork =
+        createUnidentifiedSierraWorkWith(items = List(sierraItem))
       val miroWork = createMiroWork
 
       val result = mergeAndRedirectWorks(

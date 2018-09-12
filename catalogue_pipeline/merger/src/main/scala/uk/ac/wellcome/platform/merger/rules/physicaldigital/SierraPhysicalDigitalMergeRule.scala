@@ -67,7 +67,8 @@ trait SierraPhysicalDigitalMerger extends Logging with MergerLogging {
         None
     }
 
-  private def mergeItems(physicalItem: Identifiable[Item], digitalItem: Unidentifiable[Item]) = {
+  private def mergeItems(physicalItem: Identifiable[Item],
+                         digitalItem: Unidentifiable[Item]) = {
     List(
       physicalItem.copy(
         agent = physicalItem.agent.copy(

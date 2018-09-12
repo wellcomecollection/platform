@@ -45,7 +45,6 @@ trait SierraMiroMerger extends Logging with MergerLogging {
       case (
           List(sierraItem: MaybeDisplayable[Item]),
           List(miroItem: Unidentifiable[Item])) =>
-
         info(s"Merging ${describeWorkPair(sierraWork, miroWork)}.")
 
         val mergedWork = sierraWork.copy(
@@ -63,7 +62,8 @@ trait SierraMiroMerger extends Logging with MergerLogging {
     }
   }
 
-  private def mergeItems(sierraItem: MaybeDisplayable[Item], miroItem: Unidentifiable[Item]) = {
+  private def mergeItems(sierraItem: MaybeDisplayable[Item],
+                         miroItem: Unidentifiable[Item]) = {
     val sierraDigitalLocations = sierraItem.agent.locations.collect {
       case location: DigitalLocation => location
     }
@@ -89,11 +89,13 @@ trait SierraMiroMerger extends Logging with MergerLogging {
     *  identifiers and there is no way to edit them, so they are
     *  dropped here.
     */
-  val doNotMergeIdentifierTypes = List("sierra-identifier", "sierra-system-number")
-  private def mergeIdentifiers(sierraWork: UnidentifiedWork, miroWork: UnidentifiedWork) = {
+  val doNotMergeIdentifierTypes =
+    List("sierra-identifier", "sierra-system-number")
+  private def mergeIdentifiers(sierraWork: UnidentifiedWork,
+                               miroWork: UnidentifiedWork) = {
     sierraWork.otherIdentifiers ++
-      miroWork.identifiers.filterNot(
-        sourceIdentifier => doNotMergeIdentifierTypes.contains(sourceIdentifier.identifierType.id))
+      miroWork.identifiers.filterNot(sourceIdentifier =>
+        doNotMergeIdentifierTypes.contains(sourceIdentifier.identifierType.id))
   }
 
   /**

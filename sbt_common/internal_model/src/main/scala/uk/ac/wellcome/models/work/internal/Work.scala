@@ -118,7 +118,8 @@ case class UnidentifiedRedirectedWork(
 ) extends RedirectedWork
 
 case object UnidentifiedRedirectedWork {
-  def apply(source: UnidentifiedWork, target: UnidentifiedWork): UnidentifiedRedirectedWork =
+  def apply(source: UnidentifiedWork,
+            target: UnidentifiedWork): UnidentifiedRedirectedWork =
     UnidentifiedRedirectedWork(
       sourceIdentifier = source.sourceIdentifier,
       version = source.version,

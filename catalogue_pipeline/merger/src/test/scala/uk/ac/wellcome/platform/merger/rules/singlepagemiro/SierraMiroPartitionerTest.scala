@@ -19,12 +19,10 @@ class SierraMiroPartitionerTest
     result shouldBe Some(partitioner.Partition(sierraWork, miroWork, Nil))
   }
 
-
   it("partitions a Sierra and Miro work, order in sequence") {
     val result = partitioner.partitionWorks(Seq(miroWork, sierraWork))
 
-    result shouldBe Some(
-      partitioner.Partition(sierraWork, miroWork, Nil))
+    result shouldBe Some(partitioner.Partition(sierraWork, miroWork, Nil))
   }
 
   it("partitions a Sierra, Miro and other works") {

@@ -17,7 +17,8 @@ class SierraPhysicalDigitalMergeRuleTest
       result shouldBe List(expectedMergedWork, expectedRedirectedWork)
     }
 
-    it("merges a Sierra digital and a Sierra physical work, order doesn't matter") {
+    it(
+      "merges a Sierra digital and a Sierra physical work, order doesn't matter") {
       val result = mergeAndRedirectWorks(
         List(sierraDigitalWorkWithOneItem, sierraPhysicalWorkWithOneItem))
 
@@ -39,7 +40,8 @@ class SierraPhysicalDigitalMergeRuleTest
     }
   }
 
-  describe("does not merge unless passed a single Sierra physical and single Sierra digital work") {
+  describe(
+    "does not merge unless passed a single Sierra physical and single Sierra digital work") {
     it("does not merge a single Sierra digital work") {
       val works = List(sierraDigitalWorkWithOneItem)
 
@@ -53,13 +55,15 @@ class SierraPhysicalDigitalMergeRuleTest
     }
 
     it("does not merge multiple Sierra physical works") {
-      val works = List(sierraPhysicalWorkWithOneItem, sierraPhysicalWorkWithOneItem)
+      val works =
+        List(sierraPhysicalWorkWithOneItem, sierraPhysicalWorkWithOneItem)
 
       mergeAndRedirectWorks(works) shouldBe works
     }
 
     it("does not merge multiple Sierra digital works") {
-      val works = List(sierraDigitalWorkWithOneItem, sierraDigitalWorkWithOneItem)
+      val works =
+        List(sierraDigitalWorkWithOneItem, sierraDigitalWorkWithOneItem)
 
       mergeAndRedirectWorks(works) shouldBe works
     }
@@ -70,14 +74,22 @@ class SierraPhysicalDigitalMergeRuleTest
       mergeAndRedirectWorks(works) shouldBe works
     }
 
-    it("does not merge if there are multiple digital works with a single physical work") {
-      val works = List(sierraDigitalWorkWithOneItem, sierraPhysicalWorkWithOneItem, sierraDigitalWorkWithOneItem)
+    it(
+      "does not merge if there are multiple digital works with a single physical work") {
+      val works = List(
+        sierraDigitalWorkWithOneItem,
+        sierraPhysicalWorkWithOneItem,
+        sierraDigitalWorkWithOneItem)
 
       mergeAndRedirectWorks(works) shouldBe works
     }
 
-    it("does not merge if there are multiple physical works with a single digital work") {
-      val works = List(sierraDigitalWorkWithOneItem, sierraPhysicalWorkWithOneItem, sierraPhysicalWorkWithOneItem)
+    it(
+      "does not merge if there are multiple physical works with a single digital work") {
+      val works = List(
+        sierraDigitalWorkWithOneItem,
+        sierraPhysicalWorkWithOneItem,
+        sierraPhysicalWorkWithOneItem)
 
       mergeAndRedirectWorks(works) shouldBe works
     }
@@ -143,5 +155,7 @@ class SierraPhysicalDigitalMergeRuleTest
     expectedMergedWork
   }
 
-  val expectedRedirectedWork = UnidentifiedRedirectedWork(sierraDigitalWorkWithOneItem, sierraPhysicalWorkWithOneItem)
+  val expectedRedirectedWork = UnidentifiedRedirectedWork(
+    sierraDigitalWorkWithOneItem,
+    sierraPhysicalWorkWithOneItem)
 }

@@ -16,15 +16,13 @@ class SierraPhysicalDigitalPartitionerTest
   it("partitions a physical and digital work") {
     val result = partitioner.partitionWorks(Seq(physicalWork, digitalWork))
 
-    result shouldBe Some(
-      partitioner.Partition(physicalWork, digitalWork, Nil))
+    result shouldBe Some(partitioner.Partition(physicalWork, digitalWork, Nil))
   }
 
   it("partitions a physical and digital work, order in sequence") {
     val result = partitioner.partitionWorks(Seq(digitalWork, physicalWork))
 
-    result shouldBe Some(
-      partitioner.Partition(physicalWork, digitalWork, Nil))
+    result shouldBe Some(partitioner.Partition(physicalWork, digitalWork, Nil))
   }
 
   it("partitions a physical, digital and other works") {
