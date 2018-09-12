@@ -21,5 +21,5 @@ variable "table_write_max_capacity" {
 }
 
 variable "table_stream_enabled" {
-  default = true
+  default = false
 }
