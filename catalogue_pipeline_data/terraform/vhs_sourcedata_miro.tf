@@ -3,4 +3,5 @@ module "vhs_miro" {
   name   = "sourcedata-miro"
 
   table_write_max_capacity = 750
+  account_id = "${var.account_id}"
 }

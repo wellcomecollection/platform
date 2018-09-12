@@ -1,7 +1,15 @@
 resource "aws_s3_bucket" "bucket" {
-  bucket = "${var.bucket_name_prefix}${lower(var.name)}"
+  count = "${var.prevent_destroy == "false" ? 1 : 0}"
+  bucket = "${local.bucket_name}"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
+}
+
+resource "aws_s3_bucket" "transient_bucket" {
+  count = "${var.prevent_destroy == "true" ? 1 : 0}"
+  force_destroy = true
+
+  bucket = "${local.bucket_name}"
 }
