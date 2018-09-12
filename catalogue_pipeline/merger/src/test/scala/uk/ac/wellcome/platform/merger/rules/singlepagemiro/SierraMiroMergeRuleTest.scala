@@ -91,8 +91,8 @@ class SierraMiroMergeRuleTest
       val expectedMergedWork = sierraWork.copy(
         otherIdentifiers =
           sierraWork.otherIdentifiers :+
-          miroWork.sourceIdentifier :+
-          miroLibraryReferenceSourceIdentifier,
+            miroWork.sourceIdentifier :+
+            miroLibraryReferenceSourceIdentifier,
         items = List(sierraItem.copy(
           agent = sierraItem.agent.copy(
             locations =
@@ -175,10 +175,8 @@ class SierraMiroMergeRuleTest
 
     it(
       "does not merge if there are multiple Miro works with a single Sierra work") {
-      val works = List(
-        createMiroWork,
-        createMiroWork,
-        createUnidentifiedSierraWork)
+      val works =
+        List(createMiroWork, createMiroWork, createUnidentifiedSierraWork)
 
       mergeAndRedirectWorks(works) shouldBe works
     }
