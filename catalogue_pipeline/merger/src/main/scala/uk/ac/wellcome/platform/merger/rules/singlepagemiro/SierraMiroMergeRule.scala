@@ -19,11 +19,11 @@ import uk.ac.wellcome.platform.merger.logging.MergerLogging
   *
   */
 object SierraMiroMergeRule extends SierraMiroMerger with SierraMiroPartitioner {
-  def mergeAndRedirectWork(works: Seq[BaseWork]): Seq[BaseWork] = {
+  def mergeAndRedirectWorks(works: Seq[BaseWork]): Seq[BaseWork] = {
     partitionWorks(works)
       .map {
         case Partition(sierraWork, miroWork, otherWorks) =>
-          val maybeResult = mergeAndRedirectWork(
+          val maybeResult = mergeAndRedirectWorkPair(
             sierraWork = sierraWork,
             miroWork = miroWork
           )
@@ -38,58 +38,68 @@ object SierraMiroMergeRule extends SierraMiroMerger with SierraMiroPartitioner {
 }
 
 trait SierraMiroMerger extends Logging with MergerLogging {
-  def mergeAndRedirectWork(
+  def mergeAndRedirectWorkPair(
     sierraWork: UnidentifiedWork,
     miroWork: UnidentifiedWork): Option[List[BaseWork]] = {
     (sierraWork.items, miroWork.items) match {
       case (
           List(sierraItem: MaybeDisplayable[Item]),
-          List(miroItem: Unidentifiable[Item])) => {
+          List(miroItem: Unidentifiable[Item])) =>
 
         info(s"Merging ${describeWorkPair(sierraWork, miroWork)}.")
 
-        val sierraDigitalLocations = sierraItem.agent.locations.collect {
-          case location: DigitalLocation => location
-        }
-
-        val items = sierraDigitalLocations match {
-          case Nil =>
-            val agent: Item = sierraItem.agent.copy(
-              locations = sierraItem.agent.locations ++ miroItem.agent.locations
-            )
-            List(copyItem(sierraItem, agent))
-          case _ =>
-            debug(
-              s"Sierra work already has digital location $sierraDigitalLocations takes precedence over Miro location.")
-            List(sierraItem)
-        }
-
         val mergedWork = sierraWork.copy(
-          otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers
-            .filterNot(identifier => identifier == sierraWork.sourceIdentifier),
-          items = items
-        )
-
-        val redirectedWork = UnidentifiedRedirectedWork(
-          sourceIdentifier = miroWork.sourceIdentifier,
-          version = miroWork.version,
-          redirect = IdentifiableRedirect(sierraWork.sourceIdentifier)
+          otherIdentifiers = mergeIdentifiers(sierraWork, miroWork),
+          items = mergeItems(sierraItem, miroItem)
         )
 
         Some(
           List(
             mergedWork,
-            redirectedWork
+            UnidentifiedRedirectedWork(miroWork, sierraWork)
           ))
-      }
       case _ =>
         None
     }
   }
 
+  private def mergeItems(sierraItem: MaybeDisplayable[Item], miroItem: Unidentifiable[Item]) = {
+    val sierraDigitalLocations = sierraItem.agent.locations.collect {
+      case location: DigitalLocation => location
+    }
+
+    val items = sierraDigitalLocations match {
+      case Nil =>
+        val agent: Item = sierraItem.agent.copy(
+          locations = sierraItem.agent.locations ++ miroItem.agent.locations
+        )
+        List(copyItem(sierraItem, agent))
+      case _ =>
+        debug(
+          s"Sierra work already has digital location $sierraDigitalLocations takes precedence over Miro location.")
+        List(sierraItem)
+    }
+    items
+  }
+
   /**
-    * Need to wrap this to allow copying of an item for both Unidentifiable and Identifiable types
-    * because MaybeDisplayable doesn't have a copy method defined.
+    *  Exclude all Sierra identifiers from the Miro work when
+    *  merging, not just the identifer to the Sierra merge target.
+    *  This is because in some cases Miro works have incorrect Sierra
+    *  identifiers and there is no way to edit them, so they are
+    *  dropped here.
+    */
+  val doNotMergeIdentifierTypes = List("sierra-identifier", "sierra-system-number")
+  private def mergeIdentifiers(sierraWork: UnidentifiedWork, miroWork: UnidentifiedWork) = {
+    sierraWork.otherIdentifiers ++
+      miroWork.identifiers.filterNot(
+        sourceIdentifier => doNotMergeIdentifierTypes.contains(sourceIdentifier.identifierType.id))
+  }
+
+  /**
+    * Need to wrap this to allow copying of an item for both Unidentifiable
+    * and Identifiable types because MaybeDisplayable doesn't have a
+    * copy method defined.
     */
   private def copyItem(item: MaybeDisplayable[Item], agent: Item) = {
     item match {

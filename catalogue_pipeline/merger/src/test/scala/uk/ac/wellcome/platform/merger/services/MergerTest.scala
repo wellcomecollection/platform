@@ -11,7 +11,7 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
 
   private val merger = new Merger()
 
-  it("merges a physical and digital work") {
+  it("merges a Sierra physical and Sierra digital work") {
     val result = merger.merge(
       works = Seq(sierraPhysicalWork, sierraDigitalWork)
     )
@@ -34,7 +34,7 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
     )
 
     val expectedRedirectedWork =
-      redirectedWork(sierraDigitalWork, sierraPhysicalWork)
+      UnidentifiedRedirectedWork(sierraDigitalWork, sierraPhysicalWork)
 
     result should contain theSameElementsAs List(
       expectedMergedWork,
@@ -63,7 +63,7 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
       )
     )
 
-    val expectedRedirectedWork = redirectedWork(miroWork, sierraPhysicalWork)
+    val expectedRedirectedWork = UnidentifiedRedirectedWork(miroWork, sierraPhysicalWork)
 
     result should contain theSameElementsAs List(
       expectedMergedWork,
@@ -81,7 +81,7 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
       otherIdentifiers = sierraDigitalWork.otherIdentifiers ++ miroWork.identifiers
     )
 
-    val expectedRedirectedWork = redirectedWork(miroWork, sierraDigitalWork)
+    val expectedRedirectedWork = UnidentifiedRedirectedWork(miroWork, sierraDigitalWork)
 
     result should contain theSameElementsAs List(
       expectedMergedWork,
@@ -89,7 +89,7 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
   }
 
   it(
-    "merges a Physical Sierra work, Digital Sierra work with a single-page Miro work") {
+    "merges a physical Sierra work and a digital Sierra work with a single-page Miro work") {
     val result = merger.merge(
       works = Seq(sierraPhysicalWork, sierraDigitalWork, miroWork)
     )
@@ -112,23 +112,14 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
     )
 
     val expectedRedirectedDigitalWork =
-      redirectedWork(sierraDigitalWork, sierraPhysicalWork)
+      UnidentifiedRedirectedWork(sierraDigitalWork, sierraPhysicalWork)
 
     val expectedMiroRedirectedWork =
-      redirectedWork(miroWork, sierraPhysicalWork)
+      UnidentifiedRedirectedWork(miroWork, sierraPhysicalWork)
 
     result should contain theSameElementsAs List(
       expectedMergedWork,
       expectedRedirectedDigitalWork,
       expectedMiroRedirectedWork)
-  }
-
-  private def redirectedWork(redirectedWork: UnidentifiedWork,
-                             targetWork: UnidentifiedWork) = {
-    UnidentifiedRedirectedWork(
-      sourceIdentifier = redirectedWork.sourceIdentifier,
-      version = redirectedWork.version,
-      redirect = IdentifiableRedirect(targetWork.sourceIdentifier)
-    )
   }
 }

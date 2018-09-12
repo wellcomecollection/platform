@@ -19,11 +19,11 @@ object SierraPhysicalDigitalMergeRule
     with SierraPhysicalDigitalMerger
     with SierraPhysicalDigitalPartitioner {
 
-  def mergeAndRedirectWork(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
+  def mergeAndRedirectWorks(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
     partitionWorks(works)
       .map {
         case Partition(physicalWork, digitalWork, otherWorks) =>
-          val maybeResult = mergeAndRedirectWork(
+          val maybeResult = mergeAndRedirectWorkPair(
             physicalWork = physicalWork,
             digitalWork = digitalWork
           )
@@ -38,7 +38,7 @@ object SierraPhysicalDigitalMergeRule
 }
 
 trait SierraPhysicalDigitalMerger extends Logging with MergerLogging {
-  def mergeAndRedirectWork(
+  def mergeAndRedirectWorkPair(
     physicalWork: UnidentifiedWork,
     digitalWork: UnidentifiedWork): Option[List[BaseWork]] =
     (physicalWork.items, digitalWork.items) match {
@@ -53,29 +53,27 @@ trait SierraPhysicalDigitalMerger extends Logging with MergerLogging {
         // so these locations definitely correspond to this item.
         val mergedWork = physicalWork.copy(
           otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
-          items = List(
-            physicalItem.copy(
-              agent = physicalItem.agent.copy(
-                locations = physicalItem.agent.locations ++ digitalItem.agent.locations
-              )
-            )
-          )
-        )
-
-        val redirectedWork = UnidentifiedRedirectedWork(
-          sourceIdentifier = digitalWork.sourceIdentifier,
-          version = digitalWork.version,
-          redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)
+          items = mergeItems(physicalItem, digitalItem)
         )
 
         Some(
           List(
             mergedWork,
-            redirectedWork
+            UnidentifiedRedirectedWork(digitalWork, physicalWork)
           ))
       case _ =>
         debug(
-          s"Not merging physical ${describeWorkPairWithItems(physicalWork, digitalWork)}; item counts are wrong")
+          s"Not merging physical ${describeWorkPairWithItems(physicalWork, digitalWork)} due to item counts.")
         None
     }
+
+  private def mergeItems(physicalItem: Identifiable[Item], digitalItem: Unidentifiable[Item]) = {
+    List(
+      physicalItem.copy(
+        agent = physicalItem.agent.copy(
+          locations = physicalItem.agent.locations ++ digitalItem.agent.locations
+        )
+      )
+    )
+  }
 }

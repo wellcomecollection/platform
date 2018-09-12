@@ -11,7 +11,7 @@ trait MergerRules {
 
 class Merger extends Logging with MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
-    (SierraPhysicalDigitalMergeRule.mergeAndRedirectWork _ andThen SierraMiroMergeRule.mergeAndRedirectWork)(
+    (SierraPhysicalDigitalMergeRule.mergeAndRedirectWorks _ andThen SierraMiroMergeRule.mergeAndRedirectWorks)(
       works)
   }
 }

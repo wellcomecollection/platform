@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.merger.rules.singlepagemiro
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
-import uk.ac.wellcome.platform.merger.rules.singlepagemiro.SierraMiroMergeRule.mergeAndRedirectWork
+import uk.ac.wellcome.platform.merger.rules.singlepagemiro.SierraMiroMergeRule.mergeAndRedirectWorks
 
 class SierraMiroMergeRuleTest
     extends FunSpec
@@ -14,10 +14,10 @@ class SierraMiroMergeRuleTest
     it("merges a minimal Miro work") {
       val sierraItem =
         createIdentifiableItemWith(locations = List(createPhysicalLocation))
-      val sierraWork = createSierraWorkWith(items = List(sierraItem))
+      val sierraWork = createUnidentifiedSierraWorkWith(items = List(sierraItem))
       val miroWork = createMiroWork
 
-      val result = mergeAndRedirectWork(
+      val result = mergeAndRedirectWorks(
         Seq(
           sierraWork,
           miroWork
@@ -42,16 +42,20 @@ class SierraMiroMergeRuleTest
       result shouldBe List(expectedMergedWork, expectedRedirectedWork)
     }
 
-    it("does not duplicate sierra-system-number when merging miro items") {
-      val sierraItem =
-        createIdentifiableItemWith(locations = List(createPhysicalLocation))
-      val sierraWork = createSierraWorkWith(items = List(sierraItem))
-      val libraryReferenceIdentifier = createMiroLibraryReferenceIdentifier
+    it("does not merge any Sierra identifiers from the Miro work") {
+      val sierraItem = createIdentifiableItemWith(locations = List(createPhysicalLocation))
+      val sierraWork = createUnidentifiedSierraWorkWith(items = List(sierraItem))
+
+      val miroLibraryReferenceSourceIdentifier = createMiroLibraryReferenceSourceIdentifier
       val miroWork = createMiroWorkWith(
         otherIdentifiers =
-          List(libraryReferenceIdentifier, sierraWork.sourceIdentifier))
+          List(
+            miroLibraryReferenceSourceIdentifier,
+            sierraWork.sourceIdentifier,
+            createSierraIdentifierSourceIdentifier,
+            createSierraSystemSourceIdentifier))
 
-      val result = mergeAndRedirectWork(
+      val result = mergeAndRedirectWorks(
         Seq(
           sierraWork,
           miroWork
@@ -60,7 +64,7 @@ class SierraMiroMergeRuleTest
       val expectedMergedWork = sierraWork.copy(
         otherIdentifiers = sierraWork.otherIdentifiers ++ List(
           miroWork.sourceIdentifier,
-          libraryReferenceIdentifier),
+          miroLibraryReferenceSourceIdentifier),
         items = List(sierraItem.copy(
           agent = sierraItem.agent.copy(
             locations =
@@ -82,10 +86,10 @@ class SierraMiroMergeRuleTest
       "does not merge Miro DigitalLocation if the Sierra work already has a DigitalLocation") {
       val sierraItem =
         createIdentifiableItemWith(locations = List(createDigitalLocation))
-      val sierraWork = createSierraWorkWith(items = List(sierraItem))
+      val sierraWork = createUnidentifiedSierraWorkWith(items = List(sierraItem))
       val miroWork = createMiroWork
 
-      val result = mergeAndRedirectWork(
+      val result = mergeAndRedirectWorks(
         Seq(
           sierraWork,
           miroWork

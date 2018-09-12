@@ -117,6 +117,14 @@ case class UnidentifiedRedirectedWork(
   identifiedType: String = classOf[IdentifiedRedirectedWork].getSimpleName
 ) extends RedirectedWork
 
+case object UnidentifiedRedirectedWork {
+  def apply(source: UnidentifiedWork, target: UnidentifiedWork): UnidentifiedRedirectedWork =
+    UnidentifiedRedirectedWork(
+      sourceIdentifier = source.sourceIdentifier,
+      version = source.version,
+      redirect = IdentifiableRedirect(target.sourceIdentifier))
+}
+
 case class IdentifiedRedirectedWork(
   canonicalId: String,
   sourceIdentifier: SourceIdentifier,

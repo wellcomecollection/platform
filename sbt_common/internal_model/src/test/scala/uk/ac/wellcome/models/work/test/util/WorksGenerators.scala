@@ -3,7 +3,7 @@ package uk.ac.wellcome.models.work.test.util
 import uk.ac.wellcome.models.work.internal._
 
 trait WorksGenerators extends ItemsGenerators {
-  private def createRandomTitle: String = randomAlphanumeric(length = 100)
+  private def createTitle: String = randomAlphanumeric(length = 100)
 
   def createUnidentifiedRedirectedWork: UnidentifiedRedirectedWork =
     UnidentifiedRedirectedWork(
@@ -68,7 +68,7 @@ trait WorksGenerators extends ItemsGenerators {
   def createUnidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     version: Int = 1,
-    title: String = createRandomTitle,
+    title: String = createTitle,
     otherIdentifiers: List[SourceIdentifier] = List(),
     mergeCandidates: List[MergeCandidate] = List(),
     description: Option[String] = None,
@@ -102,9 +102,6 @@ trait WorksGenerators extends ItemsGenerators {
       version = version
     )
 
-  def createUnidentifiedWorkOfRandomType: UnidentifiedWork =
-    createUnidentifiedWorkWith(sourceIdentifier = createSourceIdentifier)
-
   def createUnidentifiedWork: UnidentifiedWork = createUnidentifiedWorkWith()
 
   def createUnidentifiedWorks(count: Int): Seq[UnidentifiedWork] =
@@ -116,7 +113,7 @@ trait WorksGenerators extends ItemsGenerators {
     canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     otherIdentifiers: List[SourceIdentifier] = List(),
-    title: String = createRandomTitle,
+    title: String = createTitle,
     workType: Option[WorkType] = None,
     description: Option[String] = None,
     physicalDescription: Option[String] = None,
@@ -164,27 +161,27 @@ trait WorksGenerators extends ItemsGenerators {
       createIdentifiedWork
     }
 
-  def createSierraWorkWith(
+  def createUnidentifiedSierraWorkWith(
     workType: Option[WorkType] = None,
     items: List[MaybeDisplayable[Item]] = List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number"),
+        createSourceIdentifierWith(identifierType = createSierraSystemSourceIdentifierType),
       workType = workType,
       otherIdentifiers =
-        List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
+        List(createSourceIdentifierWith(identifierType = createSierraIdentifierSourceIdentifierType)),
       items = items
     )
 
-  def createSierraWork: UnidentifiedWork =
-    createSierraWorkWith()
+  def createUnidentifiedSierraWork: UnidentifiedWork =
+    createUnidentifiedSierraWorkWith()
 
   def createSierraPhysicalWork: UnidentifiedWork =
-    createSierraWorkWith(
+    createUnidentifiedSierraWorkWith(
       items = List(
         createIdentifiableItemWith(locations = List(createPhysicalLocation))))
 
-  def createSierraDigitalWork: UnidentifiedWork = createSierraWorkWith(
+  def createSierraDigitalWork: UnidentifiedWork = createUnidentifiedSierraWorkWith(
     workType = Some(WorkType("v", "E-books")),
     items = List(
       createUnidentifiableItemWith(locations = List(createDigitalLocation)))
@@ -200,18 +197,14 @@ trait WorksGenerators extends ItemsGenerators {
           createDigitalLocationWith(locationType = createImageLocationType))))
     )
 
+  def createMiroWork: UnidentifiedWork =
+    createMiroWorkWith()
+
   def createIsbnWork: UnidentifiedWork =
-    createIsbnWorkWith()
-
-  def createIsbnWorks(count: Int): List[UnidentifiedWork] =
-    List.fill(count)(createIsbnWork)
-
-  def createIsbnWorkWith(
-    otherIdentifiers: List[SourceIdentifier] = List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
       sourceIdentifier = createIsbnSourceIdentifier,
     )
 
-  def createMiroWork: UnidentifiedWork =
-    createMiroWorkWith()
+  def createIsbnWorks(count: Int): List[UnidentifiedWork] =
+    List.fill(count)(createIsbnWork)
 }

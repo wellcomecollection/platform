@@ -9,83 +9,86 @@ class SierraPhysicalDigitalPartitionerTest
     with Matchers {
 
   private val partitioner = new SierraPhysicalDigitalPartitioner {}
+  private val physicalWork = createSierraPhysicalWork
+  private val digitalWork = createSierraDigitalWork
+  private val otherWorks = createUnidentifiedWorks(4)
 
-  describe("filters physical and digital works") {
-    it("extracts a physical and digital work") {
-      val physicalWork = createSierraPhysicalWork
-      val digitalWork = createSierraDigitalWork
+  it("partitions a physical and digital work") {
+    val result = partitioner.partitionWorks(Seq(physicalWork, digitalWork))
 
-      val result = partitioner.partitionWorks(Seq(physicalWork, digitalWork))
+    result shouldBe Some(
+      partitioner.Partition(physicalWork, digitalWork, Nil))
+  }
 
-      result shouldBe Some(
-        partitioner.Partition(physicalWork, digitalWork, Nil))
+  it("partitions a physical and digital work, order in sequence") {
+    val result = partitioner.partitionWorks(Seq(digitalWork, physicalWork))
+
+    result shouldBe Some(
+      partitioner.Partition(physicalWork, digitalWork, Nil))
+  }
+
+  it("partitions a physical, digital and other works") {
+    val result =
+      partitioner.partitionWorks(Seq(physicalWork, digitalWork) ++ otherWorks)
+
+    result shouldBe Some(
+      partitioner.Partition(physicalWork, digitalWork, otherWorks))
+  }
+
+  it("does not partition a single physical work") {
+    val result = partitioner.partitionWorks(Seq(physicalWork))
+
+    result shouldBe None
+  }
+
+  it("does not partition a single digital work") {
+    val result = partitioner.partitionWorks(Seq(digitalWork))
+
+    result shouldBe None
+  }
+
+  it("does not partition multiple physical works") {
+    val works = (1 to 3).map { _ =>
+      createSierraPhysicalWork
     }
 
-    it("extracts a physical, digital and other works") {
-      val physicalWork = createSierraPhysicalWork
-      val digitalWork = createSierraDigitalWork
-      val otherWorks = createUnidentifiedWorks(4)
+    val result = partitioner.partitionWorks(works)
 
-      val result =
-        partitioner.partitionWorks(Seq(physicalWork, digitalWork) ++ otherWorks)
+    result shouldBe None
+  }
 
-      result shouldBe Some(
-        partitioner.Partition(physicalWork, digitalWork, otherWorks))
+  it("does not partition multiple digital works") {
+    val works = (1 to 3).map { _ =>
+      createSierraDigitalWork
     }
+    val result = partitioner.partitionWorks(works)
 
-    it("ignores a single physical work") {
-      val works = Seq(createSierraPhysicalWork)
+    result shouldBe None
+  }
 
-      val result = partitioner.partitionWorks(works)
+  it("does not partition multiple non digital or physical works") {
+    val result = partitioner.partitionWorks(otherWorks)
 
-      result shouldBe None
-    }
+    result shouldBe None
+  }
 
-    it("ignores a single digital work") {
-      val works = Seq(createSierraDigitalWork)
+  it("does not partition multiple physical works with a single digital work") {
+    val works = (1 to 3).map { _ =>
+      createSierraPhysicalWork
+    } ++ Seq(createSierraDigitalWork)
 
-      val result = partitioner.partitionWorks(works)
+    val result = partitioner.partitionWorks(works)
 
-      result shouldBe None
-    }
+    result shouldBe None
+  }
 
-    it("ignores multiple physical works") {
-      val works = (1 to 3).map { _ =>
-        createSierraPhysicalWork
-      }
+  it("does not partition multiple digital works with a single physical work") {
+    val works = (1 to 3).map { _ =>
+      createSierraDigitalWork
+    } ++ Seq(createSierraPhysicalWork)
 
-      val result = partitioner.partitionWorks(works)
+    val result = partitioner.partitionWorks(works)
 
-      result shouldBe None
-    }
-
-    it("ignores multiple digital works") {
-      val works = (1 to 3).map { _ =>
-        createSierraDigitalWork
-      }
-      val result = partitioner.partitionWorks(works)
-
-      result shouldBe None
-    }
-
-    it("ignores multiple physical works with a single digital work") {
-      val works = (1 to 3).map { _ =>
-        createSierraPhysicalWork
-      } ++ Seq(createSierraDigitalWork)
-
-      val result = partitioner.partitionWorks(works)
-
-      result shouldBe None
-    }
-
-    it("ignores multiple digital works with a single physical work") {
-      val works = (1 to 3).map { _ =>
-        createSierraDigitalWork
-      } ++ Seq(createSierraPhysicalWork)
-
-      val result = partitioner.partitionWorks(works)
-
-      result shouldBe None
-    }
+    result shouldBe None
   }
 }
