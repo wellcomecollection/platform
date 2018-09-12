@@ -1,7 +1,7 @@
 module "catalogue_pipeline" {
   source = "pipeline"
 
-  namespace = "catalogue_pipeline2"
+  namespace = "catalogue_pipeline"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
