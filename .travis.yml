@@ -120,7 +120,6 @@ jobs:
           sierra_window_generator \
           s3_demultiplexer \
           drain_ecs_container_instance \
-          dynamo_to_sns \
           ecs_ec2_instance_tagger \
           run_ecs_task \
           gatling_to_cloudwatch \
