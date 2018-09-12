@@ -11,32 +11,45 @@ class SierraPhysicalDigitalMergeRuleTest
     with Matchers {
   describe("merges Sierra digital, physical work pairs") {
     it("merges a Sierra physical and a Sierra digital work") {
-      val result = mergeAndRedirectWorks(
-        List(sierraPhysicalWorkWithOneItem, sierraDigitalWorkWithOneItem))
+      val physicalWork = sierraPhysicalWorkWithOneItem
+      val digitalWork = sierraDigitalWorkWithOneItem
 
-      result shouldBe List(expectedMergedWork, expectedRedirectedWork)
+      val result = mergeAndRedirectWorks(List(physicalWork, digitalWork))
+
+      result shouldBe List(
+        expectedMergedWork(physicalWork, digitalWork),
+        UnidentifiedRedirectedWork(
+          digitalWork,
+          physicalWork))
     }
 
     it(
       "merges a Sierra digital and a Sierra physical work, order doesn't matter") {
-      val result = mergeAndRedirectWorks(
-        List(sierraDigitalWorkWithOneItem, sierraPhysicalWorkWithOneItem))
+      val physicalWork = sierraPhysicalWorkWithOneItem
+      val digitalWork = sierraDigitalWorkWithOneItem
 
-      result shouldBe List(expectedMergedWork, expectedRedirectedWork)
+      val result = mergeAndRedirectWorks(
+        List(digitalWork, physicalWork))
+
+      result shouldBe List(
+        expectedMergedWork(physicalWork, digitalWork),
+        UnidentifiedRedirectedWork(
+          digitalWork,
+          physicalWork))
     }
 
     it("merges a Sierra physical and Sierra digital work, keeping extra works") {
-      val physicalWork = createSierraPhysicalWork
-      val digitalWork = createSierraDigitalWork
-      val anotherWork = createIsbnWork
-
+      val isbnWork = createIsbnWork
       val result =
-        mergeAndRedirectWorks(Seq(physicalWork, digitalWork, anotherWork))
+        mergeAndRedirectWorks(Seq(
+          createSierraPhysicalWork,
+          createSierraDigitalWork,
+          isbnWork))
 
       result.size shouldBe 3
 
       result.collect { case r: UnidentifiedRedirectedWork => r }.size shouldBe 1
-      result should contain(anotherWork)
+      result should contain(isbnWork)
     }
   }
 
@@ -79,7 +92,7 @@ class SierraPhysicalDigitalMergeRuleTest
       val works = List(
         sierraDigitalWorkWithOneItem,
         sierraPhysicalWorkWithOneItem,
-        sierraDigitalWorkWithOneItem)
+        createSierraDigitalWork)
 
       mergeAndRedirectWorks(works) shouldBe works
     }
@@ -89,7 +102,7 @@ class SierraPhysicalDigitalMergeRuleTest
       val works = List(
         sierraDigitalWorkWithOneItem,
         sierraPhysicalWorkWithOneItem,
-        sierraPhysicalWorkWithOneItem)
+        createSierraPhysicalWork)
 
       mergeAndRedirectWorks(works) shouldBe works
     }
@@ -119,43 +132,38 @@ class SierraPhysicalDigitalMergeRuleTest
     }
   }
 
-  val sierraPhysicalWorkWithOneItem: UnidentifiedWork = createSierraPhysicalWork
-  val sierraDigitalWorkWithOneItem: UnidentifiedWork = createSierraDigitalWork
+  private def sierraPhysicalWorkWithOneItem: UnidentifiedWork = createSierraPhysicalWork
+  private def sierraDigitalWorkWithOneItem: UnidentifiedWork = createSierraDigitalWork
 
-  private val sierraWorkWithTwoPhysicalItems = createUnidentifiedSierraWorkWith(
+  private def sierraWorkWithTwoPhysicalItems = createUnidentifiedSierraWorkWith(
     items = List(createPhysicalItem, createPhysicalItem)
   )
-  private val sierraWorkWithTwoDigitalItems = createUnidentifiedSierraWorkWith(
+  private def sierraWorkWithTwoDigitalItems = createUnidentifiedSierraWorkWith(
     items = List(createDigitalItem, createDigitalItem)
   )
-
-  private val sierraWorkWithoutItems = createUnidentifiedSierraWorkWith(
+  private def sierraWorkWithoutItems = createUnidentifiedSierraWorkWith(
     items = List()
   )
 
-  private def expectedMergedWork = {
-    val sierraPhysicalAgent = sierraPhysicalWorkWithOneItem.items.head.agent
-    val sierraDigitalAgent = sierraDigitalWorkWithOneItem.items.head.agent
+  private def expectedMergedWork(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork) = {
+    val sierraPhysicalAgent = physicalWork.items.head.agent
+    val sierraDigitalAgent = digitalWork.items.head.agent
 
     val expectedLocations = sierraPhysicalAgent.locations ++ sierraDigitalAgent.locations
 
-    val expectedItem = sierraPhysicalWorkWithOneItem.items.head
+    val expectedItem = physicalWork.items.head
       .asInstanceOf[Identifiable[Item]]
       .copy(
         agent = sierraPhysicalAgent.copy(
           locations = expectedLocations
         )
       )
-    val expectedIdentifiers = sierraPhysicalWorkWithOneItem.otherIdentifiers ++ sierraDigitalWorkWithOneItem.identifiers
+    val expectedOtherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers
 
-    val expectedMergedWork = sierraPhysicalWorkWithOneItem.copy(
-      otherIdentifiers = expectedIdentifiers,
+    val expectedMergedWork = physicalWork.copy(
+      otherIdentifiers = expectedOtherIdentifiers,
       items = List(expectedItem)
     )
     expectedMergedWork
   }
-
-  val expectedRedirectedWork = UnidentifiedRedirectedWork(
-    sierraDigitalWorkWithOneItem,
-    sierraPhysicalWorkWithOneItem)
 }

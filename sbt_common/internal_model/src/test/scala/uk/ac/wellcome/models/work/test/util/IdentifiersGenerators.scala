@@ -77,4 +77,7 @@ trait IdentifiersGenerators {
     IdentifierType("miro-library-reference")
   }
 
+  def createCalmSourceIdentifierType: IdentifierType = {
+    IdentifierType("calm-altref-no")
+  }
 }

@@ -38,9 +38,10 @@ trait SierraMiroPartitioner {
   }
 
   private def isSierraWork(work: UnidentifiedWork): Boolean =
-    work.sourceIdentifier.identifierType == IdentifierType(
-      "sierra-system-number")
+    work.sourceIdentifier.identifierType ==
+      IdentifierType("sierra-system-number")
 
   private def isMiroWork(work: UnidentifiedWork): Boolean =
-    work.sourceIdentifier.identifierType == IdentifierType("miro-image-number")
+    work.sourceIdentifier.identifierType ==
+      IdentifierType("miro-image-number")
 }

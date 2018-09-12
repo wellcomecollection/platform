@@ -69,7 +69,7 @@ class IngestorWorkerServiceTest
   it("inserts an Sierra identified Work only into the v2 index") {
     val work = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
-        identifierType = "sierra-system-number"
+        identifierType = createSierraSystemSourceIdentifierType
       )
     )
 
@@ -99,7 +99,7 @@ class IngestorWorkerServiceTest
   it("inserts an Sierra identified invisible Work into the v2 index") {
     val work = createIdentifiedInvisibleWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
-        identifierType = "sierra-system-number"
+        identifierType = createSierraSystemSourceIdentifierType
       )
     )
 
@@ -129,7 +129,7 @@ class IngestorWorkerServiceTest
   it("inserts an Sierra identified redirected Work into the v2 index") {
     val work = createIdentifiedRedirectedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
-        identifierType = "sierra-system-number"
+        identifierType = createSierraSystemSourceIdentifierType
       )
     )
 
@@ -159,19 +159,19 @@ class IngestorWorkerServiceTest
   it("inserts a mixture of miro and sierra works into the correct indices") {
     val miroWork1 = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "miro-image-number")
+        createSourceIdentifierWith(identifierType = createMiroSourceIdentifierType)
     )
     val miroWork2 = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "miro-image-number")
+        createSourceIdentifierWith(identifierType = createMiroSourceIdentifierType)
     )
     val sierraWork1 = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number")
+        createSourceIdentifierWith(identifierType = createSierraSystemSourceIdentifierType)
     )
     val sierraWork2 = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number")
+        createSourceIdentifierWith(identifierType = createSierraSystemSourceIdentifierType)
     )
 
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
@@ -213,7 +213,7 @@ class IngestorWorkerServiceTest
   it("fails inserting a non sierra or miro identified work") {
     val work = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
-        identifierType = "calm-altref-no"
+        identifierType = createCalmSourceIdentifierType
       )
     )
 
@@ -239,15 +239,15 @@ class IngestorWorkerServiceTest
     "inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
     val miroWork = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "miro-image-number")
+        createSourceIdentifierWith(identifierType = createMiroSourceIdentifierType)
     )
     val sierraWork = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number")
+        createSourceIdentifierWith(identifierType = createSierraSystemSourceIdentifierType)
     )
     val invalidWork = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "calm-altref-no")
+        createSourceIdentifierWith(identifierType = createCalmSourceIdentifierType)
     )
 
     val works = List(miroWork, sierraWork, invalidWork)
@@ -291,11 +291,11 @@ class IngestorWorkerServiceTest
     "deletes successfully ingested works from the queue, including older versions of already ingested works") {
     val sierraWork = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number")
+        createSourceIdentifierWith(identifierType = createSierraSystemSourceIdentifierType)
     )
     val newSierraWork = createIdentifiedWorkWith(
       sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number"),
+        createSourceIdentifierWith(identifierType = createSierraSystemSourceIdentifierType),
       version = 2
     )
     val oldSierraWork = newSierraWork.copy(version = 1)
