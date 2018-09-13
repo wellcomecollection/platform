@@ -14,5 +14,3 @@ variable "rds_password" {
 variable "admin_cidr_ingress" {
   description = "CIDR to allow tcp/22 ingress to EC2 instance"
 }
-
-variable "account_id" {}

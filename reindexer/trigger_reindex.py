@@ -117,7 +117,7 @@ def check_tables_are_clear():
     for table_suffix in [
         'matcher-lock-table',
         'works-graph',
-        'Recorder',
+        'recorder',
     ]:
         matching_tables = [t for t in table_names if t.endswith(table_suffix)]
         if len(matching_tables) == 0:
