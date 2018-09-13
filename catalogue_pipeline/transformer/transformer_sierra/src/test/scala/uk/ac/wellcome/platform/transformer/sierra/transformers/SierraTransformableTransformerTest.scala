@@ -4,7 +4,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibNumber,
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
@@ -65,18 +69,20 @@ class SierraTransformableTransformerTest
          |}
         """.stripMargin
 
-    val bibRecord = createSierraBibRecordWith(id = id, data = data )
-
+    val bibRecord = createSierraBibRecordWith(id = id, data = data)
 
     val expectedWorkType = WorkType(
       id = "k",
       label = "Pictures"
     )
 
-    val triedWork = transformer.transform(createSierraTransformableWith(id, Some(bibRecord)), 1)
+    val triedWork = transformer.transform(
+      createSierraTransformableWith(id, Some(bibRecord)),
+      1)
     triedWork.isSuccess shouldBe true
 
-    triedWork.get.asInstanceOf[UnidentifiedWork].workType shouldBe Some(expectedWorkType)
+    triedWork.get.asInstanceOf[UnidentifiedWork].workType shouldBe Some(
+      expectedWorkType)
   }
 
   it("extracts information from items") {
@@ -682,7 +688,8 @@ class SierraTransformableTransformerTest
     )
   }
 
-  it("extracts merge candidates from 962 subfield $$u if material type is k followed by spaces") {
+  it(
+    "extracts merge candidates from 962 subfield $$u if material type is k followed by spaces") {
     val id = createSierraBibNumber
     val miroId = "V0021476"
     val data =

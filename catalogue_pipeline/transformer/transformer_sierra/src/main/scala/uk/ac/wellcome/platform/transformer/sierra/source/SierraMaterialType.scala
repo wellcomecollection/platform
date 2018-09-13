@@ -10,5 +10,5 @@ object SierraMaterialType {
       id <- cursor.downField("code").as[String]
     } yield {
       SierraMaterialType(id.trim)
-    })
+  })
 }
