@@ -4,6 +4,6 @@ module "service_egress_security_group" {
   name        = "catalogue_pipeline_service_egress"
   description = "Allow traffic between services"
 
-  vpc_id     = "${var.vpc_id}"
-  subnet_ids = "${var.subnets}"
+  vpc_id     = "${local.vpc_id}"
+  subnet_ids = "${local.private_subnets}"
 }

@@ -48,4 +48,6 @@ module "catalogue_pipeline" {
     "${local.sierra_merged_items_topic_name}",
   ]
   service_egress_security_group_id = "${module.service_egress_security_group.sg_id}"
+
+  vhs_bucket_name = "${aws_s3_bucket.vhs_bucket.id}"
 }
