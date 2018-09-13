@@ -21,6 +21,7 @@ import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects.{
   SierraConceptSubjects,
   SierraPersonSubjects
 }
+import uk.ac.wellcome.platform.transformer.sierra.source.SierraMaterialType._
 
 import scala.util.{Failure, Success, Try}
 
