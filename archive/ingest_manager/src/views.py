@@ -8,6 +8,10 @@ from report_ingest_status import report_ingest_status
 from request_new_ingest import send_new_ingest_request
 
 
+@app.route('/healthcheck')
+def route_report_healthcheck_status():
+    return jsonify({'status' : 'OK'})
+
 @app.route('/ingests/<guid>')
 def route_report_ingest_status(guid):
     result = report_ingest_status(

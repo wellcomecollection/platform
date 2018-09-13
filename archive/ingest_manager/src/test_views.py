@@ -83,3 +83,14 @@ class TestRequestNewIngest:
     def test_get_against_request_endpoint_is_405(self, client):
         resp = client.get('/ingests')
         assert resp.status_code == 405
+
+
+class TestReportHealthStatus:
+    """
+    Tests for the GET /healthcheck endpoint.
+    """
+
+    def test_get_healthcheck_endpoint_is_200_OK(self, client):
+        resp = client.get(f'/healthcheck')
+        assert resp.status_code == 200
+        assert json.loads(resp.data) == {'status': 'OK'}
