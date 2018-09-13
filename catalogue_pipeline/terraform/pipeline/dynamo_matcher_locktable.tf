@@ -38,7 +38,7 @@ resource "aws_dynamodb_table" "matcher_lock_table" {
 }
 
 module "matcher_lock_table_dynamo_autoscaling" {
-  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=autoscaling-gsi"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v11.8.2"
 
   table_name = "${aws_dynamodb_table.matcher_lock_table.name}"
 
