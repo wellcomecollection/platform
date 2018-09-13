@@ -70,8 +70,7 @@ variable "sierra_adapter_topic_names" {
   type = "list"
 }
 
-variable "service_egress_security_group_id" {
-}
+variable "service_egress_security_group_id" {}
 
 variable "vhs_bucket_name" {
   default = ""

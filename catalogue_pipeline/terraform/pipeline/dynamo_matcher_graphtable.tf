@@ -23,7 +23,6 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
   }
 
   lifecycle {
-
     ignore_changes = [
       "read_capacity",
       "write_capacity",

@@ -1,4 +1,3 @@
-
 module "vhs_recorder" {
   source = "../../../catalogue_pipeline_data/terraform/vhs"
   name   = "${replace(var.namespace, "_", "-")}-recorder"
@@ -8,6 +7,6 @@ module "vhs_recorder" {
 
   prevent_destroy = "false"
 
-  account_id = "${var.account_id}"
+  account_id  = "${var.account_id}"
   bucket_name = "${var.vhs_bucket_name}"
 }

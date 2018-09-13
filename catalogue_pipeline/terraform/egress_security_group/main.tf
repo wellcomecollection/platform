@@ -30,7 +30,7 @@ resource "aws_vpc_endpoint" "events" {
   subnet_ids = ["${var.subnet_ids}"]
 
   service_name = "${data.aws_vpc_endpoint_service.events.service_name}"
-  depends_on = ["aws_security_group.security_group"]
+  depends_on   = ["aws_security_group.security_group"]
 }
 
 data "aws_vpc_endpoint_service" "logs" {
@@ -44,8 +44,8 @@ resource "aws_vpc_endpoint" "logs" {
   security_group_ids = [
     "${aws_security_group.security_group.id}",
   ]
-  depends_on = ["aws_security_group.security_group"]
 
+  depends_on = ["aws_security_group.security_group"]
 
   subnet_ids = ["${var.subnet_ids}"]
 
@@ -63,6 +63,7 @@ resource "aws_vpc_endpoint" "sns" {
   security_group_ids = [
     "${aws_security_group.security_group.id}",
   ]
+
   depends_on = ["aws_security_group.security_group"]
 
   subnet_ids = ["${var.subnet_ids}"]

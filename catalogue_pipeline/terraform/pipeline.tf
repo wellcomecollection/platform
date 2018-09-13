@@ -16,9 +16,9 @@ module "catalogue_pipeline" {
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 
-  vhs_miro_read_policy      = "${local.vhs_miro_read_policy}"
+  vhs_miro_read_policy = "${local.vhs_miro_read_policy}"
 
-  vhs_sierra_read_policy      = "${local.vhs_sierra_read_policy}"
+  vhs_sierra_read_policy = "${local.vhs_sierra_read_policy}"
 
   aws_region      = "${var.aws_region}"
   messages_bucket = "${aws_s3_bucket.messages.id}"
@@ -47,6 +47,7 @@ module "catalogue_pipeline" {
     "${local.sierra_merged_bibs_topic_name}",
     "${local.sierra_merged_items_topic_name}",
   ]
+
   service_egress_security_group_id = "${module.service_egress_security_group.sg_id}"
 
   vhs_bucket_name = "${aws_s3_bucket.vhs_bucket.id}"
