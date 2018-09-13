@@ -9,5 +9,5 @@ trait MergerLogging {
   def describeWorkPairWithItems(workA: UnidentifiedWork,
                                 workB: UnidentifiedWork): String =
     s"(id=${workA.sourceIdentifier.value}, itemsCount=${workA.items.size}) and " +
-      s"(id=${workB.sourceIdentifier.value}, itemsCount=${workB.items.size}) work"
+      s"(id=${workB.sourceIdentifier.value}, itemsCount=${workB.items.size})"
 }
