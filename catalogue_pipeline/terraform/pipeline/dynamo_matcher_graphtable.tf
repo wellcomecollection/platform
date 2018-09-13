@@ -33,7 +33,7 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
 }
 
 module "matcher_graph_dynamo_autoscaling" {
-  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v11.8.2"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v11.8.0"
 
   table_name = "${aws_dynamodb_table.matcher_graph_table.name}"
 
