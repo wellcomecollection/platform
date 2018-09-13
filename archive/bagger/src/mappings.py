@@ -34,6 +34,3 @@ IGNORED_PROPERTIES = [
     "Bits Per Sample",
     "Samples Per Pixel"
 ]
-
-
-

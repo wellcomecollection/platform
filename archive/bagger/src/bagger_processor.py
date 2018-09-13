@@ -3,6 +3,7 @@ import traceback
 import bagger
 import time
 
+
 def process_bagging_message(message):
     identifier = message.get("identifier", None)
     do_not_bag = message.get("do_not_bag", True)
