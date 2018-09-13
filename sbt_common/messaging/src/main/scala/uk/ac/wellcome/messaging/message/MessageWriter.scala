@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
+import io.circe.Encoder
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectStore}
@@ -39,19 +40,47 @@ class MessageWriter[T] @Inject()(
     s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
-  def write(message: T, subject: String): Future[PublishAttempt] = {
+  def write(message: T, subject: String)(
+    implicit encoder: Encoder[T]): Future[PublishAttempt] =
     for {
-      location <- objectStore.put(messageConfig.s3Config.bucketName)(
-        message,
-        keyPrefix = KeyPrefix(getKeyPrefix())
+      jsonString <- Future.fromTry(toJson(message))
+      encodedNotification <- Future.fromTry(
+        toJson[MessageNotification](InlineNotification(jsonString))
       )
-      _ = debug(s"Successfully stored message $message in location: $location")
+
+      // If the encoded message is less than 250KB, we can send it inline
+      // in SNS/SQS (although the limit is 256KB, there's a bit of overhead
+      // caused by the notification wrapper, so we're conservative).
+      //
+      // Max SQS message size:
+      // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-limits.html#limits-messages
+      //
+      // Max SNS message size:
+      // https://aws.amazon.com/sns/faqs/
+      //
+      notification: String <- if (encodedNotification
+                                    .getBytes("UTF-8")
+                                    .length > 250 * 1000) {
+        createRemoteNotification(message)
+      } else {
+        Future.successful(encodedNotification)
+      }
+
       publishAttempt <- sns.writeMessage(
-        message = location,
+        message = notification,
         subject = subject
       )
       _ = debug(publishAttempt)
     } yield publishAttempt
 
-  }
+  private def createRemoteNotification(message: T): Future[String] =
+    for {
+      location <- objectStore.put(messageConfig.s3Config.bucketName)(
+        message,
+        keyPrefix = KeyPrefix(getKeyPrefix())
+      )
+      _ = info(s"Successfully stored message in location: $location")
+      notification = RemoteNotification(location = location)
+      jsonString <- Future.fromTry(toJson[MessageNotification](notification))
+    } yield jsonString
 }

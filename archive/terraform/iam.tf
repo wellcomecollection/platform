@@ -107,13 +107,23 @@ resource "aws_iam_role_policy" "archive_asset_lookup_dynamo_permission" {
 EOF
 }
 
-resource "aws_iam_role_policy" "lambda_archive_ingest_sns" {
-  role   = "${module.lambda_archive_ingest.role_name}"
+resource "aws_iam_role_policy" "lambda_archive_report_ingest_status_sns" {
+  role   = "${module.lambda_archive_report_ingest_status.role_name}"
   policy = "${module.archivist_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "lambda_archive_ingest_archive_progress_table" {
-  role   = "${module.lambda_archive_ingest.role_name}"
+resource "aws_iam_role_policy" "lambda_archive_report_ingest_status_archive_progress_table" {
+  role   = "${module.lambda_archive_report_ingest_status.role_name}"
+  policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
+}
+
+resource "aws_iam_role_policy" "lambda_archive_request_ingest_sns" {
+  role   = "${module.lambda_archive_request_ingest.role_name}"
+  policy = "${module.archivist_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "lambda_archive_request_ingest_archive_progress_table" {
+  role   = "${module.lambda_archive_request_ingest.role_name}"
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 

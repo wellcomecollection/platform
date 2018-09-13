@@ -61,6 +61,31 @@ class SNSWriterTest
     }
   }
 
+  sealed trait Container {}
+
+  case class Box(sides: Int) extends Container
+  case class Bottle(height: Int) extends Container
+
+  it("encodes a case class using the type parameter before sending it to SNS") {
+    withLocalSnsTopic { topic =>
+      withSNSWriter(topic) { snsWriter =>
+        val message = Box(sides = 4)
+
+        val futurePublishAttempt = snsWriter.writeMessage[Container](
+          message = message,
+          subject = "box subject"
+        )
+
+        whenReady(futurePublishAttempt) { publishAttempt =>
+          val messages = listMessagesReceivedFromSNS(topic)
+          messages should have size 1
+
+          fromJson[Container](messages.head.message).get shouldBe message
+        }
+      }
+    }
+  }
+
   it("returns a failed Future if it fails to publish the message") {
     withSNSWriter(Topic("does-not-exist")) { snsWriter =>
       val futurePublishAttempt =

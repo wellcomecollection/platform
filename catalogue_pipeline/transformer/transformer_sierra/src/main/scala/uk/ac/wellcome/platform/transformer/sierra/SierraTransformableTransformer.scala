@@ -115,7 +115,7 @@ class SierraTransformableTransformer
                 s"Unable to parse bib data for ${bibRecord.id} as JSON: <<${bibRecord.data}>>"
               )
             case e: ShouldNotTransformException =>
-              info(s"Should not transform $bibId: ${e.getMessage}")
+              debug(s"Should not transform $bibId: ${e.getMessage}")
               UnidentifiedInvisibleWork(
                 sourceIdentifier = sourceIdentifier,
                 version = version

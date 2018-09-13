@@ -1,5 +1,9 @@
 variable "name" {}
 
+variable "infra_bucket" {
+  default = "wellcomecollection-platform-infra"
+}
+
 variable "bucket_name_prefix" {
   default = "wellcomecollection-vhs-"
 }
@@ -17,5 +21,5 @@ variable "table_write_max_capacity" {
 }
 
 variable "table_stream_enabled" {
-  default = true
+  default = false
 }

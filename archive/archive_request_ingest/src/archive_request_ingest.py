@@ -1,6 +1,27 @@
 # -*- encoding: utf-8 -*-
 """
-Receives a message to ingest a bag giving the URL and publishes the archive event to an SNS topic.
+Receives a POST request to ingest a bag giving the URL and publishes the
+archive event to an SNS topic.
+
+Quoting from RFC 002 at commit ea310c1 on master:
+
+    POST /ingests
+    Content-Type: application/json
+
+    {
+      "type": "Ingest",
+      "ingestType": {
+        "id": "create",
+        "type": "IngestType"
+      },
+      "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+      "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+    }
+
+    Response:
+
+    202 ACCEPTED
+
 """
 
 import os
@@ -17,9 +38,7 @@ daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 
-def post_ingest_request(event, sns_client):
-    topic_arn = os.environ['TOPIC_ARN']
-
+def post_ingest_request(event, sns_client, topic_arn):
     request = event['body']
     path = event.get('path', '')
 
@@ -35,11 +54,9 @@ def post_ingest_request(event, sns_client):
     logger.debug('ingest_request_id: %r', ingest_request_id)
 
     message = archive_bag_message(ingest_request_id, upload_url, callback_url)
-    logger.debug(f"sns-message: {message}")
+    logger.debug("sns-message: %r", message)
 
     topic_name = topic_arn.split(":")[-1]
-
-    sns_client = sns_client or boto3.client('sns')
 
     publish_sns_message(
         sns_client=sns_client,
@@ -47,25 +64,12 @@ def post_ingest_request(event, sns_client):
         message=message,
         subject=f"source: archive_ingest ({topic_name})"
     )
-    logger.debug(f"published: {message} to {topic_arn}")
+    logger.debug("published: %r to %r", message, topic_arn)
 
     return {
         'id': ingest_request_id,
         'location': join_url((path, ingest_request_id))
     }
-
-
-def get_ingest_status(event, dynamodb_resource):
-    dynamodb_resource = dynamodb_resource or boto3.resource('dynamodb')
-    table_name = os.environ['TABLE_NAME']
-    id = event['id']
-
-    table = dynamodb_resource.Table(table_name)
-
-    item = table.get_item(
-        Key={'id': id}
-    )
-    return item['Item']
 
 
 def archive_bag_message(archive_request_id, bag_url, callback_url):
@@ -95,12 +99,20 @@ def join_url(path_segments):
 
 
 @log_on_error
-def main(event, context=None, dynamodb_resource=None, sns_client=None):
+def main(event, context=None, sns_client=None):
     logger.debug('received %r', event)
 
-    request_method = event.get('request_method', 'POST')
+    request_method = event['request_method']
+    if request_method != 'POST':
+        raise ValueError(
+            'Expected request_method=POST, got %r' % request_method
+        )
 
-    if request_method.upper() == 'POST':
-        return post_ingest_request(event, sns_client)
-    elif request_method.upper() == 'GET':
-        return get_ingest_status(event, dynamodb_resource)
+    topic_arn = os.environ['TOPIC_ARN']
+    sns_client = sns_client or boto3.client('sns')
+
+    return post_ingest_request(
+        event,
+        sns_client=sns_client,
+        topic_arn=topic_arn
+    )

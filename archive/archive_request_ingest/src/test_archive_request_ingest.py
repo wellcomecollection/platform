@@ -5,7 +5,7 @@ from uuid import UUID
 
 import pytest
 
-import archive_ingest
+import archive_request_ingest as request_ingest
 
 
 TABLE_NAME = 'archive-storage-progress-table'
@@ -14,7 +14,7 @@ TABLE_NAME = 'archive-storage-progress-table'
 def test_post_sends_location_to_sns(sns_client, topic_arn):
     request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip')
 
-    response = archive_ingest.main(event=request, sns_client=sns_client)
+    response = request_ingest.main(event=request, sns_client=sns_client)
 
     id = str(UUID(response['id']))
     assert id
@@ -32,27 +32,11 @@ def test_post_sends_location_to_sns(sns_client, topic_arn):
     }
 
 
-def test_get_returns_status(dynamodb_resource):
-    os.environ['TABLE_NAME'] = TABLE_NAME
-
-    id = '245e3de7-5453-4ce1-a3ce-bd111753b1cf'
-    table = dynamodb_resource.Table(TABLE_NAME)
-    table.put_item(Item={'id': id, 'a': 'b'})
-
-    request = {
-        'request_method': 'GET',
-        'id': id
-    }
-
-    response = archive_ingest.main(event=request, dynamodb_resource=dynamodb_resource)
-    assert response['a'] == 'b'
-
-
 def test_sends_request_to_sns_with_callback(sns_client, topic_arn):
     request = ingest_request(upload_url='s3://wellcomecollection-assets-archive-ingest/test-bag.zip',
                              callback_url='https://workflow.wellcomecollection.org/callback?id=b1234567')
 
-    response = archive_ingest.main(event=request, sns_client=sns_client)
+    response = request_ingest.main(event=request, sns_client=sns_client)
 
     actual_id = str(UUID(response['id']))
     assert actual_id
@@ -69,32 +53,56 @@ def test_sends_request_to_sns_with_callback(sns_client, topic_arn):
     }
 
 
-def test_invalid_url_fails(sns_client):
+def test_invalid_url_fails(sns_client, topic_arn):
     request = ingest_request('invalidUrl')
 
     with pytest.raises(ValueError, match="\[BadRequest\] Unrecognised url scheme: invalid"):
-        archive_ingest.main(event=request, sns_client=sns_client)
+        request_ingest.main(event=request, sns_client=sns_client)
 
     assert len(sns_client.list_messages()) == 0
 
 
-def test_missing_url_fails(sns_client):
-    request = {"body": {'unknownKey': 'aValue'}}
+def test_missing_url_fails(sns_client, topic_arn):
+    request = {
+        'body': {'unknownKey': 'aValue'},
+        'request_method': 'POST'
+    }
 
     with pytest.raises(KeyError,
                        match="\[BadRequest\] Invalid request missing 'uploadUrl' in {'unknownKey': 'aValue'}"):
-        archive_ingest.main(event=request, sns_client=sns_client)
+        request_ingest.main(event=request, sns_client=sns_client)
 
     assert len(sns_client.list_messages()) == 0
 
 
-def test_invalid_json_fails(sns_client):
-    request = {"body": "not_json"}
+def test_invalid_json_fails(sns_client, topic_arn):
+    request = {
+        'body': 'not_json',
+        'request_method': 'POST'
+    }
 
     with pytest.raises(TypeError, match="\[BadRequest\] Invalid request not json: not_json"):
-        archive_ingest.main(event=request, sns_client=sns_client)
+        request_ingest.main(event=request, sns_client=sns_client)
 
     assert len(sns_client.list_messages()) == 0
+
+
+def test_throws_valueerror_if_called_with_get_event():
+    event = {
+        'request_method': 'GET'
+    }
+
+    with pytest.raises(ValueError, match='Expected request_method=POST'):
+        request_ingest.main(event=event)
+
+
+def test_throws_keyerror_if_no_topic_arn_set():
+    assert 'TOPIC_ARN' not in os.environ
+
+    event = ingest_request(upload_url='s3://bukkit/example.zip')
+
+    with pytest.raises(KeyError, match='TOPIC_ARN'):
+        request_ingest.main(event=event)
 
 
 def ingest_request(upload_url, callback_url=None):
@@ -105,40 +113,6 @@ def ingest_request(upload_url, callback_url=None):
         body['callbackUrl'] = callback_url
     return {
         'body': body,
+        'request_method': 'POST',
         'path': '/ingests/'
     }
-
-
-@pytest.yield_fixture(autouse=True)
-def run_around_tests(dynamodb_client):
-    os.environ['TABLE_NAME'] = TABLE_NAME
-
-    create_table(dynamodb_client, TABLE_NAME)
-    yield
-    dynamodb_client.delete_table(TableName=TABLE_NAME)
-
-
-def create_table(dynamodb_client, table_name):
-    try:
-        dynamodb_client.create_table(
-            TableName=table_name,
-            KeySchema=[
-                {
-                    'AttributeName': 'id',
-                    'KeyType': 'HASH'
-                }
-            ],
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'id',
-                    'AttributeType': 'S'
-                }
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            }
-        )
-        dynamodb_client.get_waiter('table_exists').wait(TableName=table_name)
-    except dynamodb_client.exceptions.ResourceInUseException:
-        pass

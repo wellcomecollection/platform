@@ -1,7 +1,21 @@
 module "catalogue_pipeline" {
   source = "pipeline"
 
-  namespace                          = "catalogue_pipeline"
+  # If you want to create a new copy of the pipeline in a different namespace,
+  # duplicate this module.
+  #
+  # DO NOT RENAME IT.
+  #
+  # There are a bunch of interconnected pieces in this module, some of
+  # which can be renamed safely, some of which can't.  Terraform doesn't
+  # get the ordering right, and you end up in a state where some of it
+  # can't be deleted by Terraform.
+  #
+  # Sadness.  To re-namespace the pipeline, create an entirely new instance
+  # of this module in Terraform, with a different name, and delete this one.
+  #
+  namespace = "catalogue_pipeline"
+
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
   recorder_container_image           = "${local.recorder_container_image}"
@@ -10,8 +24,9 @@ module "catalogue_pipeline" {
   id_minter_container_image          = "${local.id_minter_container_image}"
   ingestor_container_image           = "${local.ingestor_container_image}"
 
-  subnets    = ["${local.private_subnets}"]
-  vpc_id     = "${local.vpc_id}"
+  subnets = ["${local.private_subnets}"]
+  vpc_id  = "${local.vpc_id}"
+
   account_id = "${data.aws_caller_identity.current.account_id}"
 
   vhs_miro_read_policy      = "${local.vhs_miro_read_policy}"

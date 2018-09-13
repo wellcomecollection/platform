@@ -36,7 +36,7 @@ module "sierra_merger_service" {
     # where we exhaust the HTTP connection pool.  Turning down the parallelism
     # is an attempt to reduce the number of S3 objects in flight, and avoid
     # these errors.
-    sqs_parallelism = 7
+    sqs_parallelism = 5
   }
 
   env_vars_length = 7

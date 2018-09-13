@@ -2,93 +2,82 @@ package uk.ac.wellcome.platform.merger.services
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.merger.pairwise_transforms.SierraPhysicalDigitalWorkPair
 
 trait MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork]
 }
 
+/** The merger is implemented as a series of "pairwise" merges.
+  *
+  * Each of the pairwise mergers is implemented (and tested) as a separate object.
+  * This class should _only_ contain logic for deciding whether there are any
+  * works which are eligible for merging, and call the pairwise merger to do
+  * the actual logic of merging.
+  *
+  * The merger currently knows about three types of work, in decreasing order
+  * of precedence:
+  *
+  *   - Sierra physical record
+  *   - Sierra digital record
+  *   - Miro record
+  *
+  * We apply the pairwise merges in this order:
+  *
+  *     Miro + Sierra digital
+  *     Miro + Sierra physical
+  *     Sierra digital + Sierra physical
+  *
+  * Each of these pairwise merges is implemented as a single method on
+  * this class, and each method should take the list of current works,
+  * and return the remaining works after applying this transformation.
+  *
+  */
 class Merger extends Logging with MergerRules {
-  def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
-    mergePhysicalDigitalPair(works)
-      .getOrElse(works)
-  }
+  def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] =
+    maybeMergePhysicalDigitalWorkPair(works)
 
-  private def mergePhysicalDigitalPair(works: Seq[UnidentifiedWork]) = {
-    if (works.size == 2) {
-      val (digitalWorks, physicalWorks) = works.partition(isDigitalWork)
-      mergePhysicalAndDigitalWorks(physicalWorks, digitalWorks)
-    } else {
-      None
-    }
-  }
+  /** If we have a single physical Sierra work and a single digital Sierra work,
+    * we can merge them into a single work.
+    */
+  def maybeMergePhysicalDigitalWorkPair(
+    works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
+    val physicalWorks = works.filter { isSierraPhysicalWork }
+    val digitalWorks = works.filter { isSierraDigitalWork }
 
-  private def mergePhysicalAndDigitalWorks(
-    physicalWorks: Seq[UnidentifiedWork],
-    digitalWorks: Seq[UnidentifiedWork]) = {
     (physicalWorks, digitalWorks) match {
-      // As the works are supplied by the matcher these are trusted to refer to the same work without verification.
-      // However, it may be prudent to add extra checks before making the merge here.
       case (List(physicalWork), List(digitalWork)) =>
-        mergeAndRedirectWork(physicalWork, digitalWork)
-      case _ =>
-        None
+        val maybeResult = SierraPhysicalDigitalWorkPair.mergeAndRedirectWork(
+          physicalWork = physicalWork,
+          digitalWork = digitalWork
+        )
+        maybeResult match {
+          case Some(result) => {
+            val remainingWorks = works.filterNot { w =>
+              w.sourceIdentifier == physicalWork.sourceIdentifier ||
+              w.sourceIdentifier == digitalWork.sourceIdentifier
+            }
+            remainingWorks ++ List(result.mergedWork, result.redirectedWork)
+          }
+          case None => works
+        }
+      case _ => works
     }
   }
 
-  private def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
-                                   digitalWork: UnidentifiedWork) = {
-    (physicalWork.items, digitalWork.items) match {
-      case (
-          List(physicalItem: Identifiable[Item]),
-          List(digitalItem: Unidentifiable[Item])) =>
-        info(
-          s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
-        Some(
-          List(
-            physicalWork.copy(
-              otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
-              items = mergePhysicalAndDigitalItems(physicalItem, digitalItem)),
-            redirectWork(
-              workToRedirect = digitalWork,
-              redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)
-          ))
-      case _ =>
-        debug(
-          s"Not merging physical ${describeWorkPairWithItems(physicalWork, digitalWork)} as there are multiple items")
-        None
-    }
-  }
+  private def isSierraWork(work: UnidentifiedWork): Boolean =
+    work.sourceIdentifier.identifierType == IdentifierType(
+      "sierra-system-number")
 
-  private def mergePhysicalAndDigitalItems(
-    physicalItem: Identifiable[Item],
-    digitalItem: Unidentifiable[Item]) = {
-    List(physicalItem.copy(agent = physicalItem.agent.copy(
-      locations = physicalItem.agent.locations ++ digitalItem.agent.locations)))
-  }
-
-  private def redirectWork(workToRedirect: UnidentifiedWork,
-                           redirectTargetSourceIdentifier: SourceIdentifier) = {
-    UnidentifiedRedirectedWork(
-      sourceIdentifier = workToRedirect.sourceIdentifier,
-      version = workToRedirect.version,
-      redirect = IdentifiableRedirect(redirectTargetSourceIdentifier)
-    )
-  }
-
-  private def isDigitalWork(work: UnidentifiedWork): Boolean = {
+  private def isDigitalWork(work: UnidentifiedWork): Boolean =
     work.workType match {
       case None    => false
       case Some(t) => t.id == "v" && t.label == "E-books"
     }
-  }
 
-  private def describeWorkPair(physicalWork: UnidentifiedWork,
-                               digitalWork: UnidentifiedWork) =
-    s"physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value})"
+  private def isSierraDigitalWork(work: UnidentifiedWork): Boolean =
+    isSierraWork(work) && isDigitalWork(work)
 
-  private def describeWorkPairWithItems(physicalWork: UnidentifiedWork,
-                                        digitalWork: UnidentifiedWork) =
-    s"physical (id=${physicalWork.sourceIdentifier.value}, itemsCount=${physicalWork.items.size}) and " +
-      s"digital (id=${digitalWork.sourceIdentifier.value}, itemsCount=${digitalWork.items.size}) work"
-
+  private def isSierraPhysicalWork(work: UnidentifiedWork): Boolean =
+    isSierraWork(work) && !isDigitalWork(work)
 }

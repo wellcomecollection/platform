@@ -55,7 +55,7 @@ def publish_messages(topic_arn, messages, total_segments):
         assert resp['ResponseMetadata']['HTTPStatusCode'] == 200, resp
 
 
-def post_to_slack(source_name, reason):
+def post_to_slack(source_name, reason, total_segments):
     """
     Posts a message about the reindex in Slack, so we can track them.
     """
@@ -76,7 +76,8 @@ def post_to_slack(source_name, reason):
 
     message = (
         f'*{username}* started a reindex in *{source_name}*\n'
-        f'Reason: *{reason}*'
+        f'Reason: *{reason}* '
+        f'({total_segments} segment{"s" if total_segments != 1 else ""})'
     )
 
     slack_data = {
@@ -104,6 +105,36 @@ def build_topic_arn(topic_name):
     return f'arn:aws:sns:eu-west-1:{account_id}:{topic_name}'
 
 
+def check_tables_are_clear():
+    """
+    Check that all the tables in the pipeline are clear before starting
+    a reindex.
+    """
+    dynamodb = boto3.client('dynamodb')
+
+    table_names = dynamodb.list_tables()['TableNames']
+
+    for table_suffix in [
+        'matcher-lock-table',
+        'works-graph',
+        'Recorder',
+    ]:
+        matching_tables = [t for t in table_names if t.endswith(table_suffix)]
+        if len(matching_tables) == 0:
+            print(f'Unable to find a pipeline table for {table_suffix!r}?')
+            sys.exit(1)
+        elif len(matching_tables) > 1:
+            print(f'More than one pipeline table for {table_suffix!r}: {matching_tables}')
+            sys.exit(1)
+
+        matching_table = matching_tables[0]
+
+        resp = dynamodb.scan(TableName=matching_table, Limit=1)
+        if resp['Items']:
+            print(f'Table {matching_table!r} is already populated!  Clear tables before reindexing.')
+            sys.exit(1)
+
+
 def main():
     args = docopt.docopt(__doc__)
 
@@ -111,9 +142,16 @@ def main():
     reason = args['--reason']
     total_segments = int(args['--total_segments'])
 
+    print('Checking pipeline is clear...')
+    check_tables_are_clear()
+
     print(f'Triggering a reindex in {source_name}')
 
-    post_to_slack(source_name=source_name, reason=reason)
+    post_to_slack(
+        source_name=source_name,
+        reason=reason,
+        total_segments=total_segments
+    )
 
     messages = all_messages(total_segments=total_segments)
 
