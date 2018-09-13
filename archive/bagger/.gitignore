@@ -107,6 +107,8 @@ venv.bak/
 bag.sh
 bnums.sh
 local_run.sh
+queue_for_bagging.sh
+local_run_queue_listener.sh
 .vscode
 
 

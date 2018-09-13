@@ -93,10 +93,12 @@ def bag_from_identifier(identifier, skip_file_download):
     if skip_file_download:
         print(b_number)
         logging.info("Finished {0} without bagging".format(b_number))
+        bag_assembly.cleanup_bnumber_files(b_number)
         return
 
     bagit.make_bag(bag_details["directory"], get_bag_info(b_number, title))
     dispatch_bag(bag_details)
+    bag_assembly.cleanup_bnumber_files(b_number)
     logging.info("Finished {0}".format(b_number))
 
 
@@ -148,7 +150,8 @@ def main():
         logging.info("skipping copying and bagging operations, will just process METS")
         skip_file_download = True
 
-    bag_from_identifier(sys.argv[1], skip_file_download)
+    identifier = sys.argv[1]
+    bag_from_identifier(identifier, skip_file_download)
 
 
 if __name__ == "__main__":

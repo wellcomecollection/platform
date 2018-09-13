@@ -2,6 +2,7 @@ import os
 import json
 import boto3
 import settings
+from botocore.exceptions import ClientError
 
 boto_session = None
 
@@ -38,3 +39,23 @@ def log_processing_error(message):
     s3_path = "{0}.json".format(message["identifier"])
     obj = get_s3().Object(settings.DROP_BUCKET_NAME_ERRORS, s3_path)
     obj.put(Body=json.dumps(message, indent=4))
+
+
+def send_bag_instruction(message):
+    sqs = get_boto_session().resource("sqs")
+    queue = None
+    try:
+        queue = sqs.get_queue_by_name(QueueName=settings.BAGGING_QUEUE)
+    except ClientError as ce:
+        if ce.response["Error"]["Code"] == "AWS.SimpleQueueService.NonExistentQueue":
+            queue = sqs.create_queue(QueueName=settings.BAGGING_QUEUE, Attributes={'DelaySeconds': '0'})
+            print("Created queue - " + settings.BAGGING_QUEUE)
+
+    response = queue.send_message(MessageBody=json.dumps(message))
+    return response
+
+
+def get_bagging_messages():
+    sqs = get_boto_session().resource("sqs")
+    queue = sqs.get_queue_by_name(QueueName=settings.BAGGING_QUEUE)
+    return queue.receive_messages(WaitTimeSeconds=settings.POLL_INTERVAL)

@@ -14,7 +14,7 @@ valid_dir_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x']
 def b_numbers_from_fileshare(start_at):
     b_number_pattern = re.compile(r'\A(b[0-9ax]{8}).xml\Z')
     mets_root = os.path.join(settings.METS_FILESYSTEM_ROOT, start_at)
-    for dirpath, dirnames, filenames in os.walk(mets_root, topdown=True):
+    for dirpath, _, filenames in os.walk(mets_root, topdown=True):
         this_dir = os.path.dirname(dirpath)
         if os.path.basename(this_dir) in valid_dir_names:
             for f in filenames:

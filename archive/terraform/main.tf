@@ -71,7 +71,28 @@ module "bagger" {
   max_capacity = 1
 
   env_vars = {
-    my_var = "some_value"
+    METS_BUCKET_NAME = "${var.bagger_mets_bucket_name}"
+    READ_METS_FROM_FILESHARE = "${var.bagger_read_mets_from_fileshare}"
+    WORKING_DIRECTORY = "${var.bagger_working_directory}"
+    DROP_BUCKET_NAME = "${var.bagger_drop_bucket_name}"
+    DROP_BUCKET_NAME_METS_ONLY = "${var.bagger_drop_bucket_name_mets_only}"
+    DROP_BUCKET_NAME_ERRORS = "${var.bagger_drop_bucket_name_errors}"
+    CURRENT_PRESERVATION_BUCKET = "${var.bagger_current_preservation_bucket}"
+    DLCS_SOURCE_BUCKET = "${var.bagger_dlcs_source_bucket}"
+    # aws creds that can see Preservica as well as Platform estate
+    AWS_ACCESS_KEY_ID = "${var.bagger_aws_access_key_id}"
+    AWS_SECRET_ACCESS_KEY = "${var.bagger_aws_secret_access_key}"
+    AWS_DEFAULT_REGION = "${var.bagger_aws_region}"
+    # DLCS config
+    DLCS_ENTRY = "${var.bagger_dlcs_entry}"
+    DLCS_API_KEY = "${var.bagger_dlcs_api_key}"
+    DLCS_API_SECRET = "${var.bagger_dlcs_api_secret}"
+    DLCS_CUSTOMER_ID = "${var.bagger_dlcs_customer_id}"
+    DLCS_SPACE = "${var.bagger_dlcs_space}"
+    # DDS credentials
+    DDS_API_KEY = "${var.bagger_dds_api_key}"
+    DDS_API_SECRET = "${var.bagger_dds_api_secret}"
+    DDS_ASSET_PREFIX = "${var.bagger_dds_asset_prefix}"
   }
 
   env_vars_length = 1
