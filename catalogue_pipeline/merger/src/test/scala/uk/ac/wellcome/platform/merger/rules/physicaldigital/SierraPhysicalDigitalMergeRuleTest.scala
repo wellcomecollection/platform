@@ -18,9 +18,7 @@ class SierraPhysicalDigitalMergeRuleTest
 
       result shouldBe List(
         expectedMergedWork(physicalWork, digitalWork),
-        UnidentifiedRedirectedWork(
-          digitalWork,
-          physicalWork))
+        UnidentifiedRedirectedWork(digitalWork, physicalWork))
     }
 
     it(
@@ -28,23 +26,21 @@ class SierraPhysicalDigitalMergeRuleTest
       val physicalWork = createSierraPhysicalWork
       val digitalWork = createSierraDigitalWork
 
-      val result = mergeAndRedirectWorks(
-        List(digitalWork, physicalWork))
+      val result = mergeAndRedirectWorks(List(digitalWork, physicalWork))
 
       result shouldBe List(
         expectedMergedWork(physicalWork, digitalWork),
-        UnidentifiedRedirectedWork(
-          digitalWork,
-          physicalWork))
+        UnidentifiedRedirectedWork(digitalWork, physicalWork))
     }
 
     it("merges a Sierra physical and Sierra digital work, keeping extra works") {
       val isbnWorks = createIsbnWorks(2)
       val result =
-        mergeAndRedirectWorks(Seq(
-          createSierraPhysicalWork,
-          createSierraDigitalWork,
-        ) ++ isbnWorks)
+        mergeAndRedirectWorks(
+          Seq(
+            createSierraPhysicalWork,
+            createSierraDigitalWork,
+          ) ++ isbnWorks)
 
       result.size shouldBe 4
 
@@ -132,17 +128,20 @@ class SierraPhysicalDigitalMergeRuleTest
     }
   }
 
-  private def createSierraWorkWithTwoPhysicalItems = createUnidentifiedSierraWorkWith(
-    items = List(createPhysicalItem, createPhysicalItem)
-  )
-  private def createSierraWorkWithTwoDigitalItems = createUnidentifiedSierraWorkWith(
-    items = List(createDigitalItem, createDigitalItem)
-  )
+  private def createSierraWorkWithTwoPhysicalItems =
+    createUnidentifiedSierraWorkWith(
+      items = List(createPhysicalItem, createPhysicalItem)
+    )
+  private def createSierraWorkWithTwoDigitalItems =
+    createUnidentifiedSierraWorkWith(
+      items = List(createDigitalItem, createDigitalItem)
+    )
   private def createSierraWorkWithoutItems = createUnidentifiedSierraWorkWith(
     items = List()
   )
 
-  private def expectedMergedWork(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork) = {
+  private def expectedMergedWork(physicalWork: UnidentifiedWork,
+                                 digitalWork: UnidentifiedWork) = {
     val sierraPhysicalAgent = physicalWork.items.head.agent
     val sierraDigitalAgent = digitalWork.items.head.agent
 

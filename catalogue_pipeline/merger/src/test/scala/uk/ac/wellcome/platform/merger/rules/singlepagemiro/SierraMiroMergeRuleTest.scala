@@ -11,7 +11,8 @@ class SierraMiroMergeRuleTest
     with WorksGenerators {
 
   describe("merges a single-page Miro work into a Sierra work") {
-    it("merges locations and identifiers from the Miro work into the Sierra work") {
+    it(
+      "merges locations and identifiers from the Miro work into the Sierra work") {
       val sierraItem =
         createIdentifiableItemWith(locations = List(createPhysicalLocation))
       val sierraWork =
@@ -67,7 +68,8 @@ class SierraMiroMergeRuleTest
         UnidentifiedRedirectedWork(miroWork, sierraWork))
     }
 
-    it("merges otherIdentifiers from the Miro work, except for any Sierra identifiers, to the Sierra work") {
+    it(
+      "merges otherIdentifiers from the Miro work, except for any Sierra identifiers, to the Sierra work") {
       val sierraItem =
         createIdentifiableItemWith(locations = List(createPhysicalLocation))
       val sierraWork =
