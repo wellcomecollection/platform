@@ -29,19 +29,4 @@ class SierraWorkTypeTest
 
     transformer.getWorkType(bibData = bibData) shouldBe Some(expectedWorkType)
   }
-
-  it("trims whitespace from the materialType code") {
-    val bibData = createSierraBibDataWith(
-      materialType = Some(
-        SierraMaterialType(code = "a  ")
-      )
-    )
-
-    val expectedWorkType = WorkType(
-      id = "a",
-      label = "Books"
-    )
-
-    transformer.getWorkType(bibData = bibData) shouldBe Some(expectedWorkType)
-  }
 }

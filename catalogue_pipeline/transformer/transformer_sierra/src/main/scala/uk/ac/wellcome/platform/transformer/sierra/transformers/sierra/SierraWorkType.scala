@@ -23,6 +23,6 @@ trait SierraWorkType {
    */
   def getWorkType(bibData: SierraBibData): Option[WorkType] =
     bibData.materialType.map { t =>
-      SierraMaterialTypes.fromCode(t.code.trim)
+      SierraMaterialTypes.fromCode(t.code)
     }
 }
