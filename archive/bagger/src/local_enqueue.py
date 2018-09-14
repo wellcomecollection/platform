@@ -37,7 +37,6 @@ def main():
             print("-------------------")
 
         time_taken = time.time() - start
-        print("----------------")
         print("{0} items in {1} seconds.".format(counter, time_taken))
 
 

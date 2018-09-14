@@ -59,3 +59,21 @@ def get_bagging_messages():
     sqs = get_boto_session().resource("sqs")
     queue = sqs.get_queue_by_name(QueueName=settings.BAGGING_QUEUE)
     return queue.receive_messages(WaitTimeSeconds=settings.POLL_INTERVAL)
+
+
+def get_error_for_b_number(bnumber):
+    obj = get_s3().Object(settings.DROP_BUCKET_NAME_ERRORS, bnumber + ".json")
+    content = obj.get()["Body"].read().decode("utf-8")
+    return json.loads(content)
+
+
+def get_all_errors():
+    bucket = get_s3().Bucket(settings.DROP_BUCKET_NAME_ERRORS)
+    for error in bucket.objects.all():
+        bnumber = error.key.split(".")[-2]
+        yield get_error_for_b_number(bnumber)
+
+
+def remove_error(bnumber):
+    obj = get_s3().Object(settings.DROP_BUCKET_NAME_ERRORS, bnumber + ".json")
+    obj.delete()
