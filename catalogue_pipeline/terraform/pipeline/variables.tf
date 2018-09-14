@@ -11,17 +11,9 @@ variable "dlq_alarm_arn" {}
 
 variable "account_id" {}
 
-variable "vhs_miro_bucket_name" {}
-
 variable "vhs_miro_read_policy" {}
 
-variable "vhs_miro_table_stream_arn" {}
-
-variable "vhs_sierra_bucket_name" {}
-
 variable "vhs_sierra_read_policy" {}
-
-variable "vhs_sierra_table_stream_arn" {}
 
 variable "messages_bucket" {}
 
@@ -76,4 +68,10 @@ variable "miro_adapter_topic_names" {
 
 variable "sierra_adapter_topic_names" {
   type = "list"
+}
+
+variable "service_egress_security_group_id" {}
+
+variable "vhs_bucket_name" {
+  default = ""
 }

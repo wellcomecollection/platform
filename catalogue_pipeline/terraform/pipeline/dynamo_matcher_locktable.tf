@@ -28,8 +28,6 @@ resource "aws_dynamodb_table" "matcher_lock_table" {
   }
 
   lifecycle {
-    prevent_destroy = true
-
     ignore_changes = [
       "read_capacity",
       "write_capacity",
@@ -39,7 +37,7 @@ resource "aws_dynamodb_table" "matcher_lock_table" {
 }
 
 module "matcher_lock_table_dynamo_autoscaling" {
-  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v10.2.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v11.8.0"
 
   table_name = "${aws_dynamodb_table.matcher_lock_table.name}"
 
@@ -52,6 +50,8 @@ module "matcher_lock_table_dynamo_autoscaling" {
   write_target_utilization = 30
   write_min_capacity       = 1
   write_max_capacity       = 750
+
+  index_name = "${var.matcher_lock_table_index}"
 }
 
 module "lambda_dynamodb_write_heartbeat" {

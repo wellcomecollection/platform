@@ -1,5 +1,5 @@
 module "catalogue_vpc" {
-  source     = "../terraform-modules/network"
+  source     = "network"
   name       = "catalogue"
   cidr_block = "10.100.0.0/16"
   az_count   = "3"
