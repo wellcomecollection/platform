@@ -16,7 +16,7 @@ def process_bagging_message(message):
         start = time.time()
         try:
             bagger.bag_from_identifier(identifier, do_not_bag)
-        except:
+        except Exception:
             # catch any kind of error
             tb = traceback.format_exc()
             logging.warn(tb)

@@ -7,14 +7,16 @@ import aws
 """
     Listens to a queue for b numbers to bag.
     The message body is JSON, like this:
-    
+
     {
         "identifier": "b12345678",
         "do_not_bag": True
     }
 
-    
+
 """
+
+
 def main():
     while True:
         messages = aws.get_bagging_messages()
@@ -47,7 +49,7 @@ def process_message(message):
         aws.log_processing_error(result)
     time_taken = time.time() - start
     print("{0} took {1} seconds".format(identifier, time_taken))
-    
+
 
 if __name__ == "__main__":
     main()

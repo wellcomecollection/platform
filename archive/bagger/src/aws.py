@@ -59,4 +59,3 @@ def get_bagging_messages():
     sqs = get_boto_session().resource("sqs")
     queue = sqs.get_queue_by_name(QueueName=settings.BAGGING_QUEUE)
     return queue.receive_messages(WaitTimeSeconds=settings.POLL_INTERVAL)
-    

@@ -2,7 +2,7 @@ import sys
 import time
 import logging
 import aws
-from mets_filesource import b_numbers_from_s3 
+from mets_filesource import b_numbers_from_s3
 
 
 def main():
@@ -36,12 +36,10 @@ def main():
             print(message)
             print("-------------------")
 
-
         time_taken = time.time() - start
         print("----------------")
         print("{0} items in {1} seconds.".format(counter, time_taken))
-        
+
 
 if __name__ == "__main__":
     main()
-
