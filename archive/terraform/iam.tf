@@ -143,3 +143,13 @@ resource "aws_iam_role_policy" "bagger_task_sqs" {
   role   = "${module.bagger.task_role_name}"
   policy = "${data.aws_iam_policy_document.read_from_bagger_queue.json}"
 }
+
+resource "aws_iam_role_policy" "bagger_task_get_s3_dlcs" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.bagger_get_dlcs.json}"
+}
+
+resource "aws_iam_role_policy" "bagger_task_get_s3_preservica" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.bagger_get_preservica.json}"
+}

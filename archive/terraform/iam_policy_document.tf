@@ -120,3 +120,29 @@ data "aws_iam_policy_document" "bagger_store" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "bagger_get_dlcs" {
+  statement {
+    actions = [
+      "s3:GetObject*",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.bagger_dlcs_source_bucket}",
+      "arn:aws:s3:::${var.bagger_dlcs_source_bucket}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "bagger_get_preservica" {
+  statement {
+    actions = [
+      "s3:GetObject*",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.bagger_current_preservation_bucket}",
+      "arn:aws:s3:::${var.bagger_current_preservation_bucket}/*",
+    ]
+  }
+}

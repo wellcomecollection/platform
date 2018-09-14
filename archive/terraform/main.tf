@@ -81,9 +81,6 @@ module "bagger" {
     DLCS_SOURCE_BUCKET          = "${var.bagger_dlcs_source_bucket}"
     BAGGING_QUEUE               = "${module.bagger_queue.name}"
 
-    # aws creds that can see Preservica as well as Platform estate
-    AWS_ACCESS_KEY_ID     = "${var.bagger_aws_access_key_id}"
-    AWS_SECRET_ACCESS_KEY = "${var.bagger_aws_secret_access_key}"
     AWS_DEFAULT_REGION    = "${var.aws_region}"
 
     # DLCS config
@@ -99,7 +96,7 @@ module "bagger" {
     DDS_ASSET_PREFIX = "${var.bagger_dds_asset_prefix}"
   }
 
-  env_vars_length = 20
+  env_vars_length = 18
 
   container_image   = "${local.bagger_container_image}"
   source_queue_name = "${module.bagger_queue.name}"
