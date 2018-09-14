@@ -2,22 +2,12 @@ package uk.ac.wellcome.platform.ingestor
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.elasticsearch.{
-  ElasticClientModule,
-  ElasticConfigModule
-}
-import uk.ac.wellcome.finatra.messaging.{
-  MessageReaderConfigModule,
-  SQSClientModule
-}
+import uk.ac.wellcome.finatra.elasticsearch.ElasticClientModule
+import uk.ac.wellcome.finatra.messaging.{MessageReaderConfigModule, SQSClientModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.S3ClientModule
 import uk.ac.wellcome.platform.ingestor.modules._
@@ -34,7 +24,7 @@ class Server extends HttpServer {
     AkkaModule,
     IngestorWorkerModule,
     ElasticClientModule,
-    ElasticConfigModule,
+    IngestElasticConfigModule,
     ExecutionContextModule,
     WorksIndexModule,
     IdentifiedBaseWorkModule,

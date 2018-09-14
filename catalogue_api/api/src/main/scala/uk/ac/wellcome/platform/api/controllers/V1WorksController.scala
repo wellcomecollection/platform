@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api.controllers
 import com.google.inject.{Inject, Singleton}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes}
-import uk.ac.wellcome.elasticsearch.ElasticConfig
+import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.platform.api.models.ApiConfig
 import uk.ac.wellcome.platform.api.requests.{
   V1MultipleResultsRequest,
@@ -15,9 +15,9 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class V1WorksController @Inject()(
-  apiConfig: ApiConfig,
-  elasticConfig: ElasticConfig,
-  worksService: WorksService)(implicit ec: ExecutionContext)
+                                   apiConfig: ApiConfig,
+                                   elasticConfig: DisplayElasticConfig,
+                                   worksService: WorksService)(implicit ec: ExecutionContext)
     extends WorksController[
       V1MultipleResultsRequest,
       V1SingleWorkRequest,

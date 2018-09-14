@@ -6,22 +6,22 @@ import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.elasticsearch.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
-import uk.ac.wellcome.platform.ingestor.IngestorConfig
+import uk.ac.wellcome.platform.ingestor.{IngestElasticConfig, IngestorConfig}
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.json.JsonUtil._
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 import scala.util.Random
 
 class IngestorWorkerServiceTest
@@ -38,14 +38,13 @@ class IngestorWorkerServiceTest
 
   val itemType = "work"
 
-  it("inserts an Miro identified Work into v1 and v2 indices") {
+  it("inserts an Miro identified Work into the index") {
     val miroSourceIdentifier = createSourceIdentifier
 
     val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, _), bucket) =>
             sendMessage[IdentifiedBaseWork](
               bucket = bucket,
@@ -53,110 +52,83 @@ class IngestorWorkerServiceTest
               obj = work)
 
             assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV1,
-              itemType = itemType,
-              work)
-
-            assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV2,
+              indexName = esIndex,
               itemType = itemType,
               work)
         }
       }
-    }
   }
 
-  it("inserts an Sierra identified Work only into the v2 index") {
+  it("inserts an Sierra identified Work into the index") {
     val work = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
         identifierType = createSierraSystemSourceIdentifierType
       )
     )
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, _), bucket) =>
             sendMessage[IdentifiedBaseWork](
               bucket = bucket,
               queue = queue,
               obj = work)
 
-            assertElasticsearchNeverHasWork(
-              indexName = esIndexV1,
-              itemType = itemType,
-              work)
-
             assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV2,
+              indexName = esIndex,
               itemType = itemType,
               work)
         }
       }
-    }
   }
 
-  it("inserts an Sierra identified invisible Work into the v2 index") {
+  it("inserts an Sierra identified invisible Work into the index") {
     val work = createIdentifiedInvisibleWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
         identifierType = createSierraSystemSourceIdentifierType
       )
     )
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, _), bucket) =>
             sendMessage[IdentifiedBaseWork](
               bucket = bucket,
               queue = queue,
               obj = work)
 
-            assertElasticsearchNeverHasWork(
-              indexName = esIndexV1,
-              itemType = itemType,
-              work)
-
             assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV2,
+              indexName = esIndex,
               itemType = itemType,
               work)
         }
-      }
     }
   }
 
-  it("inserts an Sierra identified redirected Work into the v2 index") {
+  it("inserts an Sierra identified redirected Work into the index") {
     val work = createIdentifiedRedirectedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
         identifierType = createSierraSystemSourceIdentifierType
       )
     )
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, _), bucket) =>
             sendMessage[IdentifiedBaseWork](
               bucket = bucket,
               queue = queue,
               obj = work)
 
-            assertElasticsearchNeverHasWork(
-              indexName = esIndexV1,
-              itemType = itemType,
-              work)
-
             assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV2,
+              indexName = esIndex,
               itemType = itemType,
               work)
         }
       }
-    }
   }
 
-  it("inserts a mixture of miro and sierra works into the correct indices") {
+  it("inserts a mixture of miro and sierra works into the correct index") {
     val miroWork1 = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
         identifierType = createMiroSourceIdentifierType)
@@ -176,9 +148,8 @@ class IngestorWorkerServiceTest
 
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
               sendMessage[IdentifiedBaseWork](
@@ -187,56 +158,46 @@ class IngestorWorkerServiceTest
                 obj = work)
             }
 
-            assertElasticsearchNeverHasWork(
-              indexName = esIndexV1,
-              itemType = itemType,
-              sierraWork1,
-              sierraWork2)
-
             assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV2,
+              indexName = esIndex,
               itemType = itemType,
               works: _*)
-            assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV1,
-              itemType = itemType,
-              miroWork1,
-              miroWork2)
 
             assertQueueEmpty(dlq)
         }
-      }
     }
-
   }
 
-  it("fails inserting a non sierra or miro identified work") {
+  it("Inserts a non sierra or miro identified work") {
     val work = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
         identifierType = createCalmSourceIdentifierType
       )
     )
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, dlq), bucket) =>
             sendMessage[IdentifiedBaseWork](
               bucket = bucket,
               queue = queue,
               obj = work)
 
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndex,
+              itemType = itemType,
+              work)
+
             eventually {
               assertQueueEmpty(queue)
-              assertQueueHasSize(dlq, 1)
+              assertQueueEmpty(dlq)
             }
         }
       }
-    }
   }
 
   it(
-    "inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
+    "inserts a mixture of miro and sierra works into the index and sends invalid messages to the dlq") {
     val miroWork = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
         identifierType = createMiroSourceIdentifierType)
@@ -245,16 +206,15 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createSourceIdentifierWith(
         identifierType = createSierraSystemSourceIdentifierType)
     )
-    val invalidWork = createIdentifiedWorkWith(
+    val otherWork = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
         identifierType = createCalmSourceIdentifierType)
     )
 
-    val works = List(miroWork, sierraWork, invalidWork)
+    val works = List(miroWork, sierraWork, otherWork)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
               sendMessage[IdentifiedBaseWork](
@@ -263,28 +223,19 @@ class IngestorWorkerServiceTest
                 obj = work)
             }
 
-            assertElasticsearchNeverHasWork(
-              indexName = esIndexV1,
-              itemType = itemType,
-              sierraWork)
-
             assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV2,
+              indexName = esIndex,
               itemType = itemType,
               miroWork,
-              sierraWork)
-            assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV1,
-              itemType = itemType,
-              miroWork)
+              sierraWork,
+              otherWork)
+
             eventually {
               assertQueueEmpty(queue)
-              assertQueueHasSize(dlq, 1)
+              assertQueueEmpty(dlq)
             }
         }
       }
-    }
-
   }
 
   it(
@@ -302,13 +253,12 @@ class IngestorWorkerServiceTest
 
     val works = List(sierraWork, oldSierraWork)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
         insertIntoElasticsearch(
-          indexName = esIndexV2,
+          indexName = esIndex,
           itemType = itemType,
           newSierraWork)
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
               sendMessage[IdentifiedBaseWork](
@@ -318,7 +268,7 @@ class IngestorWorkerServiceTest
             }
 
             assertElasticsearchEventuallyHasWork(
-              indexName = esIndexV2,
+              indexName = esIndex,
               itemType = itemType,
               sierraWork,
               newSierraWork)
@@ -328,16 +278,13 @@ class IngestorWorkerServiceTest
             }
         }
       }
-    }
-
   }
 
   it("ingests lots of works") {
     val works = createIdentifiedWorks(count = 250)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
+    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+        withIngestorWorkerService(esIndex) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
               sendMessage[IdentifiedBaseWork](
@@ -349,11 +296,7 @@ class IngestorWorkerServiceTest
             eventually {
               works.foreach { work =>
                 assertElasticsearchEventuallyHasWork(
-                  indexName = esIndexV2,
-                  itemType = itemType,
-                  work)
-                assertElasticsearchEventuallyHasWork(
-                  indexName = esIndexV1,
+                  indexName = esIndex,
                   itemType = itemType,
                   work)
               }
@@ -365,7 +308,6 @@ class IngestorWorkerServiceTest
             }
         }
       }
-    }
   }
 
   it("only deletes successfully ingested works from the queue") {
@@ -379,12 +321,11 @@ class IngestorWorkerServiceTest
 
     val works = List(work, workDoesNotMatchMapping)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(
         subsetOfFieldsIndex,
         indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
-        esIndexV2 =>
-          withIngestorWorkerService(esIndexV1, esIndexV2) {
+        esIndex =>
+          withIngestorWorkerService(esIndex) {
             case (QueuePair(queue, dlq), bucket) =>
               works.foreach { work =>
                 sendMessage[IdentifiedBaseWork](
@@ -394,11 +335,11 @@ class IngestorWorkerServiceTest
               }
 
               assertElasticsearchNeverHasWork(
-                indexName = esIndexV2,
+                indexName = esIndex,
                 itemType = itemType,
                 workDoesNotMatchMapping)
               assertElasticsearchEventuallyHasWork(
-                indexName = esIndexV2,
+                indexName = esIndex,
                 itemType = itemType,
                 work)
               eventually {
@@ -407,8 +348,6 @@ class IngestorWorkerServiceTest
               }
           }
       }
-    }
-
   }
 
   it(
@@ -423,12 +362,11 @@ class IngestorWorkerServiceTest
 
     val works = List(miroWork, miroWorkDoesNotMatchV2Mapping)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(
         subsetOfFieldsIndex,
         indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
-        esIndexV2 =>
-          withIngestorWorkerService(esIndexV1, esIndexV2) {
+        esIndex =>
+          withIngestorWorkerService(esIndex) {
             case (QueuePair(queue, dlq), bucket) =>
               works.foreach { work =>
                 sendMessage[IdentifiedBaseWork](
@@ -438,26 +376,20 @@ class IngestorWorkerServiceTest
               }
 
               assertElasticsearchNeverHasWork(
-                indexName = esIndexV2,
+                indexName = esIndex,
                 itemType = itemType,
                 miroWorkDoesNotMatchV2Mapping)
               assertElasticsearchEventuallyHasWork(
-                indexName = esIndexV2,
+                indexName = esIndex,
                 itemType = itemType,
                 miroWork)
-              assertElasticsearchEventuallyHasWork(
-                indexName = esIndexV1,
-                itemType = itemType,
-                miroWork,
-                miroWorkDoesNotMatchV2Mapping)
+
               eventually {
                 assertQueueEmpty(queue)
                 assertQueueHasSize(dlq, 1)
               }
           }
       }
-    }
-
   }
 
   it("returns a failed Future if indexing into Elasticsearch fails") {
@@ -485,8 +417,7 @@ class IngestorWorkerServiceTest
                 )
 
                 withIngestorWorkerService[Assertion](
-                  esIndexV1 = "works-v1",
-                  esIndexV2 = "works-v2",
+                  esIndex = "works-v1",
                   actorSystem,
                   brokenWorkIndexer,
                   messageStream) { _ =>
@@ -511,8 +442,7 @@ class IngestorWorkerServiceTest
   }
 
   private def withIngestorWorkerService[R](
-    esIndexV1: String,
-    esIndexV2: String)(testWith: TestWith[(QueuePair, Bucket), R]): R = {
+    esIndex: String)(testWith: TestWith[(QueuePair, Bucket), R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalSqsQueueAndDlqAndTimeout(10) {
@@ -525,8 +455,7 @@ class IngestorWorkerServiceTest
                   queue,
                   metricsSender) { messageStream =>
                   withIngestorWorkerService[R](
-                    esIndexV1,
-                    esIndexV2,
+                    esIndex,
                     actorSystem,
                     workIndexer,
                     messageStream) { _ =>
@@ -541,8 +470,7 @@ class IngestorWorkerServiceTest
   }
 
   private def withIngestorWorkerService[R](
-    esIndexV1: String,
-    esIndexV2: String,
+    esIndex: String,
     actorSystem: ActorSystem,
     workIndexer: WorkIndexer,
     messageStream: MessageStream[IdentifiedBaseWork])(
@@ -551,10 +479,9 @@ class IngestorWorkerServiceTest
     val ingestorConfig = IngestorConfig(
       batchSize = 100,
       flushInterval = 5 seconds,
-      elasticConfig = ElasticConfig(
+      elasticConfig = IngestElasticConfig(
         documentType = itemType,
-        indexV1name = esIndexV1,
-        indexV2name = esIndexV2
+        indexName = esIndex
       )
     )
 

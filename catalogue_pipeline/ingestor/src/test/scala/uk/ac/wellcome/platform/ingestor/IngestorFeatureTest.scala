@@ -34,16 +34,13 @@ class IngestorFeatureTest
           bucket = bucket,
           queue = queue,
           obj = work)
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
-              assertElasticsearchEventuallyHasWork(indexNameV1, itemType, work)
-              assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
+        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+            withServer(queue, bucket, indexName, itemType) { _ =>
+              assertElasticsearchEventuallyHasWork(indexName, itemType, work)
             }
           }
         }
       }
-    }
   }
 
   it(
@@ -60,24 +57,20 @@ class IngestorFeatureTest
           bucket = bucket,
           queue = queue,
           obj = work)
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
-              assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
-              assertElasticsearchNeverHasWork(indexNameV1, itemType, work)
+        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+            withServer(queue, bucket, indexName, itemType) { _ =>
+              assertElasticsearchNeverHasWork(indexName, itemType, work)
             }
           }
         }
-      }
     }
   }
 
   it("does not delete a message from the queue if it fails processing") {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
+        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+            withServer(queue, bucket, indexName, itemType) { _ =>
               sendNotificationToSQS(
                 queue = queue,
                 body = "not a json string -- this will fail parsing"
@@ -106,5 +99,4 @@ class IngestorFeatureTest
         }
       }
     }
-  }
 }

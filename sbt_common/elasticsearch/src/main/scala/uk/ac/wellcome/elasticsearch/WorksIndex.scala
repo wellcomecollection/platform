@@ -10,7 +10,7 @@ import grizzled.slf4j.Logging
 
 import scala.concurrent.ExecutionContext
 
-class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)(
+class WorksIndex @Inject()(client: HttpClient, elasticConfig: DisplayElasticConfig)(
   implicit val ec: ExecutionContext)
     extends ElasticsearchIndex
     with Logging {
