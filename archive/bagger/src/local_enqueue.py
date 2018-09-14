@@ -1,3 +1,25 @@
+"""Add b numbers to the queue from the local machine.
+
+This is the primary means of triggering the process, as it is a manual decision.
+
+USAGE:
+
+local_enqueue.py <filter|bnumber> <bag|no-bag>
+
+
+the <filter> limits the b numbers returned to a filtered set, based on keys.
+The spread of b numbers is fairly even.
+
+EXAMPLES:
+
+local_enqueue.py x/1/2 no-bag
+Enqueue approximately 0.1% of the b numbers, but do not bag - just process METS
+
+local_enqueue.py b12345678 bag
+Enqueue one b number only, and bag it.
+
+"""
+
 import sys
 import time
 import logging

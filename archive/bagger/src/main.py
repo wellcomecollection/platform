@@ -1,20 +1,17 @@
+"""Listens to an SQS queue for b numbers to bag.
+
+The message body is JSON, like this:
+
+{
+    "identifier": "b12345678",
+    "do_not_bag": True
+}
+
+"""
 import json
 import time
 import bagger_processor
 import aws
-
-
-"""
-    Listens to a queue for b numbers to bag.
-    The message body is JSON, like this:
-
-    {
-        "identifier": "b12345678",
-        "do_not_bag": True
-    }
-
-
-"""
 
 
 def main():
