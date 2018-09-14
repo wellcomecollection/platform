@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "bagger_store" {
       "arn:aws:s3:::${local.ingest_bucket_name}/*",
       "arn:aws:s3:::${var.bagger_drop_bucket_name}/*",
       "arn:aws:s3:::${var.bagger_drop_bucket_name_mets_only}/*",
-      "arn:aws:s3:::${var.bagger_drop_bucket_name_errors}/*"
+      "arn:aws:s3:::${var.bagger_drop_bucket_name_errors}/*",
     ]
   }
 }
