@@ -50,7 +50,7 @@ class IngestorFeatureTest
     "reads a sierra identified work from the queue and ingests it in the v2 index only") {
     val work = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
-        identifierType = "sierra-system-number"
+        identifierType = createSierraSystemSourceIdentifierType
       )
     )
 
