@@ -81,7 +81,7 @@ module "bagger" {
     DLCS_SOURCE_BUCKET          = "${var.bagger_dlcs_source_bucket}"
     BAGGING_QUEUE               = "${module.bagger_queue.name}"
 
-    AWS_DEFAULT_REGION    = "${var.aws_region}"
+    AWS_DEFAULT_REGION = "${var.aws_region}"
 
     # DLCS config
     DLCS_ENTRY       = "${var.bagger_dlcs_entry}"
