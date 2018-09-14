@@ -47,9 +47,6 @@ variable "es_cluster_credentials" {
   type = "map"
 }
 
-variable "transformer_miro_container_image" {}
-variable "transformer_sierra_container_image" {}
-
 variable "recorder_container_image" {}
 
 variable "matcher_container_image" {}

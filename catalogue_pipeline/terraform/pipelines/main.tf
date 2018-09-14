@@ -6,7 +6,6 @@ module "v1_pipeline" {
   transformed_works_topic_name = "${module.transformed_miro_works_topic.name}"
   index                        = "${var.index_v1}"
 
-  transformer_container_image = "${var.transformer_miro_container_image}"
   id_minter_container_image   = "${var.id_minter_container_image}"
   ingestor_container_image    = "${var.ingestor_container_image}"
 
@@ -47,8 +46,6 @@ module "v2_pipeline" {
   transformed_works_topic_count = 2
   index                         = "${var.index_v2}"
 
-  transformer_miro_container_image   = "${var.transformer_miro_container_image}"
-  transformer_sierra_container_image = "${var.transformer_sierra_container_image}"
   recorder_container_image           = "${var.recorder_container_image}"
   matcher_container_image            = "${var.matcher_container_image}"
   merger_container_image             = "${var.merger_container_image}"

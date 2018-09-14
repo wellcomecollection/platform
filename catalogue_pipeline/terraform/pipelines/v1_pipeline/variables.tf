@@ -35,8 +35,6 @@ variable "es_cluster_credentials" {
   type = "map"
 }
 
-variable "transformer_container_image" {}
-
 variable "id_minter_container_image" {}
 
 variable "ingestor_container_image" {}
