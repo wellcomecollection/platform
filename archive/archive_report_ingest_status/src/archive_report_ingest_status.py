@@ -76,4 +76,17 @@ def main(event, context=None, dynamodb_resource=None, sns_client=None):
     # Similarly above, the absence of an 'id' should be a 400, and doing
     # something other than a GET should be a 405, not a 500.
     #
-    return item['Item']
+    progress = item['Item']
+    progress.update({
+        "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+        "type": "Ingest",
+        "ingestType": {
+            "id": "create",
+            "type": "IngestType"
+        },
+        "result": {
+            "type": "IngestResult",
+            "id": progress.get('result', 'created')
+        }
+    })
+    return progress
