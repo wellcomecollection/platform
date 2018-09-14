@@ -9,7 +9,7 @@ RUN pip3 install -r /requirements.txt
 COPY src /src
 WORKDIR /src
 
-COPY ingest_manager.wsgi /var/www/ingest_manager/ingest_manager.wsgi
+COPY archive_api.wsgi /var/www/archive_api/archive_api.wsgi
 COPY uwsgi.ini /etc/uwsgi
 
 EXPOSE 8888

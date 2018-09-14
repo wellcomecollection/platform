@@ -11,7 +11,7 @@ import pytest
 def client(dynamodb_resource, table_name, sns_client, topic_arn):
     os.environ.update({'TABLE_NAME': table_name})
 
-    from ingest_manager import app
+    from archive_api import app
 
     # @@AWLC: I feel like there should be a better way to configure the
     # test app config than setting it directly here.  For some reason it's

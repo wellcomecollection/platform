@@ -58,7 +58,7 @@ def send_new_ingest_request(sns_client, topic_arn, upload_url, callback_url):
         sns_client=sns_client,
         topic_arn=topic_arn,
         message=message,
-        subject=f'source: ingest_manager ({topic_name})'
+        subject=f'source: archive_api ({topic_name})'
     )
     logger.debug('Published %r to %r', message, topic_arn)
 
