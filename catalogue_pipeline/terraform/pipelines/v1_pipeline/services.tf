@@ -74,5 +74,5 @@ module "ingestor" {
   source_queue_name = "${module.es_ingest_queue.name}"
   source_queue_arn  = "${module.es_ingest_queue.arn}"
 
-  max_capacity = 5
+  max_capacity = 3
 }

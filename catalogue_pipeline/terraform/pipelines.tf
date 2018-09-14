@@ -1,7 +1,7 @@
 module "catalogue_pipelines" {
   source = "pipelines"
 
-  namespace = "catalogue_pipelines"
+  namespace = "catalogue_pipeline"
 
   miro_adapter_topic_names = [
     "${local.miro_reindexer_topic_name}",
@@ -15,8 +15,8 @@ module "catalogue_pipelines" {
   ]
   sierra_adapter_topic_count = 3
 
-  index_v1 = "v1-2018-09-14-miro-sierra-merging-take-3"
-  index_v2 = "v2-2018-09-14-miro-sierra-merging-take-3"
+  index_v1 = "v1-2018-09-14-miro-sierra-merging-take-5"
+  index_v2 = "v2-2018-09-14-miro-sierra-merging-take-5"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
