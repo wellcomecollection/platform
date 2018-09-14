@@ -64,8 +64,7 @@ module "ingestor" {
     es_username         = "${var.es_cluster_credentials["username"]}"
     es_password         = "${var.es_cluster_credentials["password"]}"
     es_protocol         = "${var.es_cluster_credentials["protocol"]}"
-    es_index_v1         = "${var.index}"
-    es_index_v2         = "deleteme"
+    es_index         = "${var.index}"
     es_doc_type         = "work"
     ingest_queue_id     = "${module.es_ingest_queue.id}"
   }
