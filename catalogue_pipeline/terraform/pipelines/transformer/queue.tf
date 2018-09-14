@@ -3,8 +3,8 @@ module "transformer_queue" {
   queue_name  = "${var.namespace}_${var.source_name}_transformer_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
-  topic_names = "${var.topic_names}"
-  topic_count = 2
+  topic_names = "${var.adapter_topic_names}"
+  topic_count = "${var.adapter_topic_count}"
 
   visibility_timeout_seconds = 30
   max_receive_count          = 3

@@ -1,17 +1,19 @@
 module "catalogue_pipelines" {
   source = "pipelines"
 
-  namespace = "catalogue_pipeline"
+  namespace = "catalogue_pipelines"
 
   miro_adapter_topic_names = [
     "${local.miro_reindexer_topic_name}",
   ]
+  miro_adapter_topic_count = 1
 
   sierra_adapter_topic_names = [
     "${local.sierra_reindexer_topic_name}",
     "${local.sierra_merged_bibs_topic_name}",
     "${local.sierra_merged_items_topic_name}",
   ]
+  sierra_adapter_topic_count = 3
 
   index_v1 = "v1-2018-09-14-miro-sierra-merging-take-3"
   index_v2 = "v2-2018-09-14-miro-sierra-merging-take-3"

@@ -44,6 +44,7 @@ module "v2_pipeline" {
   namespace = "${var.namespace}_v2"
 
   transformed_works_topic_names = ["${module.transformed_miro_works_topic.name}", "${module.transformed_sierra_works_topic.name}"]
+  transformed_works_topic_count = 2
   index = "${var.index_v2}"
 
   transformer_miro_container_image   = "${var.transformer_miro_container_image}"

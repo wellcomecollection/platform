@@ -61,7 +61,10 @@ variable "lambda_error_alarm_arn" {
 variable "miro_adapter_topic_names" {
   type = "list"
 }
-
+variable "miro_adapter_topic_count" {
+}
 variable "sierra_adapter_topic_names" {
   type = "list"
+}
+variable "sierra_adapter_topic_count" {
 }

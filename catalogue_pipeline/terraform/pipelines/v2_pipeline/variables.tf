@@ -73,7 +73,8 @@ variable "vhs_bucket_name" {
 variable "transformed_works_topic_names" {
   type = "list"
 }
-
+variable "transformed_works_topic_count" {
+}
 variable "allow_s3_messages_put_json" {
 }
 variable "allow_cloudwatch_push_metrics_json" {

@@ -37,6 +37,9 @@ variable "transformer_container_image" {}
 
 variable "messages_bucket" {}
 
-variable "topic_names" {
+variable "adapter_topic_names" {
   type = "list"
+}
+variable "adapter_topic_count" {
+
 }
