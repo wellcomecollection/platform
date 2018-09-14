@@ -6,8 +6,8 @@ module "v1_pipeline" {
   transformed_works_topic_name = "${module.transformed_miro_works_topic.name}"
   index                        = "${var.index_v1}"
 
-  id_minter_container_image   = "${var.id_minter_container_image}"
-  ingestor_container_image    = "${var.ingestor_container_image}"
+  id_minter_container_image = "${var.id_minter_container_image}"
+  ingestor_container_image  = "${var.ingestor_container_image}"
 
   vhs_miro_read_policy = "${var.vhs_miro_read_policy}"
 
@@ -46,11 +46,11 @@ module "v2_pipeline" {
   transformed_works_topic_count = 2
   index                         = "${var.index_v2}"
 
-  recorder_container_image           = "${var.recorder_container_image}"
-  matcher_container_image            = "${var.matcher_container_image}"
-  merger_container_image             = "${var.merger_container_image}"
-  id_minter_container_image          = "${var.id_minter_container_image}"
-  ingestor_container_image           = "${var.ingestor_container_image}"
+  recorder_container_image  = "${var.recorder_container_image}"
+  matcher_container_image   = "${var.matcher_container_image}"
+  merger_container_image    = "${var.merger_container_image}"
+  id_minter_container_image = "${var.id_minter_container_image}"
+  ingestor_container_image  = "${var.ingestor_container_image}"
 
   vhs_miro_read_policy   = "${var.vhs_miro_read_policy}"
   vhs_sierra_read_policy = "${var.vhs_sierra_read_policy}"
