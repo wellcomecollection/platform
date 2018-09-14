@@ -47,4 +47,3 @@ variable "bagger_dds_api_key" {}
 variable "bagger_dds_api_secret" {}
 
 variable "bagger_dds_asset_prefix" {}
-
