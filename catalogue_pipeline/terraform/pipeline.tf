@@ -1,7 +1,7 @@
 module "catalogue_pipeline" {
   source = "pipeline"
 
-  namespace = "catalogue_pipeline"
+  namespace = "catalogue_pipeline_ms2"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
@@ -24,8 +24,8 @@ module "catalogue_pipeline" {
   messages_bucket = "${aws_s3_bucket.messages.id}"
   infra_bucket    = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-08-30-parallel-scan-reindexer"
-  index_v2 = "v2-2018-08-30-parallel-scan-reindexer"
+  index_v1 = "v1-2018-09-13-miro-sierra-merging-take-2"
+  index_v2 = "v2-2018-09-13-miro-sierra-merging-take-2"
 
   rds_access_security_group_id = "${local.rds_access_security_group_id}"
 
