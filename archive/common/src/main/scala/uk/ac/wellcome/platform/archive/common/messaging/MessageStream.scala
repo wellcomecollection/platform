@@ -43,7 +43,7 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
     })
 
     source
-      .flatMapConcat(message => {
+      .flatMapConcat((message: Message) => {
         Source
           .single(message)
           .log("processing message")

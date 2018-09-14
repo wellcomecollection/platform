@@ -116,7 +116,7 @@ trait Archivist
   def withArchivist[R](
     testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Table, ArchivistApp),
                        R]) = {
-    withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
+    withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
       withLocalSnsTopic {
         snsTopic =>
           withLocalS3Bucket {

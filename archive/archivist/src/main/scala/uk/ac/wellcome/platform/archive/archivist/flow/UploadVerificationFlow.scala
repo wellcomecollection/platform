@@ -3,14 +3,42 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import java.util.zip.ZipFile
 
 import akka.NotUsed
-import akka.stream.FlowShape
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
-import akka.stream.scaladsl.{Flow, GraphDSL, Source}
+import akka.stream.scaladsl.{Flow, GraphDSL, Source, Zip}
+import akka.stream.{FlowShape, SourceShape}
+import akka.util.ByteString
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.models.{BagDigestItem, BagLocation}
 import uk.ac.wellcome.storage.ObjectLocation
 
-object UploadVerificationFlow extends Logging {
+trait CompareChecksum extends Logging {
+  def compare[T](checksum: String): PartialFunction[(T, ByteString), T] = {
+    case (result, byteChecksum: ByteString) => {
+
+      val calculatedChecksum = byteChecksum
+        .map(0xFF & _)
+        .map("%02x".format(_))
+        .foldLeft("") {
+          _ + _
+        }
+        .mkString
+
+      if (calculatedChecksum != checksum) {
+        throw new RuntimeException(
+          s"Bad checksum! ($calculatedChecksum != $checksum"
+        )
+      } else {
+        debug(s"Checksum match! ($calculatedChecksum != $checksum")
+      }
+
+      result
+    }
+  }
+}
+
+object UploadVerificationFlow
+  extends Logging
+    with CompareChecksum {
   def apply()(
     implicit s3Client: S3Client
   ): Flow[(BagLocation, BagDigestItem, ZipFile),
@@ -21,17 +49,31 @@ object UploadVerificationFlow extends Logging {
       .flatMapConcat {
         case (bagLocation, BagDigestItem(checksum, itemLocation), zipFile) =>
           val extract = FileExtractorFlow()
-          val verify = DigestCalculatorFlow("SHA-256", checksum)
+          val verify = DigestCalculatorFlow("SHA-256")
+          val source: Source[(ObjectLocation, ZipFile), NotUsed] = Source.single((itemLocation, zipFile))
 
           val uploadLocation = createUploadLocation(bagLocation, itemLocation)
-          val uploadFlow = createS3UploadFlow(s3Client, uploadLocation)
+          val upload = createS3UploadFlow(s3Client, uploadLocation)
 
-          Source
-            .single((itemLocation, zipFile))
-            .via(extract)
-            .via(verify)
-            .via(uploadFlow)
-            .log("upload result")
+          val checkedUpload = Source.fromGraph(
+            GraphDSL.create(source, extract, upload, verify)((_, _, _, _)) {
+              implicit b =>
+                (s, e, u, v) => {
+
+                  import GraphDSL.Implicits._
+
+                  val zip = b.add(Zip[MultipartUploadResult, ByteString])
+
+                  s ~> e ~> v.inlets.head
+
+                  v.outlets(0) ~> u ~> zip.in0
+                  v.outlets(1) ~> zip.in1
+
+                  SourceShape(zip.out)
+                }
+            })
+
+          checkedUpload.map(compare(checksum))
       }
   }
 

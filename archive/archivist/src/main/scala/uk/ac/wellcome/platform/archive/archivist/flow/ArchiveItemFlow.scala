@@ -30,7 +30,6 @@ object ArchiveItemFlow extends Logging {
           }
           .log("upload location")
           .via(downloadVerification)
-          .dropWhile(_ => true)
           .log("download verified")
 
     }

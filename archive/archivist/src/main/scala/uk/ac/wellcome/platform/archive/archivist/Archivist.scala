@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.sns.AmazonSNSAsync
@@ -11,11 +11,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagUploaderConfig,
-  IngestBagRequestNotification,
-  IngestRequestContext
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestBagRequestNotification, IngestRequestContext}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 
@@ -32,9 +28,19 @@ trait Archivist extends Logging {
     implicit val actorSystem: ActorSystem =
       injector.getInstance(classOf[ActorSystem])
     implicit val executionContext: ExecutionContext = actorSystem.dispatcher
-    implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
+
+    val decider: Supervision.Decider = {
+      case e => {
+        error("Stream failure", e)
+        Supervision.Resume
+      }
+    }
+
+    implicit val materializer = ActorMaterializer(
+      ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider)
+    )
 
     val messageStream =
       injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])

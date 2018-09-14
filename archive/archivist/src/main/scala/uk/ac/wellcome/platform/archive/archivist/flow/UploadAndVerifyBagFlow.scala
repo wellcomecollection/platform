@@ -3,80 +3,77 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import java.util.zip.ZipFile
 
 import akka.NotUsed
-import akka.stream.ActorMaterializer
+import akka.actor.ActorSystem
+import akka.stream._
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagUploaderConfig,
-  IngestRequestContext,
-  UploadConfig
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestRequestContext}
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagName}
 
-import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
-// TODO: Verify checksums in S3 are what you set them to
+
 object UploadAndVerifyBagFlow extends Logging {
   def apply(config: BagUploaderConfig)(
     implicit
-    materializer: ActorMaterializer,
     s3Client: S3Client,
-    executionContext: ExecutionContext
+    actorSystem: ActorSystem
   ): Flow[(ZipFile, IngestRequestContext),
-          (BagLocation, IngestRequestContext),
-          NotUsed] = {
+    (BagLocation, IngestRequestContext),
+    NotUsed] = {
+
+    val decider: Supervision.Decider = {
+      case e => {
+        error("UploadAndVerifyBagFlow stream failure", e)
+        Supervision.Stop
+      }
+    }
+
+    val materializer = ActorMaterializer(
+      ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider)
+    )
 
     Flow[(ZipFile, IngestRequestContext)].flatMapConcat {
-      case (zipFile, ingestRequestContext) =>
-        Source
+      case (zipFile, ingestRequestContext) => {
+
+        val f = Source
           .single(zipFile)
-          .mapConcat(bagNames)
-          .map(bagName =>
-            (bagName, createBagLocation(bagName, config.uploadConfig)))
-          .map {
-            case (bagName, bagLocation) =>
-              materializeArchiveBagFlow(zipFile, bagLocation, config)
-          }
-          .flatMapConcat(Source.fromFuture)
-          .map((_, ingestRequestContext))
+          .map(createArchiveJob(_, config))
+          .flatMapConcat(ArchiveBagFlow(_))
+          .groupBy(Int.MaxValue, _.bagLocation.bagName)
+          .fold(List.empty[ArchiveJob])((list, o) => o :: list)
+          .mergeSubstreams
+          .map(bags => (
+            bags.head.bagLocation,
+            ingestRequestContext
+          ))
+          .runWith(Sink.head[(BagLocation, IngestRequestContext)])(
+            materializer
+          )
+
+        Source.fromFuture(f)
+
+      }
     }
   }
 
-  private def materializeArchiveBagFlow(
-    zipFile: ZipFile,
-    bagLocation: BagLocation,
-    config: BagUploaderConfig
-  )(
-    implicit
-    materializer: ActorMaterializer,
-    s3Client: S3Client,
-    executionContext: ExecutionContext
-  ) =
-    ArchiveBagFlow(zipFile, bagLocation, config.bagItConfig)
-      .map(Success(_))
-      .recover({ case e => Failure(e) })
-      .toMat(Sink.seq)(Keep.right)
-      .run()
-      .map(_.collect { case Failure(e) => e })
-      .collect {
-        case failureList if failureList.nonEmpty => {
-          throw FailedArchivingException(bagLocation.bagName, failureList)
-        }
-        case _ =>
-          bagLocation
-      }
+  private def createArchiveJob(
+                                zipFile: ZipFile,
+                                config: BagUploaderConfig
+                              ) = {
+    val bagName = getBagName(zipFile)
 
-  private def createBagLocation(bagName: BagName, config: UploadConfig) = {
-    BagLocation(
-      storageNamespace = config.uploadNamespace,
-      storagePath = config.uploadPrefix,
+    val bagLocation = BagLocation(
+      storageNamespace = config.uploadConfig.uploadNamespace,
+      storagePath = config.uploadConfig.uploadPrefix,
       bagName = bagName
     )
+
+    ArchiveJob(zipFile, bagLocation, config.bagItConfig)
   }
 
-  private def bagNames(zipFile: ZipFile) = {
+  private def getBagName(zipFile: ZipFile) = {
     val entries = zipFile.entries()
 
     Stream
@@ -88,10 +85,6 @@ object UploadAndVerifyBagFlow extends Logging {
       .toSet
       .filterNot(_.startsWith("_"))
       .map(BagName)
+      .head
   }
 }
-
-case class FailedArchivingException(bagName: BagName, e: Seq[Throwable])
-    extends RuntimeException(
-      s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
-    ) {}

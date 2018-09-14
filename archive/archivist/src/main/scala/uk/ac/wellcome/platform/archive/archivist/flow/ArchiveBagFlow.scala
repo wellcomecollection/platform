@@ -11,23 +11,32 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 object ArchiveBagFlow {
 
-  def apply(zipFile: ZipFile, bagLocation: BagLocation, config: BagItConfig)(
+  def apply(archiveJob: ArchiveJob)(
     implicit
     s3Client: S3Client
-  ): Source[Done, NotUsed] = {
+  ): Source[ArchiveJob, NotUsed] = {
 
-    val bagDigestItemFlow = BagDigestItemFlow(config.digestDelimiterRegexp)
-    val archiveItemFlow = ArchiveItemFlow()
-    val digestLocations = digestNames(bagLocation.bagName, config.digestNames)
+    val bagDigestItemFlow =
+      BagDigestItemFlow(
+        archiveJob.config.digestDelimiterRegexp
+      )
+    val archiveItemFlow =
+      ArchiveItemFlow()
+    val digestLocations =
+      digestNames(
+        archiveJob.bagLocation.bagName,
+        archiveJob.config.digestNames
+      )
 
     Source
       .fromIterator(() => digestLocations)
       .log("digest location")
-      .map((_, bagLocation.bagName, zipFile))
+      .map((_, archiveJob.bagLocation.bagName, archiveJob.zipFile))
       .via(bagDigestItemFlow)
       .log("bag digest item")
-      .map((bagLocation, _, zipFile))
+      .map((archiveJob.bagLocation, _, archiveJob.zipFile))
       .via(archiveItemFlow)
+      .map(_ => archiveJob)
   }
 
   private def digestNames(bagName: BagName, digestNames: List[String]) =
@@ -37,3 +46,6 @@ object ArchiveBagFlow {
       })
       .toIterator
 }
+
+case class ArchiveJob(zipFile: ZipFile, bagLocation: BagLocation, config: BagItConfig)
+
