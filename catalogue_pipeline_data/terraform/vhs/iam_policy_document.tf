@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "read_policy" {
     ]
 
     resources = [
-      "${aws_dynamodb_table.table.arn}",
+      "${local.table_arn}",
     ]
   }
 
@@ -22,8 +22,8 @@ data "aws_iam_policy_document" "read_policy" {
     ]
 
     resources = [
-      "${aws_s3_bucket.bucket.arn}/",
-      "${aws_s3_bucket.bucket.arn}/*",
+      "${local.bucket_arn}/",
+      "${local.bucket_arn}/*",
     ]
   }
 }
@@ -35,10 +35,10 @@ data "aws_iam_policy_document" "full_access_policy" {
     ]
 
     resources = [
-      "${aws_dynamodb_table.table.arn}",
+      "${local.table_arn}",
 
       # Allow access to the GSIs on the table
-      "${aws_dynamodb_table.table.arn}/*",
+      "${local.table_arn}/*",
     ]
   }
 
@@ -48,8 +48,8 @@ data "aws_iam_policy_document" "full_access_policy" {
     ]
 
     resources = [
-      "${aws_s3_bucket.bucket.arn}/",
-      "${aws_s3_bucket.bucket.arn}/*",
+      "${local.bucket_arn}/",
+      "${local.bucket_arn}/*",
     ]
   }
 }
@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "dynamodb_update_policy" {
     ]
 
     resources = [
-      "${aws_dynamodb_table.table.arn}",
+      "${local.table_arn}",
     ]
   }
 }

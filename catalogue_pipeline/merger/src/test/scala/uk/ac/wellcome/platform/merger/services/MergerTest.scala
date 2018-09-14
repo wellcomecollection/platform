@@ -1,144 +1,29 @@
 package uk.ac.wellcome.platform.merger.services
 
-import org.scalatest.FunSpec
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.merger.MergerTestUtils
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
-class MergerTest extends FunSpec with MergerTestUtils {
+class MergerTest extends FunSpec with WorksGenerators with Matchers {
+  private val sierraPhysicalWork = createSierraPhysicalWork
+  private val sierraDigitalWork = createSierraDigitalWork
+  private val miroWork = createMiroWork
 
   private val merger = new Merger()
 
-  describe("maybeMergePhysicalDigitalWorkPair") {
-    it("merges a physical and digital work") {
-      val physicalWork = createPhysicalWork
-      val digitalWork = createDigitalWork
-
-      val result = merger.maybeMergePhysicalDigitalWorkPair(
-        works = Seq(physicalWork, digitalWork)
-      )
-
-      result.size shouldBe 2
-
-      val physicalItem =
-        physicalWork.items.head.asInstanceOf[Identifiable[Item]]
-      val digitalItem = digitalWork.items.head
-
-      val expectedMergedWork = physicalWork.copy(
-        otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
-        items = List(
-          physicalItem.copy(
-            agent = physicalItem.agent.copy(
-              locations = physicalItem.agent.locations ++ digitalItem.agent.locations
-            )
-          )
-        )
-      )
-
-      val expectedRedirectedWork = UnidentifiedRedirectedWork(
-        sourceIdentifier = digitalWork.sourceIdentifier,
-        version = digitalWork.version,
-        redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)
-      )
-
-      result should contain theSameElementsAs List(
-        expectedMergedWork,
-        expectedRedirectedWork)
-    }
-
-    it("merges a physical and digital work, even if there are extra works") {
-      val physicalWork = createPhysicalWork
-      val digitalWork = createDigitalWork
-
-      val result = merger.maybeMergePhysicalDigitalWorkPair(
-        works = Seq(
-          physicalWork,
-          digitalWork,
-          createUnidentifiedWorkWith(
-            sourceIdentifier = createSourceIdentifierWith(
-              identifierType = "miro-image-number"
-            )
-          )
-        )
-      )
-
-      result.size shouldBe 3
-      result.collect { case r: UnidentifiedRedirectedWork => r }.size shouldBe 1
-    }
-
-    it("ignores a single physical work") {
-      val works = Seq(createPhysicalWork)
-      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
-    }
-
-    it("ignores a single digital work") {
-      val works = Seq(createDigitalWork)
-      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
-    }
-
-    it("ignores multiple physical works") {
-      val works = (1 to 3).map { _ =>
-        createPhysicalWork
-      }
-      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
-    }
-
-    it("ignores multiple digital works") {
-      val works = (1 to 3).map { _ =>
-        createDigitalWork
-      }
-      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
-    }
-
-    it("ignores multiple physical works with a single digital work") {
-      val works = (1 to 3).map { _ =>
-        createPhysicalWork
-      } ++ Seq(createDigitalWork)
-      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
-    }
-
-    it("ignores multiple digital works with a single physical work") {
-      val works = (1 to 3).map { _ =>
-        createDigitalWork
-      } ++ Seq(createPhysicalWork)
-      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
-    }
-
-    it("ignores a physical work with multiple items") {
-      val works = List(
-        createPhysicalWorkWith(
-          items = List(createPhysicalItem, createPhysicalItem)
-        ),
-        createDigitalWork
-      )
-      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
-    }
-
-    it("ignores a digital work with multiple items") {
-      val works = List(
-        createPhysicalWork,
-        createDigitalWorkWith(
-          items = List(createDigitalItem, createDigitalItem)
-        )
-      )
-      merger.maybeMergePhysicalDigitalWorkPair(works) shouldBe works
-    }
-  }
-
-  it("merges a physical and digital work") {
-    val physicalWork = createPhysicalWork
-    val digitalWork = createDigitalWork
-
+  it("merges a Sierra physical and Sierra digital work") {
     val result = merger.merge(
-      works = Seq(physicalWork, digitalWork)
+      works = Seq(sierraPhysicalWork, sierraDigitalWork)
     )
 
     result.size shouldBe 2
 
-    val physicalItem = physicalWork.items.head.asInstanceOf[Identifiable[Item]]
-    val digitalItem = digitalWork.items.head
+    val physicalItem =
+      sierraPhysicalWork.items.head.asInstanceOf[Identifiable[Item]]
+    val digitalItem = sierraDigitalWork.items.head
 
-    val expectedMergedWork = physicalWork.copy(
-      otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
+    val expectedMergedWork = sierraPhysicalWork.copy(
+      otherIdentifiers = sierraPhysicalWork.otherIdentifiers ++ sierraDigitalWork.identifiers,
       items = List(
         physicalItem.copy(
           agent = physicalItem.agent.copy(
@@ -148,20 +33,95 @@ class MergerTest extends FunSpec with MergerTestUtils {
       )
     )
 
-    val expectedRedirectedWork = UnidentifiedRedirectedWork(
-      sourceIdentifier = digitalWork.sourceIdentifier,
-      version = digitalWork.version,
-      redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)
-    )
+    val expectedRedirectedWork =
+      UnidentifiedRedirectedWork(sierraDigitalWork, sierraPhysicalWork)
 
     result should contain theSameElementsAs List(
       expectedMergedWork,
       expectedRedirectedWork)
   }
 
-  private def createPhysicalItem: Identifiable[Item] =
-    createIdentifiableItemWith(locations = List(createPhysicalLocation))
+  it("merges a Sierra physical work with a single-page Miro work") {
+    val result = merger.merge(
+      works = Seq(sierraPhysicalWork, miroWork)
+    )
 
-  private def createDigitalItem: Unidentifiable[Item] =
-    createUnidentifiableItemWith(locations = List(createDigitalLocation))
+    result.size shouldBe 2
+
+    val sierraItem =
+      sierraPhysicalWork.items.head.asInstanceOf[Identifiable[Item]]
+    val miroItem = miroWork.items.head
+
+    val expectedMergedWork = sierraPhysicalWork.copy(
+      otherIdentifiers = sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers,
+      items = List(
+        sierraItem.copy(
+          agent = sierraItem.agent.copy(
+            locations = sierraItem.agent.locations ++ miroItem.agent.locations
+          )
+        )
+      )
+    )
+
+    val expectedRedirectedWork =
+      UnidentifiedRedirectedWork(miroWork, sierraPhysicalWork)
+
+    result should contain theSameElementsAs List(
+      expectedMergedWork,
+      expectedRedirectedWork)
+  }
+
+  it("merges a Sierra digital work with a single-page Miro work") {
+    val result = merger.merge(
+      works = Seq(sierraDigitalWork, miroWork)
+    )
+
+    result.size shouldBe 2
+
+    val expectedMergedWork = sierraDigitalWork.copy(
+      otherIdentifiers = sierraDigitalWork.otherIdentifiers ++ miroWork.identifiers
+    )
+
+    val expectedRedirectedWork =
+      UnidentifiedRedirectedWork(miroWork, sierraDigitalWork)
+
+    result should contain theSameElementsAs List(
+      expectedMergedWork,
+      expectedRedirectedWork)
+  }
+
+  it(
+    "merges a physical Sierra work and a digital Sierra work with a single-page Miro work") {
+    val result = merger.merge(
+      works = Seq(sierraPhysicalWork, sierraDigitalWork, miroWork)
+    )
+
+    result.size shouldBe 3
+
+    val sierraItem =
+      sierraPhysicalWork.items.head.asInstanceOf[Identifiable[Item]]
+    val digitalItem = sierraDigitalWork.items.head
+
+    val expectedMergedWork = sierraPhysicalWork.copy(
+      otherIdentifiers = sierraPhysicalWork.otherIdentifiers ++ sierraDigitalWork.identifiers ++ miroWork.identifiers,
+      items = List(
+        sierraItem.copy(
+          agent = sierraItem.agent.copy(
+            locations = sierraItem.agent.locations ++ digitalItem.agent.locations
+          )
+        )
+      )
+    )
+
+    val expectedRedirectedDigitalWork =
+      UnidentifiedRedirectedWork(sierraDigitalWork, sierraPhysicalWork)
+
+    val expectedMiroRedirectedWork =
+      UnidentifiedRedirectedWork(miroWork, sierraPhysicalWork)
+
+    result should contain theSameElementsAs List(
+      expectedMergedWork,
+      expectedRedirectedDigitalWork,
+      expectedMiroRedirectedWork)
+  }
 }

@@ -2,14 +2,14 @@ package uk.ac.wellcome.platform.merger.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.matcher.WorkIdentifier
-import uk.ac.wellcome.platform.merger.MergerTestUtils
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
+import uk.ac.wellcome.platform.merger.fixtures.LocalWorksVhs
 import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -17,14 +17,14 @@ class RecorderPlaybackServiceTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with LocalVersionedHybridStore
-    with MergerTestUtils {
+    with LocalWorksVhs
+    with WorksGenerators {
 
   it("fetches a single Work") {
     val work = createUnidentifiedWork
 
     withRecorderVHS { vhs =>
-      storeInVHS(vhs, work)
+      givenStoredInVhs(vhs, work)
 
       val service = new RecorderPlaybackService(vhs)
 
@@ -71,7 +71,7 @@ class RecorderPlaybackServiceTest
     )
 
     withRecorderVHS { vhs =>
-      storeInVHS(vhs, workToStore)
+      givenStoredInVhs(vhs, workToStore)
 
       val service = new RecorderPlaybackService(vhs)
 
@@ -99,7 +99,7 @@ class RecorderPlaybackServiceTest
     val storedWorks = (unchangedWorks ++ updatedWorks ++ zeroWorks).toList
 
     withRecorderVHS { vhs =>
-      storeInVHS(vhs, storedWorks)
+      givenStoredInVhs(vhs, storedWorks)
 
       val service = new RecorderPlaybackService(vhs)
 

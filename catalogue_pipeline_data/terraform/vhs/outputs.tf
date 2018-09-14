@@ -1,13 +1,9 @@
-output "table_stream_arn" {
-  value = "${aws_dynamodb_table.table.stream_arn}"
-}
-
 output "table_name" {
-  value = "${aws_dynamodb_table.table.name}"
+  value = "${local.table_name}"
 }
 
 output "bucket_name" {
-  value = "${aws_s3_bucket.bucket.id}"
+  value = "${local.bucket_name}"
 }
 
 output "read_policy" {

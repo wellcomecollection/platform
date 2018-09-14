@@ -1,20 +1,7 @@
 module "catalogue_pipeline" {
   source = "pipeline"
 
-  # If you want to create a new copy of the pipeline in a different namespace,
-  # duplicate this module.
-  #
-  # DO NOT RENAME IT.
-  #
-  # There are a bunch of interconnected pieces in this module, some of
-  # which can be renamed safely, some of which can't.  Terraform doesn't
-  # get the ordering right, and you end up in a state where some of it
-  # can't be deleted by Terraform.
-  #
-  # Sadness.  To re-namespace the pipeline, create an entirely new instance
-  # of this module in Terraform, with a different name, and delete this one.
-  #
-  namespace = "catalogue_pipeline"
+  namespace = "catalogue_pipeline_ms2"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
@@ -29,20 +16,16 @@ module "catalogue_pipeline" {
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 
-  vhs_miro_read_policy      = "${local.vhs_miro_read_policy}"
-  vhs_miro_bucket_name      = "${local.vhs_miro_bucket_name}"
-  vhs_miro_table_stream_arn = "${local.vhs_miro_table_stream_arn}"
+  vhs_miro_read_policy = "${local.vhs_miro_read_policy}"
 
-  vhs_sierra_read_policy      = "${local.vhs_sierra_read_policy}"
-  vhs_sierra_bucket_name      = "${local.vhs_sierra_bucket_name}"
-  vhs_sierra_table_stream_arn = "${local.vhs_sierra_table_stream_arn}"
+  vhs_sierra_read_policy = "${local.vhs_sierra_read_policy}"
 
   aws_region      = "${var.aws_region}"
   messages_bucket = "${aws_s3_bucket.messages.id}"
   infra_bucket    = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-08-30-parallel-scan-reindexer"
-  index_v2 = "v2-2018-08-30-parallel-scan-reindexer"
+  index_v1 = "v1-2018-09-13-miro-sierra-merging-take-2"
+  index_v2 = "v2-2018-09-13-miro-sierra-merging-take-2"
 
   rds_access_security_group_id = "${local.rds_access_security_group_id}"
 
@@ -64,4 +47,8 @@ module "catalogue_pipeline" {
     "${local.sierra_merged_bibs_topic_name}",
     "${local.sierra_merged_items_topic_name}",
   ]
+
+  service_egress_security_group_id = "${module.service_egress_security_group.sg_id}"
+
+  vhs_bucket_name = "${aws_s3_bucket.vhs_bucket.id}"
 }
