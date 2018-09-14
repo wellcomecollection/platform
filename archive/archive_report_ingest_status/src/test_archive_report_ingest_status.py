@@ -42,7 +42,9 @@ def test_get_includes_other_dynamodb_metadata(dynamodb_resource, table_name):
         event=event,
         dynamodb_resource=dynamodb_resource
     )
-    assert response == item
+    assert response['id'] == guid
+    assert response['fooKey'] == 'barValue'
+    assert response['@context'] == 'https://api.wellcomecollection.org/storage/v1/context.json'
 
 
 def test_throws_valueerror_if_called_with_post_event():
