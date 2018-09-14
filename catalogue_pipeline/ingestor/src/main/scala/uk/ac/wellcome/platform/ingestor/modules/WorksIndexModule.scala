@@ -18,7 +18,11 @@ object WorksIndexModule extends TwitterModule {
   }
 
   @Provides
-  def provideWorksIndex(client: HttpClient, elasticSearchConfig: IngestElasticConfig)(implicit ec: ExecutionContext): WorksIndex = {
-    new WorksIndex(client = client, rootIndexType = elasticSearchConfig.documentType)
+  def provideWorksIndex(client: HttpClient,
+                        elasticSearchConfig: IngestElasticConfig)(
+    implicit ec: ExecutionContext): WorksIndex = {
+    new WorksIndex(
+      client = client,
+      rootIndexType = elasticSearchConfig.documentType)
   }
 }

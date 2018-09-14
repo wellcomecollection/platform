@@ -16,8 +16,7 @@ class IngestorWorkerService @Inject()(
   messageStream: MessageStream[IdentifiedBaseWork],
   system: ActorSystem)(implicit ec: ExecutionContext) {
 
-  case class MessageBundle(message: Message,
-                           work: IdentifiedBaseWork)
+  case class MessageBundle(message: Message, work: IdentifiedBaseWork)
 
   val index = ingestorConfig.elasticConfig.indexName
 
@@ -27,9 +26,7 @@ class IngestorWorkerService @Inject()(
       source
         .map {
           case (message, identifiedWork) =>
-            MessageBundle(
-              message,
-              identifiedWork)
+            MessageBundle(message, identifiedWork)
         }
         .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval)
         .mapAsyncUnordered(10) { messages =>
@@ -45,10 +42,10 @@ class IngestorWorkerService @Inject()(
     for {
       works <- Future.successful(messageBundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
-          works = works,
-          esIndex = index,
-          esType = ingestorConfig.elasticConfig.documentType
-        )
+        works = works,
+        esIndex = index,
+        esType = ingestorConfig.elasticConfig.documentType
+      )
 
     } yield {
       val failedWorks = either.left.getOrElse(Nil)

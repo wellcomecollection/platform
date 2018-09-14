@@ -5,11 +5,9 @@ variable "subnets" {
   type = "list"
 }
 
-variable "cluster_name" {
-}
+variable "cluster_name" {}
 
-variable "namespace_id" {
-}
+variable "namespace_id" {}
 
 variable "aws_region" {}
 
@@ -49,13 +47,10 @@ variable "rds_access_security_group_id" {}
 
 variable "service_egress_security_group_id" {}
 
-variable "transformed_works_topic_name" {
-}
+variable "transformed_works_topic_name" {}
 
+variable "allow_s3_messages_put_json" {}
 
-variable "allow_s3_messages_put_json" {
-}
-variable "allow_cloudwatch_push_metrics_json" {
-}
-variable "allow_s3_messages_get_json" {
-}
+variable "allow_cloudwatch_push_metrics_json" {}
+
+variable "allow_s3_messages_get_json" {}

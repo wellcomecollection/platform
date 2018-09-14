@@ -7,6 +7,6 @@ case class IngestorConfig(batchSize: Int,
                           elasticConfig: IngestElasticConfig)
 
 case class IngestElasticConfig(
-                                documentType: String,
-                                indexName: String
-                              )
+  documentType: String,
+  indexName: String
+)

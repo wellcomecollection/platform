@@ -6,8 +6,8 @@ import org.elasticsearch.index.VersionType
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.{
-  ElasticClientBuilder,
   DisplayElasticConfig,
+  ElasticClientBuilder,
   ElasticsearchIndex,
   WorksIndex
 }
@@ -30,7 +30,9 @@ trait ElasticsearchFixtures
   private val esHost = "localhost"
   private val esPort = 9200
 
-  def displayEsLocalFlags(indexNameV1: String, indexNameV2: String, itemType: String) =
+  def displayEsLocalFlags(indexNameV1: String,
+                          indexNameV2: String,
+                          itemType: String) =
     Map(
       "es.host" -> esHost,
       "es.port" -> esPort.toString,

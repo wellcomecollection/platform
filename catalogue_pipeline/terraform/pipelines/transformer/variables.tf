@@ -40,6 +40,5 @@ variable "messages_bucket" {}
 variable "adapter_topic_names" {
   type = "list"
 }
-variable "adapter_topic_count" {
 
-}
+variable "adapter_topic_count" {}

@@ -15,9 +15,9 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class V1WorksController @Inject()(
-                                   apiConfig: ApiConfig,
-                                   elasticConfig: DisplayElasticConfig,
-                                   worksService: WorksService)(implicit ec: ExecutionContext)
+  apiConfig: ApiConfig,
+  elasticConfig: DisplayElasticConfig,
+  worksService: WorksService)(implicit ec: ExecutionContext)
     extends WorksController[
       V1MultipleResultsRequest,
       V1SingleWorkRequest,

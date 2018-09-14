@@ -6,6 +6,7 @@ module "catalogue_pipelines" {
   miro_adapter_topic_names = [
     "${local.miro_reindexer_topic_name}",
   ]
+
   miro_adapter_topic_count = 1
 
   sierra_adapter_topic_names = [
@@ -13,6 +14,7 @@ module "catalogue_pipelines" {
     "${local.sierra_merged_bibs_topic_name}",
     "${local.sierra_merged_items_topic_name}",
   ]
+
   sierra_adapter_topic_count = 3
 
   index_v1 = "v1-2018-09-14-miro-sierra-merging-take-5"
@@ -27,7 +29,7 @@ module "catalogue_pipelines" {
   ingestor_container_image           = "${local.ingestor_container_image}"
 
   private_subnets = ["${local.private_subnets}"]
-  vpc_id  = "${local.vpc_id}"
+  vpc_id          = "${local.vpc_id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 

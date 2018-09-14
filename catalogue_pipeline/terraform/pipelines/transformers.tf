@@ -3,8 +3,8 @@ module "miro_transformer" {
 
   source_name = "miro"
 
-  adapter_topic_names = "${var.miro_adapter_topic_names}"
-  adapter_topic_count = "${var.miro_adapter_topic_count}"
+  adapter_topic_names                    = "${var.miro_adapter_topic_names}"
+  adapter_topic_count                    = "${var.miro_adapter_topic_count}"
   transformed_works_topic_publish_policy = "${module.transformed_miro_works_topic.publish_policy}"
   transformed_works_topic_arn            = "${module.transformed_miro_works_topic.arn}"
 
@@ -31,7 +31,7 @@ module "miro_transformer" {
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"
 
-  vpc_id      = "${var.vpc_id}"
+  vpc_id = "${var.vpc_id}"
 }
 
 module "sierra_transformer" {
@@ -39,8 +39,8 @@ module "sierra_transformer" {
 
   source_name = "sierra"
 
-  adapter_topic_names = "${var.sierra_adapter_topic_names}"
-  adapter_topic_count = "${var.sierra_adapter_topic_count}"
+  adapter_topic_names                    = "${var.sierra_adapter_topic_names}"
+  adapter_topic_count                    = "${var.sierra_adapter_topic_count}"
   transformed_works_topic_publish_policy = "${module.transformed_sierra_works_topic.publish_policy}"
   transformed_works_topic_arn            = "${module.transformed_sierra_works_topic.arn}"
 
@@ -67,5 +67,5 @@ module "sierra_transformer" {
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"
 
-  vpc_id      = "${var.vpc_id}"
+  vpc_id = "${var.vpc_id}"
 }
