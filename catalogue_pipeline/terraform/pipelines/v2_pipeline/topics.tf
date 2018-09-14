@@ -8,11 +8,6 @@ module "es_ingest_topic" {
   name   = "${var.namespace}_es_ingest"
 }
 
-module "transformed_works_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "${var.namespace}_transformed_works"
-}
-
 module "recorded_works_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
   name   = "${var.namespace}_recorded_works"

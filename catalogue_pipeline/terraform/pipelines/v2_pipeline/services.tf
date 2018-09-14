@@ -1,9 +1,9 @@
 module "recorder" {
-  source = "service"
+  source = "../service"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  cluster_name                     = "${var.cluster_name}"
+  namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}_recorder"
@@ -28,10 +28,10 @@ module "recorder" {
 }
 
 module "matcher" {
-  source                           = "service"
+  source                           = "../service"
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  cluster_name                     = "${var.cluster_name}"
+  namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}_matcher"
@@ -56,10 +56,10 @@ module "matcher" {
 }
 
 module "merger" {
-  source                           = "service"
+  source                           = "../service"
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  cluster_name                     = "${var.cluster_name}"
+  namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}_merger"
@@ -83,11 +83,11 @@ module "merger" {
 }
 
 module "id_minter" {
-  source = "service"
+  source = "../service"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  cluster_name                     = "${var.cluster_name}"
+  namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}_id_minter"
@@ -115,7 +115,7 @@ module "id_minter" {
   // The maximum number of concurrent connection is determined by
   // max_connections * max_capacity so we always need to set those
   // two values in a way that their product doesn't exceed 45
-  max_capacity = 5
+  max_capacity = 3
 
   security_group_ids = ["${var.rds_access_security_group_id}"]
 }
@@ -130,11 +130,11 @@ data "template_file" "es_cluster_host_ingestor" {
 }
 
 module "ingestor" {
-  source = "service"
+  source = "../service"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  cluster_name                     = "${var.cluster_name}"
+  namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}_ingestor"
@@ -148,8 +148,8 @@ module "ingestor" {
     es_username         = "${var.es_cluster_credentials["username"]}"
     es_password         = "${var.es_cluster_credentials["password"]}"
     es_protocol         = "${var.es_cluster_credentials["protocol"]}"
-    es_index_v1         = "${var.index_v1}"
-    es_index_v2         = "${var.index_v2}"
+    es_index_v1         = "deleteme"
+    es_index_v2         = "${var.index}"
     es_doc_type         = "work"
     ingest_queue_id     = "${module.es_ingest_queue.id}"
   }

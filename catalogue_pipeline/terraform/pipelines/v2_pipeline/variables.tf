@@ -1,6 +1,11 @@
 variable "namespace" {}
 variable "vpc_id" {}
 
+variable "cluster_name" {
+}
+variable "namespace_id" {
+}
+
 variable "subnets" {
   type = "list"
 }
@@ -56,22 +61,22 @@ variable "id_minter_container_image" {}
 
 variable "ingestor_container_image" {}
 
-variable "index_v1" {}
-
-variable "index_v2" {}
+variable "index" {}
 
 variable "rds_access_security_group_id" {}
-
-variable "miro_adapter_topic_names" {
-  type = "list"
-}
-
-variable "sierra_adapter_topic_names" {
-  type = "list"
-}
 
 variable "service_egress_security_group_id" {}
 
 variable "vhs_bucket_name" {
-  default = ""
+}
+
+variable "transformed_works_topic_names" {
+  type = "list"
+}
+
+variable "allow_s3_messages_put_json" {
+}
+variable "allow_cloudwatch_push_metrics_json" {
+}
+variable "allow_s3_messages_get_json" {
 }

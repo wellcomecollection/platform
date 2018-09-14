@@ -3,8 +3,8 @@ module "miro_transformer" {
 
   source_name = "miro"
 
-  transformed_works_topic_publish_policy = "${module.transformed_works_topic.publish_policy}"
-  transformed_works_topic_arn            = "${module.transformed_works_topic.arn}"
+  transformed_works_topic_publish_policy = "${module.transformed_miro_works_topic.publish_policy}"
+  transformed_works_topic_arn            = "${module.transformed_miro_works_topic.arn}"
 
   vhs_read_policy = "${var.vhs_miro_read_policy}"
 
@@ -12,7 +12,7 @@ module "miro_transformer" {
 
   transformer_container_image      = "${var.transformer_miro_container_image}"
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  subnets                          = "${var.subnets}"
+  subnets                          = "${var.private_subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   namespace    = "${var.namespace}"
@@ -38,8 +38,8 @@ module "sierra_transformer" {
 
   source_name = "sierra"
 
-  transformed_works_topic_publish_policy = "${module.transformed_works_topic.publish_policy}"
-  transformed_works_topic_arn            = "${module.transformed_works_topic.arn}"
+  transformed_works_topic_publish_policy = "${module.transformed_sierra_works_topic.publish_policy}"
+  transformed_works_topic_arn            = "${module.transformed_sierra_works_topic.arn}"
 
   vhs_read_policy = "${var.vhs_sierra_read_policy}"
 
@@ -47,7 +47,7 @@ module "sierra_transformer" {
 
   transformer_container_image      = "${var.transformer_sierra_container_image}"
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  subnets                          = "${var.subnets}"
+  subnets                          = "${var.private_subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   namespace    = "${var.namespace}"
