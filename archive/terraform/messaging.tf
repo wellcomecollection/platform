@@ -75,7 +75,7 @@ module "bagger_queue" {
 
   # Ensure that messages are spread around -- if the merger has an error
   # (for example, hitting DynamoDB write limits), we don't retry too quickly.
-  visibility_timeout_seconds = 300
+  visibility_timeout_seconds = 3600
 
   alarm_topic_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 }
