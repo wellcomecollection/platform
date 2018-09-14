@@ -72,7 +72,7 @@ trait ElasticsearchFixtures
 
     val index = new WorksIndex(
       client = elasticClient,
-      elasticConfig = elasticConfig
+      rootIndexType = elasticConfig.documentType
     )
 
     withLocalElasticsearchIndex(index, indexName)(testWith)

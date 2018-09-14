@@ -350,48 +350,6 @@ class IngestorWorkerServiceTest
       }
   }
 
-  it(
-    "does not delete from the queue messages that succeed ingesting into one index but not the other") {
-    val subsetOfFieldsIndex =
-      new SubsetOfFieldsWorksIndex(elasticClient, itemType)
-
-    val miroWork = createIdentifiedWork
-    val miroWorkDoesNotMatchV2Mapping = createIdentifiedWorkWith(
-      subjects = List(Subject(label = "crystallography", concepts = Nil))
-    )
-
-    val works = List(miroWork, miroWorkDoesNotMatchV2Mapping)
-
-      withLocalElasticsearchIndex(
-        subsetOfFieldsIndex,
-        indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
-        esIndex =>
-          withIngestorWorkerService(esIndex) {
-            case (QueuePair(queue, dlq), bucket) =>
-              works.foreach { work =>
-                sendMessage[IdentifiedBaseWork](
-                  bucket = bucket,
-                  queue = queue,
-                  obj = work)
-              }
-
-              assertElasticsearchNeverHasWork(
-                indexName = esIndex,
-                itemType = itemType,
-                miroWorkDoesNotMatchV2Mapping)
-              assertElasticsearchEventuallyHasWork(
-                indexName = esIndex,
-                itemType = itemType,
-                miroWork)
-
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
-              }
-          }
-      }
-  }
-
   it("returns a failed Future if indexing into Elasticsearch fails") {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
