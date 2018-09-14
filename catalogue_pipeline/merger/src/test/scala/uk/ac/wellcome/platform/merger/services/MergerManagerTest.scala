@@ -7,9 +7,9 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedRedirectedWork,
   UnidentifiedWork
 }
-import uk.ac.wellcome.platform.merger.MergerTestUtils
+import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
-class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
+class MergerManagerTest extends FunSpec with Matchers with WorksGenerators {
 
   it("performs a merge with a single work") {
     val work = createUnidentifiedWork
@@ -21,9 +21,7 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
 
   it("performs a merge with multiple works") {
     val work = createUnidentifiedWork
-    val otherWorks = (1 to 3).map { _ =>
-      createUnidentifiedWork
-    }
+    val otherWorks = createUnidentifiedWorks(3)
 
     val works = (work +: otherWorks).map { Some(_) }.toList
 
@@ -42,14 +40,11 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
   }
 
   it("returns the works unmerged if any of the work entries are None") {
-    val expectedWorks = (1 to 3)
-      .map { _ =>
-        createUnidentifiedWork
-      }
+    val expectedWorks = createUnidentifiedWorks(3)
 
-    val maybeWorks = expectedWorks.map { Some(_) }.toList ++ List(None)
+    val maybeWorks = expectedWorks.map { Some(_) } ++ List(None)
 
-    val result = mergerManager.applyMerge(maybeWorks = maybeWorks)
+    val result = mergerManager.applyMerge(maybeWorks = maybeWorks.toList)
 
     result should contain theSameElementsAs expectedWorks
   }

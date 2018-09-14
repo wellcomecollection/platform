@@ -160,4 +160,53 @@ trait WorksGenerators extends ItemsGenerators {
     (1 to count).map { _ =>
       createIdentifiedWork
     }
+
+  def createUnidentifiedSierraWorkWith(workType: Option[WorkType] = None,
+                                       items: List[MaybeDisplayable[Item]] =
+                                         List()): UnidentifiedWork =
+    createUnidentifiedWorkWith(
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = createSierraSystemSourceIdentifierType),
+      workType = workType,
+      otherIdentifiers = List(
+        createSourceIdentifierWith(
+          identifierType = createSierraIdentifierSourceIdentifierType)),
+      items = items
+    )
+
+  def createUnidentifiedSierraWork: UnidentifiedWork =
+    createUnidentifiedSierraWorkWith()
+
+  def createSierraPhysicalWork: UnidentifiedWork =
+    createUnidentifiedSierraWorkWith(
+      items = List(
+        createIdentifiableItemWith(locations = List(createPhysicalLocation))))
+
+  def createSierraDigitalWork: UnidentifiedWork =
+    createUnidentifiedSierraWorkWith(
+      workType = Some(WorkType("v", "E-books")),
+      items = List(
+        createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+    )
+
+  def createMiroWorkWith(
+    otherIdentifiers: List[SourceIdentifier] = List()): UnidentifiedWork =
+    createUnidentifiedWorkWith(
+      sourceIdentifier = createMiroSourceIdentifier,
+      otherIdentifiers = otherIdentifiers,
+      items = List(
+        createUnidentifiableItemWith(locations = List(
+          createDigitalLocationWith(locationType = createImageLocationType))))
+    )
+
+  def createMiroWork: UnidentifiedWork =
+    createMiroWorkWith()
+
+  def createIsbnWork: UnidentifiedWork =
+    createUnidentifiedWorkWith(
+      sourceIdentifier = createIsbnSourceIdentifier,
+    )
+
+  def createIsbnWorks(count: Int): List[UnidentifiedWork] =
+    List.fill(count)(createIsbnWork)
 }

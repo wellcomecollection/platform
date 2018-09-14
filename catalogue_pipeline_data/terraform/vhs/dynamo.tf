@@ -1,10 +1,9 @@
 resource "aws_dynamodb_table" "table" {
-  name             = "${var.table_name_prefix}${var.name}"
-  read_capacity    = 1
-  write_capacity   = 1
-  hash_key         = "id"
-  stream_enabled   = "${var.table_stream_enabled}"
-  stream_view_type = "${var.table_stream_enabled ? "NEW_AND_OLD_IMAGES": ""}"
+  name           = "${local.table_name}"
+  count          = "${var.prevent_destroy == "true" ? 1 : 0}"
+  read_capacity  = 1
+  write_capacity = 1
+  hash_key       = "id"
 
   attribute {
     name = "id"
@@ -21,18 +20,24 @@ resource "aws_dynamodb_table" "table" {
   }
 }
 
-module "sourcedata_dynamo_autoscaling" {
-  source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=dynamodb-autoscaling"
+resource "aws_dynamodb_table" "transient_table" {
+  name           = "${local.table_name}"
+  count          = "${var.prevent_destroy == "false" ? 1 : 0}"
+  read_capacity  = 1
+  write_capacity = 1
+  hash_key       = "id"
 
-  table_name = "${aws_dynamodb_table.table.name}"
+  attribute {
+    name = "id"
+    type = "S"
+  }
 
-  enable_read_scaling     = true
-  read_target_utilization = 30
-  read_min_capacity       = 1
-  read_max_capacity       = "${var.table_read_max_capacity}"
+  lifecycle {
+    prevent_destroy = false
 
-  enable_write_scaling     = true
-  write_target_utilization = 30
-  write_min_capacity       = 1
-  write_max_capacity       = "${var.table_write_max_capacity}"
+    ignore_changes = [
+      "read_capacity",
+      "write_capacity",
+    ]
+  }
 }
