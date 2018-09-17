@@ -1,7 +1,24 @@
-module "catalogue_pipeline" {
-  source = "pipeline"
+module "catalogue_pipelines" {
+  source = "pipelines"
 
-  namespace = "catalogue_pipeline_ms2"
+  namespace = "catalogue_pipeline"
+
+  miro_adapter_topic_names = [
+    "${local.miro_reindexer_topic_name}",
+  ]
+
+  miro_adapter_topic_count = 1
+
+  sierra_adapter_topic_names = [
+    "${local.sierra_reindexer_topic_name}",
+    "${local.sierra_merged_bibs_topic_name}",
+    "${local.sierra_merged_items_topic_name}",
+  ]
+
+  sierra_adapter_topic_count = 3
+
+  index_v1 = "v1-2018-09-14-miro-sierra-merging-take-5"
+  index_v2 = "v2-2018-09-14-miro-sierra-merging-take-5"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
@@ -11,8 +28,8 @@ module "catalogue_pipeline" {
   id_minter_container_image          = "${local.id_minter_container_image}"
   ingestor_container_image           = "${local.ingestor_container_image}"
 
-  subnets = ["${local.private_subnets}"]
-  vpc_id  = "${local.vpc_id}"
+  private_subnets = ["${local.private_subnets}"]
+  vpc_id          = "${local.vpc_id}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
 
@@ -24,9 +41,6 @@ module "catalogue_pipeline" {
   messages_bucket = "${aws_s3_bucket.messages.id}"
   infra_bucket    = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-09-13-miro-sierra-merging-take-2"
-  index_v2 = "v2-2018-09-13-miro-sierra-merging-take-2"
-
   rds_access_security_group_id = "${local.rds_access_security_group_id}"
 
   identifiers_rds_cluster_password = "${local.identifiers_rds_cluster_password}"
@@ -37,16 +51,6 @@ module "catalogue_pipeline" {
   es_cluster_credentials = "${var.es_cluster_credentials}"
   dlq_alarm_arn          = "${local.dlq_alarm_arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-
-  miro_adapter_topic_names = [
-    "${local.miro_reindexer_topic_name}",
-  ]
-
-  sierra_adapter_topic_names = [
-    "${local.sierra_reindexer_topic_name}",
-    "${local.sierra_merged_bibs_topic_name}",
-    "${local.sierra_merged_items_topic_name}",
-  ]
 
   service_egress_security_group_id = "${module.service_egress_security_group.sg_id}"
 

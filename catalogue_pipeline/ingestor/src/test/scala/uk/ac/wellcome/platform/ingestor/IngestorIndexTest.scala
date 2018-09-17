@@ -18,19 +18,16 @@ class IngestorIndexTest
     with Messaging
     with ElasticsearchFixtures {
 
-  val indexNameV1 = "works-v1"
-  val indexNameV2 = "works-v2"
+  val indexName = "works"
   val itemType = "work"
 
   it("creates the index at startup if it doesn't already exist") {
-    deleteIndexIfExists(indexNameV1)
-    deleteIndexIfExists(indexNameV2)
+    deleteIndexIfExists(indexName)
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
-          eventuallyIndexExists(indexNameV1)
-          eventuallyIndexExists(indexNameV2)
+        withServer(queue, bucket, indexName, itemType) { _ =>
+          eventuallyIndexExists(indexName)
         }
       }
     }

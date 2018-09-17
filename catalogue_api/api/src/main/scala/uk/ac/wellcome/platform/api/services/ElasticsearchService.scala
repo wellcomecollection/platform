@@ -6,13 +6,13 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 
-import uk.ac.wellcome.elasticsearch.ElasticConfig
+import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 
 import scala.concurrent.Future
 
 @Singleton
 class ElasticsearchService @Inject()(elasticClient: HttpClient,
-                                     elasticConfig: ElasticConfig) {
+                                     elasticConfig: DisplayElasticConfig) {
 
   val documentType: String = elasticConfig.documentType
 

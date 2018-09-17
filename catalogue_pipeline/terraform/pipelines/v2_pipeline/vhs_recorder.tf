@@ -1,5 +1,5 @@
 module "vhs_recorder" {
-  source = "../../../catalogue_pipeline_data/terraform/vhs"
+  source = "../../../../catalogue_pipeline_data/terraform/vhs"
   name   = "${replace(var.namespace, "_", "-")}-recorder"
 
   table_read_max_capacity  = 1000
