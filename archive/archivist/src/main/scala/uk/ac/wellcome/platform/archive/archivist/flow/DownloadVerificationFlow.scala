@@ -1,42 +1,59 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import akka.Done
-import akka.stream.SourceShape
+import akka.stream.FlowShape
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, GraphDSL, Source, Zip}
 import akka.util.ByteString
+import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.storage.ObjectLocation
+
+import scala.util.{Failure, Success, Try}
 
 object DownloadVerificationFlow extends Logging with CompareChecksum {
-  def apply()(implicit s3Client: S3Client) =
-    Flow[(ObjectLocation, String)]
+
+
+  def apply()(implicit s3Client: S3Client) = {
+    Flow[Either[ArchiveItemJob, ArchiveItemJob]]
       .log("download to verify")
       .flatMapConcat({
-        case (uploadLocation, checksum) =>
-          val verify = DigestCalculatorFlow("SHA-256")
+        case Right(job) => {
 
           val (source, _) = s3Client
-            .download(uploadLocation.namespace, uploadLocation.key)
+            .download(
+              job.uploadLocation.namespace,
+              job.uploadLocation.key
+            )
 
-          val checkedDownload = Source.fromGraph(
-            GraphDSL.create(source, verify)((_, _)) {
-              implicit b =>
-                (s, v) => {
+          val checkedDownloadFlow: Flow[ByteString, (Done, ByteString), NotUsed] = Flow.fromGraph(
+            GraphDSL.create() {
+              implicit b => {
 
-                  import GraphDSL.Implicits._
+                import GraphDSL.Implicits._
 
-                  val zip = b.add(Zip[Done, ByteString])
+                val v = b.add(DigestCalculatorFlow("SHA-256"))
+                val zip = b.add(Zip[Done, ByteString])
 
-                  s ~> v.inlets.head
+                v.inlets.head
 
-                  v.outlets(0).fold(Done)((out, _) => out) ~> zip.in0
-                  v.outlets(1) ~> zip.in1
+                v.outlets(0).fold(Done)((out, _) => out) ~> zip.in0
+                v.outlets(1) ~> zip.in1
 
-                  SourceShape(zip.out)
-                }
+                FlowShape(v.in, zip.out)
+              }
             })
 
-          checkedDownload.map(compare(checksum))
+          source
+            .via(checkedDownloadFlow)
+            .map(compare(job.bagDigestItem.checksum))
+            .map({
+              case Success(_) => Right(job)
+              case Failure(_) => Left(job)
+            })
+
+        }
+
+        case Left(job) => Source.single(Left(job))
       })
+  }
+
 }

@@ -4,55 +4,43 @@ import java.util.zip.ZipFile
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream._
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Flow, Source}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestRequestContext}
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagName}
 
-import scala.util.{Failure, Success, Try}
-
+object SplitAndGroupArchiveJobFlow {
+  def apply()(implicit s3Client: S3Client) = Flow[ArchiveJob]
+    .flatMapConcat(ArchiveBagSource(_))
+    .groupBy(Int.MaxValue, {
+      case Right(archiveItemJob) => archiveItemJob.bagName
+      case Left(archiveItemJob) => archiveItemJob.bagName
+    })
+    .reduce((first, second) => if(first.isLeft) first else second)
+    .mergeSubstreams
+    .collect {
+      case Right(archiveItemJob) => archiveItemJob.archiveJob
+    }
+}
 
 object UploadAndVerifyBagFlow extends Logging {
   def apply(config: BagUploaderConfig)(
     implicit
     s3Client: S3Client,
     actorSystem: ActorSystem
-  ): Flow[(ZipFile, IngestRequestContext),
-    (BagLocation, IngestRequestContext),
-    NotUsed] = {
+  ): Flow[(ZipFile, IngestRequestContext), (BagLocation, IngestRequestContext), NotUsed] = {
 
-    val decider: Supervision.Decider = {
-      case e => {
-        error("UploadAndVerifyBagFlow stream failure", e)
-        Supervision.Stop
-      }
-    }
-
-    val materializer = ActorMaterializer(
-      ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider)
-    )
 
     Flow[(ZipFile, IngestRequestContext)].flatMapConcat {
       case (zipFile, ingestRequestContext) => {
-
-        val f = Source
+        Source
           .single(zipFile)
           .map(createArchiveJob(_, config))
-          .flatMapConcat(ArchiveBagFlow(_))
-          .groupBy(Int.MaxValue, _.bagLocation.bagName)
-          .fold(List.empty[ArchiveJob])((list, o) => o :: list)
-          .mergeSubstreams
-          .map(bags => (
-            bags.head.bagLocation,
-            ingestRequestContext
-          ))
-          .runWith(Sink.head[(BagLocation, IngestRequestContext)])(
-            materializer
+          .via(SplitAndGroupArchiveJobFlow())
+          .map(job =>
+            (job.bagLocation, ingestRequestContext)
           )
-
-        Source.fromFuture(f)
 
       }
     }

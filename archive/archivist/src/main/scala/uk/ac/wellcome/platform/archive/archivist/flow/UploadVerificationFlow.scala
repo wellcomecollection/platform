@@ -11,9 +11,11 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.models.{BagDigestItem, BagLocation}
 import uk.ac.wellcome.storage.ObjectLocation
 
+import scala.util.{Failure, Success, Try}
+
 trait CompareChecksum extends Logging {
-  def compare[T](checksum: String): PartialFunction[(T, ByteString), T] = {
-    case (result, byteChecksum: ByteString) => {
+  def compare[T](checksum: String): PartialFunction[(T, ByteString), Try[T]] = {
+    case (result, byteChecksum: ByteString) => Try {
 
       val calculatedChecksum = byteChecksum
         .map(0xFF & _)
@@ -41,19 +43,18 @@ object UploadVerificationFlow
     with CompareChecksum {
   def apply()(
     implicit s3Client: S3Client
-  ): Flow[(BagLocation, BagDigestItem, ZipFile),
-    MultipartUploadResult,
+  ): Flow[ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob],
     NotUsed] = {
 
-    Flow[(BagLocation, BagDigestItem, ZipFile)]
+    Flow[ArchiveItemJob]
       .flatMapConcat {
-        case (bagLocation, BagDigestItem(checksum, itemLocation), zipFile) =>
+        case job@ArchiveItemJob(archiveJob, BagDigestItem(checksum, itemLocation)) =>
           val extract = FileExtractorFlow()
           val verify = DigestCalculatorFlow("SHA-256")
-          val source: Source[(ObjectLocation, ZipFile), NotUsed] = Source.single((itemLocation, zipFile))
+          val source: Source[(ObjectLocation, ZipFile), NotUsed] =
+            Source.single((itemLocation, archiveJob.zipFile))
 
-          val uploadLocation = createUploadLocation(bagLocation, itemLocation)
-          val upload = createS3UploadFlow(s3Client, uploadLocation)
+          val upload = createS3UploadFlow(s3Client, job.uploadLocation)
 
           val checkedUpload = Source.fromGraph(
             GraphDSL.create(source, extract, upload, verify)((_, _, _, _)) {
@@ -73,7 +74,12 @@ object UploadVerificationFlow
                 }
             })
 
-          checkedUpload.map(compare(checksum))
+          checkedUpload
+            .map(compare(checksum))
+            .map {
+              case Success(_) => Right(job)
+              case Failure(_) => Left(job)
+            }
       }
   }
 
@@ -84,21 +90,7 @@ object UploadVerificationFlow
     )
 
     Flow.fromGraph(GraphDSL.create(s3Sink) { implicit builder =>
-      sink =>
-        FlowShape(sink.in, builder.materializedValue)
+      sink => FlowShape(sink.in, builder.materializedValue)
     }).flatMapConcat(Source.fromFuture)
   }
-
-  private def createUploadLocation(
-                                    bagLocation: BagLocation,
-                                    itemLocation: ObjectLocation
-                                  ) =
-    ObjectLocation(
-      bagLocation.storageNamespace,
-      List(
-        bagLocation.storagePath,
-        bagLocation.bagName.value,
-        itemLocation.key
-      ).mkString("/")
-    )
 }
