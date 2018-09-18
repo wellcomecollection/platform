@@ -174,7 +174,10 @@ def sns_client(sns_endpoint_url, docker_services):
         import yaml
 
         resp = requests.get(sns_endpoint_url)
-        data = yaml.safe_load(resp.text)['messages']
+        try:
+            data = yaml.safe_load(resp.text)['messages']
+        except KeyError:
+            return []
 
         for d in data:
             d[':message'] = json.loads(d[':message'])
