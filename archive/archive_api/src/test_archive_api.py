@@ -68,7 +68,7 @@ class TestRequestNewIngest:
 
     def test_successful_request_sends_to_sns_with_callback(self, client, sns_client):
         callback_url = 'https://example.com/post?callback'
-        resp = client.post(f'/ingests', data={
+        client.post(f'/ingests', data={
             'uploadUrl': self.upload_url,
             'callbackUrl': callback_url
         })
