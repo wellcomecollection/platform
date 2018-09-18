@@ -1,12 +1,10 @@
-package uk.ac.wellcome.platform.archive.archivist.streams.flow
-
-import java.util.zip.ZipFile
+package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.stream.scaladsl.{Flow, Framing, Source}
 import akka.util.ByteString
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob, DigestLocation}
-import uk.ac.wellcome.platform.archive.common.models.{BagItem, BagPath}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob, ZipLocation}
+import uk.ac.wellcome.platform.archive.common.models.BagItem
 
 object BagDigestItemFlow extends Logging {
 
@@ -17,12 +15,12 @@ object BagDigestItemFlow extends Logging {
   )
 
   def apply(digestDelimiter: String) =
-    Flow[(DigestLocation, ArchiveJob)]
+    Flow[ArchiveJob]
       .log("digest location")
       .flatMapConcat {
-        case (digestLocation, job@ArchiveJob(zipFile, bagLocation, _)) =>
+        case job@ArchiveJob(zipFile, bagLocation, _, manifestLocation) =>
           Source
-            .single((digestLocation.toObjectLocation, zipFile))
+            .single(ZipLocation(zipFile, manifestLocation.toObjectLocation))
             .via(ZipFileEntryFlow())
             .via(framingDelimiter)
             .map(_.utf8String)

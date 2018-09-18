@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.archive.archivist
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
@@ -8,11 +7,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, IngestRequestContextGenerators, UploadConfig}
-import uk.ac.wellcome.platform.archive.archivist.streams.flow.UploadBagFlow
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, IngestRequestContext}
+import uk.ac.wellcome.platform.archive.archivist.flow.{ArchiveZipFileFlow, ZipFileDownloadComplete}
+import uk.ac.wellcome.platform.archive.common.models.BagPath
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
-class UploadBagFlowTest
+class ArchiveZipFileFlowTest
   extends FunSpec
     with Matchers
     with ScalaFutures
@@ -40,12 +39,13 @@ class UploadBagFlowTest
           val bagName = BagPath(randomAlphanumeric())
           val (zipFile, _) = createBagItZip(bagName, 1)
 
-          val uploader = UploadBagFlow(bagUploaderConfig)
-          val ingestContext = createIngestRequestContextWith()
+          val uploader = ArchiveZipFileFlow(bagUploaderConfig)
+          val ingestContext = createIngestBagRequestWith()
           val (_, verification) =
             uploader.runWith(
-              Source.single((zipFile, ingestContext)),
-              Sink.seq)
+              Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
+              Sink.seq
+            )
 
           whenReady(verification) { result =>
             listKeysInBucket(storageBucket) should have size 5
@@ -66,12 +66,12 @@ class UploadBagFlowTest
           val bagName = BagPath(randomAlphanumeric())
           val (zipFile, _) = createBagItZip(bagName, 1, false)
 
-          val uploader = UploadBagFlow(bagUploaderConfig)
-          val ingestContext = createIngestRequestContextWith()
+          val uploader = ArchiveZipFileFlow(bagUploaderConfig)
+          val ingestContext = createIngestBagRequest
 
           val (_, verification) =
             uploader.runWith(
-              Source.single((zipFile, ingestContext)),
+              Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
               Sink.seq)
 
           whenReady(verification) { result =>

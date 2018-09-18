@@ -13,7 +13,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.{BagPath, IngestBagRequestNotification}
+import uk.ac.wellcome.platform.archive.common.models.{BagPath, IngestBagRequest}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
@@ -44,7 +44,7 @@ trait Archivist
     val ingestRequestId = UUID.randomUUID()
     sendNotificationToSQS(
       queuePair.queue,
-      IngestBagRequestNotification(
+      IngestBagRequest(
         ingestRequestId,
         uploadedBagLocation,
         callbackUri))

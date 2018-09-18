@@ -4,27 +4,38 @@ import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
 
-case class ArchiveJob(zipFile: ZipFile, bagLocation: BagLocation, config: BagItConfig) {
+case class ArchiveJob(
+                       zipFile: ZipFile,
+                       bagLocation: BagLocation,
+                       config: BagItConfig,
+                       bagManifestLocation: BagManifestLocation
+                     ) {
   def digestDelimiter = config.digestDelimiterRegexp
 }
 
 object ArchiveJob {
+
   def create(
               zipFile: ZipFile,
               config: BagUploaderConfig
             ) = {
 
-    val maybeBagPath = findBag(zipFile)
+    val maybeBagPath = findBag(zipFile).toList
 
-    maybeBagPath.map(bagPath => ArchiveJob(
-      zipFile,
-      BagLocation(
-        storageNamespace = config.uploadConfig.uploadNamespace,
-        storagePath = config.uploadConfig.uploadPrefix,
-        bagPath = bagPath
-      ),
-      config.bagItConfig
-    ))
+    maybeBagPath
+      .flatMap(BagManifestLocation.create(config.bagItConfig, _))
+      .map(bagManifestLocation => {
+        ArchiveJob(
+          zipFile,
+          BagLocation(
+            storageNamespace = config.uploadConfig.uploadNamespace,
+            storagePath = config.uploadConfig.uploadPrefix,
+            bagPath = bagManifestLocation.path
+          ),
+          config.bagItConfig,
+          bagManifestLocation
+        )
+      })
   }
 
   private def findBag(zipFile: ZipFile) = {

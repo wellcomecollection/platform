@@ -16,7 +16,7 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{
   FileEntry
 }
 import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveCompleteNotification,
+  ArchiveComplete,
   BagLocation,
   BagPath
 }
@@ -51,7 +51,7 @@ trait Registrar
                        queuePair: QueuePair) =
     sendNotificationToSQS(
       queuePair.queue,
-      ArchiveCompleteNotification(requestId, bagLocation, callbackUrl)
+      ArchiveComplete(requestId, bagLocation, callbackUrl)
     )
 
   def withBagNotification[R](

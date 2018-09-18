@@ -6,7 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveCompleteNotification, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -43,7 +43,7 @@ class ArchivistFeatureTest
               assertQueuePairSizes(queuePair, 0, 0)
 
               assertSnsReceivesOnly(
-                ArchiveCompleteNotification(
+                ArchiveComplete(
                   requestId,
                   BagLocation(storageBucket.name, "archive", validBag),
                   Some(callbackUrl)
@@ -102,7 +102,7 @@ class ArchivistFeatureTest
 
                       assertSnsReceives(
                         Set(
-                          ArchiveCompleteNotification(
+                          ArchiveComplete(
                             requestId1,
                             BagLocation(
                               storageBucket.name,
@@ -110,7 +110,7 @@ class ArchivistFeatureTest
                               validBag1),
                             Some(callbackUrl)
                           ),
-                          ArchiveCompleteNotification(
+                          ArchiveComplete(
                             requestId2,
                             BagLocation(
                               storageBucket.name,

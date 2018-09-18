@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist.streams.flow
+package uk.ac.wellcome.platform.archive.archivist.flow
 
 import java.io.File
 

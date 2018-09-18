@@ -4,12 +4,12 @@ import java.net.{URI, URISyntaxException}
 import java.util.UUID
 import uk.ac.wellcome.json.JsonUtil._
 
-case class ArchiveCompleteNotification(
+case class ArchiveComplete(
                                            archiveRequestId: UUID,
                                            bagLocation: BagLocation,
                                            archiveCompleteCallbackUrl: Option[URI] = None)
 
-object ArchiveCompleteNotification {
+object ArchiveComplete {
 
   import io.circe._
   import io.circe.generic.semiauto._
@@ -29,18 +29,18 @@ object ArchiveCompleteNotification {
   }
 
   implicit val bagArchiveCompleteNotificationDecoder
-  : Decoder[ArchiveCompleteNotification] = deriveDecoder
+  : Decoder[ArchiveComplete] = deriveDecoder
   implicit val bagArchiveCompleteNotificationEncoder
-  : Encoder[ArchiveCompleteNotification] = deriveEncoder
+  : Encoder[ArchiveComplete] = deriveEncoder
 
   def apply(
              bagLocation: BagLocation,
-             context: IngestRequestContext
-           ): ArchiveCompleteNotification =
-    ArchiveCompleteNotification(
-      context.id,
+             request: IngestBagRequest
+           ): ArchiveComplete =
+    ArchiveComplete(
+      request.archiveRequestId,
       bagLocation,
-      context.callbackUrl
+      request.archiveCompleteCallbackUrl
     )
 
 }

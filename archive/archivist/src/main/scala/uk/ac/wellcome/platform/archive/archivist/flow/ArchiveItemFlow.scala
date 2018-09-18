@@ -1,18 +1,21 @@
-package uk.ac.wellcome.platform.archive.archivist.streams.flow
+package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob}
 
 object ArchiveItemFlow extends Logging {
-  def apply()(
+  def apply(delimiter: String)(
     implicit s3Client: S3Client
   ) = {
+    val bagDigestItemFlow = BagDigestItemFlow(delimiter)
+
     val uploadVerificationFlow = UploadItemFlow()
     val downloadVerification = DownloadItemFlow()
 
-    Flow[ArchiveItemJob]
+    Flow[ArchiveJob]
+      .via(bagDigestItemFlow)
       .log("uploading and verifying")
       .via(uploadVerificationFlow)
       .log("upload verified")
