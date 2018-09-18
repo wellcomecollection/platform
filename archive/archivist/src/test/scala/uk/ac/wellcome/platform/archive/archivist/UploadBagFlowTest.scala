@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
@@ -8,7 +9,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, IngestRequestContextGenerators, UploadConfig}
 import uk.ac.wellcome.platform.archive.archivist.streams.flow.UploadBagFlow
-import uk.ac.wellcome.platform.archive.common.models.BagPath
+import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, IngestRequestContext}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class UploadBagFlowTest
@@ -44,10 +45,11 @@ class UploadBagFlowTest
           val (_, verification) =
             uploader.runWith(
               Source.single((zipFile, ingestContext)),
-              Sink.ignore)
+              Sink.seq)
 
-          whenReady(verification) { _ =>
+          whenReady(verification) { result =>
             listKeysInBucket(storageBucket) should have size 5
+            result should have size 1
           }
         }
       }
@@ -70,13 +72,11 @@ class UploadBagFlowTest
           val (_, verification) =
             uploader.runWith(
               Source.single((zipFile, ingestContext)),
-              Sink.ignore)
+              Sink.seq)
 
-          whenReady(verification.failed) { actualException =>
-            val expectedException = new RuntimeException("Nope")
-            actualException shouldBe expectedException
+          whenReady(verification) { result =>
+            result shouldBe empty
           }
-
         }
       }
     }

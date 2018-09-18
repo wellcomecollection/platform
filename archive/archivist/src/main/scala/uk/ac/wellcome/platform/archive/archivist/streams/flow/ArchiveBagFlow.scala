@@ -4,12 +4,11 @@ import akka.NotUsed
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
-import uk.ac.wellcome.platform.archive.archivist.streams.source.ArchiveBagSource
 
 object ArchiveBagFlow {
-  def apply()(implicit s3Client: S3Client): Flow[ArchiveJob, ArchiveJob, NotUsed] =
+  def apply(delimiter: String)(implicit s3Client: S3Client): Flow[ArchiveJob, ArchiveJob, NotUsed] =
     Flow[ArchiveJob]
-      .flatMapConcat(ArchiveBagSource(_))
+      .via(ArchiveItemJobFlow(delimiter))
       .groupBy(Int.MaxValue, {
         case Right(archiveItemJob) => archiveItemJob.bagName
         case Left(archiveItemJob) => archiveItemJob.bagName

@@ -25,7 +25,7 @@ object UploadBagFlow extends Logging {
           .single(zipFile)
           .map(ArchiveJob.create(_, config))
           .collect { case Some(archiveJob) => archiveJob }
-          .via(ArchiveBagFlow())
+          .via(ArchiveBagFlow(config.bagItConfig.digestDelimiterRegexp))
           .map(job =>
             (job.bagLocation, ingestRequestContext)
           )

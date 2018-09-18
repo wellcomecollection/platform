@@ -13,5 +13,4 @@ object DigestLocation {
       .map(digestName => {
         DigestLocation(archiveJob.bagLocation.bagPath, digestName)
       })
-      .toIterator
 }
