@@ -34,12 +34,18 @@ def route_report_ingest_status(guid):
 
 @app.route('/ingests', methods=['POST'])
 def route_request_new_ingest():
+    if not request.is_json:
+        raise BadRequestError('Mimetype expected to be application/json')
+
     try:
-        upload_url = request.form['uploadUrl']
+        request_data = request.get_json()
+        upload_url = request_data['uploadUrl']
+    except BadRequestError:
+        raise BadRequestError('Invalid json in request')
     except KeyError:
         raise BadRequestError('No uploadUrl parameter in request')
 
-    callback_url = request.form.get('callbackUrl')
+    callback_url = request_data.get('callbackUrl')
 
     ingest_request_id = send_new_ingest_request(
         sns_client=app.config['sns_client'],

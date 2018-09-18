@@ -14,4 +14,4 @@ COPY uwsgi.ini /etc/uwsgi
 
 EXPOSE 8888
 
-CMD ["/usr/sbin/uwsgi", "--ini", "/etc/uwsgi/uwsgi.ini"]"]
+CMD ["/usr/sbin/uwsgi", "--ini", "/etc/uwsgi/uwsgi.ini"]

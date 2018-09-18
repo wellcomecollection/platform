@@ -34,16 +34,34 @@ class TestRequestNewIngest:
     upload_url = 's3://example-bukkit/helloworld.zip'
 
     def test_request_new_ingest_is_202(self, client):
-        resp = client.post(f'/ingests', data={'uploadUrl': self.upload_url})
+        resp = client.post(
+            f'/ingests',
+            json={'uploadUrl': self.upload_url})
         assert resp.status_code == 202
 
+    def test_request_not_json_is_badrequest(self, client):
+        resp = client.post(
+            f'/ingests',
+            data="not-json",
+            headers={'Content-Type': 'application/json'})
+        assert resp.status_code == 400
+        assert b'Invalid json in request' in resp.data
+
+    def test_request_not_json_content_type_is_badrequest(self, client):
+        resp = client.post(
+            f'/ingests',
+            data=json.dumps({'uploadUrl': self.upload_url}),
+            headers={'Content-Type': 'text/plain'})
+        assert resp.status_code == 400
+        assert b'Mimetype expected to be application/json' in resp.data
+
     def test_no_uploadurl_is_badrequest(self, client):
-        resp = client.post(f'/ingests')
+        resp = client.post(f'/ingests', json={})
         assert resp.status_code == 400
         assert b'No uploadUrl parameter' in resp.data
 
     def test_request_new_ingest_has_location_header(self, client):
-        resp = client.post(f'/ingests', data={'uploadUrl': self.upload_url})
+        resp = client.post(f'/ingests', json={'uploadUrl': self.upload_url})
         assert 'Location' in resp.headers
 
         # TODO: This might need revisiting when we deploy the app behind
@@ -51,7 +69,7 @@ class TestRequestNewIngest:
         assert resp.headers['Location'].startswith('http://localhost/ingests/')
 
     def test_successful_request_sends_to_sns(self, client, sns_client):
-        resp = client.post(f'/ingests', data={'uploadUrl': self.upload_url})
+        resp = client.post(f'/ingests', json={'uploadUrl': self.upload_url})
 
         sns_messages = sns_client.list_messages()
         assert len(sns_messages) == 1
@@ -68,7 +86,7 @@ class TestRequestNewIngest:
 
     def test_successful_request_sends_to_sns_with_callback(self, client, sns_client):
         callback_url = 'https://example.com/post?callback'
-        client.post(f'/ingests', data={
+        client.post(f'/ingests', json={
             'uploadUrl': self.upload_url,
             'callbackUrl': callback_url
         })
