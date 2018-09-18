@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist.models
+package uk.ac.wellcome.platform.archive.common.models
 
 import java.net.URI
 import java.util.UUID

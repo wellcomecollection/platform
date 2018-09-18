@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist.flow
+package uk.ac.wellcome.platform.archive.archivist.streams.flow
 
 import java.util.zip.ZipFile
 
@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
-object FileExtractorFlow extends Logging {
+object ZipFileEntryFlow extends Logging {
 
   def apply() = {
     Flow[(ObjectLocation, ZipFile)].flatMapConcat {

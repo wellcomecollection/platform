@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist.flow
+package uk.ac.wellcome.platform.archive.archivist.streams.flow
 
 import java.util.zip.ZipFile
 
@@ -8,37 +8,15 @@ import akka.stream.scaladsl.{Flow, GraphDSL, Source, Zip}
 import akka.stream.{FlowShape, SourceShape}
 import akka.util.ByteString
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.models.{BagDigestItem, BagLocation}
+import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
+import uk.ac.wellcome.platform.archive.archivist.streams.fanOut.ArchiveChecksumFanOut
+import uk.ac.wellcome.platform.archive.archivist.util.CompareChecksum
+import uk.ac.wellcome.platform.archive.common.models.BagItem
 import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
-trait CompareChecksum extends Logging {
-  def compare[T](checksum: String): PartialFunction[(T, ByteString), Try[T]] = {
-    case (result, byteChecksum: ByteString) => Try {
-
-      val calculatedChecksum = byteChecksum
-        .map(0xFF & _)
-        .map("%02x".format(_))
-        .foldLeft("") {
-          _ + _
-        }
-        .mkString
-
-      if (calculatedChecksum != checksum) {
-        throw new RuntimeException(
-          s"Bad checksum! ($calculatedChecksum != $checksum"
-        )
-      } else {
-        debug(s"Checksum match! ($calculatedChecksum != $checksum")
-      }
-
-      result
-    }
-  }
-}
-
-object UploadVerificationFlow
+object UploadItemFlow
   extends Logging
     with CompareChecksum {
   def apply()(
@@ -48,9 +26,9 @@ object UploadVerificationFlow
 
     Flow[ArchiveItemJob]
       .flatMapConcat {
-        case job@ArchiveItemJob(archiveJob, BagDigestItem(checksum, itemLocation)) =>
-          val extract = FileExtractorFlow()
-          val verify = DigestCalculatorFlow("SHA-256")
+        case job@ArchiveItemJob(archiveJob, BagItem(checksum, itemLocation)) =>
+          val extract = ZipFileEntryFlow()
+          val verify = ArchiveChecksumFanOut("SHA-256")
           val source: Source[(ObjectLocation, ZipFile), NotUsed] =
             Source.single((itemLocation, archiveJob.zipFile))
 

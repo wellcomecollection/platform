@@ -1,19 +1,19 @@
-package uk.ac.wellcome.platform.archive.archivist.flow
+package uk.ac.wellcome.platform.archive.archivist.streams.flow
 
 import java.io.File
 import java.util.zip.ZipFile
 
 import akka.NotUsed
-import akka.stream.FlowShape
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import akka.stream.scaladsl.{FileIO, Flow, GraphDSL, Source}
+import akka.stream.scaladsl.Flow
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContext
+import uk.ac.wellcome.platform.archive.common.models.IngestRequestContext
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.util.{Failure, Success}
 
-object DownloadZipFileFlow extends Logging {
+object ZipFileDownloadFlow extends Logging {
+
   def apply()(implicit s3Client: S3Client)
   : Flow[(ObjectLocation, IngestRequestContext),
     (ZipFile, IngestRequestContext),
@@ -32,7 +32,7 @@ object DownloadZipFileFlow extends Logging {
           val tmpFile = File.createTempFile("archivist", ".tmp")
 
           downloadStream
-            .via(fileStoreFlow(tmpFile))
+            .via(FileStoreFlow(tmpFile))
             .map(_.status)
             .map {
               case Success(_) =>
@@ -43,13 +43,6 @@ object DownloadZipFileFlow extends Logging {
       }
       .log("downloaded zipfile")
   }
-
-  private def fileStoreFlow(tmpFile: File) = {
-    val fileSink = FileIO.toPath(tmpFile.toPath)
-
-    Flow.fromGraph(GraphDSL.create(fileSink) { implicit builder =>
-      sink =>
-        FlowShape(sink.in, builder.materializedValue)
-    }).flatMapConcat(Source.fromFuture)
-  }
 }
+
+

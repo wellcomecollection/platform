@@ -1,11 +1,12 @@
-package uk.ac.wellcome.platform.archive.archivist.models
+package uk.ac.wellcome.platform.archive.common.models
 
 import java.net.{URI, URISyntaxException}
 import java.util.UUID
 
+import uk.ac.wellcome.json.JsonUtil._
+
 import io.circe.DecodingFailure
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.json.JsonUtil._
 
 case class IngestBagRequestNotification(
   archiveRequestId: UUID,

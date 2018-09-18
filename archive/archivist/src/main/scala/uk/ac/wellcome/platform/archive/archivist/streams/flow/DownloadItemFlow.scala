@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist.flow
+package uk.ac.wellcome.platform.archive.archivist.streams.flow
 
 import akka.stream.FlowShape
 import akka.stream.alpakka.s3.scaladsl.S3Client
@@ -6,10 +6,13 @@ import akka.stream.scaladsl.{Flow, GraphDSL, Source, Zip}
 import akka.util.ByteString
 import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
+import uk.ac.wellcome.platform.archive.archivist.streams.fanOut.ArchiveChecksumFanOut
+import uk.ac.wellcome.platform.archive.archivist.util.CompareChecksum
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
-object DownloadVerificationFlow extends Logging with CompareChecksum {
+object DownloadItemFlow extends Logging with CompareChecksum {
 
 
   def apply()(implicit s3Client: S3Client) = {
@@ -30,7 +33,7 @@ object DownloadVerificationFlow extends Logging with CompareChecksum {
 
                 import GraphDSL.Implicits._
 
-                val v = b.add(DigestCalculatorFlow("SHA-256"))
+                val v = b.add(ArchiveChecksumFanOut("SHA-256"))
                 val zip = b.add(Zip[Done, ByteString])
 
                 v.inlets.head

@@ -6,12 +6,12 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
-import uk.ac.wellcome.platform.archive.archivist.flow.UploadAndVerifyBagFlow
 import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, IngestRequestContextGenerators, UploadConfig}
-import uk.ac.wellcome.platform.archive.common.models.BagName
+import uk.ac.wellcome.platform.archive.archivist.streams.flow.UploadBagFlow
+import uk.ac.wellcome.platform.archive.common.models.BagPath
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
-class UploadAndVerifyBagFlowTest
+class UploadBagFlowTest
   extends FunSpec
     with Matchers
     with ScalaFutures
@@ -36,10 +36,10 @@ class UploadAndVerifyBagFlowTest
           implicit val s3Client = s3AkkaClient
 
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-          val bagName = BagName(randomAlphanumeric())
+          val bagName = BagPath(randomAlphanumeric())
           val (zipFile, _) = createBagItZip(bagName, 1)
 
-          val uploader = UploadAndVerifyBagFlow(bagUploaderConfig)
+          val uploader = UploadBagFlow(bagUploaderConfig)
           val ingestContext = createIngestRequestContextWith()
           val (_, verification) =
             uploader.runWith(
@@ -61,10 +61,10 @@ class UploadAndVerifyBagFlowTest
           implicit val s3Client = s3AkkaClient
 
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-          val bagName = BagName(randomAlphanumeric())
+          val bagName = BagPath(randomAlphanumeric())
           val (zipFile, _) = createBagItZip(bagName, 1, false)
 
-          val uploader = UploadAndVerifyBagFlow(bagUploaderConfig)
+          val uploader = UploadBagFlow(bagUploaderConfig)
           val ingestContext = createIngestRequestContextWith()
 
           val (_, verification) =

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist.flow
+package uk.ac.wellcome.platform.archive.archivist.streams.fanOut
 
 import java.security.MessageDigest
 
@@ -7,7 +7,7 @@ import akka.stream.stage._
 import akka.util.ByteString
 import grizzled.slf4j.Logging
 
-class DigestCalculatorFlow(algorithm: String)
+class ArchiveChecksumFanOut(algorithm: String)
   extends GraphStage[UniformFanOutShape[ByteString, ByteString]]
   with Logging {
 
@@ -51,6 +51,6 @@ class DigestCalculatorFlow(algorithm: String)
     }
 }
 
-object DigestCalculatorFlow {
-  def apply(algorithm: String) = new DigestCalculatorFlow(algorithm)
+object ArchiveChecksumFanOut {
+  def apply(algorithm: String) = new ArchiveChecksumFanOut(algorithm)
 }

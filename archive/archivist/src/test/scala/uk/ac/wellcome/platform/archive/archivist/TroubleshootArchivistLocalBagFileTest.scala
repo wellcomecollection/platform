@@ -7,7 +7,7 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
-import uk.ac.wellcome.platform.archive.common.models.BagName
+import uk.ac.wellcome.platform.archive.common.models.BagPath
 
 @Ignore
 // Useful test to troubleshoot running the archivist using a local bagfile
@@ -27,7 +27,7 @@ class TroubleshootArchivistLocalBagFileTest
           progressTable,
           archivist) =>
         sendBag(
-          BagName(randomAlphanumeric()),
+          BagPath(randomAlphanumeric()),
           new File(
             List(
               System.getProperty("user.home"),

@@ -10,10 +10,11 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.flow._
-import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestBagRequestNotification, IngestRequestContext}
+import uk.ac.wellcome.platform.archive.archivist.streams._
+import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
+import uk.ac.wellcome.platform.archive.archivist.streams.flow.{ArchiveCompleteFlow, InitialiseArchiveProgressFlow, UploadBagFlow, ZipFileDownloadFlow}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
+import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequestNotification, IngestRequestContext, NotificationMessage}
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -52,11 +53,11 @@ trait Archivist extends Logging {
         .log("notification message")
         .map(parseNotification)
         .log("download location")
-        .via(DownloadZipFileFlow())
+        .via(ZipFileDownloadFlow())
         .log("download zip")
-        .via(UploadAndVerifyBagFlow(bagUploaderConfig))
+        .via(UploadBagFlow(bagUploaderConfig))
         .log("archive verified")
-        .via(BagArchiveCompleteFlow(snsConfig.topicArn))
+        .via(ArchiveCompleteFlow(snsConfig.topicArn))
 
     messageStream.run("archivist", workFlow)
   }

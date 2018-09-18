@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.archive.archivist.models
 import java.net.URI
 import java.util.UUID
 
+import uk.ac.wellcome.platform.archive.common.models.IngestRequestContext
 import uk.ac.wellcome.storage.ObjectLocation
 
 trait IngestRequestContextGenerators {

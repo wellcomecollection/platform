@@ -2,12 +2,12 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 
 import java.security.MessageDigest
 
-import uk.ac.wellcome.platform.archive.common.models.BagName
+import uk.ac.wellcome.platform.archive.common.models.BagPath
 
 import scala.util.Random
 
 trait BagIt {
-  def createBag(bagName: BagName,
+  def createBag(bagName: BagPath,
                 dataFileCount: Int = 1,
                 valid: Boolean = true) = {
 

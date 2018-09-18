@@ -88,7 +88,7 @@ class Registrar @Inject()(
     }
   }
 
-  private def createStorageManifest(requestContext: RequestContext)(
+  private def createStorageManifest(requestContext: RegisterRequestContext)(
     implicit s3Client: AmazonS3,
     materializer: ActorMaterializer,
     executionContext: ExecutionContextExecutor) = {

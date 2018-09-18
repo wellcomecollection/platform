@@ -10,18 +10,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.models.IngestBagRequestNotification
-import uk.ac.wellcome.platform.archive.archivist.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
+import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  AkkaS3,
-  BagIt,
-  FileEntry
-}
-import uk.ac.wellcome.platform.archive.common.models.BagName
+import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
+import uk.ac.wellcome.platform.archive.common.models.{BagPath, IngestBagRequestNotification}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
@@ -38,12 +30,12 @@ trait Archivist
     with Messaging
     with BagIt {
 
-  def sendBag[R](bagName: BagName,
+  def sendBag[R](bagName: BagPath,
                  file: File,
                  ingestBucket: Bucket,
                  callbackUri: Option[URI],
                  queuePair: QueuePair)(
-    testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
+    testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = {
     val uploadKey = s"upload/path/$bagName.zip"
 
     s3Client.putObject(ingestBucket.name, uploadKey, file)
@@ -64,7 +56,7 @@ trait Archivist
                      callbackUri: Option[URI],
                      queuePair: QueuePair,
                      valid: Boolean = true)(
-    testWith: TestWith[(UUID, ObjectLocation, BagName), R]) = {
+    testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = {
 
     withBag(12, valid) {
       case (bagName, _, file) =>
@@ -78,8 +70,8 @@ trait Archivist
   }
 
   def withBag[R](dataFileCount: Int = 1, valid: Boolean = true)(
-    testWith: TestWith[(BagName, ZipFile, File), R]) = {
-    val bagName = BagName(randomAlphanumeric())
+    testWith: TestWith[(BagPath, ZipFile, File), R]) = {
+    val bagName = BagPath(randomAlphanumeric())
 
     info(s"Creating bag $bagName")
 
@@ -160,7 +152,7 @@ trait Archivist
     (zipFile, file)
   }
 
-  def createBagItZip(bagName: BagName,
+  def createBagItZip(bagName: BagPath,
                      dataFileCount: Int = 1,
                      valid: Boolean = true) = {
 

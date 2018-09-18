@@ -16,9 +16,9 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{
   FileEntry
 }
 import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
+  ArchiveCompleteNotification,
   BagLocation,
-  BagName
+  BagPath
 }
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
@@ -51,7 +51,7 @@ trait Registrar
                        queuePair: QueuePair) =
     sendNotificationToSQS(
       queuePair.queue,
-      BagArchiveCompleteNotification(requestId, bagLocation, callbackUrl)
+      ArchiveCompleteNotification(requestId, bagLocation, callbackUrl)
     )
 
   def withBagNotification[R](
@@ -70,7 +70,7 @@ trait Registrar
   def withBag[R](storageBucket: Bucket,
                  dataFileCount: Int = 1,
                  valid: Boolean = true)(testWith: TestWith[BagLocation, R]) = {
-    val bagName = BagName(randomAlphanumeric())
+    val bagName = BagPath(randomAlphanumeric())
 
     info(s"Creating bag $bagName")
 
