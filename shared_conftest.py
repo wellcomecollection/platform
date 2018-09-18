@@ -209,6 +209,8 @@ def topic_arn(sns_client, docker_services, docker_ip):
 
     yield topic_arn
 
+    del os.environ['TOPIC_ARN']
+
     # This clears all the messages on the topic at the end of the test,
     # so the next test gets an empty topic.
     endpoint_url = (

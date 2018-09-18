@@ -34,12 +34,9 @@ class IngestorFeatureTest
           bucket = bucket,
           queue = queue,
           obj = work)
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
-              assertElasticsearchEventuallyHasWork(indexNameV1, itemType, work)
-              assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
-            }
+        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+          withServer(queue, bucket, indexName, itemType) { _ =>
+            assertElasticsearchEventuallyHasWork(indexName, itemType, work)
           }
         }
       }
@@ -50,7 +47,7 @@ class IngestorFeatureTest
     "reads a sierra identified work from the queue and ingests it in the v2 index only") {
     val work = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
-        identifierType = "sierra-system-number"
+        identifierType = createSierraSystemSourceIdentifierType
       )
     )
 
@@ -60,12 +57,9 @@ class IngestorFeatureTest
           bucket = bucket,
           queue = queue,
           obj = work)
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
-              assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
-              assertElasticsearchNeverHasWork(indexNameV1, itemType, work)
-            }
+        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+          withServer(queue, bucket, indexName, itemType) { _ =>
+            assertElasticsearchNeverHasWork(indexName, itemType, work)
           }
         }
       }
@@ -75,32 +69,30 @@ class IngestorFeatureTest
   it("does not delete a message from the queue if it fails processing") {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
-              sendNotificationToSQS(
-                queue = queue,
-                body = "not a json string -- this will fail parsing"
-              )
+        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+          withServer(queue, bucket, indexName, itemType) { _ =>
+            sendNotificationToSQS(
+              queue = queue,
+              body = "not a json string -- this will fail parsing"
+            )
 
-              // After a message is read, it stays invisible for 1 second and then it gets sent again.		               assertQueueHasSize(queue, size = 1)
-              // So we wait for longer than the visibility timeout and then we assert that it has become
-              // invisible again, which means that the ingestor picked it up again,
-              // and so it wasn't deleted as part of the first run.
-              // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
-              Thread.sleep(2000)
+            // After a message is read, it stays invisible for 1 second and then it gets sent again.		               assertQueueHasSize(queue, size = 1)
+            // So we wait for longer than the visibility timeout and then we assert that it has become
+            // invisible again, which means that the ingestor picked it up again,
+            // and so it wasn't deleted as part of the first run.
+            // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
+            Thread.sleep(2000)
 
-              eventually {
-                sqsClient
-                  .getQueueAttributes(
-                    queue.url,
-                    List("ApproximateNumberOfMessagesNotVisible").asJava
-                  )
-                  .getAttributes
-                  .get(
-                    "ApproximateNumberOfMessagesNotVisible"
-                  ) shouldBe "1"
-              }
+            eventually {
+              sqsClient
+                .getQueueAttributes(
+                  queue.url,
+                  List("ApproximateNumberOfMessagesNotVisible").asJava
+                )
+                .getAttributes
+                .get(
+                  "ApproximateNumberOfMessagesNotVisible"
+                ) shouldBe "1"
             }
           }
         }

@@ -10,10 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.elasticsearch.{
-  ElasticClientModule,
-  ElasticConfigModule
-}
+import uk.ac.wellcome.finatra.elasticsearch.ElasticClientModule
 import uk.ac.wellcome.finatra.messaging.{
   MessageReaderConfigModule,
   SQSClientModule
@@ -34,7 +31,7 @@ class Server extends HttpServer {
     AkkaModule,
     IngestorWorkerModule,
     ElasticClientModule,
-    ElasticConfigModule,
+    IngestElasticConfigModule,
     ExecutionContextModule,
     WorksIndexModule,
     IdentifiedBaseWorkModule,

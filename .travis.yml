@@ -120,7 +120,7 @@ jobs:
           sierra_window_generator \
           s3_demultiplexer \
           drain_ecs_container_instance \
-          dynamo_to_sns \
+          dynamo_write_heartbeat \
           ecs_ec2_instance_tagger \
           run_ecs_task \
           gatling_to_cloudwatch \
@@ -167,7 +167,7 @@ jobs:
     - env:
         - TRAVIS_LAMBDAS="archive_bags \
           archive_report_ingest_status \
-          archive_start_ingest"
+          archive_request_ingest"
         - TASK=travis-lambda-test
     - env: TASK=archive_api-test
 

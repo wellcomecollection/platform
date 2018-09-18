@@ -52,14 +52,20 @@ trait ItemsGenerators extends IdentifiersGenerators {
     license = Some(license)
   )
 
-  private def defaultLocation = createDigitalLocationWith()
-
-  private def defaultLocationUrl =
-    "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"
-
   def createImageLocationType = LocationType("iiif-image")
 
   def createPresentationLocationType = LocationType("iiif-presentation")
 
   def createStoresLocationType = LocationType("sgmed")
+
+  def createPhysicalItem: Identifiable[Item] =
+    createIdentifiableItemWith(locations = List(createPhysicalLocation))
+
+  def createDigitalItem: Unidentifiable[Item] =
+    createUnidentifiableItemWith(locations = List(createDigitalLocation))
+
+  private def defaultLocation = createDigitalLocationWith()
+
+  private def defaultLocationUrl =
+    "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"
 }

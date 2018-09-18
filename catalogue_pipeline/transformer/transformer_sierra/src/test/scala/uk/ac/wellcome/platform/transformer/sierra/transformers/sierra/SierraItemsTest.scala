@@ -21,7 +21,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
     val itemData = createSierraItemData
     val itemId = createSierraItemNumber
 
-    val sourceIdentifier1 = createSierraSourceIdentifierWith(
+    val sourceIdentifier1 = createSierraSystemSourceIdentifierWith(
       ontologyType = "Item",
       value = itemId.withCheckDigit)
 
@@ -46,7 +46,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataGenerators {
 
   it("uses the full Sierra system number as the source identifier") {
     val itemId = createSierraItemNumber
-    val sourceIdentifier = createSierraSourceIdentifierWith(
+    val sourceIdentifier = createSierraSystemSourceIdentifierWith(
       ontologyType = "Item",
       value = itemId.withCheckDigit
     )

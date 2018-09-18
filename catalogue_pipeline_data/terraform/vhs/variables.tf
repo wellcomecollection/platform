@@ -20,6 +20,17 @@ variable "table_write_max_capacity" {
   default = 300
 }
 
-variable "table_stream_enabled" {
-  default = true
+variable "prevent_destroy" {
+  default = "true"
 }
+
+variable "aws_region" {
+  description = "The AWS region to create things in."
+  default     = "eu-west-1"
+}
+
+variable "bucket_name" {
+  default = ""
+}
+
+variable "account_id" {}

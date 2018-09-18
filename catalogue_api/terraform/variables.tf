@@ -48,27 +48,27 @@ variable "infra_bucket" {}
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "romulus"
+  default     = "remus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "2cccf98f0dd22b4d2156e8fad175928e58ebbec9"
+  default     = ""
 }
 
 variable "pinned_romulus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
+  default     = ""
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = ""
+  default     = "f57489bccfe80d6d0ba2feb7c86cc340319ce4f7"
 }
 
 variable "pinned_remus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = ""
+  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
 }
 
 variable "es_config_romulus" {
@@ -76,8 +76,8 @@ variable "es_config_romulus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-08-30-parallel-scan-reindexer"
-    index_v2 = "v2-2018-08-30-parallel-scan-reindexer"
+    index_v1 = "v1-2018-09-14-miro-sierra-merging-take-5"
+    index_v2 = "v2-2018-09-14-miro-sierra-merging-take-5"
     doc_type = "work"
   }
 }
@@ -87,8 +87,8 @@ variable "es_config_remus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-08-21-no-dynamo-stream"
-    index_v2 = "v2-2018-08-21-no-dynamo-stream"
+    index_v1 = "v1-2018-09-14-miro-sierra-merging-take-5"
+    index_v2 = "v2-2018-09-14-miro-sierra-merging-take-5"
     doc_type = "work"
   }
 }

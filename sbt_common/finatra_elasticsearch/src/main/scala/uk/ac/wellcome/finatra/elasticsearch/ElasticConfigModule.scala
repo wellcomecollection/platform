@@ -2,7 +2,7 @@ package uk.ac.wellcome.finatra.elasticsearch
 
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.elasticsearch.ElasticConfig
+import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 
 object ElasticConfigModule extends TwitterModule {
   private val documentType =
@@ -13,8 +13,8 @@ object ElasticConfigModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesElasticConfig(): ElasticConfig =
-    ElasticConfig(
+  def providesElasticConfig(): DisplayElasticConfig =
+    DisplayElasticConfig(
       documentType = documentType(),
       indexV1name = indexV1name(),
       indexV2name = indexV2name()

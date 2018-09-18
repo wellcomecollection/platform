@@ -1,7 +1,7 @@
 resource "aws_security_group" "rds_access_security_group" {
   name        = "pipeline_rds_access_security_group"
   description = "Allow traffic to rds database"
-  subnet_ids  = "${local.private_subnets}"
+  vpc_id      = "${local.vpc_id}"
 
   ingress {
     from_port = 0
