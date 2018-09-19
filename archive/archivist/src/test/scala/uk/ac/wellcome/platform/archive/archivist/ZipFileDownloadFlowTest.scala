@@ -35,7 +35,7 @@ class ZipFileDownloadFlowTest
           withBag() {
             case (bagName, zipFile, file) =>
               val downloadZipFlow = ZipFileDownloadFlow()(
-                s3AkkaClient
+                s3Client
               )
 
               val uploadKey = bagName.toString

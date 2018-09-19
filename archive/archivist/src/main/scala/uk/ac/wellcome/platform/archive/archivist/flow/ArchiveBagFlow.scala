@@ -15,7 +15,7 @@ object ArchiveBagFlow {
       })
       .reduce((first, second) => if (first.isLeft) first else second)
       .mergeSubstreams
-      // TODO: Log error here
+      // TODO: Log error here & ensure visibility set short
       .collect {
         case Right(archiveItemJob) => archiveItemJob.archiveJob
       }

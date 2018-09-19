@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import java.io.File
 
 import akka.stream.FlowShape
-import akka.stream.scaladsl.{FileIO, Flow, GraphDSL, Source}
+import akka.stream.scaladsl.{FileIO, Flow, GraphDSL, Source, StreamConverters}
 
 object FileStoreFlow {
   def apply(tmpFile: File) = {
@@ -13,5 +13,7 @@ object FileStoreFlow {
       sink =>
         FlowShape(sink.in, builder.materializedValue)
     }).flatMapConcat(Source.fromFuture)
+
   }
 }
+
