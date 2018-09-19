@@ -67,7 +67,8 @@ war:about rdf:type owl:ObjectProperty ;
     rdfs:comment "Relates an article to its primary focus that it has been created to support. Examples would be articles specifically created to support an exhibition, public event or exhibited item."@en ;
     rdfs:domain war:Article ;
     rdfs:range war:Thing ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .            
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> . 
+               
     
 ####### data properties #####
 
@@ -77,4 +78,11 @@ war:positionInArticleSeries rdf:type owl:DatatypeProperty ;
     rdfs:domain war:Article ;
     rdfs:range xsd:integer ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .
+    
+war:created rdf:type owl:DatatypeProperty ;
+    rdfs:label "created"@en ;
+    rdfs:comment "The date the article was created."@en ;
+    rdfs:domain war:Article ;
+    rdfs:range xsd:date ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/article> .    
     
