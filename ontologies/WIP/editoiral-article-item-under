@@ -1,0 +1,63 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id": "watu9tbc",
+  "type": "Article",
+  "articleType": {
+    "id": "article",
+    "type": "ArticleType",
+    "label": "Article"
+  },
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "title": "Martina Amati on 'Under'",
+  "description": "Freediving is the act of swimming underwater, holding your breath, without breathing apparatus.",
+  "created": {
+    "label": "22-03-2018",
+    "type": "Date"
+  },
+  "about": {
+    "id": "e32y8y",
+    "type": "Installation",
+    "label": "Under",
+    "exhibited": {
+      "id": "d82h9",
+      "type": "Exhibition",
+      "label": "Somewhere in Between"
+    }
+  },
+  "articleFormat": [
+    {
+      "id": "a24s7qf3",
+      "label": "Interview",
+      "type": "Concept"
+    }
+  ],
+  "items": [
+    {
+      "id": "b28gh7z4n",
+      "type": "Item",
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "web",
+          "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
+          "license": {
+            "type": "License",
+            "licenseType": "CC-BY",
+            "label": "Attribution 4.0 International (CC BY 4.0)",
+            "url": "http://creativecommons.org/licenses/by/4.0/"
+          }
+        }
+      ]
+    }
+  ]
+}

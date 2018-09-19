@@ -1,12 +1,13 @@
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "watu9tbc",
-  "type": "Work",
-  "workType": {
+  "type": "Article",
+  "articleType": {
     "id": "article",
-    "type": "WorkType",
+    "type": "ArticleType",
     "label": "Article"
   },
+  "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
   "thumbnail": {
     "type": "Location",
     "locationType": "thumbnail-image",
@@ -18,48 +19,113 @@
       "url": "http://creativecommons.org/licenses/by/4.0/"
     }
   },
-  "title": "The tradesman who confronted the pestilence",
+  "title": "The stranger who started an epidemic",
   "description": "New Orleans, 1853. James McGuigan arrives in the port city and succumbs to yellow fever.",
-  "creators": [
-    {
-      "id": "2dh819d",
-      "label": "Anna Faherty",
-      "Type": "People"
+  "editorialImage": {
+    "type": "CaptionedImage",
+    "caption": "A patient in the final stages of yellow fever, observed at Cadiz, Spain in 1819.",
+    "location": {
+      "type": "Location",
+      "locationType": "iiif-image",
+      "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
+      "license": {
+        "type": "License",
+        "licenseType": "CC-BY",
+        "label": "Attribution 4.0 International (CC BY 4.0)",
+        "url": "http://creativecommons.org/licenses/by/4.0/"
+      },
+      "item": {
+        "id": "8128dh8",
+        "type": "Items",
+        "work": {
+          "id": "9d219dd",
+          "type": "Work",
+          "title": "A patient in the final stages of yellow fever"
+        }
+      }
     }
-  ],
-  "publicationDate": {
-    "label": "15 June 2017",
-    "type": "Period"
   },
-  "genres": [
+  "contributors": [
     {
-      "id": "a24s7qf3",
-      "label": "Long Read",
-      "type": "Concept"
+      "type": "Contributor",
+      "agent": {
+        "id": "a24s7qf3",
+        "label": "Anna Faherty",
+        "type": "Person",
+        "roles": [
+          {
+            "label": "Author",
+            "type": "ContributionRole"
+          }
+        ]
+      }
     }
   ],
+  "created": {
+    "label": "15-06-2017",
+    "type": "Date"
+  },
+  "articleFormat": {
+    "id": "a24s7qf3",
+    "label": "Long Read",
+    "type": "Concept"
+  },
+  "body": {
+    "textContent": "How did the minds of humans and other animals evolve from nothingness to consciousness? After Charles Darwin published his theory of evolution in 1859, scientists turned to the animal kingdom in their quest for answers. Somewhere in the evolutionary journey between the simplest single-cell organism and the higher primates, conscious thought must have emerged. But precisely at what point, and how did it come into being?",
+    "editorialImage": {
+      "type": "CaptionedImage",
+      "caption": "A patient in the final stages of yellow fever, observed at Cadiz, Spain in 1819.",
+      "location": {
+        "type": "Location",
+        "locationType": "iiif-image",
+        "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
+        "license": {
+          "type": "License",
+          "licenseType": "CC-BY",
+          "label": "Attribution 4.0 International (CC BY 4.0)",
+          "url": "http://creativecommons.org/licenses/by/4.0/"
+        },
+        "item": {
+          "id": "8128dh8",
+          "type": "Items",
+          "work": {
+            "id": "9d219dd",
+            "type": "Work",
+            "title": "A patient in the final stages of yellow fever"
+          }
+        }
+      }
+    },
+    "textualContent": "A new discipline of animal (or comparative) psychology was formed, which sought answers to the consciousness question by studying animal minds, from the most complex mammals to the lowest insects. Comparisons with the minds of human children and adults would, it was thought, throw light on the subject.",
+    "editorialImage": {
+      "type": "CaptionedImage",
+      "caption": "A patient in the final stages of yellow fever, observed at Cadiz, Spain in 1819.",
+      "location": {
+        "type": "Location",
+        "locationType": "iiif-image",
+        "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
+        "license": {
+          "type": "License",
+          "licenseType": "CC-BY",
+          "label": "Attribution 4.0 International (CC BY 4.0)",
+          "url": "http://creativecommons.org/licenses/by/4.0/"
+        },
+        "item": {
+          "id": "8128dh8",
+          "type": "Items",
+          "work": {
+            "id": "9d219dd",
+            "type": "Work",
+            "title": "A patient in the final stages of yellow fever"
+          }
+        }
+      }
+    }
+  },
   "series": {
     "id": "j19s1sj01",
     "label": "Outsiders",
     "type": "Series"
   },
-  "items": [
-    {
-      "id": "b28gh7z4n",
-      "type": "Item",
-      "locations": [
-        {
-          "type": "Location",
-          "locationType": "web",
-          "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
-          "license": {
-            "type": "License",
-            "licenseType": "CC-BY",
-            "label": "Attribution 4.0 International (CC BY 4.0)",
-            "url": "http://creativecommons.org/licenses/by/4.0/"
-          }
-        }
-      ]
-    }
-  ]
+  "positionInSeries": "2"
 }

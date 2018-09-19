@@ -1,0 +1,114 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id": "watu9tbc",
+  "type": "Article",
+  "articleType": {
+    "id": "article",
+    "type": "ArticleType",
+    "label": "Article"
+  },
+  "url": "https://wellcomecollection.org/articles/W4z18x4AACIAmwSs",
+  "thumbnail": {
+    "type": "Location",
+    "locationType": "thumbnail-image",
+    "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
+    "license": {
+      "type": "License",
+      "licenseType": "CC-BY",
+      "label": "Attribution 4.0 International (CC BY 4.0)",
+      "url": "http://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "title": "Good animals, bad humans?",
+  "description": "In their quest to prove the interconnectedness of species, Victorian students of evolution viewed people with learning disabilities as proof of a human–animal continuum. Surprisingly, these ideas persist in some branches of moral philosophy today.",
+  "contributors": [
+    {
+      "type": "Contributor",
+      "agent": {
+        "id": "a24s7qf3",
+        "label": "Simon Jarrett",
+        "type": "Person",
+        "roles": [
+          {
+            "label": "Author",
+            "type": "ContributionRole"
+          }
+        ]
+      }
+    }
+  ],
+  "created": {
+    "label": "12-09-2018",
+    "type": "Date"
+  },
+  "articleFormat": [
+    {
+      "id": "a24s7qf3",
+      "label": "Long Read",
+      "type": "Concept"
+    }
+  ],
+  "images": [
+    {
+      "type": "Image",
+      "caption": "Our knees jerking when tapped is a reflex action. Comparative psychologists in the 19th century believed that ‘idiots’ were more reflexive and instinctive, and could be studied to help explain human evolution.",
+      "location": {
+        "type": "Location",
+        "locationType": "iiif-image",
+        "url": "https://iiif.wellcomecollection.org/image/prismic:1673fcf181ce852a5ed1840ef367530e119b8cb9_zu3mux3x.jpg/full/600,/0/default.jpg",
+        "source": {
+          "type": "Source",
+          "id": "wellcome-collection",
+          "label": "Wellcome Collection"
+        },
+        "license": {
+          "type": "License",
+          "licenseType": "CC-BY",
+          "label": "Attribution 4.0 International (CC BY 4.0)",
+          "url": "http://creativecommons.org/licenses/by/4.0/"
+        },
+        "item": {
+          "id": "8128dh8",
+          "type": "Items",
+          "work": {
+            "id": "9d219dd",
+            "type": "Work",
+            "title": "The knee jerk"
+          }
+        }
+      }
+    } ,
+        {
+      "type": "Image",
+      "caption": "Psychologists such as Edward Thorndike studied animals as well as humans in order to try to understand and measure intelligence.",
+      "location": {
+        "type": "Location",
+        "locationType": "iiif-image",
+        "url": "https://iiif.wellcomecollection.org/image/prismic:b1f54921f6835f83bbdebeb9abe60ba06ae9249e_animal_intelligence_-_an_experimental_study_of_the_associative_processes_in_animals_1898-_17575801703.jpg/full/880,/0/default.jpg",
+        "source": {
+          "type": "Source",
+          "id": "wikimedia-commons",
+          "label": "Wikimedia Commons"
+        },
+        "license": {
+          "type": "License",
+          "licenseType": "CC-BY",
+          "label": "Attribution 4.0 International (CC BY 4.0)",
+          "url": "http://creativecommons.org/licenses/by/4.0/"
+        },
+        "item": {
+          "type": "Items",
+          "work": {
+            "type": "Work",
+            "title": "Animal intelligence: an experimental study of the associative processes in animals, Edward L. Thorndike."
+          }
+        }
+      }
+    }
+  ],
+  "series": {
+    "id": "j19s1sj01",
+    "label": "Outsiders",
+    "type": "Series"
+  }
+}

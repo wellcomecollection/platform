@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 5 September 2018.**
+**Last updated: 19 September 2018.**
 
 ## Problem statement
 
@@ -316,7 +316,7 @@ Response:
     }
   ],
   "manifest": {
-    "type": "Manifest",
+    "type": "FileManifest",
     "checksumAlgorithm": "sha256",
     "files": [
       {
@@ -337,7 +337,7 @@ Response:
     ]
   },
   "tagManifest": {
-    "type": "Manifest",
+    "type": "FileManifest",
     "checksumAlgorithm": "sha256",
     "files": [
       {
@@ -357,35 +357,9 @@ Response:
       }
     ]
   },
-  "locations": [
-    {
-      "type": "DigitalLocation",
-      "locationType": {
-        "id": "aws-s3-glacier",
-        "label": "AWS S3 Glacier",
-        "type": "LocationType"
-      },
-      "url": "s3://archivebucket/digitised/b22036593/"
-    },
-    {
-      "type": "DigitalLocation",
-      "locationType": {
-        "id": "azure-blob-archive",
-        "label": "Azure Blob Storage Archive",
-        "type": "LocationType"
-      },
-      "url": "https://archivebucket-replica.blob.core.windows.net/digitised/b22036593/"
-    },
-    {
-      "type": "DigitalLocation",
-      "locationType": {
-        "id": "aws-s3-standard-ia",
-        "label": "AWS S3 Standard IA",
-        "type": "LocationType"
-      },
-      "url": "s3://accessbucket/digitised/b22036593/"
-    }
-  ],
+  "accessUrl" : "s3://accessbucket/digitised/b22036593/" ,
+  "archiveUrl" : "s3://archivebucket/digitised/b22036593/" ,
+  "replicaUrl" : "https://archivebucket-replica.blob.core.windows.net/digitised/b22036593/" ,
   "description": "A account of a voyage to New South Wales",
   "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
@@ -479,7 +453,7 @@ Response:
     }
   ],
   "manifest": {
-    "type": "Manifest",
+    "type": "FileManifest",
     "checksumAlgorithm": "sha256",
     "files": [
       {
@@ -495,7 +469,7 @@ Response:
     ]
   },
   "tagManifest": {
-    "type": "Manifest",
+    "type": "FileManifest",
     "checksumAlgorithm": "md5",
     "files": [
       {
@@ -515,35 +489,9 @@ Response:
       }
     ]
   },
-  "locations": [
-    {
-      "type": "DigitalLocation",
-      "locationType": {
-        "id": "aws-s3-glacier",
-        "label": "AWS S3 Glacier",
-        "type": "LocationType"
-      },
-      "url": "s3://archivebucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
-    },
-    {
-      "type": "DigitalLocation",
-      "locationType": {
-        "id": "azure-blob-archive",
-        "label": "Azure Blob Storage Archive",
-        "type": "LocationType"
-      },
-      "url": "https://archivebucket-replica.blob.core.windows.net/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
-    },
-    {
-      "type": "DigitalLocation",
-      "locationType": {
-        "id": "aws-s3-standard-ia",
-        "label": "AWS S3 Standard IA",
-        "type": "LocationType"
-      },
-      "url": "s3://accessbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
-    }
-  ],
+  "accessUrl" : "s3://accessbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
+  "archiveUrl" : "s3://archivebucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
+  "replicaUrl" : "https://archivebucket-replica.blob.core.windows.net/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
   "description": "GC253_1046",
   "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
