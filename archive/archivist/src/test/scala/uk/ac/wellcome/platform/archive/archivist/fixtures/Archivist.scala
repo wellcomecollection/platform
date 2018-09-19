@@ -52,30 +52,54 @@ trait Archivist
     testWith((ingestRequestId, uploadedBagLocation, bagName))
   }
 
-  def sendFakeBag[R](ingestBucket: Bucket,
-                     callbackUri: Option[URI],
-                     queuePair: QueuePair,
-                     valid: Boolean = true)(
-    testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = {
+  def createAndSendValidBag[R](ingestBucket: Bucket,
+                               callbackUri: Option[URI],
+                               queuePair: QueuePair,
+                               dataFileCount: Int =12)(
+                                testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = withValidBag(12) {
+    case (bagName, _, file) =>
+      createValidBagItZip(bagName, dataFileCount)
 
-    withBag(12, valid) {
-      case (bagName, _, file) =>
-        createBagItZip(bagName, 12, valid)
-
-        sendBag(bagName, file, ingestBucket, callbackUri, queuePair) {
-          case (requestId, uploadObjectLocation, bag) =>
-            testWith((requestId, uploadObjectLocation, bag))
-        }
-    }
+      sendBag(bagName, file, ingestBucket, callbackUri, queuePair) {
+        case (requestId, uploadObjectLocation, bag) =>
+          testWith((requestId, uploadObjectLocation, bag))
+      }
   }
 
-  def withBag[R](dataFileCount: Int = 1, valid: Boolean = true)(
+  def createAndSendInvalidBag[R](ingestBucket: Bucket,
+                               callbackUri: Option[URI],
+                               queuePair: QueuePair,
+                                 dataFileCount: Int =12)(
+                                testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = withInvalidBag(12) {
+    case (bagName, _, file) =>
+      createInvalidBagItZip(bagName, dataFileCount)
+
+      sendBag(bagName, file, ingestBucket, callbackUri, queuePair) {
+        case (requestId, uploadObjectLocation, bag) =>
+          testWith((requestId, uploadObjectLocation, bag))
+      }
+  }
+
+  def withValidBag[R](dataFileCount: Int = 1)(
     testWith: TestWith[(BagPath, ZipFile, File), R]) = {
     val bagName = BagPath(randomAlphanumeric())
 
     info(s"Creating bag $bagName")
 
-    val (zipFile, file) = createBagItZip(bagName, dataFileCount, valid)
+    val (zipFile, file) = createValidBagItZip(bagName, dataFileCount)
+
+    testWith((bagName, zipFile, file))
+
+    file.delete()
+  }
+
+  def withInvalidBag[R](dataFileCount: Int = 1)(
+    testWith: TestWith[(BagPath, ZipFile, File), R]) = {
+    val bagName = BagPath(randomAlphanumeric())
+
+    info(s"Creating bag $bagName")
+
+    val (zipFile, file) = createInvalidBagItZip(bagName, dataFileCount)
 
     testWith((bagName, zipFile, file))
 
@@ -152,11 +176,19 @@ trait Archivist
     (zipFile, file)
   }
 
-  def createBagItZip(bagName: BagPath,
-                     dataFileCount: Int = 1,
-                     valid: Boolean = true) = {
 
-    val allFiles = createBag(bagName, dataFileCount, valid)
+  def createValidBagItZip(bagName: BagPath,
+                     dataFileCount: Int = 1) = {
+
+    val allFiles = createValidBag(bagName, dataFileCount)
+
+    createZip(allFiles.toList)
+  }
+
+  def createInvalidBagItZip(bagName: BagPath,
+                     dataFileCount: Int = 1) = {
+
+    val allFiles = createInvalidBag(bagName, dataFileCount)
 
     createZip(allFiles.toList)
   }

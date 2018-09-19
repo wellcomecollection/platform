@@ -37,7 +37,7 @@ class ArchiveZipFileFlowTest
 
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           val bagName = BagPath(randomAlphanumeric())
-          val (zipFile, _) = createBagItZip(bagName, 1)
+          val (zipFile, _) = createValidBagItZip(bagName, 1)
 
           val uploader = ArchiveZipFileFlow(bagUploaderConfig)
           val ingestContext = createIngestBagRequestWith()
@@ -64,7 +64,7 @@ class ArchiveZipFileFlowTest
 
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           val bagName = BagPath(randomAlphanumeric())
-          val (zipFile, _) = createBagItZip(bagName, 1, false)
+          val (zipFile, _) = createInvalidBagItZip(bagName, 1)
 
           val uploader = ArchiveZipFileFlow(bagUploaderConfig)
           val ingestContext = createIngestBagRequest
