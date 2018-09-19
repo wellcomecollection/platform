@@ -33,7 +33,7 @@ object ZipFileDownloadFlow extends Logging {
           downloadStream
             .via(FileStoreFlow(tmpFile))
             .map(_.status)
-            // TODO: Log failure here
+            // TODO: Log failure here ?divertTo
             .collect {
             case Success(_) => ZipFileDownloadComplete(
               new ZipFile(tmpFile),

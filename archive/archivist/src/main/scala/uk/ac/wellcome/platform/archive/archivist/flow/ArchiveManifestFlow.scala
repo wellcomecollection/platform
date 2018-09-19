@@ -6,7 +6,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob, ZipLocation}
 import uk.ac.wellcome.platform.archive.common.models.BagItem
 
-object BagDigestItemFlow extends Logging {
+object ArchiveManifestFlow extends Logging {
 
   val framingDelimiter = Framing.delimiter(
     ByteString("\n"),
@@ -14,7 +14,7 @@ object BagDigestItemFlow extends Logging {
     allowTruncation = true
   )
 
-  def apply(digestDelimiter: String) =
+  def apply(delimiter: String) =
     Flow[ArchiveJob]
       .log("digest location")
       .flatMapConcat {
@@ -26,11 +26,9 @@ object BagDigestItemFlow extends Logging {
             .map(_.utf8String)
             .filter(_.nonEmpty)
             .map(checksum =>
-              ArchiveItemJob(job, BagItem(checksum, bagLocation.bagPath, digestDelimiter))
+              ArchiveItemJob(job, BagItem(checksum, bagLocation.bagPath, delimiter))
             )
       }
       .log("bag digest item")
 
 }
-
-
