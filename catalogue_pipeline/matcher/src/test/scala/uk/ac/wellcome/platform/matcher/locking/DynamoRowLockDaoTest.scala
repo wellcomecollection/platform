@@ -9,7 +9,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 
@@ -21,7 +21,8 @@ class DynamoRowLockDaoTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with MatcherFixtures {
+    with MatcherFixtures
+  with IntegrationPatience{
 
   import com.gu.scanamo.syntax._
 
