@@ -7,7 +7,11 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestRequestContext, UploadConfig}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagUploaderConfig,
+  IngestRequestContext,
+  UploadConfig
+}
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagName}
 
 import scala.concurrent.ExecutionContext
@@ -21,8 +25,8 @@ object UploadAndVerifyBagFlow extends Logging {
     s3Client: S3Client,
     executionContext: ExecutionContext
   ): Flow[(ZipFile, IngestRequestContext),
-    (BagLocation, IngestRequestContext),
-    NotUsed] = {
+          (BagLocation, IngestRequestContext),
+          NotUsed] = {
 
     Flow[(ZipFile, IngestRequestContext)].flatMapConcat {
       case (zipFile, ingestRequestContext) =>
@@ -41,15 +45,15 @@ object UploadAndVerifyBagFlow extends Logging {
   }
 
   private def materializeArchiveBagFlow(
-                                         zipFile: ZipFile,
-                                         bagLocation: BagLocation,
-                                         config: BagUploaderConfig
-                                       )(
-                                         implicit
-                                         materializer: ActorMaterializer,
-                                         s3Client: S3Client,
-                                         executionContext: ExecutionContext
-                                       ) =
+    zipFile: ZipFile,
+    bagLocation: BagLocation,
+    config: BagUploaderConfig
+  )(
+    implicit
+    materializer: ActorMaterializer,
+    s3Client: S3Client,
+    executionContext: ExecutionContext
+  ) =
     ArchiveBagFlow(zipFile, bagLocation, config.bagItConfig)
       .map(Success(_))
       .recover({ case e => Failure(e) })
@@ -88,6 +92,6 @@ object UploadAndVerifyBagFlow extends Logging {
 }
 
 case class FailedArchivingException(bagName: BagName, e: Seq[Throwable])
-  extends RuntimeException(
-    s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
-  ) {}
+    extends RuntimeException(
+      s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
+    ) {}

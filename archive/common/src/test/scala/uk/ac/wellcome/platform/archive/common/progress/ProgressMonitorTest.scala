@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.archive.common.progress
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{PutItemRequest, UpdateItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  PutItemRequest,
+  UpdateItemRequest
+}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
@@ -11,14 +14,17 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Update}
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressMonitor}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{
+  IdConstraintError,
+  ProgressMonitor
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 import scala.util.Try
 
 class ProgressMonitorTest
-  extends FunSpec
+    extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with ProgressMonitorFixture
@@ -31,11 +37,8 @@ class ProgressMonitorTest
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
-        val archiveIngestProgress = Progress(
-          id,
-          uploadUrl,
-          Some(callbackUrl),
-          Progress.Processing)
+        val archiveIngestProgress =
+          Progress(id, uploadUrl, Some(callbackUrl), Progress.Processing)
 
         archiveProgressMonitor.create(archiveIngestProgress)
 
@@ -74,7 +77,6 @@ class ProgressMonitorTest
   it("adds multiple events to a monitor") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressMonitor(table) { monitor: ProgressMonitor =>
-
         val progress = givenProgressCreatedWith(
           uploadUrl,
           callbackUrl,
@@ -182,7 +184,6 @@ class ProgressMonitorTest
       val result = Try(archiveProgressMonitor.update(update))
 
       val failedException = result.failed.get
-
 
       failedException shouldBe a[RuntimeException]
       failedException shouldBe expectedException
