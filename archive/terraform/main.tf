@@ -48,10 +48,30 @@ module "registrar" {
     vhs_table_name              = "${module.vhs_archive_manifest.table_name}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
-
   env_vars_length = 6
 
   container_image   = "${local.registrar_container_image}"
   source_queue_name = "${module.registrar_queue.name}"
   source_queue_arn  = "${module.registrar_queue.arn}"
+}
+
+module "api_ecs" {
+  namespace = "${local.namespace}"
+  source = "api_ecs"
+
+  api_path = "/storage/v1"
+
+  nginx_container_image = "${local.nginx_services_ecs_container_image}"
+  nginx_container_port = "9000"
+
+  archive_api_container_image = "${local.api_ecs_container_image}"
+  archive_api_container_port = "8888"
+
+  archive_progress_table_name  = "${aws_dynamodb_table.archive_progress_table.name}"
+  archive_ingest_sns_topic_arn = "${module.archivist_topic.arn}"
+
+  vpc_id = "${local.vpc_id}"
+  private_subnets = "${local.private_subnets}"
+  public_subnets = "${local.public_subnets}"
+  certificate_domain = "api.wellcomecollection.org"
 }
