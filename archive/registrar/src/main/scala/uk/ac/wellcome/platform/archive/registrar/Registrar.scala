@@ -10,18 +10,10 @@ import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, NotificationMessage}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.registrar.flows.{
-  CallbackFlow,
-  RecordArchiveProgressEventFlow,
-  SnsPublishFlow
-}
+import uk.ac.wellcome.platform.archive.registrar.flows.{CallbackFlow, SnsPublishFlow}
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -37,16 +29,15 @@ class Registrar @Inject()(
                            s3ClientConfig: S3ClientConfig,
                            messageStream: MessageStream[NotificationMessage, Object],
                            dataStore: VersionedHybridStore[StorageManifest,
-                                  EmptyMetadata,
-                                  ObjectStore[StorageManifest]],
+                             EmptyMetadata,
+                             ObjectStore[StorageManifest]],
                            archiveProgressMonitor: ProgressMonitor,
                            actorSystem: ActorSystem
-) {
+                         ) {
   def run() = {
 
     implicit val client = snsClient
     implicit val system = actorSystem
-    implicit val progressMonitor = archiveProgressMonitor
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
@@ -69,9 +60,6 @@ class Registrar @Inject()(
       .map {
         case (manifest, context) => updateStoredManifest(manifest, context)
       }
-      .via(RecordArchiveProgressEventFlow(
-        "registered",
-        Some(Progress.Completed)))
       .via(SnsPublishFlow(snsConfig))
       .log("published notification")
       .filter {
@@ -86,7 +74,7 @@ class Registrar @Inject()(
   private def parseNotification(message: NotificationMessage) = {
     fromJson[BagArchiveCompleteNotification](message.Message) match {
       case Success(
-          bagArchiveCompleteNotification: BagArchiveCompleteNotification) =>
+      bagArchiveCompleteNotification: BagArchiveCompleteNotification) =>
         RegisterRequestContext(bagArchiveCompleteNotification)
       case Failure(e) =>
         throw new RuntimeException(
@@ -101,7 +89,7 @@ class Registrar @Inject()(
     executionContext: ExecutionContextExecutor) = {
     Source.fromFuture(
       for (manifest <- StorageManifestFactory
-             .create(requestContext.bagLocation))
+        .create(requestContext.bagLocation))
         yield (manifest, requestContext))
   }
 
