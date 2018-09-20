@@ -15,8 +15,8 @@ import uk.ac.wellcome.platform.archive.common.models.{
   NotificationMessage
 }
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.registrar.flows.{
   CallbackFlow,
   RecordArchiveProgressEventFlow,
@@ -32,15 +32,15 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 
 class Registrar @Inject()(
-  snsClient: AmazonSNSAsync,
-  snsConfig: SNSConfig,
-  s3ClientConfig: S3ClientConfig,
-  messageStream: MessageStream[NotificationMessage, Object],
-  dataStore: VersionedHybridStore[StorageManifest,
+                           snsClient: AmazonSNSAsync,
+                           snsConfig: SNSConfig,
+                           s3ClientConfig: S3ClientConfig,
+                           messageStream: MessageStream[NotificationMessage, Object],
+                           dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
-  archiveProgressMonitor: ArchiveProgressMonitor,
-  actorSystem: ActorSystem
+                           archiveProgressMonitor: ProgressMonitor,
+                           actorSystem: ActorSystem
 ) {
   def run() = {
 
@@ -71,7 +71,7 @@ class Registrar @Inject()(
       }
       .via(RecordArchiveProgressEventFlow(
         "registered",
-        Some(ArchiveProgress.Completed)))
+        Some(Progress.Completed)))
       .via(SnsPublishFlow(snsConfig))
       .log("published notification")
       .filter {

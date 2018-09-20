@@ -45,7 +45,7 @@ class UploadAndVerifyBagFlowTest
   it("succeeds when verifying and uploading a valid bag") {
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        withMockArchiveProgressMonitor() { archiveProgressMonitor =>
+        withMockProgressMonitor() { archiveProgressMonitor =>
           implicit val s3Client = s3AkkaClient
           implicit val progress = archiveProgressMonitor
 
@@ -71,7 +71,7 @@ class UploadAndVerifyBagFlowTest
   it("fails when verifying and uploading an invalid bag") {
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        withMockArchiveProgressMonitor() { archiveProgressMonitor =>
+        withMockProgressMonitor() { archiveProgressMonitor =>
           implicit val s3Client = s3AkkaClient
           implicit val progress = archiveProgressMonitor
 

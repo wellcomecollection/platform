@@ -2,14 +2,14 @@ package uk.ac.wellcome.platform.archive.registrar.flows
 
 import akka.stream._
 import akka.stream.stage.{InHandler, OutHandler, _}
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.registrar.models.RegisterRequestContext
 
 case class RecordArchiveProgressEventFlow[T](
   eventDescription: String,
-  status: Option[ArchiveProgress.Status] = None)(
-  implicit archiveProgressMonitor: ArchiveProgressMonitor)
+  status: Option[Progress.Status] = None)(
+  implicit archiveProgressMonitor: ProgressMonitor)
     extends GraphStage[
       FlowShape[(T, RegisterRequestContext), (T, RegisterRequestContext)]] {
 
@@ -29,7 +29,7 @@ case class RecordArchiveProgressEventFlow[T](
         val inflow = grab(in)
         val context = inflow._2
 
-        archiveProgressMonitor.addEvent(
+        archiveProgressMonitor.update(
           context.requestId.toString,
           eventDescription,
           status)

@@ -9,15 +9,12 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ArchiveProgress,
-  ProgressEvent
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Update}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ArchiveProgressMonitor(
+class ProgressMonitor(
   dynamoDbClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
     extends Logging {
@@ -28,8 +25,8 @@ class ArchiveProgressMonitor(
       DateTimeFormatter.ISO_INSTANT.format(_)
     )
 
-  def initialize(progress: ArchiveProgress) = Future {
-    val progressTable = Table[ArchiveProgress](dynamoConfig.table)
+  def create(progress: Progress) = Future {
+    val progressTable = Table[Progress](dynamoConfig.table)
     debug(s"initializing archiveProgressMonitor with $progress")
 
     val ops = progressTable
@@ -52,30 +49,31 @@ class ArchiveProgressMonitor(
     progress
   }
 
-  def addEvent(id: String,
-               description: String,
-               status: Option[ArchiveProgress.Status] = None) = Future {
-    val event = ProgressEvent(description, Instant.now())
+  def update(update: Update) = Future {
 
-    val update = status match {
-      case None    => append('events -> event)
-      case Some(s) => append('events -> event) and set('result -> s)
+    val event = update.toEvent
+
+    val mergedUpdate = update.status match {
+      case Progress.None =>
+        append('events -> event)
+      case status =>
+        append('events -> event) and set('result -> status)
     }
 
-    val progressTable = Table[ArchiveProgress](dynamoConfig.table)
+    val progressTable = Table[Progress](dynamoConfig.table)
     val ops = progressTable
       .given(attributeExists('id))
-      .update('id -> id, update)
+      .update('id -> update.id, mergedUpdate)
 
     Scanamo.exec(dynamoDbClient)(ops) match {
       case Left(ConditionNotMet(e: ConditionalCheckFailedException)) =>
-        throw IdConstraintError(s"Progress does not exist for id:$id", e)
+        throw IdConstraintError(s"Progress does not exist for id:${update.id}", e)
       case Left(scanamoError) =>
         val exception = new RuntimeException(scanamoError.toString)
-        warn(s"Failed to update Dynamo record: $id", exception)
+        warn(s"Failed to update Dynamo record: ${update.id}", exception)
         throw exception
       case Right(_) =>
-        debug(s"Successfully updated Dynamo record: $id")
+        debug(s"Successfully updated Dynamo record: ${update.id}")
     }
     event
   }
