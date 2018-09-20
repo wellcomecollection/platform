@@ -3,10 +3,10 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.stream._
 import akka.stream.stage.{InHandler, OutHandler, _}
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContext
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 
 case class RecordArchiveProgressEventFlow[T](eventDescription: String)(
-  implicit archiveProgressMonitor: ArchiveProgressMonitor)
+  implicit archiveProgressMonitor: ProgressMonitor)
     extends GraphStage[
       FlowShape[(T, IngestRequestContext), (T, IngestRequestContext)]] {
 
@@ -39,6 +39,6 @@ case class RecordArchiveProgressEventFlow[T](eventDescription: String)(
 
 object RecordArchiveProgressEventFlow {
   def apply[T](eventDescription: String)(
-    implicit archiveProgressMonitor: ArchiveProgressMonitor) =
+    implicit archiveProgressMonitor: ProgressMonitor) =
     new RecordArchiveProgressEventFlow[T](eventDescription: String)
 }

@@ -1,37 +1,110 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
-import java.time.{Duration, Instant}
 import java.util.UUID
 
-import com.gu.scanamo.Scanamo
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.dynamodbv2.model.{PutItemRequest, UpdateItemRequest}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
-import uk.ac.wellcome.platform.archive.common.progress.monitor.IdConstraintError
+import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Update}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{ProgressMonitor, IdConstraintError}
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-import scala.concurrent.ExecutionContext.Implicits.global
+//object ArchiveProgressUpdateFlow = {
+//  def apply[T]() = {
+//
+//  }
+//}
 
 class ProgressMonitorTest
     extends FunSpec
     with LocalDynamoDb
-    with ArchiveProgressMonitorFixture
+    with MockitoSugar
+    with ProgressMonitorFixture
     with ScalaFutures {
+
+  private val uploadUrl = "uploadUrl"
+  private val callbackUrl = "http://localhost/archive/complete"
 
   it("creates a progress monitor") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withArchiveProgressMonitor(table) { archiveProgressMonitor =>
+      withProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
-        val archiveProgress = ArchiveProgress(
+        val archiveIngestProgress = Progress(
           id,
-          "uploadUrl",
-          Some("http://localhost/archive/complete"))
+          uploadUrl,
+          Some(callbackUrl),
+          Progress.Processing)
 
-        whenReady(archiveProgressMonitor.initialize(archiveProgress)) { _ =>
-          assertTableOnlyHasItem(archiveProgress, table)
+        whenReady(archiveProgressMonitor.create(archiveIngestProgress)) {
+          _ =>
+            assertTableOnlyHasItem(archiveIngestProgress, table)
+        }
+      }
+    }
+  }
+
+  it("adds an event to a monitor with none") {
+    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+      withProgressMonitor(table) { archiveProgressMonitor =>
+        val progress = givenProgressCreatedWith(
+          uploadUrl,
+          callbackUrl,
+          archiveProgressMonitor)
+
+        val progressUpdate = Update(progress.id, "So that happened.")
+
+        whenReady(archiveProgressMonitor.update(progressUpdate)) {
+          _ =>
+            assertProgressCreated(
+              progress.id,
+              uploadUrl,
+              Some(callbackUrl),
+              table = table)
+            assertProgressRecordedRecentEvents(
+              progressUpdate.id,
+              Seq(progressUpdate.description),
+              table)
+        }
+      }
+    }
+  }
+
+  it("adds multiple events to a monitor") {
+    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+      withProgressMonitor(table) { monitor: ProgressMonitor =>
+
+        val progress = givenProgressCreatedWith(
+          uploadUrl,
+          callbackUrl,
+          monitor
+        )
+
+        val updates = List(
+          Update(progress.id, "It happened again."),
+          Update(progress.id, "Dammit Bobby.")
+        )
+
+        val eventualEvents = Future.sequence(updates.map(monitor.update))
+
+        whenReady(eventualEvents) { _ =>
+          assertProgressCreated(
+            progress.id,
+            uploadUrl,
+            Some(callbackUrl),
+            table = table)
+          assertProgressRecordedRecentEvents(
+            progress.id,
+            updates.map(_.description),
+            table)
         }
       }
     }
@@ -39,82 +112,88 @@ class ProgressMonitorTest
 
   it("only allows the creation of one progress monitor for a given id") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withArchiveProgressMonitor(table) { archiveProgressMonitor =>
+      withProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
-        val archiveIngestProgress = ArchiveProgress(
-          id,
-          "uploadUrl",
-          Some("http://localhost/archive/complete"))
 
-        givenTableHasItem(archiveIngestProgress, table)
+        val eventuallyCreated = Future.sequence(
+          Seq(
+            archiveProgressMonitor.create(
+              Progress(id, uploadUrl, Some(callbackUrl))),
+            archiveProgressMonitor.create(
+              Progress(id, uploadUrl, Some(callbackUrl)))
+          ))
+
+        whenReady(eventuallyCreated.failed) { failedException =>
+          failedException shouldBe a[IdConstraintError]
+          failedException.getMessage should include(
+            s"There is already a monitor with id:$id")
+
+          assertProgressCreated(id, uploadUrl, Some(callbackUrl), table = table)
+        }
+      }
+    }
+  }
+
+  it("throws if an event is added to progress that does not exist") {
+    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+      withProgressMonitor(table) { archiveProgressMonitor =>
+        val id = UUID.randomUUID().toString
+
+        val update = Update(id, "Such progress, wow.")
 
         whenReady(
-          archiveProgressMonitor.initialize(archiveIngestProgress).failed) {
+          archiveProgressMonitor.update(update).failed) {
           failedException =>
             failedException shouldBe a[IdConstraintError]
-            assertTableOnlyHasItem(archiveIngestProgress, table)
-        }
-
-      }
-    }
-  }
-
-  it("adds an event to a monitor with none") {
-    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withArchiveProgressMonitor(table) { archiveProgressMonitor =>
-        val id = UUID.randomUUID().toString
-        val archiveIngestProgress = ArchiveProgress(
-          id,
-          "uploadUrl",
-          Some("http://localhost/archive/complete"))
-
-        whenReady(
-          Future.sequence(
-            Seq(
-              archiveProgressMonitor.initialize(archiveIngestProgress),
-              archiveProgressMonitor.addEvent(id, "This happened")))) { _ =>
-          val records =
-            Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
-          records.size shouldBe 1
-          val progress = records.head.right.get
-
-          progress.events.size shouldBe 1
-          progress.events.head.description shouldBe "This happened"
-          Duration
-            .between(progress.events.head.time, Instant.now)
-            .getSeconds should be <= 1L
+            failedException.getMessage should include(
+              s"Progress does not exist for id:$id")
         }
       }
     }
   }
 
-  it("adds two events to a monitor") {
+  it("throws if put to dynamo fails during creation") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withArchiveProgressMonitor(table) { archiveProgressMonitor =>
-        val id = UUID.randomUUID().toString
-        val archiveIngestProgress = ArchiveProgress(
-          id,
-          "uploadUrl",
-          Some("http://localhost/archive/complete"))
+      val mockDynamoDbClient = mock[AmazonDynamoDB]
+      val expectedException = new RuntimeException("root cause")
+      when(mockDynamoDbClient.putItem(any[PutItemRequest]))
+        .thenThrow(expectedException)
+      val archiveProgressMonitor = new ProgressMonitor(
+        mockDynamoDbClient,
+        DynamoConfig(table = table.name, index = table.index)
+      )
 
-        whenReady(archiveProgressMonitor.initialize(archiveIngestProgress)) {
-          _ =>
-            whenReady(
-              Future.sequence(
-                Seq(
-                  archiveProgressMonitor.addEvent(id, "This happened"),
-                  archiveProgressMonitor.addEvent(id, "And this too")
-                ))) { _ =>
-              val records =
-                Scanamo.scan[ArchiveProgress](dynamoDbClient)(table.name)
-              records.size shouldBe 1
+      val id = UUID.randomUUID().toString
+      val progress = Progress(id, uploadUrl, Some(callbackUrl))
 
-              val progress = records.head.right.get
-              progress.events.size shouldBe 2
-              progress.events.map(_.description) should contain only ("This happened", "And this too")
-              progress.events.foreach(event => assertRecent(event.time))
-            }
-        }
+      whenReady(archiveProgressMonitor.create(progress).failed) {
+        failedException =>
+          failedException shouldBe a[RuntimeException]
+          failedException shouldBe expectedException
+      }
+    }
+  }
+
+  it("throws if put to dynamo fails when adding an event") {
+    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+      val mockDynamoDbClient = mock[AmazonDynamoDB]
+
+      val expectedException = new RuntimeException("root cause")
+      when(mockDynamoDbClient.updateItem(any[UpdateItemRequest]))
+        .thenThrow(expectedException)
+      val archiveProgressMonitor = new ProgressMonitor(
+        mockDynamoDbClient,
+        DynamoConfig(table = table.name, index = table.index)
+      )
+
+      val id = UUID.randomUUID().toString
+
+      val update = Update(id, "Too much winning.")
+
+      whenReady(archiveProgressMonitor.update(update).failed) {
+        failedException =>
+          failedException shouldBe a[RuntimeException]
+          failedException shouldBe expectedException
       }
     }
   }
