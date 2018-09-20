@@ -40,7 +40,7 @@ object DownloadItemFlow extends Logging with CompareChecksum {
 
           }.getOrElse(Source.single(Left(job)))
         case Left(job) => Source.single(Left(job))
-      }
+      }.async
   }
 
 }
