@@ -22,7 +22,7 @@ class DynamoRowLockDaoTest
     with Matchers
     with ScalaFutures
     with MatcherFixtures
-  with IntegrationPatience{
+    with IntegrationPatience {
 
   import com.gu.scanamo.syntax._
 
