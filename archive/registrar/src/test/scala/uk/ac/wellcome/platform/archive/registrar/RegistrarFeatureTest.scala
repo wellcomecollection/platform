@@ -5,33 +5,21 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlPathEqualTo}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import com.github.tomakehurst.wiremock.client.WireMock.{
-  equalToJson,
-  postRequestedFor,
-  urlPathEqualTo
-}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{
-  LocalWireMockFixture,
-  Registrar => RegistrarFixture
-}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{LocalWireMockFixture, Registrar => RegistrarFixture}
 import uk.ac.wellcome.platform.archive.registrar.flows.CallbackPayload
-import uk.ac.wellcome.platform.archive.registrar.models.{
-  BagRegistrationCompleteNotification,
-  StorageManifest,
-  StorageManifestFactory
-}
+import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrarFeatureTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
@@ -50,13 +38,13 @@ class RegistrarFeatureTest
     withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
       withRegistrar {
         case (
-            storageBucket,
-            queuePair,
-            topic,
-            registrar,
-            hybridBucket,
-            hybridTable,
-            progressTable) =>
+          storageBucket,
+          queuePair,
+          topic,
+          registrar,
+          hybridBucket,
+          hybridTable,
+          progressTable) =>
           val requestId = UUID.randomUUID()
           val callbackUrl =
             new URI(s"http://$callbackHost:$callbackPort/callback/$requestId")
@@ -93,15 +81,6 @@ class RegistrarFeatureTest
                     storageManifest.id.value,
                     storageManifest
                   )
-
-                  assertProgressRecordedRecentEvents(
-                    requestId.toString,
-                    Seq("registered"),
-                    progressTable)
-                  assertProgressStatus(
-                    requestId.toString,
-                    Progress.Completed,
-                    progressTable)
 
                   wireMock.verifyThat(
                     1,

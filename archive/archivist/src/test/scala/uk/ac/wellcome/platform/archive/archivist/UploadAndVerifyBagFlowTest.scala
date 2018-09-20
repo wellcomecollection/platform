@@ -5,27 +5,16 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.flow.{
-  BadChecksum,
-  FailedArchivingException,
-  UploadAndVerifyBagFlow
-}
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagItConfig,
-  BagUploaderConfig,
-  IngestRequestContextGenerators,
-  UploadConfig
-}
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.flow.{BadChecksum, FailedArchivingException, UploadAndVerifyBagFlow}
+import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, IngestRequestContextGenerators, UploadConfig}
 import uk.ac.wellcome.platform.archive.common.models.BagName
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class UploadAndVerifyBagFlowTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with ArchivistFixture
@@ -47,7 +36,6 @@ class UploadAndVerifyBagFlowTest
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
         withMockProgressMonitor() { archiveProgressMonitor =>
           implicit val s3Client = s3AkkaClient
-          implicit val progress = archiveProgressMonitor
 
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           val bagName = BagName(randomAlphanumeric())
@@ -73,7 +61,6 @@ class UploadAndVerifyBagFlowTest
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
         withMockProgressMonitor() { archiveProgressMonitor =>
           implicit val s3Client = s3AkkaClient
-          implicit val progress = archiveProgressMonitor
 
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           val bagName = BagName(randomAlphanumeric())

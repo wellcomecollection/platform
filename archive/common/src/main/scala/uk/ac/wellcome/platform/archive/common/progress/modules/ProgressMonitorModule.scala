@@ -21,10 +21,10 @@ object ProgressMonitorModule extends AbstractModule {
       secretKey = dynamoClientConfig.secretKey.getOrElse("")
     )
 
-    implicit val executionContext = actorSystem.dispatcher
     new ProgressMonitor(
       dynamoClient,
-      progressMonitorConfig.dynamoConfig)(executionContext)
+      progressMonitorConfig.dynamoConfig
+    )
   }
 }
 
