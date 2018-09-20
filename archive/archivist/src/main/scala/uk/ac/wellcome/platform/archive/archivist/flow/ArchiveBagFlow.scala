@@ -3,10 +3,11 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.NotUsed
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
+import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 
 object ArchiveBagFlow {
-  def apply(delimiter: String)(implicit s3Client: S3Client): Flow[ArchiveJob, ArchiveJob, NotUsed] =
+  def apply(delimiter: String)(implicit alpakkaS3Client: S3Client, s3Client: AmazonS3): Flow[ArchiveJob, ArchiveJob, NotUsed] =
     Flow[ArchiveJob]
       .via(ArchiveJobFlow(delimiter))
       .groupBy(Int.MaxValue, {

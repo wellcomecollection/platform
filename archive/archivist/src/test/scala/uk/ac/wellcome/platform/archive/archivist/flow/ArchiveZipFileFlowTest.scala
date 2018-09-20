@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist
+package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -7,7 +7,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, IngestRequestContextGenerators, UploadConfig}
-import uk.ac.wellcome.platform.archive.archivist.flow.{ArchiveZipFileFlow, ZipFileDownloadComplete}
 import uk.ac.wellcome.platform.archive.common.models.BagPath
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
@@ -20,6 +19,7 @@ class ArchiveZipFileFlowTest
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
+  implicit val s3client = s3Client
 
   def createBagUploaderConfig(bucket: Bucket) =
     BagUploaderConfig(

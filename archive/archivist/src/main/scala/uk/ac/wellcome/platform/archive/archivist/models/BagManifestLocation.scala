@@ -8,7 +8,7 @@ case class BagManifestLocation(path: BagPath, name: String) {
 }
 
 object BagManifestLocation {
-  def create(config: BagItConfig, bagPath: BagPath) =
+  def create(config: BagItConfig, bagPath: BagPath): List[BagManifestLocation] =
     config.digestNames.map(BagManifestLocation(bagPath, _))
 }
 

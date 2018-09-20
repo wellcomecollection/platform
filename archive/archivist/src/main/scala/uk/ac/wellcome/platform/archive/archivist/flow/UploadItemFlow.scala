@@ -26,7 +26,9 @@ object UploadItemFlow
           val checkedUpload = VerifiedUploadFlow(s3Client, job.uploadLocation)
 
           source
+              .log("uploading")
             .via(checkedUpload)
+            .log("checking digest")
             .map(compare(checksum))
             .map {
               case Success(_) => Right(job)

@@ -1,6 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist
-
-import java.util.zip.ZipFile
+package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -9,8 +7,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.archivist.flow.{ZipFileDownloadComplete, ZipFileDownloadFlow}
-import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
 

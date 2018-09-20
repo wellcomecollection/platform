@@ -101,7 +101,7 @@ class ArchivistFeatureTest
 
                     eventually {
 
-                      //assertQueuePairSizes(queuePair, 0, 2)
+                      assertQueuePairSizes(queuePair, 0, 2)
 
                       assertSnsReceives(
                         Set(
@@ -167,7 +167,7 @@ class ArchivistFeatureTest
 
                     eventually {
 
-                      //assertQueuePairSizes(queuePair, 0, 2)
+                      assertQueuePairSizes(queuePair, 0, 2)
 
                       assertSnsReceives(
                         Set(
@@ -254,6 +254,10 @@ class ArchivistFeatureTest
 
   private def dataManifestWithNonExistingFile(bagPath: BagPath, filesAndDigests: Seq[(String,String)]) = FileEntry(
     name = s"$bagPath/manifest-sha256.txt",
-    contents = "1234567890qwer this/does/not/exists.jpg"
+    contents = {
+      val (existingFileName, validFileDigest) = filesAndDigests.head
+
+      s"""$validFileDigest  ${existingFileName.replace(s"$bagPath/", "")}
+         |1234567890qwer  this/does/not/exists.jpg""".stripMargin}
   )
 }

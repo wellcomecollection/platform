@@ -1,40 +1,46 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import java.io.File
+import java.util.zip.ZipFile
+
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import akka.stream.scaladsl.{Flow, Source}
+import akka.stream.scaladsl.{Flow, Source, StreamConverters}
+import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
 import uk.ac.wellcome.platform.archive.archivist.util.CompareChecksum
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 
 object DownloadItemFlow extends Logging with CompareChecksum {
 
-  def apply()(implicit s3Client: S3Client) = {
+  def apply()(implicit s3Client: AmazonS3) = {
     Flow[Either[ArchiveItemJob, ArchiveItemJob]]
       .log("download to verify")
-      .flatMapConcat({
-        case Right(job) => {
+      .flatMapConcat{
+        case Right(job: ArchiveItemJob) =>
 
-          val (source, _) = s3Client
-            .download(
-              job.uploadLocation.namespace,
-              job.uploadLocation.key
-            )
+          val triedInputStream = Try(s3Client.getObject(job.uploadLocation.namespace, job.uploadLocation.key).getObjectContent)
 
-          source
-            .via(VerifiedDownloadFlow())
-            .map(compare(job.bagDigestItem.checksum))
-            .map({
-              case Success(_) => Right(job)
-              case Failure(_) => Left(job)
-            })
+          triedInputStream.map {inputStream =>
 
-        }
+            val downloadStream = StreamConverters
+              .fromInputStream(() => inputStream)
 
+            val tmpFile = File.createTempFile("archivist-item", ".tmp")
+
+            downloadStream
+              .via(VerifiedDownloadFlow())
+              .map(compare(job.bagDigestItem.checksum))
+              .map {
+                case Success(_) => Right(job)
+                case Failure(_) => Left(job)
+              }
+
+          }.getOrElse(Source.single(Left(job)))
         case Left(job) => Source.single(Left(job))
-      })
+      }
   }
 
 }

@@ -139,6 +139,7 @@ trait Archivist
     val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
     files.foreach {
       case FileEntry(name, contents) =>
+        info(s"Adding $name to zip contents")
         val zipEntry = new ZipEntry(name)
         zipOutputStream.putNextEntry(zipEntry)
         zipOutputStream.write(contents.getBytes)
@@ -146,6 +147,8 @@ trait Archivist
     }
     zipOutputStream.close()
     val zipFile = new ZipFile(file)
+
+    info(s"zipfile full path: ${file.getAbsolutePath}")
 
     (zipFile, file)
   }
@@ -157,6 +160,8 @@ trait Archivist
                      createDataManifest: (BagPath,Seq[(String,String)]) => FileEntry = createValidDataManifest) = {
 
     val allFiles = createBag(bagName, dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest)
+
+    info(s"Adding files $allFiles to bag $bagName")
 
     createZip(allFiles.toList)
   }
