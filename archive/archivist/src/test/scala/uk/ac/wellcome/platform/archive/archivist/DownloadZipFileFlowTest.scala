@@ -15,7 +15,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   IngestRequestContext,
   IngestRequestContextGenerators
 }
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -26,7 +26,7 @@ class DownloadZipFileFlowTest
     with Matchers
     with ScalaFutures
     with ArchivistFixture
-    with ArchiveProgressMonitorFixture
+    with ProgressMonitorFixture
     with IngestRequestContextGenerators {
 
   implicit val system = ActorSystem("test")
@@ -35,7 +35,7 @@ class DownloadZipFileFlowTest
   it("downloads a zipfile from s3") {
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        withMockArchiveProgressMonitor() { archiveProgressMonitor =>
+        withMockProgressMonitor() { archiveProgressMonitor =>
           withBag() {
             case (bagName, zipFile, file) =>
               val downloadZipFlow = DownloadZipFileFlow()(

@@ -7,10 +7,10 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   ArchiveProgress,
   ProgressEvent
 }
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 
 case class InitialiseArchiveProgressFlow[T](eventDescription: String)(
-  implicit archiveProgressMonitor: ArchiveProgressMonitor)
+  implicit archiveProgressMonitor: ProgressMonitor)
     extends GraphStage[
       FlowShape[(T, IngestRequestContext), (T, IngestRequestContext)]] {
 
@@ -51,6 +51,6 @@ case class InitialiseArchiveProgressFlow[T](eventDescription: String)(
 
 object InitialiseArchiveProgressFlow {
   def apply[T](eventDescription: String)(
-    implicit archiveProgressMonitor: ArchiveProgressMonitor) =
+    implicit archiveProgressMonitor: ProgressMonitor) =
     new InitialiseArchiveProgressFlow[T](eventDescription: String)
 }

@@ -14,8 +14,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.{
 }
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.registrar.fixtures.{
   LocalWireMockFixture,
   Registrar => RegistrarFixture
@@ -36,7 +36,7 @@ class RegistrarFeatureTest
     with ScalaFutures
     with MetricsSenderFixture
     with ExtendedPatience
-    with ArchiveProgressMonitorFixture
+    with ProgressMonitorFixture
     with LocalWireMockFixture
     with RegistrarFixture {
 
@@ -65,7 +65,7 @@ class RegistrarFeatureTest
             Some(callbackUrl),
             queuePair,
             storageBucket) { bagLocation =>
-            givenArchiveProgressRecord(
+            givenProgressRecord(
               requestId.toString,
               "upLoadUrl",
               Some(callbackUrl.toString),
@@ -100,7 +100,7 @@ class RegistrarFeatureTest
                     progressTable)
                   assertProgressStatus(
                     requestId.toString,
-                    ArchiveProgress.Completed,
+                    Progress.Completed,
                     progressTable)
 
                   wireMock.verifyThat(

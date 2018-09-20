@@ -18,7 +18,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 }
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -36,8 +36,8 @@ trait Archivist extends Logging {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
-    implicit val progressMonitor: ArchiveProgressMonitor =
-      injector.getInstance(classOf[ArchiveProgressMonitor])
+    implicit val progressMonitor: ProgressMonitor =
+      injector.getInstance(classOf[ProgressMonitor])
 
     val messageStream =
       injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
