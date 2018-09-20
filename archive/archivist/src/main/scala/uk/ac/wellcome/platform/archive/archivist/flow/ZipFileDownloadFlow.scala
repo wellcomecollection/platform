@@ -42,7 +42,7 @@ object ZipFileDownloadFlow extends Logging {
               request
             )
           }
-      }
+      }.async
       .log("downloaded zipfile")
   }
 }
