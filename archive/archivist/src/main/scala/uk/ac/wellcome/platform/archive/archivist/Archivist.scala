@@ -11,7 +11,11 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
-import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestBagRequestNotification, IngestRequestContext}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagUploaderConfig,
+  IngestBagRequestNotification,
+  IngestRequestContext
+}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 

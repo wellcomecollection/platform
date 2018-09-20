@@ -3,15 +3,14 @@ package uk.ac.wellcome.platform.archive.common.progress.models
 import java.time.Instant
 
 case class Progress(
-                     id: String,
-                     uploadUrl: String,
-                     callbackUrl: Option[String],
-                     result: Progress.Status =
-                            Progress.None,
-                     createdAt: Instant = Instant.now,
-                     updatedAt: Instant = Instant.now,
-                     events: Seq[ProgressEvent] = Seq.empty
-                          )
+  id: String,
+  uploadUrl: String,
+  callbackUrl: Option[String],
+  result: Progress.Status = Progress.None,
+  createdAt: Instant = Instant.now,
+  updatedAt: Instant = Instant.now,
+  events: Seq[ProgressEvent] = Seq.empty
+)
 
 object Progress {
 
@@ -30,8 +29,7 @@ object Progress {
 case class Update(id: String,
                   description: String,
                   status: Progress.Status = Progress.None,
-                  time: Instant = Instant.now
-                         ) {
+                  time: Instant = Instant.now) {
   def toEvent = ProgressEvent(description, time)
 }
 

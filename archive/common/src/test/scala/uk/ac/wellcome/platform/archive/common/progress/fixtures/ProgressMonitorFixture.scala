@@ -16,7 +16,7 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressMonitorFixture
-  extends LocalProgressMonitorDynamoDb
+    extends LocalProgressMonitorDynamoDb
     with MockitoSugar {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
@@ -40,10 +40,9 @@ trait ProgressMonitorFixture
     testWith(progressMonitor)
   }
 
-  def givenProgressCreatedWith(
-                                uploadUrl: String,
-                                callbackUrl: String,
-                                progressMonitor: ProgressMonitor): Progress = {
+  def givenProgressCreatedWith(uploadUrl: String,
+                               callbackUrl: String,
+                               progressMonitor: ProgressMonitor): Progress = {
     val id = UUID.randomUUID().toString
 
     progressMonitor.create(
