@@ -11,21 +11,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Update}
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{ProgressMonitor, IdConstraintError}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressMonitor}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-//object ArchiveProgressUpdateFlow = {
-//  def apply[T]() = {
-//
-//  }
-//}
+import scala.util.Try
 
 class ProgressMonitorTest
-    extends FunSpec
+  extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with ProgressMonitorFixture
@@ -44,10 +37,10 @@ class ProgressMonitorTest
           Some(callbackUrl),
           Progress.Processing)
 
-        whenReady(archiveProgressMonitor.create(archiveIngestProgress)) {
-          _ =>
-            assertTableOnlyHasItem(archiveIngestProgress, table)
-        }
+        archiveProgressMonitor.create(archiveIngestProgress)
+
+        assertTableOnlyHasItem(archiveIngestProgress, table)
+
       }
     }
   }
@@ -62,18 +55,18 @@ class ProgressMonitorTest
 
         val progressUpdate = Update(progress.id, "So that happened.")
 
-        whenReady(archiveProgressMonitor.update(progressUpdate)) {
-          _ =>
-            assertProgressCreated(
-              progress.id,
-              uploadUrl,
-              Some(callbackUrl),
-              table = table)
-            assertProgressRecordedRecentEvents(
-              progressUpdate.id,
-              Seq(progressUpdate.description),
-              table)
-        }
+        archiveProgressMonitor.update(progressUpdate)
+
+        assertProgressCreated(
+          progress.id,
+          uploadUrl,
+          Some(callbackUrl),
+          table = table)
+        assertProgressRecordedRecentEvents(
+          progressUpdate.id,
+          Seq(progressUpdate.description),
+          table)
+
       }
     }
   }
@@ -93,19 +86,17 @@ class ProgressMonitorTest
           Update(progress.id, "Dammit Bobby.")
         )
 
-        val eventualEvents = Future.sequence(updates.map(monitor.update))
+        updates.map(monitor.update)
 
-        whenReady(eventualEvents) { _ =>
-          assertProgressCreated(
-            progress.id,
-            uploadUrl,
-            Some(callbackUrl),
-            table = table)
-          assertProgressRecordedRecentEvents(
-            progress.id,
-            updates.map(_.description),
-            table)
-        }
+        assertProgressCreated(
+          progress.id,
+          uploadUrl,
+          Some(callbackUrl),
+          table = table)
+        assertProgressRecordedRecentEvents(
+          progress.id,
+          updates.map(_.description),
+          table)
       }
     }
   }
@@ -115,39 +106,37 @@ class ProgressMonitorTest
       withProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
 
-        val eventuallyCreated = Future.sequence(
-          Seq(
-            archiveProgressMonitor.create(
-              Progress(id, uploadUrl, Some(callbackUrl))),
-            archiveProgressMonitor.create(
-              Progress(id, uploadUrl, Some(callbackUrl)))
-          ))
+        val monitors = List(
+          Progress(id, uploadUrl, Some(callbackUrl)),
+          Progress(id, uploadUrl, Some(callbackUrl))
+        )
 
-        whenReady(eventuallyCreated.failed) { failedException =>
-          failedException shouldBe a[IdConstraintError]
-          failedException.getMessage should include(
-            s"There is already a monitor with id:$id")
+        val result = Try(monitors.map(archiveProgressMonitor.create))
+        val failedException = result.failed.get
 
-          assertProgressCreated(id, uploadUrl, Some(callbackUrl), table = table)
-        }
+        failedException shouldBe a[IdConstraintError]
+        failedException.getMessage should include(
+          s"There is already a monitor with id:$id")
+
+        assertProgressCreated(id, uploadUrl, Some(callbackUrl), table = table)
       }
+
     }
   }
 
   it("throws if an event is added to progress that does not exist") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withProgressMonitor(table) { archiveProgressMonitor =>
+      withProgressMonitor(table) { progressMonitor =>
         val id = UUID.randomUUID().toString
 
         val update = Update(id, "Such progress, wow.")
 
-        whenReady(
-          archiveProgressMonitor.update(update).failed) {
-          failedException =>
-            failedException shouldBe a[IdConstraintError]
-            failedException.getMessage should include(
-              s"Progress does not exist for id:$id")
-        }
+        val result = Try(progressMonitor.update(update))
+        val failedException = result.failed.get
+
+        failedException shouldBe a[IdConstraintError]
+        failedException.getMessage should include(
+          s"Progress does not exist for id:$id")
       }
     }
   }
@@ -166,11 +155,11 @@ class ProgressMonitorTest
       val id = UUID.randomUUID().toString
       val progress = Progress(id, uploadUrl, Some(callbackUrl))
 
-      whenReady(archiveProgressMonitor.create(progress).failed) {
-        failedException =>
-          failedException shouldBe a[RuntimeException]
-          failedException shouldBe expectedException
-      }
+      val result = Try(archiveProgressMonitor.create(progress))
+      val failedException = result.failed.get
+
+      failedException shouldBe a[RuntimeException]
+      failedException shouldBe expectedException
     }
   }
 
@@ -190,11 +179,14 @@ class ProgressMonitorTest
 
       val update = Update(id, "Too much winning.")
 
-      whenReady(archiveProgressMonitor.update(update).failed) {
-        failedException =>
-          failedException shouldBe a[RuntimeException]
-          failedException shouldBe expectedException
-      }
+      val result = Try(archiveProgressMonitor.update(update))
+
+      val failedException = result.failed.get
+
+
+      failedException shouldBe a[RuntimeException]
+      failedException shouldBe expectedException
+
     }
   }
 }

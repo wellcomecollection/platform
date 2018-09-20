@@ -12,12 +12,10 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Update}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
-import scala.concurrent.{ExecutionContext, Future}
-
 class ProgressMonitor(
-  dynamoDbClient: AmazonDynamoDB,
-  dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
-    extends Logging {
+                       dynamoClient: AmazonDynamoDB,
+                       dynamoConfig: DynamoConfig
+                     ) extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
@@ -25,7 +23,7 @@ class ProgressMonitor(
       DateTimeFormatter.ISO_INSTANT.format(_)
     )
 
-  def create(progress: Progress) = Future {
+  def create(progress: Progress) = {
     val progressTable = Table[Progress](dynamoConfig.table)
     debug(s"initializing archiveProgressMonitor with $progress")
 
@@ -33,7 +31,7 @@ class ProgressMonitor(
       .given(not(attributeExists('id)))
       .put(progress)
 
-    Scanamo.exec(dynamoDbClient)(ops) match {
+    Scanamo.exec(dynamoClient)(ops) match {
       case Left(e: ConditionalCheckFailedException) =>
         throw IdConstraintError(
           s"There is already a monitor with id:${progress.id}",
@@ -49,8 +47,7 @@ class ProgressMonitor(
     progress
   }
 
-  def update(update: Update) = Future {
-
+  def update(update: Update) = {
     val event = update.toEvent
 
     val mergedUpdate = update.status match {
@@ -65,15 +62,18 @@ class ProgressMonitor(
       .given(attributeExists('id))
       .update('id -> update.id, mergedUpdate)
 
-    Scanamo.exec(dynamoDbClient)(ops) match {
+    Scanamo.exec(dynamoClient)(ops) match {
       case Left(ConditionNotMet(e: ConditionalCheckFailedException)) =>
-        throw IdConstraintError(s"Progress does not exist for id:${update.id}", e)
+        throw IdConstraintError(
+          s"Progress does not exist for id:${update.id}", e)
       case Left(scanamoError) =>
         val exception = new RuntimeException(scanamoError.toString)
-        warn(s"Failed to update Dynamo record: ${update.id}", exception)
+        warn(
+          s"Failed to update Dynamo record: ${update.id}", exception)
         throw exception
       case Right(_) =>
-        debug(s"Successfully updated Dynamo record: ${update.id}")
+        debug(
+          s"Successfully updated Dynamo record: ${update.id}")
     }
     event
   }
@@ -81,4 +81,4 @@ class ProgressMonitor(
 
 final case class IdConstraintError(private val message: String,
                                    private val cause: Throwable)
-    extends Exception(message, cause)
+  extends Exception(message, cause)

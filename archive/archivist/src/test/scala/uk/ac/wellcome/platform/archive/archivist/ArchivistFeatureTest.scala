@@ -49,20 +49,6 @@ class ArchivistFeatureTest
                 ),
                 topic
               )
-
-              assertProgressCreated(
-                requestId.toString,
-                uploadLocation.toString,
-                Some(callbackUrl.toString),
-                progressTable)
-              assertProgressRecordedRecentEvents(
-                requestId.toString,
-                Seq("started archiving", "completed archiving"),
-                progressTable)
-              assertProgressStatus(
-                requestId.toString,
-                ArchiveProgress.Processing,
-                progressTable)
             }
         }
     }

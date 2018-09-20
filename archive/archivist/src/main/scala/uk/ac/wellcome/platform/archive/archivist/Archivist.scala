@@ -11,14 +11,9 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagUploaderConfig,
-  IngestBagRequestNotification,
-  IngestRequestContext
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, IngestBagRequestNotification, IngestRequestContext}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -36,8 +31,6 @@ trait Archivist extends Logging {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
-    implicit val progressMonitor: ProgressMonitor =
-      injector.getInstance(classOf[ProgressMonitor])
 
     val messageStream =
       injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
@@ -48,7 +41,6 @@ trait Archivist extends Logging {
       Flow[NotificationMessage]
         .log("notification message")
         .map(parseNotification)
-        .via(InitialiseArchiveProgressFlow("started archiving"))
         .log("download location")
         .via(DownloadZipFileFlow())
         .log("download zip")

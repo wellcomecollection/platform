@@ -15,12 +15,8 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-
 trait ProgressMonitorFixture
-    extends LocalProgressMonitorDynamoDb
+  extends LocalProgressMonitorDynamoDb
     with MockitoSugar {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
@@ -31,27 +27,28 @@ trait ProgressMonitorFixture
 
   def withProgressMonitor[R](table: Table)(
     testWith: TestWith[ProgressMonitor, R]): R = {
-    val archiveProgressMonitor = new ProgressMonitor(
+    val progressMonitor = new ProgressMonitor(
       dynamoDbClient,
       DynamoConfig(table = table.name, index = table.index)
     )
-    testWith(archiveProgressMonitor)
+    testWith(progressMonitor)
   }
 
   def withMockProgressMonitor[R]()(
     testWith: TestWith[ProgressMonitor, R]): R = {
-    val archiveProgressMonitor = mock[ProgressMonitor]
-    testWith(archiveProgressMonitor)
+    val progressMonitor = mock[ProgressMonitor]
+    testWith(progressMonitor)
   }
 
   def givenProgressCreatedWith(
-    uploadUrl: String,
-    callbackUrl: String,
-    archiveProgressMonitor: ProgressMonitor): Progress = {
+                                uploadUrl: String,
+                                callbackUrl: String,
+                                progressMonitor: ProgressMonitor): Progress = {
     val id = UUID.randomUUID().toString
-    val eventualProgress = archiveProgressMonitor.create(
-      Progress(id, uploadUrl, Some(callbackUrl)))
-    Await.result(eventualProgress, 500 millis)
+
+    progressMonitor.create(
+      Progress(id, uploadUrl, Some(callbackUrl))
+    )
   }
 
   def givenProgressRecord(id: String,
