@@ -13,8 +13,7 @@ variable "namespace" {}
 
 variable "api_container_image" {}
 
-variable "api_container_port" {
-}
+variable "api_container_port" {}
 
 variable task_cpu {}
 variable "task_memory" {}
@@ -22,7 +21,6 @@ variable "api_cpu" {}
 variable "api_memory" {}
 variable "nginx_cpu" {}
 variable "nginx_memory" {}
-
 
 variable "app_env_vars" {
   description = "Environment variables to pass to the container"
@@ -61,8 +59,8 @@ variable "service_discovery_namespace" {
 variable "health_check_path" {}
 
 variable "api_env_vars" {
-  type        = "map"
-  default     = {}
+  type    = "map"
+  default = {}
 }
 
 variable "api_env_vars_length" {
