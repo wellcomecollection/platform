@@ -37,7 +37,7 @@ class ArchiveZipFileFlowTest
 
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           val bagName = BagPath(randomAlphanumeric())
-          val (zipFile, _) = createValidBagItZip(bagName, 1)
+          val (zipFile, _) = createBagItZip(bagName, 1)
 
           val uploader = ArchiveZipFileFlow(bagUploaderConfig)
           val ingestContext = createIngestBagRequestWith()
@@ -48,7 +48,7 @@ class ArchiveZipFileFlowTest
             )
 
           whenReady(verification) { result =>
-            listKeysInBucket(storageBucket) should have size 5
+            listKeysInBucket(storageBucket) should have size 4
             result should have size 1
           }
         }
@@ -64,7 +64,7 @@ class ArchiveZipFileFlowTest
 
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           val bagName = BagPath(randomAlphanumeric())
-          val (zipFile, _) = createInvalidBagItZip(bagName, 1)
+          val (zipFile, _) = createBagItZip(bagName, 1, createDigest = _ => "bad_digest")
 
           val uploader = ArchiveZipFileFlow(bagUploaderConfig)
           val ingestContext = createIngestBagRequest

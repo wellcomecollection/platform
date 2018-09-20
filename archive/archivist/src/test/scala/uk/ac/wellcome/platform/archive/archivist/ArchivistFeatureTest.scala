@@ -7,7 +7,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, IngestBagRequest}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
 import uk.ac.wellcome.storage.ObjectLocation
@@ -36,11 +37,11 @@ class ArchivistFeatureTest
         topic,
         progressTable,
         archivist) =>
-        createAndSendValidBag(ingestBucket, Some(callbackUrl), queuePair) {
+        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair) {
           case (requestId, uploadLocation, validBag) =>
             archivist.run()
             eventually {
-              listKeysInBucket(storageBucket) should have size 27
+              listKeysInBucket(storageBucket) should have size 15
 
               assertQueuePairSizes(queuePair, 0, 0)
 
@@ -66,7 +67,7 @@ class ArchivistFeatureTest
         topic,
         progressTable,
         archivist) =>
-        createAndSendInvalidBag(ingestBucket, Some(callbackUrl), queuePair) { _ =>
+        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, createDigest = _ => "bad_digest") { _ =>
           archivist.run()
           eventually {
             assertQueuePairSizes(queuePair, 0, 1)
@@ -88,15 +89,15 @@ class ArchivistFeatureTest
 
         archivist.run()
 
-        createAndSendValidBag(ingestBucket, Some(callbackUrl), queuePair) {
+        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
           case (requestId1, _, validBag1) =>
 
-            createAndSendInvalidBag(ingestBucket, Some(callbackUrl), queuePair) { _ =>
+            createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createDigest = _ => "bad_digest") { _ =>
 
-              createAndSendValidBag(ingestBucket, Some(callbackUrl), queuePair) {
+              createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
                 case (requestId2, _, validBag2) =>
 
-                  createAndSendInvalidBag(ingestBucket, Some(callbackUrl), queuePair) { _ =>
+                  createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createDigest = _ => "bad_digest") { _ =>
 
                     eventually {
 
@@ -144,7 +145,7 @@ class ArchivistFeatureTest
 
         archivist.run()
 
-        createAndSendValidBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
           case (requestId1, _, validBag1) =>
 
             sendNotificationToSQS(
@@ -154,7 +155,7 @@ class ArchivistFeatureTest
                 ObjectLocation(ingestBucket.name, "non-existing1.zip"),
                 None))
 
-              createAndSendValidBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+              createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
                 case (requestId2, _, validBag2) =>
 
                   sendNotificationToSQS(
