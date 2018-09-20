@@ -13,9 +13,9 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Update}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class ProgressMonitor(
-                       dynamoClient: AmazonDynamoDB,
-                       dynamoConfig: DynamoConfig
-                     ) extends Logging {
+  dynamoClient: AmazonDynamoDB,
+  dynamoConfig: DynamoConfig
+) extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
@@ -65,15 +65,14 @@ class ProgressMonitor(
     Scanamo.exec(dynamoClient)(ops) match {
       case Left(ConditionNotMet(e: ConditionalCheckFailedException)) =>
         throw IdConstraintError(
-          s"Progress does not exist for id:${update.id}", e)
+          s"Progress does not exist for id:${update.id}",
+          e)
       case Left(scanamoError) =>
         val exception = new RuntimeException(scanamoError.toString)
-        warn(
-          s"Failed to update Dynamo record: ${update.id}", exception)
+        warn(s"Failed to update Dynamo record: ${update.id}", exception)
         throw exception
       case Right(_) =>
-        debug(
-          s"Successfully updated Dynamo record: ${update.id}")
+        debug(s"Successfully updated Dynamo record: ${update.id}")
     }
     event
   }
@@ -81,4 +80,4 @@ class ProgressMonitor(
 
 final case class IdConstraintError(private val message: String,
                                    private val cause: Throwable)
-  extends Exception(message, cause)
+    extends Exception(message, cause)

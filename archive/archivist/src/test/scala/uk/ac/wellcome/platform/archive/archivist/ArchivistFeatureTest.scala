@@ -5,8 +5,13 @@ import java.net.URI
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
-import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, BagLocation}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagArchiveCompleteNotification,
+  BagLocation
+}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -14,7 +19,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 // TODO: Test shutdown mid-stream does not succeed
 
 class ArchivistFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
@@ -27,12 +32,12 @@ class ArchivistFeatureTest
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        progressTable,
-        archivist) =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) =>
         sendFakeBag(ingestBucket, Some(callbackUrl), queuePair) {
           case (requestId, uploadLocation, validBag) =>
             archivist.run()
@@ -57,12 +62,12 @@ class ArchivistFeatureTest
   it("fails when ingesting an invalid bag") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        progressTable,
-        archivist) =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) =>
         sendFakeBag(ingestBucket, Some(callbackUrl), queuePair, false) { _ =>
           archivist.run()
           eventually {
@@ -76,12 +81,12 @@ class ArchivistFeatureTest
   it("continues after failure") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        progressTable,
-        archivist) =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) =>
         sendFakeBag(ingestBucket, Some(callbackUrl), queuePair) {
           case (requestId1, uploadLocation1, validBag1) =>
             archivist.run()
