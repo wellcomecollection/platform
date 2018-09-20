@@ -9,25 +9,13 @@ import pytest
 
 @pytest.fixture
 def client(dynamodb_resource, table_name, sns_client, topic_arn):
-    os.environ.update({'TABLE_NAME': table_name})
-
     from archive_api import app
-
-    # @@AWLC: I feel like there should be a better way to configure the
-    # test app config than setting it directly here.  For some reason it's
-    # ignoring the ``app.config.from_object("config")`` call in the main file,
-    # and I don't have time to debug it more thoroughly.
-    app.config['dynamodb_table_name'] = table_name
-    app.config['dynamodb_resource'] = dynamodb_resource
-    app.config['sns_client'] = sns_client
-    app.config['sns_topic_arn'] = topic_arn
+    app.config['DYNAMODB_TABLE_NAME'] = table_name
+    app.config['DYNAMODB_RESOURCE'] = dynamodb_resource
+    app.config['SNS_CLIENT'] = sns_client
+    app.config['SNS_TOPIC_ARN'] = topic_arn
 
     yield app.test_client()
-
-    try:
-        del os.environ['TABLE_NAME']
-    except KeyError:
-        pass
 
 
 @pytest.fixture
@@ -37,10 +25,15 @@ def guid():
 
 @pytest.fixture()
 def table_name(dynamodb_client):
-    table_name = 'report_ingest_status--table-%d' % random.randint(0, 10000)
-    create_table(dynamodb_client, table_name)
-    yield table_name
-    dynamodb_client.delete_table(TableName=table_name)
+    dynamodb_table_name = 'report_ingest_status--table-%d' % random.randint(0, 10000)
+    os.environ.update({'TABLE_NAME': dynamodb_table_name})
+    create_table(dynamodb_client, dynamodb_table_name)
+    yield dynamodb_table_name
+    dynamodb_client.delete_table(TableName=dynamodb_table_name)
+    try:
+        del os.environ['TABLE_NAME']
+    except KeyError:
+        pass
 
 
 def create_table(dynamodb_client, table_name):
