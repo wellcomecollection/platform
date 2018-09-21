@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
 class ProgressUpdateFlowTest
-  extends FunSpec
+    extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with Akka
@@ -24,100 +24,103 @@ class ProgressUpdateFlowTest
 
   it("adds an event to a monitor with none") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withProgressUpdateFlow(table) { case (flow, monitor) =>
-        withActorSystem(actorSystem => {
-          withMaterializer(actorSystem)(materializer => {
-            val progress = givenProgressCreatedWith(
-              uploadUrl,
-              callbackUrl,
-              monitor)
+      withProgressUpdateFlow(table) {
+        case (flow, monitor) =>
+          withActorSystem(actorSystem => {
+            withMaterializer(actorSystem)(materializer => {
+              val progress =
+                givenProgressCreatedWith(uploadUrl, callbackUrl, monitor)
 
-            val progressUpdate = ProgressUpdate(progress.id, "Wow.")
+              val progressUpdate = ProgressUpdate(progress.id, "Wow.")
 
-            val updates = Source.single(progressUpdate)
-              .via(flow)
-              .async
-              .runWith(Sink.ignore)(materializer)
+              val updates = Source
+                .single(progressUpdate)
+                .via(flow)
+                .async
+                .runWith(Sink.ignore)(materializer)
 
-            whenReady(updates) { _ =>
-              assertProgressCreated(
-                progress.id,
-                uploadUrl,
-                Some(callbackUrl),
-                table = table)
-              assertProgressRecordedRecentEvents(
-                progressUpdate.id,
-                Seq(progressUpdate.description),
-                table)
-            }
+              whenReady(updates) { _ =>
+                assertProgressCreated(
+                  progress.id,
+                  uploadUrl,
+                  Some(callbackUrl),
+                  table = table)
+                assertProgressRecordedRecentEvents(
+                  progressUpdate.id,
+                  Seq(progressUpdate.description),
+                  table)
+              }
+            })
           })
-        })
       }
     }
   }
 
   it("adds multiple events to a monitor") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withProgressUpdateFlow(table) { case (flow, monitor) =>
-        withActorSystem(actorSystem => {
-          withMaterializer(actorSystem)(materializer => {
+      withProgressUpdateFlow(table) {
+        case (flow, monitor) =>
+          withActorSystem(actorSystem => {
+            withMaterializer(actorSystem)(materializer => {
 
-            val progress = givenProgressCreatedWith(
-              uploadUrl,
-              callbackUrl,
-              monitor
-            )
-
-            val events = List(
-              ProgressUpdate(progress.id, "It happened again."),
-              ProgressUpdate(progress.id, "Dammit Bobby.")
-            )
-
-            val updates = Source.fromIterator(() => events.toIterator)
-              .via(flow)
-              .async
-              .runWith(Sink.ignore)(materializer)
-
-            whenReady(updates) { _ =>
-
-              assertProgressCreated(
-                progress.id,
+              val progress = givenProgressCreatedWith(
                 uploadUrl,
-                Some(callbackUrl),
-                table = table)
-              assertProgressRecordedRecentEvents(
-                progress.id,
-                events.map(_.description),
-                table)
-            }
+                callbackUrl,
+                monitor
+              )
+
+              val events = List(
+                ProgressUpdate(progress.id, "It happened again."),
+                ProgressUpdate(progress.id, "Dammit Bobby.")
+              )
+
+              val updates = Source
+                .fromIterator(() => events.toIterator)
+                .via(flow)
+                .async
+                .runWith(Sink.ignore)(materializer)
+
+              whenReady(updates) { _ =>
+                assertProgressCreated(
+                  progress.id,
+                  uploadUrl,
+                  Some(callbackUrl),
+                  table = table)
+                assertProgressRecordedRecentEvents(
+                  progress.id,
+                  events.map(_.description),
+                  table)
+              }
+            })
           })
-        })
       }
     }
   }
 
   it("materializes a Left[FailedProgressUpdate] if an update fails") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withProgressUpdateFlow(table) { case (flow, monitor) =>
-        withActorSystem(actorSystem => {
-          withMaterializer(actorSystem)(materializer => {
-            val id = UUID.randomUUID().toString
+      withProgressUpdateFlow(table) {
+        case (flow, monitor) =>
+          withActorSystem(actorSystem => {
+            withMaterializer(actorSystem)(materializer => {
+              val id = UUID.randomUUID().toString
 
-            val progressUpdate = ProgressUpdate(id, "Such progress, wow.")
+              val progressUpdate = ProgressUpdate(id, "Such progress, wow.")
 
-            val updates = Source.single(progressUpdate)
-              .via(flow)
-              .async
-              .runWith(Sink.head)(materializer)
+              val updates = Source
+                .single(progressUpdate)
+                .via(flow)
+                .async
+                .runWith(Sink.head)(materializer)
 
-            whenReady(updates) { result =>
-              result.isLeft shouldBe true
-              result.left.get.e.getMessage should include(
-                s"Progress does not exist for id:$id"
-              )
-            }
+              whenReady(updates) { result =>
+                result.isLeft shouldBe true
+                result.left.get.e.getMessage should include(
+                  s"Progress does not exist for id:$id"
+                )
+              }
+            })
           })
-        })
       }
     }
   }

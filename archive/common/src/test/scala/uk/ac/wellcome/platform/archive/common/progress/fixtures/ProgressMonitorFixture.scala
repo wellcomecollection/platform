@@ -11,7 +11,11 @@ import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models.{FailedProgressUpdate, Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  FailedProgressUpdate,
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -38,11 +42,13 @@ trait ProgressMonitorFixture
   }
 
   def withProgressUpdateFlow[R](table: Table)(
-    testWith: TestWith[
-      (
-        Flow[ProgressUpdate, Either[FailedProgressUpdate, ProgressUpdate], NotUsed],
-          ProgressMonitor
-        ), R]): R = {
+    testWith: TestWith[(
+                         Flow[ProgressUpdate,
+                              Either[FailedProgressUpdate, ProgressUpdate],
+                              NotUsed],
+                         ProgressMonitor
+                       ),
+                       R]): R = {
 
     val progressMonitor = new ProgressMonitor(
       dynamoDbClient,
