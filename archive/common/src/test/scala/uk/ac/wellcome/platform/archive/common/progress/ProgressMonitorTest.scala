@@ -10,7 +10,7 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressMonitor}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
