@@ -4,11 +4,14 @@ import java.time.format.DateTimeFormatter
 import java.time.{Duration, Instant}
 import java.util.UUID
 
+import akka.NotUsed
+import akka.stream.scaladsl.Flow
 import com.gu.scanamo.DynamoFormat
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
+import uk.ac.wellcome.platform.archive.common.progress.models.{FailedProgressUpdate, Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -32,6 +35,20 @@ trait ProgressMonitorFixture
       DynamoConfig(table = table.name, index = table.index)
     )
     testWith(progressMonitor)
+  }
+
+  def withProgressUpdateFlow[R](table: Table)(
+    testWith: TestWith[
+      (
+        Flow[ProgressUpdate, Either[FailedProgressUpdate, ProgressUpdate], NotUsed],
+          ProgressMonitor
+        ), R]): R = {
+
+    val progressMonitor = new ProgressMonitor(
+      dynamoDbClient,
+      DynamoConfig(table = table.name, index = table.index)
+    )
+    testWith((ProgressUpdateFlow(progressMonitor), progressMonitor))
   }
 
   def withMockProgressMonitor[R]()(

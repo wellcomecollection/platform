@@ -9,7 +9,7 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Update}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class ProgressMonitor(
@@ -47,7 +47,7 @@ class ProgressMonitor(
     progress
   }
 
-  def update(update: Update) = {
+  def update(update: ProgressUpdate) = {
     val event = update.toEvent
 
     val mergedUpdate = update.status match {
