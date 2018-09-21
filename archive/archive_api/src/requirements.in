@@ -1,0 +1,4 @@
+boto3
+daiquiri
+flask
+wellcome_aws_utils==2.1.3

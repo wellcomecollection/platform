@@ -86,10 +86,11 @@ define publish_lambda
 endef
 
 
-# Test a Lambda project.
+# Test a Python project.
 #
 # Args:
-#   $1 - Path to the Lambda directory, relative to the root of the repo.
+#   $1 - Path to the Python project's directory, relative to the root
+#        of the repo.
 #
 define test_python
 	$(ROOT)/docker_run.py --aws --dind -- \
