@@ -29,8 +29,7 @@ object Progress {
 case class ProgressUpdate(id: String,
                           description: String,
                           status: Progress.Status = Progress.None,
-                          time: Instant = Instant.now
-                         ) {
+                          time: Instant = Instant.now) {
   def toEvent = ProgressEvent(description, time)
 }
 case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
