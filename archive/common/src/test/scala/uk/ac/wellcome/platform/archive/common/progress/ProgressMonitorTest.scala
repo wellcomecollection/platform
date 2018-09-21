@@ -40,11 +40,9 @@ class ProgressMonitorTest
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressMonitor(table) { archiveProgressMonitor =>
         val id = UUID.randomUUID().toString
-        val archiveIngestProgress =
-          Progress(id, uploadUrl, Some(callbackUrl), Progress.Processing)
+        val archiveIngestProgress = Progress(id, uploadUrl, Some(callbackUrl), Progress.Processing)
 
         archiveProgressMonitor.create(archiveIngestProgress)
-
         assertTableOnlyHasItem(archiveIngestProgress, table)
 
       }

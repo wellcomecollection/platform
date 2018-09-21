@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.common.progress
 
 import java.util.UUID
 
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
