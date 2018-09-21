@@ -9,6 +9,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}
 import uk.ac.wellcome.test.fixtures._
 
+import scala.language.higherKinds
 import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Random, Success, Try}
@@ -137,19 +138,19 @@ trait SNS extends Matchers with Logging {
     notificationCount(topic) shouldBe 0
   }
 
-  def assertSnsReceives[T](expectedMessage: Set[T], topic: SNS.Topic)(
+  def assertSnsReceives[T, I[T] <: Iterable[T]](expectedMessages: I[T], topic: SNS.Topic)(
     implicit decoderT: Decoder[T]) = {
     val triedReceiptsT = listNotifications[T](topic).toSet
 
     debug(s"SNS $topic received $triedReceiptsT")
-    triedReceiptsT should have size expectedMessage.size
+    triedReceiptsT should have size expectedMessages.size
 
     val maybeT = triedReceiptsT collect {
       case Success(t) => t
     }
 
     maybeT should not be empty
-    maybeT shouldBe expectedMessage
+    maybeT shouldBe expectedMessages.toSet
   }
 
   private def getMessages(topic: Topic) = {

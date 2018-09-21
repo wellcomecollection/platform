@@ -10,16 +10,11 @@ import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, NotificationMessage, RequestContext}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
+import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackFlow
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.registrar.flows.{
-  CallbackFlow,
-  SnsPublishFlow
-}
+import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -81,7 +76,7 @@ class Registrar @Inject()(
     fromJson[BagArchiveCompleteNotification](message.Message) match {
       case Success(
           bagArchiveCompleteNotification: BagArchiveCompleteNotification) =>
-        RegisterRequestContext(bagArchiveCompleteNotification)
+        RequestContext(bagArchiveCompleteNotification)
       case Failure(e) =>
         throw new RuntimeException(
           s"Failed to get object location from notification: ${e.getMessage}"
@@ -89,7 +84,7 @@ class Registrar @Inject()(
     }
   }
 
-  private def createStorageManifest(requestContext: RegisterRequestContext)(
+  private def createStorageManifest(requestContext: RequestContext)(
     implicit s3Client: AmazonS3,
     materializer: ActorMaterializer,
     executionContext: ExecutionContextExecutor) = {
@@ -100,7 +95,7 @@ class Registrar @Inject()(
   }
 
   private def updateStoredManifest(storageManifest: StorageManifest,
-                                   requestContext: RegisterRequestContext) = {
+                                   requestContext: RequestContext) = {
     dataStore.updateRecord(storageManifest.id.value)(
       ifNotExisting = (storageManifest, EmptyMetadata()))(
       ifExisting = (_, _) => (storageManifest, EmptyMetadata())
