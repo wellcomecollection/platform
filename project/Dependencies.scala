@@ -5,8 +5,7 @@ object WellcomeDependencies {
   private lazy val versions = new {
     val json = "1.0.0"
     val monitoring = "1.1.0"
-    val storage = "1.5.0"
-    val storage_new = "2.2.0"
+    val storage = "2.3.0"
   }
 
   val jsonLibrary: Seq[ModuleID] = Seq(
@@ -22,11 +21,6 @@ object WellcomeDependencies {
   val storageLibrary: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "storage" % versions.storage,
     "uk.ac.wellcome" %% "storage" % versions.storage % "test" classifier "tests"
-  )
-
-  val newStorageLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "storage" % versions.storage_new,
-    "uk.ac.wellcome" %% "storage" % versions.storage_new % "test" classifier "tests"
   )
 }
 

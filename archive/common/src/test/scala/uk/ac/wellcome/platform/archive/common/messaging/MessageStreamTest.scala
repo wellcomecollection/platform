@@ -16,8 +16,8 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.fixtures.AkkaS3
-import uk.ac.wellcome.storage.utils.ExtendedPatience
 import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.duration._
 

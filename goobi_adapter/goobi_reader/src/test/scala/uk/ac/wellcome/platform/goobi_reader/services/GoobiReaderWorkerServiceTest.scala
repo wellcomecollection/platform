@@ -241,11 +241,11 @@ class GoobiReaderWorkerServiceTest
                                  bucket: Bucket) = {
 
     inside(getHybridRecord(table, id)) {
-      case HybridRecord(actualId, actualVersion, s3Key) =>
+      case HybridRecord(actualId, actualVersion, location) =>
         actualId shouldBe id
         actualVersion shouldBe version
         getRecordMetadata[GoobiRecordMetadata](table, id) shouldBe expectedMetadata
-        getContentFromS3(bucket, s3Key) shouldBe expectedContents
+        getContentFromS3(location) shouldBe expectedContents
     }
   }
 

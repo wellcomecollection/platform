@@ -12,6 +12,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -21,7 +22,8 @@ class DynamoRowLockDaoTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with MatcherFixtures {
+    with MatcherFixtures
+    with ExtendedPatience {
 
   import com.gu.scanamo.syntax._
 

@@ -37,10 +37,10 @@ class GoobiReaderFeatureTest
             eventually {
               val hybridRecord: HybridRecord = getHybridRecord(table, id)
               inside(hybridRecord) {
-                case HybridRecord(actualId, actualVersion, s3Key) =>
+                case HybridRecord(actualId, actualVersion, location) =>
                   actualId shouldBe id
                   actualVersion shouldBe 1
-                  val s3contents = getContentFromS3(bucket, s3Key)
+                  val s3contents = getContentFromS3(location)
                   s3contents shouldBe contents
               }
             }

@@ -90,7 +90,6 @@ lazy val transformer_common = doServiceSetup(project, "catalogue_pipeline/transf
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
-  .settings(libraryDependencies ++= WellcomeDependencies.newStorageLibrary)
 
 lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
   .dependsOn(transformer_common % "compile->compile;test->test")
@@ -103,7 +102,6 @@ lazy val merger = doServiceSetup(project, "catalogue_pipeline/merger")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .settings(libraryDependencies ++= WellcomeDependencies.newStorageLibrary)
 
 lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .dependsOn(common % "compile->compile;test->test")
@@ -118,7 +116,6 @@ lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
-  .settings(libraryDependencies ++= WellcomeDependencies.newStorageLibrary)
 
 lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
   .dependsOn(common % "compile->compile;test->test")
@@ -135,7 +132,6 @@ lazy val reindex_request_creator = doServiceSetup(project, "reindexer/reindex_re
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
-  .settings(libraryDependencies ++= WellcomeDependencies.newStorageLibrary)
 
 lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
@@ -147,7 +143,6 @@ lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common"
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .settings(libraryDependencies ++= WellcomeDependencies.newStorageLibrary)
 
 lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_reader")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
