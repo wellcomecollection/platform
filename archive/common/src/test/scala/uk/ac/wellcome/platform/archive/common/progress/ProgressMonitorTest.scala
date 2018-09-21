@@ -3,28 +3,22 @@ package uk.ac.wellcome.platform.archive.common.progress
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  PutItemRequest,
-  UpdateItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{PutItemRequest, UpdateItemRequest}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Update}
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{
-  IdConstraintError,
-  ProgressMonitor
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressMonitor}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 import scala.util.Try
 
 class ProgressMonitorTest
-    extends FunSpec
+  extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with ProgressMonitorFixture
@@ -56,7 +50,7 @@ class ProgressMonitorTest
           callbackUrl,
           archiveProgressMonitor)
 
-        val progressUpdate = Update(progress.id, "So that happened.")
+        val progressUpdate = ProgressUpdate(progress.id, "So that happened.")
 
         archiveProgressMonitor.update(progressUpdate)
 
@@ -84,8 +78,8 @@ class ProgressMonitorTest
         )
 
         val updates = List(
-          Update(progress.id, "It happened again."),
-          Update(progress.id, "Dammit Bobby.")
+          ProgressUpdate(progress.id, "It happened again."),
+          ProgressUpdate(progress.id, "Dammit Bobby.")
         )
 
         updates.map(monitor.update)
@@ -131,7 +125,7 @@ class ProgressMonitorTest
       withProgressMonitor(table) { progressMonitor =>
         val id = UUID.randomUUID().toString
 
-        val update = Update(id, "Such progress, wow.")
+        val update = ProgressUpdate(id, "Such progress, wow.")
 
         val result = Try(progressMonitor.update(update))
         val failedException = result.failed.get
@@ -179,7 +173,7 @@ class ProgressMonitorTest
 
       val id = UUID.randomUUID().toString
 
-      val update = Update(id, "Too much winning.")
+      val update = ProgressUpdate(id, "Too much winning.")
 
       val result = Try(archiveProgressMonitor.update(update))
 
