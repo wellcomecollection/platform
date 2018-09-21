@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.archivist.fixtures
 import java.io.{File, FileOutputStream}
 import java.net.URI
 import java.util.UUID
-import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
+import java.util.zip.{ZipEntry, ZipFile, ZipInputStream, ZipOutputStream}
 
 import com.google.inject.Guice
 import uk.ac.wellcome.json.JsonUtil._
@@ -28,17 +28,17 @@ trait Archivist
     with LocalDynamoDb
     with ProgressMonitorFixture
     with Messaging
-    with BagIt {
+    with ZipBagItFixture {
 
   def sendBag[R](bagName: BagPath,
-                 file: File,
+                 zipFile: ZipFile,
                  ingestBucket: Bucket,
                  callbackUri: Option[URI],
                  queuePair: QueuePair)(
     testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = {
     val uploadKey = s"upload/path/$bagName.zip"
 
-    s3Client.putObject(ingestBucket.name, uploadKey, file)
+    s3Client.putObject(ingestBucket.name, uploadKey, new File(zipFile.getName))
 
     val uploadedBagLocation = ObjectLocation(ingestBucket.name, uploadKey)
     val ingestRequestId = UUID.randomUUID()
@@ -58,25 +58,12 @@ trait Archivist
                                dataFileCount: Int =12,
                                createDigest: String => String = createValidDigest,
                           createDataManifest: (BagPath, Seq[(String, String)]) => FileEntry = createValidDataManifest)(
-                                testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = withBag(dataFileCount = dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest) {
-    case (bagName, _, file) =>
-      sendBag(bagName, file, ingestBucket, callbackUri, queuePair) {
+                                testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = withBagItZip(dataFileCount = dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest) {
+    case (bagName, zipFile) =>
+      sendBag(bagName, zipFile, ingestBucket, callbackUri, queuePair) {
         case (requestId, uploadObjectLocation, bag) =>
           testWith((requestId, uploadObjectLocation, bag))
       }
-  }
-
-  def withBag[R](dataFileCount: Int = 1, createDigest: String => String = createValidDigest, createDataManifest: (BagPath, Seq[(String,String)]) => FileEntry= createValidDataManifest)(
-    testWith: TestWith[(BagPath, ZipFile, File), R]) = {
-    val bagName = BagPath(randomAlphanumeric())
-
-    info(s"Creating bag $bagName")
-
-    val (zipFile, file) = createBagItZip(bagName, dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest)
-
-    testWith((bagName, zipFile, file))
-
-    file.delete()
   }
 
   def withApp[R](storageBucket: Bucket,
@@ -133,36 +120,5 @@ trait Archivist
     })
   }
 
-  def createZip(files: List[FileEntry]) = {
-    val file = File.createTempFile("archivist-test", ".zip")
-    val zipFileOutputStream = new FileOutputStream(file)
-    val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
-    files.foreach {
-      case FileEntry(name, contents) =>
-        info(s"Adding $name to zip contents")
-        val zipEntry = new ZipEntry(name)
-        zipOutputStream.putNextEntry(zipEntry)
-        zipOutputStream.write(contents.getBytes)
-        zipOutputStream.closeEntry()
-    }
-    zipOutputStream.close()
-    val zipFile = new ZipFile(file)
 
-    info(s"zipfile full path: ${file.getAbsolutePath}")
-
-    (zipFile, file)
-  }
-
-
-  def createBagItZip(bagName: BagPath,
-                     dataFileCount: Int = 1,
-                     createDigest: String => String = createValidDigest,
-                     createDataManifest: (BagPath,Seq[(String,String)]) => FileEntry = createValidDataManifest) = {
-
-    val allFiles = createBag(bagName, dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest)
-
-    info(s"Adding files $allFiles to bag $bagName")
-
-    createZip(allFiles.toList)
-  }
 }

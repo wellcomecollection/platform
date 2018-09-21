@@ -4,7 +4,6 @@ import java.security.MessageDigest
 
 import uk.ac.wellcome.platform.archive.common.models.BagPath
 
-import scala.collection.immutable
 import scala.util.Random
 
 trait BagIt {

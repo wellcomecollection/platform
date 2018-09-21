@@ -1,12 +1,10 @@
 package uk.ac.wellcome.platform.archive.archivist
 
-import java.io.File
+import java.util.zip.ZipFile
 
 import org.scalatest.{FunSpec, Ignore, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.common.models.BagPath
 
 @Ignore
@@ -28,7 +26,7 @@ class TroubleshootArchivistLocalBagFileTest
           archivist) =>
         sendBag(
           BagPath(randomAlphanumeric()),
-          new File(
+          new ZipFile(
             List(
               System.getProperty("user.home"),
               "Desktop",

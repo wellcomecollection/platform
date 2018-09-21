@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import java.io.File
+
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
@@ -7,7 +9,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -28,15 +30,15 @@ class ZipFileDownloadFlowTest
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
         withMockProgressMonitor() { archiveProgressMonitor =>
-          withBag() {
-            case (bagName, zipFile, file) =>
+          withBagItZip() {
+            case (bagName, zipFile) =>
               val downloadZipFlow = ZipFileDownloadFlow()(
                 s3Client
               )
 
               val uploadKey = bagName.toString
 
-              s3Client.putObject(storageBucket.name, uploadKey, file)
+              s3Client.putObject(storageBucket.name, uploadKey, new File(zipFile.getName))
 
               val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
               val ingestBagRequest = createIngestBagRequestWith(
