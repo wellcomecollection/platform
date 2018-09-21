@@ -1,3 +1,7 @@
+data "aws_ecr_repository" "ecr_repository_nginx_services" {
+  name = "uk.ac.wellcome/nginx_services"
+}
+
 module "ecr_repository_archivist" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "archivist"
