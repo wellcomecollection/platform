@@ -3,10 +3,10 @@ package uk.ac.wellcome.platform.archive.common.progress.modules
 import akka.actor.ActorSystem
 import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.platform.archive.common.modules.DynamoClientConfig
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
 
-object ArchiveProgressMonitorModule extends AbstractModule {
+object ProgressMonitorModule extends AbstractModule {
 
   @Provides
   def providesArchiveProgressMonitor(
@@ -20,10 +20,11 @@ object ArchiveProgressMonitorModule extends AbstractModule {
       accessKey = dynamoClientConfig.accessKey.getOrElse(""),
       secretKey = dynamoClientConfig.secretKey.getOrElse("")
     )
-    implicit val executionContext = actorSystem.dispatcher
-    new ArchiveProgressMonitor(
+
+    new ProgressMonitor(
       dynamoClient,
-      progressMonitorConfig.dynamoConfig)(executionContext)
+      progressMonitorConfig.dynamoConfig
+    )
   }
 }
 

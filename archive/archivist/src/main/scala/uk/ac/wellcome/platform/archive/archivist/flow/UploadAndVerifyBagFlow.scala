@@ -13,7 +13,6 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   UploadConfig
 }
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagName}
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -24,7 +23,6 @@ object UploadAndVerifyBagFlow extends Logging {
     implicit
     materializer: ActorMaterializer,
     s3Client: S3Client,
-    archiveProgressMonitor: ArchiveProgressMonitor,
     executionContext: ExecutionContext
   ): Flow[(ZipFile, IngestRequestContext),
           (BagLocation, IngestRequestContext),
@@ -43,7 +41,6 @@ object UploadAndVerifyBagFlow extends Logging {
           }
           .flatMapConcat(Source.fromFuture)
           .map((_, ingestRequestContext))
-          .via(RecordArchiveProgressEventFlow("completed archiving"))
     }
   }
 

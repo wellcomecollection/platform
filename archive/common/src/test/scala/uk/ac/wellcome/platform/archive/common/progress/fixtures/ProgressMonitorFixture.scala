@@ -4,22 +4,25 @@ import java.time.format.DateTimeFormatter
 import java.time.{Duration, Instant}
 import java.util.UUID
 
+import akka.NotUsed
+import akka.stream.scaladsl.Flow
 import com.gu.scanamo.DynamoFormat
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress.Status
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  FailedProgressUpdate,
+  Progress,
+  ProgressUpdate
+}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-
-trait ArchiveProgressMonitorFixture
+trait ProgressMonitorFixture
     extends LocalProgressMonitorDynamoDb
     with MockitoSugar {
 
@@ -29,36 +32,52 @@ trait ArchiveProgressMonitorFixture
       DateTimeFormatter.ISO_INSTANT.format(_)
     )
 
-  def withArchiveProgressMonitor[R](table: Table)(
-    testWith: TestWith[ArchiveProgressMonitor, R]): R = {
-    val archiveProgressMonitor = new ArchiveProgressMonitor(
+  def withProgressMonitor[R](table: Table)(
+    testWith: TestWith[ProgressMonitor, R]): R = {
+    val progressMonitor = new ProgressMonitor(
       dynamoDbClient,
       DynamoConfig(table = table.name, index = table.index)
     )
-    testWith(archiveProgressMonitor)
+    testWith(progressMonitor)
   }
 
-  def withMockArchiveProgressMonitor[R]()(
-    testWith: TestWith[ArchiveProgressMonitor, R]): R = {
-    val archiveProgressMonitor = mock[ArchiveProgressMonitor]
-    testWith(archiveProgressMonitor)
+  def withProgressUpdateFlow[R](table: Table)(
+    testWith: TestWith[(
+                         Flow[ProgressUpdate,
+                              Either[FailedProgressUpdate, ProgressUpdate],
+                              NotUsed],
+                         ProgressMonitor
+                       ),
+                       R]): R = {
+
+    val progressMonitor = new ProgressMonitor(
+      dynamoDbClient,
+      DynamoConfig(table = table.name, index = table.index)
+    )
+    testWith((ProgressUpdateFlow(progressMonitor), progressMonitor))
   }
 
-  def givenArchiveProgressCreatedWith(
-    uploadUrl: String,
-    callbackUrl: String,
-    archiveProgressMonitor: ArchiveProgressMonitor): ArchiveProgress = {
+  def withMockProgressMonitor[R]()(
+    testWith: TestWith[ProgressMonitor, R]): R = {
+    val progressMonitor = mock[ProgressMonitor]
+    testWith(progressMonitor)
+  }
+
+  def givenProgressCreatedWith(uploadUrl: String,
+                               callbackUrl: String,
+                               progressMonitor: ProgressMonitor): Progress = {
     val id = UUID.randomUUID().toString
-    val eventualProgress = archiveProgressMonitor.initialize(
-      ArchiveProgress(id, uploadUrl, Some(callbackUrl)))
-    Await.result(eventualProgress, 500 millis)
+
+    progressMonitor.create(
+      Progress(id, uploadUrl, Some(callbackUrl))
+    )
   }
 
-  def givenArchiveProgressRecord(id: String,
-                                 uploadUrl: String,
-                                 maybeCallbackUrl: Option[String],
-                                 table: Table) = {
-    givenTableHasItem(ArchiveProgress(id, uploadUrl, maybeCallbackUrl), table)
+  def givenProgressRecord(id: String,
+                          uploadUrl: String,
+                          maybeCallbackUrl: Option[String],
+                          table: Table) = {
+    givenTableHasItem(Progress(id, uploadUrl, maybeCallbackUrl), table)
   }
 
   def assertProgressCreated(id: String,
@@ -66,7 +85,7 @@ trait ArchiveProgressMonitorFixture
                             expectedCallbackUrl: Option[String],
                             table: Table,
                             recentSeconds: Int = 45): Assertion = {
-    val progress = getExistingTableItem[ArchiveProgress](id, table)
+    val progress = getExistingTableItem[Progress](id, table)
     progress.uploadUrl shouldBe expectedUploadUrl
     progress.callbackUrl shouldBe expectedCallbackUrl
 
@@ -78,7 +97,7 @@ trait ArchiveProgressMonitorFixture
                                          expectedEventDescriptions: Seq[String],
                                          table: LocalDynamoDb.Table,
                                          recentSeconds: Int = 45) = {
-    val progress = getExistingTableItem[ArchiveProgress](id, table)
+    val progress = getExistingTableItem[Progress](id, table)
 
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
     progress.events.foreach(event => assertRecent(event.time, recentSeconds))
@@ -88,7 +107,7 @@ trait ArchiveProgressMonitorFixture
   def assertProgressStatus(id: String,
                            expectedStatus: Status,
                            table: LocalDynamoDb.Table) = {
-    val progress = getExistingTableItem[ArchiveProgress](id, table)
+    val progress = getExistingTableItem[Progress](id, table)
 
     progress.result shouldBe expectedStatus
   }

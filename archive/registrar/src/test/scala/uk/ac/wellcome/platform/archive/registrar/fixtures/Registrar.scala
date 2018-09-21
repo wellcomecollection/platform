@@ -21,8 +21,8 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagName
 }
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.modules.ArchiveProgressMonitorModule
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   ConfigModule,
   TestAppConfigModule,
@@ -42,7 +42,7 @@ trait Registrar
     with Messaging
     with LocalVersionedHybridStore
     with BagIt
-    with ArchiveProgressMonitorFixture
+    with ProgressMonitorFixture
     with LocalDynamoDb {
 
   def sendNotification(requestId: UUID,
@@ -141,7 +141,7 @@ trait Registrar
         SQSClientModule,
         SNSAsyncClientModule,
         DynamoClientModule,
-        ArchiveProgressMonitorModule,
+        ProgressMonitorModule,
         MessageStreamModule
       )
 

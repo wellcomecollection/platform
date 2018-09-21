@@ -23,8 +23,8 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{
 }
 import uk.ac.wellcome.platform.archive.common.models.BagName
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.modules.ArchiveProgressMonitorModule
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -34,7 +34,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait Archivist
     extends AkkaS3
     with LocalDynamoDb
-    with ArchiveProgressMonitorFixture
+    with ProgressMonitorFixture
     with Messaging
     with BagIt {
 
@@ -107,7 +107,7 @@ trait Archivist
         CloudWatchClientModule,
         SQSClientModule,
         SNSAsyncClientModule,
-        ArchiveProgressMonitorModule
+        ProgressMonitorModule
       )
     }
     testWith(archivist)

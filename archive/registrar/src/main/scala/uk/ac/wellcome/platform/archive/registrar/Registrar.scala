@@ -15,11 +15,9 @@ import uk.ac.wellcome.platform.archive.common.models.{
   NotificationMessage
 }
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ArchiveProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.registrar.flows.{
   CallbackFlow,
-  RecordArchiveProgressEventFlow,
   SnsPublishFlow
 }
 import uk.ac.wellcome.platform.archive.registrar.models._
@@ -39,14 +37,13 @@ class Registrar @Inject()(
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
-  archiveProgressMonitor: ArchiveProgressMonitor,
+  archiveProgressMonitor: ProgressMonitor,
   actorSystem: ActorSystem
 ) {
   def run() = {
 
     implicit val client = snsClient
     implicit val system = actorSystem
-    implicit val progressMonitor = archiveProgressMonitor
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
@@ -69,9 +66,6 @@ class Registrar @Inject()(
       .map {
         case (manifest, context) => updateStoredManifest(manifest, context)
       }
-      .via(RecordArchiveProgressEventFlow(
-        "registered",
-        Some(ArchiveProgress.Completed)))
       .via(SnsPublishFlow(snsConfig))
       .log("published notification")
       .filter {
