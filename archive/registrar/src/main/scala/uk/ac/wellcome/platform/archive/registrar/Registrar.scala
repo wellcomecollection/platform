@@ -12,9 +12,17 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, NotificationMessage, RequestContext}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
+<<<<<<< HEAD
 import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackFlow
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlow
+=======
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
+import uk.ac.wellcome.platform.archive.registrar.flows.{
+  CallbackFlow,
+  SnsPublishFlow
+}
+>>>>>>> 03dfc18c8802a2a39298f297b741c94b4aa3d058
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._

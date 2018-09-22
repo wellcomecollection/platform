@@ -20,6 +20,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressMonitorFixture
   extends LocalProgressMonitorDynamoDb
+
     with MockitoSugar {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =

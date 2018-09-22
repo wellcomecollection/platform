@@ -6,19 +6,18 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
 class ProgressUpdateFlowTest
+
   extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with Akka
     with ProgressMonitorFixture
-    with SNS
     with ScalaFutures {
 
   private val uploadUrl = "uploadUrl"
