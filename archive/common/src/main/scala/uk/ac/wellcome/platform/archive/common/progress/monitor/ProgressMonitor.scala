@@ -9,10 +9,7 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{FailedEvent, Progress, ProgressUpdate}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class ProgressMonitor(
@@ -50,8 +47,9 @@ class ProgressMonitor(
     progress
   }
 
-  def update(update: ProgressUpdate) = {
-    val event = update.toEvent
+  def update(update: ProgressUpdate):
+  Either[FailedEvent[ProgressUpdate], Progress] = {
+    val event = update.event
 
     val mergedUpdate = update.status match {
       case Progress.None =>
@@ -66,21 +64,30 @@ class ProgressMonitor(
       .update('id -> update.id, mergedUpdate)
 
     Scanamo.exec(dynamoClient)(ops) match {
-      case Left(ConditionNotMet(e: ConditionalCheckFailedException)) =>
-        throw IdConstraintError(
-          s"Progress does not exist for id:${update.id}",
-          e)
-      case Left(scanamoError) =>
+      case Left(ConditionNotMet(e: ConditionalCheckFailedException)) => {
+        val idConstraintError =
+          IdConstraintError(s"Progress does not exist for id:${update.id}", e)
+
+        Left(FailedEvent(idConstraintError, update))
+      }
+
+      case Left(scanamoError) => {
         val exception = new RuntimeException(scanamoError.toString)
         warn(s"Failed to update Dynamo record: ${update.id}", exception)
-        throw exception
-      case Right(_) =>
+
+        Left(FailedEvent(exception, update))
+      }
+
+      case r@Right(progress) => {
         debug(s"Successfully updated Dynamo record: ${update.id}")
+
+        Right(progress)
+      }
     }
-    event
   }
 }
 
-final case class IdConstraintError(private val message: String,
-                                   private val cause: Throwable)
-    extends Exception(message, cause)
+final case class IdConstraintError(
+  private val message: String,
+  private val cause: Throwable
+) extends Exception(message, cause)

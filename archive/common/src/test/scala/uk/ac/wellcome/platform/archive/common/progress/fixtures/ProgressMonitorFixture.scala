@@ -41,7 +41,7 @@ trait ProgressMonitorFixture
   def withProgressUpdateFlow[R](table: Table)(
     testWith: TestWith[(
       Flow[ProgressUpdate,
-        Either[FailedEvent[ProgressUpdate], ProgressUpdate],
+        Either[FailedEvent[ProgressUpdate], Progress],
         NotUsed],
         ProgressMonitor
       ),
@@ -60,9 +60,9 @@ trait ProgressMonitorFixture
     testWith(progressMonitor)
   }
 
-  def givenProgressCreatedWith(uploadUrl: String,
-                               callbackUrl: String,
-                               progressMonitor: ProgressMonitor): Progress = {
+  def createProgress(uploadUrl: String,
+                     callbackUrl: String,
+                     progressMonitor: ProgressMonitor): Progress = {
     val id = UUID.randomUUID().toString
 
     progressMonitor.create(

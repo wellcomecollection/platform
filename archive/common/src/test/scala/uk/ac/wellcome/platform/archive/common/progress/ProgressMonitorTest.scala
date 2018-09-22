@@ -3,24 +3,15 @@ package uk.ac.wellcome.platform.archive.common.progress
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  PutItemRequest,
-  UpdateItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{PutItemRequest, UpdateItemRequest}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{
-  IdConstraintError,
-  ProgressMonitor
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressMonitor}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
@@ -52,12 +43,15 @@ class ProgressMonitorTest
   it("adds an event to a monitor with none") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressMonitor(table) { archiveProgressMonitor =>
-        val progress = givenProgressCreatedWith(
+        val progress = createProgress(
           uploadUrl,
           callbackUrl,
           archiveProgressMonitor)
 
-        val progressUpdate = ProgressUpdate(progress.id, "So that happened.")
+        val progressUpdate = ProgressUpdate(
+          progress.id,
+          ProgressEvent("So that happened.")
+        )
 
         archiveProgressMonitor.update(progressUpdate)
 
@@ -68,7 +62,7 @@ class ProgressMonitorTest
           table = table)
         assertProgressRecordedRecentEvents(
           progressUpdate.id,
-          Seq(progressUpdate.description),
+          Seq(progressUpdate.event.description),
           table)
 
       }
@@ -78,15 +72,21 @@ class ProgressMonitorTest
   it("adds multiple events to a monitor") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressMonitor(table) { monitor: ProgressMonitor =>
-        val progress = givenProgressCreatedWith(
+        val progress = createProgress(
           uploadUrl,
           callbackUrl,
           monitor
         )
 
         val updates = List(
-          ProgressUpdate(progress.id, "It happened again."),
-          ProgressUpdate(progress.id, "Dammit Bobby.")
+          ProgressUpdate(
+            progress.id,
+            ProgressEvent("It happened again.")
+          ),
+          ProgressUpdate(
+            progress.id,
+            ProgressEvent("Dammit Bobby.")
+          )
         )
 
         updates.map(monitor.update)
@@ -98,7 +98,7 @@ class ProgressMonitorTest
           table = table)
         assertProgressRecordedRecentEvents(
           progress.id,
-          updates.map(_.description),
+          updates.map(_.event.description),
           table)
       }
     }
@@ -132,7 +132,7 @@ class ProgressMonitorTest
       withProgressMonitor(table) { progressMonitor =>
         val id = UUID.randomUUID().toString
 
-        val update = ProgressUpdate(id, "Such progress, wow.")
+        val update = ProgressUpdate(id, ProgressEvent("Such progress, wow."))
 
         val result = Try(progressMonitor.update(update))
         val failedException = result.failed.get
@@ -150,6 +150,7 @@ class ProgressMonitorTest
       val expectedException = new RuntimeException("root cause")
       when(mockDynamoDbClient.putItem(any[PutItemRequest]))
         .thenThrow(expectedException)
+
       val archiveProgressMonitor = new ProgressMonitor(
         mockDynamoDbClient,
         DynamoConfig(table = table.name, index = table.index)
@@ -180,7 +181,7 @@ class ProgressMonitorTest
 
       val id = UUID.randomUUID().toString
 
-      val update = ProgressUpdate(id, "Too much winning.")
+      val update = ProgressUpdate(id, ProgressEvent("Too much winning."))
 
       val result = Try(archiveProgressMonitor.update(update))
 
