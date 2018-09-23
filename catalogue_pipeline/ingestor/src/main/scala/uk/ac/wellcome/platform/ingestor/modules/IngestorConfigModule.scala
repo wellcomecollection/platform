@@ -3,8 +3,7 @@ package uk.ac.wellcome.platform.ingestor.modules
 import com.google.inject.Provides
 import com.twitter.app.Flaggable
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.elasticsearch.ElasticConfig
-import uk.ac.wellcome.platform.ingestor.IngestorConfig
+import uk.ac.wellcome.platform.ingestor.{IngestElasticConfig, IngestorConfig}
 
 import scala.concurrent.duration.{Duration, FiniteDuration, _}
 
@@ -27,6 +26,6 @@ object IngestorConfigModule extends TwitterModule {
   )
 
   @Provides
-  def providesIngestorConfig(elasticConfig: ElasticConfig) =
+  def providesIngestorConfig(elasticConfig: IngestElasticConfig) =
     IngestorConfig(batchSize(), flushInterval(), elasticConfig)
 }

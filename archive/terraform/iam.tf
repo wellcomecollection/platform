@@ -1,3 +1,15 @@
+# Archive API (Flask)
+
+resource "aws_iam_role_policy" "archive_api_task_sns" {
+  role   = "${module.api_ecs.task_role_name}"
+  policy = "${module.archivist_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "archive_api_task_progress_table" {
+  role   = "${module.api_ecs.task_role_name}"
+  policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
+}
+
 # Archivist
 
 resource "aws_iam_role_policy" "archivist_task_store_s3" {

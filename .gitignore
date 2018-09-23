@@ -15,6 +15,7 @@ shared_infra/.releases
 .lambda_zips
 .Dockerfile
 .pytest-cache
+.pytest_cache
 
 # Files which are encrypted before they're sent to Travis
 secrets

@@ -13,7 +13,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.elasticsearch.ElasticConfig
+import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.snapshot_generator.flow.{
   DisplayWorkToJsonStringFlow,
@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SnapshotService @Inject()(actorSystem: ActorSystem,
                                 akkaS3Client: S3Client,
                                 elasticClient: HttpClient,
-                                elasticConfig: ElasticConfig,
+                                elasticConfig: DisplayElasticConfig,
                                 objectMapper: ObjectMapper)(
   implicit ec: ExecutionContext
 ) extends Logging {

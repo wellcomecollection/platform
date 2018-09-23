@@ -73,9 +73,9 @@
           }
         },
         "x-amazon-apigateway-integration": {
-          "uri": "${report_ingest_status_lambda_invoke_arn}",
+          "uri": "${request_ingest_lambda_invoke_arn}",
           "requestTemplates": {
-            "application/json": "{\"body\": $input.json('$'), \"path\":\"$context.path\"}"
+            "application/json": "{\"body\": $input.json('$'), \"path\":\"$context.path\", \"request_method\":\"$context.httpMethod\"}"
           },
           "responses": {
             "default": {
@@ -132,7 +132,7 @@
           }
         },
         "x-amazon-apigateway-integration": {
-          "uri": "${request_ingest_lambda_invoke_arn}",
+          "uri": "${report_ingest_status_lambda_invoke_arn}",
           "responses": {
             "default": {
               "statusCode": "200"

@@ -5,17 +5,16 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
 import com.github.tomakehurst.wiremock.client.WireMock.{
   equalToJson,
   postRequestedFor,
   urlPathEqualTo
 }
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.registrar.fixtures.{
   LocalWireMockFixture,
   Registrar => RegistrarFixture
@@ -36,7 +35,7 @@ class RegistrarFeatureTest
     with ScalaFutures
     with MetricsSenderFixture
     with ExtendedPatience
-    with ArchiveProgressMonitorFixture
+    with ProgressMonitorFixture
     with LocalWireMockFixture
     with RegistrarFixture {
 
@@ -65,7 +64,7 @@ class RegistrarFeatureTest
             Some(callbackUrl),
             queuePair,
             storageBucket) { bagLocation =>
-            givenArchiveProgressRecord(
+            givenProgressRecord(
               requestId.toString,
               "upLoadUrl",
               Some(callbackUrl.toString),
@@ -93,15 +92,6 @@ class RegistrarFeatureTest
                     storageManifest.id.value,
                     storageManifest
                   )
-
-                  assertProgressRecordedRecentEvents(
-                    requestId.toString,
-                    Seq("registered"),
-                    progressTable)
-                  assertProgressStatus(
-                    requestId.toString,
-                    ArchiveProgress.Completed,
-                    progressTable)
 
                   wireMock.verifyThat(
                     1,

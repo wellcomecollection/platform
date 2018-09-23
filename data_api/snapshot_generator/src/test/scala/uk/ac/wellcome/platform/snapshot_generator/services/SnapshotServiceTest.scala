@@ -19,7 +19,7 @@ import uk.ac.wellcome.display.models.{
 }
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.elasticsearch.ElasticConfig
+import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule
@@ -57,7 +57,7 @@ class SnapshotServiceTest
     s3AkkaClient: S3Client,
     indexNameV1: String,
     indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
-    val elasticConfig = ElasticConfig(
+    val elasticConfig = DisplayElasticConfig(
       documentType = itemType,
       indexV1name = indexNameV1,
       indexV2name = indexNameV2
@@ -272,7 +272,7 @@ class SnapshotServiceTest
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
           withLocalS3Bucket { bucket =>
-            val elasticConfig = ElasticConfig(
+            val elasticConfig = DisplayElasticConfig(
               documentType = itemType,
               indexV1name = "wrong-index",
               indexV2name = "wrong-index"
@@ -324,7 +324,7 @@ class SnapshotServiceTest
             secretKey = secretKey
           )
 
-          val elasticConfig = ElasticConfig(
+          val elasticConfig = DisplayElasticConfig(
             documentType = itemType,
             indexV1name = "indexv1",
             indexV2name = "indexv2"

@@ -12,8 +12,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagArchiveCompleteNotification,
   BagLocation
 }
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ArchiveProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.ArchiveProgress
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 // TODO: Test file boundaries
@@ -24,7 +23,7 @@ class ArchivistFeatureTest
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
-    with ArchiveProgressMonitorFixture
+    with ProgressMonitorFixture
     with ArchivistFixture
     with ExtendedPatience {
 
@@ -55,20 +54,6 @@ class ArchivistFeatureTest
                 ),
                 topic
               )
-
-              assertProgressCreated(
-                requestId.toString,
-                uploadLocation.toString,
-                Some(callbackUrl.toString),
-                progressTable)
-              assertProgressRecordedRecentEvents(
-                requestId.toString,
-                Seq("started archiving", "completed archiving"),
-                progressTable)
-              assertProgressStatus(
-                requestId.toString,
-                ArchiveProgress.Processing,
-                progressTable)
             }
         }
     }

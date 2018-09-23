@@ -29,7 +29,7 @@ trait ApiWorksTestBase
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
-      flags = esLocalFlags(
+      flags = displayEsLocalFlags(
         indexNameV1 = indexNameV1,
         indexNameV2 = indexNameV2,
         itemType = itemType
