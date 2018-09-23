@@ -21,5 +21,7 @@ object Progress {
 }
 
 case class ProgressEvent(description: String, time: Instant = Instant.now)
-case class ProgressUpdate(id: String, event: ProgressEvent, status: Progress.Status = Progress.None)
+case class ProgressUpdate(id: String,
+                          event: ProgressEvent,
+                          status: Progress.Status = Progress.None)
 case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)

@@ -14,7 +14,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SNSPublishFlowTest
-  extends FunSpec
+    extends FunSpec
     with SNS
     with MockitoSugar
     with Akka
@@ -33,7 +33,8 @@ class SNSPublishFlowTest
           val publishFlow =
             SnsPublishFlow[Person](snsClient, snsConfig)
 
-          val publication = Source.single(bob)
+          val publication = Source
+            .single(bob)
             .via(publishFlow)
             .async
             .runWith(Sink.head)(materializer)
@@ -58,7 +59,8 @@ class SNSPublishFlowTest
         val publishFlow =
           SnsPublishFlow[Person](snsClient, snsConfig)
 
-        val publication = Source.single(bob)
+        val publication = Source
+          .single(bob)
           .via(publishFlow)
           .async
           .runWith(Sink.head)(materializer)
@@ -76,18 +78,19 @@ class SNSPublishFlowTest
   it("handles multiple errors, returning Lefts") {
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
-
-        val bobs = () => Iterator(
-          Person("Bobbert", 42),
-          Person("Bobbrit", 41),
-          Person("Borbbit", 40)
+        val bobs = () =>
+          Iterator(
+            Person("Bobbert", 42),
+            Person("Bobbrit", 41),
+            Person("Borbbit", 40)
         )
 
         val snsConfig = SNSConfig("bad_topic")
         val publishFlow =
           SnsPublishFlow[Person](snsClient, snsConfig)
 
-        val publication = Source.fromIterator(bobs)
+        val publication = Source
+          .fromIterator(bobs)
           .via(publishFlow)
           .async
           .runWith(Sink.seq)(materializer)
@@ -107,18 +110,19 @@ class SNSPublishFlowTest
     withLocalSnsTopic { topic =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>
-
-          val bobs = () => Iterator(
-            Person("Bobbert", 42),
-            Person("Bobbrit", 41),
-            Person("Borbbit", 40)
+          val bobs = () =>
+            Iterator(
+              Person("Bobbert", 42),
+              Person("Bobbrit", 41),
+              Person("Borbbit", 40)
           )
 
           val snsConfig = SNSConfig(topic.arn)
           val publishFlow =
             SnsPublishFlow[Person](snsClient, snsConfig)
 
-          val publication = Source.fromIterator(bobs)
+          val publication = Source
+            .fromIterator(bobs)
             .via(publishFlow)
             .async
             .runWith(Sink.seq)(materializer)
@@ -135,4 +139,3 @@ class SNSPublishFlowTest
     }
   }
 }
-

@@ -9,7 +9,11 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{FailedEvent, Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  FailedEvent,
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class ProgressMonitor(
@@ -47,8 +51,8 @@ class ProgressMonitor(
     progress
   }
 
-  def update(update: ProgressUpdate):
-  Either[FailedEvent[ProgressUpdate], Progress] = {
+  def update(
+    update: ProgressUpdate): Either[FailedEvent[ProgressUpdate], Progress] = {
     val event = update.event
 
     val mergedUpdate = update.status match {
@@ -78,7 +82,7 @@ class ProgressMonitor(
         Left(FailedEvent(exception, update))
       }
 
-      case r@Right(progress) => {
+      case r @ Right(progress) => {
         debug(s"Successfully updated Dynamo record: ${update.id}")
 
         Right(progress)

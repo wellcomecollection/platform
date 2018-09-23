@@ -7,13 +7,15 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  ProgressEvent,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
 class ProgressUpdateFlowTest
-
-  extends FunSpec
+    extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with Akka
@@ -71,7 +73,9 @@ class ProgressUpdateFlowTest
               )
 
               val events = List(
-                ProgressUpdate(progress.id, ProgressEvent("It happened again.")),
+                ProgressUpdate(
+                  progress.id,
+                  ProgressEvent("It happened again.")),
                 ProgressUpdate(progress.id, ProgressEvent("Dammit Bobby."))
               )
 
@@ -106,7 +110,8 @@ class ProgressUpdateFlowTest
             withMaterializer(actorSystem)(materializer => {
               val id = UUID.randomUUID().toString
 
-              val update = ProgressUpdate(id, ProgressEvent("Such progress, wow."))
+              val update =
+                ProgressUpdate(id, ProgressEvent("Such progress, wow."))
 
               val updates = Source
                 .single(update)

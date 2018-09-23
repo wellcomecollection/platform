@@ -6,7 +6,10 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.models.RequestContext
-import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest}
+import uk.ac.wellcome.platform.archive.registrar.models.{
+  BagRegistrationCompleteNotification,
+  StorageManifest
+}
 
 import scala.util.{Failure, Success}
 
