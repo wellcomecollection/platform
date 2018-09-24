@@ -9,15 +9,6 @@ from request_new_ingest import (
 )
 
 
-def test_bad_bag_url_is_badrequest_error(guid):
-    with pytest.raises(BadRequestError, match='Unrecognised URL scheme'):
-        create_archive_bag_message(
-            guid=guid,
-            bag_url='https://example.org',
-            callback_url=None
-        )
-
-
 def test_creates_bag_message_without_callback_url(guid):
     bag_url = 's3://example-bukkit/foo/bar.zip'
 
@@ -46,10 +37,11 @@ def test_creates_bag_message_includes_callback_url(guid):
     assert resp['callbackUrl'] == callback_url
 
 
-def test_sends_notification_to_sns(sns_client, topic_arn):
+def test_sends_notification_to_sns(sns_client, topic_arn, guid):
     send_new_ingest_request(
         sns_client=sns_client,
         topic_arn=topic_arn,
+        ingest_request_id=guid,
         upload_url='s3://example-bukkit/foo/bar.zip',
         callback_url=None
     )
@@ -57,12 +49,13 @@ def test_sends_notification_to_sns(sns_client, topic_arn):
     assert len(sns_client.list_messages()) == 1
 
 
-def test_sends_notification_to_sns_with_callback_url(sns_client, topic_arn):
+def test_sends_notification_to_sns_with_callback_url(sns_client, topic_arn, guid):
     callback_url = 'https://callback.com/?example'
 
     send_new_ingest_request(
         sns_client=sns_client,
         topic_arn=topic_arn,
+        ingest_request_id=guid,
         upload_url='s3://example-bukkit/foo/bar.zip',
         callback_url=callback_url
     )
@@ -73,12 +66,22 @@ def test_sends_notification_to_sns_with_callback_url(sns_client, topic_arn):
     assert sns_messages[0][':message']['callbackUrl'] == callback_url
 
 
-def test_returns_new_location_no_path(sns_client, topic_arn):
+def test_returns_new_location_no_path(sns_client, topic_arn, guid):
     resp = send_new_ingest_request(
         sns_client=sns_client,
         topic_arn=topic_arn,
+        ingest_request_id=guid,
         upload_url='s3://example-bukkit/foo/bar.zip',
         callback_url=None
     )
 
     assert isinstance(resp, str)
+
+
+def test_non_s3_bag_url_is_badrequest_error(guid):
+    with pytest.raises(BadRequestError, match='Unrecognised URL scheme'):
+        create_archive_bag_message(
+            guid=guid,
+            bag_url='https://example.org',
+            callback_url=None
+        )
