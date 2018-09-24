@@ -9,7 +9,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 
 class NotificationParsingFlowTest
-  extends FunSpec
+    extends FunSpec
     with Akka
     with Matchers
     with ExtendedPatience
@@ -32,12 +32,14 @@ class NotificationParsingFlowTest
 
         val messages = jsonStrings
           .patch(2, badStrings, 0)
-          .map(body => NotificationMessage(
-            MessageId = "MessageId",
-            TopicArn = "TopicArn",
-            Subject = None,
-            Message = body.toString
-          ))
+          .map(
+            body =>
+              NotificationMessage(
+                MessageId = "MessageId",
+                TopicArn = "TopicArn",
+                Subject = None,
+                Message = body.toString
+            ))
 
         val source = Source(messages)
         val parsingFlow = NotificationParsingFlow[Character]

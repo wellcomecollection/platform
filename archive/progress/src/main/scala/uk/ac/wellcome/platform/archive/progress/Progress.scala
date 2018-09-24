@@ -39,7 +39,9 @@ trait Progress extends Logging {
       .getInstance(classOf[ProgressMonitor])
 
     val progressUpdateFlow = ProgressUpdateAndPublishFlow(
-      snsClient, snsConfig, progressMonitor
+      snsClient,
+      snsConfig,
+      progressMonitor
     )
 
     val parseNotification = NotificationParsingFlow[ProgressUpdate]()
