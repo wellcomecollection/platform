@@ -24,7 +24,7 @@ from platform_alarms import (
     is_critical_error,
     simplify_message
 )
-from snapshot_reports import pprint_timedelta
+from snapshot_reports import get_snapshot_report
 
 
 @attr.s
@@ -147,43 +147,6 @@ def to_bitly(sess, url, access_token):
         return url
 
 
-def get_latest_snapshots():
-    """
-    Try to return a string that describes the latest snapshots.
-    """
-    try:
-        s3 = boto3.client('s3')
-        s3_objects = s3.list_objects(
-            Bucket='wellcomecollection-data-public', #os.environ['SNAPSHOT_BUCKET'],
-            Prefix='catalogue'
-        )
-
-        last_modified_dates = {
-            obj['Key']: obj['LastModified'] for obj in s3_objects['Contents']
-        }
-
-        snapshots = {
-            k: v
-            for k, v in last_modified_dates.items()
-            if k.endswith('/works.json.gz')
-        }
-
-        v1 = last_modified_dates['catalogue/v1/works.json.gz'].replace(tzinfo=None)
-        v2 = last_modified_dates['catalogue/v2/works.json.gz'].replace(tzinfo=None)
-
-        now = dt.datetime.utcnow()
-        v1_diff = now - v1
-        v2_diff = now - v2
-
-        return '\n'.join([
-            f'v1: {pprint_timedelta(v1_diff.seconds)} ago ({v1.isoformat()})',
-            f'v2: {pprint_timedelta(v2_diff.seconds)} ago ({v2.isoformat()})',
-        ])
-
-    except KeyError:
-        return None
-
-
 def prepare_slack_payload(alarm, bitly_access_token, sess=None):
     if is_critical_error(alarm_name=alarm.name):
         slack_data = {
@@ -213,7 +176,7 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
     ]
 
     if alarm.name == 'snapshot_scheduler_queue_not_empty':
-        latest_snapshots_str = get_latest_snapshots()
+        latest_snapshots_str = get_snapshot_report()
         if latest_snapshots_str is not None:
             slack_data['attachments'][0]['fields'].append({
                 'title': 'Latest snapshots',

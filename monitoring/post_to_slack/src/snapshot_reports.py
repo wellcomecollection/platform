@@ -2,6 +2,8 @@
 
 import datetime as dt
 
+import boto3
+
 
 def pprint_timedelta(seconds):
     """
@@ -33,3 +35,28 @@ def pprint_timedelta(seconds):
             return '%dm %ds' % (minutes, seconds)
     else:
         return '%ds' % seconds
+
+
+def get_snapshot_report():
+    """
+    Try to return a string that describes the latest snapshots.
+    """
+    lines = []
+    now = dt.datetime.now()
+
+    s3 = boto3.client('s3')
+
+    for version in ['v1', 'v2']:
+        try:
+            s3_object = s3.head_object(
+                Bucket='wellcomecollection-data-public',
+                Key=f'catalogue/{version}/works.json.gz'
+            )
+
+            last_modified_date = s3_object['LastModified'].replace(tzinfo=None)
+            seconds = (now - last_modified_date).seconds
+            lines.append(
+                f'{version}: {pprint_timedelta(seconds)} ago {last_modified_date.isoformat()}'
+            )
+
+    return '\n'.join(lines)
