@@ -127,23 +127,6 @@ class ProgressMonitorTest
     }
   }
 
-  it("throws if an event is added to progress that does not exist") {
-    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withProgressMonitor(table) { progressMonitor =>
-        val id = UUID.randomUUID().toString
-
-        val update = ProgressUpdate(id, ProgressEvent("Such progress, wow."))
-
-        val result = Try(progressMonitor.update(update))
-        val failedException = result.failed.get
-
-        failedException shouldBe a[IdConstraintError]
-        failedException.getMessage should include(
-          s"Progress does not exist for id:$id")
-      }
-    }
-  }
-
   it("throws if put to dynamo fails during creation") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       val mockDynamoDbClient = mock[AmazonDynamoDB]
