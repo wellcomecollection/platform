@@ -4,6 +4,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.security.MessageDigest
 
 import akka.NotUsed
+import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream._
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Source, StreamConverters, Zip}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
@@ -32,7 +33,6 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
   val in = Inlet[ByteString]("S3UploadFlow.in")
   val out = Outlet[Try[CompleteMultipartUploadResult]]("S3UploadFlow.out")
 
-
   override val shape = FlowShape[ByteString, Try[CompleteMultipartUploadResult]](in, out)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
@@ -40,12 +40,16 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
       private var maybeUploadId: Option[String] = None
       private var partNumber = 1
       private var partEtagList: List[PartETag] = Nil
+      override def preStart(): Unit = {
+        maybeUploadId = None
+        partNumber = 1
+        partEtagList = Nil
+      }
+
       val maxSize = 5 * 1024 * 1024
 
-      override def preStart(): Unit = pull(in)
-
       setHandler(out, new OutHandler {
-        override def onPull(): Unit = ()
+        override def onPull(): Unit = pull(in)
       })
 
       setHandler(
@@ -75,43 +79,60 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           }
 
           override def onUpstreamFailure(ex: Throwable): Unit = {
-            abortUpload
-            completeStage()
+            abortUpload()
+            handleFailure(ex)
           }
         }
       )
 
-      @tailrec
-      private def uploadByteString(byteString: ByteString): Unit = {
-        val (current, next) = byteString.splitAt(maxSize)
-
-        val array = current.toArray
-        val triedUploadResult = Try(
-          s3Client.uploadPart(
-            new UploadPartRequest()
-              .withBucketName(uploadLocation.namespace)
-              .withKey(uploadLocation.key)
-              .withUploadId(getUploadId)
-              .withInputStream(new ByteArrayInputStream(array))
-              .withPartNumber(partNumber)
-              .withPartSize(array.length)
-          ))
-        triedUploadResult match {
-          case Failure(ex) =>
-            abortUpload
-            failStage(ex)
-          case Success(uploadResult) =>
-            partNumber = partNumber + 1
-            partEtagList = partEtagList :+ uploadResult.getPartETag
-            if(next.length > 0) uploadByteString(next)
+      private def handleFailure(ex: Throwable) = {
+        val supervisionStrategy = inheritedAttributes.get[SupervisionStrategy](
+          SupervisionStrategy(_ => Supervision.Stop))
+        supervisionStrategy.decider(ex) match {
+          case Supervision.Stop    => failStage(ex)
+          case Supervision.Resume  => completeStage()
+          case Supervision.Restart => ()
         }
       }
-      private def abortUpload = {
-        Try(s3Client.abortMultipartUpload(
+      @tailrec
+      private def uploadByteString(byteString: ByteString): Unit = {
+        if (byteString.nonEmpty) {
+          val (current, next) = byteString.splitAt(maxSize)
+          info(s"Uploading chunk ${current.size}")
+          val array = current.toArray
+          val triedUploadResult = Try(
+            s3Client.uploadPart(
+              new UploadPartRequest()
+                .withBucketName(uploadLocation.namespace)
+                .withKey(uploadLocation.key)
+                .withUploadId(getUploadId)
+                .withInputStream(new ByteArrayInputStream(array))
+                .withPartNumber(partNumber)
+                .withPartSize(array.length)
+            ))
+          triedUploadResult match {
+            case Failure(ex) =>
+              abortUpload()
+              handleFailure(ex)
+            case Success(uploadResult) =>
+              partNumber = partNumber + 1
+              partEtagList = partEtagList :+ uploadResult.getPartETag
+              info(s"Next chunk of size ${next.size}")
+              uploadByteString(next)
+          }
+        }
+      }
+      private def abortUpload() = {
+        maybeUploadId match {
+          case Some(uploadId) =>
+            Try(
+              s3Client.abortMultipartUpload(
           new AbortMultipartUploadRequest(
             uploadLocation.namespace,
             uploadLocation.key,
-            getUploadId)))
+            uploadId)))
+          case None => ()
+        }
       }
       private def getUploadId = {
       maybeUploadId match {
