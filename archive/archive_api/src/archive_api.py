@@ -46,8 +46,8 @@ def route_request_new_ingest():
 
     try:
         request_data = request.get_json()
-        validateType(request_data['type'])
-        validateIngestType(request_data['ingestType'])
+        validate_type(request_data['type'])
+        validate_ingest_type(request_data['ingestType'])
         upload_url = request_data['uploadUrl']
         callback_url = request_data.get('callbackUrl')
     except BadRequestError:
@@ -55,19 +55,19 @@ def route_request_new_ingest():
     except KeyError as key_error:
         raise BadRequestError(f'No {key_error.args[0]} parameter in request')
     except ValueError as value_error:
-        raise BadRequestError(f'Invalid {value_error} parameter in request')
+        raise BadRequestError(f'{value_error} in request')
 
     # TODO: There is quite a lot of request validation logic which should be moved out
     try:
-        validateUrl(upload_url, allowed_schemes=['s3'], allow_fragment=False)
-    except ValueError:
-        raise BadRequestError(f"Invalid url in uploadUrl: {upload_url}")
+        validate_url(upload_url, supported_schemes=['s3'], allow_fragment=False)
+    except ValueError as error:
+        raise BadRequestError(f"Invalid uploadUrl:{upload_url!r}, {error}")
 
     if callback_url:
         try:
-            validateUrl(callback_url, allowed_schemes=['http', 'https'])
-        except ValueError:
-            raise BadRequestError(f"Invalid url in callbackUrl: {callback_url}")
+            validate_url(callback_url, supported_schemes=['http', 'https'])
+        except ValueError as error:
+            raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
 
     ingest_request_id = str(uuid.uuid4())
     logger.debug('ingest_request_id=%r', ingest_request_id)
@@ -105,24 +105,32 @@ def bad_request_error(error):
     return jsonify(status=400, message=error.description), 400
 
 
-def validateType(type_value):
+def validate_type(type_value):
     if type_value != 'Ingest':
-        raise ValueError(f'type: {type_value}')
+        raise ValueError(f'Expected \'type\'=\'Ingest\', got {type_value!r}')
 
 
-def validateIngestType(ingest_type_value):
-    if ingest_type_value != {'id': 'create', 'type': 'IngestType'}:
-        raise ValueError(f'ingestType: {ingest_type_value}')
+def validate_ingest_type(ingest_type_value):
+    valid_ingest_type = {'id': 'create', 'type': 'IngestType'}
+    if ingest_type_value != valid_ingest_type:
+        raise ValueError(f'Expected \'ingestType\'={valid_ingest_type!r}, got {ingest_type_value!r}')
 
 
-def validateUrl(url, allowed_schemes=None, allow_fragment=True):
+def validate_url(url, supported_schemes=None, allow_fragment=True):
     """
     Validates the passed string is a URL, optionally checking against allowed schemes and
     whether a fragment is allowed
     """
     parsed_url = urlparse(url)
-    invalid = any(not p for p in [parsed_url.scheme, parsed_url.netloc, parsed_url.path])
-    invalid = invalid or (allowed_schemes and parsed_url.scheme not in allowed_schemes)
-    invalid = invalid or (not allow_fragment and bool(parsed_url.fragment))
-    if invalid:
-        raise ValueError(f"Invalid url:{url}")
+    incomplete_url = any(not p for p in [parsed_url.scheme, parsed_url.netloc])
+    invalid_scheme = (supported_schemes and parsed_url.scheme not in supported_schemes)
+    unallowed_fragment = (not allow_fragment and bool(parsed_url.fragment))
+    if incomplete_url or invalid_scheme or unallowed_fragment:
+        errors = []
+        if incomplete_url:
+            errors.append(f'is not a complete url')
+        if invalid_scheme:
+            errors.append(f'{parsed_url.scheme!r} is not one of the supported schemes ({supported_schemes!r})')
+        if unallowed_fragment:
+            errors.append(f'{parsed_url.fragment!r} fragment is not supported')
+        raise ValueError(','.join(errors))

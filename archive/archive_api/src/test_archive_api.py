@@ -49,7 +49,7 @@ class TestRequestNewIngest:
     def test_invalid_type_is_badrequest(self, client):
         resp = client.post(f'/ingests', json={'type': 'UnexpectedType'})
         assert resp.status_code == 400
-        assert b'Invalid type: UnexpectedType parameter' in resp.data
+        assert b"Expected 'type'='Ingest', got 'UnexpectedType' in request" in resp.data
 
     def test_no_ingest_type_is_badrequest(self, client):
         resp = client.post(f'/ingests', json={'type': 'Ingest'})
@@ -60,7 +60,9 @@ class TestRequestNewIngest:
         resp = client.post(f'/ingests', json={'type': 'Ingest',
                                               'ingestType': {'type': 'UnexpectedIngestType'}})
         assert resp.status_code == 400
-        assert b"Invalid ingestType: {'type': 'UnexpectedIngestType'} parameter" in resp.data
+        assert b"Expected 'ingestType'={'id': 'create', 'type': 'IngestType'}," \
+               b" got {'type': 'UnexpectedIngestType'} in request" \
+               in resp.data
 
     def test_no_uploadurl_is_badrequest(self, client):
         resp = client.post(f'/ingests', json=ingests_post())
@@ -70,27 +72,27 @@ class TestRequestNewIngest:
     def test_invalid_uploadurl_is_badrequest(self, client):
         resp = client.post(f'/ingests', json=ingests_post('not-a-url'))
         assert resp.status_code == 400
-        assert b"Invalid url in uploadUrl: not-a-url" in resp.data
+        assert b"Invalid uploadUrl:'not-a-url', is not a complete url" in resp.data
 
     def test_invalid_scheme_uploadurl_is_badrequest(self, client):
         resp = client.post(f'/ingests', json=ingests_post('ftp://example-bukkit/helloworld.zip'))
         assert resp.status_code == 400
-        assert b"Invalid url in uploadUrl: ftp://example-bukkit/helloworld.zip" in resp.data
+        assert b"Invalid uploadUrl:'ftp://example-bukkit/helloworld.zip', 'ftp' is not one of the supported schemes (['s3'])" in resp.data
 
     def test_uploadurl_with_fragments_is_badrequest(self, client):
         resp = client.post(f'/ingests', json=ingests_post('s3://example-bukkit/helloworld.zip#fragment'))
         assert resp.status_code == 400
-        assert b"Invalid url in uploadUrl: s3://example-bukkit/helloworld.zip#fragment" in resp.data
+        assert b"Invalid uploadUrl:'s3://example-bukkit/helloworld.zip#fragment', 'fragment' fragment is not supported" in resp.data
 
     def test_invalid_callback_url_is_badrequest(self, client):
         resp = client.post(f'/ingests', json=ingests_post(self.upload_url, 'not-a-url'))
         assert resp.status_code == 400
-        assert b"Invalid url in callbackUrl: not-a-url" in resp.data
+        assert b"Invalid callbackUrl:'not-a-url', is not a complete url" in resp.data
 
     def test_invalid_scheme_callback_url_is_badrequest(self, client):
         resp = client.post(f'/ingests', json=ingests_post(self.upload_url, 's3://example.com'))
         assert resp.status_code == 400
-        assert b"Invalid url in callbackUrl: s3://example.com" in resp.data
+        assert b"Invalid callbackUrl:'s3://example.com', 's3' is not one of the supported schemes (['http', 'https'])" in resp.data
 
     def test_request_allows_fragment_in_callback(self, client):
         resp = client.post(f'/ingests', json=ingests_post(self.upload_url, f'{self.callback_url}#fragment'))
