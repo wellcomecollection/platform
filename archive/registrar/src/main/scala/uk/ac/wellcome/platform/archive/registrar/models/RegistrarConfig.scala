@@ -7,13 +7,12 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
 import uk.ac.wellcome.platform.archive.registrar.modules.HybridStoreConfig
 
-case class RegistrarConfig(
-                            s3ClientConfig: S3ClientConfig,
-                            cloudwatchClientConfig: CloudwatchClientConfig,
-                            sqsClientConfig: SQSClientConfig,
-                            sqsConfig: SQSConfig,
-                            snsClientConfig: SnsClientConfig,
-                            snsConfig: SNSConfig,
-                            hybridStoreConfig: HybridStoreConfig,
-                            archiveProgressMonitorConfig: ProgressMonitorConfig,
-                            metricsConfig: MetricsConfig)
+case class RegistrarConfig(s3ClientConfig: S3ClientConfig,
+                           cloudwatchClientConfig: CloudwatchClientConfig,
+                           sqsClientConfig: SQSClientConfig,
+                           sqsConfig: SQSConfig,
+                           snsClientConfig: SnsClientConfig,
+                           snsConfig: SNSConfig,
+                           hybridStoreConfig: HybridStoreConfig,
+                           archiveProgressMonitorConfig: ProgressMonitorConfig,
+                           metricsConfig: MetricsConfig)
