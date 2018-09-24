@@ -7,7 +7,7 @@ import uuid
 import daiquiri
 from flask import Flask
 from flask_restplus import Api, Resource, fields
-from flask import jsonify, make_response, request, url_for
+from flask import jsonify, make_response, request
 from werkzeug.exceptions import BadRequest as BadRequestError
 
 from report_ingest_status import report_ingest_status
