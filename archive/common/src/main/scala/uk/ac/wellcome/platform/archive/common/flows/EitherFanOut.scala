@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.common.flows
 import akka.stream.FanOutShape2
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL}
 
-object EitherFanOutFlow {
+object EitherFanOut {
   def apply[L, R]() = {
     GraphDSL.create[FanOutShape2[Either[L, R], L, R]]() { implicit builder =>
       import GraphDSL.Implicits._

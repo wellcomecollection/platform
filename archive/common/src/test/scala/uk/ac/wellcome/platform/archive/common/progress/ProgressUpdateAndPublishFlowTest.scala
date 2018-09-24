@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
 import akka.stream.scaladsl.{Sink, Source}
+import com.amazonaws.services.sns.model.PublishResult
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -9,11 +10,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateAndPublishFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -60,10 +57,8 @@ class ProgressUpdateAndPublishFlowTest
                 .async
                 .runWith(Sink.head)(materializer)
 
-              whenReady(eventualResult) {
-                result =>
-                  result.isRight shouldBe true
-                  result.right.get shouldBe update
+              whenReady(eventualResult) { result =>
+                  result shouldBe a[PublishResult]
 
                   assertSnsReceivesOnly(expectedProgress, topic)
 
