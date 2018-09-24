@@ -36,7 +36,7 @@ class TestRequestNewIngest:
 
     def test_request_new_ingest_is_202(self, client):
         resp = client.post(
-            f'/ingests',
+            '/ingests',
             json=ingests_post(self.upload_url))
         assert resp.status_code == 202
         assert resp.data == b''
@@ -44,30 +44,28 @@ class TestRequestNewIngest:
     def test_no_type_is_badrequest(self, client):
         resp = client.post(f'/ingests', json={})
         assert resp.status_code == 400
-        assert b'No type parameter' in resp.data
+        assert b"'type' is a required property" in resp.data
 
     def test_invalid_type_is_badrequest(self, client):
         resp = client.post(f'/ingests', json={'type': 'UnexpectedType'})
         assert resp.status_code == 400
-        assert b"Expected 'type'='Ingest', got 'UnexpectedType' in request" in resp.data
+        assert b"'UnexpectedType' is not one of ['Ingest']" in resp.data
 
     def test_no_ingest_type_is_badrequest(self, client):
         resp = client.post(f'/ingests', json={'type': 'Ingest'})
         assert resp.status_code == 400
-        assert b'No ingestType parameter' in resp.data
+        assert b"'ingestType' is a required property" in resp.data
 
     def test_invalid_ingest_type_is_badrequest(self, client):
         resp = client.post(f'/ingests', json={'type': 'Ingest',
                                               'ingestType': {'type': 'UnexpectedIngestType'}})
         assert resp.status_code == 400
-        assert b"Expected 'ingestType'={'id': 'create', 'type': 'IngestType'}," \
-               b" got {'type': 'UnexpectedIngestType'} in request" \
-               in resp.data
+        assert b"'UnexpectedIngestType' is not one of ['IngestType']" in resp.data
 
     def test_no_uploadurl_is_badrequest(self, client):
         resp = client.post(f'/ingests', json=ingests_post())
         assert resp.status_code == 400
-        assert b'No uploadUrl parameter' in resp.data
+        assert b"'uploadUrl' is a required property" in resp.data
 
     def test_invalid_uploadurl_is_badrequest(self, client):
         resp = client.post(f'/ingests', json=ingests_post('not-a-url'))
@@ -151,19 +149,11 @@ class TestRequestNewIngest:
 
     def test_request_not_json_is_badrequest(self, client):
         resp = client.post(
-            f'/ingests',
-            data="not-json",
+            '/ingests',
+            data="notjson",
             headers={'Content-Type': 'application/json'})
         assert resp.status_code == 400
-        assert b'Invalid json in request' in resp.data
-
-    def test_request_not_json_content_type_is_badrequest(self, client):
-        resp = client.post(
-            f'/ingests',
-            data=json.dumps({'uploadUrl': self.upload_url}),
-            headers={'Content-Type': 'text/plain'})
-        assert resp.status_code == 400
-        assert b'Mimetype expected to be application/json' in resp.data
+        assert b'The browser (or proxy) sent a request that this server could not understand' in resp.data
 
 
 class TestReportHealthStatus:

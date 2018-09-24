@@ -38,7 +38,7 @@ ingest_request_model = api.model('Ingest request', {
     'ingestType': fields.Nested(api.model('Ingest type', {
         'type': fields.String(description='Type of the object', enum=['IngestType'], required=True),
         'id': fields.String(description='identifier for ingest type', enum=['create'], required=True),
-    }))
+    }), required=True)
 })
 
 error_model = api.model('Error', {
@@ -58,17 +58,7 @@ class IngestCollection(Resource):
     def post(self):
         upload_url = request.json['uploadUrl']
         callback_url = request.json.get('callbackUrl')
-
-        try:
-            validate_url(upload_url, supported_schemes=['s3'], allow_fragment=False)
-        except ValueError as error:
-            raise BadRequestError(f"Invalid uploadUrl:{upload_url!r}, {error}")
-
-        if callback_url:
-            try:
-                validate_url(callback_url, supported_schemes=['http', 'https'])
-            except ValueError as error:
-                raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
+        self.validate_urls(callback_url, upload_url)
 
         ingest_request_id = str(uuid.uuid4())
         logger.debug('ingest_request_id=%r', ingest_request_id)
@@ -88,9 +78,9 @@ class IngestCollection(Resource):
 
         # Construct the URL where the user will be able to get the status
         # of their ingest request.
-        location = url_for(
-            'route_report_ingest_status',
-            guid=ingest_request_id
+        location = api.url_for(
+            IngestResource,
+            id=ingest_request_id
         )
 
         # Now we set the Location response header.  There's no way to do this
@@ -99,6 +89,17 @@ class IngestCollection(Resource):
         resp = make_response('', 202)
         resp.headers['Location'] = location
         return resp
+
+    def validate_urls(self, callback_url, upload_url):
+        try:
+            validate_url(upload_url, supported_schemes=['s3'], allow_fragment=False)
+        except ValueError as error:
+            raise BadRequestError(f"Invalid uploadUrl:{upload_url!r}, {error}")
+        if callback_url:
+            try:
+                validate_url(callback_url, supported_schemes=['http', 'https'])
+            except ValueError as error:
+                raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
 
 
 @ns.route('/<id>')
@@ -130,7 +131,10 @@ def default_error_handler(error):
         'type': 'Error',
     }
     if error_response['httpStatus'] != 500:
-        error_response['description'] = getattr(error, 'description', str(error))
+        if hasattr(error, 'data'):
+            error_response['description'] = ', '.join(error.data.get('errors', {}).values())
+        else:
+            error_response['description'] = getattr(error, 'description', str(error))
     return jsonify(error_response), error_response['httpStatus']
 
 
