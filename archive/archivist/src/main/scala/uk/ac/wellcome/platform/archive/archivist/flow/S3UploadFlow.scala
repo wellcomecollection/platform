@@ -27,13 +27,13 @@ object S3UploadFlow extends Logging{
 }
 
 class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
-  extends GraphStage[FlowShape[ByteString, Try[CompleteMultipartUploadResult]]]
+  extends GraphStage[FlowShape[ByteString, CompleteMultipartUploadResult]]
     with Logging {
 
   val in = Inlet[ByteString]("S3UploadFlow.in")
-  val out = Outlet[Try[CompleteMultipartUploadResult]]("S3UploadFlow.out")
+  val out = Outlet[CompleteMultipartUploadResult]("S3UploadFlow.out")
 
-  override val shape = FlowShape[ByteString, Try[CompleteMultipartUploadResult]](in, out)
+  override val shape = FlowShape[ByteString, CompleteMultipartUploadResult](in, out)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
@@ -70,8 +70,10 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
                     uploadId,
                     partEtagList.asJava)
                 val res = Try(s3Client.completeMultipartUpload(compRequest))
-
-                push(out, res)
+                res match {
+                  case Success(result) => push(out, result)
+                  case Failure(ex) => handleFailure(ex)
+                }
               case None => ()
             }
 
@@ -79,13 +81,13 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           }
 
           override def onUpstreamFailure(ex: Throwable): Unit = {
-            abortUpload()
             handleFailure(ex)
           }
         }
       )
 
       private def handleFailure(ex: Throwable) = {
+        abortUpload()
         val supervisionStrategy = inheritedAttributes.get[SupervisionStrategy](
           SupervisionStrategy(_ => Supervision.Stop))
         supervisionStrategy.decider(ex) match {
@@ -98,7 +100,6 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
       private def uploadByteString(byteString: ByteString): Unit = {
         if (byteString.nonEmpty) {
           val (current, next) = byteString.splitAt(maxSize)
-          info(s"Uploading chunk ${current.size}")
           val array = current.toArray
           val triedUploadResult = Try(
             s3Client.uploadPart(
@@ -112,12 +113,10 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
             ))
           triedUploadResult match {
             case Failure(ex) =>
-              abortUpload()
               handleFailure(ex)
             case Success(uploadResult) =>
               partNumber = partNumber + 1
               partEtagList = partEtagList :+ uploadResult.getPartETag
-              info(s"Next chunk of size ${next.size}")
               uploadByteString(next)
           }
         }
