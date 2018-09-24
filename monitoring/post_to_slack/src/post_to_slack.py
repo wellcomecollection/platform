@@ -146,6 +146,58 @@ def to_bitly(sess, url, access_token):
         return url
 
 
+def pretty_time_delta(seconds):
+    seconds = int(seconds)
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    if days > 0:
+        return '%dd %dh %dm %ds' % (days, hours, minutes, seconds)
+    elif hours > 0:
+        return '%dh %dm %ds' % (hours, minutes, seconds)
+    elif minutes > 0:
+        return '%dm %ds' % (minutes, seconds)
+    else:
+        return '%ds' % (seconds,)
+
+
+def get_latest_snapshots():
+    """
+    Try to return a string that describes the latest snapshots.
+    """
+    try:
+        s3 = boto3.client('s3')
+        s3_objects = s3.list_objects(
+            Bucket='wellcomecollection-data-public', #os.environ['SNAPSHOT_BUCKET'],
+            Prefix='catalogue'
+        )
+
+        last_modified_dates = {
+            obj['Key']: obj['LastModified'] for obj in s3_objects['Contents']
+        }
+
+        snapshots = {
+            k: v
+            for k, v in last_modified_dates.items()
+            if k.endswith('/works.json.gz')
+        }
+
+        v1 = last_modified_dates['catalogue/v1/works.json.gz'].replace(tzinfo=None)
+        v2 = last_modified_dates['catalogue/v2/works.json.gz'].replace(tzinfo=None)
+
+        now = dt.datetime.utcnow()
+        v1_diff = now - v1
+        v2_diff = now - v2
+
+        return '\n'.join([
+            f'v1: {pretty_time_delta(v1_diff.seconds)} ago ({v1.isoformat()})',
+            f'v2: {pretty_time_delta(v2_diff.seconds)} ago ({v2.isoformat()})',
+        ])
+
+    except KeyError:
+        return None
+
+
 def prepare_slack_payload(alarm, bitly_access_token, sess=None):
     if is_critical_error(alarm_name=alarm.name):
         slack_data = {
@@ -174,7 +226,13 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
         }
     ]
 
-    print(alarm)
+    if alarm.name == 'snapshot_scheduler_queue_not_empty':
+        latest_snapshots_str = get_latest_snapshots()
+        if latest_snapshots_str is not None:
+            slack_data['attachments'][0]['fields'].append({
+                'title': 'Latest snapshots',
+                'value': latest_snapshots_str
+            })
 
     messages = alarm.cloudwatch_messages()
     if messages:
