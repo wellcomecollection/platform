@@ -24,6 +24,7 @@ from platform_alarms import (
     is_critical_error,
     simplify_message
 )
+from snapshot_reports import pprint_timedelta
 
 
 @attr.s
@@ -146,21 +147,6 @@ def to_bitly(sess, url, access_token):
         return url
 
 
-def pretty_time_delta(seconds):
-    seconds = int(seconds)
-    days, seconds = divmod(seconds, 86400)
-    hours, seconds = divmod(seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-    if days > 0:
-        return '%dd %dh %dm %ds' % (days, hours, minutes, seconds)
-    elif hours > 0:
-        return '%dh %dm %ds' % (hours, minutes, seconds)
-    elif minutes > 0:
-        return '%dm %ds' % (minutes, seconds)
-    else:
-        return '%ds' % (seconds,)
-
-
 def get_latest_snapshots():
     """
     Try to return a string that describes the latest snapshots.
@@ -190,8 +176,8 @@ def get_latest_snapshots():
         v2_diff = now - v2
 
         return '\n'.join([
-            f'v1: {pretty_time_delta(v1_diff.seconds)} ago ({v1.isoformat()})',
-            f'v2: {pretty_time_delta(v2_diff.seconds)} ago ({v2.isoformat()})',
+            f'v1: {pprint_timedelta(v1_diff.seconds)} ago ({v1.isoformat()})',
+            f'v2: {pprint_timedelta(v2_diff.seconds)} ago ({v2.isoformat()})',
         ])
 
     except KeyError:
