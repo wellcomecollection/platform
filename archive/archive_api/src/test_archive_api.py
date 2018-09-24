@@ -42,62 +42,62 @@ class TestRequestNewIngest:
         assert resp.data == b''
 
     def test_no_type_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json={})
+        resp = client.post('/ingests', json={})
         assert resp.status_code == 400
         assert b"'type' is a required property" in resp.data
 
     def test_invalid_type_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json={'type': 'UnexpectedType'})
+        resp = client.post('/ingests', json={'type': 'UnexpectedType'})
         assert resp.status_code == 400
         assert b"'UnexpectedType' is not one of ['Ingest']" in resp.data
 
     def test_no_ingest_type_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json={'type': 'Ingest'})
+        resp = client.post('/ingests', json={'type': 'Ingest'})
         assert resp.status_code == 400
         assert b"'ingestType' is a required property" in resp.data
 
     def test_invalid_ingest_type_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json={'type': 'Ingest',
+        resp = client.post('/ingests', json={'type': 'Ingest',
                                               'ingestType': {'type': 'UnexpectedIngestType'}})
         assert resp.status_code == 400
         assert b"'UnexpectedIngestType' is not one of ['IngestType']" in resp.data
 
     def test_no_uploadurl_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json=ingests_post())
+        resp = client.post('/ingests', json=ingests_post())
         assert resp.status_code == 400
         assert b"'uploadUrl' is a required property" in resp.data
 
     def test_invalid_uploadurl_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json=ingests_post('not-a-url'))
+        resp = client.post('/ingests', json=ingests_post('not-a-url'))
         assert resp.status_code == 400
         assert b"Invalid uploadUrl:'not-a-url', is not a complete url" in resp.data
 
     def test_invalid_scheme_uploadurl_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json=ingests_post('ftp://example-bukkit/helloworld.zip'))
+        resp = client.post('/ingests', json=ingests_post('ftp://example-bukkit/helloworld.zip'))
         assert resp.status_code == 400
         assert b"Invalid uploadUrl:'ftp://example-bukkit/helloworld.zip', 'ftp' is not one of the supported schemes (['s3'])" in resp.data
 
     def test_uploadurl_with_fragments_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json=ingests_post('s3://example-bukkit/helloworld.zip#fragment'))
+        resp = client.post('/ingests', json=ingests_post('s3://example-bukkit/helloworld.zip#fragment'))
         assert resp.status_code == 400
         assert b"Invalid uploadUrl:'s3://example-bukkit/helloworld.zip#fragment', 'fragment' fragment is not supported" in resp.data
 
     def test_invalid_callback_url_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json=ingests_post(self.upload_url, 'not-a-url'))
+        resp = client.post('/ingests', json=ingests_post(self.upload_url, 'not-a-url'))
         assert resp.status_code == 400
         assert b"Invalid callbackUrl:'not-a-url', is not a complete url" in resp.data
 
     def test_invalid_scheme_callback_url_is_badrequest(self, client):
-        resp = client.post(f'/ingests', json=ingests_post(self.upload_url, 's3://example.com'))
+        resp = client.post('/ingests', json=ingests_post(self.upload_url, 's3://example.com'))
         assert resp.status_code == 400
         assert b"Invalid callbackUrl:'s3://example.com', 's3' is not one of the supported schemes (['http', 'https'])" in resp.data
 
     def test_request_allows_fragment_in_callback(self, client):
-        resp = client.post(f'/ingests', json=ingests_post(self.upload_url, f'{self.callback_url}#fragment'))
+        resp = client.post('/ingests', json=ingests_post(self.upload_url, f'{self.callback_url}#fragment'))
         assert resp.status_code == 202
 
     def test_request_new_ingest_has_location_header(self, client):
-        resp = client.post(f'/ingests', json=ingests_post(self.upload_url))
+        resp = client.post('/ingests', json=ingests_post(self.upload_url))
         assert 'Location' in resp.headers
 
         # TODO: This might need revisiting when we deploy the app behind
@@ -105,7 +105,7 @@ class TestRequestNewIngest:
         assert resp.headers['Location'].startswith('http://localhost/ingests/')
 
     def test_successful_request_sends_to_sns(self, client, sns_client):
-        resp = client.post(f'/ingests', json=ingests_post(self.upload_url))
+        resp = client.post('/ingests', json=ingests_post(self.upload_url))
 
         sns_messages = sns_client.list_messages()
         assert len(sns_messages) == 1
@@ -121,7 +121,7 @@ class TestRequestNewIngest:
         assert resp.headers['Location'].endswith(message['archiveRequestId'])
 
     def test_successful_request_sends_to_sns_with_callback(self, client, sns_client):
-        client.post(f'/ingests', json=ingests_post(self.upload_url, self.callback_url))
+        client.post('/ingests', json=ingests_post(self.upload_url, self.callback_url))
 
         sns_messages = sns_client.list_messages()
         assert len(sns_messages) == 1
@@ -131,7 +131,7 @@ class TestRequestNewIngest:
         assert message['callbackUrl'] == self.callback_url
 
     def test_successful_request_creates_progress(self, client, dynamodb_resource, table_name):
-        response = client.post(f'/ingests', json=ingests_post(self.upload_url, self.callback_url))
+        response = client.post('/ingests', json=ingests_post(self.upload_url, self.callback_url))
 
         assert 'Location' in response.headers
         request_id = response.headers['Location'].split('/')[-1]
