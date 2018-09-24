@@ -12,7 +12,7 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
 import uk.ac.wellcome.platform.archive.common.progress.models.{
-  FailedProgressUpdate,
+  FailedEvent,
   Progress,
   ProgressUpdate
 }
@@ -44,7 +44,7 @@ trait ProgressMonitorFixture
   def withProgressUpdateFlow[R](table: Table)(
     testWith: TestWith[(
                          Flow[ProgressUpdate,
-                              Either[FailedProgressUpdate, ProgressUpdate],
+                              Either[FailedEvent[ProgressUpdate], Progress],
                               NotUsed],
                          ProgressMonitor
                        ),
@@ -63,9 +63,9 @@ trait ProgressMonitorFixture
     testWith(progressMonitor)
   }
 
-  def givenProgressCreatedWith(uploadUrl: String,
-                               callbackUrl: String,
-                               progressMonitor: ProgressMonitor): Progress = {
+  def createProgress(uploadUrl: String,
+                     callbackUrl: String,
+                     progressMonitor: ProgressMonitor): Progress = {
     val id = UUID.randomUUID().toString
 
     progressMonitor.create(

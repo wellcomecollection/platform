@@ -7,7 +7,10 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  ProgressEvent,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -29,12 +32,12 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
               val progress =
-                givenProgressCreatedWith(uploadUrl, callbackUrl, monitor)
+                createProgress(uploadUrl, callbackUrl, monitor)
 
-              val progressUpdate = ProgressUpdate(progress.id, "Wow.")
+              val update = ProgressUpdate(progress.id, ProgressEvent("Wow."))
 
               val updates = Source
-                .single(progressUpdate)
+                .single(update)
                 .via(flow)
                 .async
                 .runWith(Sink.ignore)(materializer)
@@ -46,8 +49,8 @@ class ProgressUpdateFlowTest
                   Some(callbackUrl),
                   table = table)
                 assertProgressRecordedRecentEvents(
-                  progressUpdate.id,
-                  Seq(progressUpdate.description),
+                  update.id,
+                  Seq(update.event.description),
                   table)
               }
             })
@@ -63,15 +66,17 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
 
-              val progress = givenProgressCreatedWith(
+              val progress = createProgress(
                 uploadUrl,
                 callbackUrl,
                 monitor
               )
 
               val events = List(
-                ProgressUpdate(progress.id, "It happened again."),
-                ProgressUpdate(progress.id, "Dammit Bobby.")
+                ProgressUpdate(
+                  progress.id,
+                  ProgressEvent("It happened again.")),
+                ProgressUpdate(progress.id, ProgressEvent("Dammit Bobby."))
               )
 
               val updates = Source
@@ -88,7 +93,7 @@ class ProgressUpdateFlowTest
                   table = table)
                 assertProgressRecordedRecentEvents(
                   progress.id,
-                  events.map(_.description),
+                  events.map(_.event.description),
                   table)
               }
             })
@@ -105,10 +110,11 @@ class ProgressUpdateFlowTest
             withMaterializer(actorSystem)(materializer => {
               val id = UUID.randomUUID().toString
 
-              val progressUpdate = ProgressUpdate(id, "Such progress, wow.")
+              val update =
+                ProgressUpdate(id, ProgressEvent("Such progress, wow."))
 
               val updates = Source
-                .single(progressUpdate)
+                .single(update)
                 .via(flow)
                 .async
                 .runWith(Sink.head)(materializer)

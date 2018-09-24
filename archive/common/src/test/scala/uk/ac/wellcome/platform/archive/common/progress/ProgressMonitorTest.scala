@@ -15,6 +15,7 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
+  ProgressEvent,
   ProgressUpdate
 }
 import uk.ac.wellcome.platform.archive.common.progress.monitor.{
@@ -53,12 +54,13 @@ class ProgressMonitorTest
   it("adds an event to a monitor with none") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressMonitor(table) { archiveProgressMonitor =>
-        val progress = givenProgressCreatedWith(
-          uploadUrl,
-          callbackUrl,
-          archiveProgressMonitor)
+        val progress =
+          createProgress(uploadUrl, callbackUrl, archiveProgressMonitor)
 
-        val progressUpdate = ProgressUpdate(progress.id, "So that happened.")
+        val progressUpdate = ProgressUpdate(
+          progress.id,
+          ProgressEvent("So that happened.")
+        )
 
         archiveProgressMonitor.update(progressUpdate)
 
@@ -69,7 +71,7 @@ class ProgressMonitorTest
           table = table)
         assertProgressRecordedRecentEvents(
           progressUpdate.id,
-          Seq(progressUpdate.description),
+          Seq(progressUpdate.event.description),
           table)
 
       }
@@ -79,15 +81,21 @@ class ProgressMonitorTest
   it("adds multiple events to a monitor") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressMonitor(table) { monitor: ProgressMonitor =>
-        val progress = givenProgressCreatedWith(
+        val progress = createProgress(
           uploadUrl,
           callbackUrl,
           monitor
         )
 
         val updates = List(
-          ProgressUpdate(progress.id, "It happened again."),
-          ProgressUpdate(progress.id, "Dammit Bobby.")
+          ProgressUpdate(
+            progress.id,
+            ProgressEvent("It happened again.")
+          ),
+          ProgressUpdate(
+            progress.id,
+            ProgressEvent("Dammit Bobby.")
+          )
         )
 
         updates.map(monitor.update)
@@ -99,7 +107,7 @@ class ProgressMonitorTest
           table = table)
         assertProgressRecordedRecentEvents(
           progress.id,
-          updates.map(_.description),
+          updates.map(_.event.description),
           table)
       }
     }
@@ -128,29 +136,13 @@ class ProgressMonitorTest
     }
   }
 
-  it("throws if an event is added to progress that does not exist") {
-    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-      withProgressMonitor(table) { progressMonitor =>
-        val id = UUID.randomUUID().toString
-
-        val update = ProgressUpdate(id, "Such progress, wow.")
-
-        val result = Try(progressMonitor.update(update))
-        val failedException = result.failed.get
-
-        failedException shouldBe a[IdConstraintError]
-        failedException.getMessage should include(
-          s"Progress does not exist for id:$id")
-      }
-    }
-  }
-
   it("throws if put to dynamo fails during creation") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       val mockDynamoDbClient = mock[AmazonDynamoDB]
       val expectedException = new RuntimeException("root cause")
       when(mockDynamoDbClient.putItem(any[PutItemRequest]))
         .thenThrow(expectedException)
+
       val archiveProgressMonitor = new ProgressMonitor(
         mockDynamoDbClient,
         DynamoConfig(table = table.name, index = table.index)
@@ -181,7 +173,7 @@ class ProgressMonitorTest
 
       val id = UUID.randomUUID().toString
 
-      val update = ProgressUpdate(id, "Too much winning.")
+      val update = ProgressUpdate(id, ProgressEvent("Too much winning."))
 
       val result = Try(archiveProgressMonitor.update(update))
 
