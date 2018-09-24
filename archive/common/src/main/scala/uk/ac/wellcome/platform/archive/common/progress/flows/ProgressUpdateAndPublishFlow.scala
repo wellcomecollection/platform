@@ -6,8 +6,15 @@ import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge, Zip}
 import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.flows.{EitherFanOutFlow, SnsPublishFlow}
-import uk.ac.wellcome.platform.archive.common.progress.models.{FailedEvent, Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.flows.{
+  EitherFanOutFlow,
+  SnsPublishFlow
+}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  FailedEvent,
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 
 object ProgressUpdateAndPublishFlow {
@@ -16,10 +23,12 @@ object ProgressUpdateAndPublishFlow {
   type FailedPublish = FailedEvent[Progress]
 
   def apply(
-             snsClient: AmazonSNS,
-             snsConfig: SNSConfig,
-             progressMonitor: ProgressMonitor
-           ): Flow[ProgressUpdate, Either[FailedEvent[ProgressUpdate], ProgressUpdate], NotUsed] = {
+    snsClient: AmazonSNS,
+    snsConfig: SNSConfig,
+    progressMonitor: ProgressMonitor
+  ): Flow[ProgressUpdate,
+          Either[FailedEvent[ProgressUpdate], ProgressUpdate],
+          NotUsed] = {
 
     val progressUpdateFlow = ProgressUpdateFlow(progressMonitor)
     val publishFlow = SnsPublishFlow[Progress](snsClient, snsConfig)
@@ -27,7 +36,7 @@ object ProgressUpdateAndPublishFlow {
 
     val eitherEventFlow = Flow[(Option[Throwable], ProgressUpdate)].map {
       case (Some(e), t) => Left(FailedEvent(e, t))
-      case (None, t) => Right(t)
+      case (None, t)    => Right(t)
     }
 
     val wrapFailedUpdate = Flow[FailedUpdate].map(failedUpdate => {

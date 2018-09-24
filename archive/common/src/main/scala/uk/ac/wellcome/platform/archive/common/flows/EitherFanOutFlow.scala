@@ -6,7 +6,6 @@ import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL}
 object EitherFanOutFlow {
   def apply[L, R]() = {
     GraphDSL.create[FanOutShape2[Either[L, R], L, R]]() { implicit builder =>
-
       import GraphDSL.Implicits._
 
       val either = builder.add(Flow[Either[L, R]])
@@ -14,7 +13,7 @@ object EitherFanOutFlow {
 
       either ~> broadcast
 
-      val left = builder.add(Flow[Either[L, R]].collect { case Left(l) => l })
+      val left = builder.add(Flow[Either[L, R]].collect { case Left(l)   => l })
       val right = builder.add(Flow[Either[L, R]].collect { case Right(r) => r })
 
       broadcast ~> left

@@ -9,13 +9,16 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateAndPublishFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
 class ProgressUpdateAndPublishFlowTest
-
-  extends FunSpec
+    extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with Akka
@@ -57,30 +60,30 @@ class ProgressUpdateAndPublishFlowTest
                 .async
                 .runWith(Sink.head)(materializer)
 
-              whenReady(eventualResult) { result =>
+              whenReady(eventualResult) {
+                result =>
+                  result.isRight shouldBe true
+                  result.right.get shouldBe update
 
-                result.isRight shouldBe true
-                result.right.get shouldBe update
+                  assertSnsReceivesOnly(expectedProgress, topic)
 
-                assertSnsReceivesOnly(expectedProgress, topic)
+                  assertProgressCreated(
+                    progress.id,
+                    uploadUrl,
+                    Some(callbackUrl),
+                    table = table)
 
-                assertProgressCreated(
-                  progress.id,
-                  uploadUrl,
-                  Some(callbackUrl),
-                  table = table)
+                  assertProgressRecordedRecentEvents(
+                    progress.id,
+                    Seq(update.event.description),
+                    table
+                  )
 
-                assertProgressRecordedRecentEvents(
-                  progress.id,
-                  Seq(update.event.description),
-                  table
-                )
-
-                assertProgressStatus(
-                  progress.id,
-                  status,
-                  table
-                )
+                  assertProgressStatus(
+                    progress.id,
+                    status,
+                    table
+                  )
 
               }
             })

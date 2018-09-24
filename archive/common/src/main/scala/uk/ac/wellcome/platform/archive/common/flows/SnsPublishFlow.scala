@@ -15,9 +15,10 @@ import scala.util.Try
 object SnsPublishFlow extends Logging {
 
   def apply[T](
-                   snsClient: AmazonSNS, snsConfig: SNSConfig,
-                   subject: String = ""
-                 )(implicit encode: Encoder[T]) = {
+    snsClient: AmazonSNS,
+    snsConfig: SNSConfig,
+    subject: String = ""
+  )(implicit encode: Encoder[T]) = {
 
     def toPublishRequest(message: String) =
       new PublishRequest(snsConfig.topicArn, message, subject)
@@ -32,7 +33,7 @@ object SnsPublishFlow extends Logging {
 
     val eitherEventFlow = Flow[(Option[Throwable], T)].map {
       case (Some(e), t) => Left(FailedEvent(e, t))
-      case (None, t) => Right(t)
+      case (None, t)    => Right(t)
     }
 
     Flow.fromGraph(GraphDSL.create() { implicit builder =>
