@@ -138,3 +138,30 @@ resource "aws_iam_role_policy" "lambda_archive_request_ingest_archive_progress_t
   role   = "${module.lambda_archive_request_ingest.role_name}"
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
+
+# Bagger
+
+resource "aws_iam_role_policy" "bagger_task_get_s3" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.bagger_get.json}"
+}
+
+resource "aws_iam_role_policy" "bagger_task_put_s3" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.bagger_store.json}"
+}
+
+resource "aws_iam_role_policy" "bagger_task_sqs" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.read_from_bagger_queue.json}"
+}
+
+resource "aws_iam_role_policy" "bagger_task_get_s3_dlcs" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.bagger_get_dlcs.json}"
+}
+
+resource "aws_iam_role_policy" "bagger_task_get_s3_preservica" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.bagger_get_preservica.json}"
+}

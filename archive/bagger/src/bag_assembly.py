@@ -12,6 +12,17 @@ def clean_working_dir():
             shutil.rmtree(path)
 
 
+def cleanup_bnumber_files(b_number):
+    directory = os.path.join(settings.WORKING_DIRECTORY, b_number)
+    print("deleting " + directory)
+    if os.path.isdir(directory):
+        shutil.rmtree(directory)
+    zipfile = os.path.join(settings.WORKING_DIRECTORY, b_number + ".zip")
+    print("deleting " + zipfile)
+    if os.path.isfile(zipfile):
+        os.remove(zipfile)
+
+
 def prepare_bag_dir(b_number):
     zip_file_name = "{0}.zip".format(b_number)
     bag_details = {

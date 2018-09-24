@@ -14,7 +14,7 @@ valid_dir_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'x']
 def b_numbers_from_fileshare(start_at):
     b_number_pattern = re.compile(r'\A(b[0-9ax]{8}).xml\Z')
     mets_root = os.path.join(settings.METS_FILESYSTEM_ROOT, start_at)
-    for dirpath, dirnames, filenames in os.walk(mets_root, topdown=True):
+    for dirpath, _, filenames in os.walk(mets_root, topdown=True):
         this_dir = os.path.dirname(dirpath)
         if os.path.basename(this_dir) in valid_dir_names:
             for f in filenames:
@@ -23,7 +23,7 @@ def b_numbers_from_fileshare(start_at):
                     yield m.group(1)
 
 
-def b_numbers_from_s3():
+def b_numbers_from_s3(filter=""):
     # We don't just want to enumerate all the keys in the bucket, as the majority of
     # keys will be for ALTO files (one per image), with multiple manifestations as well.
 
@@ -40,7 +40,7 @@ def b_numbers_from_s3():
     prefix = settings.METS_ONLY_ROOT_PREFIX
     b_number_pattern = re.compile(r"\A" + prefix + r"[0-9ax/]*/(b[0-9ax]{8}).xml\Z")
     for key in get_matching_s3_keys(
-            bucket=settings.METS_BUCKET_NAME, prefix=prefix):
+            bucket=settings.METS_BUCKET_NAME, prefix=prefix + filter):
         m = b_number_pattern.match(key)
         if m:
             yield m.group(1)

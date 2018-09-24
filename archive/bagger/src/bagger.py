@@ -1,3 +1,9 @@
+"""Creates bagit bags by processing METS files and collecting assets from their various locations.
+
+Can run in mets-only mode, where no bags are created
+and no I/O operations happen, other than on METS files.
+"""
+
 import sys
 import os
 import shutil
@@ -93,10 +99,12 @@ def bag_from_identifier(identifier, skip_file_download):
     if skip_file_download:
         print(b_number)
         logging.info("Finished {0} without bagging".format(b_number))
+        bag_assembly.cleanup_bnumber_files(b_number)
         return
 
     bagit.make_bag(bag_details["directory"], get_bag_info(b_number, title))
     dispatch_bag(bag_details)
+    bag_assembly.cleanup_bnumber_files(b_number)
     logging.info("Finished {0}".format(b_number))
 
 
@@ -137,18 +145,29 @@ def get_bag_info(b_number, title):
 
 
 def main():
+    if len(sys.argv) == 1:
+        print()
+        print("USAGE")
+        print()
+        print("> bagger.py clean")
+        print("Delete contents of working directory.")
+        print()
+        print("> bagger.py b12345678 <bag|no-bag>")
+        print("Bag a b number. If 'no-bag', process METS only.")
+        print()
+        return
+
     if sys.argv[1] == "clean":
         bag_assembly.clean_working_dir()
         return
 
-    print(sys.argv)
-
     skip_file_download = False
     if len(sys.argv) == 3 and sys.argv[2] == "no-bag":
-        logging.info("skipping copying and bagging operations, will just process METS")
+        logging.info("skipping copying and bagging operations, will just process METS.")
         skip_file_download = True
 
-    bag_from_identifier(sys.argv[1], skip_file_download)
+    identifier = sys.argv[1]
+    bag_from_identifier(identifier, skip_file_download)
 
 
 if __name__ == "__main__":
