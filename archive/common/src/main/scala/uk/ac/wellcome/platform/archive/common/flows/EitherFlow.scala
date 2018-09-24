@@ -9,8 +9,8 @@ import scala.util.Try
 
 object EitherFlow {
 
-  def apply[In, Out](f: In => Try[Out]):
-  Flow[In, Either[FailedEvent[In], Out], NotUsed] = {
+  def apply[In, Out](
+    f: In => Try[Out]): Flow[In, Either[FailedEvent[In], Out], NotUsed] = {
 
     val broadcastInFlow = Broadcast[In](2)
     val processFlow = Flow[In].map(in => f(in).toEither)
@@ -18,7 +18,7 @@ object EitherFlow {
 
     val wrapProcessFlow =
       Flow[(In, (Option[Throwable], Option[Out]))].map {
-        case (in, (Some(e), None)) => Left(FailedEvent(e, in))
+        case (in, (Some(e), None))  => Left(FailedEvent(e, in))
         case (_, (None, Some(out))) => Right(out)
       }
 

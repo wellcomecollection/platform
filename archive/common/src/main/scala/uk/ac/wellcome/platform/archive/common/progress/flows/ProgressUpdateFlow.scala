@@ -7,7 +7,9 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 
 object ProgressUpdateFlow {
-  def apply(progressMonitor: ProgressMonitor): Flow[ProgressUpdate, Progress, NotUsed] = {
-    ProcessLogDiscardFlow[ProgressUpdate, Progress]("sns_publish")(progressMonitor.update)
+  def apply(progressMonitor: ProgressMonitor)
+    : Flow[ProgressUpdate, Progress, NotUsed] = {
+    ProcessLogDiscardFlow[ProgressUpdate, Progress]("sns_publish")(
+      progressMonitor.update)
   }
 }

@@ -6,10 +6,12 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
 
 object LogLeftFlow extends Logging {
-  def apply[In, Out](name: String): Flow[Either[FailedEvent[In], Out], Either[FailedEvent[In], Out], NotUsed] = {
+  def apply[In, Out](name: String): Flow[Either[FailedEvent[In], Out],
+                                         Either[FailedEvent[In], Out],
+                                         NotUsed] = {
 
     Flow[Either[FailedEvent[In], Out]].map {
-      case left@Left(event) => {
+      case left @ Left(event) => {
         val t = event.t
         val e = event.e
 

@@ -8,7 +8,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class EitherFanOutTest
-  extends FunSpec
+    extends FunSpec
     with Akka
     with Matchers
     with ExtendedPatience
@@ -50,7 +50,7 @@ class EitherFanOutTest
 
         whenReady(eventualResult) { result =>
           result.toList shouldBe students.collect {
-            case r@Right(o) => o
+            case r @ Right(o) => o
           }
         }
       }
@@ -93,7 +93,7 @@ class EitherFanOutTest
 
         whenReady(eventualResult) { result =>
           result.toList shouldBe students.collect {
-            case l@Left(o) => o
+            case l @ Left(o) => o
           }
         }
       }

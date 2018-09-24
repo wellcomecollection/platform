@@ -9,15 +9,18 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.util.{Failure, Success, Try}
 
 class ProgressMonitor(
-                       dynamoClient: AmazonDynamoDB,
-                       dynamoConfig: DynamoConfig
-                     ) extends Logging {
+  dynamoClient: AmazonDynamoDB,
+  dynamoConfig: DynamoConfig
+) extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
@@ -79,7 +82,7 @@ class ProgressMonitor(
         Failure(exception)
       }
 
-      case r@Right(progress) => {
+      case r @ Right(progress) => {
         debug(s"Successfully updated Dynamo record: ${update.id}")
 
         Success(progress)
@@ -89,6 +92,6 @@ class ProgressMonitor(
 }
 
 final case class IdConstraintError(
-                                    private val message: String,
-                                    private val cause: Throwable
-                                  ) extends Exception(message, cause)
+  private val message: String,
+  private val cause: Throwable
+) extends Exception(message, cause)

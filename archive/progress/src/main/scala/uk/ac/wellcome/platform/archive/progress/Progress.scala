@@ -51,4 +51,3 @@ trait Progress extends Logging {
     }
   }
 }
-

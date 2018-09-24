@@ -8,22 +8,24 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
-import uk.ac.wellcome.platform.archive.progress.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.progress.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.platform.archive.progress.{Progress => ProgressApp}
 
 trait Progress
-  extends AkkaS3
+    extends AkkaS3
     with LocalDynamoDb
     with ProgressMonitorFixture
     with Messaging
     with BagIt {
 
-  def withApp[R](queuePair: QueuePair,
-                 topicArn: Topic,
-                 progressTable: Table)(testWith: TestWith[ProgressApp, R]) = {
+  def withApp[R](queuePair: QueuePair, topicArn: Topic, progressTable: Table)(
+    testWith: TestWith[ProgressApp, R]) = {
     val progress = new ProgressApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(
@@ -44,26 +46,16 @@ trait Progress
   }
 
   def withProgress[R](
-                       testWith: TestWith[(QueuePair, Topic, Table, ProgressApp),
-                         R]) = {
+    testWith: TestWith[(QueuePair, Topic, Table, ProgressApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalSnsTopic {
-        snsTopic =>
+      withLocalSnsTopic { snsTopic =>
+        withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) {
+          progressTable =>
+            withApp(queuePair, snsTopic, progressTable) { archivist =>
+              testWith((queuePair, snsTopic, progressTable, archivist))
+            }
 
-          withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) {
-            progressTable =>
-              withApp(queuePair, snsTopic, progressTable) {
-                archivist =>
-                  testWith(
-                    (
-
-                      queuePair,
-                      snsTopic,
-                      progressTable,
-                      archivist))
-              }
-
-          }
+        }
       }
     })
   }

@@ -10,7 +10,11 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateAndPublishFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -57,7 +61,8 @@ class ProgressUpdateAndPublishFlowTest
                 .async
                 .runWith(Sink.head)(materializer)
 
-              whenReady(eventualResult) { result =>
+              whenReady(eventualResult) {
+                result =>
                   result shouldBe a[PublishResult]
 
                   assertSnsReceivesOnly(expectedProgress, topic)
