@@ -59,7 +59,7 @@ def get_snapshot_report():
             last_modified_date = s3_object['LastModified'].replace(tzinfo=None)
             seconds = (now - last_modified_date).seconds
             lines.append(
-                f'{version}: {pprint_timedelta(seconds)} ago {last_modified_date.isoformat()}'
+                f'{version}: {pprint_timedelta(seconds)} ago ({last_modified_date.isoformat()})'
             )
         except Exception:
             pass
