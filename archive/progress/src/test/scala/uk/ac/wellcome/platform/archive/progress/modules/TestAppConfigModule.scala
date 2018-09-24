@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.registrar.modules
+package uk.ac.wellcome.platform.archive.progress.modules
 
 import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.messaging.sns.SNSConfig
@@ -6,21 +6,17 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
-import uk.ac.wellcome.platform.archive.registrar.models.RegistrarConfig
+import uk.ac.wellcome.platform.archive.progress.models.ProgressConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.concurrent.duration._
 
 class TestAppConfigModule(queueUrl: String,
-                          bucketName: String,
                           topicArn: String,
-                          hybridStoreTableName: String,
-                          hybridStoreBucketName: String,
-                          hybridStoreGlobalPrefix: String,
                           progressTable: Table)
     extends AbstractModule {
+
   @Provides
   def providesAppConfig = {
     val s3ClientConfig = S3ClientConfig(
@@ -40,10 +36,7 @@ class TestAppConfigModule(queueUrl: String,
       endpoint = Some("http://localhost:9324")
     )
     val sqsConfig = SQSConfig(queueUrl)
-    val metricsConfig = MetricsConfig(
-      namespace = "namespace",
-      flushInterval = 60 seconds
-    )
+
     val snsClientConfig = SnsClientConfig(
       accessKey = Some("access"),
       secretKey = Some("secret"),
@@ -52,22 +45,9 @@ class TestAppConfigModule(queueUrl: String,
     )
     val snsConfig = SNSConfig(topicArn)
 
-    val hybridStoreConfig = HybridStoreConfig(
-      dynamoClientConfig = DynamoClientConfig(
-        accessKey = Some("access"),
-        secretKey = Some("secret"),
-        region = "localhost",
-        endpoint = Some("http://localhost:45678")
-      ),
-      s3ClientConfig = s3ClientConfig,
-      dynamoConfig = DynamoConfig(
-        table = hybridStoreTableName,
-        maybeIndex = None
-      ),
-      s3Config = S3Config(
-        bucketName = hybridStoreBucketName
-      ),
-      s3GlobalPrefix = hybridStoreGlobalPrefix
+    val metricsConfig = MetricsConfig(
+      namespace = "namespace",
+      flushInterval = 60 seconds
     )
 
     val archiveProgressMonitorConfig = ProgressMonitorConfig(
@@ -83,14 +63,13 @@ class TestAppConfigModule(queueUrl: String,
       )
     )
 
-    RegistrarConfig(
+    ProgressConfig(
       s3ClientConfig,
       cloudwatchClientConfig,
       sqsClientConfig,
       sqsConfig,
       snsClientConfig,
       snsConfig,
-      hybridStoreConfig,
       archiveProgressMonitorConfig,
       metricsConfig
     )
