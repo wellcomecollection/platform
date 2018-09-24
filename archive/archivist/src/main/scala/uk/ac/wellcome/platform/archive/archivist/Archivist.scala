@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.archive.archivist
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
-import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.amazonaws.services.s3.AmazonS3
@@ -12,10 +11,10 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.archivist.flow.{ArchiveCompleteFlow, ArchiveZipFileFlow, ZipFileDownloadFlow}
+import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, IngestBagRequestNotification, IngestRequestContext, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
 
 import scala.concurrent.ExecutionContext
 import scala.util.Success
