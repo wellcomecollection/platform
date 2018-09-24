@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.fixtures.{
-  AkkaS3,
+  TransferManagerS3,
   BagIt,
   FileEntry
 }
@@ -38,7 +38,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 
 trait Registrar
-    extends AkkaS3
+    extends TransferManagerS3
     with Messaging
     with LocalVersionedHybridStore
     with BagIt
@@ -136,7 +136,6 @@ trait Registrar
         ConfigModule,
         VHSModule,
         AkkaModule,
-        AkkaS3ClientModule,
         CloudWatchClientModule,
         SQSClientModule,
         SNSAsyncClientModule,

@@ -6,9 +6,7 @@ import grizzled.slf4j.Logging
 import scala.util.Try
 
 trait CompareChecksum extends Logging {
-  def compare[T](checksum: String): PartialFunction[(T, ByteString), Try[T]] = {
-    case (result, byteChecksum: ByteString) => Try {
-
+  def compare[T](checksum: String)(byteChecksum: ByteString): Boolean = {
       val calculatedChecksum = byteChecksum
         .map(0xFF & _)
         .map("%02x".format(_))
@@ -17,15 +15,16 @@ trait CompareChecksum extends Logging {
         }
         .mkString
 
-      if (calculatedChecksum != checksum) {
-        throw new RuntimeException(
+      val isSameChecksum= if (calculatedChecksum != checksum) {
+        warn(
           s"Bad checksum! ($calculatedChecksum != $checksum"
         )
+        false
       } else {
         debug(s"Checksum match! ($calculatedChecksum != $checksum")
+        true
       }
 
-      result
-    }
+      isSameChecksum
   }
 }

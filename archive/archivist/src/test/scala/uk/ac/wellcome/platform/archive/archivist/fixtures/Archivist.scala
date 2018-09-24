@@ -1,18 +1,17 @@
 package uk.ac.wellcome.platform.archive.archivist.fixtures
 
-import java.io.{File, FileOutputStream}
+import java.io.File
 import java.net.URI
 import java.util.UUID
-import java.util.zip.{ZipEntry, ZipFile, ZipInputStream, ZipOutputStream}
+import java.util.zip.ZipFile
 
 import com.google.inject.Guice
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
-import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
+import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.{BagPath, IngestBagRequest}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
@@ -24,8 +23,7 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Archivist
-    extends AkkaS3
-    with LocalDynamoDb
+    extends LocalDynamoDb
     with ProgressMonitorFixture
     with Messaging
     with ZipBagItFixture {
@@ -79,7 +77,6 @@ trait Archivist
           progressTable),
         ConfigModule,
         AkkaModule,
-        AkkaS3ClientModule,
         S3ClientModule,
         CloudWatchClientModule,
         SQSClientModule,

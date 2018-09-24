@@ -6,6 +6,7 @@ import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.transfer.TransferManager
 import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject.Injector
 import grizzled.slf4j.Logging
@@ -23,7 +24,7 @@ trait Archivist extends Logging {
   val injector: Injector
 
   def run() = {
-    implicit val s3Client: S3Client = injector.getInstance(classOf[S3Client])
+    implicit val transferManager: TransferManager = injector.getInstance(classOf[TransferManager])
     implicit val amazonS3: AmazonS3 = injector.getInstance(classOf[AmazonS3])
 
     implicit val snsClient: AmazonSNSAsync =

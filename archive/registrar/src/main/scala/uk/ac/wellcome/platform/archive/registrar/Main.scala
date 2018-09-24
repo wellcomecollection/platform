@@ -19,7 +19,6 @@ object Main extends App with Logging {
     ConfigModule,
     VHSModule,
     AkkaModule,
-    AkkaS3ClientModule,
     CloudWatchClientModule,
     SQSClientModule,
     SNSAsyncClientModule,

@@ -9,20 +9,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 case class ZipLocation(
                         zipFile: ZipFile,
                         objectLocation: ObjectLocation
-                      ) extends Logging{
-  def inputStream: Option[InputStream] = {
-    info(s"objectLocation: $objectLocation")
-    val name = s"${objectLocation.namespace}/${objectLocation.key}"
-    info(s"Getting ZipEntry $name")
-
-    val maybeInputStream = for {
-      zipEntry <- Option(zipFile.getEntry(name))
-      zipStream <- Option(zipFile.getInputStream(zipEntry))
-    } yield zipStream
-
-    maybeInputStream
-  }
-}
+                      )
 
 object ZipLocation {
   def apply(archiveItemJob: ArchiveItemJob): ZipLocation = {

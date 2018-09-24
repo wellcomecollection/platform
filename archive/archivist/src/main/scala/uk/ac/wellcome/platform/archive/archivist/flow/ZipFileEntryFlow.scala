@@ -5,15 +5,15 @@ import java.io.InputStream
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ZipLocation
+import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 
 object ZipFileEntryFlow extends Logging {
   def apply() = {
     Flow[ZipLocation]
-      .map(_.inputStream)
-      .flatMapConcat {
-        case Some(inputStream) => sourceFrom(inputStream)
-        //TODO: THIS IS WRONG
-        case None => throw new RuntimeException("foof")
+      .log("reading input stream")
+      .map(ZipFileReader.maybeInputStream).collect{ case Some(inputStream) => inputStream}
+      .log("converting inputstream")
+      .flatMapConcat { inputStream => sourceFrom(inputStream)
       }
   }
 

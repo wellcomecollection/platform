@@ -1,21 +1,12 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import java.io.File
-import java.util.zip.ZipFile
-
-import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob, BagItConfig, BagManifestLocation}
-import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt}
-import uk.ac.wellcome.platform.archive.common.models.{BagItem, BagLocation, BagPath}
-import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.platform.archive.common.models.BagPath
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.Akka
@@ -38,7 +29,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
 
             s3Client.putObject(bucket.name, s"archive/$bagName/$fileName", fileContent)
 
-            val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "otherNamespace")
+            val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
 
             val source = Source.single(Right(archiveItemJob))
             val flow = DownloadItemFlow()(s3Client)
@@ -70,7 +61,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
 
             s3Client.putObject(bucket.name, s"archive/$bagName/$fileName", fileContent)
 
-            val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "otherNamespace")
+            val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
 
             val source = Source.single(Right(archiveItemJob))
             val flow = DownloadItemFlow()(s3Client)
@@ -97,7 +88,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
           val fileName = "key.txt"
 
           val bagName = BagPath(randomAlphanumeric())
-          val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "otherNamespace")
+          val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
           val source = Source.single(Left(archiveItemJob))
           val flow = DownloadItemFlow()(s3Client)
           val futureResult = source via flow runWith Sink.head
@@ -122,7 +113,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
               val fileName = "this/does/not/exist.txt"
 
               val bagName = BagPath(randomAlphanumeric())
-              val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "otherNamespace")
+              val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
               val source = Source.single(Right(archiveItemJob))
               val flow = DownloadItemFlow()(s3Client)
               val futureResult = source via flow runWith Sink.head

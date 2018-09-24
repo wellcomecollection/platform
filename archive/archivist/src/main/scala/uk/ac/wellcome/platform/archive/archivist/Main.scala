@@ -1,10 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist
 
 import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.archivist.modules.{
-  AppConfigModule,
-  ConfigModule
-}
+import uk.ac.wellcome.platform.archive.archivist.modules.{AppConfigModule, ConfigModule}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 
@@ -16,7 +13,6 @@ object Main extends App with Archivist {
     new AppConfigModule(args),
     ConfigModule,
     AkkaModule,
-    AkkaS3ClientModule,
     S3ClientModule,
     CloudWatchClientModule,
     SQSClientModule,

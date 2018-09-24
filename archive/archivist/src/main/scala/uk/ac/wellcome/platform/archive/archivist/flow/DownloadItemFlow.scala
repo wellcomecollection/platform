@@ -34,8 +34,8 @@ object DownloadItemFlow extends Logging with CompareChecksum {
               .via(VerifiedDownloadFlow())
               .map(compare(job.bagDigestItem.checksum))
               .map {
-                case Success(_) => Right(job)
-                case Failure(_) => Left(job)
+                case true => Right(job)
+                case false => Left(job)
               }
 
           }.getOrElse(Source.single(Left(job)))

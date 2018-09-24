@@ -20,7 +20,7 @@ object VerifiedDownloadFlow {
         v.outlets(0).fold(Done)((out, _) => out) ~> zip.in0
         v.outlets(1) ~> zip.in1
 
-        FlowShape(v.in, zip.out)
+        FlowShape(v.in, zip.out.map{ case (_, checksum) => checksum}.outlet)
       }
     })
 }

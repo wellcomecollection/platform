@@ -31,53 +31,47 @@ class ArchiveZipFileFlowTest
 
   it("succeeds when verifying and uploading a valid bag") {
     withLocalS3Bucket { storageBucket =>
-      withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        withMockProgressMonitor() { archiveProgressMonitor =>
-          implicit val s3Client = s3AkkaClient
+      withMockProgressMonitor() { archiveProgressMonitor =>
+                val bagUploaderConfig = createBagUploaderConfig(storageBucket)
+                withBagItZip(dataFileCount = 1) {case (bagName, zipFile) =>
+                  val uploader = ArchiveZipFileFlow(bagUploaderConfig)
+                  val ingestContext = createIngestBagRequestWith()
+                  val (_, verification) =
+                    uploader.runWith(
+                      Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
+                      Sink.seq
+                    )
 
-          val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-          withBagItZip(dataFileCount = 1) {case (bagName, zipFile) =>
-            val uploader = ArchiveZipFileFlow(bagUploaderConfig)
-            val ingestContext = createIngestBagRequestWith()
-            val (_, verification) =
-              uploader.runWith(
-                Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
-                Sink.seq
-              )
-
-            whenReady(verification) { result =>
-              listKeysInBucket(storageBucket) should have size 4
-              result should have size 1
+                  whenReady(verification) { result =>
+                    listKeysInBucket(storageBucket) should have size 4
+                    result should have size 1
+                  }
+                }
+              }
             }
-          }
-        }
-      }
-    }
   }
 
   it("fails when verifying and uploading an invalid bag") {
     withLocalS3Bucket { storageBucket =>
-      withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        withMockProgressMonitor() { archiveProgressMonitor =>
-          implicit val s3Client = s3AkkaClient
+      withMockProgressMonitor() { archiveProgressMonitor =>
 
-          val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-          withBagItZip(dataFileCount = 1,createDigest = _ => "bad_digest") { case (bagName, zipFile) =>
+                val bagUploaderConfig = createBagUploaderConfig(storageBucket)
+                withBagItZip(dataFileCount = 1,createDigest = _ => "bad_digest") { case (bagName, zipFile) =>
 
-            val uploader = ArchiveZipFileFlow(bagUploaderConfig)
-            val ingestContext = createIngestBagRequest
+                  val uploader = ArchiveZipFileFlow(bagUploaderConfig)
+                  val ingestContext = createIngestBagRequest
 
-            val (_, verification) =
-              uploader.runWith(
-                Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
-                Sink.seq)
+                  val (_, verification) =
+                    uploader.runWith(
+                      Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
+                      Sink.seq)
 
-            whenReady(verification) { result =>
-              result shouldBe empty
+                  whenReady(verification) { result =>
+                    result shouldBe empty
+                  }
+                }
+              }
             }
-          }
-        }
-      }
-    }
+
   }
 }
