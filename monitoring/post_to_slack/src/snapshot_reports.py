@@ -48,6 +48,9 @@ def get_snapshot_report():
 
     for version in ['v1', 'v2']:
         try:
+            # Yes, this makes a bunch of hard-coded assumptions about the
+            # way the bucket is laid out.  It's a quick-win helper for
+            # bug diagnosis, not a prod API.
             s3_object = s3.head_object(
                 Bucket='wellcomecollection-data-public',
                 Key=f'catalogue/{version}/works.json.gz'
@@ -58,5 +61,7 @@ def get_snapshot_report():
             lines.append(
                 f'{version}: {pprint_timedelta(seconds)} ago {last_modified_date.isoformat()}'
             )
+        except Exception:
+            pass
 
     return '\n'.join(lines)
