@@ -19,6 +19,21 @@ resource "aws_alb_listener" "api_https" {
   }
 }
 
+resource "aws_lb_listener" "api_http" {
+  load_balancer_arn = "${aws_alb.services.id}"
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = 443
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_alb_listener_rule" "path_rule" {
   listener_arn = "${aws_alb_listener.api_https.arn}"
 
@@ -32,21 +47,6 @@ resource "aws_alb_listener_rule" "path_rule" {
     values = ["${var.api_path}"]
   }
 }
-
-//resource "aws_lb_listener" "api_http" {
-//  load_balancer_arn = "${aws_alb.services.id}"
-//  port              = 80
-//  protocol          = "HTTP"
-//
-//  default_action {
-//    type = "redirect"
-//    redirect {
-//      port        = 443
-//      protocol    = "HTTPS"
-//      status_code = "HTTP_301"
-//    }
-//  }
-//}
 
 data "aws_acm_certificate" "certificate" {
   domain   = "${var.certificate_domain}"
