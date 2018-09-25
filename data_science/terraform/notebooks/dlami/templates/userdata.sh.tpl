@@ -94,9 +94,6 @@ pushd efs-utils
   # See https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html
   sudo mkdir -p /mnt/efs
   sudo mount -t efs ${efs_mount_id}:/ /mnt/efs
-
-  # Ensure the Jupyter user can actually write to this file!
-  sudo chown -R ${notebook_user}:${notebook_user} /mnt/efs
 popd
 
 # Start notebook server
