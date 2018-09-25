@@ -1,5 +1,7 @@
 # -*- encoding: utf-8
 
+import json
+
 from flask_restplus import fields
 
 from archive_api import api
@@ -67,13 +69,5 @@ IngestRequest = api.model('Ingest request', {
 # TODO: It would be much better if we could define this model in a common
 # location, rather than copying this from the Scala app Swagger spec.
 #
-Error = api.model('Error', {
-    '@context': fields.String(description='Context URL'),
-    'errorType': fields.String(description='The type of error', enum=['http']),
-    'httpStatus': fields.Integer(description='The HTTP response status code'),
-    'label': fields.String(
-        description='The title or other short name of the error'
-    ),
-    'description': fields.String(description='The specific error'),
-    'type': fieldType(name='Error'),
-})
+catalogue_swagger = json.load(open('catalogue/v2_swagger.json'))
+Error = api.schema_model('Error', catalogue_swagger['definitions']['Error'])
