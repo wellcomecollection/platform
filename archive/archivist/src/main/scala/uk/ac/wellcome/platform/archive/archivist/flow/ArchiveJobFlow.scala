@@ -8,9 +8,8 @@ import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 object ArchiveJobFlow {
   def apply(delimiter: String)(implicit s3Client: AmazonS3): Flow[ArchiveJob, ArchiveJob, NotUsed] =
     Flow[ArchiveJob]
-
-      .via(ArchiveItemJobCreatorFlow(delimiter))
-      .collect{case Right(archiveItemJob) => archiveItemJob}
+    .map(job => ArchiveItemJobCreator.createArchiveItemJobs(job, delimiter))
+      .collect{case Right(archiveItemJobs) => archiveItemJobs}.mapConcat(identity)
       .via(ArchiveItemJobFlow(delimiter))
       .groupBy(Int.MaxValue, {
         case Right(archiveItemJob) => archiveItemJob.bagName

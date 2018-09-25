@@ -8,6 +8,10 @@ import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 
 trait ArchiveJobGenerators {
+  def createArchiveJob: ArchiveJob = {
+  ???
+  }
+
   def createArchiveItemJob(zipFile: ZipFile, bucket: S3.Bucket, digest: String, bagName: BagPath, s3Key: String, bagDigestItemLocationNamespace: String) = {
     val bagLocation = BagLocation(bucket.name, "archive", bagName)
     val archiveJob = ArchiveJob(zipFile, bagLocation, BagItConfig(), List(BagManifestLocation(bagName, "manifest-sha256.txt")))
