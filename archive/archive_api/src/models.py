@@ -5,6 +5,14 @@ from flask_restplus import fields
 from archive_api import api
 
 
+def fieldType(name, **kwargs):
+    return fields.String(
+        description='Type of the object',
+        enum=[name],
+        **kwargs
+    )
+
+
 # Example of a valid request from the RFC:
 #
 #     {
@@ -18,11 +26,7 @@ from archive_api import api
 #     }
 #
 ingest_type = api.model('Ingest type', {
-    'type': fields.String(
-        description='Type of the object',
-        enum=['IngestType'],
-        required=True
-    ),
+    'type': fieldType(name='IngestType', required=True),
     'id': fields.String(
         description='Identifier for ingest type',
         enum=['create'],
@@ -31,11 +35,7 @@ ingest_type = api.model('Ingest type', {
 })
 
 ingest_request_model = api.model('Ingest request', {
-    'type': fields.String(
-        description='Type of the object',
-        enum=['Ingest'],
-        required=True
-    ),
+    'type': fieldType(name='Ingest', required=True),
     'uploadUrl': fields.String(
         description='S3 URL of uploaded BagIt resource, supports only a zipped BagIt file',
         example='s3://source-bucket/source-path/source-bag.zip',
