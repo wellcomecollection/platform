@@ -34,7 +34,7 @@ ingest_type = api.model('Ingest type', {
     ),
 })
 
-ingest_request_model = api.model('Ingest request', {
+ingest_request = api.model('Ingest request', {
     'type': fieldType(name='Ingest', required=True),
     'uploadUrl': fields.String(
         description='S3 URL of uploaded BagIt resource, supports only a zipped BagIt file',
@@ -50,4 +50,30 @@ ingest_request_model = api.model('Ingest request', {
         description='Request to ingest a BagIt resource',
         required=True
     )
+})
+
+
+# Example of an error in the Catalogue API style:
+#
+#       {
+#         "@context:" "https://example.org/catalogue/v2/context.json",
+#         "errorType:" "http",
+#         "httpStatus:" 404,
+#         "label:" "Not Found",
+#         "description:" "Work not found for identifier 1234",
+#         "type:" "Error"
+#       }
+#
+# TODO: It would be much better if we could define this model in a common
+# location, rather than copying this from the Scala app Swagger spec.
+#
+error = api.model('Error', {
+    '@context': fields.String(description='Context URL'),
+    'errorType': fields.String(description='The type of error', enum=['http']),
+    'httpStatus': fields.Integer(description='The HTTP response status code'),
+    'label': fields.String(
+        description='The title or other short name of the error'
+    ),
+    'description': fields.String(description='The specific error'),
+    'type': fieldType(name='Error'),
 })

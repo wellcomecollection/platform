@@ -6,7 +6,7 @@ import uuid
 
 import daiquiri
 from flask import Flask
-from flask_restplus import Api, Resource, fields
+from flask_restplus import Api, Resource
 from flask import jsonify, make_response, request
 from werkzeug.exceptions import BadRequest as BadRequestError
 
@@ -38,25 +38,16 @@ api.namespaces.clear()
 ns = api.namespace('ingests', description='Ingest requests')
 
 
-from models import ingest_request_model
-
-error_model = api.model('Error', {
-    '@context': fields.String(description='Context URL'),
-    'errorType': fields.String(description='errorType'),
-    'httpStatus': fields.Integer(description='httpStatus'),
-    'label': fields.String(description='label'),
-    'description': fields.String(description='description of the error'),
-    'type': fields.String(description='type'),
-})
+import models
 
 
 @ns.route('')
 @ns.doc(description='Request the ingest of a BagIt resource.')
 @ns.param('payload', 'The ingest request specifying the uploadUrl where the BagIt resource can be found', _in='body')
 class IngestCollection(Resource):
-    @ns.expect(ingest_request_model, validate=True)
+    @ns.expect(models.ingest_request, validate=True)
     @ns.response(202, 'Ingest created')
-    @ns.response(400, 'Bad request', error_model)
+    @ns.response(400, 'Bad request', models.error)
     def post(self):
         """Create a request to ingest a BagIt resource"""
         upload_url = request.json['uploadUrl']
@@ -110,7 +101,7 @@ class IngestCollection(Resource):
 class IngestResource(Resource):
     @ns.doc(description='The ingest request id is returned in the Location header from a POSTed ingest request')
     @ns.response(200, 'Ingest found')
-    @ns.response(404, 'Ingest not found', error_model)
+    @ns.response(404, 'Ingest not found', models.error)
     def get(self, id):
         """Get the current status of an ingest request"""
         result = report_ingest_status(
@@ -128,7 +119,7 @@ def route_report_healthcheck_status():
 
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)
-# @api.marshal_with(error_model)
+# @api.marshal_with(models.error)
 def default_error_handler(error):
     error_response = {
         '@context': 'https://api.wellcomecollection.org/storage/v1/context.json',
