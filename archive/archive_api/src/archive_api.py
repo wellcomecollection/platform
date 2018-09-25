@@ -58,18 +58,18 @@ class IngestCollection(Resource):
         callback_url = request.json.get('callbackUrl')
         self.validate_urls(callback_url, upload_url)
 
-        IngestRequest_id = str(uuid.uuid4())
-        logger.debug('IngestRequest_id=%r', IngestRequest_id)
+        ingest_request_id = str(uuid.uuid4())
+        logger.debug('ingest_request_id=%r', ingest_request_id)
 
         create_ingest_progress(
-            IngestProgress(IngestRequest_id, upload_url, callback_url),
+            IngestProgress(ingest_request_id, upload_url, callback_url),
             app.config['DYNAMODB_RESOURCE'],
             app.config['DYNAMODB_TABLE_NAME'])
 
-        IngestRequest_id = send_new_ingest_request(
+        ingest_request_id = send_new_ingest_request(
             sns_client=app.config['SNS_CLIENT'],
             topic_arn=app.config['SNS_TOPIC_ARN'],
-            IngestRequest_id=IngestRequest_id,
+            ingest_request_id=ingest_request_id,
             upload_url=upload_url,
             callback_url=callback_url
         )
@@ -78,7 +78,7 @@ class IngestCollection(Resource):
         # of their ingest request.
         location = api.url_for(
             IngestResource,
-            id=IngestRequest_id
+            id=ingest_request_id
         )
 
         # Now we set the Location response header.  There's no way to do this
