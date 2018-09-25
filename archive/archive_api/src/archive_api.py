@@ -10,7 +10,7 @@ from flask import jsonify, make_response, request
 from werkzeug.exceptions import BadRequest as BadRequestError
 
 from report_ingest_status import report_ingest_status
-from request_new_ingest import send_new_ingest_request
+from request_new_ingest import send_new_IngestRequest
 
 from create_ingest_progress import (
     IngestProgress,
@@ -45,27 +45,27 @@ import validators
 @ns.doc(description='Request the ingest of a BagIt resource.')
 @ns.param('payload', 'The ingest request specifying the uploadUrl where the BagIt resource can be found', _in='body')
 class IngestCollection(Resource):
-    @ns.expect(models.ingest_request, validate=True)
+    @ns.expect(models.IngestRequest, validate=True)
     @ns.response(202, 'Ingest created')
-    @ns.response(400, 'Bad request', models.error)
+    @ns.response(400, 'Bad request', models.Error)
     def post(self):
         """Create a request to ingest a BagIt resource"""
         upload_url = request.json['uploadUrl']
         callback_url = request.json.get('callbackUrl')
         self.validate_urls(callback_url, upload_url)
 
-        ingest_request_id = str(uuid.uuid4())
-        logger.debug('ingest_request_id=%r', ingest_request_id)
+        IngestRequest_id = str(uuid.uuid4())
+        logger.debug('IngestRequest_id=%r', IngestRequest_id)
 
         create_ingest_progress(
-            IngestProgress(ingest_request_id, upload_url, callback_url),
+            IngestProgress(IngestRequest_id, upload_url, callback_url),
             app.config['DYNAMODB_RESOURCE'],
             app.config['DYNAMODB_TABLE_NAME'])
 
-        ingest_request_id = send_new_ingest_request(
+        IngestRequest_id = send_new_IngestRequest(
             sns_client=app.config['SNS_CLIENT'],
             topic_arn=app.config['SNS_TOPIC_ARN'],
-            ingest_request_id=ingest_request_id,
+            IngestRequest_id=IngestRequest_id,
             upload_url=upload_url,
             callback_url=callback_url
         )
@@ -74,7 +74,7 @@ class IngestCollection(Resource):
         # of their ingest request.
         location = api.url_for(
             IngestResource,
-            id=ingest_request_id
+            id=IngestRequest_id
         )
 
         # Now we set the Location response header.  There's no way to do this
@@ -108,7 +108,7 @@ class IngestCollection(Resource):
 class IngestResource(Resource):
     @ns.doc(description='The ingest request id is returned in the Location header from a POSTed ingest request')
     @ns.response(200, 'Ingest found')
-    @ns.response(404, 'Ingest not found', models.error)
+    @ns.response(404, 'Ingest not found', models.Error)
     def get(self, id):
         """Get the current status of an ingest request"""
         result = report_ingest_status(
@@ -126,7 +126,7 @@ def route_report_healthcheck_status():
 
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)
-# @api.marshal_with(models.error)
+# @api.marshal_with(models.Error)
 def default_error_handler(error):
     error_response = {
         '@context': 'https://api.wellcomecollection.org/storage/v1/context.json',
