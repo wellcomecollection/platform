@@ -10,10 +10,9 @@ SBT_NO_DOCKER_LIBRARIES =
 ECS_TASKS   =
 LAMBDAS     = snapshot_scheduler
 
-TF_NAME     = data_api
-TF_PATH     = $(STACK_ROOT)/terraform
-TF_IS_PUBLIC_FACING = true
-
+TF_NAME     =
+TF_PATH     =
+TF_IS_PUBLIC_FACING =
 
 
 $(val $(call stack_setup))

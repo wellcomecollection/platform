@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "snapshot_scheduler_queue_not_empty" {
   evaluation_periods  = 1
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
-  period              = 60
+  period              = 3600
   threshold           = 2
   statistic           = "Average"
 
