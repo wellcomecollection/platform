@@ -42,13 +42,10 @@ module "task" {
   aws_region = "${var.aws_region}"
   task_name  = "${var.namespace}"
 
-  container_image = "${var.api_container_image}"
-  container_port  = "${var.api_container_port}"
-  cpu             = "${var.api_cpu}"
-  memory          = "${var.api_memory}"
-  env_vars        = "${var.api_env_vars}"
-  env_vars_length = "${var.api_env_vars_length}"
-
-  cpu    = "${var.task_cpu}"
-  memory = "${var.task_memory}"
+  container_image = "${var.container_image}"
+  container_port  = "${var.container_port}"
+  cpu             = "${var.cpu}"
+  memory          = "${var.memory}"
+  env_vars        = "${var.env_vars}"
+  env_vars_length = "${var.env_vars_length}"
 }
