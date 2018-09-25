@@ -3,12 +3,11 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import java.io.InputStream
 
 import akka.NotUsed
-import akka.stream.scaladsl.{Flow, Source}
+import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ZipLocation}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
-import uk.ac.wellcome.platform.archive.common.models.BagItem
 
 object UploadItemFlow
   extends Logging {
@@ -18,14 +17,17 @@ object UploadItemFlow
     NotUsed] = {
 
     Flow[ArchiveItemJob]
-      .flatMapConcat {
-        case job@ArchiveItemJob(_, BagItem(checksum, _)) =>
-          Source.single(job)
-            .map(j => ZipFileReader.maybeInputStream(ZipLocation(j))).map {
-            case Some(inputStream) => Right(inputStream)
-            case None => Left(())
-          }
-            .via(FoldEitherFlow[Unit, InputStream, Either[ArchiveItemJob, ArchiveItemJob]](_ => Left(job))(UploadInputStreamFlow(job, checksum)))
-      }
+      .map(j => (j, ZipFileReader.maybeInputStream(ZipLocation(j))))
+      .map {
+      case (j, Some(inputStream)) => Right((j, inputStream))
+      case (j, None)              => Left(j)
+    }
+    .via(
+        FoldEitherFlow[
+          ArchiveItemJob,
+          (ArchiveItemJob, InputStream),
+          Either[ArchiveItemJob, ArchiveItemJob]](j => Left(j))(
+          UploadInputStreamFlow()))
   }
+
 }

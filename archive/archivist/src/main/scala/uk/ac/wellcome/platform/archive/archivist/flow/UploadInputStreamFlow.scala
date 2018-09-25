@@ -8,15 +8,17 @@ import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
 import scala.util.Success
 
 object UploadInputStreamFlow{
-  def apply(job: ArchiveItemJob, checksum: String)(implicit s3Client: AmazonS3) = Flow[InputStream]
-    .log("converting inputstream")
-    .flatMapConcat { inputStream =>
-      StreamConverters.fromInputStream(() => inputStream)
+  def apply()(implicit s3Client: AmazonS3) = Flow[(ArchiveItemJob, InputStream)]
+    .flatMapConcat { case (job, inputStream) =>
+      val checksum = job.bagDigestItem.checksum
+      StreamConverters
+        .fromInputStream(() => inputStream)
+        .via(UploadAndGetChecksumFlow(job.uploadLocation))
+        .map {
+          case Success(calculatedChecksum) if calculatedChecksum == checksum =>
+            Right(job)
+          case _ => Left(job)
+        }
     }
-    .via(UploadAndGetChecksumFlow(job.uploadLocation))
-    .map {
-      case Success(calculatedChecksum) if calculatedChecksum == checksum =>
-        Right(job)
-      case _ => Left(job)
-    }
+
 }

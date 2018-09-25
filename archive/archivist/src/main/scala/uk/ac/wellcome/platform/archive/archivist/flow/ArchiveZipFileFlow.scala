@@ -13,7 +13,7 @@ object ArchiveZipFileFlow extends Logging {
   ): Flow[ZipFileDownloadComplete, ArchiveComplete, NotUsed] = {
 
     Flow[ZipFileDownloadComplete].flatMapConcat {
-      case ZipFileDownloadComplete(zipFile, ingestRequest) => {
+      case ZipFileDownloadComplete(zipFile, ingestRequest) =>
         Source
           .single(zipFile)
           .mapConcat(ArchiveJob.create(_, config))
@@ -23,10 +23,7 @@ object ArchiveZipFileFlow extends Logging {
             ArchiveComplete(
               job.bagLocation,
               ingestRequest
-            )
-          )
-
-      }
+            ))
     }
   }
 }

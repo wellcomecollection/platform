@@ -19,7 +19,8 @@ object ArchiveJobFlow extends Logging {
       .via(archiveManifestFlow)
       .log("uploading and verifying")
       .via(uploadVerificationFlow)
-      .via(FoldEitherFlow[ArchiveItemJob, ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob]](job => Left(job))(downloadVerification))
+      .via(FoldEitherFlow[ArchiveItemJob, ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob]](ifLeft = job => Left(job))(
+        ifRight = downloadVerification))
       .log("download verified")
   }
 }
