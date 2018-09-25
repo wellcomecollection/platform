@@ -16,6 +16,7 @@ from create_ingest_progress import (
     IngestProgress,
     create_ingest_progress
 )
+import config
 import validators
 
 app = Flask(__name__)
@@ -26,10 +27,11 @@ api = Api(app,
                       '(https://tools.ietf.org/html/draft-kunze-bagit-17) resources',
           prefix='/storage/v1')
 
-if os.environ.get('FLASK_ENV') == 'development':
-    app.config.from_object('config.DevelopmentConfig')
-else:
-    app.config.from_object('config.ProductionConfig')
+config_obj = config.ArchiveAPIConfig(
+    development=(os.environ.get('FLASK_ENV') == 'development')
+)
+
+app.config.from_object(config_obj)
 
 daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
