@@ -19,7 +19,12 @@ from create_ingest_progress import (
 )
 
 app = Flask(__name__)
-api = Api(app)
+api = Api(app,
+          version='0.1',
+          title='Archive API',
+          description='A service to ingest and archive BagIt '
+                      '(https://tools.ietf.org/html/draft-kunze-bagit-17) resources',
+          prefix='/storage/v1')
 
 if os.environ.get('FLASK_ENV') == 'development':
     app.config.from_object('config.DevelopmentConfig')
@@ -29,16 +34,17 @@ else:
 daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
-ns = api.namespace('ingests', description='')
+api.namespaces.clear()
+ns = api.namespace('ingests', description='Ingest requests')
 
 ingest_request_model = api.model('Ingest request', {
     'type': fields.String(description='Type of the object', enum=['Ingest'], required=True),
-    'uploadUrl': fields.String(description='URL of uploaded bag', required=True),
-    'callbackUrl': fields.String(description='URL to use for callback on completion'),
+    'uploadUrl': fields.String(description='URL of uploaded BagIt resource, supports only a zipped BagIt file', required=True),
+    'callbackUrl': fields.String(description='URL to use for callback on completion or failure'),
     'ingestType': fields.Nested(api.model('Ingest type', {
         'type': fields.String(description='Type of the object', enum=['IngestType'], required=True),
-        'id': fields.String(description='identifier for ingest type', enum=['create'], required=True),
-    }), required=True)
+        'id': fields.String(description='Identifier for ingest type', enum=['create'], required=True),
+    }), description="Request to ingest a BagIt resource", required=True)
 })
 
 error_model = api.model('Error', {
@@ -46,17 +52,20 @@ error_model = api.model('Error', {
     'errorType': fields.String(description='errorType'),
     'httpStatus': fields.Integer(description='httpStatus'),
     'label': fields.String(description='label'),
-    'description': fields.String(description='description'),
+    'description': fields.String(description='description of the error'),
     'type': fields.String(description='type'),
 })
 
 
 @ns.route('')
+@ns.doc(description='Request the ingest of a BagIt resource.')
+@ns.param('payload', 'The ingest request specifying the uploadUrl where the BagIt resource can be found', _in='body')
 class IngestCollection(Resource):
-    @api.expect(ingest_request_model, validate=True)
-    @api.response(202, 'Ingest created')
-    @api.response(400, 'Bad request', error_model)
+    @ns.expect(ingest_request_model, validate=True)
+    @ns.response(202, 'Ingest created')
+    @ns.response(400, 'Bad request', error_model)
     def post(self):
+        """Create a request to ingest a BagIt resource"""
         upload_url = request.json['uploadUrl']
         callback_url = request.json.get('callbackUrl')
         self.validate_urls(callback_url, upload_url)
@@ -103,11 +112,14 @@ class IngestCollection(Resource):
                 raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
 
 
-@ns.route('/<id>')
+@ns.route('/<string:id>')
+@ns.param('id', 'The ingest request identifier')
 class IngestResource(Resource):
-    @api.response(200, 'Ingest found')
-    @api.response(404, 'Ingest not found', error_model)
+    @ns.doc(description='The ingest request id is returned in the Location header from a POSTed ingest request')
+    @ns.response(200, 'Ingest found')
+    @ns.response(404, 'Ingest not found', error_model)
     def get(self, id):
+        """Get the current status of an ingest request"""
         result = report_ingest_status(
             dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
             table_name=app.config['DYNAMODB_TABLE_NAME'],
@@ -126,7 +138,7 @@ def route_report_healthcheck_status():
 # @api.marshal_with(error_model)
 def default_error_handler(error):
     error_response = {
-        '@context': 'https://....',
+        '@context': 'https://api.wellcomecollection.org/storage/v1/context.json',
         'errorType': 'http',
         'httpStatus': getattr(error, 'code', 500),
         'label': getattr(error, 'name', 'Internal Server Error'),
