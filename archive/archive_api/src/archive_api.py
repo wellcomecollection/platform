@@ -16,6 +16,7 @@ from create_ingest_progress import (
     IngestProgress,
     create_ingest_progress
 )
+import validators
 
 app = Flask(__name__)
 api = Api(app,
@@ -37,8 +38,9 @@ api.namespaces.clear()
 ns = api.namespace('ingests', description='Ingest requests')
 
 
-import models
-import validators
+# We can't move this import to the top because the models need the ``api``
+# instance defined in this file.
+import models  # noqa
 
 
 @ns.route('')
