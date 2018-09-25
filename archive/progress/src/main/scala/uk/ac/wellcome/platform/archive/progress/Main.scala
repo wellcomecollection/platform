@@ -13,7 +13,6 @@ object Main extends App with Progress {
     new AppConfigModule(args),
     ConfigModule,
     AkkaModule,
-    AkkaS3ClientModule,
     CloudWatchClientModule,
     SQSClientModule,
     SNSAsyncClientModule,

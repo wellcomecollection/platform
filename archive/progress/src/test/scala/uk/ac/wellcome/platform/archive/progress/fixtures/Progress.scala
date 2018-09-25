@@ -70,7 +70,6 @@ trait Progress
         ),
         ConfigModule,
         AkkaModule,
-        AkkaS3ClientModule,
         CloudWatchClientModule,
         SQSClientModule,
         SNSAsyncClientModule,
