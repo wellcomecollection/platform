@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.archive.progress
 import com.google.inject.{Guice, Injector}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
-import uk.ac.wellcome.platform.archive.progress.modules.{AppConfigModule, ConfigModule}
+import uk.ac.wellcome.platform.archive.progress.modules.{
+  AppConfigModule,
+  ConfigModule
+}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

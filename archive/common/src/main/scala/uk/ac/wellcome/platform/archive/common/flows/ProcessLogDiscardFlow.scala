@@ -7,7 +7,8 @@ import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
 import scala.util.Try
 
 object ProcessLogDiscardFlow {
-  def apply[In, Out](name: String)(f: In => Try[Out]): Flow[In, Out, NotUsed] = {
+  def apply[In, Out](name: String)(
+    f: In => Try[Out]): Flow[In, Out, NotUsed] = {
     type ProcessEither = Either[FailedEvent[In], Out]
 
     val logLeftFlow: Flow[ProcessEither, ProcessEither, NotUsed] =

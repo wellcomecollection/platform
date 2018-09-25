@@ -10,10 +10,17 @@ import uk.ac.wellcome.platform.archive.common.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models
-import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate, Progress => ProgressModel}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  ProgressEvent,
+  ProgressUpdate,
+  Progress => ProgressModel
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.progress.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.progress.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.platform.archive.progress.{Progress => ProgressApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -22,7 +29,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import scala.util.Random
 
 trait Progress
-  extends AkkaS3
+    extends AkkaS3
     with LocalDynamoDb
     with ProgressMonitorFixture
     with Messaging {
@@ -34,7 +41,8 @@ trait Progress
     Random.alphanumeric take length mkString
   }
 
-  def withProgress[R](monitor: ProgressMonitor)(testWith: TestWith[models.Progress, R]) = {
+  def withProgress[R](monitor: ProgressMonitor)(
+    testWith: TestWith[models.Progress, R]) = {
     val id = UUID.randomUUID().toString
     val createdProgress = ProgressModel(id, uploadUrl, Some(callbackUrl))
 
@@ -43,7 +51,9 @@ trait Progress
     testWith(storedProgress)
   }
 
-  def withProgressUpdate[R](id: String, status: ProgressModel.Status = ProgressModel.None)(testWith: TestWith[ProgressUpdate, R]) = {
+  def withProgressUpdate[R](id: String,
+                            status: ProgressModel.Status = ProgressModel.None)(
+    testWith: TestWith[ProgressUpdate, R]) = {
 
     val event = ProgressEvent(
       description = randomAlphanumeric()
@@ -58,9 +68,8 @@ trait Progress
     testWith(progress)
   }
 
-  def withApp[R](queuePair: QueuePair,
-                 topicArn: Topic,
-                 progressTable: Table)(testWith: TestWith[ProgressApp, R]) = {
+  def withApp[R](queuePair: QueuePair, topicArn: Topic, progressTable: Table)(
+    testWith: TestWith[ProgressApp, R]) = {
     val progress = new ProgressApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(
@@ -80,26 +89,16 @@ trait Progress
   }
 
   def withProgressApp[R](
-                          testWith: TestWith[(QueuePair, Topic, Table, ProgressApp),
-                            R]) = {
+    testWith: TestWith[(QueuePair, Topic, Table, ProgressApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalSnsTopic {
-        snsTopic =>
+      withLocalSnsTopic { snsTopic =>
+        withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) {
+          progressTable =>
+            withApp(queuePair, snsTopic, progressTable) { archivist =>
+              testWith((queuePair, snsTopic, progressTable, archivist))
+            }
 
-          withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) {
-            progressTable =>
-              withApp(queuePair, snsTopic, progressTable) {
-                archivist =>
-                  testWith(
-                    (
-
-                      queuePair,
-                      snsTopic,
-                      progressTable,
-                      archivist))
-              }
-
-          }
+        }
       }
     })
   }

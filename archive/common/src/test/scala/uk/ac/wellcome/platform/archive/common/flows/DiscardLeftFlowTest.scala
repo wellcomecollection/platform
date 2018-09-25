@@ -7,7 +7,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class DiscardLeftFlowTest
-  extends FunSpec
+    extends FunSpec
     with Akka
     with Matchers
     with ExtendedPatience

@@ -9,7 +9,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.util.Try
 
 class ProcessLogDiscardFlowTest
-  extends FunSpec
+    extends FunSpec
     with Akka
     with Matchers
     with ExtendedPatience
@@ -18,14 +18,14 @@ class ProcessLogDiscardFlowTest
   it("process, logs & discards failed events") {
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
-
         val e = new RuntimeException("EitherFlowTest")
-        val func: String => Try[Int] = (in: String) => Try {
-          if (in.startsWith("f")) {
-            throw e
-          }
+        val func: String => Try[Int] = (in: String) =>
+          Try {
+            if (in.startsWith("f")) {
+              throw e
+            }
 
-          in.length
+            in.length
         }
 
         val failList = List("fail", "flumps")

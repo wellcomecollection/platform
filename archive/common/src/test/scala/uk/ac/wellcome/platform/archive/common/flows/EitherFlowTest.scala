@@ -10,7 +10,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.util.Try
 
 class EitherFlowTest
-  extends FunSpec
+    extends FunSpec
     with Akka
     with Matchers
     with ExtendedPatience
@@ -19,14 +19,14 @@ class EitherFlowTest
   it("turns a Try into an Either, wrapping a FailedEvent[In]") {
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
-
         val e = new RuntimeException("EitherFlowTest")
-        val func: String => Try[Int] = (in: String) => Try {
-          if (in.startsWith("f")) {
-            throw e
-          }
+        val func: String => Try[Int] = (in: String) =>
+          Try {
+            if (in.startsWith("f")) {
+              throw e
+            }
 
-          in.length
+            in.length
         }
 
         val failList = List("fail", "flumps")
@@ -41,12 +41,15 @@ class EitherFlowTest
           .async
           .runWith(Sink.seq)(materializer)
 
-        whenReady(eventualResult) { result: Seq[Either[FailedEvent[String], Int]] =>
-          val lefts = result.filter(_.isLeft)
-          lefts.collect { case Left(l) => l } shouldBe failList.map(FailedEvent(e, _))
+        whenReady(eventualResult) {
+          result: Seq[Either[FailedEvent[String], Int]] =>
+            val lefts = result.filter(_.isLeft)
+            lefts.collect { case Left(l) => l } shouldBe failList.map(
+              FailedEvent(e, _))
 
-          val rights = result.filter(_.isRight)
-          rights.collect { case Right(r) => r } shouldBe succeedList.map(func(_).get)
+            val rights = result.filter(_.isRight)
+            rights.collect { case Right(r) => r } shouldBe succeedList.map(
+              func(_).get)
         }
       }
     }

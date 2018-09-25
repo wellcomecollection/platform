@@ -12,7 +12,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SNSPublishFlowTest
-  extends FunSpec
+    extends FunSpec
     with SNS
     with MockitoSugar
     with Akka
@@ -56,7 +56,7 @@ class SNSPublishFlowTest
             Person("Bobbert", 42),
             Person("Bobbrit", 41),
             Person("Borbbit", 40)
-          )
+        )
 
         val snsConfig = SNSConfig("bad_topic")
         val publishFlow =
@@ -84,7 +84,7 @@ class SNSPublishFlowTest
               Person("Bobbert", 42),
               Person("Bobbrit", 41),
               Person("Borbbit", 40)
-            )
+          )
 
           val snsConfig = SNSConfig(topic.arn)
           val publishFlow =
