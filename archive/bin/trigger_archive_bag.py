@@ -6,18 +6,24 @@ Create a request to archive a bag
 Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>] [--topic=<TOPIC_NAME>|--api=<API>] [--sns=(true|false)]
        trigger_archive_bag.py -h | --help
 
+Arguments:
+    BAG                    BagIt files to ingest
+
+Examples:
+    trigger_archive_bag.py b22454408.zip
+
 Options:
-  sns                    Send directly to SNS rather than through the API
-                         [default: false]
-  --bucket=<BUCKET_NAME> The S3 bucket containing the bags.
-                         [default: wellcomecollection-assets-archive-ingest]
-  --topic=<TOPIC_NAME>   The archivist topic.
-                         [default: archive-storage_archivist]
-   --api=<API>           The API endpoint to use
-                         [default: http://api.wellcomecollection.org/prod/storage/v1/ingests]
-   --sns=(true|false)    Send directly to SNS rather than through the API
-                         [default: false]
-  -h --help              Print this help message
+    sns                    Send directly to SNS rather than through the API
+                           [default: false]
+    --bucket=<BUCKET_NAME> The S3 bucket containing the bags.
+                           [default: wellcomecollection-assets-archive-ingest]
+    --topic=<TOPIC_NAME>   The archivist topic.
+                           [default: archive-storage_archivist]
+    --api=<API>            The API endpoint to use
+                           [default: http://api.wellcomecollection.org/storage/v1/ingests]
+    --sns=(true|false)     Send directly to SNS rather than through the API
+                           [default: false]
+    -h --help              Print this help message
 """
 
 import boto3
@@ -43,7 +49,12 @@ def archive_bag_api_messages(bags, bucket):
     """
     for bag in bags:
         yield {
-            'uploadUrl': f"s3://{bucket}/{bag}"
+            'type': 'Ingest',
+            'ingestType' : {
+                'id': 'create',
+                'type': 'IngestType'
+            },
+            'uploadUrl': f's3://{bucket}/{bag}'
         }
 
 
@@ -87,7 +98,21 @@ def call_ingest_api(bucket_name, bags, api):
     session = requests.Session()
     for message in archive_bag_api_messages(bags, bucket_name):
         response = session.post(api, json=message)
-        print(f'{message} -> {api} [{response.status_code}] {response.json()}')
+        status_code = response.status_code
+        if status_code != 202:
+            print_result(f'ERROR calling {api}', response)
+        else:
+            print(f'{message} -> {api} [{status_code}]')
+            location = response.headers.get('Location')
+            ingest = session.get(location)
+            if location:
+                print_result(location, ingest)
+
+
+def print_result(description, result):
+    print(description)
+    dumped_json = json.dumps(result.json(), indent=2)
+    print(dumped_json)
 
 
 def main():
