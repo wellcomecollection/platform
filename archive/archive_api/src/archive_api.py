@@ -123,7 +123,7 @@ class IngestResource(Resource):
         return jsonify(result)
 
 
-@app.route('/healthcheck')
+@app.route('/storage/v1/healthcheck')
 def route_report_healthcheck_status():
     return jsonify({'status': 'OK'})
 

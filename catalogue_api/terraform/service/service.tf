@@ -73,7 +73,7 @@ module "service" {
   namespace_id = "${var.namespace_id}"
 
   container_port = "${var.sidecar_container_port}"
-  container_name = "${module.task.sidecar_task_name}"
+  container_name = "${module.task.task_name}"
 
   task_definition_arn = "${module.task.task_definition_arn}"
 
