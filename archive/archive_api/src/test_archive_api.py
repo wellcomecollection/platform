@@ -47,7 +47,10 @@ class TestRequestNewIngest:
         assert b"'type' is a required property" in resp.data
 
     def test_invalid_type_is_badrequest(self, client):
-        resp = client.post('/storage/v1/ingests', json={'type': 'UnexpectedType'})
+        resp = client.post(
+            '/storage/v1/ingests',
+            json={'type': 'UnexpectedType'}
+        )
         assert resp.status_code == 400
         assert b"'UnexpectedType' is not one of ['Ingest']" in resp.data
 
@@ -57,8 +60,13 @@ class TestRequestNewIngest:
         assert b"'ingestType' is a required property" in resp.data
 
     def test_invalid_ingest_type_is_badrequest(self, client):
-        resp = client.post('/storage/v1/ingests', json={'type': 'Ingest',
-                                             'ingestType': {'type': 'UnexpectedIngestType'}})
+        resp = client.post(
+            '/storage/v1/ingests',
+            json={
+                'type': 'Ingest',
+                'ingestType': {'type': 'UnexpectedIngestType'}
+            }
+        )
         assert resp.status_code == 400
         assert b"'UnexpectedIngestType' is not one of ['IngestType']" in resp.data
 
@@ -68,7 +76,10 @@ class TestRequestNewIngest:
         assert b"'uploadUrl' is a required property" in resp.data
 
     def test_invalid_uploadurl_is_badrequest(self, client):
-        resp = client.post('/storage/v1/ingests', json=ingests_post('not-a-url'))
+        resp = client.post(
+            '/storage/v1/ingests',
+            json=ingests_post('not-a-url')
+        )
         assert resp.status_code == 400
         assert b"Invalid uploadUrl:'not-a-url', is not a complete URL" in resp.data
 
