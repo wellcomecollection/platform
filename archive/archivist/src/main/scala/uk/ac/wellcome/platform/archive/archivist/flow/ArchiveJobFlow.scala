@@ -3,24 +3,23 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
-import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob}
+import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 
-object ArchiveJobFlow extends Logging {
-  def apply(delimiter: String)(
-    implicit s3Client: AmazonS3
-  ): Flow[ArchiveJob, Either[ArchiveItemJob, ArchiveItemJob], NotUsed] = {
-    val archiveManifestFlow = ArchiveManifestFlow(delimiter)
-
-    val uploadVerificationFlow = UploadItemFlow()
-    val downloadVerification = DownloadItemFlow()
-
+object ArchiveJobFlow {
+  def apply(delimiter: String)(implicit s3Client: AmazonS3): Flow[ArchiveJob, ArchiveJob, NotUsed] =
     Flow[ArchiveJob]
-      .via(archiveManifestFlow)
-      .log("uploading and verifying")
-      .via(uploadVerificationFlow)
-      .via(FoldEitherFlow[ArchiveItemJob, ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob]](ifLeft = job => Left(job))(
-        ifRight = downloadVerification))
-      .log("download verified")
-  }
+
+      .via(ArchiveItemJobCreatorFlow(delimiter))
+      .collect{case Right(archiveItemJob) => archiveItemJob}
+      .via(ArchiveItemJobFlow(delimiter))
+      .groupBy(Int.MaxValue, {
+        case Right(archiveItemJob) => archiveItemJob.bagName
+        case Left(archiveItemJob) => archiveItemJob.bagName
+      })
+      .reduce((first, second) => if (first.isLeft) first else second)
+      .mergeSubstreams
+      // TODO: Log error here & ensure visibility set short
+      .collect {
+        case Right(archiveItemJob) => archiveItemJob.archiveJob
+      }
 }

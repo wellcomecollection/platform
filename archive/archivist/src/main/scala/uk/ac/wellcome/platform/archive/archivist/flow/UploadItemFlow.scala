@@ -19,8 +19,7 @@ object UploadItemFlow
     Flow[ArchiveItemJob]
       .map(j => (j, ZipFileReader.maybeInputStream(ZipLocation(j))))
       .map {
-      case (j, Some(inputStream)) => Right((j, inputStream))
-      case (j, None)              => Left(j)
+      case (j, option) => option.toRight(j).map(inputStream => (j,inputStream))
     }
     .via(
         FoldEitherFlow[

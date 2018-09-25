@@ -123,7 +123,7 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         supervisionStrategy.decider(ex) match {
           case Supervision.Stop    => failStage(ex)
           case Supervision.Resume  => completeStage()
-          case Supervision.Restart => ()
+          case Supervision.Restart => completeStage()
         }
       }
 

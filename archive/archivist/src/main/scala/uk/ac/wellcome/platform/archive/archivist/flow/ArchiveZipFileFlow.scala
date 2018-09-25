@@ -16,9 +16,9 @@ object ArchiveZipFileFlow extends Logging {
       case ZipFileDownloadComplete(zipFile, ingestRequest) =>
         Source
           .single(zipFile)
-          .mapConcat(ArchiveJob.create(_, config))
+          .map(ArchiveJob.create(_, config).right.get)
           // TODO: Log error here
-          .via(ArchiveBagFlow(config.bagItConfig.digestDelimiterRegexp))
+          .via(ArchiveJobFlow(config.bagItConfig.digestDelimiterRegexp))
           .map(job =>
             ArchiveComplete(
               job.bagLocation,

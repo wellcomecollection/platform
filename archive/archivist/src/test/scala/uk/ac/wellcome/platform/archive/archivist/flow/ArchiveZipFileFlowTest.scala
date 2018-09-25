@@ -5,12 +5,19 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
-import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, IngestRequestContextGenerators, UploadConfig}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagItConfig,
+  BagUploaderConfig,
+  IngestRequestContextGenerators,
+  UploadConfig
+}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveZipFileFlowTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with ArchivistFixture
@@ -30,47 +37,42 @@ class ArchiveZipFileFlowTest
 
   it("succeeds when verifying and uploading a valid bag") {
     withLocalS3Bucket { storageBucket =>
-      withMockProgressMonitor() { archiveProgressMonitor =>
-                val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-                withBagItZip(dataFileCount = 1) {case (bagName, zipFile) =>
-                  val uploader = ArchiveZipFileFlow(bagUploaderConfig)
-                  val ingestContext = createIngestBagRequestWith()
-                  val (_, verification) =
-                    uploader.runWith(
-                      Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
-                      Sink.seq
-                    )
+      val bagUploaderConfig = createBagUploaderConfig(storageBucket)
+      withBagItZip(dataFileCount = 1) {
+        case (bagName, zipFile) =>
+          val uploader = ArchiveZipFileFlow(bagUploaderConfig)
+          val ingestContext = createIngestBagRequestWith()
+          val (_, verification) =
+            uploader.runWith(
+              Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
+              Sink.seq
+            )
 
-                  whenReady(verification) { result =>
-                    listKeysInBucket(storageBucket) should have size 4
-                    result should have size 1
-                  }
-                }
-              }
-            }
+          whenReady(verification) { result =>
+            listKeysInBucket(storageBucket) should have size 4
+            result should have size 1
+          }
+      }
+    }
   }
 
   it("fails when verifying and uploading an invalid bag") {
     withLocalS3Bucket { storageBucket =>
-      withMockProgressMonitor() { archiveProgressMonitor =>
+      val bagUploaderConfig = createBagUploaderConfig(storageBucket)
+      withBagItZip(dataFileCount = 1, createDigest = _ => "bad_digest") {
+        case (bagName, zipFile) =>
+          val uploader = ArchiveZipFileFlow(bagUploaderConfig)
+          val ingestContext = createIngestBagRequest
 
-                val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-                withBagItZip(dataFileCount = 1,createDigest = _ => "bad_digest") { case (bagName, zipFile) =>
+          val (_, verification) =
+            uploader.runWith(
+              Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
+              Sink.seq)
 
-                  val uploader = ArchiveZipFileFlow(bagUploaderConfig)
-                  val ingestContext = createIngestBagRequest
-
-                  val (_, verification) =
-                    uploader.runWith(
-                      Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
-                      Sink.seq)
-
-                  whenReady(verification) { result =>
-                    result shouldBe empty
-                  }
-                }
-              }
-            }
+          whenReady(verification) { result => result shouldBe empty
+          }
+      }
+    }
 
   }
 }

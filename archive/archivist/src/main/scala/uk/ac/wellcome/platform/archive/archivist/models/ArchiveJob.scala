@@ -8,7 +8,7 @@ case class ArchiveJob(
                        zipFile: ZipFile,
                        bagLocation: BagLocation,
                        config: BagItConfig,
-                       bagManifestLocation: BagManifestLocation
+                       bagManifestLocations: List[BagManifestLocation]
                      ) {
   def digestDelimiter = config.digestDelimiterRegexp
 }
@@ -20,22 +20,23 @@ object ArchiveJob {
               config: BagUploaderConfig
             ) = {
 
-    val maybeBagPath = findBag(zipFile).toList
+    val maybeBagPath = findBag(zipFile).toRight(new NoSuchElementException("bagit.txt"))
 
     maybeBagPath
-      .flatMap(BagManifestLocation.create(config.bagItConfig, _))
-      .map(bagManifestLocation => {
-        ArchiveJob(
-          zipFile,
-          BagLocation(
-            storageNamespace = config.uploadConfig.uploadNamespace,
-            storagePath = config.uploadConfig.uploadPrefix,
-            bagPath = bagManifestLocation.path
-          ),
-          config.bagItConfig,
-          bagManifestLocation
-        )
-      })
+      .map(bagPath =>
+        (bagPath, BagManifestLocation.create(config.bagItConfig, bagPath)))
+      .map { case (bagPath, bagManifestLocations) =>
+      ArchiveJob(
+        zipFile,
+        BagLocation(
+          storageNamespace = config.uploadConfig.uploadNamespace,
+          storagePath = config.uploadConfig.uploadPrefix,
+          bagPath = bagPath
+        ),
+        config.bagItConfig,
+        bagManifestLocations
+      )
+    }
   }
 
   private def findBag(zipFile: ZipFile) = {

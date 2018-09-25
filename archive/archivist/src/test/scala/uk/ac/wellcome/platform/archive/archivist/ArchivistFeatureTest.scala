@@ -100,7 +100,7 @@ class ArchivistFeatureTest
 
                     eventually {
 
-                      assertQueuePairSizes(queuePair, 0, 2)
+//                      assertQueuePairSizes(queuePair, 0, 2)
 
                       assertSnsReceives(
                         Set(
