@@ -4,6 +4,57 @@ set -o errexit
 set -o nounset
 set -o xtrace
 
+
+# We're going to use the Message Of The Day (MOTD) to report the progress
+# of this bootstrap script.  First remove a bunch of stuff from the default
+# MOTD to make it a bit cleaner.
+rm -f /etc/update-motd.d/00-header
+rm -f /etc/update-motd.d/51-cloudguest
+rm -f /etc/update-motd.d/9*
+
+# This script will print "BOOTSTRAP COMPLETE/PENDING" when you first log
+# on to the box, depending on whether this script has completed.
+#
+# It relies on the fact that this script is written on the box to
+#
+#     /var/lib/cloud/instance/scripts/part-001
+#
+# which seems to be true, but is based on anecdotal evidence.  This has
+# been consistent so far, but we can't be sure it's true!
+#
+BOOTSTRAP_COMPLETE_PATH="/usr/local/bootstrap_complete"
+
+cat << EOF > /etc/update-motd.d/99-bootstrap-motd
+#!/bin/bash
+
+echo ""
+
+ps -eaf | grep "bash /var/lib/cloud/instance/scripts/part-001" | grep --quiet --invert-match grep
+
+
+if (( \$? == 0 ))
+then
+  echo -e "\e[33m*** BOOTSTRAP RUNNING ***\e[0m"
+else
+  if [[ -f "$BOOTSTRAP_COMPLETE_PATH" ]]
+  then
+    echo -e "\e[32m*** BOOTSTRAP COMPLETE ***\e[0m"
+  else
+    echo -e "\e[31m*** BOOTSTRAP FAILED ***"
+    echo ""
+    echo "Check the bootstrap script logs for more information:"
+    echo ""
+    echo -e "$ cat /var/log/cloud-init-output.log\e[0m"
+  fi
+fi
+
+echo ""
+EOF
+
+chmod +x /etc/update-motd.d/99-bootstrap-motd
+
+
+
 # Create jupyter user
 adduser ${notebook_user} --gecos "" --disabled-password
 
@@ -50,3 +101,9 @@ popd
 
 # Start notebook server
 runuser --login ${notebook_user} --command '/home/ubuntu/anaconda3/bin/jupyter notebook'
+
+
+
+# Finally, mark this script as complete.
+touch "$BOOTSTRAP_COMPLETE_PATH"
+wall "*** BOOTSTRAP COMPLETE ***"
