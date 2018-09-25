@@ -102,14 +102,14 @@ def main():
         subprocess.check_call([
             'ssh',
 
-            # Use the provided SSH key to connect
+            # Use the provided SSH key to connect.
             '-i', key_path,
 
             # Create a tunnel to port 8888 (Jupyter) on the remote host
             '-L', '%s:%s:8888' % (port, public_dns),
 
             # Our data science AMI is based on Ubuntu
-                  'ubuntu@%s' % public_dns
+            'ubuntu@%s' % public_dns
         ])
     except subprocess.CalledProcessError as err:
         sys.exit(err.returncode)
