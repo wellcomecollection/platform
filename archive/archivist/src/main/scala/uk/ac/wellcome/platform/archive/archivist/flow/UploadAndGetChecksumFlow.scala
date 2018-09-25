@@ -15,15 +15,15 @@ object UploadAndGetChecksumFlow {
         import GraphDSL.Implicits._
 
         val verify = b.add(ArchiveChecksumFlow("SHA-256"))
-        val broadcast = b.add(Flow[ByteString])
+        val flow = b.add(Flow[ByteString])
         val upload = b.add(S3UploadFlow(uploadLocation))
         val ignore = b.add(Sink.ignore)
 
-        broadcast.out ~> verify.inlets.head
+        flow.out ~> verify.inlets.head
 
         verify.outlets(0).log("uploading to s3") ~> upload ~> ignore.in
 
-        FlowShape(broadcast.in, verify.outlets(1))
+        FlowShape(flow.in, verify.outlets(1))
       }
     )
   }

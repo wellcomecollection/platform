@@ -19,10 +19,12 @@ object UploadItemFlow
     Flow[ArchiveItemJob]
       .flatMapConcat {
         case job@ArchiveItemJob(_, BagItem(checksum, _)) =>
-          Source.single(job).map(ZipLocation.apply)
-            .via(ZipFileEntryFlow.apply())
+          Source.single(job).map(ZipLocation.apply).log("extracting file from zip")
+            .via(ZipFileEntryFlow.apply()).log("uploading and extracting checksum")
             .via(UploadAndGetChecksumFlow(job.uploadLocation))
+            .log("comparing checksum")
             .map(compare(checksum))
+            .log("to either")
             .map{
               case true => Right(job)
               case false => Left(job)

@@ -16,14 +16,14 @@ object Common {
       ) ++ fullResolvers.value ++ Seq(Resolver.sonatypeRepo("releases")),
 
     scalacOptions ++= Seq(
-//      "-deprecation",
-//      "-unchecked",
+      "-deprecation",
+      "-unchecked",
       "-encoding",
       "UTF-8",
-//      "-Xlint",
-//      "-Xverify",
+      "-Xlint",
+      "-Xverify",
 //      "-Xfatal-warnings",
-//      "-feature",
+      "-feature",
       "-language:postfixOps"
     ),
     parallelExecution in Test := false,

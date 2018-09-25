@@ -12,6 +12,8 @@ import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
+import scala.util.Failure
+
 class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka{
 
   it("writes a stream of bytestring to S3"){
@@ -22,9 +24,9 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka{
             val s3Key = "key.txt"
             val futureResult = StreamConverters.fromInputStream(() => new ByteArrayInputStream(content.getBytes())).via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client)).runWith(Sink.head)
 
-            whenReady(futureResult) { result =>
-              result.getBucketName shouldBe bucket.name
-              result.getKey shouldBe s3Key
+            whenReady(futureResult) { triedResult =>
+              triedResult.get.getBucketName shouldBe bucket.name
+              triedResult.get.getKey shouldBe s3Key
 
               getContentFromS3(bucket, s3Key) shouldBe content
             }
@@ -63,8 +65,8 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka{
 
           whenReady(futureResult) { result =>
           result should have size 1
-            result.head.getBucketName shouldBe bucket.name
-            result.head.getKey shouldBe s3Key
+            result.head.get.getBucketName shouldBe bucket.name
+            result.head.get.getKey shouldBe s3Key
 
             val is = s3Client.getObject(bucket.name, s3Key).getObjectContent
             Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray shouldBe res
@@ -131,7 +133,8 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka{
             .via(S3UploadFlow(ObjectLocation("does-not-exist", s3Key))(s3Client)).runWith(Sink.seq)
 
           whenReady(futureResult) { result =>
-            result shouldBe empty
+            result should have size 1
+            result.head shouldBe a[Failure[_]]
           }
         }
   }

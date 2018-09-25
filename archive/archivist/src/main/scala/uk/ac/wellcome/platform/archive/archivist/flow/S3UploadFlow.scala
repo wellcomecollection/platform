@@ -1,24 +1,18 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import java.io.{ByteArrayInputStream, InputStream}
-import java.security.MessageDigest
+import java.io.ByteArrayInputStream
 
-import akka.NotUsed
 import akka.stream.ActorAttributes.SupervisionStrategy
 import akka.stream._
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Source, StreamConverters, Zip}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model._
-import com.amazonaws.services.s3.transfer.TransferManager
-import com.amazonaws.services.s3.transfer.model.UploadResult
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.concurrent.Promise
 import scala.util.{Failure, Success, Try}
 
 
@@ -27,13 +21,13 @@ object S3UploadFlow extends Logging{
 }
 
 class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
-  extends GraphStage[FlowShape[ByteString, CompleteMultipartUploadResult]]
+  extends GraphStage[FlowShape[ByteString, Try[CompleteMultipartUploadResult]]]
     with Logging {
 
   val in = Inlet[ByteString]("S3UploadFlow.in")
-  val out = Outlet[CompleteMultipartUploadResult]("S3UploadFlow.out")
+  val out = Outlet[Try[CompleteMultipartUploadResult]]("S3UploadFlow.out")
 
-  override val shape = FlowShape[ByteString, CompleteMultipartUploadResult](in, out)
+  override val shape = FlowShape.of(in, out)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
@@ -61,20 +55,8 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           }
 
           override def onUpstreamFinish(): Unit = {
-            maybeUploadId match {
-              case Some(uploadId) =>
-                val compRequest =
-                  new CompleteMultipartUploadRequest(
-                    uploadLocation.namespace,
-                    uploadLocation.key,
-                    uploadId,
-                    partEtagList.asJava)
-                val res = Try(s3Client.completeMultipartUpload(compRequest))
-                res match {
-                  case Success(result) => push(out, result)
-                  case Failure(ex) => handleFailure(ex)
-                }
-              case None => ()
+            maybeUploadId.foreach { uploadId =>
+              completeUpload(uploadId)
             }
 
             completeStage()
@@ -86,6 +68,53 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       )
 
+      @tailrec
+      private def uploadByteString(byteString: ByteString): Unit = {
+        if (byteString.nonEmpty) {
+          val (current, next) = byteString.splitAt(maxSize)
+          val triedUploadResult = getUploadId.flatMap{uploadId =>
+
+            val inputStream = new ByteArrayInputStream(current.toArray)
+            Try(
+            s3Client.uploadPart(
+              new UploadPartRequest()
+                .withBucketName(uploadLocation.namespace)
+                .withKey(uploadLocation.key)
+                .withUploadId(uploadId)
+                .withInputStream(inputStream)
+                .withPartNumber(partNumber)
+                .withPartSize(current.size)
+            ))}
+          triedUploadResult match {
+            case Failure(ex) =>
+              handleInternalFailure(ex)
+            case Success(uploadResult) =>
+              partNumber = partNumber + 1
+              partEtagList = partEtagList :+ uploadResult.getPartETag
+              uploadByteString(next)
+          }
+        }
+      }
+
+      private def completeUpload(uploadId: String) = {
+        val compRequest =
+          new CompleteMultipartUploadRequest(
+            uploadLocation.namespace,
+            uploadLocation.key,
+            uploadId,
+            partEtagList.asJava)
+        val res = Try(s3Client.completeMultipartUpload(compRequest))
+        res match {
+          case Success(result) => push(out, Try(result))
+          case Failure(ex)     => handleInternalFailure(ex)
+        }
+      }
+
+      private def handleInternalFailure(ex: Throwable) = {
+        push(out, Failure(ex))
+        handleFailure(ex)
+      }
+
       private def handleFailure(ex: Throwable) = {
         abortUpload()
         val supervisionStrategy = inheritedAttributes.get[SupervisionStrategy](
@@ -96,58 +125,33 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           case Supervision.Restart => ()
         }
       }
-      @tailrec
-      private def uploadByteString(byteString: ByteString): Unit = {
-        if (byteString.nonEmpty) {
-          val (current, next) = byteString.splitAt(maxSize)
-          val array = current.toArray
-          val triedUploadResult = Try(
-            s3Client.uploadPart(
-              new UploadPartRequest()
-                .withBucketName(uploadLocation.namespace)
-                .withKey(uploadLocation.key)
-                .withUploadId(getUploadId)
-                .withInputStream(new ByteArrayInputStream(array))
-                .withPartNumber(partNumber)
-                .withPartSize(array.length)
-            ))
-          triedUploadResult match {
-            case Failure(ex) =>
-              handleFailure(ex)
-            case Success(uploadResult) =>
-              partNumber = partNumber + 1
-              partEtagList = partEtagList :+ uploadResult.getPartETag
-              uploadByteString(next)
-          }
-        }
-      }
-      private def abortUpload() = {
-        maybeUploadId match {
-          case Some(uploadId) =>
-            Try(
-              s3Client.abortMultipartUpload(
-          new AbortMultipartUploadRequest(
-            uploadLocation.namespace,
-            uploadLocation.key,
-            uploadId)))
-          case None => ()
-        }
-      }
-      private def getUploadId = {
-      maybeUploadId match {
-        case None =>
-          val initializedId = initializeUpload(uploadLocation)
-          maybeUploadId = Some(initializedId)
-          initializedId
-        case Some(initializedId) => initializedId
-      }
-    }
-      private def initializeUpload(uploadLocation: ObjectLocation)= {
-        val initRequest = new InitiateMultipartUploadRequest(uploadLocation.namespace, uploadLocation.key)
-        val initResponse = s3Client.initiateMultipartUpload(initRequest)
 
-        initResponse.getUploadId
+      private def abortUpload() = {
+        maybeUploadId.foreach{uploadId =>
+          Try(
+            s3Client.abortMultipartUpload(
+              new AbortMultipartUploadRequest(
+                uploadLocation.namespace,
+                uploadLocation.key,
+                uploadId)))
+        }
       }
+
+      private def getUploadId: Try[String] = maybeUploadId match {
+        case None =>
+          val triedUploadId = initializeUpload(uploadLocation)
+          triedUploadId.foreach(uploadId => maybeUploadId = Some(uploadId))
+          triedUploadId
+        case Some(initializedId) => Try(initializedId)
+
+    }
+      private def initializeUpload(uploadLocation: ObjectLocation)=
+        Try(s3Client
+          .initiateMultipartUpload(
+            new InitiateMultipartUploadRequest(
+              uploadLocation.namespace,
+              uploadLocation.key))
+          .getUploadId)
     }
 
 

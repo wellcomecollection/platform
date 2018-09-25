@@ -10,6 +10,7 @@ import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.BagPath
 import uk.ac.wellcome.storage.fixtures.S3
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.Akka
 
 class UploadItemFlowTest extends FunSpec with Matchers with S3 with MockitoSugar with ZipBagItFixture with Akka with ScalaFutures with ArchiveJobGenerators {
@@ -74,4 +75,35 @@ class UploadItemFlowTest extends FunSpec with Matchers with S3 with MockitoSugar
       }
     }
   }
+
+  it("sends a left of archive item job when uploading a file fails because the bucket does not exist") {
+      withLocalS3Bucket { bucket =>
+        withActorSystem { implicit actorSystem =>
+          withMaterializer(actorSystem) { implicit materializer =>
+            val fileContent = "bah buh bih beh"
+            val namespace = "basepath"
+
+            val fileName = "key.txt"
+            withZipFile(List(FileEntry(s"$namespace/$fileName", fileContent))) { zipFile =>
+
+              val digest = "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
+
+              val bagName = BagPath(randomAlphanumeric())
+
+              val failingArchiveItemJob = createArchiveItemJob(zipFile, Bucket("does-not-exist"), digest, bagName, fileName, namespace)
+
+              val source = Source.single(failingArchiveItemJob)
+              val flow = UploadItemFlow()(s3Client)
+              val futureResult = source via flow runWith Sink.seq
+
+              whenReady(futureResult) { result =>
+                result shouldBe List(Left(failingArchiveItemJob))
+              }
+
+            }
+          }
+        }
+      }
+    }
+
 }
