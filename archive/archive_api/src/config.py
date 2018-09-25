@@ -19,6 +19,4 @@ class ArchiveAPIConfig(object):
                 self.DYNAMODB_TABLE_NAME = os.environ['TABLE_NAME']
                 self.SNS_TOPIC_ARN = os.environ['TOPIC_ARN']
         except KeyError as err:
-            raise RuntimeError(
-                f'Unable to create config: {err!r}'
-            )
+            raise RuntimeError(f'Unable to create config: {err!r}')
