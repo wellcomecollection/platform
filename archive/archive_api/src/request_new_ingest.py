@@ -38,7 +38,6 @@ def create_archive_bag_message(guid, bag_url, callback_url):
 def send_new_ingest_request(sns_client, topic_arn, ingest_request_id, upload_url, callback_url):
     """
     Create a new ingest request, and send a notification to SNS.
-
     """
     message = create_archive_bag_message(
         guid=ingest_request_id,

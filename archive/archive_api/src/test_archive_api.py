@@ -58,7 +58,7 @@ class TestRequestNewIngest:
 
     def test_invalid_ingest_type_is_badrequest(self, client):
         resp = client.post('/ingests', json={'type': 'Ingest',
-                                              'ingestType': {'type': 'UnexpectedIngestType'}})
+                                             'ingestType': {'type': 'UnexpectedIngestType'}})
         assert resp.status_code == 400
         assert b"'UnexpectedIngestType' is not one of ['IngestType']" in resp.data
 

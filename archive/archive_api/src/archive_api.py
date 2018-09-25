@@ -50,6 +50,7 @@ error_model = api.model('Error', {
     'type': fields.String(description='type'),
 })
 
+
 @ns.route('')
 class IngestCollection(Resource):
     @api.expect(ingest_request_model, validate=True)
@@ -118,6 +119,7 @@ class IngestResource(Resource):
 @app.route('/healthcheck')
 def route_report_healthcheck_status():
     return jsonify({'status': 'OK'})
+
 
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)
