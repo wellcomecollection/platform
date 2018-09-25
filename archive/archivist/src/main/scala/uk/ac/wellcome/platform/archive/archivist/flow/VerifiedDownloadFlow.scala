@@ -1,26 +1,23 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import akka.Done
+import akka.NotUsed
 import akka.stream.FlowShape
-import akka.stream.scaladsl.{Flow, GraphDSL, Zip}
+import akka.stream.scaladsl.{Flow, GraphDSL, Sink}
 import akka.util.ByteString
 
 object VerifiedDownloadFlow {
-  def apply() = Flow.fromGraph(
+  def apply(): Flow[ByteString, String, NotUsed] = Flow.fromGraph(
     GraphDSL.create() {
       implicit b => {
 
         import GraphDSL.Implicits._
 
         val v = b.add(ArchiveChecksumFlow("SHA-256"))
-        val zip = b.add(Zip[Done, ByteString])
+        val ignore = b.add(Sink.ignore)
 
-        v.inlets.head
+        v.out0 ~> ignore.in
 
-        v.outlets(0).fold(Done)((out, _) => out) ~> zip.in0
-        v.outlets(1) ~> zip.in1
-
-        FlowShape(v.in, zip.out.map{ case (_, checksum) => checksum}.outlet)
+        FlowShape(v.in, v.out1)
       }
     })
 }

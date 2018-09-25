@@ -4,12 +4,11 @@ import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
-import uk.ac.wellcome.platform.archive.archivist.util.CompareChecksum
 
 import scala.util.Try
 
 
-object DownloadItemFlow extends Logging with CompareChecksum {
+object DownloadItemFlow extends Logging {
 
   def apply()(implicit s3Client: AmazonS3) = {
     Flow[Either[ArchiveItemJob, ArchiveItemJob]]
@@ -26,10 +25,9 @@ object DownloadItemFlow extends Logging with CompareChecksum {
 
             downloadStream
               .via(VerifiedDownloadFlow())
-              .map(compare(job.bagDigestItem.checksum))
               .map {
-                case true => Right(job)
-                case false => Left(job)
+                case calculatedChecksum if job.bagDigestItem.checksum == calculatedChecksum => Right(job)
+                case _ => Left(job)
               }
 
           }.getOrElse(Source.single(Left(job)))

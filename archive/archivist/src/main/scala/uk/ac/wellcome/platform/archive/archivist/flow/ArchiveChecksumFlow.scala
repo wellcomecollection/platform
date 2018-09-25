@@ -8,14 +8,14 @@ import akka.util.ByteString
 import grizzled.slf4j.Logging
 
 class ArchiveChecksumFlow(algorithm: String)
-  extends GraphStage[UniformFanOutShape[ByteString, ByteString]]
+  extends GraphStage[FanOutShape2[ByteString, ByteString, String]]
   with Logging {
 
   val in = Inlet[ByteString]("DigestCalculator.in")
   val out = Outlet[ByteString]("DigestCalculator.out")
-  val outDigest = Outlet[ByteString]("DigestCalculatorFinished.out")
+  val outDigest = Outlet[String]("DigestCalculatorFinished.out")
 
-  override val shape = UniformFanOutShape[ByteString, ByteString](in, out, outDigest)
+  override val shape = new FanOutShape2[ByteString, ByteString, String](in, out, outDigest)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) {
@@ -23,6 +23,13 @@ class ArchiveChecksumFlow(algorithm: String)
 
       setHandler(out, new OutHandler {
         override def onPull(): Unit = pull(in)
+
+        override def onDownstreamFinish(): Unit = {
+          push(outDigest, toStringChecksum(ByteString(digest.digest())))
+
+          digest.reset()
+          completeStage()
+        }
       })
 
       setHandler(outDigest, new OutHandler {
@@ -41,13 +48,23 @@ class ArchiveChecksumFlow(algorithm: String)
           }
 
           override def onUpstreamFinish(): Unit = {
-            push(outDigest, ByteString(digest.digest()))
+            push(outDigest, toStringChecksum(ByteString(digest.digest())))
 
             digest.reset()
             completeStage()
           }
         }
       )
+
+      private def toStringChecksum(byteChecksum: ByteString) = {
+        byteChecksum
+          .map(0xFF & _)
+          .map("%02x".format(_))
+          .foldLeft("") {
+            _ + _
+          }
+          .mkString
+      }
     }
 }
 

@@ -40,7 +40,7 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         partEtagList = Nil
       }
 
-      val maxSize = 5 * 1024 * 1024
+      val maxSize: Int = 5 * 1024 * 1024
 
       setHandler(out, new OutHandler {
         override def onPull(): Unit = pull(in)
@@ -96,7 +96,7 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       }
 
-      private def completeUpload(uploadId: String) = {
+      private def completeUpload(uploadId: String): Unit = {
         val compRequest =
           new CompleteMultipartUploadRequest(
             uploadLocation.namespace,
@@ -110,12 +110,13 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       }
 
-      private def handleInternalFailure(ex: Throwable) = {
+      private def handleInternalFailure(ex: Throwable): Unit = {
         push(out, Failure(ex))
         handleFailure(ex)
       }
 
-      private def handleFailure(ex: Throwable) = {
+      private def handleFailure(ex: Throwable): Unit = {
+        error("There was a failure uploading to s3!", ex)
         abortUpload()
         val supervisionStrategy = inheritedAttributes.get[SupervisionStrategy](
           SupervisionStrategy(_ => Supervision.Stop))
@@ -126,7 +127,7 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       }
 
-      private def abortUpload() = {
+      private def abortUpload(): Unit = {
         maybeUploadId.foreach{uploadId =>
           Try(
             s3Client.abortMultipartUpload(

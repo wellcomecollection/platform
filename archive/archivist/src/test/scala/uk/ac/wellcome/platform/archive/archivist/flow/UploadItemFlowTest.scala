@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import akka.stream.{ActorAttributes, Supervision}
 import akka.stream.scaladsl.{Sink, Source}
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
@@ -76,8 +77,7 @@ class UploadItemFlowTest extends FunSpec with Matchers with S3 with MockitoSugar
     }
   }
 
-  it("sends a left of archive item job when uploading a file fails because the bucket does not exist") {
-      withLocalS3Bucket { bucket =>
+  it("sends a left of archive item job when uploading a file fails because the bucket does not exist (Resume supervision strategy)") {
         withActorSystem { implicit actorSystem =>
           withMaterializer(actorSystem) { implicit materializer =>
             val fileContent = "bah buh bih beh"
@@ -93,7 +93,11 @@ class UploadItemFlowTest extends FunSpec with Matchers with S3 with MockitoSugar
               val failingArchiveItemJob = createArchiveItemJob(zipFile, Bucket("does-not-exist"), digest, bagName, fileName, namespace)
 
               val source = Source.single(failingArchiveItemJob)
-              val flow = UploadItemFlow()(s3Client)
+              val decider: Supervision.Decider = { e =>
+                error("Stream failure", e)
+                Supervision.Resume
+              }
+              val flow = UploadItemFlow()(s3Client).withAttributes(ActorAttributes.supervisionStrategy(decider))
               val futureResult = source via flow runWith Sink.seq
 
               whenReady(futureResult) { result =>
@@ -104,6 +108,5 @@ class UploadItemFlowTest extends FunSpec with Matchers with S3 with MockitoSugar
           }
         }
       }
-    }
 
 }

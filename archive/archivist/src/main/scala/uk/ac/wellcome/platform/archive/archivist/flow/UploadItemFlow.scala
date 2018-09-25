@@ -1,16 +1,17 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import java.io.InputStream
+
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ZipLocation}
-import uk.ac.wellcome.platform.archive.archivist.util.CompareChecksum
+import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models.BagItem
 
 object UploadItemFlow
-  extends Logging
-    with CompareChecksum {
+  extends Logging {
   def apply()(
     implicit s3Client: AmazonS3
   ): Flow[ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob],
@@ -19,17 +20,9 @@ object UploadItemFlow
     Flow[ArchiveItemJob]
       .flatMapConcat {
         case job@ArchiveItemJob(_, BagItem(checksum, _)) =>
-          Source.single(job).map(ZipLocation.apply).log("extracting file from zip")
-            .via(ZipFileEntryFlow.apply()).log("uploading and extracting checksum")
-            .via(UploadAndGetChecksumFlow(job.uploadLocation))
-            .log("comparing checksum")
-            .map(compare(checksum))
-            .log("to either")
-            .map{
-              case true => Right(job)
-              case false => Left(job)
-            }
-
+          Source.single(job)
+            .map(j => ZipFileReader.maybeInputStream(ZipLocation(j)))
+            .via(FoldOptionFlow[InputStream, Either[ArchiveItemJob, ArchiveItemJob]](Left(job))(UploadInputStreamFlow(job, checksum)))
       }
   }
 }
