@@ -50,7 +50,7 @@ def archive_bag_api_messages(bags, bucket):
     for bag in bags:
         yield {
             'type': 'Ingest',
-            'ingestType' : {
+            'ingestType': {
                 'id': 'create',
                 'type': 'IngestType'
             },
