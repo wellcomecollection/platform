@@ -37,15 +37,8 @@ logger = daiquiri.getLogger()
 api.namespaces.clear()
 ns = api.namespace('ingests', description='Ingest requests')
 
-ingest_request_model = api.model('Ingest request', {
-    'type': fields.String(description='Type of the object', enum=['Ingest'], required=True),
-    'uploadUrl': fields.String(description='URL of uploaded BagIt resource, supports only a zipped BagIt file', required=True),
-    'callbackUrl': fields.String(description='URL to use for callback on completion or failure'),
-    'ingestType': fields.Nested(api.model('Ingest type', {
-        'type': fields.String(description='Type of the object', enum=['IngestType'], required=True),
-        'id': fields.String(description='Identifier for ingest type', enum=['create'], required=True),
-    }), description="Request to ingest a BagIt resource", required=True)
-})
+
+from models import ingest_request_model
 
 error_model = api.model('Error', {
     '@context': fields.String(description='Context URL'),
