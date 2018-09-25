@@ -7,7 +7,6 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
 
 case class ProgressConfig(
-  s3ClientConfig: S3ClientConfig,
   cloudwatchClientConfig: CloudwatchClientConfig,
   sqsClientConfig: SQSClientConfig,
   sqsConfig: SQSConfig,

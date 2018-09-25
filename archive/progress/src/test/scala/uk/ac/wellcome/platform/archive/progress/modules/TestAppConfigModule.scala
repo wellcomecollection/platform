@@ -19,12 +19,6 @@ class TestAppConfigModule(queueUrl: String,
 
   @Provides
   def providesAppConfig = {
-    val s3ClientConfig = S3ClientConfig(
-      accessKey = Some("accessKey1"),
-      secretKey = Some("verySecretKey1"),
-      region = "localhost",
-      endpoint = Some("http://localhost:33333")
-    )
     val cloudwatchClientConfig = CloudwatchClientConfig(
       region = "localhost",
       endpoint = Some("localhost")
@@ -64,7 +58,6 @@ class TestAppConfigModule(queueUrl: String,
     )
 
     ProgressConfig(
-      s3ClientConfig,
       cloudwatchClientConfig,
       sqsClientConfig,
       sqsConfig,

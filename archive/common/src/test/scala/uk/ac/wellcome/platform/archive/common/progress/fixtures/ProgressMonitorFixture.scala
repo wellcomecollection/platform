@@ -12,7 +12,6 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
 import uk.ac.wellcome.platform.archive.common.progress.models.{
-  FailedEvent,
   Progress,
   ProgressUpdate
 }
@@ -43,9 +42,7 @@ trait ProgressMonitorFixture
 
   def withProgressUpdateFlow[R](table: Table)(
     testWith: TestWith[(
-                         Flow[ProgressUpdate,
-                              Either[FailedEvent[ProgressUpdate], Progress],
-                              NotUsed],
+                         Flow[ProgressUpdate, Progress, NotUsed],
                          ProgressMonitor
                        ),
                        R]): R = {

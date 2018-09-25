@@ -62,6 +62,7 @@ cache:
     - archive/commmon/target
     - archive/archivist/target
     - archive/registrar/target
+    - archive/progress/target
 
 
 # Based on instructions from
@@ -164,6 +165,7 @@ jobs:
     - env: TASK=archive_common-test
     - env: TASK=registrar-test
     - env: TASK=archivist-test
+    - env: TASK=progress-test
     - env:
         - TRAVIS_LAMBDAS="archive_bags \
           archive_report_ingest_status \

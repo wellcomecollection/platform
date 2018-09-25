@@ -102,7 +102,7 @@ class ProgressUpdateFlowTest
     }
   }
 
-  it("materializes a Left[FailedProgressUpdate] if an update fails") {
+  it("continues on failure") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
@@ -117,13 +117,10 @@ class ProgressUpdateFlowTest
                 .single(update)
                 .via(flow)
                 .async
-                .runWith(Sink.head)(materializer)
+                .runWith(Sink.seq)(materializer)
 
               whenReady(updates) { result =>
-                result.isLeft shouldBe true
-                result.left.get.e.getMessage should include(
-                  s"Progress does not exist for id:$id"
-                )
+                result shouldBe empty
               }
             })
           })

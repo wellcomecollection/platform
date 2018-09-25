@@ -1,14 +1,13 @@
-package uk.ac.wellcome.platform.archive.common.progress
+package uk.ac.wellcome.platform.archive.common.flows
 
 import akka.stream.FlowShape
 import akka.stream.scaladsl.{Flow, GraphDSL, Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.common.flows.EitherFanOutFlow
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-class EitherFanOutFlowTest
+class EitherFanOutTest
     extends FunSpec
     with Akka
     with Matchers
@@ -32,7 +31,7 @@ class EitherFanOutFlowTest
 
           val r = builder.add(rightFlow)
 
-          val e = builder.add(EitherFanOutFlow[String, String]())
+          val e = builder.add(EitherFanOut[String, String]())
           val s = builder.add(Sink.ignore)
 
           e.out0 ~> s
@@ -75,7 +74,7 @@ class EitherFanOutFlowTest
 
           val l = builder.add(leftFlow)
 
-          val e = builder.add(EitherFanOutFlow[String, String]())
+          val e = builder.add(EitherFanOut[String, String]())
           val s = builder.add(Sink.ignore)
 
           e.out0 ~> l

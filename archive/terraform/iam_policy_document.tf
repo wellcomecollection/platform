@@ -76,6 +76,22 @@ data "aws_iam_policy_document" "archive_progress_table_read_write_policy" {
   }
 }
 
+# Progress
+
+data "aws_iam_policy_document" "read_from_progress_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+    ]
+
+    resources = [
+      "${module.progress_queue.arn}",
+    ]
+  }
+}
+
 # Bagger
 
 data "aws_iam_policy_document" "read_from_bagger_queue" {

@@ -4,9 +4,6 @@ import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.platform.archive.progress.models.ProgressConfig
 
 object ConfigModule extends AbstractModule {
-  @Provides
-  def providesS3ClientConfig(appConfig: ProgressConfig) =
-    appConfig.s3ClientConfig
 
   @Provides
   def providesCloudwatchClientConfig(appConfig: ProgressConfig) =

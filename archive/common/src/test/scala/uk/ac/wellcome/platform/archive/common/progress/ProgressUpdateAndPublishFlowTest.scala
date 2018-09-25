@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
 import akka.stream.scaladsl.{Sink, Source}
+import com.amazonaws.services.sns.model.PublishResult
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -62,8 +63,7 @@ class ProgressUpdateAndPublishFlowTest
 
               whenReady(eventualResult) {
                 result =>
-                  result.isRight shouldBe true
-                  result.right.get shouldBe update
+                  result shouldBe a[PublishResult]
 
                   assertSnsReceivesOnly(expectedProgress, topic)
 

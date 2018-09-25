@@ -10,7 +10,14 @@ case class Progress(
   createdAt: Instant = Instant.now,
   updatedAt: Instant = Instant.now,
   events: Seq[ProgressEvent] = Seq.empty
-)
+) {
+  def update(progressUpdate: ProgressUpdate) = {
+    this.copy(
+      result = progressUpdate.status,
+      events = progressUpdate.event +: this.events
+    )
+  }
+}
 
 object Progress {
   sealed trait Status
@@ -21,6 +28,7 @@ object Progress {
 }
 
 case class ProgressEvent(description: String, time: Instant = Instant.now)
+
 case class ProgressUpdate(id: String,
                           event: ProgressEvent,
                           status: Progress.Status = Progress.None)

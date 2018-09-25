@@ -172,6 +172,7 @@ trait SQS extends Matchers with Logging {
 
   def sendNotificationToSQS(queue: Queue, body: String): SendMessageResult = {
     val message = createNotificationMessageWith(body = body)
+
     sendSqsMessage(queue = queue, obj = message)
   }
 
@@ -189,8 +190,11 @@ trait SQS extends Matchers with Logging {
       body = Random.alphanumeric take 50 mkString)
 
   private def sendMessageToSqsClient(queue: Queue,
-                                     body: String): SendMessageResult =
+                                     body: String): SendMessageResult = {
+    debug(s"Sending message to ${queue.url}: ${body}")
+
     sqsClient.sendMessage(queue.url, body)
+  }
 
   def noMessagesAreWaitingIn(queue: Queue) = {
     // No messages in flight

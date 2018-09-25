@@ -13,11 +13,6 @@ import scala.concurrent.duration._
 
 class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
 
-  val awsS3AccessKey = opt[String]()
-  val awsS3SecretKey = opt[String]()
-  val awsS3Region = opt[String](default = Some("eu-west-1"))
-  val awsS3Endpoint = opt[String]()
-
   val awsSqsAccessKey = opt[String]()
   val awsSqsSecretKey = opt[String]()
   val awsSqsRegion = opt[String](default = Some("eu-west-1"))
@@ -33,6 +28,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   val topicArn: ScallopOption[String] = opt[String](required = true)
   val sqsQueueUrl: ScallopOption[String] = opt[String](required = true)
+
   val sqsWaitTimeSeconds = opt[Int](required = true, default = Some(20))
   val sqsMaxMessages = opt[Int](required = true, default = Some(10))
   val sqsParallelism = opt[Int](required = true, default = Some(10))
@@ -40,10 +36,6 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   val metricsNamespace = opt[String](default = Some("app"))
   val metricsFlushIntervalSeconds =
     opt[Int](required = true, default = Some(20))
-
-  val uploadNamespace = opt[String](required = true)
-  val uploadPrefix = opt[String](default = Some("archive"))
-  val digestDelimiterRegexp = opt[String](default = Some(" +"))
 
   val archiveProgressMonitorTableName = opt[String](required = true)
 
@@ -54,13 +46,6 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   val archiveProgressMonitorDynamoEndpoint = opt[String]()
 
   verify()
-
-  val s3ClientConfig = S3ClientConfig(
-    accessKey = awsS3AccessKey.toOption,
-    secretKey = awsS3SecretKey.toOption,
-    region = awsS3Region(),
-    endpoint = awsS3Endpoint.toOption
-  )
 
   val cloudwatchClientConfig = CloudwatchClientConfig(
     region = awsCloudwatchRegion(),
@@ -111,7 +96,6 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   )
 
   val appConfig = ProgressConfig(
-    s3ClientConfig,
     cloudwatchClientConfig,
     sqsClientConfig,
     sqsConfig,
