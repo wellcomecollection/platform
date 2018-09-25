@@ -106,11 +106,6 @@ def check_staging_api():
     prod_json = prod_resp.json()
     stage_json = stage_resp.json()
 
-    # TODO: Doesn't this indicate a problem with the context URLs
-    # when we flip the APIs?  Won't prod temporarily point at stage?
-    # See https://github.com/wellcometrust/platform/issues/2413
-    stage_json['@context'] = stage_json['@context'].replace('api-stage', 'api')
-
     if prod_json == stage_json:
         print('OK!')
     else:
