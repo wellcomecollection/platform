@@ -1,7 +1,6 @@
 # -*- encoding: utf-8
 
 import os
-from urllib.parse import urlparse
 import uuid
 
 import daiquiri
@@ -39,6 +38,7 @@ ns = api.namespace('ingests', description='Ingest requests')
 
 
 import models
+import validators
 
 
 @ns.route('')
@@ -86,12 +86,19 @@ class IngestCollection(Resource):
 
     def validate_urls(self, callback_url, upload_url):
         try:
-            validate_url(upload_url, supported_schemes=['s3'], allow_fragment=False)
+            validators.validate_single_url(
+                upload_url,
+                supported_schemes=['s3'],
+                allow_fragment=False
+            )
         except ValueError as error:
             raise BadRequestError(f"Invalid uploadUrl:{upload_url!r}, {error}")
         if callback_url:
             try:
-                validate_url(callback_url, supported_schemes=['http', 'https'])
+                validators.validate_single_url(
+                    callback_url,
+                    supported_schemes=['http', 'https']
+                )
             except ValueError as error:
                 raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
 
@@ -134,23 +141,3 @@ def default_error_handler(error):
         else:
             error_response['description'] = getattr(error, 'description', str(error))
     return jsonify(error_response), error_response['httpStatus']
-
-
-def validate_url(url, supported_schemes=None, allow_fragment=True):
-    """
-    Validates the passed string is a URL, optionally checking against allowed schemes and
-    whether a fragment is allowed
-    """
-    parsed_url = urlparse(url)
-    incomplete_url = any(not p for p in [parsed_url.scheme, parsed_url.netloc])
-    invalid_scheme = (supported_schemes and parsed_url.scheme not in supported_schemes)
-    unallowed_fragment = (not allow_fragment and bool(parsed_url.fragment))
-    if incomplete_url or invalid_scheme or unallowed_fragment:
-        errors = []
-        if incomplete_url:
-            errors.append(f'is not a complete url')
-        if invalid_scheme:
-            errors.append(f'{parsed_url.scheme!r} is not one of the supported schemes ({supported_schemes!r})')
-        if unallowed_fragment:
-            errors.append(f'{parsed_url.fragment!r} fragment is not supported')
-        raise ValueError(','.join(errors))
