@@ -10,7 +10,7 @@ from flask import jsonify, make_response, request
 from werkzeug.exceptions import BadRequest as BadRequestError
 
 from report_ingest_status import report_ingest_status
-from request_new_ingest import send_new_IngestRequest
+from request_new_ingest import send_new_ingest_request
 
 from create_ingest_progress import (
     IngestProgress,
@@ -62,7 +62,7 @@ class IngestCollection(Resource):
             app.config['DYNAMODB_RESOURCE'],
             app.config['DYNAMODB_TABLE_NAME'])
 
-        IngestRequest_id = send_new_IngestRequest(
+        IngestRequest_id = send_new_ingest_request(
             sns_client=app.config['SNS_CLIENT'],
             topic_arn=app.config['SNS_TOPIC_ARN'],
             IngestRequest_id=IngestRequest_id,
