@@ -21,8 +21,11 @@ object UploadItemFlow
       .flatMapConcat {
         case job@ArchiveItemJob(_, BagItem(checksum, _)) =>
           Source.single(job)
-            .map(j => ZipFileReader.maybeInputStream(ZipLocation(j)))
-            .via(FoldOptionFlow[InputStream, Either[ArchiveItemJob, ArchiveItemJob]](Left(job))(UploadInputStreamFlow(job, checksum)))
+            .map(j => ZipFileReader.maybeInputStream(ZipLocation(j))).map {
+            case Some(inputStream) => Right(inputStream)
+            case None => Left(())
+          }
+            .via(FoldEitherFlow[Unit, InputStream, Either[ArchiveItemJob, ArchiveItemJob]](_ => Left(job))(UploadInputStreamFlow(job, checksum)))
       }
   }
 }

@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
@@ -10,20 +11,20 @@ import scala.util.Try
 
 object DownloadItemFlow extends Logging {
 
-  def apply()(implicit s3Client: AmazonS3) = {
-    Flow[Either[ArchiveItemJob, ArchiveItemJob]]
+  def apply()(implicit s3Client: AmazonS3)
+    : Flow[ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob], NotUsed] = {
+    Flow[ArchiveItemJob]
       .log("download to verify")
-      .flatMapConcat{
-        case Right(job: ArchiveItemJob) =>
+      .flatMapConcat{ job =>
 
           val triedInputStream = Try(s3Client.getObject(job.uploadLocation.namespace, job.uploadLocation.key).getObjectContent)
 
           triedInputStream.map {inputStream =>
 
-            val downloadStream = StreamConverters
+            val downloadSource = StreamConverters
               .fromInputStream(() => inputStream)
 
-            downloadStream
+            downloadSource
               .via(VerifiedDownloadFlow())
               .map {
                 case calculatedChecksum if job.bagDigestItem.checksum == calculatedChecksum => Right(job)
@@ -31,7 +32,6 @@ object DownloadItemFlow extends Logging {
               }
 
           }.getOrElse(Source.single(Left(job)))
-        case Left(job) => Source.single(Left(job))
       }.async
   }
 
