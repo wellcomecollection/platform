@@ -1,10 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.NotUsed
-import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.transfer.TransferManager
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 
 object ArchiveBagFlow {

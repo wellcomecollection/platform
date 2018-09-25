@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.NotUsed
-import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
@@ -10,8 +9,7 @@ import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 
 object ArchiveZipFileFlow extends Logging {
   def apply(config: BagUploaderConfig)(
-    implicit s3Client: AmazonS3,
-    actorSystem: ActorSystem
+    implicit s3Client: AmazonS3
   ): Flow[ZipFileDownloadComplete, ArchiveComplete, NotUsed] = {
 
     Flow[ZipFileDownloadComplete].flatMapConcat {

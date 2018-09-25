@@ -3,8 +3,6 @@ package uk.ac.wellcome.platform.archive.archivist.util
 import akka.util.ByteString
 import grizzled.slf4j.Logging
 
-import scala.util.Try
-
 trait CompareChecksum extends Logging {
   def compare[T](checksum: String)(byteChecksum: ByteString): Boolean = {
       val calculatedChecksum = byteChecksum

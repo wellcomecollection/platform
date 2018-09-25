@@ -4,7 +4,6 @@ import akka.stream.scaladsl.{Flow, Framing, Source}
 import akka.util.ByteString
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob, ZipLocation}
-import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models.BagItem
 
 object ArchiveManifestFlow extends Logging {

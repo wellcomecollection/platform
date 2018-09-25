@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import java.io.File
 
 import akka.stream.FlowShape
-import akka.stream.scaladsl.{FileIO, Flow, GraphDSL, Source, StreamConverters}
+import akka.stream.scaladsl.{FileIO, Flow, GraphDSL, Source}
 
 object FileStoreFlow {
   def apply(tmpFile: File) = {

@@ -1,9 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.models
 
-import java.io.InputStream
 import java.util.zip.ZipFile
 
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class ZipLocation(

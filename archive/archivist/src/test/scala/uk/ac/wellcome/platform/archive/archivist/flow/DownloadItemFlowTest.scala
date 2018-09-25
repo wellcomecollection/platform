@@ -15,11 +15,9 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
 
   it("passes through a correct right archive item job") {
     withLocalS3Bucket { bucket =>
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
+      withActorSystem { implicit actorSystem =>
+        withMaterializer(actorSystem) { implicit materializer =>
           withZipFile(List()) { zipFile =>
-            implicit val s = actorSystem
-            implicit val m = materializer
 
             val fileContent = "bah buh bih beh"
             val digest = "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
@@ -47,11 +45,9 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
 
   it("transforms a right archive job into a left if the checksum doesn't match") {
     withLocalS3Bucket { bucket =>
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) {materializer =>
+      withActorSystem { implicit actorSystem =>
+        withMaterializer(actorSystem) { implicit materializer =>
           withZipFile(List()) { zipFile =>
-            implicit val s = actorSystem
-            implicit val m = materializer
 
             val fileContent = "bah buh bih beh"
             val digest = "bad-digest"
@@ -77,11 +73,9 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
   }
 
   it("passes through a left archive item job") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) {materializer =>
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) {implicit materializer =>
         withZipFile(List()) { zipFile =>
-          implicit val s = actorSystem
-          implicit val m = materializer
 
           val bucket = Bucket("bucket")
           val digest = "digest"
@@ -102,12 +96,10 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
   }
 
   it("returns a left of archive item job if the file does not exist") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
           withLocalS3Bucket { bucket =>
             withZipFile(List()) { zipFile =>
-              implicit val s = actorSystem
-              implicit val m = materializer
 
               val digest = "digest"
               val fileName = "this/does/not/exist.txt"

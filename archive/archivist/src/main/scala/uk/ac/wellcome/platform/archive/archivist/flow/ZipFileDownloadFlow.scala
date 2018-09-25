@@ -4,7 +4,6 @@ import java.io.File
 import java.util.zip.ZipFile
 
 import akka.NotUsed
-import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging

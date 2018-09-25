@@ -1,16 +1,12 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import java.io.File
-import java.util.zip.ZipFile
-
-import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
 import uk.ac.wellcome.platform.archive.archivist.util.CompareChecksum
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 
 object DownloadItemFlow extends Logging with CompareChecksum {
@@ -27,8 +23,6 @@ object DownloadItemFlow extends Logging with CompareChecksum {
 
             val downloadStream = StreamConverters
               .fromInputStream(() => inputStream)
-
-            val tmpFile = File.createTempFile("archivist-item", ".tmp")
 
             downloadStream
               .via(VerifiedDownloadFlow())
