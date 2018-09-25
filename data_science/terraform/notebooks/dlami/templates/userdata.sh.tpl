@@ -96,11 +96,9 @@ pushd efs-utils
   sudo mount -t efs ${efs_mount_id}:/ /mnt/efs
 popd
 
-# Start notebook server
-runuser --login ${notebook_user} --command '/home/ubuntu/anaconda3/bin/jupyter notebook'
-
-
-
-# Finally, mark this script as complete.
+# Mark this script as complete.
 touch "$BOOTSTRAP_COMPLETE_PATH"
 wall "*** BOOTSTRAP COMPLETE ***"
+
+# Start notebook server
+runuser --login ${notebook_user} --command '/home/ubuntu/anaconda3/bin/jupyter notebook'
