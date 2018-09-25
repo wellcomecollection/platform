@@ -12,7 +12,7 @@ module "ecr_repository_registrar" {
   name   = "registrar"
 }
 
-module "ecr_repository_progress" {
+module "ecr_repository_progress_async" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "progress"
 }

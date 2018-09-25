@@ -76,9 +76,9 @@ data "aws_iam_policy_document" "archive_progress_table_read_write_policy" {
   }
 }
 
-# Progress
+# progress_async
 
-data "aws_iam_policy_document" "read_from_progress_queue" {
+data "aws_iam_policy_document" "read_from_progress_async_queue" {
   statement {
     actions = [
       "sqs:DeleteMessage",
@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "read_from_progress_queue" {
     ]
 
     resources = [
-      "${module.progress_queue.arn}",
+      "${module.progress_async_queue.arn}",
     ]
   }
 }
