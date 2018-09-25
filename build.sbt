@@ -190,6 +190,10 @@ lazy val registrar = doServiceSetup(project, "archive/registrar")
   .dependsOn(archive_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
+lazy val progress = doServiceSetup(project, "archive/progress")
+  .dependsOn(archive_common % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
+
 lazy val root = (project in file("."))
   .aggregate(
     common,
@@ -228,5 +232,6 @@ lazy val root = (project in file("."))
 
     archive_common,
     archivist,
-    registrar
+    registrar,
+    progress
   )

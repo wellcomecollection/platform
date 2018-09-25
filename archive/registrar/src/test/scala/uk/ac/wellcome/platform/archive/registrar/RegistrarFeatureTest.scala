@@ -5,7 +5,6 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-
 import com.github.tomakehurst.wiremock.client.WireMock.{
   equalToJson,
   postRequestedFor,

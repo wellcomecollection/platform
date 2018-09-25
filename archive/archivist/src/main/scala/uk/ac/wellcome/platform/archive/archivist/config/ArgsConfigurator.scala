@@ -6,7 +6,7 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ArchiveProgressMonitorConfig
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.duration._
@@ -102,7 +102,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     topicArn(),
   )
 
-  val archiveProgressMonitorConfig = ArchiveProgressMonitorConfig(
+  val archiveProgressMonitorConfig = ProgressMonitorConfig(
     DynamoConfig(
       table = archiveProgressMonitorTableName(),
       maybeIndex = None

@@ -56,6 +56,33 @@ module "registrar" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
+module "progress" {
+  source = "service"
+
+  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets                          = "${local.private_subnets}"
+  vpc_id                           = "${local.vpc_id}"
+  service_name                     = "${local.namespace}_progress"
+  aws_region                       = "${var.aws_region}"
+
+  min_capacity = 1
+  max_capacity = 1
+
+  env_vars = {
+    queue_url                   = "${module.progress_queue.id}"
+    topic_arn                   = "${module.caller_topic.arn}"
+    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+  }
+
+  env_vars_length = 3
+
+  container_image   = "${local.progress_container_image}"
+  source_queue_name = "${module.progress_queue.name}"
+  source_queue_arn  = "${module.progress_queue.arn}"
+}
+
 module "bagger" {
   source = "service"
 

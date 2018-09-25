@@ -11,7 +11,7 @@ object ProgressMonitorModule extends AbstractModule {
   @Provides
   def providesArchiveProgressMonitor(
     actorSystem: ActorSystem,
-    progressMonitorConfig: ArchiveProgressMonitorConfig) = {
+    progressMonitorConfig: ProgressMonitorConfig) = {
     val dynamoClientConfig = progressMonitorConfig.dynamoClientConfig
 
     val dynamoClient = DynamoClientFactory.create(
@@ -28,5 +28,5 @@ object ProgressMonitorModule extends AbstractModule {
   }
 }
 
-case class ArchiveProgressMonitorConfig(dynamoConfig: DynamoConfig,
-                                        dynamoClientConfig: DynamoClientConfig)
+case class ProgressMonitorConfig(dynamoConfig: DynamoConfig,
+                                 dynamoClientConfig: DynamoClientConfig)
