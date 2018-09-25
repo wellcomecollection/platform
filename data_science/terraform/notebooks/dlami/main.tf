@@ -27,7 +27,7 @@ module "launch_config" {
 }
 
 module "security_groups" {
-  source = "../../modules/security_groups"
+  source = "git::https://github.com/wellcometrust/terraform.git//ec2/modules/security_groups?ref=v11.7.2"
 
   name   = "${var.name}"
   vpc_id = "${var.vpc_id}"
