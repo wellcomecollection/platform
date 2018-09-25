@@ -1,15 +1,13 @@
-package uk.ac.wellcome.platform.archive.common.progress
+package uk.ac.wellcome.platform.archive.common.flows
 
 import akka.stream.scaladsl.{Sink, Source}
-import com.amazonaws.services.sns.model.AmazonSNSException
+import com.amazonaws.services.sns.model.PublishResult
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.flows.SnsPublishFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -40,42 +38,17 @@ class SNSPublishFlowTest
             .runWith(Sink.head)(materializer)
 
           whenReady(publication) { result =>
-            result.isRight shouldBe true
-            result.right.get shouldBe bob
+            result shouldBe a[PublishResult]
+
+            assertSnsReceivesOnly(bob, topic)
           }
 
-          assertSnsReceivesOnly(bob, topic)
         }
       }
     }
   }
 
-  it("returns a Left(FailedEvent[T]) on failure") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        val bob = Person("Bobbert", 42)
-
-        val snsConfig = SNSConfig("bad_topic")
-        val publishFlow =
-          SnsPublishFlow[Person](snsClient, snsConfig)
-
-        val publication = Source
-          .single(bob)
-          .via(publishFlow)
-          .async
-          .runWith(Sink.head)(materializer)
-
-        whenReady(publication) { result =>
-          result.isLeft shouldBe true
-          result.left.get shouldBe a[FailedEvent[_]]
-          result.left.get.t shouldBe bob
-          result.left.get.e shouldBe a[AmazonSNSException]
-        }
-      }
-    }
-  }
-
-  it("handles multiple errors, returning Lefts") {
+  it("handles multiple errors") {
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         val bobs = () =>
@@ -95,12 +68,8 @@ class SNSPublishFlowTest
           .async
           .runWith(Sink.seq)(materializer)
 
-        val resultantBobs = bobs().toList
-
         whenReady(publication) { result =>
-          result.collect {
-            case Left(FailedEvent(_: AmazonSNSException, t)) => t
-          } shouldBe resultantBobs
+          result shouldBe empty
         }
       }
     }
@@ -130,10 +99,11 @@ class SNSPublishFlowTest
           val resultantBobs = bobs().toList
 
           whenReady(publication) { result =>
-            result shouldBe resultantBobs.map(Right(_))
+            result should have length resultantBobs.length
+
+            assertSnsReceives(resultantBobs, topic)
           }
 
-          assertSnsReceives(resultantBobs, topic)
         }
       }
     }
