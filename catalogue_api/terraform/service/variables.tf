@@ -2,7 +2,6 @@ variable "name" {}
 variable "vpc_id" {}
 variable "aws_region" {}
 variable "alb_listener_arn_https" {}
-variable "alb_listener_arn_http" {}
 variable "host_name" {}
 
 variable "private_subnets" {
@@ -74,7 +73,6 @@ variable "sidecar_env_vars" {
   default     = {}
 }
 
-variable "alb_id" {}
 variable "cluster_id" {}
 variable "namespace_id" {}
 
@@ -97,3 +95,5 @@ variable "alb_server_error_alarm_arn" {}
 variable "alb_client_error_alarm_arn" {}
 
 variable "enable_alb_alarm" {}
+
+variable "lb_service_security_group_id" {}

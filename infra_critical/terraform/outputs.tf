@@ -77,3 +77,19 @@ output "identifiers_rds_cluster_port" {
 output "identifiers_rds_cluster_host" {
   value = "${module.identifiers_delta_rds_cluster.host}"
 }
+
+output "alb_api_wc_service_lb_security_group_id" {
+  value = "${module.load_balancer.service_lb_security_group_id}"
+}
+
+output "alb_api_wc_http_listener_arn" {
+  value = "${module.load_balancer.http_listener_arn}"
+}
+
+output "alb_api_wc_https_listener_arn" {
+  value = "${module.load_balancer.https_listener_arn}"
+}
+
+output "alb_api_wc_cloudwatch_id" {
+  value = "${module.load_balancer.cloudwatch_id}"
+}
