@@ -3,6 +3,7 @@
 import json
 from test_asset_lookup_request import create_table
 
+
 class TestReportIngestStatus:
     """
     Tests for the GET /ingests/<guid> endpoint.
@@ -42,7 +43,6 @@ class TestAssetLookup:
         resp = client.get(f'/storage/v1/assets/{asset_id}')
         assert resp.status_code == 200
         assert json.loads(resp.data) == {'manifest': asset_id}
-
 
     def test_lookup_missing_item_is_404(self, client, asset_id):
         resp = client.get(f'/storage/v1/assets/{asset_id}')
