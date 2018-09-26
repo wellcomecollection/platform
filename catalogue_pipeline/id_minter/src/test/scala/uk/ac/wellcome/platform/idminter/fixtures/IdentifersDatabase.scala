@@ -10,7 +10,6 @@ import uk.ac.wellcome.platform.idminter.models.{
   IdentifiersTableConfig,
   RDSClientConfig
 }
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
 
