@@ -9,6 +9,7 @@ class ArchiveAPIConfig(object):
 
     DYNAMODB_RESOURCE = boto3.resource('dynamodb')
     SNS_CLIENT = boto3.client('sns')
+    S3_CLIENT = boto3.client('s3')
 
     def __init__(self, development=False):
         try:

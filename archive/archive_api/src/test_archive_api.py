@@ -1,7 +1,7 @@
 # -*- encoding: utf-8
 
 import json
-
+from test_asset_lookup_request import create_table
 
 class TestReportIngestStatus:
     """
@@ -24,6 +24,39 @@ class TestReportIngestStatus:
     def test_post_against_lookup_endpoint_is_405(self, client, guid):
         resp = client.post(f'/storage/v1/ingests/{guid}')
         assert resp.status_code == 405
+
+
+class TestAssetLookup:
+    """
+    Tests for the GET /assets/<id> endpoint.
+    """
+
+    def test_lookup_asset(self, client, dynamodb_client, s3_client, asset_id, bucket_asset_lookup, table_name_asset_lookup):
+        stored_manifest = {'manifest': asset_id}
+
+        s3_client.put_object(Bucket=bucket_asset_lookup, Key=asset_id, Body=json.dumps(stored_manifest))
+
+        dynamodb_client.put_item(
+            TableName=table_name_asset_lookup,
+            Item={
+                'id': {
+                    'S': asset_id
+                },
+                's3key': {
+                    'S': asset_id
+                }
+            }
+        )
+
+        resp = client.get(f'/storage/v1/assets/{asset_id}')
+        assert resp.status_code == 200
+        assert json.loads(resp.data) == {'manifest': asset_id}
+
+
+    def test_lookup_missing_item_is_404(self, client, asset_id):
+        resp = client.get(f'/storage/v1/assets/{asset_id}')
+        assert resp.status_code == 404
+        assert (b'No asset found for id=%r' % asset_id) in resp.data
 
 
 class TestRequestNewIngest:
