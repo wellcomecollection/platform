@@ -17,8 +17,6 @@ def asset_lookup_request(dynamodb_resource, table_name, s3_client, bucket_name, 
     item_response = table.get_item(Key={'id': id})
 
     try:
-        print('table_name={}, bucket={}, key={}'.format(table_name, bucket_name, item_response['Item']['s3key']), file=sys.stderr)
-
         manifest_response = s3_client.get_object(
             Bucket=bucket_name,
             Key=item_response['Item']['s3key']
