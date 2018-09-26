@@ -73,8 +73,8 @@ object AkkaS3ClientModule extends AbstractModule with Logging {
 }
 
 case class S3ClientConfig(
-  accessKey: Option[String],
-  secretKey: Option[String],
-  endpoint: Option[String],
+  accessKey: Option[String] = None,
+  secretKey: Option[String] = None,
+  endpoint: Option[String] = None,
   region: String
 )

@@ -16,7 +16,7 @@ object Main extends App with Archivist {
     new AppConfigModule(args),
     ConfigModule,
     AkkaModule,
-    AkkaS3ClientModule,
+    S3ClientModule,
     CloudWatchClientModule,
     SQSClientModule,
     SNSAsyncClientModule,

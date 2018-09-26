@@ -37,5 +37,6 @@ case class BagItConfig(digestDelimiterRegexp: String = " +",
 
 case class BagUploaderConfig(
   uploadConfig: UploadConfig,
-  bagItConfig: BagItConfig = BagItConfig()
+  bagItConfig: BagItConfig = BagItConfig(),
+  parallelism: Int
 )

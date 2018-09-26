@@ -1,18 +1,18 @@
-package uk.ac.wellcome.platform.archive.archivist.models
+package uk.ac.wellcome.platform.archive.common.models
 
 import java.net.{URI, URISyntaxException}
 import java.util.UUID
 
-import io.circe.DecodingFailure
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.json.JsonUtil._
 
-case class IngestBagRequestNotification(
-  archiveRequestId: UUID,
-  bagLocation: ObjectLocation,
-  archiveCompleteCallbackUrl: Option[URI] = None)
+import io.circe.DecodingFailure
+import uk.ac.wellcome.storage.ObjectLocation
 
-object IngestBagRequestNotification {
+case class IngestBagRequest(archiveRequestId: UUID,
+                            zippedBagLocation: ObjectLocation,
+                            archiveCompleteCallbackUrl: Option[URI] = None)
+
+object IngestBagRequest {
   import io.circe.generic.semiauto._
   import io.circe.{Decoder, Encoder}
 
@@ -44,8 +44,8 @@ object IngestBagRequestNotification {
     }
   }
 
-  implicit val ingestBagRequestNotificationDecoder
-    : Decoder[IngestBagRequestNotification] = deriveDecoder
-  implicit val ingestBagRequestNotificationEncoder
-    : Encoder[IngestBagRequestNotification] = deriveEncoder
+  implicit val ingestBagRequestNotificationDecoder: Decoder[IngestBagRequest] =
+    deriveDecoder
+  implicit val ingestBagRequestNotificationEncoder: Encoder[IngestBagRequest] =
+    deriveEncoder
 }

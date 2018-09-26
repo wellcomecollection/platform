@@ -11,7 +11,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
+  ArchiveComplete,
   NotificationMessage,
   RequestContext
 }
@@ -77,9 +77,8 @@ class Registrar @Inject()(
   }
 
   private def parseNotification(message: NotificationMessage) = {
-    fromJson[BagArchiveCompleteNotification](message.Message) match {
-      case Success(
-          bagArchiveCompleteNotification: BagArchiveCompleteNotification) =>
+    fromJson[ArchiveComplete](message.Message) match {
+      case Success(bagArchiveCompleteNotification: ArchiveComplete) =>
         RequestContext(bagArchiveCompleteNotification)
       case Failure(e) =>
         throw new RuntimeException(

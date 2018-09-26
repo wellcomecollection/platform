@@ -6,7 +6,7 @@ import akka.event.LoggingAdapter
 import akka.stream._
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{AckResult, SqsAckFlow, SqsSource}
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
@@ -15,8 +15,6 @@ import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
-
-import scala.util.{Failure, Success, Try}
 
 class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
                                     sqsClient: AmazonSQSAsync,
@@ -34,18 +32,9 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
 
   def run(streamName: String, workFlow: Flow[T, R, NotUsed])(
     implicit decoderT: Decoder[T],
-    loggingAdapter: LoggingAdapter
+    loggingAdapter: LoggingAdapter,
+    materializer: Materializer
   ) = {
-
-    val metricName = s"${streamName}_ProcessMessage"
-
-    val stoppingMaterializer = ActorMaterializer(
-      ActorMaterializerSettings(system)
-        .withSupervisionStrategy(decider(metricName, Supervision.Stop)))
-
-    val resumingMaterializer = ActorMaterializer(
-      ActorMaterializerSettings(system)
-        .withSupervisionStrategy(decider(metricName, Supervision.Resume)))
 
     val typeConversion = Flow[Message].map(m => {
       val msg = fromJson[T](m.getBody).get
@@ -53,53 +42,20 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       msg
     })
 
-    val actionFlow = Flow[(Seq[Try[R]], Message)].map {
-      case (s, m) if s.collect({ case a: Failure[_] => a }).nonEmpty =>
-        metricsSender.countFailure(metricName)
-        warn(s"Failure during message processing: $m")
-        (m, MessageAction.ChangeMessageVisibility(1))
-      case (_, m) =>
-        metricsSender.countSuccess(metricName)
-        info(s"Message processed successfully: $m")
-        (m, MessageAction.Delete)
-    }
-
-    val capturedWorkflow: Flow[T, Seq[Try[R]], NotUsed] =
-      Flow[T].flatMapConcat(t => {
-        Source.fromFuture(
-          Source
-            .single(t)
-            .via(workFlow)
-            .map(Success(_))
-            .recover({ case e => Failure(e) })
-            .toMat(Sink.seq)(Keep.right)
-            .run()(stoppingMaterializer)
-        )
-      })
-
     source
-      .flatMapConcat(message => {
+      .flatMapConcat((message: Message) => {
         Source
           .single(message)
           .log("processing message")
           .via(typeConversion)
           .log("message converted")
-          .via(capturedWorkflow)
+          .via(workFlow)
           .log("workflow completed")
-          .map(r => (r, message))
-          .via(actionFlow)
+          .map(_ => (message, MessageAction.Delete))
           .log("message action")
           .via(ackFlow)
           .log("message completed")
       })
-      .runWith(sink)(resumingMaterializer)
-  }
-
-  private def decider(metricName: String,
-                      strategy: Supervision.Directive): Supervision.Decider = {
-    case e =>
-      error("MessageStream failure encountered", e)
-      metricsSender.countFailure(metricName)
-      strategy
+      .runWith(sink)
   }
 }
