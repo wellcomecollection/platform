@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import akka.actor.ActorSystem
 import org.mockito.Mockito.{never, verify}
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
@@ -19,7 +19,6 @@ import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 
@@ -32,7 +31,7 @@ class SierraItemsToDynamoWorkerServiceTest
     with SQS
     with Matchers
     with Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with Akka
     with MetricsSenderFixture
     with ScalaFutures
