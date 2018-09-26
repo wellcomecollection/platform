@@ -30,12 +30,19 @@ trait ZipBagItFixture extends BagIt with Logging {
     file.delete()
   }
 
-  def withBagItZip[R](bagName: BagPath = BagPath(randomAlphanumeric()), dataFileCount: Int = 1, createDigest: String => String = createValidDigest, createDataManifest: (BagPath, Seq[(String,String)]) => FileEntry= createValidDataManifest)(
+  def withBagItZip[R](
+                       bagName: BagPath = BagPath(randomAlphanumeric()),
+                       dataFileCount: Int = 1,
+                       createDigest: String => String = createValidDigest,
+                       createDataManifest: (BagPath, List[(String,String)]) => Option[FileEntry]= createValidDataManifest,
+                       createTagManifest: (BagPath, List[(String,String)]) => Option[FileEntry]= createValidTagManifest,
+                       createBagItFile: BagPath => Option[FileEntry] = createValidBagItFile
+                     )(
     testWith: TestWith[(BagPath, ZipFile), R]) = {
 
     info(s"Creating bag $bagName")
 
-    val allFiles = createBag(bagName, dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest)
+    val allFiles = createBag(bagName, dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest, createTagManifest = createTagManifest, createBagItFile = createBagItFile)
     info(s"Adding files $allFiles to bag $bagName")
     withZipFile(allFiles) { zipFile =>
       testWith((bagName, zipFile))

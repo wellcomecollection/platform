@@ -55,7 +55,7 @@ trait Archivist
                                queuePair: QueuePair,
                                dataFileCount: Int =12,
                                createDigest: String => String = createValidDigest,
-                          createDataManifest: (BagPath, Seq[(String, String)]) => FileEntry = createValidDataManifest)(
+                          createDataManifest: (BagPath, List[(String, String)]) => Option[FileEntry] = createValidDataManifest)(
                                 testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = withBagItZip(dataFileCount = dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest) {
     case (bagName, zipFile) =>
       sendBag(bagName, zipFile, ingestBucket, callbackUri, queuePair) {

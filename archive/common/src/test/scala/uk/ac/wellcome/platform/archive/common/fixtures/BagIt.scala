@@ -22,52 +22,72 @@ trait BagIt {
   }
 
   def createBag(bagName: BagPath,
-                dataFileCount: Int = 1, createDigest: String => String = createValidDigest, createDataManifest: (BagPath, Seq[(String, String)]) => FileEntry = createValidDataManifest) = {
+                dataFileCount: Int = 1,
+                createDigest: String => String = createValidDigest,
+                createDataManifest: (BagPath, List[(String, String)]) => Option[FileEntry] = createValidDataManifest,
+                createTagManifest: (BagPath, List[(String, String)]) => Option[FileEntry] = createValidTagManifest,
+                createBagItFile: BagPath => Option[FileEntry] = createValidBagItFile) = {
 
     val dataFiles = createDataFiles(bagName, dataFileCount)
-    val filesAndDigest = dataFiles.map{case FileEntry(fileName, contents) => (fileName, createDigest(contents))}
+    val filesAndDigest = dataFiles.map{case FileEntry(fileName, contents) => (fileName, createDigest(contents))}.toList
 
     val dataManifest = createDataManifest(bagName, filesAndDigest)
 
-    val bagItFile = FileEntry(s"$bagName/bagit.txt", bagItFileContents)
+    val maybeBagItFile = createBagItFile(bagName)
 
     val bagInfoFile = FileEntry(s"$bagName/bag-info.txt", bagInfoFileContents)
 
-    val metaManifest = createTagManifest(bagName, dataManifest, bagItFileContents, bagInfoFileContents)
+    val tagManifestFiles = dataManifest.toList ++ maybeBagItFile.toList ++ List(bagInfoFile)
 
-    dataFiles  ++ List(
-      dataManifest,
-      metaManifest,
-      bagInfoFile,
-      bagItFile
-    )
+    val tagManifestFileAndDigests = tagManifestFiles.map{case FileEntry(fileName, contents) => (fileName, createDigest(contents))}.toList
+    val metaManifest = createTagManifest(bagName, tagManifestFileAndDigests)
+
+    dataFiles  ++ tagManifestFiles ++ metaManifest.toList
   }
 
-  private def createTagManifest(bagName: BagPath, dataManifest: FileEntry, bagItFileContents: String, bagInfoFileContents: String) = {
-    val dataManifestCheckSum = createValidDigest(dataManifest.contents)
-    val bagitFileCheckSum = createValidDigest(bagItFileContents)
-    val bagInfoFileChecksum = createValidDigest(bagInfoFileContents)
-    FileEntry(
-      s"$bagName/tagmanifest-sha256.txt",
-      s"""$dataManifestCheckSum  manifest-sha256.txt
-         |$bagitFileCheckSum  bagit.txt
-         |$bagInfoFileChecksum  bag-info.txt
-       """.stripMargin.trim
-    )
-  }
+  def createValidBagItFile(bagName: BagPath) = Some(FileEntry(s"$bagName/bagit.txt", bagItFileContents))
 
-  def createValidDataManifest(bagName: BagPath, dataFiles: Seq[(String, String)]) = {
-    FileEntry(
-      s"$bagName/manifest-sha256.txt",
-      dataFiles
-        .map {
-          case (fileName, contentsDigest) =>
-            val digestFileName = fileName.replace(s"$bagName/", "")
-            s"$contentsDigest  $digestFileName"
-        }
-        .mkString("\n")
-    )
-  }
+  def dataManifestWithNonExistingFile(bagPath: BagPath, filesAndDigests: Seq[(String,String)]) = Some(FileEntry(
+    name = s"$bagPath/manifest-sha256.txt",
+    contents = {
+      val validContent = filesAndDigests.map {
+        case (existingFileName, validFileDigest) =>
+        s"""$validFileDigest  ${existingFileName.replace(s"$bagPath/", "")}"""
+      }
+      (validContent :+ """1234567890qwer  this/does/not/exists.jpg""").mkString("\n")
+    }
+  ))
+
+  def dataManifestWithWrongChecksum(bagPath: BagPath, filesAndDigests: List[(String,String)]) = Some(FileEntry(
+    name = s"$bagPath/manifest-sha256.txt",
+    contents = {
+      filesAndDigests match {
+        case (head: (String,String)) :: (list: List[(String,String)]) =>
+          val (invalidChecksumFileName,_) = head
+          val invalidChecksumManifestEntry = s"""badDigest  ${invalidChecksumFileName.replace(s"$bagPath/", "")}"""
+          val validEntries = list.map {
+            case (existingFileName, validFileDigest) =>
+              s"""$validFileDigest  ${existingFileName.replace(s"$bagPath/", "")}"""
+          }
+          (invalidChecksumManifestEntry +: validEntries).mkString("\n")
+        case _ => ""
+      }
+    }
+  ))
+
+  private def createValidManifestFile(bagName: BagPath, dataFiles: List[(String, String)], manifestFileName: String) =     Some(FileEntry(
+    s"$bagName/$manifestFileName",
+    dataFiles
+      .map {
+        case (fileName, contentsDigest) =>
+          val digestFileName = fileName.replace(s"$bagName/", "")
+          s"$contentsDigest  $digestFileName"
+      }
+      .mkString("\n")
+  ))
+
+  def createValidDataManifest(bagName: BagPath, dataFiles: List[(String, String)]) = createValidManifestFile(bagName, dataFiles, "manifest-sha256.txt")
+  def createValidTagManifest(bagName: BagPath, dataFiles: List[(String, String)]) = createValidManifestFile(bagName, dataFiles, "tagmanifest-sha256.txt")
 
   private def createDataFiles(bagPath: BagPath, dataFileCount: Int) = {
     val subPathLength = Random.nextInt(3)

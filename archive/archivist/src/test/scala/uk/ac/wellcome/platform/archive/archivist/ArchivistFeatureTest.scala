@@ -7,8 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
-import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, IngestBagRequest}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -251,12 +250,4 @@ class ArchivistFeatureTest
     }
   }
 
-  private def dataManifestWithNonExistingFile(bagPath: BagPath, filesAndDigests: Seq[(String,String)]) = FileEntry(
-    name = s"$bagPath/manifest-sha256.txt",
-    contents = {
-      val (existingFileName, validFileDigest) = filesAndDigests.head
-
-      s"""$validFileDigest  ${existingFileName.replace(s"$bagPath/", "")}
-         |1234567890qwer  this/does/not/exists.jpg""".stripMargin}
-  )
 }
