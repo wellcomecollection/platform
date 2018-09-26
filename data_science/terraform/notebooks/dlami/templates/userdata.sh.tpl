@@ -34,7 +34,11 @@ ps -eaf | grep "bash /var/lib/cloud/instance/scripts/part-001" | grep --quiet --
 
 if (( \$? == 0 ))
 then
-  echo -e "\e[33m*** BOOTSTRAP RUNNING ***\e[0m"
+  echo -e "\e[33m*** BOOTSTRAP RUNNING ***"
+  echo ""
+  echo "Follow the bootstrap script logs for progress info:"
+  echo ""
+  echo -e "$ tail -f /var/log/cloud-init-output.log\e[0m"
 else
   if [[ -f "$BOOTSTRAP_COMPLETE_PATH" ]]
   then
