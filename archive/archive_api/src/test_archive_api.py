@@ -1,7 +1,6 @@
 # -*- encoding: utf-8
 
 import json
-from test_asset_lookup_request import create_table
 
 
 class TestReportIngestStatus:
