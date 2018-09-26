@@ -37,7 +37,7 @@ daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 logger = daiquiri.getLogger()
 
 api.namespaces.clear()
-ns = api.namespace('ingests', description='Ingest requests')
+ns_ingests = api.namespace('ingests', description='Ingest requests')
 
 
 # We can't move this import to the top because the models need the ``api``
@@ -45,13 +45,15 @@ ns = api.namespace('ingests', description='Ingest requests')
 import models  # noqa
 
 
-@ns.route('')
-@ns.doc(description='Request the ingest of a BagIt resource.')
-@ns.param('payload', 'The ingest request specifying the uploadUrl where the BagIt resource can be found', _in='body')
+@ns_ingests.route('')
+@ns_ingests.doc(description='Request the ingest of a BagIt resource.')
+@ns_ingests.param(
+    'payload',
+    'The ingest request specifying the uploadUrl where the BagIt resource can be found', _in='body')
 class IngestCollection(Resource):
-    @ns.expect(models.IngestRequest, validate=True)
-    @ns.response(202, 'Ingest created')
-    @ns.response(400, 'Bad request', models.Error)
+    @ns_ingests.expect(models.IngestRequest, validate=True)
+    @ns_ingests.response(202, 'Ingest created')
+    @ns_ingests.response(400, 'Bad request', models.Error)
     def post(self):
         """Create a request to ingest a BagIt resource"""
         upload_url = request.json['uploadUrl']
@@ -107,12 +109,12 @@ class IngestCollection(Resource):
                 raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
 
 
-@ns.route('/<string:id>')
-@ns.param('id', 'The ingest request identifier')
+@ns_ingests.route('/<string:id>')
+@ns_ingests.param('id', 'The ingest request identifier')
 class IngestResource(Resource):
-    @ns.doc(description='The ingest request id is returned in the Location header from a POSTed ingest request')
-    @ns.response(200, 'Ingest found')
-    @ns.response(404, 'Ingest not found', models.Error)
+    @ns_ingests.doc(description='The ingest request id is returned in the Location header from a POSTed ingest request')
+    @ns_ingests.response(200, 'Ingest found')
+    @ns_ingests.response(404, 'Ingest not found', models.Error)
     def get(self, id):
         """Get the current status of an ingest request"""
         result = report_ingest_status(
@@ -123,7 +125,7 @@ class IngestResource(Resource):
         return jsonify(result)
 
 
-@app.route('/healthcheck')
+@app.route('/storage/v1/healthcheck')
 def route_report_healthcheck_status():
     return jsonify({'status': 'OK'})
 

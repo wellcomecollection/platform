@@ -22,8 +22,8 @@ module "service" {
 
   security_group_ids = ["${var.service_lb_security_group_id}"]
 
-  container_name = "${module.task.sidecar_task_name}"
-  container_port = "${var.nginx_container_port}"
+  container_name = "${module.task.task_name}"
+  container_port = "${module.task.task_port}"
 
   ecs_cluster_id = "${var.ecs_cluster_id}"
 
@@ -37,26 +37,15 @@ module "service" {
 }
 
 module "task" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=v11.8.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=v11.8.0"
 
   aws_region = "${var.aws_region}"
   task_name  = "${var.namespace}"
 
-  app_container_image = "${var.api_container_image}"
-  app_container_port  = "${var.api_container_port}"
-  app_cpu             = "${var.api_cpu}"
-  app_memory          = "${var.api_memory}"
-  app_env_vars        = "${var.api_env_vars}"
-  app_env_vars_length = "${var.api_env_vars_length}"
-
-  sidecar_container_image = "${var.nginx_container_image}"
-  sidecar_container_port  = "${var.nginx_container_port}"
-  sidecar_cpu             = "${var.nginx_cpu}"
-  sidecar_memory          = "${var.nginx_memory}"
-  sidecar_env_vars        = "${var.nginx_env_vars}"
-  sidecar_env_vars_length = "${var.nginx_env_vars_length}"
-  sidecar_is_proxy        = "true"
-
-  cpu    = "${var.task_cpu}"
-  memory = "${var.task_memory}"
+  container_image = "${var.container_image}"
+  container_port  = "${var.container_port}"
+  cpu             = "${var.cpu}"
+  memory          = "${var.memory}"
+  env_vars        = "${var.env_vars}"
+  env_vars_length = "${var.env_vars_length}"
 }
