@@ -6,5 +6,5 @@ module "load_balancer" {
   vpc_id         = "${local.vpc_id}"
   public_subnets = "${local.public_subnets}"
 
-  certificate_domain       = "api.wellcomecollection.org"
+  certificate_domain = "api.wellcomecollection.org"
 }

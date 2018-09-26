@@ -14,4 +14,3 @@ resource "aws_security_group" "service_egress_security_group" {
     Name = "${var.name}-egress"
   }
 }
-

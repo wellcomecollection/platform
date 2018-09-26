@@ -19,7 +19,7 @@ resource "aws_alb_listener" "https" {
     fixed_response {
       content_type = "text/plain"
       message_body = "Not Found"
-      status_code = "404"
+      status_code  = "404"
     }
   }
 }

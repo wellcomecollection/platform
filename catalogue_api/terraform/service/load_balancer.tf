@@ -16,4 +16,3 @@ resource "aws_alb_listener_rule" "https" {
     values = ["${var.path_pattern}"]
   }
 }
-

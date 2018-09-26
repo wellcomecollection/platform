@@ -14,5 +14,3 @@ module "alb_alarms" {
 
   healthy_host_threshold = "${local.healthy_host_threshold}"
 }
-
-
