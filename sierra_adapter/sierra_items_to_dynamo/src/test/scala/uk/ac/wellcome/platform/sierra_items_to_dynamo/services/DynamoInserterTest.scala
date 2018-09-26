@@ -17,7 +17,6 @@ import uk.ac.wellcome.storage.vhs.{
   VHSConfig,
   VersionedHybridStore
 }
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
