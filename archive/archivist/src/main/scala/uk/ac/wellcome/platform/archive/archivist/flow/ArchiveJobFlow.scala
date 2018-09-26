@@ -8,16 +8,16 @@ import cats.implicits._
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveItemJobCreator
 
 object ArchiveJobFlow {
-  def apply(delimiter: String)(implicit s3Client: AmazonS3): Flow[ArchiveJob, Either[ArchiveJob,ArchiveJob], NotUsed] =
+  def apply(delimiter: String, parallelism: Int)(implicit s3Client: AmazonS3): Flow[ArchiveJob, Either[ArchiveJob,ArchiveJob], NotUsed] =
     Flow[ArchiveJob]
     .map(job => ArchiveItemJobCreator.createArchiveItemJobs(job, delimiter))
       .via(FoldEitherFlow[ArchiveJob, List[ArchiveItemJob], Either[ArchiveJob,ArchiveJob]](Left(_))(
-        mapReduceArchiveItemJobs(delimiter)))
+        mapReduceArchiveItemJobs(delimiter, parallelism)))
 
 
-  private def mapReduceArchiveItemJobs(delimiter: String)(implicit s3Client: AmazonS3) = Flow[List[ArchiveItemJob]]
+  private def mapReduceArchiveItemJobs(delimiter: String, parallelism: Int)(implicit s3Client: AmazonS3) = Flow[List[ArchiveItemJob]]
     .mapConcat(identity)
-    .via(ArchiveItemJobFlow(delimiter))
+    .via(ArchiveItemJobFlow(delimiter, parallelism))
     .groupBy(Int.MaxValue, {
       case Right(archiveItemJob) => archiveItemJob.bagName
       case Left(archiveItemJob) => archiveItemJob.bagName

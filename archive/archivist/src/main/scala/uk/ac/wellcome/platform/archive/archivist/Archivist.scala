@@ -51,7 +51,7 @@ trait Archivist extends Logging {
         .log("notification message")
         .via(NotificationMessageFlow())
         .log("download location")
-        .via(ZipFileDownloadFlow())
+        .via(ZipFileDownloadFlow(bagUploaderConfig.parallelism))
         .log("download zip")
         .via(ArchiveZipFileFlow(bagUploaderConfig))
         .log("archive verified")

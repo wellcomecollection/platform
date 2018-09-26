@@ -42,6 +42,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     opt[Int](required = true, default = Some(20))
 
   val uploadNamespace = opt[String](required = true)
+  val parallelism = opt[Int](default = Some(10))
   val uploadPrefix = opt[String](default = Some("archive"))
   val digestDelimiterRegexp = opt[String](default = Some(" +"))
 
@@ -62,7 +63,8 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     ),
     bagItConfig = BagItConfig(
       digestDelimiterRegexp = digestDelimiterRegexp()
-    )
+    ),
+    parallelism = parallelism()
   )
 
   val s3ClientConfig = S3ClientConfig(

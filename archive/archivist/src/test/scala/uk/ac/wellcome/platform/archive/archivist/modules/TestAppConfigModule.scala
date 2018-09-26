@@ -52,6 +52,7 @@ class TestAppConfigModule(queueUrl: String,
     )
     val bagUploaderConfig = BagUploaderConfig(
       uploadConfig = UploadConfig(storageBucketName),
+      parallelism = 10,
       bagItConfig = BagItConfig()
     )
 

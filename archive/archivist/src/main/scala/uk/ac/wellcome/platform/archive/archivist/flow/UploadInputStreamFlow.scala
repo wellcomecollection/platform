@@ -8,8 +8,8 @@ import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
 import scala.util.Success
 
 object UploadInputStreamFlow{
-  def apply()(implicit s3Client: AmazonS3) = Flow[(ArchiveItemJob, InputStream)]
-    .flatMapConcat { case (job, inputStream) =>
+  def apply(parallelism: Int)(implicit s3Client: AmazonS3) = Flow[(ArchiveItemJob, InputStream)]
+    .flatMapMerge(parallelism, { case (job, inputStream) =>
       val checksum = job.bagDigestItem.checksum
       StreamConverters
         .fromInputStream(() => inputStream)
@@ -19,6 +19,6 @@ object UploadInputStreamFlow{
             Right(job)
           case _ => Left(job)
         }
-    }
+    })
 
 }

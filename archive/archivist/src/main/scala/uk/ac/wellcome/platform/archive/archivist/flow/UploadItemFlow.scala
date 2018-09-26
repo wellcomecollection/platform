@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 
 object UploadItemFlow
   extends Logging {
-  def apply()(
+  def apply(parallelism: Int)(
     implicit s3Client: AmazonS3
   ): Flow[ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob],
     NotUsed] = {
@@ -26,7 +26,7 @@ object UploadItemFlow
           ArchiveItemJob,
           (ArchiveItemJob, InputStream),
           Either[ArchiveItemJob, ArchiveItemJob]](j => Left(j))(
-          UploadInputStreamFlow()))
+          UploadInputStreamFlow(parallelism)))
   }
 
 }

@@ -7,14 +7,14 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
 
 object ArchiveItemJobFlow extends Logging {
-  def apply(delimiter: String)(
+  def apply(delimiter: String, parallelism: Int)(
     implicit s3Client: AmazonS3
   ): Flow[ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob], NotUsed] = {
     Flow[ArchiveItemJob]
       .log("uploading and verifying")
-      .via(UploadItemFlow())
+      .via(UploadItemFlow(parallelism))
       .via(FoldEitherFlow[ArchiveItemJob, ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob]](ifLeft = job => Left(job))(
-        ifRight = DownloadItemFlow()))
+        ifRight = DownloadItemFlow(parallelism)))
       .log("download verified")
   }
 }

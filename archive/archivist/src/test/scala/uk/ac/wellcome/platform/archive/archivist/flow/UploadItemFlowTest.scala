@@ -33,7 +33,7 @@ class UploadItemFlowTest extends FunSpec with Matchers with S3 with MockitoSugar
               val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, namespace)
 
               val source = Source.single(archiveItemJob)
-              val flow = UploadItemFlow()(s3Client)
+              val flow = UploadItemFlow(10)(s3Client)
               val futureResult = source via flow runWith Sink.head
 
               whenReady(futureResult) { result =>
@@ -61,7 +61,7 @@ class UploadItemFlowTest extends FunSpec with Matchers with S3 with MockitoSugar
               val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, namespace)
 
               val source = Source.single(archiveItemJob)
-              val flow = UploadItemFlow()(s3Client)
+              val flow = UploadItemFlow(10)(s3Client)
               val futureResult = source via flow runWith Sink.seq
 
               whenReady(futureResult) { result =>
@@ -97,7 +97,7 @@ class UploadItemFlowTest extends FunSpec with Matchers with S3 with MockitoSugar
                 error("Stream failure", e)
                 Supervision.Resume
               }
-              val flow = UploadItemFlow()(s3Client).withAttributes(ActorAttributes.supervisionStrategy(decider))
+              val flow = UploadItemFlow(10)(s3Client).withAttributes(ActorAttributes.supervisionStrategy(decider))
               val futureResult = source via flow runWith Sink.seq
 
               whenReady(futureResult) { result =>

@@ -29,7 +29,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
             val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
 
             val source = Source.single(archiveItemJob)
-            val flow = DownloadItemFlow()(s3Client)
+            val flow = DownloadItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -59,7 +59,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
             val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
 
             val source = Source.single(archiveItemJob)
-            val flow = DownloadItemFlow()(s3Client)
+            val flow = DownloadItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -83,7 +83,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
               val bagName = BagPath(randomAlphanumeric())
               val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
               val source = Source.single(archiveItemJob)
-              val flow = DownloadItemFlow()(s3Client)
+              val flow = DownloadItemFlow(10)(s3Client)
               val futureResult = source via flow runWith Sink.head
 
               whenReady(futureResult) { result =>

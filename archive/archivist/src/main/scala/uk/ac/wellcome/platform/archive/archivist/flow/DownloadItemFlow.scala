@@ -11,11 +11,11 @@ import scala.util.Try
 
 object DownloadItemFlow extends Logging {
 
-  def apply()(implicit s3Client: AmazonS3)
+  def apply(parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob], NotUsed] = {
     Flow[ArchiveItemJob]
       .log("download to verify")
-      .flatMapConcat{ job =>
+      .flatMapMerge(parallelism, { job =>
 
           val triedInputStream = Try(s3Client.getObject(job.uploadLocation.namespace, job.uploadLocation.key).getObjectContent)
 
@@ -32,7 +32,7 @@ object DownloadItemFlow extends Logging {
               }
 
           }.getOrElse(Source.single(Left(job)))
-      }.async
+      }).async
   }
 
 }

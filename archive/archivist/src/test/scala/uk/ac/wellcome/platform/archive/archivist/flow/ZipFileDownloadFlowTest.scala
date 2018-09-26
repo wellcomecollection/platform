@@ -9,7 +9,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -20,7 +19,6 @@ class ZipFileDownloadFlowTest
     with Matchers
     with ScalaFutures
     with ArchivistFixture
-    with ProgressMonitorFixture
     with IngestRequestContextGenerators {
 
   implicit val system = ActorSystem("test")
@@ -28,10 +26,9 @@ class ZipFileDownloadFlowTest
 
   it("downloads a zipfile from s3") {
     withLocalS3Bucket { storageBucket =>
-      withMockProgressMonitor() { archiveProgressMonitor =>
                 withBagItZip() {
                   case (bagName, zipFile) =>
-                    val downloadZipFlow = ZipFileDownloadFlow()(
+                    val downloadZipFlow = ZipFileDownloadFlow(10)(
                       s3Client
                     )
 
@@ -59,6 +56,5 @@ class ZipFileDownloadFlowTest
                     }
                 }
               }
-            }
   }
 }

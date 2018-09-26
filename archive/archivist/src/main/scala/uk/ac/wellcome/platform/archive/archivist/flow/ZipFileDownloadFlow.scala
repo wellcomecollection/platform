@@ -13,14 +13,14 @@ import scala.util.Success
 
 object ZipFileDownloadFlow extends Logging {
 
-  def apply()(implicit s3Client: AmazonS3)
+  def apply(parallelism: Int)(implicit s3Client: AmazonS3)
   : Flow[IngestBagRequest,
     ZipFileDownloadComplete,
     NotUsed] = {
 
     Flow[IngestBagRequest]
       .log("download location")
-      .flatMapConcat {
+      .flatMapMerge(parallelism, {
         case request@IngestBagRequest(_, location, _) =>
 
           val response = s3Client.getObject(location.namespace, location.key)
@@ -32,7 +32,7 @@ object ZipFileDownloadFlow extends Logging {
           val tmpFile = File.createTempFile("archivist", ".tmp")
 
           downloadStream
-            .via(FileStoreFlow(tmpFile))
+            .via(FileStoreFlow(tmpFile, parallelism))
             .map(_.status)
             // TODO: Log failure here ?divertTo
             .collect {
@@ -41,7 +41,7 @@ object ZipFileDownloadFlow extends Logging {
               request
             )
           }
-      }.async
+      }).async
       .log("downloaded zipfile")
   }
 }

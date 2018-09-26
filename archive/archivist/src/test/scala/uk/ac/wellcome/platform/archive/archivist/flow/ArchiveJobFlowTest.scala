@@ -25,7 +25,7 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2) { case (bagName, zipFile) =>
             val archiveJob = createArchiveJob(zipFile, bagName, bucket)
             val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp)
+            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
             val eventualArchiveJobs = source via flow runWith Sink.seq
             whenReady(eventualArchiveJobs) { archiveJobs =>
               archiveJobs shouldBe List(Right(archiveJob))
@@ -43,7 +43,7 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2, createDataManifest = dataManifestWithNonExistingFile) { case (bagName, zipFile) =>
             val archiveJob = createArchiveJob(zipFile, bagName, bucket)
             val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp)
+            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
             val eventualArchiveJobs = source via flow runWith Sink.seq
             whenReady(eventualArchiveJobs) { archiveJobs =>
               archiveJobs shouldBe List(Left(archiveJob))
@@ -61,7 +61,7 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2, createDigest = _ => "bad-digest") { case (bagName, zipFile) =>
             val archiveJob = createArchiveJob(zipFile, bagName, bucket)
             val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp)
+            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
             val eventualArchiveJobs = source via flow runWith Sink.seq
             whenReady(eventualArchiveJobs) { archiveJobs =>
               archiveJobs shouldBe List(Left(archiveJob))
@@ -79,7 +79,7 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2, createDataManifest = dataManifestWithWrongChecksum) { case (bagName, zipFile) =>
             val archiveJob = createArchiveJob(zipFile, bagName, bucket)
             val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp)
+            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
             val eventualArchiveJobs = source via flow runWith Sink.seq
             whenReady(eventualArchiveJobs) { archiveJobs =>
               archiveJobs shouldBe List(Left(archiveJob))
@@ -97,7 +97,7 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2, createDataManifest = (_, _) => None) { case (bagName, zipFile) =>
             val archiveJob = createArchiveJob(zipFile, bagName, bucket)
             val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp)
+            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
 
             val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -117,7 +117,7 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2, createDataManifest = (bagName, _)=> Some(FileEntry(s"$bagName/manifest-sha256.txt",randomAlphanumeric()))) { case (bagName, zipFile) =>
             val archiveJob = createArchiveJob(zipFile, bagName, bucket)
             val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp)
+            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
 
             val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -137,7 +137,7 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2, createTagManifest = (_, _) => None) { case (bagName, zipFile) =>
             val archiveJob = createArchiveJob(zipFile, bagName, bucket)
             val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp)
+            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
 
             val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -157,7 +157,7 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2, createTagManifest = (bagName, _)=> Some(FileEntry(s"$bagName/tagmanifest-sha256.txt",randomAlphanumeric()))) { case (bagName, zipFile) =>
             val archiveJob = createArchiveJob(zipFile, bagName, bucket)
             val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp)
+            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
 
             val eventualArchiveJobs = source via flow runWith Sink.seq
 

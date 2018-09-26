@@ -30,6 +30,7 @@ class ArchiveZipFileFlowTest
       uploadConfig = UploadConfig(
         uploadNamespace = bucket.name
       ),
+      parallelism = 10,
       bagItConfig = BagItConfig()
     )
 
