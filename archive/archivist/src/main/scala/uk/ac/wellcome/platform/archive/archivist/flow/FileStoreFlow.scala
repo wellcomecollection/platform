@@ -9,11 +9,11 @@ object FileStoreFlow {
   def apply(tmpFile: File, parallelism: Int) = {
     val fileSink = FileIO.toPath(tmpFile.toPath)
 
-    Flow.fromGraph(GraphDSL.create(fileSink) { implicit builder =>
-      sink =>
+    Flow
+      .fromGraph(GraphDSL.create(fileSink) { implicit builder => sink =>
         FlowShape(sink.in, builder.materializedValue)
-    }).flatMapMerge(parallelism, (Source.fromFuture))
+      })
+      .flatMapMerge(parallelism, (Source.fromFuture))
 
   }
 }
-

@@ -10,23 +10,39 @@ import uk.ac.wellcome.platform.archive.common.models.BagPath
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
-class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with ScalaFutures with Akka with MockitoSugar with ArchiveJobGenerators{
+class DownloadItemFlowTest
+    extends FunSpec
+    with S3
+    with ZipBagItFixture
+    with ScalaFutures
+    with Akka
+    with MockitoSugar
+    with ArchiveJobGenerators {
 
   it("passes through a correct right archive item job") {
     withLocalS3Bucket { bucket =>
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withZipFile(List()) { zipFile =>
-
             val fileContent = "bah buh bih beh"
-            val digest = "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
+            val digest =
+              "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
             val fileName = "key.txt"
 
             val bagName = BagPath(randomAlphanumeric())
 
-            s3Client.putObject(bucket.name, s"archive/$bagName/$fileName", fileContent)
+            s3Client.putObject(
+              bucket.name,
+              s"archive/$bagName/$fileName",
+              fileContent)
 
-            val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
+            val archiveItemJob = createArchiveItemJob(
+              zipFile,
+              bucket,
+              digest,
+              bagName,
+              fileName,
+              "basepath")
 
             val source = Source.single(archiveItemJob)
             val flow = DownloadItemFlow(10)(s3Client)
@@ -38,7 +54,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
 
           }
         }
-        }
+      }
     }
   }
 
@@ -47,16 +63,24 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withZipFile(List()) { zipFile =>
-
             val fileContent = "bah buh bih beh"
             val digest = "bad-digest"
             val fileName = "key.txt"
 
             val bagName = BagPath(randomAlphanumeric())
 
-            s3Client.putObject(bucket.name, s"archive/$bagName/$fileName", fileContent)
+            s3Client.putObject(
+              bucket.name,
+              s"archive/$bagName/$fileName",
+              fileContent)
 
-            val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
+            val archiveItemJob = createArchiveItemJob(
+              zipFile,
+              bucket,
+              digest,
+              bagName,
+              fileName,
+              "basepath")
 
             val source = Source.single(archiveItemJob)
             val flow = DownloadItemFlow(10)(s3Client)
@@ -66,31 +90,36 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
               result shouldBe Left(archiveItemJob)
             }
           }
-          }
         }
+      }
     }
   }
 
   it("returns a left of archive item job if the file does not exist") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-          withLocalS3Bucket { bucket =>
-            withZipFile(List()) { zipFile =>
+        withLocalS3Bucket { bucket =>
+          withZipFile(List()) { zipFile =>
+            val digest = "digest"
+            val fileName = "this/does/not/exist.txt"
 
-              val digest = "digest"
-              val fileName = "this/does/not/exist.txt"
+            val bagName = BagPath(randomAlphanumeric())
+            val archiveItemJob = createArchiveItemJob(
+              zipFile,
+              bucket,
+              digest,
+              bagName,
+              fileName,
+              "basepath")
+            val source = Source.single(archiveItemJob)
+            val flow = DownloadItemFlow(10)(s3Client)
+            val futureResult = source via flow runWith Sink.head
 
-              val bagName = BagPath(randomAlphanumeric())
-              val archiveItemJob = createArchiveItemJob(zipFile, bucket, digest, bagName, fileName, "basepath")
-              val source = Source.single(archiveItemJob)
-              val flow = DownloadItemFlow(10)(s3Client)
-              val futureResult = source via flow runWith Sink.head
-
-              whenReady(futureResult) { result =>
-                result shouldBe Left(archiveItemJob)
-              }
+            whenReady(futureResult) { result =>
+              result shouldBe Left(archiveItemJob)
             }
           }
+        }
       }
     }
   }

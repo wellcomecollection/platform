@@ -5,9 +5,9 @@ import java.util.zip.ZipFile
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class ZipLocation(
-                        zipFile: ZipFile,
-                        objectLocation: ObjectLocation
-                      )
+  zipFile: ZipFile,
+  objectLocation: ObjectLocation
+)
 
 object ZipLocation {
   def apply(archiveItemJob: ArchiveItemJob): ZipLocation = {

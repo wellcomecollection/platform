@@ -4,10 +4,9 @@ import java.net.{URI, URISyntaxException}
 import java.util.UUID
 import uk.ac.wellcome.json.JsonUtil._
 
-case class ArchiveComplete(
-                                           archiveRequestId: UUID,
-                                           bagLocation: BagLocation,
-                                           archiveCompleteCallbackUrl: Option[URI] = None)
+case class ArchiveComplete(archiveRequestId: UUID,
+                           bagLocation: BagLocation,
+                           archiveCompleteCallbackUrl: Option[URI] = None)
 
 object ArchiveComplete {
 
@@ -24,19 +23,19 @@ object ArchiveComplete {
           case _: URISyntaxException =>
             Left(DecodingFailure("URI", cursor.history))
         }
-      case l@Left(_) => l.asInstanceOf[Decoder.Result[URI]]
+      case l @ Left(_) => l.asInstanceOf[Decoder.Result[URI]]
     }
   }
 
-  implicit val bagArchiveCompleteNotificationDecoder
-  : Decoder[ArchiveComplete] = deriveDecoder
-  implicit val bagArchiveCompleteNotificationEncoder
-  : Encoder[ArchiveComplete] = deriveEncoder
+  implicit val bagArchiveCompleteNotificationDecoder: Decoder[ArchiveComplete] =
+    deriveDecoder
+  implicit val bagArchiveCompleteNotificationEncoder: Encoder[ArchiveComplete] =
+    deriveEncoder
 
   def apply(
-             bagLocation: BagLocation,
-             request: IngestBagRequest
-           ): ArchiveComplete =
+    bagLocation: BagLocation,
+    request: IngestBagRequest
+  ): ArchiveComplete =
     ArchiveComplete(
       request.archiveRequestId,
       bagLocation,

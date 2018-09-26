@@ -15,13 +15,14 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-
-object S3UploadFlow extends Logging{
-  def apply(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3) = new S3UploadFlow(uploadLocation)(s3Client)
+object S3UploadFlow extends Logging {
+  def apply(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3) =
+    new S3UploadFlow(uploadLocation)(s3Client)
 }
 
 class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
-  extends GraphStage[FlowShape[ByteString, Try[CompleteMultipartUploadResult]]]
+    extends GraphStage[
+      FlowShape[ByteString, Try[CompleteMultipartUploadResult]]]
     with Logging {
 
   val in = Inlet[ByteString]("S3UploadFlow.in")
@@ -72,19 +73,19 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
       private def uploadByteString(byteString: ByteString): Unit = {
         if (byteString.nonEmpty) {
           val (current, next) = byteString.splitAt(maxSize)
-          val triedUploadResult = getUploadId.flatMap{uploadId =>
-
+          val triedUploadResult = getUploadId.flatMap { uploadId =>
             val inputStream = new ByteArrayInputStream(current.toArray)
             Try(
-            s3Client.uploadPart(
-              new UploadPartRequest()
-                .withBucketName(uploadLocation.namespace)
-                .withKey(uploadLocation.key)
-                .withUploadId(uploadId)
-                .withInputStream(inputStream)
-                .withPartNumber(partNumber)
-                .withPartSize(current.size)
-            ))}
+              s3Client.uploadPart(
+                new UploadPartRequest()
+                  .withBucketName(uploadLocation.namespace)
+                  .withKey(uploadLocation.key)
+                  .withUploadId(uploadId)
+                  .withInputStream(inputStream)
+                  .withPartNumber(partNumber)
+                  .withPartSize(current.size)
+              ))
+          }
           triedUploadResult match {
             case Failure(ex) =>
               handleInternalFailure(ex)
@@ -128,7 +129,7 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
       }
 
       private def abortUpload(): Unit = {
-        maybeUploadId.foreach{uploadId =>
+        maybeUploadId.foreach { uploadId =>
           Try(
             s3Client.abortMultipartUpload(
               new AbortMultipartUploadRequest(
@@ -145,15 +146,15 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           triedUploadId
         case Some(initializedId) => Try(initializedId)
 
+      }
+      private def initializeUpload(uploadLocation: ObjectLocation) =
+        Try(
+          s3Client
+            .initiateMultipartUpload(
+              new InitiateMultipartUploadRequest(
+                uploadLocation.namespace,
+                uploadLocation.key))
+            .getUploadId)
     }
-      private def initializeUpload(uploadLocation: ObjectLocation)=
-        Try(s3Client
-          .initiateMultipartUpload(
-            new InitiateMultipartUploadRequest(
-              uploadLocation.namespace,
-              uploadLocation.key))
-          .getUploadId)
-    }
-
 
 }

@@ -28,17 +28,19 @@ object S3ClientModule extends AbstractModule {
 
     explicitConfigSettings match {
 
-      case Some((credentialsProvider, endpoint)) => standardClient
-        .withCredentials(credentialsProvider)
-        .withPathStyleAccessEnabled(true)
-        .withEndpointConfiguration(new EndpointConfiguration(endpoint, region))
-        .build()
+      case Some((credentialsProvider, endpoint)) =>
+        standardClient
+          .withCredentials(credentialsProvider)
+          .withPathStyleAccessEnabled(true)
+          .withEndpointConfiguration(
+            new EndpointConfiguration(endpoint, region))
+          .build()
 
-      case None => standardClient
-        .withRegion(region)
-        .build()
+      case None =>
+        standardClient
+          .withRegion(region)
+          .build()
 
     }
   }
 }
-

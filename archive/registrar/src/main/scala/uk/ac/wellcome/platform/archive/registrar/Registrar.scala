@@ -10,7 +10,11 @@ import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage, RequestContext}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  NotificationMessage,
+  RequestContext
+}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackFlow
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
@@ -74,8 +78,7 @@ class Registrar @Inject()(
 
   private def parseNotification(message: NotificationMessage) = {
     fromJson[ArchiveComplete](message.Message) match {
-      case Success(
-          bagArchiveCompleteNotification: ArchiveComplete) =>
+      case Success(bagArchiveCompleteNotification: ArchiveComplete) =>
         RequestContext(bagArchiveCompleteNotification)
       case Failure(e) =>
         throw new RuntimeException(

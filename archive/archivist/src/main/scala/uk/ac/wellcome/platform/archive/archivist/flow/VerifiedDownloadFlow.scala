@@ -6,9 +6,9 @@ import akka.stream.scaladsl.{Flow, GraphDSL, Sink}
 import akka.util.ByteString
 
 object VerifiedDownloadFlow {
-  def apply(): Flow[ByteString, String, NotUsed] = Flow.fromGraph(
-    GraphDSL.create() {
-      implicit b => {
+  def apply(): Flow[ByteString, String, NotUsed] =
+    Flow.fromGraph(GraphDSL.create() { implicit b =>
+      {
 
         import GraphDSL.Implicits._
 

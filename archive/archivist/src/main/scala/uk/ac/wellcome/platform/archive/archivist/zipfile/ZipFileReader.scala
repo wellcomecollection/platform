@@ -5,7 +5,7 @@ import java.io.InputStream
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ZipLocation
 
-object ZipFileReader extends Logging{
+object ZipFileReader extends Logging {
   def maybeInputStream(zipLocation: ZipLocation): Option[InputStream] = {
     val objectLocation = zipLocation.objectLocation
     val zipFile = zipLocation.zipFile

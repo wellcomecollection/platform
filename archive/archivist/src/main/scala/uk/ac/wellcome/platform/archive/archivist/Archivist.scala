@@ -10,10 +10,17 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.flow.{ArchiveCompleteFlow, ArchiveZipFileFlow, ZipFileDownloadFlow}
+import uk.ac.wellcome.platform.archive.archivist.flow.{
+  ArchiveCompleteFlow,
+  ArchiveZipFileFlow,
+  ZipFileDownloadFlow
+}
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  IngestBagRequest,
+  NotificationMessage
+}
 
 import scala.util.Success
 
@@ -67,7 +74,7 @@ object NotificationMessageFlow {
       .map(message => fromJson[IngestBagRequest](message.Message))
       // TODO: Log error here
       .collect {
-      case Success(bagRequest) => bagRequest
-    }
+        case Success(bagRequest) => bagRequest
+      }
   }
 }

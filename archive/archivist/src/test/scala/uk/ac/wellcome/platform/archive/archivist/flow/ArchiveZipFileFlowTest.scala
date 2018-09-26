@@ -91,7 +91,8 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-          withBagItZip(createBagItFile = _ => None) { case (bagName, zipFile) =>
+          withBagItZip(createBagItFile = _ => None) {
+            case (bagName, zipFile) =>
               val uploader = ArchiveZipFileFlow(bagUploaderConfig)
               val ingestContext = createIngestBagRequest
 

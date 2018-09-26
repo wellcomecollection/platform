@@ -9,7 +9,10 @@ import com.google.inject.Guice
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.archivist.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.{BagPath, IngestBagRequest}
@@ -42,28 +45,32 @@ trait Archivist
     val ingestRequestId = UUID.randomUUID()
     sendNotificationToSQS(
       queuePair.queue,
-      IngestBagRequest(
-        ingestRequestId,
-        uploadedBagLocation,
-        callbackUri))
+      IngestBagRequest(ingestRequestId, uploadedBagLocation, callbackUri))
 
     testWith((ingestRequestId, uploadedBagLocation, bagName))
   }
 
-  def createAndSendBag[R](ingestBucket: Bucket,
-                               callbackUri: Option[URI],
-                               queuePair: QueuePair,
-                               dataFileCount: Int =12,
-                               createDigest: String => String = createValidDigest,
-                          createDataManifest: (BagPath, List[(String, String)]) => Option[FileEntry] = createValidDataManifest,
-                          createBagItFile: BagPath => Option[FileEntry] = createValidBagItFile)(
-                                testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = withBagItZip(dataFileCount = dataFileCount, createDigest = createDigest, createDataManifest = createDataManifest, createBagItFile = createBagItFile) {
-    case (bagName, zipFile) =>
-      sendBag(bagName, zipFile, ingestBucket, callbackUri, queuePair) {
-        case (requestId, uploadObjectLocation, bag) =>
-          testWith((requestId, uploadObjectLocation, bag))
-      }
-  }
+  def createAndSendBag[R](
+    ingestBucket: Bucket,
+    callbackUri: Option[URI],
+    queuePair: QueuePair,
+    dataFileCount: Int = 12,
+    createDigest: String => String = createValidDigest,
+    createDataManifest: (BagPath, List[(String, String)]) => Option[FileEntry] =
+      createValidDataManifest,
+    createBagItFile: BagPath => Option[FileEntry] = createValidBagItFile)(
+    testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) =
+    withBagItZip(
+      dataFileCount = dataFileCount,
+      createDigest = createDigest,
+      createDataManifest = createDataManifest,
+      createBagItFile = createBagItFile) {
+      case (bagName, zipFile) =>
+        sendBag(bagName, zipFile, ingestBucket, callbackUri, queuePair) {
+          case (requestId, uploadObjectLocation, bag) =>
+            testWith((requestId, uploadObjectLocation, bag))
+        }
+    }
 
   def withApp[R](storageBucket: Bucket,
                  queuePair: QueuePair,
@@ -117,6 +124,5 @@ trait Archivist
       }
     })
   }
-
 
 }

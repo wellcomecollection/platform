@@ -22,68 +22,79 @@ class ArchiveJobFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2) { case (bagName, zipFile) =>
-            val archiveJob = createArchiveJob(zipFile, bagName, bucket)
-            val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
-            val eventualArchiveJobs = source via flow runWith Sink.seq
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Right(archiveJob))
-            }
+          withBagItZip(dataFileCount = 2) {
+            case (bagName, zipFile) =>
+              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
+              val eventualArchiveJobs = source via flow runWith Sink.seq
+              whenReady(eventualArchiveJobs) { archiveJobs =>
+                archiveJobs shouldBe List(Right(archiveJob))
+              }
           }
         }
       }
     }
   }
 
-  it("outputs a left of archive job if one of the items fails because it does not exist in the zipFile") {
+  it(
+    "outputs a left of archive job if one of the items fails because it does not exist in the zipFile") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createDataManifest = dataManifestWithNonExistingFile) { case (bagName, zipFile) =>
-            val archiveJob = createArchiveJob(zipFile, bagName, bucket)
-            val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
-            val eventualArchiveJobs = source via flow runWith Sink.seq
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(archiveJob))
-            }
+          withBagItZip(
+            dataFileCount = 2,
+            createDataManifest = dataManifestWithNonExistingFile) {
+            case (bagName, zipFile) =>
+              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
+              val eventualArchiveJobs = source via flow runWith Sink.seq
+              whenReady(eventualArchiveJobs) { archiveJobs =>
+                archiveJobs shouldBe List(Left(archiveJob))
+              }
           }
         }
       }
     }
   }
 
-  it("outputs a left of archive job if all of the items fail because the checksum is incorrect") {
+  it(
+    "outputs a left of archive job if all of the items fail because the checksum is incorrect") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createDigest = _ => "bad-digest") { case (bagName, zipFile) =>
-            val archiveJob = createArchiveJob(zipFile, bagName, bucket)
-            val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
-            val eventualArchiveJobs = source via flow runWith Sink.seq
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(archiveJob))
-            }
+          withBagItZip(dataFileCount = 2, createDigest = _ => "bad-digest") {
+            case (bagName, zipFile) =>
+              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
+              val eventualArchiveJobs = source via flow runWith Sink.seq
+              whenReady(eventualArchiveJobs) { archiveJobs =>
+                archiveJobs shouldBe List(Left(archiveJob))
+              }
           }
         }
       }
     }
   }
 
-  it("outputs a left of archive job if one of the items fail because the checksum is incorrect") {
+  it(
+    "outputs a left of archive job if one of the items fail because the checksum is incorrect") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createDataManifest = dataManifestWithWrongChecksum) { case (bagName, zipFile) =>
-            val archiveJob = createArchiveJob(zipFile, bagName, bucket)
-            val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
-            val eventualArchiveJobs = source via flow runWith Sink.seq
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(archiveJob))
-            }
+          withBagItZip(
+            dataFileCount = 2,
+            createDataManifest = dataManifestWithWrongChecksum) {
+            case (bagName, zipFile) =>
+              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
+              val eventualArchiveJobs = source via flow runWith Sink.seq
+              whenReady(eventualArchiveJobs) { archiveJobs =>
+                archiveJobs shouldBe List(Left(archiveJob))
+              }
           }
         }
       }
@@ -94,16 +105,17 @@ class ArchiveJobFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createDataManifest = (_, _) => None) { case (bagName, zipFile) =>
-            val archiveJob = createArchiveJob(zipFile, bagName, bucket)
-            val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
+          withBagItZip(dataFileCount = 2, createDataManifest = (_, _) => None) {
+            case (bagName, zipFile) =>
+              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
 
-            val eventualArchiveJobs = source via flow runWith Sink.seq
+              val eventualArchiveJobs = source via flow runWith Sink.seq
 
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(archiveJob))
-            }
+              whenReady(eventualArchiveJobs) { archiveJobs =>
+                archiveJobs shouldBe List(Left(archiveJob))
+              }
           }
         }
       }
@@ -114,16 +126,23 @@ class ArchiveJobFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createDataManifest = (bagName, _)=> Some(FileEntry(s"$bagName/manifest-sha256.txt",randomAlphanumeric()))) { case (bagName, zipFile) =>
-            val archiveJob = createArchiveJob(zipFile, bagName, bucket)
-            val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
+          withBagItZip(
+            dataFileCount = 2,
+            createDataManifest = (bagName, _) =>
+              Some(
+                FileEntry(
+                  s"$bagName/manifest-sha256.txt",
+                  randomAlphanumeric()))) {
+            case (bagName, zipFile) =>
+              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
 
-            val eventualArchiveJobs = source via flow runWith Sink.seq
+              val eventualArchiveJobs = source via flow runWith Sink.seq
 
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(archiveJob))
-            }
+              whenReady(eventualArchiveJobs) { archiveJobs =>
+                archiveJobs shouldBe List(Left(archiveJob))
+              }
           }
         }
       }
@@ -134,16 +153,17 @@ class ArchiveJobFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createTagManifest = (_, _) => None) { case (bagName, zipFile) =>
-            val archiveJob = createArchiveJob(zipFile, bagName, bucket)
-            val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
+          withBagItZip(dataFileCount = 2, createTagManifest = (_, _) => None) {
+            case (bagName, zipFile) =>
+              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
 
-            val eventualArchiveJobs = source via flow runWith Sink.seq
+              val eventualArchiveJobs = source via flow runWith Sink.seq
 
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(archiveJob))
-            }
+              whenReady(eventualArchiveJobs) { archiveJobs =>
+                archiveJobs shouldBe List(Left(archiveJob))
+              }
           }
         }
       }
@@ -154,16 +174,23 @@ class ArchiveJobFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createTagManifest = (bagName, _)=> Some(FileEntry(s"$bagName/tagmanifest-sha256.txt",randomAlphanumeric()))) { case (bagName, zipFile) =>
-            val archiveJob = createArchiveJob(zipFile, bagName, bucket)
-            val source = Source.single(archiveJob)
-            val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
+          withBagItZip(
+            dataFileCount = 2,
+            createTagManifest = (bagName, _) =>
+              Some(
+                FileEntry(
+                  s"$bagName/tagmanifest-sha256.txt",
+                  randomAlphanumeric()))) {
+            case (bagName, zipFile) =>
+              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
 
-            val eventualArchiveJobs = source via flow runWith Sink.seq
+              val eventualArchiveJobs = source via flow runWith Sink.seq
 
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(archiveJob))
-            }
+              whenReady(eventualArchiveJobs) { archiveJobs =>
+                archiveJobs shouldBe List(Left(archiveJob))
+              }
           }
         }
       }

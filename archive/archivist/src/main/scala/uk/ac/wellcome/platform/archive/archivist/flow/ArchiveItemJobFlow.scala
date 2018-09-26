@@ -13,8 +13,12 @@ object ArchiveItemJobFlow extends Logging {
     Flow[ArchiveItemJob]
       .log("uploading and verifying")
       .via(UploadItemFlow(parallelism))
-      .via(FoldEitherFlow[ArchiveItemJob, ArchiveItemJob, Either[ArchiveItemJob, ArchiveItemJob]](ifLeft = job => Left(job))(
-        ifRight = DownloadItemFlow(parallelism)))
+      .via(
+        FoldEitherFlow[
+          ArchiveItemJob,
+          ArchiveItemJob,
+          Either[ArchiveItemJob, ArchiveItemJob]](ifLeft = job => Left(job))(
+          ifRight = DownloadItemFlow(parallelism)))
       .log("download verified")
   }
 }

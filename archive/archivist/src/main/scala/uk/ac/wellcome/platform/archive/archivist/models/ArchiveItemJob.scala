@@ -6,12 +6,13 @@ import uk.ac.wellcome.storage.ObjectLocation
 case class ArchiveItemJob(archiveJob: ArchiveJob, bagDigestItem: BagItem) {
   def bagName = archiveJob.bagLocation.bagPath
 
-  def uploadLocation = createUploadLocation(archiveJob.bagLocation, bagDigestItem.location)
+  def uploadLocation =
+    createUploadLocation(archiveJob.bagLocation, bagDigestItem.location)
 
   private def createUploadLocation(
-                                    bagLocation: BagLocation,
-                                    itemLocation: ObjectLocation
-                                  ) =
+    bagLocation: BagLocation,
+    itemLocation: ObjectLocation
+  ) =
     ObjectLocation(
       bagLocation.storageNamespace,
       List(

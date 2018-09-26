@@ -6,8 +6,14 @@ import java.util.UUID
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation,
+  IngestBagRequest
+}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -16,7 +22,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 // TODO: Test shutdown mid-stream does not succeed
 
 class ArchivistFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
@@ -29,12 +35,12 @@ class ArchivistFeatureTest
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        progressTable,
-        archivist) =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) =>
         createAndSendBag(ingestBucket, Some(callbackUrl), queuePair) {
           case (requestId, uploadLocation, validBag) =>
             archivist.run()
@@ -59,13 +65,17 @@ class ArchivistFeatureTest
   it("fails when ingesting an invalid bag") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        progressTable,
-        archivist) =>
-        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, createDigest = _ => "bad_digest") { _ =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) =>
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          createDigest = _ => "bad_digest") { _ =>
           archivist.run()
           eventually {
             assertQueuePairSizes(queuePair, 0, 1)
@@ -78,25 +88,39 @@ class ArchivistFeatureTest
   it("continues after bag with bad checksum") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        progressTable,
-        archivist) => {
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) => {
 
         archivist.run()
 
-        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          dataFileCount = 1) {
           case (requestId1, _, validBag1) =>
-
-            createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createDigest = _ => "bad_digest") { _ =>
-
-              createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+            createAndSendBag(
+              ingestBucket,
+              Some(callbackUrl),
+              queuePair,
+              dataFileCount = 1,
+              createDigest = _ => "bad_digest") { _ =>
+              createAndSendBag(
+                ingestBucket,
+                Some(callbackUrl),
+                queuePair,
+                dataFileCount = 1) {
                 case (requestId2, _, validBag2) =>
-
-                  createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createDigest = _ => "bad_digest") { _ =>
-
+                  createAndSendBag(
+                    ingestBucket,
+                    Some(callbackUrl),
+                    queuePair,
+                    dataFileCount = 1,
+                    createDigest = _ => "bad_digest") { _ =>
                     eventually {
 
 //                      assertQueuePairSizes(queuePair, 0, 2)
@@ -133,19 +157,15 @@ class ArchivistFeatureTest
 
   it("continues after non existing zip file") {
     withArchivist {
-      case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        _,
-        archivist) =>
-
+      case (ingestBucket, storageBucket, queuePair, topic, _, archivist) =>
         archivist.run()
 
-        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          dataFileCount = 1) {
           case (requestId1, _, validBag1) =>
-
             sendNotificationToSQS(
               queuePair.queue,
               IngestBagRequest(
@@ -153,44 +173,41 @@ class ArchivistFeatureTest
                 ObjectLocation(ingestBucket.name, "non-existing1.zip"),
                 None))
 
-              createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
-                case (requestId2, _, validBag2) =>
+            createAndSendBag(
+              ingestBucket,
+              Some(callbackUrl),
+              queuePair,
+              dataFileCount = 1) {
+              case (requestId2, _, validBag2) =>
+                sendNotificationToSQS(
+                  queuePair.queue,
+                  IngestBagRequest(
+                    UUID.randomUUID(),
+                    ObjectLocation(ingestBucket.name, "non-existing2.zip"),
+                    None))
 
-                  sendNotificationToSQS(
-                    queuePair.queue,
-                    IngestBagRequest(
-                      UUID.randomUUID(),
-                      ObjectLocation(ingestBucket.name, "non-existing2.zip"),
-                      None))
+                eventually {
 
-                    eventually {
+                  assertQueuePairSizes(queuePair, 0, 2)
 
-                      assertQueuePairSizes(queuePair, 0, 2)
-
-                      assertSnsReceives(
-                        Set(
-                          ArchiveComplete(
-                            requestId1,
-                            BagLocation(
-                              storageBucket.name,
-                              "archive",
-                              validBag1),
-                            Some(callbackUrl)
-                          ),
-                          ArchiveComplete(
-                            requestId2,
-                            BagLocation(
-                              storageBucket.name,
-                              "archive",
-                              validBag2),
-                            Some(callbackUrl)
-                          )
-                        ),
-                        topic
+                  assertSnsReceives(
+                    Set(
+                      ArchiveComplete(
+                        requestId1,
+                        BagLocation(storageBucket.name, "archive", validBag1),
+                        Some(callbackUrl)
+                      ),
+                      ArchiveComplete(
+                        requestId2,
+                        BagLocation(storageBucket.name, "archive", validBag2),
+                        Some(callbackUrl)
                       )
-                    }
-                  }
-              }
+                    ),
+                    topic
+                  )
+                }
+            }
+        }
 
     }
   }
@@ -198,25 +215,39 @@ class ArchivistFeatureTest
   it("continues after non existing file referenced in manifest") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        progressTable,
-        archivist) => {
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) => {
 
         archivist.run()
 
-        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          dataFileCount = 1) {
           case (requestId1, _, validBag1) =>
-
-            createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createDataManifest = dataManifestWithNonExistingFile) { _ =>
-
-              createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+            createAndSendBag(
+              ingestBucket,
+              Some(callbackUrl),
+              queuePair,
+              dataFileCount = 1,
+              createDataManifest = dataManifestWithNonExistingFile) { _ =>
+              createAndSendBag(
+                ingestBucket,
+                Some(callbackUrl),
+                queuePair,
+                dataFileCount = 1) {
                 case (requestId2, _, validBag2) =>
-
-                  createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createDataManifest = dataManifestWithNonExistingFile) { _ =>
-
+                  createAndSendBag(
+                    ingestBucket,
+                    Some(callbackUrl),
+                    queuePair,
+                    dataFileCount = 1,
+                    createDataManifest = dataManifestWithNonExistingFile) { _ =>
                     eventually {
 
                       assertQueuePairSizes(queuePair, 0, 2)
@@ -254,25 +285,39 @@ class ArchivistFeatureTest
   it("continues after zip file with no bagit.txt") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        topic,
-        progressTable,
-        archivist) => {
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) => {
 
         archivist.run()
 
-        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          dataFileCount = 1) {
           case (requestId1, _, validBag1) =>
-
-            createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createBagItFile = _ => None) { _ =>
-
-              createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+            createAndSendBag(
+              ingestBucket,
+              Some(callbackUrl),
+              queuePair,
+              dataFileCount = 1,
+              createBagItFile = _ => None) { _ =>
+              createAndSendBag(
+                ingestBucket,
+                Some(callbackUrl),
+                queuePair,
+                dataFileCount = 1) {
                 case (requestId2, _, validBag2) =>
-
-                  createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createBagItFile = _ => None) { _ =>
-
+                  createAndSendBag(
+                    ingestBucket,
+                    Some(callbackUrl),
+                    queuePair,
+                    dataFileCount = 1,
+                    createBagItFile = _ => None) { _ =>
                     eventually {
 
                       assertQueuePairSizes(queuePair, 0, 2)

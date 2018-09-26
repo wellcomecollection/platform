@@ -8,10 +8,9 @@ import uk.ac.wellcome.json.JsonUtil._
 import io.circe.DecodingFailure
 import uk.ac.wellcome.storage.ObjectLocation
 
-case class IngestBagRequest(
-                             archiveRequestId: UUID,
-                             zippedBagLocation: ObjectLocation,
-                             archiveCompleteCallbackUrl: Option[URI] = None)
+case class IngestBagRequest(archiveRequestId: UUID,
+                            zippedBagLocation: ObjectLocation,
+                            archiveCompleteCallbackUrl: Option[URI] = None)
 
 object IngestBagRequest {
   import io.circe.generic.semiauto._
@@ -45,8 +44,8 @@ object IngestBagRequest {
     }
   }
 
-  implicit val ingestBagRequestNotificationDecoder
-    : Decoder[IngestBagRequest] = deriveDecoder
-  implicit val ingestBagRequestNotificationEncoder
-    : Encoder[IngestBagRequest] = deriveEncoder
+  implicit val ingestBagRequestNotificationDecoder: Decoder[IngestBagRequest] =
+    deriveDecoder
+  implicit val ingestBagRequestNotificationEncoder: Encoder[IngestBagRequest] =
+    deriveEncoder
 }

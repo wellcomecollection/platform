@@ -11,4 +11,3 @@ object BagManifestLocation {
   def create(config: BagItConfig, bagPath: BagPath): List[BagManifestLocation] =
     config.digestNames.map(BagManifestLocation(bagPath, _))
 }
-

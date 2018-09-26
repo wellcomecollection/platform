@@ -4,7 +4,9 @@ import java.util.zip.ZipFile
 
 import org.scalatest.{FunSpec, Ignore, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.common.models.BagPath
 
 @Ignore

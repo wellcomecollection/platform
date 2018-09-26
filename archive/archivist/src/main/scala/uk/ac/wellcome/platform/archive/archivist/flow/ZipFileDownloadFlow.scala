@@ -14,36 +14,38 @@ import scala.util.Success
 object ZipFileDownloadFlow extends Logging {
 
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
-  : Flow[IngestBagRequest,
-    ZipFileDownloadComplete,
-    NotUsed] = {
+    : Flow[IngestBagRequest, ZipFileDownloadComplete, NotUsed] = {
 
     Flow[IngestBagRequest]
       .log("download location")
-      .flatMapMerge(parallelism, {
-        case request@IngestBagRequest(_, location, _) =>
+      .flatMapMerge(
+        parallelism, {
+          case request @ IngestBagRequest(_, location, _) =>
+            val response = s3Client.getObject(location.namespace, location.key)
+            val inputStream = response.getObjectContent
 
-          val response = s3Client.getObject(location.namespace, location.key)
-          val inputStream = response.getObjectContent
+            val downloadStream = StreamConverters
+              .fromInputStream(() => inputStream)
 
-          val downloadStream = StreamConverters
-            .fromInputStream(() => inputStream)
+            val tmpFile = File.createTempFile("archivist", ".tmp")
 
-          val tmpFile = File.createTempFile("archivist", ".tmp")
-
-          downloadStream
-            .via(FileStoreFlow(tmpFile, parallelism))
-            .map(_.status)
-            // TODO: Log failure here ?divertTo
-            .collect {
-            case Success(_) => ZipFileDownloadComplete(
-              new ZipFile(tmpFile),
-              request
-            )
-          }
-      }).async
+            downloadStream
+              .via(FileStoreFlow(tmpFile, parallelism))
+              .map(_.status)
+              // TODO: Log failure here ?divertTo
+              .collect {
+                case Success(_) =>
+                  ZipFileDownloadComplete(
+                    new ZipFile(tmpFile),
+                    request
+                  )
+              }
+        }
+      )
+      .async
       .log("downloaded zipfile")
   }
 }
 
-case class ZipFileDownloadComplete(zipFile: ZipFile, ingestBagRequest: IngestBagRequest)
+case class ZipFileDownloadComplete(zipFile: ZipFile,
+                                   ingestBagRequest: IngestBagRequest)
