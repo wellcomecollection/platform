@@ -2,12 +2,13 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import org.scalatest.{FunSpec, Inside, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.test.fixtures.Akka
 
 class ArchiveZipFileFlowTest
@@ -16,8 +17,10 @@ class ArchiveZipFileFlowTest
     with ScalaFutures
     with ArchivistFixture
     with IngestRequestContextGenerators
-    with BagUploaderConfigGenerator
-    with Akka {
+      with BagUploaderConfigGenerator
+    with Akka
+    with SNS
+with Inside{
 
   implicit val s3client = s3Client
 
@@ -25,6 +28,7 @@ class ArchiveZipFileFlowTest
     withLocalS3Bucket { storageBucket =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
+        withLocalSnsTopic { topic =>
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           withBagItZip() {
             case (_, zipFile) =>
@@ -32,16 +36,24 @@ class ArchiveZipFileFlowTest
               val ingestContext = createIngestBagRequestWith()
               val (_, verification) =
                 uploader.runWith(
-                  Source.single(
-                    ZipFileDownloadComplete(zipFile, ingestContext)),
+                  Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
                   Sink.seq
                 )
 
               whenReady(verification) { result =>
                 listKeysInBucket(storageBucket) should have size 4
                 result should have size 1
+                val messages = listMessagesReceivedFromSNS(topic)
+                messages should have size 1
+                val progressUpdate = fromJson[ProgressUpdate](messages.head.message).get
+                inside(progressUpdate) { case ProgressUpdate(id, event, status) =>
+                  id shouldBe ingestContext.archiveRequestId.toString
+                  status shouldBe Progress.Processing
+                  event.description shouldBe "bag archived successfully"
+                }
               }
           }
+        }
         }
       }
     }
