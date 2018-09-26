@@ -57,6 +57,7 @@ module "service" {
   security_group_ids = [
     "${aws_security_group.service_lb_security_group.id}",
     "${aws_security_group.service_egress_security_group.id}",
+    "${var.alb_api_wc_service_lb_security_group_id}"
   ]
 
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
