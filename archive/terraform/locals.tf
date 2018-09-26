@@ -12,5 +12,4 @@ locals {
   progress_container_image           = "${module.ecr_repository_progress.repository_url}:${var.release_ids["progress"]}"
   bagger_container_image             = "${module.ecr_repository_bagger.repository_url}:${var.release_ids["bagger"]}"
   api_ecs_container_image            = "${module.ecr_repository_archive_api.repository_url}:${var.release_ids["archive_api"]}"
-  nginx_services_ecs_container_image = "${data.aws_ecr_repository.ecr_repository_nginx_services.repository_url}:${var.release_ids["nginx_services"]}"
 }

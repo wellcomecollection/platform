@@ -136,11 +136,8 @@ module "api_ecs" {
 
   api_path = "/storage/v1"
 
-  nginx_container_image = "${local.nginx_services_ecs_container_image}"
-  nginx_container_port  = "9000"
-
   archive_api_container_image = "${local.api_ecs_container_image}"
-  archive_api_container_port  = "8888"
+  archive_api_container_port  = "9000"
 
   archive_progress_table_name  = "${aws_dynamodb_table.archive_progress_table.name}"
   archive_ingest_sns_topic_arn = "${module.archivist_topic.arn}"

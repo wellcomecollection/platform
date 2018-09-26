@@ -20,10 +20,6 @@ variable "archive_api_container_image" {}
 
 variable "archive_api_container_port" {}
 
-variable "nginx_container_image" {}
-
-variable "nginx_container_port" {}
-
 variable "certificate_domain" {}
 
 variable "archive_progress_table_name" {}

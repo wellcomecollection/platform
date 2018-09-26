@@ -12,6 +12,6 @@ WORKDIR /src
 COPY archive_api.wsgi /var/www/archive_api/archive_api.wsgi
 COPY uwsgi.ini /etc/uwsgi
 
-EXPOSE 8888
+EXPOSE 9000
 
 CMD ["/usr/sbin/uwsgi", "--ini", "/etc/uwsgi/uwsgi.ini"]
