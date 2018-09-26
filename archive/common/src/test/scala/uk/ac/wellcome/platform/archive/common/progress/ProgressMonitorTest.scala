@@ -3,32 +3,22 @@ package uk.ac.wellcome.platform.archive.common.progress
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  PutItemRequest,
-  UpdateItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest, UpdateItemRequest}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{
-  IdConstraintError,
-  ProgressMonitor
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressMonitor}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 import scala.util.Try
 
 class ProgressMonitorTest
-    extends FunSpec
+  extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with ProgressMonitorFixture
@@ -47,6 +37,64 @@ class ProgressMonitorTest
         archiveProgressMonitor.create(archiveIngestProgress)
         assertTableOnlyHasItem(archiveIngestProgress, table)
 
+      }
+    }
+  }
+
+  describe("get progress") {
+    it("retrieves progress by id") {
+      withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+        withProgressMonitor(table) { progressMonitor =>
+          val progress =
+            createProgress(uploadUrl, callbackUrl, progressMonitor)
+
+          val result = progressMonitor.get(progress.id)
+
+          assertTableOnlyHasItem(progress, table)
+
+
+          result shouldBe a[Some[_]]
+          result.get shouldBe progress
+        }
+      }
+    }
+
+    it("returns None when no progress monitor matches id") {
+      withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+        withProgressMonitor(table) { progressMonitor =>
+          val progress =
+            createProgress(uploadUrl, callbackUrl, progressMonitor)
+
+          val result = progressMonitor.get("not_the_id_we_created")
+
+          assertTableOnlyHasItem(progress, table)
+          result shouldBe None
+        }
+      }
+    }
+
+    it("throws when it encounters an error") {
+      withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+        val mockDynamoDbClient = mock[AmazonDynamoDB]
+        val expectedException = new RuntimeException("root cause")
+        when(mockDynamoDbClient.getItem(any[GetItemRequest]))
+          .thenThrow(expectedException)
+
+        val archiveProgressMonitor = new ProgressMonitor(
+          mockDynamoDbClient,
+          DynamoConfig(table = table.name, index = table.index)
+        )
+
+        val id = UUID.randomUUID().toString
+
+        val result = Try(archiveProgressMonitor.get(id))
+
+        println(result)
+
+        val failedException = result.failed.get
+
+        failedException shouldBe a[RuntimeException]
+        failedException shouldBe expectedException
       }
     }
   }

@@ -28,6 +28,21 @@ class ProgressMonitor(
       DateTimeFormatter.ISO_INSTANT.format(_)
     )
 
+  def get(id: String) = {
+    Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
+      'id -> id
+    ) match {
+      case Some(Right(progress)) => Some(progress)
+      case Some(Left(error)) => {
+        val exception = new RuntimeException(
+          s"Failed to get progress monitor ${error.toString}")
+        warn(s"Failed to get Dynamo record: ${id}", exception)
+        throw exception
+      }
+      case None => None
+    }
+  }
+
   def create(progress: Progress) = {
     val progressTable = Table[Progress](dynamoConfig.table)
     debug(s"initializing archiveProgressMonitor with $progress")

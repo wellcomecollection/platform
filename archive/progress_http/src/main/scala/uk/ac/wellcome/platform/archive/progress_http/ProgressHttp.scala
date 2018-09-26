@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archive.progress_http
 
 import akka.actor.ActorSystem
-import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.GET
 import akka.http.scaladsl.model.{HttpRequest, _}
@@ -11,8 +10,8 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.progress_http.models.ProgressHttpConfig
-//import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 
 import scala.concurrent.Future
 
@@ -48,15 +47,15 @@ trait ProgressHttp extends Logging {
       HttpResponse(404, entity = "Unknown resource!")
     }
 
+    val progressMonitor = injector
+      .getInstance(classOf[ProgressMonitor])
+
     def requestHandler: ProcessRequest = {
       case HttpRequest(GET, Uri.Path("/progress/id"), _, _, _) =>
         HttpResponse(entity = fakeResponseBody)
 
       case request => notFoundResponse(request)
     }
-
-    //  val progressMonitor = injector
-    //    .getInstance(classOf[ProgressMonitor])
 
     val serverSource = Http().bind(
       interface = "localhost",
