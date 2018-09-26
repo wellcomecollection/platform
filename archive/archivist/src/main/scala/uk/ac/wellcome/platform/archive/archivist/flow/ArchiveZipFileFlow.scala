@@ -14,11 +14,11 @@ object ArchiveZipFileFlow extends Logging {
 
     Flow[ZipFileDownloadComplete].flatMapConcat {
       case ZipFileDownloadComplete(zipFile, ingestRequest) =>
+        // TODO report progress here
         Source
           .single(zipFile)
           .map(ArchiveJob.create(_, config))
           .collect{case Right(job) => job}
-          // TODO: Log error here
           .via(ArchiveJobFlow(config.bagItConfig.digestDelimiterRegexp))
           .collect {case Right(archiveJob) => archiveJob}
           .map(job =>
