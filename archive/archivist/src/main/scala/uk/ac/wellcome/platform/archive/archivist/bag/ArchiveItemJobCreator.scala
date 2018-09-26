@@ -24,10 +24,9 @@ object ArchiveItemJobCreator extends Logging {
     Try(ZipFileReader.maybeInputStream(zipLocation).get).flatMap {
       inputStream =>
         val manifestFileLines =
-          scala.io.Source.fromInputStream(inputStream).mkString.split("\n")
+          scala.io.Source.fromInputStream(inputStream).mkString.split("\n").toList
         manifestFileLines
           .filter(_.nonEmpty)
-          .toList
           .traverse { line =>
             BagItemCreator
               .create(line.trim(), job.bagLocation.bagPath, delimiter)

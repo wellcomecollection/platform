@@ -194,6 +194,7 @@ class ArchivistFeatureTest
 
     }
   }
+
   it("continues after non existing file referenced in manifest") {
     withArchivist {
       case (
@@ -215,6 +216,62 @@ class ArchivistFeatureTest
                 case (requestId2, _, validBag2) =>
 
                   createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createDataManifest = dataManifestWithNonExistingFile) { _ =>
+
+                    eventually {
+
+                      assertQueuePairSizes(queuePair, 0, 2)
+
+                      assertSnsReceives(
+                        Set(
+                          ArchiveComplete(
+                            requestId1,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              validBag1),
+                            Some(callbackUrl)
+                          ),
+                          ArchiveComplete(
+                            requestId2,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              validBag2),
+                            Some(callbackUrl)
+                          )
+                        ),
+                        topic
+                      )
+                    }
+                  }
+              }
+            }
+        }
+      }
+    }
+  }
+
+  it("continues after zip file with no bagit.txt") {
+    withArchivist {
+      case (
+        ingestBucket,
+        storageBucket,
+        queuePair,
+        topic,
+        progressTable,
+        archivist) => {
+
+        archivist.run()
+
+        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+          case (requestId1, _, validBag1) =>
+
+            createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createBagItFile = _ => None) { _ =>
+
+              createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1) {
+                case (requestId2, _, validBag2) =>
+
+                  createAndSendBag(ingestBucket, Some(callbackUrl), queuePair, dataFileCount = 1, createBagItFile = _ => None) { _ =>
 
                     eventually {
 
