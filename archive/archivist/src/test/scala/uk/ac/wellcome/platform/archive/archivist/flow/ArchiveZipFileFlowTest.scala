@@ -20,7 +20,7 @@ class ArchiveZipFileFlowTest
       with BagUploaderConfigGenerator
     with Akka
     with SNS
-with Inside{
+    with Inside {
 
   implicit val s3client = s3Client
 
@@ -28,32 +28,35 @@ with Inside{
     withLocalS3Bucket { storageBucket =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
-        withLocalSnsTopic { topic =>
-          val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-          withBagItZip() {
-            case (_, zipFile) =>
-              val uploader = ArchiveZipFileFlow(bagUploaderConfig)
-              val ingestContext = createIngestBagRequestWith()
-              val (_, verification) =
-                uploader.runWith(
-                  Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
-                  Sink.seq
-                )
+          withLocalSnsTopic { topic =>
+            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
+            withBagItZip() {
+              case (_, zipFile) =>
+                val uploader = ArchiveZipFileFlow(bagUploaderConfig)
+                val ingestContext = createIngestBagRequestWith()
+                val (_, verification) =
+                  uploader.runWith(
+                    Source.single(
+                      ZipFileDownloadComplete(zipFile, ingestContext)),
+                    Sink.seq
+                  )
 
-              whenReady(verification) { result =>
-                listKeysInBucket(storageBucket) should have size 4
-                result should have size 1
-                val messages = listMessagesReceivedFromSNS(topic)
-                messages should have size 1
-                val progressUpdate = fromJson[ProgressUpdate](messages.head.message).get
-                inside(progressUpdate) { case ProgressUpdate(id, event, status) =>
-                  id shouldBe ingestContext.archiveRequestId.toString
-                  status shouldBe Progress.Processing
-                  event.description shouldBe "bag archived successfully"
+                whenReady(verification) { result =>
+                  listKeysInBucket(storageBucket) should have size 4
+                  result should have size 1
+                  val messages = listMessagesReceivedFromSNS(topic)
+                  messages should have size 1
+                  val progressUpdate =
+                    fromJson[ProgressUpdate](messages.head.message).get
+                  inside(progressUpdate) {
+                    case ProgressUpdate(id, event, status) =>
+                      id shouldBe ingestContext.archiveRequestId.toString
+                      status shouldBe Progress.Processing
+                      event.description shouldBe "bag archived successfully"
+                  }
                 }
-              }
+            }
           }
-        }
         }
       }
     }
