@@ -54,7 +54,10 @@ module "service" {
   service_name       = "${var.name}"
   task_desired_count = "${var.task_desired_count}"
 
-  security_group_ids = "${concat(list("${aws_security_group.service_lb_security_group.id}", "${aws_security_group.service_egress_security_group.id}"),"${var.security_group_ids}")}"
+  security_group_ids = [
+    "${aws_security_group.service_egress_security_group.id}",
+    "${var.lb_service_security_group_id}"
+  ]
 
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
   deployment_maximum_percent         = "200"

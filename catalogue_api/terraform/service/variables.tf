@@ -96,7 +96,4 @@ variable "alb_client_error_alarm_arn" {}
 
 variable "enable_alb_alarm" {}
 
-variable "security_group_ids" {
-  type = "list"
-  default = []
-}
+variable "lb_service_security_group_id" {}

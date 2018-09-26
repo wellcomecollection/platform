@@ -57,7 +57,7 @@ module "romulus" {
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
   alb_cloudwatch_id          = "${local.alb_api_wc_cloudwatch_id}"
 
-  security_group_ids = ["${local.alb_api_wc_service_lb_security_group_id}"]
+  lb_service_security_group_id = "${local.alb_api_wc_service_lb_security_group_id}"
 }
 
 module "remus" {
@@ -86,6 +86,6 @@ module "remus" {
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
   enable_alb_alarm           = "${local.remus_enable_alb_alarm}"
 
-  security_group_ids = ["${local.alb_api_wc_service_lb_security_group_id}"]
+  lb_service_security_group_id = "${local.alb_api_wc_service_lb_security_group_id}"
 }
 
