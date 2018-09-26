@@ -30,7 +30,7 @@ locals {
   romulus_enable_alb_alarm = "${local.romulus_is_prod == "true" ? 1 : 0}"
 }
 
-module "api_romulus_delta" {
+module "romulus" {
   source = "service"
 
   name            = "${local.namespace}-romulus"
@@ -41,7 +41,7 @@ module "api_romulus_delta" {
   private_subnets = "${local.private_subnets}"
 
 
-  alb_listener_arn_https = "${module.load_balancer.https_listener_arn}"
+  alb_listener_arn_https = "${local.alb_api_wc_https_listener_arn}"
 
   sidecar_container_image = "${local.romulus_nginx_uri}"
   app_container_image     = "${local.romulus_app_uri}"
@@ -55,13 +55,12 @@ module "api_romulus_delta" {
   enable_alb_alarm           = "${local.romulus_enable_alb_alarm}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-  alb_cloudwatch_id          = "${module.load_balancer.cloudwatch_id}"
+  alb_cloudwatch_id          = "${local.alb_api_wc_cloudwatch_id}"
 
-  alb_api_wc_service_lb_security_group_id = "${local.alb_api_wc_service_lb_security_group_id}"
-  alb_api_wc_cloudwatch_id = "${local.alb_api_wc_cloudwatch_id}"
+  security_group_ids = ["${local.alb_api_wc_service_lb_security_group_id}"]
 }
 
-module "api_remus_delta" {
+module "remus" {
   source = "service"
 
   name            = "${local.namespace}-remus"
@@ -71,7 +70,7 @@ module "api_remus_delta" {
   namespace_id    = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   private_subnets = "${local.private_subnets}"
 
-  alb_listener_arn_https =  "${module.load_balancer.https_listener_arn}"
+  alb_listener_arn_https =  "${local.alb_api_wc_https_listener_arn}"
 
   sidecar_container_image = "${local.remus_nginx_uri}"
   app_container_image     = "${local.remus_app_uri}"
@@ -82,11 +81,11 @@ module "api_remus_delta" {
   es_config              = "${var.es_config_remus}"
 
   task_desired_count         = "${local.remus_task_number}"
-  alb_cloudwatch_id          = "${module.load_balancer.cloudwatch_id}"
+  alb_cloudwatch_id          = "${local.alb_api_wc_cloudwatch_id}}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
   enable_alb_alarm           = "${local.remus_enable_alb_alarm}"
 
-  alb_api_wc_service_lb_security_group_id = "${local.alb_api_wc_service_lb_security_group_id}"
-  alb_api_wc_cloudwatch_id = "${local.alb_api_wc_cloudwatch_id}"
+  security_group_ids = ["${local.alb_api_wc_service_lb_security_group_id}"]
 }
+

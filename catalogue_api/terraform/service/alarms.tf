@@ -16,16 +16,3 @@ module "alb_alarms" {
 }
 
 
-module "alb_alarms_delta" {
-  source           = "git::https://github.com/wellcometrust/terraform.git//cloudwatch/prebuilt/alb_alarms?ref=v11.6.0"
-  enable_alb_alarm = "${var.enable_alb_alarm}"
-
-  service_name                 = "${var.name}-2"
-  server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
-  target_group_id              = "${module.service.target_group_arn_suffix}"
-  loadbalancer_cloudwatch_id   = "${var.alb_api_wc_cloudwatch_id}"
-
-  healthy_host_threshold = "${local.healthy_host_threshold}"
-}
-

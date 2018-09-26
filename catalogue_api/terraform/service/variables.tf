@@ -96,6 +96,7 @@ variable "alb_client_error_alarm_arn" {}
 
 variable "enable_alb_alarm" {}
 
-variable "alb_api_wc_service_lb_security_group_id" {}
-
-variable "alb_api_wc_cloudwatch_id" {}
+variable "security_group_ids" {
+  type = "list"
+  default = []
+}
