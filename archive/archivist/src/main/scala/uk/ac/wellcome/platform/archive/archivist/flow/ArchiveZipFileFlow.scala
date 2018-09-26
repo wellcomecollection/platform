@@ -16,7 +16,8 @@ object ArchiveZipFileFlow extends Logging {
       case ZipFileDownloadComplete(zipFile, ingestRequest) =>
         Source
           .single(zipFile)
-          .map(ArchiveJob.create(_, config).right.get)
+          .map(ArchiveJob.create(_, config))
+          .collect{case Right(job) => job}
           // TODO: Log error here
           .via(ArchiveJobFlow(config.bagItConfig.digestDelimiterRegexp))
           .collect {case Right(archiveJob) => archiveJob}

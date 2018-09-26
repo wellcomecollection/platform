@@ -42,7 +42,7 @@ class DownloadItemFlowTest extends FunSpec with S3 with ZipBagItFixture with Sca
     }
   }
 
-  it("transforms a right archive job into a left if the checksum doesn't match") {
+  it("outputs a left of archive item job if the checksum doesn't match") {
     withLocalS3Bucket { bucket =>
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
