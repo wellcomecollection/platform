@@ -1,10 +1,9 @@
 package uk.ac.wellcome.platform.sierra_reader
 
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.storage.fixtures.S3
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraReaderFeatureTest
     extends FunSpec
@@ -13,7 +12,7 @@ class SierraReaderFeatureTest
     with SQS
     with Eventually
     with Matchers
-    with ExtendedPatience {
+    with IntegrationPatience {
 
   it("reads bibs from Sierra and writes files to S3") {
     withLocalS3Bucket { bucket =>
