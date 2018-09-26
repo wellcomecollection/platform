@@ -31,3 +31,7 @@ variable "archive_progress_table_name" {}
 variable "archive_ingest_sns_topic_arn" {}
 
 variable "api_path" {}
+
+variable "asset_lookup_vhs_bucket_name" {}
+
+variable "asset_lookup_vhs_table_name" {}
