@@ -1,7 +1,6 @@
 # -*- encoding: utf-8
 import daiquiri
 import json
-import sys
 
 from werkzeug.exceptions import NotFound as NotFoundError
 
