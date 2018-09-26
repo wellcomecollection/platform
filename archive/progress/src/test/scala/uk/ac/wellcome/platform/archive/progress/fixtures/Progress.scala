@@ -6,21 +6,13 @@ import com.google.inject.Guice
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressEvent,
-  ProgressUpdate,
-  Progress => ProgressModel
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate, Progress => ProgressModel}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.progress.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
+import uk.ac.wellcome.platform.archive.progress.modules.{ConfigModule, TestAppConfigModule}
 import uk.ac.wellcome.platform.archive.progress.{Progress => ProgressApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -29,8 +21,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import scala.util.Random
 
 trait Progress
-    extends AkkaS3
-    with LocalDynamoDb
+    extends LocalDynamoDb
     with ProgressMonitorFixture
     with Messaging {
 
