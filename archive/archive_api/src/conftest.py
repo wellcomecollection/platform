@@ -8,15 +8,15 @@ import pytest
 
 
 @pytest.fixture
-def client(dynamodb_resource, s3_client, table_name, sns_client, topic_arn, bucket, table_name_asset_lookup, bucket_asset_lookup):
+def client(dynamodb_resource, s3_client, table_name, sns_client, topic_arn, bucket, table_name_bag, bucket_bag):
     from archive_api import app
     app.config['DYNAMODB_TABLE_NAME'] = table_name
     app.config['DYNAMODB_RESOURCE'] = dynamodb_resource
     app.config['SNS_CLIENT'] = sns_client
     app.config['SNS_TOPIC_ARN'] = topic_arn
     app.config['S3_CLIENT'] = s3_client
-    app.config['ASSET_LOOKUP_VHS_TABLE_NAME'] = table_name_asset_lookup
-    app.config['ASSET_LOOKUP_BUCKET_NAME'] = bucket_asset_lookup
+    app.config['BAG_VHS_TABLE_NAME'] = table_name_bag
+    app.config['BAG_VHS_BUCKET_NAME'] = bucket_bag
 
     yield app.test_client()
 
@@ -40,14 +40,14 @@ def table_name(dynamodb_client):
 
 
 @pytest.fixture()
-def table_name_asset_lookup(dynamodb_client):
-    dynamodb_table_name = 'asset-lookup--table-%d' % random.randint(0, 10000)
-    os.environ.update({'ASSET_LOOKUP_VHS_TABLE_NAME': dynamodb_table_name})
+def table_name_bag(dynamodb_client):
+    dynamodb_table_name = 'bag--table-%d' % random.randint(0, 10000)
+    os.environ.update({'BAG_VHS_TABLE_NAME': dynamodb_table_name})
     create_table(dynamodb_client, dynamodb_table_name)
     yield dynamodb_table_name
     dynamodb_client.delete_table(TableName=dynamodb_table_name)
     try:
-        del os.environ['ASSET_LOOKUP_VHS_TABLE_NAME']
+        del os.environ['BAG_VHS_TABLE_NAME']
     except KeyError:
         pass
 
@@ -84,8 +84,8 @@ def asset_id():
 
 
 @pytest.fixture
-def bucket_asset_lookup(s3_client):
-    bucket_name = 'test-python-bucket-asset-lookup'
-    os.environ.update({'ASSET_LOOKUP_VHS_TABLE_NAME': bucket_name})
+def bucket_bag(s3_client):
+    bucket_name = 'test-python-bucket-bag'
+    os.environ.update({'BAG_VHS_TABLE_NAME': bucket_name})
     s3_client.create_bucket(Bucket=bucket_name)
     yield bucket_name

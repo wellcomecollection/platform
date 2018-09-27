@@ -16,12 +16,12 @@ class ArchiveAPIConfig(object):
             if development:
                 self.DYNAMODB_TABLE_NAME = 'archive-storage-progress-table'
                 self.SNS_TOPIC_ARN = 'arn:aws:sns:eu-west-1:760097843905:archive-storage_archivist'
-                self.ASSET_LOOKUP_VHS_BUCKET_NAME = 'wellcomecollection-vhs-archive-manifests'
-                self.ASSET_LOOKUP_VHS_TABLE_NAME = 'vhs-archive-manifests'
+                self.BAG_VHS_BUCKET_NAME = 'wellcomecollection-vhs-archive-manifests'
+                self.BAG_VHS_TABLE_NAME = 'vhs-archive-manifests'
             else:
                 self.DYNAMODB_TABLE_NAME = os.environ['TABLE_NAME']
                 self.SNS_TOPIC_ARN = os.environ['TOPIC_ARN']
-                self.ASSET_LOOKUP_VHS_BUCKET_NAME = os.environ['ASSET_LOOKUP_VHS_BUCKET_NAME']
-                self.ASSET_LOOKUP_VHS_TABLE_NAME = os.environ['ASSET_LOOKUP_VHS_TABLE_NAME']
+                self.BAG_VHS_BUCKET_NAME = os.environ['BAG_VHS_BUCKET_NAME']
+                self.BAG_VHS_TABLE_NAME = os.environ['BAG_VHS_TABLE_NAME']
         except KeyError as err:
             raise RuntimeError(f'Unable to create config: {err!r}')

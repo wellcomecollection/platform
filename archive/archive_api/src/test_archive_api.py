@@ -26,27 +26,27 @@ class TestReportIngestStatus:
         assert resp.status_code == 405
 
 
-class TestAssetLookup:
+class TestBags:
     """
-    Tests for the GET /assets/<id> endpoint.
+    Tests for the GET /bags/<id> endpoint.
     """
 
-    def test_lookup_asset(self, client, dynamodb_resource, s3_client, asset_id, bucket_asset_lookup, table_name_asset_lookup):
-        stored_manifest = {'manifest': asset_id}
+    def test_lookup_bag(self, client, dynamodb_resource, s3_client, bag_id, bucket_bag, table_name_bag):
+        stored_bag = {'id': bag_id}
 
-        s3_client.put_object(Bucket=bucket_asset_lookup, Key=asset_id, Body=json.dumps(stored_manifest))
+        s3_client.put_object(Bucket=bucket_bag, Key=bag_id, Body=json.dumps(stored_bag))
 
-        table = dynamodb_resource.Table(table_name_asset_lookup)
-        table.put_item(Item={'id': asset_id, 's3Key': asset_id})
+        table = dynamodb_resource.Table(table_name_bag)
+        table.put_item(Item={'id': bag_id, 's3Key': bag_id})
 
-        resp = client.get(f'/storage/v1/assets/{asset_id}')
+        resp = client.get(f'/storage/v1/bags/{bag_id}')
         assert resp.status_code == 200
-        assert json.loads(resp.data) == {'manifest': asset_id}
+        assert json.loads(resp.data) == {'id': bag_id}
 
-    def test_lookup_missing_item_is_404(self, client, asset_id):
-        resp = client.get(f'/storage/v1/assets/{asset_id}')
+    def test_lookup_missing_item_is_404(self, client, bag_id):
+        resp = client.get(f'/storage/v1/bags/{bag_id}')
         assert resp.status_code == 404
-        assert (b'No asset found for id=%r' % asset_id) in resp.data
+        assert (b'No bag found for id=%r' % bag_id) in resp.data
 
 
 class TestRequestNewIngest:

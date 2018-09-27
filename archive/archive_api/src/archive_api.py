@@ -17,7 +17,7 @@ from create_ingest_progress import (
     create_ingest_progress
 )
 
-from asset_lookup_request import asset_lookup_request
+from bag_request import bag_request
 
 import config
 import validators
@@ -41,7 +41,7 @@ logger = daiquiri.getLogger()
 
 api.namespaces.clear()
 ns_ingests = api.namespace('ingests', description='Ingest requests')
-ns_assets = api.namespace('assets', description='Asset lookup requests')
+ns_bags = api.namespace('bags', description='Bag requests')
 
 # We can't move this import to the top because the models need the ``api``
 # instance defined in this file.
@@ -128,19 +128,19 @@ class IngestResource(Resource):
         return jsonify(result)
 
 
-@ns_assets.route('/<string:id>')
-@ns_assets.param('id', 'The asset lookup identifier')
-class AssetResource(Resource):
-    @ns_assets.doc(description='The asset storage manifest is returned in the body of the response')
-    @ns_assets.response(200, 'Asset found')
-    @ns_assets.response(404, 'Asset not found', models.Error)
+@ns_bags.route('/<string:id>')
+@ns_bags.param('id', 'The bag identifier')
+class BagResource(Resource):
+    @ns_bags.doc(description='The bag is returned in the body of the response')
+    @ns_bags.response(200, 'Bag found')
+    @ns_bags.response(404, 'Bag not found', models.Error)
     def get(self, id):
-        """Get the storage manifest associated with an asset id"""
-        result = asset_lookup_request(
+        """Get the bag associated with an id"""
+        result = bag_request(
             dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
-            table_name=app.config['ASSET_LOOKUP_VHS_TABLE_NAME'],
+            table_name=app.config['BAG_VHS_TABLE_NAME'],
             s3_client=app.config['S3_CLIENT'],
-            bucket_name=app.config['ASSET_LOOKUP_BUCKET_NAME'],
+            bucket_name=app.config['BAG_VHS_BUCKET_NAME'],
             id=id
         )
         return jsonify(result)
