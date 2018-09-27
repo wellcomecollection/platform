@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.{SierraBibData, VarField}
-import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.MarcUtils
+import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.SierraConcepts
 
-trait SierraOrganisationSubjects extends MarcUtils {
+trait SierraOrganisationSubjects extends SierraConcepts {
 
   // Populate wwork:subject
   //
@@ -38,20 +38,15 @@ trait SierraOrganisationSubjects extends MarcUtils {
     val label = createLabel(varField, subfieldTags = List("a", "b"))
     val organisation = Organisation(label = label)
 
-    val identifierSubfields = varField.subfields.filter { _.tag == "0" }
-
-    identifierSubfields match {
-      case Seq(subfield) => {
+    getIdentifierSubfieldContents(varField) match {
+      case Seq(identifier) => {
         val sourceIdentifier = SourceIdentifier(
           identifierType = IdentifierType("lc-names"),
-          value = subfield.content,
-          ontologyType = "Organisation"
+          ontologyType = "Organisation",
+          value = identifier
         )
 
-        Identifiable(
-          agent = organisation,
-          sourceIdentifier = sourceIdentifier
-        )
+        Identifiable(organisation, sourceIdentifier = sourceIdentifier)
       }
       case _ => Unidentifiable(organisation)
     }

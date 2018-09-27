@@ -94,7 +94,8 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
       val maybeDisplayableOrganisation = concepts.head
       maybeDisplayableOrganisation shouldBe a[Identifiable[_]]
 
-      val identifiableOrganisation = maybeDisplayableOrganisation.asInstanceOf[Identifiable[Organisation]]
+      val identifiableOrganisation = maybeDisplayableOrganisation
+        .asInstanceOf[Identifiable[Organisation]]
       identifiableOrganisation.identifiers shouldBe List(
         SourceIdentifier(
           identifierType = IdentifierType("lc-names"),
