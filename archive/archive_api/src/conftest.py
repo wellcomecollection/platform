@@ -85,7 +85,7 @@ def bag_id():
 
 @pytest.fixture
 def bucket_bag(s3_client):
-    bucket_name = 'test-python-bag--bucket-%d' % random.randint(0, 10000)'
+    bucket_name = 'test-python-bag--bucket-%d' % random.randint(0, 10000)
     os.environ.update({'BAG_VHS_BUCKET_NAME': bucket_name})
     s3_client.create_bucket(Bucket=bucket_name)
     yield bucket_name
