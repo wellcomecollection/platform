@@ -37,7 +37,7 @@ def test_creates_ingest_progress_with_callback(dynamodb_resource, table_name, gu
 
 
 def test_raises_if_id_is_invalid(dynamodb_resource, table_name):
-    with pytest.raises(ValueError, match="Cannot create IngestProgress, invalid id ''."):
+    with pytest.raises(ValueError, match='is not a valid ID'):
         create_ingest_progress(
             IngestProgress("", bag_url, callback_url),
             dynamodb_resource,
