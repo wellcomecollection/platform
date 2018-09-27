@@ -3,7 +3,7 @@ package uk.ac.wellcome.elasticsearch.test.fixtures
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.{
   DisplayElasticConfig,
@@ -15,14 +15,13 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
 trait ElasticsearchFixtures
     extends Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with ScalaFutures
     with Matchers
     with JsonAssertions { this: Suite =>
