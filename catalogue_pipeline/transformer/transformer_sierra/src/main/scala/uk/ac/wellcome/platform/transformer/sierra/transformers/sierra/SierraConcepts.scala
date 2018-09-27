@@ -17,7 +17,7 @@ trait SierraConcepts extends MarcUtils {
     orderedSubfields.map { _.content }.mkString(" - ")
   }
 
-  /** Return a list of the distinct contents of every subfield $0 on
+  /** Return a list of the distinct contents of every subfield 0 on
     * this varField, which is a commonly-used subfield for identifiers.
     */
   def getIdentifierSubfieldContents(varField: VarField): List[String] =
