@@ -9,15 +9,15 @@ from flask_restplus import Api, Resource
 from flask import jsonify, make_response, request
 from werkzeug.exceptions import BadRequest as BadRequestError
 
-from report_ingest_status import report_ingest_status
 from request_new_ingest import send_new_ingest_request
 
 import config
 import validators
 
-from ingests.create_ingest_progress import (
+from ingests import (
     IngestProgress,
-    create_ingest_progress
+    create_ingest_progress,
+    report_ingest_status
 )
 
 app = Flask(__name__)

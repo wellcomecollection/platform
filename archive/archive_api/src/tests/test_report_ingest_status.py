@@ -3,7 +3,7 @@
 import pytest
 from werkzeug.exceptions import NotFound as NotFoundError
 
-from report_ingest_status import report_ingest_status
+from ingests import report_ingest_status
 
 
 def test_finds_present_status(dynamodb_resource, table_name, guid):

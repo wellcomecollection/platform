@@ -5,7 +5,7 @@ from datetime import (datetime, timezone, timedelta)
 
 from botocore.exceptions import ClientError
 
-from ingests.create_ingest_progress import (
+from ingests import (
     IngestProgress,
     create_ingest_progress
 )
