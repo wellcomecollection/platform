@@ -13,6 +13,15 @@ trait SierraOrganisationSubjects extends MarcUtils {
   // *  Populate the platform "label" with the concatenated values of
   //    subfields a, b, c, d and e.
   //
+  // *  Populate "concepts" with a single value:
+  //
+  //    -   Create "label" from subfields a and b
+  //    -   Set "type" to "Organisation"
+  //    -   Use subfield 0 to populate "identifiers", if present.  Note the
+  //        identifierType should be "lc-names".
+  //
+  // https://www.loc.gov/marc/bibliographic/bd610.html
+  //
   def getSubjectsWithOrganisation(bibData: SierraBibData): List[Subject[MaybeDisplayable[Organisation]]] =
     getMatchingVarFields(bibData, marcTag = "610").map { varField =>
       val label = createLabel(varField, subfieldTags = List("a", "b", "c", "d", "e"))
@@ -25,10 +34,12 @@ trait SierraOrganisationSubjects extends MarcUtils {
       )
     }
 
-  private def createOrganisation(varField: VarField): MaybeDisplayable[Organisation] =
+  private def createOrganisation(varField: VarField): MaybeDisplayable[Organisation] = {
+    val label = createLabel(varField, subfieldTags = List("a", "b"))
     Unidentifiable(
-      Organisation(label = "ACME Corp")
+      Organisation(label = label)
     )
+  }
 
   /** Given a varField and a list of subfield tags, create a label by
     * concatenating the contents of every subfield with one of the given tags.

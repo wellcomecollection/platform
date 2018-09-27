@@ -77,7 +77,7 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
       val concepts = subjects.head.concepts
       val organisation = concepts.head.agent
-      organisation.label shouldBe "Wellcome Trust. Facilities, Health and Safety"
+      organisation.label shouldBe "Wellcome Trust. Facilities, Health & Safety"
     }
   }
 
