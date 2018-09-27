@@ -11,4 +11,4 @@ $(ARCHIVE_API)/src/test_requirements.txt: $(ARCHIVE_API)/src/test_requirements.i
 
 
 archive_api-run:
-	docker run --rm --publish 8888:8888 archive_api
+	docker run --rm --publish 9000:9000 archive_api
