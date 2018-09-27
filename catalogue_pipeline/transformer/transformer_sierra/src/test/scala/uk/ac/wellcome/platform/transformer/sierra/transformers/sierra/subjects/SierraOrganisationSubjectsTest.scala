@@ -53,6 +53,23 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
     subjects.head.label shouldBe "United States. Army. Cavalry, 7th. Company E, depicted."
   }
 
+  it("creates an Organisation as the concept") {
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createMarc610VarField(
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Wellcome Trust."),
+          )
+        )
+      )
+    )
+
+    val subjects = transformer.getSubjectsWithOrganisation(bibData)
+    subjects should have size 1
+
+    subjects.head.concepts should have size 1
+  }
+
   val transformer = new SierraOrganisationSubjects {}
 
   private def createMarc610VarField(subfields: List[MarcSubfield]): VarField =
