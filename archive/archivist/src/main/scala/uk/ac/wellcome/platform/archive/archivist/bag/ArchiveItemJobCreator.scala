@@ -17,7 +17,7 @@ object ArchiveItemJobCreator extends Logging {
     job: ArchiveJob,
     delimiter: String): Either[ArchiveJob, List[ArchiveItemJob]] = {
     val zipLocations = job.bagManifestLocations.map(manifestLocation =>
-      ZipLocation(job.zipFile, manifestLocation.toObjectLocation))
+      ZipLocation(job.zipFile, manifestLocation.toEntryPath))
     zipLocations
       .traverse { zipLocation =>
         parseArchiveItemJobs(job, zipLocation, delimiter)

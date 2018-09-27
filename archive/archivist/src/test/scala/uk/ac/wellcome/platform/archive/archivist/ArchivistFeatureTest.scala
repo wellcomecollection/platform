@@ -6,14 +6,9 @@ import java.util.UUID
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  IngestBagRequest
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.models.DigitisedStorageType
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, IngestBagRequest}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -42,7 +37,7 @@ class ArchivistFeatureTest
           progressTable,
           archivist) =>
         createAndSendBag(ingestBucket, Some(callbackUrl), queuePair) {
-          case (requestId, uploadLocation, validBag) =>
+          case (requestId, uploadLocation, bagIdentifier) =>
             archivist.run()
             eventually {
               listKeysInBucket(storageBucket) should have size 15
@@ -52,7 +47,7 @@ class ArchivistFeatureTest
               assertSnsReceivesOnly(
                 ArchiveComplete(
                   requestId,
-                  BagLocation(storageBucket.name, "archive", validBag),
+                  BagLocation(storageBucket.name, "archive", BagPath(s"$DigitisedStorageType/$bagIdentifier")),
                   Some(callbackUrl)
                 ),
                 topic
@@ -132,7 +127,7 @@ class ArchivistFeatureTest
                             BagLocation(
                               storageBucket.name,
                               "archive",
-                              validBag1),
+                              BagPath(s"$DigitisedStorageType/$validBag1")),
                             Some(callbackUrl)
                           ),
                           ArchiveComplete(
@@ -140,7 +135,7 @@ class ArchivistFeatureTest
                             BagLocation(
                               storageBucket.name,
                               "archive",
-                              validBag2),
+                              BagPath(s"$DigitisedStorageType/$validBag2")),
                             Some(callbackUrl)
                           )
                         ),
@@ -194,12 +189,12 @@ class ArchivistFeatureTest
                     Set(
                       ArchiveComplete(
                         requestId1,
-                        BagLocation(storageBucket.name, "archive", validBag1),
+                        BagLocation(storageBucket.name, "archive", BagPath(s"$DigitisedStorageType/$validBag1")),
                         Some(callbackUrl)
                       ),
                       ArchiveComplete(
                         requestId2,
-                        BagLocation(storageBucket.name, "archive", validBag2),
+                        BagLocation(storageBucket.name, "archive", BagPath(s"$DigitisedStorageType/$validBag2")),
                         Some(callbackUrl)
                       )
                     ),
@@ -259,7 +254,7 @@ class ArchivistFeatureTest
                             BagLocation(
                               storageBucket.name,
                               "archive",
-                              validBag1),
+                              BagPath(s"$DigitisedStorageType/$validBag1")),
                             Some(callbackUrl)
                           ),
                           ArchiveComplete(
@@ -267,7 +262,7 @@ class ArchivistFeatureTest
                             BagLocation(
                               storageBucket.name,
                               "archive",
-                              validBag2),
+                              BagPath(s"$DigitisedStorageType/$validBag2")),
                             Some(callbackUrl)
                           )
                         ),
@@ -282,7 +277,7 @@ class ArchivistFeatureTest
     }
   }
 
-  it("continues after zip file with no bagit.txt") {
+  it("continues after zip file with no bag-info.txt") {
     withArchivist {
       case (
           ingestBucket,
@@ -305,7 +300,7 @@ class ArchivistFeatureTest
               Some(callbackUrl),
               queuePair,
               dataFileCount = 1,
-              createBagItFile = _ => None) { _ =>
+              createBagInfoFile = _ => None) { _ =>
               createAndSendBag(
                 ingestBucket,
                 Some(callbackUrl),
@@ -317,7 +312,7 @@ class ArchivistFeatureTest
                     Some(callbackUrl),
                     queuePair,
                     dataFileCount = 1,
-                    createBagItFile = _ => None) { _ =>
+                    createBagInfoFile = _ => None) { _ =>
                     eventually {
 
                       assertQueuePairSizes(queuePair, 0, 2)
@@ -329,7 +324,7 @@ class ArchivistFeatureTest
                             BagLocation(
                               storageBucket.name,
                               "archive",
-                              validBag1),
+                              BagPath(s"$DigitisedStorageType/$validBag1")),
                             Some(callbackUrl)
                           ),
                           ArchiveComplete(
@@ -337,7 +332,7 @@ class ArchivistFeatureTest
                             BagLocation(
                               storageBucket.name,
                               "archive",
-                              validBag2),
+                              BagPath(s"$DigitisedStorageType/$validBag2")),
                             Some(callbackUrl)
                           )
                         ),

@@ -14,6 +14,7 @@ object ArchiveJobFlow {
   def apply(delimiter: String, parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[ArchiveJob, Either[ArchiveJob, ArchiveJob], NotUsed] =
     Flow[ArchiveJob]
+      .log("creating archive item jobs")
       .map(job => ArchiveItemJobCreator.createArchiveItemJobs(job, delimiter))
       .via(
         FoldEitherFlow[

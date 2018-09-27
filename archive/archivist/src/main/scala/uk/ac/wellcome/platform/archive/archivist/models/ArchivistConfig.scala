@@ -40,3 +40,8 @@ case class BagUploaderConfig(
   bagItConfig: BagItConfig = BagItConfig(),
   parallelism: Int
 )
+
+sealed trait StorageType
+case object DigitisedStorageType {
+  override def toString = "digitised"
+}

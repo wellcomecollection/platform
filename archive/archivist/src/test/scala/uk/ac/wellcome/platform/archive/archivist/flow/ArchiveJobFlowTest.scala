@@ -105,7 +105,7 @@ class ArchiveJobFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createDataManifest = (_, _) => None) {
+          withBagItZip(dataFileCount = 2, createDataManifest =  _ => None) {
             case (bagName, zipFile) =>
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
@@ -128,10 +128,9 @@ class ArchiveJobFlowTest
         withLocalS3Bucket { bucket =>
           withBagItZip(
             dataFileCount = 2,
-            createDataManifest = (bagName, _) =>
+            createDataManifest = _ =>
               Some(
-                FileEntry(
-                  s"$bagName/manifest-sha256.txt",
+                FileEntry("manifest-sha256.txt",
                   randomAlphanumeric()))) {
             case (bagName, zipFile) =>
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
@@ -153,7 +152,7 @@ class ArchiveJobFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          withBagItZip(dataFileCount = 2, createTagManifest = (_, _) => None) {
+          withBagItZip(dataFileCount = 2, createTagManifest = _ => None) {
             case (bagName, zipFile) =>
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
@@ -176,10 +175,10 @@ class ArchiveJobFlowTest
         withLocalS3Bucket { bucket =>
           withBagItZip(
             dataFileCount = 2,
-            createTagManifest = (bagName, _) =>
+            createTagManifest = _ =>
               Some(
                 FileEntry(
-                  s"$bagName/tagmanifest-sha256.txt",
+                  "tagmanifest-sha256.txt",
                   randomAlphanumeric()))) {
             case (bagName, zipFile) =>
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)

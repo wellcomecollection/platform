@@ -9,13 +9,10 @@ import com.google.inject.Guice
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
+import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.{BagPath, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
@@ -31,13 +28,13 @@ trait Archivist
     with Messaging
     with ZipBagItFixture {
 
-  def sendBag[R](bagName: BagPath,
-                 zipFile: ZipFile,
+  def sendBag[R](zipFile: ZipFile,
                  ingestBucket: Bucket,
                  callbackUri: Option[URI],
                  queuePair: QueuePair)(
-    testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) = {
-    val uploadKey = s"upload/path/$bagName.zip"
+    testWith: TestWith[(UUID, ObjectLocation), R]) = {
+    val fileName = s"${randomAlphanumeric()}.zip"
+      val uploadKey = s"upload/path/$fileName"
 
     s3Client.putObject(ingestBucket.name, uploadKey, new File(zipFile.getName))
 
@@ -47,7 +44,7 @@ trait Archivist
       queuePair.queue,
       IngestBagRequest(ingestRequestId, uploadedBagLocation, callbackUri))
 
-    testWith((ingestRequestId, uploadedBagLocation, bagName))
+    testWith((ingestRequestId, uploadedBagLocation))
   }
 
   def createAndSendBag[R](
@@ -56,19 +53,20 @@ trait Archivist
     queuePair: QueuePair,
     dataFileCount: Int = 12,
     createDigest: String => String = createValidDigest,
-    createDataManifest: (BagPath, List[(String, String)]) => Option[FileEntry] =
-      createValidDataManifest,
-    createBagItFile: BagPath => Option[FileEntry] = createValidBagItFile)(
-    testWith: TestWith[(UUID, ObjectLocation, BagPath), R]) =
+    createDataManifest: List[(String, String)] => Option[FileEntry] = createValidDataManifest,
+    createBagItFile: => Option[FileEntry] = createValidBagItFile,
+    createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile)(
+    testWith: TestWith[(UUID, ObjectLocation, String), R]) =
     withBagItZip(
       dataFileCount = dataFileCount,
       createDigest = createDigest,
       createDataManifest = createDataManifest,
-      createBagItFile = createBagItFile) {
-      case (bagName, zipFile) =>
-        sendBag(bagName, zipFile, ingestBucket, callbackUri, queuePair) {
-          case (requestId, uploadObjectLocation, bag) =>
-            testWith((requestId, uploadObjectLocation, bag))
+      createBagItFile = createBagItFile,
+      createBagInfoFile = createBagInfoFile) {
+      case (bagIdentifier, zipFile) =>
+        sendBag(zipFile, ingestBucket, callbackUri, queuePair) {
+          case (requestId, uploadObjectLocation) =>
+            testWith((requestId, uploadObjectLocation, bagIdentifier))
         }
     }
 

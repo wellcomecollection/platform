@@ -3,16 +3,9 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagItConfig,
-  BagUploaderConfig,
-  IngestRequestContextGenerators,
-  UploadConfig
-}
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
+import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
 import uk.ac.wellcome.test.fixtures.Akka
 
 class ArchiveZipFileFlowTest
@@ -21,18 +14,10 @@ class ArchiveZipFileFlowTest
     with ScalaFutures
     with ArchivistFixture
     with IngestRequestContextGenerators
+    with BagUploaderConfigGenerator
     with Akka {
 
   implicit val s3client = s3Client
-
-  def createBagUploaderConfig(bucket: Bucket) =
-    BagUploaderConfig(
-      uploadConfig = UploadConfig(
-        uploadNamespace = bucket.name
-      ),
-      parallelism = 10,
-      bagItConfig = BagItConfig()
-    )
 
   it("succeeds when verifying and uploading a valid bag") {
     withLocalS3Bucket { storageBucket =>
@@ -40,7 +25,7 @@ class ArchiveZipFileFlowTest
         withMaterializer(actorSystem) { implicit materializer =>
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           withBagItZip() {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val uploader = ArchiveZipFileFlow(bagUploaderConfig)
               val ingestContext = createIngestBagRequestWith()
               val (_, verification) =
@@ -66,7 +51,7 @@ class ArchiveZipFileFlowTest
         withMaterializer(actorSystem) { implicit materializer =>
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           withBagItZip(createDigest = _ => "bad_digest") {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val uploader = ArchiveZipFileFlow(bagUploaderConfig)
               val ingestContext = createIngestBagRequest
 
@@ -86,13 +71,13 @@ class ArchiveZipFileFlowTest
 
   }
 
-  it("fails when verifying and uploading a bag with no bagit.txt file") {
+  it("fails when verifying and uploading a bag with no bag-info.txt file") {
     withLocalS3Bucket { storageBucket =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-          withBagItZip(createBagItFile = _ => None) {
-            case (bagName, zipFile) =>
+          withBagItZip(createBagInfoFile = _ => None) {
+            case (_, zipFile) =>
               val uploader = ArchiveZipFileFlow(bagUploaderConfig)
               val ingestContext = createIngestBagRequest
 

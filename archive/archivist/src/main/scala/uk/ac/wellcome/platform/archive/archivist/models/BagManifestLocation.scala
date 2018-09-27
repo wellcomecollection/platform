@@ -1,13 +1,11 @@
 package uk.ac.wellcome.platform.archive.archivist.models
+import uk.ac.wellcome.platform.archive.common.models.EntryPath
 
-import uk.ac.wellcome.platform.archive.common.models.BagPath
-import uk.ac.wellcome.storage.ObjectLocation
-
-case class BagManifestLocation(path: BagPath, name: String) {
-  def toObjectLocation = ObjectLocation(path.value, name)
+case class BagManifestLocation(name: String){
+  def toEntryPath = EntryPath(name)
 }
 
 object BagManifestLocation {
-  def create(config: BagItConfig, bagPath: BagPath): List[BagManifestLocation] =
-    config.digestNames.map(BagManifestLocation(bagPath, _))
+  def create(config: BagItConfig): List[BagManifestLocation] =
+    config.digestNames.map(BagManifestLocation(_))
 }
