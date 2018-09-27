@@ -12,7 +12,7 @@ resource "aws_iam_role_policy" "archive_api_task_progress_table" {
 
 resource "aws_iam_role_policy" "archive_api_task_bag_vhs" {
   role   = "${module.api_ecs.task_role_name}"
-  policy = "${module.vhs_archive_manifest.read_policy.json}"
+  policy = "${module.vhs_archive_manifest.read_policy}"
 }
 
 # Archivist
