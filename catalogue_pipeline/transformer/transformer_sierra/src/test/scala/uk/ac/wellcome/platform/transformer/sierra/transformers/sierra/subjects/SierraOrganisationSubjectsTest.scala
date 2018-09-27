@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.Unidentifiable
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData, VarField}
 
@@ -78,6 +78,30 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
       val concepts = subjects.head.concepts
       val organisation = concepts.head.agent
       organisation.label shouldBe "Wellcome Trust. Facilities, Health & Safety"
+    }
+
+    it("creates an Identifiable Organisation if subfield 0 is present") {
+      val lcNamesCode = "n81290903210"
+      val bibData = create610bibDataWith(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "ACME Corp"),
+          MarcSubfield(tag = "0", content = lcNamesCode)
+        )
+      )
+
+      val subjects = transformer.getSubjectsWithOrganisation(bibData)
+      val concepts = subjects.head.concepts
+      val maybeDisplayableOrganisation = concepts.head
+      maybeDisplayableOrganisation shouldBe a[Identifiable[_]]
+
+      val identifiableOrganisation = maybeDisplayableOrganisation.asInstanceOf[Identifiable[Organisation]]
+      identifiableOrganisation.identifiers shouldBe List(
+        SourceIdentifier(
+          identifierType = IdentifierType("lc-names"),
+          ontologyType = "Organisation",
+          value = lcNamesCode
+        )
+      )
     }
   }
 
