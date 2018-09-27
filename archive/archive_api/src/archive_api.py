@@ -12,6 +12,7 @@ from werkzeug.exceptions import BadRequest as BadRequestError
 import config
 import validators
 
+from bag_request import bag_request
 from ingests import (
     IngestProgress,
     create_ingest_progress,
@@ -38,7 +39,7 @@ logger = daiquiri.getLogger()
 
 api.namespaces.clear()
 ns_ingests = api.namespace('ingests', description='Ingest requests')
-
+ns_bags = api.namespace('bags', description='Bag requests')
 
 # We can't move this import to the top because the models need the ``api``
 # instance defined in this file.
@@ -121,6 +122,24 @@ class IngestResource(Resource):
             dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
             table_name=app.config['DYNAMODB_TABLE_NAME'],
             guid=id
+        )
+        return jsonify(result)
+
+
+@ns_bags.route('/<string:id>')
+@ns_bags.param('id', 'The bag identifier')
+class BagResource(Resource):
+    @ns_bags.doc(description='The bag is returned in the body of the response')
+    @ns_bags.response(200, 'Bag found')
+    @ns_bags.response(404, 'Bag not found', models.Error)
+    def get(self, id):
+        """Get the bag associated with an id"""
+        result = bag_request(
+            dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
+            table_name=app.config['BAG_VHS_TABLE_NAME'],
+            s3_client=app.config['S3_CLIENT'],
+            bucket_name=app.config['BAG_VHS_BUCKET_NAME'],
+            id=id
         )
         return jsonify(result)
 
