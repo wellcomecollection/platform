@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData, VarField}
 
@@ -144,6 +145,48 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
       val maybeDisplayableOrganisation = concepts.head
       maybeDisplayableOrganisation shouldBe a[Unidentifiable[_]]
     }
+  }
+
+  describe("missing label") {
+
+    // This is probably a cataloguing error; in this case we should just
+    // throw and have somebody inspect the record manually.  It's not at all
+    // clear what we should do, as we don't have enough to populate the
+    // Organisation label.
+    it("errors if there's nothing in subfield a or b") {
+      val varField = createMarc610VarField(subfields = List())
+      val bibData = createSierraBibDataWith(varFields = List(varField))
+
+      val err = intercept[TransformerException] {
+        transformer.getSubjectsWithOrganisation(bibData)
+      }
+      err.e.getMessage shouldBe s"Not enough information to build a label on $varField"
+    }
+  }
+
+  it("gets multiple instances of the MARC 610 field") {
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createMarc610VarField(
+          subfields = List(
+            MarcSubfield(tag = "a", content = "ACME Corp.")
+          )
+        ),
+        createMarc610VarField(
+          subfields = List(
+            MarcSubfield(tag = "a", content = "BBC.")
+          )
+        ),
+        createMarc610VarField(
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Charlie's Chocolate Factory.")
+          )
+        )
+      )
+    )
+
+    val subjects = transformer.getSubjectsWithOrganisation(bibData)
+    subjects should have size 3
   }
 
   val transformer = new SierraOrganisationSubjects {}

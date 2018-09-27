@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.{SierraBibData, VarField}
 import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.SierraConcepts
 
@@ -37,6 +38,13 @@ trait SierraOrganisationSubjects extends SierraConcepts {
   private def createOrganisation(varField: VarField): MaybeDisplayable[Organisation] = {
     val label = createLabel(varField, subfieldTags = List("a", "b"))
     val organisation = Organisation(label = label)
+
+    // @@AWLC: I'm not sure if this can happen in practice -- but we don't have
+    // enough information to build the Organisation, so erroring out here is
+    // the best we can do for now.
+    if (label == "") {
+      throw TransformerException(s"Not enough information to build a label on $varField")
+    }
 
     getIdentifierSubfieldContents(varField) match {
       case Seq(identifier) => {
