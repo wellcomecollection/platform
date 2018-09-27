@@ -42,12 +42,12 @@ def table_name(dynamodb_client):
 @pytest.fixture()
 def table_name_asset_lookup(dynamodb_client):
     dynamodb_table_name = 'asset-lookup--table-%d' % random.randint(0, 10000)
-    os.environ.update({'TABLE_NAME': dynamodb_table_name})
+    os.environ.update({'ASSET_LOOKUP_VHS_TABLE_NAME': dynamodb_table_name})
     create_table(dynamodb_client, dynamodb_table_name)
     yield dynamodb_table_name
     dynamodb_client.delete_table(TableName=dynamodb_table_name)
     try:
-        del os.environ['TABLE_NAME']
+        del os.environ['ASSET_LOOKUP_VHS_TABLE_NAME']
     except KeyError:
         pass
 
@@ -86,5 +86,6 @@ def asset_id():
 @pytest.fixture
 def bucket_asset_lookup(s3_client):
     bucket_name = 'test-python-bucket-asset-lookup'
+    os.environ.update({'ASSET_LOOKUP_VHS_TABLE_NAME': bucket_name})
     s3_client.create_bucket(Bucket=bucket_name)
     yield bucket_name
