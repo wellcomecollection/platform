@@ -13,10 +13,7 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
   it("uses subfields a, b, c, d and e as the label") {
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          marcTag = "610",
-          indicator1 = "",
-          indicator2 = "",
+        createMarc610VarField(
           subfields = List(
             MarcSubfield(tag = "a", content = "United States."),
             MarcSubfield(tag = "b", content = "Supreme Court,"),
@@ -38,10 +35,7 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
     // This is based on an example from the MARC spec
     val bibData = createSierraBibDataWith(
       varFields = List(
-        VarField(
-          marcTag = "610",
-          indicator1 = "",
-          indicator2 = "",
+        createMarc610VarField(
           subfields = List(
             MarcSubfield(tag = "a", content = "United States."),
             MarcSubfield(tag = "b", content = "Army."),
@@ -60,4 +54,12 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
   }
 
   val transformer = new SierraOrganisationSubjects {}
+
+  private def createMarc610VarField(subfields: List[MarcSubfield]): VarField =
+    VarField(
+      marcTag = "610",
+      indicator1 = "",
+      indicator2 = "",
+      subfields = subfields
+    )
 }
