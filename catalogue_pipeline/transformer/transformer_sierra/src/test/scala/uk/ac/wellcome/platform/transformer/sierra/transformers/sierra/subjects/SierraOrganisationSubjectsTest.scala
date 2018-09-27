@@ -103,6 +103,21 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
         )
       )
     }
+
+    it("skips adding an identifier if subfield 0 is ambiguous") {
+      val bibData = create610bibDataWith(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "ACME Corp"),
+          MarcSubfield(tag = "0", content = "n12345"),
+          MarcSubfield(tag = "0", content = "n67890")
+        )
+      )
+
+      val subjects = transformer.getSubjectsWithOrganisation(bibData)
+      val concepts = subjects.head.concepts
+      val maybeDisplayableOrganisation = concepts.head
+      maybeDisplayableOrganisation shouldBe a[Unidentifiable[_]]
+    }
   }
 
   val transformer = new SierraOrganisationSubjects {}
