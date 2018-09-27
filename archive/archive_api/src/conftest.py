@@ -8,7 +8,7 @@ import pytest
 
 
 @pytest.fixture
-def client(dynamodb_resource, s3_client, table_name, sns_client, topic_arn, bucket, table_name_bag, bucket_bag):
+def client(dynamodb_resource, s3_client, table_name, sns_client, topic_arn, table_name_bag, bucket_bag):
     from archive_api import app
     app.config['DYNAMODB_TABLE_NAME'] = table_name
     app.config['DYNAMODB_RESOURCE'] = dynamodb_resource
