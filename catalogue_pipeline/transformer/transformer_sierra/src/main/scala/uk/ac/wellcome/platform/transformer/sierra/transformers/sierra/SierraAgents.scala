@@ -35,7 +35,7 @@ trait SierraAgents {
     )
   }
 
-  // This is used to construct a Person from MARc tags 110 and 710.
+  // This is used to construct an Organisation from MARC tags 110 and 710.
   // For all entries:
   //  - Subfield $a is "label"
   //  - Subfield $0 is used to populate "identifiers". The identifier scheme is lc-names.
