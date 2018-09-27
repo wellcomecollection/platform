@@ -147,3 +147,7 @@ def default_error_handler(error):
         else:
             error_response['description'] = getattr(error, 'description', str(error))
     return jsonify(error_response), error_response['httpStatus']
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
