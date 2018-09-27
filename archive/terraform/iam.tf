@@ -91,7 +91,6 @@ resource "aws_iam_role_policy" "progress_task_archive_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
-
 data "aws_iam_policy_document" "read_from_registrar_queue" {
   statement {
     actions = [
