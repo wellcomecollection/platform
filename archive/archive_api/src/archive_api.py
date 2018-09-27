@@ -12,12 +12,13 @@ from werkzeug.exceptions import BadRequest as BadRequestError
 from report_ingest_status import report_ingest_status
 from request_new_ingest import send_new_ingest_request
 
-from create_ingest_progress import (
+import config
+import validators
+
+from ingests.create_ingest_progress import (
     IngestProgress,
     create_ingest_progress
 )
-import config
-import validators
 
 app = Flask(__name__)
 api = Api(app,

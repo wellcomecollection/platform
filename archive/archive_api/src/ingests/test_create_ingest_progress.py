@@ -3,7 +3,7 @@
 import pytest
 from datetime import (datetime, timezone, timedelta)
 
-from create_ingest_progress import (
+from ingests.create_ingest_progress import (
     IngestProgress,
     create_ingest_progress
 )

@@ -1,7 +1,8 @@
 # -*- encoding: utf-8
 
 from uuid import UUID
-from datetime import (datetime, timezone)
+from datetime import datetime, timezone
+
 from botocore.exceptions import ClientError
 
 
