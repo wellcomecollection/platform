@@ -3,7 +3,7 @@
 import pytest
 from werkzeug.exceptions import BadRequest as BadRequestError
 
-from request_new_ingest import (
+from ingests import (
     create_archive_bag_message,
     send_new_ingest_request
 )
