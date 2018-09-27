@@ -10,7 +10,7 @@ object ZipFileReader extends Logging {
     val objectLocation = zipLocation.objectLocation
     val zipFile = zipLocation.zipFile
     info(s"objectLocation: $objectLocation")
-    val name = s"${objectLocation.namespace}/${objectLocation.key}"
+    val name = List(objectLocation.namespace,objectLocation.key).filterNot(_.isEmpty).mkString("/")
     info(s"Getting ZipEntry $name")
 
     val maybeInputStream = for {
