@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
-import uk.ac.wellcome.models.work.internal.{MaybeDisplayable, Organisation, Subject, Unidentifiable}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.{SierraBibData, VarField}
 import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.MarcUtils
 
@@ -36,9 +36,25 @@ trait SierraOrganisationSubjects extends MarcUtils {
 
   private def createOrganisation(varField: VarField): MaybeDisplayable[Organisation] = {
     val label = createLabel(varField, subfieldTags = List("a", "b"))
-    Unidentifiable(
-      Organisation(label = label)
-    )
+    val organisation = Organisation(label = label)
+
+    val identifierSubfields = varField.subfields.filter { _.tag == "0" }
+
+    identifierSubfields match {
+      case Seq(subfield) => {
+        val sourceIdentifier = SourceIdentifier(
+          identifierType = IdentifierType("lc-names"),
+          value = subfield.content,
+          ontologyType = "Organisation"
+        )
+
+        Identifiable(
+          agent = organisation,
+          sourceIdentifier = sourceIdentifier
+        )
+      }
+      case _ => Unidentifiable(organisation)
+    }
   }
 
   /** Given a varField and a list of subfield tags, create a label by
