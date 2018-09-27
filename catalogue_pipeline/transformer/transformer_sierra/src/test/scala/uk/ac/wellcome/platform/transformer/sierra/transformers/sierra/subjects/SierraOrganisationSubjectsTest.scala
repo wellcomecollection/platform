@@ -105,6 +105,31 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
       )
     }
 
+    it("creates an Identifiable Organisation if subfield 0 has multiple but unambiguous values") {
+      val bibData = create610bibDataWith(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "ACME Corp"),
+          MarcSubfield(tag = "0", content = "  n1234"),
+          MarcSubfield(tag = "0", content = "n1234"),
+        )
+      )
+
+      val subjects = transformer.getSubjectsWithOrganisation(bibData)
+      val concepts = subjects.head.concepts
+      val maybeDisplayableOrganisation = concepts.head
+      maybeDisplayableOrganisation shouldBe a[Identifiable[_]]
+
+      val identifiableOrganisation = maybeDisplayableOrganisation
+        .asInstanceOf[Identifiable[Organisation]]
+      identifiableOrganisation.identifiers shouldBe List(
+        SourceIdentifier(
+          identifierType = IdentifierType("lc-names"),
+          ontologyType = "Organisation",
+          value = "n1234"
+        )
+      )
+    }
+
     it("skips adding an identifier if subfield 0 is ambiguous") {
       val bibData = create610bibDataWith(
         subfields = List(
