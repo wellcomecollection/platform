@@ -55,6 +55,15 @@ def test_raises_if_id_is_already_saved(dynamodb_resource, table_name, guid):
             table_name)
 
 
+def test_raises_for_all_other_errors(dynamodb_resource, guid):
+    with pytest.raises(ValueError, match='foo'):
+        create_ingest_progress(
+            IngestProgress(guid, bag_url, callback_url),
+            dynamodb_resource=dynamodb_resource,
+            table_name='DoesNotExist'
+        )
+
+
 def initialised_progress_item(guid, upload_url, callback_url=None):
     item = {
         '@context': 'https://api.wellcomecollection.org/storage/v1/context.json',
