@@ -4,7 +4,7 @@ import org.rogach.scallop.ScallopConf
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
-import uk.ac.wellcome.platform.archive.progress_http.models.ProgressHttpConfig
+import uk.ac.wellcome.platform.archive.progress_http.models.{HttpServerConfig, ProgressHttpConfig}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.duration._
@@ -28,6 +28,9 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   val appPort =
     opt[Int](required = true, default = Some(9001))
+
+  val appHost =
+    opt[String](required = true, default = Some("localhost"))
 
   verify()
 
@@ -54,10 +57,15 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     flushInterval = metricsFlushIntervalSeconds() seconds
   )
 
+  val httpServerConfig = HttpServerConfig(
+    host = appHost(),
+    port = appPort()
+  )
+
   val appConfig = ProgressHttpConfig(
     cloudwatchClientConfig,
     archiveProgressMonitorConfig,
     metricsConfig,
-    appPort()
+    httpServerConfig
   )
 }

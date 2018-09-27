@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.archive.progress_http.fixtures
 
 import java.util.UUID
 
+import akka.http.scaladsl.model.HttpEntity
+import akka.stream.Materializer
 import com.google.inject.Guice
+import io.circe.Decoder
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.platform.archive.common.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archive.common.modules._
@@ -11,11 +14,16 @@ import uk.ac.wellcome.platform.archive.common.progress.models
 import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate, Progress => ProgressModel}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.progress_http.modules.{ConfigModule, TestAppConfigModule}
-import uk.ac.wellcome.platform.archive.progress_http.{ProgressHttp => ProgressHttpApp}
+import uk.ac.wellcome.platform.archive.progress_http.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.progress_http.modules._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
+
+import scala.concurrent.duration._
+import uk.ac.wellcome.json.JsonUtil._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.util.Random
 
@@ -71,33 +79,50 @@ trait ProgressHttpFixture
     testWith(progress)
   }
 
-  def withApp[R](table: Table, port: Int)(
-    testWith: TestWith[ProgressHttpApp, R]) = {
+  def withApp[R](table: Table, serverConfig: HttpServerConfig)(
+    testWith: TestWith[AkkaHttpApp, R]) = {
 
-    val progress = new ProgressHttpApp {
+    val progress = new AkkaHttpApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(table, port),
+        new TestAppConfigModule(table, serverConfig),
         ConfigModule,
         AkkaModule,
         CloudWatchClientModule,
+        HttpStreamModule,
+        RequestHandlerModule,
         ProgressMonitorModule
       )
     }
     testWith(progress)
   }
 
+  def withConfiguredApp[R](testWith: TestWith[(Table, String, AkkaHttpApp), R]) = {
 
-
-  def withConfiguredApp[R](
-                            testWith: TestWith[(Table, Int, ProgressHttpApp), R]) = {
-
+    val host = "localhost"
     val port = randomPort
+
+    val serverConfig = HttpServerConfig(host, port)
+
+    val baseUrl = s"http://$host:$port"
 
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) {
       table =>
-        withApp(table, port) { progressHttp =>
-          testWith((table, port, progressHttp))
+        withApp(table, serverConfig) { progressHttp =>
+          testWith((table, baseUrl, progressHttp))
         }
     }
+  }
+
+  def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T], materializer: Materializer) = {
+    val timeout = 300.millis
+
+    val stringBody = entity.toStrict(timeout)
+      .map(_.data)
+      .map(_.utf8String)
+      .value
+      .get
+      .get
+
+    fromJson[T](stringBody).get
   }
 }

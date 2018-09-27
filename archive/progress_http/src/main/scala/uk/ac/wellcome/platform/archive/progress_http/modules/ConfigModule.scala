@@ -15,4 +15,8 @@ object ConfigModule extends AbstractModule {
   @Provides
   def providesProgressMonitorConfig(appConfig: ProgressHttpConfig) =
     appConfig.progressMonitorConfig
+
+  @Provides
+  def providesHttpServerConfig(appConfig: ProgressHttpConfig) =
+    appConfig.httpServerConfig
 }

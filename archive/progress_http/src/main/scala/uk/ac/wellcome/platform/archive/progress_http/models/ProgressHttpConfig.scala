@@ -8,5 +8,6 @@ case class ProgressHttpConfig(
                                cloudwatchClientConfig: CloudwatchClientConfig,
                                progressMonitorConfig: ProgressMonitorConfig,
                                metricsConfig: MetricsConfig,
-                               port: Int
+                               httpServerConfig: HttpServerConfig,
                              )
+

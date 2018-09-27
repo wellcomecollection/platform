@@ -4,7 +4,7 @@ import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
-import uk.ac.wellcome.platform.archive.progress_http.models.ProgressHttpConfig
+import uk.ac.wellcome.platform.archive.progress_http.models.{HttpServerConfig, ProgressHttpConfig}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 
@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 
 class TestAppConfigModule(
                            progressTable: Table,
-                           port: Int
+                           serverConfig: HttpServerConfig
                          )
   extends AbstractModule {
 
@@ -45,7 +45,7 @@ class TestAppConfigModule(
       cloudwatchClientConfig,
       archiveProgressMonitorConfig,
       metricsConfig,
-      port
+      serverConfig
     )
   }
 }

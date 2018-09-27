@@ -3,17 +3,18 @@ package uk.ac.wellcome.platform.archive.progress_async
 import com.google.inject.{Guice, Injector}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
-import uk.ac.wellcome.platform.archive.progress_http.ProgressHttp
-import uk.ac.wellcome.platform.archive.progress_http.modules.{AppConfigModule, ConfigModule}
+import uk.ac.wellcome.platform.archive.progress_http.modules._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object Main extends App with ProgressHttp {
+object Main extends App with AkkaHttpApp {
   override val injector: Injector = Guice.createInjector(
     new AppConfigModule(args),
     ConfigModule,
     AkkaModule,
+    RequestHandlerModule,
+    HttpStreamModule,
     ProgressMonitorModule
   )
 
