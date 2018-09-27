@@ -124,7 +124,7 @@ class TestRequestNewIngest:
         assert len(sns_messages) == 1
         message = sns_messages[0][':message']
 
-        assert message['bagLocation'] == {
+        assert message['zippedBagLocation'] == {
             'namespace': 'example-bukkit',
             'key': 'helloworld.zip'
         }

@@ -3,7 +3,7 @@
 """
 Create a request to archive a bag
 
-Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>] [--topic=<TOPIC_NAME>|--api=<API>] [--sns=(true|false)]
+Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>] [--topic=<TOPIC_NAME>|--api=<API>] [--sns] [--insecure]
        trigger_archive_bag.py -h | --help
 
 Arguments:
@@ -11,20 +11,20 @@ Arguments:
 
 Examples:
     trigger_archive_bag.py b22454408.zip
+    trigger_archive_bag.py b22454408.zip --sns
 
 Options:
-    sns                    Send directly to SNS rather than through the API
-                           [default: false]
-    --bucket=<BUCKET_NAME> The S3 bucket containing the bags.
-                           [default: wellcomecollection-assets-archive-ingest]
-    --topic=<TOPIC_NAME>   The archivist topic.
-                           [default: archive-storage_archivist]
-    --api=<API>            The API endpoint to use
-                           [default: http://api.wellcomecollection.org/storage/v1/ingests]
-    --sns=(true|false)     Send directly to SNS rather than through the API
-                           [default: false]
-    -h --help              Print this help message
+    --bucket=<BUCKET_NAME>  The S3 bucket containing the bags.
+                            [default: wellcomecollection-assets-archive-ingest]
+    --topic=<TOPIC_NAME>    The archivist topic.
+                            [default: archive-storage_archivist]
+    --api=<API>             The API endpoint to use
+                            [default: http://api.wellcomecollection.org/storage/v1/ingests]
+    --sns                   Send directly to SNS rather than through the API
+    --insecure              Allow insecure connections to the API
+    -h --help               Print this help message
 """
+import uuid
 
 import boto3
 import docopt
@@ -34,12 +34,16 @@ import requests
 
 def archive_bag_sns_messages(bags, bucket):
     """
-    Generates bag archive messages.
+    Generates bag archive request messages.
     """
     for bag in bags:
+        request_id = str(uuid.uuid4())
         yield {
-            'namespace': bucket,
-            'key': bag
+            'archiveRequestId': request_id,
+            'zippedBagLocation': {
+                'namespace': bucket,
+                'key': bag
+            }
         }
 
 
@@ -94,17 +98,17 @@ def publish_to_sns(bucket_name, bags, topic_name):
     )
 
 
-def call_ingest_api(bucket_name, bags, api):
+def call_ingest_api(bucket_name, bags, api, verify_ssl_certificate=True):
     session = requests.Session()
     for message in archive_bag_api_messages(bags, bucket_name):
-        response = session.post(api, json=message)
+        response = session.post(api, json=message, verify=verify_ssl_certificate)
         status_code = response.status_code
         if status_code != 202:
             print_result(f'ERROR calling {api}', response)
         else:
             print(f'{message} -> {api} [{status_code}]')
             location = response.headers.get('Location')
-            ingest = session.get(location)
+            ingest = session.get(location, verify=verify_ssl_certificate)
             if location:
                 print_result(location, ingest)
 
@@ -120,13 +124,14 @@ def main():
     bags = args['<BAG>']
     bucket_name = args['--bucket']
     use_sns_directly = args['--sns']
+    insecure_api = args['--insecure']
 
-    if use_sns_directly.lower() == "true":
+    if use_sns_directly:
         topic_name = args['--topic']
         publish_to_sns(bucket_name, bags, topic_name)
     else:
         api = args['--api']
-        call_ingest_api(bucket_name, bags, api)
+        call_ingest_api(bucket_name, bags, api, not insecure_api)
 
 
 if __name__ == '__main__':

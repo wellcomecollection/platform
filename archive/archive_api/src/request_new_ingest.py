@@ -23,7 +23,7 @@ def create_archive_bag_message(guid, bag_url, callback_url):
 
     message = {
         'archiveRequestId': guid,
-        'bagLocation': {
+        'zippedBagLocation': {
             'namespace': bucket,
             'key': key
         }
