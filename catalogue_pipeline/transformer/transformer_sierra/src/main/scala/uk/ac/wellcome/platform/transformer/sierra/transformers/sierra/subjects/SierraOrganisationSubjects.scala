@@ -2,8 +2,14 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.source.{SierraBibData, VarField}
-import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.{MarcUtils, SierraAgents}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  SierraBibData,
+  VarField
+}
+import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.{
+  MarcUtils,
+  SierraAgents
+}
 
 trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
 
@@ -23,9 +29,11 @@ trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
   //
   // https://www.loc.gov/marc/bibliographic/bd610.html
   //
-  def getSubjectsWithOrganisation(bibData: SierraBibData): List[Subject[MaybeDisplayable[Organisation]]] =
+  def getSubjectsWithOrganisation(
+    bibData: SierraBibData): List[Subject[MaybeDisplayable[Organisation]]] =
     getMatchingVarFields(bibData, marcTag = "610").map { varField =>
-      val label = createLabel(varField, subfieldTags = List("a", "b", "c", "d", "e"))
+      val label =
+        createLabel(varField, subfieldTags = List("a", "b", "c", "d", "e"))
 
       val organisation = createOrganisation(varField)
 
@@ -35,20 +43,23 @@ trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
       )
     }
 
-  private def createOrganisation(varField: VarField): MaybeDisplayable[Organisation] = {
+  private def createOrganisation(
+    varField: VarField): MaybeDisplayable[Organisation] = {
     val label = createLabel(varField, subfieldTags = List("a", "b"))
 
     // @@AWLC: I'm not sure if this can happen in practice -- but we don't have
     // enough information to build the Organisation, so erroring out here is
     // the best we can do for now.
     if (label == "") {
-      throw TransformerException(s"Not enough information to build a label on $varField")
+      throw TransformerException(
+        s"Not enough information to build a label on $varField")
     }
 
     val organisation = Organisation(label = label)
 
     varField.indicator2 match {
-      case Some("0") => identify(varField.subfields, organisation, "Organisation")
+      case Some("0") =>
+        identify(varField.subfields, organisation, "Organisation")
       case _ => Unidentifiable(organisation)
     }
   }
@@ -59,10 +70,12 @@ trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
     * The order is the same as that in the original MARC.
     *
     */
-  private def createLabel(varField: VarField, subfieldTags: List[String]): String =
-    varField
-      .subfields
-      .filter { vf => subfieldTags.contains(vf.tag) }
+  private def createLabel(varField: VarField,
+                          subfieldTags: List[String]): String =
+    varField.subfields
+      .filter { vf =>
+        subfieldTags.contains(vf.tag)
+      }
       .map { _.content }
       .mkString(" ")
 }

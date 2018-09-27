@@ -21,8 +21,7 @@ trait SierraConcepts extends MarcUtils {
     * this varField, which is a commonly-used subfield for identifiers.
     */
   def getIdentifierSubfieldContents(varField: VarField): List[String] =
-    varField
-      .subfields
+    varField.subfields
       .filter { _.tag == "0" }
       .map { _.content }
 

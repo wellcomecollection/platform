@@ -603,7 +603,8 @@ class SierraTransformableTransformerTest
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.subjects shouldBe List(
       Subject(
-        label = content, List(Unidentifiable(Organisation(content)))
+        label = content,
+        List(Unidentifiable(Organisation(content)))
       )
     )
   }

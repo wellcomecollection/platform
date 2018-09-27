@@ -4,9 +4,16 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
-class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDataGenerators {
+class SierraOrganisationSubjectsTest
+    extends FunSpec
+    with Matchers
+    with SierraDataGenerators {
   it("returns an empty list if there are no instances of MARC tag 610") {
     val bibData = createSierraBibDataWith(varFields = List())
     transformer.getSubjectsWithOrganisation(bibData) shouldBe List()
@@ -107,7 +114,8 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
       )
     }
 
-    it("creates an Identifiable Organisation if subfield 0 has multiple but unambiguous values") {
+    it(
+      "creates an Identifiable Organisation if subfield 0 has multiple but unambiguous values") {
       val bibData = create610bibDataWith(
         indicator2 = "0",
         subfields = List(
@@ -209,14 +217,16 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
 
   val transformer = new SierraOrganisationSubjects {}
 
-  private def create610bibDataWith(subfields: List[MarcSubfield], indicator2: String = ""): SierraBibData =
+  private def create610bibDataWith(subfields: List[MarcSubfield],
+                                   indicator2: String = ""): SierraBibData =
     createSierraBibDataWith(
       varFields = List(
         createMarc610VarField(subfields = subfields, indicator2 = indicator2)
       )
     )
 
-  private def createMarc610VarField(subfields: List[MarcSubfield], indicator2: String = ""): VarField =
+  private def createMarc610VarField(subfields: List[MarcSubfield],
+                                    indicator2: String = ""): VarField =
     VarField(
       marcTag = "610",
       indicator1 = "",
