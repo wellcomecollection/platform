@@ -84,6 +84,7 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
     it("creates an Identifiable Organisation if subfield 0 is present") {
       val lcNamesCode = "n81290903210"
       val bibData = create610bibDataWith(
+        indicator2 = "0",
         subfields = List(
           MarcSubfield(tag = "a", content = "ACME Corp"),
           MarcSubfield(tag = "0", content = lcNamesCode)
@@ -108,6 +109,7 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
 
     it("creates an Identifiable Organisation if subfield 0 has multiple but unambiguous values") {
       val bibData = create610bibDataWith(
+        indicator2 = "0",
         subfields = List(
           MarcSubfield(tag = "a", content = "ACME Corp"),
           MarcSubfield(tag = "0", content = "  n1234"),
@@ -133,10 +135,26 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
 
     it("skips adding an identifier if subfield 0 is ambiguous") {
       val bibData = create610bibDataWith(
+        indicator2 = "0",
         subfields = List(
           MarcSubfield(tag = "a", content = "ACME Corp"),
           MarcSubfield(tag = "0", content = "n12345"),
           MarcSubfield(tag = "0", content = "n67890")
+        )
+      )
+
+      val subjects = transformer.getSubjectsWithOrganisation(bibData)
+      val concepts = subjects.head.concepts
+      val maybeDisplayableOrganisation = concepts.head
+      maybeDisplayableOrganisation shouldBe a[Unidentifiable[_]]
+    }
+
+    it("skips adding an identifier if the 2nd indicator is not '0'") {
+      val bibData = create610bibDataWith(
+        indicator2 = "2",
+        subfields = List(
+          MarcSubfield(tag = "a", content = "ACME Corp"),
+          MarcSubfield(tag = "0", content = "n12345")
         )
       )
 
@@ -191,18 +209,18 @@ class SierraOrganisationSubjectsTest extends FunSpec with Matchers with SierraDa
 
   val transformer = new SierraOrganisationSubjects {}
 
-  private def create610bibDataWith(subfields: List[MarcSubfield]): SierraBibData =
+  private def create610bibDataWith(subfields: List[MarcSubfield], indicator2: String = ""): SierraBibData =
     createSierraBibDataWith(
       varFields = List(
-        createMarc610VarField(subfields = subfields)
+        createMarc610VarField(subfields = subfields, indicator2 = indicator2)
       )
     )
 
-  private def createMarc610VarField(subfields: List[MarcSubfield]): VarField =
+  private def createMarc610VarField(subfields: List[MarcSubfield], indicator2: String = ""): VarField =
     VarField(
       marcTag = "610",
       indicator1 = "",
-      indicator2 = "",
+      indicator2 = indicator2,
       subfields = subfields
     )
 }
