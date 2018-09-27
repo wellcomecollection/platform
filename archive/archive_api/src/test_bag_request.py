@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 import json
+import pytest
 
 from bag_request import (
     bag_request
@@ -30,7 +31,7 @@ def test_looks_up_bag(dynamodb_client, dynamodb_resource, s3_client, bucket_bag,
 
     assert response == stored_bag
 
-
+@pytest.yield_fixture(autouse=True)
 def run_around_tests(dynamodb_client, s3_client, bucket_bag, table_name_bag):
     s3_client.create_bucket(Bucket=bucket_bag)
 

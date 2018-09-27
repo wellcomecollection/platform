@@ -89,3 +89,7 @@ def bucket_bag(s3_client):
     os.environ.update({'BAG_VHS_BUCKET_NAME': bucket_name})
     s3_client.create_bucket(Bucket=bucket_name)
     yield bucket_name
+    try:
+        del os.environ['BAG_VHS_BUCKET_NAME']
+    except KeyError:
+        pass
