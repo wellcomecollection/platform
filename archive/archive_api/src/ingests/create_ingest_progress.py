@@ -60,3 +60,5 @@ def create_ingest_progress(ingest_progress, dynamodb_resource, table_name):
     except ClientError as e:
         if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
             raise ValueError(f"Cannot create IngestProgress, id already exists '{ingest_progress.id}'.")
+        else:
+            raise
