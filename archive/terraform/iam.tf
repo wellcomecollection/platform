@@ -10,6 +10,11 @@ resource "aws_iam_role_policy" "archive_api_task_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
+resource "aws_iam_role_policy" "archive_api_task_bag_vhs" {
+  role   = "${module.api_ecs.task_role_name}"
+  policy = "${module.vhs_archive_manifest.read_policy.json}"
+}
+
 # Archivist
 
 resource "aws_iam_role_policy" "archivist_task_store_s3" {
@@ -86,7 +91,6 @@ resource "aws_iam_role_policy" "progress_task_archive_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
-# asset lookup lambda
 
 data "aws_iam_policy_document" "read_from_registrar_queue" {
   statement {
@@ -101,6 +105,8 @@ data "aws_iam_policy_document" "read_from_registrar_queue" {
     ]
   }
 }
+
+# asset lookup lambda
 
 resource "aws_iam_role_policy" "archive_asset_lookup_dynamo_permission" {
   role = "${module.lambda_archive_bags.role_name}"
