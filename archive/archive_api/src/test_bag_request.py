@@ -35,9 +35,7 @@ def test_looks_up_bag(dynamodb_client, dynamodb_resource, s3_client, bucket_bag,
 def run_around_tests(dynamodb_client, s3_client, bucket_bag, table_name_bag):
     s3_client.create_bucket(Bucket=bucket_bag)
 
-    create_table(dynamodb_client, table_name_bag)
     yield
-    dynamodb_client.delete_table(TableName=table_name_bag)
 
     objects = s3_client.list_objects(Bucket=bucket_bag)
     for content in objects['Contents']:
