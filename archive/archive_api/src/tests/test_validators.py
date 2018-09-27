@@ -66,3 +66,26 @@ class TestValidateSingleUrl:
     ])
     def test_good_url_is_allowed(self, good_url):
         validators.validate_single_url(good_url)
+
+
+class TestValidateUUID:
+    """
+    Tests for ``validate_uuid``.
+    """
+
+    @pytest.mark.parametrize('bad_id', [
+        'foo',
+        'bar',
+        '1234567890',
+        'hwta58gq',
+    ])
+    def test_bad_id_is_rejected(self, bad_id):
+        with pytest.raises(ValueError, match='Invalid id'):
+            validators.validate_uuid(bad_id)
+
+    @pytest.mark.parametrize('good_id', [
+        '6adf5859-ffed-4224-a4d2-768278eb3240',
+        'EA851462-0EDB-452A-9B9E-CE163A927614',
+    ])
+    def test_good_id_is_allowed(self, good_id):
+        validators.validate_uuid(good_id)
