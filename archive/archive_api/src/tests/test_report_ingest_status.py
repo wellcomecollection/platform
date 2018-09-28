@@ -1,7 +1,6 @@
 # -*- encoding: utf-8
 
 import pytest
-from werkzeug.exceptions import NotFound as NotFoundError
 
 from ingests import report_ingest_status
 

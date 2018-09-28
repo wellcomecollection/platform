@@ -1,7 +1,6 @@
 # -*- encoding: utf-8
 
 import pytest
-from werkzeug.exceptions import BadRequest as BadRequestError
 
 from ingests import (
     create_archive_bag_message,
