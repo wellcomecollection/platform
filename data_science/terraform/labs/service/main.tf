@@ -46,5 +46,5 @@ module "service" {
   namespace_id     = "${var.service_discovery_namespace}"
   healthcheck_path = "${var.health_check_path}"
 
-  launch_type = "EC2"
+  launch_type = "${var.launch_type}"
 }
