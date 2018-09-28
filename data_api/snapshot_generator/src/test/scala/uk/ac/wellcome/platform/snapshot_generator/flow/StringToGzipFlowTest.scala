@@ -6,11 +6,10 @@ import java.nio.file.Paths
 import akka.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, IOResult, Materializer}
 import akka.util.ByteString
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.Future
 
@@ -19,8 +18,8 @@ class StringToGzipFlowTest
     with Matchers
     with Akka
     with GzipUtils
-    with ExtendedPatience
-    with ScalaFutures {
+    with ScalaFutures
+    with IntegrationPatience {
 
   it("produces a gzip-compressed file from the lines") {
     withActorSystem { actorSystem =>

@@ -10,7 +10,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.elasticsearch.client.ResponseException
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.{
   ApiVersions,
@@ -32,7 +32,6 @@ import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -44,7 +43,7 @@ class SnapshotServiceTest
     with AkkaS3
     with S3
     with GzipUtils
-    with ExtendedPatience
+    with IntegrationPatience
     with ElasticsearchFixtures
     with WorksGenerators {
 
