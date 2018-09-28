@@ -13,7 +13,7 @@ class TroubleshootArchivistLocalBagFileTest
     with ArchivistFixture
     with MetricsSenderFixture {
 
-  it("downloads, uploads and verifies a known BagIt bag") {
+  ignore("downloads, uploads and verifies a known BagIt bag") {
     withArchivist {
       case (
           ingestBucket,
@@ -36,7 +36,7 @@ class TroubleshootArchivistLocalBagFileTest
 
           while (true) {
             Thread.sleep(10000)
-            println(s"Uploaded: ${listKeysInBucket(storageBucket)}")
+            println(s"Uploaded: ${listKeysInBucket(storageBucket).size}")
           }
         }
     }

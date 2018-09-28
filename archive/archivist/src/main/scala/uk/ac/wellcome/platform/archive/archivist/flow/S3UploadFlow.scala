@@ -11,6 +11,7 @@ import com.amazonaws.services.s3.model._
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
+import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
@@ -42,11 +43,18 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         partEtagList = Nil
       }
 
+      // Each part of a MultipartUpload (except the last) needs to be at least 5MB according to AWS specs
       val minSize: Int = 5 * 1024 * 1024
+
+      // The maximum size for each part in a MultipartUpload according to AWS specs if 5GB.
+      // Setting it smaller here so we know we don't run out of memory
+      // TODO: this should be configurable
       val maxSize: Int = 10 * 1024 * 1024
 
       setHandler(out, new OutHandler {
         override def onPull(): Unit = pull(in)
+
+        override def onDownstreamFinish(): Unit = completeStage()
       })
 
       setHandler(
@@ -55,16 +63,16 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           override def onPush(): Unit = {
             val byteString = grab(in)
             debug(s"Received bytestring of size ${byteString.size}")
-            currentPart = currentPart ++ byteString
-            uploadIfAboveMinSize(currentPart)
+            uploadIfAboveMinSize(currentPart ++ byteString, false)
+            pull(in)
           }
 
           override def onUpstreamFinish(): Unit = {
-            uploadByteString(currentPart)
+            uploadIfAboveMinSize(currentPart, true)
             maybeUploadId.foreach { uploadId =>
               completeUpload(uploadId)
             }
-
+            debug("completing stage")
             completeStage()
           }
 
@@ -74,21 +82,22 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       )
 
-      private def uploadIfAboveMinSize(byteString: ByteString): Unit = {
+      @tailrec
+      private def uploadIfAboveMinSize(byteString: ByteString, isLast: Boolean): Unit = {
         byteString.size match {
-          case size if size >= minSize && size < maxSize =>
-            debug(s"Current stored bytestring is $maxSize < ${byteString.size} >= $minSize: uploading")
-            uploadByteString(byteString)
-          case size if size < minSize =>
-            debug(s"Current stored bytestring is ${byteString.size} < $minSize: pulling from inlet")
+          case size if size < minSize && !isLast =>
+            debug(s"Current bytestring is ${byteString.size} < $minSize: pulling from inlet")
             currentPart = byteString
-            pull(in)
+          case size if size < maxSize =>
+            debug(s"Current bytestring is ${byteString.size} < $maxSize: uploading")
+            uploadByteString(byteString)
+            currentPart = ByteString.empty
           case _ =>
+            debug(s"Current bytestring is ${byteString.size} > $maxSize: uploading a chunk")
             val (current,next) = byteString.splitAt(maxSize)
             uploadByteString(current)
-            if(next.nonEmpty) uploadIfAboveMinSize(next)
+            if(next.nonEmpty) uploadIfAboveMinSize(next, isLast)
         }
-
       }
 
       private def uploadByteString(byteString: ByteString): Unit = {
@@ -127,8 +136,12 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
             partEtagList.asJava)
         val res = Try(s3Client.completeMultipartUpload(compRequest))
         res match {
-          case Success(result) => push(out, Try(result))
-          case Failure(ex)     => handleInternalFailure(ex)
+          case Success(result) =>
+            debug("Upload completed successfully")
+            push(out, Try(result))
+          case Failure(ex)     =>
+            error("Failure while completing upload", ex)
+            handleInternalFailure(ex)
         }
       }
 
