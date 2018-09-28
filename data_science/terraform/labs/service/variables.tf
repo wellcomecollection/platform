@@ -28,3 +28,6 @@ variable "aws_region" {
 }
 
 variable "health_check_path" {}
+
+variable "memory" {default="2048"}
+variable "cpu" {default="1024"}

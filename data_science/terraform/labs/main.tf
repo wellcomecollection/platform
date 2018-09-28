@@ -7,6 +7,24 @@ resource "aws_service_discovery_private_dns_namespace" "namespace" {
   vpc  = "${var.vpc_id}"
 }
 
+module "devise_search_service" {
+  source    = "service"
+  namespace = "devise"
+
+  lb_listener_arn = "${aws_alb_listener.http_80.arn}"
+  vpc_id          = "${var.vpc_id}"
+  container_image = "harrisonpim/devise_search:v1"
+  ecs_cluster_id  = "${aws_ecs_cluster.cluster.id}"
+  vpc_cidr_block  = "${var.vpc_cidr_block}"
+  subnets         = "${var.private_subnets}"
+  memory          = "8192"
+  cpu             = "4096"
+
+  service_discovery_namespace  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  service_lb_security_group_id = "${aws_security_group.service_lb_security_group.id}"
+  health_check_path            = "/devise/index.html"
+}
+
 module "palette_service" {
   source    = "service"
   namespace = "palette"

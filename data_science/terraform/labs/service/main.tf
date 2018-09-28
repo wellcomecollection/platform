@@ -21,8 +21,8 @@ module "task" {
   container_image = "${var.container_image}"
   container_port  = "${var.container_port}"
 
-  memory = "2048"
-  cpu    = "1024"
+  memory = "${var.memory}"
+  cpu    = "${var.cpu}"
 }
 
 module "service" {
