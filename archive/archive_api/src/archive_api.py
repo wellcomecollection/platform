@@ -8,6 +8,7 @@ from flask import Flask
 from flask_restplus import Api, Resource
 from flask import jsonify, make_response, request
 from werkzeug.exceptions import BadRequest as BadRequestError
+from werkzeug.exceptions import NotFound as NotFoundError
 
 import config
 import validators
@@ -134,14 +135,17 @@ class BagResource(Resource):
     @ns_bags.response(404, 'Bag not found', models.Error)
     def get(self, id):
         """Get the bag associated with an id"""
-        result = bag_request(
-            dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
-            table_name=app.config['BAG_VHS_TABLE_NAME'],
-            s3_client=app.config['S3_CLIENT'],
-            bucket_name=app.config['BAG_VHS_BUCKET_NAME'],
-            id=id
-        )
-        return jsonify(result)
+        try:
+            result = bag_request(
+                dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
+                table_name=app.config['BAG_VHS_TABLE_NAME'],
+                s3_client=app.config['S3_CLIENT'],
+                bucket_name=app.config['BAG_VHS_BUCKET_NAME'],
+                id=id
+            )
+            return jsonify(result)
+        except ValueError as error:
+            raise NotFoundError(error)
 
 
 @app.route('/storage/v1/healthcheck')
