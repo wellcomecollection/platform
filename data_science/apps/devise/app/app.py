@@ -20,7 +20,6 @@ image_ids = np.load('../data/image_ids.npy')
 embeddings = np.load('../data/embeddings.npy')
 index_to_wordvec = np.load('../data/index_to_wordvec.npy')
 word_to_index = pickle.load(open('../data/word_to_index.pkl', 'rb'))
-# search_index = pickle.load(open('../data/search_index.pkl, 'rb'))
 
 # Create sentence embedding model and load its pre-trained weights
 model = SentenceEncoder(index_to_wordvec)
@@ -32,7 +31,7 @@ model.load_state_dict(torch.load('../data/sentence-encoder-2018-09-27.pt',
 # embeddings and what they represent.
 search_index = nmslib.init(method='hnsw', space='cosinesimil')
 search_index.addDataPointBatch(embeddings)
-search_index.createIndex({'post': 2})
+search_index.loadIndex('../data/search_index.hnsw')
 
 # Define endpoint classes
 class devise_search(Resource):
@@ -62,4 +61,3 @@ def send_index(path):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
-    #app.run()
