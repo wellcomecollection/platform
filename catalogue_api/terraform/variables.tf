@@ -92,7 +92,3 @@ variable "es_config_remus" {
     doc_type = "work"
   }
 }
-
-variable "data_acm_cert_arn" {
-  description = "ARN for the data ssl cert"
-}
