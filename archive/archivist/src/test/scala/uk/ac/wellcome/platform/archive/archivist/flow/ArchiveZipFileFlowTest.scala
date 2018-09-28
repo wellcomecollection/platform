@@ -3,7 +3,9 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
 import uk.ac.wellcome.test.fixtures.Akka

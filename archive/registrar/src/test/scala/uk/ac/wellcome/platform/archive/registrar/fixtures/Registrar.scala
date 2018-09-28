@@ -10,15 +10,28 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, DigitisedStorageType}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation,
+  BagPath,
+  DigitisedStorageType
+}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
-import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule, VHSModule}
+import uk.ac.wellcome.platform.archive.registrar.modules.{
+  ConfigModule,
+  TestAppConfigModule,
+  VHSModule
+}
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore, S3}
+import uk.ac.wellcome.storage.fixtures.{
+  LocalDynamoDb,
+  LocalVersionedHybridStore,
+  S3
+}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Registrar
@@ -59,7 +72,10 @@ trait Registrar
     val fileEntries = createBag(bagIdentifier, dataFileCount)
     val storagePrefix = "archive"
 
-    val bagLocation = BagLocation(storageBucket.name, storagePrefix, BagPath(s"$DigitisedStorageType/$bagIdentifier"))
+    val bagLocation = BagLocation(
+      storageBucket.name,
+      storagePrefix,
+      BagPath(s"$DigitisedStorageType/$bagIdentifier"))
 
     fileEntries.map((entry: FileEntry) => {
       s3Client

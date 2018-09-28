@@ -8,10 +8,10 @@ import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
 
 import scala.util.{Failure, Success}
 
-object UploadInputStreamFlow extends Logging{
+object UploadInputStreamFlow extends Logging {
   def apply(parallelism: Int)(implicit s3Client: AmazonS3) =
     Flow[(ArchiveItemJob, InputStream)]
-    .log("uploading input stream and verifying checksum")
+      .log("uploading input stream and verifying checksum")
       .flatMapMerge(
         parallelism, {
           case (job, inputStream) =>
@@ -26,7 +26,8 @@ object UploadInputStreamFlow extends Logging{
                     if calculatedChecksum == checksum =>
                   Right(job)
                 case Success(calculatedChecksum) =>
-                  warn(s"Checksum didn't match: $calculatedChecksum != $checksum")
+                  warn(
+                    s"Checksum didn't match: $calculatedChecksum != $checksum")
                   Left(job)
                 case Failure(ex) =>
                   warn("There was an exception!", ex)

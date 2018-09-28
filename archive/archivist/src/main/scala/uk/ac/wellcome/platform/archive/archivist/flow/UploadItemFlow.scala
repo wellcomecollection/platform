@@ -30,8 +30,7 @@ object UploadItemFlow extends Logging {
           Either[ArchiveItemJob, ArchiveItemJob]](j => {
           warn(s"Failed extracting inputStream for $j")
           Left(j)
-        })(
-          UploadInputStreamFlow(parallelism)))
+        })(UploadInputStreamFlow(parallelism)))
   }
 
 }

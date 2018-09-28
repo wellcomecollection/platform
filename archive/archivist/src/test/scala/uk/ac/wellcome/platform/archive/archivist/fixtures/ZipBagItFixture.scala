@@ -37,9 +37,9 @@ trait ZipBagItFixture extends BagIt with Logging {
       createValidDataManifest,
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
-    createBagItFile:  => Option[FileEntry] = createValidBagItFile,
+    createBagItFile: => Option[FileEntry] = createValidBagItFile,
     createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile
-  )(testWith: TestWith[(String,ZipFile), R]) = {
+  )(testWith: TestWith[(String, ZipFile), R]) = {
 
     info(s"Creating bag $bagIdentifier")
 

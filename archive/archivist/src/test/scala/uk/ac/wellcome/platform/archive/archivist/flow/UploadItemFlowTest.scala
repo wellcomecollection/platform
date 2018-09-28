@@ -32,28 +32,29 @@ class UploadItemFlowTest
           val fileContent = "bah buh bih beh"
 
           val fileName = "key.txt"
-          withZipFile(List(FileEntry(s"$fileName", fileContent))) {
-            zipFile =>
-              val digest =
-                "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
+          withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+            val digest =
+              "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
 
-              val bagIdentifier = randomAlphanumeric()
+            val bagIdentifier = randomAlphanumeric()
 
-              val archiveItemJob = createArchiveItemJob(
-                zipFile,
+            val archiveItemJob = createArchiveItemJob(
+              zipFile,
+              bucket,
+              digest,
+              bagIdentifier,
+              fileName)
+
+            val source = Source.single(archiveItemJob)
+            val flow = UploadItemFlow(10)(s3Client)
+            val futureResult = source via flow runWith Sink.head
+
+            whenReady(futureResult) { result =>
+              result shouldBe Right(archiveItemJob)
+              getContentFromS3(
                 bucket,
-                digest,
-                bagIdentifier,
-                fileName)
-
-              val source = Source.single(archiveItemJob)
-              val flow = UploadItemFlow(10)(s3Client)
-              val futureResult = source via flow runWith Sink.head
-
-              whenReady(futureResult) { result =>
-                result shouldBe Right(archiveItemJob)
-                getContentFromS3(bucket, s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
-              }
+                s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
+            }
 
           }
         }
@@ -61,36 +62,36 @@ class UploadItemFlowTest
     }
   }
 
-  it(
-    "sends a left of archive item job when uploading a file with wrong digest") {
+  it("sends a left of archive item job when uploading a file with wrong digest") {
     withLocalS3Bucket { bucket =>
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           val fileContent = "bah buh bih beh"
 
           val fileName = "key.txt"
-          withZipFile(List(FileEntry(s"$fileName", fileContent))) {
-            zipFile =>
-              val digest =
-                "wrong!"
+          withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+            val digest =
+              "wrong!"
 
-              val bagIdentifier = randomAlphanumeric()
+            val bagIdentifier = randomAlphanumeric()
 
-              val archiveItemJob = createArchiveItemJob(
-                zipFile,
+            val archiveItemJob = createArchiveItemJob(
+              zipFile,
+              bucket,
+              digest,
+              bagIdentifier,
+              fileName)
+
+            val source = Source.single(archiveItemJob)
+            val flow = UploadItemFlow(10)(s3Client)
+            val futureResult = source via flow runWith Sink.head
+
+            whenReady(futureResult) { result =>
+              result shouldBe Left(archiveItemJob)
+              getContentFromS3(
                 bucket,
-                digest,
-                bagIdentifier,
-                fileName)
-
-              val source = Source.single(archiveItemJob)
-              val flow = UploadItemFlow(10)(s3Client)
-              val futureResult = source via flow runWith Sink.head
-
-              whenReady(futureResult) { result =>
-                result shouldBe Left(archiveItemJob)
-                getContentFromS3(bucket, s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
-              }
+                s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
+            }
 
           }
         }
@@ -124,7 +125,9 @@ class UploadItemFlowTest
             whenReady(futureResult) { result =>
               result shouldBe List(Left(archiveItemJob))
               val exception = intercept[AmazonS3Exception] {
-                getContentFromS3(bucket, s"archive/$DigitisedStorageType/$bagIdentifier/$fileName")
+                getContentFromS3(
+                  bucket,
+                  s"archive/$DigitisedStorageType/$bagIdentifier/$fileName")
               }
               exception.getErrorCode shouldBe "NoSuchKey"
             }
@@ -141,32 +144,31 @@ class UploadItemFlowTest
         val fileContent = "bah buh bih beh"
 
         val fileName = "key.txt"
-        withZipFile(List(FileEntry(s"$fileName", fileContent))) {
-          zipFile =>
-            val digest =
-              "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
+        withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+          val digest =
+            "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
 
-            val bagIdentifier = randomAlphanumeric()
+          val bagIdentifier = randomAlphanumeric()
 
-            val failingArchiveItemJob = createArchiveItemJob(
-              zipFile,
-              Bucket("does-not-exist"),
-              digest,
-              bagIdentifier,
-              fileName)
+          val failingArchiveItemJob = createArchiveItemJob(
+            zipFile,
+            Bucket("does-not-exist"),
+            digest,
+            bagIdentifier,
+            fileName)
 
-            val source = Source.single(failingArchiveItemJob)
-            val decider: Supervision.Decider = { e =>
-              error("Stream failure", e)
-              Supervision.Resume
-            }
-            val flow = UploadItemFlow(10)(s3Client)
-              .withAttributes(ActorAttributes.supervisionStrategy(decider))
-            val futureResult = source via flow runWith Sink.seq
+          val source = Source.single(failingArchiveItemJob)
+          val decider: Supervision.Decider = { e =>
+            error("Stream failure", e)
+            Supervision.Resume
+          }
+          val flow = UploadItemFlow(10)(s3Client)
+            .withAttributes(ActorAttributes.supervisionStrategy(decider))
+          val futureResult = source via flow runWith Sink.seq
 
-            whenReady(futureResult) { result =>
-              result shouldBe List(Left(failingArchiveItemJob))
-            }
+          whenReady(futureResult) { result =>
+            result shouldBe List(Left(failingArchiveItemJob))
+          }
 
         }
       }

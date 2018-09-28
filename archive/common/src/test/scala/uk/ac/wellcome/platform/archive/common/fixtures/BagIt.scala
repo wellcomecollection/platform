@@ -46,7 +46,8 @@ trait BagIt {
   def createValidBagItFile =
     Some(FileEntry("bagit.txt", bagItFileContents))
 
-  def createValidBagInfoFile(bagIdentifier: String) = Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier)))
+  def createValidBagInfoFile(bagIdentifier: String) =
+    Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier)))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
     Some(

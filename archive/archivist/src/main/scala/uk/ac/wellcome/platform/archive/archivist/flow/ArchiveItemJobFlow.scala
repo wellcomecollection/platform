@@ -18,10 +18,9 @@ object ArchiveItemJobFlow extends Logging {
           ArchiveItemJob,
           ArchiveItemJob,
           Either[ArchiveItemJob, ArchiveItemJob]](ifLeft = job => {
-            warn(s"job $job uploading and verifying failed")
-            Left(job)
-        })(
-          ifRight = DownloadItemFlow(parallelism)))
+          warn(s"job $job uploading and verifying failed")
+          Left(job)
+        })(ifRight = DownloadItemFlow(parallelism)))
       .log("download verified")
   }
 }

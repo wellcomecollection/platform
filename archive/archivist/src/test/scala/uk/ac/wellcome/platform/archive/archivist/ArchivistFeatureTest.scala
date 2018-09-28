@@ -6,7 +6,9 @@ import java.util.UUID
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
@@ -28,12 +30,7 @@ class ArchivistFeatureTest
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          topic,
-          archivist) =>
+      case (ingestBucket, storageBucket, queuePair, topic, archivist) =>
         createAndSendBag(ingestBucket, Some(callbackUrl), queuePair) {
           case (requestId, uploadLocation, bagIdentifier) =>
             archivist.run()
@@ -45,7 +42,10 @@ class ArchivistFeatureTest
               assertSnsReceivesOnly(
                 ArchiveComplete(
                   requestId,
-                  BagLocation(storageBucket.name, "archive", BagPath(s"$DigitisedStorageType/$bagIdentifier")),
+                  BagLocation(
+                    storageBucket.name,
+                    "archive",
+                    BagPath(s"$DigitisedStorageType/$bagIdentifier")),
                   Some(callbackUrl)
                 ),
                 topic
@@ -57,12 +57,7 @@ class ArchivistFeatureTest
 
   it("fails when ingesting an invalid bag") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          topic,
-          archivist) =>
+      case (ingestBucket, storageBucket, queuePair, topic, archivist) =>
         createAndSendBag(
           ingestBucket,
           Some(callbackUrl),
@@ -79,12 +74,7 @@ class ArchivistFeatureTest
 
   it("continues after bag with bad checksum") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          topic,
-          archivist) => {
+      case (ingestBucket, storageBucket, queuePair, topic, archivist) => {
 
         archivist.run()
 
@@ -185,12 +175,18 @@ class ArchivistFeatureTest
                     Set(
                       ArchiveComplete(
                         requestId1,
-                        BagLocation(storageBucket.name, "archive", BagPath(s"$DigitisedStorageType/$validBag1")),
+                        BagLocation(
+                          storageBucket.name,
+                          "archive",
+                          BagPath(s"$DigitisedStorageType/$validBag1")),
                         Some(callbackUrl)
                       ),
                       ArchiveComplete(
                         requestId2,
-                        BagLocation(storageBucket.name, "archive", BagPath(s"$DigitisedStorageType/$validBag2")),
+                        BagLocation(
+                          storageBucket.name,
+                          "archive",
+                          BagPath(s"$DigitisedStorageType/$validBag2")),
                         Some(callbackUrl)
                       )
                     ),
@@ -205,12 +201,7 @@ class ArchivistFeatureTest
 
   it("continues after non existing file referenced in manifest") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          topic,
-          archivist) => {
+      case (ingestBucket, storageBucket, queuePair, topic, archivist) => {
 
         archivist.run()
 
@@ -274,12 +265,7 @@ class ArchivistFeatureTest
 
   it("continues after zip file with no bag-info.txt") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          topic,
-          archivist) => {
+      case (ingestBucket, storageBucket, queuePair, topic, archivist) => {
 
         archivist.run()
 

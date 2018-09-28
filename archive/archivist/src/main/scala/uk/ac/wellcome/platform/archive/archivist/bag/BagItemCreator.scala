@@ -1,5 +1,10 @@
 package uk.ac.wellcome.platform.archive.archivist.bag
-import uk.ac.wellcome.platform.archive.common.models.{BagItem, BagPath, EntryPath, MalformedBagDigestException}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagItem,
+  BagPath,
+  EntryPath,
+  MalformedBagDigestException
+}
 
 import scala.util.Try
 

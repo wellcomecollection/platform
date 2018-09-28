@@ -9,7 +9,10 @@ import com.google.inject.Guice
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.archivist.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
@@ -18,17 +21,15 @@ import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
-trait Archivist
-    extends Messaging
-    with ZipBagItFixture {
+trait Archivist extends Messaging with ZipBagItFixture {
 
-  def sendBag[R](zipFile: ZipFile,
-                 ingestBucket: Bucket,
-                 callbackUri: Option[URI],
-                 queuePair: QueuePair)(
-    testWith: TestWith[(UUID, ObjectLocation), R]) = {
+  def sendBag[R](
+    zipFile: ZipFile,
+    ingestBucket: Bucket,
+    callbackUri: Option[URI],
+    queuePair: QueuePair)(testWith: TestWith[(UUID, ObjectLocation), R]) = {
     val fileName = s"${randomAlphanumeric()}.zip"
-      val uploadKey = s"upload/path/$fileName"
+    val uploadKey = s"upload/path/$fileName"
 
     s3Client.putObject(ingestBucket.name, uploadKey, new File(zipFile.getName))
 
@@ -47,7 +48,8 @@ trait Archivist
     queuePair: QueuePair,
     dataFileCount: Int = 12,
     createDigest: String => String = createValidDigest,
-    createDataManifest: List[(String, String)] => Option[FileEntry] = createValidDataManifest,
+    createDataManifest: List[(String, String)] => Option[FileEntry] =
+      createValidDataManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
     createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile)(
     testWith: TestWith[(UUID, ObjectLocation, String), R]) =
@@ -56,7 +58,8 @@ trait Archivist
       createDigest = createDigest,
       createDataManifest = createDataManifest,
       createBagItFile = createBagItFile,
-      createBagInfoFile = createBagInfoFile) {
+      createBagInfoFile = createBagInfoFile
+    ) {
       case (bagIdentifier, zipFile) =>
         sendBag(zipFile, ingestBucket, callbackUri, queuePair) {
           case (requestId, uploadObjectLocation) =>
@@ -64,9 +67,8 @@ trait Archivist
         }
     }
 
-  def withApp[R](storageBucket: Bucket,
-                 queuePair: QueuePair,
-                 topicArn: Topic)(testWith: TestWith[ArchivistApp, R]) = {
+  def withApp[R](storageBucket: Bucket, queuePair: QueuePair, topicArn: Topic)(
+    testWith: TestWith[ArchivistApp, R]) = {
     val archivist = new ArchivistApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(
@@ -85,28 +87,18 @@ trait Archivist
   }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchivistApp),
-                       R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchivistApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
-      withLocalSnsTopic {
-        snsTopic =>
-          withLocalS3Bucket {
-            ingestBucket =>
-              withLocalS3Bucket {
-                storageBucket =>
-                  withApp(storageBucket, queuePair, snsTopic) {
-                        archivist =>
-                          testWith(
-                            (
-                              ingestBucket,
-                              storageBucket,
-                              queuePair,
-                              snsTopic,
-                              archivist))
-                      }
+      withLocalSnsTopic { snsTopic =>
+        withLocalS3Bucket { ingestBucket =>
+          withLocalS3Bucket { storageBucket =>
+            withApp(storageBucket, queuePair, snsTopic) { archivist =>
+              testWith(
+                (ingestBucket, storageBucket, queuePair, snsTopic, archivist))
+            }
 
-              }
           }
+        }
       }
     })
   }

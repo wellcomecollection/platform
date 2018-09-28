@@ -81,7 +81,8 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
       )
 
       @tailrec
-      private def uploadIfAboveMinSize(byteString: ByteString, isLast: Boolean): Unit = {
+      private def uploadIfAboveMinSize(byteString: ByteString,
+                                       isLast: Boolean): Unit = {
         byteString.size match {
           case size if size < minSize && !isLast =>
             currentPart = byteString
@@ -89,14 +90,14 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
             uploadByteString(byteString)
             currentPart = ByteString.empty
           case _ =>
-            val (current,next) = byteString.splitAt(maxSize)
+            val (current, next) = byteString.splitAt(maxSize)
             uploadByteString(current)
-            if(next.nonEmpty) uploadIfAboveMinSize(next, isLast)
+            if (next.nonEmpty) uploadIfAboveMinSize(next, isLast)
         }
       }
 
       private def uploadByteString(byteString: ByteString): Unit = {
-        if(byteString.nonEmpty) {
+        if (byteString.nonEmpty) {
           val triedUploadResult = getUploadId.flatMap { uploadId =>
             val inputStream = new ByteArrayInputStream(byteString.toArray)
             Try(
@@ -133,7 +134,7 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           case Success(result) =>
             debug("Upload completed successfully")
             push(out, Try(result))
-          case Failure(ex)     =>
+          case Failure(ex) =>
             error("Failure while completing upload", ex)
             handleInternalFailure(ex)
         }

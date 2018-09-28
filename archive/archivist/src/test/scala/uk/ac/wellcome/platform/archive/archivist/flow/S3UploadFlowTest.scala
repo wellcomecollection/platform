@@ -16,7 +16,12 @@ import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.util.Failure
 
-class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka with PatienceConfiguration{
+class S3UploadFlowTest
+    extends FunSpec
+    with S3
+    with ScalaFutures
+    with Akka
+    with PatienceConfiguration {
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(
     timeout = scaled(Span(40, Seconds)),
@@ -77,7 +82,8 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka with 
 
           // list of bytestrings of 1KB each
           val byteStringList = res.grouped(1024).map(ByteString(_))
-          val futureResult = Source.fromIterator(() => byteStringList)
+          val futureResult = Source
+            .fromIterator(() => byteStringList)
             .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
             .runWith(Sink.head)
 
@@ -85,7 +91,8 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka with 
             triedResult.get.getBucketName shouldBe bucket.name
             triedResult.get.getKey shouldBe s3Key
 
-            val actualObjectStream = s3Client.getObject(bucket.name, s3Key).getObjectContent
+            val actualObjectStream =
+              s3Client.getObject(bucket.name, s3Key).getObjectContent
             val actualBytes = IOUtils.toByteArray(actualObjectStream)
 
             actualBytes shouldBe res
@@ -99,12 +106,11 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka with 
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-
           val res = Array.fill(23 * 1024 * 1024)(
             (scala.util.Random.nextInt(256) - 128).toByte)
           val s3Key = "key.txt"
           val futureResult = Source
-            // one bytestring of 23MB
+          // one bytestring of 23MB
             .single(ByteString(res))
             .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
             .runWith(Sink.seq)
@@ -130,18 +136,21 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka with 
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-
-          val smallArray1 = Array.fill(1024)(
-            (scala.util.Random.nextInt(256) - 128).toByte)
+          val smallArray1 =
+            Array.fill(1024)((scala.util.Random.nextInt(256) - 128).toByte)
 
           val bigArray = Array.fill(23 * 1024 * 1024)(
             (scala.util.Random.nextInt(256) - 128).toByte)
 
-          val smallArray2 = Array.fill(1024)(
-            (scala.util.Random.nextInt(256) - 128).toByte)
+          val smallArray2 =
+            Array.fill(1024)((scala.util.Random.nextInt(256) - 128).toByte)
 
           val s3Key = "key.txt"
-          val futureResult = Source(List(ByteString(smallArray1), ByteString(bigArray), ByteString(smallArray2)))
+          val futureResult = Source(
+            List(
+              ByteString(smallArray1),
+              ByteString(bigArray),
+              ByteString(smallArray2)))
             .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
             .runWith(Sink.seq)
 

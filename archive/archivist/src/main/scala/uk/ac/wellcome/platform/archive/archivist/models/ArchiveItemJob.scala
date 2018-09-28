@@ -1,6 +1,10 @@
 package uk.ac.wellcome.platform.archive.archivist.models
 
-import uk.ac.wellcome.platform.archive.common.models.{BagItem, BagLocation, EntryPath}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagItem,
+  BagLocation,
+  EntryPath
+}
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class ArchiveItemJob(archiveJob: ArchiveJob, bagDigestItem: BagItem) {

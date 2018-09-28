@@ -4,7 +4,9 @@ import java.util.zip.ZipFile
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 
 // Useful test to troubleshoot running the archivist using a local bagfile
 class TroubleshootArchivistLocalBagFileTest
@@ -15,12 +17,7 @@ class TroubleshootArchivistLocalBagFileTest
 
   ignore("downloads, uploads and verifies a known BagIt bag") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          _,
-          archivist) =>
+      case (ingestBucket, storageBucket, queuePair, _, archivist) =>
         sendBag(
           new ZipFile(
             List(
