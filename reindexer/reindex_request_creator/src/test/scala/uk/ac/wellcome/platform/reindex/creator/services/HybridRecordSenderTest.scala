@@ -15,9 +15,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class HybridRecordSenderTest
     extends FunSpec
     with Matchers
-    with IntegrationPatience
     with MockitoSugar
     with ScalaFutures
+    with IntegrationPatience
     with SNS {
 
   val hybridRecords = List("miro/1", "miro/2", "miro/3").map { id =>
