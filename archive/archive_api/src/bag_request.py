@@ -1,10 +1,6 @@
 # -*- encoding: utf-8
-import daiquiri
+
 import json
-
-from werkzeug.exceptions import NotFound as NotFoundError
-
-logger = daiquiri.getLogger()
 
 
 def bag_request(dynamodb_resource, table_name, s3_client, bucket_name, id):
@@ -21,6 +17,6 @@ def bag_request(dynamodb_resource, table_name, s3_client, bucket_name, id):
             Key=item_response['Item']['s3key']
         )
     except KeyError:
-        raise NotFoundError(f'No bag found for id={id!r}')
+        raise ValueError(f'No bag found for id={id!r}')
 
     return json.loads(response['Body'].read())
