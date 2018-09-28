@@ -13,8 +13,6 @@ object Main extends App with AkkaHttpApp {
     new AppConfigModule(args),
     ConfigModule,
     AkkaModule,
-    RequestHandlerModule,
-    HttpStreamModule,
     ProgressMonitorModule
   )
 

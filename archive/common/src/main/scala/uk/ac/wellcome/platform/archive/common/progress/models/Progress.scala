@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.time.Instant
+import java.util.UUID
 
 case class Progress(
   id: String,
@@ -25,6 +26,16 @@ object Progress {
   case object Processing extends Status
   case object Completed extends Status
   case object Failed extends Status
+
+  def apply(createRequest: ProgressCreateRequest): Progress = {
+    Progress(
+      id = generateId,
+      uploadUrl = createRequest.uploadUrl,
+      callbackUrl = createRequest.callbackUrl
+    )
+  }
+
+  private def generateId = UUID.randomUUID().toString
 }
 
 case class ProgressEvent(description: String, time: Instant = Instant.now)
@@ -33,3 +44,5 @@ case class ProgressUpdate(id: String,
                           event: ProgressEvent,
                           status: Progress.Status = Progress.None)
 case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
+
+case class ProgressCreateRequest(uploadUrl: String, callbackUrl: Option[String])

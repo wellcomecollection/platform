@@ -27,9 +27,6 @@ class ProgressUpdateAndPublishFlowTest
     with ProgressMonitorFixture
     with ScalaFutures {
 
-  private val uploadUrl = "uploadUrl"
-  private val callbackUrl = "http://localhost/archive/complete"
-
   it("updates progress and publishes status") {
     withLocalSnsTopic { topic =>
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
@@ -46,7 +43,7 @@ class ProgressUpdateAndPublishFlowTest
               val event = ProgressEvent("Run!")
               val status = Progress.Failed
 
-              val progress = createProgress(uploadUrl, callbackUrl, monitor)
+              val progress = createProgress(monitor, callbackUrl, uploadUrl)
               val update = ProgressUpdate(progress.id, event, status)
 
               val expectedProgress = progress.copy(

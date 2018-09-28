@@ -28,6 +28,7 @@ object Dependencies {
 
   lazy val versions = new {
     val akka = "2.5.9"
+    val akkaHttp = "10.1.5"
     val akkaStreamAlpakka = "0.20"
     val aws = "1.11.95"
     val apacheLogging = "2.8.2"
@@ -184,6 +185,8 @@ object Dependencies {
   val archiveCommonDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
     "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
-    "org.rogach" %% "scallop" % "3.1.3"
+    "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
+    "org.rogach" %% "scallop" % "3.1.3",
+    "de.heikoseeberger" %% "akka-http-circe" % "1.22.0"
   ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 }

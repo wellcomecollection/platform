@@ -24,9 +24,6 @@ class ProgressMonitorTest
     with ProgressMonitorFixture
     with ScalaFutures {
 
-  private val uploadUrl = "uploadUrl"
-  private val callbackUrl = "http://localhost/archive/complete"
-
   describe("create") {
     it("creates a progress monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
@@ -94,7 +91,7 @@ class ProgressMonitorTest
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { progressMonitor =>
           val progress =
-            createProgress(uploadUrl, callbackUrl, progressMonitor)
+            createProgress(progressMonitor, callbackUrl, uploadUrl)
 
           val result = progressMonitor.get(progress.id)
 
@@ -111,7 +108,7 @@ class ProgressMonitorTest
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { progressMonitor =>
           val progress =
-            createProgress(uploadUrl, callbackUrl, progressMonitor)
+            createProgress(progressMonitor, callbackUrl, uploadUrl)
 
           val result = progressMonitor.get("not_the_id_we_created")
 
@@ -153,7 +150,7 @@ class ProgressMonitorTest
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { archiveProgressMonitor =>
           val progress =
-            createProgress(uploadUrl, callbackUrl, archiveProgressMonitor)
+            createProgress(archiveProgressMonitor, callbackUrl, uploadUrl)
 
           val progressUpdate = ProgressUpdate(
             progress.id,
@@ -179,11 +176,7 @@ class ProgressMonitorTest
     it("adds multiple events to a monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { monitor: ProgressMonitor =>
-          val progress = createProgress(
-            uploadUrl,
-            callbackUrl,
-            monitor
-          )
+          val progress = createProgress(monitor, callbackUrl, uploadUrl)
 
           val updates = List(
             ProgressUpdate(

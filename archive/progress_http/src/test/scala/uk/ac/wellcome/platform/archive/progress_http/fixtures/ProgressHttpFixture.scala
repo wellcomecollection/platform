@@ -2,10 +2,13 @@ package uk.ac.wellcome.platform.archive.progress_http.fixtures
 
 import java.util.UUID
 
-import akka.http.scaladsl.model.HttpEntity
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import akka.stream.Materializer
 import com.google.inject.Guice
 import io.circe.Decoder
+import org.scalatest.concurrent.ScalaFutures
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.platform.archive.common.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archive.common.modules._
@@ -20,21 +23,16 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.concurrent.duration._
-import uk.ac.wellcome.json.JsonUtil._
-
 import scala.concurrent.ExecutionContext.Implicits.global
-
+import scala.concurrent.duration._
 import scala.util.Random
 
 trait ProgressHttpFixture
   extends AkkaS3
     with LocalDynamoDb
+    with ScalaFutures
     with ProgressMonitorFixture
     with Messaging {
-
-  val uploadUrl = "uploadUrl"
-  val callbackUrl = "http://localhost/archive/complete"
 
   import ProgressModel._
 
@@ -88,8 +86,6 @@ trait ProgressHttpFixture
         ConfigModule,
         AkkaModule,
         CloudWatchClientModule,
-        HttpStreamModule,
-        RequestHandlerModule,
         ProgressMonitorModule
       )
     }
@@ -100,10 +96,9 @@ trait ProgressHttpFixture
 
     val host = "localhost"
     val port = randomPort
-
-    val serverConfig = HttpServerConfig(host, port)
-
     val baseUrl = s"http://$host:$port"
+
+    val serverConfig = HttpServerConfig(host, port, baseUrl)
 
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) {
       table =>
@@ -125,4 +120,12 @@ trait ProgressHttpFixture
 
     fromJson[T](stringBody).get
   }
+
+  def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]) =
+    withActorSystem { actorSystem =>
+      implicit val system = actorSystem
+
+      val request = Http().singleRequest(r)
+      whenReady(request) { result => testWith(result) }
+    }
 }

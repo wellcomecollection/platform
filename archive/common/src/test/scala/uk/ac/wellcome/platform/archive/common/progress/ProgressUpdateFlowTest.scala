@@ -22,9 +22,6 @@ class ProgressUpdateFlowTest
     with ProgressMonitorFixture
     with ScalaFutures {
 
-  private val uploadUrl = "uploadUrl"
-  private val callbackUrl = "http://localhost/archive/complete"
-
   it("adds an event to a monitor with none") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressUpdateFlow(table) {
@@ -32,7 +29,7 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
               val progress =
-                createProgress(uploadUrl, callbackUrl, monitor)
+                createProgress(monitor, callbackUrl, uploadUrl)
 
               val update = ProgressUpdate(progress.id, ProgressEvent("Wow."))
 
@@ -66,11 +63,7 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
 
-              val progress = createProgress(
-                uploadUrl,
-                callbackUrl,
-                monitor
-              )
+              val progress = createProgress(monitor, callbackUrl, uploadUrl)
 
               val events = List(
                 ProgressUpdate(

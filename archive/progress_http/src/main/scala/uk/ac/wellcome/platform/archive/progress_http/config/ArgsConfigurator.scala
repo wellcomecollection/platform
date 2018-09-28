@@ -32,6 +32,9 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   val appHost =
     opt[String](required = true, default = Some("localhost"))
 
+  val appBaseUrl =
+    opt[String](required = true)
+
   verify()
 
   val cloudwatchClientConfig = CloudwatchClientConfig(
@@ -59,7 +62,8 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   val httpServerConfig = HttpServerConfig(
     host = appHost(),
-    port = appPort()
+    port = appPort(),
+    externalBaseUrl = appBaseUrl(),
   )
 
   val appConfig = ProgressHttpConfig(

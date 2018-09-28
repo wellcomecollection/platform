@@ -25,6 +25,9 @@ trait ProgressMonitorFixture
     extends LocalProgressMonitorDynamoDb
     with MockitoSugar {
 
+  val uploadUrl = "uploadUrl"
+  val callbackUrl = "http://localhost/archive/complete"
+
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
       Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
@@ -60,9 +63,11 @@ trait ProgressMonitorFixture
     testWith(progressMonitor)
   }
 
-  def createProgress(uploadUrl: String,
-                     callbackUrl: String,
-                     progressMonitor: ProgressMonitor): Progress = {
+  def createProgress(
+                      progressMonitor: ProgressMonitor,
+                      callbackUrl: String = callbackUrl,
+                      uploadUrl: String = uploadUrl
+                    ): Progress = {
     val id = UUID.randomUUID().toString
 
     progressMonitor.create(
