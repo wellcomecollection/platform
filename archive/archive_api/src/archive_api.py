@@ -14,6 +14,7 @@ import config
 import validators
 
 from bag_request import bag_request
+from bags import fetch_bag
 from ingests import (
     IngestProgress,
     create_ingest_progress,
@@ -139,7 +140,7 @@ class BagResource(Resource):
     def get(self, id):
         """Get the bag associated with an id"""
         try:
-            result = bag_request(
+            result = fetch_bag(
                 dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
                 table_name=app.config['BAG_VHS_TABLE_NAME'],
                 s3_client=app.config['S3_CLIENT'],
