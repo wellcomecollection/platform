@@ -37,7 +37,13 @@ class TestBags:
         s3_client.put_object(Bucket=bucket_bag, Key=bag_id, Body=json.dumps(stored_bag))
 
         table = dynamodb_resource.Table(table_name_bag)
-        table.put_item(Item={'id': bag_id, 's3key': bag_id})
+        table.put_item(Item={
+            'id': bag_id,
+            'location': {
+                'key': bag_id,
+                'namespace': bucket_bag
+            }
+        })
 
         resp = client.get(f'/storage/v1/bags/{bag_id}')
         assert resp.status_code == 200

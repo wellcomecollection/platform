@@ -80,8 +80,13 @@ def given_bag_in_vhs(bag_id, stored_bag, dynamodb_client, s3_client, bucket_bag,
             'id': {
                 'S': bag_id
             },
-            's3key': {
-                'S': key
+            'location': {
+                'key': {
+                    'S': key
+                },
+                'namespace': {
+                    'S': bucket_bag
+                }
             }
         }
     )
