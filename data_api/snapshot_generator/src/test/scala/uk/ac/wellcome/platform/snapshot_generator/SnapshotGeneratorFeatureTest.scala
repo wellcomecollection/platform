@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.snapshot_generator
 import java.io.File
 
 import com.amazonaws.services.s3.model.GetObjectRequest
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v1.DisplayV1SerialisationTestBase
@@ -22,7 +22,6 @@ import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 
@@ -39,7 +38,7 @@ class SnapshotGeneratorFeatureTest
     with CloudWatch
     with GzipUtils
     with JsonAssertions
-    with ExtendedPatience
+    with IntegrationPatience
     with ElasticsearchFixtures
     with DisplayV1SerialisationTestBase
     with WorksGenerators {
