@@ -3,7 +3,7 @@
 import json
 import pytest
 
-from bag_request import (
+from bags import (
     bag_request
 )
 
