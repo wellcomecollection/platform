@@ -4,7 +4,7 @@ import json
 import pytest
 
 from bags import (
-    bag_request
+    fetch_bag
 )
 
 
@@ -21,7 +21,7 @@ def test_looks_up_bag(dynamodb_client, dynamodb_resource, s3_client, bucket_bag,
         table_name_bag
     )
 
-    response = bag_request(
+    response = fetch_bag(
         dynamodb_resource,
         table_name_bag,
         s3_client,
