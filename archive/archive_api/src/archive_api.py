@@ -145,7 +145,7 @@ class BagResource(Resource):
             )
             return jsonify(result)
         except ValueError as error:
-            raise NotFoundError(error)
+            raise NotFoundError(str(error))
 
 
 @app.route('/storage/v1/healthcheck')
