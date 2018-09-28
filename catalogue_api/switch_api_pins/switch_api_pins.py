@@ -191,5 +191,6 @@ if __name__ == '__main__':
     print('Triggering terraform update...')
     subprocess.check_call(['make', 'catalogue_api-terraform-plan'], cwd=ROOT)
 
+    print('')
     print('Once the change has successfully deployed, you can remove the')
     print('pins for the staging API.')
