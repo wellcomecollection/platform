@@ -49,9 +49,18 @@ def _aws_credentials_args():
             '--env', 'AWS_DEFAULT_REGION=%s' % os.environ.get('AWS_DEFAULT_REGION', ''),
         ])
     else:
+        # If we're running this script from inside another Docker image,
+        # we need to make sure we still mount the correct AWS directory
+        # in the new container.
+        try:
+            user_dir = os.environ['USER_DIR']
+        except KeyError:
+            user_dir = os.environ['HOME']
+
         print('*** Missing environment variable, using ~/.aws')
-        aws_path = os.path.join(os.environ['HOME'], '.aws')
+        aws_path = os.path.join(user_dir, '.aws')
         cmd.extend(['--volume', '%s:/root/.aws' % aws_path])
+        cmd.extend(['--env', 'USER_DIR=%s' % user_dir])
 
     return cmd
 
@@ -67,6 +76,10 @@ def parse_args():
     parser.add_argument(
         '--dind', dest='docker_in_docker', action='store_const', const=True,
         help='Whether to allow this container to run Docker'
+    )
+    parser.add_argument(
+        '--repo', dest='repo', action='store_const', const=True,
+        help='Whether to mount the entire repo at /repo in the container'
     )
     parser.add_argument(
         '--sbt', dest='share_sbt_dirs', action='store_const', const=True,
@@ -87,8 +100,11 @@ if __name__ == '__main__':
     if namespace.share_aws_creds:
         cmd += _aws_credentials_args()
 
+    if namespace.docker_in_docker or namespace.repo:
+        cmd += ['--volume', '%s:%s' % (ROOT, ROOT)]
+        cmd += ['--workdir', ROOT]
+
     if namespace.docker_in_docker:
-        cmd += ['--volume', '%s:/repo' % ROOT]
         cmd += ['--volume', '/var/run/docker.sock:/var/run/docker.sock']
 
     if namespace.share_sbt_dirs:
