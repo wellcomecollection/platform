@@ -1,3 +1,9 @@
+data "aws_acm_certificate" "iiif_wc_org" {
+  domain   = "iiif.wellcomecollection.org"
+  statuses = ["ISSUED"]
+  provider = "aws.us_east_1"
+}
+
 resource "aws_cloudfront_distribution" "loris" {
   origin {
     domain_name = "iiif-origin.wellcomecollection.org"
@@ -41,7 +47,7 @@ resource "aws_cloudfront_distribution" "loris" {
   price_class = "PriceClass_100"
 
   viewer_certificate {
-    acm_certificate_arn      = "${var.iiif_acm_cert_arn}"
+    acm_certificate_arn      = "${data.aws_acm_certificate.iiif_wc_org.arn}"
     minimum_protocol_version = "TLSv1"
     ssl_support_method       = "sni-only"
   }

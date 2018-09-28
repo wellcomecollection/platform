@@ -15,8 +15,6 @@ module "data_api" {
   infra_bucket = "${var.infra_bucket}"
   key_name     = "${var.key_name}"
 
-  data_acm_cert_arn = "${var.data_acm_cert_arn}"
-
   es_cluster_credentials = "${var.es_cluster_credentials}"
 
   es_config_snapshot = "${local.prod_es_config}"
