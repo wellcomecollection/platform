@@ -119,12 +119,15 @@ class IngestResource(Resource):
     @ns_ingests.response(404, 'Ingest not found', models.Error)
     def get(self, id):
         """Get the current status of an ingest request"""
-        result = report_ingest_status(
-            dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
-            table_name=app.config['DYNAMODB_TABLE_NAME'],
-            guid=id
-        )
-        return jsonify(result)
+        try:
+            result = report_ingest_status(
+                dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
+                table_name=app.config['DYNAMODB_TABLE_NAME'],
+                guid=id
+            )
+            return jsonify(result)
+        except ValueError as error:
+            raise BadRequestError(f"Invalid id: {error}")
 
 
 @ns_bags.route('/<string:id>')
@@ -145,7 +148,7 @@ class BagResource(Resource):
             )
             return jsonify(result)
         except ValueError as error:
-            raise NotFoundError(str(error))
+            raise NotFoundError(f"Invalid id: {error}")
 
 
 @app.route('/storage/v1/healthcheck')

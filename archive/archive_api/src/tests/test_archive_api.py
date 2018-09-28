@@ -19,7 +19,7 @@ class TestReportIngestStatus:
     def test_lookup_missing_item_is_404(self, client, guid):
         resp = client.get(f'/storage/v1/ingests/{guid}')
         assert resp.status_code == 404
-        assert (b'No ingest found for id=%r' % guid) in resp.data
+        assert (b'Invalid id: No ingest found for id=%r' % guid) in resp.data
 
     def test_post_against_lookup_endpoint_is_405(self, client, guid):
         resp = client.post(f'/storage/v1/ingests/{guid}')
@@ -46,7 +46,7 @@ class TestBags:
     def test_lookup_missing_item_is_404(self, client, bag_id):
         resp = client.get(f'/storage/v1/bags/{bag_id}')
         assert resp.status_code == 404
-        assert (b'No bag found for id=%r' % bag_id) in resp.data
+        assert (b'Invalid id: No bag found for id=%r' % bag_id) in resp.data
 
 
 class TestRequestNewIngest:
