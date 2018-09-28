@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.archivist.generators
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
-import uk.ac.wellcome.platform.archive.common.models.{BagItem, BagLocation, BagPath, EntryPath}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 

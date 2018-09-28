@@ -24,7 +24,10 @@ object ArchiveItemJobCreator extends Logging {
       }
       .map(_.flatten)
       .toEither
-      .leftMap(_ => job)
+      .leftMap(ex => {
+        error(s"Failed creating archive item jobs from $job", ex)
+        job
+      })
   }
 
   private def parseArchiveItemJobs(

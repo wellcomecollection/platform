@@ -3,7 +3,7 @@ import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, EntryPath}
+import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, DigitisedStorageType, EntryPath}
 
 import scala.util.Try
 

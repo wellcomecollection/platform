@@ -3,14 +3,12 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveItemJob,
-  ArchiveJob
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob}
 import cats.implicits._
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveItemJobCreator
 
-object ArchiveJobFlow {
+object ArchiveJobFlow extends Logging {
   def apply(delimiter: String, parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[ArchiveJob, Either[ArchiveJob, ArchiveJob], NotUsed] =
     Flow[ArchiveJob]
@@ -20,7 +18,10 @@ object ArchiveJobFlow {
         FoldEitherFlow[
           ArchiveJob,
           List[ArchiveItemJob],
-          Either[ArchiveJob, ArchiveJob]](Left(_))(
+          Either[ArchiveJob, ArchiveJob]](job => {
+          warn(s"$job failed creating archive item jobs")
+          Left(job)
+        })(
           mapReduceArchiveItemJobs(delimiter, parallelism)))
 
   private def mapReduceArchiveItemJobs(delimiter: String, parallelism: Int)(

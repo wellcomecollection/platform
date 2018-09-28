@@ -17,7 +17,10 @@ object ArchiveItemJobFlow extends Logging {
         FoldEitherFlow[
           ArchiveItemJob,
           ArchiveItemJob,
-          Either[ArchiveItemJob, ArchiveItemJob]](ifLeft = job => Left(job))(
+          Either[ArchiveItemJob, ArchiveItemJob]](ifLeft = job => {
+            warn(s"job $job uploading and verifying failed")
+            Left(job)
+        })(
           ifRight = DownloadItemFlow(parallelism)))
       .log("download verified")
   }

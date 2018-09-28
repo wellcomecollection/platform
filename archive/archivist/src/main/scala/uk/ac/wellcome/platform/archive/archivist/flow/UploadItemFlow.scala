@@ -27,7 +27,10 @@ object UploadItemFlow extends Logging {
         FoldEitherFlow[
           ArchiveItemJob,
           (ArchiveItemJob, InputStream),
-          Either[ArchiveItemJob, ArchiveItemJob]](j => Left(j))(
+          Either[ArchiveItemJob, ArchiveItemJob]](j => {
+          warn(s"Failed extracting inputStream for $j")
+          Left(j)
+        })(
           UploadInputStreamFlow(parallelism)))
   }
 
