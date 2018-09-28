@@ -6,15 +6,22 @@ import akka.stream.scaladsl.{Concat, Sink, Source, StreamConverters}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.util.ByteString
 import com.amazonaws.services.s3.model.ListMultipartUploadsRequest
+import org.apache.commons.io.IOUtils
 import org.scalatest.FunSpec
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
+import org.scalatest.time.{Millis, Seconds, Span}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.util.Failure
 
-class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka {
+class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka with PatienceConfiguration{
+
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
+    timeout = scaled(Span(40, Seconds)),
+    interval = scaled(Span(150, Millis))
+  )
 
   it("writes a stream of bytestring to S3") {
     withActorSystem { implicit actorSystem =>
@@ -32,6 +39,31 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka {
             triedResult.get.getKey shouldBe s3Key
 
             getContentFromS3(bucket, s3Key) shouldBe content
+          }
+        }
+      }
+    }
+  }
+
+  it("writes a stream from a jp2 to S3") {
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withLocalS3Bucket { bucket =>
+          val s3Key = "key.txt"
+          val futureResult = StreamConverters
+            .fromInputStream(() => getClass.getResourceAsStream("/b22454408_0001.jp2"))
+            .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
+            .runWith(Sink.head)
+
+          whenReady(futureResult) { triedResult =>
+            triedResult.get.getBucketName shouldBe bucket.name
+            triedResult.get.getKey shouldBe s3Key
+
+            val actualObjectStream = s3Client.getObject(bucket.name, s3Key).getObjectContent
+            val actualBytes = IOUtils.toByteArray(actualObjectStream)
+
+            val expectedBytes = IOUtils.toByteArray(getClass.getResourceAsStream("/b22454408_0001.jp2"))
+            actualBytes shouldBe expectedBytes
           }
         }
       }
@@ -63,7 +95,7 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          val res = Array.fill(13 * 1024 * 1024)(
+          val res = Array.fill(23 * 1024 * 1024)(
             (scala.util.Random.nextInt(256) - 128).toByte)
           val s3Key = "key.txt"
           val futureResult = Source

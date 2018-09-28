@@ -47,7 +47,11 @@ object Dependencies {
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
     val wiremockVersion = "2.18.0"
+    val apacheCommons = "2.6"
   }
+
+  val apacheCommons = Seq(
+    "commons-io" % "commons-io" % versions.apacheCommons % "test")
 
   // External Library dependency groups
   val akkaDependencies: Seq[ModuleID] = Seq(
@@ -137,7 +141,7 @@ object Dependencies {
       circeDependencies ++ Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
     "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
-  )
+  ) ++ apacheCommons
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 

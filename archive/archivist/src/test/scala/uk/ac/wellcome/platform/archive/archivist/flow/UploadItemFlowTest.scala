@@ -62,6 +62,43 @@ class UploadItemFlowTest
   }
 
   it(
+    "sends a left of archive item job when uploading a file with wrong digest") {
+    withLocalS3Bucket { bucket =>
+      withActorSystem { implicit actorSystem =>
+        withMaterializer(actorSystem) { implicit materializer =>
+          val fileContent = "bah buh bih beh"
+
+          val fileName = "key.txt"
+          withZipFile(List(FileEntry(s"$fileName", fileContent))) {
+            zipFile =>
+              val digest =
+                "wrong!"
+
+              val bagIdentifier = randomAlphanumeric()
+
+              val archiveItemJob = createArchiveItemJob(
+                zipFile,
+                bucket,
+                digest,
+                bagIdentifier,
+                fileName)
+
+              val source = Source.single(archiveItemJob)
+              val flow = UploadItemFlow(10)(s3Client)
+              val futureResult = source via flow runWith Sink.head
+
+              whenReady(futureResult) { result =>
+                result shouldBe Left(archiveItemJob)
+                getContentFromS3(bucket, s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
+              }
+
+          }
+        }
+      }
+    }
+  }
+
+  it(
     "sends a left of archive item job when uploading a file fails because the file does not exist") {
     withLocalS3Bucket { bucket =>
       withActorSystem { implicit actorSystem =>
