@@ -82,4 +82,3 @@ def given_bag_in_vhs(bag_id, stored_bag, dynamodb_resource, s3_client, bucket_ba
             'namespace': bucket_bag
         }
     })
-
