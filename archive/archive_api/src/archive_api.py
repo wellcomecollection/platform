@@ -9,15 +9,15 @@ from flask_restplus import Api, Resource
 from flask import jsonify, make_response, request
 from werkzeug.exceptions import BadRequest as BadRequestError
 
-from report_ingest_status import report_ingest_status
-from request_new_ingest import send_new_ingest_request
-
-from create_ingest_progress import (
-    IngestProgress,
-    create_ingest_progress
-)
 import config
 import validators
+
+from ingests import (
+    IngestProgress,
+    create_ingest_progress,
+    report_ingest_status,
+    send_new_ingest_request
+)
 
 app = Flask(__name__)
 api = Api(app,
@@ -147,3 +147,7 @@ def default_error_handler(error):
         else:
             error_response['description'] = getattr(error, 'description', str(error))
     return jsonify(error_response), error_response['httpStatus']
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

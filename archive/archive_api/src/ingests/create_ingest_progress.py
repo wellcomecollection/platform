@@ -1,8 +1,10 @@
 # -*- encoding: utf-8
 
-from uuid import UUID
-from datetime import (datetime, timezone)
+from datetime import datetime, timezone
+
 from botocore.exceptions import ClientError
+
+from validators import validate_uuid
 
 
 class IngestProgress(object):
@@ -14,7 +16,13 @@ class IngestProgress(object):
     }
 
     def __init__(self, id, bag_url, callback_url=None):
-        self.validateId(id)
+        try:
+            validate_uuid(id)
+        except ValueError:
+            raise ValueError(
+                f'Cannot create IngestProgress.  id={id!r} is not a valid ID.'
+            )
+
         self.id = id
 
         self.uploadUrl = bag_url
@@ -24,12 +32,6 @@ class IngestProgress(object):
 
         self.createdDate = self.nowIsoFormatted()
         self.lastModifiedDate = self.nowIsoFormatted()
-
-    def validateId(self, id):
-        try:
-            UUID(id)
-        except ValueError:
-            raise ValueError(f"Cannot create IngestProgress, invalid id '{id}'.")
 
     def dict_with_static_data(self):
         """
@@ -59,3 +61,5 @@ def create_ingest_progress(ingest_progress, dynamodb_resource, table_name):
     except ClientError as e:
         if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
             raise ValueError(f"Cannot create IngestProgress, id already exists '{ingest_progress.id}'.")
+        else:
+            raise

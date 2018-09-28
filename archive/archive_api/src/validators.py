@@ -1,6 +1,7 @@
 # -*- encoding: utf-8
 
 from urllib.parse import urlparse
+from uuid import UUID
 
 
 def validate_single_url(url, supported_schemes=None, allow_fragment=True):
@@ -29,3 +30,16 @@ def validate_single_url(url, supported_schemes=None, allow_fragment=True):
 
     if errors:
         raise ValueError(', '.join(errors))
+
+
+def validate_uuid(s):
+    """
+    Check that the string ``s`` is a valid UUID.
+
+    Raises ``ValueError`` if the string fails validation.
+
+    """
+    try:
+        UUID(s)
+    except ValueError:
+        raise ValueError(f'Invalid id={s!r}')

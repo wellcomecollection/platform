@@ -3,7 +3,9 @@
 import pytest
 from datetime import (datetime, timezone, timedelta)
 
-from create_ingest_progress import (
+from botocore.exceptions import ClientError
+
+from ingests import (
     IngestProgress,
     create_ingest_progress
 )
@@ -35,7 +37,7 @@ def test_creates_ingest_progress_with_callback(dynamodb_resource, table_name, gu
 
 
 def test_raises_if_id_is_invalid(dynamodb_resource, table_name):
-    with pytest.raises(ValueError, match="Cannot create IngestProgress, invalid id ''."):
+    with pytest.raises(ValueError, match='is not a valid ID'):
         create_ingest_progress(
             IngestProgress("", bag_url, callback_url),
             dynamodb_resource,
@@ -53,6 +55,16 @@ def test_raises_if_id_is_already_saved(dynamodb_resource, table_name, guid):
             IngestProgress(guid, bag_url, callback_url),
             dynamodb_resource,
             table_name)
+
+
+def test_raises_for_all_other_errors(dynamodb_resource, guid):
+    with pytest.raises(ClientError) as err:
+        create_ingest_progress(
+            IngestProgress(guid, bag_url, callback_url),
+            dynamodb_resource=dynamodb_resource,
+            table_name='DoesNotExist'
+        )
+    assert err.value.response['Error']['Code'] == 'ResourceNotFoundException'
 
 
 def initialised_progress_item(guid, upload_url, callback_url=None):
