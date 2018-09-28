@@ -25,4 +25,4 @@ $(ROOT)/.docker/switch_api_pins: $(SWITCH_API_PINS)/Dockerfile $(SWITCH_API_PINS
 	touch $(ROOT)/.docker/switch_api_pins
 
 catalogue_api-terraform-switch: $(ROOT)/.docker/switch_api_pins
-	$(ROOT)/docker_run.py --aws --root -- switch_api_pins
+	$(ROOT)/docker_run.py --aws --repo -- switch_api_pins
