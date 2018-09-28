@@ -127,7 +127,7 @@ class IngestResource(Resource):
             )
             return jsonify(result)
         except ValueError as error:
-            raise BadRequestError(f"Invalid id: {error}")
+            raise NotFoundError(f"Invalid id: {error}")
 
 
 @ns_bags.route('/<string:id>')
