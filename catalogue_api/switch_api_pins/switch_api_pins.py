@@ -8,6 +8,7 @@ so you can create a new set of pins.
 import difflib
 import json
 import os
+import subprocess
 import sys
 
 import attr
@@ -16,7 +17,16 @@ import hcl
 import requests
 
 
-API_DIR = '/repo/catalogue_api'
+try:
+    API_DIR = os.path.join(
+        subprocess.check_output([
+            'git', 'rev-parse', '--show-toplevel']).strip().decode('utf8'),
+        'catalogue_api'
+    )
+except subprocess.CalledProcessError:
+    # Running inside a container
+    API_DIR = '/repo/catalogue_api'
+
 API_TF = os.path.join(API_DIR, 'terraform')
 
 
