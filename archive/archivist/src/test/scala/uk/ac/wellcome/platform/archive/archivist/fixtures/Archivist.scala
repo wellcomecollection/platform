@@ -14,18 +14,12 @@ import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Archivist
-    extends LocalDynamoDb
-    with ProgressMonitorFixture
-    with Messaging
+    extends Messaging
     with ZipBagItFixture {
 
   def sendBag[R](zipFile: ZipFile,
@@ -72,29 +66,26 @@ trait Archivist
 
   def withApp[R](storageBucket: Bucket,
                  queuePair: QueuePair,
-                 topicArn: Topic,
-                 progressTable: Table)(testWith: TestWith[ArchivistApp, R]) = {
+                 topicArn: Topic)(testWith: TestWith[ArchivistApp, R]) = {
     val archivist = new ArchivistApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(
           queuePair.queue.url,
           storageBucket.name,
-          topicArn.arn,
-          progressTable),
+          topicArn.arn),
         ConfigModule,
         AkkaModule,
         S3ClientModule,
         CloudWatchClientModule,
         SQSClientModule,
-        SNSAsyncClientModule,
-        ProgressMonitorModule
+        SNSAsyncClientModule
       )
     }
     testWith(archivist)
   }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Table, ArchivistApp),
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchivistApp),
                        R]) = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
       withLocalSnsTopic {
@@ -103,9 +94,7 @@ trait Archivist
             ingestBucket =>
               withLocalS3Bucket {
                 storageBucket =>
-                  withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) {
-                    progressTable =>
-                      withApp(storageBucket, queuePair, snsTopic, progressTable) {
+                  withApp(storageBucket, queuePair, snsTopic) {
                         archivist =>
                           testWith(
                             (
@@ -113,10 +102,9 @@ trait Archivist
                               storageBucket,
                               queuePair,
                               snsTopic,
-                              progressTable,
                               archivist))
                       }
-                  }
+
               }
           }
       }

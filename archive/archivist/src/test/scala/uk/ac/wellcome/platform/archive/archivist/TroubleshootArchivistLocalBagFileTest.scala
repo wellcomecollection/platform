@@ -20,7 +20,6 @@ class TroubleshootArchivistLocalBagFileTest
           storageBucket,
           queuePair,
           _,
-          progressTable,
           archivist) =>
         sendBag(
           new ZipFile(

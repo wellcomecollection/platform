@@ -35,8 +35,4 @@ object ConfigModule extends AbstractModule {
   @Provides
   def providesBagUploaderConfig(appConfig: ArchivistConfig) =
     appConfig.bagUploaderConfig
-
-  @Provides
-  def providesProgressMonitorConfig(appConfig: ArchivistConfig) =
-    appConfig.progressMonitorConfig
 }

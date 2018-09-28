@@ -33,7 +33,6 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           topic,
-          progressTable,
           archivist) =>
         createAndSendBag(ingestBucket, Some(callbackUrl), queuePair) {
           case (requestId, uploadLocation, bagIdentifier) =>
@@ -63,7 +62,6 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           topic,
-          progressTable,
           archivist) =>
         createAndSendBag(
           ingestBucket,
@@ -86,7 +84,6 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           topic,
-          progressTable,
           archivist) => {
 
         archivist.run()
@@ -151,7 +148,7 @@ class ArchivistFeatureTest
 
   it("continues after non existing zip file") {
     withArchivist {
-      case (ingestBucket, storageBucket, queuePair, topic, _, archivist) =>
+      case (ingestBucket, storageBucket, queuePair, topic, archivist) =>
         archivist.run()
 
         createAndSendBag(
@@ -213,7 +210,6 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           topic,
-          progressTable,
           archivist) => {
 
         archivist.run()
@@ -283,7 +279,6 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           topic,
-          progressTable,
           archivist) => {
 
         archivist.run()
