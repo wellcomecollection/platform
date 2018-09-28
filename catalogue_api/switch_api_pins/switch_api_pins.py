@@ -74,6 +74,7 @@ def print_current_state(prod_api, staging_api):
     """
     Prints a summary of the current API state.
     """
+    print('')
     print(f'The prod API is {bold(prod_api.name)}')
     print(f'- api   = {bold(prod_api.api)}')
     print(f'- nginx = {bold(prod_api.nginx)}')
@@ -161,11 +162,18 @@ variable "pinned_remus_api_nginx-delta" {{
     print('pins for the staging API.')
 
 
-if __name__ == '__main__':
-    with open(os.path.join(API_TF, 'variables.tf')) as var_tf:
-        variables = hcl.load(var_tf)['variable']
+def read_local_terraform():
+    """
+    Returns a dict of API configuration data from the local Terraform config.
+    """
+    with open(os.path.join(API_TF, 'api_pins.tf')) as tf_file:
+        return hcl.load(tf_file)['locals']
 
-    prod_api = variables['production_api']['default']
+
+if __name__ == '__main__':
+    existing_tf = read_local_terraform()
+
+    prod_api = existing_tf['production_api']
     prod_api_info = get_ecs_api_info(prod_api)
 
     staging_api = 'remus' if prod_api == 'romulus' else 'romulus'
