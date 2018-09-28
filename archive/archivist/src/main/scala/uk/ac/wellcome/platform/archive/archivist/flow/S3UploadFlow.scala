@@ -62,7 +62,6 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         new InHandler {
           override def onPush(): Unit = {
             val byteString = grab(in)
-            debug(s"Received bytestring of size ${byteString.size}")
             uploadIfAboveMinSize(currentPart ++ byteString, false)
             pull(in)
           }
@@ -72,7 +71,6 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
             maybeUploadId.foreach { uploadId =>
               completeUpload(uploadId)
             }
-            debug("completing stage")
             completeStage()
           }
 
@@ -86,14 +84,11 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
       private def uploadIfAboveMinSize(byteString: ByteString, isLast: Boolean): Unit = {
         byteString.size match {
           case size if size < minSize && !isLast =>
-            debug(s"Current bytestring is ${byteString.size} < $minSize: pulling from inlet")
             currentPart = byteString
           case size if size < maxSize =>
-            debug(s"Current bytestring is ${byteString.size} < $maxSize: uploading")
             uploadByteString(byteString)
             currentPart = ByteString.empty
           case _ =>
-            debug(s"Current bytestring is ${byteString.size} > $maxSize: uploading a chunk")
             val (current,next) = byteString.splitAt(maxSize)
             uploadByteString(current)
             if(next.nonEmpty) uploadIfAboveMinSize(next, isLast)
@@ -102,7 +97,6 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
 
       private def uploadByteString(byteString: ByteString): Unit = {
         if(byteString.nonEmpty) {
-          debug(s"Uploading bytestring of size ${byteString.size}")
           val triedUploadResult = getUploadId.flatMap { uploadId =>
             val inputStream = new ByteArrayInputStream(byteString.toArray)
             Try(
