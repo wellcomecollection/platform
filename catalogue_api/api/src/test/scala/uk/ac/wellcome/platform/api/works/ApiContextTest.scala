@@ -17,8 +17,8 @@ class ApiContextTest
           server.httpGet(
             path = s"/$apiPrefix/context.json",
             andExpect = Status.Ok,
-            withJsonBody =
-              IOUtils.toString(getClass.getResourceAsStream("/context.json"), "UTF-8"))
+            withJsonBody = IOUtils
+              .toString(getClass.getResourceAsStream("/context.json"), "UTF-8"))
       }
     }
   }
