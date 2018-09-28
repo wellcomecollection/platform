@@ -10,27 +10,15 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, DigitisedStorageType}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
-import uk.ac.wellcome.platform.archive.registrar.modules.{
-  ConfigModule,
-  TestAppConfigModule,
-  VHSModule
-}
+import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule, VHSModule}
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.fixtures.{
-  LocalDynamoDb,
-  LocalVersionedHybridStore,
-  S3
-}
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Registrar
@@ -64,20 +52,20 @@ trait Registrar
 
   def withBag[R](storageBucket: Bucket, dataFileCount: Int = 1)(
     testWith: TestWith[BagLocation, R]) = {
-    val bagName = BagPath(randomAlphanumeric())
+    val bagIdentifier = randomAlphanumeric()
 
-    info(s"Creating bag $bagName")
+    info(s"Creating bag $bagIdentifier")
 
-    val fileEntries = createBag(bagName, dataFileCount)
+    val fileEntries = createBag(bagIdentifier, dataFileCount)
     val storagePrefix = "archive"
 
-    val bagLocation = BagLocation(storageBucket.name, storagePrefix, bagName)
+    val bagLocation = BagLocation(storageBucket.name, storagePrefix, BagPath(s"$DigitisedStorageType/$bagIdentifier"))
 
     fileEntries.map((entry: FileEntry) => {
       s3Client
         .putObject(
           bagLocation.storageNamespace,
-          s"${storagePrefix}/${entry.name}",
+          s"$storagePrefix/${bagLocation.bagPath}/${entry.name}",
           entry.contents
         )
     })
