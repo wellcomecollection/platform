@@ -16,7 +16,7 @@ import hcl
 import requests
 
 
-API_DIR = os.path.dirname(os.path.realpath(__file__))
+API_DIR = '/repo/catalogue_api'
 API_TF = os.path.join(API_DIR, 'terraform')
 
 
