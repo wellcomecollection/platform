@@ -1,3 +1,4 @@
+
 module "service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=v11.4.1"
 
@@ -11,6 +12,12 @@ module "service" {
   container_port = "${module.task.task_port}"
 
   ecs_cluster_id = "${var.cluster_id}"
+
+  cpu    = 2048
+  memory = 4096
+
+  env_vars        = "${var.env_vars}"
+  env_vars_length = "${var.env_vars_length}"
 
   vpc_id  = "${var.vpc_id}"
   subnets = "${var.private_subnets}"

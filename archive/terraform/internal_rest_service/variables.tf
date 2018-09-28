@@ -14,3 +14,9 @@ variable "aws_region" {
 }
 variable "container_image" {}
 variable "container_port" {}
+
+variable "env_vars" {
+  type = "map"
+  default = {}
+}
+variable "env_vars_length" {}

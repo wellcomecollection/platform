@@ -91,6 +91,13 @@ module "progress_http" {
   container_port = "9001"
   container_image = "${local.progress_http_container_image}"
 
+  env_vars = {
+    app_base_url                = "https://api.wellcomecollection.org"
+    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+  }
+
+  env_vars_length = 2
+
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
   private_subnets = "${local.private_subnets}"
 
