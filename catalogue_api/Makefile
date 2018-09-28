@@ -17,8 +17,10 @@ TF_IS_PUBLIC_FACING = true
 $(val $(call stack_setup))
 
 
-$(ROOT)/.docker/switch_api_pins: $(ROOT)/catalogue_api/switch_api_pins/Dockerfile
-	docker build --tag switch_api_pins $(ROOT)/catalogue_api/switch_api_pins
+SWITCH_API_PINS = $(ROOT)/catalogue_api/switch_api_pins
+
+$(ROOT)/.docker/switch_api_pins: $(SWITCH_API_PINS)/Dockerfile $(SWITCH_API_PINS)/switch_api_pins.py
+	docker build --tag switch_api_pins $(SWITCH_API_PINS)
 	mkdir -p $(ROOT)/.docker
 	touch $(ROOT)/.docker/switch_api_pins
 
