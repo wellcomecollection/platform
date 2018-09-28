@@ -17,7 +17,6 @@ cors = CORS(app)
 
 # Load required data
 image_ids = np.load('../data/image_ids.npy')
-embeddings = np.load('../data/embeddings.npy')
 index_to_wordvec = np.load('../data/index_to_wordvec.npy')
 word_to_index = pickle.load(open('../data/word_to_index.pkl', 'rb'))
 
@@ -26,11 +25,10 @@ model = SentenceEncoder(index_to_wordvec)
 model.load_state_dict(torch.load('../data/sentence-encoder-2018-09-27.pt',
                                  map_location='cpu'))
 
-# Initialise search index based on images' devise'd sentence embeddings.
+# Initialise a search index based on the images' devise'd sentence embeddings.
 # See notebooks for a complete explanation of how/why we're searching on these
 # embeddings and what they represent.
 search_index = nmslib.init(method='hnsw', space='cosinesimil')
-search_index.addDataPointBatch(embeddings)
 search_index.loadIndex('../data/search_index.hnsw')
 
 # Define endpoint classes
@@ -61,3 +59,4 @@ def send_index(path):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+    

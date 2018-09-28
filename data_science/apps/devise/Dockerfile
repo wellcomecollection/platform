@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get clean
 
 RUN pip3 install --upgrade pip
-RUN pip install flask flask_restful flask_cors numpy nmslib torch nltk 
+RUN pip install flask flask_restful flask_cors numpy nltk torch nmslib
 RUN python3 -m nltk.downloader punkt
 
 WORKDIR /app

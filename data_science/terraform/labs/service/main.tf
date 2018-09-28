@@ -29,7 +29,7 @@ module "service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=v11.0.0"
 
   service_name       = "${var.namespace}"
-  task_desired_count = "3"
+  task_desired_count = "${var.task_desired_count}"
 
   task_definition_arn = "${module.task.task_definition_arn}"
 
@@ -46,5 +46,5 @@ module "service" {
   namespace_id     = "${var.service_discovery_namespace}"
   healthcheck_path = "${var.health_check_path}"
 
-  launch_type = "FARGATE"
+  launch_type = "EC2"
 }
