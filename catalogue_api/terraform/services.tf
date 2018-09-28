@@ -1,15 +1,9 @@
 locals {
-  romulus_api_is_pinned   = "${var.pinned_romulus_api == "" ? "false" : "true" }"
-  romulus_nginx_is_pinned = "${var.pinned_romulus_api_nginx-delta == "" ? "false" : "true" }"
+  romulus_api_release_id   = "${local.pinned_romulus_api == "" ? local.pinned_romulus_api : var.release_ids["api"]}"
+  romulus_nginx_release_id = "${local.pinned_romulus_nginx == "" ? local.pinned_romulus_nginx : var.release_ids["nginx_api-delta"]}"
 
-  remus_api_is_pinned   = "${var.pinned_remus_api == "" ? "false" : "true" }"
-  remus_nginx_is_pinned = "${var.pinned_remus_api_nginx-delta == "" ? "false" : "true" }"
-
-  romulus_api_release_id   = "${local.romulus_api_is_pinned == "true" ? var.pinned_romulus_api : var.release_ids["api"]}"
-  romulus_nginx_release_id = "${local.romulus_nginx_is_pinned == "true" ? var.pinned_romulus_api_nginx-delta : var.release_ids["nginx_api-delta"]}"
-
-  remus_api_release_id   = "${local.remus_api_is_pinned == "true" ? var.pinned_remus_api : var.release_ids["api"]}"
-  remus_nginx_release_id = "${local.remus_nginx_is_pinned == "true" ? var.pinned_remus_api_nginx-delta : var.release_ids["nginx_api-delta"]}"
+  remus_api_release_id   = "${local.pinned_remus_api == "" ? local.pinned_remus_api : var.release_ids["api"]}"
+  remus_nginx_release_id = "${local.pinned_remus_nginx == "" ? local.pinned_remus_nginx : var.release_ids["nginx_api-delta"]}"
 
   romulus_app_uri   = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
   romulus_nginx_uri = "${module.ecr_repository_nginx_api-delta.repository_url}:${local.romulus_nginx_release_id}"
@@ -17,8 +11,8 @@ locals {
   remus_app_uri   = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
   remus_nginx_uri = "${module.ecr_repository_nginx_api-delta.repository_url}:${local.remus_nginx_release_id}"
 
-  romulus_is_prod = "${var.production_api == "romulus" ? "true" : "false"}"
-  remus_is_prod   = "${var.production_api == "remus" ? "true" : "false"}"
+  romulus_is_prod = "${local.production_api == "romulus" ? "true" : "false"}"
+  remus_is_prod   = "${local.production_api == "remus" ? "true" : "false"}"
 
   remus_hostname   = "${local.remus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
   romulus_hostname = "${local.romulus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
