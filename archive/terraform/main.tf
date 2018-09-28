@@ -1,5 +1,5 @@
 module "archivist" {
-  source = "service"
+  source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
@@ -27,7 +27,7 @@ module "archivist" {
 }
 
 module "registrar" {
-  source = "service"
+  source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
@@ -57,7 +57,7 @@ module "registrar" {
 }
 
 module "progress_async" {
-  source = "service"
+  source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
@@ -83,8 +83,25 @@ module "progress_async" {
   source_queue_arn  = "${module.progress_async_queue.arn}"
 }
 
+module "progress_http" {
+  source = "internal_rest_service"
+
+  name = "progress_http"
+
+  container_port = "9001"
+  container_image = "${local.progress_http_container_image}"
+
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  private_subnets = "${local.private_subnets}"
+
+  cluster_id = "${aws_ecs_cluster.cluster.id}"
+  vpc_id = "${local.vpc_id}"
+
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+}
+
 module "bagger" {
-  source = "service"
+  source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
