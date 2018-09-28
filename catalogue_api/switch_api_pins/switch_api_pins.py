@@ -17,17 +17,10 @@ import hcl
 import requests
 
 
-try:
-    API_DIR = os.path.join(
-        subprocess.check_output([
-            'git', 'rev-parse', '--show-toplevel']).strip().decode('utf8'),
-        'catalogue_api'
-    )
-except subprocess.CalledProcessError:
-    # Running inside a container
-    API_DIR = '/repo/catalogue_api'
+ROOT = subprocess.check_output([
+        'git', 'rev-parse', '--show-toplevel']).strip().decode('utf8')
 
-API_TF = os.path.join(API_DIR, 'terraform')
+API_TF = os.path.join(ROOT, 'catalogue_api', 'terraform')
 
 
 @attr.s
@@ -136,48 +129,28 @@ def check_staging_api():
         sys.exit(1)
 
 
-def print_new_tfvars(new_prod_api, romulus_api, remus_api):
-    print('If you want to switch the prod/staging API, copy the following')
-    print('Terraform into variables.tf:')
-    print('')
-
-    print(f'''
-\033[32mvariable "production_api" {{
-  description = "Which version of the API is production? (romulus | remus)"
-  default     = "{new_prod_api}"
-}}
-
-variable "pinned_romulus_api" {{
-  description = "Which version of the API image to pin romulus to, if any"
-  default     = "{romulus_api.api}"
-}}
-
-variable "pinned_romulus_api_nginx-delta" {{
-  description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "{romulus_api.nginx}"
-}}
-
-variable "pinned_remus_api" {{
-  description = "Which version of the API image to pin remus to, if any"
-  default     = "{remus_api.api}"
-}}
-
-variable "pinned_remus_api_nginx-delta" {{
-  description = "Which version of the nginx API image to pin remus to, if any"
-  default     = "{remus_api.nginx}"
-}}\033[0m
-    '''.strip())
-
-    print('\nOnce the change has successfully deployed, you can remove the')
-    print('pins for the staging API.')
-
-
 def read_local_terraform():
     """
     Returns a dict of API configuration data from the local Terraform config.
     """
     with open(os.path.join(API_TF, 'api_pins.tf')) as tf_file:
         return hcl.load(tf_file)['locals']
+
+
+def write_new_terraform(new_prod_api, romulus_api, remus_api):
+    """
+    Write the new API configuration to Terraform.
+    """
+    with open(os.path.join(API_TF, 'api_pins.tf'), 'w') as tf_file:
+        tf_file.write(f'''
+locals {{
+  production_api       = "{new_prod_api}"
+  pinned_remus_api     = "{remus_api.api}"
+  pinned_remus_nginx   = "{remus_api.nginx}"
+  pinned_romulus_api   = "{romulus_api.api}"
+  pinned_romulus_nginx = "{romulus_api.nginx}"
+}}
+'''.lstrip())
 
 
 if __name__ == '__main__':
@@ -209,8 +182,14 @@ if __name__ == '__main__':
         remus_api = prod_api_info
         new_prod_api = 'romulus'
 
-    print_new_tfvars(
+    write_new_terraform(
         new_prod_api=new_prod_api,
         romulus_api=romulus_api,
         remus_api=remus_api
     )
+
+    print('Triggering terraform update...')
+    subprocess.check_call(['make', 'catalogue_api-terraform-plan'], cwd=ROOT)
+
+    print('Once the change has successfully deployed, you can remove the')
+    print('pins for the staging API.')
