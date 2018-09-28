@@ -1,11 +1,10 @@
 package uk.ac.wellcome.platform.reindex.creator.services
 
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.creator.exceptions.ReindexerException
 import uk.ac.wellcome.storage.ObjectLocation
@@ -16,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class HybridRecordSenderTest
     extends FunSpec
     with Matchers
-    with ExtendedPatience
+    with IntegrationPatience
     with MockitoSugar
     with ScalaFutures
     with SNS {
