@@ -5,28 +5,16 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.github.tomakehurst.wiremock.client.WireMock.{
-  equalToJson,
-  postRequestedFor,
-  urlPathEqualTo
-}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlPathEqualTo}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackPayload
-import uk.ac.wellcome.platform.archive.call_backerei.fixtures.{
-  LocalWireMockFixture,
-  CallBäckerei => CallBäckereiFixture
-}
-import uk.ac.wellcome.platform.archive.call_backerei.models.{
-  BagRegistrationCompleteNotification,
-  StorageManifest,
-  StorageManifestFactory
-}
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.platform.archive.call_backerei.fixtures.{LocalWireMockFixture, CallBäckerei => CallBäckereiFixture}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Completed
 
 class CallBäckereiFeatureTest
     extends FunSpec
@@ -34,7 +22,6 @@ class CallBäckereiFeatureTest
     with ScalaFutures
     with MetricsSenderFixture
     with IntegrationPatience
-    with ProgressMonitorFixture
     with LocalWireMockFixture
     with CallBäckereiFixture {
 
@@ -44,40 +31,39 @@ class CallBäckereiFeatureTest
   private val callbackHost = "localhost"
   private val callbackPort = 8080
 
+  def createProgressWith(callbackUrl: Option[String]): Progress =
+    Progress(
+      id = randomAlphanumeric(25),
+      uploadUrl = randomAlphanumeric(25),
+      callbackUrl = callbackUrl,
+      result = Completed
+    )
+
   it("registers an archived BagIt bag from S3") {
     withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
       withCallBäckerei {
-        case (
-            storageBucket,
-            queuePair,
-            topic,
-            registrar,
-            hybridBucket,
-            hybridTable,
-            progressTable) =>
+        case (queuePair, _, callBäckerei) =>
           val requestId = UUID.randomUUID()
-          val callbackUrl =
-            new URI(s"http://$callbackHost:$callbackPort/callback/$requestId")
-          withBagNotification(
-            requestId,
-            Some(callbackUrl),
-            queuePair,
-            storageBucket) { bagLocation =>
-            givenProgressRecord(
-              requestId.toString,
-              "upLoadUrl",
-              Some(callbackUrl.toString),
-              progressTable)
 
-            registrar.run()
+          val callbackUrl = s"http://$callbackHost:$callbackPort/callback/$requestId"
 
-            eventually {
-              wireMock.verifyThat(
-                1,
-                postRequestedFor(urlPathEqualTo(callbackUrl.getPath))
-                  .withRequestBody(equalToJson(
-                    toJson(CallbackPayload(requestId.toString)).get)))
-            }
+          val progress = createProgressWith(
+            callbackUrl = Some(callbackUrl)
+          )
+
+          sendNotificationToSQS(
+            queue = queuePair.queue,
+            message = progress
+          )
+
+          callBäckerei.run()
+
+          eventually {
+            wireMock.verifyThat(
+              1,
+              postRequestedFor(urlPathEqualTo(new URI(callbackUrl).getPath))
+                .withRequestBody(equalToJson(
+                  toJson(CallbackPayload(requestId.toString)).get)))
           }
       }
     }

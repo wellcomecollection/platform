@@ -6,7 +6,7 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
-import uk.ac.wellcome.platform.archive.call_backerei.models.RegistrarConfig
+import uk.ac.wellcome.platform.archive.call_backerei.models.CallBäckereiConfig
 import uk.ac.wellcome.platform.archive.call_backerei.modules.HybridStoreConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
@@ -149,7 +149,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     )
   )
 
-  val appConfig = RegistrarConfig(
+  val appConfig = CallBäckereiConfig(
     s3ClientConfig,
     cloudwatchClientConfig,
     sqsClientConfig,
