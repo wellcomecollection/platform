@@ -5,12 +5,19 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlPathEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{
+  equalToJson,
+  postRequestedFor,
+  urlPathEqualTo
+}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.call_backerei.fixtures.{LocalWireMockFixture, CallBackereiFixture => CallBäckereiFixture}
+import uk.ac.wellcome.platform.archive.call_backerei.fixtures.{
+  LocalWireMockFixture,
+  CallBackereiFixture => CallBäckereiFixture
+}
 import uk.ac.wellcome.platform.archive.call_backerei.flows.CallbackPayload
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Completed
@@ -44,7 +51,8 @@ class CallBackereiFeatureTest
         case (queuePair, _, callBäckerei) =>
           val requestId = UUID.randomUUID()
 
-          val callbackUrl = s"http://$callbackHost:$callbackPort/callback/$requestId"
+          val callbackUrl =
+            s"http://$callbackHost:$callbackPort/callback/$requestId"
 
           val progress = createProgressWith(
             id = requestId,
@@ -62,35 +70,36 @@ class CallBackereiFeatureTest
             wireMock.verifyThat(
               1,
               postRequestedFor(urlPathEqualTo(new URI(callbackUrl).getPath))
-                .withRequestBody(equalToJson(
-                  toJson(CallbackPayload(requestId.toString)).get)))
+                .withRequestBody(
+                  equalToJson(toJson(CallbackPayload(requestId.toString)).get)))
           }
       }
     }
   }
 
   it("doesn't make any requests if it receives a Progress without a callback") {
-    withCallBackerei { case (queuePair, _, callBäckerei) =>
-      val requestId = UUID.randomUUID()
+    withCallBackerei {
+      case (queuePair, _, callBäckerei) =>
+        val requestId = UUID.randomUUID()
 
-      val progress = createProgressWith(
-        id = requestId,
-        callbackUrl = None
-      )
+        val progress = createProgressWith(
+          id = requestId,
+          callbackUrl = None
+        )
 
-      sendNotificationToSQS(
-        queue = queuePair.queue,
-        message = progress
-      )
+        sendNotificationToSQS(
+          queue = queuePair.queue,
+          message = progress
+        )
 
-      callBäckerei.run()
+        callBäckerei.run()
 
-      Thread.sleep(1000)
+        Thread.sleep(1000)
 
-      eventually {
-        assertQueueEmpty(queuePair.queue)
-        assertQueueEmpty(queuePair.dlq)
-      }
+        eventually {
+          assertQueueEmpty(queuePair.queue)
+          assertQueueEmpty(queuePair.dlq)
+        }
     }
   }
 }

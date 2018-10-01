@@ -11,8 +11,7 @@ import uk.ac.wellcome.platform.archive.common.modules._
 
 import scala.concurrent.duration._
 
-class TestAppConfigModule(queue: Queue, topic: Topic)
-    extends AbstractModule {
+class TestAppConfigModule(queue: Queue, topic: Topic) extends AbstractModule {
   @Provides
   def providesAppConfig: CallBackereiConfig = {
     val cloudwatchClientConfig = CloudwatchClientConfig(

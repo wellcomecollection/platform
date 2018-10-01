@@ -32,7 +32,8 @@ case class CallbackFlowResult(
   *
   */
 object CallbackFlow {
-  def apply()(implicit actorSystem: ActorSystem): Flow[Progress, CallbackFlowResult, NotUsed] = {
+  def apply()(implicit actorSystem: ActorSystem)
+    : Flow[Progress, CallbackFlowResult, NotUsed] = {
 
     // This flow handles the case where there is a callback URL on
     // the progress object.
@@ -44,7 +45,7 @@ object CallbackFlow {
     val http = Http().superPool[Progress]()
     val withCallbackUrlFlow = Flow[Progress]
       .collect {
-        case progress@Progress(id, _, Some(callbackUrl), _, _, _, _) =>
+        case progress @ Progress(id, _, Some(callbackUrl), _, _, _, _) =>
           (createHttpRequest(id, callbackUrl), progress)
       }
       .via(http)
@@ -93,10 +94,10 @@ object CallbackFlow {
     //      (This is the `Merge` component.)
     //
     Flow.fromGraph(
-      GraphDSL.create(Broadcast[Progress](2), Merge[CallbackFlowResult](2))(Keep.none) {
-        implicit builder =>
-          import GraphDSL.Implicits._
-          (broadcast, merge) =>
+      GraphDSL.create(Broadcast[Progress](2), Merge[CallbackFlowResult](2))(
+        Keep.none) { implicit builder =>
+        import GraphDSL.Implicits._
+        (broadcast, merge) =>
           {
             val withCallbackUrl = builder.add(withCallbackUrlFlow)
             val withoutCallbackUrl = builder.add(withoutCallbackUrlFlow)
@@ -109,9 +110,10 @@ object CallbackFlow {
       })
   }
 
-  private def createHttpRequest(id: String, callbackUri: String): HttpRequest = {
+  private def createHttpRequest(id: String,
+                                callbackUri: String): HttpRequest = {
     val contentJson = ContentTypes.`application/json`
-    val jsonBody = toJson(CallbackPayload(id)).get  // TODO: Make this not be a ".get"
+    val jsonBody = toJson(CallbackPayload(id)).get // TODO: Make this not be a ".get"
     val entity = HttpEntity(contentJson, jsonBody)
 
     HttpRequest(
