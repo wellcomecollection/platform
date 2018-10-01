@@ -4,19 +4,16 @@ import org.rogach.scallop.{ScallopConf, ScallopOption}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
-import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.call_backerei.models.CallBackereiConfig
-import uk.ac.wellcome.platform.archive.common.config.{SnsClientConfigurator, SqsClientConfigurator}
+import uk.ac.wellcome.platform.archive.common.config.{CloudWatchClientConfigurator, SnsClientConfigurator, SqsClientConfigurator}
 
 import scala.concurrent.duration._
 
 class ArgsConfigurator(val arguments: Seq[String])
   extends ScallopConf(arguments)
+  with CloudWatchClientConfigurator
   with SnsClientConfigurator
   with SqsClientConfigurator {
-
-  val awsCloudwatchRegion = opt[String](default = Some("eu-west-1"))
-  val awsCloudwatchEndpoint = opt[String]()
 
   val topicArn: ScallopOption[String] = opt[String](required = true)
   val sqsQueueUrl: ScallopOption[String] = opt[String](required = true)
@@ -29,11 +26,6 @@ class ArgsConfigurator(val arguments: Seq[String])
     opt[Int](required = true, default = Some(20))
 
   verify()
-
-  val cloudwatchClientConfig = CloudwatchClientConfig(
-    region = awsCloudwatchRegion(),
-    endpoint = awsCloudwatchEndpoint.toOption
-  )
 
   val sqsConfig = SQSConfig(
     sqsQueueUrl(),
