@@ -78,10 +78,6 @@ def parse_args():
         help='Whether to allow this container to run Docker'
     )
     parser.add_argument(
-        '--repo', dest='repo', action='store_const', const=True,
-        help='Whether to mount the entire repo at /repo in the container'
-    )
-    parser.add_argument(
         '--sbt', dest='share_sbt_dirs', action='store_const', const=True,
         help='Whether to share sbt directories with the running container'
     )
@@ -100,7 +96,7 @@ if __name__ == '__main__':
     if namespace.share_aws_creds:
         cmd += _aws_credentials_args()
 
-    if namespace.docker_in_docker or namespace.repo:
+    if namespace.docker_in_docker:
         cmd += ['--volume', '%s:%s' % (ROOT, ROOT)]
         cmd += ['--workdir', ROOT]
 
