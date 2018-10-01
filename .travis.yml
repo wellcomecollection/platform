@@ -167,11 +167,6 @@ jobs:
     - env: TASK=archivist-test
     - env: TASK=progress_async-test
     - env: TASK=progress_http-test
-    - env:
-        - TRAVIS_LAMBDAS="archive_bags \
-          archive_report_ingest_status \
-          archive_request_ingest"
-        - TASK=travis-lambda-test
     - env: TASK=archive_api-test
 
     # (not under active development)
