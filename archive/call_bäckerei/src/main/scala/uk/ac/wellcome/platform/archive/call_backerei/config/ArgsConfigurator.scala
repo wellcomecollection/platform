@@ -5,7 +5,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.call_backerei.models.CallBäckereiConfig
+import uk.ac.wellcome.platform.archive.call_backerei.models.CallBackereiConfig
 
 import scala.concurrent.duration._
 
@@ -71,7 +71,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     flushInterval = metricsFlushIntervalSeconds() seconds
   )
 
-  val appConfig = CallBäckereiConfig(
+  val appConfig = CallBackereiConfig(
     cloudwatchClientConfig = cloudwatchClientConfig,
     sqsClientConfig = sqsClientConfig,
     sqsConfig = sqsConfig,

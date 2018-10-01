@@ -26,7 +26,7 @@ object Main extends App with Logging {
     SNSAsyncClientModule
   )
 
-  val app = injector.getInstance(classOf[CallBäckerei])
+  val app = injector.getInstance(classOf[CallBackerei])
 
   try {
     info(s"Starting worker.")

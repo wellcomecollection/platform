@@ -6,7 +6,7 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.MetricsConfig
-import uk.ac.wellcome.platform.archive.call_backerei.models.CallBäckereiConfig
+import uk.ac.wellcome.platform.archive.call_backerei.models.CallBackereiConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 
 import scala.concurrent.duration._
@@ -14,7 +14,7 @@ import scala.concurrent.duration._
 class TestAppConfigModule(queue: Queue, topic: Topic)
     extends AbstractModule {
   @Provides
-  def providesAppConfig: CallBäckereiConfig = {
+  def providesAppConfig: CallBackereiConfig = {
     val cloudwatchClientConfig = CloudwatchClientConfig(
       region = "localhost",
       endpoint = Some("localhost")
@@ -41,7 +41,7 @@ class TestAppConfigModule(queue: Queue, topic: Topic)
       flushInterval = 60 seconds
     )
 
-    CallBäckereiConfig(
+    CallBackereiConfig(
       cloudwatchClientConfig = cloudwatchClientConfig,
       sqsClientConfig = sqsClientConfig,
       sqsConfig = sqsConfig,

@@ -13,26 +13,21 @@ import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
-import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 
-class CallBäckerei @Inject()(
+class CallBackerei @Inject()(
   snsClient: AmazonSNSAsync,
   snsConfig: SNSConfig,
   messageStream: MessageStream[NotificationMessage, Object],
   actorSystem: ActorSystem
 ) {
   def run() = {
-
-    implicit val client = snsClient
     implicit val system = actorSystem
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
     implicit val materializer: ActorMaterializer = ActorMaterializer()
-    implicit val executionContext: ExecutionContextExecutor =
-      actorSystem.dispatcher
 
     val workFlow = Flow[NotificationMessage]
       .map(parseNotification)

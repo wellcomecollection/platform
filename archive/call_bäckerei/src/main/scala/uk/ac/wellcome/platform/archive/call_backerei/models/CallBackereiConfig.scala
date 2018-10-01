@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.archive.common.modules.{
   SnsClientConfig
 }
 
-case class CallBäckereiConfig(
+case class CallBackereiConfig(
   cloudwatchClientConfig: CloudwatchClientConfig,
   sqsClientConfig: SQSClientConfig,
   sqsConfig: SQSConfig,
