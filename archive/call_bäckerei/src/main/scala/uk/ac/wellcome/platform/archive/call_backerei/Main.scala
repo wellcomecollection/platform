@@ -2,12 +2,15 @@ package uk.ac.wellcome.platform.archive.call_backerei
 
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.call_backerei.modules.{
   AppConfigModule,
-  ConfigModule,
-  VHSModule
+  ConfigModule
+}
+import uk.ac.wellcome.platform.archive.common.modules.{
+  AkkaModule,
+  CloudWatchClientModule,
+  SNSAsyncClientModule,
+  SQSClientModule
 }
 
 import scala.concurrent.Await
@@ -17,14 +20,10 @@ object Main extends App with Logging {
   val injector: Injector = Guice.createInjector(
     new AppConfigModule(args),
     ConfigModule,
-    VHSModule,
     AkkaModule,
     CloudWatchClientModule,
     SQSClientModule,
-    SNSAsyncClientModule,
-    DynamoClientModule,
-    ProgressMonitorModule,
-    MessageStreamModule
+    SNSAsyncClientModule
   )
 
   val app = injector.getInstance(classOf[CallBäckerei])

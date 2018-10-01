@@ -11,8 +11,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackPayload
 import uk.ac.wellcome.platform.archive.call_backerei.fixtures.{LocalWireMockFixture, CallBäckerei => CallBäckereiFixture}
+import uk.ac.wellcome.platform.archive.call_backerei.flows.CallbackPayload
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Completed
 

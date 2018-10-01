@@ -3,28 +3,15 @@ package uk.ac.wellcome.platform.archive.call_backerei
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Source}
-import com.amazonaws.services.s3.AmazonS3
+import akka.stream.scaladsl.Flow
 import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.platform.archive.call_backerei.flows.CallbackFlow
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  NotificationMessage,
-  RequestContext
-}
-import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackFlow
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.call_backerei.flows.SnsPublishFlow
-import uk.ac.wellcome.platform.archive.call_backerei.models._
+import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.s3.S3ClientFactory
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
@@ -60,27 +47,8 @@ class CallBäckerei @Inject()(
       case Success(progress: Progress) => progress
       case Failure(e) =>
         throw new RuntimeException(
-          s"Failed to get object location from notification: ${e.getMessage}"
+          s"Failed to get Progress from notification: ${e.getMessage}"
         )
     }
-  }
-
-  private def createStorageManifest(requestContext: RequestContext)(
-    implicit s3Client: AmazonS3,
-    materializer: ActorMaterializer,
-    executionContext: ExecutionContextExecutor) = {
-    Source.fromFuture(
-      for (manifest <- StorageManifestFactory
-             .create(requestContext.bagLocation))
-        yield (manifest, requestContext))
-  }
-
-  private def updateStoredManifest(storageManifest: StorageManifest,
-                                   requestContext: RequestContext) = {
-    dataStore.updateRecord(storageManifest.id.value)(
-      ifNotExisting = (storageManifest, EmptyMetadata()))(
-      ifExisting = (_, _) => (storageManifest, EmptyMetadata())
-    )
-    (storageManifest, requestContext)
   }
 }
