@@ -22,32 +22,32 @@ object CallbackFlow {
   def apply()(implicit actorSystem: ActorSystem): Flow[Progress, CallbackResult, NotUsed] = {
     val http = Http().superPool[Progress]()
 
+    val withCallbackUrlFlow = Flow[Progress]
+      .collect {
+        case progress@Progress(id, _, Some(callbackUrl), _, _, _, _) =>
+          (createHttpRequest(id, callbackUrl), progress)
+      }
+      .via(http)
+      .map {
+        case (tryHttpResponse, progress) =>
+          CallbackResult(
+            progress = progress,
+            httpResponse = Some(tryHttpResponse)
+          )
+      }
+
+    val withoutCallbackUrlFlow = Flow[Progress]
+      .filter { _.callbackUrl.isEmpty }
+      .map { progress: Progress =>
+        CallbackResult(progress = progress, httpResponse = None)
+      }
+
     Flow.fromGraph(
       GraphDSL.create(Broadcast[Progress](2), Merge[CallbackResult](2))(Keep.none) {
         implicit builder =>
           import GraphDSL.Implicits._
           (broadcast, merge) =>
           {
-            val withCallbackUrlFlow = Flow[Progress]
-              .collect {
-                case progress@Progress(id, _, Some(callbackUrl), _, _, _, _) =>
-                  (createHttpRequest(id, callbackUrl), progress)
-              }
-              .via(http)
-              .map {
-                case (tryHttpResponse, progress) =>
-                  CallbackResult(
-                    progress = progress,
-                    httpResponse = Some(tryHttpResponse)
-                  )
-              }
-
-            val withoutCallbackUrlFlow = Flow[Progress]
-              .filter { _.callbackUrl.isEmpty }
-              .map { progress: Progress =>
-                CallbackResult(progress = progress, httpResponse = None)
-              }
-
             val withCallbackUrl = builder.add(withCallbackUrlFlow)
             val withoutCallbackUrl = builder.add(withoutCallbackUrlFlow)
 
