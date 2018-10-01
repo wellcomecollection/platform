@@ -12,7 +12,7 @@ class ArgsConfigurator(val arguments: Seq[String])
   with SnsConfigConfigurator
   with SqsClientConfigurator
   with SqsConfigConfigurator {
-  
+
   verify()
 
   val appConfig = CallBackereiConfig(
