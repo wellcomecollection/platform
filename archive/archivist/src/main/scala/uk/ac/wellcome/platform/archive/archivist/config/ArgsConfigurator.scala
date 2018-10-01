@@ -130,7 +130,6 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     sqsConfig,
     snsClientConfig,
     snsConfig,
-    archiveProgressMonitorConfig,
     metricsConfig
   )
 }

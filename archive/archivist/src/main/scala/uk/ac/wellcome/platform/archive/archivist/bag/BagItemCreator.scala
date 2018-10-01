@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import uk.ac.wellcome.platform.archive.common.models.{
   BagItem,
   BagPath,
+  EntryPath,
   MalformedBagDigestException
 }
-import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.util.Try
 
@@ -20,7 +20,7 @@ object BagItemCreator {
       case Array(checksum: String, key: String) =>
         BagItem(
           checksum,
-          ObjectLocation(bagName.value, key)
+          EntryPath(key)
         )
       case default =>
         throw MalformedBagDigestException(

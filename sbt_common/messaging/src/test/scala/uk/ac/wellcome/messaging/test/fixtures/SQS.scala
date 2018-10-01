@@ -249,8 +249,6 @@ trait SQS extends Matchers with Logging {
     debug(
       s"\ndlq: ${queue.dlq.url}, ${messagesDlqSize}\nqueue: ${queue.queue.url}, ${messagesQSize}")
 
-    debug(s"$messagesDlq")
-
     messagesQSize shouldBe qSize
     messagesDlqSize shouldBe dlqSize
   }

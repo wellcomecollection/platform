@@ -6,16 +6,12 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 
 import scala.concurrent.duration._
 
 class TestAppConfigModule(queueUrl: String,
                           storageBucketName: String,
-                          topicArn: String,
-                          progressTable: Table)
+                          topicArn: String)
     extends AbstractModule {
 
   @Provides
@@ -56,19 +52,6 @@ class TestAppConfigModule(queueUrl: String,
       bagItConfig = BagItConfig()
     )
 
-    val archiveProgressMonitorConfig = ProgressMonitorConfig(
-      DynamoConfig(
-        table = progressTable.name,
-        index = progressTable.index
-      ),
-      DynamoClientConfig(
-        accessKey = Some("access"),
-        secretKey = Some("secret"),
-        region = "localhost",
-        endpoint = Some("http://localhost:45678")
-      )
-    )
-
     ArchivistConfig(
       s3ClientConfig,
       bagUploaderConfig,
@@ -77,7 +60,6 @@ class TestAppConfigModule(queueUrl: String,
       sqsConfig,
       snsClientConfig,
       snsConfig,
-      archiveProgressMonitorConfig,
       metricsConfig
     )
   }
