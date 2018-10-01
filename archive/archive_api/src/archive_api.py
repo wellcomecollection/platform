@@ -13,7 +13,6 @@ from werkzeug.exceptions import NotFound as NotFoundError
 import config
 import validators
 
-from bag_request import bag_request
 from bags import fetch_bag
 from ingests import (
     IngestProgress,
