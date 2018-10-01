@@ -10,7 +10,7 @@ from post_to_slack import to_bitly
 
 
 with Betamax.configure() as config:
-    config.cassette_library_dir = '.'
+    config.cassette_library_dir = os.path.dirname(os.path.abspath(__file__))
 
     access_token = os.environ.get('BITLY_ACCESS_TOKEN', 'testtoken')
     config.define_cassette_placeholder('<ACCESS_TOKEN>', access_token)

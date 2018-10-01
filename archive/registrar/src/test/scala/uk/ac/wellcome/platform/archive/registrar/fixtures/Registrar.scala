@@ -6,19 +6,14 @@ import java.util.UUID
 import com.amazonaws.services.dynamodbv2.model._
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  AkkaS3,
-  BagIt,
-  FileEntry
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
+  ArchiveComplete,
   BagLocation,
-  BagName
+  BagPath
 }
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
@@ -28,17 +23,18 @@ import uk.ac.wellcome.platform.archive.registrar.modules.{
   TestAppConfigModule,
   VHSModule
 }
+import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{
   LocalDynamoDb,
-  LocalVersionedHybridStore
+  LocalVersionedHybridStore,
+  S3
 }
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 
 trait Registrar
-    extends AkkaS3
+    extends S3
     with Messaging
     with LocalVersionedHybridStore
     with BagIt
@@ -51,7 +47,7 @@ trait Registrar
                        queuePair: QueuePair) =
     sendNotificationToSQS(
       queuePair.queue,
-      BagArchiveCompleteNotification(requestId, bagLocation, callbackUrl)
+      ArchiveComplete(requestId, bagLocation, callbackUrl)
     )
 
   def withBagNotification[R](
@@ -59,22 +55,20 @@ trait Registrar
     callbackUrl: Option[URI],
     queuePair: QueuePair,
     storageBucket: Bucket,
-    dataFileCount: Int = 1,
-    valid: Boolean = true)(testWith: TestWith[BagLocation, R]) = {
-    withBag(storageBucket, dataFileCount, valid) { bagLocation =>
+    dataFileCount: Int = 1)(testWith: TestWith[BagLocation, R]) = {
+    withBag(storageBucket, dataFileCount) { bagLocation =>
       sendNotification(requestId, bagLocation, callbackUrl, queuePair)
       testWith(bagLocation)
     }
   }
 
-  def withBag[R](storageBucket: Bucket,
-                 dataFileCount: Int = 1,
-                 valid: Boolean = true)(testWith: TestWith[BagLocation, R]) = {
-    val bagName = BagName(randomAlphanumeric())
+  def withBag[R](storageBucket: Bucket, dataFileCount: Int = 1)(
+    testWith: TestWith[BagLocation, R]) = {
+    val bagName = BagPath(randomAlphanumeric())
 
     info(s"Creating bag $bagName")
 
-    val fileEntries = createBag(bagName, dataFileCount, valid)
+    val fileEntries = createBag(bagName, dataFileCount)
     val storagePrefix = "archive"
 
     val bagLocation = BagLocation(storageBucket.name, storagePrefix, bagName)
@@ -136,7 +130,6 @@ trait Registrar
         ConfigModule,
         VHSModule,
         AkkaModule,
-        AkkaS3ClientModule,
         CloudWatchClientModule,
         SQSClientModule,
         SNSAsyncClientModule,

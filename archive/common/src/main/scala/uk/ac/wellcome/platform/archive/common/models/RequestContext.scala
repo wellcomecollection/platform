@@ -8,7 +8,7 @@ case class RequestContext(requestId: UUID,
                           callbackUrl: Option[URI] = None)
 
 object RequestContext {
-  def apply(notification: BagArchiveCompleteNotification) =
+  def apply(notification: ArchiveComplete) =
     new RequestContext(
       notification.archiveRequestId,
       notification.bagLocation,

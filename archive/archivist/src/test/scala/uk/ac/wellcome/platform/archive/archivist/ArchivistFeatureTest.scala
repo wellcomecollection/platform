@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist
 
 import java.net.URI
+import java.util.UUID
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -9,10 +10,12 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
 import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
-  BagLocation
+  ArchiveComplete,
+  BagLocation,
+  IngestBagRequest
 }
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 // TODO: Test file boundaries
@@ -38,16 +41,16 @@ class ArchivistFeatureTest
           topic,
           progressTable,
           archivist) =>
-        sendFakeBag(ingestBucket, Some(callbackUrl), queuePair) {
+        createAndSendBag(ingestBucket, Some(callbackUrl), queuePair) {
           case (requestId, uploadLocation, validBag) =>
             archivist.run()
             eventually {
-              listKeysInBucket(storageBucket) should have size 27
+              listKeysInBucket(storageBucket) should have size 15
 
               assertQueuePairSizes(queuePair, 0, 0)
 
               assertSnsReceivesOnly(
-                BagArchiveCompleteNotification(
+                ArchiveComplete(
                   requestId,
                   BagLocation(storageBucket.name, "archive", validBag),
                   Some(callbackUrl)
@@ -68,7 +71,11 @@ class ArchivistFeatureTest
           topic,
           progressTable,
           archivist) =>
-        sendFakeBag(ingestBucket, Some(callbackUrl), queuePair, false) { _ =>
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          createDigest = _ => "bad_digest") { _ =>
           archivist.run()
           eventually {
             assertQueuePairSizes(queuePair, 0, 1)
@@ -78,7 +85,7 @@ class ArchivistFeatureTest
     }
   }
 
-  it("continues after failure") {
+  it("continues after bag with bad checksum") {
     withArchivist {
       case (
           ingestBucket,
@@ -86,49 +93,263 @@ class ArchivistFeatureTest
           queuePair,
           topic,
           progressTable,
-          archivist) =>
-        sendFakeBag(ingestBucket, Some(callbackUrl), queuePair) {
-          case (requestId1, uploadLocation1, validBag1) =>
-            archivist.run()
-            sendFakeBag(ingestBucket, Some(callbackUrl), queuePair, false) {
-              _ =>
-                sendFakeBag(ingestBucket, Some(callbackUrl), queuePair) {
-                  case (requestId2, uploadLocation2, validBag2) =>
-                    sendFakeBag(
-                      ingestBucket,
-                      Some(callbackUrl),
-                      queuePair,
-                      false) { _ =>
-                      eventually {
+          archivist) => {
 
-                        assertQueuePairSizes(queuePair, 0, 2)
+        archivist.run()
 
-                        assertSnsReceives(
-                          Set(
-                            BagArchiveCompleteNotification(
-                              requestId1,
-                              BagLocation(
-                                storageBucket.name,
-                                "archive",
-                                validBag1),
-                              Some(callbackUrl)
-                            ),
-                            BagArchiveCompleteNotification(
-                              requestId2,
-                              BagLocation(
-                                storageBucket.name,
-                                "archive",
-                                validBag2),
-                              Some(callbackUrl)
-                            )
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          dataFileCount = 1) {
+          case (requestId1, _, validBag1) =>
+            createAndSendBag(
+              ingestBucket,
+              Some(callbackUrl),
+              queuePair,
+              dataFileCount = 1,
+              createDigest = _ => "bad_digest") { _ =>
+              createAndSendBag(
+                ingestBucket,
+                Some(callbackUrl),
+                queuePair,
+                dataFileCount = 1) {
+                case (requestId2, _, validBag2) =>
+                  createAndSendBag(
+                    ingestBucket,
+                    Some(callbackUrl),
+                    queuePair,
+                    dataFileCount = 1,
+                    createDigest = _ => "bad_digest") { _ =>
+                    eventually {
+
+//                      assertQueuePairSizes(queuePair, 0, 2)
+
+                      assertSnsReceives(
+                        Set(
+                          ArchiveComplete(
+                            requestId1,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              validBag1),
+                            Some(callbackUrl)
                           ),
-                          topic
-                        )
-                      }
+                          ArchiveComplete(
+                            requestId2,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              validBag2),
+                            Some(callbackUrl)
+                          )
+                        ),
+                        topic
+                      )
                     }
+                  }
+              }
+            }
+        }
+      }
+    }
+  }
+
+  it("continues after non existing zip file") {
+    withArchivist {
+      case (ingestBucket, storageBucket, queuePair, topic, _, archivist) =>
+        archivist.run()
+
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          dataFileCount = 1) {
+          case (requestId1, _, validBag1) =>
+            sendNotificationToSQS(
+              queuePair.queue,
+              IngestBagRequest(
+                UUID.randomUUID(),
+                ObjectLocation(ingestBucket.name, "non-existing1.zip"),
+                None))
+
+            createAndSendBag(
+              ingestBucket,
+              Some(callbackUrl),
+              queuePair,
+              dataFileCount = 1) {
+              case (requestId2, _, validBag2) =>
+                sendNotificationToSQS(
+                  queuePair.queue,
+                  IngestBagRequest(
+                    UUID.randomUUID(),
+                    ObjectLocation(ingestBucket.name, "non-existing2.zip"),
+                    None))
+
+                eventually {
+
+                  assertQueuePairSizes(queuePair, 0, 2)
+
+                  assertSnsReceives(
+                    Set(
+                      ArchiveComplete(
+                        requestId1,
+                        BagLocation(storageBucket.name, "archive", validBag1),
+                        Some(callbackUrl)
+                      ),
+                      ArchiveComplete(
+                        requestId2,
+                        BagLocation(storageBucket.name, "archive", validBag2),
+                        Some(callbackUrl)
+                      )
+                    ),
+                    topic
+                  )
                 }
             }
         }
+
     }
   }
+
+  it("continues after non existing file referenced in manifest") {
+    withArchivist {
+      case (
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) => {
+
+        archivist.run()
+
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          dataFileCount = 1) {
+          case (requestId1, _, validBag1) =>
+            createAndSendBag(
+              ingestBucket,
+              Some(callbackUrl),
+              queuePair,
+              dataFileCount = 1,
+              createDataManifest = dataManifestWithNonExistingFile) { _ =>
+              createAndSendBag(
+                ingestBucket,
+                Some(callbackUrl),
+                queuePair,
+                dataFileCount = 1) {
+                case (requestId2, _, validBag2) =>
+                  createAndSendBag(
+                    ingestBucket,
+                    Some(callbackUrl),
+                    queuePair,
+                    dataFileCount = 1,
+                    createDataManifest = dataManifestWithNonExistingFile) { _ =>
+                    eventually {
+
+                      assertQueuePairSizes(queuePair, 0, 2)
+
+                      assertSnsReceives(
+                        Set(
+                          ArchiveComplete(
+                            requestId1,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              validBag1),
+                            Some(callbackUrl)
+                          ),
+                          ArchiveComplete(
+                            requestId2,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              validBag2),
+                            Some(callbackUrl)
+                          )
+                        ),
+                        topic
+                      )
+                    }
+                  }
+              }
+            }
+        }
+      }
+    }
+  }
+
+  it("continues after zip file with no bagit.txt") {
+    withArchivist {
+      case (
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          topic,
+          progressTable,
+          archivist) => {
+
+        archivist.run()
+
+        createAndSendBag(
+          ingestBucket,
+          Some(callbackUrl),
+          queuePair,
+          dataFileCount = 1) {
+          case (requestId1, _, validBag1) =>
+            createAndSendBag(
+              ingestBucket,
+              Some(callbackUrl),
+              queuePair,
+              dataFileCount = 1,
+              createBagItFile = _ => None) { _ =>
+              createAndSendBag(
+                ingestBucket,
+                Some(callbackUrl),
+                queuePair,
+                dataFileCount = 1) {
+                case (requestId2, _, validBag2) =>
+                  createAndSendBag(
+                    ingestBucket,
+                    Some(callbackUrl),
+                    queuePair,
+                    dataFileCount = 1,
+                    createBagItFile = _ => None) { _ =>
+                    eventually {
+
+                      assertQueuePairSizes(queuePair, 0, 2)
+
+                      assertSnsReceives(
+                        Set(
+                          ArchiveComplete(
+                            requestId1,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              validBag1),
+                            Some(callbackUrl)
+                          ),
+                          ArchiveComplete(
+                            requestId2,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              validBag2),
+                            Some(callbackUrl)
+                          )
+                        ),
+                        topic
+                      )
+                    }
+                  }
+              }
+            }
+        }
+      }
+    }
+  }
+
 }

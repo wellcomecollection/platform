@@ -10,7 +10,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{
   postRequestedFor,
   urlPathEqualTo
 }
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -25,7 +25,6 @@ import uk.ac.wellcome.platform.archive.registrar.models.{
   StorageManifest,
   StorageManifestFactory
 }
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -34,7 +33,7 @@ class RegistrarFeatureTest
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
-    with ExtendedPatience
+    with IntegrationPatience
     with ProgressMonitorFixture
     with LocalWireMockFixture
     with RegistrarFixture {

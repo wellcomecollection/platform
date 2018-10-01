@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.progress_async
 
 import akka.actor.ActorSystem
 import akka.event.Logging
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject.Injector
@@ -28,6 +29,8 @@ trait ProgressAsync extends Logging {
 
     implicit val system =
       injector.getInstance(classOf[ActorSystem])
+
+    implicit val materializer = ActorMaterializer()
 
     implicit val adapter =
       Logging(system.eventStream, "customLogger")

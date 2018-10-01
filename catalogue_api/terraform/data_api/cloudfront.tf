@@ -1,3 +1,9 @@
+data "aws_acm_certificate" "data_wc_org" {
+  domain   = "data.wellcomecollection.org"
+  statuses = ["ISSUED"]
+  provider = "aws.us_east_1"
+}
+
 resource "aws_cloudfront_distribution" "data_api" {
   origin {
     domain_name = "${aws_s3_bucket.public_data.bucket_domain_name}"
@@ -43,7 +49,7 @@ resource "aws_cloudfront_distribution" "data_api" {
   price_class = "PriceClass_100"
 
   viewer_certificate {
-    acm_certificate_arn      = "${var.data_acm_cert_arn}"
+    acm_certificate_arn      = "${data.aws_acm_certificate.data_wc_org.arn}"
     minimum_protocol_version = "TLSv1"
     ssl_support_method       = "sni-only"
   }

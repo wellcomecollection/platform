@@ -38,8 +38,8 @@ resource "aws_security_group" "service_lb_security_group" {
 
   ingress {
     protocol  = "tcp"
-    from_port = "${var.nginx_container_port}"
-    to_port   = "${var.nginx_container_port}"
+    from_port = "${var.archive_api_container_port}"
+    to_port   = "${var.archive_api_container_port}"
     self      = true
   }
 

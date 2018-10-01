@@ -9,10 +9,10 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
+import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -23,7 +23,12 @@ class DynamoRowLockDaoTest
     with Matchers
     with ScalaFutures
     with MatcherFixtures
-    with ExtendedPatience {
+    with PatienceConfiguration {
+
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
+    timeout = scaled(Span(40, Seconds)),
+    interval = scaled(Span(150, Millis))
+  )
 
   import com.gu.scanamo.syntax._
 

@@ -17,10 +17,6 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraItemData
 }
 import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra._
-import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects.{
-  SierraConceptSubjects,
-  SierraPersonSubjects
-}
 import uk.ac.wellcome.platform.transformer.sierra.source.SierraMaterialType._
 
 import scala.util.{Failure, Success, Try}
@@ -39,10 +35,9 @@ class SierraTransformableTransformer
     with SierraLocation
     with SierraProduction
     with SierraDimensions
-    with SierraConceptSubjects
-    with SierraPersonSubjects
     with SierraGenres
-    with SierraMergeCandidates {
+    with SierraMergeCandidates
+    with SierraSubjects {
 
   def transform(
     transformable: SierraTransformable,
@@ -88,8 +83,7 @@ class SierraTransformableTransformer
                 extent = getExtent(sierraBibData),
                 lettering = getLettering(sierraBibData),
                 createdDate = None,
-                subjects = getSubjectswithAbstractConcepts(sierraBibData) ++ getSubjectsWithPerson(
-                  sierraBibData),
+                subjects = getSubjects(sierraBibData),
                 genres = getGenres(sierraBibData),
                 contributors = getContributors(sierraBibData),
                 thumbnail = None,

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.recorder.services
 
 import com.gu.scanamo.Scanamo
 import io.circe.Decoder
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
@@ -17,7 +17,6 @@ import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -31,7 +30,7 @@ class RecorderWorkerServiceTest
     with ScalaFutures
     with Messaging
     with MetricsSenderFixture
-    with ExtendedPatience
+    with IntegrationPatience
     with WorksGenerators {
 
   it("records an UnidentifiedWork") {

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.miro
 
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -9,7 +9,6 @@ import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWr
 import uk.ac.wellcome.platform.transformer.miro.utils.MiroTransformableMessageGenerators
 import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
 import uk.ac.wellcome.storage.fixtures.S3
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class MiroTransformerFeatureTest
     extends FunSpec
@@ -20,7 +19,7 @@ class MiroTransformerFeatureTest
     with Messaging
     with uk.ac.wellcome.platform.transformer.miro.fixtures.Server
     with Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with MiroTransformableWrapper
     with HybridRecordMessageGenerator
     with MiroTransformableMessageGenerators {
