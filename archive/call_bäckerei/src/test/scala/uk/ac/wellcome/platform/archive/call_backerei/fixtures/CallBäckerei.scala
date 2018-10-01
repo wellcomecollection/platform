@@ -15,7 +15,7 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.call_backerei.modules.{ConfigModule, TestAppConfigModule, VHSModule}
-import uk.ac.wellcome.platform.archive.call_backerei.{Registrar => RegistrarApp}
+import uk.ac.wellcome.platform.archive.call_backerei.{CallBäckerei => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore, S3}

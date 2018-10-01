@@ -27,7 +27,7 @@ object Main extends App with Logging {
     MessageStreamModule
   )
 
-  val app = injector.getInstance(classOf[Registrar])
+  val app = injector.getInstance(classOf[CallBäckerei])
 
   try {
     info(s"Starting worker.")

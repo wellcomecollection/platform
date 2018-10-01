@@ -20,6 +20,7 @@ import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackFlow
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.call_backerei.flows.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.call_backerei.models._
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.s3.S3ClientFactory
@@ -28,15 +29,10 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 
-class Registrar @Inject()(
+class CallBäckerei @Inject()(
   snsClient: AmazonSNSAsync,
   snsConfig: SNSConfig,
-  s3ClientConfig: S3ClientConfig,
   messageStream: MessageStream[NotificationMessage, Object],
-  dataStore: VersionedHybridStore[StorageManifest,
-                                  EmptyMetadata,
-                                  ObjectStore[StorageManifest]],
-  archiveProgressMonitor: ProgressMonitor,
   actorSystem: ActorSystem
 ) {
   def run() = {
@@ -51,35 +47,17 @@ class Registrar @Inject()(
     implicit val executionContext: ExecutionContextExecutor =
       actorSystem.dispatcher
 
-    implicit val s3Client: AmazonS3 = S3ClientFactory.create(
-      region = s3ClientConfig.region,
-      endpoint = s3ClientConfig.endpoint.getOrElse(""),
-      accessKey = s3ClientConfig.accessKey.getOrElse(""),
-      secretKey = s3ClientConfig.secretKey.getOrElse("")
-    )
-
     val workFlow = Flow[NotificationMessage]
-      .log("notification message")
       .map(parseNotification)
-      .flatMapConcat(createStorageManifest)
-      .map {
-        case (manifest, context) => updateStoredManifest(manifest, context)
-      }
-      .via(SnsPublishFlow(snsConfig))
-      .log("published notification")
-      .filter {
-        case (_, context) => context.callbackUrl.isDefined
-      }
       .via(CallbackFlow())
       .log("executed callback")
 
-    messageStream.run("registrar", workFlow)
+    messageStream.run("callBäckerei", workFlow)
   }
 
   private def parseNotification(message: NotificationMessage) = {
-    fromJson[ArchiveComplete](message.Message) match {
-      case Success(bagArchiveCompleteNotification: ArchiveComplete) =>
-        RequestContext(bagArchiveCompleteNotification)
+    fromJson[Progress](message.Message) match {
+      case Success(progress: Progress) => progress
       case Failure(e) =>
         throw new RuntimeException(
           s"Failed to get object location from notification: ${e.getMessage}"
