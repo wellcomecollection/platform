@@ -70,6 +70,13 @@ trait ProgressMonitorFixture
     )
   }
 
+  def givenProgressRecord(id: String,
+                          uploadUrl: String,
+                          maybeCallbackUrl: Option[String],
+                          table: Table) = {
+    givenTableHasItem(Progress(id, uploadUrl, maybeCallbackUrl), table)
+  }
+
   def assertProgressCreated(id: String,
                             expectedUploadUrl: String,
                             expectedCallbackUrl: Option[String],
