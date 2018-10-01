@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archive.call_backerei.fixtures
 
 import com.google.inject.{Guice, Injector}
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
@@ -18,31 +17,27 @@ trait CallBackereiFixture
     with BagIt {
 
   def withApp[R](queue: Queue, topic: Topic)(testWith: TestWith[CallBackerei, R]): R = {
+    val appConfigModule = new TestAppConfigModule(
+      queue = queue,
+      topic = topic
+    )
 
-    class TestApp extends Logging {
+    val injector: Injector = Guice.createInjector(
+      appConfigModule,
+      ConfigModule,
+      AkkaModule,
+      CloudWatchClientModule,
+      SQSClientModule,
+      SNSAsyncClientModule,
+      MessageStreamModule
+    )
 
-      val appConfigModule = new TestAppConfigModule(
-        queue = queue,
-        topic = topic
-      )
+    val app = injector.getInstance(classOf[CallBackerei])
 
-      val injector: Injector = Guice.createInjector(
-        appConfigModule,
-        ConfigModule,
-        AkkaModule,
-        CloudWatchClientModule,
-        SQSClientModule,
-        SNSAsyncClientModule,
-        MessageStreamModule
-      )
-
-      val app = injector.getInstance(classOf[CallBackerei])
-    }
-
-    testWith((new TestApp()).app)
+    testWith(app)
   }
 
-  def withCallBäckerei[R](
+  def withCallBackerei[R](
     testWith: TestWith[(QueuePair, Topic, CallBackerei), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic { topic =>

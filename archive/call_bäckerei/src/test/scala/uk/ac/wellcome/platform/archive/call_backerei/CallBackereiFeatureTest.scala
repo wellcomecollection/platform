@@ -40,7 +40,7 @@ class CallBackereiFeatureTest
 
   it("makes a POST request when it receives a Progress with a callback") {
     withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
-      withCallBäckerei {
+      withCallBackerei {
         case (queuePair, _, callBäckerei) =>
           val requestId = UUID.randomUUID()
 
@@ -70,7 +70,7 @@ class CallBackereiFeatureTest
   }
 
   it("doesn't make any requests if it receives a Progress without a callback") {
-    withCallBäckerei { case (queuePair, _, callBäckerei) =>
+    withCallBackerei { case (queuePair, _, callBäckerei) =>
       val requestId = UUID.randomUUID()
 
       val progress = createProgressWith(
