@@ -1,11 +1,10 @@
 # -*- encoding: utf-8 -*-
 
 import json
+
 import pytest
 
-from bags import (
-    fetch_bag
-)
+from bags import fetch_bag
 
 
 def test_looks_up_bag(dynamodb_resource, s3_client, bucket_bag, table_name_bag):
@@ -33,7 +32,7 @@ def test_looks_up_bag(dynamodb_resource, s3_client, bucket_bag, table_name_bag):
 
 
 @pytest.yield_fixture(autouse=True)
-def run_around_tests(dynamodb_client, s3_client, bucket_bag, table_name_bag):
+def run_around_tests(s3_client, bucket_bag):
     s3_client.create_bucket(Bucket=bucket_bag)
 
     yield
