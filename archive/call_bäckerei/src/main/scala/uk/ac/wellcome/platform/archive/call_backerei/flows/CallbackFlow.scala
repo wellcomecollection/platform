@@ -11,6 +11,8 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
 import scala.util.Try
 
+case class CallbackPayload(id: String)
+
 case class CallbackResult(
   progress: Progress,
   httpResponse: Option[Try[HttpResponse]]
@@ -75,5 +77,3 @@ object CallbackFlow {
     )
   }
 }
-
-case class CallbackPayload(id: String)
