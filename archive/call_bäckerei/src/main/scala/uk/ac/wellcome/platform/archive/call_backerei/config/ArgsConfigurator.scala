@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archive.call_backerei.config
 
-import org.rogach.scallop.{ScallopConf, ScallopOption}
-import uk.ac.wellcome.messaging.sns.SNSConfig
+import org.rogach.scallop.ScallopConf
 import uk.ac.wellcome.platform.archive.call_backerei.models.CallBackereiConfig
 import uk.ac.wellcome.platform.archive.common.config._
 
@@ -10,16 +9,11 @@ class ArgsConfigurator(val arguments: Seq[String])
   with CloudWatchClientConfigurator
   with MetricsConfigConfigurator
   with SnsClientConfigurator
+  with SnsConfigConfigurator
   with SqsClientConfigurator
   with SqsConfigConfigurator {
-
-  val topicArn: ScallopOption[String] = opt[String](required = true)
-
+  
   verify()
-
-  val snsConfig = SNSConfig(
-    topicArn(),
-  )
 
   val appConfig = CallBackereiConfig(
     cloudwatchClientConfig = cloudwatchClientConfig,
