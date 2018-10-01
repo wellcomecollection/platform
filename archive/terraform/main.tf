@@ -88,7 +88,7 @@ module "progress_http" {
 
   name = "progress_http"
 
-  container_port = "9001"
+  container_port  = "9001"
   container_image = "${local.progress_http_container_image}"
 
   env_vars = {
@@ -99,10 +99,10 @@ module "progress_http" {
   env_vars_length = 2
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
-  private_subnets = "${local.private_subnets}"
+  private_subnets    = "${local.private_subnets}"
 
   cluster_id = "${aws_ecs_cluster.cluster.id}"
-  vpc_id = "${local.vpc_id}"
+  vpc_id     = "${local.vpc_id}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }

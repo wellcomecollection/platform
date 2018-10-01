@@ -1,4 +1,3 @@
-
 module "service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=v11.4.1"
 
