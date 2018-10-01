@@ -142,9 +142,9 @@ Response:
     "id": "{id}",
     "type": "Bag"
   },
-  "result": {
-    "id": "success",
-    "type": "IngestResult"
+  "status": {
+    "id": "processing|failure|success",
+    "type": "IngestStatus"
   },
   "events": [ ... ]
 }
