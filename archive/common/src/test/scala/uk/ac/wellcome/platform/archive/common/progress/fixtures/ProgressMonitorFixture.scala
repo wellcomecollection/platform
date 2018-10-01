@@ -64,10 +64,10 @@ trait ProgressMonitorFixture
   }
 
   def createProgress(
-                      progressMonitor: ProgressMonitor,
-                      callbackUrl: String = callbackUrl,
-                      uploadUrl: String = uploadUrl
-                    ): Progress = {
+    progressMonitor: ProgressMonitor,
+    callbackUrl: String = callbackUrl,
+    uploadUrl: String = uploadUrl
+  ): Progress = {
     val id = UUID.randomUUID().toString
 
     progressMonitor.create(

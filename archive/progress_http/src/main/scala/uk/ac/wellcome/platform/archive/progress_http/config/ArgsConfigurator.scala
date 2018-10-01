@@ -4,7 +4,10 @@ import org.rogach.scallop.ScallopConf
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
-import uk.ac.wellcome.platform.archive.progress_http.models.{HttpServerConfig, ProgressHttpConfig}
+import uk.ac.wellcome.platform.archive.progress_http.models.{
+  HttpServerConfig,
+  ProgressHttpConfig
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.duration._

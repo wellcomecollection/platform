@@ -10,7 +10,10 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.util.{Failure, Success, Try}
