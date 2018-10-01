@@ -1,13 +1,17 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.stream.scaladsl.{Sink, Source}
-import org.scalatest.FunSpec
+import org.scalatest.{FunSpec, Inside}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.BagItConfig
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.models.EntryPath
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
+
+import scala.collection.JavaConverters._
 
 class ArchiveJobFlowTest
     extends FunSpec
@@ -15,7 +19,7 @@ class ArchiveJobFlowTest
     with S3
     with Akka
     with ScalaFutures
-    with ZipBagItFixture {
+    with ZipBagItFixture with Inside {
   implicit val s = s3Client
 
   it("outputs a right of archive job if all of the items succeed") {
@@ -51,7 +55,11 @@ class ArchiveJobFlowTest
               val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(archiveJob))
+              inside(archiveJobs.toList){ case List(Left(ArchiveJobError(actualArchiveJob, List(FileNotFoundError(archiveItemJob))))) =>
+                actualArchiveJob shouldBe archiveJob
+                archiveItemJob.bagDigestItem.location shouldBe EntryPath("this/does/not/exists.jpg")
+              }
+
               }
           }
         }
@@ -67,11 +75,18 @@ class ArchiveJobFlowTest
           withBagItZip(dataFileCount = 2, createDigest = _ => "bad-digest") {
             case (bagName, zipFile) =>
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+
+              val failedFiles: List[String] = zipFile.entries().asScala.collect{case entry if !entry.getName.contains("tagmanifest") => entry.getName}.toList
+
               val source = Source.single(archiveJob)
               val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(archiveJob))
+                inside(archiveJobs.toList){ case List(Left(ArchiveJobError(actualArchiveJob, errors))) =>
+                  actualArchiveJob shouldBe archiveJob
+                  all (errors) shouldBe a[ChecksumNotMatchedOnUploadError]
+                  errors.map(_.job.bagDigestItem.location.path) should contain theSameElementsAs failedFiles
+                }
               }
           }
         }

@@ -4,6 +4,7 @@ import java.io.File
 import java.util.zip.ZipFile
 
 import akka.NotUsed
+import akka.stream.Attributes
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
@@ -16,7 +17,7 @@ object ZipFileDownloadFlow extends Logging {
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[IngestBagRequest, ZipFileDownloadComplete, NotUsed] = {
 
-    Flow[IngestBagRequest]
+    Flow[IngestBagRequest].withAttributes(Attributes.name(""))
       .log("download location")
       .flatMapMerge(
         parallelism, {

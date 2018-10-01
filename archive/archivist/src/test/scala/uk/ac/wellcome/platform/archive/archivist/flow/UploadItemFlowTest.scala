@@ -5,9 +5,10 @@ import akka.stream.{ActorAttributes, Supervision}
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ChecksumNotMatchedOnUploadError, FileNotFoundError, UploadError}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.DigitisedStorageType
 import uk.ac.wellcome.storage.fixtures.S3
@@ -22,7 +23,7 @@ class UploadItemFlowTest
     with ZipBagItFixture
     with Akka
     with ScalaFutures
-    with ArchiveJobGenerators {
+    with ArchiveJobGenerators with Inside {
 
   it(
     "sends a right of archive item job when uploading a file from an archive item job succeeds") {
@@ -87,7 +88,8 @@ class UploadItemFlowTest
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
-              result shouldBe Left(archiveItemJob)
+              result shouldBe Left(
+                ChecksumNotMatchedOnUploadError(digest,"52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73",archiveItemJob))
               getContentFromS3(
                 bucket,
                 s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
@@ -123,7 +125,7 @@ class UploadItemFlowTest
             val futureResult = source via flow runWith Sink.seq
 
             whenReady(futureResult) { result =>
-              result shouldBe List(Left(archiveItemJob))
+              result shouldBe List(Left(FileNotFoundError(archiveItemJob)))
               val exception = intercept[AmazonS3Exception] {
                 getContentFromS3(
                   bucket,
@@ -167,12 +169,15 @@ class UploadItemFlowTest
           val futureResult = source via flow runWith Sink.seq
 
           whenReady(futureResult) { result =>
-            result shouldBe List(Left(failingArchiveItemJob))
+          inside(result.toList) { case List(Left(UploadError(exception, job))) =>
+            job shouldBe failingArchiveItemJob
+            exception shouldBe a[AmazonS3Exception]
+            exception.asInstanceOf[AmazonS3Exception].getErrorCode shouldBe "NoSuchBucket"
           }
 
         }
       }
     }
-  }
+  }}
 
 }

@@ -1,11 +1,13 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.stream.scaladsl.{Sink, Source}
-import org.scalatest.FunSpec
+import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ChecksumNotMatchedOnDownloadError, DownloadError}
 import uk.ac.wellcome.platform.archive.common.models.DigitisedStorageType
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
@@ -17,7 +19,8 @@ class DownloadItemFlowTest
     with ScalaFutures
     with Akka
     with MockitoSugar
-    with ArchiveJobGenerators {
+    with ArchiveJobGenerators
+    with Inside {
 
   it("passes through a correct right archive item job") {
     withLocalS3Bucket { bucket =>
@@ -85,7 +88,7 @@ class DownloadItemFlowTest
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
-              result shouldBe Left(archiveItemJob)
+              result shouldBe Left(ChecksumNotMatchedOnDownloadError(digest, "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73", archiveItemJob))
             }
           }
         }
@@ -113,7 +116,11 @@ class DownloadItemFlowTest
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
-              result shouldBe Left(archiveItemJob)
+              inside(result) {
+                case Left(DownloadError(exception, job)) =>
+                job shouldBe archiveItemJob
+                exception shouldBe a[AmazonS3Exception]
+              }
             }
           }
         }

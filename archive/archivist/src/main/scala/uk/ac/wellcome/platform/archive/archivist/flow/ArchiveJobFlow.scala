@@ -5,43 +5,43 @@ import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveItemJobCreator
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, ArchiveJobError}
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob}
-import uk.ac.wellcome.platform.archive.common.progress.models.ProgressEvent
+
 
 object ArchiveJobFlow extends Logging {
   def apply(delimiter: String, parallelism: Int)(implicit s3Client: AmazonS3)
-    : Flow[ArchiveJob, Either[(List[ProgressEvent],ArchiveJob), ArchiveJob], NotUsed] =
+    : Flow[ArchiveJob, Either[ArchiveError[ArchiveJob], ArchiveJob], NotUsed] =
     Flow[ArchiveJob]
       .log("creating archive item jobs")
       .map(job => ArchiveItemJobCreator.createArchiveItemJobs(job, delimiter))
       .via(
         FoldEitherFlow[
-          (ProgressEvent, ArchiveJob),
+          ArchiveError[ArchiveJob],
           List[ArchiveItemJob],
-          Either[(List[ProgressEvent],ArchiveJob), ArchiveJob]]{ case (event, job) =>
-              warn(s"$job failed creating archive item jobs")
-          Left((List(event),job))}(mapReduceArchiveItemJobs(delimiter, parallelism)))
+          Either[ArchiveError[ArchiveJob], ArchiveJob]]{ error =>
+              warn(s"${error.job} failed creating archive item jobs")
+          Left(error)}(mapReduceArchiveItemJobs(delimiter, parallelism)))
 
   private def mapReduceArchiveItemJobs(delimiter: String, parallelism: Int)(
-    implicit s3Client: AmazonS3): Flow[List[ArchiveItemJob], Either[(List[ProgressEvent], ArchiveJob),ArchiveJob], NotUsed] =
+    implicit s3Client: AmazonS3): Flow[List[ArchiveItemJob], Either[ArchiveJobError,ArchiveJob], NotUsed] =
     Flow[List[ArchiveItemJob]]
       .mapConcat(identity)
       .via(ArchiveItemJobFlow(delimiter, parallelism))
       .groupBy(Int.MaxValue, {
-        case Right(archiveItemJob) => archiveItemJob.bagName
-        case Left((_,archiveItemJob))  => archiveItemJob.bagName
+        case Right(archiveItemJob) => archiveItemJob.archiveJob
+        case Left(error)  => error.job.archiveJob
       })
-    .fold((Nil: List[ProgressEvent], None: Option[ArchiveJob])){(accumulator, archiveItemJobResult) =>
+    .fold((Nil: List[ArchiveError[ArchiveItemJob]], None: Option[ArchiveJob])){(accumulator, archiveItemJobResult) =>
       (accumulator, archiveItemJobResult) match {
-        case ((eventList, _),Right(archiveItemJob)) => (eventList, Some(archiveItemJob.archiveJob))
-        case ((eventList, _),Left((event, archiveItemJob))) => (event :: eventList, Some(archiveItemJob.archiveJob))
+        case ((errorList, _),Right(archiveItemJob)) => (errorList, Some(archiveItemJob.archiveJob))
+        case ((errorList, _),Left(error)) => (error :: errorList, Some(error.job.archiveJob))
       }
     }.collect {
       case (events, Some(archiveJob)) => (events, archiveJob)
-    }
-      .mergeSubstreams
+    }.mergeSubstreams
     .map {
-      case (events, archiveJob) if events.nonEmpty => Left((events, archiveJob))
+      case (errors, archiveJob) if errors.nonEmpty => Left(ArchiveJobError(archiveJob, errors))
       case (_, archiveJob) => Right(archiveJob)
      }
 }
