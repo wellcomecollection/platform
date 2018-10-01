@@ -11,15 +11,11 @@ class ArgsConfigurator(val arguments: Seq[String])
   extends ScallopConf(arguments)
   with CloudWatchClientConfigurator
   with MetricsConfigConfigurator
+  with S3ClientConfigurator
   with SnsClientConfigurator
   with SnsConfigConfigurator
   with SqsClientConfigurator
   with SqsConfigConfigurator {
-
-  val awsS3AccessKey = opt[String]()
-  val awsS3SecretKey = opt[String]()
-  val awsS3Region = opt[String](default = Some("eu-west-1"))
-  val awsS3Endpoint = opt[String]()
 
   val uploadNamespace = opt[String](required = true)
   val parallelism = opt[Int](default = Some(10))
@@ -45,13 +41,6 @@ class ArgsConfigurator(val arguments: Seq[String])
       digestDelimiterRegexp = digestDelimiterRegexp()
     ),
     parallelism = parallelism()
-  )
-
-  val s3ClientConfig = S3ClientConfig(
-    accessKey = awsS3AccessKey.toOption,
-    secretKey = awsS3SecretKey.toOption,
-    region = awsS3Region(),
-    endpoint = awsS3Endpoint.toOption
   )
 
   val archiveProgressMonitorConfig = ProgressMonitorConfig(
