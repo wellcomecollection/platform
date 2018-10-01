@@ -3,7 +3,7 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT>
+Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT> [--skip-pipeline-checks]
        trigger_reindex.py -h | --help
 
 Options:
@@ -11,6 +11,8 @@ Options:
   --reason=<REASON>         An explanation of why you're running this reindex.
                             This will be printed in the Slack alert.
   --total_segments=<COUNT>  How many segments to divide the VHS table into.
+  --skip-pipeline-checks    Don't check if the pipeline tables are clear
+                            before running.
   -h --help                 Print this help message
 
 """
@@ -135,9 +137,11 @@ def main():
     source_name = args["--source"]
     reason = args["--reason"]
     total_segments = int(args["--total_segments"])
+    skip_pipeline_checks = args['--skip-pipeline-checks']
 
-    print("Checking pipeline is clear...")
-    check_tables_are_clear()
+    if not skip_pipeline_checks:
+        print('Checking pipeline is clear...')
+        check_tables_are_clear()
 
     print(f"Triggering a reindex in {source_name}")
 
