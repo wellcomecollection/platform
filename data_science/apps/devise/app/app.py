@@ -33,11 +33,12 @@ search_index.loadIndex('../data/search_index.hnsw')
 
 # Define endpoint classes
 class devise_search(Resource):
-    def get(self):        
+    def get(self):
         query = urllib.parse.unquote_plus(request.args.get('query'))
+        n = int(request.args.get('n'))
 
         response_ids = search(query, search_index, model, image_ids, 
-                              word_to_index, index_to_wordvec, 12)
+                              word_to_index, index_to_wordvec, n)
         blank_url = 'https://iiif.wellcomecollection.org/image/{}.jpg/full/760,/0/default.jpg'
         response_urls = [blank_url.format(id) for id in response_ids]
 

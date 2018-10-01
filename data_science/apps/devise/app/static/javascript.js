@@ -1,7 +1,7 @@
-function display_images(query) {
+function display_images(query, n='12') {
     document.getElementById('images').innerHTML = '';
     image_div = document.getElementById('images');
-    const query_url = '/devise/search?query='.concat(query);
+    const query_url = '/devise/search?query='.concat(query.toLowerCase()).concat('&n=').concat(n);
     fetch(query_url)
         .then((resp) => resp.json())
         .then(function (data) {
@@ -26,3 +26,11 @@ function display_images(query) {
             console.log(error);
         });
 }
+
+document.getElementById("query")
+    .addEventListener("keypress", function (event) {
+        event.preventDefault();
+        if (event.key === 'Enter') {
+            document.getElementById("search_button").click();
+        }
+    });
