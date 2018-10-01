@@ -6,18 +6,14 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.call_backerei.models.CallBackereiConfig
-import uk.ac.wellcome.platform.archive.common.config.SqsClientConfigurator
+import uk.ac.wellcome.platform.archive.common.config.{SnsClientConfigurator, SqsClientConfigurator}
 
 import scala.concurrent.duration._
 
 class ArgsConfigurator(val arguments: Seq[String])
   extends ScallopConf(arguments)
+  with SnsClientConfigurator
   with SqsClientConfigurator {
-
-  val awsSnsAccessKey = opt[String]()
-  val awsSnsSecretKey = opt[String]()
-  val awsSnsRegion = opt[String](default = Some("eu-west-1"))
-  val awsSnsEndpoint = opt[String]()
 
   val awsCloudwatchRegion = opt[String](default = Some("eu-west-1"))
   val awsCloudwatchEndpoint = opt[String]()
@@ -44,13 +40,6 @@ class ArgsConfigurator(val arguments: Seq[String])
     sqsWaitTimeSeconds() seconds,
     sqsMaxMessages(),
     sqsParallelism()
-  )
-
-  val snsClientConfig = SnsClientConfig(
-    accessKey = awsSnsAccessKey.toOption,
-    secretKey = awsSnsSecretKey.toOption,
-    region = awsSnsRegion(),
-    endpoint = awsSnsEndpoint.toOption
   )
 
   val snsConfig = SNSConfig(
