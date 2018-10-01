@@ -17,7 +17,7 @@ object Main extends App with AkkaHttpApp {
   )
 
   try {
-    info(s"Starting worker.")
+    info(s"Starting service.")
 
     val app = run()
 
@@ -26,6 +26,6 @@ object Main extends App with AkkaHttpApp {
     case e: Throwable =>
       error("Fatal error:", e)
   } finally {
-    info(s"Terminating worker.")
+    info(s"Terminating service.")
   }
 }

@@ -56,57 +56,6 @@ module "registrar" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
-module "progress_async" {
-  source = "internal_queue_service"
-
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${local.private_subnets}"
-  vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_progress_async"
-  aws_region                       = "${var.aws_region}"
-
-  min_capacity = 1
-  max_capacity = 1
-
-  env_vars = {
-    queue_url                   = "${module.progress_async_queue.id}"
-    topic_arn                   = "${module.caller_topic.arn}"
-    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
-  }
-
-  env_vars_length = 3
-
-  container_image   = "${local.progress_async_container_image}"
-  source_queue_name = "${module.progress_async_queue.name}"
-  source_queue_arn  = "${module.progress_async_queue.arn}"
-}
-
-module "progress_http" {
-  source = "internal_rest_service"
-
-  name = "progress_http"
-
-  container_port  = "9001"
-  container_image = "${local.progress_http_container_image}"
-
-  env_vars = {
-    app_base_url                = "https://api.wellcomecollection.org"
-    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
-  }
-
-  env_vars_length = 2
-
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
-  private_subnets    = "${local.private_subnets}"
-
-  cluster_id = "${aws_ecs_cluster.cluster.id}"
-  vpc_id     = "${local.vpc_id}"
-
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-}
-
 module "bagger" {
   source = "internal_queue_service"
 
@@ -170,4 +119,57 @@ module "api_ecs" {
   private_subnets    = "${local.private_subnets}"
   public_subnets     = "${local.public_subnets}"
   certificate_domain = "api.wellcomecollection.org"
+}
+
+# Progress
+
+module "progress_async" {
+  source = "internal_queue_service"
+
+  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets                          = "${local.private_subnets}"
+  vpc_id                           = "${local.vpc_id}"
+  service_name                     = "progress_async"
+  aws_region                       = "${var.aws_region}"
+
+  min_capacity = 1
+  max_capacity = 1
+
+  env_vars = {
+    queue_url                   = "${module.progress_async_queue.id}"
+    topic_arn                   = "${module.caller_topic.arn}"
+    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+  }
+
+  env_vars_length = 3
+
+  container_image   = "${local.progress_async_container_image}"
+  source_queue_name = "${module.progress_async_queue.name}"
+  source_queue_arn  = "${module.progress_async_queue.arn}"
+}
+
+module "progress_http" {
+  source = "internal_rest_service"
+
+  service_name = "progress_http"
+
+  container_port  = "9001"
+  container_image = "${local.progress_http_container_image}"
+
+  env_vars = {
+    app_base_url                = "https://api.wellcomecollection.org"
+    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+  }
+
+  env_vars_length = 2
+
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  private_subnets    = "${local.private_subnets}"
+
+  cluster_id = "${aws_ecs_cluster.cluster.id}"
+  vpc_id     = "${local.vpc_id}"
+
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }

@@ -1,7 +1,7 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=v11.4.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=role-dupe-fix"
 
-  service_name       = "${var.name}"
+  service_name       = "${var.service_name}"
   task_desired_count = "1"
 
   task_definition_arn = "${module.task.task_definition_arn}"
@@ -12,12 +12,6 @@ module "service" {
 
   ecs_cluster_id = "${var.cluster_id}"
 
-  cpu    = 2048
-  memory = 4096
-
-  env_vars        = "${var.env_vars}"
-  env_vars_length = "${var.env_vars_length}"
-
   vpc_id  = "${var.vpc_id}"
   subnets = "${var.private_subnets}"
 
@@ -27,10 +21,16 @@ module "service" {
 }
 
 module "task" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=v11.4.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=role-dupe-fix"
+
+  cpu    = 2048
+  memory = 4096
+
+  env_vars        = "${var.env_vars}"
+  env_vars_length = "${var.env_vars_length}"
 
   aws_region = "${var.aws_region}"
-  task_name  = "${var.name}"
+  task_name  = "${var.service_name}"
 
   container_image = "${var.container_image}"
   container_port  = "${var.container_port}"

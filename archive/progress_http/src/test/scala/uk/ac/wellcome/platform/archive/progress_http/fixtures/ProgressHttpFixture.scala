@@ -10,7 +10,6 @@ import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.platform.archive.common.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models
@@ -19,7 +18,7 @@ import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorMo
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.progress_http.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.progress_http.modules._
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
@@ -28,7 +27,7 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 trait ProgressHttpFixture
-  extends AkkaS3
+  extends S3
     with LocalDynamoDb
     with ScalaFutures
     with ProgressMonitorFixture

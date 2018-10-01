@@ -8,6 +8,8 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.progress_http.Router
 import uk.ac.wellcome.platform.archive.progress_http.models.HttpServerConfig
 
+import scala.concurrent.{ExecutionContext, Future}
+
 trait AkkaHttpApp extends Logging {
   val injector: Injector
 
@@ -15,9 +17,22 @@ trait AkkaHttpApp extends Logging {
     val router = injector.getInstance(classOf[Router])
     val config = injector.getInstance(classOf[HttpServerConfig])
 
-    implicit val system = injector.getInstance(classOf[ActorSystem])
+    implicit val sys = injector.getInstance(classOf[ActorSystem])
     implicit val mat = injector.getInstance(classOf[ActorMaterializer])
+    implicit val ctx = injector.getInstance(classOf[ExecutionContext])
 
-    Http().bindAndHandle(router.routes, config.host, config.port)
+    val bindingFuture: Future[Http.ServerBinding] = Http()
+      .bindAndHandle(router.routes, config.host, config.port)
+
+    val startMessage =
+      s"Listening on ${config.host}:${config.port}"
+
+    bindingFuture
+      .map(b => {
+        info(startMessage)
+
+        b
+      })
+      .flatMap(_.whenTerminated)
   }
 }

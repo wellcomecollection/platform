@@ -30,7 +30,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     opt[Int](required = true, default = Some(9001))
 
   val appHost =
-    opt[String](required = true, default = Some("localhost"))
+    opt[String](required = true, default = Some("0.0.0.0"))
 
   val appBaseUrl =
     opt[String](required = true)

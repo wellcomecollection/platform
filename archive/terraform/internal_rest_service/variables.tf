@@ -1,4 +1,4 @@
-variable "name" {}
+variable "service_name" {}
 
 variable "security_group_ids" {
   type = "list"
