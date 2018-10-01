@@ -3,7 +3,10 @@ module "updates_queue" {
   queue_name  = "sierra_${var.resource_type}_merger_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
-  topic_names = ["${var.updates_topic_name}"]
+  topic_names = [
+    "${var.updates_topic_name}",
+    "${var.reindexed_items_topic_name}"
+  ]
 
   # Ensure that messages are spread around -- if the merger has an error
   # (for example, hitting DynamoDB write limits), we don't retry too quickly.
