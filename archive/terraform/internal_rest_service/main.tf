@@ -1,5 +1,5 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=role-dupe-fix"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=v11.8.1"
 
   service_name       = "${var.service_name}"
   task_desired_count = "1"
@@ -21,7 +21,7 @@ module "service" {
 }
 
 module "task" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=role-dupe-fix"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=v11.8.1"
 
   cpu    = 2048
   memory = 4096
