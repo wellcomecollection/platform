@@ -4,10 +4,8 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  BagUploaderConfig
-}
+import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
+import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 
 object ArchiveZipFileFlow extends Logging {
@@ -20,7 +18,8 @@ object ArchiveZipFileFlow extends Logging {
           // TODO report progress here
           Source
             .single(zipFile)
-            .map(ArchiveJob.create(_, config))
+            .log("creating archive job")
+            .map(ArchiveJobCreator.create(_, config))
             .collect { case Right(job) => job }
             .via(ArchiveJobFlow(
               config.bagItConfig.digestDelimiterRegexp,

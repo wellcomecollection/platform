@@ -2,11 +2,11 @@ package uk.ac.wellcome.platform.archive.archivist.models
 
 import java.util.zip.ZipFile
 
-import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.platform.archive.common.models.EntryPath
 
 case class ZipLocation(
   zipFile: ZipFile,
-  objectLocation: ObjectLocation
+  entryPath: EntryPath
 )
 
 object ZipLocation {

@@ -13,7 +13,8 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   BagLocation,
-  BagPath
+  BagPath,
+  DigitisedStorageType
 }
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
@@ -64,20 +65,23 @@ trait Registrar
 
   def withBag[R](storageBucket: Bucket, dataFileCount: Int = 1)(
     testWith: TestWith[BagLocation, R]) = {
-    val bagName = BagPath(randomAlphanumeric())
+    val bagIdentifier = randomAlphanumeric()
 
-    info(s"Creating bag $bagName")
+    info(s"Creating bag $bagIdentifier")
 
-    val fileEntries = createBag(bagName, dataFileCount)
+    val fileEntries = createBag(bagIdentifier, dataFileCount)
     val storagePrefix = "archive"
 
-    val bagLocation = BagLocation(storageBucket.name, storagePrefix, bagName)
+    val bagLocation = BagLocation(
+      storageBucket.name,
+      storagePrefix,
+      BagPath(s"$DigitisedStorageType/$bagIdentifier"))
 
     fileEntries.map((entry: FileEntry) => {
       s3Client
         .putObject(
           bagLocation.storageNamespace,
-          s"${storagePrefix}/${entry.name}",
+          s"$storagePrefix/${bagLocation.bagPath}/${entry.name}",
           entry.contents
         )
     })

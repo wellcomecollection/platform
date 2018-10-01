@@ -17,14 +17,17 @@ object ArchiveItemJobCreator extends Logging {
     job: ArchiveJob,
     delimiter: String): Either[ArchiveJob, List[ArchiveItemJob]] = {
     val zipLocations = job.bagManifestLocations.map(manifestLocation =>
-      ZipLocation(job.zipFile, manifestLocation.toObjectLocation))
+      ZipLocation(job.zipFile, manifestLocation.toEntryPath))
     zipLocations
       .traverse { zipLocation =>
         parseArchiveItemJobs(job, zipLocation, delimiter)
       }
       .map(_.flatten)
       .toEither
-      .leftMap(_ => job)
+      .leftMap(ex => {
+        error(s"Failed creating archive item jobs from $job", ex)
+        job
+      })
   }
 
   private def parseArchiveItemJobs(

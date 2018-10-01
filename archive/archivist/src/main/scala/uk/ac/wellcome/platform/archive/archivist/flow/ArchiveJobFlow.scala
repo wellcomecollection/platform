@@ -8,19 +8,23 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveJob
 }
 import cats.implicits._
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveItemJobCreator
 
-object ArchiveJobFlow {
+object ArchiveJobFlow extends Logging {
   def apply(delimiter: String, parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[ArchiveJob, Either[ArchiveJob, ArchiveJob], NotUsed] =
     Flow[ArchiveJob]
+      .log("creating archive item jobs")
       .map(job => ArchiveItemJobCreator.createArchiveItemJobs(job, delimiter))
       .via(
         FoldEitherFlow[
           ArchiveJob,
           List[ArchiveItemJob],
-          Either[ArchiveJob, ArchiveJob]](Left(_))(
-          mapReduceArchiveItemJobs(delimiter, parallelism)))
+          Either[ArchiveJob, ArchiveJob]](job => {
+          warn(s"$job failed creating archive item jobs")
+          Left(job)
+        })(mapReduceArchiveItemJobs(delimiter, parallelism)))
 
   private def mapReduceArchiveItemJobs(delimiter: String, parallelism: Int)(
     implicit s3Client: AmazonS3) =
