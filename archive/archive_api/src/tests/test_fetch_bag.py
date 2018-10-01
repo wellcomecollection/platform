@@ -2,8 +2,6 @@
 
 import json
 
-import pytest
-
 from bags import fetch_bag
 
 
@@ -29,18 +27,6 @@ def test_looks_up_bag(dynamodb_resource, s3_client, bucket_bag, table_name_bag):
     )
 
     assert response == stored_bag
-
-
-@pytest.yield_fixture(autouse=True)
-def run_around_tests(s3_client, bucket_bag):
-    s3_client.create_bucket(Bucket=bucket_bag)
-
-    yield
-
-    objects = s3_client.list_objects(Bucket=bucket_bag)
-    for content in objects['Contents']:
-        s3_client.delete_object(Bucket=bucket_bag, Key=content['Key'])
-    s3_client.delete_bucket(Bucket=bucket_bag)
 
 
 def create_table(dynamodb_client, table_name_bag):
