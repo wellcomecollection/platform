@@ -26,13 +26,17 @@ case object LazyFuture {
 }
 
 object BatchExecutor {
-  def execute[T](futures: Seq[LazyFuture[T]])(concurFactor: Int)(implicit ec: ExecutionContext): Future[Seq[T]] =
+  def execute[T](futures: Seq[LazyFuture[T]])(concurFactor: Int)(
+    implicit ec: ExecutionContext): Future[Seq[T]] =
     futures
       .grouped(concurFactor)
-      .foldLeft(Future.successful(List.empty[T])) { (completedFutures, newFutures) =>
-        val batch = Future.sequence(newFutures.map { _ () })
-        completedFutures.flatMap {
-          cf => batch.map { values => cf ++ values }
-        }
+      .foldLeft(Future.successful(List.empty[T])) {
+        (completedFutures, newFutures) =>
+          val batch = Future.sequence(newFutures.map { _() })
+          completedFutures.flatMap { cf =>
+            batch.map { values =>
+              cf ++ values
+            }
+          }
       }
 }
