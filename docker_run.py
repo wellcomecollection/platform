@@ -19,7 +19,7 @@ import sys
 
 # Root of the Git repository
 ROOT = subprocess.check_output([
-    'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
+    'git', 'rev-parse', '--show-toplevel']).decode('utf8').strip()
 
 
 def _aws_credentials_args():
