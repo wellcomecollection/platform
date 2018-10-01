@@ -30,9 +30,9 @@ class CallBackereiFeatureTest
   private val callbackHost = "localhost"
   private val callbackPort = 8080
 
-  def createProgressWith(callbackUrl: Option[String]): Progress =
+  def createProgressWith(id: UUID, callbackUrl: Option[String]): Progress =
     Progress(
-      id = randomAlphanumeric(25),
+      id = id.toString,
       uploadUrl = randomAlphanumeric(25),
       callbackUrl = callbackUrl,
       result = Completed
@@ -47,6 +47,7 @@ class CallBackereiFeatureTest
           val callbackUrl = s"http://$callbackHost:$callbackPort/callback/$requestId"
 
           val progress = createProgressWith(
+            id = requestId,
             callbackUrl = Some(callbackUrl)
           )
 
