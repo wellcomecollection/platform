@@ -79,11 +79,6 @@ def create_table(dynamodb_client, table_name):
 
 
 @pytest.fixture
-def bag_id():
-    return str(uuid.uuid4())
-
-
-@pytest.fixture
 def bucket_bag(s3_client):
     bucket_name = 'test-python-bag-bucket-%d' % random.randint(0, 10000)
     os.environ.update({'BAG_VHS_BUCKET_NAME': bucket_name})
