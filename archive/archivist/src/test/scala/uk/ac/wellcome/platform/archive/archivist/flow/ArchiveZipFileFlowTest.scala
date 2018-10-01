@@ -28,7 +28,6 @@ class ArchiveZipFileFlowTest
     withLocalS3Bucket { storageBucket =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
-          withLocalSnsTopic { topic =>
             val bagUploaderConfig = createBagUploaderConfig(storageBucket)
             withBagItZip() {
               case (_, zipFile) =>
@@ -44,43 +43,44 @@ class ArchiveZipFileFlowTest
                 whenReady(verification) { result =>
                   listKeysInBucket(storageBucket) should have size 4
                   result should have size 1
-                  val messages = listMessagesReceivedFromSNS(topic)
-                  messages should have size 1
-                  val progressUpdate =
-                    fromJson[ProgressUpdate](messages.head.message).get
-                  inside(progressUpdate) {
-                    case ProgressUpdate(id, event, status) =>
-                      id shouldBe ingestContext.archiveRequestId.toString
-                      status shouldBe Progress.Processing
-                      event.description shouldBe "bag archived successfully"
-                  }
                 }
-            }
           }
         }
       }
     }
   }
 
-  it("fails when verifying and uploading a bag with incorrect digests") {
+  it("fails and notifies progess when verifying and uploading a bag with incorrect digests") {
     withLocalS3Bucket { storageBucket =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
-          val bagUploaderConfig = createBagUploaderConfig(storageBucket)
-          withBagItZip(createDigest = _ => "bad_digest") {
-            case (_, zipFile) =>
-              val uploader = ArchiveZipFileFlow(bagUploaderConfig)
-              val ingestContext = createIngestBagRequest
+          withLocalSnsTopic { reportingTopic =>
+            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
+            withBagItZip(createDigest = _ => "bad_digest") {
+              case (_, zipFile) =>
+                val uploader = ArchiveZipFileFlow(bagUploaderConfig)
+                val ingestContext = createIngestBagRequest
 
-              val (_, verification) =
-                uploader.runWith(
-                  Source.single(
-                    ZipFileDownloadComplete(zipFile, ingestContext)),
-                  Sink.seq)
+                val (_, verification) =
+                  uploader.runWith(
+                    Source.single(ZipFileDownloadComplete(zipFile, ingestContext)),
+                    Sink.seq)
 
-              whenReady(verification) { result =>
-                result shouldBe empty
-              }
+                whenReady(verification) { result =>
+                  result shouldBe empty
+
+                  val messages = listMessagesReceivedFromSNS(reportingTopic)
+                  messages should have size 1
+                  val progressUpdate =
+                    fromJson[ProgressUpdate](messages.head.message).get
+                  inside(progressUpdate) {
+                    case ProgressUpdate(id, event, status) =>
+                      id shouldBe ingestContext.archiveRequestId.toString
+                      status shouldBe Progress.Failed
+                      event.description shouldBe "failed"
+                  }
+                }
+            }
           }
         }
       }

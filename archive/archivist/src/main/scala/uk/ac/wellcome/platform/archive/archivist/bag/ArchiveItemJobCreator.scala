@@ -2,12 +2,9 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 
 import cats.implicits._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveItemJob,
-  ArchiveJob,
-  ZipLocation
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob, ZipLocation}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
+import uk.ac.wellcome.platform.archive.common.progress.models.ProgressEvent
 
 import scala.util.Try
 
@@ -15,7 +12,7 @@ object ArchiveItemJobCreator extends Logging {
 
   def createArchiveItemJobs(
     job: ArchiveJob,
-    delimiter: String): Either[ArchiveJob, List[ArchiveItemJob]] = {
+    delimiter: String): Either[(ProgressEvent, ArchiveJob), List[ArchiveItemJob]] = {
     val zipLocations = job.bagManifestLocations.map(manifestLocation =>
       ZipLocation(job.zipFile, manifestLocation.toEntryPath))
     zipLocations
@@ -26,7 +23,7 @@ object ArchiveItemJobCreator extends Logging {
       .toEither
       .leftMap(ex => {
         error(s"Failed creating archive item jobs from $job", ex)
-        job
+        (ProgressEvent(s"Failed creating archive item jobs from $job: ${ex.getMessage}"), job)
       })
   }
 
