@@ -8,20 +8,21 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil.{toJson, _}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
+import scala.concurrent.{ExecutionContext, Future}
+
 object CallbackFlow extends Logging {
 
-  def apply()(implicit actorSystem: ActorSystem) = {
-    val http = Http().superPool[Progress]()
-
+  def apply()(implicit actorSystem: ActorSystem, ec: ExecutionContext) =
     Flow[Progress]
-      .filter { _.callbackUrl.isDefined }
-      .collect {
-        case progress @ Progress(id, _, Some(callbackUri), _, _, _, _) =>
+      // We should only make an HTTP request if we have a callback URL
+      // to send the request to -- but we still want the message in the
+      // stream, or it won't get deleted from the SQS queue.
+      .map {
+        case Progress(id, _, Some(callbackUri), _, _, _, _) =>
           val httpRequest = createHttpRequest(id, callbackUri)
-          (httpRequest, progress)
+          Http().singleRequest(request = httpRequest).map { Some(_) }
+        case _ => Future.successful(None)
       }
-      .via(http)
-  }
 
   def createHttpRequest(id: String, callbackUri: String): HttpRequest = {
     val contentJson = ContentTypes.`application/json`

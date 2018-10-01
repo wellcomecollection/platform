@@ -38,7 +38,7 @@ class CallBackereiFeatureTest
       result = Completed
     )
 
-  it("registers an archived BagIt bag from S3") {
+  it("makes a POST request when it receives a Progress with a callback") {
     withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
       withCallBäckerei {
         case (queuePair, _, callBäckerei) =>
@@ -65,6 +65,31 @@ class CallBackereiFeatureTest
                 .withRequestBody(equalToJson(
                   toJson(CallbackPayload(requestId.toString)).get)))
           }
+      }
+    }
+  }
+
+  it("doesn't make any requests if it receives a Progress without a callback") {
+    withCallBäckerei { case (queuePair, _, callBäckerei) =>
+      val requestId = UUID.randomUUID()
+
+      val progress = createProgressWith(
+        id = requestId,
+        callbackUrl = None
+      )
+
+      sendNotificationToSQS(
+        queue = queuePair.queue,
+        message = progress
+      )
+
+      callBäckerei.run()
+
+      Thread.sleep(1000)
+
+      eventually {
+        assertQueueEmpty(queuePair.queue)
+        assertQueueEmpty(queuePair.dlq)
       }
     }
   }

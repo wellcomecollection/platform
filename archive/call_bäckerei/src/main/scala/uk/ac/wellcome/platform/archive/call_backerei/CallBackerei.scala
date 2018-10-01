@@ -13,6 +13,7 @@ import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 class CallBackerei @Inject()(
@@ -20,7 +21,7 @@ class CallBackerei @Inject()(
   snsConfig: SNSConfig,
   messageStream: MessageStream[NotificationMessage, Object],
   actorSystem: ActorSystem
-) {
+)(implicit ec: ExecutionContext) {
   def run() = {
     implicit val system = actorSystem
 
