@@ -31,8 +31,8 @@ object ArchiveJobFlow extends Logging {
         case Right(archiveItemJob) => archiveItemJob.bagName
         case Left((_,archiveItemJob))  => archiveItemJob.bagName
       })
-    .fold((Nil: List[ProgressEvent], None: Option[ArchiveJob])){(tuple, archiveItemJobResult) =>
-      (tuple, archiveItemJobResult) match {
+    .fold((Nil: List[ProgressEvent], None: Option[ArchiveJob])){(accumulator, archiveItemJobResult) =>
+      (accumulator, archiveItemJobResult) match {
         case ((eventList, _),Right(archiveItemJob)) => (eventList, Some(archiveItemJob.archiveJob))
         case ((eventList, _),Left((event, archiveItemJob))) => (event :: eventList, Some(archiveItemJob.archiveJob))
       }

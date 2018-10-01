@@ -22,9 +22,9 @@ object BagItemCreator {
           checksum,
           EntryPath(key)
         )
-      case default =>
+      case _ =>
         throw MalformedBagDigestException(
-          default.mkString(delimiter),
+          fileChunk,
           bagName
         )
     }

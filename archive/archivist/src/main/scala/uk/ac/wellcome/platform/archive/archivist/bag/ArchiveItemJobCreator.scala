@@ -23,7 +23,7 @@ object ArchiveItemJobCreator extends Logging {
       .toEither
       .leftMap(ex => {
         error(s"Failed creating archive item jobs from $job", ex)
-        (ProgressEvent(s"Failed creating archive item jobs from $job: ${ex.getMessage}"), job)
+        (ProgressEvent(s"Failed creating archive item jobs for ${job.bagLocation.bagPath}: ${ex.getMessage}"), job)
       })
   }
 
@@ -31,7 +31,7 @@ object ArchiveItemJobCreator extends Logging {
     job: ArchiveJob,
     zipLocation: ZipLocation,
     delimiter: String): Try[List[ArchiveItemJob]] = {
-    Try(ZipFileReader.maybeInputStream(zipLocation).get).flatMap {
+    Try(ZipFileReader.maybeInputStream(zipLocation).getOrElse(throw new NoSuchElementException(s"${zipLocation.entryPath.path} does not exist"))).flatMap {
       inputStream =>
         val manifestFileLines =
           scala.io.Source
