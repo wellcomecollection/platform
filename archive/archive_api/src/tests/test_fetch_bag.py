@@ -71,13 +71,17 @@ def create_table(dynamodb_client, table_name_bag):
 
 def given_bag_in_vhs(bag_id, stored_bag, dynamodb_resource, s3_client, bucket_bag, table_name_bag):
     key = bag_id
-    s3_client.put_object(Bucket=bucket_bag, Key=key, Body=json.dumps(stored_bag))
+    s3_client.put_object(
+        Bucket=bucket_bag,
+        Key=key,
+        Body=json.dumps(stored_bag)
+    )
 
     table = dynamodb_resource.Table(table_name_bag)
     table.put_item(Item={
         'id': bag_id,
         'location': {
-            'key': bag_id,
+            'key': key,
             'namespace': bucket_bag
         }
     })
