@@ -6,15 +6,13 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.call_backerei.models.CallBackereiConfig
+import uk.ac.wellcome.platform.archive.common.config.SqsClientConfigurator
 
 import scala.concurrent.duration._
 
-class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
-
-  val awsSqsAccessKey = opt[String]()
-  val awsSqsSecretKey = opt[String]()
-  val awsSqsRegion = opt[String](default = Some("eu-west-1"))
-  val awsSqsEndpoint = opt[String]()
+class ArgsConfigurator(val arguments: Seq[String])
+  extends ScallopConf(arguments)
+  with SqsClientConfigurator {
 
   val awsSnsAccessKey = opt[String]()
   val awsSnsSecretKey = opt[String]()
@@ -39,13 +37,6 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   val cloudwatchClientConfig = CloudwatchClientConfig(
     region = awsCloudwatchRegion(),
     endpoint = awsCloudwatchEndpoint.toOption
-  )
-
-  val sqsClientConfig = SQSClientConfig(
-    accessKey = awsSqsAccessKey.toOption,
-    secretKey = awsSqsSecretKey.toOption,
-    region = awsSqsRegion(),
-    endpoint = awsSqsEndpoint.toOption
   )
 
   val sqsConfig = SQSConfig(
