@@ -31,13 +31,7 @@ object CallbackFlow {
             val withCallbackUrlFlow = Flow[Progress]
               .collect {
                 case progress@Progress(id, _, Some(callbackUrl), _, _, _, _) =>
-                  (
-                    createHttpRequest(
-                      id = progress.id,
-                      callbackUri = progress.callbackUrl.get
-                    ),
-                    progress
-                  )
+                  (createHttpRequest(id, callbackUrl), progress)
               }
               .via(http)
               .map {
