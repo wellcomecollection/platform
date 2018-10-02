@@ -10,14 +10,14 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
 
 class ArgsConfigurator(val arguments: Seq[String])
-  extends ScallopConf(arguments)
-  with CloudWatchClientConfigurator
-  with MetricsConfigConfigurator
-  with S3ClientConfigurator
-  with SnsClientConfigurator
-  with SnsConfigConfigurator
-  with SqsClientConfigurator
-  with SqsConfigConfigurator {
+    extends ScallopConf(arguments)
+    with CloudWatchClientConfigurator
+    with MetricsConfigConfigurator
+    with S3ClientConfigurator
+    with SnsClientConfigurator
+    with SnsConfigConfigurator
+    with SqsClientConfigurator
+    with SqsConfigConfigurator {
 
   val uploadNamespace = opt[String](required = true)
   val uploadPrefix = opt[String](default = Some("archive"))

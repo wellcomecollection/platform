@@ -8,14 +8,14 @@ import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorCo
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class ArgsConfigurator(val arguments: Seq[String])
-  extends ScallopConf(arguments)
-  with CloudWatchClientConfigurator
-  with MetricsConfigConfigurator
-  with S3ClientConfigurator
-  with SnsClientConfigurator
-  with SnsConfigConfigurator
-  with SqsClientConfigurator
-  with SqsConfigConfigurator {
+    extends ScallopConf(arguments)
+    with CloudWatchClientConfigurator
+    with MetricsConfigConfigurator
+    with S3ClientConfigurator
+    with SnsClientConfigurator
+    with SnsConfigConfigurator
+    with SqsClientConfigurator
+    with SqsConfigConfigurator {
 
   val uploadNamespace = opt[String](required = true)
   val parallelism = opt[Int](default = Some(10))
