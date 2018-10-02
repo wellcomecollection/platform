@@ -12,9 +12,10 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.flows.NotificationParsingFlow
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
-import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateAndPublishFlow
+import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
+import uk.ac.wellcome.platform.archive.progress_async.flows.CallbackNotificationFlow
 
 trait ProgressAsync extends Logging {
   val injector: Injector
@@ -41,19 +42,15 @@ trait ProgressAsync extends Logging {
     val progressMonitor = injector
       .getInstance(classOf[ProgressMonitor])
 
-    val progressUpdateFlow = ProgressUpdateAndPublishFlow(
-      snsClient,
-      snsConfig,
-      progressMonitor
-    )
+    val progressUpdateFlow = ProgressUpdateFlow(progressMonitor)
+    val parseNotificationFlow = NotificationParsingFlow[ProgressUpdate]()
+    val callbackNotificationFlow = CallbackNotificationFlow(snsClient, snsConfig)
 
-    val parseNotification = NotificationParsingFlow[ProgressUpdate]()
-
-    val workFlow =
-      Flow[NotificationMessage]
-        .log("notification message")
-        .via(parseNotification)
-        .via(progressUpdateFlow)
+    val workFlow = Flow[NotificationMessage]
+      .log("notification message")
+      .via(parseNotificationFlow)
+      .via(progressUpdateFlow)
+      .via(callbackNotificationFlow)
 
     messageStream.run("progress", workFlow)
   }
