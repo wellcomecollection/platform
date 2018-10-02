@@ -19,11 +19,44 @@ class TestReportIngestStatus:
     def test_lookup_missing_item_is_404(self, client, guid):
         resp = client.get(f'/storage/v1/ingests/{guid}')
         assert resp.status_code == 404
-        assert (b'No ingest found for id=%r' % guid) in resp.data
+        assert (b'Invalid id: No ingest found for id=%r' % guid) in resp.data
 
     def test_post_against_lookup_endpoint_is_405(self, client, guid):
         resp = client.post(f'/storage/v1/ingests/{guid}')
         assert resp.status_code == 405
+
+
+class TestBags:
+    """
+    Tests for the GET /bags/<id> endpoint.
+    """
+
+    def test_lookup_bag(self, client, dynamodb_resource, s3_client, guid, bucket_bag, table_name_bag):
+        stored_bag = {'id': guid}
+
+        s3_client.put_object(
+            Bucket=bucket_bag,
+            Key=guid,
+            Body=json.dumps(stored_bag)
+        )
+
+        table = dynamodb_resource.Table(table_name_bag)
+        table.put_item(Item={
+            'id': guid,
+            'location': {
+                'key': guid,
+                'namespace': bucket_bag
+            }
+        })
+
+        resp = client.get(f'/storage/v1/bags/{guid}')
+        assert resp.status_code == 200
+        assert json.loads(resp.data) == {'id': guid}
+
+    def test_lookup_missing_item_is_404(self, client, guid):
+        resp = client.get(f'/storage/v1/bags/{guid}')
+        assert resp.status_code == 404
+        assert (b'Invalid id: No bag found for id=%r' % guid) in resp.data
 
 
 class TestRequestNewIngest:

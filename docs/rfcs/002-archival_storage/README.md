@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 20 September 2018.**
+**Last updated: 01 October 2018.**
 
 ## Problem statement
 
@@ -142,9 +142,9 @@ Response:
     "id": "{id}",
     "type": "Bag"
   },
-  "result": {
-    "id": "success",
-    "type": "IngestResult"
+  "status": {
+    "id": "processing|failure|success",
+    "type": "IngestStatus"
   },
   "events": [ ... ]
 }

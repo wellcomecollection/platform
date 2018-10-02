@@ -1,7 +1,6 @@
 # -*- encoding: utf-8
 
 import pytest
-from werkzeug.exceptions import NotFound as NotFoundError
 
 from ingests import report_ingest_status
 
@@ -32,12 +31,12 @@ def test_gets_all_attributes_from_ddb(dynamodb_resource, table_name, guid):
     assert result == item
 
 
-def test_throws_notfounderror_for_missing_status(
+def test_throws_valueerror_for_missing_status(
     dynamodb_resource,
     table_name,
     guid
 ):
-    with pytest.raises(NotFoundError, match='No ingest found for id'):
+    with pytest.raises(ValueError, match='No ingest found for id'):
         report_ingest_status(
             dynamodb_resource=dynamodb_resource,
             table_name=table_name,

@@ -1,7 +1,6 @@
 # -*- encoding: utf-8
 
 import pytest
-from werkzeug.exceptions import BadRequest as BadRequestError
 
 from ingests import (
     create_archive_bag_message,
@@ -78,8 +77,8 @@ def test_returns_new_location_no_path(sns_client, topic_arn, guid):
     assert isinstance(resp, str)
 
 
-def test_non_s3_bag_url_is_badrequest_error(guid):
-    with pytest.raises(BadRequestError, match='Unrecognised URL scheme'):
+def test_non_s3_bag_url_is_value_error(guid):
+    with pytest.raises(ValueError, match='Unrecognised URL scheme'):
         create_archive_bag_message(
             guid=guid,
             bag_url='https://example.org',
