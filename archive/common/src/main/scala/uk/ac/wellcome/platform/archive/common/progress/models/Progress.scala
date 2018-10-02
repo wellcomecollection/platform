@@ -1,9 +1,10 @@
 package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.time.Instant
+import java.util.UUID
 
 case class Progress(
-  id: String,
+  id: UUID,
   uploadUrl: String,
   callbackUrl: Option[String],
   result: Progress.Status = Progress.None,
@@ -14,7 +15,7 @@ case class Progress(
   def update(progressUpdate: ProgressUpdate) = {
     this.copy(
       result = progressUpdate.status,
-      events = progressUpdate.event +: this.events
+      events = progressUpdate.events ++ this.events
     )
   }
 }
@@ -29,7 +30,7 @@ object Progress {
 
 case class ProgressEvent(description: String, time: Instant = Instant.now)
 
-case class ProgressUpdate(id: String,
-                          event: ProgressEvent,
+case class ProgressUpdate(id: UUID,
+                          events: List[ProgressEvent],
                           status: Progress.Status = Progress.None)
 case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
