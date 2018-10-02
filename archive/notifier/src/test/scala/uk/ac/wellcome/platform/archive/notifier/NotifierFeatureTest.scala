@@ -7,11 +7,12 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlPathEqualTo, _}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Completed
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.notifier.fixtures.{LocalWireMockFixture, NotifierFixture => notifierFixture}
 
 class NotifierFeatureTest
@@ -21,7 +22,9 @@ class NotifierFeatureTest
     with MetricsSenderFixture
     with IntegrationPatience
     with LocalWireMockFixture
-    with notifierFixture {
+    with notifierFixture
+    with Inside
+    with TimeTestFixture {
 
   implicit val system: ActorSystem = ActorSystem("test")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
@@ -99,12 +102,6 @@ class NotifierFeatureTest
 
             notifier.run()
 
-            val expectedUpdate = ProgressUpdate(
-              progress.id,
-              ProgressEvent("Callback fulfilled."),
-              Progress.CompletedCallbackSucceeded
-            )
-
             eventually {
               wireMock.verifyThat(
                 1,
@@ -112,7 +109,13 @@ class NotifierFeatureTest
                   .withRequestBody(
                     equalToJson(toJson(progress).get)))
 
-              assertSnsReceivesOnly[ProgressUpdate](expectedUpdate, topic)
+              inside(notificationMessage[ProgressUpdate](topic)) {
+                case ProgressUpdate(id, progressEvent, status) =>
+                  id shouldBe progress.id
+                  progressEvent.description shouldBe "Callback fulfilled."
+                  status shouldBe Progress.CompletedCallbackSucceeded
+                  assertRecent(progressEvent.time)
+              }
             }
         }
       }
@@ -138,14 +141,14 @@ class NotifierFeatureTest
 
           notifier.run()
 
-          val expectedUpdate = ProgressUpdate(
-            progress.id,
-            ProgressEvent(s"Callback failed for: ${progress.id}, got [status]!"),
-            Progress.CompletedCallbackFailed
-          )
-
           eventually {
-            assertSnsReceivesOnly[ProgressUpdate](expectedUpdate, topic)
+            inside(notificationMessage[ProgressUpdate](topic)) {
+              case ProgressUpdate(id, progressEvent, status) =>
+                id shouldBe progress.id
+                progressEvent.description shouldBe s"Callback failed for: ${progress.id}, got 404 Not Found!"
+                status shouldBe Progress.CompletedCallbackFailed
+                assertRecent(progressEvent.time)
+            }
           }
       }
     }

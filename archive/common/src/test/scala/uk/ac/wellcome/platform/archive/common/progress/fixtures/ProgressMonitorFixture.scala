@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
 import java.time.format.DateTimeFormatter
-import java.time.{Duration, Instant}
+import java.time.Instant
 import java.util.UUID
 
 import akka.NotUsed
@@ -23,7 +23,8 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressMonitorFixture
     extends LocalProgressMonitorDynamoDb
-    with MockitoSugar {
+    with MockitoSugar
+    with TimeTestFixture {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
@@ -108,9 +109,4 @@ trait ProgressMonitorFixture
 
     progress.result shouldBe expectedStatus
   }
-
-  def assertRecent(instant: Instant, recentSeconds: Int = 1): Assertion =
-    Duration
-      .between(instant, Instant.now)
-      .getSeconds should be <= recentSeconds.toLong
 }
