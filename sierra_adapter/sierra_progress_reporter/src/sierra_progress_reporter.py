@@ -121,7 +121,6 @@ def main(event=None, _ctxt=None):
             )
         except IncompleteReportError:
             errors.append(resource_type)
-            pass
 
     if errors:
         if errors == ['bibs']:

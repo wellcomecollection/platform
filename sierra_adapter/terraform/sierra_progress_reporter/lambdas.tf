@@ -3,8 +3,8 @@ module "lambda" {
 
   name = "sierra_progress_reporter"
 
-  s3_bucket   = "${var.infra_bucket}"
-  s3_key      = "lambdas/sierra_adapter/sierra_progress_reporter.zip"
+  s3_bucket = "${var.infra_bucket}"
+  s3_key    = "lambdas/sierra_adapter/sierra_progress_reporter.zip"
 
   description     = "Run progress reports against the Sierra reader"
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
