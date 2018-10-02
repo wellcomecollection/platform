@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
+import java.net.URI
 import java.time.format.DateTimeFormatter
 import java.time.{Duration, Instant}
 import java.util.UUID
@@ -11,10 +12,7 @@ import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -27,6 +25,7 @@ trait ProgressMonitorFixture
 
   val uploadUrl = "uploadUrl"
   val callbackUrl = "http://localhost/archive/complete"
+  val callbackUri = new URI("http://localhost/archive/complete")
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
