@@ -10,13 +10,19 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
-import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{
+  Registrar => RegistrarFixture
+}
+import uk.ac.wellcome.platform.archive.registrar.models.{
+  BagRegistrationCompleteNotification,
+  StorageManifest,
+  StorageManifestFactory
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrarFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
@@ -32,22 +38,23 @@ class RegistrarFeatureTest
 
   def createCallbackUrl = {
     val requestId = UUID.randomUUID()
-    (new URI(
-      s"http://$callbackHost:$callbackPort/callback/$requestId"
-    ), requestId)
+    (
+      new URI(
+        s"http://$callbackHost:$callbackPort/callback/$requestId"
+      ),
+      requestId)
   }
 
   it("registers an archived BagIt bag from S3") {
     withRegistrar {
       case (
-        storageBucket,
-        queuePair,
-        topic,
-        registrar,
-        hybridBucket,
-        hybridTable,
-        progressTable) =>
-
+          storageBucket,
+          queuePair,
+          topic,
+          registrar,
+          hybridBucket,
+          hybridTable,
+          progressTable) =>
         val (callbackUrl, requestId) = createCallbackUrl
 
         withBagNotification(
@@ -55,7 +62,6 @@ class RegistrarFeatureTest
           Some(callbackUrl),
           queuePair,
           storageBucket) { bagLocation =>
-
           givenProgressRecord(
             requestId.toString,
             "upLoadUrl",
