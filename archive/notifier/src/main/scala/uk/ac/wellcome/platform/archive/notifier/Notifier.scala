@@ -3,24 +3,27 @@ package uk.ac.wellcome.platform.archive.notifier
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Flow
 import com.amazonaws.services.sns.AmazonSNSAsync
+import com.amazonaws.services.sns.model.PublishResult
+import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject._
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.notifier.flows.CallbackFlow
+import uk.ac.wellcome.messaging.sqs.SQSConfig
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
 
-import scala.util.{Failure, Success}
+import uk.ac.wellcome.json.JsonUtil._
 
 class Notifier @Inject()(
-  snsClient: AmazonSNSAsync,
-  snsConfig: SNSConfig,
-  messageStream: MessageStream[NotificationMessage, Object],
-  actorSystem: ActorSystem
-) {
+                          sqsClient: AmazonSQSAsync,
+                          sqsConfig: SQSConfig,
+                          snsClient: AmazonSNSAsync,
+                          snsConfig: SNSConfig,
+                          actorSystem: ActorSystem,
+                          metricsSender: MetricsSender
+                        ) {
   def run() = {
     implicit val system = actorSystem
 
@@ -29,21 +32,12 @@ class Notifier @Inject()(
 
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-    val workFlow = Flow[NotificationMessage]
-      .map(parseNotification)
-      .via(CallbackFlow())
-      .log("executed callback")
+    val stream =
+      new MessageStream[Progress, PublishResult](
+        sqsClient, sqsConfig, metricsSender)
 
-    messageStream.run("callBäckerei", workFlow)
-  }
+    val workFlow = NotificationFlow(snsClient, snsConfig)
 
-  private def parseNotification(message: NotificationMessage) = {
-    fromJson[Progress](message.Message) match {
-      case Success(progress: Progress) => progress
-      case Failure(e) =>
-        throw new RuntimeException(
-          s"Failed to get Progress from notification: ${e.getMessage}"
-        )
-    }
+    stream.run("notifier", workFlow)
   }
 }

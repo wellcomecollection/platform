@@ -7,6 +7,7 @@ import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.common.messaging.NotificationParsingFlow
 
 class NotificationParsingFlowTest
     extends FunSpec

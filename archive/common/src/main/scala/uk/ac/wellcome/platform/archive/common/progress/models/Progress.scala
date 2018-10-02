@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.time.Instant
 
+
 case class Progress(
   id: String,
   uploadUrl: String,
@@ -25,6 +26,9 @@ object Progress {
   case object Processing extends Status
   case object Completed extends Status
   case object Failed extends Status
+  case object CompletedNoCallbackProvided extends Status
+  case object CompletedCallbackSucceeded extends Status
+  case object CompletedCallbackFailed extends Status
 }
 
 case class ProgressEvent(description: String, time: Instant = Instant.now)
