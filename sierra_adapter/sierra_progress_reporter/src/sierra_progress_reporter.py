@@ -148,7 +148,6 @@ def main(event=None, _ctxt=None):
         resp.raise_for_status()
 
 
-
 if __name__ == '__main__':
     s3_client = boto3.client('s3')
     bucket = 'wellcomecollection-platform-adapters-sierra'
