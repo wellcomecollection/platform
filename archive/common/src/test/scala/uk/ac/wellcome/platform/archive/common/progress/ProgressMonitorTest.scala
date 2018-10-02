@@ -41,7 +41,7 @@ class ProgressMonitorTest
     it("creates a progress monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { archiveProgressMonitor =>
-          val id = UUID.randomUUID().toString
+          val id = UUID.randomUUID()
           val archiveIngestProgress =
             Progress(id, uploadUri, Some(callbackUri), Progress.Processing)
 
@@ -55,7 +55,7 @@ class ProgressMonitorTest
     it("only allows the creation of one progress monitor for a given id") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { archiveProgressMonitor =>
-          val id = UUID.randomUUID().toString
+          val id = UUID.randomUUID()
 
           val monitors = List(
             Progress(id, uploadUri, Some(callbackUri)),
@@ -87,7 +87,7 @@ class ProgressMonitorTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        val id = UUID.randomUUID().toString
+        val id = UUID.randomUUID()
         val progress = Progress(id, uploadUri, Some(callbackUri))
 
         val result = Try(archiveProgressMonitor.create(progress))
@@ -160,10 +160,10 @@ class ProgressMonitorTest
           val progress =
             createProgress(archiveProgressMonitor, callbackUri, uploadUri)
 
-          val progressUpdate = ProgressUpdate(
-            progress.id,
-            ProgressEvent("So that happened.")
-          )
+        val progressUpdate = ProgressUpdate(
+          progress.id,
+          List(ProgressEvent("So that happened."))
+        )
 
           archiveProgressMonitor.update(progressUpdate)
 
@@ -174,7 +174,7 @@ class ProgressMonitorTest
             table)
           assertProgressRecordedRecentEvents(
             progressUpdate.id,
-            Seq(progressUpdate.event.description),
+            progressUpdate.events.map(_.description),
             table)
 
         }
@@ -186,16 +186,16 @@ class ProgressMonitorTest
         withProgressMonitor(table) { monitor: ProgressMonitor =>
           val progress = createProgress(monitor, callbackUri, uploadUri)
 
-          val updates = List(
-            ProgressUpdate(
-              progress.id,
-              ProgressEvent("It happened again.")
-            ),
-            ProgressUpdate(
-              progress.id,
-              ProgressEvent("Dammit Bobby.")
-            )
+        val updates = List(
+          ProgressUpdate(
+            progress.id,
+            List(ProgressEvent("It happened again."))
+          ),
+          ProgressUpdate(
+            progress.id,
+            List(ProgressEvent("Dammit Bobby."))
           )
+        )
 
           updates.map(monitor.update)
 
@@ -206,7 +206,7 @@ class ProgressMonitorTest
             table)
           assertProgressRecordedRecentEvents(
             progress.id,
-            updates.map(_.event.description),
+            updates.flatMap(_.events.map(_.description)),
             table)
         }
       }
@@ -224,9 +224,9 @@ class ProgressMonitorTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        val id = UUID.randomUUID().toString
+        val id = UUID.randomUUID()
 
-        val update = ProgressUpdate(id, ProgressEvent("Too much winning."))
+        val update = ProgressUpdate(id, List(ProgressEvent("Too much winning.")))
 
         val result = Try(archiveProgressMonitor.update(update))
 

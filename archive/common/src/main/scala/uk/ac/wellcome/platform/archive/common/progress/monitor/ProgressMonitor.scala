@@ -64,13 +64,13 @@ class ProgressMonitor @Inject()(
   def update(update: ProgressUpdate): Try[Progress] = {
     debug(s"Updating Dynamo record ${update.id} with: $update")
 
-    val event = update.event
+    val events = update.events
 
     val mergedUpdate = update.status match {
       case Progress.None =>
-        append('events -> event)
+        events.map(event => append('events -> event)).reduce(_ and _)
       case status =>
-        append('events -> event) and set('result -> status)
+        events.map(event => append('events -> event)).reduce(_ and _) and set('result -> status)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)

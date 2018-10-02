@@ -42,14 +42,16 @@ class ProgressUpdateAndPublishFlowTest
                 monitor
               )
 
-              val event = ProgressEvent("Run!")
+              val events = List(ProgressEvent("Run!"))
               val status = Progress.Failed
 
               val progress = createProgress(monitor, callbackUri, uploadUri)
-              val update = ProgressUpdate(progress.id, event, status)
+              val update = ProgressUpdate(progress.id, events, status)
 
-              val expectedProgress = progress
-                .copy(result = status, events = progress.events :+ event)
+              val expectedProgress = progress.copy(
+                events = progress.events ++ events,
+                result = status
+              )
 
               val source = Source.single(update)
 
@@ -72,7 +74,7 @@ class ProgressUpdateAndPublishFlowTest
 
                   assertProgressRecordedRecentEvents(
                     progress.id,
-                    Seq(update.event.description),
+                    update.events.map(_.description),
                     table
                   )
 

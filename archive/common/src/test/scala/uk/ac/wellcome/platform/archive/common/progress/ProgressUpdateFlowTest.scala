@@ -31,7 +31,7 @@ class ProgressUpdateFlowTest
               val progress =
                 createProgress(monitor, callbackUri, uploadUri)
 
-              val update = ProgressUpdate(progress.id, ProgressEvent("Wow."))
+              val update = ProgressUpdate(progress.id, List(ProgressEvent("Wow.")))
 
               val updates = Source
                 .single(update)
@@ -47,7 +47,7 @@ class ProgressUpdateFlowTest
                   table)
                 assertProgressRecordedRecentEvents(
                   update.id,
-                  Seq(update.event.description),
+                  update.events.map(_.description),
                   table)
               }
             })
@@ -65,20 +65,20 @@ class ProgressUpdateFlowTest
 
               val progress = createProgress(monitor, callbackUri, uploadUri)
 
-              val events = List(
+              val progressUpdates = List(
                 ProgressUpdate(
                   progress.id,
-                  ProgressEvent("It happened again.")),
-                ProgressUpdate(progress.id, ProgressEvent("Dammit Bobby."))
+                  List(ProgressEvent("It happened again."))),
+                ProgressUpdate(progress.id, List(ProgressEvent("Dammit Bobby.")))
               )
 
-              val updates = Source
-                .fromIterator(() => events.toIterator)
+              val futureUpdates = Source
+                .fromIterator(() => progressUpdates.toIterator)
                 .via(flow)
                 .async
                 .runWith(Sink.ignore)(materializer)
 
-              whenReady(updates) { _ =>
+              whenReady(futureUpdates) { _ =>
                 assertProgressCreated(
                   progress.id,
                   uploadUri,
@@ -86,7 +86,7 @@ class ProgressUpdateFlowTest
                   table)
                 assertProgressRecordedRecentEvents(
                   progress.id,
-                  events.map(_.event.description),
+                  progressUpdates.flatMap(_.events.map(_.description)),
                   table)
               }
             })
@@ -101,10 +101,10 @@ class ProgressUpdateFlowTest
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
-              val id = UUID.randomUUID().toString
+              val id = UUID.randomUUID()
 
               val update =
-                ProgressUpdate(id, ProgressEvent("Such progress, wow."))
+                ProgressUpdate(id, List(ProgressEvent("Such progress, wow.")))
 
               val updates = Source
                 .single(update)

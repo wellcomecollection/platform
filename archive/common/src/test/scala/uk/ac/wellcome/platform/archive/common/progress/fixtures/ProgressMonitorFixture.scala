@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
 import java.net.URI
-import java.time.format.DateTimeFormatter
 import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 import akka.NotUsed
@@ -11,11 +11,7 @@ import com.gu.scanamo.DynamoFormat
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -72,26 +68,26 @@ trait ProgressMonitorFixture
     callbackUrl: URI = callbackUri,
     uploadUrl: URI = uploadUri
   ): Progress = {
-    val id = UUID.randomUUID().toString
+    val id = UUID.randomUUID()
 
     progressMonitor.create(
       Progress(id, uploadUrl, Some(callbackUrl))
     )
   }
 
-  def givenProgressRecord(id: String,
+  def givenProgressRecord(id: UUID,
                           uploadUri: URI,
                           maybeCallbackUri: Option[URI],
                           table: Table) = {
     givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri), table)
   }
 
-  def assertProgressCreated(id: String,
+  def assertProgressCreated(id: UUID,
                             expectedUploadUri: URI,
                             expectedCallbackUri: Option[URI],
                             table: Table,
                             recentSeconds: Int = 45): Assertion = {
-    val progress = getExistingTableItem[Progress](id, table)
+    val progress = getExistingTableItem[Progress](id.toString, table)
     progress.uploadUri shouldBe expectedUploadUri
     progress.callbackUri shouldBe expectedCallbackUri
 
@@ -99,21 +95,21 @@ trait ProgressMonitorFixture
     assertRecent(progress.updatedAt, recentSeconds)
   }
 
-  def assertProgressRecordedRecentEvents(id: String,
+  def assertProgressRecordedRecentEvents(id: UUID,
                                          expectedEventDescriptions: Seq[String],
                                          table: LocalDynamoDb.Table,
                                          recentSeconds: Int = 45) = {
-    val progress = getExistingTableItem[Progress](id, table)
+    val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
     progress.events.foreach(event => assertRecent(event.time, recentSeconds))
     progress
   }
 
-  def assertProgressStatus(id: String,
+  def assertProgressStatus(id: UUID,
                            expectedStatus: Status,
                            table: LocalDynamoDb.Table) = {
-    val progress = getExistingTableItem[Progress](id, table)
+    val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.result shouldBe expectedStatus
   }
