@@ -7,37 +7,39 @@ import com.amazonaws.services.sns.AmazonSNSAsync
 import com.amazonaws.services.sns.model.PublishResult
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject._
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
+import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
+import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
-
-import uk.ac.wellcome.json.JsonUtil._
 
 class Notifier @Inject()(
                           sqsClient: AmazonSQSAsync,
                           sqsConfig: SQSConfig,
                           snsClient: AmazonSNSAsync,
                           snsConfig: SNSConfig,
-                          actorSystem: ActorSystem,
                           metricsSender: MetricsSender
-                        ) {
+                        )(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
   def run() = {
-    implicit val system = actorSystem
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
-    implicit val materializer: ActorMaterializer = ActorMaterializer()
-
     val stream =
-      new MessageStream[Progress, PublishResult](
-        sqsClient, sqsConfig, metricsSender)
+      new MessageStream[NotificationMessage, PublishResult](
+        actorSystem, sqsClient, sqsConfig, metricsSender)
 
-    val workFlow = NotificationFlow(snsClient, snsConfig)
+    val notificationParsingFlow = NotificationParsingFlow[CallbackNotification]()
 
-    stream.run("notifier", workFlow)
+    val workflow = NotificationFlow(snsClient, snsConfig)
+
+    val flow = notificationParsingFlow.via(workflow)
+
+    stream.run("notifier", flow)
   }
 }
+
+case class CallbackNotification(id: String, callbackUrl: String, payload: Progress)

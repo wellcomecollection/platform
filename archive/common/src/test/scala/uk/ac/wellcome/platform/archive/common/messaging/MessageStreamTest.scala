@@ -160,6 +160,7 @@ class MessageStreamTest
             )
 
             val stream = new MessageStream[ExampleObject, Unit](
+              actorSystem = actorSystem,
               sqsClient = asyncSqsClient,
               sqsConfig = sqsConfig,
               metricsSender = metricsSender

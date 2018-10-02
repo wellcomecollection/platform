@@ -11,7 +11,9 @@ object MessageParsingFlow extends Logging {
   def apply[T]()(implicit dec: Decoder[T]) = {
     def parse(message: Message) =
       for {
-        notification <- fromJson[NotificationMessage](message.getBody)
+        notification <- fromJson[NotificationMessage](
+          message.getBody
+        )
         t <- fromJson[T](notification.Message)
       } yield t
 
