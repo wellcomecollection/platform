@@ -19,7 +19,8 @@ object AkkaModule extends AbstractModule {
 
   @Singleton
   @Provides
-  def providesActorMaterializer(implicit actorSystem: ActorSystem): ActorMaterializer = {
+  def providesActorMaterializer(
+    implicit actorSystem: ActorSystem): ActorMaterializer = {
     ActorMaterializer()
   }
 

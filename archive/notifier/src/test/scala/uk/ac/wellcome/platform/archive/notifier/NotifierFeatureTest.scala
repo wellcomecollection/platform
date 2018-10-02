@@ -5,18 +5,29 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlPathEqualTo, _}
+import com.github.tomakehurst.wiremock.client.WireMock.{
+  equalToJson,
+  postRequestedFor,
+  urlPathEqualTo,
+  _
+}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Completed
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
-import uk.ac.wellcome.platform.archive.notifier.fixtures.{LocalWireMockFixture, NotifierFixture => notifierFixture}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressUpdate
+}
+import uk.ac.wellcome.platform.archive.notifier.fixtures.{
+  LocalWireMockFixture,
+  NotifierFixture => notifierFixture
+}
 
 class NotifierFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
@@ -66,8 +77,7 @@ class NotifierFeatureTest
               wireMock.verifyThat(
                 1,
                 postRequestedFor(urlPathEqualTo(new URI(callbackUrl).getPath))
-                  .withRequestBody(
-                    equalToJson(toJson(progress).get)))
+                  .withRequestBody(equalToJson(toJson(progress).get)))
             }
         }
       }
@@ -106,8 +116,7 @@ class NotifierFeatureTest
               wireMock.verifyThat(
                 1,
                 postRequestedFor(urlPathEqualTo(new URI(callbackUrl).getPath))
-                  .withRequestBody(
-                    equalToJson(toJson(progress).get)))
+                  .withRequestBody(equalToJson(toJson(progress).get)))
 
               inside(notificationMessage[ProgressUpdate](topic)) {
                 case ProgressUpdate(id, progressEvent, status) =>
@@ -121,7 +130,8 @@ class NotifierFeatureTest
       }
     }
 
-    it("sends a ProgressUpdate when it receives Progress with a callback it cannot fulfill") {
+    it(
+      "sends a ProgressUpdate when it receives Progress with a callback it cannot fulfill") {
       withNotifier {
         case (queuePair, topic, notifier) =>
           val requestId = UUID.randomUUID()
@@ -154,4 +164,3 @@ class NotifierFeatureTest
     }
   }
 }
-

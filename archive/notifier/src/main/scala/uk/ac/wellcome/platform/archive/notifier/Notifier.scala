@@ -11,18 +11,21 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
+import uk.ac.wellcome.platform.archive.common.messaging.{
+  MessageStream,
+  NotificationParsingFlow
+}
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
 
 class Notifier @Inject()(
-                          sqsClient: AmazonSQSAsync,
-                          sqsConfig: SQSConfig,
-                          snsClient: AmazonSNSAsync,
-                          snsConfig: SNSConfig,
-                          metricsSender: MetricsSender
-                        )(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
+  sqsClient: AmazonSQSAsync,
+  sqsConfig: SQSConfig,
+  snsClient: AmazonSNSAsync,
+  snsConfig: SNSConfig,
+  metricsSender: MetricsSender
+)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
   def run() = {
 
     implicit val adapter: LoggingAdapter =
@@ -30,9 +33,13 @@ class Notifier @Inject()(
 
     val stream =
       new MessageStream[NotificationMessage, PublishResult](
-        actorSystem, sqsClient, sqsConfig, metricsSender)
+        actorSystem,
+        sqsClient,
+        sqsConfig,
+        metricsSender)
 
-    val notificationParsingFlow = NotificationParsingFlow[CallbackNotification]()
+    val notificationParsingFlow =
+      NotificationParsingFlow[CallbackNotification]()
 
     val workflow = NotificationFlow(snsClient, snsConfig)
 
@@ -42,4 +49,6 @@ class Notifier @Inject()(
   }
 }
 
-case class CallbackNotification(id: String, callbackUrl: String, payload: Progress)
+case class CallbackNotification(id: String,
+                                callbackUrl: String,
+                                payload: Progress)

@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.time.Instant
 
-
 case class Progress(
   id: String,
   uploadUrl: String,

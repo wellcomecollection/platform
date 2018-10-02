@@ -17,19 +17,20 @@ object CallbackUrlFlow {
   // a (Try[HttpResponse], String) tuple -- preserving the original
   // progress as context.
   //
-  def apply()(implicit actorSystem: ActorSystem) = Flow[CallbackNotification]
-    .collect {
-      case CallbackNotification(id, callbackUrl, progress) =>
-        (createHttpRequest(progress, callbackUrl), id)
-    }
-    .via(http)
-    .map {
-      case (tryHttpResponse, id) =>
-        CallbackFlowResult(
-          id = id,
-          httpResponse = Some(tryHttpResponse)
-        )
-    }
+  def apply()(implicit actorSystem: ActorSystem) =
+    Flow[CallbackNotification]
+      .collect {
+        case CallbackNotification(id, callbackUrl, progress) =>
+          (createHttpRequest(progress, callbackUrl), id)
+      }
+      .via(http)
+      .map {
+        case (tryHttpResponse, id) =>
+          CallbackFlowResult(
+            id = id,
+            httpResponse = Some(tryHttpResponse)
+          )
+      }
 
   private def http(implicit actorSystem: ActorSystem) =
     Http().superPool[String]()

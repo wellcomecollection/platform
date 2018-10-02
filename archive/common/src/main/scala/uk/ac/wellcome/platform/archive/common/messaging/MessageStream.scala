@@ -20,7 +20,7 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
                                     sqsClient: AmazonSQSAsync,
                                     sqsConfig: SQSConfig,
                                     metricsSender: MetricsSender)
-  extends Logging {
+    extends Logging {
 
   implicit val system = actorSystem
   implicit val dispatcher = system.dispatcher

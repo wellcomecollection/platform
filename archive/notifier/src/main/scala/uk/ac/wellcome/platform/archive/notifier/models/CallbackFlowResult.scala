@@ -5,7 +5,6 @@ import akka.http.scaladsl.model.HttpResponse
 import scala.util.Try
 
 case class CallbackFlowResult(
-                               id: String,
-                               httpResponse: Option[Try[HttpResponse]]
-                             )
-
+  id: String,
+  httpResponse: Option[Try[HttpResponse]]
+)

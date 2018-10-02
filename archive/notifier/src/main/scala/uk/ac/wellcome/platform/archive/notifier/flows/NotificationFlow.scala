@@ -22,7 +22,8 @@ import uk.ac.wellcome.platform.archive.notifier.CallbackNotification
   */
 object NotificationFlow {
   def apply(snsClient: AmazonSNS, snsConfig: SNSConfig)(
-    implicit actorSystem: ActorSystem): Flow[CallbackNotification, PublishResult, NotUsed] = {
+    implicit actorSystem: ActorSystem)
+    : Flow[CallbackNotification, PublishResult, NotUsed] = {
 
     val withCallbackUrlFlow = CallbackUrlFlow()
     val prepareNotificationFlow = PrepareNotificationFlow()

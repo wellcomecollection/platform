@@ -13,7 +13,8 @@ object MessageStreamModule extends AbstractModule {
   @Provides
   def providesMessageStream(sqsClient: AmazonSQSAsync,
                             sqsConfig: SQSConfig,
-                            metricsSender: MetricsSender, actorSystem: ActorSystem) = {
+                            metricsSender: MetricsSender,
+                            actorSystem: ActorSystem) = {
     new MessageStream[NotificationMessage, Unit](
       actorSystem,
       sqsClient,
