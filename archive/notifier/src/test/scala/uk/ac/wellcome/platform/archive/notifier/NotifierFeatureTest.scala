@@ -11,9 +11,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Completed
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.notifier.fixtures.{LocalWireMockFixture, NotifierFixture => notifierFixture}
-import uk.ac.wellcome.platform.archive.notifier.flows.PrepareNotificationFlow
 
 class NotifierFeatureTest
   extends FunSpec
@@ -54,8 +53,8 @@ class NotifierFeatureTest
             )
 
             sendNotificationToSQS(
-              queue = queuePair.queue,
-              message = progress
+              queuePair.queue,
+              CallbackNotification(requestId.toString, callbackUrl, progress)
             )
 
             notifier.run()
@@ -65,7 +64,7 @@ class NotifierFeatureTest
                 1,
                 postRequestedFor(urlPathEqualTo(new URI(callbackUrl).getPath))
                   .withRequestBody(
-                    equalToJson(toJson(CallbackPayload(requestId.toString)).get)))
+                    equalToJson(toJson(progress).get)))
             }
         }
       }
@@ -93,16 +92,16 @@ class NotifierFeatureTest
               callbackUrl = Some(callbackUrl)
             )
 
-            sendNotificationToSQS[Progress](
+            sendNotificationToSQS[CallbackNotification](
               queuePair.queue,
-              progress
+              CallbackNotification(requestId.toString, callbackUrl, progress)
             )
 
             notifier.run()
 
             val expectedUpdate = ProgressUpdate(
               progress.id,
-              PrepareNotificationFlow.callBackSuccessEvent,
+              ProgressEvent("Callback fulfilled."),
               Progress.CompletedCallbackSucceeded
             )
 
@@ -111,7 +110,7 @@ class NotifierFeatureTest
                 1,
                 postRequestedFor(urlPathEqualTo(new URI(callbackUrl).getPath))
                   .withRequestBody(
-                    equalToJson(toJson(CallbackPayload(requestId.toString)).get)))
+                    equalToJson(toJson(progress).get)))
 
               assertSnsReceivesOnly[ProgressUpdate](expectedUpdate, topic)
             }
@@ -132,16 +131,16 @@ class NotifierFeatureTest
             callbackUrl = Some(callbackUrl)
           )
 
-          sendNotificationToSQS[Progress](
+          sendNotificationToSQS[CallbackNotification](
             queuePair.queue,
-            progress
+            CallbackNotification(requestId.toString, callbackUrl, progress)
           )
 
           notifier.run()
 
           val expectedUpdate = ProgressUpdate(
             progress.id,
-            PrepareNotificationFlow.callBackFailureEvent,
+            ProgressEvent(s"Callback failed for: ${progress.id}, got [status]!"),
             Progress.CompletedCallbackFailed
           )
 
