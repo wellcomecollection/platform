@@ -7,4 +7,7 @@ module "load_balancer" {
   public_subnets = "${local.public_subnets}"
 
   certificate_domain = "api.wellcomecollection.org"
+
+  top_level_host = "developers.wellcomecollection.org"
+  top_level_path = "/developers"
 }
