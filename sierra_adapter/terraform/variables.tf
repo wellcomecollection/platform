@@ -27,3 +27,5 @@ variable "namespace" {
 variable "vpc_cidr_block" {
   default = "20.60.0.0/16"
 }
+
+variable "critical_slack_webhook" {}
