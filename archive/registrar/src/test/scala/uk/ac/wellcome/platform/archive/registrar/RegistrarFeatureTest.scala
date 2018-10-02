@@ -5,37 +5,23 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.github.tomakehurst.wiremock.client.WireMock.{
-  equalToJson,
-  postRequestedFor,
-  urlPathEqualTo
-}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackPayload
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{
-  LocalWireMockFixture,
-  Registrar => RegistrarFixture
-}
-import uk.ac.wellcome.platform.archive.registrar.models.{
-  BagRegistrationCompleteNotification,
-  StorageManifest,
-  StorageManifestFactory
-}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
+import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrarFeatureTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
     with IntegrationPatience
     with ProgressMonitorFixture
-    with LocalWireMockFixture
     with RegistrarFixture {
 
   implicit val system: ActorSystem = ActorSystem("test")
@@ -44,63 +30,64 @@ class RegistrarFeatureTest
   private val callbackHost = "localhost"
   private val callbackPort = 8080
 
+  def createCallbackUrl = {
+    val requestId = UUID.randomUUID()
+    (new URI(
+      s"http://$callbackHost:$callbackPort/callback/$requestId"
+    ), requestId)
+  }
+
   it("registers an archived BagIt bag from S3") {
-    withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
-      withRegistrar {
-        case (
-            storageBucket,
-            queuePair,
-            topic,
-            registrar,
-            hybridBucket,
-            hybridTable,
-            progressTable) =>
-          val requestId = UUID.randomUUID()
-          val callbackUrl =
-            new URI(s"http://$callbackHost:$callbackPort/callback/$requestId")
-          withBagNotification(
-            requestId,
-            Some(callbackUrl),
-            queuePair,
-            storageBucket) { bagLocation =>
-            givenProgressRecord(
-              requestId.toString,
-              "upLoadUrl",
-              Some(callbackUrl.toString),
-              progressTable)
+    withRegistrar {
+      case (
+        storageBucket,
+        queuePair,
+        topic,
+        registrar,
+        hybridBucket,
+        hybridTable,
+        progressTable) =>
 
-            registrar.run()
+        val (callbackUrl, requestId) = createCallbackUrl
 
-            implicit val _ = s3Client
+        withBagNotification(
+          requestId,
+          Some(callbackUrl),
+          queuePair,
+          storageBucket) { bagLocation =>
 
-            whenReady(StorageManifestFactory.create(bagLocation)) {
-              storageManifest =>
-                debug(s"Created StorageManifest: $storageManifest")
+          givenProgressRecord(
+            requestId.toString,
+            "upLoadUrl",
+            Some(callbackUrl.toString),
+            progressTable
+          )
 
-                eventually {
-                  assertSnsReceivesOnly(
-                    BagRegistrationCompleteNotification(
-                      requestId,
-                      storageManifest),
-                    topic
-                  )
+          registrar.run()
 
-                  assertStored[StorageManifest](
-                    hybridBucket,
-                    hybridTable,
-                    storageManifest.id.value,
-                    storageManifest
-                  )
+          implicit val _ = s3Client
 
-                  wireMock.verifyThat(
-                    1,
-                    postRequestedFor(urlPathEqualTo(callbackUrl.getPath))
-                      .withRequestBody(equalToJson(
-                        toJson(CallbackPayload(requestId.toString)).get)))
-                }
-            }
+          whenReady(StorageManifestFactory.create(bagLocation)) {
+            storageManifest =>
+              debug(s"Created StorageManifest: $storageManifest")
+
+              eventually {
+                assertSnsReceivesOnly(
+                  BagRegistrationCompleteNotification(
+                    requestId,
+                    storageManifest),
+                  topic
+                )
+
+                assertStored[StorageManifest](
+                  hybridBucket,
+                  hybridTable,
+                  storageManifest.id.value,
+                  storageManifest
+                )
+              }
           }
-      }
+        }
     }
   }
 }
