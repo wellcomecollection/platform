@@ -6,8 +6,12 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress => ProgressModel}
-import uk.ac.wellcome.platform.archive.progress_async.fixtures.{ProgressAsyncFixture => ProgressFixture}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress => ProgressModel
+}
+import uk.ac.wellcome.platform.archive.progress_async.fixtures.{
+  ProgressAsyncFixture => ProgressFixture
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class ProgressAsyncFeatureTest

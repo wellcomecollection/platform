@@ -11,7 +11,8 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.json.JsonUtil._
 
 object CallbackNotificationFlow {
-  def apply(snsClient: AmazonSNS, snsConfig: SNSConfig): Flow[Progress, PublishResult, NotUsed] = {
+  def apply(snsClient: AmazonSNS,
+            snsConfig: SNSConfig): Flow[Progress, PublishResult, NotUsed] = {
     val publishFlow = SnsPublishFlow[CallbackNotification](
       snsClient,
       snsConfig,

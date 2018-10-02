@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.archive.progress_async.models.ProgressAsyncConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class ArgsConfigurator(val arguments: Seq[String])
-  extends ScallopConf(arguments)
+    extends ScallopConf(arguments)
     with CloudWatchClientConfigurator
     with MetricsConfigConfigurator
     with SnsClientConfigurator
