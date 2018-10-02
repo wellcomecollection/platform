@@ -4,11 +4,19 @@
 import collections
 import datetime as dt
 import json
+import os
+import sys
 
 import boto3
 
 from build_windows import generate_windows
-from report_adapter_progress import BUCKET, build_report
+
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), 'sierra_progress_reporter', 'src'))
+from sierra_progress_reporter import build_report  # noqa
+
+
+BUCKET = 'wellcomecollection-platform-adapters-sierra'
 
 
 def sliding_window(iterable):
@@ -46,7 +54,11 @@ if __name__ == '__main__':
     client = boto3.client('sns')
 
     for resource_type in ('bibs', 'items'):
-        report = build_report(bucket=BUCKET, resource_type=resource_type)
+        report = build_report(
+            s3_client=boto3.client('s3'),
+            bucket=BUCKET,
+            resource_type=resource_type
+        )
         for missing_window in get_missing_windows(report):
             print(missing_window)
             client.publish(
