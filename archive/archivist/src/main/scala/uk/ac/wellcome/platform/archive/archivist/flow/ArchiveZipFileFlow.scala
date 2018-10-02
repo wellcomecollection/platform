@@ -19,7 +19,7 @@ object ArchiveZipFileFlow extends Logging {
           Source
             .single(zipFile)
             .log("creating archive job")
-            .map(ArchiveJobCreator.create(_, config))
+            .map(ArchiveJobCreator.create(_, config, ingestRequest))
             .collect { case Right(job) => job }
             .via(ArchiveJobFlow(
               config.bagItConfig.digestDelimiterRegexp,

@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.models.errors
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob}
+import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 
 sealed trait ArchiveError[T]{
   val job: T
@@ -21,8 +22,8 @@ case class DownloadError(exception:Throwable,job: ArchiveItemJob) extends Archiv
   override def toString = s"There was an exception while downloading object ${job.uploadLocation}: ${exception.getMessage}"
 }
 
-case class FileNotFoundError(job: ArchiveItemJob) extends ArchiveError[ArchiveItemJob] {
-  override def toString = s"Failed reading file ${job.bagDigestItem.location} from zip file"
+case class FileNotFoundError[T](path: String ,job: T) extends ArchiveError[T] {
+  override def toString = s"Failed reading file $path from zip file"
 }
 
 case class MissingBagManifestError(path: String, job: ArchiveJob) extends ArchiveError[ArchiveJob] {
@@ -34,3 +35,5 @@ case class InvalidBagManifestError(job: ArchiveJob, manifestName: String) extend
 }
 
 case class ArchiveJobError(job: ArchiveJob, errors: List[ArchiveError[ArchiveItemJob]]) extends ArchiveError[ArchiveJob]
+
+case class InvalidBagInfo(job: IngestBagRequest) extends ArchiveError[IngestBagRequest]

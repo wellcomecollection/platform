@@ -56,9 +56,10 @@ class ArchiveJobFlowTest
               val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
-              inside(archiveJobs.toList){ case List(Left(ArchiveJobError(actualArchiveJob, List(FileNotFoundError(archiveItemJob))))) =>
+              inside(archiveJobs.toList){ case List(Left(ArchiveJobError(actualArchiveJob, List(FileNotFoundError("this/does/not/exists.jpg",archiveItemJob))))) =>
                 actualArchiveJob shouldBe archiveJob
                 archiveItemJob.bagDigestItem.location shouldBe EntryPath("this/does/not/exists.jpg")
+                archiveItemJob.archiveJob shouldBe archiveJob
               }
 
               }

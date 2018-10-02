@@ -125,7 +125,7 @@ class UploadItemFlowTest
             val futureResult = source via flow runWith Sink.seq
 
             whenReady(futureResult) { result =>
-              result shouldBe List(Left(FileNotFoundError(archiveItemJob)))
+              result shouldBe List(Left(FileNotFoundError(fileName, archiveItemJob)))
               val exception = intercept[AmazonS3Exception] {
                 getContentFromS3(
                   bucket,

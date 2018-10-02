@@ -74,10 +74,11 @@ class ArchiveZipFileFlowTest
                   val progressUpdate =
                     fromJson[ProgressUpdate](messages.head.message).get
                   inside(progressUpdate) {
-                    case ProgressUpdate(id, event, status) =>
-                      id shouldBe ingestContext.archiveRequestId.toString
+                    case ProgressUpdate(id, events, status) =>
+                      id shouldBe ingestContext.archiveRequestId
                       status shouldBe Progress.Failed
-                      event.description shouldBe "failed"
+
+                      all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                   }
                 }
             }
