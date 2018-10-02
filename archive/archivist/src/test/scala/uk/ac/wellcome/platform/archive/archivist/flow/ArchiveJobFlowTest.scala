@@ -1,11 +1,12 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.stream.scaladsl.{Sink, Source}
+import org.apache.commons.io.IOUtils
 import org.scalatest.{FunSpec, Inside}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.BagItConfig
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors._
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.EntryPath
 import uk.ac.wellcome.storage.fixtures.S3
@@ -86,6 +87,7 @@ class ArchiveJobFlowTest
                   actualArchiveJob shouldBe archiveJob
                   all (errors) shouldBe a[ChecksumNotMatchedOnUploadError]
                   errors.map(_.job.bagDigestItem.location.path) should contain theSameElementsAs failedFiles
+                  errors.map(_.job.archiveJob).distinct shouldBe List(archiveJob)
                 }
               }
           }
@@ -103,12 +105,22 @@ class ArchiveJobFlowTest
             dataFileCount = 2,
             createDataManifest = dataManifestWithWrongChecksum) {
             case (bagName, zipFile) =>
+              val manifestZipEntry = zipFile.getEntry("manifest-sha256.txt")
+              val badChecksumLine = IOUtils.toString(zipFile.getInputStream(manifestZipEntry), "UTF-8").split("\n").filter(_.contains("badDigest")).head
+              val filepath = badChecksumLine.replace("badDigest","").trim
+
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
               val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(archiveJob))
+                inside(archiveJobs.toList) { case List(Left(ArchiveJobError(job,List(error)))) =>
+                  error shouldBe a[ChecksumNotMatchedOnUploadError]
+                  val checksumNotMatchedOnUploadError = error.asInstanceOf[ChecksumNotMatchedOnUploadError]
+                  checksumNotMatchedOnUploadError.job.archiveJob shouldBe archiveJob
+                  checksumNotMatchedOnUploadError.job.bagDigestItem.location shouldBe EntryPath(filepath)
+                  job shouldBe archiveJob
+                }
               }
           }
         }
@@ -129,7 +141,7 @@ class ArchiveJobFlowTest
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(archiveJob))
+                archiveJobs shouldBe List(Left(MissingBagManifestError("manifest-sha256.txt", archiveJob)))
               }
           }
         }
@@ -153,7 +165,7 @@ class ArchiveJobFlowTest
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(archiveJob))
+                archiveJobs shouldBe List(Left(InvalidBagManifestError(archiveJob, "manifest-sha256.txt")))
               }
           }
         }
@@ -174,7 +186,7 @@ class ArchiveJobFlowTest
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(archiveJob))
+                archiveJobs shouldBe List(Left(MissingBagManifestError("tagmanifest-sha256.txt", archiveJob)))
               }
           }
         }
@@ -198,7 +210,7 @@ class ArchiveJobFlowTest
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(archiveJob))
+                archiveJobs shouldBe List(Left(InvalidBagManifestError(archiveJob, "tagmanifest-sha256.txt")))
               }
           }
         }
