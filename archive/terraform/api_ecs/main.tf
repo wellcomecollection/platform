@@ -20,9 +20,12 @@ module "api_ecs" {
   env_vars = {
     TABLE_NAME = "${var.archive_progress_table_name}"
     TOPIC_ARN  = "${var.archive_ingest_sns_topic_arn}"
+
+    BAG_VHS_TABLE_NAME  = "${var.bag_vhs_table_name}"
+    BAG_VHS_BUCKET_NAME = "${var.bag_vhs_bucket_name}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 4
 
   service_lb_security_group_id = "${aws_security_group.service_lb_security_group.id}"
   ecs_cluster_id               = "${aws_ecs_cluster.cluster.id}"

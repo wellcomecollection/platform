@@ -8,10 +8,12 @@ from flask import Flask
 from flask_restplus import Api, Resource
 from flask import jsonify, make_response, request
 from werkzeug.exceptions import BadRequest as BadRequestError
+from werkzeug.exceptions import NotFound as NotFoundError
 
 import config
 import validators
 
+from bags import fetch_bag
 from ingests import (
     IngestProgress,
     create_ingest_progress,
@@ -38,7 +40,7 @@ logger = daiquiri.getLogger()
 
 api.namespaces.clear()
 ns_ingests = api.namespace('ingests', description='Ingest requests')
-
+ns_bags = api.namespace('bags', description='Bag requests')
 
 # We can't move this import to the top because the models need the ``api``
 # instance defined in this file.
@@ -117,12 +119,36 @@ class IngestResource(Resource):
     @ns_ingests.response(404, 'Ingest not found', models.Error)
     def get(self, id):
         """Get the current status of an ingest request"""
-        result = report_ingest_status(
-            dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
-            table_name=app.config['DYNAMODB_TABLE_NAME'],
-            guid=id
-        )
-        return jsonify(result)
+        try:
+            result = report_ingest_status(
+                dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
+                table_name=app.config['DYNAMODB_TABLE_NAME'],
+                guid=id
+            )
+            return jsonify(result)
+        except ValueError as error:
+            raise NotFoundError(f"Invalid id: {error}")
+
+
+@ns_bags.route('/<string:id>')
+@ns_bags.param('id', 'The bag identifier')
+class BagResource(Resource):
+    @ns_bags.doc(description='The bag is returned in the body of the response')
+    @ns_bags.response(200, 'Bag found')
+    @ns_bags.response(404, 'Bag not found', models.Error)
+    def get(self, id):
+        """Get the bag associated with an id"""
+        try:
+            result = fetch_bag(
+                dynamodb_resource=app.config['DYNAMODB_RESOURCE'],
+                table_name=app.config['BAG_VHS_TABLE_NAME'],
+                s3_client=app.config['S3_CLIENT'],
+                bucket_name=app.config['BAG_VHS_BUCKET_NAME'],
+                id=id
+            )
+            return jsonify(result)
+        except ValueError as error:
+            raise NotFoundError(f"Invalid id: {error}")
 
 
 @app.route('/storage/v1/healthcheck')
@@ -141,6 +167,7 @@ def default_error_handler(error):
         'label': getattr(error, 'name', 'Internal Server Error'),
         'type': 'Error',
     }
+    logger.warn(error)
     if error_response['httpStatus'] != 500:
         if hasattr(error, 'data'):
             error_response['description'] = ', '.join(error.data.get('errors', {}).values())

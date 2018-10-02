@@ -4,8 +4,6 @@ from urllib.parse import urlparse
 
 import daiquiri
 from wellcome_aws_utils.sns_utils import publish_sns_message
-from werkzeug.exceptions import BadRequest as BadRequestError
-
 
 logger = daiquiri.getLogger()
 
@@ -16,7 +14,7 @@ def create_archive_bag_message(guid, bag_url, callback_url):
     """
     parsed_bag_url = urlparse(bag_url)
     if parsed_bag_url.scheme != 's3':
-        raise BadRequestError(f'Unrecognised URL scheme: {bag_url!r}')
+        raise ValueError(f'Unrecognised URL scheme: {bag_url!r}')
 
     bucket = parsed_bag_url.netloc
     key = parsed_bag_url.path.lstrip('/')
