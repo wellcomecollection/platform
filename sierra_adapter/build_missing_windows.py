@@ -4,11 +4,19 @@
 import collections
 import datetime as dt
 import json
+import os
+import sys
 
 import boto3
 
 from build_windows import generate_windows
-from report_adapter_progress import BUCKET, build_report
+
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), 'sierra_progress_reporter', 'src'))
+from sierra_progress_reporter import build_report
+
+
+BUCKET = 'wellcomecollection-platform-adapters-sierra'
 
 
 def sliding_window(iterable):
