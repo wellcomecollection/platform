@@ -9,13 +9,13 @@ import uk.ac.wellcome.platform.archive.progress_async.models.ProgressAsyncConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class ArgsConfigurator(val arguments: Seq[String])
-  extends ScallopConf(arguments)
-  with CloudWatchClientConfigurator
-  with MetricsConfigConfigurator
-  with SnsClientConfigurator
-  with SnsConfigConfigurator
-  with SqsClientConfigurator
-  with SqsConfigConfigurator {
+    extends ScallopConf(arguments)
+    with CloudWatchClientConfigurator
+    with MetricsConfigConfigurator
+    with SnsClientConfigurator
+    with SnsConfigConfigurator
+    with SqsClientConfigurator
+    with SqsConfigConfigurator {
 
   val archiveProgressMonitorTableName = opt[String](required = true)
 
