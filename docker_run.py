@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 """
 Run a Docker image used by a Make task.
@@ -19,7 +19,7 @@ import sys
 
 # Root of the Git repository
 ROOT = subprocess.check_output([
-    'git', 'rev-parse', '--show-toplevel']).decode('ascii').strip()
+    'git', 'rev-parse', '--show-toplevel']).decode('utf8').strip()
 
 
 def _aws_credentials_args():
