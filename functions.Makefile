@@ -184,7 +184,7 @@ endef
 define docker_compose_up
     $(ROOT)/docker_run.py --dind --sbt --root -- \
     		--net host \
-    		docker/compose:1.21.0 -f /repo/$(1) up
+    		docker/compose:1.21.0 -f $(ROOT)/$(1) up
 endef
 
 
@@ -196,7 +196,7 @@ endef
 define docker_compose_down
     $(ROOT)/docker_run.py --dind --sbt --root -- \
         		--net host \
-        		docker/compose:1.21.0 -f /repo/$(1) down
+        		docker/compose:1.21.0 -f $(ROOT)/$(1) down
 endef
 
 
