@@ -5,6 +5,7 @@ a report in Slack
 """
 
 import datetime as dt
+import json
 import os
 
 import boto3
@@ -123,15 +124,19 @@ def main(event=None, _ctxt=None):
             pass
 
     if errors:
+        if errors == ['bibs']:
+            message = 'There are gaps in the bib data.'
+        elif errors == ['items']:
+            message = 'There are gaps in the item data.'
+        else:
+            message = 'There are gaps in the bib and the item data.'
+
         slack_data = {
             'username': 'sierra-reader',
             'icon_emoji': ':sierra:',
             'attachments': [{
                 'color': '#8B4F30',
-                'fields': [{
-                    'value': 'The Sierra reader has a gap in its data (%r)' %
-                    errors
-                }]
+                'fields': [{'value': message}]
             }]
         }
 

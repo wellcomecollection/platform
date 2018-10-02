@@ -12,6 +12,6 @@ data "aws_iam_policy_document" "allow_s3_access" {
 }
 
 resource "aws_iam_role_policy" "allow_s3_access" {
-  role   = "${module.window_generator_lambda.role_name}"
+  role   = "${module.lambda.role_name}"
   policy = "${data.aws_iam_policy_document.allow_s3_access.json}"
 }

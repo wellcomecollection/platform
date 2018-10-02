@@ -11,8 +11,8 @@ module "lambda" {
   timeout         = 300
 
   environment_variables = {
-    BUCKET             = "${var.s3_adapter_bucket_name}"
-    SLACK_ACCESS_TOKEN = "${var.slack_access_token}"
+    BUCKET        = "${var.s3_adapter_bucket_name}"
+    SLACK_WEBHOOK = "${var.slack_access_token}"
   }
 
   log_retention_in_days = 30
