@@ -59,7 +59,8 @@ class ProgressMonitor(
       case Progress.None =>
         events.map(event => append('events -> event)).reduce(_ and _)
       case status =>
-        events.map(event => append('events -> event)).reduce(_ and _) and set('result -> status)
+        events.map(event => append('events -> event)).reduce(_ and _) and set(
+          'result -> status)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)
