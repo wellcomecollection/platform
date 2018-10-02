@@ -28,6 +28,7 @@ import scala.util.Random
 class IngestorWorkerServiceTest
     extends FunSpec
     with ScalaFutures
+    with PatienceConfiguration
     with Matchers
     with Messaging
     with ElasticsearchFixtures
@@ -35,8 +36,7 @@ class IngestorWorkerServiceTest
     with S3
     with WorkIndexerFixtures
     with WorksGenerators
-    with CustomElasticsearchMapping
-    with PatienceConfiguration {
+    with CustomElasticsearchMapping {
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(
     timeout = scaled(Span(40, Seconds)),
