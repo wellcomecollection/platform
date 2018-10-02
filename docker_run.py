@@ -96,7 +96,7 @@ if __name__ == '__main__':
     if namespace.share_aws_creds:
         cmd += _aws_credentials_args()
 
-    if namespace.docker_in_docker:
+    if namespace.expose_host_root_folder:
         cmd += ['--volume', '%s:%s' % (ROOT, ROOT)]
         cmd += ['--workdir', ROOT]
 
