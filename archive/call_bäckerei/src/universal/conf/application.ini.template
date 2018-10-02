@@ -1,2 +1,2 @@
 --sqs-queue-url=${queue_url}
---topic-arn=${topic_arn}
+--sns-topic-arn=${topic_arn}
