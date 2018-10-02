@@ -162,3 +162,17 @@ data "aws_iam_policy_document" "bagger_get_preservica" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "read_from_registrar_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+    ]
+
+    resources = [
+      "${module.registrar_queue.arn}",
+    ]
+  }
+}
