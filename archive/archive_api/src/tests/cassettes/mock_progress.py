@@ -7,7 +7,7 @@ the responses for the ProgressManager tests.
 It mimics the external interface but not the functionlity!
 """
 
-from flask import Flask, request, Response
+from flask import Flask, jsonify, request, Response
 import uuid
 
 app = Flask(__name__)
@@ -39,7 +39,7 @@ def post_route():
 def get_route(id):
     if id.startswith('bad_status-'):
         return b'', int(id.split('bad_status-')[1])
-    return f'<<progress: {id}>>'
+    return jsonify({'progress': id})
 
 
 app.run(debug=True, port=6000)

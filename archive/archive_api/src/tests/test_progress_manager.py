@@ -75,7 +75,8 @@ def test_progress_manager_can_extract_id(progress_manager):
 class TestLookupProgress:
 
     def test_can_lookup_existing_id(self, progress_manager):
-        progress_manager.lookup_progress(id='123')
+        result = progress_manager.lookup_progress(id='123')
+        assert result == {'progress': '123'}
 
     @pytest.mark.parametrize('bad_status', [202, 400, 500])
     def test_not_200_or_404_is_error(self, bad_status, progress_manager):

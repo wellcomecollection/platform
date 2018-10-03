@@ -88,3 +88,6 @@ class ProgressManager:
 
         elif resp.status_code == 404:
             raise ProgressNotFoundError(id)
+
+        else:
+            return resp.json()
