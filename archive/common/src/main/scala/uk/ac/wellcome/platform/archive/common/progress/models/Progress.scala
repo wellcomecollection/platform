@@ -5,7 +5,6 @@ import java.util.UUID
 
 import io.circe.{Decoder, Encoder, Json}
 
-
 case class Progress(
   id: String,
   uploadUrl: String,
@@ -24,25 +23,24 @@ case class Progress(
 }
 
 object Progress {
-  implicit val statusEncoder = Encoder.instance[Progress.Status](
-    _ match {
-        case None => Json.fromString("none")
-        case Processing => Json.fromString("processing")
-        case Completed => Json.fromString("completed")
-        case Failed => Json.fromString("failed")
-      })
+  implicit val statusEncoder = Encoder.instance[Progress.Status](_ match {
+    case None       => Json.fromString("none")
+    case Processing => Json.fromString("processing")
+    case Completed  => Json.fromString("completed")
+    case Failed     => Json.fromString("failed")
+  })
 
   implicit val licenseDecoder = Decoder.instance[Progress.Status](cursor =>
     for {
       status <- cursor.downField("result").as[String]
     } yield {
       status match {
-        case "none" => None
+        case "none"       => None
         case "processing" => Processing
-        case "completed" => Completed
-        case "failed" => Failed
+        case "completed"  => Completed
+        case "failed"     => Failed
       }
-    })
+  })
 
   sealed trait Status
   case object None extends Status

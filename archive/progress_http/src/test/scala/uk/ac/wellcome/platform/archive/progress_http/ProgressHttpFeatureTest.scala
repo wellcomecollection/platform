@@ -46,8 +46,6 @@ class ProgressHttpFeatureTest
               val request =
                 HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
 
-
-
               whenRequestReady(request) { result =>
                 result.status shouldBe StatusCodes.OK
                 getT[Progress](result.entity) shouldBe progress

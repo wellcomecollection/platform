@@ -39,7 +39,8 @@ class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) {
         get {
           monitor.get(id) match {
             case scala.Some(progress) => complete(progress)
-            case scala.None           => complete(NotFound -> "Progress monitor not found!")
+            case scala.None =>
+              complete(NotFound -> "Progress monitor not found!")
           }
         }
       }
