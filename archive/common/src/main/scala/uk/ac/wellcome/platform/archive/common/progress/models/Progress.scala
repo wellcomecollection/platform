@@ -25,6 +25,9 @@ object Progress {
   case object Processing extends Status
   case object Completed extends Status
   case object Failed extends Status
+  case object CompletedNoCallbackProvided extends Status
+  case object CompletedCallbackSucceeded extends Status
+  case object CompletedCallbackFailed extends Status
 }
 
 case class ProgressEvent(description: String, time: Instant = Instant.now)

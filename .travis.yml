@@ -59,11 +59,11 @@ cache:
     - sierra_adapter/sierra_bib_merger/target
     - sierra_adapter/sierra_item_merger/target
 
-    - archive/call_bäckerei/target
     - archive/commmon/target
     - archive/archivist/target
     - archive/registrar/target
     - archive/progress/target
+    - archive/notifier/target
 
 
 # Based on instructions from
@@ -163,12 +163,12 @@ jobs:
     - env: TASK=sierra_item_merger-test
 
     # Archive
-    - env: TASK=archive_common-test
-    - env: TASK=call_bäckerei-test
-    - env: TASK=registrar-test
-    - env: TASK=archivist-test
-    - env: TASK=progress-test
     - env: TASK=archive_api-test
+    - env: TASK=archive_common-test
+    - env: TASK=archivist-test
+    - env: TASK=registrar-test
+    - env: TASK=progress-test
+    - env: TASK=notifier-test
 
     # (not under active development)
 

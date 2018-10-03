@@ -187,6 +187,12 @@ trait SNS extends Matchers with Logging {
       case Right(t) => t
     }
   }
+
+  def notificationMessage[T](topic: Topic)(implicit decoderT: Decoder[T]): T = {
+    notificationCount(topic) shouldBe 1
+    val maybeT = listNotifications[T](topic).head
+    maybeT.get
+  }
 }
 
 case class SNSNotificationMessage(
