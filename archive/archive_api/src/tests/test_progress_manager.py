@@ -87,3 +87,7 @@ class TestLookupProgress:
     def test_404_is_not_found(self, progress_manager):
         with pytest.raises(ProgressNotFoundError):
             progress_manager.lookup_progress(id='bad_status-404')
+
+    def test_bad_json_is_error(self, progress_manager):
+        with pytest.raises(ProgressServiceError):
+            progress_manager.lookup_progress(id='notjson')

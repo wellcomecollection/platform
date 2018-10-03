@@ -1,5 +1,6 @@
 # -*- encoding: utf-8
 
+import json
 import os
 
 import requests
@@ -90,4 +91,7 @@ class ProgressManager:
             raise ProgressNotFoundError(id)
 
         else:
-            return resp.json()
+            try:
+                return resp.json()
+            except json.JSONDecodeError as err:
+                raise ProgressServiceError(err)

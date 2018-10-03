@@ -39,6 +39,8 @@ def post_route():
 def get_route(id):
     if id.startswith('bad_status-'):
         return b'', int(id.split('bad_status-')[1])
+    elif id == 'notjson':
+        return b'<<notjson>>'
     return jsonify({'progress': id})
 
 
