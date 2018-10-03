@@ -10,6 +10,11 @@ class ProgressServiceError(Exception):
     pass
 
 
+class ProgressNotFoundError(Exception):
+    """Raised if we try to look up a progress that doesn't exist."""
+    pass
+
+
 class ProgressManager:
     """
     Handles requests to/from the progress service.
@@ -80,3 +85,6 @@ class ProgressManager:
                 'Expected HTTP 200 or 404; got %d (id=%r)' %
                 (resp.status_code, id)
             )
+
+        elif resp.status_code == 404:
+            raise ProgressNotFoundError(id)

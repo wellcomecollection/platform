@@ -4,7 +4,11 @@ import betamax
 import pytest
 import requests
 
-from progress_manager import ProgressManager, ProgressServiceError
+from progress_manager import (
+    ProgressManager,
+    ProgressNotFoundError,
+    ProgressServiceError,
+)
 
 
 @pytest.fixture(scope='session')
@@ -68,11 +72,17 @@ def test_progress_manager_can_extract_id(progress_manager):
     assert result == '123'
 
 
-def test_can_lookup_existing_id(progress_manager):
-    progress_manager.lookup_progress(id='123')
+class TestLookupProgress:
 
+    def test_can_lookup_existing_id(self, progress_manager):
+        progress_manager.lookup_progress(id='123')
 
-@pytest.mark.parametrize('bad_status', [202, 400, 500])
-def test_not_200_or_404_is_error(bad_status, progress_manager):
-    with pytest.raises(ProgressServiceError, match='Expected HTTP 200 or 404'):
-        progress_manager.lookup_progress(id='bad_status-{bad_status}')
+    @pytest.mark.parametrize('bad_status', [202, 400, 500])
+    def test_not_200_or_404_is_error(self, bad_status, progress_manager):
+        with pytest.raises(ProgressServiceError,
+                           match='Expected HTTP 200 or 404'):
+            progress_manager.lookup_progress(id='bad_status-{bad_status}')
+
+    def test_404_is_not_found(self, progress_manager):
+        with pytest.raises(ProgressNotFoundError):
+            progress_manager.lookup_progress(id='bad_status-404')
