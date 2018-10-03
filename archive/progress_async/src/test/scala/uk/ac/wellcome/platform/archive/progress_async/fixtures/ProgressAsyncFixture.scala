@@ -48,7 +48,7 @@ trait ProgressAsyncFixture
     val id = generateUUID
 
     val createdProgress =
-      ProgressModel(id, uploadUrl, Some(callbackUrl))
+      ProgressModel(id, uploadUri, Some(callbackUri))
 
     val storedProgress = monitor.create(createdProgress)
 

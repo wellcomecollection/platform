@@ -3,12 +3,9 @@ package uk.ac.wellcome.platform.archive.progress_http
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressCreateRequest
-}
+import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressCreateRequest}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.progress_http.models.HttpServerConfig
 
 import scala.util.Try
 

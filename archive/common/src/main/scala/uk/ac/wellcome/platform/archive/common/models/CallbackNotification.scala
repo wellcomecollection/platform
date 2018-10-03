@@ -1,16 +1,18 @@
 package uk.ac.wellcome.platform.archive.common.models
 
+import java.net.URI
+
+import uk.ac.wellcome.platform.archive.common.json.URIConverters
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
-case class CallbackNotification(id: String,
-                                callbackUrl: String,
-                                payload: Progress)
+case class CallbackNotification(id: String, callbackUri: URI, payload: Progress)
 
-object CallbackNotification {
+object CallbackNotification extends URIConverters {
+
   def apply(progress: Progress): CallbackNotification = {
     CallbackNotification(
       progress.id,
-      progress.callbackUrl.getOrElse(
+      progress.callbackUri.getOrElse(
         throw new RuntimeException(
           "Could not createCallbackNotification, no callbackUrl found.")
       ),

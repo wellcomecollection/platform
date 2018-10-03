@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier.flows
 
+import java.net.URI
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
@@ -10,6 +12,9 @@ import uk.ac.wellcome.platform.archive.notifier.CallbackNotification
 import uk.ac.wellcome.platform.archive.notifier.models.CallbackFlowResult
 
 object CallbackUrlFlow {
+
+  import Progress._
+
   // This flow handles the case where there is a callback URL on
   // the progress object.
   //
@@ -20,8 +25,8 @@ object CallbackUrlFlow {
   def apply()(implicit actorSystem: ActorSystem) =
     Flow[CallbackNotification]
       .collect {
-        case CallbackNotification(id, callbackUrl, progress) =>
-          (createHttpRequest(progress, callbackUrl), id)
+        case CallbackNotification(id, callbackUri, progress) =>
+          (createHttpRequest(progress, callbackUri), id)
       }
       .via(http)
       .map {
@@ -36,7 +41,7 @@ object CallbackUrlFlow {
     Http().superPool[String]()
 
   private def createHttpRequest(progress: Progress,
-                                callbackUri: String): HttpRequest = {
+                                callbackUri: URI): HttpRequest = {
 
     // Making a `.get` here!
     val entity = HttpEntity(
@@ -46,7 +51,7 @@ object CallbackUrlFlow {
 
     HttpRequest(
       method = HttpMethods.POST,
-      uri = Uri(callbackUri.toString),
+      uri = callbackUri.toString,
       entity = entity
     )
   }

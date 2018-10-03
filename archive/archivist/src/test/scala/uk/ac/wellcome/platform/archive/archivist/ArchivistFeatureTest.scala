@@ -12,9 +12,7 @@ import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
-
-// TODO: Test file boundaries
-// TODO: Test shutdown mid-stream does not succeed
+import uk.ac.wellcome.json.JsonUtil._
 
 class ArchivistFeatureTest
     extends FunSpec
@@ -24,6 +22,8 @@ class ArchivistFeatureTest
     with ProgressMonitorFixture
     with ArchivistFixture
     with ExtendedPatience {
+
+  import IngestBagRequest._
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {

@@ -27,8 +27,9 @@ trait ProgressMonitorFixture
     with MockitoSugar
     with TimeTestFixture {
 
-  val uploadUrl = "uploadUrl"
-  val callbackUrl = "http://localhost/archive/complete"
+  import Progress._
+
+  val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
@@ -68,8 +69,8 @@ trait ProgressMonitorFixture
 
   def createProgress(
     progressMonitor: ProgressMonitor,
-    callbackUrl: String = callbackUrl,
-    uploadUrl: String = uploadUrl
+    callbackUrl: URI = callbackUri,
+    uploadUrl: URI = uploadUri
   ): Progress = {
     val id = UUID.randomUUID().toString
 
@@ -79,20 +80,16 @@ trait ProgressMonitorFixture
   }
 
   def givenProgressRecord(id: String,
-                          uploadUrl: String,
-                          maybeCallbackUrl: Option[String],
+                          uploadUri: URI,
+                          maybeCallbackUri: Option[URI],
                           table: Table) = {
-    givenTableHasItem(Progress(id, uploadUrl, maybeCallbackUrl), table)
+    givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri), table)
   }
 
-  def assertProgressCreated(id: String,
-                            expectedUploadUrl: String,
-                            expectedCallbackUrl: Option[String],
-                            table: Table,
-                            recentSeconds: Int = 45): Assertion = {
+  def assertProgressCreated(id: String, expectedUploadUri: URI, expectedCallbackUri: Option[URI], table: Table, recentSeconds: Int = 45): Assertion = {
     val progress = getExistingTableItem[Progress](id, table)
-    progress.uploadUrl shouldBe expectedUploadUrl
-    progress.callbackUrl shouldBe expectedCallbackUrl
+    progress.uploadUri shouldBe expectedUploadUri
+    progress.callbackUri shouldBe expectedCallbackUri
 
     assertRecent(progress.createdAt, recentSeconds)
     assertRecent(progress.updatedAt, recentSeconds)

@@ -27,6 +27,8 @@ class ProgressUpdateAndPublishFlowTest
     with ProgressMonitorFixture
     with ScalaFutures {
 
+  import Progress._
+
   it("updates progress and publishes status") {
     withLocalSnsTopic { topic =>
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
@@ -43,13 +45,10 @@ class ProgressUpdateAndPublishFlowTest
               val event = ProgressEvent("Run!")
               val status = Progress.Failed
 
-              val progress = createProgress(monitor, callbackUrl, uploadUrl)
+              val progress = createProgress(monitor, callbackUri, uploadUri)
               val update = ProgressUpdate(progress.id, event, status)
 
-              val expectedProgress = progress.copy(
-                events = progress.events :+ event,
-                result = status
-              )
+              val expectedProgress = progress.copy(result = status, events = progress.events :+ event)
 
               val source = Source.single(update)
 
@@ -64,11 +63,7 @@ class ProgressUpdateAndPublishFlowTest
 
                   assertSnsReceivesOnly(expectedProgress, topic)
 
-                  assertProgressCreated(
-                    progress.id,
-                    uploadUrl,
-                    Some(callbackUrl),
-                    table = table)
+                  assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
 
                   assertProgressRecordedRecentEvents(
                     progress.id,

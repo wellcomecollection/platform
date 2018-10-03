@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier
 
+import java.net.URI
+
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
@@ -11,10 +13,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.archive.common.messaging.{
-  MessageStream,
-  NotificationParsingFlow
-}
+import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
@@ -27,6 +26,8 @@ class Notifier @Inject()(
   metricsSender: MetricsSender
 )(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
   def run() = {
+
+    import Progress._
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
@@ -49,6 +50,4 @@ class Notifier @Inject()(
   }
 }
 
-case class CallbackNotification(id: String,
-                                callbackUrl: String,
-                                payload: Progress)
+case class CallbackNotification(id: String, callbackUri: URI, payload: Progress)

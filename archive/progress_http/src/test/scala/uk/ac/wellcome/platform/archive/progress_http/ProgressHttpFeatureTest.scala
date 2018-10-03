@@ -91,8 +91,8 @@ class ProgressHttpFeatureTest
               val url = s"$baseUrl/progress"
 
               val createProgressRequest = ProgressCreateRequest(
-                uploadUrl,
-                Some(callbackUrl)
+                uploadUri,
+                Some(callbackUri)
               )
 
               val entity = HttpEntity(
@@ -132,13 +132,10 @@ class ProgressHttpFeatureTest
                 // Check the progress is stored
                 whenReady(progressFuture) { progress =>
                   val expectedProgress = Progress(
-                    id,
-                    uploadUrl,
-                    Some(callbackUrl)
-                  ).copy(
-                    createdAt = progress.createdAt,
-                    updatedAt = progress.updatedAt
-                  )
+                                      id,
+                                      uploadUri,
+                                      Some(callbackUri)
+                                    ).copy(createdAt = progress.createdAt, updatedAt = progress.updatedAt)
 
                   progress shouldBe expectedProgress
                   assertTableOnlyHasItem(expectedProgress, table)

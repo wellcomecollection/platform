@@ -20,8 +20,11 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.json.JsonUtil._
 
 trait Archivist extends Messaging with ZipBagItFixture {
+
+  import IngestBagRequest._
 
   def sendBag[R](
     zipFile: ZipFile,

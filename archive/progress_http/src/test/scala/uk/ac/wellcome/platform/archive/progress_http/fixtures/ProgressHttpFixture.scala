@@ -10,17 +10,13 @@ import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressEvent,
-  ProgressUpdate,
-  Progress => ProgressModel
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate, Progress => ProgressModel}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.progress_http.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.progress_http.modules._
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -57,7 +53,7 @@ trait ProgressHttpFixture
     val id = generateUUID
 
     val createdProgress =
-      ProgressModel(id, uploadUrl, Some(callbackUrl))
+      ProgressModel(id, uploadUri, Some(callbackUri))
 
     val storedProgress = monitor.create(createdProgress)
 

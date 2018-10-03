@@ -1,8 +1,5 @@
 package uk.ac.wellcome.platform.archive.common.progress.monitor
 
-import java.time.Instant
-import java.time.format.DateTimeFormatter
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import com.google.inject.Inject
@@ -10,24 +7,17 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.storage.dynamo._
 
 import scala.util.{Failure, Success, Try}
 
 class ProgressMonitor @Inject()(
-  dynamoClient: AmazonDynamoDB,
-  dynamoConfig: DynamoConfig
-) extends Logging {
+                                 dynamoClient: AmazonDynamoDB,
+                                 dynamoConfig: DynamoConfig
+                               ) extends Logging {
 
-  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
-      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
-      DateTimeFormatter.ISO_INSTANT.format(_)
-    )
+  import Progress._
 
   def get(id: String) = {
     Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
@@ -40,7 +30,7 @@ class ProgressMonitor @Inject()(
         warn(s"Failed to get Dynamo record: ${id}", exception)
         throw exception
       }
-      case None => None
+      case scala.None => scala.None
     }
   }
 
@@ -69,6 +59,8 @@ class ProgressMonitor @Inject()(
   }
 
   def update(update: ProgressUpdate): Try[Progress] = {
+    debug(s"Updating Dynamo record ${update.id} with: $update")
+
     val event = update.event
 
     val mergedUpdate = update.status match {
@@ -98,8 +90,8 @@ class ProgressMonitor @Inject()(
         Failure(exception)
       }
 
-      case r @ Right(progress) => {
-        debug(s"Successfully updated Dynamo record: ${update.id}")
+      case r@Right(progress) => {
+        debug(s"Successfully updated Dynamo record: ${update.id}, got $progress")
 
         Success(progress)
       }
@@ -108,6 +100,6 @@ class ProgressMonitor @Inject()(
 }
 
 final case class IdConstraintError(
-  private val message: String,
-  private val cause: Throwable
-) extends Exception(message, cause)
+                                    private val message: String,
+                                    private val cause: Throwable
+                                  ) extends Exception(message, cause)

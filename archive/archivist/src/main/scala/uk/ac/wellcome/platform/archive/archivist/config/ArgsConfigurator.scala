@@ -11,7 +11,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     extends ScallopConf(arguments)
     with CloudWatchClientConfigurator
     with MetricsConfigConfigurator
-    with S3ClientConfigurator
+    with HttpServerConfigurator
     with SnsClientConfigurator
     with SnsConfigConfigurator
     with SqsClientConfigurator

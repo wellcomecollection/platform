@@ -35,13 +35,15 @@ class ProgressMonitorTest
     with ProgressMonitorFixture
     with ScalaFutures {
 
+  import Progress._
+
   describe("create") {
     it("creates a progress monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { archiveProgressMonitor =>
           val id = UUID.randomUUID().toString
           val archiveIngestProgress =
-            Progress(id, uploadUrl, Some(callbackUrl), Progress.Processing)
+            Progress(id, uploadUri, Some(callbackUri), Progress.Processing)
 
           archiveProgressMonitor.create(archiveIngestProgress)
           assertTableOnlyHasItem(archiveIngestProgress, table)
@@ -56,8 +58,8 @@ class ProgressMonitorTest
           val id = UUID.randomUUID().toString
 
           val monitors = List(
-            Progress(id, uploadUrl, Some(callbackUrl)),
-            Progress(id, uploadUrl, Some(callbackUrl))
+            Progress(id, uploadUri, Some(callbackUri)),
+            Progress(id, uploadUri, Some(callbackUri))
           )
 
           val result = Try(monitors.map(archiveProgressMonitor.create))
@@ -67,7 +69,8 @@ class ProgressMonitorTest
           failedException.getMessage should include(
             s"There is already a monitor with id:$id")
 
-          assertProgressCreated(id, uploadUrl, Some(callbackUrl), table = table)
+          assertProgressCreated(
+            id, uploadUri, Some(callbackUri), table)
         }
 
       }
@@ -86,7 +89,7 @@ class ProgressMonitorTest
         )
 
         val id = UUID.randomUUID().toString
-        val progress = Progress(id, uploadUrl, Some(callbackUrl))
+        val progress = Progress(id, uploadUri, Some(callbackUri))
 
         val result = Try(archiveProgressMonitor.create(progress))
         val failedException = result.failed.get
@@ -102,7 +105,7 @@ class ProgressMonitorTest
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { progressMonitor =>
           val progress =
-            createProgress(progressMonitor, callbackUrl, uploadUrl)
+            createProgress(progressMonitor, callbackUri, uploadUri)
 
           val result = progressMonitor.get(progress.id)
 
@@ -118,12 +121,12 @@ class ProgressMonitorTest
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { progressMonitor =>
           val progress =
-            createProgress(progressMonitor, callbackUrl, uploadUrl)
+            createProgress(progressMonitor, callbackUri, uploadUri)
 
           val result = progressMonitor.get("not_the_id_we_created")
 
           assertTableOnlyHasItem(progress, table)
-          result shouldBe None
+          result shouldBe scala.None
         }
       }
     }
@@ -141,11 +144,7 @@ class ProgressMonitorTest
         )
 
         val id = UUID.randomUUID().toString
-
         val result = Try(archiveProgressMonitor.get(id))
-
-        println(result)
-
         val failedException = result.failed.get
 
         failedException shouldBe a[RuntimeException]
@@ -160,7 +159,7 @@ class ProgressMonitorTest
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { archiveProgressMonitor =>
           val progress =
-            createProgress(archiveProgressMonitor, callbackUrl, uploadUrl)
+            createProgress(archiveProgressMonitor, callbackUri, uploadUri)
 
           val progressUpdate = ProgressUpdate(
             progress.id,
@@ -169,11 +168,7 @@ class ProgressMonitorTest
 
           archiveProgressMonitor.update(progressUpdate)
 
-          assertProgressCreated(
-            progress.id,
-            uploadUrl,
-            Some(callbackUrl),
-            table = table)
+          assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
           assertProgressRecordedRecentEvents(
             progressUpdate.id,
             Seq(progressUpdate.event.description),
@@ -186,7 +181,7 @@ class ProgressMonitorTest
     it("adds multiple events to a monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { monitor: ProgressMonitor =>
-          val progress = createProgress(monitor, callbackUrl, uploadUrl)
+          val progress = createProgress(monitor, callbackUri, uploadUri)
 
           val updates = List(
             ProgressUpdate(
@@ -201,11 +196,7 @@ class ProgressMonitorTest
 
           updates.map(monitor.update)
 
-          assertProgressCreated(
-            progress.id,
-            uploadUrl,
-            Some(callbackUrl),
-            table = table)
+          assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
           assertProgressRecordedRecentEvents(
             progress.id,
             updates.map(_.event.description),

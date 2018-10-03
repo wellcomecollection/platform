@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http.models
+package uk.ac.wellcome.platform.archive.common.config.models
 
 case class HttpServerConfig(
   host: String,

@@ -23,6 +23,8 @@ class ProgressAsyncFeatureTest
     with ProgressFixture
     with ExtendedPatience {
 
+  import CallbackNotification._
+
   it("updates an existing progress monitor to Completed") {
     withConfiguredApp {
       case (qPair, topic, table, app) => {
@@ -39,12 +41,9 @@ class ProgressAsyncFeatureTest
 
               eventually {
                 assertSnsReceivesOnly(expectedNotification, topic)
+
                 assertProgressCreated(
-                  progress.id,
-                  uploadUrl,
-                  Some(callbackUrl),
-                  table = table
-                )
+                  progress.id, uploadUri, Some(callbackUri), table)
 
                 assertProgressRecordedRecentEvents(
                   update.id,

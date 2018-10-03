@@ -5,8 +5,8 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.google.inject.Injector
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.progress_http.Router
-import uk.ac.wellcome.platform.archive.progress_http.models.HttpServerConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 

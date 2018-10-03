@@ -44,8 +44,12 @@ trait ProgressAsync extends Logging {
     val progressMonitor = injector
       .getInstance(classOf[ProgressMonitor])
 
-    val progressUpdateFlow = ProgressUpdateFlow(progressMonitor)
-    val parseNotificationFlow = NotificationParsingFlow[ProgressUpdate]()
+    val progressUpdateFlow =
+      ProgressUpdateFlow(progressMonitor)
+
+    val parseNotificationFlow =
+      NotificationParsingFlow[ProgressUpdate]()
+
     val callbackNotificationFlow =
       CallbackNotificationFlow(snsClient, snsConfig)
 

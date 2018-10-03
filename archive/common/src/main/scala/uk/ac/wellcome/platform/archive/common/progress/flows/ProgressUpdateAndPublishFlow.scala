@@ -20,6 +20,8 @@ object ProgressUpdateAndPublishFlow {
     progressMonitor: ProgressMonitor
   ) = {
 
+    import Progress._
+
     val snsPublishFlow =
       SnsPublishFlow[Progress](snsClient, snsConfig, "progress-update")
 

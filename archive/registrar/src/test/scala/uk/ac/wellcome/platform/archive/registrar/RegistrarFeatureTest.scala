@@ -64,8 +64,8 @@ class RegistrarFeatureTest
           storageBucket) { bagLocation =>
           givenProgressRecord(
             requestId.toString,
-            "upLoadUrl",
-            Some(callbackUrl.toString),
+            uploadUri,
+            Some(callbackUri),
             progressTable
           )
 

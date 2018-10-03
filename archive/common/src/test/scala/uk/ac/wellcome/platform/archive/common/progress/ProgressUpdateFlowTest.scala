@@ -29,7 +29,7 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
               val progress =
-                createProgress(monitor, callbackUrl, uploadUrl)
+                createProgress(monitor, callbackUri, uploadUri)
 
               val update = ProgressUpdate(progress.id, ProgressEvent("Wow."))
 
@@ -40,11 +40,7 @@ class ProgressUpdateFlowTest
                 .runWith(Sink.ignore)(materializer)
 
               whenReady(updates) { _ =>
-                assertProgressCreated(
-                  progress.id,
-                  uploadUrl,
-                  Some(callbackUrl),
-                  table = table)
+                assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
                 assertProgressRecordedRecentEvents(
                   update.id,
                   Seq(update.event.description),
@@ -63,7 +59,7 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
 
-              val progress = createProgress(monitor, callbackUrl, uploadUrl)
+              val progress = createProgress(monitor, callbackUri, uploadUri)
 
               val events = List(
                 ProgressUpdate(
@@ -79,11 +75,7 @@ class ProgressUpdateFlowTest
                 .runWith(Sink.ignore)(materializer)
 
               whenReady(updates) { _ =>
-                assertProgressCreated(
-                  progress.id,
-                  uploadUrl,
-                  Some(callbackUrl),
-                  table = table)
+                assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
                 assertProgressRecordedRecentEvents(
                   progress.id,
                   events.map(_.event.description),
