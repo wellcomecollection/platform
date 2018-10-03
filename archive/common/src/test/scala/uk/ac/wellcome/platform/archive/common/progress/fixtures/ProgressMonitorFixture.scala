@@ -63,26 +63,26 @@ trait ProgressMonitorFixture
   def createProgress(uploadUrl: String,
                      callbackUrl: String,
                      progressMonitor: ProgressMonitor): Progress = {
-    val id = UUID.randomUUID().toString
+    val id = UUID.randomUUID()
 
     progressMonitor.create(
       Progress(id, uploadUrl, Some(callbackUrl))
     )
   }
 
-  def givenProgressRecord(id: String,
+  def givenProgressRecord(id: UUID,
                           uploadUrl: String,
                           maybeCallbackUrl: Option[String],
                           table: Table) = {
     givenTableHasItem(Progress(id, uploadUrl, maybeCallbackUrl), table)
   }
 
-  def assertProgressCreated(id: String,
+  def assertProgressCreated(id: UUID,
                             expectedUploadUrl: String,
                             expectedCallbackUrl: Option[String],
                             table: Table,
                             recentSeconds: Int = 45): Assertion = {
-    val progress = getExistingTableItem[Progress](id, table)
+    val progress = getExistingTableItem[Progress](id.toString, table)
     progress.uploadUrl shouldBe expectedUploadUrl
     progress.callbackUrl shouldBe expectedCallbackUrl
 
@@ -90,21 +90,21 @@ trait ProgressMonitorFixture
     assertRecent(progress.updatedAt, recentSeconds)
   }
 
-  def assertProgressRecordedRecentEvents(id: String,
+  def assertProgressRecordedRecentEvents(id: UUID,
                                          expectedEventDescriptions: Seq[String],
                                          table: LocalDynamoDb.Table,
                                          recentSeconds: Int = 45) = {
-    val progress = getExistingTableItem[Progress](id, table)
+    val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
     progress.events.foreach(event => assertRecent(event.time, recentSeconds))
     progress
   }
 
-  def assertProgressStatus(id: String,
+  def assertProgressStatus(id: UUID,
                            expectedStatus: Status,
                            table: LocalDynamoDb.Table) = {
-    val progress = getExistingTableItem[Progress](id, table)
+    val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.result shouldBe expectedStatus
   }
