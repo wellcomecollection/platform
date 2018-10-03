@@ -58,7 +58,7 @@ trait Archivist extends Logging {
         .log("notification message")
         .via(NotificationMessageFlow())
         .log("download zip")
-        .via(ZipFileDownloadFlow(bagUploaderConfig.parallelism))
+        .via(ZipFileDownloadFlow(bagUploaderConfig.parallelism, snsProgressConfig))
         .log("archiving zip")
         .via(FoldEitherFlow[
           ArchiveError[IngestBagRequest],

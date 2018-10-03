@@ -3,16 +3,18 @@ package uk.ac.wellcome.platform.archive.archivist
 import java.util.UUID
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Assertion, FunSpec, Inside, Matchers}
-import uk.ac.wellcome.json.JsonUtil.{fromJson, _}
-import uk.ac.wellcome.messaging.test.fixtures.SNS
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
+
+// TODO: Test file boundaries
 
 class ArchivistFeatureTest
     extends FunSpec
@@ -22,7 +24,7 @@ class ArchivistFeatureTest
     with ProgressMonitorFixture
     with ArchivistFixture
     with ExtendedPatience
-    with Inside {
+    with ProgressUpdateAssertions{
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
@@ -58,6 +60,14 @@ class ArchivistFeatureTest
                 progressTopic,
                 Progress.None) { events =>
                 events should have size 1
+                events.head.description shouldBe "zipFile downloaded successfully"
+              }
+
+              assertTopicReceivesProgressUpdate(
+                requestId,
+                progressTopic,
+                Progress.None) { events =>
+                events should have size 1
                 events.head.description shouldBe "Bag uploaded and verified successfully"
               }
             }
@@ -65,26 +75,7 @@ class ArchivistFeatureTest
     }
   }
 
-  private def assertTopicReceivesProgressUpdate(
-    requestId: UUID,
-    progressTopic: SNS.Topic,
-    status: Progress.Status)(assert: List[ProgressEvent] => Assertion) = {
-    val messages = listMessagesReceivedFromSNS(progressTopic)
-    val progressUpdates = messages.map { messageinfo =>
-      fromJson[ProgressUpdate](messageinfo.message).get
-    }
 
-    val filtered = progressUpdates.filter(_.id == requestId)
-    filtered should have size 1
-    val progressUpdate = filtered.head
-    inside(progressUpdate) {
-      case ProgressUpdate(id, events, status) =>
-        id shouldBe requestId
-        status shouldBe status
-
-        assert(events)
-    }
-  }
   it("fails when ingesting an invalid bag") {
     withArchivist {
       case (
@@ -272,7 +263,7 @@ class ArchivistFeatureTest
                     progressTopic,
                     Progress.Failed) { events =>
                     events should have size 1
-                    events.head.description shouldBe s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip"
+                    events.head.description should startWith (s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip")
                   }
 
                   assertTopicReceivesProgressUpdate(
@@ -280,7 +271,7 @@ class ArchivistFeatureTest
                     progressTopic,
                     Progress.Failed) { events =>
                     events should have size 1
-                    events.head.description shouldBe s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip"
+                    events.head.description should startWith (s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip")
                   }
                 }
             }

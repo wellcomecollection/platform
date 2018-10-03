@@ -36,6 +36,6 @@ case class InvalidBagInfo(job: IngestBagRequest) extends ArchiveError[IngestBagR
   override def toString = "Invalid bag-info.txt"
 }
 
-case class ZipFileDownloadingError(job: IngestBagRequest) extends ArchiveError[IngestBagRequest] {
-  override def toString = s"Failed downloading zipFile ${job.zippedBagLocation.namespace}/${job.zippedBagLocation.key}"
+case class ZipFileDownloadingError(job: IngestBagRequest, exception: Throwable) extends ArchiveError[IngestBagRequest] {
+  override def toString = s"Failed downloading zipFile ${job.zippedBagLocation.namespace}/${job.zippedBagLocation.key}: ${exception.getMessage}"
 }
