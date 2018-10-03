@@ -1,11 +1,13 @@
 # -*- encoding: utf-8
 
+import uuid
+
 from flask import jsonify, make_response, request
 from flask_restplus import Resource
 from werkzeug.exceptions import BadRequest as BadRequestError
 from werkzeug.exceptions import NotFound as NotFoundError
 
-from archive_api import app, api
+from archive_api import app, api, logger
 from bags import fetch_bag
 from ingests import (
     IngestProgress,
