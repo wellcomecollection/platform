@@ -12,9 +12,11 @@ from progress_manager import (
 
 
 @pytest.fixture(scope='session')
-def sess():
+def sess(pytestconfig):
     with betamax.Betamax.configure() as config:
-        config.cassette_library_dir = 'tests/cassettes'
+        config.cassette_library_dir = str(
+            pytestconfig.rootdir.join('src', 'tests', 'cassettes')
+        )
 
     session = requests.Session()
     with betamax.Betamax(session) as vcr:
