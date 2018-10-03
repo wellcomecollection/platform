@@ -33,43 +33,36 @@ def progress_manager(sess):
     return ProgressManager(endpoint='http://localhost:6000', sess=sess)
 
 
-def test_can_create_ingest_request(progress_manager):
-    progress_manager.create_request(
-        upload_url='http://example.org/',
-        callback_url=None
-    )
+class TestCreateRequest:
 
+    @pytest.mark.parametrize('bad_status', [200, 400, 404, 500])
+    def test_not_202_from_service_is_error(self, bad_status, progress_manager):
+        with pytest.raises(ProgressServiceError, match='Expected HTTP 202'):
+            progress_manager.create_request(
+                upload_url=f'http://example.org/?status={bad_status}',
+                callback_url=None
+            )
 
-def test_can_create_ingest_request_with_callback_url(progress_manager):
-    progress_manager.create_request(
-        upload_url='http://example.org',
-        callback_url='http://callback.net?id=123'
-    )
+    def test_missing_location_header_is_error(self, progress_manager):
+        with pytest.raises(ProgressServiceError, match='No Location header'):
+            progress_manager.create_request(
+                upload_url='http://example.org/?location=no',
+                callback_url=None
+            )
 
-
-@pytest.mark.parametrize('bad_status', [200, 400, 404, 500])
-def test_not_202_from_progress_service_is_error(bad_status, progress_manager):
-    with pytest.raises(ProgressServiceError, match='Expected HTTP 202'):
-        progress_manager.create_request(
-            upload_url=f'http://example.org/?status={bad_status}',
+    def test_create_request(self, progress_manager):
+        result = progress_manager.create_request(
+            upload_url='http://example.org/?id=123',
             callback_url=None
         )
+        assert result == '123'
 
-
-def test_missing_location_header_is_error(progress_manager):
-    with pytest.raises(ProgressServiceError, match='No Location header'):
-        progress_manager.create_request(
-            upload_url='http://example.org/?location=no',
-            callback_url=None
+    def test_can_create_request_with_callback(self, progress_manager):
+        result = progress_manager.create_request(
+            upload_url='http://example.org/?id=567',
+            callback_url='http://callback.net/?id=b567'
         )
-
-
-def test_progress_manager_can_extract_id(progress_manager):
-    result = progress_manager.create_request(
-        upload_url='http://example.org/?id=123',
-        callback_url=None
-    )
-    assert result == '123'
+        assert result == '567'
 
 
 class TestLookupProgress:
