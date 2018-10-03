@@ -8,17 +8,25 @@ import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, CompletedCallbackFailed, CompletedCallbackSucceeded, CompletedNoCallbackProvided, Failed, None, Processing}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
+  Completed,
+  CompletedCallbackFailed,
+  CompletedCallbackSucceeded,
+  CompletedNoCallbackProvided,
+  Failed,
+  None,
+  Processing
+}
 
 case class Progress(
-                     id: String,
-                     uploadUri: URI,
-                     callbackUri: Option[URI],
-                     result: Progress.Status = Progress.None,
-                     createdAt: Instant = Instant.now,
-                     updatedAt: Instant = Instant.now,
-                     events: Seq[ProgressEvent] = Seq.empty
-                   ) {
+  id: String,
+  uploadUri: URI,
+  callbackUri: Option[URI],
+  result: Progress.Status = Progress.None,
+  createdAt: Instant = Instant.now,
+  updatedAt: Instant = Instant.now,
+  events: Seq[ProgressEvent] = Seq.empty
+) {
 
   def update(progressUpdate: ProgressUpdate) = {
     this.copy(
@@ -33,10 +41,10 @@ trait StatusConverters {
   import uk.ac.wellcome.json.JsonUtil.{fromJson, toJson}
 
   implicit val enc = Encoder.instance[Progress.Status](_ match {
-    case None => Json.fromString("none")
+    case None       => Json.fromString("none")
     case Processing => Json.fromString("processing")
-    case Completed => Json.fromString("completed")
-    case Failed => Json.fromString("failed")
+    case Completed  => Json.fromString("completed")
+    case Failed     => Json.fromString("failed")
 
     case CompletedNoCallbackProvided =>
       Json.fromString("completed-callback-none")
@@ -51,10 +59,10 @@ trait StatusConverters {
       status <- cursor.value.as[String]
     } yield {
       status match {
-        case "none" => None
+        case "none"       => None
         case "processing" => Processing
-        case "completed" => Completed
-        case "failed" => Failed
+        case "completed"  => Completed
+        case "failed"     => Failed
 
         case "completed-callback-none" =>
           CompletedNoCallbackProvided
@@ -63,13 +71,11 @@ trait StatusConverters {
         case "completed-callback-failure" =>
           CompletedCallbackFailed
       }
-    })
+  })
 
   implicit val fmtStatus =
     DynamoFormat.xmap[Progress.Status, String](
-      fromJson[Progress.Status](_)(dec)
-        .toEither
-        .left
+      fromJson[Progress.Status](_)(dec).toEither.left
         .map(TypeCoercionError)
     )(
       toJson[Progress.Status](_).get
@@ -95,7 +101,10 @@ object Progress extends URIConverters with StatusConverters {
   case object CompletedCallbackFailed extends Status
 
   def apply(createRequest: ProgressCreateRequest): Progress = {
-    Progress(id = generateId, uploadUri = createRequest.uploadUri, callbackUri = createRequest.callbackUri)
+    Progress(
+      id = generateId,
+      uploadUri = createRequest.uploadUri,
+      callbackUri = createRequest.callbackUri)
   }
 
   private def generateId = UUID.randomUUID().toString
@@ -105,7 +114,8 @@ case class ProgressEvent(description: String, time: Instant = Instant.now)
 
 case class ProgressUpdate(id: String,
                           event: ProgressEvent,
-                          status: Progress.Status = Progress.None) extends StatusConverters
+                          status: Progress.Status = Progress.None)
+    extends StatusConverters
 
 case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
 

@@ -1,14 +1,18 @@
 package uk.ac.wellcome.platform.archive.progress_http.config
 
 import org.rogach.scallop.ScallopConf
-import uk.ac.wellcome.platform.archive.common.config.{CloudWatchClientConfigurator, HttpServerConfigurator, MetricsConfigConfigurator}
+import uk.ac.wellcome.platform.archive.common.config.{
+  CloudWatchClientConfigurator,
+  HttpServerConfigurator,
+  MetricsConfigConfigurator
+}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
 import uk.ac.wellcome.platform.archive.progress_http.models.ProgressHttpConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class ArgsConfigurator(val arguments: Seq[String])
-  extends ScallopConf(arguments)
+    extends ScallopConf(arguments)
     with CloudWatchClientConfigurator
     with MetricsConfigConfigurator
     with HttpServerConfigurator {

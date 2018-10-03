@@ -96,13 +96,13 @@ class NotifierFeatureTest
             )
 
             val progress = createProgressWith(
-              requestId, Some(callbackUri)
+              requestId,
+              Some(callbackUri)
             )
 
             sendNotificationToSQS[CallbackNotification](
               queuePair.queue,
-              CallbackNotification(
-                requestId.toString, callbackUri, progress)
+              CallbackNotification(requestId.toString, callbackUri, progress)
             )
 
             notifier.run()

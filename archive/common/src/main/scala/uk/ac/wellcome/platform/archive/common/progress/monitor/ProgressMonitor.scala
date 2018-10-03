@@ -7,15 +7,18 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.dynamo._
 
 import scala.util.{Failure, Success, Try}
 
 class ProgressMonitor @Inject()(
-                                 dynamoClient: AmazonDynamoDB,
-                                 dynamoConfig: DynamoConfig
-                               ) extends Logging {
+  dynamoClient: AmazonDynamoDB,
+  dynamoConfig: DynamoConfig
+) extends Logging {
 
   import Progress._
 
@@ -90,8 +93,9 @@ class ProgressMonitor @Inject()(
         Failure(exception)
       }
 
-      case r@Right(progress) => {
-        debug(s"Successfully updated Dynamo record: ${update.id}, got $progress")
+      case r @ Right(progress) => {
+        debug(
+          s"Successfully updated Dynamo record: ${update.id}, got $progress")
 
         Success(progress)
       }
@@ -100,6 +104,6 @@ class ProgressMonitor @Inject()(
 }
 
 final case class IdConstraintError(
-                                    private val message: String,
-                                    private val cause: Throwable
-                                  ) extends Exception(message, cause)
+  private val message: String,
+  private val cause: Throwable
+) extends Exception(message, cause)

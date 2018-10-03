@@ -43,7 +43,10 @@ class ProgressAsyncFeatureTest
                 assertSnsReceivesOnly(expectedNotification, topic)
 
                 assertProgressCreated(
-                  progress.id, uploadUri, Some(callbackUri), table)
+                  progress.id,
+                  uploadUri,
+                  Some(callbackUri),
+                  table)
 
                 assertProgressRecordedRecentEvents(
                   update.id,

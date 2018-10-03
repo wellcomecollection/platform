@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.archive.common.models
 import java.net.URI
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
+import uk.ac.wellcome.platform.archive.common.json.{
+  URIConverters,
+  UUIDConverters
+}
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class IngestBagRequest(archiveRequestId: UUID,

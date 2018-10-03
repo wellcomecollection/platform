@@ -24,7 +24,7 @@ trait UUIDConverters {
           case _: IllegalArgumentException =>
             Left(DecodingFailure("UUID", cursor.history))
         }
-      case l@Left(_) => l.asInstanceOf[Decoder.Result[UUID]]
+      case l @ Left(_) => l.asInstanceOf[Decoder.Result[UUID]]
     }
   }
 }

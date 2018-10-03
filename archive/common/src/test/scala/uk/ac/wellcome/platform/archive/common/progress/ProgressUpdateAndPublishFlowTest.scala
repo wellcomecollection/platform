@@ -48,7 +48,8 @@ class ProgressUpdateAndPublishFlowTest
               val progress = createProgress(monitor, callbackUri, uploadUri)
               val update = ProgressUpdate(progress.id, event, status)
 
-              val expectedProgress = progress.copy(result = status, events = progress.events :+ event)
+              val expectedProgress = progress
+                .copy(result = status, events = progress.events :+ event)
 
               val source = Source.single(update)
 
@@ -63,7 +64,11 @@ class ProgressUpdateAndPublishFlowTest
 
                   assertSnsReceivesOnly(expectedProgress, topic)
 
-                  assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
+                  assertProgressCreated(
+                    progress.id,
+                    uploadUri,
+                    Some(callbackUri),
+                    table)
 
                   assertProgressRecordedRecentEvents(
                     progress.id,

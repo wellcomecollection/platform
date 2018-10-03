@@ -69,8 +69,7 @@ class ProgressMonitorTest
           failedException.getMessage should include(
             s"There is already a monitor with id:$id")
 
-          assertProgressCreated(
-            id, uploadUri, Some(callbackUri), table)
+          assertProgressCreated(id, uploadUri, Some(callbackUri), table)
         }
 
       }
@@ -168,7 +167,11 @@ class ProgressMonitorTest
 
           archiveProgressMonitor.update(progressUpdate)
 
-          assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
+          assertProgressCreated(
+            progress.id,
+            uploadUri,
+            Some(callbackUri),
+            table)
           assertProgressRecordedRecentEvents(
             progressUpdate.id,
             Seq(progressUpdate.event.description),
@@ -196,7 +199,11 @@ class ProgressMonitorTest
 
           updates.map(monitor.update)
 
-          assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
+          assertProgressCreated(
+            progress.id,
+            uploadUri,
+            Some(callbackUri),
+            table)
           assertProgressRecordedRecentEvents(
             progress.id,
             updates.map(_.event.description),

@@ -40,7 +40,11 @@ class ProgressUpdateFlowTest
                 .runWith(Sink.ignore)(materializer)
 
               whenReady(updates) { _ =>
-                assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
+                assertProgressCreated(
+                  progress.id,
+                  uploadUri,
+                  Some(callbackUri),
+                  table)
                 assertProgressRecordedRecentEvents(
                   update.id,
                   Seq(update.event.description),
@@ -75,7 +79,11 @@ class ProgressUpdateFlowTest
                 .runWith(Sink.ignore)(materializer)
 
               whenReady(updates) { _ =>
-                assertProgressCreated(progress.id, uploadUri, Some(callbackUri), table)
+                assertProgressCreated(
+                  progress.id,
+                  uploadUri,
+                  Some(callbackUri),
+                  table)
                 assertProgressRecordedRecentEvents(
                   progress.id,
                   events.map(_.event.description),

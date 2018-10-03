@@ -86,7 +86,11 @@ trait ProgressMonitorFixture
     givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri), table)
   }
 
-  def assertProgressCreated(id: String, expectedUploadUri: URI, expectedCallbackUri: Option[URI], table: Table, recentSeconds: Int = 45): Assertion = {
+  def assertProgressCreated(id: String,
+                            expectedUploadUri: URI,
+                            expectedCallbackUri: Option[URI],
+                            table: Table,
+                            recentSeconds: Int = 45): Assertion = {
     val progress = getExistingTableItem[Progress](id, table)
     progress.uploadUri shouldBe expectedUploadUri
     progress.callbackUri shouldBe expectedCallbackUri
