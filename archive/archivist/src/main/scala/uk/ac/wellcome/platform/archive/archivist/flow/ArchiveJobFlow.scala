@@ -20,7 +20,7 @@ object ArchiveJobFlow extends Logging {
         FoldEitherFlow[
           ArchiveError[ArchiveJob],
           List[ArchiveItemJob],
-          Either[ArchiveError[ArchiveJob], ArchiveComplete]](Flow[ArchiveError[ArchiveJob]].map{error =>
+          Either[ArchiveError[ArchiveJob], ArchiveComplete]](error => {
               warn(s"${error.job} failed creating archive item jobs")
           Left(error)})(mapReduceArchiveItemJobs(delimiter, parallelism, ingestBagRequest)))
 

@@ -2,18 +2,18 @@ package uk.ac.wellcome.platform.archive.common.modules
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.sns.{AmazonSNSAsync, AmazonSNSAsyncClientBuilder}
+import com.amazonaws.services.sns.AmazonSNS
+import com.amazonaws.services.sns.AmazonSNSClientBuilder._
 import com.google.inject.{AbstractModule, Provides, Singleton}
 
-object SNSAsyncClientModule extends AbstractModule {
+object SNSClientModule extends AbstractModule {
   @Singleton
   @Provides
-  def providesSNSAsyncClient(
-    snsClientConfig: SnsClientConfig): AmazonSNSAsync = {
+  def providesSNSClient(
+    snsClientConfig: SnsClientConfig): AmazonSNS = {
     val endpoint = snsClientConfig.endpoint.getOrElse("")
     if (endpoint.isEmpty) {
-      AmazonSNSAsyncClientBuilder
-        .standard()
+      standard()
         .withRegion(snsClientConfig.region)
         .build()
     } else {
@@ -21,8 +21,7 @@ object SNSAsyncClientModule extends AbstractModule {
         throw new RuntimeException("accessKey required"))
       val secretKey = snsClientConfig.secretKey.getOrElse(
         throw new RuntimeException("secretKey required"))
-      AmazonSNSAsyncClientBuilder
-        .standard()
+      standard()
         .withCredentials(new AWSStaticCredentialsProvider(
           new BasicAWSCredentials(accessKey, secretKey)))
         .withEndpointConfiguration(

@@ -18,7 +18,7 @@ object ArchiveItemJobFlow extends Logging {
         FoldEitherFlow[
           ArchiveError[ArchiveItemJob],
           ArchiveItemJob,
-          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](ifLeft = Flow[ArchiveError[ArchiveItemJob]].map{ error =>
+          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](ifLeft = error => {
               warn(s"job ${error.job} uploading and verifying failed")
               Left(error)
         })(ifRight = DownloadItemFlow(parallelism)))

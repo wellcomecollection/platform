@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import cats.implicits._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, MissingBagManifestError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, FileNotFoundError}
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob, ZipLocation}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 
@@ -28,7 +28,7 @@ object ArchiveItemJobCreator extends Logging {
     delimiter: String): Either[ArchiveError[ArchiveJob],List[ArchiveItemJob]] = {
     val value: Either[ArchiveError[ArchiveJob], InputStream] = ZipFileReader
         .maybeInputStream(zipLocation)
-        .toRight(MissingBagManifestError(zipLocation.entryPath.path, job))
+        .toRight(FileNotFoundError(zipLocation.entryPath.path, job))
 
       value.flatMap {
       inputStream =>

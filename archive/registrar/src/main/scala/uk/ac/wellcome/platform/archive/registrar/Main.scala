@@ -21,7 +21,7 @@ object Main extends App with Logging {
     AkkaModule,
     CloudWatchClientModule,
     SQSClientModule,
-    SNSAsyncClientModule,
+    SNSClientModule,
     DynamoClientModule,
     ProgressMonitorModule,
     MessageStreamModule

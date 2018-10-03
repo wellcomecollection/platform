@@ -85,7 +85,7 @@ trait ProgressAsyncFixture
         AkkaModule,
         CloudWatchClientModule,
         SQSClientModule,
-        SNSAsyncClientModule,
+        SNSClientModule,
         ProgressMonitorModule
       )
     }

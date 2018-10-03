@@ -18,7 +18,7 @@ object Main extends App with ProgressAsync {
     AkkaModule,
     CloudWatchClientModule,
     SQSClientModule,
-    SNSAsyncClientModule,
+    SNSClientModule,
     ProgressMonitorModule,
     MessageStreamModule
   )

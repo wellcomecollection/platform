@@ -18,7 +18,7 @@ object Main extends App with Archivist {
     S3ClientModule,
     CloudWatchClientModule,
     SQSClientModule,
-    SNSAsyncClientModule,
+    SNSClientModule,
     MessageStreamModule
   )
 

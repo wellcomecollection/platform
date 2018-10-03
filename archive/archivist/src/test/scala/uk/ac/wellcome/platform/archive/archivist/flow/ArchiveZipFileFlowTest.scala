@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.stream.scaladsl.{Sink, Source}
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
@@ -14,6 +14,7 @@ import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, DigitisedStorageType}
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.test.fixtures.Akka
+import scala.collection.JavaConverters._
 
 class ArchiveZipFileFlowTest
     extends FunSpec
@@ -24,8 +25,7 @@ class ArchiveZipFileFlowTest
     with BagUploaderConfigGenerator
     with Akka
     with SNS
-    with Inside
-    with Eventually {
+    with Inside {
 
   implicit val s3client = s3Client
   implicit val snsclient = snsClient
@@ -105,6 +105,8 @@ class ArchiveZipFileFlowTest
                       case ProgressUpdate(id, events, status) =>
                         id shouldBe ingestContext.archiveRequestId
                         status shouldBe Progress.Failed
+
+                        events should have size (zipFile.entries().asScala.size - 1)
 
                         all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                     }
@@ -206,6 +208,30 @@ class ArchiveZipFileFlowTest
   }
 
   it("doesn't output if notifying progress fails"){
+    withLocalS3Bucket { storageBucket =>
+      withActorSystem { actorSystem =>
+        withMaterializer(actorSystem) { implicit materializer =>
+            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
+            withBagItZip(createDigest = _ => "bad_digest") {
+              case (_, zipFile) =>
+                val uploader = ArchiveZipFileFlow(
+                  bagUploaderConfig,
+                  SNSConfig("bad-topic"))
+                val ingestContext = createIngestBagRequest
+
+                val (_, verification) =
+                  uploader.runWith(
+                    Source.single(
+                      ZipFileDownloadComplete(zipFile, ingestContext)),
+                    Sink.seq)
+
+                whenReady(verification) { result =>
+                  result shouldBe empty
+                }
+            }
+          }
+      }
+    }
 
   }
 }

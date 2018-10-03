@@ -136,7 +136,7 @@ trait Registrar
         AkkaModule,
         CloudWatchClientModule,
         SQSClientModule,
-        SNSAsyncClientModule,
+        SNSClientModule,
         DynamoClientModule,
         ProgressMonitorModule,
         MessageStreamModule

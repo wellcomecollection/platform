@@ -8,14 +8,15 @@ import akka.stream.Attributes
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, ZipFileDownloadingError}
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 object ZipFileDownloadFlow extends Logging {
 
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
-    : Flow[IngestBagRequest, ZipFileDownloadComplete, NotUsed] = {
+    : Flow[IngestBagRequest, Either[ArchiveError[IngestBagRequest],ZipFileDownloadComplete], NotUsed] = {
 
     Flow[IngestBagRequest].withAttributes(Attributes.name(""))
       .log("download location")
@@ -32,14 +33,16 @@ object ZipFileDownloadFlow extends Logging {
 
             downloadStream
               .via(FileStoreFlow(tmpFile, parallelism))
-              .map(_.status)
-              // TODO: Log failure here ?divertTo
-              .collect {
+              .map {result => result.status match {
                 case Success(_) =>
-                  ZipFileDownloadComplete(
+                  Right(ZipFileDownloadComplete(
                     new ZipFile(tmpFile),
                     request
-                  )
+                  ))
+                case Failure(ex) =>
+                  warn(s"Failed downloading zipFile from $location")
+                  Left(ZipFileDownloadingError(request))
+                  }
               }
         }
       )

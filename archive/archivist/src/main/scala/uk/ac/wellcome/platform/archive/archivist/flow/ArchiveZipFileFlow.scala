@@ -31,16 +31,15 @@ object ArchiveZipFileFlow extends Logging {
                 ArchiveError[IngestBagRequest],
                 ArchiveJob,
               Either[ArchiveError[_],ArchiveComplete]
-              ](ifLeft = Flow[ArchiveError[IngestBagRequest]].map(Left(_)))
+              ](ifLeft = Left(_))
               (ifRight = ArchiveJobFlow(
                 config.bagItConfig.digestDelimiterRegexp,
                 config.parallelism, ingestRequest)
             ))
             .flatMapMerge(config.parallelism, (result: Either[ArchiveError[_], ArchiveComplete])=>
               Source.single(toProgressUpdate(result, ingestRequest))
-              .log("sending to sns")
+              .log("sending to progress monitor")
                 .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig))
-              .log("discarding result")
                 .map(_ => result)
             )
       }

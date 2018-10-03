@@ -26,14 +26,16 @@ case class FileNotFoundError[T](path: String ,job: T) extends ArchiveError[T] {
   override def toString = s"Failed reading file $path from zip file"
 }
 
-case class MissingBagManifestError(path: String, job: ArchiveJob) extends ArchiveError[ArchiveJob] {
-  override def toString = s"Missing bag manifest $path from zip file"
-}
-
 case class InvalidBagManifestError(job: ArchiveJob, manifestName: String) extends ArchiveError[ArchiveJob] {
   override def toString = s"Invalid bag manifest $manifestName"
 }
 
 case class ArchiveJobError(job: ArchiveJob, errors: List[ArchiveError[ArchiveItemJob]]) extends ArchiveError[ArchiveJob]
 
-case class InvalidBagInfo(job: IngestBagRequest) extends ArchiveError[IngestBagRequest]
+case class InvalidBagInfo(job: IngestBagRequest) extends ArchiveError[IngestBagRequest]{
+  override def toString = "Invalid bag-info.txt"
+}
+
+case class ZipFileDownloadingError(job: IngestBagRequest) extends ArchiveError[IngestBagRequest] {
+  override def toString = s"Failed downloading zipFile ${job.zippedBagLocation.namespace}/${job.zippedBagLocation.key}"
+}

@@ -6,11 +6,11 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import org.scalatest.{FunSpec, Inside, Matchers}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
+import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
+import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -21,7 +21,7 @@ class ZipFileDownloadFlowTest
     with Matchers
     with ScalaFutures
     with ArchivistFixture
-    with IngestRequestContextGenerators {
+    with IngestRequestContextGenerators with Inside {
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
@@ -45,17 +45,20 @@ class ZipFileDownloadFlowTest
           val ingestBagRequest =
             createIngestBagRequestWith(ingestBagLocation = objectLocation)
 
-          val download: Future[ZipFileDownloadComplete] =
+          val download
+            : Future[Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete]]  =
             downloadZipFlow
               .runWith(Source.single(ingestBagRequest), Sink.head)
               ._2
 
-          whenReady(download) {
-            case ZipFileDownloadComplete(downloadedZipFile, _) =>
-              zipFile.entries.asScala.toList
-                .map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList
-                .map(_.toString)
-              zipFile.size shouldEqual downloadedZipFile.size
+          whenReady(download) { result =>
+            inside(result) {
+              case Right(ZipFileDownloadComplete(downloadedZipFile, _)) =>
+                zipFile.entries.asScala.toList
+                  .map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList
+                  .map(_.toString)
+                zipFile.size shouldEqual downloadedZipFile.size
+            }
           }
       }
     }

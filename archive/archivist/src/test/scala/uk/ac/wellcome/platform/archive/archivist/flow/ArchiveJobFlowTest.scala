@@ -147,7 +147,7 @@ class ArchiveJobFlowTest
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(MissingBagManifestError("manifest-sha256.txt", archiveJob)))
+                archiveJobs shouldBe List(Left(FileNotFoundError("manifest-sha256.txt", archiveJob)))
               }
           }
         }
@@ -194,7 +194,7 @@ class ArchiveJobFlowTest
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(MissingBagManifestError("tagmanifest-sha256.txt", archiveJob)))
+                archiveJobs shouldBe List(Left(FileNotFoundError("tagmanifest-sha256.txt", archiveJob)))
               }
           }
         }

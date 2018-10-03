@@ -5,14 +5,13 @@ import java.net.URI
 import java.util.UUID
 import java.util.zip.ZipFile
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.google.inject.Guice
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
+import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
@@ -70,39 +69,52 @@ trait Archivist extends Messaging with ZipBagItFixture {
         }
     }
 
-  def withApp[R](storageBucket: Bucket, queuePair: QueuePair, topicArn: Topic)(
+  def withApp[R](actorSystem: ActorSystem, actorMaterializer: ActorMaterializer, storageBucket: Bucket, queuePair: QueuePair, registrarTopic: Topic, progressTopic: Topic)(
     testWith: TestWith[ArchivistApp, R]) = {
     val archivist = new ArchivistApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(
+          actorSystem,
+          actorMaterializer,
           queuePair.queue.url,
           storageBucket.name,
-          topicArn.arn),
+          registrarTopic.arn,
+          progressTopic.arn),
         ConfigModule,
-        AkkaModule,
         S3ClientModule,
         CloudWatchClientModule,
         SQSClientModule,
-        SNSAsyncClientModule
+        SNSClientModule
       )
     }
     testWith(archivist)
   }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchivistApp), R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, ArchivistApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
-      withLocalSnsTopic { snsTopic =>
+      withLocalSnsTopic { registrarTopic =>
+      withLocalSnsTopic { progressTopic =>
         withLocalS3Bucket { ingestBucket =>
           withLocalS3Bucket { storageBucket =>
-            withApp(storageBucket, queuePair, snsTopic) { archivist =>
-              testWith(
-                (ingestBucket, storageBucket, queuePair, snsTopic, archivist))
+          withActorSystem { actorSystem =>
+          withMaterializer(actorSystem) { materializer =>
+            withApp(actorSystem,
+              materializer,storageBucket, queuePair, registrarTopic, progressTopic) {
+              archivist =>
+                testWith(
+                  (
+                    ingestBucket,
+                    storageBucket,
+                    queuePair,
+                    registrarTopic,
+                    progressTopic,
+                    archivist))
             }
-
           }
+          }}
         }
-      }
+      }}
     })
   }
 
