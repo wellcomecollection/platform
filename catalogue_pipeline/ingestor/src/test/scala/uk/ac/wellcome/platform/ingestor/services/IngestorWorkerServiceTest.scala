@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.sksamuel.elastic4s.http.HttpClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
-import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.ElasticCredentials
@@ -28,7 +28,6 @@ import scala.util.Random
 class IngestorWorkerServiceTest
     extends FunSpec
     with ScalaFutures
-    with PatienceConfiguration
     with Matchers
     with Messaging
     with ElasticsearchFixtures
@@ -37,11 +36,6 @@ class IngestorWorkerServiceTest
     with WorkIndexerFixtures
     with WorksGenerators
     with CustomElasticsearchMapping {
-
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
-    timeout = scaled(Span(40, Seconds)),
-    interval = scaled(Span(150, Millis))
-  )
 
   val itemType = "work"
 
