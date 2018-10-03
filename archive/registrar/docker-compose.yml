@@ -15,9 +15,3 @@ dynamodb:
   image: peopleperhour/dynamodb
   ports:
     - "45678:8000"
-wiremock:
-  image: rodolpheche/wiremock
-  ports:
-    - "8080:8080"
-  volumes:
-    - "${ROOT}/archive/registrar/src/test/resources/wiremock:/home/wiremock"

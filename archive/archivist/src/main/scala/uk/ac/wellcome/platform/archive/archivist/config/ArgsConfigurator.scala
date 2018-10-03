@@ -15,7 +15,8 @@ class ArgsConfigurator(val arguments: Seq[String])
     with SnsClientConfigurator
     with SnsConfigConfigurator
     with SqsClientConfigurator
-    with SqsConfigConfigurator {
+    with SqsConfigConfigurator
+    with S3ClientConfigurator {
 
   val uploadNamespace = opt[String](required = true)
   val parallelism = opt[Int](default = Some(10))
