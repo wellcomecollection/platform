@@ -37,7 +37,9 @@ def post_route():
 
 @app.route('/progress/<id>')
 def get_route(id):
-    return 'bar'
+    if id.startswith('bad_status-'):
+        return b'', int(id.split('bad_status-')[1])
+    return f'<<progress: {id}>>'
 
 
 app.run(debug=True, port=6000)

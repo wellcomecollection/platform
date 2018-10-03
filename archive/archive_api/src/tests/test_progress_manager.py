@@ -66,3 +66,13 @@ def test_progress_manager_can_extract_id(progress_manager):
         callback_url=None
     )
     assert result == '123'
+
+
+def test_can_lookup_existing_id(progress_manager):
+    progress_manager.lookup_progress(id='123')
+
+
+@pytest.mark.parametrize('bad_status', [202, 400, 500])
+def test_not_200_or_404_is_error(bad_status, progress_manager):
+    with pytest.raises(ProgressServiceError, match='Expected HTTP 200 or 404'):
+        progress_manager.lookup_progress(id='bad_status-{bad_status}')

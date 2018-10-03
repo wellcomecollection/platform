@@ -63,3 +63,20 @@ class ProgressManager:
 
         # Finally, extract the ID from the location URL.
         return os.path.basename(location)
+
+    def lookup_progress(self, id):
+        """
+        Look up an existing ingest request.
+
+        Passes the response through directly (if any).
+
+        """
+        resp = self.sess.get(f'{self.endpoint}/progress/{id}')
+
+        # The service should return an HTTP 200 (if present) or 404 (if not).
+        # Anything else should be treated as an error.
+        if resp.status_code not in (200, 404):
+            raise ProgressServiceError(
+                'Expected HTTP 200 or 404; got %d (id=%r)' %
+                (resp.status_code, id)
+            )
