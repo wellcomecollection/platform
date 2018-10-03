@@ -11,7 +11,7 @@ SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES = sierra_adapter_common
 
 ECS_TASKS   =
-LAMBDAS     = s3_demultiplexer sierra_window_generator
+LAMBDAS     = s3_demultiplexer sierra_progress_reporter sierra_window_generator
 
 TF_NAME     = sierra_adapter
 TF_PATH     = $(STACK_ROOT)/terraform
