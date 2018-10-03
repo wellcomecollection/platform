@@ -60,6 +60,14 @@ class ArchivistFeatureTest
                 progressTopic,
                 Progress.None) { events =>
                 events should have size 1
+                events.head.description shouldBe s"Started working on ingestRequest: $requestId"
+              }
+
+              assertTopicReceivesProgressUpdate(
+                requestId,
+                progressTopic,
+                Progress.None) { events =>
+                events should have size 1
                 events.head.description shouldBe "zipFile downloaded successfully"
               }
 
@@ -95,6 +103,16 @@ class ArchivistFeatureTest
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
+
+
+              assertTopicReceivesProgressUpdate(
+                requestId,
+                progressTopic,
+                Progress.None) { events =>
+                events should have size 1
+                events.head.description shouldBe s"Started working on ingestRequest: $requestId"
+              }
+
               assertTopicReceivesProgressUpdate(
                 requestId,
                 progressTopic,
@@ -173,16 +191,16 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressUpdate(
                             invalidRequestId1,
                             progressTopic,
-                            Progress.Failed)({ events =>
+                            Progress.Failed){ events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
-                          })
+                          }
 
                           assertTopicReceivesProgressUpdate(
                             invalidRequestId2,
                             progressTopic,
-                            Progress.Failed)({ events =>
+                            Progress.Failed){ events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
-                          })
+                          }
 
                         }
                     }

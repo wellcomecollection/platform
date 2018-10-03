@@ -18,8 +18,6 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest, NotificationMessage}
 
-import scala.util.Success
-
 trait Archivist extends Logging {
   val injector: Injector
 
@@ -56,7 +54,7 @@ trait Archivist extends Logging {
     val workFlow =
       Flow[NotificationMessage]
         .log("notification message")
-        .via(NotificationMessageFlow())
+        .via(NotificationMessageFlow(bagUploaderConfig.parallelism, snsClient, snsProgressConfig))
         .log("download zip")
         .via(ZipFileDownloadFlow(bagUploaderConfig.parallelism, snsProgressConfig))
         .log("archiving zip")
@@ -64,12 +62,12 @@ trait Archivist extends Logging {
           ArchiveError[IngestBagRequest],
           ZipFileDownloadComplete,
           Unit
-          ](ifLeft = _ => ())(ifRight = buhflow(bagUploaderConfig, snsProgressConfig, snsRegistrarConfig)))
+          ](ifLeft = _ => ())(ifRight = ArchiveAndNotifyRegistrarFlow(bagUploaderConfig, snsProgressConfig, snsRegistrarConfig)))
 
     messageStream.run("archivist", workFlow)
   }
 
-  private def buhflow(bagUploaderConfig: BagUploaderConfig, snsProgressConfig: SNSConfig, snsRegistrarConfig: SNSConfig)(implicit s3: AmazonS3, snsClient: AmazonSNS): Flow[ZipFileDownloadComplete, Unit, NotUsed] = {
+  private def ArchiveAndNotifyRegistrarFlow(bagUploaderConfig: BagUploaderConfig, snsProgressConfig: SNSConfig, snsRegistrarConfig: SNSConfig)(implicit s3: AmazonS3, snsClient: AmazonSNS): Flow[ZipFileDownloadComplete, Unit, NotUsed] = {
     ArchiveZipFileFlow(bagUploaderConfig, snsProgressConfig)
       .log("archive verified")
       .via(FoldEitherFlow[
@@ -77,19 +75,5 @@ trait Archivist extends Logging {
         ArchiveComplete,
         Unit
         ](ifLeft = _ => ())(ifRight = ArchiveCompleteFlow(snsRegistrarConfig).map(_=>()) ))
-  }
-}
-
-object NotificationMessageFlow {
-
-  import IngestBagRequest._
-
-  def apply() = {
-    Flow[NotificationMessage]
-      .map(message => fromJson[IngestBagRequest](message.Message))
-      // TODO: Log error here
-      .collect {
-        case Success(bagRequest) => bagRequest
-      }
   }
 }
