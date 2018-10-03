@@ -25,9 +25,9 @@ object UploadItemFlow extends Logging {
         FoldEitherFlow[
           ArchiveItemJob,
           (ArchiveItemJob, InputStream),
-          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](j => {
+          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](Flow[ArchiveItemJob].map{j =>
           warn(s"Failed extracting inputStream for $j")
-          Left(FileNotFoundError(j))
+          Left(FileNotFoundError(j.bagDigestItem.location.path,j))
         })(UploadInputStreamFlow(parallelism)))
   }
 

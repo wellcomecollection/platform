@@ -10,17 +10,11 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.flow.{
-  ArchiveCompleteFlow,
-  ArchiveZipFileFlow,
-  ZipFileDownloadFlow
-}
+import uk.ac.wellcome.platform.archive.archivist.flow.{ArchiveCompleteFlow, ArchiveZipFileFlow, FoldEitherFlow, ZipFileDownloadFlow}
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
+import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest, NotificationMessage}
 
 import scala.util.Success
 
@@ -49,9 +43,10 @@ trait Archivist extends Logging {
     )
 
     val messageStream =
-      injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
+      injector.getInstance(classOf[MessageStream[NotificationMessage, Unit]])
     val bagUploaderConfig = injector.getInstance(classOf[BagUploaderConfig])
-    val snsConfig = injector.getInstance(classOf[SNSConfig])
+    val snsRegistrarConfig = injector.getInstance(classOf[SNSConfig])
+    val snsProgressMonitorConfig = injector.getInstance(classOf[SNSConfig])
 
     val workFlow =
       Flow[NotificationMessage]
@@ -60,10 +55,13 @@ trait Archivist extends Logging {
         .log("download location")
         .via(ZipFileDownloadFlow(bagUploaderConfig.parallelism))
         .log("download zip")
-        .via(ArchiveZipFileFlow(bagUploaderConfig))
+        .via(ArchiveZipFileFlow(bagUploaderConfig, snsProgressMonitorConfig))
         .log("archive verified")
-        .via(ArchiveCompleteFlow(snsConfig.topicArn))
-
+        .via(FoldEitherFlow[
+            ArchiveError[_],
+          ArchiveComplete,
+          Unit
+          ](ifLeft = Flow[ArchiveError[_]].map(_ => ()))(ifRight = ArchiveCompleteFlow(snsRegistrarConfig.topicArn).map(_=>()) ))
     messageStream.run("archivist", workFlow)
   }
 }
