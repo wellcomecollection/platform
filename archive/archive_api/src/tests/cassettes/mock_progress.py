@@ -19,6 +19,10 @@ def post_route():
     if '?status=' in request.form['uploadUrl']:
         return b'', int(request.form['uploadUrl'].split('=')[1])
 
+    # e.g. http://localhost:6000?location=no
+    if request.form['uploadUrl'].endswith('?location=no'):
+        return b'', 202
+
     resp = Response()
     resp.headers['Location'] = f'/progress/{str(uuid.uuid4())}'
     return resp, 202

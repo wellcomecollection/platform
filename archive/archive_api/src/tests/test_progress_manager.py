@@ -50,3 +50,11 @@ def test_not_202_from_progress_service_is_error(bad_status, progress_manager):
             upload_url=f'http://example.org/?status={bad_status}',
             callback_url=None
         )
+
+
+def test_missing_location_header_is_error(progress_manager):
+    with pytest.raises(ProgressServiceError, match='No Location header'):
+        progress_manager.create_request(
+            upload_url=f'http://example.org/?location=no',
+            callback_url=None
+        )

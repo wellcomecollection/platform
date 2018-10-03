@@ -49,5 +49,14 @@ class ProgressManager:
                 (resp.status_code, data)
             )
 
-        print(resp.headers)
+        # The new ID should be sent in the path parameter of the Location
+        # header.  If this header is missing, that's an error.
+        try:
+            location = resp.headers['Location']
+        except KeyError:
+            raise ProgressServiceError(
+                'No Location header in progress response; got %r (data=%r)' %
+                (resp.headers, data)
+            )
+
         return 'foo'
