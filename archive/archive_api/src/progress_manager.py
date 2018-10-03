@@ -3,8 +3,8 @@
 import requests
 
 
-class ProgressError(Exception):
-    """Raised if we get an unexpected response from the progress service."""
+class ProgressServiceError(Exception):
+    """Raised if we get an unexpected error from the progress service."""
     pass
 
 
@@ -40,5 +40,14 @@ class ProgressManager:
             data['callbackUrl'] = callback_url
 
         resp = self.sess.post(f'{self.endpoint}/progress', data=data)
+
+        # The service should return an HTTP 202 if successful.  Anything
+        # else should be treated as an error.
+        if resp.status_code != 202:
+            raise ProgressServiceError(
+                'Expected HTTP 202; got %d (data=%r)' %
+                (resp.status_code, data)
+            )
+
         print(resp.headers)
         return 'foo'

@@ -4,7 +4,7 @@ import betamax
 import pytest
 import requests
 
-from progress_manager import ProgressManager
+from progress_manager import ProgressManager, ProgressServiceError
 
 
 @pytest.fixture(scope='session')
@@ -41,3 +41,12 @@ def test_can_create_ingest_request_with_callback_url(progress_manager):
         upload_url='http://example.org',
         callback_url='http://callback.net?id=123'
     )
+
+
+@pytest.mark.parametrize('bad_status', [200, 400, 404, 500])
+def test_not_202_from_progress_service_is_error(bad_status, progress_manager):
+    with pytest.raises(ProgressServiceError, match='Expected HTTP 202'):
+        progress_manager.create_request(
+            upload_url=f'http://example.org/?status={bad_status}',
+            callback_url=None
+        )
