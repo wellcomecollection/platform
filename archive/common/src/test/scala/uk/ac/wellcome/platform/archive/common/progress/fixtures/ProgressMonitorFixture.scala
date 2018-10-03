@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
 import java.net.URI
 import java.time.format.DateTimeFormatter
-import java.time.{Duration, Instant}
+import java.time.Instant
 import java.util.UUID
 
 import akka.NotUsed
@@ -24,7 +24,8 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressMonitorFixture
     extends LocalProgressMonitorDynamoDb
-    with MockitoSugar {
+    with MockitoSugar
+    with TimeTestFixture {
 
   val uploadUrl = "uploadUrl"
   val callbackUrl = "http://localhost/archive/complete"
@@ -115,9 +116,4 @@ trait ProgressMonitorFixture
 
     progress.result shouldBe expectedStatus
   }
-
-  def assertRecent(instant: Instant, recentSeconds: Int = 1): Assertion =
-    Duration
-      .between(instant, Instant.now)
-      .getSeconds should be <= recentSeconds.toLong
 }

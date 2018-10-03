@@ -97,20 +97,30 @@ def process_report(s3_client, bucket, resource_type):
             raise IncompleteReportError(resource_type)
 
 
-def print_report(s3_client, bucket, resource_type):
-    for iv in get_consolidated_report(s3_client, bucket, resource_type):
-        print(f'{iv.start.isoformat()} -- {iv.end.isoformat()}')
+def prepare_report(s3_client, bucket, resource_type):
+    lines = [
+        '',
+        f'*{resource_type} windows*',
+    ]
 
-    print('')
+    for iv in get_consolidated_report(s3_client, bucket, resource_type):
+        lines.append(f'{iv.start.isoformat()} – {iv.end.isoformat()}')
+
+    lines.append('')
+    return lines
+
+
+def print_report(s3_client, bucket, resource_type):
+    print('\n'.join(prepare_report(s3_client, bucket, resource_type)))
 
 
 def main(event=None, _ctxt=None):
-
     s3_client = boto3.client('s3')
     bucket = os.environ['BUCKET']
     slack_webhook = os.environ['SLACK_WEBHOOK']
 
     errors = []
+    error_lines = []
 
     for resource_type in ('bibs', 'items'):
         try:
@@ -120,6 +130,13 @@ def main(event=None, _ctxt=None):
                 resource_type=resource_type
             )
         except IncompleteReportError:
+            error_lines.extend(
+                prepare_report(
+                    s3_client=s3_client,
+                    bucket=bucket,
+                    resource_type=resource_type
+                )
+            )
             errors.append(resource_type)
 
     if errors:
@@ -130,12 +147,15 @@ def main(event=None, _ctxt=None):
         else:
             message = 'There are gaps in the bib and the item data.'
 
+        error_lines.insert(0, message)
+
         slack_data = {
             'username': 'sierra-reader',
             'icon_emoji': ':sierra:',
             'attachments': [{
                 'color': '#8B4F30',
-                'fields': [{'value': message}]
+                'text': '\n'.join(error_lines).strip(),
+                'mrkdwn_in': ['text']
             }]
         }
 
@@ -152,10 +172,6 @@ if __name__ == '__main__':
     bucket = 'wellcomecollection-platform-adapters-sierra'
 
     for resource_type in ('bibs', 'items'):
-        print('')
-        print('=' * 79)
-        print(f'{resource_type} windows')
-        print('=' * 79)
         print_report(
             s3_client=s3_client,
             bucket=bucket,
