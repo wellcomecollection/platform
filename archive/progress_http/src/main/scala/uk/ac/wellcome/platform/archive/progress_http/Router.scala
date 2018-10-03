@@ -20,7 +20,8 @@ class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) {
   def routes = {
     import akka.http.scaladsl.server.Directives._
     import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-    import io.circe.generic.auto._
+    import uk.ac.wellcome.json.JsonUtil._
+    import Progress._
 
     pathPrefix("progress") {
       post {
@@ -37,8 +38,8 @@ class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) {
       } ~ path(Segment) { id: String =>
         get {
           monitor.get(id) match {
-            case Some(progress) => complete(progress)
-            case None           => complete(NotFound -> "Progress monitor not found!")
+            case scala.Some(progress) => complete(progress)
+            case scala.None           => complete(NotFound -> "Progress monitor not found!")
           }
         }
       }

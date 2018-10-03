@@ -8,7 +8,6 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
@@ -29,7 +28,8 @@ class ProgressHttpFeatureTest
 
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-  import io.circe.generic.auto._
+  import Progress._
+  import uk.ac.wellcome.json.JsonUtil._
 
   describe("GET /progress/:id") {
     it("returns a progress monitor when available") {
@@ -45,6 +45,8 @@ class ProgressHttpFeatureTest
               val progress = createProgress(progressMonitor)
               val request =
                 HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
+
+
 
               whenRequestReady(request) { result =>
                 result.status shouldBe StatusCodes.OK
