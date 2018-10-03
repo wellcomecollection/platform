@@ -8,12 +8,10 @@ import requests
 
 class ProgressServiceError(Exception):
     """Raised if we get an unexpected error from the progress service."""
-    pass
 
 
 class ProgressNotFoundError(Exception):
     """Raised if we try to look up a progress that doesn't exist."""
-    pass
 
 
 class ProgressManager:
