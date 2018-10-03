@@ -1,5 +1,7 @@
 # -*- encoding: utf-8
 
+import os
+
 import requests
 
 
@@ -59,4 +61,5 @@ class ProgressManager:
                 (resp.headers, data)
             )
 
-        return 'foo'
+        # Finally, extract the ID from the location URL.
+        return os.path.basename(location)
