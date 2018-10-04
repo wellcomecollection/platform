@@ -91,6 +91,18 @@ resource "aws_iam_role_policy" "progress_task_archive_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
+# Notifier
+
+resource "aws_iam_role_policy" "notifier_task_sqs" {
+  role   = "${module.notifier.task_role_name}"
+  policy = "${data.aws_iam_policy_document.read_from_notifier_queue.json}"
+}
+
+resource "aws_iam_role_policy" "notifier_task_publish_progress_sns" {
+  role   = "${module.notifier.task_role_name}"
+  policy = "${module.progress_async_topic.publish_policy}"
+}
+
 # Bagger
 
 resource "aws_iam_role_policy" "bagger_task_get_s3" {
