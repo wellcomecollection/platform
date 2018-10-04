@@ -12,7 +12,10 @@ class TestReportIngestStatus:
         lookup_id = "F423966E-A5E5-4D91-B321-88B90D1B5154"
         resp = client.get(f"/storage/v1/ingests/{lookup_id}")
         assert resp.status_code == 200
-        assert json.loads(resp.data) == {"progress": lookup_id}
+        assert json.loads(resp.data) == {
+            "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+            "progress": lookup_id,
+        }
 
     def test_lookup_missing_item_is_404(self, client):
         lookup_id = "bad_status-404"
@@ -44,7 +47,10 @@ class TestBags:
 
         resp = client.get(f"/storage/v1/bags/{guid}")
         assert resp.status_code == 200
-        assert json.loads(resp.data) == {"id": guid}
+        assert json.loads(resp.data) == {
+            "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+            "id": guid,
+        }
 
     def test_lookup_missing_item_is_404(self, client, guid):
         resp = client.get(f"/storage/v1/bags/{guid}")
@@ -207,7 +213,7 @@ class TestReportHealthStatus:
     def test_get_healthcheck_endpoint_is_200_OK(self, client):
         resp = client.get("/storage/v1/healthcheck")
         assert resp.status_code == 200
-        assert json.loads(resp.data) == {"status": "OK"}
+        assert json.loads(resp.data)["status"] == "OK"
 
 
 def ingests_post(upload_url=None, callback_url=None):

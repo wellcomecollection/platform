@@ -87,7 +87,7 @@ class IngestResource(Resource):
         """Get the current status of an ingest request"""
         try:
             result = progress_manager.lookup_progress(id=id)
-            return jsonify(result)
+            return result
         except ProgressNotFoundError as error:
             raise NotFoundError(f"Invalid id: No ingest found for id={id!r}")
 
@@ -115,7 +115,7 @@ class BagResource(Resource):
 
 @app.route("/storage/v1/healthcheck")
 def route_report_healthcheck_status():
-    return jsonify({"status": "OK"})
+    return {"status": "OK"}
 
 
 # TODO: There's no testing of the error handling; we should fix that!
@@ -123,7 +123,6 @@ def route_report_healthcheck_status():
 @api.errorhandler(Exception)
 def default_error_handler(error):
     error_response = {
-        "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
         "errorType": "http",
         "httpStatus": getattr(error, "code", 500),
         "label": getattr(error, "name", "Internal Server Error"),
@@ -137,4 +136,4 @@ def default_error_handler(error):
             )
         else:
             error_response["description"] = getattr(error, "description", str(error))
-    return jsonify(error_response), error_response["httpStatus"]
+    return error_response, error_response["httpStatus"]

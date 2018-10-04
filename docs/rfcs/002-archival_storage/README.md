@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 01 October 2018.**
+**Last updated: 04 October 2018.**
 
 ## Problem statement
 
@@ -109,7 +109,7 @@ Content-Type: application/json
     "type": "IngestType"
   },
   "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
-  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567"
 }
 ```
 
