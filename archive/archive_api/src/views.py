@@ -1,6 +1,5 @@
 # -*- encoding: utf-8
 
-import uuid
 
 from flask import jsonify, make_response, request
 from flask_restplus import Resource
@@ -9,15 +8,13 @@ from werkzeug.exceptions import NotFound as NotFoundError
 
 from archive_api import app, api, logger
 from bags import fetch_bag
-from ingests import (
-    IngestProgress,
-    create_ingest_progress,
-    report_ingest_status,
-    send_new_ingest_request,
-)
+from ingests import send_new_ingest_request
 import models
+from progress_manager import ProgressNotFoundError
 import validators
 
+
+progress_manager = app.config["PROGRESS_MANAGER"]
 
 api.namespaces.clear()
 ns_ingests = api.namespace("ingests", description="Ingest requests")
@@ -41,14 +38,10 @@ class IngestCollection(Resource):
         callback_url = request.json.get("callbackUrl")
         self.validate_urls(callback_url, upload_url)
 
-        ingest_request_id = str(uuid.uuid4())
-        logger.debug("ingest_request_id=%r", ingest_request_id)
-
-        create_ingest_progress(
-            IngestProgress(ingest_request_id, upload_url, callback_url),
-            app.config["DYNAMODB_RESOURCE"],
-            app.config["DYNAMODB_TABLE_NAME"],
+        ingest_request_id = progress_manager.create_request(
+            upload_url=upload_url, callback_url=callback_url
         )
+        logger.debug("ingest_request_id=%r", ingest_request_id)
 
         ingest_request_id = send_new_ingest_request(
             sns_client=app.config["SNS_CLIENT"],
@@ -71,16 +64,13 @@ class IngestCollection(Resource):
 
     def validate_urls(self, callback_url, upload_url):
         try:
-            validators.validate_single_url(
-                upload_url, supported_schemes=["s3"], allow_fragment=False
-            )
+            validators.validate_upload_url(upload_url)
         except ValueError as error:
             raise BadRequestError(f"Invalid uploadUrl:{upload_url!r}, {error}")
-        if callback_url:
+
+        if callback_url is not None:
             try:
-                validators.validate_single_url(
-                    callback_url, supported_schemes=["http", "https"]
-                )
+                validators.validate_callback_url(callback_url)
             except ValueError as error:
                 raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
 
@@ -96,14 +86,10 @@ class IngestResource(Resource):
     def get(self, id):
         """Get the current status of an ingest request"""
         try:
-            result = report_ingest_status(
-                dynamodb_resource=app.config["DYNAMODB_RESOURCE"],
-                table_name=app.config["DYNAMODB_TABLE_NAME"],
-                guid=id,
-            )
+            result = progress_manager.lookup_progress(id=id)
             return jsonify(result)
-        except ValueError as error:
-            raise NotFoundError(f"Invalid id: {error}")
+        except ProgressNotFoundError as error:
+            raise NotFoundError(f"Invalid id: No ingest found for id={id!r}")
 
 
 @ns_bags.route("/<string:id>")

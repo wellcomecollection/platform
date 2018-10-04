@@ -17,6 +17,11 @@ class ProgressNotFoundError(Exception):
 class ProgressManager:
     """
     Handles requests to/from the progress service.
+
+    The progress service is a separate, internal-only app running in ECS.
+    It manages connections to the progress tracking table in DynamoDB --
+    we should never query that table directly, only through this service.
+
     """
 
     def __init__(self, endpoint, sess=None):
@@ -46,7 +51,7 @@ class ProgressManager:
         if callback_url is not None:
             data["callbackUrl"] = callback_url
 
-        resp = self.sess.post(f"{self.endpoint}/progress", data=data)
+        resp = self.sess.post(f"{self.endpoint}/progress", data=data, timeout=1)
 
         # The service should return an HTTP 202 if successful.  Anything
         # else should be treated as an error.
@@ -75,7 +80,7 @@ class ProgressManager:
         Passes the response through directly (if any).
 
         """
-        resp = self.sess.get(f"{self.endpoint}/progress/{id}")
+        resp = self.sess.get(f"{self.endpoint}/progress/{id}", timeout=1)
 
         # The service should return an HTTP 200 (if present) or 404 (if not).
         # Anything else should be treated as an error.
