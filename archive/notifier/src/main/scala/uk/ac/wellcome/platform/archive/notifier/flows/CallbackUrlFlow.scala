@@ -1,21 +1,19 @@
 package uk.ac.wellcome.platform.archive.notifier.flows
 
-import java.util.UUID
-
 import java.net.URI
+import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.scaladsl.Flow
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.notifier.CallbackNotification
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress._
 import uk.ac.wellcome.platform.archive.notifier.models.CallbackFlowResult
 
 object CallbackUrlFlow {
-
-  import Progress._
 
   // This flow handles the case where there is a callback URL on
   // the progress object.

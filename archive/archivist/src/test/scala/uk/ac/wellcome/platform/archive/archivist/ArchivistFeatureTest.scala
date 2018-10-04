@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist
 
+import java.net.URI
 import java.util.UUID
 
 import org.scalatest.concurrent.ScalaFutures
@@ -9,7 +10,6 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -22,11 +22,11 @@ class ArchivistFeatureTest
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
-    with ProgressMonitorFixture
     with ArchivistFixture
     with ExtendedPatience
     with ProgressUpdateAssertions{
 
+  val callbackUri = new URI("http://localhost/archive/complete")
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
       case (
@@ -104,15 +104,6 @@ class ArchivistFeatureTest
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
-
-
-              assertTopicReceivesProgressUpdate(
-                requestId,
-                progressTopic,
-                Progress.None) { events =>
-                events should have size 1
-                events.head.description shouldBe s"Started working on ingestRequest: $requestId"
-              }
 
               assertTopicReceivesProgressUpdate(
                 requestId,

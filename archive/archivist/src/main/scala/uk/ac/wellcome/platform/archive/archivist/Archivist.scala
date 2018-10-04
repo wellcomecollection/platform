@@ -47,8 +47,8 @@ trait Archivist extends Logging {
     val snsRegistrarConfig = injector.getInstance(Key.get(classOf[SNSConfig], Names.named("registrarSnsConfig")))
     val snsProgressConfig = injector.getInstance(Key.get(classOf[SNSConfig], Names.named("progressSnsConfig")))
 
-    info(s"registrar topic: $snsRegistrarConfig")
-    info(s"progress topic: $snsProgressConfig")
+    debug(s"registrar topic: $snsRegistrarConfig")
+    debug(s"progress topic: $snsProgressConfig")
 
     val workFlow =
       Flow[NotificationMessage]

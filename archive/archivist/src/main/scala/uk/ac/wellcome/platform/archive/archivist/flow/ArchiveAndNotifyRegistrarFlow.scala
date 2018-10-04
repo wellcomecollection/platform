@@ -16,6 +16,6 @@ object ArchiveAndNotifyRegistrarFlow {
         ArchiveError[_],
         ArchiveComplete,
         Unit
-        ](ifLeft = _ => ())(ifRight = ArchiveCompleteFlow(snsRegistrarConfig).map(_=>()) ))
+        ](ifLeft = _ => ())(ifRight = RegistrarNotifierFlow(snsRegistrarConfig).map(_=>()) ))
   }
 }

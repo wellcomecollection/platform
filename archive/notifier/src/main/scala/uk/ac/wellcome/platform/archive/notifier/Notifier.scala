@@ -1,8 +1,5 @@
 package uk.ac.wellcome.platform.archive.notifier
 
-import java.net.URI
-import java.util.UUID
-
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
@@ -14,11 +11,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
 import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
-import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.models.{CallbackNotification, NotificationMessage}
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
+import uk.ac.wellcome.platform.archive.common.models.CallbackNotification._
 
 class Notifier @Inject()(
   sqsClient: AmazonSQSAsync,
@@ -27,7 +23,6 @@ class Notifier @Inject()(
   snsConfig: SNSConfig,
   metricsSender: MetricsSender
 )(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
-  import CallbackNotification._
   def run() = {
 
     implicit val adapter: LoggingAdapter =
@@ -50,7 +45,3 @@ class Notifier @Inject()(
     stream.run("notifier", flow)
   }
 }
-
-case class CallbackNotification(id: UUID, callbackUri: URI, payload: Progress)
-
-object CallbackNotification extends UUIDConverters with URIConverters

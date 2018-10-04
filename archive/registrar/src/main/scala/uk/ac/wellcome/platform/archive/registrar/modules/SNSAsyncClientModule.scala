@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.archive.common.modules.SnsClientConfig
 object SNSAsyncClientModule extends AbstractModule {
   @Singleton
   @Provides
-  def providesSNSClient(
+  def providesSNSAsyncClient(
     snsClientConfig: SnsClientConfig): AmazonSNSAsync = {
     val endpoint = snsClientConfig.endpoint.getOrElse("")
     if (endpoint.isEmpty) {
