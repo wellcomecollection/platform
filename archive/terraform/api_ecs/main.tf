@@ -2,11 +2,6 @@ resource "aws_ecs_cluster" "cluster" {
   name = "${var.namespace}"
 }
 
-resource "aws_service_discovery_private_dns_namespace" "namespace" {
-  name = "${var.namespace}_api"
-  vpc  = "${var.vpc_id}"
-}
-
 module "api_ecs" {
   source    = "service"
   namespace = "${var.namespace}_api"
@@ -31,7 +26,7 @@ module "api_ecs" {
   ecs_cluster_id               = "${aws_ecs_cluster.cluster.id}"
   subnets                      = "${var.private_subnets}"
 
-  service_discovery_namespace = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  service_discovery_namespace = "${var.service_discovery_namespace_id}"
   health_check_path           = "${var.api_path}/healthcheck"
 
   cpu    = 1024

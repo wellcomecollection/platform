@@ -1,3 +1,4 @@
+variable "service_discovery_namespace_id" {}
 variable "namespace" {}
 
 variable "public_subnets" {

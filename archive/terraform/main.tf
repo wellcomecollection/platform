@@ -118,10 +118,11 @@ module "api_ecs" {
   bag_vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
   bag_vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
 
-  vpc_id             = "${local.vpc_id}"
-  private_subnets    = "${local.private_subnets}"
-  public_subnets     = "${local.public_subnets}"
-  certificate_domain = "api.wellcomecollection.org"
+  vpc_id                         = "${local.vpc_id}"
+  private_subnets                = "${local.private_subnets}"
+  public_subnets                 = "${local.public_subnets}"
+  certificate_domain             = "api.wellcomecollection.org"
+  service_discovery_namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }
 
 # Progress
