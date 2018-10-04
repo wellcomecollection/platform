@@ -43,7 +43,7 @@ class NotifierFeatureTest
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   def createProgressWith(id: UUID, callbackUri: Option[URI]): Progress =
-    Progress(id.toString, uploadUri, callbackUri, Completed)
+    Progress(id, uploadUri, callbackUri, Completed)
 
   describe("Making callbacks") {
     it("makes a POST request when it receives a Progress with a callback") {
@@ -62,7 +62,7 @@ class NotifierFeatureTest
 
             sendNotificationToSQS(
               queuePair.queue,
-              CallbackNotification(requestId.toString, callbackUri, progress)
+              CallbackNotification(requestId, callbackUri, progress)
             )
 
             notifier.run()
@@ -102,7 +102,7 @@ class NotifierFeatureTest
 
             sendNotificationToSQS[CallbackNotification](
               queuePair.queue,
-              CallbackNotification(requestId.toString, callbackUri, progress)
+              CallbackNotification(requestId, callbackUri, progress)
             )
 
             notifier.run()
@@ -114,7 +114,7 @@ class NotifierFeatureTest
                   .withRequestBody(equalToJson(toJson(progress).get)))
 
               inside(notificationMessage[ProgressUpdate](topic)) {
-                case ProgressUpdate(id, progressEvent, status) =>
+                case ProgressUpdate(id, List(progressEvent), status) =>
                   id shouldBe progress.id
                   progressEvent.description shouldBe "Callback fulfilled."
                   status shouldBe Progress.CompletedCallbackSucceeded
@@ -142,14 +142,14 @@ class NotifierFeatureTest
 
           sendNotificationToSQS[CallbackNotification](
             queuePair.queue,
-            CallbackNotification(requestId.toString, callbackUri, progress)
+            CallbackNotification(requestId, callbackUri, progress)
           )
 
           notifier.run()
 
           eventually {
             inside(notificationMessage[ProgressUpdate](topic)) {
-              case ProgressUpdate(id, progressEvent, status) =>
+              case ProgressUpdate(id, List(progressEvent), status) =>
                 id shouldBe progress.id
                 progressEvent.description shouldBe s"Callback failed for: ${progress.id}, got 404 Not Found!"
                 status shouldBe Progress.CompletedCallbackFailed

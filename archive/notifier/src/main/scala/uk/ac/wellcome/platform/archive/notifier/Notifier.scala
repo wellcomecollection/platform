@@ -1,11 +1,12 @@
 package uk.ac.wellcome.platform.archive.notifier
 
 import java.net.URI
+import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import com.amazonaws.services.sns.AmazonSNSAsync
+import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishResult
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject._
@@ -13,10 +14,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.archive.common.messaging.{
-  MessageStream,
-  NotificationParsingFlow
-}
+import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
@@ -24,13 +22,11 @@ import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
 class Notifier @Inject()(
   sqsClient: AmazonSQSAsync,
   sqsConfig: SQSConfig,
-  snsClient: AmazonSNSAsync,
+  snsClient: AmazonSNS,
   snsConfig: SNSConfig,
   metricsSender: MetricsSender
 )(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
   def run() = {
-
-    import Progress._
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
@@ -53,4 +49,4 @@ class Notifier @Inject()(
   }
 }
 
-case class CallbackNotification(id: String, callbackUri: URI, payload: Progress)
+case class CallbackNotification(id: UUID, callbackUri: URI, payload: Progress)

@@ -19,34 +19,31 @@ object PrepareNotificationFlow extends Logging {
     Flow[CallbackFlowResult].map {
       case CallbackFlowResult(
           id,
-          Some(Success(HttpResponse(StatusCodes.OK, _, _, _)))) => {
+          Some(Success(HttpResponse(StatusCodes.OK, _, _, _)))) =>
         info(s"Callback fulfilled for: $id")
 
         ProgressUpdate(
           id,
-          ProgressEvent("Callback fulfilled."),
+          List(ProgressEvent("Callback fulfilled.")),
           Progress.CompletedCallbackSucceeded)
-      }
       case CallbackFlowResult(
           id,
-          Some(Success(HttpResponse(status, _, _, _)))) => {
+          Some(Success(HttpResponse(status, _, _, _)))) =>
         info(s"Callback failed for: $id, got $status!")
 
         ProgressUpdate(
           id,
-          ProgressEvent(s"Callback failed for: $id, got $status!"),
+          List(ProgressEvent(s"Callback failed for: $id, got $status!")),
           Progress.CompletedCallbackFailed
         )
-      }
-      case CallbackFlowResult(id, Some(Failure(e))) => {
+      case CallbackFlowResult(id, Some(Failure(e))) =>
         error(s"Callback failed for: $id", e)
 
         ProgressUpdate(
           id,
-          ProgressEvent(s"Callback failed for: $id (${e.getMessage})"),
+          List(ProgressEvent(s"Callback failed for: $id (${e.getMessage})")),
           Progress.CompletedCallbackFailed
         )
-      }
     }
   }
 }

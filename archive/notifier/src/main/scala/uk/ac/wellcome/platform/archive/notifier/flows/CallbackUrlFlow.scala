@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier.flows
 
+import java.util.UUID
+
 import java.net.URI
 
 import akka.actor.ActorSystem
@@ -38,7 +40,7 @@ object CallbackUrlFlow {
       }
 
   private def http(implicit actorSystem: ActorSystem) =
-    Http().superPool[String]()
+    Http().superPool[UUID]()
 
   private def createHttpRequest(progress: Progress,
                                 callbackUri: URI): HttpRequest = {

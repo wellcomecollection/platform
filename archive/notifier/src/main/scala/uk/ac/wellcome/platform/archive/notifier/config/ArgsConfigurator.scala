@@ -9,7 +9,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     with CloudWatchClientConfigurator
     with MetricsConfigConfigurator
     with SnsClientConfigurator
-    with RegistrarSnsConfigConfigurator
+    with SnsConfigConfigurator
     with SqsClientConfigurator
     with SqsConfigConfigurator {
 
@@ -20,7 +20,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     sqsClientConfig = sqsClientConfig,
     sqsConfig = sqsConfig,
     snsClientConfig = snsClientConfig,
-    snsConfig = registrarSnsConfig,
+    snsConfig = snsConfig,
     metricsConfig = metricsConfig
   )
 }
