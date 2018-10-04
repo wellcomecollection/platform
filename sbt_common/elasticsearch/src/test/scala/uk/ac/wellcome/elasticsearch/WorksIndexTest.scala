@@ -9,7 +9,6 @@ import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Person, Subject, Unidentifiable}
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
@@ -24,7 +23,6 @@ class WorksIndexTest
     with Matchers
     with JsonAssertions
     with BeforeAndAfterEach
-    with ExtendedPatience
     with PropertyChecks with WorksGenerators {
 
   // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
