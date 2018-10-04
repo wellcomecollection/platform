@@ -122,7 +122,7 @@ class ProgressMonitorTest
           val progress =
             createProgress(progressMonitor, callbackUri, uploadUri)
 
-          val result = progressMonitor.get("not_the_id_we_created")
+          val result = progressMonitor.get(UUID.randomUUID())
 
           assertTableOnlyHasItem(progress, table)
           result shouldBe scala.None
@@ -142,7 +142,7 @@ class ProgressMonitorTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        val id = UUID.randomUUID().toString
+        val id = UUID.randomUUID()
         val result = Try(archiveProgressMonitor.get(id))
         val failedException = result.failed.get
 
