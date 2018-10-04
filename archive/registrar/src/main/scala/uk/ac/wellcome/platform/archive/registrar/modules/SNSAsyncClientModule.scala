@@ -13,7 +13,8 @@ object SNSAsyncClientModule extends AbstractModule {
     snsClientConfig: SnsClientConfig): AmazonSNSAsync = {
     val endpoint = snsClientConfig.endpoint.getOrElse("")
     if (endpoint.isEmpty) {
-      AmazonSNSAsyncClientBuilder.standard()
+      AmazonSNSAsyncClientBuilder
+        .standard()
         .withRegion(snsClientConfig.region)
         .build()
     } else {
@@ -21,7 +22,8 @@ object SNSAsyncClientModule extends AbstractModule {
         throw new RuntimeException("accessKey required"))
       val secretKey = snsClientConfig.secretKey.getOrElse(
         throw new RuntimeException("secretKey required"))
-      AmazonSNSAsyncClientBuilder.standard()
+      AmazonSNSAsyncClientBuilder
+        .standard()
         .withCredentials(new AWSStaticCredentialsProvider(
           new BasicAWSCredentials(accessKey, secretKey)))
         .withEndpointConfiguration(

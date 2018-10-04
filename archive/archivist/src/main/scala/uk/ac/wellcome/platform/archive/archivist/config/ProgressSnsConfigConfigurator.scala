@@ -6,7 +6,8 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 trait ProgressSnsConfigConfigurator extends ScallopConf {
   val arguments: Seq[String]
 
-  private val progressSnsTopicArn: ScallopOption[String] = opt[String](required = true)
+  private val progressSnsTopicArn: ScallopOption[String] =
+    opt[String](required = true)
 
   verify()
 

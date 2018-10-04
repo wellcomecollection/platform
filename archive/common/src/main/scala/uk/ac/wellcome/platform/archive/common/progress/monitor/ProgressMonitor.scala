@@ -9,7 +9,10 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.storage.dynamo._
 
 import scala.util.{Failure, Success, Try}
@@ -69,7 +72,8 @@ class ProgressMonitor @Inject()(
       case Progress.None =>
         events.map(event => append('events -> event)).reduce(_ and _)
       case status =>
-        events.map(event => append('events -> event)).reduce(_ and _) and set('result -> status)
+        events.map(event => append('events -> event)).reduce(_ and _) and set(
+          'result -> status)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)

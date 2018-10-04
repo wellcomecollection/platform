@@ -13,10 +13,10 @@ module "archivist" {
   max_capacity = 1
 
   env_vars = {
-    queue_url                   = "${module.archivist_queue.id}"
-    archive_bucket              = "${aws_s3_bucket.archive_storage.id}"
-    registrar_topic_arn                   = "${module.registrar_topic.arn}"
-    progress_topic_arn                   = "${module.progress_async_topic.arn}"
+    queue_url           = "${module.archivist_queue.id}"
+    archive_bucket      = "${aws_s3_bucket.archive_storage.id}"
+    registrar_topic_arn = "${module.registrar_topic.arn}"
+    progress_topic_arn  = "${module.progress_async_topic.arn}"
   }
 
   env_vars_length = 4

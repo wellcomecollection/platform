@@ -7,7 +7,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -24,7 +26,7 @@ class ArchivistFeatureTest
     with MetricsSenderFixture
     with ArchivistFixture
     with ExtendedPatience
-    with ProgressUpdateAssertions{
+    with ProgressUpdateAssertions {
 
   val callbackUri = new URI("http://localhost/archive/complete")
   it("downloads, uploads and verifies a BagIt bag") {
@@ -83,7 +85,6 @@ class ArchivistFeatureTest
         }
     }
   }
-
 
   it("fails when ingesting an invalid bag") {
     withArchivist {
@@ -183,14 +184,14 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressUpdate(
                             invalidRequestId1,
                             progressTopic,
-                            Progress.Failed){ events =>
+                            Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
                           assertTopicReceivesProgressUpdate(
                             invalidRequestId2,
                             progressTopic,
-                            Progress.Failed){ events =>
+                            Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
@@ -273,7 +274,8 @@ class ArchivistFeatureTest
                     progressTopic,
                     Progress.Failed) { events =>
                     events should have size 1
-                    events.head.description should startWith (s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip")
+                    events.head.description should startWith(
+                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip")
                   }
 
                   assertTopicReceivesProgressUpdate(
@@ -281,7 +283,8 @@ class ArchivistFeatureTest
                     progressTopic,
                     Progress.Failed) { events =>
                     events should have size 1
-                    events.head.description should startWith (s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip")
+                    events.head.description should startWith(
+                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip")
                   }
                 }
             }
@@ -444,7 +447,7 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressUpdate(
                             invalidRequestId1,
                             progressTopic,
-                            Progress.Failed){ events =>
+                            Progress.Failed) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }
@@ -452,7 +455,7 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressUpdate(
                             invalidRequestId2,
                             progressTopic,
-                            Progress.Failed){ events =>
+                            Progress.Failed) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }
@@ -460,7 +463,7 @@ class ArchivistFeatureTest
                     }
                 }
             }
-          }
+        }
     }
   }
 

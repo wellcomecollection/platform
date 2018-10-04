@@ -11,10 +11,9 @@ import uk.ac.wellcome.platform.archive.common.modules._
 
 import scala.concurrent.duration._
 
-class TestAppConfigModule(
-                          actorSystem: ActorSystem,
+class TestAppConfigModule(actorSystem: ActorSystem,
                           actorMaterializer: ActorMaterializer,
-                           queueUrl: String,
+                          queueUrl: String,
                           storageBucketName: String,
                           registrarTopicArn: String,
                           progressTopicArn: String)

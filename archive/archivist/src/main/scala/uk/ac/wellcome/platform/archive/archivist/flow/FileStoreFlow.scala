@@ -9,7 +9,8 @@ import akka.util.ByteString
 import scala.concurrent.Future
 
 object FileStoreFlow {
-  def apply(tmpFile: File, parallelism: Int): Flow[ByteString, IOResult, Future[IOResult]] = {
+  def apply(tmpFile: File,
+            parallelism: Int): Flow[ByteString, IOResult, Future[IOResult]] = {
     val fileSink = FileIO.toPath(tmpFile.toPath)
 
     Flow

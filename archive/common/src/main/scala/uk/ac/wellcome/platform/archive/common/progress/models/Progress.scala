@@ -8,7 +8,15 @@ import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, CompletedCallbackFailed, CompletedCallbackSucceeded, CompletedNoCallbackProvided, Failed, None, Processing}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
+  Completed,
+  CompletedCallbackFailed,
+  CompletedCallbackSucceeded,
+  CompletedNoCallbackProvided,
+  Failed,
+  None,
+  Processing
+}
 
 case class Progress(
   id: UUID,

@@ -31,7 +31,8 @@ class ProgressUpdateFlowTest
               val progress =
                 createProgress(monitor, callbackUri, uploadUri)
 
-              val update = ProgressUpdate(progress.id, List(ProgressEvent("Wow.")))
+              val update =
+                ProgressUpdate(progress.id, List(ProgressEvent("Wow.")))
 
               val updates = Source
                 .single(update)
@@ -69,7 +70,9 @@ class ProgressUpdateFlowTest
                 ProgressUpdate(
                   progress.id,
                   List(ProgressEvent("It happened again."))),
-                ProgressUpdate(progress.id, List(ProgressEvent("Dammit Bobby.")))
+                ProgressUpdate(
+                  progress.id,
+                  List(ProgressEvent("Dammit Bobby.")))
               )
 
               val futureUpdates = Source

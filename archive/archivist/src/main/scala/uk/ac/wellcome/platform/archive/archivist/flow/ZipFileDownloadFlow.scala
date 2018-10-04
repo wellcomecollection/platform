@@ -10,27 +10,40 @@ import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, ZipFileDownloadingError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveError,
+  ZipFileDownloadingError
+}
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressUpdate
+}
 
 import scala.util.{Failure, Success, Try}
 
 object ZipFileDownloadFlow extends Logging {
 
-  def apply(parallelism: Int, snsConfig: SNSConfig)(implicit s3Client: AmazonS3, snsClient: AmazonSNS)
-    : Flow[IngestBagRequest, Either[ArchiveError[IngestBagRequest],ZipFileDownloadComplete], NotUsed] = {
+  def apply(parallelism: Int, snsConfig: SNSConfig)(implicit s3Client: AmazonS3,
+                                                    snsClient: AmazonSNS)
+    : Flow[IngestBagRequest,
+           Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete],
+           NotUsed] = {
 
     Flow[IngestBagRequest]
       .log("download location")
       .flatMapMerge(
         parallelism, {
           case request @ IngestBagRequest(_, location, _) =>
-            val triedInputStream =  Try(s3Client.getObject(location.namespace, location.key)).map(response => response.getObjectContent)
+            val triedInputStream =
+              Try(s3Client.getObject(location.namespace, location.key)).map(
+                response => response.getObjectContent)
 
             triedInputStream match {
-              case Failure(ex) => warn(s"Failed downloading zipFile from $location")
+              case Failure(ex) =>
+                warn(s"Failed downloading zipFile from $location")
                 Source.single(Left(ZipFileDownloadingError(request, ex)))
               case Success(inputStream) =>
                 val tmpFile = File.createTempFile("archivist", ".tmp")
@@ -38,35 +51,50 @@ object ZipFileDownloadFlow extends Logging {
                 StreamConverters
                   .fromInputStream(() => inputStream)
                   .via(FileStoreFlow(tmpFile, parallelism))
-                  .map {result => result.status match {
-                    case Success(_) =>
-                      Right(ZipFileDownloadComplete(
-                        new ZipFile(tmpFile),
-                        request
-                      ))
-                    case Failure(ex) =>
-                      warn(s"Failed downloading zipFile from $location")
-                      Left(ZipFileDownloadingError(request, ex))
-                  }
+                  .map { result =>
+                    result.status match {
+                      case Success(_) =>
+                        Right(
+                          ZipFileDownloadComplete(
+                            new ZipFile(tmpFile),
+                            request
+                          ))
+                      case Failure(ex) =>
+                        warn(s"Failed downloading zipFile from $location")
+                        Left(ZipFileDownloadingError(request, ex))
+                    }
                   }
             }
 
         }
       )
       .async
-      .flatMapMerge(parallelism, (result: Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete])=>
-        Source.single(toProgressUpdate(result))
-          .log("sending to progress monitor")
-          .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig))
-          .map(_ => result)
+      .flatMapMerge(
+        parallelism,
+        (result: Either[ArchiveError[IngestBagRequest],
+                        ZipFileDownloadComplete]) =>
+          Source
+            .single(toProgressUpdate(result))
+            .log("sending to progress monitor")
+            .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig))
+            .map(_ => result)
       )
       .log("downloaded zipfile")
   }
 
-  private def toProgressUpdate(result: Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete]): ProgressUpdate =
+  private def toProgressUpdate(
+    result: Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete])
+    : ProgressUpdate =
     result match {
-      case Right(ZipFileDownloadComplete(_, ingestBagRequest)) => ProgressUpdate(ingestBagRequest.archiveRequestId, List(ProgressEvent("zipFile downloaded successfully")))
-      case Left(archiveError) => ProgressUpdate(archiveError.job.archiveRequestId, List(ProgressEvent(archiveError.toString)), Progress.Failed)
+      case Right(ZipFileDownloadComplete(_, ingestBagRequest)) =>
+        ProgressUpdate(
+          ingestBagRequest.archiveRequestId,
+          List(ProgressEvent("zipFile downloaded successfully")))
+      case Left(archiveError) =>
+        ProgressUpdate(
+          archiveError.job.archiveRequestId,
+          List(ProgressEvent(archiveError.toString)),
+          Progress.Failed)
     }
 }
 

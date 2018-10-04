@@ -9,13 +9,19 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 
 object ArchiveAndNotifyRegistrarFlow {
-  def apply(bagUploaderConfig: BagUploaderConfig, snsProgressConfig: SNSConfig, snsRegistrarConfig: SNSConfig)(implicit s3: AmazonS3, snsClient: AmazonSNS): Flow[ZipFileDownloadComplete, Unit, NotUsed] = {
+  def apply(bagUploaderConfig: BagUploaderConfig,
+            snsProgressConfig: SNSConfig,
+            snsRegistrarConfig: SNSConfig)(
+    implicit s3: AmazonS3,
+    snsClient: AmazonSNS): Flow[ZipFileDownloadComplete, Unit, NotUsed] = {
     ArchiveZipFileFlow(bagUploaderConfig, snsProgressConfig)
       .log("archive verified")
-      .via(FoldEitherFlow[
-        ArchiveError[_],
-        ArchiveComplete,
-        Unit
-        ](ifLeft = _ => ())(ifRight = RegistrarNotifierFlow(snsRegistrarConfig).map(_=>()) ))
+      .via(
+        FoldEitherFlow[
+          ArchiveError[_],
+          ArchiveComplete,
+          Unit
+        ](ifLeft = _ => ())(
+          ifRight = RegistrarNotifierFlow(snsRegistrarConfig).map(_ => ())))
   }
 }

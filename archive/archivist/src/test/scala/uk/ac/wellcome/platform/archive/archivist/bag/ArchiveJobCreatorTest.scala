@@ -2,8 +2,17 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagItConfig, BagManifestLocation, IngestRequestContextGenerators}
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, DigitisedStorageType}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  BagItConfig,
+  BagManifestLocation,
+  IngestRequestContextGenerators
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagLocation,
+  BagPath,
+  DigitisedStorageType
+}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest
@@ -11,14 +20,18 @@ class ArchiveJobCreatorTest
     with ZipBagItFixture
     with BagUploaderConfigGenerator
     with Matchers
-    with Inside with IngestRequestContextGenerators {
+    with Inside
+    with IngestRequestContextGenerators {
   it("creates an archive job") {
     withBagItZip() {
       case (bagIdentifier, zipFile) =>
         val bucketName = "bucket"
         inside(
           ArchiveJobCreator
-            .create(zipFile, createBagUploaderConfig(Bucket(bucketName)), createIngestBagRequest)) {
+            .create(
+              zipFile,
+              createBagUploaderConfig(Bucket(bucketName)),
+              createIngestBagRequest)) {
           case Right(
               ArchiveJob(
                 actualZipFile,

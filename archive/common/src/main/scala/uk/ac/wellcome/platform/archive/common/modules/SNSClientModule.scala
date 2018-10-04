@@ -9,8 +9,7 @@ import com.google.inject.{AbstractModule, Provides, Singleton}
 object SNSClientModule extends AbstractModule {
   @Singleton
   @Provides
-  def providesSNSClient(
-    snsClientConfig: SnsClientConfig): AmazonSNS = {
+  def providesSNSClient(snsClientConfig: SnsClientConfig): AmazonSNS = {
     val endpoint = snsClientConfig.endpoint.getOrElse("")
     if (endpoint.isEmpty) {
       standard()

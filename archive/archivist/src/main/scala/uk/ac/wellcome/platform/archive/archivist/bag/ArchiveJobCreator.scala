@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, FileNotFoundError, InvalidBagInfo}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveError,
+  FileNotFoundError,
+  InvalidBagInfo
+}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models._
 
@@ -29,11 +33,13 @@ object ArchiveJobCreator {
       }
   }
 
-  private def getBagIdentifier(zipFile: ZipFile, ingestBagRequest: IngestBagRequest)
-    : Either[ArchiveError[IngestBagRequest], String]  = {
+  private def getBagIdentifier(zipFile: ZipFile,
+                               ingestBagRequest: IngestBagRequest)
+    : Either[ArchiveError[IngestBagRequest], String] = {
     ZipFileReader
-        .maybeInputStream(ZipLocation(zipFile, EntryPath("bag-info.txt")))
-      .toRight[ArchiveError[IngestBagRequest]](FileNotFoundError("bag-info.txt", ingestBagRequest))
+      .maybeInputStream(ZipLocation(zipFile, EntryPath("bag-info.txt")))
+      .toRight[ArchiveError[IngestBagRequest]](
+        FileNotFoundError("bag-info.txt", ingestBagRequest))
       .flatMap { inputStream =>
         val bagInfoLines = scala.io.Source
           .fromInputStream(inputStream, "UTF-8")
@@ -41,10 +47,11 @@ object ArchiveJobCreator {
           .split("\n")
         val regex = """(.*?)\s*:\s*(.*)\s*""".r
 
-          bagInfoLines
-            .collectFirst {
-              case regex(key, value) if key == "External-Identifier" => value
-            }.toRight(InvalidBagInfo(ingestBagRequest))
+        bagInfoLines
+          .collectFirst {
+            case regex(key, value) if key == "External-Identifier" => value
+          }
+          .toRight(InvalidBagInfo(ingestBagRequest))
       }
   }
 }

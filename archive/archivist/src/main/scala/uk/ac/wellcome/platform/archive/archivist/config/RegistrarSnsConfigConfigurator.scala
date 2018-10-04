@@ -6,7 +6,8 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 trait RegistrarSnsConfigConfigurator extends ScallopConf {
   val arguments: Seq[String]
 
-  private val registrarSnsTopicArn: ScallopOption[String] = opt[String](required = true)
+  private val registrarSnsTopicArn: ScallopOption[String] =
+    opt[String](required = true)
 
   verify()
 

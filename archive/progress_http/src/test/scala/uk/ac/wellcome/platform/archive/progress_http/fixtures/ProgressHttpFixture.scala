@@ -67,9 +67,10 @@ trait ProgressHttpFixture
   def withProgressUpdate[R](id: UUID, status: Status = None)(
     testWith: TestWith[ProgressUpdate, R]) = {
 
-    val events = List(ProgressEvent(
-      description = randomAlphanumeric()
-    ))
+    val events = List(
+      ProgressEvent(
+        description = randomAlphanumeric()
+      ))
 
     val progress = ProgressUpdate(
       id = id,

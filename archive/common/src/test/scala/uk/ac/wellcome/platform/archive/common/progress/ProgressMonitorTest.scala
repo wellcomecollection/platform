@@ -160,10 +160,10 @@ class ProgressMonitorTest
           val progress =
             createProgress(archiveProgressMonitor, callbackUri, uploadUri)
 
-        val progressUpdate = ProgressUpdate(
-          progress.id,
-          List(ProgressEvent("So that happened."))
-        )
+          val progressUpdate = ProgressUpdate(
+            progress.id,
+            List(ProgressEvent("So that happened."))
+          )
 
           archiveProgressMonitor.update(progressUpdate)
 
@@ -186,16 +186,16 @@ class ProgressMonitorTest
         withProgressMonitor(table) { monitor: ProgressMonitor =>
           val progress = createProgress(monitor, callbackUri, uploadUri)
 
-        val updates = List(
-          ProgressUpdate(
-            progress.id,
-            List(ProgressEvent("It happened again."))
-          ),
-          ProgressUpdate(
-            progress.id,
-            List(ProgressEvent("Dammit Bobby."))
+          val updates = List(
+            ProgressUpdate(
+              progress.id,
+              List(ProgressEvent("It happened again."))
+            ),
+            ProgressUpdate(
+              progress.id,
+              List(ProgressEvent("Dammit Bobby."))
+            )
           )
-        )
 
           updates.map(monitor.update)
 
@@ -226,7 +226,8 @@ class ProgressMonitorTest
 
         val id = UUID.randomUUID()
 
-        val update = ProgressUpdate(id, List(ProgressEvent("Too much winning.")))
+        val update =
+          ProgressUpdate(id, List(ProgressEvent("Too much winning.")))
 
         val result = Try(archiveProgressMonitor.update(update))
 

@@ -10,7 +10,9 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
 object ArchiveItemJobFlow extends Logging {
   def apply(delimiter: String, parallelism: Int)(
     implicit s3Client: AmazonS3
-  ): Flow[ArchiveItemJob, Either[ArchiveError[ArchiveItemJob], ArchiveItemJob], NotUsed] = {
+  ): Flow[ArchiveItemJob,
+          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
+          NotUsed] = {
     Flow[ArchiveItemJob]
       .log("uploading and verifying")
       .via(UploadItemFlow(parallelism))
@@ -18,10 +20,11 @@ object ArchiveItemJobFlow extends Logging {
         FoldEitherFlow[
           ArchiveError[ArchiveItemJob],
           ArchiveItemJob,
-          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](ifLeft = error => {
-              warn(s"job ${error.job} uploading and verifying failed")
-              Left(error)
-        })(ifRight = DownloadItemFlow(parallelism)))
+          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](
+          ifLeft = error => {
+            warn(s"job ${error.job} uploading and verifying failed")
+            Left(error)
+          })(ifRight = DownloadItemFlow(parallelism)))
       .log("download verified")
   }
 }

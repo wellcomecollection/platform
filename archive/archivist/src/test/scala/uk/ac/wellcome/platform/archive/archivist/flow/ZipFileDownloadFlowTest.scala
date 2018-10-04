@@ -9,9 +9,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, ZipFileDownloadingError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveError,
+  ZipFileDownloadingError
+}
 import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -25,7 +30,10 @@ class ZipFileDownloadFlowTest
     with Matchers
     with ScalaFutures
     with ArchivistFixture
-    with IngestRequestContextGenerators with Inside with SNS with ProgressUpdateAssertions {
+    with IngestRequestContextGenerators
+    with Inside
+    with SNS
+    with ProgressUpdateAssertions {
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
@@ -35,47 +43,49 @@ class ZipFileDownloadFlowTest
   it("downloads a zipfile from s3") {
     withLocalS3Bucket { storageBucket =>
       withLocalSnsTopic { progressTopic =>
-      withBagItZip() {
-        case (bagName, zipFile) =>
-          val downloadZipFlow = ZipFileDownloadFlow(10, SNSConfig(progressTopic.arn))
+        withBagItZip() {
+          case (bagName, zipFile) =>
+            val downloadZipFlow =
+              ZipFileDownloadFlow(10, SNSConfig(progressTopic.arn))
 
-          val uploadKey = bagName.toString
+            val uploadKey = bagName.toString
 
-          s3Client.putObject(
-            storageBucket.name,
-            uploadKey,
-            new File(zipFile.getName))
+            s3Client.putObject(
+              storageBucket.name,
+              uploadKey,
+              new File(zipFile.getName))
 
-          val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
-          val ingestBagRequest =
-            createIngestBagRequestWith(ingestBagLocation = objectLocation)
+            val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
+            val ingestBagRequest =
+              createIngestBagRequestWith(ingestBagLocation = objectLocation)
 
-          val download: Future[Either[ArchiveError[IngestBagRequest],
+            val download: Future[Either[ArchiveError[IngestBagRequest],
                                         ZipFileDownloadComplete]] =
-            downloadZipFlow
-              .runWith(Source.single(ingestBagRequest), Sink.head)
-              ._2
+              downloadZipFlow
+                .runWith(Source.single(ingestBagRequest), Sink.head)
+                ._2
 
-          whenReady(download) { result =>
-            inside(result) {
-              case Right(ZipFileDownloadComplete(downloadedZipFile, _)) =>
-                downloadedZipFile.entries.asScala.toList
+            whenReady(download) { result =>
+              inside(result) {
+                case Right(ZipFileDownloadComplete(downloadedZipFile, _)) =>
+                  downloadedZipFile.entries.asScala.toList
                     .map(_.toString) should contain theSameElementsAs zipFile.entries.asScala.toList
                     .map(_.toString)
-                downloadedZipFile.size shouldEqual zipFile.size
+                  downloadedZipFile.size shouldEqual zipFile.size
+              }
             }
-          }
+        }
       }
-    }
     }
   }
 
   it("outputs a left of archive error if the zipfile does not exist in s3") {
     withLocalS3Bucket { storageBucket =>
-    withLocalSnsTopic { progressTopic =>
+      withLocalSnsTopic { progressTopic =>
         val bagIdentifier = randomAlphanumeric()
 
-        val downloadZipFlow = ZipFileDownloadFlow(10, SNSConfig(progressTopic.arn))
+        val downloadZipFlow =
+          ZipFileDownloadFlow(10, SNSConfig(progressTopic.arn))
 
         val objectLocation =
           ObjectLocation(storageBucket.name, bagIdentifier.toString)
@@ -93,9 +103,13 @@ class ZipFileDownloadFlowTest
               actualBagRequest shouldBe ingestBagRequest
           }
 
-          assertTopicReceivesProgressUpdate(ingestBagRequest.archiveRequestId, progressTopic, Progress.Failed){ events =>
+          assertTopicReceivesProgressUpdate(
+            ingestBagRequest.archiveRequestId,
+            progressTopic,
+            Progress.Failed) { events =>
             events should have size 1
-            events.head.description should startWith (s"Failed downloading zipFile ${objectLocation.namespace}/${objectLocation.key}")
+            events.head.description should startWith(
+              s"Failed downloading zipFile ${objectLocation.namespace}/${objectLocation.key}")
           }
         }
       }

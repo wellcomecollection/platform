@@ -5,7 +5,10 @@ import org.scalatest.{FunSpec, Inside}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, IngestRequestContextGenerators}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagItConfig,
+  IngestRequestContextGenerators
+}
 import uk.ac.wellcome.platform.archive.archivist.models.errors._
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models._
@@ -20,7 +23,9 @@ class ArchiveJobFlowTest
     with S3
     with Akka
     with ScalaFutures
-    with ZipBagItFixture with Inside with IngestRequestContextGenerators {
+    with ZipBagItFixture
+    with Inside
+    with IngestRequestContextGenerators {
   implicit val s = s3Client
 
   it("outputs a right of archive complete if all of the items succeed") {
@@ -32,10 +37,20 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10, ingestRequest)
+              val flow = ArchiveJobFlow(
+                BagItConfig().digestDelimiterRegexp,
+                10,
+                ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Right(ArchiveComplete( BagLocation(bucket.name, "archive", BagPath(s"$DigitisedStorageType/$bagName")), ingestRequest)))
+                archiveJobs shouldBe List(
+                  Right(
+                    ArchiveComplete(
+                      BagLocation(
+                        bucket.name,
+                        "archive",
+                        BagPath(s"$DigitisedStorageType/$bagName")),
+                      ingestRequest)))
               }
           }
         }
@@ -55,14 +70,25 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10, ingestRequest)
+              val flow = ArchiveJobFlow(
+                BagItConfig().digestDelimiterRegexp,
+                10,
+                ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
-              inside(archiveJobs.toList){ case List(Left(ArchiveJobError(actualArchiveJob, List(FileNotFoundError("this/does/not/exists.jpg",archiveItemJob))))) =>
-                actualArchiveJob shouldBe archiveJob
-                archiveItemJob.bagDigestItem.location shouldBe EntryPath("this/does/not/exists.jpg")
-                archiveItemJob.archiveJob shouldBe archiveJob
-              }
+                inside(archiveJobs.toList) {
+                  case List(
+                      Left(
+                        ArchiveJobError(
+                          actualArchiveJob,
+                          List(FileNotFoundError(
+                            "this/does/not/exists.jpg",
+                            archiveItemJob))))) =>
+                    actualArchiveJob shouldBe archiveJob
+                    archiveItemJob.bagDigestItem.location shouldBe EntryPath(
+                      "this/does/not/exists.jpg")
+                    archiveItemJob.archiveJob shouldBe archiveJob
+                }
 
               }
           }
@@ -81,17 +107,29 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
 
-              val failedFiles: List[String] = zipFile.entries().asScala.collect{case entry if !entry.getName.contains("tagmanifest") => entry.getName}.toList
+              val failedFiles: List[String] = zipFile
+                .entries()
+                .asScala
+                .collect {
+                  case entry if !entry.getName.contains("tagmanifest") =>
+                    entry.getName
+                }
+                .toList
 
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10, ingestRequest)
+              val flow = ArchiveJobFlow(
+                BagItConfig().digestDelimiterRegexp,
+                10,
+                ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                inside(archiveJobs.toList){ case List(Left(ArchiveJobError(actualArchiveJob, errors))) =>
-                  actualArchiveJob shouldBe archiveJob
-                  all (errors) shouldBe a[ChecksumNotMatchedOnUploadError]
-                  errors.map(_.job.bagDigestItem.location.path) should contain theSameElementsAs failedFiles
-                  errors.map(_.job.archiveJob).distinct shouldBe List(archiveJob)
+                inside(archiveJobs.toList) {
+                  case List(Left(ArchiveJobError(actualArchiveJob, errors))) =>
+                    actualArchiveJob shouldBe archiveJob
+                    all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
+                    errors.map(_.job.bagDigestItem.location.path) should contain theSameElementsAs failedFiles
+                    errors.map(_.job.archiveJob).distinct shouldBe List(
+                      archiveJob)
                 }
               }
           }
@@ -111,20 +149,30 @@ class ArchiveJobFlowTest
             case (bagName, zipFile) =>
               val ingestRequest = createIngestBagRequest
               val manifestZipEntry = zipFile.getEntry("manifest-sha256.txt")
-              val badChecksumLine = IOUtils.toString(zipFile.getInputStream(manifestZipEntry), "UTF-8").split("\n").filter(_.contains("badDigest")).head
-              val filepath = badChecksumLine.replace("badDigest","").trim
+              val badChecksumLine = IOUtils
+                .toString(zipFile.getInputStream(manifestZipEntry), "UTF-8")
+                .split("\n")
+                .filter(_.contains("badDigest"))
+                .head
+              val filepath = badChecksumLine.replace("badDigest", "").trim
 
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10, ingestRequest)
+              val flow = ArchiveJobFlow(
+                BagItConfig().digestDelimiterRegexp,
+                10,
+                ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                inside(archiveJobs.toList) { case List(Left(ArchiveJobError(job,List(error)))) =>
-                  error shouldBe a[ChecksumNotMatchedOnUploadError]
-                  val checksumNotMatchedOnUploadError = error.asInstanceOf[ChecksumNotMatchedOnUploadError]
-                  checksumNotMatchedOnUploadError.job.archiveJob shouldBe archiveJob
-                  checksumNotMatchedOnUploadError.job.bagDigestItem.location shouldBe EntryPath(filepath)
-                  job shouldBe archiveJob
+                inside(archiveJobs.toList) {
+                  case List(Left(ArchiveJobError(job, List(error)))) =>
+                    error shouldBe a[ChecksumNotMatchedOnUploadError]
+                    val checksumNotMatchedOnUploadError =
+                      error.asInstanceOf[ChecksumNotMatchedOnUploadError]
+                    checksumNotMatchedOnUploadError.job.archiveJob shouldBe archiveJob
+                    checksumNotMatchedOnUploadError.job.bagDigestItem.location shouldBe EntryPath(
+                      filepath)
+                    job shouldBe archiveJob
                 }
               }
           }
@@ -142,12 +190,16 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10, ingestRequest)
+              val flow = ArchiveJobFlow(
+                BagItConfig().digestDelimiterRegexp,
+                10,
+                ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(FileNotFoundError("manifest-sha256.txt", archiveJob)))
+                archiveJobs shouldBe List(
+                  Left(FileNotFoundError("manifest-sha256.txt", archiveJob)))
               }
           }
         }
@@ -167,12 +219,16 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10, ingestRequest)
+              val flow = ArchiveJobFlow(
+                BagItConfig().digestDelimiterRegexp,
+                10,
+                ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(InvalidBagManifestError(archiveJob, "manifest-sha256.txt")))
+                archiveJobs shouldBe List(Left(
+                  InvalidBagManifestError(archiveJob, "manifest-sha256.txt")))
               }
           }
         }
@@ -189,12 +245,16 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10, ingestRequest)
+              val flow = ArchiveJobFlow(
+                BagItConfig().digestDelimiterRegexp,
+                10,
+                ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(FileNotFoundError("tagmanifest-sha256.txt", archiveJob)))
+                archiveJobs shouldBe List(
+                  Left(FileNotFoundError("tagmanifest-sha256.txt", archiveJob)))
               }
           }
         }
@@ -214,12 +274,18 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(BagItConfig().digestDelimiterRegexp, 10, ingestRequest)
+              val flow = ArchiveJobFlow(
+                BagItConfig().digestDelimiterRegexp,
+                10,
+                ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
               whenReady(eventualArchiveJobs) { archiveJobs =>
-                archiveJobs shouldBe List(Left(InvalidBagManifestError(archiveJob, "tagmanifest-sha256.txt")))
+                archiveJobs shouldBe List(
+                  Left(InvalidBagManifestError(
+                    archiveJob,
+                    "tagmanifest-sha256.txt")))
               }
           }
         }
