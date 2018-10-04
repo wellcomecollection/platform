@@ -3,6 +3,7 @@
 import json
 
 from flask import Response, jsonify
+from werkzeug.wsgi import ClosingIterator
 
 
 class ContextResponse(Response):
@@ -15,9 +16,14 @@ class ContextResponse(Response):
     """
     context_url = "https://api.wellcomecollection.org/storage/v1/context.json"
 
-    def __init__(self, response, **kwargs):
-        # Here we unmarshal the response as provided by Flask-RESTPlus, add
-        # the @context parameter, then repack it.
+    def __init__(self, response, *args, **kwargs):
+        """
+        Unmarshal the response as provided by Flask-RESTPlus, add the
+        @context parameter, then repack it.
+        """
+        if isinstance(response, ClosingIterator):
+            response = b''.join([char for char in response])
+
         rv = json.loads(response)
 
         # The @context may already be provided if we've been through the
@@ -26,7 +32,8 @@ class ContextResponse(Response):
             return super(ContextResponse, self).__init__(response, **kwargs)
         else:
             rv["@context"] = self.context_url
-            return super(ContextResponse, self).__init__(json.dumps(rv), **kwargs)
+            json_string = json.dumps(rv)
+            return super(ContextResponse, self).__init__(json_string, **kwargs)
 
     @classmethod
     def force_type(cls, rv, environ=None):
