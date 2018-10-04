@@ -61,8 +61,8 @@ module "progress_async_queue" {
 # Messaging - caller
 
 module "caller_topic" {
- source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
- name   = "${local.namespace}_caller"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${local.namespace}_caller"
 }
 
 # Messaging - callback notifier
@@ -126,4 +126,3 @@ module "bagger_queue" {
 
   alarm_topic_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 }
-
