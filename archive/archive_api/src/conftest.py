@@ -10,7 +10,7 @@ import requests
 
 
 @pytest.fixture(scope='session')
-def global_sess(pytestconfig):
+def recorded_sess(pytestconfig):
     with betamax.Betamax.configure() as config:
         config.cassette_library_dir = str(
             pytestconfig.rootdir.join('src', 'tests', 'cassettes')
@@ -30,13 +30,13 @@ def client(
     topic_arn,
     table_name_bag,
     bucket_bag,
-    global_sess
+    recorded_sess
 ):
     # This only has to work when populating the betamax recording file;
     # although we run on Linux in Travis CI, this will still fine because
     # we use the cached recordings.
     os.environ.update({
-        'PROGRESS_MANAGER_ENDPOINT': 'http://docker.for.mac.localhost:6000'
+        'PROGRESS_MANAGER_ENDPOINT': 'http://docker.for.mac.localhost:6000',
     })
 
     from archive_api import app
@@ -47,6 +47,7 @@ def client(
     app.config["S3_CLIENT"] = s3_client
     app.config["BAG_VHS_TABLE_NAME"] = table_name_bag
     app.config["BAG_VHS_BUCKET_NAME"] = bucket_bag
+    app.config["PROGRESS_MANAGER"].sess = recorded_sess
 
     yield app.test_client()
 

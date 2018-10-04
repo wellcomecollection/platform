@@ -28,7 +28,7 @@ app.config.from_object(config_obj)
 daiquiri.setup(level=os.environ.get("LOG_LEVEL", "INFO"))
 logger = daiquiri.getLogger()
 
-progress_manager = ProgressManager(
+app.config['PROGRESS_MANAGER'] = ProgressManager(
     endpoint=app.config['PROGRESS_MANAGER_ENDPOINT'],
     sess=app.config['PROGRESS_MANAGER_SESSION']
 )

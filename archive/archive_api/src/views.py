@@ -7,13 +7,15 @@ from flask_restplus import Resource
 from werkzeug.exceptions import BadRequest as BadRequestError
 from werkzeug.exceptions import NotFound as NotFoundError
 
-from archive_api import app, api, logger, progress_manager
+from archive_api import app, api, logger
 from bags import fetch_bag
 from ingests import send_new_ingest_request
 import models
 from progress_manager import ProgressNotFoundError
 import validators
 
+
+progress_manager = app.config['PROGRESS_MANAGER']
 
 api.namespaces.clear()
 ns_ingests = api.namespace("ingests", description="Ingest requests")

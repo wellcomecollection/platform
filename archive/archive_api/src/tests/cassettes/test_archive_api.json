@@ -1,0 +1,400 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "method": "GET",
+        "uri": "http://docker.for.mac.localhost:6000/progress/479da42f-d94a-4ac7-9f4f-e84f515ec0e2"
+      },
+      "response": {
+        "body": {
+          "encoding": null,
+          "string": "{\n  \"progress\": \"479da42f-d94a-4ac7-9f4f-e84f515ec0e2\"\n}\n"
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ],
+          "Content-Length": [
+            "57"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Thu, 04 Oct 2018 10:13:10 GMT"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "http://docker.for.mac.localhost:6000/progress/479da42f-d94a-4ac7-9f4f-e84f515ec0e2"
+      },
+      "recorded_at": "2018-10-04T10:13:10"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "method": "GET",
+        "uri": "http://docker.for.mac.localhost:6000/progress/bad_status-404"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Thu, 04 Oct 2018 10:13:10 GMT"
+          ]
+        },
+        "status": {
+          "code": 404,
+          "message": "NOT FOUND"
+        },
+        "url": "http://docker.for.mac.localhost:6000/progress/bad_status-404"
+      },
+      "recorded_at": "2018-10-04T10:13:10"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=s3%3A%2F%2Fexample-bukkit%2Fhelloworld.zip"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "52"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Location": [
+            "http://docker.for.mac.localhost:6000/progress/1a03847c-0947-4745-b2bc-d346aee59040"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Thu, 04 Oct 2018 10:13:11 GMT"
+          ]
+        },
+        "status": {
+          "code": 202,
+          "message": "ACCEPTED"
+        },
+        "url": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-04T10:13:11"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=s3%3A%2F%2Fexample-bukkit%2Fhelloworld.zip&callbackUrl=https%3A%2F%2Fexample.com%2Fpost%3Fcallback%23fragment"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "119"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Location": [
+            "http://docker.for.mac.localhost:6000/progress/48207c9a-acf1-4916-8720-673a0aa0092b"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Thu, 04 Oct 2018 10:13:12 GMT"
+          ]
+        },
+        "status": {
+          "code": 202,
+          "message": "ACCEPTED"
+        },
+        "url": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-04T10:13:12"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=s3%3A%2F%2Fexample-bukkit%2Fhelloworld.zip"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "52"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Location": [
+            "http://docker.for.mac.localhost:6000/progress/e5c789f6-b499-4484-a6ec-e157807d5afa"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Thu, 04 Oct 2018 10:13:12 GMT"
+          ]
+        },
+        "status": {
+          "code": 202,
+          "message": "ACCEPTED"
+        },
+        "url": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-04T10:13:12"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=s3%3A%2F%2Fexample-bukkit%2Fhelloworld.zip"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "52"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Location": [
+            "http://docker.for.mac.localhost:6000/progress/c5df8c2f-07e5-4d8f-a57e-062382cbae03"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Thu, 04 Oct 2018 10:13:12 GMT"
+          ]
+        },
+        "status": {
+          "code": 202,
+          "message": "ACCEPTED"
+        },
+        "url": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-04T10:13:12"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=s3%3A%2F%2Fexample-bukkit%2Fhelloworld.zip&callbackUrl=https%3A%2F%2Fexample.com%2Fpost%3Fcallback"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "108"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Location": [
+            "http://docker.for.mac.localhost:6000/progress/44e3d687-42cb-4dc3-a7f8-9f77490d8eef"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Thu, 04 Oct 2018 10:13:12 GMT"
+          ]
+        },
+        "status": {
+          "code": 202,
+          "message": "ACCEPTED"
+        },
+        "url": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-04T10:13:12"
+    }
+  ],
+  "recorded_with": "betamax/0.8.1"
+}
