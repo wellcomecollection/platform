@@ -10,14 +10,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{
-  Registrar => RegistrarFixture
-}
-import uk.ac.wellcome.platform.archive.registrar.models.{
-  BagRegistrationCompleteNotification,
-  StorageManifest,
-  StorageManifestFactory
-}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
+import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -63,7 +57,7 @@ class RegistrarFeatureTest
           queuePair,
           storageBucket) { bagLocation =>
           givenProgressRecord(
-            requestId.toString,
+            requestId,
             uploadUri,
             Some(callbackUri),
             progressTable

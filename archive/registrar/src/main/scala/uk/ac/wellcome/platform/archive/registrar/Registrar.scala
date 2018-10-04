@@ -10,11 +10,7 @@ import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  NotificationMessage,
-  RequestContext
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage, RequestContext}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlow

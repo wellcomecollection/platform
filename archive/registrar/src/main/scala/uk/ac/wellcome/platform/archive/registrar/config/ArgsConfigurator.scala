@@ -15,7 +15,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     with MetricsConfigConfigurator
     with HttpServerConfigurator
     with SnsClientConfigurator
-    with RegistrarSnsConfigConfigurator
+    with SnsConfigConfigurator
     with SqsClientConfigurator
     with SqsConfigConfigurator
     with S3ClientConfigurator {
@@ -90,7 +90,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     sqsClientConfig,
     sqsConfig,
     snsClientConfig,
-    registrarSnsConfig,
+    snsConfig,
     hybridStoreConfig,
     archiveProgressMonitorConfig,
     metricsConfig
