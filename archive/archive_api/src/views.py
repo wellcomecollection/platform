@@ -9,12 +9,7 @@ from werkzeug.exceptions import NotFound as NotFoundError
 
 from archive_api import app, api, logger, progress_manager
 from bags import fetch_bag
-from ingests import (
-    IngestProgress,
-    create_ingest_progress,
-    report_ingest_status,
-    send_new_ingest_request,
-)
+from ingests import report_ingest_status, send_new_ingest_request
 import models
 import validators
 
