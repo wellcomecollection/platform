@@ -115,7 +115,7 @@ class BagResource(Resource):
 
 @app.route("/storage/v1/healthcheck")
 def route_report_healthcheck_status():
-    return jsonify({"status": "OK"})
+    return {"status": "OK"}
 
 
 # TODO: There's no testing of the error handling; we should fix that!

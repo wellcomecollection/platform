@@ -7,9 +7,12 @@ from flask import Flask
 from flask_restplus import Api
 
 import config
+from responses import ContextResponse
 from progress_manager import ProgressManager
 
 app = Flask(__name__)
+app.response_class = ContextResponse
+
 api = Api(
     app,
     version="0.1",
