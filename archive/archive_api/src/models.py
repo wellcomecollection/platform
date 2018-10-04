@@ -68,7 +68,6 @@ IngestRequest = api.model(
 Error = api.model(
     "Error",
     {
-        "@context": fields.String(description="Context URL"),
         "errorType": fields.String(description="The type of error", enum=["http"]),
         "httpStatus": fields.Integer(description="The HTTP response status code"),
         "label": fields.String(
