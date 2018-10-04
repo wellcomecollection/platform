@@ -14,6 +14,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
 import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -26,6 +27,7 @@ class Notifier @Inject()(
   snsConfig: SNSConfig,
   metricsSender: MetricsSender
 )(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
+  import CallbackNotification._
   def run() = {
 
     implicit val adapter: LoggingAdapter =
@@ -50,3 +52,5 @@ class Notifier @Inject()(
 }
 
 case class CallbackNotification(id: UUID, callbackUri: URI, payload: Progress)
+
+object CallbackNotification extends UUIDConverters with URIConverters
