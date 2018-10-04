@@ -51,7 +51,7 @@ class ProgressManager:
         if callback_url is not None:
             data["callbackUrl"] = callback_url
 
-        resp = self.sess.post(f"{self.endpoint}/progress", data=data)
+        resp = self.sess.post(f"{self.endpoint}/progress", data=data, timeout=1)
 
         # The service should return an HTTP 202 if successful.  Anything
         # else should be treated as an error.
@@ -80,7 +80,7 @@ class ProgressManager:
         Passes the response through directly (if any).
 
         """
-        resp = self.sess.get(f"{self.endpoint}/progress/{id}")
+        resp = self.sess.get(f"{self.endpoint}/progress/{id}", timeout=1)
 
         # The service should return an HTTP 200 (if present) or 404 (if not).
         # Anything else should be treated as an error.
