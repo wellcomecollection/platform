@@ -11,6 +11,7 @@ from archive_api import app, api, logger, progress_manager
 from bags import fetch_bag
 from ingests import report_ingest_status, send_new_ingest_request
 import models
+from progress_manager import ProgressNotFoundError
 import validators
 
 
@@ -87,13 +88,9 @@ class IngestResource(Resource):
     def get(self, id):
         """Get the current status of an ingest request"""
         try:
-            result = report_ingest_status(
-                dynamodb_resource=app.config["DYNAMODB_RESOURCE"],
-                table_name=app.config["DYNAMODB_TABLE_NAME"],
-                guid=id,
-            )
+            result = progress_manager.lookup_progress(id=id)
             return jsonify(result)
-        except ValueError as error:
+        except ProgressNotFoundError as error:
             raise NotFoundError(f"Invalid id: {error}")
 
 
