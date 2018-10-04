@@ -1,11 +1,11 @@
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
   "id": "watu9tbc",
-  "type": "Series",
-  "seriesType": {
-    "id": "archive-series",
-    "type": "seriesType",
-    "label": "ArchiveSeries"
+  "type": "Work",
+  "workType": {
+    "id": "archive-item",
+    "type": "WorkType",
+    "label": "Archive Item"
   },
   "identifiers": [
     {
@@ -14,16 +14,38 @@
       "identifierScheme": "ref-no"
     }
   ],
-  "title": "General correspondence - Correspondence - Professor Michael Ashburner: archive",
+  "title": "General correspondence - Alphabetical Correspondence",
   "numberInSeries": "22",
-  "section": {
+  "partOf": {
     "id": "d921j0ddj",
-    "label": "Correspondence",
-    "type": "Section"
+    "label": "Alphabetical Correspondence",
+    "workType": {
+      "id": "archive-sub-section",
+      "type": "WorkType",
+      "label": "Archive sub-section"
+    },
+    "partOf": {
+      "id": "g621j0ddj",
+      "label": "Correspondence",
+      "workType": {
+        "id": "archive-section",
+        "type": "WorkType",
+        "label": "Archive section"
+      },
+      "partOf": {
+        "id": "g621j0ddj",
+        "label": "Francis Crick (1916-2004): archives",
+        "workType": {
+          "id": "archive-collection",
+          "type": "WorkType",
+          "label": "Archive collection"
+        }
+      }
+    }
   },
   "collection": {
     "id": "y767k0ddj",
-    "label": "Professor Michael Ashburner: archive",
+    "label": "Francis Crick (1916-2004): archives",
     "type": "Collection"
   },
   "works": [

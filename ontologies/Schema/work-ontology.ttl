@@ -103,15 +103,15 @@ wwork:hasPart rdf:type owl:ObjectProperty ;
     rdfs:range wwork:Work ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .    
     
-wwork:isCopyOf rdf:type owl:ObjectProperty ;
-    rdfs:label "isCopyOf"@en ;
+wwork:copyOf rdf:type owl:ObjectProperty ;
+    rdfs:label "copyOf"@en ;
     rdfs:comment "Relates an entity to one of which it forms a copy - that is, a transcription or other duplication.  (This property is used when it results in the creation of a new bibliographic entity and not simply for second instances of a particular work.) "@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Work ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
     
-wwork:isOriginalOf rdf:type owl:ObjectProperty ;
-    rdfs:label "isOriginalOf"@en ;
+wwork:originalOf rdf:type owl:ObjectProperty ;
+    rdfs:label "originalOf"@en ;
     rdfs:comment "Relates an entity to one that forms a copy of it.  (This property is used when it results in the creation of a new bibliographic entity and not simply for second instances of a particular work.) "@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Work ;

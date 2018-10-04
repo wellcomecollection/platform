@@ -18,7 +18,7 @@
       "type": "WorkType",
       "label": "Journal Issue"
     },
-    "series": {
+    "partOf": {
       "id": "j921s9j21",
       "type": "Work",
       "title": "The lancet",
