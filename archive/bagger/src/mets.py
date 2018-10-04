@@ -1,5 +1,6 @@
 import logging
 from xml_help import namespaces, expand
+import mappings
 
 # Borrowed from Dds.Dashboard, LogicalStructDiv impl
 
@@ -17,6 +18,7 @@ manifestation_types = [
     "MultipleCopy",
     "MultipleVolumeMultipleCopy",
     "Audio",
+    "Map",
 ]
 
 
@@ -96,14 +98,29 @@ the AMD to start at _0001
         old_id = tech_md.get("ID")
         if old_id in ignore:
             continue
+
+        refs = root.findall(".//mets:div[@ADMID='{0}']".format(old_id), namespaces)
+        if len(refs) == 0 and is_ignorable_file(tech_md):
+            amd_sec.remove(tech_md)
+            continue
+
         new_id = "AMD_" + str(counter).zfill(4)
         tech_md.set("ID", new_id)
-        refs = root.findall(".//mets:div[@ADMID='{0}']".format(old_id), namespaces)
         assert len(refs) == 1, "Expected 1 AMD ref for {0}, got {1}".format(
             old_id, len(refs)
         )
         refs[0].set("ADMID", new_id)
         counter = counter + 1
+
+
+def is_ignorable_file(tech_md):
+    file_name_els = tech_md.findall(
+        "./mets:mdWrap/mets:xmlData/tessella:File/tessella:FileName", namespaces
+    )
+    if len(file_name_els) == 1:
+        logging.info("ignoring techMd file " + file_name_els[0].text)
+        return file_name_els[0].text in mappings.IGNORED_TECHMD_FILENAMES
+    return False
 
 
 def remodel_file_section(root):
