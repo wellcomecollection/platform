@@ -69,6 +69,9 @@ trait Archivist extends Logging {
 }
 
 object NotificationMessageFlow {
+
+  import IngestBagRequest._
+
   def apply() = {
     Flow[NotificationMessage]
       .map(message => fromJson[IngestBagRequest](message.Message))

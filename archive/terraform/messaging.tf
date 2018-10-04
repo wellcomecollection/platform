@@ -40,17 +40,17 @@ module "registrar_queue" {
 
 # Messaging - progress
 
-module "progress_topic" {
+module "progress_async_topic" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
   name   = "${local.namespace}_progress"
 }
 
-module "progress_queue" {
+module "progress_async_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
   queue_name  = "${local.namespace}_progress_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.progress_topic.name}"]
+  topic_names = ["${module.progress_async_topic.name}"]
 
   visibility_timeout_seconds = 43200
   max_receive_count          = 3

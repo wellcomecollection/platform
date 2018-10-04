@@ -167,7 +167,9 @@ jobs:
     - env: TASK=archive_common-test
     - env: TASK=archivist-test
     - env: TASK=registrar-test
-    - env: TASK=progress-test
+    - env: TASK=progress_async-test
+    - env: TASK=progress_http-test
+    - env: TASK=archive_api-test
     - env: TASK=notifier-test
 
     # (not under active development)

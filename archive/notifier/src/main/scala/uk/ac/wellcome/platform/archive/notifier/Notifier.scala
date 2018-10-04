@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier
 
+import java.net.URI
+
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
@@ -28,6 +30,8 @@ class Notifier @Inject()(
 )(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
   def run() = {
 
+    import Progress._
+
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
@@ -49,6 +53,4 @@ class Notifier @Inject()(
   }
 }
 
-case class CallbackNotification(id: String,
-                                callbackUrl: String,
-                                payload: Progress)
+case class CallbackNotification(id: String, callbackUri: URI, payload: Progress)

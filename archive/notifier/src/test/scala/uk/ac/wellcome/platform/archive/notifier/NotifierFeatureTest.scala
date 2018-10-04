@@ -23,7 +23,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 }
 import uk.ac.wellcome.platform.archive.notifier.fixtures.{
   LocalWireMockFixture,
-  NotifierFixture => notifierFixture
+  NotifierFixture
 }
 
 class NotifierFeatureTest
@@ -33,23 +33,17 @@ class NotifierFeatureTest
     with MetricsSenderFixture
     with IntegrationPatience
     with LocalWireMockFixture
-    with notifierFixture
+    with NotifierFixture
     with Inside
     with TimeTestFixture {
+
+  import Progress._
 
   implicit val system: ActorSystem = ActorSystem("test")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  private val callbackHost = "localhost"
-  private val callbackPort = 8080
-
-  def createProgressWith(id: UUID, callbackUrl: Option[String]): Progress =
-    Progress(
-      id = id.toString,
-      uploadUrl = randomAlphanumeric(25),
-      callbackUrl = callbackUrl,
-      result = Completed
-    )
+  def createProgressWith(id: UUID, callbackUri: Option[URI]): Progress =
+    Progress(id.toString, uploadUri, callbackUri, Completed)
 
   describe("Making callbacks") {
     it("makes a POST request when it receives a Progress with a callback") {
@@ -58,17 +52,17 @@ class NotifierFeatureTest
           case (queuePair, _, notifier) =>
             val requestId = UUID.randomUUID()
 
-            val callbackUrl =
-              s"http://$callbackHost:$callbackPort/callback/$requestId"
+            val callbackUri =
+              new URI(s"http://$callbackHost:$callbackPort/callback/$requestId")
 
             val progress = createProgressWith(
-              id = requestId,
-              callbackUrl = Some(callbackUrl)
+              requestId,
+              Some(callbackUri)
             )
 
             sendNotificationToSQS(
               queuePair.queue,
-              CallbackNotification(requestId.toString, callbackUrl, progress)
+              CallbackNotification(requestId.toString, callbackUri, progress)
             )
 
             notifier.run()
@@ -76,7 +70,7 @@ class NotifierFeatureTest
             eventually {
               wireMock.verifyThat(
                 1,
-                postRequestedFor(urlPathEqualTo(new URI(callbackUrl).getPath))
+                postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(progress).get)))
             }
         }
@@ -92,8 +86,9 @@ class NotifierFeatureTest
             val requestId = UUID.randomUUID()
 
             val callbackPath = s"/callback/$requestId"
-            val callbackUrl =
+            val callbackUri = new URI(
               s"http://$callbackHost:$callbackPort" + callbackPath
+            )
 
             stubFor(
               post(urlEqualTo(callbackPath))
@@ -101,13 +96,13 @@ class NotifierFeatureTest
             )
 
             val progress = createProgressWith(
-              id = requestId,
-              callbackUrl = Some(callbackUrl)
+              requestId,
+              Some(callbackUri)
             )
 
             sendNotificationToSQS[CallbackNotification](
               queuePair.queue,
-              CallbackNotification(requestId.toString, callbackUrl, progress)
+              CallbackNotification(requestId.toString, callbackUri, progress)
             )
 
             notifier.run()
@@ -115,7 +110,7 @@ class NotifierFeatureTest
             eventually {
               wireMock.verifyThat(
                 1,
-                postRequestedFor(urlPathEqualTo(new URI(callbackUrl).getPath))
+                postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(progress).get)))
 
               inside(notificationMessage[ProgressUpdate](topic)) {
@@ -136,17 +131,18 @@ class NotifierFeatureTest
         case (queuePair, topic, notifier) =>
           val requestId = UUID.randomUUID()
 
-          val callbackUrl =
+          val callbackUri = new URI(
             s"http://$callbackHost:$callbackPort/callback/$requestId"
+          )
 
           val progress = createProgressWith(
             id = requestId,
-            callbackUrl = Some(callbackUrl)
+            callbackUri = Some(callbackUri)
           )
 
           sendNotificationToSQS[CallbackNotification](
             queuePair.queue,
-            CallbackNotification(requestId.toString, callbackUrl, progress)
+            CallbackNotification(requestId.toString, callbackUri, progress)
           )
 
           notifier.run()
