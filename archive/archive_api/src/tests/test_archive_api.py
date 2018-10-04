@@ -47,7 +47,10 @@ class TestBags:
 
         resp = client.get(f"/storage/v1/bags/{guid}")
         assert resp.status_code == 200
-        assert json.loads(resp.data) == {"id": guid}
+        assert json.loads(resp.data) == {
+            "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+            "id": guid
+        }
 
     def test_lookup_missing_item_is_404(self, client, guid):
         resp = client.get(f"/storage/v1/bags/{guid}")

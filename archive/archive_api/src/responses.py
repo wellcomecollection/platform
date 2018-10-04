@@ -24,16 +24,21 @@ class ContextResponse(Response):
         if isinstance(response, ClosingIterator):
             response = b''.join([char for char in response])
 
+        # Some requests (e.g. POST /ingests) return an empty response body,
+        # so we shouldn't try to add a parameter.
+        if not response:
+            return super().__init__(response, *args, **kwargs)
+
         rv = json.loads(response)
 
         # The @context may already be provided if we've been through the
         # force_type method below.
         if "@context" in rv:
-            return super(ContextResponse, self).__init__(response, **kwargs)
+            return super().__init__(response, *args, **kwargs)
         else:
             rv["@context"] = self.context_url
             json_string = json.dumps(rv)
-            return super(ContextResponse, self).__init__(json_string, **kwargs)
+            return super().__init__(json_string, *args, **kwargs)
 
     @classmethod
     def force_type(cls, rv, environ=None):
@@ -44,4 +49,4 @@ class ContextResponse(Response):
         assert "@context" not in rv, rv
         rv["@context"] = cls.context_url
 
-        return super(ContextResponse, cls).force_type(jsonify(rv), environ)
+        return super().force_type(jsonify(rv), environ)
