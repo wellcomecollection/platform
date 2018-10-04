@@ -21,12 +21,12 @@
           ]
         },
         "method": "GET",
-        "uri": "http://docker.for.mac.localhost:6000/progress/479da42f-d94a-4ac7-9f4f-e84f515ec0e2"
+        "uri": "http://docker.for.mac.localhost:6000/progress/F423966E-A5E5-4D91-B321-88B90D1B5154"
       },
       "response": {
         "body": {
           "encoding": null,
-          "string": "{\n  \"progress\": \"479da42f-d94a-4ac7-9f4f-e84f515ec0e2\"\n}\n"
+          "string": "{\n  \"progress\": \"F423966E-A5E5-4D91-B321-88B90D1B5154\"\n}\n"
         },
         "headers": {
           "Content-Type": [
@@ -39,16 +39,16 @@
             "Werkzeug/0.14.1 Python/3.6.1"
           ],
           "Date": [
-            "Thu, 04 Oct 2018 10:13:10 GMT"
+            "Thu, 04 Oct 2018 10:16:20 GMT"
           ]
         },
         "status": {
           "code": 200,
           "message": "OK"
         },
-        "url": "http://docker.for.mac.localhost:6000/progress/479da42f-d94a-4ac7-9f4f-e84f515ec0e2"
+        "url": "http://docker.for.mac.localhost:6000/progress/F423966E-A5E5-4D91-B321-88B90D1B5154"
       },
-      "recorded_at": "2018-10-04T10:13:10"
+      "recorded_at": "2018-10-04T10:16:20"
     },
     {
       "request": {
@@ -89,7 +89,7 @@
             "Werkzeug/0.14.1 Python/3.6.1"
           ],
           "Date": [
-            "Thu, 04 Oct 2018 10:13:10 GMT"
+            "Thu, 04 Oct 2018 10:16:20 GMT"
           ]
         },
         "status": {
@@ -98,7 +98,7 @@
         },
         "url": "http://docker.for.mac.localhost:6000/progress/bad_status-404"
       },
-      "recorded_at": "2018-10-04T10:13:10"
+      "recorded_at": "2018-10-04T10:16:20"
     },
     {
       "request": {
@@ -139,7 +139,7 @@
             "text/html; charset=utf-8"
           ],
           "Location": [
-            "http://docker.for.mac.localhost:6000/progress/1a03847c-0947-4745-b2bc-d346aee59040"
+            "http://docker.for.mac.localhost:6000/progress/38db84dd-9872-41e8-91b6-772957aea8f9"
           ],
           "Content-Length": [
             "0"
@@ -148,7 +148,7 @@
             "Werkzeug/0.14.1 Python/3.6.1"
           ],
           "Date": [
-            "Thu, 04 Oct 2018 10:13:11 GMT"
+            "Thu, 04 Oct 2018 10:16:20 GMT"
           ]
         },
         "status": {
@@ -157,7 +157,7 @@
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
-      "recorded_at": "2018-10-04T10:13:11"
+      "recorded_at": "2018-10-04T10:16:20"
     },
     {
       "request": {
@@ -198,7 +198,7 @@
             "text/html; charset=utf-8"
           ],
           "Location": [
-            "http://docker.for.mac.localhost:6000/progress/48207c9a-acf1-4916-8720-673a0aa0092b"
+            "http://docker.for.mac.localhost:6000/progress/7fb2225b-0ecc-4945-b83d-817f6c730ead"
           ],
           "Content-Length": [
             "0"
@@ -207,7 +207,7 @@
             "Werkzeug/0.14.1 Python/3.6.1"
           ],
           "Date": [
-            "Thu, 04 Oct 2018 10:13:12 GMT"
+            "Thu, 04 Oct 2018 10:16:21 GMT"
           ]
         },
         "status": {
@@ -216,7 +216,7 @@
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
-      "recorded_at": "2018-10-04T10:13:12"
+      "recorded_at": "2018-10-04T10:16:21"
     },
     {
       "request": {
@@ -257,7 +257,7 @@
             "text/html; charset=utf-8"
           ],
           "Location": [
-            "http://docker.for.mac.localhost:6000/progress/e5c789f6-b499-4484-a6ec-e157807d5afa"
+            "http://docker.for.mac.localhost:6000/progress/8dc00545-16b7-4b2d-bdb6-311edec3f604"
           ],
           "Content-Length": [
             "0"
@@ -266,7 +266,7 @@
             "Werkzeug/0.14.1 Python/3.6.1"
           ],
           "Date": [
-            "Thu, 04 Oct 2018 10:13:12 GMT"
+            "Thu, 04 Oct 2018 10:16:21 GMT"
           ]
         },
         "status": {
@@ -275,7 +275,7 @@
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
-      "recorded_at": "2018-10-04T10:13:12"
+      "recorded_at": "2018-10-04T10:16:21"
     },
     {
       "request": {
@@ -316,7 +316,7 @@
             "text/html; charset=utf-8"
           ],
           "Location": [
-            "http://docker.for.mac.localhost:6000/progress/c5df8c2f-07e5-4d8f-a57e-062382cbae03"
+            "http://docker.for.mac.localhost:6000/progress/b4c8b161-5c1b-4493-86ba-ca1fc324f380"
           ],
           "Content-Length": [
             "0"
@@ -325,7 +325,7 @@
             "Werkzeug/0.14.1 Python/3.6.1"
           ],
           "Date": [
-            "Thu, 04 Oct 2018 10:13:12 GMT"
+            "Thu, 04 Oct 2018 10:16:21 GMT"
           ]
         },
         "status": {
@@ -334,7 +334,7 @@
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
-      "recorded_at": "2018-10-04T10:13:12"
+      "recorded_at": "2018-10-04T10:16:21"
     },
     {
       "request": {
@@ -375,7 +375,7 @@
             "text/html; charset=utf-8"
           ],
           "Location": [
-            "http://docker.for.mac.localhost:6000/progress/44e3d687-42cb-4dc3-a7f8-9f77490d8eef"
+            "http://docker.for.mac.localhost:6000/progress/11664074-43ad-4d3d-b60b-156692d618ce"
           ],
           "Content-Length": [
             "0"
@@ -384,7 +384,7 @@
             "Werkzeug/0.14.1 Python/3.6.1"
           ],
           "Date": [
-            "Thu, 04 Oct 2018 10:13:12 GMT"
+            "Thu, 04 Oct 2018 10:16:22 GMT"
           ]
         },
         "status": {
@@ -393,7 +393,7 @@
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
-      "recorded_at": "2018-10-04T10:13:12"
+      "recorded_at": "2018-10-04T10:16:22"
     }
   ],
   "recorded_with": "betamax/0.8.1"
