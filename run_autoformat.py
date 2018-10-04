@@ -15,34 +15,33 @@ from travistooling import branch_name, get_changed_paths, git, make
 def _run_task_for_extension(extension, task):
     relevant_paths = [f for f in changed_paths if f.endswith(extension)]
     if relevant_paths:
-        print('*** Running %s for the following paths:' % task)
+        print("*** Running %s for the following paths:" % task)
         for p in relevant_paths:
-            print(' - %s' % p)
+            print(" - %s" % p)
         make(task)
     else:
-        print(
-            '*** Skipping %s as there are no affected files' % task)
+        print("*** Skipping %s as there are no affected files" % task)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # First get information about the currently running patch.
     # In particular, we want to know which files have actually changed.
-    travis_event_type = os.environ['TRAVIS_EVENT_TYPE']
+    travis_event_type = os.environ["TRAVIS_EVENT_TYPE"]
 
-    if travis_event_type == 'pull_request':
-        changed_paths = get_changed_paths('HEAD', 'master')
+    if travis_event_type == "pull_request":
+        changed_paths = get_changed_paths("HEAD", "master")
     else:
-        git('fetch', 'origin')
-        changed_paths = get_changed_paths(os.environ['TRAVIS_COMMIT_RANGE'])
+        git("fetch", "origin")
+        changed_paths = get_changed_paths(os.environ["TRAVIS_COMMIT_RANGE"])
 
     # Then run the 'format' tasks.  These are any tasks which might edit
     # the code, and for which we might push changes.
     extension_to_format_task = [
-        ('.tf', 'format-terraform'),
-        (('.sbt', '.scala'), 'format-scala'),
-        ('.py', 'format-python'),
-        ('.json', 'format-json'),
+        (".tf", "format-terraform"),
+        ((".sbt", ".scala"), "format-scala"),
+        (".py", "format-python"),
+        (".json", "format-json"),
     ]
 
     for extension, format_task in extension_to_format_task:
@@ -52,47 +51,42 @@ if __name__ == '__main__':
     relevant_paths = [
         f
         for f in changed_paths
-        if f.endswith('README.md') and f.startswith('docs/rfcs')]
+        if f.endswith("README.md") and f.startswith("docs/rfcs")
+    ]
     if relevant_paths:
-        make('format-rfcs')
+        make("format-rfcs")
 
     # If there are any changes, push to GitHub immediately and fail the
     # build.  This will abort the remaining jobs, and trigger a new build
     # with the reformatted code.
     if get_changed_paths():
-        print('*** There were changes from formatting, creating a commit')
+        print("*** There were changes from formatting, creating a commit")
 
-        git('config', 'user.name', 'Travis CI on behalf of Wellcome')
-        git('config', 'user.email', 'wellcomedigitalplatform@wellcome.ac.uk')
-        git('config', 'core.sshCommand', 'ssh -i id_rsa')
+        git("config", "user.name", "Travis CI on behalf of Wellcome")
+        git("config", "user.email", "wellcomedigitalplatform@wellcome.ac.uk")
+        git("config", "core.sshCommand", "ssh -i id_rsa")
 
-        git(
-            'remote', 'add', 'ssh-origin',
-            'git@github.com:wellcometrust/platform.git'
-        )
+        git("remote", "add", "ssh-origin", "git@github.com:wellcometrust/platform.git")
 
         # We checkout the branch before we add the commit, so we don't
         # include the merge commit that Travis makes.
-        git('fetch', 'ssh-origin')
-        git('checkout', branch_name())
+        git("fetch", "ssh-origin")
+        git("checkout", branch_name())
 
-        git('add', '--verbose', '--update')
-        git('commit', '-m', 'Apply auto-formatting rules')
-        git('push', 'ssh-origin', 'HEAD:%s' % branch_name())
+        git("add", "--verbose", "--update")
+        git("commit", "-m", "Apply auto-formatting rules")
+        git("push", "ssh-origin", "HEAD:%s" % branch_name())
 
         # We exit here to fail the build, so Travis will skip to the next
         # build, which includes the autoformat commit.
         sys.exit(1)
     else:
-        print('*** There were no changes from auto-formatting')
+        print("*** There were no changes from auto-formatting")
 
     # Finally, run the 'lint' tasks.  A failure in these tasks requires
     # manual intervention, so we run them last to get any automatic fixes
     # out of the way.
-    extension_to_lint_task = [
-        ('.py', 'lint-python'),
-        ('.ttl', 'lint-ontologies'),
-    ]
+    extension_to_lint_task = [(".py", "lint-python"), (".ttl", "lint-ontologies")]
 
     for extension, lint_task in extension_to_lint_task:
         _run_task_for_extension(extension, lint_task)

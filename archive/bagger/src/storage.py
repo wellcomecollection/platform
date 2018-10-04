@@ -11,7 +11,7 @@ def analyse_origin(origin):
         "bucket_name": None,
         "bucket_key": None,
         "alt_key": None,
-        "web_url": None
+        "web_url": None,
     }
     if origin.startswith(settings.DDS_ASSET_PREFIX):
         guid = origin.split("/")[-1]
@@ -20,7 +20,8 @@ def analyse_origin(origin):
         origin_info["web_url"] = origin
         origin_info["bucket_name"] = settings.DLCS_SOURCE_BUCKET
         origin_info["bucket_key"] = "{0}/{1}/{2}".format(
-            settings.DLCS_CUSTOMER_ID, settings.DLCS_SPACE, guid)
+            settings.DLCS_CUSTOMER_ID, settings.DLCS_SPACE, guid
+        )
         # messy, a small %age of DLCS JP2s have a file extension
         origin_info["alt_key"] = origin_info["bucket_key"] + ".jp2"
 

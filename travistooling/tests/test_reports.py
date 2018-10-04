@@ -10,15 +10,15 @@ from travistooling.reports import build_report_output
 
 def test_build_complete_report():
     report = {
-        True: {
-            ExclusivelyAffectsThisTask.message: set(['foo/bar.txt', 'foo/baz.txt']),
-        },
+        True: {ExclusivelyAffectsThisTask.message: set(["foo/bar.txt", "foo/baz.txt"])},
         False: {
-            IgnoredPath.message: set(['README.md', 'LICENSE']),
-            ScalaChangeAndNotScalaApp.message: set(['main.scala']),
+            IgnoredPath.message: set(["README.md", "LICENSE"]),
+            ScalaChangeAndNotScalaApp.message: set(["main.scala"]),
         },
     }
-    assert build_report_output(report) == """
+    assert (
+        build_report_output(report)
+        == """
 ## Reasons to run tests ##
 
 Path is an exclusive dependency of this build task:
@@ -34,17 +34,20 @@ Path has no effect on build tasks:
 
 Changes to Scala common libs are irrelevant to non-Scala apps:
  - main.scala""".strip()
+    )
 
 
 def test_report_only_includes_relevant_sections():
     report = {
         True: {},
         False: {
-            IgnoredPath.message: set(['README.md', 'LICENSE']),
-            ScalaChangeAndNotScalaApp.message: set(['main.scala']),
+            IgnoredPath.message: set(["README.md", "LICENSE"]),
+            ScalaChangeAndNotScalaApp.message: set(["main.scala"]),
         },
     }
-    assert build_report_output(report) == """
+    assert (
+        build_report_output(report)
+        == """
 ## Reasons not to run tests ##
 
 Path has no effect on build tasks:
@@ -53,3 +56,4 @@ Path has no effect on build tasks:
 
 Changes to Scala common libs are irrelevant to non-Scala apps:
  - main.scala""".strip()
+    )

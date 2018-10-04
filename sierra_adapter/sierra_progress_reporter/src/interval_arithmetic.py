@@ -13,11 +13,11 @@ class Interval:
     key = attr.ib()
 
     def __repr__(self):
-        return f'%s(start=%r, end=%r, key=%r)' % (
+        return f"%s(start=%r, end=%r, key=%r)" % (
             type(self).__name__,
             self.start.isoformat(),
             self.end.isoformat(),
-            self.key
+            self.key,
         )
 
     __str__ = __repr__
@@ -32,20 +32,20 @@ def get_intervals(keys):
     """
     for k in keys:
         name = os.path.basename(k)
-        start, end = name.split('__')
-        start = start.strip('Z')
-        end = end.strip('Z')
+        start, end = name.split("__")
+        start = start.strip("Z")
+        end = end.strip("Z")
         try:
             yield Interval(
-                start=dt.datetime.strptime(start, '%Y-%m-%dT%H-%M-%S.%f+00-00'),
-                end=dt.datetime.strptime(end, '%Y-%m-%dT%H-%M-%S.%f+00-00'),
-                key=k
+                start=dt.datetime.strptime(start, "%Y-%m-%dT%H-%M-%S.%f+00-00"),
+                end=dt.datetime.strptime(end, "%Y-%m-%dT%H-%M-%S.%f+00-00"),
+                key=k,
             )
         except ValueError:
             yield Interval(
-                start=dt.datetime.strptime(start, '%Y-%m-%dT%H-%M-%S+00-00'),
-                end=dt.datetime.strptime(end, '%Y-%m-%dT%H-%M-%S+00-00'),
-                key=k
+                start=dt.datetime.strptime(start, "%Y-%m-%dT%H-%M-%S+00-00"),
+                end=dt.datetime.strptime(end, "%Y-%m-%dT%H-%M-%S+00-00"),
+                key=k,
             )
 
 

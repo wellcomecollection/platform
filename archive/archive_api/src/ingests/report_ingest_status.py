@@ -7,9 +7,9 @@ def report_ingest_status(dynamodb_resource, table_name, guid):
     of the row.
     """
     table = dynamodb_resource.Table(table_name)
-    item = table.get_item(Key={'id': guid})
+    item = table.get_item(Key={"id": guid})
 
     try:
-        return item['Item']
+        return item["Item"]
     except KeyError:
-        raise ValueError(f'No ingest found for id={guid!r}')
+        raise ValueError(f"No ingest found for id={guid!r}")

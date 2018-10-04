@@ -21,9 +21,6 @@ class WellcomeTemplateHTTPResolver(TemplateHTTPResolver):
     # This causes us to retry the request once, if it's some sort of
     # HTTP error.  We've been running this in prod for months, and that sort
     # of 500 essentially vanished.
-    @retry(
-        stop=stop_after_attempt(2),
-        retry=retry_if_exception_type(RequestException)
-    )
+    @retry(stop=stop_after_attempt(2), retry=retry_if_exception_type(RequestException))
     def copy_to_cache(self, ident):
         return super().copy_to_cache(ident)

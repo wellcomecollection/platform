@@ -6,8 +6,8 @@ import re
 import boto3
 
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('SourceData')
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("SourceData")
 
 
 def items():
@@ -15,19 +15,19 @@ def items():
     kwargs = {}
     while True:
         resp = table.scan(**kwargs)
-        yield from resp['Items']
-        kwargs['ExclusiveStartKey'] = resp['LastEvaluatedKey']
+        yield from resp["Items"]
+        kwargs["ExclusiveStartKey"] = resp["LastEvaluatedKey"]
         break
 
 
 def transform_item(item):
     print(f'Processing {item["id"]}')
 
-    prefix, id = item['id'].split('/')
-    if prefix == 'sierra':
-        new_id = id.lstrip('b')
-        assert re.match(r'^\d{7}$', new_id)
-        item['id'] = '/'.join([prefix, new_id])
+    prefix, id = item["id"].split("/")
+    if prefix == "sierra":
+        new_id = id.lstrip("b")
+        assert re.match(r"^\d{7}$", new_id)
+        item["id"] = "/".join([prefix, new_id])
 
     return item
 

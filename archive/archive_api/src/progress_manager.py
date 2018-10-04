@@ -18,6 +18,7 @@ class ProgressManager:
     """
     Handles requests to/from the progress service.
     """
+
     def __init__(self, endpoint, sess=None):
         self.endpoint = endpoint
         self.sess = sess or requests.Session()
@@ -41,28 +42,27 @@ class ProgressManager:
         # a 202 Created and the new ID in the path parameter of the
         # Location header.
         #
-        data = {'uploadUrl': upload_url}
+        data = {"uploadUrl": upload_url}
         if callback_url is not None:
-            data['callbackUrl'] = callback_url
+            data["callbackUrl"] = callback_url
 
-        resp = self.sess.post(f'{self.endpoint}/progress', data=data)
+        resp = self.sess.post(f"{self.endpoint}/progress", data=data)
 
         # The service should return an HTTP 202 if successful.  Anything
         # else should be treated as an error.
         if resp.status_code != 202:
             raise ProgressServiceError(
-                'Expected HTTP 202; got %d (data=%r)' %
-                (resp.status_code, data)
+                "Expected HTTP 202; got %d (data=%r)" % (resp.status_code, data)
             )
 
         # The new ID should be sent in the path parameter of the Location
         # header.  If this header is missing, that's an error.
         try:
-            location = resp.headers['Location']
+            location = resp.headers["Location"]
         except KeyError:
             raise ProgressServiceError(
-                'No Location header in progress response; got %r (data=%r)' %
-                (resp.headers, data)
+                "No Location header in progress response; got %r (data=%r)"
+                % (resp.headers, data)
             )
 
         # Finally, extract the ID from the location URL.
@@ -75,14 +75,13 @@ class ProgressManager:
         Passes the response through directly (if any).
 
         """
-        resp = self.sess.get(f'{self.endpoint}/progress/{id}')
+        resp = self.sess.get(f"{self.endpoint}/progress/{id}")
 
         # The service should return an HTTP 200 (if present) or 404 (if not).
         # Anything else should be treated as an error.
         if resp.status_code not in (200, 404):
             raise ProgressServiceError(
-                'Expected HTTP 200 or 404; got %d (id=%r)' %
-                (resp.status_code, id)
+                "Expected HTTP 200 or 404; got %d (id=%r)" % (resp.status_code, id)
             )
 
         elif resp.status_code == 404:
