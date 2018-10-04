@@ -12,6 +12,7 @@ object ProgressMonitorModule extends AbstractModule {
   def providesArchiveProgressMonitor(
     actorSystem: ActorSystem,
     progressMonitorConfig: ProgressMonitorConfig) = {
+
     val dynamoClientConfig = progressMonitorConfig.dynamoClientConfig
 
     val dynamoClient = DynamoClientFactory.create(

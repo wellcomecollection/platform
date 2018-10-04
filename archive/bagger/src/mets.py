@@ -4,11 +4,7 @@ import mappings
 
 # Borrowed from Dds.Dashboard, LogicalStructDiv impl
 
-collection_types = [
-    "MultipleManifestation",
-    "Periodical",
-    "PeriodicalVolume"
-]
+collection_types = ["MultipleManifestation", "Periodical", "PeriodicalVolume"]
 
 manifestation_types = [
     "Monograph",
@@ -90,7 +86,9 @@ the AMD to start at _0001
     amd_sec = root.find("./mets:amdSec[@ID='AMD']", namespaces)
     # assume the first tech_md is the deliverable unit - if it isn't,
     # this is an unusual METS so we should bail out at this point anyway
-    du = amd_sec[0].find("./mets:mdWrap/mets:xmlData/[tessella:DeliverableUnit]", namespaces)
+    du = amd_sec[0].find(
+        "./mets:mdWrap/mets:xmlData/[tessella:DeliverableUnit]", namespaces
+    )
     assert du is not None, "The first techMD is not the deliverable unit"
     amd_sec.remove(amd_sec[0])
 
@@ -108,7 +106,9 @@ the AMD to start at _0001
 
         new_id = "AMD_" + str(counter).zfill(4)
         tech_md.set("ID", new_id)
-        assert len(refs) == 1, "Expected 1 AMD ref for {0}, got {1}".format(old_id, len(refs))
+        assert len(refs) == 1, "Expected 1 AMD ref for {0}, got {1}".format(
+            old_id, len(refs)
+        )
         refs[0].set("ADMID", new_id)
         counter = counter + 1
 
@@ -123,9 +123,8 @@ def is_ignorable_file(tech_md):
 
 def remodel_file_section(root):
     logging.info("transforming file section")
-    sdb_file_group = root.find(
-        "./mets:fileSec/mets:fileGrp[@USE='SDB']", namespaces)
-    sdb_file_group.set('USE', 'OBJECTS')
+    sdb_file_group = root.find("./mets:fileSec/mets:fileGrp[@USE='SDB']", namespaces)
+    sdb_file_group.set("USE", "OBJECTS")
     for sdb_file in sdb_file_group:
         sdb_file_id = sdb_file.get("ID")
         bag_file_id = sdb_file_id.replace("_SDB", "_OBJECTS")
@@ -161,7 +160,10 @@ def get_physical_file_maps(root):
         else:
             adm_id = tech_md.get("ID")
             logging.info("adding " + adm_id + " to map")
-            uuid_el = premis_object.find("./premis:objectIdentifier[premis:objectIdentifierType='uuid']", namespaces)
+            uuid_el = premis_object.find(
+                "./premis:objectIdentifier[premis:objectIdentifierType='uuid']",
+                namespaces,
+            )
             uuid_value = uuid_el.find("./premis:objectIdentifierValue", namespaces).text
             tech_file_infos[tech_md.get("ID")] = {
                 "uuid": uuid_value
@@ -170,7 +172,9 @@ def get_physical_file_maps(root):
     assets = {}
     alto = {}
 
-    sequences = physical_struct_map.findall("./mets:div[@TYPE='physSequence']", namespaces)
+    sequences = physical_struct_map.findall(
+        "./mets:div[@TYPE='physSequence']", namespaces
+    )
     for seq in sequences:
         phys_files = seq.findall("./mets:div", namespaces)
         for phys_file in phys_files:
@@ -182,7 +186,7 @@ def get_physical_file_maps(root):
                 "ORDER": phys_file.get("ORDER"),
                 "ORDERLABEL": phys_file.get("ORDERLABEL"),
                 "TYPE": phys_file.get("TYPE"),
-                "tech_md": tech_md
+                "tech_md": tech_md,
             }
             for fptr in phys_file.findall("./mets:fptr", namespaces):
                 file_id = fptr.get("FILEID")

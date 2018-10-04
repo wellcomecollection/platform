@@ -6,7 +6,7 @@ from travistooling.git_utils import get_changed_paths, git
 
 
 def test_no_change_is_empty_diff():
-    assert get_changed_paths('HEAD', 'HEAD') == set()
+    assert get_changed_paths("HEAD", "HEAD") == set()
 
 
 def test_known_change_diff():
@@ -21,7 +21,7 @@ def test_known_change_diff():
     # See https://docs.travis-ci.com/user/customizing-the-build#Git-Clone-Depth
     #
     try:
-        git('fetch', 'origin', '--unshallow')
+        git("fetch", "origin", "--unshallow")
     except SystemExit as err:  # pragma: no cover
 
         # When running tests locally, you normally have a full checkout,
@@ -33,13 +33,12 @@ def test_known_change_diff():
         # but we don't need to run this branch in the tests.
         assert err.code == 128
 
-    assert get_changed_paths('1228fc9^', '1228fc9') == set([
-        'travistooling/decisionmaker.py',
-        'travistooling/decisions.py',
-    ])
+    assert get_changed_paths("1228fc9^", "1228fc9") == set(
+        ["travistooling/decisionmaker.py", "travistooling/decisions.py"]
+    )
 
 
 def test_error_becomes_systemexit(capsys):
     with pytest.raises(SystemExit) as err:
-        git('--what')
+        git("--what")
     assert err.value.code == 129

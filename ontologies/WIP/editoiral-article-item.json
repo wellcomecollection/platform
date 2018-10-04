@@ -7,7 +7,6 @@
     "type": "ArticleType",
     "label": "Video"
   },
-  Article as content: 
   "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
   "thumbnail": {
     "type": "Location",

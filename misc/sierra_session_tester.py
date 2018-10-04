@@ -63,13 +63,13 @@ class SierraAPI(object):
         # Return the shared Session object if we have one, or a new
         # Session object if not.
         if self.use_shared_session:
-            self._sess.hooks['response'] = [self.raise_error]
+            self._sess.hooks["response"] = [self.raise_error]
             _sess = self._sess
         else:
             _sess = requests.Session()
-            _sess.hooks['response'].append(self.raise_error)
+            _sess.hooks["response"].append(self.raise_error)
 
-        if hasattr(self, 'headers'):
+        if hasattr(self, "headers"):
             self._sess.headers = self.headers
         return _sess
 
@@ -81,16 +81,15 @@ class SierraAPI(object):
         # Get an access token
         # https://sandbox.iii.com/docs/Content/zReference/authClient.htm
         resp = self.sess.post(
-            f'{self.api_url}/token',
-            auth=(self.oauth_key, self.oauth_secret)
+            f"{self.api_url}/token", auth=(self.oauth_key, self.oauth_secret)
         )
 
-        access_token = resp.json()['access_token']
+        access_token = resp.json()["access_token"]
 
         self.headers = {
-            'Authorization': f'Bearer {access_token}',
-            'Accept': 'application/json',
-            'Connection': 'close',
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json",
+            "Connection": "close",
             # 'Connection' :'Keep-Alive',
             # 'Keep-Alive': 'max=1',
             # 'Cookie': 'jcontainerId=.jcontainer-public1',
@@ -98,7 +97,7 @@ class SierraAPI(object):
 
     def _http_get(self, path, params):
         def _call():
-            get_url = f'{self.api_url}{path}'
+            get_url = f"{self.api_url}{path}"
 
             from contextlib import closing
 
@@ -115,16 +114,10 @@ class SierraAPI(object):
                 raise
 
     def _get_objects_from_id(self, path, id, params):
-        id_param = {'id': f'[{id},]'}
-        merged_params = {
-            **id_param,
-            **params
-        }
+        id_param = {"id": f"[{id},]"}
+        merged_params = {**id_param, **params}
         try:
-            json_response = self._http_get(
-                path=path,
-                params=merged_params
-            ).json()
+            json_response = self._http_get(path=path, params=merged_params).json()
 
             self._current_response = json_response
 
@@ -144,18 +137,14 @@ class SierraAPI(object):
             params = {}
 
         def _get(id):
-            return self._get_objects_from_id(
-                path=path,
-                id=id,
-                params=params
-            )
+            return self._get_objects_from_id(path=path, id=id, params=params)
 
         class ObjectIterable(object):
             def __init__(_self):
                 _self.objs = _get(0)
 
             def __len__(_self):
-                return self._current_response['total']
+                return self._current_response["total"]
 
             def __iter__(_self):
                 i = 0
@@ -163,11 +152,11 @@ class SierraAPI(object):
                 t0 = t
                 while True:
                     try:
-                        i += len(_self.objs['entries'])
+                        i += len(_self.objs["entries"])
                         print(i, time.time() - t0)
                         t0 = time.time()
-                        yield from _self.objs['entries']
-                        last_id = int(_self.objs['entries'][-1]['id']) + 1
+                        yield from _self.objs["entries"]
+                        last_id = int(_self.objs["entries"][-1]["id"]) + 1
                         _self.objs = _get(last_id)
                     except KeyError:
                         break
@@ -182,15 +171,17 @@ class SierraAPI(object):
 
 def run_test(*args, **kwargs):
     s = SierraAPI(
-        "https://libsys.wellcomelibrary.org/iii/sierra-api/v4",
-        *args, **kwargs
+        "https://libsys.wellcomelibrary.org/iii/sierra-api/v4", *args, **kwargs
     )
 
-    bibs = s.get_objects("/bibs", params={
-        'updatedDate': '[2018-01-12T07:48:08.040617+00:00,2018-01-12T08:18:08.040617+00:00]',
-        "fields": "updatedDate,createdDate,deletedDate,deleted,suppressed,available,lang,title,author,materialType,bibLevel,publishYear,catalogDate,country,orders,normTitle,normAuthor,locations,fixedFields,varFields",
-        'limit': 50,
-    })
+    bibs = s.get_objects(
+        "/bibs",
+        params={
+            "updatedDate": "[2018-01-12T07:48:08.040617+00:00,2018-01-12T08:18:08.040617+00:00]",
+            "fields": "updatedDate,createdDate,deletedDate,deleted,suppressed,available,lang,title,author,materialType,bibLevel,publishYear,catalogDate,country,orders,normTitle,normAuthor,locations,fixedFields,varFields",
+            "limit": 50,
+        },
+    )
 
     for i, _ in enumerate(bibs):
         if i == 1000:
@@ -199,27 +190,19 @@ def run_test(*args, **kwargs):
     return s
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = docopt.docopt(__doc__)
-    oauth_key = args['--oauthkey']
-    oauth_secret = args['--oauthsec']
+    oauth_key = args["--oauthkey"]
+    oauth_secret = args["--oauthsec"]
 
-    print('=' * 79)
-    print('Using a shared session')
-    print('=' * 79)
-    run_test(
-        use_shared_session=True,
-        oauth_key=oauth_key,
-        oauth_secret=oauth_secret
-    )
+    print("=" * 79)
+    print("Using a shared session")
+    print("=" * 79)
+    run_test(use_shared_session=True, oauth_key=oauth_key, oauth_secret=oauth_secret)
 
-    print('\n' * 1)
+    print("\n" * 1)
     #
-    print('=' * 79)
-    print('Ignoring shared sessions')
-    print('=' * 79)
-    run_test(
-        use_shared_session=False,
-        oauth_key=oauth_key,
-        oauth_secret=oauth_secret
-    )
+    print("=" * 79)
+    print("Ignoring shared sessions")
+    print("=" * 79)
+    run_test(use_shared_session=False, oauth_key=oauth_key, oauth_secret=oauth_secret)

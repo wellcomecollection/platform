@@ -15,3 +15,14 @@ TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = true
 
 $(val $(call stack_setup))
+
+
+SWITCH_API_PINS = $(ROOT)/catalogue_api/switch_api_pins
+
+$(ROOT)/.docker/switch_api_pins: $(SWITCH_API_PINS)/Dockerfile $(SWITCH_API_PINS)/switch_api_pins.py
+	docker build --tag switch_api_pins $(SWITCH_API_PINS)
+	mkdir -p $(ROOT)/.docker
+	touch $(ROOT)/.docker/switch_api_pins
+
+catalogue_api-terraform-switch: $(ROOT)/.docker/switch_api_pins
+	$(ROOT)/docker_run.py --aws --dind -- --volume ~/.ssh:/root/.ssh switch_api_pins

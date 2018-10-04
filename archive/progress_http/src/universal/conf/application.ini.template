@@ -1,0 +1,3 @@
+--archive-progress-monitor-table-name=${archive_progress_table_name}
+--metrics-namespace=progress_http
+--app-base-url=${app_base_url}

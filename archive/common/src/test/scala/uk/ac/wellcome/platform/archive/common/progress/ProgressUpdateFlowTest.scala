@@ -22,9 +22,6 @@ class ProgressUpdateFlowTest
     with ProgressMonitorFixture
     with ScalaFutures {
 
-  private val uploadUrl = "uploadUrl"
-  private val callbackUrl = "http://localhost/archive/complete"
-
   it("adds an event to a monitor with none") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressUpdateFlow(table) {
@@ -32,7 +29,7 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
               val progress =
-                createProgress(uploadUrl, callbackUrl, monitor)
+                createProgress(monitor, callbackUri, uploadUri)
 
               val update = ProgressUpdate(progress.id, ProgressEvent("Wow."))
 
@@ -45,9 +42,9 @@ class ProgressUpdateFlowTest
               whenReady(updates) { _ =>
                 assertProgressCreated(
                   progress.id,
-                  uploadUrl,
-                  Some(callbackUrl),
-                  table = table)
+                  uploadUri,
+                  Some(callbackUri),
+                  table)
                 assertProgressRecordedRecentEvents(
                   update.id,
                   Seq(update.event.description),
@@ -66,11 +63,7 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
 
-              val progress = createProgress(
-                uploadUrl,
-                callbackUrl,
-                monitor
-              )
+              val progress = createProgress(monitor, callbackUri, uploadUri)
 
               val events = List(
                 ProgressUpdate(
@@ -88,9 +81,9 @@ class ProgressUpdateFlowTest
               whenReady(updates) { _ =>
                 assertProgressCreated(
                   progress.id,
-                  uploadUrl,
-                  Some(callbackUrl),
-                  table = table)
+                  uploadUri,
+                  Some(callbackUri),
+                  table)
                 assertProgressRecordedRecentEvents(
                   progress.id,
                   events.map(_.event.description),
@@ -102,7 +95,7 @@ class ProgressUpdateFlowTest
     }
   }
 
-  it("materializes a Left[FailedProgressUpdate] if an update fails") {
+  it("continues on failure") {
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
@@ -117,13 +110,10 @@ class ProgressUpdateFlowTest
                 .single(update)
                 .via(flow)
                 .async
-                .runWith(Sink.head)(materializer)
+                .runWith(Sink.seq)(materializer)
 
               whenReady(updates) { result =>
-                result.isLeft shouldBe true
-                result.left.get.e.getMessage should include(
-                  s"Progress does not exist for id:$id"
-                )
+                result shouldBe empty
               }
             })
           })

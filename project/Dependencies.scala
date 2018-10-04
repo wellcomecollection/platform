@@ -28,6 +28,7 @@ object Dependencies {
 
   lazy val versions = new {
     val akka = "2.5.9"
+    val akkaHttp = "10.1.5"
     val akkaStreamAlpakka = "0.20"
     val aws = "1.11.95"
     val apacheLogging = "2.8.2"
@@ -39,7 +40,7 @@ object Dependencies {
     val junitInterface = "0.11"
     val elastic4s = "5.6.5"
     val scanamo = "1.0.0-M3"
-    val circeVersion = "0.9.3"
+    val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
     val scalaCsv = "1.3.5"
@@ -47,7 +48,11 @@ object Dependencies {
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
     val wiremockVersion = "2.18.0"
+    val apacheCommons = "2.6"
   }
+
+  val apacheCommons = Seq(
+    "commons-io" % "commons-io" % versions.apacheCommons % "test")
 
   // External Library dependency groups
   val akkaDependencies: Seq[ModuleID] = Seq(
@@ -137,7 +142,7 @@ object Dependencies {
       circeDependencies ++ Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
     "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
-  )
+  ) ++ apacheCommons
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
@@ -184,6 +189,8 @@ object Dependencies {
   val archiveCommonDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
     "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
-    "org.rogach" %% "scallop" % "3.1.3"
+    "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
+    "org.rogach" %% "scallop" % "3.1.3",
+    "de.heikoseeberger" %% "akka-http-circe" % "1.21.1"
   ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 }

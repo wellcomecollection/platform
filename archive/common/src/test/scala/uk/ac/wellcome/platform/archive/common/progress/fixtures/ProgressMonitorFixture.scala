@@ -1,7 +1,8 @@
 package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
+import java.net.URI
 import java.time.format.DateTimeFormatter
-import java.time.{Duration, Instant}
+import java.time.Instant
 import java.util.UUID
 
 import akka.NotUsed
@@ -12,7 +13,6 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
 import uk.ac.wellcome.platform.archive.common.progress.models.{
-  FailedEvent,
   Progress,
   ProgressUpdate
 }
@@ -24,7 +24,13 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressMonitorFixture
     extends LocalProgressMonitorDynamoDb
-    with MockitoSugar {
+    with MockitoSugar
+    with TimeTestFixture {
+
+  import Progress._
+
+  val uploadUri = new URI("http://www.example.com/asset")
+  val callbackUri = new URI("http://localhost/archive/complete")
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
@@ -43,9 +49,7 @@ trait ProgressMonitorFixture
 
   def withProgressUpdateFlow[R](table: Table)(
     testWith: TestWith[(
-                         Flow[ProgressUpdate,
-                              Either[FailedEvent[ProgressUpdate], Progress],
-                              NotUsed],
+                         Flow[ProgressUpdate, Progress, NotUsed],
                          ProgressMonitor
                        ),
                        R]): R = {
@@ -63,9 +67,11 @@ trait ProgressMonitorFixture
     testWith(progressMonitor)
   }
 
-  def createProgress(uploadUrl: String,
-                     callbackUrl: String,
-                     progressMonitor: ProgressMonitor): Progress = {
+  def createProgress(
+    progressMonitor: ProgressMonitor,
+    callbackUrl: URI = callbackUri,
+    uploadUrl: URI = uploadUri
+  ): Progress = {
     val id = UUID.randomUUID().toString
 
     progressMonitor.create(
@@ -74,20 +80,20 @@ trait ProgressMonitorFixture
   }
 
   def givenProgressRecord(id: String,
-                          uploadUrl: String,
-                          maybeCallbackUrl: Option[String],
+                          uploadUri: URI,
+                          maybeCallbackUri: Option[URI],
                           table: Table) = {
-    givenTableHasItem(Progress(id, uploadUrl, maybeCallbackUrl), table)
+    givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri), table)
   }
 
   def assertProgressCreated(id: String,
-                            expectedUploadUrl: String,
-                            expectedCallbackUrl: Option[String],
+                            expectedUploadUri: URI,
+                            expectedCallbackUri: Option[URI],
                             table: Table,
                             recentSeconds: Int = 45): Assertion = {
     val progress = getExistingTableItem[Progress](id, table)
-    progress.uploadUrl shouldBe expectedUploadUrl
-    progress.callbackUrl shouldBe expectedCallbackUrl
+    progress.uploadUri shouldBe expectedUploadUri
+    progress.callbackUri shouldBe expectedCallbackUri
 
     assertRecent(progress.createdAt, recentSeconds)
     assertRecent(progress.updatedAt, recentSeconds)
@@ -111,9 +117,4 @@ trait ProgressMonitorFixture
 
     progress.result shouldBe expectedStatus
   }
-
-  def assertRecent(instant: Instant, recentSeconds: Int = 1): Assertion =
-    Duration
-      .between(instant, Instant.now)
-      .getSeconds should be <= recentSeconds.toLong
 }

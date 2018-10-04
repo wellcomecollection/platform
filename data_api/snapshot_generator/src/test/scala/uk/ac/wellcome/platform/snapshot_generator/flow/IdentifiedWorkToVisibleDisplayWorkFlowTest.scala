@@ -1,21 +1,20 @@
 package uk.ac.wellcome.platform.snapshot_generator.flow
 
 import akka.stream.scaladsl.{Sink, Source}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.{V1WorksIncludes, V2WorksIncludes}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class IdentifiedWorkToVisibleDisplayWorkFlowTest
     extends FunSpec
     with Matchers
     with Akka
     with ScalaFutures
-    with ExtendedPatience
+    with IntegrationPatience
     with WorksGenerators {
 
   it("creates V1 DisplayWorks from IdentifiedWorks") {

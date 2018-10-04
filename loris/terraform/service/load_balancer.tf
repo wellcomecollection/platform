@@ -14,8 +14,39 @@ resource "aws_alb_listener" "https" {
   certificate_arn   = "${data.aws_acm_certificate.certificate.arn}"
 
   default_action {
-    target_group_arn = "${module.service.target_group_arn}"
-    type             = "forward"
+    type = "redirect"
+
+    redirect {
+      host        = "developers.wellcomecollection.org"
+      path        = "/iiif"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+# If Googlebot tries to crawl /robots.txt and gets a 500 error (for example,
+# a gateway error if we haven't defined this path), it writes off the
+# entire domain -- it becomes unable to index or cache images from
+# iiif.wellcomecollection.org.
+#
+# This fixed response ensures that Googlebot gets a sensible response
+# if it tries to crawl robots.txt, and that it can crawl the images.
+#
+resource "aws_alb_listener_rule" "robots_is_404" {
+  listener_arn = "${aws_alb_listener.https.arn}"
+
+  action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "404"
+    }
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["/robots.txt"]
   }
 }
 
@@ -29,7 +60,7 @@ resource "aws_alb_listener_rule" "https" {
 
   condition {
     field  = "path-pattern"
-    values = ["${var.path_pattern}"]
+    values = ["/image/*"]
   }
 }
 

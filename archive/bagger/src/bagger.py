@@ -18,7 +18,7 @@ import aws
 import tech_md
 from xml_help import load_from_disk, load_from_string
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 def bag_from_identifier(identifier, skip_file_download):
@@ -30,7 +30,9 @@ def bag_from_identifier(identifier, skip_file_download):
     root = tree.getroot()
     title = mets.get_title(root)
     logging.info("#### {0}: {1}".format(b_number, title))
-    logging.info("We will transform xml that involves Preservica, and the tessella namespace")
+    logging.info(
+        "We will transform xml that involves Preservica, and the tessella namespace"
+    )
 
     # Compare the logic here with the METS Repository
     # This is simpler as we always start with a b number
@@ -130,8 +132,9 @@ def load_xml(path):
 def dispatch_bag(bag_details):
     # now zip this bag in a way that will be efficient for the archiver
     logging.info("creating zip file for " + bag_details["b_number"])
-    shutil.make_archive(bag_details["zip_file_path"]
-                        [0:-4], 'zip', bag_details["directory"])
+    shutil.make_archive(
+        bag_details["zip_file_path"][0:-4], "zip", bag_details["directory"]
+    )
     logging.info("uploading " + bag_details["zip_file_name"] + " to S3")
     aws.upload(bag_details["zip_file_path"], bag_details["zip_file_name"])
     logging.info("upload completed")

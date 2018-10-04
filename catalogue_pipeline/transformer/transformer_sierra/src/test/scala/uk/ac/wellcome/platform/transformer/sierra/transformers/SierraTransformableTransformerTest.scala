@@ -574,6 +574,41 @@ class SierraTransformableTransformerTest
       Subject(content, List(Unidentifiable(Person(content)))))
   }
 
+  it("extracts organisation subjects if present") {
+    val id = createSierraBibNumber
+    val content = "ACME CORP"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Wacky Racers",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "610",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "a",
+         |           "content": "$content"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val work = transformDataToUnidentifiedWork(id = id, data = data)
+    work.subjects shouldBe List(
+      Subject(
+        label = content,
+        List(Unidentifiable(Organisation(content)))
+      )
+    )
+  }
+
   it("adds production events if possible") {
     val id = createSierraBibNumber
     val placeLabel = "London"

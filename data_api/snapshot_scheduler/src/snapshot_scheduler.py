@@ -23,18 +23,18 @@ class SnapshotRequest(object):
 @log_on_error
 def main(event=None, _ctxt=None, sns_client=None):
     print(os.environ)
-    sns_client = sns_client or boto3.client('sns')
+    sns_client = sns_client or boto3.client("sns")
 
-    topic_arn = os.environ['TOPIC_ARN']
+    topic_arn = os.environ["TOPIC_ARN"]
 
-    public_bucket_name = os.environ['PUBLIC_BUCKET_NAME']
+    public_bucket_name = os.environ["PUBLIC_BUCKET_NAME"]
 
-    public_object_key_v1 = os.environ['PUBLIC_OBJECT_KEY_V1']
-    public_object_key_v2 = os.environ['PUBLIC_OBJECT_KEY_V2']
+    public_object_key_v1 = os.environ["PUBLIC_OBJECT_KEY_V1"]
+    public_object_key_v2 = os.environ["PUBLIC_OBJECT_KEY_V2"]
 
     for (api_version, public_object_key) in [
-        ('v1', public_object_key_v1),
-        ('v2', public_object_key_v2),
+        ("v1", public_object_key_v1),
+        ("v2", public_object_key_v2),
     ]:
         snapshot_request_message = SnapshotRequest(
             apiVersion=api_version,
@@ -46,5 +46,5 @@ def main(event=None, _ctxt=None, sns_client=None):
             sns_client=sns_client,
             topic_arn=topic_arn,
             message=attr.asdict(snapshot_request_message),
-            subject='source: snapshot_scheduler.main'
+            subject="source: snapshot_scheduler.main",
         )

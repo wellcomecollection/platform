@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
 import akka.stream.scaladsl.{Sink, Source}
+import com.amazonaws.services.sns.model.PublishResult
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -26,8 +27,7 @@ class ProgressUpdateAndPublishFlowTest
     with ProgressMonitorFixture
     with ScalaFutures {
 
-  private val uploadUrl = "uploadUrl"
-  private val callbackUrl = "http://localhost/archive/complete"
+  import Progress._
 
   it("updates progress and publishes status") {
     withLocalSnsTopic { topic =>
@@ -45,13 +45,11 @@ class ProgressUpdateAndPublishFlowTest
               val event = ProgressEvent("Run!")
               val status = Progress.Failed
 
-              val progress = createProgress(uploadUrl, callbackUrl, monitor)
+              val progress = createProgress(monitor, callbackUri, uploadUri)
               val update = ProgressUpdate(progress.id, event, status)
 
-              val expectedProgress = progress.copy(
-                events = progress.events :+ event,
-                result = status
-              )
+              val expectedProgress = progress
+                .copy(result = status, events = progress.events :+ event)
 
               val source = Source.single(update)
 
@@ -62,16 +60,15 @@ class ProgressUpdateAndPublishFlowTest
 
               whenReady(eventualResult) {
                 result =>
-                  result.isRight shouldBe true
-                  result.right.get shouldBe update
+                  result shouldBe a[PublishResult]
 
                   assertSnsReceivesOnly(expectedProgress, topic)
 
                   assertProgressCreated(
                     progress.id,
-                    uploadUrl,
-                    Some(callbackUrl),
-                    table = table)
+                    uploadUri,
+                    Some(callbackUri),
+                    table)
 
                   assertProgressRecordedRecentEvents(
                     progress.id,

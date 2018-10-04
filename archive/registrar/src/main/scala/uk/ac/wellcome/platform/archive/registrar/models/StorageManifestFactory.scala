@@ -22,7 +22,7 @@ object StorageManifestFactory extends Logging {
         bagLocation.storageNamespace,
         List(
           bagLocation.storagePath,
-          bagLocation.bagName.value,
+          bagLocation.bagPath.value,
           name
         ).mkString("/")
       )
@@ -62,7 +62,7 @@ object StorageManifestFactory extends Logging {
       List(
         s"http://${bagLocation.storageNamespace}.s3.amazonaws.com",
         bagLocation.storagePath,
-        bagLocation.bagName
+        bagLocation.bagPath
       ).mkString("/"),
       LocationType(
         "aws-s3-standard-ia",
@@ -84,7 +84,7 @@ object StorageManifestFactory extends Logging {
       )
     } yield
       StorageManifest(
-        id = BagId(bagLocation.bagName.value),
+        id = BagId(bagLocation.bagPath.value),
         source = sourceIdentifier,
         identifiers = List(sourceIdentifier),
         manifest = fileManifest,

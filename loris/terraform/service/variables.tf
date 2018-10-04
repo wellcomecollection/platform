@@ -18,10 +18,6 @@ variable "healthcheck_path" {
   default = "/image/"
 }
 
-variable "path_pattern" {
-  default = "/*"
-}
-
 variable "ebs_container_path" {
   default = "/mnt/loris"
 }

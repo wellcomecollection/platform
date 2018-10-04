@@ -11,12 +11,11 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
+  ArchiveComplete,
   NotificationMessage,
   RequestContext
 }
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.common.progress.flows.CallbackFlow
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.registrar.models._
@@ -58,28 +57,25 @@ class Registrar @Inject()(
       secretKey = s3ClientConfig.secretKey.getOrElse("")
     )
 
-    val workFlow = Flow[NotificationMessage]
+    val flow = Flow[NotificationMessage]
       .log("notification message")
       .map(parseNotification)
       .flatMapConcat(createStorageManifest)
       .map {
-        case (manifest, context) => updateStoredManifest(manifest, context)
+        case (manifest, ctx) => updateStoredManifest(manifest, ctx)
       }
       .via(SnsPublishFlow(snsConfig))
       .log("published notification")
       .filter {
         case (_, context) => context.callbackUrl.isDefined
       }
-      .via(CallbackFlow())
-      .log("executed callback")
 
-    messageStream.run("registrar", workFlow)
+    messageStream.run("registrar", flow)
   }
 
   private def parseNotification(message: NotificationMessage) = {
-    fromJson[BagArchiveCompleteNotification](message.Message) match {
-      case Success(
-          bagArchiveCompleteNotification: BagArchiveCompleteNotification) =>
+    fromJson[ArchiveComplete](message.Message) match {
+      case Success(bagArchiveCompleteNotification: ArchiveComplete) =>
         RequestContext(bagArchiveCompleteNotification)
       case Failure(e) =>
         throw new RuntimeException(

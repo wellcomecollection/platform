@@ -31,7 +31,7 @@ SIGNIFICANT_PROPERTIES = {
     "Image Height": "ImageHeight",
     "Bitrate (kbps)": "Bitrate",
     "Length In Seconds": "Duration",
-    "Number of Pages": "PageNumber"  # this is a property of PDFs
+    "Number of Pages": "PageNumber",  # this is a property of PDFs
 }
 
 # Do not transform any of these file properties.
@@ -40,7 +40,7 @@ IGNORED_PROPERTIES = [
     "Creation Date",
     "Number of Images",
     "Bits Per Sample",
-    "Samples Per Pixel"
+    "Samples Per Pixel",
 ]
 
 IGNORED_TECHMD_FILENAMES = [

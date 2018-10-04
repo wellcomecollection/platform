@@ -4,7 +4,6 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
 
 case class ArchivistConfig(
   s3ClientConfig: S3ClientConfig,
@@ -14,7 +13,6 @@ case class ArchivistConfig(
   sqsConfig: SQSConfig,
   snsClientConfig: SnsClientConfig,
   snsConfig: SNSConfig,
-  progressMonitorConfig: ProgressMonitorConfig,
   metricsConfig: MetricsConfig
 )
 
@@ -37,5 +35,6 @@ case class BagItConfig(digestDelimiterRegexp: String = " +",
 
 case class BagUploaderConfig(
   uploadConfig: UploadConfig,
-  bagItConfig: BagItConfig = BagItConfig()
+  bagItConfig: BagItConfig = BagItConfig(),
+  parallelism: Int
 )

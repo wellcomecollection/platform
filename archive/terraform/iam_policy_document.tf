@@ -76,6 +76,22 @@ data "aws_iam_policy_document" "archive_progress_table_read_write_policy" {
   }
 }
 
+# progress_async
+
+data "aws_iam_policy_document" "read_from_progress_async_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+    ]
+
+    resources = [
+      "${module.progress_async_queue.arn}",
+    ]
+  }
+}
+
 # Bagger
 
 data "aws_iam_policy_document" "read_from_bagger_queue" {
@@ -143,6 +159,20 @@ data "aws_iam_policy_document" "bagger_get_preservica" {
     resources = [
       "arn:aws:s3:::${var.bagger_current_preservation_bucket}",
       "arn:aws:s3:::${var.bagger_current_preservation_bucket}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "read_from_registrar_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+    ]
+
+    resources = [
+      "${module.registrar_queue.arn}",
     ]
   }
 }

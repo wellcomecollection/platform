@@ -9,47 +9,40 @@ import subprocess
 import sys
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         verb = sys.argv[1]
-        assert verb in ('test', 'publish')
+        assert verb in ("test", "publish")
     except (AssertionError, IndexError):
         sys.exit(__doc__.strip())
 
     results = {}
 
-    names = [
-        n
-        for n in os.environ['TRAVIS_LAMBDAS'].split()
-        if n != '\\'
-    ]
+    names = [n for n in os.environ["TRAVIS_LAMBDAS"].split() if n != "\\"]
 
     for lambda_name in names:
-        print('===  Starting Lambda task for %s ===' % lambda_name)
+        print("===  Starting Lambda task for %s ===" % lambda_name)
 
         env = os.environ.copy()
-        env['TASK'] = '%s-%s' % (lambda_name, verb)
+        env["TASK"] = "%s-%s" % (lambda_name, verb)
 
         try:
-            subprocess.check_call(['python', 'run_travis_task.py'], env=env)
+            subprocess.check_call(["python3", "run_travis_task.py"], env=env)
         except subprocess.CalledProcessError:
-            outcome = 'FAILED'
+            outcome = "FAILED"
         else:
-            outcome = 'OK'
+            outcome = "OK"
 
         results[lambda_name] = outcome
 
-        print(
-            '=== Completed Lambda task for %s [%s] ===' %
-            (lambda_name, outcome)
-        )
+        print("=== Completed Lambda task for %s [%s] ===" % (lambda_name, outcome))
 
-    print('')
-    print('=== SUMMARY ===')
+    print("")
+    print("=== SUMMARY ===")
     for (name, outcome) in sorted(results.items()):
-        print('%s %s' % (name.ljust(30), outcome))
+        print("%s %s" % (name.ljust(30), outcome))
 
-    if set(results.values()) == set(['OK']):
+    if set(results.values()) == set(["OK"]):
         sys.exit(0)
     else:
         sys.exit(1)

@@ -1,31 +1,41 @@
 package uk.ac.wellcome.platform.archive.common.progress.monitor
 
-import java.time.Instant
-import java.time.format.DateTimeFormatter
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
+import com.google.inject.Inject
 import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.progress.models.{
-  FailedEvent,
   Progress,
   ProgressUpdate
 }
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.storage.dynamo._
 
-class ProgressMonitor(
+import scala.util.{Failure, Success, Try}
+
+class ProgressMonitor @Inject()(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
-      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
-      DateTimeFormatter.ISO_INSTANT.format(_)
-    )
+  import Progress._
+
+  def get(id: String) = {
+    Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
+      'id -> id
+    ) match {
+      case Some(Right(progress)) => Some(progress)
+      case Some(Left(error)) => {
+        val exception = new RuntimeException(
+          s"Failed to get progress monitor ${error.toString}")
+        warn(s"Failed to get Dynamo record: ${id}", exception)
+        throw exception
+      }
+      case scala.None => scala.None
+    }
+  }
 
   def create(progress: Progress) = {
     val progressTable = Table[Progress](dynamoConfig.table)
@@ -51,8 +61,9 @@ class ProgressMonitor(
     progress
   }
 
-  def update(
-    update: ProgressUpdate): Either[FailedEvent[ProgressUpdate], Progress] = {
+  def update(update: ProgressUpdate): Try[Progress] = {
+    debug(s"Updating Dynamo record ${update.id} with: $update")
+
     val event = update.event
 
     val mergedUpdate = update.status match {
@@ -72,20 +83,21 @@ class ProgressMonitor(
         val idConstraintError =
           IdConstraintError(s"Progress does not exist for id:${update.id}", e)
 
-        Left(FailedEvent(idConstraintError, update))
+        Failure(idConstraintError)
       }
 
       case Left(scanamoError) => {
         val exception = new RuntimeException(scanamoError.toString)
         warn(s"Failed to update Dynamo record: ${update.id}", exception)
 
-        Left(FailedEvent(exception, update))
+        Failure(exception)
       }
 
       case r @ Right(progress) => {
-        debug(s"Successfully updated Dynamo record: ${update.id}")
+        debug(
+          s"Successfully updated Dynamo record: ${update.id}, got $progress")
 
-        Right(progress)
+        Success(progress)
       }
     }
   }

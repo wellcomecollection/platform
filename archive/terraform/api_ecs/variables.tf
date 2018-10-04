@@ -20,10 +20,6 @@ variable "archive_api_container_image" {}
 
 variable "archive_api_container_port" {}
 
-variable "nginx_container_image" {}
-
-variable "nginx_container_port" {}
-
 variable "certificate_domain" {}
 
 variable "archive_progress_table_name" {}
@@ -31,3 +27,7 @@ variable "archive_progress_table_name" {}
 variable "archive_ingest_sns_topic_arn" {}
 
 variable "api_path" {}
+
+variable "bag_vhs_bucket_name" {}
+
+variable "bag_vhs_table_name" {}

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.idminter.fixtures
 
 import org.scalatest.Matchers
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import scalikejdbc.{AutoSession, ConnectionPool, DB, SQLSyntax}
 import uk.ac.wellcome.test.fixtures.TestWith
 import scalikejdbc._
@@ -10,13 +10,12 @@ import uk.ac.wellcome.platform.idminter.models.{
   IdentifiersTableConfig,
   RDSClientConfig
 }
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
 
 trait IdentifiersDatabase
     extends Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with Matchers {
 
   val host = "localhost"

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.sierra
 
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -14,7 +14,6 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
 import uk.ac.wellcome.storage.fixtures.S3
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraTransformerFeatureTest
     extends FunSpec
@@ -25,7 +24,7 @@ class SierraTransformerFeatureTest
     with Messaging
     with fixtures.Server
     with Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with SierraGenerators
     with HybridRecordMessageGenerator {
 
