@@ -15,8 +15,8 @@ import uk.ac.wellcome.platform.archive.registrar.fixtures.{
 }
 import uk.ac.wellcome.platform.archive.registrar.models.{
   BagRegistrationCompleteNotification,
-  StorageManifest,
-  StorageManifestFactory
+  BagManifest,
+  BagManifestFactory
 }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -73,7 +73,7 @@ class RegistrarFeatureTest
 
           implicit val _ = s3Client
 
-          whenReady(StorageManifestFactory.create(bagLocation)) {
+          whenReady(BagManifestFactory.create(bagLocation)) {
             storageManifest =>
               debug(s"Created StorageManifest: $storageManifest")
 
@@ -85,7 +85,7 @@ class RegistrarFeatureTest
                   topic
                 )
 
-                assertStored[StorageManifest](
+                assertStored[BagManifest](
                   hybridBucket,
                   hybridTable,
                   storageManifest.id.value,

@@ -2,16 +2,16 @@ package uk.ac.wellcome.platform.archive.common.progress.modules
 
 import akka.actor.ActorSystem
 import com.google.inject.{AbstractModule, Provides}
-import uk.ac.wellcome.platform.archive.common.modules.DynamoClientConfig
+import uk.ac.wellcome.platform.archive.common.config.models.ProgressMonitorConfig
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
+import uk.ac.wellcome.storage.dynamo.DynamoClientFactory
 
 object ProgressMonitorModule extends AbstractModule {
 
   @Provides
   def providesArchiveProgressMonitor(
-    actorSystem: ActorSystem,
-    progressMonitorConfig: ProgressMonitorConfig) = {
+                                      actorSystem: ActorSystem,
+                                      progressMonitorConfig: ProgressMonitorConfig) = {
 
     val dynamoClientConfig = progressMonitorConfig.dynamoClientConfig
 
@@ -28,6 +28,3 @@ object ProgressMonitorModule extends AbstractModule {
     )
   }
 }
-
-case class ProgressMonitorConfig(dynamoConfig: DynamoConfig,
-                                 dynamoClientConfig: DynamoClientConfig)

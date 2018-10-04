@@ -22,8 +22,7 @@ import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorMo
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   ConfigModule,
   SNSAsyncClientModule,
-  TestAppConfigModule,
-  VHSModule
+  TestAppConfigModule
 }
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
