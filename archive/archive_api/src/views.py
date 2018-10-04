@@ -7,7 +7,7 @@ from flask_restplus import Resource
 from werkzeug.exceptions import BadRequest as BadRequestError
 from werkzeug.exceptions import NotFound as NotFoundError
 
-from archive_api import app, api, logger
+from archive_api import app, api, logger, progress_manager
 from bags import fetch_bag
 from ingests import (
     IngestProgress,
@@ -41,14 +41,11 @@ class IngestCollection(Resource):
         callback_url = request.json.get("callbackUrl")
         self.validate_urls(callback_url, upload_url)
 
-        ingest_request_id = str(uuid.uuid4())
-        logger.debug("ingest_request_id=%r", ingest_request_id)
-
-        create_ingest_progress(
-            IngestProgress(ingest_request_id, upload_url, callback_url),
-            app.config["DYNAMODB_RESOURCE"],
-            app.config["DYNAMODB_TABLE_NAME"],
+        ingest_request_id = progress_manager.create_request(
+            upload_url=upload_url,
+            callback_url=callback_url
         )
+        logger.debug("ingest_request_id=%r", ingest_request_id)
 
         ingest_request_id = send_new_ingest_request(
             sns_client=app.config["SNS_CLIENT"],

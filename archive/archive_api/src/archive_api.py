@@ -7,6 +7,7 @@ from flask import Flask
 from flask_restplus import Api
 
 import config
+from progress_manager import ProgressManager
 
 app = Flask(__name__)
 api = Api(
@@ -26,6 +27,11 @@ app.config.from_object(config_obj)
 
 daiquiri.setup(level=os.environ.get("LOG_LEVEL", "INFO"))
 logger = daiquiri.getLogger()
+
+progress_manager = ProgressManager(
+    endpoint=app.config['PROGRESS_MANAGER_ENDPOINT'],
+    sess=app.config['PROGRESS_MANAGER_SESSION']
+)
 
 # We can't move this import to the top because the views need the ``api``
 # instance defined in this file.
