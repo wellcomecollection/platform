@@ -12,6 +12,8 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, Pr
 import scala.util.{Failure, Success}
 
 object NotificationMessageFlow extends Logging{
+  import IngestBagRequest._
+
   def apply(parallelism: Int, snsClient: AmazonSNS, progressSnsConfig: SNSConfig): Flow[NotificationMessage, IngestBagRequest, NotUsed] = {
     Flow[NotificationMessage]
       .map(message => fromJson[IngestBagRequest](message.Message))

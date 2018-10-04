@@ -13,6 +13,7 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorF
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import IngestBagRequest._
 
 // TODO: Test file boundaries
 
