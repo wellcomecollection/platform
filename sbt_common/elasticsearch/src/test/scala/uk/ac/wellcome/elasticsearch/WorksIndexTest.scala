@@ -3,7 +3,7 @@ package uk.ac.wellcome.elasticsearch
 import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search, _}
 import org.elasticsearch.client.ResponseException
 import org.scalacheck.Shrink
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -23,7 +23,6 @@ class WorksIndexTest
     with Matchers
     with JsonAssertions
     with BeforeAndAfterEach
-    with IntegrationPatience
     with PropertyChecks with WorksGenerators {
 
   // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
