@@ -4,19 +4,38 @@ import os
 import random
 import uuid
 
+import betamax
 import pytest
+import requests
+
+
+@pytest.fixture(scope='session')
+def global_sess(pytestconfig):
+    with betamax.Betamax.configure() as config:
+        config.cassette_library_dir = str(
+            pytestconfig.rootdir.join('src', 'tests', 'cassettes')
+        )
+
+    session = requests.Session()
+    with betamax.Betamax(session) as vcr:
+        vcr.use_cassette('test_archive_api')
+        yield session
 
 
 @pytest.fixture
 def client(
     dynamodb_resource,
     s3_client,
-    table_name,
     sns_client,
     topic_arn,
     table_name_bag,
     bucket_bag,
+    global_sess
 ):
+    os.environ.update({
+        'PROGRESS_MANAGER_ENDPOINT': 'http://localhost:6000'
+    })
+
     from archive_api import app
 
     app.config["DYNAMODB_RESOURCE"] = dynamodb_resource
