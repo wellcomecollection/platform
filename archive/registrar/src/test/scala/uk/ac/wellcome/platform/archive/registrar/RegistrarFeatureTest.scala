@@ -14,7 +14,7 @@ import uk.ac.wellcome.platform.archive.registrar.fixtures.{
   Registrar => RegistrarFixture
 }
 import uk.ac.wellcome.platform.archive.registrar.models.{
-  BagRegistrationCompleteNotification,
+  RegistrationComplete,
   BagManifest,
   BagManifestFactory
 }
@@ -79,7 +79,7 @@ class RegistrarFeatureTest
 
               eventually {
                 assertSnsReceivesOnly(
-                  BagRegistrationCompleteNotification(
+                  RegistrationComplete(
                     requestId,
                     storageManifest),
                   topic
