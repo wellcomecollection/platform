@@ -14,6 +14,7 @@ class ContextResponse(Response):
     For an explanation of how this works/is used, read
     https://blog.miguelgrinberg.com/post/customizing-the-flask-response-class
     """
+
     context_url = "https://api.wellcomecollection.org/storage/v1/context.json"
 
     def __init__(self, response, *args, **kwargs):
@@ -22,7 +23,7 @@ class ContextResponse(Response):
         @context parameter, then repack it.
         """
         if isinstance(response, ClosingIterator):
-            response = b''.join([char for char in response])
+            response = b"".join([char for char in response])
 
         # Some requests (e.g. POST /ingests) return an empty response body,
         # so we shouldn't try to add a parameter.

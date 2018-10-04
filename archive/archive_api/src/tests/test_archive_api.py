@@ -14,7 +14,7 @@ class TestReportIngestStatus:
         assert resp.status_code == 200
         assert json.loads(resp.data) == {
             "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
-            "progress": lookup_id
+            "progress": lookup_id,
         }
 
     def test_lookup_missing_item_is_404(self, client):
@@ -49,7 +49,7 @@ class TestBags:
         assert resp.status_code == 200
         assert json.loads(resp.data) == {
             "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
-            "id": guid
+            "id": guid,
         }
 
     def test_lookup_missing_item_is_404(self, client, guid):
