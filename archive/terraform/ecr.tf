@@ -22,6 +22,11 @@ module "ecr_repository_progress_http" {
   name   = "progress_http"
 }
 
+module "ecr_repository_notifier" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "notifier"
+}
+
 module "ecr_repository_bagger" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "bagger"

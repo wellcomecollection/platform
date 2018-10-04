@@ -92,6 +92,22 @@ data "aws_iam_policy_document" "read_from_progress_async_queue" {
   }
 }
 
+# Notifier
+
+data "aws_iam_policy_document" "read_from_notifier_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+    ]
+
+    resources = [
+      "${module.notifier_queue.arn}",
+    ]
+  }
+}
+
 # Bagger
 
 data "aws_iam_policy_document" "read_from_bagger_queue" {
