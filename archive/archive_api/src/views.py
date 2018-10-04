@@ -1,6 +1,5 @@
 # -*- encoding: utf-8
 
-import uuid
 
 from flask import jsonify, make_response, request
 from flask_restplus import Resource
