@@ -109,7 +109,7 @@ Content-Type: application/json
     "type": "IngestType"
   },
   "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
-  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567"
 }
 ```
 
