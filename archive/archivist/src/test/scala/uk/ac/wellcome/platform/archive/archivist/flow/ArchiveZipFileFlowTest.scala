@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
@@ -17,6 +16,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   FileNotFoundError,
   InvalidBagManifestError
 }
+import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
@@ -24,11 +24,9 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagPath,
   DigitisedStorageType
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.test.fixtures.Akka
+
 import scala.collection.JavaConverters._
 
 class ArchiveZipFileFlowTest
@@ -40,7 +38,8 @@ class ArchiveZipFileFlowTest
     with BagUploaderConfigGenerator
     with Akka
     with SNS
-    with Inside {
+    with Inside
+    with ProgressUpdateAssertions {
 
   implicit val s3client = s3Client
   implicit val snsclient = snsClient
@@ -76,16 +75,14 @@ class ArchiveZipFileFlowTest
                           BagPath(s"$DigitisedStorageType/$bagName")),
                         None)))
 
-                  val messages = listMessagesReceivedFromSNS(reportingTopic)
-                  messages should have size 1
-                  val progressUpdate =
-                    fromJson[ProgressUpdate](messages.head.message).get
-                  inside(progressUpdate) {
-                    case ProgressUpdate(id, List(event), status) =>
-                      id shouldBe ingestContext.archiveRequestId
-                      status shouldBe Progress.None
-
-                      event.description shouldBe "Bag uploaded and verified successfully"
+                  assertTopicReceivesProgressUpdate(
+                    ingestContext.archiveRequestId,
+                    reportingTopic,
+                    Progress.None) { events =>
+                    inside(events) {
+                      case List(event) =>
+                        event.description shouldBe "Bag uploaded and verified successfully"
+                    }
                   }
                 }
             }
@@ -120,21 +117,13 @@ class ArchiveZipFileFlowTest
                     case List(Left(ArchiveJobError(_, errors))) =>
                       all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
                   }
-                  val messages = listMessagesReceivedFromSNS(reportingTopic)
-                  messages should have size 1
-                  val progressUpdate =
-                    fromJson[ProgressUpdate](messages.head.message).get
-                  inside(progressUpdate) {
-                    case ProgressUpdate(id, events, status) =>
-                      id shouldBe ingestContext.archiveRequestId
-                      status shouldBe Progress.Failed
 
-                      events should have size (zipFile
-                        .entries()
-                        .asScala
-                        .size - 1)
-
-                      all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+                  assertTopicReceivesProgressUpdate(
+                    ingestContext.archiveRequestId,
+                    reportingTopic,
+                    Progress.Failed) { events =>
+                    events should have size (zipFile.entries().asScala.size - 1)
+                    all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                   }
                 }
             }
@@ -171,16 +160,14 @@ class ArchiveZipFileFlowTest
                       ingestRequest shouldBe ingestContext
                       path shouldBe "bag-info.txt"
                   }
-
-                  val messages = listMessagesReceivedFromSNS(reportingTopic)
-                  messages should have size 1
-                  val progressUpdate =
-                    fromJson[ProgressUpdate](messages.head.message).get
-                  inside(progressUpdate) {
-                    case ProgressUpdate(id, List(event), status) =>
-                      id shouldBe ingestContext.archiveRequestId
-                      status shouldBe Progress.Failed
-                      event.description shouldBe result.head.left.get.toString
+                  assertTopicReceivesProgressUpdate(
+                    ingestContext.archiveRequestId,
+                    reportingTopic,
+                    Progress.Failed) { events =>
+                    inside(events) {
+                      case List(event) =>
+                        event.description shouldBe result.head.left.get.toString
+                    }
                   }
                 }
             }
@@ -224,15 +211,14 @@ class ArchiveZipFileFlowTest
                         BagPath(s"$DigitisedStorageType/$bagName"))
                   }
 
-                  val messages = listMessagesReceivedFromSNS(reportingTopic)
-                  messages should have size 1
-                  val progressUpdate =
-                    fromJson[ProgressUpdate](messages.head.message).get
-                  inside(progressUpdate) {
-                    case ProgressUpdate(id, List(event), status) =>
-                      id shouldBe ingestContext.archiveRequestId
-                      status shouldBe Progress.Failed
-                      event.description shouldBe result.head.left.get.toString
+                  assertTopicReceivesProgressUpdate(
+                    ingestContext.archiveRequestId,
+                    reportingTopic,
+                    Progress.Failed) { events =>
+                    inside(events) {
+                      case List(event) =>
+                        event.description shouldBe result.head.left.get.toString
+                    }
                   }
                 }
             }
