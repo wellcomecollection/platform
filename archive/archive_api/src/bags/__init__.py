@@ -2,6 +2,4 @@
 
 from .fetch_bag import fetch_bag
 
-__all__ = [
-    'fetch_bag',
-]
+__all__ = ["fetch_bag"]

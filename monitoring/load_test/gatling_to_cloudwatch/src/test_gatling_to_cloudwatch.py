@@ -5,7 +5,7 @@ from mock import MagicMock
 
 import gatling_to_cloudwatch
 
-unix_time = 1501244573961
+unix_time = 1_501_244_573_961
 timestamp = datetime.fromtimestamp(unix_time / 1000)
 
 assertions_json = f"""
@@ -44,35 +44,30 @@ assertions_json = f"""
 
 """
 
-event = {
-    'Records': [
-        {
-            'Sns': {
-                'Message': assertions_json
-            }
-        }
-    ]
-}
+event = {"Records": [{"Sns": {"Message": assertions_json}}]}
 
 
 @mock_cloudwatch
 def test_send_assertions_to_cloudwatch():
-    client = boto3.client('cloudwatch')
-    client.put_metric_data = MagicMock(name='put_metric_data')
+    client = boto3.client("cloudwatch")
+    client.put_metric_data = MagicMock(name="put_metric_data")
 
-    gatling_to_cloudwatch.send_assertions_to_cloudwatch(
-        client,
-        event
-    )
+    gatling_to_cloudwatch.send_assertions_to_cloudwatch(client, event)
 
     client.put_metric_data.assert_called_once_with(
         MetricData=[
-            {'MetricName': 'Global_max_of_response_time',
-             'Timestamp': timestamp,
-             'Value': 59645.0, 'Unit': 'Count'},
-            {'MetricName': 'Global_percentage_of_successful_requests',
-             'Timestamp': timestamp,
-             'Value': 50.77669902912621, 'Unit': 'Count'}
+            {
+                "MetricName": "Global_max_of_response_time",
+                "Timestamp": timestamp,
+                "Value": 59645.0,
+                "Unit": "Count",
+            },
+            {
+                "MetricName": "Global_percentage_of_successful_requests",
+                "Timestamp": timestamp,
+                "Value": 50.776_699_029_126_21,
+                "Unit": "Count",
+            },
         ],
-        Namespace='gatling/testing.load.LorisSimulation'
+        Namespace="gatling/testing.load.LorisSimulation",
     )

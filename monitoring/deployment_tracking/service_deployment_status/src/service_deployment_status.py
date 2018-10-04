@@ -11,16 +11,14 @@ import os
 
 import boto3
 
-from wellcome_aws_utils.ecs_utils import (
-    EcsThrottleException
-)
+from wellcome_aws_utils.ecs_utils import EcsThrottleException
 
 from wellcome_aws_utils.deployment_utils import (
     get_deployments_from_ecs,
     get_deployments_from_dynamo,
     put_deployment_in_dynamo,
     delete_deployment_in_dynamo,
-    update_deployment_in_dynamo
+    update_deployment_in_dynamo,
 )
 from wellcome_aws_utils.lambda_utils import log_on_error
 
@@ -31,11 +29,15 @@ def _find_in_deployments(deployment_list, key):
 
 def compare_deployments(current_deployments, last_deployments):
     current_deployments_keys = set(
-        [current_deployment.deployment_key
-         for current_deployment in current_deployments])
+        [
+            current_deployment.deployment_key
+            for current_deployment in current_deployments
+        ]
+    )
 
-    last_deployments_keys = set([last_deployment.deployment_key
-                                 for last_deployment in last_deployments])
+    last_deployments_keys = set(
+        [last_deployment.deployment_key for last_deployment in last_deployments]
+    )
 
     deletions_keys = last_deployments_keys - current_deployments_keys
     additions_keys = current_deployments_keys - last_deployments_keys
@@ -58,25 +60,29 @@ def compare_deployments(current_deployments, last_deployments):
         for remaining_key in remaining_keys
     ]
 
-    updated_deployments = list(
-        set(maybe_updated_deployments) - unchanged_deployments
-    )
+    updated_deployments = list(set(maybe_updated_deployments) - unchanged_deployments)
 
     return {
-        'deletions': deleted_deployments,
-        'additions': added_deployments,
-        'updates': updated_deployments
+        "deletions": deleted_deployments,
+        "additions": added_deployments,
+        "updates": updated_deployments,
     }
 
 
 def run_operations(operations, table):
     return {
-        "delete_results": [delete_deployment_in_dynamo(table, deployment)
-                           for deployment in operations["deletions"]],
-        "put_results": [put_deployment_in_dynamo(table, deployment)
-                        for deployment in operations["additions"]],
-        "update_results": [update_deployment_in_dynamo(table, deployment)
-                           for deployment in operations["updates"]]
+        "delete_results": [
+            delete_deployment_in_dynamo(table, deployment)
+            for deployment in operations["deletions"]
+        ],
+        "put_results": [
+            put_deployment_in_dynamo(table, deployment)
+            for deployment in operations["additions"]
+        ],
+        "update_results": [
+            update_deployment_in_dynamo(table, deployment)
+            for deployment in operations["updates"]
+        ],
     }
 
 
@@ -84,8 +90,8 @@ def run_operations(operations, table):
 def main(event, _):
     table_name = os.environ["TABLE_NAME"]
 
-    ecs_client = boto3.client('ecs')
-    dynamodb = boto3.resource('dynamodb')
+    ecs_client = boto3.client("ecs")
+    dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table(table_name)
 
     try:
@@ -101,4 +107,4 @@ def main(event, _):
 
     for result_list in ops.values():
         for result in result_list:
-            assert result['ResponseMetadata']['HTTPStatusCode'] == 200, ops
+            assert result["ResponseMetadata"]["HTTPStatusCode"] == 200, ops

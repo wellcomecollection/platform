@@ -2,12 +2,12 @@ import xml.etree.ElementTree as ElTree
 
 # premis is the addition
 namespaces = {
-    'mets': 'http://www.loc.gov/METS/',
-    'mods': 'http://www.loc.gov/mods/v3',
-    'tessella': 'http://www.tessella.com/transfer',
-    'dv': 'http://dfg-viewer.de/',
-    'xlink': 'http://www.w3.org/1999/xlink',
-    'premis': 'http://www.loc.gov/premis/v3'
+    "mets": "http://www.loc.gov/METS/",
+    "mods": "http://www.loc.gov/mods/v3",
+    "tessella": "http://www.tessella.com/transfer",
+    "dv": "http://dfg-viewer.de/",
+    "xlink": "http://www.w3.org/1999/xlink",
+    "premis": "http://www.loc.gov/premis/v3",
 }
 
 for prefix, ns in namespaces.items():
@@ -23,7 +23,7 @@ def copy_simple_value_child(source_parent, source_name, target_parent, target_na
 def make_child_with_whitespace(parent, name):
     # This isn't quite right but tidier than nothing
     child = ElTree.SubElement(parent, name)
-    child.text = parent.text + '  '
+    child.text = parent.text + "  "
     child.tail = parent.text
     return child
 

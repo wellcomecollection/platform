@@ -9,10 +9,10 @@ from validators import validate_uuid
 
 class IngestProgress(object):
     static_fields = {
-        '@context': 'https://api.wellcomecollection.org/storage/v1/context.json',
-        'type': 'Ingest',
-        'description': 'Ingest requested',
-        'ingestType': {'id': 'create', 'type': 'IngestType'}
+        "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+        "type": "Ingest",
+        "description": "Ingest requested",
+        "ingestType": {"id": "create", "type": "IngestType"},
     }
 
     def __init__(self, id, bag_url, callback_url=None):
@@ -20,7 +20,7 @@ class IngestProgress(object):
             validate_uuid(id)
         except ValueError:
             raise ValueError(
-                f'Cannot create IngestProgress.  id={id!r} is not a valid ID.'
+                f"Cannot create IngestProgress.  id={id!r} is not a valid ID."
             )
 
         self.id = id
@@ -56,10 +56,12 @@ def create_ingest_progress(ingest_progress, dynamodb_resource, table_name):
     try:
         table.put_item(
             Item=ingest_progress.dict_with_static_data(),
-            ConditionExpression='attribute_not_exists(id)'
+            ConditionExpression="attribute_not_exists(id)",
         )
     except ClientError as e:
-        if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
-            raise ValueError(f"Cannot create IngestProgress, id already exists '{ingest_progress.id}'.")
+        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            raise ValueError(
+                f"Cannot create IngestProgress, id already exists '{ingest_progress.id}'."
+            )
         else:
             raise

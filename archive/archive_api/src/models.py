@@ -6,11 +6,7 @@ from archive_api import api
 
 
 def fieldType(name, **kwargs):
-    return fields.String(
-        description='Type of the object',
-        enum=[name],
-        **kwargs
-    )
+    return fields.String(description="Type of the object", enum=[name], **kwargs)
 
 
 # Example of a valid request from the RFC:
@@ -25,32 +21,34 @@ def fieldType(name, **kwargs):
 #       "callbackUrl": "https://example.org/callback?id=b1234567",
 #     }
 #
-IngestType = api.model('Ingest type', {
-    'type': fieldType(name='IngestType', required=True),
-    'id': fields.String(
-        description='Identifier for ingest type',
-        enum=['create'],
-        required=True
-    ),
-})
+IngestType = api.model(
+    "Ingest type",
+    {
+        "type": fieldType(name="IngestType", required=True),
+        "id": fields.String(
+            description="Identifier for ingest type", enum=["create"], required=True
+        ),
+    },
+)
 
-IngestRequest = api.model('Ingest request', {
-    'type': fieldType(name='Ingest', required=True),
-    'uploadUrl': fields.String(
-        description='S3 URL of uploaded BagIt resource, supports only a zipped BagIt file',
-        example='s3://source-bucket/source-path/source-bag.zip',
-        required=True,
-    ),
-    'callbackUrl': fields.String(
-        description='URL to use for callback on completion or failure',
-        example='https://workflow.wellcomecollection.org/callback?id=b1234567'
-    ),
-    'ingestType': fields.Nested(
-        IngestType,
-        description='Request to ingest a BagIt resource',
-        required=True
-    )
-})
+IngestRequest = api.model(
+    "Ingest request",
+    {
+        "type": fieldType(name="Ingest", required=True),
+        "uploadUrl": fields.String(
+            description="S3 URL of uploaded BagIt resource, supports only a zipped BagIt file",
+            example="s3://source-bucket/source-path/source-bag.zip",
+            required=True,
+        ),
+        "callbackUrl": fields.String(
+            description="URL to use for callback on completion or failure",
+            example="https://workflow.wellcomecollection.org/callback?id=b1234567",
+        ),
+        "ingestType": fields.Nested(
+            IngestType, description="Request to ingest a BagIt resource", required=True
+        ),
+    },
+)
 
 
 # Example of an error in the Catalogue API style:
@@ -67,13 +65,16 @@ IngestRequest = api.model('Ingest request', {
 # TODO: It would be much better if we could define this model in a common
 # location, rather than copying this from the Scala app Swagger spec.
 #
-Error = api.model('Error', {
-    '@context': fields.String(description='Context URL'),
-    'errorType': fields.String(description='The type of error', enum=['http']),
-    'httpStatus': fields.Integer(description='The HTTP response status code'),
-    'label': fields.String(
-        description='The title or other short name of the error'
-    ),
-    'description': fields.String(description='The specific error'),
-    'type': fieldType(name='Error'),
-})
+Error = api.model(
+    "Error",
+    {
+        "@context": fields.String(description="Context URL"),
+        "errorType": fields.String(description="The type of error", enum=["http"]),
+        "httpStatus": fields.Integer(description="The HTTP response status code"),
+        "label": fields.String(
+            description="The title or other short name of the error"
+        ),
+        "description": fields.String(description="The specific error"),
+        "type": fieldType(name="Error"),
+    },
+)

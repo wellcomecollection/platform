@@ -29,8 +29,10 @@ def remodel_file_technical_metadata(root):
 
         premis_file.set("xsi:type", "premis:file")
         # These v3 schemas conflict with the v2 asserted in the existing METS, but fix that later
-        premis_file.set("xsi:schemaLocation",
-                        "http://www.loc.gov/premis/v3 http://www.loc.gov/standards/premis/v3/premis.xsd")
+        premis_file.set(
+            "xsi:schemaLocation",
+            "http://www.loc.gov/premis/v3 http://www.loc.gov/standards/premis/v3/premis.xsd",
+        )
         premis_file.set("version", "3.0")
 
         file_name = tessella_file.find("tessella:FileName", namespaces).text
@@ -41,7 +43,9 @@ def remodel_file_technical_metadata(root):
         file_properties = tessella_file.findall("tessella:FileProperty", namespaces)
         to_copy = mappings.SIGNIFICANT_PROPERTIES.keys()
         for file_property in file_properties:
-            name = file_property.find("tessella:FilePropertyName", namespaces).text.strip()
+            name = file_property.find(
+                "tessella:FilePropertyName", namespaces
+            ).text.strip()
             if name in to_copy:
                 value = file_property.find("tessella:Value", namespaces).text.strip()
                 premis_name = mappings.SIGNIFICANT_PROPERTIES[name]
@@ -57,7 +61,9 @@ def remodel_file_technical_metadata(root):
         composition_level.text = 0  # ??
         fixity = make_child(characteristics, "premis", "fixity")
         algorithm = make_child(fixity, "premis", "messageDigestAlgorithm")
-        algorithm.text = tessella_file.find("tessella:ChecksumAlgorithmRef", namespaces).text
+        algorithm.text = tessella_file.find(
+            "tessella:ChecksumAlgorithmRef", namespaces
+        ).text
         message_digest = make_child(fixity, "premis", "messageDigest")
         message_digest.text = tessella_file.find("tessella:Checksum", namespaces).text
         file_size = make_child(characteristics, "premis", "size")
@@ -67,9 +73,13 @@ def remodel_file_technical_metadata(root):
         format_name = make_child(format_designation, "premis", "formatName")
         format_name.text = tessella_file.find("tessella:FormatName", namespaces).text
         format_registry = make_child(p_format, "premis", "formatRegistry")
-        format_registry_name = make_child(format_registry, "premis", "formatRegistryName")
+        format_registry_name = make_child(
+            format_registry, "premis", "formatRegistryName"
+        )
         format_registry_name.text = "PRONOM"  # assume this is always used
         format_registry_key = make_child(format_registry, "premis", "formatRegistryKey")
-        format_registry_key.text = mappings.PRONOM[format_name.text]  # allow this to raise error if missing key!
+        format_registry_key.text = mappings.PRONOM[
+            format_name.text
+        ]  # allow this to raise error if missing key!
 
         remove_first_child(xmldata)

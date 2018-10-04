@@ -35,7 +35,7 @@ from travistooling import (
     git,
     make,
     should_run_build_task,
-    unpack_secrets
+    unpack_secrets,
 )
 
 
@@ -46,7 +46,8 @@ def timestamps():
     """
     proc = subprocess.Popen(
         'while true; do echo "[[run_travis_task.py]] "$(date); sleep 60; done',
-        shell=True)
+        shell=True,
+    )
     yield
     proc.kill()
 
@@ -55,23 +56,20 @@ def _should_run_tests(task, travis_event_type):
     """
     Should we run the tests?
     """
-    if travis_event_type == 'cron':
-        print('*** We always run tests in cron!')
+    if travis_event_type == "cron":
+        print("*** We always run tests in cron!")
         return True
 
-    assert travis_event_type in ('pull_request', 'push')
+    assert travis_event_type in ("pull_request", "push")
 
-    if travis_event_type == 'pull_request':
-        changed_paths = get_changed_paths('HEAD', 'master')
+    if travis_event_type == "pull_request":
+        changed_paths = get_changed_paths("HEAD", "master")
     else:
-        git('fetch', 'origin')
-        changed_paths = get_changed_paths(os.environ['TRAVIS_COMMIT_RANGE'])
+        git("fetch", "origin")
+        changed_paths = get_changed_paths(os.environ["TRAVIS_COMMIT_RANGE"])
 
-    result, report = should_run_build_task(
-        changed_paths=changed_paths,
-        task=task
-    )
-    print('\n' + build_report_output(report) + '\n')
+    result, report = should_run_build_task(changed_paths=changed_paths, task=task)
+    print("\n" + build_report_output(report) + "\n")
 
     return result
 
@@ -80,20 +78,17 @@ def _should_run_publish(task, travis_event_type):
     """
     Should we run the publish step?
     """
-    if travis_event_type in ('cron', 'pull_request'):
-        print('*** We never publish from cron or pull requests!')
+    if travis_event_type in ("cron", "pull_request"):
+        print("*** We never publish from cron or pull requests!")
         return False
 
-    assert travis_event_type == 'push'
+    assert travis_event_type == "push"
 
-    git('fetch', 'origin')
+    git("fetch", "origin")
 
-    changed_paths = get_changed_paths(os.environ['TRAVIS_COMMIT_RANGE'])
-    result, report = should_run_build_task(
-        changed_paths=changed_paths,
-        task=task
-    )
-    print('\n' + build_report_output(report) + '\n')
+    changed_paths = get_changed_paths(os.environ["TRAVIS_COMMIT_RANGE"])
+    result, report = should_run_build_task(changed_paths=changed_paths, task=task)
+    print("\n" + build_report_output(report) + "\n")
 
     return result
 
@@ -102,8 +97,8 @@ def main():
     with timestamps():
 
         # https://docs.travis-ci.com/user/environment-variables/
-        travis_event_type = os.environ['TRAVIS_EVENT_TYPE']
-        task = os.environ['TASK']
+        travis_event_type = os.environ["TRAVIS_EVENT_TYPE"]
+        task = os.environ["TASK"]
 
         if _should_run_tests(task=task, travis_event_type=travis_event_type):
             print("*** We're going to run tests")
@@ -115,20 +110,14 @@ def main():
 
         make(task)
 
-        if task in [
-            'travis-format',
-            'travistooling-test',
-        ]:
-            print('*** Task %s does not have a publish step' % task)
+        if task in ["travis-format", "travistooling-test"]:
+            print("*** Task %s does not have a publish step" % task)
             return 0
 
-        publish_task = task.replace('-build', '-publish')
-        publish_task = task.replace('-test', '-publish')
+        publish_task = task.replace("-build", "-publish")
+        publish_task = task.replace("-test", "-publish")
 
-        if _should_run_publish(
-            task=publish_task,
-            travis_event_type=travis_event_type
-        ):
+        if _should_run_publish(task=publish_task, travis_event_type=travis_event_type):
             print("*** We're going to run the publish task")
             make(publish_task)
         else:
@@ -136,10 +125,10 @@ def main():
 
             # Doing a --dry-run checks that the associated publish task exists,
             # which protects us from merging a branch with no publish task.
-            make(publish_task, '--dry-run')
+            make(publish_task, "--dry-run")
 
         return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

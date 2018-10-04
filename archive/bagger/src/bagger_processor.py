@@ -7,11 +7,7 @@ import time
 def process_bagging_message(message):
     identifier = message.get("identifier", None)
     do_not_bag = message.get("do_not_bag", True)
-    result = {
-        "identifier": identifier,
-        "duration": -1,
-        "error": None
-    }
+    result = {"identifier": identifier, "duration": -1, "error": None}
     if identifier is not None:
         start = time.time()
         try:

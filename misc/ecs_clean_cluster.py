@@ -29,37 +29,43 @@ def get_ec2_dns_names(cluster):
     Generates the public DNS names of instances in the cluster.
     """
 
-    ecs = boto3.client('ecs')
-    resp = ecs.list_container_instances(cluster='api_cluster')
-    arns = resp['containerInstanceArns']
+    ecs = boto3.client("ecs")
+    resp = ecs.list_container_instances(cluster="api_cluster")
+    arns = resp["containerInstanceArns"]
 
-    resp = ecs.describe_container_instances(cluster='api_cluster', containerInstances=arns)
-    instance_ids = [e['ec2InstanceId'] for e in resp['containerInstances']]
+    resp = ecs.describe_container_instances(
+        cluster="api_cluster", containerInstances=arns
+    )
+    instance_ids = [e["ec2InstanceId"] for e in resp["containerInstances"]]
 
-    ec2 = boto3.client('ec2')
+    ec2 = boto3.client("ec2")
     resp = ec2.describe_instances(InstanceIds=instance_ids)
 
-    for r in resp['Reservations']:
-        for i in r['Instances']:
-            yield i['PublicDnsName']
+    for r in resp["Reservations"]:
+        for i in r["Instances"]:
+            yield i["PublicDnsName"]
 
 
 def main():
     args = docopt.docopt(__doc__)
 
-    for name in get_ec2_dns_names(args['--cluster']):
-        print(f'*** {name}')
-        proc = subprocess.Popen([
-            'ssh', '-i', args['--key'],
-            f'core@{name}', 'docker rm $(docker ps -a -q)'
-        ])
+    for name in get_ec2_dns_names(args["--cluster"]):
+        print(f"*** {name}")
+        proc = subprocess.Popen(
+            ["ssh", "-i", args["--key"], f"core@{name}", "docker rm $(docker ps -a -q)"]
+        )
         proc.communicate()
-        proc = subprocess.Popen([
-            'ssh', '-i', args['--key'],
-            f'core@{name}', 'docker rmi $(docker images -q)'
-        ])
+        proc = subprocess.Popen(
+            [
+                "ssh",
+                "-i",
+                args["--key"],
+                f"core@{name}",
+                "docker rmi $(docker images -q)",
+            ]
+        )
         proc.communicate()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

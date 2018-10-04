@@ -48,7 +48,9 @@ def send_bag_instruction(message):
         queue = sqs.get_queue_by_name(QueueName=settings.BAGGING_QUEUE)
     except ClientError as ce:
         if ce.response["Error"]["Code"] == "AWS.SimpleQueueService.NonExistentQueue":
-            queue = sqs.create_queue(QueueName=settings.BAGGING_QUEUE, Attributes={'DelaySeconds': '0'})
+            queue = sqs.create_queue(
+                QueueName=settings.BAGGING_QUEUE, Attributes={"DelaySeconds": "0"}
+            )
             print("Created queue - " + settings.BAGGING_QUEUE)
 
     response = queue.send_message(MessageBody=json.dumps(message))

@@ -18,23 +18,23 @@ def pprint_timedelta(seconds):
 
     if days > 0:
         if hours == 0:
-            return '%dd' % days
+            return "%dd" % days
         else:
-            return '%dd %dh' % (days, hours)
+            return "%dd %dh" % (days, hours)
 
     elif hours > 0:
         if minutes == 0:
-            return '%dh' % hours
+            return "%dh" % hours
         else:
-            return '%dh %dm' % (hours, minutes)
+            return "%dh %dm" % (hours, minutes)
 
     elif minutes > 0:
         if seconds == 0:
-            return '%dm' % minutes
+            return "%dm" % minutes
         else:
-            return '%dm %ds' % (minutes, seconds)
+            return "%dm %ds" % (minutes, seconds)
     else:
-        return '%ds' % seconds
+        return "%ds" % seconds
 
 
 def get_snapshot_report():
@@ -44,24 +44,24 @@ def get_snapshot_report():
     lines = []
     now = dt.datetime.now()
 
-    s3 = boto3.client('s3')
+    s3 = boto3.client("s3")
 
-    for version in ['v1', 'v2']:
+    for version in ["v1", "v2"]:
         try:
             # Yes, this makes a bunch of hard-coded assumptions about the
             # way the bucket is laid out.  It's a quick-win helper for
             # bug diagnosis, not a prod API.
             s3_object = s3.head_object(
-                Bucket='wellcomecollection-data-public',
-                Key=f'catalogue/{version}/works.json.gz'
+                Bucket="wellcomecollection-data-public",
+                Key=f"catalogue/{version}/works.json.gz",
             )
 
-            last_modified_date = s3_object['LastModified'].replace(tzinfo=None)
+            last_modified_date = s3_object["LastModified"].replace(tzinfo=None)
             seconds = (now - last_modified_date).seconds
             lines.append(
-                f'{version}: {pprint_timedelta(seconds)} ago ({last_modified_date.isoformat()})'
+                f"{version}: {pprint_timedelta(seconds)} ago ({last_modified_date.isoformat()})"
             )
         except Exception:
             pass
 
-    return '\n'.join(lines)
+    return "\n".join(lines)
