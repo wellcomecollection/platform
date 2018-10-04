@@ -4,4 +4,9 @@
 #
 #    pip-compile --output-file test_requirements.txt test_requirements.in
 #
+betamax==0.8.1
+certifi==2018.8.24        # via requests
+chardet==3.0.4            # via requests
+idna==2.7                 # via requests
+requests==2.19.1          # via betamax
 urllib3==1.22
