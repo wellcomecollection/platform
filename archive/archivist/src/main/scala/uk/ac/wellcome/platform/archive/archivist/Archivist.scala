@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.archive.archivist
 
-import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.scaladsl.Flow
@@ -16,7 +15,7 @@ import uk.ac.wellcome.platform.archive.archivist.flow._
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
 
 trait Archivist extends Logging {
   val injector: Injector
@@ -65,15 +64,5 @@ trait Archivist extends Logging {
           ](ifLeft = _ => ())(ifRight = ArchiveAndNotifyRegistrarFlow(bagUploaderConfig, snsProgressConfig, snsRegistrarConfig)))
 
     messageStream.run("archivist", workFlow)
-  }
-
-  private def ArchiveAndNotifyRegistrarFlow(bagUploaderConfig: BagUploaderConfig, snsProgressConfig: SNSConfig, snsRegistrarConfig: SNSConfig)(implicit s3: AmazonS3, snsClient: AmazonSNS): Flow[ZipFileDownloadComplete, Unit, NotUsed] = {
-    ArchiveZipFileFlow(bagUploaderConfig, snsProgressConfig)
-      .log("archive verified")
-      .via(FoldEitherFlow[
-        ArchiveError[_],
-        ArchiveComplete,
-        Unit
-        ](ifLeft = _ => ())(ifRight = ArchiveCompleteFlow(snsRegistrarConfig).map(_=>()) ))
   }
 }
