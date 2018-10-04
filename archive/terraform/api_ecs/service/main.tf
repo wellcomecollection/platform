@@ -13,7 +13,7 @@ resource "aws_alb_listener_rule" "path_rule" {
 }
 
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=v11.8.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=v11.8.1"
 
   service_name       = "${var.namespace}"
   task_desired_count = "1"
@@ -37,7 +37,7 @@ module "service" {
 }
 
 module "task" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=v11.8.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=v11.8.1"
 
   aws_region = "${var.aws_region}"
   task_name  = "${var.namespace}"
