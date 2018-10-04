@@ -5,14 +5,14 @@ import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagUploaderConfig}
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, ArchiveJobError}
-import uk.ac.wellcome.platform.archive.common.flows.SnsPublishFlow
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagUploaderConfig}
+import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest}
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
-import uk.ac.wellcome.json.JsonUtil._
 
 object ArchiveZipFileFlow extends Logging {
   def apply(config: BagUploaderConfig,
