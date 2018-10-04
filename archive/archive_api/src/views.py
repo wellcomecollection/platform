@@ -71,18 +71,17 @@ class IngestCollection(Resource):
 
     def validate_urls(self, callback_url, upload_url):
         try:
-            validators.validate_single_url(
-                upload_url, supported_schemes=["s3"], allow_fragment=False
-            )
+            validators.validate_upload_url(upload_url)
         except ValueError as error:
             raise BadRequestError(f"Invalid uploadUrl:{upload_url!r}, {error}")
+
         if callback_url:
             try:
-                validators.validate_single_url(
-                    callback_url, supported_schemes=["http", "https"]
-                )
+                validators.validate_callback_url(callback_url)
             except ValueError as error:
-                raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
+                raise BadRequestError(
+                    f"Invalid callbackUrl:{callback_url!r}, {error}"
+                )
 
 
 @ns_ingests.route("/<string:id>")
