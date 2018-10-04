@@ -17,6 +17,11 @@ class ProgressNotFoundError(Exception):
 class ProgressManager:
     """
     Handles requests to/from the progress service.
+
+    The progress service is a separate, internal-only app running in ECS.
+    It manages connections to the progress tracking table in DynamoDB --
+    we should never query that table directly, only through this service.
+
     """
 
     def __init__(self, endpoint, sess=None):
