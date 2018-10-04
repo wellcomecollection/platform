@@ -14,7 +14,11 @@ import uk.ac.wellcome.platform.archive.common.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models
-import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate, Progress => ProgressModel}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  ProgressEvent,
+  ProgressUpdate,
+  Progress => ProgressModel
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.progress_http.modules._

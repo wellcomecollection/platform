@@ -13,7 +13,7 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import scala.concurrent.duration._
 
 class ArgsConfigurator(val arguments: Seq[String])
-  extends ScallopConf(arguments) {
+    extends ScallopConf(arguments) {
 
   private val awsCloudwatchRegion = opt[String](default = Some("eu-west-1"))
   private val awsCloudwatchEndpoint = opt[String]()
