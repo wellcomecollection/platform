@@ -16,12 +16,12 @@ PRONOM = {
     "Acrobat PDF 1.7 - Portable Document Format 1.7": "fmt/276",
     "Acrobat PDF/X - Portable Document Format - Exchange 1a:2001": "fmt/157",
     "Acrobat PDF/X - Portable Document Format - Exchange PDF/X-4": "fmt/488",
-    "Extensible Markup Language 1.0": "fmt/101"
+    "Extensible Markup Language 1.0": "fmt/101",
 }
 
 FOR_CONSIDERATION = {
     "JPEG2000 / Macintosh PICT Image 1.0": "x-fmt/392",
-    "JPEG File Interchange Format 1.01": "x-fmt/392"
+    "JPEG File Interchange Format 1.01": "x-fmt/392",
 }
 
 # map of tessella names to premis names
@@ -43,6 +43,4 @@ IGNORED_PROPERTIES = [
     "Samples Per Pixel",
 ]
 
-IGNORED_TECHMD_FILENAMES = [
-    "thumbs.db"
-]
+IGNORED_TECHMD_FILENAMES = ["thumbs.db"]

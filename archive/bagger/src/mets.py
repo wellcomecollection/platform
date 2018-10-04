@@ -18,7 +18,7 @@ manifestation_types = [
     "MultipleCopy",
     "MultipleVolumeMultipleCopy",
     "Audio",
-    "Map"
+    "Map",
 ]
 
 
@@ -114,7 +114,9 @@ the AMD to start at _0001
 
 
 def is_ignorable_file(tech_md):
-    file_name_els = tech_md.findall("./mets:mdWrap/mets:xmlData/tessella:File/tessella:FileName", namespaces)
+    file_name_els = tech_md.findall(
+        "./mets:mdWrap/mets:xmlData/tessella:File/tessella:FileName", namespaces
+    )
     if len(file_name_els) == 1:
         logging.info("ignoring techMd file " + file_name_els[0].text)
         return file_name_els[0].text in mappings.IGNORED_TECHMD_FILENAMES
