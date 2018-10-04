@@ -75,7 +75,7 @@ class IngestCollection(Resource):
         except ValueError as error:
             raise BadRequestError(f"Invalid uploadUrl:{upload_url!r}, {error}")
 
-        if callback_url:
+        if callback_url is not None:
             try:
                 validators.validate_callback_url(callback_url)
             except ValueError as error:
