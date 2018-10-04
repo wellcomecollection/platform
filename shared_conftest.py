@@ -27,7 +27,15 @@ def random_alpha():
 
 @pytest.fixture(scope='session')
 def docker_compose_file(pytestconfig):
-    return os.path.join(str(pytestconfig.rootdir), 'docker-compose.yml')
+    root_docker_compose = pytestconfig.rootdir.join('docker-compose.yml')
+    src_docker_compose = pytestconfig.rootdir.join('src', 'docker-compose.yml')
+
+    if root_docker_compose.exists():
+        return root_docker_compose
+    elif src_docker_compose.exists():
+        return src_docker_compose
+    else:
+        assert False, 'Cannot find docker-compose file!'
 
 
 def _is_responsive(endpoint_url, condition):
