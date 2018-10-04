@@ -8,18 +8,16 @@ class TestReportIngestStatus:
     Tests for the GET /ingests/<guid> endpoint.
     """
 
-    def test_lookup_item(self, client, dynamodb_resource, table_name, guid):
-        table = dynamodb_resource.Table(table_name)
-        table.put_item(Item={"id": guid})
-
+    def test_lookup_item(self, client, guid):
         resp = client.get(f"/storage/v1/ingests/{guid}")
         assert resp.status_code == 200
-        assert json.loads(resp.data) == {"id": guid}
+        assert json.loads(resp.data) == {"progress": guid}
 
-    def test_lookup_missing_item_is_404(self, client, guid):
-        resp = client.get(f"/storage/v1/ingests/{guid}")
+    def test_lookup_missing_item_is_404(self, client):
+        lookup_id = "bad_status-404"
+        resp = client.get(f"/storage/v1/ingests/{lookup_id}")
         assert resp.status_code == 404
-        assert (b"Invalid id: No ingest found for id=%r" % guid) in resp.data
+        assert (b"Invalid id: No ingest found for id=%r" % lookup_id) in resp.data
 
     def test_post_against_lookup_endpoint_is_405(self, client, guid):
         resp = client.post(f"/storage/v1/ingests/{guid}")
@@ -184,24 +182,6 @@ class TestRequestNewIngest:
         assert "callbackUrl" in message
         assert message["callbackUrl"] == self.callback_url
 
-    def test_successful_request_creates_progress(
-        self, client, dynamodb_resource, table_name
-    ):
-        response = client.post(
-            "/storage/v1/ingests", json=ingests_post(self.upload_url, self.callback_url)
-        )
-
-        assert "Location" in response.headers
-        request_id = response.headers["Location"].split("/")[-1]
-
-        table = dynamodb_resource.Table(table_name)
-        dynamo_response = table.get_item(Key={"id": request_id})
-        assert "Item" in dynamo_response
-        progress = dynamo_response["Item"]
-        assert progress["uploadUrl"] == self.upload_url
-        assert progress["callbackUrl"] == self.callback_url
-
-    def test_get_against_request_endpoint_is_405(self, client):
         resp = client.get("/storage/v1/ingests")
         assert resp.status_code == 405
 

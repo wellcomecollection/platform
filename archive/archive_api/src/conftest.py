@@ -32,8 +32,11 @@ def client(
     bucket_bag,
     global_sess
 ):
+    # This only has to work when populating the betamax recording file;
+    # although we run on Linux in Travis CI, this will still fine because
+    # we use the cached recordings.
     os.environ.update({
-        'PROGRESS_MANAGER_ENDPOINT': 'http://localhost:6000'
+        'PROGRESS_MANAGER_ENDPOINT': 'http://docker.for.mac.localhost:6000'
     })
 
     from archive_api import app

@@ -91,7 +91,7 @@ class IngestResource(Resource):
             result = progress_manager.lookup_progress(id=id)
             return jsonify(result)
         except ProgressNotFoundError as error:
-            raise NotFoundError(f"Invalid id: {error}")
+            raise NotFoundError(f"Invalid id: No ingest found for id={id!r}")
 
 
 @ns_bags.route("/<string:id>")
