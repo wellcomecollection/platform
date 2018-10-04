@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.archive.notifier.modules.{
 import uk.ac.wellcome.platform.archive.common.modules.{
   AkkaModule,
   CloudWatchClientModule,
-  SNSAsyncClientModule,
+  SNSClientModule,
   SQSClientModule
 }
 
@@ -23,7 +23,7 @@ object Main extends App with Logging {
     AkkaModule,
     CloudWatchClientModule,
     SQSClientModule,
-    SNSAsyncClientModule
+    SNSClientModule
   )
 
   val app = injector.getInstance(classOf[Notifier])

@@ -63,7 +63,7 @@ class RegistrarFeatureTest
           queuePair,
           storageBucket) { bagLocation =>
           givenProgressRecord(
-            requestId.toString,
+            requestId,
             uploadUri,
             Some(callbackUri),
             progressTable

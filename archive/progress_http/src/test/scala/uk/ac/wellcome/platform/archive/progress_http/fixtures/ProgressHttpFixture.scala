@@ -50,7 +50,7 @@ trait ProgressHttpFixture
     startPort + Random.nextInt(portRange)
   }
 
-  private def generateUUID = UUID.randomUUID().toString
+  private def generateUUID = UUID.randomUUID()
 
   def withProgress[R](monitor: ProgressMonitor)(
     testWith: TestWith[models.Progress, R]) = {
@@ -64,16 +64,17 @@ trait ProgressHttpFixture
     testWith(storedProgress)
   }
 
-  def withProgressUpdate[R](id: String, status: Status = None)(
+  def withProgressUpdate[R](id: UUID, status: Status = None)(
     testWith: TestWith[ProgressUpdate, R]) = {
 
-    val event = ProgressEvent(
-      description = randomAlphanumeric()
-    )
+    val events = List(
+      ProgressEvent(
+        description = randomAlphanumeric()
+      ))
 
     val progress = ProgressUpdate(
       id = id,
-      event = event,
+      events = events,
       status = status
     )
 

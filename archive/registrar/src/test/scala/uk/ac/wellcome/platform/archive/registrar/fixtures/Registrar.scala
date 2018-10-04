@@ -21,6 +21,7 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorF
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   ConfigModule,
+  SNSAsyncClientModule,
   TestAppConfigModule,
   VHSModule
 }

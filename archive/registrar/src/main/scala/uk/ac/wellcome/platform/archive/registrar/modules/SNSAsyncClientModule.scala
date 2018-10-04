@@ -1,9 +1,10 @@
-package uk.ac.wellcome.platform.archive.common.modules
+package uk.ac.wellcome.platform.archive.registrar.modules
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sns.{AmazonSNSAsync, AmazonSNSAsyncClientBuilder}
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import uk.ac.wellcome.platform.archive.common.modules.SnsClientConfig
 
 object SNSAsyncClientModule extends AbstractModule {
   @Singleton
@@ -31,10 +32,3 @@ object SNSAsyncClientModule extends AbstractModule {
     }
   }
 }
-
-case class SnsClientConfig(
-  accessKey: Option[String],
-  secretKey: Option[String],
-  endpoint: Option[String],
-  region: String
-)

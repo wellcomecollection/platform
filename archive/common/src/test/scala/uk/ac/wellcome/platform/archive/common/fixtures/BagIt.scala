@@ -20,7 +20,8 @@ trait BagIt {
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile) = {
+    createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile)
+    : Seq[FileEntry] = {
 
     val dataFiles = createDataFiles(dataFileCount)
     val filesAndDigest = dataFiles.map {

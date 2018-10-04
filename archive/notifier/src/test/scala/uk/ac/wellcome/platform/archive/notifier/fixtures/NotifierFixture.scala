@@ -36,7 +36,7 @@ trait NotifierFixture extends S3 with Messaging with BagIt {
       AkkaModule,
       CloudWatchClientModule,
       SQSClientModule,
-      SNSAsyncClientModule,
+      SNSClientModule,
       MessageStreamModule
     )
 

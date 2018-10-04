@@ -50,7 +50,7 @@ class ProgressAsyncFeatureTest
 
                 assertProgressRecordedRecentEvents(
                   update.id,
-                  Seq(update.event.description),
+                  update.events.map(_.description),
                   table
                 )
 

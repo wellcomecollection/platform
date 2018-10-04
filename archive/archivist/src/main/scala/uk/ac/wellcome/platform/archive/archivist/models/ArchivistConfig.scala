@@ -12,7 +12,8 @@ case class ArchivistConfig(
   sqsClientConfig: SQSClientConfig,
   sqsConfig: SQSConfig,
   snsClientConfig: SnsClientConfig,
-  snsConfig: SNSConfig,
+  registrarSnsConfig: SNSConfig,
+  progressSnsConfig: SNSConfig,
   metricsConfig: MetricsConfig
 )
 

@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.progress_http
 
+import java.util.UUID
+
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
@@ -37,7 +39,8 @@ class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) {
         }
       } ~ path(Segment) { id: String =>
         get {
-          monitor.get(id) match {
+          // TODO add test for what happens if id is not a valid UUID
+          monitor.get(UUID.fromString(id)) match {
             case scala.Some(progress) => complete(progress)
             case scala.None =>
               complete(NotFound -> "Progress monitor not found!")

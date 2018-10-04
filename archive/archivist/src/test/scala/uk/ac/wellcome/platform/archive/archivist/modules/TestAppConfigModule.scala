@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.modules
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
@@ -9,9 +11,12 @@ import uk.ac.wellcome.platform.archive.common.modules._
 
 import scala.concurrent.duration._
 
-class TestAppConfigModule(queueUrl: String,
+class TestAppConfigModule(actorSystem: ActorSystem,
+                          actorMaterializer: ActorMaterializer,
+                          queueUrl: String,
                           storageBucketName: String,
-                          topicArn: String)
+                          registrarTopicArn: String,
+                          progressTopicArn: String)
     extends AbstractModule {
 
   @Provides
@@ -40,7 +45,8 @@ class TestAppConfigModule(queueUrl: String,
       region = "localhost",
       endpoint = Some("http://localhost:9292")
     )
-    val snsConfig = SNSConfig(topicArn)
+    val registrarSnsConfig = SNSConfig(registrarTopicArn)
+    val progressSnsConfig = SNSConfig(progressTopicArn)
 
     val metricsConfig = MetricsConfig(
       namespace = "namespace",
@@ -59,8 +65,13 @@ class TestAppConfigModule(queueUrl: String,
       sqsClientConfig,
       sqsConfig,
       snsClientConfig,
-      snsConfig,
+      registrarSnsConfig,
+      progressSnsConfig,
       metricsConfig
     )
   }
+  @Provides
+  def providesActorSystem = actorSystem
+  @Provides
+  def providesActorMaterialzer = actorMaterializer
 }

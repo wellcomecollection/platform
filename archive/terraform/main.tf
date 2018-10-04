@@ -13,10 +13,10 @@ module "archivist" {
   max_capacity = 1
 
   env_vars = {
-    queue_url                   = "${module.archivist_queue.id}"
-    archive_bucket              = "${aws_s3_bucket.archive_storage.id}"
-    topic_arn                   = "${module.registrar_topic.arn}"
-    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+    queue_url           = "${module.archivist_queue.id}"
+    archive_bucket      = "${aws_s3_bucket.archive_storage.id}"
+    registrar_topic_arn = "${module.registrar_topic.arn}"
+    progress_topic_arn  = "${module.progress_async_topic.arn}"
   }
 
   env_vars_length = 4

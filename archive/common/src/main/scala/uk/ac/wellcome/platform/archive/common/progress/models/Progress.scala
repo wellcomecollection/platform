@@ -19,7 +19,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
 }
 
 case class Progress(
-  id: String,
+  id: UUID,
   uploadUri: URI,
   callbackUri: Option[URI],
   result: Progress.Status = Progress.None,
@@ -31,7 +31,7 @@ case class Progress(
   def update(progressUpdate: ProgressUpdate) = {
     this.copy(
       result = progressUpdate.status,
-      events = progressUpdate.event +: this.events
+      events = progressUpdate.events ++ this.events
     )
   }
 }
@@ -107,13 +107,13 @@ object Progress extends URIConverters with StatusConverters {
       callbackUri = createRequest.callbackUri)
   }
 
-  private def generateId = UUID.randomUUID().toString
+  private def generateId = UUID.randomUUID()
 }
 
 case class ProgressEvent(description: String, time: Instant = Instant.now)
 
-case class ProgressUpdate(id: String,
-                          event: ProgressEvent,
+case class ProgressUpdate(id: UUID,
+                          events: List[ProgressEvent],
                           status: Progress.Status = Progress.None)
     extends StatusConverters
 

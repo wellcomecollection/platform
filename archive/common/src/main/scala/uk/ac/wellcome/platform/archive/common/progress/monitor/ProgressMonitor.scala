@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress.monitor
 
+import java.util.UUID
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import com.google.inject.Inject
@@ -22,7 +24,7 @@ class ProgressMonitor @Inject()(
 
   import Progress._
 
-  def get(id: String) = {
+  def get(id: UUID) = {
     Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
       'id -> id
     ) match {
@@ -64,13 +66,14 @@ class ProgressMonitor @Inject()(
   def update(update: ProgressUpdate): Try[Progress] = {
     debug(s"Updating Dynamo record ${update.id} with: $update")
 
-    val event = update.event
+    val events = update.events
 
     val mergedUpdate = update.status match {
       case Progress.None =>
-        append('events -> event)
+        events.map(event => append('events -> event)).reduce(_ and _)
       case status =>
-        append('events -> event) and set('result -> status)
+        events.map(event => append('events -> event)).reduce(_ and _) and set(
+          'result -> status)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)

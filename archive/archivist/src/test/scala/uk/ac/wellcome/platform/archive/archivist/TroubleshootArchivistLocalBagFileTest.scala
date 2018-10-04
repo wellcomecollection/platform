@@ -17,7 +17,7 @@ class TroubleshootArchivistLocalBagFileTest
 
   ignore("downloads, uploads and verifies a known BagIt bag") {
     withArchivist {
-      case (ingestBucket, storageBucket, queuePair, _, archivist) =>
+      case (ingestBucket, storageBucket, queuePair, _, _, archivist) =>
         sendBag(
           new ZipFile(
             List(

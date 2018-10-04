@@ -124,7 +124,7 @@ class ProgressHttpFeatureTest
 
                 // We should have an id
                 maybeId.isEmpty shouldBe false
-                val id = maybeId.get
+                val id = UUID.fromString(maybeId.get)
 
                 // Check progress is returned
                 val progressFuture = Unmarshal(result.entity).to[Progress]

@@ -2,23 +2,22 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
-import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagLocation,
-  BagPath,
-  DigitisedStorageType,
-  EntryPath
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveError,
+  FileNotFoundError,
+  InvalidBagInfo
 }
-
-import scala.util.Try
+import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
+import uk.ac.wellcome.platform.archive.common.models._
 
 object ArchiveJobCreator {
   def create(
     zipFile: ZipFile,
-    config: BagUploaderConfig
-  ) = {
+    config: BagUploaderConfig,
+    ingestBagRequest: IngestBagRequest
+  ): Either[ArchiveError[IngestBagRequest], ArchiveJob] = {
 
-    getBagIdentifier(zipFile)
+    getBagIdentifier(zipFile, ingestBagRequest)
       .map(bagIdentifier => BagPath(s"$DigitisedStorageType/$bagIdentifier"))
       .map { bagPath =>
         ArchiveJob(
@@ -32,28 +31,27 @@ object ArchiveJobCreator {
           BagManifestLocation.create(config.bagItConfig)
         )
       }
-      .toEither
   }
 
-  private def getBagIdentifier(zipFile: ZipFile): Try[String] = {
-    Try(
-      ZipFileReader
-        .maybeInputStream(ZipLocation(zipFile, EntryPath("bag-info.txt")))
-        .getOrElse(
-          throw new NoSuchElementException("Unable to read from bag-info.txt")))
+  private def getBagIdentifier(zipFile: ZipFile,
+                               ingestBagRequest: IngestBagRequest)
+    : Either[ArchiveError[IngestBagRequest], String] = {
+    ZipFileReader
+      .maybeInputStream(ZipLocation(zipFile, EntryPath("bag-info.txt")))
+      .toRight[ArchiveError[IngestBagRequest]](
+        FileNotFoundError("bag-info.txt", ingestBagRequest))
       .flatMap { inputStream =>
         val bagInfoLines = scala.io.Source
           .fromInputStream(inputStream, "UTF-8")
           .mkString
           .split("\n")
         val regex = """(.*?)\s*:\s*(.*)\s*""".r
-        Try(
-          bagInfoLines
-            .collectFirst {
-              case regex(key, value) if key == "External-Identifier" => value
-            }
-            .getOrElse(throw new NoSuchElementException(
-              "Unable to extract External-Indentifier from bag-info.txt")))
+
+        bagInfoLines
+          .collectFirst {
+            case regex(key, value) if key == "External-Identifier" => value
+          }
+          .toRight(InvalidBagInfo(ingestBagRequest))
       }
   }
 }

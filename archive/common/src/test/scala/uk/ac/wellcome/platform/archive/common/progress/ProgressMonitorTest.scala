@@ -41,7 +41,7 @@ class ProgressMonitorTest
     it("creates a progress monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { archiveProgressMonitor =>
-          val id = UUID.randomUUID().toString
+          val id = UUID.randomUUID()
           val archiveIngestProgress =
             Progress(id, uploadUri, Some(callbackUri), Progress.Processing)
 
@@ -55,7 +55,7 @@ class ProgressMonitorTest
     it("only allows the creation of one progress monitor for a given id") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { archiveProgressMonitor =>
-          val id = UUID.randomUUID().toString
+          val id = UUID.randomUUID()
 
           val monitors = List(
             Progress(id, uploadUri, Some(callbackUri)),
@@ -87,7 +87,7 @@ class ProgressMonitorTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        val id = UUID.randomUUID().toString
+        val id = UUID.randomUUID()
         val progress = Progress(id, uploadUri, Some(callbackUri))
 
         val result = Try(archiveProgressMonitor.create(progress))
@@ -122,7 +122,7 @@ class ProgressMonitorTest
           val progress =
             createProgress(progressMonitor, callbackUri, uploadUri)
 
-          val result = progressMonitor.get("not_the_id_we_created")
+          val result = progressMonitor.get(UUID.randomUUID())
 
           assertTableOnlyHasItem(progress, table)
           result shouldBe scala.None
@@ -142,7 +142,7 @@ class ProgressMonitorTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        val id = UUID.randomUUID().toString
+        val id = UUID.randomUUID()
         val result = Try(archiveProgressMonitor.get(id))
         val failedException = result.failed.get
 
@@ -162,7 +162,7 @@ class ProgressMonitorTest
 
           val progressUpdate = ProgressUpdate(
             progress.id,
-            ProgressEvent("So that happened.")
+            List(ProgressEvent("So that happened."))
           )
 
           archiveProgressMonitor.update(progressUpdate)
@@ -174,7 +174,7 @@ class ProgressMonitorTest
             table)
           assertProgressRecordedRecentEvents(
             progressUpdate.id,
-            Seq(progressUpdate.event.description),
+            progressUpdate.events.map(_.description),
             table)
 
         }
@@ -189,11 +189,11 @@ class ProgressMonitorTest
           val updates = List(
             ProgressUpdate(
               progress.id,
-              ProgressEvent("It happened again.")
+              List(ProgressEvent("It happened again."))
             ),
             ProgressUpdate(
               progress.id,
-              ProgressEvent("Dammit Bobby.")
+              List(ProgressEvent("Dammit Bobby."))
             )
           )
 
@@ -206,7 +206,7 @@ class ProgressMonitorTest
             table)
           assertProgressRecordedRecentEvents(
             progress.id,
-            updates.map(_.event.description),
+            updates.flatMap(_.events.map(_.description)),
             table)
         }
       }
@@ -224,9 +224,10 @@ class ProgressMonitorTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        val id = UUID.randomUUID().toString
+        val id = UUID.randomUUID()
 
-        val update = ProgressUpdate(id, ProgressEvent("Too much winning."))
+        val update =
+          ProgressUpdate(id, List(ProgressEvent("Too much winning.")))
 
         val result = Try(archiveProgressMonitor.update(update))
 

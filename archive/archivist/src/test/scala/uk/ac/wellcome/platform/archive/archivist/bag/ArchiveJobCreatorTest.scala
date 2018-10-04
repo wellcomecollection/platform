@@ -5,7 +5,8 @@ import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGen
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveJob,
   BagItConfig,
-  BagManifestLocation
+  BagManifestLocation,
+  IngestRequestContextGenerators
 }
 import uk.ac.wellcome.platform.archive.common.models.{
   BagLocation,
@@ -19,14 +20,18 @@ class ArchiveJobCreatorTest
     with ZipBagItFixture
     with BagUploaderConfigGenerator
     with Matchers
-    with Inside {
+    with Inside
+    with IngestRequestContextGenerators {
   it("creates an archive job") {
     withBagItZip() {
       case (bagIdentifier, zipFile) =>
         val bucketName = "bucket"
         inside(
           ArchiveJobCreator
-            .create(zipFile, createBagUploaderConfig(Bucket(bucketName)))) {
+            .create(
+              zipFile,
+              createBagUploaderConfig(Bucket(bucketName)),
+              createIngestBagRequest)) {
           case Right(
               ArchiveJob(
                 actualZipFile,

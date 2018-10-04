@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
-import com.amazonaws.services.sns.AmazonSNSAsync
+import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
@@ -26,8 +26,8 @@ trait ProgressAsync extends Logging {
 
     type StreamNotice = MessageStream[NotificationMessage, Object]
 
-    implicit val snsClient: AmazonSNSAsync =
-      injector.getInstance(classOf[AmazonSNSAsync])
+    implicit val snsClient: AmazonSNS =
+      injector.getInstance(classOf[AmazonSNS])
     val snsConfig = injector.getInstance(classOf[SNSConfig])
 
     implicit val system =
