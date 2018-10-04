@@ -28,9 +28,9 @@ app.config.from_object(config_obj)
 daiquiri.setup(level=os.environ.get("LOG_LEVEL", "INFO"))
 logger = daiquiri.getLogger()
 
-app.config['PROGRESS_MANAGER'] = ProgressManager(
-    endpoint=app.config['PROGRESS_MANAGER_ENDPOINT'],
-    sess=app.config['PROGRESS_MANAGER_SESSION']
+app.config["PROGRESS_MANAGER"] = ProgressManager(
+    endpoint=app.config["PROGRESS_MANAGER_ENDPOINT"],
+    sess=app.config["PROGRESS_MANAGER_SESSION"],
 )
 
 # We can't move this import to the top because the views need the ``api``

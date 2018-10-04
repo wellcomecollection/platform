@@ -9,16 +9,16 @@ import pytest
 import requests
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def recorded_sess(pytestconfig):
     with betamax.Betamax.configure() as config:
         config.cassette_library_dir = str(
-            pytestconfig.rootdir.join('src', 'tests', 'cassettes')
+            pytestconfig.rootdir.join("src", "tests", "cassettes")
         )
 
     session = requests.Session()
     with betamax.Betamax(session) as vcr:
-        vcr.use_cassette('test_archive_api')
+        vcr.use_cassette("test_archive_api")
         yield session
 
 
@@ -30,14 +30,14 @@ def client(
     topic_arn,
     table_name_bag,
     bucket_bag,
-    recorded_sess
+    recorded_sess,
 ):
     # This only has to work when populating the betamax recording file;
     # although we run on Linux in Travis CI, this will still fine because
     # we use the cached recordings.
-    os.environ.update({
-        'PROGRESS_MANAGER_ENDPOINT': 'http://docker.for.mac.localhost:6000',
-    })
+    os.environ.update(
+        {"PROGRESS_MANAGER_ENDPOINT": "http://docker.for.mac.localhost:6000"}
+    )
 
     from archive_api import app
 

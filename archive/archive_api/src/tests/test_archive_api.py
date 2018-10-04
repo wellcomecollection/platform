@@ -9,10 +9,10 @@ class TestReportIngestStatus:
     """
 
     def test_lookup_item(self, client):
-        lookup_id = 'F423966E-A5E5-4D91-B321-88B90D1B5154'
-        resp = client.get(f'/storage/v1/ingests/{lookup_id}')
+        lookup_id = "F423966E-A5E5-4D91-B321-88B90D1B5154"
+        resp = client.get(f"/storage/v1/ingests/{lookup_id}")
         assert resp.status_code == 200
-        assert json.loads(resp.data) == {'progress': lookup_id}
+        assert json.loads(resp.data) == {"progress": lookup_id}
 
     def test_lookup_missing_item_is_404(self, client):
         lookup_id = "bad_status-404"

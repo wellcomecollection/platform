@@ -38,14 +38,14 @@ def validate_upload_url(url):
     """
     An upload URL should be an S3 URL without a fragment.
     """
-    validate_single_url(url, supported_schemes=['s3'], allow_fragment=False)
+    validate_single_url(url, supported_schemes=["s3"], allow_fragment=False)
 
 
 def validate_callback_url(url):
     """
     A callback URL should be an HTTP or HTTPS URL.
     """
-    validate_single_url(url, supported_schemes=['http', 'https'])
+    validate_single_url(url, supported_schemes=["http", "https"])
 
 
 def validate_uuid(s):

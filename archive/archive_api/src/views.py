@@ -14,7 +14,7 @@ from progress_manager import ProgressNotFoundError
 import validators
 
 
-progress_manager = app.config['PROGRESS_MANAGER']
+progress_manager = app.config["PROGRESS_MANAGER"]
 
 api.namespaces.clear()
 ns_ingests = api.namespace("ingests", description="Ingest requests")
@@ -39,8 +39,7 @@ class IngestCollection(Resource):
         self.validate_urls(callback_url, upload_url)
 
         ingest_request_id = progress_manager.create_request(
-            upload_url=upload_url,
-            callback_url=callback_url
+            upload_url=upload_url, callback_url=callback_url
         )
         logger.debug("ingest_request_id=%r", ingest_request_id)
 
@@ -73,9 +72,7 @@ class IngestCollection(Resource):
             try:
                 validators.validate_callback_url(callback_url)
             except ValueError as error:
-                raise BadRequestError(
-                    f"Invalid callbackUrl:{callback_url!r}, {error}"
-                )
+                raise BadRequestError(f"Invalid callbackUrl:{callback_url!r}, {error}")
 
 
 @ns_ingests.route("/<string:id>")
