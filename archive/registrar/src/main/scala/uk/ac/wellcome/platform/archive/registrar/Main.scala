@@ -6,8 +6,7 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   AppConfigModule,
-  ConfigModule,
-  VHSModule
+  ConfigModule
 }
 
 import scala.concurrent.Await

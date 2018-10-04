@@ -20,7 +20,7 @@ case class BagSourceId(val value: String)
 
 // StorageManifest
 
-case class StorageManifest(
+case class BagManifest(
   id: BagId,
   source: SourceIdentifier,
   identifiers: List[SourceIdentifier],
@@ -42,7 +42,7 @@ sealed trait Manifest {
 
 case class FileManifest(
   checksumAlgorithm: ChecksumAlgorithm,
-  files: List[BagDigestFile]
+  files: Iterable[BagDigestFile]
 )
 
 case class TagManifest(
@@ -85,3 +85,13 @@ case class BagDigestFile(
   checksum: Checksum,
   path: BagFilePath
 )
+
+object BagDigestFile {
+  def apply(line: (String, String)) = {
+    BagDigestFile(
+      Checksum(line._1),
+      BagFilePath(line._2)
+    )
+  }
+
+}
