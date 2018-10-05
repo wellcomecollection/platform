@@ -129,7 +129,6 @@ def route_report_healthcheck_status():
 @api.marshal_with(models.Error)
 def default_error_handler(error):
     error_response = {
-        "errorType": "http",
         "httpStatus": getattr(error, "code", 500),
         "label": getattr(error, "name", "Internal Server Error"),
     }
