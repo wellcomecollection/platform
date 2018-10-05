@@ -22,7 +22,8 @@ class TypedModel(Model):
         if isinstance(model_fields, dict) and "type" not in model_fields:
             model_fields["type"] = fields.String(
                 description="Type of the object",
-                enum=[name]
+                enum=[name],
+                default=name
             )
 
         super().__init__(name, model_fields, *args, **kwargs)
