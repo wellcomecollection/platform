@@ -5,8 +5,40 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.AmazonSNSClientBuilder._
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import com.typesafe.config.Config
+import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.platform.archive.common.models.EnrichConfig
 
-object SNSClientModule extends AbstractModule {
+object SnsClientModule extends AbstractModule {
+  import EnrichConfig._
+
+  @Singleton
+  @Provides
+  def providesSnsConfig(config: Config) = {
+    val arn = config
+      .required[String]("aws.sns.topic.arn")
+
+    SNSConfig(arn)
+  }
+
+  @Singleton
+  @Provides
+  def providesSnsClientConfig(config: Config) = {
+    val key = config
+      .get[String]("aws.sns.key")
+
+    val secret = config
+      .get[String]("aws.sns.secret")
+
+    val endpoint = config
+      .get[String]("aws.sns.endpoint")
+
+    val region = config
+      .getOrElse[String]("aws.sns.region")("eu-west-1")
+
+    SnsClientConfig(key, secret, endpoint, region)
+  }
+
   @Singleton
   @Provides
   def providesSNSClient(snsClientConfig: SnsClientConfig): AmazonSNS = {

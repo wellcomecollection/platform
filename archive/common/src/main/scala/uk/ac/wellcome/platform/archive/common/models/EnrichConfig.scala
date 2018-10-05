@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.archive.common.modules.config
+package uk.ac.wellcome.platform.archive.common.models
 
 import com.typesafe.config.Config
 
-object ConfigHelper {
+object EnrichConfig {
   implicit class RichConfig(val underlying: Config) extends AnyVal {
     def get[T](path: String): Option[T] = if (underlying.hasPath(path)) {
       Some(underlying.getAnyRef(path).asInstanceOf[T])

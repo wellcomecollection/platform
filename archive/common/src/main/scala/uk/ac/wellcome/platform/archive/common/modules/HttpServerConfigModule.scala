@@ -1,10 +1,10 @@
-package uk.ac.wellcome.platform.archive.common.modules.config
+package uk.ac.wellcome.platform.archive.common.modules
 
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.typesafe.config.Config
 
 object HttpServerConfigModule extends AbstractModule {
-  import ConfigHelper._
+  import uk.ac.wellcome.platform.archive.common.models.EnrichConfig._
 
   @Provides
   @Singleton

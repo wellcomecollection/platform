@@ -1,15 +1,17 @@
-package uk.ac.wellcome.platform.archive.common.modules.config
+package uk.ac.wellcome.platform.archive.common.modules
 
-import com.google.inject.AbstractModule
+import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.typesafe.config.Config
 import uk.ac.wellcome.monitoring.MetricsConfig
+import uk.ac.wellcome.platform.archive.common.models.EnrichConfig
 
 import scala.concurrent.duration._
 
 object MetricsConfigModule extends AbstractModule {
+  import EnrichConfig._
 
-  import ConfigHelper._
-
+  @Singleton
+  @Provides
   def providesMetricsConfig(config: Config) = {
     val namespace = config
       .get[String]("metrics.namespace")

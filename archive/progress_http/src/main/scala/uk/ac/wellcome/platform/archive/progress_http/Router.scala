@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.StatusCodes._
 import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
-import uk.ac.wellcome.platform.archive.common.modules.config.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.modules.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressCreateRequest}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 

@@ -12,7 +12,7 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.modules.{
-  ConfigModule,
+  AppConfigModule,
   TestAppConfigModule
 }
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
@@ -87,11 +87,11 @@ trait Archivist extends Messaging with ZipBagItFixture {
           storageBucket.name,
           registrarTopic.arn,
           progressTopic.arn),
-        ConfigModule,
+        AppConfigModule,
         S3ClientModule,
         CloudWatchClientModule,
-        SQSClientModule,
-        SNSClientModule
+        SqsClientModule,
+        SnsClientModule
       )
     }
     testWith(archivist)

@@ -1,25 +1,23 @@
 package uk.ac.wellcome.platform.archive.archivist
 
 import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.archivist.modules.{
-  AppConfigModule,
-  ConfigModule
-}
+import uk.ac.wellcome.platform.archive.archivist.modules.BagUploaderConfigModule
 import uk.ac.wellcome.platform.archive.common.modules._
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorClientModule
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 object Main extends App with Archivist {
   override val injector: Injector = Guice.createInjector(
-    new AppConfigModule(args),
-    ConfigModule,
+    TypesafeConfigModule,
     AkkaModule,
     S3ClientModule,
     CloudWatchClientModule,
-    SQSClientModule,
-    SNSClientModule,
-    MessageStreamModule
+    SnsClientModule,
+    MessageStreamModule,
+    ProgressMonitorClientModule,
+    BagUploaderConfigModule
   )
 
   try {

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorClientModule
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   AppConfigModule,
   ConfigModule,
@@ -21,10 +21,10 @@ object Main extends App with Logging {
     VHSModule,
     AkkaModule,
     CloudWatchClientModule,
-    SQSClientModule,
+    SqsClientModule,
     SNSAsyncClientModule,
     DynamoClientModule,
-    ProgressMonitorModule,
+    ProgressMonitorClientModule,
     MessageStreamModule
   )
 

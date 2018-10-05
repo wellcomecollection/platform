@@ -11,11 +11,11 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.modules.config.HttpServerConfig
+import HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models
 import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate, Progress => ProgressModel}
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorClientModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.progress_http.modules._
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
@@ -85,7 +85,7 @@ trait ProgressHttpFixture
         new TestAppConfigModule(table, serverConfig),
         AkkaModule,
         CloudWatchClientModule,
-        ProgressMonitorModule
+        ProgressMonitorClientModule
       )
     }
     testWith(progress)

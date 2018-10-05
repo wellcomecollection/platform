@@ -1,10 +1,10 @@
-package uk.ac.wellcome.platform.archive.common.modules.config
+package uk.ac.wellcome.platform.archive.common.modules
 
 import com.google.inject.{AbstractModule, Provides}
 import com.typesafe.config.{Config, ConfigFactory}
 import javax.inject.Inject
 
-object ConfigModule extends AbstractModule {
+object TypesafeConfigModule extends AbstractModule {
 
   @Provides
   @Inject
