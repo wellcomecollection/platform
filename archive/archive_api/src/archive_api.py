@@ -6,6 +6,7 @@ import daiquiri
 from flask import Flask
 from flask_restplus import Api
 
+from apis import bag_api
 import config
 from responses import ContextResponse
 from progress_manager import ProgressManager
@@ -21,6 +22,8 @@ api = Api(
     "(https://tools.ietf.org/html/draft-kunze-bagit-17) resources",
     prefix="/storage/v1",
 )
+
+api.add_namespace(bag_api)
 
 config_obj = config.ArchiveAPIConfig(
     development=(os.environ.get("FLASK_ENV") == "development")
