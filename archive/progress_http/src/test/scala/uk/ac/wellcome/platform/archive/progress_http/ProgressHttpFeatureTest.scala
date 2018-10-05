@@ -109,22 +109,9 @@ class ProgressHttpFeatureTest
 
               val request = Http().singleRequest(httpRequest)
 
-              val expectedLocationR = s"$url/(.+)".r
-
               whenReady(request) { result: HttpResponse =>
                 // Successful request
                 result.status shouldBe StatusCodes.Created
-
-                debug(result)
-
-                // Collect first location header matching pattern
-                val maybeId = result.headers.collectFirst {
-                  case HttpHeader("location", expectedLocationR(id)) => id
-                }
-
-                // We should have an id
-                maybeId.isEmpty shouldBe false
-                val id = UUID.fromString(maybeId.get)
 
                 // Check progress is returned
                 val progressFuture = Unmarshal(result.entity).to[Progress]
@@ -132,14 +119,17 @@ class ProgressHttpFeatureTest
                 // Check the progress is stored
                 whenReady(progressFuture) { progress =>
                   val expectedProgress = Progress(
-                    id,
-                    uploadUri,
-                    Some(callbackUri)
+                    ProgressCreateRequest(
+                      uploadUri,
+                      Some(callbackUri)
+                    )
                   ).copy(
+                    id = progress.id,
                     createdAt = progress.createdAt,
                     updatedAt = progress.updatedAt)
 
                   progress shouldBe expectedProgress
+
                   assertTableOnlyHasItem(expectedProgress, table)
                 }
               }

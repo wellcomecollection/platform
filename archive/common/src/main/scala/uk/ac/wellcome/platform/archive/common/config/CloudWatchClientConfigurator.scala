@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.config
 
 import org.rogach.scallop.ScallopConf
-import uk.ac.wellcome.platform.archive.common.modules.CloudwatchClientConfig
+import uk.ac.wellcome.platform.archive.common.modules.config.CloudwatchConfig
 
 trait CloudWatchClientConfigurator extends ScallopConf {
   val arguments: Seq[String]
@@ -11,7 +11,7 @@ trait CloudWatchClientConfigurator extends ScallopConf {
 
   verify()
 
-  val cloudwatchClientConfig = CloudwatchClientConfig(
+  val cloudwatchClientConfig = CloudwatchConfig(
     region = awsCloudwatchRegion(),
     endpoint = awsCloudwatchEndpoint.toOption
   )

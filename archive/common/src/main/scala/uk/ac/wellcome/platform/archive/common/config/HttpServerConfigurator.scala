@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.config
 
 import org.rogach.scallop.ScallopConf
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.modules.config.HttpServerConfig
 
 trait HttpServerConfigurator extends ScallopConf {
   val arguments: Seq[String]
@@ -12,14 +12,10 @@ trait HttpServerConfigurator extends ScallopConf {
   private val appHost =
     opt[String](required = true, default = Some("0.0.0.0"))
 
-  private val appBaseUrl =
-    opt[String](required = true)
-
   verify()
 
   val httpServerConfig = HttpServerConfig(
     host = appHost(),
-    port = appPort(),
-    externalBaseUrl = appBaseUrl(),
+    port = appPort()
   )
 }
