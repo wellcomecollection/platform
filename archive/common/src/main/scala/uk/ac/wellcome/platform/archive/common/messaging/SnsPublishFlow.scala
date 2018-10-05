@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.messaging
 
 import akka.NotUsed
+import akka.stream.ActorAttributes
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.{PublishRequest, PublishResult}
@@ -25,5 +26,8 @@ object SnsPublishFlow extends Logging {
         .flatMap(r => Try(snsClient.publish(r)))
 
     ProcessLogDiscardFlow[T, PublishResult]("sns_publish")(publish)
+      .withAttributes(
+        ActorAttributes.dispatcher(
+          "akka.stream.materializer.blocking-io-dispatcher"))
   }
 }
