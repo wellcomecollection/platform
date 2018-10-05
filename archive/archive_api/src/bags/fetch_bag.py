@@ -12,11 +12,13 @@ def fetch_bag(dynamodb_resource, table_name, s3_client, bucket_name, id):
     item_response = table.get_item(Key={"id": id})
 
     try:
-        response = s3_client.get_object(
-            Bucket=item_response["Item"]["location"]["namespace"],
-            Key=item_response["Item"]["location"]["key"],
-        )
+        item = item_response["Item"]
     except KeyError:
         raise ValueError(f"No bag found for id={id!r}")
 
-    return json.loads(response["Body"].read())
+    bucket = item["location"]["namespace"]
+    key = item["location"]["key"]
+
+    body = s3_client.get_object(Bucket=bucket, Key=key)["Body"].read()
+
+    return json.loads(body)
