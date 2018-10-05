@@ -13,6 +13,11 @@ class ArchiveAPIConfig(object):
     S3_CLIENT = boto3.client("s3")
     PROGRESS_MANAGER_SESSION = requests.Session()
 
+    # This disables the ability to request an object with partial matching --
+    # our API always returns the full model, or nothing at all.
+    # See https://flask-restplus.readthedocs.io/en/stable/mask.html
+    RESTPLUS_MASK_SWAGGER = False
+
     def __init__(self, development=False):
         try:
             if development:
