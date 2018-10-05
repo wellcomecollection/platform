@@ -1,6 +1,6 @@
 # -*- encoding: utf-8
 
-from flask_restplus import fields
+from flask_restplus import fields, Model
 
 from archive_api import api
 
@@ -77,3 +77,13 @@ Error = api.model(
         "type": fieldType(name="Error"),
     },
 )
+
+
+class TypedModel(Model):
+    """
+    A thin wrapper around ``Model`` that adds a ``type`` field.
+    """
+
+    def __init__(self, name, fields):
+        fields["type"] = fields.String(description="Type of the object", enum=[name])
+        super().__init__(name, fields)
