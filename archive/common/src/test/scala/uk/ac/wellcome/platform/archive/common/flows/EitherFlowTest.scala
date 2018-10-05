@@ -8,11 +8,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.util.Try
 
-class EitherFlowTest
-    extends FunSpec
-    with Akka
-    with Matchers
-    with ScalaFutures {
+class EitherFlowTest extends FunSpec with Akka with Matchers with ScalaFutures {
 
   it("turns a Try into an Either, wrapping a FailedEvent[In]") {
     withActorSystem { actorSystem =>
