@@ -16,6 +16,7 @@ register_models(api, models=models)
 class BagResource(Resource):
 
     @api.doc(description="Returns a single bag")
+    @api.marshal_with(models.Bag)
     @api.response(200, "Bag found")
     @api.response(404, "Bag not found", Error)
     def get(self, id):
