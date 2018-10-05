@@ -17,45 +17,61 @@ class ArgsConfigurator(val arguments: Seq[String])
 
   val hybridDynamoAccessKey = opt[String]("hybrid-dynamo-access-key")
   val hybridDynamoSecretKey = opt[String]("hybrid-dynamo-secret-key")
-  val hybridDynamoRegion = opt[String]("hybrid-dynamo-region", default = Some("eu-west-1"))
+  val hybridDynamoRegion =
+    opt[String]("hybrid-dynamo-region", default = Some("eu-west-1"))
   val hybridDynamoEndpoint = opt[String]("hybrid-dynamo-endpoint")
 
   val hybridS3AccessKey = opt[String]("hybrid-s3-access-key")
   val hybridS3SecretKey = opt[String]("hybrid-s3-secret-key")
-  val hybridS3Region = opt[String]("hybrid-s3-region", default = Some("eu-west-1"))
+  val hybridS3Region =
+    opt[String]("hybrid-s3-region", default = Some("eu-west-1"))
   val hybridS3Endpoint = opt[String]("hybrid-s3-endpoint")
 
-  val hybridGlobalS3Prefix = opt[String]("hybrid-global-s3-prefix", default = Some("archive"))
+  val hybridGlobalS3Prefix =
+    opt[String]("hybrid-global-s3-prefix", default = Some("archive"))
   val hybridDynamoTableName = opt[String]("hybrid-dynamo-table-name")
   val hybridS3BucketName = opt[String]("hybrid-s3-bucket-name")
 
   private val awsS3AccessKey = opt[String]("aws-s3-access-key")
   private val awsS3SecretKey = opt[String]("aws-s3-secret-key")
-  private val awsS3Region = opt[String]("aws-s3-region", default = Some("eu-west-1"))
+  private val awsS3Region =
+    opt[String]("aws-s3-region", default = Some("eu-west-1"))
   private val awsS3Endpoint = opt[String]("aws-s3-endpoint")
 
-  private val sqsQueueUrl: ScallopOption[String] = opt[String]("sqs-queue-url", required = true)
-  private val sqsWaitTimeSeconds = opt[Int]("sqs-wait-time-seconds", required = true, default = Some(20))
-  private val sqsMaxMessages = opt[Int]("sqs-max-messages", required = true, default = Some(10))
-  private val sqsParallelism = opt[Int]("sqs-parallelism", required = true, default = Some(10))
+  private val sqsQueueUrl: ScallopOption[String] =
+    opt[String]("sqs-queue-url", required = true)
+  private val sqsWaitTimeSeconds =
+    opt[Int]("sqs-wait-time-seconds", required = true, default = Some(20))
+  private val sqsMaxMessages =
+    opt[Int]("sqs-max-messages", required = true, default = Some(10))
+  private val sqsParallelism =
+    opt[Int]("sqs-parallelism", required = true, default = Some(10))
 
   private val awsSqsAccessKey = opt[String]("aws-sqs-access-key")
   private val awsSqsSecretKey = opt[String]("aws-sqs-secret-key")
-  private val awsSqsRegion = opt[String]("aws-sqs-region", default = Some("eu-west-1"))
+  private val awsSqsRegion =
+    opt[String]("aws-sqs-region", default = Some("eu-west-1"))
   private val awsSqsEndpoint = opt[String]("aws-sqs-endpoint")
 
-  private val snsTopicArn: ScallopOption[String] = opt[String]("sns-topic-arn", required = true)
+  private val snsTopicArn: ScallopOption[String] =
+    opt[String]("sns-topic-arn", required = true)
 
   private val awsSnsAccessKey = opt[String]("aws-sns-access-key")
   private val awsSnsSecretKey = opt[String]("aws-sns-secret-key")
-  private val awsSnsRegion = opt[String]("aws-sns-region", default = Some("eu-west-1"))
+  private val awsSnsRegion =
+    opt[String]("aws-sns-region", default = Some("eu-west-1"))
   private val awsSnsEndpoint = opt[String]("aws-sns-endpoint")
 
-  private val metricsNamespace = opt[String]("metrics-namespace", default = Some("app"))
+  private val metricsNamespace =
+    opt[String]("metrics-namespace", default = Some("app"))
   private val metricsFlushIntervalSeconds =
-    opt[Int]("metrics-flush-interval-seconds", required = true, default = Some(20))
+    opt[Int](
+      "metrics-flush-interval-seconds",
+      required = true,
+      default = Some(20))
 
-  private val awsCloudwatchRegion = opt[String]("aws-cloudwatch-region", default = Some("eu-west-1"))
+  private val awsCloudwatchRegion =
+    opt[String]("aws-cloudwatch-region", default = Some("eu-west-1"))
   private val awsCloudwatchEndpoint = opt[String]("aws-cloudwatch-endpoint")
 
   verify()

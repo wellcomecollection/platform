@@ -14,11 +14,11 @@ module "api_ecs" {
   bag_vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
   bag_vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
 
-  vpc_id             = "${local.vpc_id}"
+  vpc_id                         = "${local.vpc_id}"
   interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
-  private_subnets    = "${local.private_subnets}"
-  public_subnets     = "${local.public_subnets}"
-  certificate_domain = "api.wellcomecollection.org"
+  private_subnets                = "${local.private_subnets}"
+  public_subnets                 = "${local.public_subnets}"
+  certificate_domain             = "api.wellcomecollection.org"
 }
 
 # Archivist

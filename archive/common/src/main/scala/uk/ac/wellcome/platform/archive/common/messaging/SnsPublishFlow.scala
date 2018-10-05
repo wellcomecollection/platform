@@ -14,18 +14,19 @@ import scala.util.Try
 
 object SnsPublishFlow extends Logging {
   def apply[T](
-                snsClient: AmazonSNS,
-                snsConfig: SNSConfig,
-                maybeSubject: Option[String] = None
+    snsClient: AmazonSNS,
+    snsConfig: SNSConfig,
+    maybeSubject: Option[String] = None
   )(implicit encode: Encoder[T]): Flow[T, PublishResult, NotUsed] = {
 
     def publish(t: T) =
       toJson[T](t)
-        .map { messageString => maybeSubject match {
-          case Some(subject) =>
-            new PublishRequest(snsConfig.topicArn, messageString, subject)
-          case _ =>
-            new PublishRequest(snsConfig.topicArn, messageString)
+        .map { messageString =>
+          maybeSubject match {
+            case Some(subject) =>
+              new PublishRequest(snsConfig.topicArn, messageString, subject)
+            case _ =>
+              new PublishRequest(snsConfig.topicArn, messageString)
           }
         }
         .flatMap(publishRequest => Try(snsClient.publish(publishRequest)))
