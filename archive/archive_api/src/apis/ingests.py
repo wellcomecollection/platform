@@ -24,7 +24,7 @@ class IngestCollection(Resource):
     def post(self):
         upload_url = request.json["uploadUrl"]
         callback_url = request.json.get("callbackUrl")
-        self.validate_urls(callback_url, upload_url)
+        self._validate_urls(callback_url, upload_url)
 
         from archive_api import app, logger
         progress_manager = app.config["PROGRESS_MANAGER"]
