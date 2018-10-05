@@ -90,3 +90,17 @@ def test_returns_404_if_no_such_bag(client, guid):
         "label": "Not Found",
         "type": "Error"
     }
+
+
+def test_returns_405_if_try_to_post(client):
+    resp = client.post(f"/storage/v1/bags/123")
+
+    assert resp.status_code == 405
+    assert json.loads(resp.data) == {
+        "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+        "description": "The method is not allowed for the requested URL.",
+        "errorType": "http",
+        "httpStatus": 405,
+        "label": "Method Not Allowed",
+        "type": "Error"
+    }
