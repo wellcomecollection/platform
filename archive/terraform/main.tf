@@ -34,7 +34,7 @@ module "archivist" {
   service_name                     = "archivist"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
@@ -64,7 +64,7 @@ module "registrar" {
   service_name                     = "registrar"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
@@ -96,7 +96,7 @@ module "notifier" {
   service_name                     = "notifier"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
@@ -124,7 +124,7 @@ module "progress_async" {
   service_name                     = "progress_async"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
