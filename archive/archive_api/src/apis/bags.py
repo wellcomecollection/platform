@@ -15,6 +15,6 @@ class BagResource(Resource):
 
     @api.doc(description="Returns a single bag")
     @api.response(200, "Bag found")
-    @api.response(404, "Bag not found", models.Error)
+    @api.response(404, "Bag not found", Error)
     def get(self, id):
         return id
