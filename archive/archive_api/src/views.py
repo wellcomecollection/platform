@@ -126,7 +126,7 @@ def route_report_healthcheck_status():
 # TODO: There's no testing of the error handling; we should fix that!
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)
-@api.marshal_with(models.Error)
+@api.marshal_with(models.Error, skip_none=True)
 def default_error_handler(error):
     error_response = {
         "httpStatus": getattr(error, "code", 500),
