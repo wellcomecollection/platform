@@ -7,7 +7,6 @@ import uk.ac.wellcome.platform.archive.common.models.EnrichConfig
 object BagUploaderConfigModule extends AbstractModule {
   import EnrichConfig._
 
-  @Singleton
   @Provides
   def providesBagUploaderConfig(config: Config) = {
 
