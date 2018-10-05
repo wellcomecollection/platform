@@ -38,7 +38,10 @@ class ProgressAsyncFeatureTest
 
               val updatedProgress = progress.update(update)
               val expectedNotification =
-                CallbackNotification(updatedProgress.id, updatedProgress.callbackUri.get, updatedProgress)
+                CallbackNotification(
+                  updatedProgress.id,
+                  updatedProgress.callbackUri.get,
+                  updatedProgress)
 
               eventually {
                 assertSnsReceivesOnly(expectedNotification, topic)

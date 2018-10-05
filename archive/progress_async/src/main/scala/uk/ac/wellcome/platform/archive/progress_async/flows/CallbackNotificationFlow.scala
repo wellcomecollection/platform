@@ -21,10 +21,12 @@ object CallbackNotificationFlow extends Logging {
       Some("callback_notification")
     )
 
-    Flow[Progress].flatMapConcat{
-      case progress@ Progress(  id,_, Some(callbackUri), _, _, _, _) =>
-        Source.single(CallbackNotification(id, callbackUri, progress))
-        .via(publishFlow).map(_ => ())
+    Flow[Progress].flatMapConcat {
+      case progress @ Progress(id, _, Some(callbackUri), _, _, _, _) =>
+        Source
+          .single(CallbackNotification(id, callbackUri, progress))
+          .via(publishFlow)
+          .map(_ => ())
       case _ => Source.single(())
     }
 

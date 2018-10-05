@@ -43,6 +43,7 @@ module "archivist" {
     registrar_topic_arn = "${module.registrar_topic.arn}"
     progress_topic_arn  = "${module.progress_async_topic.arn}"
   }
+
   env_vars_length = 4
 
   container_image   = "${local.archivist_container_image}"
@@ -74,6 +75,7 @@ module "registrar" {
     vhs_table_name              = "${module.vhs_archive_manifest.table_name}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
+
   env_vars_length = 6
 
   container_image   = "${local.registrar_container_image}"
@@ -101,6 +103,7 @@ module "notifier" {
     notifier_queue_url = "${module.notifier_queue.id}"
     progress_topic_arn = "${module.progress_async_topic.arn}"
   }
+
   env_vars_length = 2
 
   container_image   = "${local.notifier_container_image}"
@@ -129,6 +132,7 @@ module "progress_async" {
     topic_arn                   = "${module.caller_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
+
   env_vars_length = 3
 
   container_image   = "${local.progress_async_container_image}"
@@ -148,6 +152,7 @@ module "progress_http" {
     app_base_url                = "https://api.wellcomecollection.org"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
+
   env_vars_length = 2
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
@@ -198,6 +203,7 @@ module "bagger" {
     DDS_API_SECRET   = "${var.bagger_dds_api_secret}"
     DDS_ASSET_PREFIX = "${var.bagger_dds_asset_prefix}"
   }
+
   env_vars_length = 18
 
   container_image   = "${local.bagger_container_image}"
