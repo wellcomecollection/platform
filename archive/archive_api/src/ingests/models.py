@@ -23,7 +23,7 @@ from models import TypedModel
 
 
 IngestType = TypedModel(
-    "Ingest type",
+    "IngestType",
     {
         "id": fields.String(
             description="Identifier for ingest type", enum=["create"], required=True
@@ -32,7 +32,7 @@ IngestType = TypedModel(
 )
 
 IngestRequest = TypedModel(
-    "Ingest request",
+    "Ingest",
     {
         "uploadUrl": fields.String(
             description="S3 URL of uploaded BagIt resource, supports only a zipped BagIt file",
