@@ -24,7 +24,7 @@ trait ProgressAsync extends Logging {
 
   def run() = {
 
-    type StreamNotice = MessageStream[NotificationMessage, Object]
+    type StreamNotice = MessageStream[NotificationMessage, Unit]
 
     implicit val snsClient: AmazonSNS =
       injector.getInstance(classOf[AmazonSNS])
