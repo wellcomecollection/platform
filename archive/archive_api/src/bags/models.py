@@ -135,7 +135,7 @@ File = TypedModel("File", {"checksum": fields.String(), "path": fields.String()}
 
 
 FileManifest = TypedModel(
-    "File", {"checksumAlgorithm": fields.String(), "files": fields.List(File)}
+    "File", {"checksumAlgorithm": fields.String(), "files": fields.List(fields.Nested(File))}
 )
 
 
@@ -149,13 +149,13 @@ Bag = TypedModel(
             Source, description="The source of the bag", required=True
         ),
         "identifiers": fields.List(
-            Identifier,
+            fields.Nested(Identifier),
             description=(
                 "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
             ),
         ),
-        "manifest": fields.List(FileManifest),
-        "tagManifest": fields.List(FileManifest),
+        "manifest": fields.List(fields.Nested(FileManifest)),
+        "tagManifest": fields.List(fields.Nested(FileManifest)),
         "archiveUrl": fields.String(),
         "replicaUrl": fields.String(),
         "accessUrl": fields.String(),
