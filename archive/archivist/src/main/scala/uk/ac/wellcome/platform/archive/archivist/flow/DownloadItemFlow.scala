@@ -1,15 +1,12 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.NotUsed
+import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
-  ChecksumNotMatchedOnDownloadError,
-  DownloadError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, ChecksumNotMatchedOnDownloadError, DownloadError}
 
 import scala.util.{Failure, Success, Try}
 
@@ -53,7 +50,7 @@ object DownloadItemFlow extends Logging {
           }
         }
       )
-      .async
+    .withAttributes(ActorAttributes.dispatcher("akka.stream.materializer.blocking-io-dispatcher"))
   }
 
 }
