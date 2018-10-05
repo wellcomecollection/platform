@@ -10,7 +10,7 @@ import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models

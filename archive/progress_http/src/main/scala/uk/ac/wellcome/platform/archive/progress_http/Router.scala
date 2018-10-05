@@ -5,7 +5,7 @@ import java.util.UUID
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
   ProgressCreateRequest
