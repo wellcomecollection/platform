@@ -32,7 +32,7 @@ module "registrar_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.registrar_topic.name}"]
 
-  visibility_timeout_seconds = 43200
+  visibility_timeout_seconds = 300
   max_receive_count          = 3
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
@@ -52,7 +52,7 @@ module "progress_async_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.progress_async_topic.name}"]
 
-  visibility_timeout_seconds = 43200
+  visibility_timeout_seconds = 180
   max_receive_count          = 3
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
@@ -79,7 +79,7 @@ module "notifier_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.notifier_topic.name}"]
 
-  visibility_timeout_seconds = 43200
+  visibility_timeout_seconds = 300
   max_receive_count          = 3
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
@@ -99,7 +99,7 @@ module "registrar_completed_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.registrar_completed_topic.name}"]
 
-  visibility_timeout_seconds = 43200
+  visibility_timeout_seconds = 300
   max_receive_count          = 3
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
