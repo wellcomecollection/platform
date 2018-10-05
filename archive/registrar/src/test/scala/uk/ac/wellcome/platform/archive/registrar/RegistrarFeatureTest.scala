@@ -10,14 +10,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{
-  Registrar => RegistrarFixture
-}
-import uk.ac.wellcome.platform.archive.registrar.models.{
-  RegistrationComplete,
-  BagManifest,
-  BagManifestFactory
-}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
+import uk.ac.wellcome.platform.archive.registrar.models.{BagManifest, BagManifestFactory}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

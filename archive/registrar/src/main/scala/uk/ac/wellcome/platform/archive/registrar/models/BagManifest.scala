@@ -87,10 +87,10 @@ case class BagDigestFile(
 )
 
 object BagDigestFile {
-  def apply(line: (String, String)) = {
+  def apply(checksum: String, filePath: String): BagDigestFile = {
     BagDigestFile(
-      Checksum(line._1),
-      BagFilePath(line._2)
+      Checksum(checksum),
+      BagFilePath(filePath)
     )
   }
 

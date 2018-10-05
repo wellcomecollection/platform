@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Source}
+import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject._
@@ -16,11 +16,10 @@ import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.s3.S3ClientFactory
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord, VersionedHybridStore}
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 class Registrar @Inject()(
                            snsConfig: SNSConfig,
@@ -45,26 +44,19 @@ class Registrar @Inject()(
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
-    val snsPublishFlow = SnsPublishFlow(snsClient, snsConfig)
-    val notificationParsingFlow = NotificationParsingFlow[ArchiveComplete]()
-
     val flow = Flow[NotificationMessage]
-      .via(notificationParsingFlow)
+      .via(NotificationParsingFlow[ArchiveComplete]())
       .map(RegistrationRequest(_))
-      .map(BagManifestFactory(s3Client)(_))
-      .map {
-        case (manifest, ctx) => updateStoredManifest(manifest)
-      }
-      .via(snsPublishFlow)
+      .map(registrationRequest => BagManifestFactory.create(s3Client,registrationRequest.bagLocation))
+      .collect { case Success(bagManifest) => bagManifest}
+      .map { bagManifest => updateStoredManifest(bagManifest)}
+      .via(SnsPublishFlow(snsClient, snsConfig))
       .log("published notification")
-    //      .filter {
-    //        case (_, context) => context.callbackUrl.isDefined
-    //      }
 
     messageStream.run("registrar", flow)
   }
 
-  private def updateStoredManifest(manifest: BagManifest) = {
+  private def updateStoredManifest(manifest: BagManifest): Future[(HybridRecord, EmptyMetadata)] = {
     dataStore.updateRecord(manifest.id.value)(
       ifNotExisting = (manifest, EmptyMetadata()))(
       ifExisting = (_, _) => (manifest, EmptyMetadata())
