@@ -186,8 +186,8 @@ class TestRequestNewIngest:
         assert len(sns_messages) == 1
         message = sns_messages[0][":message"]
 
-        assert "callbackUrl" in message
-        assert message["callbackUrl"] == self.callback_url
+        assert "archiveCompleteCallbackUrl" in message
+        assert message["archiveCompleteCallbackUrl"] == self.callback_url
 
         resp = client.get("/storage/v1/ingests")
         assert resp.status_code == 405
