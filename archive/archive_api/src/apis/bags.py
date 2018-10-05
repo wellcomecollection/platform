@@ -3,14 +3,14 @@
 from flask import abort
 from flask_restplus import Namespace, Resource, fields
 
-from bags import models
+from bags import bag_models
 from models import Error, register_models
 from storage import VHSError, VHSNotFound, read_from_vhs
 
 
 api = Namespace("bags", description="Operations around BagIt bags")
 
-register_models(api, models=models)
+register_models(api, models=bag_models)
 
 
 @api.route("/<id>")
@@ -18,7 +18,7 @@ register_models(api, models=models)
 class BagResource(Resource):
 
     @api.doc(description="Returns a single bag")
-    @api.marshal_with(models.Bag)
+    @api.marshal_with(bag_models.Bag)
     @api.response(200, "Bag found")
     @api.response(404, "Bag not found", Error)
     def get(self, id):
