@@ -189,7 +189,9 @@ class ProgressMonitorTest
 
           val progressUpdate = ProgressUpdate(
             progress.id,
-            List(ProgressEvent("So that happened."), ProgressEvent("And then this"))
+            List(
+              ProgressEvent("So that happened."),
+              ProgressEvent("And then this"))
           )
 
           archiveProgressMonitor.update(progressUpdate)
