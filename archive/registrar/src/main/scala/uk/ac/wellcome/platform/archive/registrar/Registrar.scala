@@ -16,7 +16,6 @@ import uk.ac.wellcome.platform.archive.common.models.{
   RequestContext
 }
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
@@ -35,7 +34,6 @@ class Registrar @Inject()(
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
-  archiveProgressMonitor: ProgressMonitor,
   actorSystem: ActorSystem
 ) {
   def run() = {

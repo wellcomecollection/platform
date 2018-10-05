@@ -35,7 +35,7 @@ variable "max_capacity" {
 }
 
 variable "desired_task_count" {
-  default = 0
+  default = 1
 }
 
 variable "security_group_ids" {

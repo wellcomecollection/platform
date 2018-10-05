@@ -6,12 +6,9 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressCreateRequest
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressCreateRequest}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-
+import uk.ac.wellcome.platform.archive.common.progress.models.ProgressCreateRequest._
 import scala.util.Try
 
 class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) {
@@ -23,7 +20,6 @@ class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) {
     import akka.http.scaladsl.server.Directives._
     import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
     import uk.ac.wellcome.json.JsonUtil._
-    import Progress._
 
     pathPrefix("progress") {
       post {

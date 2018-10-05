@@ -19,7 +19,7 @@ object CallbackNotificationFlow extends Logging {
     val publishFlow = SnsPublishFlow[CallbackNotification](
       snsClient,
       snsConfig,
-      "callback_notification"
+      Some("callback_notification")
     )
 
     Flow[Progress]
