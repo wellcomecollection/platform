@@ -29,4 +29,3 @@ object VHSModule extends AbstractModule {
     new S3StorageBackend(s3Client)(executionContext)
   }
 }
-

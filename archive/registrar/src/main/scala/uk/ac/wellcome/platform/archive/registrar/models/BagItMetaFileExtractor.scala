@@ -6,13 +6,16 @@ import uk.ac.wellcome.platform.archive.common.models.BagLocation
 import uk.ac.wellcome.storage.ObjectLocation
 
 object BagItMetaFileExtractor {
-  def get(s3Client: AmazonS3, bagLocation: BagLocation, config: BagMetaFileConfig): Map[String, String] = {
+  def get(s3Client: AmazonS3,
+          bagLocation: BagLocation,
+          config: BagMetaFileConfig): Map[String, String] = {
     val location = createBagItMetaFileLocation(bagLocation, config.name)
     extractMap(s3Client)(location, config.delimiter)
   }
 
   private def extractMap(s3Client: AmazonS3)(
-    location: ObjectLocation, delimiter: String
+    location: ObjectLocation,
+    delimiter: String
   ): Map[String, String] = {
     val obj = s3Client.getObject(
       location.namespace,
@@ -31,9 +34,9 @@ object BagItMetaFileExtractor {
   }
 
   private def createBagItMetaFileLocation(
-                                           bagLocation: BagLocation,
-                                           name: String
-                                         ): ObjectLocation =
+    bagLocation: BagLocation,
+    name: String
+  ): ObjectLocation =
     ObjectLocation(
       bagLocation.storageNamespace,
       List(

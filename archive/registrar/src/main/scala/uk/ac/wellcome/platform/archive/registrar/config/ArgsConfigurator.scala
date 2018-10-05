@@ -5,7 +5,7 @@ import uk.ac.wellcome.platform.archive.common.config._
 import uk.ac.wellcome.platform.archive.registrar.models.RegistrarConfig
 
 class ArgsConfigurator(val arguments: Seq[String])
-  extends ScallopConf(arguments)
+    extends ScallopConf(arguments)
     with CloudWatchClientConfigurator
     with MetricsConfigConfigurator
     with HttpServerConfigurator

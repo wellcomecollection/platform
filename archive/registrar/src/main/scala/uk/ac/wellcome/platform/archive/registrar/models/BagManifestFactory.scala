@@ -9,14 +9,15 @@ import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 object BagManifestFactory extends Logging {
-  def create(s3Client: AmazonS3,bagLocation: BagLocation)(
+  def create(s3Client: AmazonS3, bagLocation: BagLocation)(
     implicit materializer: Materializer,
     executionContext: ExecutionContext
   ): Try[BagManifest] = Try {
     val algorithm = "sha256"
 
     val manifestFileName = BagMetaFileConfig(s"manifest-$algorithm.txt", " +")
-    val filesWithChecksum = BagItMetaFileExtractor.get(s3Client, bagLocation, manifestFileName)
+    val filesWithChecksum =
+      BagItMetaFileExtractor.get(s3Client, bagLocation, manifestFileName)
 
     val sourceIdentifier = SourceIdentifier(
       IdentifierType("source", "Label"),

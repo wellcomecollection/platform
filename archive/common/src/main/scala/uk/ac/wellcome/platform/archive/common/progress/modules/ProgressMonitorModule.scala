@@ -10,8 +10,8 @@ object ProgressMonitorModule extends AbstractModule {
 
   @Provides
   def providesArchiveProgressMonitor(
-                                      actorSystem: ActorSystem,
-                                      progressMonitorConfig: ProgressMonitorConfig) = {
+    actorSystem: ActorSystem,
+    progressMonitorConfig: ProgressMonitorConfig) = {
 
     val dynamoClientConfig = progressMonitorConfig.dynamoClientConfig
 

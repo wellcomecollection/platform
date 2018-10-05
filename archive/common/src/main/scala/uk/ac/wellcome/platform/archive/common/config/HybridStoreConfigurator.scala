@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.archive.common.config
 
 import org.rogach.scallop.ScallopConf
 import uk.ac.wellcome.platform.archive.common.config.models.HybridStoreConfig
-import uk.ac.wellcome.platform.archive.common.modules.{DynamoClientConfig, S3ClientConfig}
+import uk.ac.wellcome.platform.archive.common.modules.{
+  DynamoClientConfig,
+  S3ClientConfig
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
 
