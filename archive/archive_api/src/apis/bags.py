@@ -3,8 +3,9 @@
 from flask import abort
 from flask_restplus import Namespace, Resource, fields
 
-from bags import fetch_bag, models
+from bags import models
 from models import Error, register_models
+from storage import VHSError, VHSNotFound, read_from_vhs
 
 
 api = Namespace("bags", description="Operations around BagIt bags")
@@ -23,12 +24,14 @@ class BagResource(Resource):
     def get(self, id):
         try:
             from archive_api import app
-            return fetch_bag(
+            return read_from_vhs(
                 dynamodb_resource=app.config["DYNAMODB_RESOURCE"],
                 table_name=app.config["BAG_VHS_TABLE_NAME"],
                 s3_client=app.config["S3_CLIENT"],
                 bucket_name=app.config["BAG_VHS_BUCKET_NAME"],
                 id=id,
             )
-        except ValueError as error:
-            abort(404, f"Invalid id: {error}")
+        except VHSNotFound:
+            abort(404, f"No bag found for id={id!r}")
+        except VHSError:
+            abort(500)

@@ -84,7 +84,7 @@ def test_returns_404_if_no_such_bag(client, guid):
 
     assert json.loads(resp.data) == {
         "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
-        "description": f"Invalid id: No bag found for id='{guid}'",
+        "description": f"No bag found for id='{guid}'",
         "errorType": "http",
         "httpStatus": 404,
         "label": "Not Found",

@@ -7,7 +7,6 @@ from werkzeug.exceptions import BadRequest as BadRequestError
 from werkzeug.exceptions import NotFound as NotFoundError
 
 from archive_api import app, api, logger
-from bags import fetch_bag
 from ingests import send_new_ingest_request
 import models
 from progress_manager import ProgressNotFoundError
@@ -95,27 +94,6 @@ api.add_model(name="Error", definition=models.Error)
 #             return result
 #         except ProgressNotFoundError as error:
 #             raise NotFoundError(f"Invalid id: No ingest found for id={id!r}")
-
-
-# @ns_bags.route("/<string:id>")
-# @ns_bags.param("id", "The bag identifier")
-# class BagResource(Resource):
-#     @ns_bags.doc(description="The bag is returned in the body of the response")
-#     @ns_bags.response(200, "Bag found")
-#     @ns_bags.response(404, "Bag not found", models.Error)
-#     def get(self, id):
-#         """Get the bag associated with an id"""
-#         try:
-#             result = fetch_bag(
-#                 dynamodb_resource=app.config["DYNAMODB_RESOURCE"],
-#                 table_name=app.config["BAG_VHS_TABLE_NAME"],
-#                 s3_client=app.config["S3_CLIENT"],
-#                 bucket_name=app.config["BAG_VHS_BUCKET_NAME"],
-#                 id=id,
-#             )
-#             return jsonify(result)
-#         except ValueError as error:
-#             raise NotFoundError(f"Invalid id: {error}")
 
 
 @app.route("/storage/v1/healthcheck")
