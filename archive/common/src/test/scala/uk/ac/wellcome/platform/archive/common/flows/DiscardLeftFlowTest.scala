@@ -4,13 +4,11 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class DiscardLeftFlowTest
     extends FunSpec
     with Akka
     with Matchers
-    with ExtendedPatience
     with ScalaFutures {
 
   it("discards Left values") {

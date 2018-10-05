@@ -5,7 +5,6 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.messaging.NotificationParsingFlow
 
@@ -13,7 +12,6 @@ class NotificationParsingFlowTest
     extends FunSpec
     with Akka
     with Matchers
-    with ExtendedPatience
     with ScalaFutures {
 
   it("parses T from a message body") {
