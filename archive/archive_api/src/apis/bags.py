@@ -2,11 +2,13 @@
 
 from flask_restplus import Namespace, Resource, fields
 
-from bags import Bag
-from models import Error
+from bags import models
+from models import Error, register_models
 
 
 api = Namespace("bags", description="Operations around BagIt bags")
+
+register_models(api, models=models)
 
 
 @api.route("/<id>")
