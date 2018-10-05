@@ -70,10 +70,9 @@ class ProgressMonitor @Inject()(
 
     val mergedUpdate = update.status match {
       case Progress.None =>
-        events.map(event => append('events -> event)).reduce(_ and _)
+        appendAll('events -> events)
       case status =>
-        events.map(event => append('events -> event)).reduce(_ and _) and set(
-          'result -> status)
+        appendAll('events -> events) and set('result -> status)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)

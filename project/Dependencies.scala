@@ -5,7 +5,7 @@ object WellcomeDependencies {
   private lazy val versions = new {
     val json = "1.0.0"
     val monitoring = "1.1.0"
-    val storage = "2.3.0"
+    val storage = "2.4.0"
   }
 
   val jsonLibrary: Seq[ModuleID] = Seq(
@@ -39,7 +39,6 @@ object Dependencies {
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
     val elastic4s = "5.6.5"
-    val scanamo = "1.0.0-M3"
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
@@ -59,12 +58,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
-
-  val dynamoDependencies: Seq[ModuleID] = Seq(
-    "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
-    "com.gu" %% "scanamo" % versions.scanamo
-  )
-
+  
   val circeDependencies = Seq(
     "io.circe" %% "circe-core" % versions.circeVersion,
     "io.circe" %% "circe-generic"% versions.circeVersion,
@@ -164,7 +158,7 @@ object Dependencies {
 
   val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
 
-  val internalModelDependencies = dynamoDependencies ++ Seq(
+  val internalModelDependencies = Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
   ) ++ WellcomeDependencies.jsonLibrary
 
