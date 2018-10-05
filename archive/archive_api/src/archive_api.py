@@ -6,7 +6,7 @@ import daiquiri
 from flask import Flask
 from flask_restplus import Api
 
-from apis import bag_api
+from apis import bag_api, ingests_api
 import config
 from responses import ContextResponse
 from progress_manager import ProgressManager
@@ -25,6 +25,7 @@ api = Api(
 
 
 api.add_namespace(bag_api)
+api.add_namespace(ingests_api)
 
 config_obj = config.ArchiveAPIConfig(
     development=(os.environ.get("FLASK_ENV") == "development")
