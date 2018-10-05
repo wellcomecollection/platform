@@ -1,7 +1,7 @@
 # -*- encoding: utf-8
 
+from flask import abort
 from flask_restplus import Namespace, Resource, fields
-from werkzeug.exceptions import NotFound as NotFoundError
 
 from bags import fetch_bag, models
 from models import Error, register_models
@@ -31,4 +31,4 @@ class BagResource(Resource):
                 id=id,
             )
         except ValueError as error:
-            raise NotFoundError(f"Invalid id: {error}")
+            abort(404, f"Invalid id: {error}")
