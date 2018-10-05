@@ -4,12 +4,14 @@ from flask import abort
 from flask_restplus import Namespace, Resource, fields
 
 from bags import fetch_bag, models
+from error_handler import register_error_handler
 from models import Error, register_models
 
 
 api = Namespace("bags", description="Operations around BagIt bags")
 
 register_models(api, models=models)
+register_error_handler(api)
 
 
 @api.route("/<id>")
