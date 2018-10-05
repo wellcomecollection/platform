@@ -15,10 +15,8 @@ api = Namespace("ingests", description="Operations around ingests")
 register_models(api, models=ingest_models)
 
 
-@api.route("/<id>")
-@api.param("id", "The bag to return")
-class BagResource(Resource):
-
+@api.route("")
+class IngestCollection(Resource):
     @api.doc(description="Request the ingest of a BagIt resource from S3")
     @api.expect(ingest_models.IngestRequest, validate=True)
     @api.response(202, "Ingest created")
