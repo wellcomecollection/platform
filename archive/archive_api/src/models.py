@@ -84,6 +84,6 @@ class TypedModel(Model):
     A thin wrapper around ``Model`` that adds a ``type`` field.
     """
 
-    def __init__(self, name, fields):
-        fields["type"] = fields.String(description="Type of the object", enum=[name])
-        super().__init__(name, fields)
+    def __init__(self, name, _fields):
+        _fields["type"] = fields.String(description="Type of the object", enum=[name])
+        super().__init__(name, _fields)
