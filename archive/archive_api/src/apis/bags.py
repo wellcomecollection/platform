@@ -1,8 +1,9 @@
 # -*- encoding: utf-8
 
 from flask_restplus import Namespace, Resource, fields
+from werkzeug.exceptions import NotFound as NotFoundError
 
-from bags import models
+from bags import fetch_bag, models
 from models import Error, register_models
 
 
@@ -20,4 +21,14 @@ class BagResource(Resource):
     @api.response(200, "Bag found")
     @api.response(404, "Bag not found", Error)
     def get(self, id):
-        return id
+        try:
+            from archive_api import app
+            return fetch_bag(
+                dynamodb_resource=app.config["DYNAMODB_RESOURCE"],
+                table_name=app.config["BAG_VHS_TABLE_NAME"],
+                s3_client=app.config["S3_CLIENT"],
+                bucket_name=app.config["BAG_VHS_BUCKET_NAME"],
+                id=id,
+            )
+        except ValueError as error:
+            raise NotFoundError(f"Invalid id: {error}")
