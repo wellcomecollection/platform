@@ -31,11 +31,11 @@ variable "min_capacity" {
 }
 
 variable "max_capacity" {
-  default = 15
+  default = 1
 }
 
 variable "desired_task_count" {
-  default = 1
+  default = 0
 }
 
 variable "security_group_ids" {
