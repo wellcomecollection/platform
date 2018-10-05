@@ -55,9 +55,9 @@ class ProgressManager:
 
         # The service should return an HTTP 202 if successful.  Anything
         # else should be treated as an error.
-        if resp.status_code != 202:
+        if resp.status_code != 201:
             raise ProgressServiceError(
-                "Expected HTTP 202; got %d (data=%r)" % (resp.status_code, data)
+                "Expected HTTP 201; got %d (data=%r)" % (resp.status_code, data)
             )
 
         # The new ID should be sent in the path parameter of the Location
