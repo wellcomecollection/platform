@@ -1,7 +1,7 @@
 # -*- encoding: utf-8
 
 from flask import abort
-from flask_restplus import Namespace, Resource, fields
+from flask_restplus import Namespace, Resource
 
 from bags import bag_models
 from models import Error, register_models
