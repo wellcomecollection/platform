@@ -23,7 +23,7 @@
             "52"
           ],
           "Content-Type": [
-            "application/x-www-form-urlencoded"
+            "application/json"
           ]
         },
         "method": "POST",
@@ -79,7 +79,7 @@
             "52"
           ],
           "Content-Type": [
-            "application/x-www-form-urlencoded"
+            "application/json"
           ]
         },
         "method": "POST",
@@ -135,7 +135,7 @@
             "52"
           ],
           "Content-Type": [
-            "application/x-www-form-urlencoded"
+            "application/json"
           ]
         },
         "method": "POST",
@@ -191,7 +191,7 @@
             "52"
           ],
           "Content-Type": [
-            "application/x-www-form-urlencoded"
+            "application/json"
           ]
         },
         "method": "POST",
@@ -247,7 +247,7 @@
             "53"
           ],
           "Content-Type": [
-            "application/x-www-form-urlencoded"
+            "application/json"
           ]
         },
         "method": "POST",
@@ -273,8 +273,8 @@
           ]
         },
         "status": {
-          "code": 202,
-          "message": "ACCEPTED"
+          "code": 201,
+          "message": "CREATED"
         },
         "url": "http://localhost:6000/progress"
       },
@@ -303,7 +303,7 @@
             "48"
           ],
           "Content-Type": [
-            "application/x-www-form-urlencoded"
+            "application/json"
           ]
         },
         "method": "POST",
@@ -332,8 +332,8 @@
           ]
         },
         "status": {
-          "code": 202,
-          "message": "ACCEPTED"
+          "code": 201,
+          "message": "CREATED"
         },
         "url": "http://localhost:6000/progress"
       },
@@ -362,7 +362,7 @@
             "101"
           ],
           "Content-Type": [
-            "application/x-www-form-urlencoded"
+            "application/json"
           ]
         },
         "method": "POST",
@@ -391,8 +391,8 @@
           ]
         },
         "status": {
-          "code": 202,
-          "message": "ACCEPTED"
+          "code": 201,
+          "message": "CREATED"
         },
         "url": "http://localhost:6000/progress"
       },

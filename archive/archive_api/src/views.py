@@ -30,7 +30,7 @@ ns_bags = api.namespace("bags", description="Bag requests")
 )
 class IngestCollection(Resource):
     @ns_ingests.expect(models.IngestRequest, validate=True)
-    @ns_ingests.response(202, "Ingest created")
+    @ns_ingests.response(201, "Ingest created")
     @ns_ingests.response(400, "Bad request", models.Error)
     def post(self):
         """Create a request to ingest a BagIt resource"""
@@ -58,7 +58,7 @@ class IngestCollection(Resource):
         # Now we set the Location response header.  There's no way to do this
         # without constructing our own Response object, so that's what we do
         # here.  See https://stackoverflow.com/q/25860304/1558022
-        resp = make_response("", 202)
+        resp = make_response("", 201)
         resp.headers["Location"] = location
         return resp
 
