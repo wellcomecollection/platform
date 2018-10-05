@@ -47,9 +47,9 @@ class ProgressManager:
         # a 202 Created and the new ID in the path parameter of the
         # Location header.
         #
-        data = {"uploadUrl": upload_url}
+        data = {"uploadUri": upload_url}
         if callback_url is not None:
-            data["callbackUrl"] = callback_url
+            data["callbackUri"] = callback_url
 
         resp = self.sess.post(f"{self.endpoint}/progress", json=data, timeout=1)
 

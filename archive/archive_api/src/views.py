@@ -34,8 +34,8 @@ class IngestCollection(Resource):
     @ns_ingests.response(400, "Bad request", models.Error)
     def post(self):
         """Create a request to ingest a BagIt resource"""
-        upload_url = request.json["uploadUrl"]
-        callback_url = request.json.get("callbackUrl")
+        upload_url = request.json["uploadUri"]
+        callback_url = request.json.get("callbackUri")
         self.validate_urls(callback_url, upload_url)
 
         ingest_request_id = progress_manager.create_request(
