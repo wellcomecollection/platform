@@ -18,6 +18,10 @@ class ArchiveAPIConfig(object):
     # See https://flask-restplus.readthedocs.io/en/stable/mask.html
     RESTPLUS_MASK_SWAGGER = False
 
+    # Disable Flask-RESTPlus including the "message" field on errors.
+    # See https://flask-restplus.readthedocs.io/en/stable/errors.html
+    ERROR_INCLUDE_MESSAGE = False
+
     def __init__(self, development=False):
         try:
             if development:
