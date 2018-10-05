@@ -11,10 +11,17 @@ import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, ZipFileDownloadingError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveError,
+  ZipFileDownloadingError
+}
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressUpdate
+}
 
 import scala.util.{Failure, Success, Try}
 
@@ -62,7 +69,8 @@ object ZipFileDownloadFlow extends Logging {
 
         }
       )
-      .withAttributes(ActorAttributes.dispatcher("akka.stream.materializer.blocking-io-dispatcher"))
+      .withAttributes(ActorAttributes.dispatcher(
+        "akka.stream.materializer.blocking-io-dispatcher"))
       .flatMapMerge(
         parallelism,
         (result: Either[ArchiveError[IngestBagRequest],

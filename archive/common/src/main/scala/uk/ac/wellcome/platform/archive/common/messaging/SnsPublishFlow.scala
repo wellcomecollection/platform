@@ -26,6 +26,8 @@ object SnsPublishFlow extends Logging {
         .flatMap(r => Try(snsClient.publish(r)))
 
     ProcessLogDiscardFlow[T, PublishResult]("sns_publish")(publish)
-      .withAttributes(ActorAttributes.dispatcher("akka.stream.materializer.blocking-io-dispatcher"))
+      .withAttributes(
+        ActorAttributes.dispatcher(
+          "akka.stream.materializer.blocking-io-dispatcher"))
   }
 }
