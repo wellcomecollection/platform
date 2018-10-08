@@ -9,12 +9,8 @@ import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  NotificationMessage,
-  RequestContext
-}
+import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.registrar.models._
@@ -23,8 +19,7 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.s3.S3ClientFactory
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
-import scala.concurrent.ExecutionContextExecutor
-import scala.util.{Failure, Success}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 class Registrar @Inject()(
   snsClient: AmazonSNSAsync,
@@ -57,35 +52,24 @@ class Registrar @Inject()(
 
     val flow = Flow[NotificationMessage]
       .log("notification message")
-      .map(parseNotification)
+      .via(NotificationParsingFlow[ArchiveComplete])
       .flatMapConcat(createStorageManifest)
-      .map {
+      .mapAsync(10) {
         case (manifest, ctx) => updateStoredManifest(manifest, ctx)
       }
       .via(SnsPublishFlow(snsConfig))
       .log("published notification")
       .filter {
-        case (_, context) => context.callbackUrl.isDefined
+        case (_, context) => context.archiveCompleteCallbackUrl.isDefined
       }
 
     messageStream.run("registrar", flow)
   }
 
-  private def parseNotification(message: NotificationMessage) = {
-    fromJson[ArchiveComplete](message.Message) match {
-      case Success(bagArchiveCompleteNotification: ArchiveComplete) =>
-        RequestContext(bagArchiveCompleteNotification)
-      case Failure(e) =>
-        throw new RuntimeException(
-          s"Failed to get object location from notification: ${e.getMessage}"
-        )
-    }
-  }
-
-  private def createStorageManifest(requestContext: RequestContext)(
+  private def createStorageManifest(requestContext: ArchiveComplete)(
     implicit s3Client: AmazonS3,
     materializer: ActorMaterializer,
-    executionContext: ExecutionContextExecutor) = {
+    executionContext: ExecutionContext) = {
     Source.fromFuture(
       for (manifest <- StorageManifestFactory
              .create(requestContext.bagLocation))
@@ -93,11 +77,9 @@ class Registrar @Inject()(
   }
 
   private def updateStoredManifest(storageManifest: StorageManifest,
-                                   requestContext: RequestContext) = {
+                                   requestContext: ArchiveComplete)(implicit ec: ExecutionContext) =
     dataStore.updateRecord(storageManifest.id.value)(
       ifNotExisting = (storageManifest, EmptyMetadata()))(
       ifExisting = (_, _) => (storageManifest, EmptyMetadata())
-    )
-    (storageManifest, requestContext)
-  }
+    ).map ( _ => (storageManifest, requestContext))
 }

@@ -5,24 +5,21 @@ import com.amazonaws.services.sns.AmazonSNSAsync
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.models.RequestContext
-import uk.ac.wellcome.platform.archive.registrar.models.{
-  BagRegistrationCompleteNotification,
-  StorageManifest
-}
+import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
+import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest}
 
 import scala.util.{Failure, Success}
 
 object SnsPublishFlow extends Logging {
 
   def apply(snsConfig: SNSConfig)(implicit snsClient: AmazonSNSAsync) =
-    Flow[(StorageManifest, RequestContext)]
+    Flow[(StorageManifest, ArchiveComplete)]
       .flatMapConcat({
         case (manifest, context) =>
           Source
             .single((manifest, context))
             .map {
-              case (m, c) => BagRegistrationCompleteNotification(c.requestId, m)
+              case (m, c) => BagRegistrationCompleteNotification(c.archiveRequestId, m)
             }
             .log("created notification")
             .map(serializeCompletedNotification)
