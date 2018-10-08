@@ -3,7 +3,7 @@
 import types
 
 from ._base import TypedModel
-from .catalogue import Error
+from . import catalogue, ingests
 
 
 def register_models(namespace, models):
@@ -31,6 +31,7 @@ def register_models(namespace, models):
 
 
 __all__ = [
-    "Error",
+    "catalogue",
+    "ingests",
     "register_models",
 ]
