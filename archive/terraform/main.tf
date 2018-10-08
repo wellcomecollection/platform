@@ -130,7 +130,7 @@ module "progress_async" {
 
   env_vars = {
     queue_url                   = "${module.progress_async_queue.id}"
-    topic_arn                   = "${module.caller_topic.arn}"
+    topic_arn                   = "${module.notifier_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
 
