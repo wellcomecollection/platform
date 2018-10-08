@@ -33,3 +33,18 @@ Error = TypedModel(
         "description": fields.String(description="The specific error"),
     },
 )
+
+
+# This model matches "Identifier" in the Catalogue API.
+Identifier = TypedModel(
+    "Identifier",
+    {
+        "identifierType": fields.Nested(
+            IdentifierType,
+            description="Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system.",
+        ),
+        "value": fields.String(
+            description="The value of the thing. e.g. an identifier"
+        ),
+    },
+)
