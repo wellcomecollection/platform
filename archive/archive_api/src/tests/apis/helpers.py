@@ -29,12 +29,9 @@ def assert_is_error_response(resp, status, description=None):
 
     actual_resp = json.loads(resp.data)
     if actual_resp != expected_resp:
-        import difflib
-        print('\n'.join(difflib.context_diff(
-            json.dumps(actual_resp, indent=2, sort_keys=True).splitlines(),
-            json.dumps(expected_resp, indent=2, sort_keys=True).splitlines(),
-            fromfile='actual_resp',
-            tofile='expected_resp'
-        )))
+        print('***  actual response  ***')
+        print(json.dumps(actual_resp, indent=2, sort_keys=True))
+        print('*** expected response ***')
+        print(json.dumps(expected_resp, indent=2, sort_keys=True))
 
     assert actual_resp == expected_resp
