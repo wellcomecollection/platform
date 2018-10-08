@@ -9,6 +9,8 @@ from storage import VHSNotFound, read_from_vhs
 
 api = Namespace("bags", description="Bag requests")
 
+api.add_model("Error", definition=Error)
+
 
 @api.route("/<id>")
 @api.param("id", "The bag identifier")
