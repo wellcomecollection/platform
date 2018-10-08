@@ -152,8 +152,8 @@
           ]
         },
         "status": {
-          "code": 202,
-          "message": "ACCEPTED"
+          "code": 201,
+          "message": "CREATED"
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
@@ -211,8 +211,8 @@
           ]
         },
         "status": {
-          "code": 202,
-          "message": "ACCEPTED"
+          "code": 201,
+          "message": "CREATED"
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
@@ -270,8 +270,8 @@
           ]
         },
         "status": {
-          "code": 202,
-          "message": "ACCEPTED"
+          "code": 201,
+          "message": "CREATED"
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
@@ -329,8 +329,8 @@
           ]
         },
         "status": {
-          "code": 202,
-          "message": "ACCEPTED"
+          "code": 201,
+          "message": "CREATED"
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },
@@ -388,8 +388,8 @@
           ]
         },
         "status": {
-          "code": 202,
-          "message": "ACCEPTED"
+          "code": 201,
+          "message": "CREATED"
         },
         "url": "http://docker.for.mac.localhost:6000/progress"
       },

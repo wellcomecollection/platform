@@ -21,7 +21,7 @@ def test_creates_bag_message_includes_callback_url(guid):
     resp = create_archive_bag_message(
         guid=guid, bag_url="s3://example-bukkit/foo/bar.zip", callback_url=callback_url
     )
-    assert resp["callbackUrl"] == callback_url
+    assert resp["archiveCompleteCallbackUrl"] == callback_url
 
 
 def test_sends_notification_to_sns(sns_client, topic_arn, guid):
@@ -49,8 +49,8 @@ def test_sends_notification_to_sns_with_callback_url(sns_client, topic_arn, guid
 
     sns_messages = sns_client.list_messages()
     assert len(sns_messages) == 1
-    assert "callbackUrl" in sns_messages[0][":message"]
-    assert sns_messages[0][":message"]["callbackUrl"] == callback_url
+    assert "archiveCompleteCallbackUrl" in sns_messages[0][":message"]
+    assert sns_messages[0][":message"]["archiveCompleteCallbackUrl"] == callback_url
 
 
 def test_returns_new_location_no_path(sns_client, topic_arn, guid):
