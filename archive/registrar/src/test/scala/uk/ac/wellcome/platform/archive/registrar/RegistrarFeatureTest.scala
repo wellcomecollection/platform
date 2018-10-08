@@ -55,7 +55,7 @@ class RegistrarFeatureTest
               val messages = listMessagesReceivedFromSNS(topic)
               messages should have size 1
               val registrationCompleteNotification =
-                fromJson[BagRegistrationCompleteNotification](
+                fromJson[RegistrationComplete](
                   messages.head.message).get
 
               assertStored[StorageManifest](
@@ -70,8 +70,8 @@ class RegistrarFeatureTest
                     bagId,
                     sourceIdentifier,
                     identifiers,
-                    FileManifest(ChecksumAlgorithm("sha-256"), bagDigestFiles),
-                    TagManifest(ChecksumAlgorithm("sha-256"), Nil),
+                    FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+                    TagManifest(ChecksumAlgorithm("sha256"), Nil),
                     List(digitalLocation),
                     _,
                     _,
@@ -83,8 +83,7 @@ class RegistrarFeatureTest
                     value = "123"
                   )
                   identifiers shouldBe List(sourceIdentifier)
-
-                  bagDigestFiles should have size 3
+                  bagDigestFiles should have size 1
 
                   digitalLocation shouldBe DigitalLocation(
                     s"http://${storageBucket.name}.s3.amazonaws.com/${bagLocation.storagePath}/${bagLocation.bagPath.value}",

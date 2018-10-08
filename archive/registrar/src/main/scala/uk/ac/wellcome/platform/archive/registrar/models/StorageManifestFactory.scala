@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar.models
 
+import akka.event.LoggingAdapter
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
@@ -13,7 +14,7 @@ import scala.concurrent.ExecutionContext
 object StorageManifestFactory extends Logging {
   def create(bagLocation: BagLocation)(implicit s3Client: AmazonS3,
                                        materializer: Materializer,
-                                       executionContext: ExecutionContext) = {
+                                       executionContext: ExecutionContext,adapter: LoggingAdapter) = {
 
     val algorithm = "sha256"
 
@@ -59,9 +60,9 @@ object StorageManifestFactory extends Logging {
       )
   }
 
-  def getTuples(bagLocation: BagLocation, name: String, delimiter: String)(implicit s3Client: AmazonS3, materializer: Materializer) = {
+  def getTuples(bagLocation: BagLocation, name: String, delimiter: String)(implicit s3Client: AmazonS3, materializer: Materializer, adapter: LoggingAdapter) = {
     val location = createBagItMetaFileLocation(bagLocation,name)
-
+    identity(adapter)
     s3LocationToSource(location)
       .via(FileSplitterFlow(delimiter))
       .runWith(Sink.seq)

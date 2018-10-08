@@ -12,7 +12,6 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.registrar.factories.StorageManifestFactory
 import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlowA
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
@@ -21,7 +20,6 @@ import uk.ac.wellcome.storage.s3.S3ClientFactory
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-import akka.stream.scaladsl.Flow
 
 class Registrar @Inject()(
   snsClient: AmazonSNSAsync,
@@ -71,7 +69,8 @@ class Registrar @Inject()(
   private def createStorageManifest(requestContext: ArchiveComplete)(
     implicit s3Client: AmazonS3,
     materializer: ActorMaterializer,
-    executionContext: ExecutionContext) = {
+    executionContext: ExecutionContext,
+    adapter: LoggingAdapter) = {
     Source.fromFuture(
       for (manifest <- StorageManifestFactory
              .create(requestContext.bagLocation))
