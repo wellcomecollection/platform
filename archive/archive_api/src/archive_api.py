@@ -58,6 +58,20 @@ def default_error_handler(error):
             error_response["description"] = ", ".join(
                 error.data.get("errors", {}).values()
             )
+
+            # The ``data`` attribute is set on ``ValidationError`` if
+            # the user sends a model that doesn't validate.  If we pass this
+            # attribute along to the Flask-RESTPlus error handlers, they
+            # discard our custom response and use the "data" value instead.
+            #
+            # So we delete the ``data`` attribute here, and then Flask-RESTPlus
+            # leaves our custom error model alone.
+            #
+            # For more details, see
+            # https://github.com/noirbizarre/flask-restplus/issues/530
+            #
+            del error.data
+
         else:
             error_response["description"] = getattr(error, "description", str(error))
     return error_response, error_response["httpStatus"]
