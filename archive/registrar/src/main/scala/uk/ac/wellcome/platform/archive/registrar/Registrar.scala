@@ -12,7 +12,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlow
+import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlowA
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -57,7 +57,7 @@ class Registrar @Inject()(
       .mapAsync(10) {
         case (manifest, ctx) => updateStoredManifest(manifest, ctx)
       }
-      .via(SnsPublishFlow(snsConfig))
+      .via(SnsPublishFlowA(snsConfig))
       .log("published notification")
       .filter {
         case (_, context) => context.archiveCompleteCallbackUrl.isDefined
@@ -69,7 +69,8 @@ class Registrar @Inject()(
   private def createStorageManifest(requestContext: ArchiveComplete)(
     implicit s3Client: AmazonS3,
     materializer: ActorMaterializer,
-    executionContext: ExecutionContext) = {
+    executionContext: ExecutionContext,
+    adapter: LoggingAdapter) = {
     Source.fromFuture(
       for (manifest <- StorageManifestFactory
              .create(requestContext.bagLocation))
