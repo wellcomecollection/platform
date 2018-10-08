@@ -7,10 +7,10 @@ from werkzeug.exceptions import BadRequest as BadRequestError
 from werkzeug.exceptions import NotFound as NotFoundError
 
 from archive_api import app, api, logger
-from bags import fetch_bag
 from ingests import send_new_ingest_request
 import models
 from progress_manager import ProgressNotFoundError
+from storage import read_from_vhs, VHSNotFound
 import validators
 
 
@@ -101,7 +101,7 @@ class BagResource(Resource):
     def get(self, id):
         """Get the bag associated with an id"""
         try:
-            result = fetch_bag(
+            result = read_from_vhs(
                 dynamodb_resource=app.config["DYNAMODB_RESOURCE"],
                 table_name=app.config["BAG_VHS_TABLE_NAME"],
                 s3_client=app.config["S3_CLIENT"],
@@ -109,8 +109,8 @@ class BagResource(Resource):
                 id=id,
             )
             return jsonify(result)
-        except ValueError as error:
-            raise NotFoundError(f"Invalid id: {error}")
+        except VHSNotFound:
+            raise NotFoundError(f"Invalid id: No bag found for id={id!r}")
 
 
 @app.route("/storage/v1/healthcheck")
