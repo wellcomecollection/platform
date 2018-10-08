@@ -76,14 +76,28 @@ class TestPOSTIngests:
             description="'ingestType' is a required property"
         )
 
-    def test_invalid_ingest_type_is_badrequest(self, client, ingest_request):
-        ingest_request["ingestType"] = {"type": "UnexpectedIngestType"}
+    @pytest.mark.parametrize('ingest_type,error_description', [
+        (
+            {"id": "create", "type": "UnexpectedIngestType"},
+            "'UnexpectedIngestType' is not one of ['IngestType']"
+        ),
+        (
+            {"id": "destroy", "type": "IngestType"},
+            "'destroy' is not one of ['create']"
+        ),
+        (
+            {"type": "IngestType"},
+            "'id' is a required property"
+        ),
+        (
+            {"id": "create"},
+            "'type' is a required property"
+        ),
+    ])
+    def test_invalid_ingest_type_is_badrequest(self, client, ingest_request, ingest_type, error_description):
+        ingest_request["ingestType"] = ingest_type
         resp = client.post("/storage/v1/ingests", json=ingest_request)
-        assert_is_error_response(
-            resp,
-            status=400,
-            description="'UnexpectedIngestType' is not one of ['IngestType']"
-        )
+        assert_is_error_response(resp, status=400, description=error_description)
 
     def test_no_uploadurl_is_badrequest(self, client, ingest_request):
         del ingest_request["uploadUrl"]
@@ -94,50 +108,44 @@ class TestPOSTIngests:
             description="'uploadUrl' is a required property"
         )
 
-    def test_invalid_uploadurl_is_badrequest(self, client, ingest_request):
-        ingest_request["uploadUrl"] = "not-a-url"
+    @pytest.mark.parametrize('upload_url,error_description', [
+        (
+            "not-a-url",
+            "Invalid uploadUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['s3']"
+        ),
+        (
+            "ftp://example-bukkit/helloworld.zip",
+            "Invalid uploadUrl:'ftp://example-bukkit/helloworld.zip', 'ftp' is not a supported scheme ['s3']"
+        ),
+        (
+            "s3://example-bukkit/helloworld.zip#fragment",
+            "Invalid uploadUrl:'s3://example-bukkit/helloworld.zip#fragment', 'fragment' fragment is not allowed"
+        ),
+    ])
+    def test_invalid_uploadurl_is_badrequest(self, client, ingest_request, upload_url, error_description):
+        ingest_request["uploadUrl"] = upload_url
         resp = client.post("/storage/v1/ingests", json=ingest_request)
-        assert_is_error_response(
-            resp,
-            status=400,
-            description="Invalid uploadUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['s3']"
-        )
+        assert_is_error_response(resp, status=400, description=error_description)
 
-    def test_invalid_scheme_uploadurl_is_badrequest(self, client, ingest_request):
-        ingest_request["uploadUrl"] = "ftp://example-bukkit/helloworld.zip"
+    def test_allows_no_callback_url(self, client, ingest_request):
+        del ingest_request["callbackUrl"]
         resp = client.post("/storage/v1/ingests", json=ingest_request)
-        assert_is_error_response(
-            resp,
-            status=400,
-            description="Invalid uploadUrl:'ftp://example-bukkit/helloworld.zip', 'ftp' is not a supported scheme ['s3']"
-        )
+        assert resp.status_code == 201
 
-    def test_uploadurl_with_fragments_is_badrequest(self, client, ingest_request):
-        ingest_request["uploadUrl"] = "s3://example-bukkit/helloworld.zip#fragment"
+    @pytest.mark.parametrize('callback_url,error_description', [
+        (
+            "not-a-url",
+            "Invalid callbackUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['http', 'https']"
+        ),
+        (
+            "s3://example.com",
+            "Invalid callbackUrl:'s3://example.com', 's3' is not a supported scheme ['http', 'https']"
+        ),
+    ])
+    def test_invalid_callback_url_is_badrequest(self, client, ingest_request, callback_url, error_description):
+        ingest_request["callbackUrl"] = callback_url
         resp = client.post("/storage/v1/ingests", json=ingest_request)
-        assert_is_error_response(
-            resp,
-            status=400,
-            description="Invalid uploadUrl:'s3://example-bukkit/helloworld.zip#fragment', 'fragment' fragment is not allowed"
-        )
-
-    def test_invalid_callback_url_is_badrequest(self, client, ingest_request):
-        ingest_request["callbackUrl"] = "not-a-url"
-        resp = client.post("/storage/v1/ingests", json=ingest_request)
-        assert_is_error_response(
-            resp,
-            status=400,
-            description="Invalid callbackUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['http', 'https']"
-        )
-
-    def test_invalid_scheme_callback_url_is_badrequest(self, client, ingest_request):
-        ingest_request["callbackUrl"] = "s3://example.com"
-        resp = client.post("/storage/v1/ingests", json=ingest_request)
-        assert_is_error_response(
-            resp,
-            status=400,
-            description="Invalid callbackUrl:'s3://example.com', 's3' is not a supported scheme ['http', 'https']"
-        )
+        assert_is_error_response(resp, status=400, description=error_description)
 
     def test_request_allows_fragment_in_callback(self, client, ingest_request):
         ingest_request["callbackUrl"] += "#fragment"

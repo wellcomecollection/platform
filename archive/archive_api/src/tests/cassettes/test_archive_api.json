@@ -340,6 +340,65 @@
       "request": {
         "body": {
           "encoding": "utf-8",
+          "string": "uploadUrl=s3%3A%2F%2Fexample-bukkit%2Fhelloworld.zip"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "52"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Location": [
+            "http://docker.for.mac.localhost:6000/progress/b4c8b161-5c1b-4493-86ba-ca1fc324f380"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Thu, 04 Oct 2018 10:16:21 GMT"
+          ]
+        },
+        "status": {
+          "code": 201,
+          "message": "CREATED"
+        },
+        "url": "http://docker.for.mac.localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-04T10:16:21"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
           "string": "uploadUrl=s3%3A%2F%2Fexample-bukkit%2Fhelloworld.zip&callbackUrl=https%3A%2F%2Fexample.com%2Fpost%3Fcallback"
         },
         "headers": {
