@@ -16,7 +16,6 @@ class VHSError(Exception):
     Raised if there was an unexpected error while reading from the VHS.
     """
 
-
     pass
 
 

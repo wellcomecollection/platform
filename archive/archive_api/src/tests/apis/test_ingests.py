@@ -62,19 +62,25 @@ class TestPOSTIngests:
             json={"ingestType": {"id": "create", "type": "IngestType"}},
         )
         assert_is_error_response(
-            resp, status=400, description="The browser (or proxy) sent a request that this server could not understand."
+            resp,
+            status=400,
+            description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
     def test_invalid_type_is_badrequest(self, client):
         resp = client.post("/storage/v1/ingests", json={"type": "UnexpectedType"})
         assert_is_error_response(
-            resp, status=400, description="The browser (or proxy) sent a request that this server could not understand."
+            resp,
+            status=400,
+            description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
     def test_no_ingest_type_is_badrequest(self, client):
         resp = client.post("/storage/v1/ingests", json={"type": "Ingest"})
         assert_is_error_response(
-            resp, status=400, description="The browser (or proxy) sent a request that this server could not understand."
+            resp,
+            status=400,
+            description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
     def test_invalid_ingest_type_is_badrequest(self, client):
@@ -91,7 +97,9 @@ class TestPOSTIngests:
     def test_no_uploadurl_is_badrequest(self, client):
         resp = client.post("/storage/v1/ingests", json=_create_ingest_request())
         assert_is_error_response(
-            resp, status=400, description="The browser (or proxy) sent a request that this server could not understand."
+            resp,
+            status=400,
+            description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
     def test_invalid_uploadurl_is_badrequest(self, client):

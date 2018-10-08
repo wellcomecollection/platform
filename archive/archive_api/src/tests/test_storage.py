@@ -8,7 +8,7 @@ from storage import VHSNotFound, VHSError, read_from_vhs
 
 
 def test_can_read_from_vhs(dynamodb_resource, vhs_table_name, s3_client, bucket):
-    vhs_value = {'id': '123'}
+    vhs_value = {"id": "123"}
 
     s3_client.put_object(Bucket=bucket, Key="123.txt", Body=json.dumps(vhs_value))
 
@@ -28,14 +28,18 @@ def test_dynamodb_error_is_vhserror(dynamodb_resource, s3_client):
         )
 
 
-def test_missing_dynamodb_table_is_vhsnotfounderror(dynamodb_resource, vhs_table_name, s3_client):
+def test_missing_dynamodb_table_is_vhsnotfounderror(
+    dynamodb_resource, vhs_table_name, s3_client
+):
     with pytest.raises(VHSNotFound, match="123"):
         read_from_vhs(
             dynamodb_resource, vhs_table_name, s3_client, "no-such-bucket", id="123"
         )
 
 
-def test_malformed_dynamodb_row_is_vhserror(dynamodb_resource, vhs_table_name, s3_client):
+def test_malformed_dynamodb_row_is_vhserror(
+    dynamodb_resource, vhs_table_name, s3_client
+):
     table = dynamodb_resource.Table(vhs_table_name)
     table.put_item(
         Item={"id": "123", "location": {"k_y": "123.txt", "n_m_s_a_e": "bukkit"}}
@@ -55,7 +59,9 @@ def test_missing_s3_object_is_vhserror(dynamodb_resource, vhs_table_name, s3_cli
         read_from_vhs(dynamodb_resource, vhs_table_name, s3_client, "bukkit", id="123")
 
 
-def test_non_json_in_s3_is_vhserror(dynamodb_resource, vhs_table_name, s3_client, bucket):
+def test_non_json_in_s3_is_vhserror(
+    dynamodb_resource, vhs_table_name, s3_client, bucket
+):
     s3_client.put_object(Bucket=bucket, Key="123.txt", Body="<<notJson>>")
 
     table = dynamodb_resource.Table(vhs_table_name)

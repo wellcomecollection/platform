@@ -29,6 +29,7 @@ from werkzeug.exceptions import HTTPException
 
 api.add_model(name="Error", definition=models.Error)
 
+
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)
 @bag_api.errorhandler(Exception)
@@ -59,9 +60,10 @@ def default_error_handler2(error):
     # print(error.data)
 
     print(error_response)
-    print('@@AWLC description=%r' % error_response.get("description"))
-    print('@@AWLC error_response=%r' % error_response)
+    print("@@AWLC description=%r" % error_response.get("description"))
+    print("@@AWLC error_response=%r" % error_response)
     return error_response, error_response["httpStatus"]
+
 
 print(api.error_handlers)
 

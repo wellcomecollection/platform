@@ -135,7 +135,8 @@ File = TypedModel("File", {"checksum": fields.String(), "path": fields.String()}
 
 
 FileManifest = TypedModel(
-    "File", {"checksumAlgorithm": fields.String(), "files": fields.List(fields.Nested(File))}
+    "File",
+    {"checksumAlgorithm": fields.String(), "files": fields.List(fields.Nested(File))},
 )
 
 

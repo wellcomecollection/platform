@@ -21,9 +21,7 @@ class TypedModel(Model):
         #
         if isinstance(model_fields, dict) and "type" not in model_fields:
             model_fields["type"] = fields.String(
-                description="Type of the object",
-                enum=[name],
-                default=name
+                description="Type of the object", enum=[name], default=name
             )
 
         super().__init__(name, model_fields, *args, **kwargs)
@@ -70,7 +68,9 @@ def register_models(namespace, models):
 Error = TypedModel(
     "Error",
     {
-        "errorType": fields.String(description="The type of error", enum=["http"], default="http"),
+        "errorType": fields.String(
+            description="The type of error", enum=["http"], default="http"
+        ),
         "httpStatus": fields.Integer(description="The HTTP response status code"),
         "label": fields.String(
             description="The title or other short name of the error"
