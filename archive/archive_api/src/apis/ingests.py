@@ -7,6 +7,7 @@ from flask_restplus import Namespace, Resource
 from ingests import send_new_ingest_request
 from models.catalogue import Error
 from models.ingests import Ingest, IngestType
+from models.progress import Progress, ProgressEvent
 from progress_manager import ProgressNotFoundError
 import validators
 
@@ -14,8 +15,12 @@ import validators
 api = Namespace("ingests", description="Ingest requests")
 
 api.add_model(name="Error", definition=Error)
+
 api.add_model(name="Ingest", definition=Ingest)
 api.add_model(name="IngestType", definition=IngestType)
+
+api.add_model(name="Progress", definition=Progress)
+api.add_model(name="ProgressEvent", definition=ProgressEvent)
 
 logger = daiquiri.getLogger()
 
@@ -84,6 +89,7 @@ class IngestResource(Resource):
     @api.doc(
         description="The ingest request id is returned in the Location header from a POSTed ingest request"
     )
+    @api.marshal_with(Progress)
     @api.response(200, "Ingest found")
     @api.response(404, "Ingest not found", Error)
     def get(self, id):
@@ -94,6 +100,6 @@ class IngestResource(Resource):
             progress_manager = app.config["PROGRESS_MANAGER"]
 
             result = progress_manager.lookup_progress(id=id)
-            return result
+            return {"id": result["progress"]}
         except ProgressNotFoundError as error:
             abort(404, f"Invalid id: No ingest found for id={id!r}")
