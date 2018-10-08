@@ -21,7 +21,8 @@ class TypedModel(Model):
             model_fields["type"] = fields.String(
                 description="Type of the object",
                 enum=[name],
-                default=name
+                default=name,
+                required=True
             )
 
         super().__init__(name, model_fields, *args, **kwargs)
