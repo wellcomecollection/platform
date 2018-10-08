@@ -25,7 +25,7 @@ def create_archive_bag_message(guid, bag_url, callback_url):
     }
 
     if callback_url is not None:
-        message["callbackUrl"] = callback_url
+        message["archiveCompleteCallbackUrl"] = callback_url
 
     return message
 

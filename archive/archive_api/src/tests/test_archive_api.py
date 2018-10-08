@@ -66,9 +66,9 @@ class TestRequestNewIngest:
     upload_url = "s3://example-bukkit/helloworld.zip"
     callback_url = "https://example.com/post?callback"
 
-    def test_request_new_ingest_is_202(self, client):
+    def test_request_new_ingest_is_201(self, client):
         resp = client.post("/storage/v1/ingests", json=ingests_post(self.upload_url))
-        assert resp.status_code == 202
+        assert resp.status_code == 201
         assert resp.data == b""
 
     def test_no_type_is_badrequest(self, client):
@@ -150,7 +150,7 @@ class TestRequestNewIngest:
             "/storage/v1/ingests",
             json=ingests_post(self.upload_url, f"{self.callback_url}#fragment"),
         )
-        assert resp.status_code == 202
+        assert resp.status_code == 201
 
     def test_request_new_ingest_has_location_header(self, client):
         resp = client.post("/storage/v1/ingests", json=ingests_post(self.upload_url))
@@ -186,8 +186,8 @@ class TestRequestNewIngest:
         assert len(sns_messages) == 1
         message = sns_messages[0][":message"]
 
-        assert "callbackUrl" in message
-        assert message["callbackUrl"] == self.callback_url
+        assert "archiveCompleteCallbackUrl" in message
+        assert message["archiveCompleteCallbackUrl"] == self.callback_url
 
         resp = client.get("/storage/v1/ingests")
         assert resp.status_code == 405
