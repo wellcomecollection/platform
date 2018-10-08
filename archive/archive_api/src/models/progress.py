@@ -9,11 +9,7 @@ from ._base import TypedModel
 
 
 ProgressEvent = TypedModel(
-    "ProgressEvent",
-    {
-        "description": fields.String(),
-        "time": fields.String(),
-    }
+    "ProgressEvent", {"description": fields.String(), "time": fields.String()}
 )
 
 
@@ -27,5 +23,5 @@ Progress = TypedModel(
         "createdAt": fields.String(),
         "updatedAt": fields.String(),
         "events": fields.List(fields.Nested(ProgressEvent)),
-    }
+    },
 )

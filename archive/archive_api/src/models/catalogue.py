@@ -25,7 +25,9 @@ from ._base import TypedModel
 Error = TypedModel(
     "Error",
     {
-        "errorType": fields.String(description="The type of error", enum=["http"], default="http"),
+        "errorType": fields.String(
+            description="The type of error", enum=["http"], default="http"
+        ),
         "httpStatus": fields.Integer(description="The HTTP response status code"),
         "label": fields.String(
             description="The title or other short name of the error"

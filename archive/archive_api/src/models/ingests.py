@@ -25,7 +25,7 @@ IngestType = TypedModel(
     {
         "id": fields.String(
             description="Identifier for ingest type", enum=["create"], required=True
-        ),
+        )
     },
 )
 

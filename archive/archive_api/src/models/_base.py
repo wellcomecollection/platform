@@ -22,7 +22,7 @@ class TypedModel(Model):
                 description="Type of the object",
                 enum=[name],
                 default=name,
-                required=True
+                required=True,
             )
 
         super().__init__(name, model_fields, *args, **kwargs)

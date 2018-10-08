@@ -18,7 +18,10 @@ class TestGETIngests:
         assert resp.status_code == 200
 
         rv = json.loads(resp.data)
-        assert rv["@context"] == "https://api.wellcomecollection.org/storage/v1/context.json"
+        assert (
+            rv["@context"]
+            == "https://api.wellcomecollection.org/storage/v1/context.json"
+        )
         assert rv["id"] == lookup_id
         assert rv["type"] == "Progress"
 
