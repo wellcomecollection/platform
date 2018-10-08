@@ -37,7 +37,9 @@ class TestPOST:
     callback_url = "https://example.com/post?callback"
 
     def test_request_new_ingest_is_201(self, client):
-        resp = client.post("/storage/v1/ingests", json=_create_ingest_request(self.upload_url))
+        resp = client.post(
+            "/storage/v1/ingests", json=_create_ingest_request(self.upload_url)
+        )
         assert resp.status_code == 201
         assert resp.data == b""
 
@@ -70,7 +72,9 @@ class TestPOST:
         assert b"'uploadUrl' is a required property" in resp.data
 
     def test_invalid_uploadurl_is_badrequest(self, client):
-        resp = client.post("/storage/v1/ingests", json=_create_ingest_request("not-a-url"))
+        resp = client.post(
+            "/storage/v1/ingests", json=_create_ingest_request("not-a-url")
+        )
         assert resp.status_code == 400
         assert b"Invalid uploadUrl:'not-a-url', is not a complete URL" in resp.data
 
@@ -98,7 +102,8 @@ class TestPOST:
 
     def test_invalid_callback_url_is_badrequest(self, client):
         resp = client.post(
-            "/storage/v1/ingests", json=_create_ingest_request(self.upload_url, "not-a-url")
+            "/storage/v1/ingests",
+            json=_create_ingest_request(self.upload_url, "not-a-url"),
         )
         assert resp.status_code == 400
         assert b"Invalid callbackUrl:'not-a-url', is not a complete URL" in resp.data
@@ -117,12 +122,16 @@ class TestPOST:
     def test_request_allows_fragment_in_callback(self, client):
         resp = client.post(
             "/storage/v1/ingests",
-            json=_create_ingest_request(self.upload_url, f"{self.callback_url}#fragment"),
+            json=_create_ingest_request(
+                self.upload_url, f"{self.callback_url}#fragment"
+            ),
         )
         assert resp.status_code == 201
 
     def test_request_new_ingest_has_location_header(self, client):
-        resp = client.post("/storage/v1/ingests", json=_create_ingest_request(self.upload_url))
+        resp = client.post(
+            "/storage/v1/ingests", json=_create_ingest_request(self.upload_url)
+        )
         assert "Location" in resp.headers
 
         # TODO: This might need revisiting when we deploy the app behind
@@ -131,7 +140,9 @@ class TestPOST:
         assert new_location.startswith("http://localhost/storage/v1/ingests/")
 
     def test_successful_request_sends_to_sns(self, client, sns_client):
-        resp = client.post("/storage/v1/ingests", json=_create_ingest_request(self.upload_url))
+        resp = client.post(
+            "/storage/v1/ingests", json=_create_ingest_request(self.upload_url)
+        )
 
         sns_messages = sns_client.list_messages()
         assert len(sns_messages) == 1
@@ -148,7 +159,8 @@ class TestPOST:
 
     def test_successful_request_sends_to_sns_with_callback(self, client, sns_client):
         client.post(
-            "/storage/v1/ingests", json=_create_ingest_request(self.upload_url, self.callback_url)
+            "/storage/v1/ingests",
+            json=_create_ingest_request(self.upload_url, self.callback_url),
         )
 
         sns_messages = sns_client.list_messages()
@@ -175,13 +187,7 @@ class TestPOST:
 
 
 def _create_ingest_request(upload_url=None, callback_url=None):
-    request = {
-        "type": "Ingest",
-        "ingestType": {
-            "id": "create",
-            "type": "IngestType"
-        }
-    }
+    request = {"type": "Ingest", "ingestType": {"id": "create", "type": "IngestType"}}
     if upload_url:
         request["uploadUrl"] = upload_url
     if callback_url:

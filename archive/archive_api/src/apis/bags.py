@@ -21,6 +21,7 @@ class BagResource(Resource):
     def get(self, id):
         """Get the bag associated with an id"""
         from archive_api import app
+
         try:
             result = read_from_vhs(
                 dynamodb_resource=app.config["DYNAMODB_RESOURCE"],

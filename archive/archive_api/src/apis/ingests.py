@@ -37,6 +37,7 @@ class IngestCollection(Resource):
         self._validate_urls(callback_url, upload_url)
 
         from archive_api import app
+
         progress_manager = app.config["PROGRESS_MANAGER"]
 
         ingest_request_id = progress_manager.create_request(
@@ -88,6 +89,7 @@ class IngestResource(Resource):
         """Get the current status of an ingest request"""
         try:
             from archive_api import app
+
             progress_manager = app.config["PROGRESS_MANAGER"]
 
             result = progress_manager.lookup_progress(id=id)
