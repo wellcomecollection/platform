@@ -4,9 +4,8 @@ import os
 
 import daiquiri
 from flask import Flask
-from flask_restplus import Api
 
-from apis import bags_api, ingests_api
+from apis import api
 import config
 from models.catalogue import Error
 from responses import ContextResponse
@@ -15,14 +14,7 @@ from progress_manager import ProgressManager
 app = Flask(__name__)
 app.response_class = ContextResponse
 
-api = Api(
-    app,
-    version="0.1",
-    title="Archive API",
-    description="A service to ingest and archive BagIt "
-    "(https://tools.ietf.org/html/draft-kunze-bagit-17) resources",
-    prefix="/storage/v1",
-)
+api.init_app(app)
 
 config_obj = config.ArchiveAPIConfig(
     development=(os.environ.get("FLASK_ENV") == "development")
@@ -38,14 +30,9 @@ app.config["PROGRESS_MANAGER"] = ProgressManager(
     sess=app.config["PROGRESS_MANAGER_SESSION"],
 )
 
-api.add_namespace(bags_api)
-api.add_namespace(ingests_api)
-
 
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)
-@bags_api.errorhandler(Exception)
-@ingests_api.errorhandler(Exception)
 @api.marshal_with(Error, skip_none=True)
 def default_error_handler(error):
     error_response = {
