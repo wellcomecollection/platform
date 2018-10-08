@@ -4,7 +4,7 @@
 import json
 
 
-def is_error_response(resp, status, description=None):
+def assert_is_error_response(resp, status, description=None):
     """
     Constructs an error response to match against API responses.
     """
@@ -28,5 +28,6 @@ def is_error_response(resp, status, description=None):
     if description is not None:
         expected_resp["description"] = description
 
+    print(resp.data)
+    print(expected_resp)
     assert json.loads(resp.data) == expected_resp
-    return True

@@ -16,6 +16,11 @@ register_models(api, models=ingest_models)
 
 
 @api.route("")
+@api.param(
+    "payload",
+    "The ingest request specifying the uploadUrl where the BagIt resource can be found",
+    _in="body",
+)
 class IngestCollection(Resource):
     @api.doc(description="Request the ingest of a BagIt resource from S3")
     @api.expect(ingest_models.IngestRequest, validate=True)

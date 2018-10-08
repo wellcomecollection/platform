@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from helpers import is_error_response
+from helpers import assert_is_error_response
 
 
 class TestGETIngests:
@@ -25,14 +25,14 @@ class TestGETIngests:
     def test_lookup_missing_item_is_404(self, client):
         lookup_id = "bad_status-404"
         resp = client.get(f"/storage/v1/ingests/{lookup_id}")
-        assert is_error_response(
+        assert_is_error_response(
             resp, status=404, description="No ingest found for id='bad_status-404'"
         )
 
     @pytest.mark.skip("This doesn't seem to be working right now")
     def test_post_against_lookup_endpoint_is_405(self, client, guid):
         resp = client.post(f"/storage/v1/ingests/{guid}")
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=405,
             description="The method is not allowed for the requested URL.",
@@ -61,20 +61,20 @@ class TestPOSTIngests:
             "/storage/v1/ingests",
             json={"ingestType": {"id": "create", "type": "IngestType"}},
         )
-        assert is_error_response(
-            resp, status=400, description="'type' is a required property"
+        assert_is_error_response(
+            resp, status=400, description="The browser (or proxy) sent a request that this server could not understand."
         )
 
     def test_invalid_type_is_badrequest(self, client):
         resp = client.post("/storage/v1/ingests", json={"type": "UnexpectedType"})
-        assert is_error_response(
-            resp, status=400, description="'UnexpectedType' is not one of ['Ingest']"
+        assert_is_error_response(
+            resp, status=400, description="The browser (or proxy) sent a request that this server could not understand."
         )
 
     def test_no_ingest_type_is_badrequest(self, client):
         resp = client.post("/storage/v1/ingests", json={"type": "Ingest"})
-        assert is_error_response(
-            resp, status=400, description="'ingestType' is a required property"
+        assert_is_error_response(
+            resp, status=400, description="The browser (or proxy) sent a request that this server could not understand."
         )
 
     def test_invalid_ingest_type_is_badrequest(self, client):
@@ -82,26 +82,26 @@ class TestPOSTIngests:
             "/storage/v1/ingests",
             json={"type": "Ingest", "ingestType": {"type": "UnexpectedIngestType"}},
         )
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=400,
-            description="'UnexpectedIngestType' is not one of ['IngestType']",
+            description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
     def test_no_uploadurl_is_badrequest(self, client):
         resp = client.post("/storage/v1/ingests", json=_create_ingest_request())
-        assert is_error_response(
-            resp, status=400, description="'uploadUrl' is a required property"
+        assert_is_error_response(
+            resp, status=400, description="The browser (or proxy) sent a request that this server could not understand."
         )
 
     def test_invalid_uploadurl_is_badrequest(self, client):
         resp = client.post(
             "/storage/v1/ingests", json=_create_ingest_request("not-a-url")
         )
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=400,
-            description="Invalid uploadUrl:'not-a-url', is not a complete URL",
+            description="Invalid uploadUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['s3']",
         )
 
     def test_invalid_scheme_uploadurl_is_badrequest(self, client):
@@ -109,7 +109,7 @@ class TestPOSTIngests:
             "/storage/v1/ingests",
             json=_create_ingest_request("ftp://example-bukkit/helloworld.zip"),
         )
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=400,
             description="Invalid uploadUrl:'ftp://example-bukkit/helloworld.zip', 'ftp' is not a supported scheme ['s3']",
@@ -120,7 +120,7 @@ class TestPOSTIngests:
             "/storage/v1/ingests",
             json=_create_ingest_request("s3://example-bukkit/helloworld.zip#fragment"),
         )
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=400,
             description="Invalid uploadUrl:'s3://example-bukkit/helloworld.zip#fragment', 'fragment' fragment is not allowed",
@@ -131,10 +131,10 @@ class TestPOSTIngests:
             "/storage/v1/ingests",
             json=_create_ingest_request(self.upload_url, "not-a-url"),
         )
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=400,
-            description="Invalid callbackUrl:'not-a-url', is not a complete URL",
+            description="Invalid callbackUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['http', 'https']",
         )
 
     def test_invalid_scheme_callback_url_is_badrequest(self, client):
@@ -142,7 +142,7 @@ class TestPOSTIngests:
             "/storage/v1/ingests",
             json=_create_ingest_request(self.upload_url, "s3://example.com"),
         )
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=400,
             description="Invalid callbackUrl:'s3://example.com', 's3' is not a supported scheme ['http', 'https']",
@@ -202,7 +202,7 @@ class TestPOSTIngests:
 
     def test_get_to_post_endpoint_is_405(self, client):
         resp = client.get("/storage/v1/ingests")
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=405,
             description="The method is not allowed for the requested URL.",
@@ -214,10 +214,10 @@ class TestPOSTIngests:
             data="notjson",
             headers={"Content-Type": "application/json"},
         )
-        assert is_error_response(
+        assert_is_error_response(
             resp,
             status=400,
-            description="The browser (or proxy) sent a request that this server could not understand",
+            description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
 
