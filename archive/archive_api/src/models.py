@@ -1,8 +1,6 @@
 # -*- encoding: utf-8
 
-from flask_restplus import fields
-
-from archive_api import api
+from flask_restplus import Model, fields
 
 
 def fieldType(name, **kwargs):
@@ -21,8 +19,8 @@ def fieldType(name, **kwargs):
 #       "callbackUrl": "https://example.org/callback?id=b1234567",
 #     }
 #
-IngestType = api.model(
-    "Ingest type",
+IngestType = Model(
+    "IngestType",
     {
         "type": fieldType(name="IngestType", required=True),
         "id": fields.String(
@@ -31,8 +29,8 @@ IngestType = api.model(
     },
 )
 
-IngestRequest = api.model(
-    "Ingest request",
+IngestRequest = Model(
+    "IngestRequest",
     {
         "type": fieldType(name="Ingest", required=True),
         "uploadUrl": fields.String(
@@ -65,7 +63,7 @@ IngestRequest = api.model(
 # TODO: It would be much better if we could define this model in a common
 # location, rather than copying this from the Scala app Swagger spec.
 #
-Error = api.model(
+Error = Model(
     "Error",
     {
         "errorType": fields.String(description="The type of error", enum=["http"]),
