@@ -18,7 +18,6 @@ progress_manager = app.config["PROGRESS_MANAGER"]
 
 api.namespaces.clear()
 ns_ingests = api.namespace("ingests", description="Ingest requests")
-ns_bags = api.namespace("bags", description="Bag requests")
 
 
 @ns_ingests.route("")
@@ -90,27 +89,6 @@ class IngestResource(Resource):
             return result
         except ProgressNotFoundError as error:
             raise NotFoundError(f"Invalid id: No ingest found for id={id!r}")
-
-
-@ns_bags.route("/<string:id>")
-@ns_bags.param("id", "The bag identifier")
-class BagResource(Resource):
-    @ns_bags.doc(description="The bag is returned in the body of the response")
-    @ns_bags.response(200, "Bag found")
-    @ns_bags.response(404, "Bag not found", models.Error)
-    def get(self, id):
-        """Get the bag associated with an id"""
-        try:
-            result = read_from_vhs(
-                dynamodb_resource=app.config["DYNAMODB_RESOURCE"],
-                table_name=app.config["BAG_VHS_TABLE_NAME"],
-                s3_client=app.config["S3_CLIENT"],
-                bucket_name=app.config["BAG_VHS_BUCKET_NAME"],
-                id=id,
-            )
-            return jsonify(result)
-        except VHSNotFound:
-            raise NotFoundError(f"Invalid id: No bag found for id={id!r}")
 
 
 @app.route("/storage/v1/healthcheck")
