@@ -59,7 +59,6 @@ class RegistrarFeatureTest
           Some(callbackUrl),
           queuePair,
           storageBucket) { bagLocation =>
-
           registrar.run()
 
           implicit val _ = s3Client

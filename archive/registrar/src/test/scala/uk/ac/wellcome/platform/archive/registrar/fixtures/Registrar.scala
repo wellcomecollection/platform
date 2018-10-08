@@ -145,9 +145,8 @@ trait Registrar
   }
 
   def withRegistrar[R](
-    testWith: TestWith[
-      (Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
-      R]) = {
+    testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
+                       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
         snsTopic =>
@@ -155,26 +154,25 @@ trait Registrar
             storageBucket =>
               withLocalS3Bucket {
                 hybridStoreBucket =>
-                  withLocalDynamoDbTable {
-                    hybridDynamoTable =>
-                        withApp(
+                  withLocalDynamoDbTable { hybridDynamoTable =>
+                    withApp(
+                      storageBucket,
+                      hybridStoreBucket,
+                      hybridDynamoTable,
+                      queuePair,
+                      snsTopic) { registrar =>
+                      testWith(
+                        (
                           storageBucket,
-                          hybridStoreBucket,
-                          hybridDynamoTable,
                           queuePair,
-                          snsTopic) { registrar =>
-                          testWith(
-                            (
-                              storageBucket,
-                              queuePair,
-                              snsTopic,
-                              registrar,
-                              hybridStoreBucket,
-                              hybridDynamoTable)
-                          )
-                        }
-                      }
+                          snsTopic,
+                          registrar,
+                          hybridStoreBucket,
+                          hybridDynamoTable)
+                      )
+                    }
                   }
+              }
 
           }
       }
