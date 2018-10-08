@@ -7,7 +7,7 @@ import java.util.UUID
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
-import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
+import uk.ac.wellcome.platform.archive.common.json.URIConverters
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, CompletedCallbackFailed, CompletedCallbackSucceeded, Failed, None, Processing}
 
 case class Progress(
@@ -72,7 +72,6 @@ trait StatusConverters {
 
 object Progress
   extends URIConverters
-    with UUIDConverters
     with StatusConverters {
 
   sealed trait Status
