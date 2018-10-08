@@ -7,7 +7,7 @@ import pytest
 from helpers import assert_is_error_response
 
 
-class TestGET:
+class TestGETIngests:
     """
     Tests for the GET /ingests/<guid> endpoint.
     """
@@ -39,7 +39,7 @@ class TestGET:
         )
 
 
-class TestPOST:
+class TestPOSTIngests:
     """
     Tests for the POST /ingests endpoint.
     """
