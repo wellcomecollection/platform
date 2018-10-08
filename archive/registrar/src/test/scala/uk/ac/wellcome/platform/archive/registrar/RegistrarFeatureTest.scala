@@ -9,7 +9,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.registrar.fixtures.{
   Registrar => RegistrarFixture
 }
@@ -27,7 +26,6 @@ class RegistrarFeatureTest
     with ScalaFutures
     with MetricsSenderFixture
     with IntegrationPatience
-    with ProgressMonitorFixture
     with RegistrarFixture {
 
   implicit val system: ActorSystem = ActorSystem("test")
@@ -53,8 +51,7 @@ class RegistrarFeatureTest
           topic,
           registrar,
           hybridBucket,
-          hybridTable,
-          progressTable) =>
+          hybridTable) =>
         val (callbackUrl, requestId) = createCallbackUrl
 
         withBagNotification(
@@ -62,12 +59,6 @@ class RegistrarFeatureTest
           Some(callbackUrl),
           queuePair,
           storageBucket) { bagLocation =>
-          givenProgressRecord(
-            requestId,
-            uploadUri,
-            Some(callbackUri),
-            progressTable
-          )
 
           registrar.run()
 

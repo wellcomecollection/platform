@@ -17,8 +17,6 @@ import uk.ac.wellcome.platform.archive.common.models.{
   DigitisedStorageType
 }
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   ConfigModule,
   SNSAsyncClientModule,
@@ -40,7 +38,6 @@ trait Registrar
     with Messaging
     with LocalVersionedHybridStore
     with BagIt
-    with ProgressMonitorFixture
     with LocalDynamoDb {
 
   def sendNotification(requestId: UUID,
@@ -115,8 +112,7 @@ trait Registrar
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 topicArn: Topic,
-                 progressTable: Table)(testWith: TestWith[RegistrarApp, R]) = {
+                 topicArn: Topic)(testWith: TestWith[RegistrarApp, R]) = {
 
     class TestApp extends Logging {
 
@@ -126,8 +122,7 @@ trait Registrar
         topicArn.arn,
         hybridStoreTable.name,
         hybridStoreBucket.name,
-        "archive",
-        progressTable
+        "archive"
       )
 
       val injector: Injector = Guice.createInjector(
@@ -139,7 +134,6 @@ trait Registrar
         SQSClientModule,
         SNSAsyncClientModule,
         DynamoClientModule,
-        ProgressMonitorModule,
         MessageStreamModule
       )
 
@@ -152,7 +146,7 @@ trait Registrar
 
   def withRegistrar[R](
     testWith: TestWith[
-      (Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table, Table),
+      (Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
@@ -163,15 +157,12 @@ trait Registrar
                 hybridStoreBucket =>
                   withLocalDynamoDbTable {
                     hybridDynamoTable =>
-                      withSpecifiedLocalDynamoDbTable(
-                        createProgressMonitorTable) { progressTable =>
                         withApp(
                           storageBucket,
                           hybridStoreBucket,
                           hybridDynamoTable,
                           queuePair,
-                          snsTopic,
-                          progressTable) { registrar =>
+                          snsTopic) { registrar =>
                           testWith(
                             (
                               storageBucket,
@@ -179,13 +170,12 @@ trait Registrar
                               snsTopic,
                               registrar,
                               hybridStoreBucket,
-                              hybridDynamoTable,
-                              progressTable)
+                              hybridDynamoTable)
                           )
                         }
                       }
                   }
-              }
+
           }
       }
     })

@@ -5,10 +5,8 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
 import uk.ac.wellcome.platform.archive.registrar.models.RegistrarConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.concurrent.duration._
@@ -18,8 +16,7 @@ class TestAppConfigModule(queueUrl: String,
                           topicArn: String,
                           hybridStoreTableName: String,
                           hybridStoreBucketName: String,
-                          hybridStoreGlobalPrefix: String,
-                          progressTable: Table)
+                          hybridStoreGlobalPrefix: String)
     extends AbstractModule {
   @Provides
   def providesAppConfig = {
