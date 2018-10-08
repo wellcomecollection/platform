@@ -54,7 +54,7 @@ class IngestCollection(Resource):
         # Now we set the Location response header.  There's no way to do this
         # without constructing our own Response object, so that's what we do
         # here.  See https://stackoverflow.com/q/25860304/1558022
-        resp = make_response("", 202)
+        resp = make_response("", 201)
         resp.headers["Location"] = location
         return resp
 
@@ -90,4 +90,4 @@ class IngestResource(Resource):
             result = progress_manager.lookup_progress(id=id)
             return result
         except ProgressNotFoundError as error:
-            abort(404, f"No ingest found for id={id!r}")
+            abort(404, f"Invalid id: No ingest found for id={id!r}")

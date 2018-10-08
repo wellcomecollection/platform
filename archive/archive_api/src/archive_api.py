@@ -6,7 +6,7 @@ import daiquiri
 from flask import Flask
 from flask_restplus import Api
 
-from apis import bag_api, ingests_api
+from apis import bags_api, ingests_api
 import config
 from responses import ContextResponse
 from progress_manager import ProgressManager
@@ -83,6 +83,9 @@ app.config["PROGRESS_MANAGER"] = ProgressManager(
     endpoint=app.config["PROGRESS_MANAGER_ENDPOINT"],
     sess=app.config["PROGRESS_MANAGER_SESSION"],
 )
+
+api.add_namespace(bags_api)
+api.add_namespace(ingests_api)
 
 # We can't move this import to the top because the views need the ``api``
 # instance defined in this file.

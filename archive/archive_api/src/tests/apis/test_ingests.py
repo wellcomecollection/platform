@@ -155,7 +155,7 @@ class TestPOSTIngests:
                 self.upload_url, f"{self.callback_url}#fragment"
             ),
         )
-        assert resp.status_code == 202
+        assert resp.status_code == 201
 
     def test_request_new_ingest_has_location_header(self, client):
         resp = client.post(
@@ -191,7 +191,7 @@ class TestPOSTIngests:
             "/storage/v1/ingests",
             json=_create_ingest_request(self.upload_url, self.callback_url),
         )
-        assert resp.status_code == 202
+        assert resp.status_code == 201
 
         sns_messages = sns_client.list_messages()
         assert len(sns_messages) == 1
