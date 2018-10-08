@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/callback/server_error"
+  },
+  "response": {
+    "status": 500,
+    "body": "Server error!",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

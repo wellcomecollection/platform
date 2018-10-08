@@ -12,6 +12,7 @@ locals {
   progress_async_container_image = "${module.ecr_repository_progress_async.repository_url}:${var.release_ids["progress_async"]}"
   progress_http_container_image  = "${module.ecr_repository_progress_http.repository_url}:${var.release_ids["progress_http"]}"
   notifier_container_image       = "${module.ecr_repository_notifier.repository_url}:${var.release_ids["notifier"]}"
+  callback_stub_server_container_image = "${module.ecr_repository_callback_stub_server.repository_url}:${var.release_ids["callback_stub_server"]}"
   bagger_container_image         = "${module.ecr_repository_bagger.repository_url}:${var.release_ids["bagger"]}"
   api_ecs_container_image        = "${module.ecr_repository_archive_api.repository_url}:${var.release_ids["archive_api"]}"
 }
