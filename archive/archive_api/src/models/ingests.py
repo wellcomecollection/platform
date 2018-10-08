@@ -29,8 +29,8 @@ IngestType = TypedModel(
     },
 )
 
-IngestRequest = TypedModel(
-    "IngestRequest",
+Ingest = TypedModel(
+    "Ingest",
     {
         "uploadUrl": fields.String(
             description="S3 URL of uploaded BagIt resource, supports only a zipped BagIt file",

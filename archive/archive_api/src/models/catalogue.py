@@ -3,6 +3,8 @@
 Models that correspond to models in the Catalogue API.
 """
 
+from flask_restplus import fields
+
 from ._base import TypedModel
 
 

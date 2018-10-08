@@ -3,7 +3,7 @@
 from flask import abort, jsonify
 from flask_restplus import Namespace, Resource
 
-from models import Error
+from models.catalogue import Error
 from storage import VHSNotFound, read_from_vhs
 
 
