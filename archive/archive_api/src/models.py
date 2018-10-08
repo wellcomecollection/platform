@@ -4,7 +4,7 @@ from flask_restplus import Model, fields
 
 
 def fieldType(name, **kwargs):
-    return fields.String(description="Type of the object", enum=[name], **kwargs)
+    return fields.String(description="Type of the object", enum=[name], default=name, **kwargs)
 
 
 # Example of a valid request from the RFC:
@@ -66,7 +66,7 @@ IngestRequest = Model(
 Error = Model(
     "Error",
     {
-        "errorType": fields.String(description="The type of error", enum=["http"]),
+        "errorType": fields.String(description="The type of error", enum=["http"], default="http"),
         "httpStatus": fields.Integer(description="The HTTP response status code"),
         "label": fields.String(
             description="The title or other short name of the error"
