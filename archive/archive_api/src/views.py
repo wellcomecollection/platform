@@ -5,8 +5,6 @@ from archive_api import app, api, logger
 
 progress_manager = app.config["PROGRESS_MANAGER"]
 
-api.namespaces.clear()
-
 
 @app.route("/storage/v1/healthcheck")
 def route_report_healthcheck_status():
