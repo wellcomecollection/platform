@@ -4,19 +4,19 @@ import java.time.Instant
 
 // Value classes
 
-case class ChecksumAlgorithm(value: String)
+case class ChecksumAlgorithm( value: String)
 
-case class BagId(value: String)
+case class BagId( value: String)
 
-case class BagDescription(value: String)
+case class BagDescription( value: String)
 
-case class BagVersion(value: Int)
+case class BagVersion( value: Int)
 
-case class Checksum(value: String)
+case class Checksum( value: String)
 
-case class BagFilePath(value: String)
+case class BagFilePath( value: String)
 
-case class BagSourceId(value: String)
+case class BagSourceId( value: String)
 
 // StorageManifest
 
