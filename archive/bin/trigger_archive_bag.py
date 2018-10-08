@@ -94,7 +94,7 @@ def call_ingest_api(bucket_name, bags, api, verify_ssl_certificate=True):
     for message in archive_bag_api_messages(bags, bucket_name):
         response = session.post(api, json=message, verify=verify_ssl_certificate)
         status_code = response.status_code
-        if status_code != 202:
+        if status_code != 201:
             print_result(f"ERROR calling {api}", response)
         else:
             print(f"{message} -> {api} [{status_code}]")

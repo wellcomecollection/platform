@@ -9,16 +9,16 @@ module "api_ecs" {
   archive_api_container_image = "${local.api_ecs_container_image}"
   archive_api_container_port  = "9000"
 
-  archive_progress_table_name  = "${aws_dynamodb_table.archive_progress_table.name}"
   archive_ingest_sns_topic_arn = "${module.archivist_topic.arn}"
 
   bag_vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
   bag_vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
 
-  vpc_id             = "${local.vpc_id}"
-  private_subnets    = "${local.private_subnets}"
-  public_subnets     = "${local.public_subnets}"
-  certificate_domain = "api.wellcomecollection.org"
+  vpc_id                         = "${local.vpc_id}"
+  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
+  private_subnets                = "${local.private_subnets}"
+  public_subnets                 = "${local.public_subnets}"
+  certificate_domain             = "api.wellcomecollection.org"
 }
 
 # Archivist
@@ -31,10 +31,10 @@ module "archivist" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_archivist"
+  service_name                     = "archivist"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
@@ -61,10 +61,10 @@ module "registrar" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_registrar"
+  service_name                     = "registrar"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
@@ -93,10 +93,10 @@ module "notifier" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_notifier"
+  service_name                     = "notifier"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
@@ -124,7 +124,7 @@ module "progress_async" {
   service_name                     = "progress_async"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
@@ -172,7 +172,7 @@ module "bagger" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_bagger"
+  service_name                     = "bagger"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1

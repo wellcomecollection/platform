@@ -36,8 +36,12 @@ class ProgressAsyncFeatureTest
             withProgressUpdate(progress.id, ProgressModel.Completed) { update =>
               sendNotificationToSQS(qPair.queue, update)
 
+              val updatedProgress = progress.update(update)
               val expectedNotification =
-                CallbackNotification(progress.update(update))
+                CallbackNotification(
+                  updatedProgress.id,
+                  updatedProgress.callbackUri.get,
+                  updatedProgress)
 
               eventually {
                 assertSnsReceivesOnly(expectedNotification, topic)

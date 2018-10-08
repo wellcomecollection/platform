@@ -18,8 +18,9 @@ module "api_ecs" {
   container_port  = "${var.archive_api_container_port}"
 
   env_vars = {
-    TABLE_NAME = "${var.archive_progress_table_name}"
-    TOPIC_ARN  = "${var.archive_ingest_sns_topic_arn}"
+    TOPIC_ARN = "${var.archive_ingest_sns_topic_arn}"
+
+    PROGRESS_MANAGER_ENDPOINT = "http://progress_http.archive-storage:9001"
 
     BAG_VHS_TABLE_NAME  = "${var.bag_vhs_table_name}"
     BAG_VHS_BUCKET_NAME = "${var.bag_vhs_bucket_name}"
@@ -27,9 +28,10 @@ module "api_ecs" {
 
   env_vars_length = 4
 
-  service_lb_security_group_id = "${aws_security_group.service_lb_security_group.id}"
-  ecs_cluster_id               = "${aws_ecs_cluster.cluster.id}"
-  subnets                      = "${var.private_subnets}"
+  service_lb_security_group_id   = "${aws_security_group.service_lb_security_group.id}"
+  interservice_security_group_id = "${var.interservice_security_group_id}"
+  ecs_cluster_id                 = "${aws_ecs_cluster.cluster.id}"
+  subnets                        = "${var.private_subnets}"
 
   service_discovery_namespace = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   health_check_path           = "${var.api_path}/healthcheck"

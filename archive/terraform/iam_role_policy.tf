@@ -74,20 +74,27 @@ resource "aws_iam_role_policy" "registrar_task_archive_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
-# Progress
+# Progress Async
 
-resource "aws_iam_role_policy" "progress_task_sns" {
+resource "aws_iam_role_policy" "progress_async_task_sns" {
   role   = "${module.progress_async.task_role_name}"
   policy = "${module.caller_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "progress_task_sqs" {
+resource "aws_iam_role_policy" "progress_async_task_sqs" {
   role   = "${module.progress_async.task_role_name}"
   policy = "${data.aws_iam_policy_document.read_from_progress_async_queue.json}"
 }
 
-resource "aws_iam_role_policy" "progress_task_archive_progress_table" {
+resource "aws_iam_role_policy" "progress_async_task_archive_progress_table" {
   role   = "${module.progress_async.task_role_name}"
+  policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
+}
+
+# Progress Http
+
+resource "aws_iam_role_policy" "progress_http_task_archive_progress_table" {
+  role   = "${module.progress_http.task_role_name}"
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 

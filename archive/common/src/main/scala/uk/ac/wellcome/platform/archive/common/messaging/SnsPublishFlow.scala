@@ -17,14 +17,20 @@ object SnsPublishFlow extends Logging {
   def apply[T](
     snsClient: AmazonSNS,
     snsConfig: SNSConfig,
-    subject: String = ""
+    maybeSubject: Option[String] = None
   )(implicit encode: Encoder[T]): Flow[T, PublishResult, NotUsed] = {
 
     def publish(t: T) =
       toJson[T](t)
-        .map(new PublishRequest(snsConfig.topicArn, _, subject))
-        .flatMap(r => Try(snsClient.publish(r)))
-
+        .map { messageString =>
+          maybeSubject match {
+            case Some(subject) =>
+              new PublishRequest(snsConfig.topicArn, messageString, subject)
+            case _ =>
+              new PublishRequest(snsConfig.topicArn, messageString)
+          }
+        }
+        .flatMap(publishRequest => Try(snsClient.publish(publishRequest)))
     ProcessLogDiscardFlow[T, PublishResult]("sns_publish")(publish)
       .withAttributes(
         ActorAttributes.dispatcher(
