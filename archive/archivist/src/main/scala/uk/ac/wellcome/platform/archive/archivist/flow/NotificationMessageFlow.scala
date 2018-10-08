@@ -35,7 +35,7 @@ object NotificationMessageFlow extends Logging {
               bagRequest.archiveRequestId,
               List(ProgressEvent(
                 s"Started working on ingestRequest: ${bagRequest.archiveRequestId}"))))
-            .via(SnsPublishFlow(snsClient, progressSnsConfig))
+            .via(SnsPublishFlow(snsClient, progressSnsConfig, Some("archivist_progress")))
             .map(_ => bagRequest)
         }
       )

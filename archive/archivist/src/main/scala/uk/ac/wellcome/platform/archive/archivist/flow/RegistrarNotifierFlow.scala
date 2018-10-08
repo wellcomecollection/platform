@@ -12,6 +12,6 @@ object RegistrarNotifierFlow {
   def apply(snsConfig: SNSConfig)(implicit snsClient: AmazonSNS)
     : Flow[ArchiveComplete, PublishResult, NotUsed] =
     Flow[ArchiveComplete]
-      .via(SnsPublishFlow[ArchiveComplete](snsClient, snsConfig))
+      .via(SnsPublishFlow[ArchiveComplete](snsClient, snsConfig, Some("archive_completed")))
       .log("published notification")
 }
