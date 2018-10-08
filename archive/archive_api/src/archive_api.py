@@ -64,9 +64,9 @@ def default_error_handler(error):
     return error_response, error_response["httpStatus"]
 
 
-# We can't move this import to the top because the views need the ``api``
-# instance defined in this file.
-from views import *  # noqa
+@app.route("/storage/v1/healthcheck")
+def route_report_healthcheck_status():
+    return {"status": "OK"}
 
 
 if __name__ == "__main__":
