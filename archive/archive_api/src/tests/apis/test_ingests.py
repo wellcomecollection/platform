@@ -27,7 +27,7 @@ class TestGETIngests:
         assert_is_error_response(
             resp,
             status=404,
-            description="Invalid id: No ingest found for id=%r" % lookup_id
+            description="Invalid id: No ingest found for id=%r" % lookup_id,
         )
 
     def test_post_against_lookup_endpoint_is_405(self, client, guid):
@@ -35,7 +35,7 @@ class TestGETIngests:
         assert_is_error_response(
             resp,
             status=405,
-            description="The method is not allowed for the requested URL."
+            description="The method is not allowed for the requested URL.",
         )
 
 
@@ -53,48 +53,41 @@ class TestPOSTIngests:
         del ingest_request["type"]
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert_is_error_response(
-            resp,
-            status=400,
-            description="'type' is a required property"
+            resp, status=400, description="'type' is a required property"
         )
 
     def test_invalid_type_is_badrequest(self, client, ingest_request):
         ingest_request["type"] = "UnexpectedType"
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert_is_error_response(
-            resp,
-            status=400,
-            description="'UnexpectedType' is not one of ['Ingest']"
+            resp, status=400, description="'UnexpectedType' is not one of ['Ingest']"
         )
 
     def test_no_ingest_type_is_badrequest(self, client, ingest_request):
         del ingest_request["ingestType"]
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert_is_error_response(
-            resp,
-            status=400,
-            description="'ingestType' is a required property"
+            resp, status=400, description="'ingestType' is a required property"
         )
 
-    @pytest.mark.parametrize('ingest_type,error_description', [
-        (
-            {"id": "create", "type": "UnexpectedIngestType"},
-            "'UnexpectedIngestType' is not one of ['IngestType']"
-        ),
-        (
-            {"id": "destroy", "type": "IngestType"},
-            "'destroy' is not one of ['create']"
-        ),
-        (
-            {"type": "IngestType"},
-            "'id' is a required property"
-        ),
-        (
-            {"id": "create"},
-            "'type' is a required property"
-        ),
-    ])
-    def test_invalid_ingest_type_is_badrequest(self, client, ingest_request, ingest_type, error_description):
+    @pytest.mark.parametrize(
+        "ingest_type,error_description",
+        [
+            (
+                {"id": "create", "type": "UnexpectedIngestType"},
+                "'UnexpectedIngestType' is not one of ['IngestType']",
+            ),
+            (
+                {"id": "destroy", "type": "IngestType"},
+                "'destroy' is not one of ['create']",
+            ),
+            ({"type": "IngestType"}, "'id' is a required property"),
+            ({"id": "create"}, "'type' is a required property"),
+        ],
+    )
+    def test_invalid_ingest_type_is_badrequest(
+        self, client, ingest_request, ingest_type, error_description
+    ):
         ingest_request["ingestType"] = ingest_type
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert_is_error_response(resp, status=400, description=error_description)
@@ -103,26 +96,29 @@ class TestPOSTIngests:
         del ingest_request["uploadUrl"]
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert_is_error_response(
-            resp,
-            status=400,
-            description="'uploadUrl' is a required property"
+            resp, status=400, description="'uploadUrl' is a required property"
         )
 
-    @pytest.mark.parametrize('upload_url,error_description', [
-        (
-            "not-a-url",
-            "Invalid uploadUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['s3']"
-        ),
-        (
-            "ftp://example-bukkit/helloworld.zip",
-            "Invalid uploadUrl:'ftp://example-bukkit/helloworld.zip', 'ftp' is not a supported scheme ['s3']"
-        ),
-        (
-            "s3://example-bukkit/helloworld.zip#fragment",
-            "Invalid uploadUrl:'s3://example-bukkit/helloworld.zip#fragment', 'fragment' fragment is not allowed"
-        ),
-    ])
-    def test_invalid_uploadurl_is_badrequest(self, client, ingest_request, upload_url, error_description):
+    @pytest.mark.parametrize(
+        "upload_url,error_description",
+        [
+            (
+                "not-a-url",
+                "Invalid uploadUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['s3']",
+            ),
+            (
+                "ftp://example-bukkit/helloworld.zip",
+                "Invalid uploadUrl:'ftp://example-bukkit/helloworld.zip', 'ftp' is not a supported scheme ['s3']",
+            ),
+            (
+                "s3://example-bukkit/helloworld.zip#fragment",
+                "Invalid uploadUrl:'s3://example-bukkit/helloworld.zip#fragment', 'fragment' fragment is not allowed",
+            ),
+        ],
+    )
+    def test_invalid_uploadurl_is_badrequest(
+        self, client, ingest_request, upload_url, error_description
+    ):
         ingest_request["uploadUrl"] = upload_url
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert_is_error_response(resp, status=400, description=error_description)
@@ -132,17 +128,22 @@ class TestPOSTIngests:
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert resp.status_code == 201
 
-    @pytest.mark.parametrize('callback_url,error_description', [
-        (
-            "not-a-url",
-            "Invalid callbackUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['http', 'https']"
-        ),
-        (
-            "s3://example.com",
-            "Invalid callbackUrl:'s3://example.com', 's3' is not a supported scheme ['http', 'https']"
-        ),
-    ])
-    def test_invalid_callback_url_is_badrequest(self, client, ingest_request, callback_url, error_description):
+    @pytest.mark.parametrize(
+        "callback_url,error_description",
+        [
+            (
+                "not-a-url",
+                "Invalid callbackUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['http', 'https']",
+            ),
+            (
+                "s3://example.com",
+                "Invalid callbackUrl:'s3://example.com', 's3' is not a supported scheme ['http', 'https']",
+            ),
+        ],
+    )
+    def test_invalid_callback_url_is_badrequest(
+        self, client, ingest_request, callback_url, error_description
+    ):
         ingest_request["callbackUrl"] = callback_url
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert_is_error_response(resp, status=400, description=error_description)
@@ -180,7 +181,9 @@ class TestPOSTIngests:
         # the one we've been given to look up the request later.
         assert resp.headers["Location"].endswith(message["archiveRequestId"])
 
-    def test_successful_request_sends_to_sns_with_callback(self, client, sns_client, ingest_request):
+    def test_successful_request_sends_to_sns_with_callback(
+        self, client, sns_client, ingest_request
+    ):
         client.post("/storage/v1/ingests", json=ingest_request)
 
         sns_messages = sns_client.list_messages()
@@ -194,7 +197,7 @@ class TestPOSTIngests:
         assert_is_error_response(
             resp,
             status=405,
-            description="The method is not allowed for the requested URL."
+            description="The method is not allowed for the requested URL.",
         )
 
     def test_request_not_json_is_badrequest(self, client):
@@ -206,7 +209,7 @@ class TestPOSTIngests:
         assert_is_error_response(
             resp,
             status=400,
-            description="The browser (or proxy) sent a request that this server could not understand."
+            description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
 
@@ -214,10 +217,7 @@ class TestPOSTIngests:
 def ingest_request():
     return {
         "type": "Ingest",
-        "ingestType": {
-            "id": "create",
-            "type": "IngestType"
-        },
+        "ingestType": {"id": "create", "type": "IngestType"},
         "uploadUrl": "s3://example-bukkit/helloworld.zip",
-        "callbackUrl": "https://example.com/post?callback"
+        "callbackUrl": "https://example.com/post?callback",
     }
