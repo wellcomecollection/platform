@@ -57,21 +57,19 @@ class TestPOST:
         assert_is_error_response(
             resp,
             status=400,
-            description="'type' is a required property"
+            description="'ingestType' is a required property, 'type' is a required property, 'uploadUrl' is a required property"
         )
-
-        assert b in resp.data
 
     def test_invalid_type_is_badrequest(self, client):
         resp = client.post("/storage/v1/ingests", json={"type": "UnexpectedType"})
         assert_is_error_response(
             resp,
             status=400,
-            description="'UnexpectedType' is not one of ['Ingest']"
+            description="'ingestType' is a required property, 'uploadUrl' is a required property, 'UnexpectedType' is not one of ['Ingest']"
         )
 
     def test_no_ingest_type_is_badrequest(self, client):
-        resp = client.post("/storage/v1/ingests", json={"type": "Ingest"})
+        resp = client.post("/storage/v1/ingests", json={"type": "Ingest", "uploadUrl": "http://example.net"})
         assert_is_error_response(
             resp,
             status=400,
@@ -86,7 +84,8 @@ class TestPOST:
         assert_is_error_response(
             resp,
             status=400,
-            description="'UnexpectedIngestType' is not one of ['IngestType']"
+            # TODO: Really?  You want an ID?
+            description="'uploadUrl' is a required property, 'id' is a required property, 'UnexpectedIngestType' is not one of ['IngestType']"
         )
 
     def test_no_uploadurl_is_badrequest(self, client):
@@ -102,7 +101,7 @@ class TestPOST:
         assert_is_error_response(
             resp,
             status=400,
-            description="Invalid uploadUrl:'not-a-url', is not a complete URL"
+            description="Invalid uploadUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['s3']"
         )
 
     def test_invalid_scheme_uploadurl_is_badrequest(self, client):
@@ -135,7 +134,7 @@ class TestPOST:
         assert_is_error_response(
             resp,
             status=400,
-            description="Invalid callbackUrl:'not-a-url', is not a complete URL"
+            description="Invalid callbackUrl:'not-a-url', is not a complete URL, '' is not a supported scheme ['http', 'https']"
         )
 
     def test_invalid_scheme_callback_url_is_badrequest(self, client):
