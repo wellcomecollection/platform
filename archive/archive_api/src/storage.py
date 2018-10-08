@@ -7,6 +7,7 @@ class VHSNotFound(Exception):
     """
     Raised if an item isn't found in VHS.
     """
+
     pass
 
 
@@ -14,6 +15,7 @@ class VHSError(Exception):
     """
     Raised if there was an unexpected error while reading from the VHS.
     """
+
     pass
 
 
