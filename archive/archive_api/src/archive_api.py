@@ -42,7 +42,6 @@ api.add_namespace(bags_api)
 api.add_namespace(ingests_api)
 
 
-# TODO: There's no testing of the error handling; we should fix that!
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)
 @bags_api.errorhandler(Exception)
