@@ -7,8 +7,6 @@ import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.duration._
 
@@ -53,25 +51,12 @@ class ArgsConfigurator(val arguments: Seq[String])
   private val awsSqsEndpoint = opt[String]("aws-sqs-endpoint")
 
   private val uploadNamespace =
-    opt[String]("upload-namespace", required = false)
+    opt[String]("upload-namespace", required = true)
   private val parallelism = opt[Int]("parallelism", default = Some(10))
   private val uploadPrefix =
     opt[String]("upload-prefix", default = Some("archive"))
   private val digestDelimiterRegexp =
     opt[String]("digest-delimiter-regexp", default = Some(" +"))
-
-  private val archiveProgressMonitorTableName =
-    opt[String]("archive-progress-monitor-table-name", required = false)
-
-  private val archiveProgressMonitorDynamoAccessKey =
-    opt[String]("archive-progress-monitor-dynamo-access-key")
-  private val archiveProgressMonitorDynamoSecretKey =
-    opt[String]("archive-progress-monitor-dynamo-secret-key")
-  private val archiveProgressMonitorDynamoRegion = opt[String](
-    "archive-progress-monitor-dynamo-region",
-    default = Some("eu-west-1"))
-  private val archiveProgressMonitorDynamoEndpoint =
-    opt[String]("archive-progress-monitor-dynamo-endpoint")
 
   private val sqsQueueUrl: ScallopOption[String] =
     opt[String]("sqs-queue-url", required = false)
@@ -151,19 +136,6 @@ class ArgsConfigurator(val arguments: Seq[String])
       digestDelimiterRegexp = digestDelimiterRegexp()
     ),
     parallelism = parallelism()
-  )
-
-  val archiveProgressMonitorConfig = ProgressMonitorConfig(
-    DynamoConfig(
-      table = archiveProgressMonitorTableName(),
-      maybeIndex = None
-    ),
-    DynamoClientConfig(
-      accessKey = archiveProgressMonitorDynamoAccessKey.toOption,
-      secretKey = archiveProgressMonitorDynamoSecretKey.toOption,
-      region = archiveProgressMonitorDynamoRegion(),
-      endpoint = archiveProgressMonitorDynamoEndpoint.toOption
-    )
   )
 
   val appConfig = ArchivistConfig(
