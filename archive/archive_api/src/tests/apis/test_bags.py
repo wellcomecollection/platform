@@ -2,6 +2,8 @@
 
 import json
 
+from helpers import assert_is_error_response
+
 
 def test_lookup_bag(
     client, dynamodb_resource, s3_client, guid, bucket_bag, table_name_bag
@@ -25,5 +27,8 @@ def test_lookup_bag(
 
 def test_lookup_missing_item_is_404(client, guid):
     resp = client.get(f"/storage/v1/bags/{guid}")
-    assert resp.status_code == 404
-    assert (b"Invalid id: No bag found for id=%r" % guid) in resp.data
+    assert_is_error_response(
+        resp,
+        status=404,
+        description="Invalid id: No bag found for id=%r" % guid
+    )
