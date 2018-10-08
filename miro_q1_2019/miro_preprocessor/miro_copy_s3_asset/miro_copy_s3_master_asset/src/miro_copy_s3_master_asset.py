@@ -38,7 +38,9 @@ def _select_best_keys(keys, prefix):
     if matching_keys:
         return matching_keys
     else:
-        raise MiroKeyIdMismatchException(f"Unable to match prefix {prefix} with keys {keys}")
+        raise MiroKeyIdMismatchException(
+            f"Unable to match prefix {prefix} with keys {keys}"
+        )
 
 
 def _generate_key_prefix(miro_image):
@@ -51,8 +53,8 @@ def _generate_key_prefix(miro_image):
 def _list_matching_image_keys(s3_client, src_bucket, key_prefix):
     list_response = s3_client.list_objects_v2(Bucket=src_bucket, Prefix=key_prefix)
 
-    if 'Contents' in list_response.keys():
-        keys = [x['Key'] for x in list_response['Contents']]
+    if "Contents" in list_response.keys():
+        keys = [x["Key"] for x in list_response["Contents"]]
         return keys
 
     return None
@@ -69,8 +71,8 @@ def main(event, _):
     destination_prefix = os.environ["S3_DESTINATION_PREFIX"]
     topic_arn = os.environ["TOPIC_ARN"]
 
-    image_info = json.loads(event['Records'][0]['Sns']['Message'])
-    subject = event['Records'][0]['Sns']['Subject']
+    image_info = json.loads(event["Records"][0]["Sns"]["Message"])
+    subject = event["Records"][0]["Sns"]["Subject"]
 
     miro_image = MiroImage(image_info)
 
@@ -88,12 +90,12 @@ def main(event, _):
                     src_bucket=src_bucket,
                     dst_bucket=dst_bucket,
                     src_key=src_key,
-                    dst_key=dst_key
+                    dst_key=dst_key,
                 )
 
                 sns_utils.publish_sns_message(
                     sns_client=sns_client,
                     topic_arn=topic_arn,
                     message=image_info,
-                    subject=f'{subject}_master'
+                    subject=f"{subject}_master",
                 )

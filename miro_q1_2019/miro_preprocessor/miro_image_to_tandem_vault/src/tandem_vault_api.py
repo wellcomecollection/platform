@@ -25,17 +25,14 @@ class TandemVaultAPI(object):
         def raise_error(resp, *args, **kwargs):
             resp.raise_for_status()
 
-        self.sess.hooks['response'].append(raise_error)
+        self.sess.hooks["response"].append(raise_error)
 
     def get_assets(self, filename):
         resp = self.sess.get(
-            f'{self.api_url}/assets',
-            params={
-                'api_key': self.api_key,
-                'filename': os.path.basename(filename)
-            }
+            f"{self.api_url}/assets",
+            params={"api_key": self.api_key, "filename": os.path.basename(filename)},
         )
-        logger.debug('Response from GET /assets: %s', resp.text)
+        logger.debug("Response from GET /assets: %s", resp.text)
         asset_data = resp.json()
         return asset_data
 
@@ -48,77 +45,73 @@ class TandemVaultAPI(object):
         # Retrieve an upload signature for uploading files to S3.
         # https://tandemvault.com/docs/api/v1/assets/get_upload_signature.html
         resp = self.sess.post(
-            f'{self.api_url}/assets/get_upload_signature',
+            f"{self.api_url}/assets/get_upload_signature",
             params={
-                'api_key': self.api_key,
-                'filename': os.path.basename(filename),
-                'content_type': 'image/jpeg',
-            }
+                "api_key": self.api_key,
+                "filename": os.path.basename(filename),
+                "content_type": "image/jpeg",
+            },
         )
-        logger.debug('Response from POST /assets/get_upload_signature: %s', resp.text)
+        logger.debug("Response from POST /assets/get_upload_signature: %s", resp.text)
         upload_data = resp.json()
 
         # Use the upload signature from the previous request to upload the
         # file to S3.  This is a standard S3 POST upload:
         # https://aws.amazon.com/articles/browser-uploads-to-s3-using-html-post-forms/
         resp = self.sess.post(
-            'http://uploads.tandemstock.com.s3.amazonaws.com/',
+            "http://uploads.tandemstock.com.s3.amazonaws.com/",
             files={
-                'Content-Type': 'image/jpeg',
-                'Content-Disposition': 'attachment',
-                'AWSAccessKeyId': upload_data['access_key_id'],
-                'Signature': upload_data['signature'],
-                'policy': upload_data['policy'],
-                'acl': 'private',
-                'key': upload_data['key'],
-                'filename': os.path.basename(filename),
-                'success_action_status': '201',
-                'file': image,
-            }
+                "Content-Type": "image/jpeg",
+                "Content-Disposition": "attachment",
+                "AWSAccessKeyId": upload_data["access_key_id"],
+                "Signature": upload_data["signature"],
+                "policy": upload_data["policy"],
+                "acl": "private",
+                "key": upload_data["key"],
+                "filename": os.path.basename(filename),
+                "success_action_status": "201",
+                "file": image,
+            },
         )
-        logger.debug('Response from POST to uploads.tandemstock.s3: %s', resp.text)
+        logger.debug("Response from POST to uploads.tandemstock.s3: %s", resp.text)
 
         # Now create an asset from the S3 upload location.
         # https://tandemvault.com/docs/api/v1/assets/create.html
         resp = self.sess.post(
-            f'{self.api_url}/assets',
+            f"{self.api_url}/assets",
             params={
-                'api_key': self.api_key,
-                'upload_set_id': upload_set_id,
-                'asset[filename]': os.path.basename(filename),
-            }
+                "api_key": self.api_key,
+                "upload_set_id": upload_set_id,
+                "asset[filename]": os.path.basename(filename),
+            },
         )
-        logger.debug('Response from POST /assets: %s', resp.text)
+        logger.debug("Response from POST /assets: %s", resp.text)
         asset_data = resp.json()
         return asset_data
 
     def add_image_metadata(self, asset_id, metadata):
         resp = self.sess.put(
-            f'{self.api_url}/assets/{asset_id}',
+            f"{self.api_url}/assets/{asset_id}",
             params={
-                'api_key': self.api_key,
-                'id': asset_id,
-                'asset[description]': metadata['caption'],
-                'asset[photographer]': metadata['creator'],
-                'asset[copyright]': metadata['copyright'],
-                'asset[notes]': metadata['notes'],
-                'asset[usage_terms]': metadata['usage'],
-            }
+                "api_key": self.api_key,
+                "id": asset_id,
+                "asset[description]": metadata["caption"],
+                "asset[photographer]": metadata["creator"],
+                "asset[copyright]": metadata["copyright"],
+                "asset[notes]": metadata["notes"],
+                "asset[usage_terms]": metadata["usage"],
+            },
         )
 
-        logger.debug(f'Response from PUT /assets/{asset_id}: %s', resp.text)
+        logger.debug(f"Response from PUT /assets/{asset_id}: %s", resp.text)
 
     def add_image_tags(self, asset_id, tags):
         resp = self.sess.put(
-            f'{self.api_url}/assets/{asset_id}/add_tags',
-            params={
-                'api_key': self.api_key,
-                'id': asset_id,
-                'tags[]': tags,
-            }
+            f"{self.api_url}/assets/{asset_id}/add_tags",
+            params={"api_key": self.api_key, "id": asset_id, "tags[]": tags},
         )
 
-        logger.debug(f'Response from PUT /assets/{asset_id}/add_tags: %s', resp.text)
+        logger.debug(f"Response from PUT /assets/{asset_id}/add_tags: %s", resp.text)
 
     def add_image_to_collection(self, asset_id, collection_id):
         """
@@ -129,10 +122,7 @@ class TandemVaultAPI(object):
         # Add an asset to a collection.
         # https://tandemvault.com/docs/api/v1/collections/add_assets.html
         resp = self.sess.put(
-            f'{self.api_url}/collections/{collection_id}/add_assets',
-            params={
-                'api_key': self.api_key,
-                'asset_ids': asset_id,
-            }
+            f"{self.api_url}/collections/{collection_id}/add_assets",
+            params={"api_key": self.api_key, "asset_ids": asset_id},
         )
-        logger.debug('Response from PUT /add_assets: %s', resp.text)
+        logger.debug("Response from PUT /add_assets: %s", resp.text)

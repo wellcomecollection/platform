@@ -12,8 +12,7 @@ class SQSReader:
     def __iter__(self):
         while True:
             response = self.sqs_client.receive_message(
-                QueueUrl=self.queue_url,
-                MaxNumberOfMessages=self.max_message
+                QueueUrl=self.queue_url, MaxNumberOfMessages=self.max_message
             )
 
             if "Messages" in response:
@@ -26,5 +25,5 @@ class SQSReader:
         if self._current_message is not None:
             self.sqs_client.delete_message(
                 QueueUrl=self.queue_url,
-                ReceiptHandle=self._current_message['ReceiptHandle']
+                ReceiptHandle=self._current_message["ReceiptHandle"],
             )

@@ -20,23 +20,24 @@ class MiroCollection:
     """
     Represents an old Miro collection, as stored in Tandem Vault.
     """
+
     upload_set_id = attr.ib()
     collection_id = attr.ib()
 
 
 miro_collections = {
-    'A': MiroCollection(50064, 111597),  # noqa
-    'AS': MiroCollection(47807, 111598),  # noqa
-    'B': MiroCollection(50067, 111600),  # noqa
-    'D': MiroCollection(47809, 111601),  # noqa
-    'F': MiroCollection(47810, 111603),  # noqa
-    'FP': MiroCollection(47811, 111604),  # noqa
-    'L': MiroCollection(50073, 111605),  # noqa
-    'M': MiroCollection(50075, 111606),  # noqa
-    'N:': MiroCollection(47814, 111607),  # noqa
-    'S': MiroCollection(47815, 111608),  # noqa
-    'V': MiroCollection(50077, 111609),  # noqa
-    'W': MiroCollection(47817, 1116011),  # noqa
+    "A": MiroCollection(50064, 111_597),  # noqa
+    "AS": MiroCollection(47807, 111_598),  # noqa
+    "B": MiroCollection(50067, 111_600),  # noqa
+    "D": MiroCollection(47809, 111_601),  # noqa
+    "F": MiroCollection(47810, 111_603),  # noqa
+    "FP": MiroCollection(47811, 111_604),  # noqa
+    "L": MiroCollection(50073, 111_605),  # noqa
+    "M": MiroCollection(50075, 111_606),  # noqa
+    "N:": MiroCollection(47814, 111_607),  # noqa
+    "S": MiroCollection(47815, 111_608),  # noqa
+    "V": MiroCollection(50077, 111_609),  # noqa
+    "W": MiroCollection(47817, 1_116_011),  # noqa
 }
 
 
@@ -45,33 +46,33 @@ class InvalidWIAYear(Exception):
 
 
 wia_year = {
-    '1997': 110075,
-    '1998': 110076,
-    '1999': 110077,
-    '2001': 110078,
-    '2002': 110079,
-    '2005': 110080,
-    '2006': 110081,
-    '2008': 110082,
-    '2009': 110083,
-    '2011': 110084,
-    '2012': 110085,
-    '2014': 110086,
-    '2015': 110087,
-    '2016': 110088,
-    '2017': 110089,
+    "1997": 110_075,
+    "1998": 110_076,
+    "1999": 110_077,
+    "2001": 110_078,
+    "2002": 110_079,
+    "2005": 110_080,
+    "2006": 110_081,
+    "2008": 110_082,
+    "2009": 110_083,
+    "2011": 110_084,
+    "2012": 110_085,
+    "2014": 110_086,
+    "2015": 110_087,
+    "2016": 110_088,
+    "2017": 110_089,
 }
 
 CONTRIB_MAP = None
 
 
-def _contrib_map(bucket='miro-data', key='contrib_map.json'):
+def _contrib_map(bucket="miro-data", key="contrib_map.json"):
     global CONTRIB_MAP
     if CONTRIB_MAP is None:
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource("s3")
 
         obj = s3.Object(bucket, key)
-        object_body = obj.get()['Body'].read().decode('utf-8')
+        object_body = obj.get()["Body"].read().decode("utf-8")
 
         CONTRIB_MAP = json.loads(object_body)
 
@@ -83,9 +84,9 @@ def lookup_contributor(d, contrib_map=None):
         contrib_map = _contrib_map()
 
     try:
-        contrib_code = d['image_source_code']
+        contrib_code = d["image_source_code"]
     except KeyError:
-        return ''
+        return ""
 
     # All the values in contrib_map are uppercase, but some of the
     # Miro records have lowercase contrib codes.
@@ -94,9 +95,9 @@ def lookup_contributor(d, contrib_map=None):
     try:
         contributor = contrib_map[contrib_code]
     except KeyError:
-        return ''
+        return ""
     else:
-        return contributor or ''
+        return contributor or ""
 
 
 def _zip(d, a, b):
@@ -127,9 +128,9 @@ def _zip(d, a, b):
         first = pair[0]
         second = pair[1]
 
-        return f'{first}{delimiter}{second}'
+        return f"{first}{delimiter}{second}"
 
-    return ", ".join([_join(pair, " ") for pair in zipped if _check_zip(pair)]) + '\n'
+    return ", ".join([_join(pair, " ") for pair in zipped if _check_zip(pair)]) + "\n"
 
 
 def _list_to_string(candidate_string, delimiter=", "):
@@ -166,26 +167,26 @@ def _if_exists(d, a, prefix=""):
 
 def _followed_by_comma(d, a, prefix=""):
     s = _is_in(d, a)
-    return _prefix_string(s, prefix, ', ')
+    return _prefix_string(s, prefix, ", ")
 
 
 def _followed_by_newline(d, a, prefix="", delimiter=", "):
     s = _is_in(d, a)
-    return _prefix_string(s, prefix, '\n')
+    return _prefix_string(s, prefix, "\n")
 
 
 def _show_only_if_match_hide_value(d, a, match, text):
     s = _is_in(d, a)
     if s != match:
         return ""
-    return _prefix_string(text, '', '\n')
+    return _prefix_string(text, "", "\n")
 
 
 def _show_only_if_match(d, a, match, prefix="", suffix=""):
     s = _is_in(d, a)
     if s != match:
         return ""
-    return _prefix_string(s, prefix, '\n')
+    return _prefix_string(s, prefix, "\n")
 
 
 def _or(s1, s2):
@@ -202,77 +203,84 @@ def create_usage(d):
     parts = []
 
     try:
-        if d['image_copyright_info']:
+        if d["image_copyright_info"]:
             parts.append(
-                'This image may have additional copyright information. '
-                'Please contact digitisation@wellcome.ac.uk.\n\n'
+                "This image may have additional copyright information. "
+                "Please contact digitisation@wellcome.ac.uk.\n\n"
             )
     except KeyError:
         pass
 
-    parts.extend([
-        _followed_by_newline(d, 'image_use_restrictions'),
-        _followed_by_newline(d, 'image_copyright_cleared', "Likely in copyright. Cleared for open access? "),
-        _show_only_if_match_hide_value(
-            d, 'image_general_use', 'N',
-            'May be sensitive or unsuitable for general use.'
-        ),
-    ])
+    parts.extend(
+        [
+            _followed_by_newline(d, "image_use_restrictions"),
+            _followed_by_newline(
+                d,
+                "image_copyright_cleared",
+                "Likely in copyright. Cleared for open access? ",
+            ),
+            _show_only_if_match_hide_value(
+                d,
+                "image_general_use",
+                "N",
+                "May be sensitive or unsuitable for general use.",
+            ),
+        ]
+    )
 
     return "".join(parts)
 
 
 def _prefix_b_number(s):
-    if s and not s.startswith('b'):
-        return f'b{s}'
+    if s and not s.startswith("b"):
+        return f"b{s}"
 
     return s
 
 
 def create_caption(d):
     parts = [
-        _followed_by_newline(d, 'image_no_calc'),
-        _followed_by_newline(d, 'image_title'),
+        _followed_by_newline(d, "image_no_calc"),
+        _followed_by_newline(d, "image_title"),
         _followed_by_newline(
-            {
-                'innopac_id': _prefix_b_number(_is_in(d, 'image_innopac_id'))
-            },
-            'innopac_id',
-            'Sierra record number: '
+            {"innopac_id": _prefix_b_number(_is_in(d, "image_innopac_id"))},
+            "innopac_id",
+            "Sierra record number: ",
         ),
-        _followed_by_comma(d, 'image_pub_author'),
-        _followed_by_comma({'creator': create_creator(d)}, 'creator'),
-        _followed_by_comma(d, 'image_pub_title'),
-        _followed_by_comma(d, 'image_pub_publisher'),
-        _or(
-            _is_in(d, 'image_pub_date'),
-            _is_in(d, 'image_artwork_date'),
+        _followed_by_comma(d, "image_pub_author"),
+        _followed_by_comma({"creator": create_creator(d)}, "creator"),
+        _followed_by_comma(d, "image_pub_title"),
+        _followed_by_comma(d, "image_pub_publisher"),
+        _or(_is_in(d, "image_pub_date"), _is_in(d, "image_artwork_date")),
+        "\n",
+        _followed_by_comma(d, "image_pub_periodical"),
+        _followed_by_comma(d, "image_pub_volume"),
+        _followed_by_comma(d, "image_pub_issue"),
+        _followed_by_comma(d, "image_pub_page_no"),
+        _followed_by_newline(d, "image_pub_plate"),
+        _followed_by_newline(d, "image_image_desc")
+        + _zip(d, "image_library_ref_department", "image_library_ref_id")
+        + _followed_by_newline(d, "image_pub_archive")
+        + _followed_by_newline(d, "image_library_dept")
+        + _followed_by_newline(d, "image_award", "Used for exhibition: ")
+        + _followed_by_newline(
+            d, "image_wellcome_publications", "Used for Wellcome publication: "
+        )
+        + _followed_by_newline(d, "image_tech_scanned_by", "Photographer: ")
+        + _show_only_if_match(
+            d, "image_transparency_held", "Yes", "Transparency held: "
         ),
-        '\n',
-        _followed_by_comma(d, 'image_pub_periodical'),
-        _followed_by_comma(d, 'image_pub_volume'),
-        _followed_by_comma(d, 'image_pub_issue'),
-        _followed_by_comma(d, 'image_pub_page_no'),
-        _followed_by_newline(d, 'image_pub_plate'),
-        _followed_by_newline(d, 'image_image_desc') +
-        _zip(d, 'image_library_ref_department', 'image_library_ref_id') +
-        _followed_by_newline(d, 'image_pub_archive') +
-        _followed_by_newline(d, 'image_library_dept') +
-        _followed_by_newline(d, 'image_award', "Used for exhibition: ") +
-        _followed_by_newline(d, 'image_wellcome_publications', "Used for Wellcome publication: ") +
-        _followed_by_newline(d, 'image_tech_scanned_by', "Photographer: ") +
-        _show_only_if_match(d, 'image_transparency_held', 'Yes', 'Transparency held: '),
-        _prefix_string(_is_in(d, 'image_related_images'), prefix="Related images: "),
+        _prefix_string(_is_in(d, "image_related_images"), prefix="Related images: "),
     ]
 
     return "".join(parts)
 
 
 def create_copyright(d):
-    image_credit_line = _is_in(d, 'image_credit_line')
+    image_credit_line = _is_in(d, "image_credit_line")
 
-    if 'Wellcome' in image_credit_line:
-        return 'Wellcome Collection'
+    if "Wellcome" in image_credit_line:
+        return "Wellcome Collection"
 
     if not image_credit_line:
         possible_creator = lookup_contributor(d)
@@ -283,36 +291,42 @@ def create_copyright(d):
 
 
 def create_notes():
-    return "".join([
-        "Important usage information:\n",
-        "Some images are in copyright or unsuitable for general use due to sensitivities. ",
-        "Please refer to the image metadata before sharing. ",
-        "If you are unable to download an image that you need, ",
-        "or if you are unsure about what use is permitted, ",
-        "please contact digitisation@wellcome.ac.uk."
-    ])
+    return "".join(
+        [
+            "Important usage information:\n",
+            "Some images are in copyright or unsuitable for general use due to sensitivities. ",
+            "Please refer to the image metadata before sharing. ",
+            "If you are unable to download an image that you need, ",
+            "or if you are unsure about what use is permitted, ",
+            "please contact digitisation@wellcome.ac.uk.",
+        ]
+    )
 
 
 def create_tags(d):
     def _split(s):
         if not isinstance(s, list):
-            tokens = s.lower().split(',')
+            tokens = s.lower().split(",")
         else:
             tokens = [t.lower() for t in s]
 
         return [t.strip() for t in tokens]
 
-    return sorted(list(set(
-        _split(_is_in(d, 'image_subject_names')) +
-        _split(_is_in(d, 'image_keywords')) +
-        _split(_is_in(d, 'image_lcsh_place')) +
-        _split(_is_in(d, 'image_mesh')) +
-        _split(_is_in(d, 'image_loc'))
-    )))
+    return sorted(
+        list(
+            set(
+                _split(_is_in(d, "image_subject_names"))
+                + _split(_is_in(d, "image_keywords"))
+                + _split(_is_in(d, "image_lcsh_place"))
+                + _split(_is_in(d, "image_mesh"))
+                + _split(_is_in(d, "image_loc"))
+            )
+        )
+    )
 
 
 def create_creator(d):
-    creators = _is_in(d, 'image_creator', '/')
+    creators = _is_in(d, "image_creator", "/")
 
     if not creators:
         possible_creator = lookup_contributor(d)
@@ -334,5 +348,5 @@ def create_metadata(image_data):
         "usage": usage,
         "creator": creator,
         "copyright": copy_right,
-        "notes": notes
+        "notes": notes,
     }

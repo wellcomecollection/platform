@@ -9,57 +9,55 @@ from unittest import mock
 import miro_inventory
 
 miro_id = "A0000002"
-index = 'index'
-type = 'type'
+index = "index"
+type = "type"
 collection = "Images-C"
-cluster_url = 'https://example.com'
-subject = 'catalogue_api'
+cluster_url = "https://example.com"
+subject = "catalogue_api"
 
-put_url = f'{cluster_url}/{index}/{type}/{miro_id}_{subject}'
+put_url = f"{cluster_url}/{index}/{type}/{miro_id}_{subject}"
 
 image_data = {
-    'image_no_calc': miro_id,
-    'image_int_default': None,
-    'image_artwork_date_from': "01/02/2000",
-    'image_artwork_date_to': "13/12/2000",
-    'image_barcode': "10000000",
-    'image_creator': ["Caspar Bauhin"]
+    "image_no_calc": miro_id,
+    "image_int_default": None,
+    "image_artwork_date_from": "01/02/2000",
+    "image_artwork_date_to": "13/12/2000",
+    "image_barcode": "10000000",
+    "image_creator": ["Caspar Bauhin"],
 }
 
-image_json = json.dumps({
-    'collection': collection,
-    'image_data': image_data
-})
+image_json = json.dumps({"collection": collection, "image_data": image_data})
 
 os.environ = {
     "ES_CLUSTER_URL": cluster_url,
     "ES_INDEX": index,
     "ES_TYPE": type,
-    "ES_USERNAME": 'foo',
-    "ES_PASSWORD": 'foo',
-    "ID_FIELD": 'image_data.image_no_calc',
+    "ES_USERNAME": "foo",
+    "ES_PASSWORD": "foo",
+    "ID_FIELD": "image_data.image_no_calc",
 }
 
 event = {
-    'Records': [{
-        'EventSource': 'aws:sns',
-        'EventVersion': '1.0',
-        'EventSubscriptionArn':
-            'arn:aws:sns:region:account_id:sns:stuff',
-        'Sns': {
-            'Type': 'Notification',
-            'MessageId': 'b20eb72b-ffc7-5d09-9636-e6f65d67d10f',
-            'TopicArn':
-                'arn:aws:sns:region:account_id:sns',
-            'Subject': subject,
-            'Message': image_json,
-            'Timestamp': '2017-07-10T15:42:24.307Z',
-            'SignatureVersion': '1',
-            'Signature': 'signature',
-            'SigningCertUrl': 'https://certificate.pem',
-            'UnsubscribeUrl': 'https://unsubscribe-url',
-            'MessageAttributes': {}}
-    }]
+    "Records": [
+        {
+            "EventSource": "aws:sns",
+            "EventVersion": "1.0",
+            "EventSubscriptionArn": "arn:aws:sns:region:account_id:sns:stuff",
+            "Sns": {
+                "Type": "Notification",
+                "MessageId": "b20eb72b-ffc7-5d09-9636-e6f65d67d10f",
+                "TopicArn": "arn:aws:sns:region:account_id:sns",
+                "Subject": subject,
+                "Message": image_json,
+                "Timestamp": "2017-07-10T15:42:24.307Z",
+                "SignatureVersion": "1",
+                "Signature": "signature",
+                "SigningCertUrl": "https://certificate.pem",
+                "UnsubscribeUrl": "https://unsubscribe-url",
+                "MessageAttributes": {},
+            },
+        }
+    ]
 }
 
 
@@ -73,23 +71,23 @@ def mocked_requests_put(*args, **kwargs):
     if args[0] == put_url:
         return MockResponse(200)
 
-    print(f'{args[0]} != {put_url}')
+    print(f"{args[0]} != {put_url}")
 
     return MockResponse(500)
 
 
-@mock.patch('miro_inventory.requests.put', side_effect=mocked_requests_put)
+@mock.patch("miro_inventory.requests.put", side_effect=mocked_requests_put)
 def test_miro_inventory(mock_get):
     miro_inventory.main(event, None)
 
     mock_get.assert_called_with(
         put_url,
         data='{"id": "A0000002_catalogue_api", "subject": "catalogue_api", "message": {"collection": "Images-C", "image_data": {"image_no_calc": "A0000002", "image_int_default": null, "image_artwork_date_from": "01/02/2000", "image_artwork_date_to": "13/12/2000", "image_barcode": "10000000", "image_creator": ["Caspar Bauhin"]}}}',
-        auth=('foo', 'foo')
+        auth=("foo", "foo"),
     )
 
 
-@mock.patch('miro_inventory.requests.put', side_effect=mocked_requests_put)
+@mock.patch("miro_inventory.requests.put", side_effect=mocked_requests_put)
 def test_miro_inventory_raises_error_on_500(mock_get):
     with pytest.raises(HTTPError):
         os.environ["ES_INDEX"] = "nope"

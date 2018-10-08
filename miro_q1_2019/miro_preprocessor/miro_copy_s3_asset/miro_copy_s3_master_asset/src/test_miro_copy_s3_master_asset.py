@@ -11,7 +11,7 @@ from miro_copy_s3_master_asset import MiroKeyIdMismatchException
 
 def assert_bucket_is_empty(destination_bucket_name, s3_client):
     objects = s3_client.list_objects(Bucket=destination_bucket_name)
-    assert 'Content' not in objects.keys()
+    assert "Content" not in objects.keys()
 
 
 @pytest.fixture
@@ -31,117 +31,128 @@ def sns_image_json_event():
     miro_id = "A0000002"
     collection = "Images-A"
     image_data = {
-        'image_no_calc': miro_id,
-        'image_int_default': None,
-        'image_artwork_date_from': "01/02/2000",
-        'image_artwork_date_to': "13/12/2000",
-        'image_barcode': "10000000",
-        'image_creator': ["Caspar Bauhin"]
+        "image_no_calc": miro_id,
+        "image_int_default": None,
+        "image_artwork_date_from": "01/02/2000",
+        "image_artwork_date_to": "13/12/2000",
+        "image_barcode": "10000000",
+        "image_creator": ["Caspar Bauhin"],
     }
 
-    image_json = json.dumps({
-        'collection': collection,
-        'image_data': image_data
-    })
+    image_json = json.dumps({"collection": collection, "image_data": image_data})
 
     event = {
-        'Records': [{
-            'EventSource': 'aws:sns',
-            'EventVersion': '1.0',
-            'EventSubscriptionArn':
-                'arn:aws:sns:region:account_id:sns:stuff',
-            'Sns': {
-                'Type': 'Notification',
-                'MessageId': 'b20eb72b-ffc7-5d09-9636-e6f65d67d10f',
-                'TopicArn':
-                    'arn:aws:sns:region:account_id:sns',
-                'Subject': None,
-                'Message': image_json,
-                'Timestamp': '2017-07-10T15:42:24.307Z',
-                'SignatureVersion': '1',
-                'Signature': 'signature',
-                'SigningCertUrl': 'https://certificate.pem',
-                'UnsubscribeUrl': 'https://unsubscribe-url',
-                'MessageAttributes': {}}
-        }]
+        "Records": [
+            {
+                "EventSource": "aws:sns",
+                "EventVersion": "1.0",
+                "EventSubscriptionArn": "arn:aws:sns:region:account_id:sns:stuff",
+                "Sns": {
+                    "Type": "Notification",
+                    "MessageId": "b20eb72b-ffc7-5d09-9636-e6f65d67d10f",
+                    "TopicArn": "arn:aws:sns:region:account_id:sns",
+                    "Subject": None,
+                    "Message": image_json,
+                    "Timestamp": "2017-07-10T15:42:24.307Z",
+                    "SignatureVersion": "1",
+                    "Signature": "signature",
+                    "SigningCertUrl": "https://certificate.pem",
+                    "UnsubscribeUrl": "https://unsubscribe-url",
+                    "MessageAttributes": {},
+                },
+            }
+        ]
     }
 
     return miro_id, image_json, event
 
 
 def test_should_copy_an_asset_into_a_different_bucket(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
-    image_body = b'baba'
+    image_body = b"baba"
     destination_prefix = "library/"
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
+        ACL="private",
+        Body=image_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2",
+    )
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     miro_copy_s3_master_asset.main(event, None)
 
-    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
-    assert s3_response['Body'].read() == image_body
+    s3_response = s3_client.get_object(
+        Bucket=destination_bucket_name, Key=destination_key
+    )
+    assert s3_response["Body"].read() == image_body
 
 
 def test_should_copy_dt_and_tifs_into_a_different_bucket(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
-    image_dt_body = b'aghte'
-    image_tif_body = b'baba'
+    image_dt_body = b"aghte"
+    image_tif_body = b"baba"
     destination_prefix = "library/"
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_dt_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.dt")
+        ACL="private",
+        Body=image_dt_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.dt",
+    )
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_tif_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.tif")
+        ACL="private",
+        Body=image_tif_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.tif",
+    )
 
     destination_tif_key = f"{destination_prefix}A0000000/{miro_id}.tif"
     destination_dt_key = f"{destination_prefix}A0000000/{miro_id}.dt"
 
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     miro_copy_s3_master_asset.main(event, None)
 
-    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_tif_key)
-    assert s3_response['Body'].read() == image_tif_body
+    s3_response = s3_client.get_object(
+        Bucket=destination_bucket_name, Key=destination_tif_key
+    )
+    assert s3_response["Body"].read() == image_tif_body
 
-    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_dt_key)
-    assert s3_response['Body'].read() == image_dt_body
+    s3_response = s3_client.get_object(
+        Bucket=destination_bucket_name, Key=destination_dt_key
+    )
+    assert s3_response["Body"].read() == image_dt_body
 
 
 def test_should_not_crash_if_the_asset_does_not_exist(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
@@ -149,11 +160,13 @@ def test_should_not_crash_if_the_asset_does_not_exist(
     miro_id, image_json, event = sns_image_json_event
 
     destination_prefix = "library/"
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     miro_copy_s3_master_asset.main(event, None)
 
@@ -161,203 +174,240 @@ def test_should_not_crash_if_the_asset_does_not_exist(
 
 
 def test_should_replace_asset_if_already_exists_with_different_content(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
-    image_body = b'baba'
+    image_body = b"baba"
     destination_prefix = "library/"
-    s3_client.put_bucket_versioning(Bucket=destination_bucket_name,
-                                    VersioningConfiguration={'Status': 'Enabled'})
+    s3_client.put_bucket_versioning(
+        Bucket=destination_bucket_name, VersioningConfiguration={"Status": "Enabled"}
+    )
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
+        ACL="private",
+        Body=image_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2",
+    )
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
     s3_client.put_object(
         Bucket=destination_bucket_name,
-        ACL='private',
-        Body=b"adjhgkjae", Key=destination_key)
+        ACL="private",
+        Body=b"adjhgkjae",
+        Key=destination_key,
+    )
 
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     miro_copy_s3_master_asset.main(event, None)
 
-    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
-    assert s3_response['Body'].read() == image_body
+    s3_response = s3_client.get_object(
+        Bucket=destination_bucket_name, Key=destination_key
+    )
+    assert s3_response["Body"].read() == image_body
 
 
 def test_should_copy_the_exact_matching_key(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
-    image_body = b'baba'
+    image_body = b"baba"
     destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=b'hsgdf', Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}-RA-RA.jp2")
+        ACL="private",
+        Body=b"hsgdf",
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}-RA-RA.jp2",
+    )
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2")
+        ACL="private",
+        Body=image_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.jp2",
+    )
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     miro_copy_s3_master_asset.main(event, None)
 
-    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
-    assert s3_response['Body'].read() == image_body
+    s3_response = s3_client.get_object(
+        Bucket=destination_bucket_name, Key=destination_key
+    )
+    assert s3_response["Body"].read() == image_body
 
 
 def test_should_copy_the_exact_matching_key_capital_file_extension(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
-    image_body = b'baba'
+    image_body = b"baba"
     destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=b'hsgdf', Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}-RA-RA.jp2")
+        ACL="private",
+        Body=b"hsgdf",
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}-RA-RA.jp2",
+    )
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.JP2")
+        ACL="private",
+        Body=image_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}.JP2",
+    )
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     miro_copy_s3_master_asset.main(event, None)
 
-    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
-    assert s3_response['Body'].read() == image_body
+    s3_response = s3_client.get_object(
+        Bucket=destination_bucket_name, Key=destination_key
+    )
+    assert s3_response["Body"].read() == image_body
 
 
 def test_should_choose_the_exact_match_before_dash_if_multiple_non_exact_matches(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
-    image_body = b'baba'
+    image_body = b"baba"
     destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}-RA-RA.jp2")
+        ACL="private",
+        Body=image_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}-RA-RA.jp2",
+    )
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=b'hsgdf', Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL.jp2")
+        ACL="private",
+        Body=b"hsgdf",
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL.jp2",
+    )
 
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     destination_key = f"{destination_prefix}A0000000/{miro_id}.jp2"
 
     miro_copy_s3_master_asset.main(event, None)
-    s3_response = s3_client.get_object(Bucket=destination_bucket_name, Key=destination_key)
-    assert s3_response['Body'].read() == image_body
+    s3_response = s3_client.get_object(
+        Bucket=destination_bucket_name, Key=destination_key
+    )
+    assert s3_response["Body"].read() == image_body
 
 
 def test_should_raise_an_exception_if_multiple_non_exact_matches(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
-    image_body = b'baba'
+    image_body = b"baba"
     destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EF-RA-RA.jp2")
+        ACL="private",
+        Body=image_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EF-RA-RA.jp2",
+    )
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=b'hsgdf', Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL.jp2")
+        ACL="private",
+        Body=b"hsgdf",
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL.jp2",
+    )
 
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     with pytest.raises(MiroKeyIdMismatchException):
         miro_copy_s3_master_asset.main(event, None)
 
 
 def test_should_raise_an_exception_if_only_match_is_not_exact_or_exact_before_hyphen(
-        create_source_and_destination_buckets,
-        sns_image_json_event,
-        queue_url):
+    create_source_and_destination_buckets, sns_image_json_event, queue_url
+):
 
     s3_client = boto3.client("s3")
 
     source_bucket_name, destination_bucket_name = create_source_and_destination_buckets
     miro_id, image_json, event = sns_image_json_event
 
-    image_body = b'baba'
+    image_body = b"baba"
     destination_prefix = "library/"
 
     s3_client.put_object(
         Bucket=source_bucket_name,
-        ACL='private',
-        Body=image_body, Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL-RA-RA.jp2")
+        ACL="private",
+        Body=image_body,
+        Key=f"Wellcome_Images_Archive/A Images/A0000000/{miro_id}EL-RA-RA.jp2",
+    )
 
-    os.environ.update({
-        "S3_SOURCE_BUCKET": source_bucket_name,
-        "S3_DESTINATION_BUCKET": destination_bucket_name,
-        "S3_DESTINATION_PREFIX": destination_prefix,
-    })
+    os.environ.update(
+        {
+            "S3_SOURCE_BUCKET": source_bucket_name,
+            "S3_DESTINATION_BUCKET": destination_bucket_name,
+            "S3_DESTINATION_PREFIX": destination_prefix,
+        }
+    )
 
     with pytest.raises(MiroKeyIdMismatchException):
         miro_copy_s3_master_asset.main(event, None)

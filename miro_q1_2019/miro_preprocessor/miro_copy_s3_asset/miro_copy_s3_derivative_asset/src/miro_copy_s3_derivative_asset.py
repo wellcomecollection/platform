@@ -18,8 +18,8 @@ def main(event, _):
     destination_prefix = os.environ["S3_DESTINATION_PREFIX"]
     topic_arn = os.environ["TOPIC_ARN"]
 
-    image_info = json.loads(event['Records'][0]['Sns']['Message'])
-    subject = event['Records'][0]['Sns']['Subject']
+    image_info = json.loads(event["Records"][0]["Sns"]["Message"])
+    subject = event["Records"][0]["Sns"]["Subject"]
     miro_image = MiroImage(image_info)
 
     src_key = f"fullsize/{miro_image.image_path}.jpg"
@@ -31,12 +31,12 @@ def main(event, _):
             dst_bucket=dst_bucket,
             src_key=src_key,
             dst_key=dst_key,
-            lazy=True
+            lazy=True,
         )
 
         sns_utils.publish_sns_message(
             sns_client=sns_client,
             topic_arn=topic_arn,
             message=image_info,
-            subject=f'{subject}_derivative'
+            subject=f"{subject}_derivative",
         )

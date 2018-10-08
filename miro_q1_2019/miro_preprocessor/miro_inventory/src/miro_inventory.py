@@ -21,11 +21,11 @@ def _extract_id(o, id_field):
 
 
 def _extract_subject(event):
-    return event['Records'][0]['Sns']['Subject']
+    return event["Records"][0]["Sns"]["Subject"]
 
 
 def _extract_message(event):
-    return json.loads(event['Records'][0]['Sns']['Message'])
+    return json.loads(event["Records"][0]["Sns"]["Message"])
 
 
 def _generate_indexable_object(event, id_field):
@@ -33,26 +33,20 @@ def _generate_indexable_object(event, id_field):
     subject = _extract_subject(event)
     id = _extract_id(message, id_field)
 
-    return {
-        'id': f'{id}_{subject}',
-        'subject': subject,
-        'message': message
-    }
+    return {"id": f"{id}_{subject}", "subject": subject, "message": message}
 
 
-def _put_to_es(id, es_cluster_url, es_index, es_type, es_username, es_password, payload):
-    put_url = f'{es_cluster_url}/{es_index}/{es_type}/{id}'
-    print(f'PUTing to {put_url}')
+def _put_to_es(
+    id, es_cluster_url, es_index, es_type, es_username, es_password, payload
+):
+    put_url = f"{es_cluster_url}/{es_index}/{es_type}/{id}"
+    print(f"PUTing to {put_url}")
 
-    return requests.put(
-        put_url,
-        data=payload,
-        auth=(es_username, es_password)
-    )
+    return requests.put(put_url, data=payload, auth=(es_username, es_password))
 
 
 def main(event, _):
-    print(f'event = {event!r}')
+    print(f"event = {event!r}")
 
     es_cluster_url = os.environ["ES_CLUSTER_URL"]
     es_index = os.environ["ES_INDEX"]
@@ -64,19 +58,19 @@ def main(event, _):
     id_field = os.environ["ID_FIELD"]
     indexable = _generate_indexable_object(event, id_field)
 
-    print(f'indexable_json: {indexable}')
+    print(f"indexable_json: {indexable}")
 
     response = _put_to_es(
-        indexable['id'],
+        indexable["id"],
         es_cluster_url,
         es_index,
         es_type,
         es_username,
         es_password,
-        json.dumps(indexable)
+        json.dumps(indexable),
     )
 
-    print(f'_put_to_es response: {response}')
+    print(f"_put_to_es response: {response}")
 
     # A very common source of errors is a 429: Rate Limited Exceeded from
     # the Elasticsearch cluster.  If we raise an exception here, the Lambda

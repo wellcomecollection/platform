@@ -25,15 +25,10 @@ class Rules:
         "Awaiting catalogue details",
         "Awaiting caption info",
         "No info available about this object",
-        "No neg"
+        "No neg",
     ]
 
-    _cc_accesses = [
-        "CC-0",
-        "CC-BY",
-        "CC-BY-NC",
-        "CC-BY-NC-ND"
-    ]
+    _cc_accesses = ["CC-0", "CC-BY", "CC-BY-NC", "CC-BY-NC-ND"]
 
     @staticmethod
     def _normalise_string(s):
@@ -63,7 +58,9 @@ class Rules:
         )
 
     def _is_collection(self, collection_name):
-        return self._normalise_string(self.collection) == self._normalise_string(f"images-{collection_name}")
+        return self._normalise_string(self.collection) == self._normalise_string(
+            f"images-{collection_name}"
+        )
 
     def _search(self, regex, key):
         if self._get_normalised(key) is None:
@@ -85,7 +82,9 @@ class Rules:
 
     @property
     def image_library_dept_is_Archives_and_Manuscripts(self):
-        return self._compare("image_library_dept", "Archives and Manuscripts") or self._compare("image_library_dept", "Archives & Manuscripts")
+        return self._compare(
+            "image_library_dept", "Archives and Manuscripts"
+        ) or self._compare("image_library_dept", "Archives & Manuscripts")
 
     @property
     def image_library_dept_is_Public_programmes(self):
@@ -105,7 +104,9 @@ class Rules:
 
     @property
     def is_title_empty(self):
-        return self.is_title_blank or self._key_matches('image_title', self._empty_title_strings)
+        return self.is_title_blank or self._key_matches(
+            "image_title", self._empty_title_strings
+        )
 
     @property
     def is_image_pub_title_blank(self):
@@ -125,11 +126,11 @@ class Rules:
 
     @property
     def is_copyright_cleared(self):
-        return self._get('image_copyright_cleared') == 'Y'
+        return self._get("image_copyright_cleared") == "Y"
 
     @property
     def is_not_general_use(self):
-        return self._get('image_general_use') == 'N'
+        return self._get("image_general_use") == "N"
 
     @property
     def has_use_restrictions(self):
@@ -137,7 +138,11 @@ class Rules:
 
     @property
     def is_not_for_public_access(self):
-        return (not self.is_copyright_cleared) or self.is_not_general_use or self.has_use_restrictions
+        return (
+            (not self.is_copyright_cleared)
+            or self.is_not_general_use
+            or self.has_use_restrictions
+        )
 
     @property
     def is_for_public_access(self):
@@ -146,42 +151,56 @@ class Rules:
     @property
     def is_a_wellcome_image_awards_winner(self):
         return self._key_matches(
-            'image_award',
-            ['Biomedical Image Awards', 'Wellcome Image Awards']
+            "image_award", ["Biomedical Image Awards", "Wellcome Image Awards"]
         )
 
     @property
     def is_cold_store(self):
-        return self.is_collection("D", "F", "AS", "FP") or \
-            (self.is_collection("L", "M", "V") and self.image_library_dept_is_Archives_and_Manuscripts) or \
-            (self.is_collection("L", "M", "V") and self.image_tech_captured_mode_is_videodisc) or \
-            (self.is_collection("L", "M", "V") and
-             not self.is_innopac_id_8_digits and
-             self.is_title_empty and
-             self.is_image_pub_title_blank and
-             self.is_image_pub_periodical_blank)
+        return (
+            self.is_collection("D", "F", "AS", "FP")
+            or (
+                self.is_collection("L", "M", "V")
+                and self.image_library_dept_is_Archives_and_Manuscripts
+            )
+            or (
+                self.is_collection("L", "M", "V")
+                and self.image_tech_captured_mode_is_videodisc
+            )
+            or (
+                self.is_collection("L", "M", "V")
+                and not self.is_innopac_id_8_digits
+                and self.is_title_empty
+                and self.is_image_pub_title_blank
+                and self.is_image_pub_periodical_blank
+            )
+        )
 
     @property
     def is_tandem_vault(self):
         return (
-            self.image_library_dept_is_Public_programmes or
-            self.is_collection("L") and self.is_after_first_march_2016 or
-            self.is_collection("L", "M", "V") and self.is_not_for_public_access or
-            self.is_a_wellcome_image_awards_winner
+            self.image_library_dept_is_Public_programmes
+            or self.is_collection("L")
+            and self.is_after_first_march_2016
+            or self.is_collection("L", "M", "V")
+            and self.is_not_for_public_access
+            or self.is_a_wellcome_image_awards_winner
         )
 
     # TODO: Remove `and self.is_innopac_id_8_digits`
     @property
     def is_catalogue_api(self):
-        return not self.image_library_dept_is_Public_programmes \
-            and self.is_for_public_access and (self._get("image_innopac_id") is None or self.is_innopac_id_8_digits)
+        return (
+            not self.image_library_dept_is_Public_programmes
+            and self.is_for_public_access
+            and (self._get("image_innopac_id") is None or self.is_innopac_id_8_digits)
+        )
 
 
 class Decision(enum.Enum):
-    cold_store = 'cold_store'
-    tandem_vault = 'tandem_vault'
-    catalogue_api = 'catalogue_api'
-    none = 'none'
+    cold_store = "cold_store"
+    tandem_vault = "tandem_vault"
+    catalogue_api = "catalogue_api"
+    none = "none"
 
 
 class InvalidCollectionException(Exception):
@@ -191,24 +210,27 @@ class InvalidCollectionException(Exception):
 def _get_decisions_from_id_exceptions(exceptions, image_data):
     for exception in exceptions:
         if exception.pop("miro_id").strip() == image_data["image_no_calc"]:
-            return [getattr(Decision, key) for key, value in exception.items()
-                    if value is not "" and not value.strip().lower() == "false"]
+            return [
+                getattr(Decision, key)
+                for key, value in exception.items()
+                if value is not "" and not value.strip().lower() == "false"
+            ]
 
     # There are "holding images" in MIRO, which are thumbnails put into
     # duplicate image records for some explicit AIDS posters.  All the
     # posters are available, so we delete these records.  They all have
     # image numbers in the L sequence ending with "FX", e.g. "L0052198FX".
-    if re.match(r'^L\d+FX$', image_data['image_no_calc']):
+    if re.match(r"^L\d+FX$", image_data["image_no_calc"]):
         return [Decision.cold_store]
 
 
 def _get_decisions_from_contrib_exceptions(collection, exceptions, image_data):
     collections = exceptions.fieldnames
-    collection = collection.split('-')[-1]
+    collection = collection.split("-")[-1]
 
     if collection in collections:
         contrib_codes = [row[collection] for row in exceptions]
-        image_source_code = image_data['image_source_code']
+        image_source_code = image_data["image_source_code"]
 
         if image_source_code in contrib_codes:
             return [Decision.catalogue_api]
@@ -223,10 +245,9 @@ def _get_decisions_from_rules(collection, image_data):
     decisions = []
     r = Rules(collection, image_data)
     if not r.is_collection("D", "F", "L", "V", "M", "FP", "AS", "S"):
-        raise InvalidCollectionException({
-            "collection": collection,
-            "image_data": image_data
-        })
+        raise InvalidCollectionException(
+            {"collection": collection, "image_data": image_data}
+        )
 
     if r.is_cold_store:
         decisions = [Decision.cold_store]
@@ -240,7 +261,7 @@ def _get_decisions_from_rules(collection, image_data):
     if not r.is_cold_store and not r.is_catalogue_api and not r.is_tandem_vault:
         decisions.append(Decision.none)
 
-    print(f'_get_decisions_from_rules = {decisions}')
+    print(f"_get_decisions_from_rules = {decisions}")
 
     return decisions
 
@@ -249,7 +270,7 @@ def _assess_rules(rule_list):
     for rule in rule_list:
         decisions = rule()
 
-        print(f'_assess_rules = {decisions}')
+        print(f"_assess_rules = {decisions}")
 
         if decisions is not None:
             return decisions
@@ -258,14 +279,18 @@ def _assess_rules(rule_list):
 
 
 def sort_image(collection, image_data, id_exceptions, contrib_exceptions):
-    print(f'collection = {collection}')
-    print(f'image_data = {image_data}')
+    print(f"collection = {collection}")
+    print(f"image_data = {image_data}")
 
-    decisions = _assess_rules([
-        lambda: _get_decisions_from_id_exceptions(id_exceptions, image_data),
-        lambda: _get_decisions_from_contrib_exceptions(collection, contrib_exceptions, image_data),
-        lambda: _get_decisions_from_rules(collection, image_data)
-    ])
+    decisions = _assess_rules(
+        [
+            lambda: _get_decisions_from_id_exceptions(id_exceptions, image_data),
+            lambda: _get_decisions_from_contrib_exceptions(
+                collection, contrib_exceptions, image_data
+            ),
+            lambda: _get_decisions_from_rules(collection, image_data),
+        ]
+    )
 
     # Wellcome Images Awards winners *always* go to Tandem Vault, in addition
     # to any other rules we might have applied.
