@@ -181,6 +181,35 @@ class ProgressMonitorTest
       }
     }
 
+    it("adds an update with multiple events") {
+      withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+        withProgressMonitor(table) { archiveProgressMonitor =>
+          val progress =
+            createProgress(archiveProgressMonitor, callbackUri, uploadUri)
+
+          val progressUpdate = ProgressUpdate(
+            progress.id,
+            List(
+              ProgressEvent("So that happened."),
+              ProgressEvent("And then this"))
+          )
+
+          archiveProgressMonitor.update(progressUpdate)
+
+          assertProgressCreated(
+            progress.id,
+            uploadUri,
+            Some(callbackUri),
+            table)
+          assertProgressRecordedRecentEvents(
+            progressUpdate.id,
+            progressUpdate.events.map(_.description),
+            table)
+
+        }
+      }
+    }
+
     it("adds multiple events to a monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { monitor: ProgressMonitor =>

@@ -20,7 +20,7 @@ module "service" {
 
   task_definition_arn = "${module.task.task_definition_arn}"
 
-  security_group_ids = ["${var.service_lb_security_group_id}"]
+  security_group_ids = ["${var.service_lb_security_group_id}", "${var.interservice_security_group_id}"]
 
   container_name = "${module.task.task_name}"
   container_port = "${module.task.task_port}"

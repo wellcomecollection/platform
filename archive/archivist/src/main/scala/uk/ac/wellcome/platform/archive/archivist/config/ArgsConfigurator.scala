@@ -1,38 +1,131 @@
 package uk.ac.wellcome.platform.archive.archivist.config
 
-import org.rogach.scallop.ScallopConf
+import org.rogach.scallop.{ScallopConf, ScallopOption}
+import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.sqs.SQSConfig
+import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.archivist.models._
-import uk.ac.wellcome.platform.archive.common.config._
+import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
+
+import scala.concurrent.duration._
 
 class ArgsConfigurator(val arguments: Seq[String])
-    extends ScallopConf(arguments)
-    with CloudWatchClientConfigurator
-    with MetricsConfigConfigurator
-    with HttpServerConfigurator
-    with SnsClientConfigurator
-    with RegistrarSnsConfigConfigurator
-    with ProgressSnsConfigConfigurator
-    with SqsClientConfigurator
-    with SqsConfigConfigurator
-    with S3ClientConfigurator {
+    extends ScallopConf(arguments) {
 
-  val uploadNamespace = opt[String](required = true)
-  val parallelism = opt[Int](default = Some(10))
-  val uploadPrefix = opt[String](default = Some("archive"))
-  val digestDelimiterRegexp = opt[String](default = Some(" +"))
+  private val awsCloudwatchRegion =
+    opt[String]("aws-cloudwatch-region", default = Some("eu-west-1"))
+  private val awsCloudwatchEndpoint = opt[String]("aws-cloudwatch-endpoint")
 
-  val archiveProgressMonitorTableName = opt[String](required = true)
+  private val metricsNamespace =
+    opt[String]("metrics-namespace", default = Some("app"))
+  private val metricsFlushIntervalSeconds = opt[Int](
+    "metrics-flush-interval-seconds",
+    required = false,
+    default = Some(20))
 
-  val archiveProgressMonitorDynamoAccessKey = opt[String]()
-  val archiveProgressMonitorDynamoSecretKey = opt[String]()
-  val archiveProgressMonitorDynamoRegion =
-    opt[String](default = Some("eu-west-1"))
-  val archiveProgressMonitorDynamoEndpoint = opt[String]()
+  private val appPort =
+    opt[Int]("app-port", required = false, default = Some(9001))
+  private val appHost =
+    opt[String]("app-host", required = false, default = Some("0.0.0.0"))
+  private val appBaseUrl = opt[String](
+    "app-base-url",
+    required = false,
+    default = Some("api.wellcomecollection.org/storage/v1"))
+
+  private val awsSnsAccessKey = opt[String]("aws-sns-access-key")
+  private val awsSnsSecretKey = opt[String]("aws-sns-secret-key")
+  private val awsSnsRegion =
+    opt[String]("aws-sns-region", default = Some("eu-west-1"))
+  private val awsSnsEndpoint = opt[String]("aws-sns-endpoint")
+
+  private val registrarSnsTopicArn =
+    opt[String]("registrar-sns-topic-arn", required = false)
+  private val progressSnsTopicArn =
+    opt[String]("progress-sns-topic-arn", required = false)
+
+  private val awsSqsAccessKey = opt[String]("aws-sqs-access-key")
+  private val awsSqsSecretKey = opt[String]("aws-sqs-secret-key")
+  private val awsSqsRegion =
+    opt[String]("aws-sqs-region", default = Some("eu-west-1"))
+  private val awsSqsEndpoint = opt[String]("aws-sqs-endpoint")
+
+  private val uploadNamespace =
+    opt[String]("upload-namespace", required = true)
+  private val parallelism = opt[Int]("parallelism", default = Some(10))
+  private val uploadPrefix =
+    opt[String]("upload-prefix", default = Some("archive"))
+  private val digestDelimiterRegexp =
+    opt[String]("digest-delimiter-regexp", default = Some(" +"))
+
+  private val sqsQueueUrl: ScallopOption[String] =
+    opt[String]("sqs-queue-url", required = false)
+  private val sqsWaitTimeSeconds =
+    opt[Int]("sqs-wait-time-seconds", required = false, default = Some(20))
+  private val sqsMaxMessages =
+    opt[Int]("sqs-max-messages", required = false, default = Some(10))
+  private val sqsParallelism =
+    opt[Int]("sqs-parallelism", required = false, default = Some(10))
+
+  private val awsS3AccessKey = opt[String]("aws-s3-access-key")
+  private val awsS3SecretKey = opt[String]("aws-s3-secret-key")
+  private val awsS3Region =
+    opt[String]("aws-s3-region", default = Some("eu-west-1"))
+  private val awsS3Endpoint = opt[String]("aws-s3-endpoint")
 
   verify()
+
+  val cloudwatchClientConfig = CloudwatchClientConfig(
+    region = awsCloudwatchRegion(),
+    endpoint = awsCloudwatchEndpoint.toOption
+  )
+
+  val metricsConfig = MetricsConfig(
+    namespace = metricsNamespace(),
+    flushInterval = metricsFlushIntervalSeconds() seconds
+  )
+
+  val httpServerConfig = HttpServerConfig(
+    host = appHost(),
+    port = appPort(),
+    externalBaseUrl = appBaseUrl(),
+  )
+
+  val snsClientConfig = SnsClientConfig(
+    accessKey = awsSnsAccessKey.toOption,
+    secretKey = awsSnsSecretKey.toOption,
+    region = awsSnsRegion(),
+    endpoint = awsSnsEndpoint.toOption
+  )
+
+  val registrarSnsConfig = SNSConfig(
+    topicArn = registrarSnsTopicArn()
+  )
+
+  val progressSnsConfig = SNSConfig(
+    topicArn = progressSnsTopicArn()
+  )
+
+  val sqsClientConfig = SQSClientConfig(
+    accessKey = awsSqsAccessKey.toOption,
+    secretKey = awsSqsSecretKey.toOption,
+    region = awsSqsRegion(),
+    endpoint = awsSqsEndpoint.toOption
+  )
+
+  val sqsConfig = SQSConfig(
+    queueUrl = sqsQueueUrl(),
+    waitTime = sqsWaitTimeSeconds() seconds,
+    maxMessages = sqsMaxMessages(),
+    parallelism = sqsParallelism()
+  )
+
+  val s3ClientConfig = S3ClientConfig(
+    accessKey = awsS3AccessKey.toOption,
+    secretKey = awsS3SecretKey.toOption,
+    region = awsS3Region(),
+    endpoint = awsS3Endpoint.toOption
+  )
 
   val bagUploaderConfig = BagUploaderConfig(
     uploadConfig = UploadConfig(
@@ -43,19 +136,6 @@ class ArgsConfigurator(val arguments: Seq[String])
       digestDelimiterRegexp = digestDelimiterRegexp()
     ),
     parallelism = parallelism()
-  )
-
-  val archiveProgressMonitorConfig = ProgressMonitorConfig(
-    DynamoConfig(
-      table = archiveProgressMonitorTableName(),
-      maybeIndex = None
-    ),
-    DynamoClientConfig(
-      accessKey = archiveProgressMonitorDynamoAccessKey.toOption,
-      secretKey = archiveProgressMonitorDynamoSecretKey.toOption,
-      region = archiveProgressMonitorDynamoRegion(),
-      endpoint = archiveProgressMonitorDynamoEndpoint.toOption
-    )
   )
 
   val appConfig = ArchivistConfig(

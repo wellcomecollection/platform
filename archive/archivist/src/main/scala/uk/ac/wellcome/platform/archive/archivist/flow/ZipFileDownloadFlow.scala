@@ -4,6 +4,7 @@ import java.io.File
 import java.util.zip.ZipFile
 
 import akka.NotUsed
+import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
@@ -68,7 +69,8 @@ object ZipFileDownloadFlow extends Logging {
 
         }
       )
-      .async
+      .withAttributes(ActorAttributes.dispatcher(
+        "akka.stream.materializer.blocking-io-dispatcher"))
       .flatMapMerge(
         parallelism,
         (result: Either[ArchiveError[IngestBagRequest],
@@ -76,7 +78,11 @@ object ZipFileDownloadFlow extends Logging {
           Source
             .single(toProgressUpdate(result))
             .log("sending to progress monitor")
-            .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig))
+            .via(
+              SnsPublishFlow[ProgressUpdate](
+                snsClient,
+                snsConfig,
+                Some("archivist_progress")))
             .map(_ => result)
       )
       .log("downloaded zipfile")

@@ -19,7 +19,7 @@ def add_premis_significant_prop(premis_file, p_type, value):
     value_el.text = value
 
 
-def remodel_file_technical_metadata(root):
+def remodel_file_technical_metadata(root, id_map):
     logging.info("transforming Tessella techMD")
     x_path = ".//mets:xmlData[tessella:File]"
     tessella_file_xmldata = root.findall(x_path, namespaces)
@@ -37,8 +37,9 @@ def remodel_file_technical_metadata(root):
 
         file_name = tessella_file.find("tessella:FileName", namespaces).text
         add_premis_identifier(premis_file, "local", file_name)
-        checksum = tessella_file.find("tessella:ID", namespaces).text
-        add_premis_identifier(premis_file, "uuid", checksum)
+        uuid = tessella_file.find("tessella:ID", namespaces).text
+        add_premis_identifier(premis_file, "uuid", uuid)
+        id_map[uuid] = file_name
 
         file_properties = tessella_file.findall("tessella:FileProperty", namespaces)
         to_copy = mappings.SIGNIFICANT_PROPERTIES.keys()
