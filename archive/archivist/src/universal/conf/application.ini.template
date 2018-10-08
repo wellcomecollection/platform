@@ -1,5 +1,5 @@
 --sqs-queue-url=${queue_url}
 --registrar-sns-topic-arn=${registrar_topic_arn}
 --progress-sns-topic-arn=${progress_topic_arn}
---archive-progress-monitor-table-name=archive-storage-progress-table
+--upload-namespace=${archive_bucket}
 --metrics-namespace=archivist
