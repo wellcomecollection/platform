@@ -1,7 +1,7 @@
 # -*- encoding: utf-8
 
 import daiquiri
-from flask import abort, make_response, request
+from flask import abort, make_response, request, url_for
 from flask_restplus import Namespace, Resource
 
 from ingests import send_new_ingest_request
@@ -54,7 +54,7 @@ class IngestCollection(Resource):
 
         # Construct the URL where the user will be able to get the status
         # of their ingest request.
-        location = api.url_for(IngestResource, id=ingest_request_id)
+        location = url_for(IngestResource.endpoint, id=ingest_request_id)
 
         # Now we set the Location response header.  There's no way to do this
         # without constructing our own Response object, so that's what we do
