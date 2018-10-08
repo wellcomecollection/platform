@@ -21,6 +21,7 @@ def pytest_runtest_setup(item):
     boto3.setup_default_session(region_name="eu-west-1")
 
 
+@pytest.fixture
 def random_alpha():
     return "".join(random.choice(string.ascii_lowercase) for _ in range(10))
 
@@ -257,14 +258,14 @@ def elasticsearch_url(docker_services, elasticsearch_hostname):
 
 
 @pytest.fixture
-def elasticsearch_index(docker_services, elasticsearch_url):
+def elasticsearch_index(docker_services, elasticsearch_url, random_alpha):
     docker_services.wait_until_responsive(
         timeout=60.0,
         pause=0.1,
         check=_is_responsive(elasticsearch_url, lambda r: r.status_code == 401),
     )
 
-    index_name = random_alpha()
+    index_name = random_alpha
     resp = requests.put(
         f"{elasticsearch_url}/{index_name}", auth=("elastic", "changeme")
     )
