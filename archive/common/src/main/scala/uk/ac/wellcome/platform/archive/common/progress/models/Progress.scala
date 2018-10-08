@@ -7,16 +7,8 @@ import java.util.UUID
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
-import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
-  Completed,
-  CompletedCallbackFailed,
-  CompletedCallbackSucceeded,
-  CompletedNoCallbackProvided,
-  Failed,
-  None,
-  Processing
-}
+import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, CompletedCallbackFailed, CompletedCallbackSucceeded, Failed, None, Processing}
 
 case class Progress(
   id: UUID,
@@ -46,8 +38,6 @@ trait StatusConverters {
     case Completed  => Json.fromString("completed")
     case Failed     => Json.fromString("failed")
 
-    case CompletedNoCallbackProvided =>
-      Json.fromString("completed-callback-none")
     case CompletedCallbackSucceeded =>
       Json.fromString("completed-callback-success")
     case CompletedCallbackFailed =>
@@ -64,8 +54,6 @@ trait StatusConverters {
         case "completed"  => Completed
         case "failed"     => Failed
 
-        case "completed-callback-none" =>
-          CompletedNoCallbackProvided
         case "completed-callback-success" =>
           CompletedCallbackSucceeded
         case "completed-callback-failure" =>
@@ -82,7 +70,10 @@ trait StatusConverters {
     )
 }
 
-object Progress extends URIConverters with StatusConverters {
+object Progress
+  extends URIConverters
+    with UUIDConverters
+    with StatusConverters {
 
   sealed trait Status
 
@@ -93,8 +84,6 @@ object Progress extends URIConverters with StatusConverters {
   case object Completed extends Status
 
   case object Failed extends Status
-
-  case object CompletedNoCallbackProvided extends Status
 
   case object CompletedCallbackSucceeded extends Status
 

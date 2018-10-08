@@ -27,7 +27,7 @@ variable "source_queue_name" {}
 variable "source_queue_arn" {}
 
 variable "min_capacity" {
-  default = 0
+  default = 1
 }
 
 variable "max_capacity" {
@@ -35,7 +35,7 @@ variable "max_capacity" {
 }
 
 variable "desired_task_count" {
-  default = 0
+  default = 1
 }
 
 variable "security_group_ids" {

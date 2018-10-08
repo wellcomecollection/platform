@@ -6,7 +6,6 @@ module "service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.8.1"
 
   service_name       = "${var.service_name}"
-  task_desired_count = "${var.desired_task_count}"
 
   container_image = "${var.container_image}"
 
@@ -31,6 +30,8 @@ module "service" {
   namespace_id = "${var.namespace_id}"
 
   launch_type = "FARGATE"
+
+  task_desired_count = "${var.desired_task_count}"
 
   min_capacity = "${var.min_capacity}"
   max_capacity = "${var.max_capacity}"
