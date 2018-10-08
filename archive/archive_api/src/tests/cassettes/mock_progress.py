@@ -21,7 +21,7 @@ def post_route():
 
     # e.g. http://localhost:6000?location=no
     if request.form["uploadUrl"].endswith("?location=no"):
-        return b"", 202
+        return b"", 201
 
     # e.g. http://localhost:6000?id=123
     # This lets an external caller pick a deterministic ID.
@@ -32,7 +32,7 @@ def post_route():
 
     resp = Response()
     resp.headers["Location"] = f"/progress/{new_id}"
-    return resp, 202
+    return resp, 201
 
 
 @app.route("/progress/<id>")

@@ -47,17 +47,17 @@ class ProgressManager:
         # a 202 Created and the new ID in the path parameter of the
         # Location header.
         #
-        data = {"uploadUrl": upload_url}
+        data = {"uploadUri": upload_url}
         if callback_url is not None:
-            data["callbackUrl"] = callback_url
+            data["callbackUri"] = callback_url
 
-        resp = self.sess.post(f"{self.endpoint}/progress", data=data, timeout=1)
+        resp = self.sess.post(f"{self.endpoint}/progress", json=data, timeout=1)
 
         # The service should return an HTTP 202 if successful.  Anything
         # else should be treated as an error.
-        if resp.status_code != 202:
+        if resp.status_code != 201:
             raise ProgressServiceError(
-                "Expected HTTP 202; got %d (data=%r)" % (resp.status_code, data)
+                "Expected HTTP 201; got %d (data=%r)" % (resp.status_code, data)
             )
 
         # The new ID should be sent in the path parameter of the Location
