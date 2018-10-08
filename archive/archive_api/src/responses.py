@@ -33,8 +33,9 @@ class ContextResponse(Response):
         rv = json.loads(response)
 
         # The @context may already be provided if we've been through the
-        # force_type method below.
-        if "@context" in rv:
+        # force_type method below.  We also don't add a context if we're
+        # looking at the healthcheck endpoint.
+        if ("@context" in rv) or (rv == {"status": "OK"}):
             return super().__init__(response, *args, **kwargs)
         else:
             rv["@context"] = self.context_url
