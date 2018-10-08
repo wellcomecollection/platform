@@ -34,7 +34,7 @@ module "archivist" {
   service_name                     = "archivist"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 0
+  min_capacity = 1
   max_capacity = 1
 
   env_vars = {
@@ -64,7 +64,7 @@ module "registrar" {
   service_name                     = "registrar"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 0
+  min_capacity = 1
   max_capacity = 1
 
   env_vars = {
@@ -97,7 +97,7 @@ module "notifier" {
   service_name                     = "notifier"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 0
+  min_capacity = 1
   max_capacity = 1
 
   env_vars = {
@@ -125,7 +125,7 @@ module "progress_async" {
   service_name                     = "progress_async"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 0
+  min_capacity = 1
   max_capacity = 1
 
   env_vars = {
@@ -225,7 +225,7 @@ module "callback_stub_server" {
   env_vars = {}
   env_vars_length = 0
 
-  security_group_ids = ["${aws_security_group.interservice_security_group.id}"]
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
 
   cluster_id = "${aws_ecs_cluster.cluster.id}"
