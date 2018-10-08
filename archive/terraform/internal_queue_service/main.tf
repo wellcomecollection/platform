@@ -5,7 +5,7 @@ data "aws_ecs_cluster" "cluster" {
 module "service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.8.1"
 
-  service_name       = "${var.service_name}"
+  service_name = "${var.service_name}"
 
   container_image = "${var.container_image}"
 

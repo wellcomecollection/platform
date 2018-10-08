@@ -89,7 +89,7 @@ module "notifier" {
   source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  security_group_ids = ["${aws_security_group.interservice_security_group.id}"]
+  security_group_ids               = ["${aws_security_group.interservice_security_group.id}"]
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
@@ -222,7 +222,7 @@ module "callback_stub_server" {
   container_port  = "8080"
   container_image = "${local.callback_stub_server_container_image}"
 
-  env_vars = {}
+  env_vars        = {}
   env_vars_length = 0
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]

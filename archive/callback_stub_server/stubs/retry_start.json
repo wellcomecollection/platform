@@ -8,7 +8,9 @@
   },
   "response": {
     "status": 501,
-    "jsonBody": { "state": "error" },
+    "jsonBody": {
+      "state": "error"
+    },
     "headers": {
       "Content-Type": "application/json"
     }

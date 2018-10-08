@@ -15,13 +15,13 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.test.fixtures.Akka
 
 class CallbackNotificationFlowTest
-  extends FunSpec
-  with Akka
-  with Matchers
-  with ScalaFutures
-  with IntegrationPatience
-  with Eventually
-  with SNS {
+    extends FunSpec
+    with Akka
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience
+    with Eventually
+    with SNS {
 
   val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
@@ -38,17 +38,19 @@ class CallbackNotificationFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>
           withLocalSnsTopic { topic =>
-              val callbackNotificationFlow = CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
-              val id = UUID.randomUUID()
-              val progress =
-                Progress(id, uploadUri, Some(callbackUri), status)
+            val callbackNotificationFlow =
+              CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
+            val id = UUID.randomUUID()
+            val progress =
+              Progress(id, uploadUri, Some(callbackUri), status)
 
-            val eventuallyResult = Source.single(progress)
-                .via(callbackNotificationFlow)
-                .runWith(Sink.seq)(materializer)
+            val eventuallyResult = Source
+              .single(progress)
+              .via(callbackNotificationFlow)
+              .runWith(Sink.seq)(materializer)
 
             whenReady(eventuallyResult) { result =>
-              result should have size(1)
+              result should have size (1)
               val msg = notificationMessage[CallbackNotification](topic)
               msg.id shouldBe id
               msg.callbackUri shouldBe callbackUri
@@ -71,13 +73,15 @@ class CallbackNotificationFlowTest
       withMaterializer(actorSystem) { materializer =>
         withLocalSnsTopic { topic =>
           forAll(status) { status =>
-            val callbackNotificationFlow = CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
+            val callbackNotificationFlow =
+              CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
             val id = UUID.randomUUID()
 
             val progress =
               Progress(id, uploadUri, Some(callbackUri), status)
 
-            val eventuallyResult = Source.single(progress)
+            val eventuallyResult = Source
+              .single(progress)
               .via(callbackNotificationFlow)
               .runWith(Sink.seq)(materializer)
 
@@ -94,15 +98,16 @@ class CallbackNotificationFlowTest
   it("failure to send to callbackNotifications ends up on the DLQ") {
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
+        val callbackNotificationFlow =
+          CallbackNotificationFlow(snsClient, SNSConfig("does-not-exist"))
+        val id = UUID.randomUUID()
+        val progress =
+          Progress(id, uploadUri, Some(callbackUri), Progress.Completed)
 
-          val callbackNotificationFlow = CallbackNotificationFlow(snsClient, SNSConfig("does-not-exist"))
-          val id = UUID.randomUUID()
-          val progress =
-              Progress(id, uploadUri, Some(callbackUri), Progress.Completed)
-
-          val eventuallyResult = Source.single(progress)
-            .via(callbackNotificationFlow)
-            .runWith(Sink.seq)(materializer)
+        val eventuallyResult = Source
+          .single(progress)
+          .via(callbackNotificationFlow)
+          .runWith(Sink.seq)(materializer)
 
         whenReady(eventuallyResult) { result =>
           result shouldBe List.empty

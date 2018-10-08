@@ -8,7 +8,9 @@
   },
   "response": {
     "status": 200,
-    "jsonBody": { "state": "success" },
+    "jsonBody": {
+      "state": "success"
+    },
     "headers": {
       "Content-Type": "application/json"
     }
