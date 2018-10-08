@@ -6,7 +6,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
@@ -15,7 +15,6 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   ProgressCreateRequest
 }
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class ProgressHttpFeatureTest
     extends FunSpec
@@ -24,7 +23,7 @@ class ProgressHttpFeatureTest
     with MetricsSenderFixture
     with ProgressMonitorFixture
     with ProgressHttpFixture
-    with ExtendedPatience {
+    with IntegrationPatience {
 
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._

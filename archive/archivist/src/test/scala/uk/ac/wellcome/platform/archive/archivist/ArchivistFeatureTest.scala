@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.archivist
 import java.net.URI
 import java.util.UUID
 
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -14,7 +14,6 @@ import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertio
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import IngestBagRequest._
 
 // TODO: Test file boundaries
@@ -25,7 +24,7 @@ class ArchivistFeatureTest
     with ScalaFutures
     with MetricsSenderFixture
     with ArchivistFixture
-    with ExtendedPatience
+    with IntegrationPatience
     with ProgressUpdateAssertions {
 
   val callbackUri = new URI("http://localhost/archive/complete")
