@@ -13,6 +13,10 @@ class ArchiveAPIConfig(object):
     S3_CLIENT = boto3.client("s3")
     PROGRESS_MANAGER_SESSION = requests.Session()
 
+    # Disable Flask-RESTPlus including the "message" field on errors.
+    # See https://flask-restplus.readthedocs.io/en/stable/errors.html
+    ERROR_INCLUDE_MESSAGE = False
+
     def __init__(self, development=False):
         try:
             if development:
