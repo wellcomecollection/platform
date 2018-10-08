@@ -18,7 +18,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorClientModule
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   ConfigModule,
   SNSAsyncClientModule,
@@ -136,10 +136,10 @@ trait Registrar
         VHSModule,
         AkkaModule,
         CloudWatchClientModule,
-        SQSClientModule,
+        SqsClientModule,
         SNSAsyncClientModule,
         DynamoClientModule,
-        ProgressMonitorModule,
+        ProgressMonitorClientModule,
         MessageStreamModule
       )
 

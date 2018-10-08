@@ -9,8 +9,8 @@ import uk.ac.wellcome.platform.archive.notifier.modules.{
 import uk.ac.wellcome.platform.archive.common.modules.{
   AkkaModule,
   CloudWatchClientModule,
-  SNSClientModule,
-  SQSClientModule
+  SnsClientModule,
+  SqsClientModule
 }
 
 import scala.concurrent.Await
@@ -22,8 +22,8 @@ object Main extends App with Logging {
     ConfigModule,
     AkkaModule,
     CloudWatchClientModule,
-    SQSClientModule,
-    SNSClientModule
+    SqsClientModule,
+    SnsClientModule
   )
 
   val app = injector.getInstance(classOf[Notifier])

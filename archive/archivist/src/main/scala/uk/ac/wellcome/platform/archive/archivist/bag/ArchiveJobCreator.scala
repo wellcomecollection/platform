@@ -2,11 +2,8 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
-  FileNotFoundError,
-  InvalidBagInfo
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, FileNotFoundError, InvalidBagInfo}
+import uk.ac.wellcome.platform.archive.archivist.modules.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models._
 

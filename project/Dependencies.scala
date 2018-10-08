@@ -191,6 +191,8 @@ object Dependencies {
     "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
     "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
     "org.rogach" %% "scallop" % "3.1.3",
+    "com.typesafe" % "config" % "1.3.2",
+    "com.github.racc" % "typesafeconfig-guice" % "0.1.0",
     "de.heikoseeberger" %% "akka-http-circe" % "1.21.1"
   ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 }

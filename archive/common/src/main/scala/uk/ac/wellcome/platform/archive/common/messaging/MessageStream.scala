@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.common.messaging
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.stream._
@@ -15,6 +15,8 @@ import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
+
+import scala.concurrent.Future
 
 class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
                                     sqsClient: AmazonSQSAsync,
@@ -34,7 +36,7 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
     implicit decoderT: Decoder[T],
     loggingAdapter: LoggingAdapter,
     materializer: Materializer
-  ) = {
+  ): Future[Done] = {
 
     val typeConversion = Flow[Message].map(m => {
       val msg = fromJson[T](m.getBody).get

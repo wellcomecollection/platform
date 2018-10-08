@@ -10,16 +10,12 @@ import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
+import HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressEvent,
-  ProgressUpdate,
-  Progress => ProgressModel
-}
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
+import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate, Progress => ProgressModel}
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorClientModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.progress_http.modules._
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
@@ -87,10 +83,9 @@ trait ProgressHttpFixture
     val progress = new AkkaHttpApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(table, serverConfig),
-        ConfigModule,
         AkkaModule,
         CloudWatchClientModule,
-        ProgressMonitorModule
+        ProgressMonitorClientModule
       )
     }
     testWith(progress)
@@ -103,7 +98,7 @@ trait ProgressHttpFixture
     val port = randomPort
     val baseUrl = s"http://$host:$port"
 
-    val serverConfig = HttpServerConfig(host, port, baseUrl)
+    val serverConfig = HttpServerConfig(host, port)
 
     withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
       withApp(table, serverConfig) { progressHttp =>

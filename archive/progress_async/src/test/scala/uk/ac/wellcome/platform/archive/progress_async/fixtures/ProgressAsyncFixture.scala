@@ -14,7 +14,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   ProgressUpdate,
   Progress => ProgressModel
 }
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorClientModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.platform.archive.progress_async.modules.{
   ConfigModule,
@@ -84,9 +84,9 @@ trait ProgressAsyncFixture
         ConfigModule,
         AkkaModule,
         CloudWatchClientModule,
-        SQSClientModule,
-        SNSClientModule,
-        ProgressMonitorModule
+        SqsClientModule,
+        SnsClientModule,
+        ProgressMonitorClientModule
       )
     }
     testWith(progress)

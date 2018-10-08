@@ -8,31 +8,30 @@ import java.util.zip.ZipFile
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.Guice
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.json.JsonUtil._
 
-trait Archivist extends Messaging with ZipBagItFixture {
-
-  import IngestBagRequest._
+trait Archivist
+  extends Messaging
+    with ZipBagItFixture
+    with UUIDConverters
+    with URIConverters {
 
   def sendBag[R](
-    zipFile: ZipFile,
-    ingestBucket: Bucket,
-    callbackUri: Option[URI],
-    queuePair: QueuePair)(testWith: TestWith[(UUID, ObjectLocation), R]) = {
+                  zipFile: ZipFile,
+                  ingestBucket: Bucket,
+                  callbackUri: Option[URI],
+                  queuePair: QueuePair)(testWith: TestWith[(UUID, ObjectLocation), R]) = {
     val fileName = s"${randomAlphanumeric()}.zip"
     val uploadKey = s"upload/path/$fileName"
 
@@ -48,16 +47,16 @@ trait Archivist extends Messaging with ZipBagItFixture {
   }
 
   def createAndSendBag[R](
-    ingestBucket: Bucket,
-    callbackUri: Option[URI],
-    queuePair: QueuePair,
-    dataFileCount: Int = 12,
-    createDigest: String => String = createValidDigest,
-    createDataManifest: List[(String, String)] => Option[FileEntry] =
-      createValidDataManifest,
-    createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile)(
-    testWith: TestWith[(UUID, ObjectLocation, String), R]) =
+                           ingestBucket: Bucket,
+                           callbackUri: Option[URI],
+                           queuePair: QueuePair,
+                           dataFileCount: Int = 12,
+                           createDigest: String => String = createValidDigest,
+                           createDataManifest: List[(String, String)] => Option[FileEntry] =
+                           createValidDataManifest,
+                           createBagItFile: => Option[FileEntry] = createValidBagItFile,
+                           createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile)(
+                           testWith: TestWith[(UUID, ObjectLocation, String), R]) =
     withBagItZip(
       dataFileCount = dataFileCount,
       createDigest = createDigest,
@@ -80,26 +79,18 @@ trait Archivist extends Messaging with ZipBagItFixture {
                  progressTopic: Topic)(testWith: TestWith[ArchivistApp, R]) = {
     val archivist = new ArchivistApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(
-          actorSystem,
-          actorMaterializer,
-          queuePair.queue.url,
-          storageBucket.name,
-          registrarTopic.arn,
-          progressTopic.arn),
-        ConfigModule,
         S3ClientModule,
         CloudWatchClientModule,
-        SQSClientModule,
-        SNSClientModule
+        SqsClientModule,
+        SnsClientModule
       )
     }
     testWith(archivist)
   }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, ArchivistApp),
-                       R]) = {
+                        testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, ArchivistApp),
+                          R]) = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
       withLocalSnsTopic {
         registrarTopic =>
