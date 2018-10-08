@@ -30,8 +30,6 @@ def test_returns_a_present_bag(
 def test_returns_500_if_s3_object_missing(
     client, dynamodb_resource, table_name_bag, bucket_bag, guid
 ):
-    stored_bag = {"id": guid}
-
     table = dynamodb_resource.Table(table_name_bag)
     table.put_item(
         Item={"id": guid, "location": {"key": guid, "namespace": bucket_bag}}
