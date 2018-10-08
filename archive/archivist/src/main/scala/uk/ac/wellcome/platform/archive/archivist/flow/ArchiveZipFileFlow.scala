@@ -57,7 +57,11 @@ object ArchiveZipFileFlow extends Logging {
                 Source
                   .single(toProgressUpdate(result, ingestRequest))
                   .log("sending to progress monitor")
-                  .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig, Some("archivist_progress")))
+                  .via(
+                    SnsPublishFlow[ProgressUpdate](
+                      snsClient,
+                      snsConfig,
+                      Some("archivist_progress")))
                   .map(_ => result)
             )
       }
