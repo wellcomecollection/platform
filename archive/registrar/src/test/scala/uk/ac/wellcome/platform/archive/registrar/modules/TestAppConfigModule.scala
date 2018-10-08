@@ -70,19 +70,6 @@ class TestAppConfigModule(queueUrl: String,
       s3GlobalPrefix = hybridStoreGlobalPrefix
     )
 
-    val archiveProgressMonitorConfig = ProgressMonitorConfig(
-      DynamoConfig(
-        table = progressTable.name,
-        index = progressTable.index
-      ),
-      DynamoClientConfig(
-        accessKey = Some("access"),
-        secretKey = Some("secret"),
-        region = "localhost",
-        endpoint = Some("http://localhost:45678")
-      )
-    )
-
     RegistrarConfig(
       s3ClientConfig,
       cloudwatchClientConfig,
@@ -91,7 +78,6 @@ class TestAppConfigModule(queueUrl: String,
       snsClientConfig,
       snsConfig,
       hybridStoreConfig,
-      archiveProgressMonitorConfig,
       metricsConfig
     )
   }
