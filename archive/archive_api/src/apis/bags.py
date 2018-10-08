@@ -3,13 +3,20 @@
 from flask import abort, jsonify
 from flask_restplus import Namespace, Resource
 
-from models.catalogue import Error
+from models.bags import Bag, File, FileManifest, Source
+from models.catalogue import Error, Identifier, IdentifierType
 from storage import VHSNotFound, read_from_vhs
 
 
 api = Namespace("bags", description="Bag requests")
 
+api.add_model("Bag", definition=Bag)
 api.add_model("Error", definition=Error)
+api.add_model("File", definition=File)
+api.add_model("FileManifest", definition=FileManifest)
+api.add_model("Identifier", definition=Identifier)
+api.add_model("IdentifierType", definition=IdentifierType)
+api.add_model("Source", definition=Source)
 
 
 @api.route("/<id>")

@@ -108,12 +108,6 @@ Source = TypedModel(
 )
 
 
-# This model matches "IdentifierType" in the Catalogue API.
-IdentifierType = TypedModel(
-    "IdentifierType", {"id": fields.String(), "label": fields.String()}
-)
-
-
 File = TypedModel("File", {"checksum": fields.String(), "path": fields.String()})
 
 

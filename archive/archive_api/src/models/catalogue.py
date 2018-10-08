@@ -35,7 +35,11 @@ Error = TypedModel(
 )
 
 
-# This model matches "Identifier" in the Catalogue API.
+IdentifierType = TypedModel(
+    "IdentifierType", {"id": fields.String(), "label": fields.String()}
+)
+
+
 Identifier = TypedModel(
     "Identifier",
     {
