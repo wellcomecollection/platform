@@ -7,7 +7,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -17,7 +19,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 // TODO: Test file boundaries
 
 class ArchivistFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
@@ -30,12 +32,12 @@ class ArchivistFeatureTest
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        registrarTopic,
-        progressTopic,
-        archivist) =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          registrarTopic,
+          progressTopic,
+          archivist) =>
         createAndSendBag(ingestBucket, Some(callbackUri), queuePair) {
           case (requestId, uploadLocation, bagIdentifier) =>
             archivist.run()
@@ -87,12 +89,12 @@ class ArchivistFeatureTest
   it("fails when ingesting an invalid bag") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        registrarTopic,
-        progressTopic,
-        archivist) =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          registrarTopic,
+          progressTopic,
+          archivist) =>
         createAndSendBag(
           ingestBucket,
           Some(callbackUri),
@@ -118,12 +120,12 @@ class ArchivistFeatureTest
   it("continues after bag with bad checksum") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        registrarTopic,
-        progressTopic,
-        archivist) => {
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          registrarTopic,
+          progressTopic,
+          archivist) => {
 
         archivist.run()
 
@@ -205,12 +207,12 @@ class ArchivistFeatureTest
   it("continues after non existing zip file") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        registrarTopic,
-        progressTopic,
-        archivist) =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          registrarTopic,
+          progressTopic,
+          archivist) =>
         archivist.run()
 
         createAndSendBag(
@@ -294,12 +296,12 @@ class ArchivistFeatureTest
   it("continues after non existing file referenced in manifest") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        registrarTopic,
-        progressTopic,
-        archivist) => {
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          registrarTopic,
+          progressTopic,
+          archivist) => {
 
         archivist.run()
 
@@ -382,12 +384,12 @@ class ArchivistFeatureTest
   it("continues after zip file with no bag-info.txt") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        registrarTopic,
-        progressTopic,
-        archivist) =>
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          registrarTopic,
+          progressTopic,
+          archivist) =>
         archivist.run()
 
         createAndSendBag(

@@ -15,7 +15,10 @@ import uk.ac.wellcome.platform.archive.archivist.flow._
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
 import uk.ac.wellcome.platform.archive.archivist.modules.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  IngestBagRequest,
+  NotificationMessage
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTopic
 
 trait Archivist extends Logging {
@@ -70,7 +73,7 @@ trait Archivist extends Logging {
             ArchiveError[IngestBagRequest],
             ZipFileDownloadComplete,
             Unit
-            ](ifLeft = _ => ())(
+          ](ifLeft = _ => ())(
             ifRight = ArchiveAndNotifyRegistrarFlow(
               bagUploaderConfig,
               snsProgressConfig,

@@ -3,14 +3,22 @@ package uk.ac.wellcome.platform.archive.progress_http
 import akka.http.scaladsl.model.StatusCodes._
 import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
+import uk.ac.wellcome.platform.archive.common.json.{
+  URIConverters,
+  UUIDConverters
+}
 import uk.ac.wellcome.platform.archive.common.modules.HttpServerConfig
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressCreateRequest}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressCreateRequest
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 
 import scala.util.Try
 
-class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) extends URIConverters with UUIDConverters {
+class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig)
+    extends URIConverters
+    with UUIDConverters {
 
   def routes = {
     import akka.http.scaladsl.server.Directives._
@@ -21,7 +29,7 @@ class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) exten
         entity(as[ProgressCreateRequest]) { progressCreateRequest =>
           Try(monitor.create(Progress(progressCreateRequest))) match {
             case util.Success(progress) => complete(Created -> progress)
-            case util.Failure(e) => failWith(e)
+            case util.Failure(e)        => failWith(e)
           }
         }
       } ~ path(JavaUUID) { uuid =>
@@ -36,4 +44,3 @@ class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) exten
     }
   }
 }
-

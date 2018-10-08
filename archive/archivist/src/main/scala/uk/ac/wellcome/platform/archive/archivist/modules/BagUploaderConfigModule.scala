@@ -31,10 +31,10 @@ object BagUploaderConfigModule extends AbstractModule {
 }
 
 case class BagUploaderConfig(
-                              uploadConfig: UploadConfig,
-                              bagItConfig: BagItConfig = BagItConfig(),
-                              parallelism: Int
-                            )
+  uploadConfig: UploadConfig,
+  bagItConfig: BagItConfig = BagItConfig(),
+  parallelism: Int
+)
 
 case class UploadConfig(uploadNamespace: String,
                         uploadPrefix: String = "archive")

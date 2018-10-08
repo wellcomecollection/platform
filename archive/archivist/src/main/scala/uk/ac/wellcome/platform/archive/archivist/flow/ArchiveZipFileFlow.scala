@@ -9,19 +9,29 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveError, ArchiveJobError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveError,
+  ArchiveJobError
+}
 import uk.ac.wellcome.platform.archive.archivist.modules.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest}
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  IngestBagRequest
+}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressUpdate
+}
 
 object ArchiveZipFileFlow extends Logging {
   def apply(config: BagUploaderConfig, snsConfig: SNSConfig)(
     implicit s3Client: AmazonS3,
     snsClient: AmazonSNS
   ): Flow[ZipFileDownloadComplete,
-    Either[ArchiveError[_], ArchiveComplete],
-    NotUsed] =
+          Either[ArchiveError[_], ArchiveComplete],
+          NotUsed] =
     Flow[ZipFileDownloadComplete].flatMapMerge(
       config.parallelism, {
         case ZipFileDownloadComplete(zipFile, ingestRequest) =>
@@ -34,7 +44,7 @@ object ArchiveZipFileFlow extends Logging {
                 ArchiveError[IngestBagRequest],
                 ArchiveJob,
                 Either[ArchiveError[_], ArchiveComplete]
-                ](ifLeft = Left(_))(
+              ](ifLeft = Left(_))(
                 ifRight = ArchiveJobFlow(
                   config.bagItConfig.digestDelimiterRegexp,
                   config.parallelism,
@@ -52,8 +62,8 @@ object ArchiveZipFileFlow extends Logging {
     )
 
   private def toProgressUpdate(
-                                result: Either[ArchiveError[_], ArchiveComplete],
-                                ingestBagRequest: IngestBagRequest): ProgressUpdate =
+    result: Either[ArchiveError[_], ArchiveComplete],
+    ingestBagRequest: IngestBagRequest): ProgressUpdate =
     result match {
       case Right(ArchiveComplete(id, _, _)) =>
         ProgressUpdate(

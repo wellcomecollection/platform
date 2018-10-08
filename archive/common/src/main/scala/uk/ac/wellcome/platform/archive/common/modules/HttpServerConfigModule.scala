@@ -23,6 +23,6 @@ object HttpServerConfigModule extends AbstractModule {
 }
 
 case class HttpServerConfig(
-                             host: String,
-                             port: Int
-                           )
+  host: String,
+  port: Int
+)

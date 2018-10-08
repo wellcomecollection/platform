@@ -11,9 +11,9 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import scala.concurrent.duration._
 
 class TestAppConfigModule(
-                           progressTable: Table,
-                           serverConfig: HttpServerConfig
-                         ) extends AbstractModule {
+  progressTable: Table,
+  serverConfig: HttpServerConfig
+) extends AbstractModule {
 
   @Provides
   def providesCloudwatchConfig =

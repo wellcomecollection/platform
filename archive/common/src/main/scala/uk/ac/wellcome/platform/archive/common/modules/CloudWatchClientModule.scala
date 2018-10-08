@@ -24,15 +24,14 @@ object CloudWatchClientModule extends AbstractModule {
   @Provides
   @Singleton
   def providesAmazonCloudWatch(
-                                serviceClientConfig: CloudwatchConfig): AmazonCloudWatch =
+    serviceClientConfig: CloudwatchConfig): AmazonCloudWatch =
     CloudWatchClientFactory.create(
       region = serviceClientConfig.region,
-      endpoint = serviceClientConfig
-        .endpoint.getOrElse("")
+      endpoint = serviceClientConfig.endpoint.getOrElse("")
     )
 }
 
 case class CloudwatchConfig(
-                             endpoint: Option[String],
-                             region: String
-                           )
+  endpoint: Option[String],
+  region: String
+)

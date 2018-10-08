@@ -2,9 +2,17 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagManifestLocation, IngestRequestContextGenerators}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  BagManifestLocation,
+  IngestRequestContextGenerators
+}
 import uk.ac.wellcome.platform.archive.archivist.modules.BagItConfig
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, DigitisedStorageType}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagLocation,
+  BagPath,
+  DigitisedStorageType
+}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest

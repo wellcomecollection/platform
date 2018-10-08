@@ -13,8 +13,8 @@ object ArchiveAndNotifyRegistrarFlow {
   def apply(bagUploaderConfig: BagUploaderConfig,
             snsProgressConfig: SNSConfig,
             snsRegistrarConfig: SNSConfig)(
-             implicit s3: AmazonS3,
-             snsClient: AmazonSNS): Flow[ZipFileDownloadComplete, Unit, NotUsed] = {
+    implicit s3: AmazonS3,
+    snsClient: AmazonSNS): Flow[ZipFileDownloadComplete, Unit, NotUsed] = {
     ArchiveZipFileFlow(bagUploaderConfig, snsProgressConfig)
       .log("archive verified")
       .via(
@@ -22,7 +22,7 @@ object ArchiveAndNotifyRegistrarFlow {
           ArchiveError[_],
           ArchiveComplete,
           Unit
-          ](ifLeft = _ => ())(
+        ](ifLeft = _ => ())(
           ifRight = RegistrarNotifierFlow(snsRegistrarConfig).map(_ => ())))
   }
 }

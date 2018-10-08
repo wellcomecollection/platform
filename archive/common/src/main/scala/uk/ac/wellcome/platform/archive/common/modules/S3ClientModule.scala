@@ -68,8 +68,8 @@ object S3ClientModule extends AbstractModule {
 }
 
 case class S3ClientConfig(
-                           accessKey: Option[String] = None,
-                           secretKey: Option[String] = None,
-                           endpoint: Option[String] = None,
-                           region: String
-                         )
+  accessKey: Option[String] = None,
+  secretKey: Option[String] = None,
+  endpoint: Option[String] = None,
+  region: String
+)

@@ -22,4 +22,3 @@ object ProgressMonitorClientModule extends AbstractModule {
 }
 
 case class ProgressTopic(arn: String)
-

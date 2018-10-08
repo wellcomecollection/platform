@@ -5,7 +5,10 @@ import com.google.inject.{AbstractModule, Provides}
 import com.typesafe.config.Config
 import javax.inject.Singleton
 import uk.ac.wellcome.platform.archive.common.models.EnrichConfig
-import uk.ac.wellcome.platform.archive.common.modules.{AkkaModule, DynamoClientConfig}
+import uk.ac.wellcome.platform.archive.common.modules.{
+  AkkaModule,
+  DynamoClientConfig
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
 
