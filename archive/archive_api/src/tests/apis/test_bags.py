@@ -28,7 +28,6 @@ def test_returns_a_present_bag(
     rv = json.loads(resp.data)
     assert rv["id"] == guid
     assert rv["@context"] == "https://api.wellcomecollection.org/storage/v1/context.json"
-    assert rv["type"] == "Bag"
 
 
 def test_returns_500_if_s3_object_missing(
@@ -66,7 +65,7 @@ def test_returns_500_if_malformed_dynamodb(
 
 def test_returns_404_if_no_such_bag(client, guid):
     resp = client.get(f"/storage/v1/bags/{guid}")
-    assert_is_error_response(resp, status=404, description=f"No bag found for id='{guid}'")
+    assert_is_error_response(resp, status=404, description=f"Invalid id: No bag found for id='{guid}'")
 
 
 def test_returns_405_if_try_to_post(client):
