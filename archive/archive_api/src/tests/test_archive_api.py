@@ -2,6 +2,18 @@
 
 import json
 
+from helpers import assert_is_error_response
+
+
+def test_get_root_endpoint_is_404(client):
+    resp = client.get("/")
+    assert_is_error_response(resp, status=404, description="The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.")
+
+
+def test_get_unknown_endpoint_is_404(client):
+    resp = client.get("/foo")
+    assert_is_error_response(resp, status=404, description="The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.")
+
 
 class TestReportHealthStatus:
     """
