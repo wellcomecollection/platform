@@ -24,7 +24,9 @@ object ArchiveJobCreator {
   ): Either[ArchiveError[IngestBagRequest], ArchiveJob] = {
 
     getBagIdentifier(zipFile, ingestBagRequest)
-      .map { bagIdentifier => BagPath(s"$DigitisedStorageType/$bagIdentifier") }
+      .map { bagIdentifier =>
+        BagPath(s"$DigitisedStorageType/$bagIdentifier")
+      }
       .map { bagPath =>
         ArchiveJob(
           zipFile = zipFile,

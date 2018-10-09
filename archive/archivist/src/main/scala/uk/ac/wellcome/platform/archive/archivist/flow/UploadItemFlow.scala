@@ -44,12 +44,10 @@ object UploadItemFlow extends Logging {
         FoldEitherFlow[
           ArchiveItemJob,
           (ArchiveItemJob, InputStream),
-          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](
-          ifLeft = j => {
-            warn(s"Failed extracting inputStream for $j")
-            Left(FileNotFoundError(j.bagDigestItem.location.path, j))
-          })(
-          ifRight = UploadInputStreamFlow(parallelism))
+          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](ifLeft = j => {
+          warn(s"Failed extracting inputStream for $j")
+          Left(FileNotFoundError(j.bagDigestItem.location.path, j))
+        })(ifRight = UploadInputStreamFlow(parallelism))
       )
   }
 

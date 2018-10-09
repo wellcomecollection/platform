@@ -38,7 +38,8 @@ object NotificationMessageFlow extends Logging {
           val progressUpdate = ProgressUpdate(
             id = bagRequest.archiveRequestId,
             events = List(
-              ProgressEvent(s"Started working on ingestRequest: ${bagRequest.archiveRequestId}")
+              ProgressEvent(
+                s"Started working on ingestRequest: ${bagRequest.archiveRequestId}")
             )
           )
 

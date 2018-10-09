@@ -223,7 +223,8 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         * (if successful).
         *
         */
-      private def initializeUpload(uploadLocation: ObjectLocation): Try[String] = {
+      private def initializeUpload(
+        uploadLocation: ObjectLocation): Try[String] = {
         val initiateRequest =
           new InitiateMultipartUploadRequest(
             uploadLocation.namespace,

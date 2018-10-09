@@ -41,8 +41,8 @@ object UploadInputStreamFlow extends Logging {
               .log("to either")
               .map {
                 case Success(calculatedChecksum)
-                  if calculatedChecksum == checksum =>
-                    Right(job)
+                    if calculatedChecksum == checksum =>
+                  Right(job)
                 case Success(calculatedChecksum) =>
                   warn(
                     s"Checksum didn't match: $calculatedChecksum != $checksum")
