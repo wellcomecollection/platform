@@ -46,5 +46,7 @@ module "service" {
   namespace_id     = "${var.service_discovery_namespace}"
   healthcheck_path = "${var.health_check_path}"
 
+  deployment_minimum_healthy_percent = "0"
+
   launch_type = "${var.launch_type}"
 }
