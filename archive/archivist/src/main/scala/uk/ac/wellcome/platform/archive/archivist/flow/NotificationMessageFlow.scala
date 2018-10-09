@@ -18,6 +18,11 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   ProgressUpdate
 }
 
+/** Parses a [[NotificationMessage]] as an [[IngestBagRequest]], tells
+  * the progress service that it's done so, and then emits the
+  * bag request.
+  *
+  */
 object NotificationMessageFlow extends Logging {
   import IngestBagRequest._
 

@@ -3,6 +3,17 @@ import akka.NotUsed
 import akka.stream.FlowShape
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge}
 
+/** This flow combines an Either[L, R] and emits instances of Out
+  * for both sides.
+  *
+  * It starts with the Right flow (which we assume is the happy path),
+  * and adds elements from the Left flow if/when they occur.
+  *
+  *       R --- ifRight ---\
+  *                         +---> Out
+  *       L --- ifLeft ----/
+  *
+  */
 object FoldEitherFlow {
   def apply[L, R, Out](ifLeft: L => Out)(
     ifRight: Flow[R, Out, NotUsed]): Flow[Either[L, R], Out, NotUsed] = {

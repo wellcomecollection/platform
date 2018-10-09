@@ -25,6 +25,13 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 
 import scala.util.{Failure, Success, Try}
 
+/** This flow takes an ingest request, and downloads the entire ZIP file
+  * associated with the request to a local (temporary) path.
+  *
+  * It returns an Either with errors on the Left, or the zipfile and the
+  * original request on the Right.
+  *
+  */
 object ZipFileDownloadFlow extends Logging {
 
   def apply(parallelism: Int, snsConfig: SNSConfig)(implicit s3Client: AmazonS3,

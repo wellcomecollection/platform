@@ -8,6 +8,11 @@ import akka.util.ByteString
 
 import scala.concurrent.Future
 
+/** Takes a [[File]] and a source of bytes, and writes the bytes to the file.
+  *
+  * It emits the [[IOResult]] from the file write.
+  *
+  */
 object FileStoreFlow {
   def apply(tmpFile: File,
             parallelism: Int): Flow[ByteString, IOResult, Future[IOResult]] = {
@@ -17,7 +22,6 @@ object FileStoreFlow {
       .fromGraph(GraphDSL.create(fileSink) { implicit builder => sink =>
         FlowShape(sink.in, builder.materializedValue)
       })
-      .flatMapMerge(parallelism, (Source.fromFuture))
-
+      .flatMapMerge(parallelism, Source.fromFuture)
   }
 }

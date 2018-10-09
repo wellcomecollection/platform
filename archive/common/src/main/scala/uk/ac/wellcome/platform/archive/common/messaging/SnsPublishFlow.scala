@@ -13,6 +13,11 @@ import uk.ac.wellcome.platform.archive.common.flows.ProcessLogDiscardFlow
 
 import scala.util.Try
 
+/** Publishes a message to SNS.
+  *
+  * This flow discards work if there's a failure when publishing to SNS.
+  *
+  */
 object SnsPublishFlow extends Logging {
   def apply[T](
     snsClient: AmazonSNS,

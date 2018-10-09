@@ -6,6 +6,10 @@ import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
 
 import scala.util.Try
 
+/** This process takes a function (In => Try[Out]), and only returns
+  * the successful results.
+  *
+  */
 object ProcessLogDiscardFlow {
   def apply[In, Out](name: String)(
     f: In => Try[Out]): Flow[In, Out, NotUsed] = {
