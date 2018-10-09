@@ -40,7 +40,7 @@ trait Archivist extends Logging {
       }
     }
 
-    implicit val materializer = ActorMaterializer(
+    implicit val materializer: ActorMaterializer = ActorMaterializer(
       ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider)
     )
 
@@ -60,9 +60,11 @@ trait Archivist extends Logging {
         .log("notification message")
         .via(
           NotificationMessageFlow(
-            bagUploaderConfig.parallelism,
-            snsClient,
-            snsProgressConfig))
+            parallelism = bagUploaderConfig.parallelism,
+            snsClient = snsClient,
+            progressSnsConfig = snsProgressConfig
+          )
+        )
         .log("download zip")
         .via(
           ZipFileDownloadFlow(bagUploaderConfig.parallelism, snsProgressConfig))
