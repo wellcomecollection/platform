@@ -5,16 +5,10 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Try
 
-class EitherFlowTest
-    extends FunSpec
-    with Akka
-    with Matchers
-    with ExtendedPatience
-    with ScalaFutures {
+class EitherFlowTest extends FunSpec with Akka with Matchers with ScalaFutures {
 
   it("turns a Try into an Either, wrapping a FailedEvent[In]") {
     withActorSystem { actorSystem =>

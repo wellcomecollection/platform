@@ -5,14 +5,24 @@ from flask_restplus import Namespace, Resource
 
 from ingests import models as ingest_models
 from ingests import send_new_ingest_request
-from models import Error, register_models
+from models.catalogue import Error
+from models.ingests import Ingest, IngestType
+from models.progress import Progress, ProgressEvent
 from progress_manager import ProgressNotFoundError
 import validators
 
 
 api = Namespace("ingests", description="Operations around ingests")
 
-register_models(api, models=ingest_models)
+api.add_model(name="Error", definition=Error)
+
+api.add_model(name="Ingest", definition=Ingest)
+api.add_model(name="IngestType", definition=IngestType)
+
+api.add_model(name="Progress", definition=Progress)
+api.add_model(name="ProgressEvent", definition=ProgressEvent)
+
+logger = daiquiri.getLogger()
 
 
 @api.route("")
@@ -23,8 +33,8 @@ register_models(api, models=ingest_models)
 )
 class IngestCollection(Resource):
     @api.doc(description="Request the ingest of a BagIt resource from S3")
-    @api.expect(ingest_models.IngestRequest, validate=True)
-    @api.response(202, "Ingest created")
+    @api.expect(Ingest, validate=True)
+    @api.response(201, "Ingest created")
     @api.response(400, "Bad request", Error)
     def post(self):
         upload_url = request.json["uploadUrl"]
@@ -81,6 +91,7 @@ class IngestResource(Resource):
             "POSTed ingest request"
         )
     )
+    @api.marshal_with(Progress)
     @api.response(200, "Ingest found")
     @api.response(404, "Ingest not found", Error)
     def get(self, id):
@@ -90,6 +101,6 @@ class IngestResource(Resource):
             progress_manager = app.config["PROGRESS_MANAGER"]
 
             result = progress_manager.lookup_progress(id=id)
-            return result
+            return {"id": result["progress"]}
         except ProgressNotFoundError as error:
             abort(404, f"Invalid id: No ingest found for id={id!r}")

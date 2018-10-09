@@ -116,7 +116,7 @@ Content-Type: application/json
 Response:
 
 ```http
-202 ACCEPTED
+201 ACCEPTED
 ```
 
 Request:

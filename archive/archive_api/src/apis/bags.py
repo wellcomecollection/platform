@@ -3,14 +3,20 @@
 from flask import abort
 from flask_restplus import Namespace, Resource
 
-from bags import models as bag_models
-from models import Error, register_models
+from models.bags import Bag, File, FileManifest, Source
+from models.catalogue import Error, Identifier, IdentifierType
 from storage import VHSError, VHSNotFound, read_from_vhs
 
 
 api = Namespace("bags", description="Operations around BagIt bags")
 
-register_models(api, models=bag_models)
+api.add_model("Bag", definition=Bag)
+api.add_model("Error", definition=Error)
+api.add_model("File", definition=File)
+api.add_model("FileManifest", definition=FileManifest)
+api.add_model("Identifier", definition=Identifier)
+api.add_model("IdentifierType", definition=IdentifierType)
+api.add_model("Source", definition=Source)
 
 
 @api.route("/<id>")

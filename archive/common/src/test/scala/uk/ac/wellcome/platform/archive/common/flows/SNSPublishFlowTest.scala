@@ -3,22 +3,21 @@ package uk.ac.wellcome.platform.archive.common.flows
 import akka.stream.scaladsl.{Sink, Source}
 import com.amazonaws.services.sns.model.PublishResult
 import org.scalatest.FunSpec
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SNSPublishFlowTest
     extends FunSpec
     with SNS
     with MockitoSugar
     with Akka
-    with ExtendedPatience
-    with ScalaFutures {
+    with ScalaFutures
+    with IntegrationPatience {
 
   case class Person(name: String, age: Int)
 

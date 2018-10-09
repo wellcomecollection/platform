@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8
 
 import json
@@ -28,6 +27,11 @@ def assert_is_error_response(resp, status, description=None):
     if description is not None:
         expected_resp["description"] = description
 
-    print(resp.data)
-    print(expected_resp)
-    assert json.loads(resp.data) == expected_resp
+    actual_resp = json.loads(resp.data)
+    if actual_resp != expected_resp:
+        print("***  actual response  ***")
+        print(json.dumps(actual_resp, indent=2, sort_keys=True))
+        print("*** expected response ***")
+        print(json.dumps(expected_resp, indent=2, sort_keys=True))
+
+    assert actual_resp == expected_resp

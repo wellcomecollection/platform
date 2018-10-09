@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.progress_async
 
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -12,7 +12,6 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 import uk.ac.wellcome.platform.archive.progress_async.fixtures.{
   ProgressAsyncFixture => ProgressFixture
 }
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class ProgressAsyncFeatureTest
     extends FunSpec
@@ -21,7 +20,7 @@ class ProgressAsyncFeatureTest
     with MetricsSenderFixture
     with ProgressMonitorFixture
     with ProgressFixture
-    with ExtendedPatience {
+    with IntegrationPatience {
 
   import CallbackNotification._
 
