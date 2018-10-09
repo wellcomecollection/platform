@@ -49,6 +49,9 @@ class ContextResponse(Response):
         assert isinstance(rv, dict)
 
         assert "@context" not in rv, rv
-        rv["@context"] = cls.context_url
+
+        # We don't add a context to the healthcheck endpoint.
+        if rv != {"status": "OK"}:
+            rv["@context"] = cls.context_url
 
         return super().force_type(jsonify(rv), environ)
