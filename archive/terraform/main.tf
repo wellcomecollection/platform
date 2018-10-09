@@ -224,7 +224,7 @@ module "callback_stub_server" {
 
   env_vars        = {}
   env_vars_length = 0
-  command = ["--verbose", "--disable-banner"]
+  command         = ["--verbose", "--disable-banner"]
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
