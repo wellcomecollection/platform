@@ -26,7 +26,7 @@
       "response": {
         "body": {
           "encoding": null,
-          "string": "{\n  \"progress\": \"F423966E-A5E5-4D91-B321-88B90D1B5154\"\n}\n"
+          "string": "{\"id\": \"F423966E-A5E5-4D91-B321-88B90D1B5154\", \"uploadUri\": \"s3://wellcomecollection-assets-archive-ingest/some.zip\",  \"callbackUri\": \"https://example.org/callback?id=b1234567\", \"result\": \"none\", \"createdAt\": \"2018-10-09T12:32:03.108Z\", \"updatedAt\": \"2018-10-09T12:32:03.108Z\",\"events\": [{\"description\": \"zipFile downloaded successfully\", \"time\": \"2018-10-09T12:16:15.180Z\"}]}"
         },
         "headers": {
           "Content-Type": [

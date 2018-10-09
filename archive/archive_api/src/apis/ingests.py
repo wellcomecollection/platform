@@ -89,7 +89,7 @@ class IngestResource(Resource):
     @api.doc(
         description="The ingest request id is returned in the Location header from a POSTed ingest request"
     )
-    @api.marshal_with(Progress)
+    @api.marshal_with(Ingest)
     @api.response(200, "Ingest found")
     @api.response(404, "Ingest not found", Error)
     def get(self, id):

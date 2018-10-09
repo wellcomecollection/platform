@@ -23,7 +23,8 @@ class TestGETIngests:
             == "https://api.wellcomecollection.org/storage/v1/context.json"
         )
         assert rv["id"] == lookup_id
-        assert rv["type"] == "Progress"
+        assert rv["type"] == "Ingest"
+        # TODO: test additional fields
 
     def test_lookup_missing_item_is_404(self, client):
         lookup_id = "bad_status-404"
