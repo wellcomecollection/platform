@@ -6,6 +6,7 @@ and no I/O operations happen, other than on METS files.
 
 import sys
 import os
+import collections
 import shutil
 import logging
 import bagit
@@ -18,19 +19,22 @@ import aws
 import tech_md
 from xml_help import load_from_disk, load_from_string
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 def bag_from_identifier(identifier, skip_file_download):
     b_number = identifiers.normalise_b_number(identifier)
     bag_details = bag_assembly.prepare_bag_dir(b_number)
+    id_map = collections.OrderedDict()
     mets_path = "{0}{1}.xml".format(bag_details["mets_partial_path"], b_number)
     logging.info("process METS or anchor file at %s", mets_path)
     tree = load_xml(mets_path)
     root = tree.getroot()
     title = mets.get_title(root)
     logging.info("#### {0}: {1}".format(b_number, title))
-    logging.info("We will transform xml that involves Preservica, and the tessella namespace")
+    logging.info(
+        "We will transform xml that involves Preservica, and the tessella namespace"
+    )
 
     # Compare the logic here with the METS Repository
     # This is simpler as we always start with a b number
@@ -80,7 +84,7 @@ def bag_from_identifier(identifier, skip_file_download):
             manif_struct_div = mets.get_logical_struct_div(mf_root)
             link_to_anchor = mets.get_file_pointer_link(manif_struct_div)
             logging.info("{0} should be link back to anchor".format(link_to_anchor))
-            process_manifestation(mf_root, bag_details, skip_file_download)
+            process_manifestation(mf_root, bag_details, skip_file_download, id_map)
             # not os separator, this is in the METS; always /
             parts = rel_path[0].split("/")
             manifestation_file = os.path.join(bag_details["directory"], *parts)
@@ -89,12 +93,14 @@ def bag_from_identifier(identifier, skip_file_download):
             aws.save_mets_to_side(b_number, manifestation_file)
 
     elif mets.is_manifestation(struct_type):
-        process_manifestation(root, bag_details, skip_file_download)
+        process_manifestation(root, bag_details, skip_file_download, id_map)
         tree.write(root_mets_file, encoding="utf-8", xml_declaration=True)
         aws.save_mets_to_side(b_number, root_mets_file)
 
     else:
         raise ValueError("Unknown struct type: " + struct_type)
+
+    aws.save_id_map(b_number, id_map)
 
     if skip_file_download:
         print(b_number)
@@ -108,9 +114,9 @@ def bag_from_identifier(identifier, skip_file_download):
     logging.info("Finished {0}".format(b_number))
 
 
-def process_manifestation(root, bag_details, skip_file_download):
+def process_manifestation(root, bag_details, skip_file_download, id_map):
     mets.remove_deliverable_unit(root)
-    tech_md.remodel_file_technical_metadata(root)
+    tech_md.remodel_file_technical_metadata(root, id_map)
     mets.remodel_file_section(root)
     assets, alto = mets.get_physical_file_maps(root)
     files.process_assets(root, bag_details, assets, skip_file_download)
@@ -130,8 +136,9 @@ def load_xml(path):
 def dispatch_bag(bag_details):
     # now zip this bag in a way that will be efficient for the archiver
     logging.info("creating zip file for " + bag_details["b_number"])
-    shutil.make_archive(bag_details["zip_file_path"]
-                        [0:-4], 'zip', bag_details["directory"])
+    shutil.make_archive(
+        bag_details["zip_file_path"][0:-4], "zip", bag_details["directory"]
+    )
     logging.info("uploading " + bag_details["zip_file_name"] + " to S3")
     aws.upload(bag_details["zip_file_path"], bag_details["zip_file_name"])
     logging.info("upload completed")

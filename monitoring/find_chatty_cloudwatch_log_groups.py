@@ -20,11 +20,11 @@ def describe_all_log_groups():
     https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_DescribeLogGroups.html
 
     """
-    client = boto3.client('logs')
-    paginator = client.get_paginator('describe_log_groups')
+    client = boto3.client("logs")
+    paginator = client.get_paginator("describe_log_groups")
 
     for page in paginator.paginate():
-        yield from page['logGroups']
+        yield from page["logGroups"]
 
 
 def print_bar_chart(data):
@@ -48,21 +48,21 @@ def print_bar_chart(data):
         bar_chunks, remainder = divmod(int(count * 8 / increment), 8)
 
         # First draw the full width chunks
-        bar = '█' * bar_chunks
+        bar = "█" * bar_chunks
 
         # Then add the fractional part.  The Unicode code points for
         # block elements are (8/8), (7/8), (6/8), ... , so we need to
         # work backwards.
         if remainder > 0:
-            bar += chr(ord('█') + (8 - remainder))
+            bar += chr(ord("█") + (8 - remainder))
 
         # If the bar is empty, add a left one-eighth block
-        bar = bar or '▏'
+        bar = bar or "▏"
 
-        print(f'{label.rjust(longest_label_length)} ▏ {count:#6.2f} {bar}')
+        print(f"{label.rjust(longest_label_length)} ▏ {count:#6.2f} {bar}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     stored_sizes = {}
 
@@ -76,11 +76,11 @@ if __name__ == '__main__':
         # We don't care about the prefix, so we can strip it off to make the
         # results easier to read.
         #
-        name = group['logGroupName'].split('/')[-1]
+        name = group["logGroupName"].split("/")[-1]
 
         # The CloudWatch API counts stored bytes.  This isn't an especially
         # useful metric, so convert it to gigabytes instead.
-        size = group['storedBytes'] / 1024 / 1024 / 1024
+        size = group["storedBytes"] / 1024 / 1024 / 1024
 
         stored_sizes[name] = size
     # stored_sizes = {
@@ -89,6 +89,7 @@ if __name__ == '__main__':
     # }
 
     import collections
+
     chattiest_groups = collections.Counter(stored_sizes).most_common(10)
 
     print_bar_chart(chattiest_groups)

@@ -1,7 +1,8 @@
 package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
+import java.net.URI
+import java.time.Instant
 import java.time.format.DateTimeFormatter
-import java.time.{Duration, Instant}
 import java.util.UUID
 
 import akka.NotUsed
@@ -10,7 +11,6 @@ import com.gu.scanamo.DynamoFormat
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
   ProgressUpdate
@@ -23,7 +23,13 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressMonitorFixture
     extends LocalProgressMonitorDynamoDb
-    with MockitoSugar {
+    with MockitoSugar
+    with TimeTestFixture {
+
+  import Progress._
+
+  val uploadUri = new URI("http://www.example.com/asset")
+  val callbackUri = new URI("http://localhost/archive/complete")
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
@@ -60,57 +66,54 @@ trait ProgressMonitorFixture
     testWith(progressMonitor)
   }
 
-  def createProgress(uploadUrl: String,
-                     callbackUrl: String,
-                     progressMonitor: ProgressMonitor): Progress = {
-    val id = UUID.randomUUID().toString
+  def createProgress(
+    progressMonitor: ProgressMonitor,
+    callbackUrl: URI = callbackUri,
+    uploadUrl: URI = uploadUri
+  ): Progress = {
+    val id = UUID.randomUUID()
 
     progressMonitor.create(
       Progress(id, uploadUrl, Some(callbackUrl))
     )
   }
 
-  def givenProgressRecord(id: String,
-                          uploadUrl: String,
-                          maybeCallbackUrl: Option[String],
+  def givenProgressRecord(id: UUID,
+                          uploadUri: URI,
+                          maybeCallbackUri: Option[URI],
                           table: Table) = {
-    givenTableHasItem(Progress(id, uploadUrl, maybeCallbackUrl), table)
+    givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri), table)
   }
 
-  def assertProgressCreated(id: String,
-                            expectedUploadUrl: String,
-                            expectedCallbackUrl: Option[String],
+  def assertProgressCreated(id: UUID,
+                            expectedUploadUri: URI,
+                            expectedCallbackUri: Option[URI],
                             table: Table,
                             recentSeconds: Int = 45): Assertion = {
-    val progress = getExistingTableItem[Progress](id, table)
-    progress.uploadUrl shouldBe expectedUploadUrl
-    progress.callbackUrl shouldBe expectedCallbackUrl
+    val progress = getExistingTableItem[Progress](id.toString, table)
+    progress.uploadUri shouldBe expectedUploadUri
+    progress.callbackUri shouldBe expectedCallbackUri
 
     assertRecent(progress.createdAt, recentSeconds)
     assertRecent(progress.updatedAt, recentSeconds)
   }
 
-  def assertProgressRecordedRecentEvents(id: String,
+  def assertProgressRecordedRecentEvents(id: UUID,
                                          expectedEventDescriptions: Seq[String],
                                          table: LocalDynamoDb.Table,
                                          recentSeconds: Int = 45) = {
-    val progress = getExistingTableItem[Progress](id, table)
+    val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
     progress.events.foreach(event => assertRecent(event.time, recentSeconds))
     progress
   }
 
-  def assertProgressStatus(id: String,
+  def assertProgressStatus(id: UUID,
                            expectedStatus: Status,
                            table: LocalDynamoDb.Table) = {
-    val progress = getExistingTableItem[Progress](id, table)
+    val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.result shouldBe expectedStatus
   }
-
-  def assertRecent(instant: Instant, recentSeconds: Int = 1): Assertion =
-    Duration
-      .between(instant, Instant.now)
-      .getSeconds should be <= recentSeconds.toLong
 }

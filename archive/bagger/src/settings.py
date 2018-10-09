@@ -45,7 +45,7 @@ BAG_INFO = {
     "Source-Organization": "Intranda GmbH",
     "Contact-Email": "support@intranda.com",
     "External-Description": "[TO BE REPLACED]",
-    "External-Identifier": "[TO BE REPLACED]"
+    "External-Identifier": "[TO BE REPLACED]",
 }
 
 # Possibly to go in bag-info:

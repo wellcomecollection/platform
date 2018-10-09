@@ -5,7 +5,6 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
 import uk.ac.wellcome.platform.archive.registrar.models.RegistrarConfig
 import uk.ac.wellcome.platform.archive.registrar.modules.HybridStoreConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -13,63 +12,111 @@ import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.concurrent.duration._
 
-class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
+class ArgsConfigurator(val arguments: Seq[String])
+    extends ScallopConf(arguments) {
 
-  val awsS3AccessKey = opt[String]()
-  val awsS3SecretKey = opt[String]()
-  val awsS3Region = opt[String](default = Some("eu-west-1"))
-  val awsS3Endpoint = opt[String]()
+  val hybridDynamoAccessKey = opt[String]("hybrid-dynamo-access-key")
+  val hybridDynamoSecretKey = opt[String]("hybrid-dynamo-secret-key")
+  val hybridDynamoRegion =
+    opt[String]("hybrid-dynamo-region", default = Some("eu-west-1"))
+  val hybridDynamoEndpoint = opt[String]("hybrid-dynamo-endpoint")
 
-  val awsSqsAccessKey = opt[String]()
-  val awsSqsSecretKey = opt[String]()
-  val awsSqsRegion = opt[String](default = Some("eu-west-1"))
-  val awsSqsEndpoint = opt[String]()
+  val hybridS3AccessKey = opt[String]("hybrid-s3-access-key")
+  val hybridS3SecretKey = opt[String]("hybrid-s3-secret-key")
+  val hybridS3Region =
+    opt[String]("hybrid-s3-region", default = Some("eu-west-1"))
+  val hybridS3Endpoint = opt[String]("hybrid-s3-endpoint")
 
-  val awsSnsAccessKey = opt[String]()
-  val awsSnsSecretKey = opt[String]()
-  val awsSnsRegion = opt[String](default = Some("eu-west-1"))
-  val awsSnsEndpoint = opt[String]()
+  val hybridGlobalS3Prefix =
+    opt[String]("hybrid-global-s3-prefix", default = Some("archive"))
+  val hybridDynamoTableName = opt[String]("hybrid-dynamo-table-name")
+  val hybridS3BucketName = opt[String]("hybrid-s3-bucket-name")
 
-  val awsCloudwatchRegion = opt[String](default = Some("eu-west-1"))
-  val awsCloudwatchEndpoint = opt[String]()
+  private val awsS3AccessKey = opt[String]("aws-s3-access-key")
+  private val awsS3SecretKey = opt[String]("aws-s3-secret-key")
+  private val awsS3Region =
+    opt[String]("aws-s3-region", default = Some("eu-west-1"))
+  private val awsS3Endpoint = opt[String]("aws-s3-endpoint")
 
-  val topicArn: ScallopOption[String] = opt[String](required = true)
-  val sqsQueueUrl: ScallopOption[String] = opt[String](required = true)
-  val sqsWaitTimeSeconds = opt[Int](required = true, default = Some(20))
-  val sqsMaxMessages = opt[Int](required = true, default = Some(10))
-  val sqsParallelism = opt[Int](required = true, default = Some(10))
+  private val sqsQueueUrl: ScallopOption[String] =
+    opt[String]("sqs-queue-url", required = true)
+  private val sqsWaitTimeSeconds =
+    opt[Int]("sqs-wait-time-seconds", required = true, default = Some(20))
+  private val sqsMaxMessages =
+    opt[Int]("sqs-max-messages", required = true, default = Some(10))
+  private val sqsParallelism =
+    opt[Int]("sqs-parallelism", required = true, default = Some(10))
 
-  val metricsNamespace = opt[String](default = Some("app"))
-  val metricsFlushIntervalSeconds =
-    opt[Int](required = true, default = Some(20))
+  private val awsSqsAccessKey = opt[String]("aws-sqs-access-key")
+  private val awsSqsSecretKey = opt[String]("aws-sqs-secret-key")
+  private val awsSqsRegion =
+    opt[String]("aws-sqs-region", default = Some("eu-west-1"))
+  private val awsSqsEndpoint = opt[String]("aws-sqs-endpoint")
 
-  val uploadNamespace = opt[String](required = true)
-  val uploadPrefix = opt[String](default = Some("archive"))
-  val digestDelimiterRegexp = opt[String](default = Some(" +"))
+  private val snsTopicArn: ScallopOption[String] =
+    opt[String]("sns-topic-arn", required = true)
 
-  val hybridDynamoAccessKey = opt[String]()
-  val hybridDynamoSecretKey = opt[String]()
-  val hybridDynamoRegion = opt[String](default = Some("eu-west-1"))
-  val hybridDynamoEndpoint = opt[String]()
+  private val awsSnsAccessKey = opt[String]("aws-sns-access-key")
+  private val awsSnsSecretKey = opt[String]("aws-sns-secret-key")
+  private val awsSnsRegion =
+    opt[String]("aws-sns-region", default = Some("eu-west-1"))
+  private val awsSnsEndpoint = opt[String]("aws-sns-endpoint")
 
-  val hybridS3AccessKey = opt[String]()
-  val hybridS3SecretKey = opt[String]()
-  val hybridS3Region = opt[String](default = Some("eu-west-1"))
-  val hybridS3Endpoint = opt[String]()
+  private val metricsNamespace =
+    opt[String]("metrics-namespace", default = Some("app"))
+  private val metricsFlushIntervalSeconds =
+    opt[Int](
+      "metrics-flush-interval-seconds",
+      required = true,
+      default = Some(20))
 
-  val hybridGlobalS3Prefix = opt[String](default = Some("archive"))
-  val hybridDynamoTableName = opt[String]()
-  val hybridS3BucketName = opt[String]()
-
-  val archiveProgressMonitorTableName = opt[String](required = true)
-
-  val archiveProgressMonitorDynamoAccessKey = opt[String]()
-  val archiveProgressMonitorDynamoSecretKey = opt[String]()
-  val archiveProgressMonitorDynamoRegion =
-    opt[String](default = Some("eu-west-1"))
-  val archiveProgressMonitorDynamoEndpoint = opt[String]()
+  private val awsCloudwatchRegion =
+    opt[String]("aws-cloudwatch-region", default = Some("eu-west-1"))
+  private val awsCloudwatchEndpoint = opt[String]("aws-cloudwatch-endpoint")
 
   verify()
+
+  val cloudwatchClientConfig = CloudwatchClientConfig(
+    region = awsCloudwatchRegion(),
+    endpoint = awsCloudwatchEndpoint.toOption
+  )
+
+  val metricsConfig = MetricsConfig(
+    namespace = metricsNamespace(),
+    flushInterval = metricsFlushIntervalSeconds() seconds
+  )
+
+  val snsClientConfig = SnsClientConfig(
+    accessKey = awsSnsAccessKey.toOption,
+    secretKey = awsSnsSecretKey.toOption,
+    region = awsSnsRegion(),
+    endpoint = awsSnsEndpoint.toOption
+  )
+
+  val snsConfig = SNSConfig(
+    topicArn = snsTopicArn()
+  )
+
+  val sqsClientConfig = SQSClientConfig(
+    accessKey = awsSqsAccessKey.toOption,
+    secretKey = awsSqsSecretKey.toOption,
+    region = awsSqsRegion(),
+    endpoint = awsSqsEndpoint.toOption
+  )
+
+  val sqsConfig = SQSConfig(
+    queueUrl = sqsQueueUrl(),
+    waitTime = sqsWaitTimeSeconds() seconds,
+    maxMessages = sqsMaxMessages(),
+    parallelism = sqsParallelism()
+  )
+
+  val s3ClientConfig = S3ClientConfig(
+    accessKey = awsS3AccessKey.toOption,
+    secretKey = awsS3SecretKey.toOption,
+    region = awsS3Region(),
+    endpoint = awsS3Endpoint.toOption
+  )
 
   val hybridStoreConfig = HybridStoreConfig(
     dynamoClientConfig = DynamoClientConfig(
@@ -94,61 +141,6 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     s3GlobalPrefix = hybridGlobalS3Prefix()
   )
 
-  val s3ClientConfig = S3ClientConfig(
-    accessKey = awsS3AccessKey.toOption,
-    secretKey = awsS3SecretKey.toOption,
-    region = awsS3Region(),
-    endpoint = awsS3Endpoint.toOption
-  )
-
-  val cloudwatchClientConfig = CloudwatchClientConfig(
-    region = awsCloudwatchRegion(),
-    endpoint = awsCloudwatchEndpoint.toOption
-  )
-
-  val sqsClientConfig = SQSClientConfig(
-    accessKey = awsSqsAccessKey.toOption,
-    secretKey = awsSqsSecretKey.toOption,
-    region = awsSqsRegion(),
-    endpoint = awsSqsEndpoint.toOption
-  )
-
-  val sqsConfig = SQSConfig(
-    sqsQueueUrl(),
-    sqsWaitTimeSeconds() seconds,
-    sqsMaxMessages(),
-    sqsParallelism()
-  )
-
-  val snsClientConfig = SnsClientConfig(
-    accessKey = awsSnsAccessKey.toOption,
-    secretKey = awsSnsSecretKey.toOption,
-    region = awsSnsRegion(),
-    endpoint = awsSnsEndpoint.toOption
-  )
-
-  val snsConfig = SNSConfig(
-    topicArn(),
-  )
-
-  val metricsConfig = MetricsConfig(
-    namespace = metricsNamespace(),
-    flushInterval = metricsFlushIntervalSeconds() seconds
-  )
-
-  val archiveProgressMonitorConfig = ProgressMonitorConfig(
-    DynamoConfig(
-      table = archiveProgressMonitorTableName(),
-      maybeIndex = None
-    ),
-    DynamoClientConfig(
-      accessKey = archiveProgressMonitorDynamoAccessKey.toOption,
-      secretKey = archiveProgressMonitorDynamoSecretKey.toOption,
-      region = archiveProgressMonitorDynamoRegion(),
-      endpoint = archiveProgressMonitorDynamoEndpoint.toOption
-    )
-  )
-
   val appConfig = RegistrarConfig(
     s3ClientConfig,
     cloudwatchClientConfig,
@@ -157,7 +149,6 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     snsClientConfig,
     snsConfig,
     hybridStoreConfig,
-    archiveProgressMonitorConfig,
     metricsConfig
   )
 }

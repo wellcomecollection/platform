@@ -4,11 +4,20 @@
 import collections
 import datetime as dt
 import json
+import os
+import sys
 
 import boto3
 
 from build_windows import generate_windows
-from report_adapter_progress import BUCKET, build_report
+
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), "sierra_progress_reporter", "src")
+)
+from sierra_progress_reporter import build_report  # noqa
+
+
+BUCKET = "wellcomecollection-platform-adapters-sierra"
 
 
 def sliding_window(iterable):
@@ -35,22 +44,20 @@ def get_missing_windows(report):
         missing_start = window_1.end - dt.timedelta(seconds=1)
         missing_end = window_2.start + dt.timedelta(seconds=1)
 
-        yield from generate_windows(
-            start=missing_start,
-            end=missing_end,
-            minutes=5
+        yield from generate_windows(start=missing_start, end=missing_end, minutes=5)
+
+
+if __name__ == "__main__":
+    client = boto3.client("sns")
+
+    for resource_type in ("bibs", "items"):
+        report = build_report(
+            s3_client=boto3.client("s3"), bucket=BUCKET, resource_type=resource_type
         )
-
-
-if __name__ == '__main__':
-    client = boto3.client('sns')
-
-    for resource_type in ('bibs', 'items'):
-        report = build_report(bucket=BUCKET, resource_type=resource_type)
         for missing_window in get_missing_windows(report):
             print(missing_window)
             client.publish(
-                TopicArn=f'arn:aws:sns:eu-west-1:760097843905:sierra_{resource_type}_windows',
+                TopicArn=f"arn:aws:sns:eu-west-1:760097843905:sierra_{resource_type}_windows",
                 Message=json.dumps(missing_window),
-                Subject=f'Window sent by {__file__}'
+                Subject=f"Window sent by {__file__}",
             )

@@ -20,16 +20,16 @@ def api_miro_ids():
     page = 1
     while True:
         r = requests.get(
-            'https://api.wellcomecollection.org/catalogue/v0/works',
-            params={'includes': 'identifiers', 'pageSize': 100, 'page': page}
+            "https://api.wellcomecollection.org/catalogue/v0/works",
+            params={"includes": "identifiers", "pageSize": 100, "page": page},
         )
-        if not r.json()['results']:
+        if not r.json()["results"]:
             break
-        for work in r.json()['results']:
-            identifiers = work['identifiers']
-            miro_ids = [i for i in identifiers if i['source'] == 'Miro']
+        for work in r.json()["results"]:
+            identifiers = work["identifiers"]
+            miro_ids = [i for i in identifiers if i["source"] == "Miro"]
             if miro_ids:
-                yield miro_ids[0]['value']
+                yield miro_ids[0]["value"]
         page += 1
 
 
@@ -40,7 +40,7 @@ def get_records(table):
     kwargs = {}
     while True:
         resp = table.scan(**kwargs)
-        yield from resp['Items']
+        yield from resp["Items"]
 
         # DynamoDB results are paginated, with the ``LastEvaluatedKey`` in
         # the response defining a parameter to be passed into the next page,
@@ -48,17 +48,17 @@ def get_records(table):
         # we're at the end of the table.  For more details:
         # http://boto3.readthedocs.io/en/latest/reference/services/dynamodb.html#DynamoDB.Table.scan
         try:
-            kwargs['ExclusiveStartKey'] = resp['LastEvaluatedKey']
+            kwargs["ExclusiveStartKey"] = resp["LastEvaluatedKey"]
         except KeyError:
             break
 
 
 def main():
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('MiroData')
+    dynamodb = boto3.resource("dynamodb")
+    table = dynamodb.Table("MiroData")
 
     api_ids = list(api_miro_ids())
-    dynamodb_records = [t['MiroID'] for t in get_records(table)]
+    dynamodb_records = [t["MiroID"] for t in get_records(table)]
 
     missing = set(dynamodb_records) - set(api_ids)
     if missing:
@@ -68,5 +68,5 @@ def main():
         return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

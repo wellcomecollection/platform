@@ -43,19 +43,22 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
     })
 
     source
-      .flatMapConcat((message: Message) => {
-        Source
-          .single(message)
-          .log("processing message")
-          .via(typeConversion)
-          .log("message converted")
-          .via(workFlow)
-          .log("workflow completed")
-          .map(_ => (message, MessageAction.Delete))
-          .log("message action")
-          .via(ackFlow)
-          .log("message completed")
-      })
+      .flatMapMerge(
+        sqsConfig.parallelism,
+        (message: Message) => {
+          Source
+            .single(message)
+            .log("processing message")
+            .via(typeConversion)
+            .log("message converted")
+            .via(workFlow)
+            .log("workflow completed")
+            .map(_ => (message, MessageAction.Delete))
+            .log("message action")
+            .via(ackFlow)
+            .log("message completed")
+        }
+      )
       .runWith(sink)
   }
 }

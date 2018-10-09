@@ -17,16 +17,15 @@ from wellcome_aws_utils.lambda_utils import log_on_error
 @log_on_error
 def main(event=None, context=None, dynamodb_client=None):
     try:
-        table_names = [t.strip() for t in os.environ['TABLE_NAMES'].split(',')]
+        table_names = [t.strip() for t in os.environ["TABLE_NAMES"].split(",")]
     except KeyError:
-        raise RuntimeError('TABLE_NAMES not found')
+        raise RuntimeError("TABLE_NAMES not found")
 
-    dynamodb_client = dynamodb_client or boto3.client('dynamodb')
+    dynamodb_client = dynamodb_client or boto3.client("dynamodb")
     for table_name in table_names:
         try:
             response = dynamodb_client.delete_item(
-                TableName=table_name.strip(),
-                Key={'id': {'S': 'dummy-id-not-there'}}
+                TableName=table_name.strip(), Key={"id": {"S": "dummy-id-not-there"}}
             )
 
         # The purpose of this heartbeat is to bring the provisioned throughput
@@ -43,9 +42,9 @@ def main(event=None, context=None, dynamodb_client=None):
         #   capacity, so a failure is fine.
         #
         except ClientError as err:
-            if err.response['Error']['Code'] in (
-                'ProvisionedThroughputExceededException',
-                'ResourceNotFoundException',
+            if err.response["Error"]["Code"] in (
+                "ProvisionedThroughputExceededException",
+                "ResourceNotFoundException",
             ):
                 print(f'Benign error from DynamoDB: {err.response["Error"]["Code"]}')
             else:
@@ -53,6 +52,6 @@ def main(event=None, context=None, dynamodb_client=None):
 
         else:
             print(
-                f'Heartbeat, delete_item on dynamoDb table: {table_name}, '
+                f"Heartbeat, delete_item on dynamoDb table: {table_name}, "
                 f'returned-status: {response["ResponseMetadata"]["HTTPStatusCode"]}'
             )

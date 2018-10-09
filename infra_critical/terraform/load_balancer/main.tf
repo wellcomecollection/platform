@@ -14,12 +14,12 @@ resource "aws_alb_listener" "https" {
   certificate_arn   = "${data.aws_acm_certificate.certificate.arn}"
 
   default_action {
-    type = "fixed-response"
+    type = "redirect"
 
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Not Found"
-      status_code  = "404"
+    redirect {
+      host        = "${var.top_level_host}"
+      path        = "${var.top_level_path}"
+      status_code = "HTTP_301"
     }
   }
 }

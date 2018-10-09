@@ -13,13 +13,13 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   BagLocation,
-  BagPath
+  BagPath,
+  DigitisedStorageType
 }
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   ConfigModule,
+  SNSAsyncClientModule,
   TestAppConfigModule,
   VHSModule
 }
@@ -38,7 +38,6 @@ trait Registrar
     with Messaging
     with LocalVersionedHybridStore
     with BagIt
-    with ProgressMonitorFixture
     with LocalDynamoDb {
 
   def sendNotification(requestId: UUID,
@@ -64,20 +63,23 @@ trait Registrar
 
   def withBag[R](storageBucket: Bucket, dataFileCount: Int = 1)(
     testWith: TestWith[BagLocation, R]) = {
-    val bagName = BagPath(randomAlphanumeric())
+    val bagIdentifier = randomAlphanumeric()
 
-    info(s"Creating bag $bagName")
+    info(s"Creating bag $bagIdentifier")
 
-    val fileEntries = createBag(bagName, dataFileCount)
+    val fileEntries = createBag(bagIdentifier, dataFileCount)
     val storagePrefix = "archive"
 
-    val bagLocation = BagLocation(storageBucket.name, storagePrefix, bagName)
+    val bagLocation = BagLocation(
+      storageBucket.name,
+      storagePrefix,
+      BagPath(s"$DigitisedStorageType/$bagIdentifier"))
 
     fileEntries.map((entry: FileEntry) => {
       s3Client
         .putObject(
           bagLocation.storageNamespace,
-          s"${storagePrefix}/${entry.name}",
+          s"$storagePrefix/${bagLocation.bagPath}/${entry.name}",
           entry.contents
         )
     })
@@ -110,8 +112,7 @@ trait Registrar
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 topicArn: Topic,
-                 progressTable: Table)(testWith: TestWith[RegistrarApp, R]) = {
+                 topicArn: Topic)(testWith: TestWith[RegistrarApp, R]) = {
 
     class TestApp extends Logging {
 
@@ -121,8 +122,7 @@ trait Registrar
         topicArn.arn,
         hybridStoreTable.name,
         hybridStoreBucket.name,
-        "archive",
-        progressTable
+        "archive"
       )
 
       val injector: Injector = Guice.createInjector(
@@ -134,7 +134,6 @@ trait Registrar
         SQSClientModule,
         SNSAsyncClientModule,
         DynamoClientModule,
-        ProgressMonitorModule,
         MessageStreamModule
       )
 
@@ -146,9 +145,8 @@ trait Registrar
   }
 
   def withRegistrar[R](
-    testWith: TestWith[
-      (Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table, Table),
-      R]) = {
+    testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
+                       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
         snsTopic =>
@@ -156,31 +154,26 @@ trait Registrar
             storageBucket =>
               withLocalS3Bucket {
                 hybridStoreBucket =>
-                  withLocalDynamoDbTable {
-                    hybridDynamoTable =>
-                      withSpecifiedLocalDynamoDbTable(
-                        createProgressMonitorTable) { progressTable =>
-                        withApp(
+                  withLocalDynamoDbTable { hybridDynamoTable =>
+                    withApp(
+                      storageBucket,
+                      hybridStoreBucket,
+                      hybridDynamoTable,
+                      queuePair,
+                      snsTopic) { registrar =>
+                      testWith(
+                        (
                           storageBucket,
-                          hybridStoreBucket,
-                          hybridDynamoTable,
                           queuePair,
                           snsTopic,
-                          progressTable) { registrar =>
-                          testWith(
-                            (
-                              storageBucket,
-                              queuePair,
-                              snsTopic,
-                              registrar,
-                              hybridStoreBucket,
-                              hybridDynamoTable,
-                              progressTable)
-                          )
-                        }
-                      }
+                          registrar,
+                          hybridStoreBucket,
+                          hybridDynamoTable)
+                      )
+                    }
                   }
               }
+
           }
       }
     })

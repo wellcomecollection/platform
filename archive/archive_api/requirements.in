@@ -2,3 +2,4 @@ boto3
 daiquiri
 flask-restplus
 wellcome_aws_utils==2.1.3
+requests

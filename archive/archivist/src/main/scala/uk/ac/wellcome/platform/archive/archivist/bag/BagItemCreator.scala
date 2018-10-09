@@ -1,32 +1,29 @@
 package uk.ac.wellcome.platform.archive.archivist.bag
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagItem,
-  BagPath,
-  MalformedBagDigestException
+import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveError,
+  InvalidBagManifestError
 }
-import uk.ac.wellcome.storage.ObjectLocation
-
-import scala.util.Try
+import uk.ac.wellcome.platform.archive.common.models.{BagItem, EntryPath}
 
 object BagItemCreator {
   def create(
     fileChunk: String,
-    bagName: BagPath,
+    job: ArchiveJob,
+    manifestName: String,
     delimiter: String
-  ): Try[BagItem] = Try {
+  ): Either[ArchiveError[ArchiveJob], BagItem] = {
     val splitChunk = fileChunk.split(delimiter).map(_.trim)
 
     splitChunk match {
       case Array(checksum: String, key: String) =>
-        BagItem(
-          checksum,
-          ObjectLocation(bagName.value, key)
-        )
-      case default =>
-        throw MalformedBagDigestException(
-          default.mkString(delimiter),
-          bagName
-        )
+        Right(
+          BagItem(
+            checksum,
+            EntryPath(key)
+          ))
+      case _ =>
+        Left(InvalidBagManifestError(job, manifestName))
     }
   }
 }

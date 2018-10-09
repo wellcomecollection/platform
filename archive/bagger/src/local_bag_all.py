@@ -38,10 +38,7 @@ def main():
         counter = 0
         for b_number in b_numbers_from_s3(filter):
             logging.info("processing " + b_number)
-            message = {
-                "identifier": b_number,
-                "do_not_bag": skip
-            }
+            message = {"identifier": b_number, "do_not_bag": skip}
             result = bagger_processor.process_bagging_message(message)
             error = result.get("error", None)
             if error is not None:

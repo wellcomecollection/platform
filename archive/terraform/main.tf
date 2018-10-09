@@ -1,22 +1,47 @@
+# API
+
+module "api_ecs" {
+  source = "api_ecs"
+
+  namespace = "${local.namespace}"
+  api_path  = "/storage/v1"
+
+  archive_api_container_image = "${local.api_ecs_container_image}"
+  archive_api_container_port  = "9000"
+
+  archive_ingest_sns_topic_arn = "${module.archivist_topic.arn}"
+
+  bag_vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
+  bag_vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
+
+  vpc_id                         = "${local.vpc_id}"
+  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
+  private_subnets                = "${local.private_subnets}"
+  public_subnets                 = "${local.public_subnets}"
+  certificate_domain             = "api.wellcomecollection.org"
+}
+
+# Archivist
+
 module "archivist" {
-  source = "service"
+  source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_archivist"
+  service_name                     = "archivist"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
-    queue_url                   = "${module.archivist_queue.id}"
-    archive_bucket              = "${aws_s3_bucket.archive_storage.id}"
-    topic_arn                   = "${module.registrar_topic.arn}"
-    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+    queue_url           = "${module.archivist_queue.id}"
+    archive_bucket      = "${aws_s3_bucket.archive_storage.id}"
+    registrar_topic_arn = "${module.registrar_topic.arn}"
+    progress_topic_arn  = "${module.progress_async_topic.arn}"
   }
 
   env_vars_length = 4
@@ -26,18 +51,20 @@ module "archivist" {
   source_queue_arn  = "${module.archivist_queue.arn}"
 }
 
+# Registrar
+
 module "registrar" {
-  source = "service"
+  source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_registrar"
+  service_name                     = "registrar"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
@@ -56,42 +83,96 @@ module "registrar" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
-module "progress" {
-  source = "service"
+# Notifier
+
+module "notifier" {
+  source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_progress"
+  service_name                     = "notifier"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 1
+  min_capacity = 0
   max_capacity = 1
 
   env_vars = {
-    queue_url                   = "${module.progress_queue.id}"
+    notifier_queue_url = "${module.notifier_queue.id}"
+    progress_topic_arn = "${module.progress_async_topic.arn}"
+  }
+
+  env_vars_length = 2
+
+  container_image   = "${local.notifier_container_image}"
+  source_queue_name = "${module.notifier_queue.name}"
+  source_queue_arn  = "${module.notifier_queue.arn}"
+}
+
+# Progress
+
+module "progress_async" {
+  source = "internal_queue_service"
+
+  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets                          = "${local.private_subnets}"
+  vpc_id                           = "${local.vpc_id}"
+  service_name                     = "progress_async"
+  aws_region                       = "${var.aws_region}"
+
+  min_capacity = 0
+  max_capacity = 1
+
+  env_vars = {
+    queue_url                   = "${module.progress_async_queue.id}"
     topic_arn                   = "${module.caller_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
 
   env_vars_length = 3
 
-  container_image   = "${local.progress_container_image}"
-  source_queue_name = "${module.progress_queue.name}"
-  source_queue_arn  = "${module.progress_queue.arn}"
+  container_image   = "${local.progress_async_container_image}"
+  source_queue_name = "${module.progress_async_queue.name}"
+  source_queue_arn  = "${module.progress_async_queue.arn}"
+}
+
+module "progress_http" {
+  source = "internal_rest_service"
+
+  service_name = "progress_http"
+
+  container_port  = "9001"
+  container_image = "${local.progress_http_container_image}"
+
+  env_vars = {
+    app_base_url                = "https://api.wellcomecollection.org"
+    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+  }
+
+  env_vars_length = 2
+
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  private_subnets    = "${local.private_subnets}"
+
+  cluster_id = "${aws_ecs_cluster.cluster.id}"
+  vpc_id     = "${local.vpc_id}"
+
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }
 
 module "bagger" {
-  source = "service"
+  source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_bagger"
+  service_name                     = "bagger"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1
@@ -128,22 +209,4 @@ module "bagger" {
   container_image   = "${local.bagger_container_image}"
   source_queue_name = "${module.bagger_queue.name}"
   source_queue_arn  = "${module.bagger_queue.arn}"
-}
-
-module "api_ecs" {
-  namespace = "${local.namespace}"
-  source    = "api_ecs"
-
-  api_path = "/storage/v1"
-
-  archive_api_container_image = "${local.api_ecs_container_image}"
-  archive_api_container_port  = "9000"
-
-  archive_progress_table_name  = "${aws_dynamodb_table.archive_progress_table.name}"
-  archive_ingest_sns_topic_arn = "${module.archivist_topic.arn}"
-
-  vpc_id             = "${local.vpc_id}"
-  private_subnets    = "${local.private_subnets}"
-  public_subnets     = "${local.public_subnets}"
-  certificate_domain = "api.wellcomecollection.org"
 }

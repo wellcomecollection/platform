@@ -2,14 +2,12 @@ package uk.ac.wellcome.platform.archive.archivist
 
 import java.util.zip.ZipFile
 
-import org.scalatest.{FunSpec, Ignore, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
-import uk.ac.wellcome.platform.archive.common.models.BagPath
 
-@Ignore
 // Useful test to troubleshoot running the archivist using a local bagfile
 class TroubleshootArchivistLocalBagFileTest
     extends FunSpec
@@ -17,22 +15,15 @@ class TroubleshootArchivistLocalBagFileTest
     with ArchivistFixture
     with MetricsSenderFixture {
 
-  it("downloads, uploads and verifies a known BagIt bag") {
+  ignore("downloads, uploads and verifies a known BagIt bag") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          _,
-          progressTable,
-          archivist) =>
+      case (ingestBucket, storageBucket, queuePair, _, _, archivist) =>
         sendBag(
-          BagPath(randomAlphanumeric()),
           new ZipFile(
             List(
               System.getProperty("user.home"),
-              "Desktop",
-              "b24923333-b.zip"
+              "git/platform",
+              "b22454408.zip"
             ).mkString("/")),
           ingestBucket,
           None,

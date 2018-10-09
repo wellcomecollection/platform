@@ -15,14 +15,14 @@ from wellcome_aws_utils.lambda_utils import log_on_error
 from cloudwatch_alarms import (
     build_cloudwatch_url,
     datetime_to_cloudwatch_ts,
-    ThresholdMessage
+    ThresholdMessage,
 )
 from platform_alarms import (
     get_human_message,
     guess_cloudwatch_log_group,
     guess_cloudwatch_search_terms,
     is_critical_error,
-    simplify_message
+    simplify_message,
 )
 from snapshot_reports import get_snapshot_report
 
@@ -43,11 +43,11 @@ class Alarm:
 
     @property
     def name(self):
-        return self.message['AlarmName']
+        return self.message["AlarmName"]
 
     @property
     def state_reason(self):
-        return self.message['NewStateReason']
+        return self.message["NewStateReason"]
 
     # Sometimes there's enough data in the alarm to make an educated guess
     # about useful CloudWatch logs to check, so we include that in the alarm.
@@ -62,7 +62,7 @@ class Alarm:
         try:
             return Interval(
                 start=threshold.date - dt.timedelta(seconds=300),
-                end=threshold.date + dt.timedelta(seconds=300)
+                end=threshold.date + dt.timedelta(seconds=300),
             )
         except TypeError:
             # Raised when threshold.date is None.
@@ -80,24 +80,23 @@ class Alarm:
                     search_term=search_term,
                     log_group_name=log_group_name,
                     start_date=timeframe.start,
-                    end_date=timeframe.end
+                    end_date=timeframe.end,
                 )
-                for search_term in guess_cloudwatch_search_terms(
-                    alarm_name=self.name)
+                for search_term in guess_cloudwatch_search_terms(alarm_name=self.name)
             ]
 
         except MessageHasNoDateError:
             pass
 
         except ValueError as err:
-            print(f'Error in cloudwatch_urls: {err}')
+            print(f"Error in cloudwatch_urls: {err}")
             return []
 
     def cloudwatch_messages(self):
         """
         Try to find some CloudWatch messages that might be relevant.
         """
-        client = boto3.client('logs')
+        client = boto3.client("logs")
 
         messages = []
 
@@ -118,15 +117,15 @@ class Alarm:
                     logGroupName=log_group_name,
                     startTime=startTime,
                     endTime=endTime,
-                    filterPattern=term
+                    filterPattern=term,
                 )
-                messages.extend([e['message'] for e in resp['events']])
+                messages.extend([e["message"] for e in resp["events"]])
 
         except MessageHasNoDateError:
             pass
 
         except Exception as err:
-            print(f'Error in cloudwatch_messages: {err!r}')
+            print(f"Error in cloudwatch_messages: {err!r}")
 
         return messages
 
@@ -137,89 +136,80 @@ def to_bitly(sess, url, access_token):
     original URL.
     """
     resp = sess.get(
-        'https://api-ssl.bitly.com/v3/user/link_save',
-        params={'access_token': access_token, 'longUrl': url}
+        "https://api-ssl.bitly.com/v3/user/link_save",
+        params={"access_token": access_token, "longUrl": url},
     )
     try:
-        return resp.json()['data']['link_save']['link']
+        return resp.json()["data"]["link_save"]["link"]
     except TypeError:  # thrown if "data" = null
-        print(f'response from bit.ly: {resp.json()}')
+        print(f"response from bit.ly: {resp.json()}")
         return url
 
 
 def prepare_slack_payload(alarm, bitly_access_token, sess=None):
     if is_critical_error(alarm_name=alarm.name):
-        slack_data = {
-            'username': 'cloudwatch-alarm',
-            'icon_emoji': ':rotating_light:',
-        }
-        alarm_color = 'danger'
+        slack_data = {"username": "cloudwatch-alarm", "icon_emoji": ":rotating_light:"}
+        alarm_color = "danger"
     else:
-        slack_data = {
-            'username': 'cloudwatch-warning',
-            'icon_emoji': ':warning:',
-        }
-        alarm_color = 'warning'
+        slack_data = {"username": "cloudwatch-warning", "icon_emoji": ":warning:"}
+        alarm_color = "warning"
 
-    slack_data['attachments'] = [
+    slack_data["attachments"] = [
         {
-            'color': alarm_color,
-            'fallback': alarm.name,
-            'title': alarm.name,
-            'fields': [{
-                'value': get_human_message(
-                    alarm_name=alarm.name,
-                    state_reason=alarm.state_reason
-                )
-            }]
+            "color": alarm_color,
+            "fallback": alarm.name,
+            "title": alarm.name,
+            "fields": [
+                {
+                    "value": get_human_message(
+                        alarm_name=alarm.name, state_reason=alarm.state_reason
+                    )
+                }
+            ],
         }
     ]
 
-    if alarm.name == 'snapshot_scheduler_queue_not_empty':
+    if alarm.name == "snapshot_scheduler_queue_not_empty":
         latest_snapshots_str = get_snapshot_report()
         if latest_snapshots_str is not None:
-            slack_data['attachments'][0]['fields'].append({
-                'title': 'Latest snapshots',
-                'value': latest_snapshots_str
-            })
+            slack_data["attachments"][0]["fields"].append(
+                {"title": "Latest snapshots", "value": latest_snapshots_str}
+            )
 
     messages = alarm.cloudwatch_messages()
     if messages:
-        cloudwatch_message_str = '\n'.join(set([
-            simplify_message(m) for m in messages
-        ]))
-        slack_data['attachments'][0]['fields'].append({
-            'title': 'CloudWatch messages',
-            'value': cloudwatch_message_str
-        })
+        cloudwatch_message_str = "\n".join(set([simplify_message(m) for m in messages]))
+        slack_data["attachments"][0]["fields"].append(
+            {"title": "CloudWatch messages", "value": cloudwatch_message_str}
+        )
 
     cloudwatch_urls = alarm.cloudwatch_urls()
     if cloudwatch_urls:
         sess = sess or requests.Session()
-        cloudwatch_url_str = ' / '.join([
-            to_bitly(sess=sess, url=url, access_token=bitly_access_token)
-            for url in cloudwatch_urls
-        ])
-        slack_data['attachments'][0]['fields'].append({
-            'value': cloudwatch_url_str
-        })
+        cloudwatch_url_str = " / ".join(
+            [
+                to_bitly(sess=sess, url=url, access_token=bitly_access_token)
+                for url in cloudwatch_urls
+            ]
+        )
+        slack_data["attachments"][0]["fields"].append({"value": cloudwatch_url_str})
 
     return slack_data
 
 
 @log_on_error
 def main(event, _ctxt=None):
-    bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
-    webhook_url = os.environ['CRITICAL_SLACK_WEBHOOK']
+    bitly_access_token = os.environ["BITLY_ACCESS_TOKEN"]
+    webhook_url = os.environ["CRITICAL_SLACK_WEBHOOK"]
 
-    alarm = Alarm(event['Records'][0]['Sns']['Message'])
+    alarm = Alarm(event["Records"][0]["Sns"]["Message"])
     slack_data = prepare_slack_payload(alarm, bitly_access_token)
 
-    print('Sending message %s' % json.dumps(slack_data))
+    print("Sending message %s" % json.dumps(slack_data))
 
     response = requests.post(
         webhook_url,
         data=json.dumps(slack_data),
-        headers={'Content-Type': 'application/json'}
+        headers={"Content-Type": "application/json"},
     )
     response.raise_for_status()

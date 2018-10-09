@@ -20,16 +20,32 @@ def validate_single_url(url, supported_schemes=None, allow_fragment=True):
     errors = []
 
     if (not parsed_url.scheme) or (not parsed_url.netloc):
-        errors.append('is not a complete URL')
+        errors.append("is not a complete URL")
 
     if supported_schemes and (parsed_url.scheme not in supported_schemes):
-        errors.append(f'{parsed_url.scheme!r} is not a supported scheme {supported_schemes!r}')
+        errors.append(
+            f"{parsed_url.scheme!r} is not a supported scheme {supported_schemes!r}"
+        )
 
     if (not allow_fragment) and parsed_url.fragment:
-        errors.append(f'{parsed_url.fragment!r} fragment is not allowed')
+        errors.append(f"{parsed_url.fragment!r} fragment is not allowed")
 
     if errors:
-        raise ValueError(', '.join(errors))
+        raise ValueError(", ".join(errors))
+
+
+def validate_upload_url(url):
+    """
+    An upload URL should be an S3 URL without a fragment.
+    """
+    validate_single_url(url, supported_schemes=["s3"], allow_fragment=False)
+
+
+def validate_callback_url(url):
+    """
+    A callback URL should be an HTTP or HTTPS URL.
+    """
+    validate_single_url(url, supported_schemes=["http", "https"])
 
 
 def validate_uuid(s):
@@ -42,4 +58,4 @@ def validate_uuid(s):
     try:
         UUID(s)
     except ValueError:
-        raise ValueError(f'Invalid id={s!r}')
+        raise ValueError(f"Invalid id={s!r}")

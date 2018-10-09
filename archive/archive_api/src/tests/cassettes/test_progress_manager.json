@@ -1,0 +1,712 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=http%3A%2F%2Fexample.org%2F%3Fstatus%3D200"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "52"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "http://localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=http%3A%2F%2Fexample.org%2F%3Fstatus%3D400"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "52"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 400,
+          "message": "BAD REQUEST"
+        },
+        "url": "http://localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=http%3A%2F%2Fexample.org%2F%3Fstatus%3D404"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "52"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 404,
+          "message": "NOT FOUND"
+        },
+        "url": "http://localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=http%3A%2F%2Fexample.org%2F%3Fstatus%3D500"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "52"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 500,
+          "message": "INTERNAL SERVER ERROR"
+        },
+        "url": "http://localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=http%3A%2F%2Fexample.org%2F%3Flocation%3Dno"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "53"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 201,
+          "message": "CREATED"
+        },
+        "url": "http://localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=http%3A%2F%2Fexample.org%2F%3Fid%3D123"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "48"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Location": [
+            "http://localhost:6000/progress/123"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 201,
+          "message": "CREATED"
+        },
+        "url": "http://localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "uploadUrl=http%3A%2F%2Fexample.org%2F%3Fid%3D567&callbackUrl=http%3A%2F%2Fcallback.net%2F%3Fid%3Db567"
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "101"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "uri": "http://localhost:6000/progress"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Location": [
+            "http://localhost:6000/progress/567"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 201,
+          "message": "CREATED"
+        },
+        "url": "http://localhost:6000/progress"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "method": "GET",
+        "uri": "http://localhost:6000/progress/123"
+      },
+      "response": {
+        "body": {
+          "encoding": null,
+          "string": "{\n  \"progress\": \"123\"\n}\n"
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "http://localhost:6000/progress/123"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "method": "GET",
+        "uri": "http://localhost:6000/progress/bad_status-%7Bbad_status%7D"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n  \"http://www.w3.org/TR/html4/loose.dtd\">\n<html>\n  <head>\n    <title>ValueError: invalid literal for int() with base 10: '{bad_status}' // Werkzeug Debugger</title>\n    <link rel=\"stylesheet\" href=\"?__debugger__=yes&amp;cmd=resource&amp;f=style.css\"\n        type=\"text/css\">\n    <!-- We need to make sure this has a favicon so that the debugger does\n         not by accident trigger a request to /favicon.ico which might\n         change the application state. -->\n    <link rel=\"shortcut icon\"\n        href=\"?__debugger__=yes&amp;cmd=resource&amp;f=console.png\">\n    <script src=\"?__debugger__=yes&amp;cmd=resource&amp;f=jquery.js\"></script>\n    <script src=\"?__debugger__=yes&amp;cmd=resource&amp;f=debugger.js\"></script>\n    <script type=\"text/javascript\">\n      var TRACEBACK = 4418261176,\n          CONSOLE_MODE = false,\n          EVALEX = true,\n          EVALEX_TRUSTED = false,\n          SECRET = \"IET3sl5tHqXLeEQnbKUg\";\n    </script>\n  </head>\n  <body style=\"background-color: #fff\">\n    <div class=\"debugger\">\n<h1>builtins.ValueError</h1>\n<div class=\"detail\">\n  <p class=\"errormsg\">ValueError: invalid literal for int() with base 10: '{bad_status}'</p>\n</div>\n<h2 class=\"traceback\">Traceback <em>(most recent call last)</em></h2>\n<div class=\"traceback\">\n  \n  <ul><li><div class=\"frame\" id=\"frame-4418261568\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2309</em>,\n      in <code class=\"function\">__call__</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def __call__(self, environ, start_response):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>&quot;&quot;&quot;The WSGI server calls the Flask application object as the</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>WSGI application. This calls :meth:`wsgi_app` which can be</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>wrapped to applying middleware.&quot;&quot;&quot;</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return self.wsgi_app(environ, start_response)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def __repr__(self):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return '&lt;%s %r&gt;' % (</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>self.__class__.__name__,</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>self.name,</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262072\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2295</em>,\n      in <code class=\"function\">wsgi_app</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>ctx.push()</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>response = self.full_dispatch_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>except Exception as e:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>error = e</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>response = self.handle_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = sys.exc_info()[1]</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>raise</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>return response(environ, start_response)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>finally:</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262128\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1741</em>,\n      in <code class=\"function\">handle_exception</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span># if we want to repropagate the exception, we can attempt to</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># raise it with the whole traceback in case we can do that</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># (the function was actually called from the except part)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># otherwise, we just raise the error again</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if exc_value is e:</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>reraise(exc_type, exc_value, tb)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>raise e</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>self.log_exception((exc_type, exc_value, tb))</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>if handler is None:</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262184\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\"</cite>,\n      line <em class=\"line\">35</em>,\n      in <code class=\"function\">reraise</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">    </span>from io import StringIO</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def reraise(tp, value, tb=None):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if value.__traceback__ is not tb:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>raise value.with_traceback(tb)</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>raise value</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>implements_to_string = _identity</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>text_type = unicode</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262016\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2292</em>,\n      in <code class=\"function\">wsgi_app</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span>ctx = self.request_context(environ)</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>error = None</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>ctx.push()</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>response = self.full_dispatch_request()</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except Exception as e:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = e</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>response = self.handle_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = sys.exc_info()[1]</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262296\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1815</em>,\n      in <code class=\"function\">full_dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>request_started.send(self)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>rv = self.preprocess_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if rv is None:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>rv = self.dispatch_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>except Exception as e:</pre>\n<pre class=\"line current\"><span class=\"ws\">            </span>rv = self.handle_user_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return self.finalize_request(rv)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def finalize_request(self, rv, from_error_handler=False):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Given the return value from a view function this finalizes</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>the request by converting it into a response and invoking the</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262352\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1718</em>,\n      in <code class=\"function\">handle_user_exception</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>return self.handle_http_exception(e)</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>handler = self._find_error_handler(e)</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if handler is None:</pre>\n<pre class=\"line current\"><span class=\"ws\">            </span>reraise(exc_type, exc_value, tb)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return handler(e)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def handle_exception(self, e):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Default exception handling that kicks in when an exception</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>occurs that is not caught.  In debug mode the exception will</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262408\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\"</cite>,\n      line <em class=\"line\">35</em>,\n      in <code class=\"function\">reraise</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">    </span>from io import StringIO</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def reraise(tp, value, tb=None):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if value.__traceback__ is not tb:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>raise value.with_traceback(tb)</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>raise value</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>implements_to_string = _identity</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>text_type = unicode</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262240\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1813</em>,\n      in <code class=\"function\">full_dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span>self.try_trigger_before_first_request_functions()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>request_started.send(self)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>rv = self.preprocess_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if rv is None:</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>rv = self.dispatch_request()</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>except Exception as e:</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>rv = self.handle_user_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return self.finalize_request(rv)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def finalize_request(self, rv, from_error_handler=False):</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262520\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1799</em>,\n      in <code class=\"function\">dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span># request came with the OPTIONS method, reply automatically</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if getattr(rule, 'provide_automatic_options', False) \\</pre>\n<pre class=\"line before\"><span class=\"ws\">           </span>and req.method == 'OPTIONS':</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>return self.make_default_options_response()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span># otherwise dispatch to the handler for that endpoint</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return self.view_functions[rule.endpoint](**req.view_args)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def full_dispatch_request(self):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Dispatches the request and on top of that performs request</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>pre and postprocessing as well as HTTP exception catching and</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>error handling.</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4418262576\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py\"</cite>,\n      line <em class=\"line\">41</em>,\n      in <code class=\"function\">get_route</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\"></span>@app.route('/progress/&lt;id&gt;')</pre>\n<pre class=\"line before\"><span class=\"ws\"></span>def get_route(id):</pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>if id.startswith('bad_status-'):</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return b'', int(id.split('bad_status-')[1])</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>elif id == 'notjson':</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return b'&lt;&lt;notjson&gt;&gt;'</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>return jsonify({'progress': id})</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre></div>\n</div>\n</ul>\n  <blockquote>ValueError: invalid literal for int() with base 10: '{bad_status}'</blockquote>\n</div>\n\n<div class=\"plain\">\n  <form action=\"/?__debugger__=yes&amp;cmd=paste\" method=\"post\">\n    <p>\n      <input type=\"hidden\" name=\"language\" value=\"pytb\">\n      This is the Copy/Paste friendly version of the traceback.  <span\n      class=\"pastemessage\">You can also paste this traceback into\n      a <a href=\"https://gist.github.com/\">gist</a>:\n      <input type=\"submit\" value=\"create paste\"></span>\n    </p>\n    <textarea cols=\"50\" rows=\"10\" name=\"code\" readonly>Traceback (most recent call last):\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2309, in __call__\n    return self.wsgi_app(environ, start_response)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2295, in wsgi_app\n    response = self.handle_exception(e)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1741, in handle_exception\n    reraise(exc_type, exc_value, tb)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py&quot;, line 35, in reraise\n    raise value\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2292, in wsgi_app\n    response = self.full_dispatch_request()\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1815, in full_dispatch_request\n    rv = self.handle_user_exception(e)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1718, in handle_user_exception\n    reraise(exc_type, exc_value, tb)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py&quot;, line 35, in reraise\n    raise value\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1813, in full_dispatch_request\n    rv = self.dispatch_request()\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1799, in dispatch_request\n    return self.view_functions[rule.endpoint](**req.view_args)\n  File &quot;/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py&quot;, line 41, in get_route\n    return b'', int(id.split('bad_status-')[1])\nValueError: invalid literal for int() with base 10: '{bad_status}'</textarea>\n  </form>\n</div>\n<div class=\"explanation\">\n  The debugger caught an exception in your WSGI application.  You can now\n  look at the traceback which led to the error.  <span class=\"nojavascript\">\n  If you enable JavaScript you can also use additional features such as code\n  execution (if the evalex feature is enabled), automatic pasting of the\n  exceptions and much more.</span>\n</div>\n      <div class=\"footer\">\n        Brought to you by <strong class=\"arthur\">DON'T PANIC</strong>, your\n        friendly Werkzeug powered traceback interpreter.\n      </div>\n    </div>\n\n    <div class=\"pin-prompt\">\n      <div class=\"inner\">\n        <h3>Console Locked</h3>\n        <p>\n          The console is locked and needs to be unlocked by entering the PIN.\n          You can find the PIN printed out on the standard output of your\n          shell that runs the server.\n        <form>\n          <p>PIN:\n            <input type=text name=pin size=14>\n            <input type=submit name=btn value=\"Confirm Pin\">\n        </form>\n      </div>\n    </div>\n  </body>\n</html>\n\n<!--\n\nTraceback (most recent call last):\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2309, in __call__\n    return self.wsgi_app(environ, start_response)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2295, in wsgi_app\n    response = self.handle_exception(e)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1741, in handle_exception\n    reraise(exc_type, exc_value, tb)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\", line 35, in reraise\n    raise value\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2292, in wsgi_app\n    response = self.full_dispatch_request()\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1815, in full_dispatch_request\n    rv = self.handle_user_exception(e)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1718, in handle_user_exception\n    reraise(exc_type, exc_value, tb)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\", line 35, in reraise\n    raise value\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1813, in full_dispatch_request\n    rv = self.dispatch_request()\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1799, in dispatch_request\n    return self.view_functions[rule.endpoint](**req.view_args)\n  File \"/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py\", line 41, in get_route\n    return b'', int(id.split('bad_status-')[1])\nValueError: invalid literal for int() with base 10: '{bad_status}'\n\n-->\n"
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "X-XSS-Protection": [
+            "0"
+          ],
+          "Connection": [
+            "close"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 500,
+          "message": "INTERNAL SERVER ERROR"
+        },
+        "url": "http://localhost:6000/progress/bad_status-%7Bbad_status%7D"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "method": "GET",
+        "uri": "http://localhost:6000/progress/bad_status-%7Bbad_status%7D"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n  \"http://www.w3.org/TR/html4/loose.dtd\">\n<html>\n  <head>\n    <title>ValueError: invalid literal for int() with base 10: '{bad_status}' // Werkzeug Debugger</title>\n    <link rel=\"stylesheet\" href=\"?__debugger__=yes&amp;cmd=resource&amp;f=style.css\"\n        type=\"text/css\">\n    <!-- We need to make sure this has a favicon so that the debugger does\n         not by accident trigger a request to /favicon.ico which might\n         change the application state. -->\n    <link rel=\"shortcut icon\"\n        href=\"?__debugger__=yes&amp;cmd=resource&amp;f=console.png\">\n    <script src=\"?__debugger__=yes&amp;cmd=resource&amp;f=jquery.js\"></script>\n    <script src=\"?__debugger__=yes&amp;cmd=resource&amp;f=debugger.js\"></script>\n    <script type=\"text/javascript\">\n      var TRACEBACK = 4419691744,\n          CONSOLE_MODE = false,\n          EVALEX = true,\n          EVALEX_TRUSTED = false,\n          SECRET = \"IET3sl5tHqXLeEQnbKUg\";\n    </script>\n  </head>\n  <body style=\"background-color: #fff\">\n    <div class=\"debugger\">\n<h1>builtins.ValueError</h1>\n<div class=\"detail\">\n  <p class=\"errormsg\">ValueError: invalid literal for int() with base 10: '{bad_status}'</p>\n</div>\n<h2 class=\"traceback\">Traceback <em>(most recent call last)</em></h2>\n<div class=\"traceback\">\n  \n  <ul><li><div class=\"frame\" id=\"frame-4419692024\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2309</em>,\n      in <code class=\"function\">__call__</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def __call__(self, environ, start_response):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>&quot;&quot;&quot;The WSGI server calls the Flask application object as the</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>WSGI application. This calls :meth:`wsgi_app` which can be</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>wrapped to applying middleware.&quot;&quot;&quot;</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return self.wsgi_app(environ, start_response)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def __repr__(self):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return '&lt;%s %r&gt;' % (</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>self.__class__.__name__,</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>self.name,</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419692584\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2295</em>,\n      in <code class=\"function\">wsgi_app</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>ctx.push()</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>response = self.full_dispatch_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>except Exception as e:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>error = e</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>response = self.handle_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = sys.exc_info()[1]</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>raise</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>return response(environ, start_response)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>finally:</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419692696\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1741</em>,\n      in <code class=\"function\">handle_exception</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span># if we want to repropagate the exception, we can attempt to</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># raise it with the whole traceback in case we can do that</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># (the function was actually called from the except part)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># otherwise, we just raise the error again</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if exc_value is e:</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>reraise(exc_type, exc_value, tb)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>raise e</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>self.log_exception((exc_type, exc_value, tb))</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>if handler is None:</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419692752\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\"</cite>,\n      line <em class=\"line\">35</em>,\n      in <code class=\"function\">reraise</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">    </span>from io import StringIO</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def reraise(tp, value, tb=None):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if value.__traceback__ is not tb:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>raise value.with_traceback(tb)</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>raise value</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>implements_to_string = _identity</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>text_type = unicode</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419692640\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2292</em>,\n      in <code class=\"function\">wsgi_app</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span>ctx = self.request_context(environ)</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>error = None</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>ctx.push()</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>response = self.full_dispatch_request()</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except Exception as e:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = e</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>response = self.handle_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = sys.exc_info()[1]</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419692864\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1815</em>,\n      in <code class=\"function\">full_dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>request_started.send(self)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>rv = self.preprocess_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if rv is None:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>rv = self.dispatch_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>except Exception as e:</pre>\n<pre class=\"line current\"><span class=\"ws\">            </span>rv = self.handle_user_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return self.finalize_request(rv)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def finalize_request(self, rv, from_error_handler=False):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Given the return value from a view function this finalizes</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>the request by converting it into a response and invoking the</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419692920\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1718</em>,\n      in <code class=\"function\">handle_user_exception</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>return self.handle_http_exception(e)</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>handler = self._find_error_handler(e)</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if handler is None:</pre>\n<pre class=\"line current\"><span class=\"ws\">            </span>reraise(exc_type, exc_value, tb)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return handler(e)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def handle_exception(self, e):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Default exception handling that kicks in when an exception</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>occurs that is not caught.  In debug mode the exception will</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419692976\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\"</cite>,\n      line <em class=\"line\">35</em>,\n      in <code class=\"function\">reraise</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">    </span>from io import StringIO</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def reraise(tp, value, tb=None):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if value.__traceback__ is not tb:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>raise value.with_traceback(tb)</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>raise value</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>implements_to_string = _identity</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>text_type = unicode</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419692808\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1813</em>,\n      in <code class=\"function\">full_dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span>self.try_trigger_before_first_request_functions()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>request_started.send(self)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>rv = self.preprocess_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if rv is None:</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>rv = self.dispatch_request()</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>except Exception as e:</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>rv = self.handle_user_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return self.finalize_request(rv)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def finalize_request(self, rv, from_error_handler=False):</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419693088\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1799</em>,\n      in <code class=\"function\">dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span># request came with the OPTIONS method, reply automatically</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if getattr(rule, 'provide_automatic_options', False) \\</pre>\n<pre class=\"line before\"><span class=\"ws\">           </span>and req.method == 'OPTIONS':</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>return self.make_default_options_response()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span># otherwise dispatch to the handler for that endpoint</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return self.view_functions[rule.endpoint](**req.view_args)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def full_dispatch_request(self):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Dispatches the request and on top of that performs request</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>pre and postprocessing as well as HTTP exception catching and</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>error handling.</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4419693144\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py\"</cite>,\n      line <em class=\"line\">41</em>,\n      in <code class=\"function\">get_route</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\"></span>@app.route('/progress/&lt;id&gt;')</pre>\n<pre class=\"line before\"><span class=\"ws\"></span>def get_route(id):</pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>if id.startswith('bad_status-'):</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return b'', int(id.split('bad_status-')[1])</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>elif id == 'notjson':</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return b'&lt;&lt;notjson&gt;&gt;'</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>return jsonify({'progress': id})</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre></div>\n</div>\n</ul>\n  <blockquote>ValueError: invalid literal for int() with base 10: '{bad_status}'</blockquote>\n</div>\n\n<div class=\"plain\">\n  <form action=\"/?__debugger__=yes&amp;cmd=paste\" method=\"post\">\n    <p>\n      <input type=\"hidden\" name=\"language\" value=\"pytb\">\n      This is the Copy/Paste friendly version of the traceback.  <span\n      class=\"pastemessage\">You can also paste this traceback into\n      a <a href=\"https://gist.github.com/\">gist</a>:\n      <input type=\"submit\" value=\"create paste\"></span>\n    </p>\n    <textarea cols=\"50\" rows=\"10\" name=\"code\" readonly>Traceback (most recent call last):\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2309, in __call__\n    return self.wsgi_app(environ, start_response)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2295, in wsgi_app\n    response = self.handle_exception(e)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1741, in handle_exception\n    reraise(exc_type, exc_value, tb)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py&quot;, line 35, in reraise\n    raise value\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2292, in wsgi_app\n    response = self.full_dispatch_request()\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1815, in full_dispatch_request\n    rv = self.handle_user_exception(e)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1718, in handle_user_exception\n    reraise(exc_type, exc_value, tb)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py&quot;, line 35, in reraise\n    raise value\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1813, in full_dispatch_request\n    rv = self.dispatch_request()\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1799, in dispatch_request\n    return self.view_functions[rule.endpoint](**req.view_args)\n  File &quot;/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py&quot;, line 41, in get_route\n    return b'', int(id.split('bad_status-')[1])\nValueError: invalid literal for int() with base 10: '{bad_status}'</textarea>\n  </form>\n</div>\n<div class=\"explanation\">\n  The debugger caught an exception in your WSGI application.  You can now\n  look at the traceback which led to the error.  <span class=\"nojavascript\">\n  If you enable JavaScript you can also use additional features such as code\n  execution (if the evalex feature is enabled), automatic pasting of the\n  exceptions and much more.</span>\n</div>\n      <div class=\"footer\">\n        Brought to you by <strong class=\"arthur\">DON'T PANIC</strong>, your\n        friendly Werkzeug powered traceback interpreter.\n      </div>\n    </div>\n\n    <div class=\"pin-prompt\">\n      <div class=\"inner\">\n        <h3>Console Locked</h3>\n        <p>\n          The console is locked and needs to be unlocked by entering the PIN.\n          You can find the PIN printed out on the standard output of your\n          shell that runs the server.\n        <form>\n          <p>PIN:\n            <input type=text name=pin size=14>\n            <input type=submit name=btn value=\"Confirm Pin\">\n        </form>\n      </div>\n    </div>\n  </body>\n</html>\n\n<!--\n\nTraceback (most recent call last):\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2309, in __call__\n    return self.wsgi_app(environ, start_response)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2295, in wsgi_app\n    response = self.handle_exception(e)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1741, in handle_exception\n    reraise(exc_type, exc_value, tb)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\", line 35, in reraise\n    raise value\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2292, in wsgi_app\n    response = self.full_dispatch_request()\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1815, in full_dispatch_request\n    rv = self.handle_user_exception(e)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1718, in handle_user_exception\n    reraise(exc_type, exc_value, tb)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\", line 35, in reraise\n    raise value\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1813, in full_dispatch_request\n    rv = self.dispatch_request()\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1799, in dispatch_request\n    return self.view_functions[rule.endpoint](**req.view_args)\n  File \"/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py\", line 41, in get_route\n    return b'', int(id.split('bad_status-')[1])\nValueError: invalid literal for int() with base 10: '{bad_status}'\n\n-->\n"
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "X-XSS-Protection": [
+            "0"
+          ],
+          "Connection": [
+            "close"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 500,
+          "message": "INTERNAL SERVER ERROR"
+        },
+        "url": "http://localhost:6000/progress/bad_status-%7Bbad_status%7D"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "method": "GET",
+        "uri": "http://localhost:6000/progress/bad_status-%7Bbad_status%7D"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n  \"http://www.w3.org/TR/html4/loose.dtd\">\n<html>\n  <head>\n    <title>ValueError: invalid literal for int() with base 10: '{bad_status}' // Werkzeug Debugger</title>\n    <link rel=\"stylesheet\" href=\"?__debugger__=yes&amp;cmd=resource&amp;f=style.css\"\n        type=\"text/css\">\n    <!-- We need to make sure this has a favicon so that the debugger does\n         not by accident trigger a request to /favicon.ico which might\n         change the application state. -->\n    <link rel=\"shortcut icon\"\n        href=\"?__debugger__=yes&amp;cmd=resource&amp;f=console.png\">\n    <script src=\"?__debugger__=yes&amp;cmd=resource&amp;f=jquery.js\"></script>\n    <script src=\"?__debugger__=yes&amp;cmd=resource&amp;f=debugger.js\"></script>\n    <script type=\"text/javascript\">\n      var TRACEBACK = 4421298440,\n          CONSOLE_MODE = false,\n          EVALEX = true,\n          EVALEX_TRUSTED = false,\n          SECRET = \"IET3sl5tHqXLeEQnbKUg\";\n    </script>\n  </head>\n  <body style=\"background-color: #fff\">\n    <div class=\"debugger\">\n<h1>builtins.ValueError</h1>\n<div class=\"detail\">\n  <p class=\"errormsg\">ValueError: invalid literal for int() with base 10: '{bad_status}'</p>\n</div>\n<h2 class=\"traceback\">Traceback <em>(most recent call last)</em></h2>\n<div class=\"traceback\">\n  \n  <ul><li><div class=\"frame\" id=\"frame-4421298720\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2309</em>,\n      in <code class=\"function\">__call__</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def __call__(self, environ, start_response):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>&quot;&quot;&quot;The WSGI server calls the Flask application object as the</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>WSGI application. This calls :meth:`wsgi_app` which can be</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>wrapped to applying middleware.&quot;&quot;&quot;</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return self.wsgi_app(environ, start_response)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def __repr__(self):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return '&lt;%s %r&gt;' % (</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>self.__class__.__name__,</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>self.name,</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299336\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2295</em>,\n      in <code class=\"function\">wsgi_app</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>ctx.push()</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>response = self.full_dispatch_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>except Exception as e:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>error = e</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>response = self.handle_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = sys.exc_info()[1]</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>raise</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>return response(environ, start_response)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>finally:</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299392\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1741</em>,\n      in <code class=\"function\">handle_exception</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span># if we want to repropagate the exception, we can attempt to</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># raise it with the whole traceback in case we can do that</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># (the function was actually called from the except part)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span># otherwise, we just raise the error again</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if exc_value is e:</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>reraise(exc_type, exc_value, tb)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>raise e</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>self.log_exception((exc_type, exc_value, tb))</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>if handler is None:</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299448\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\"</cite>,\n      line <em class=\"line\">35</em>,\n      in <code class=\"function\">reraise</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">    </span>from io import StringIO</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def reraise(tp, value, tb=None):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if value.__traceback__ is not tb:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>raise value.with_traceback(tb)</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>raise value</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>implements_to_string = _identity</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>text_type = unicode</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299280\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">2292</em>,\n      in <code class=\"function\">wsgi_app</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span>ctx = self.request_context(environ)</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>error = None</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>ctx.push()</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>response = self.full_dispatch_request()</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except Exception as e:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = e</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>response = self.handle_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>except:</pre>\n<pre class=\"line after\"><span class=\"ws\">                </span>error = sys.exc_info()[1]</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299560\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1815</em>,\n      in <code class=\"function\">full_dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>request_started.send(self)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>rv = self.preprocess_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if rv is None:</pre>\n<pre class=\"line before\"><span class=\"ws\">                </span>rv = self.dispatch_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>except Exception as e:</pre>\n<pre class=\"line current\"><span class=\"ws\">            </span>rv = self.handle_user_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return self.finalize_request(rv)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def finalize_request(self, rv, from_error_handler=False):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Given the return value from a view function this finalizes</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>the request by converting it into a response and invoking the</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299616\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1718</em>,\n      in <code class=\"function\">handle_user_exception</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">            </span>return self.handle_http_exception(e)</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>handler = self._find_error_handler(e)</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if handler is None:</pre>\n<pre class=\"line current\"><span class=\"ws\">            </span>reraise(exc_type, exc_value, tb)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return handler(e)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def handle_exception(self, e):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Default exception handling that kicks in when an exception</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>occurs that is not caught.  In debug mode the exception will</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299672\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\"</cite>,\n      line <em class=\"line\">35</em>,\n      in <code class=\"function\">reraise</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">    </span>from io import StringIO</pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>def reraise(tp, value, tb=None):</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if value.__traceback__ is not tb:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>raise value.with_traceback(tb)</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>raise value</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>implements_to_string = _identity</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span>else:</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>text_type = unicode</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299504\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1813</em>,\n      in <code class=\"function\">full_dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span>self.try_trigger_before_first_request_functions()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>try:</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>request_started.send(self)</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>rv = self.preprocess_request()</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>if rv is None:</pre>\n<pre class=\"line current\"><span class=\"ws\">                </span>rv = self.dispatch_request()</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>except Exception as e:</pre>\n<pre class=\"line after\"><span class=\"ws\">            </span>rv = self.handle_user_exception(e)</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return self.finalize_request(rv)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def finalize_request(self, rv, from_error_handler=False):</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299784\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\"</cite>,\n      line <em class=\"line\">1799</em>,\n      in <code class=\"function\">dispatch_request</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\">        </span># request came with the OPTIONS method, reply automatically</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span>if getattr(rule, 'provide_automatic_options', False) \\</pre>\n<pre class=\"line before\"><span class=\"ws\">           </span>and req.method == 'OPTIONS':</pre>\n<pre class=\"line before\"><span class=\"ws\">            </span>return self.make_default_options_response()</pre>\n<pre class=\"line before\"><span class=\"ws\">        </span># otherwise dispatch to the handler for that endpoint</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return self.view_functions[rule.endpoint](**req.view_args)</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>def full_dispatch_request(self):</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>&quot;&quot;&quot;Dispatches the request and on top of that performs request</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>pre and postprocessing as well as HTTP exception catching and</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>error handling.</pre></div>\n</div>\n\n<li><div class=\"frame\" id=\"frame-4421299840\">\n  <h4>File <cite class=\"filename\">\"/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py\"</cite>,\n      line <em class=\"line\">41</em>,\n      in <code class=\"function\">get_route</code></h4>\n  <div class=\"source\"><pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\"></span> </pre>\n<pre class=\"line before\"><span class=\"ws\"></span>@app.route('/progress/&lt;id&gt;')</pre>\n<pre class=\"line before\"><span class=\"ws\"></span>def get_route(id):</pre>\n<pre class=\"line before\"><span class=\"ws\">    </span>if id.startswith('bad_status-'):</pre>\n<pre class=\"line current\"><span class=\"ws\">        </span>return b'', int(id.split('bad_status-')[1])</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>elif id == 'notjson':</pre>\n<pre class=\"line after\"><span class=\"ws\">        </span>return b'&lt;&lt;notjson&gt;&gt;'</pre>\n<pre class=\"line after\"><span class=\"ws\">    </span>return jsonify({'progress': id})</pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre>\n<pre class=\"line after\"><span class=\"ws\"></span> </pre></div>\n</div>\n</ul>\n  <blockquote>ValueError: invalid literal for int() with base 10: '{bad_status}'</blockquote>\n</div>\n\n<div class=\"plain\">\n  <form action=\"/?__debugger__=yes&amp;cmd=paste\" method=\"post\">\n    <p>\n      <input type=\"hidden\" name=\"language\" value=\"pytb\">\n      This is the Copy/Paste friendly version of the traceback.  <span\n      class=\"pastemessage\">You can also paste this traceback into\n      a <a href=\"https://gist.github.com/\">gist</a>:\n      <input type=\"submit\" value=\"create paste\"></span>\n    </p>\n    <textarea cols=\"50\" rows=\"10\" name=\"code\" readonly>Traceback (most recent call last):\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2309, in __call__\n    return self.wsgi_app(environ, start_response)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2295, in wsgi_app\n    response = self.handle_exception(e)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1741, in handle_exception\n    reraise(exc_type, exc_value, tb)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py&quot;, line 35, in reraise\n    raise value\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 2292, in wsgi_app\n    response = self.full_dispatch_request()\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1815, in full_dispatch_request\n    rv = self.handle_user_exception(e)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1718, in handle_user_exception\n    reraise(exc_type, exc_value, tb)\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py&quot;, line 35, in reraise\n    raise value\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1813, in full_dispatch_request\n    rv = self.dispatch_request()\n  File &quot;/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py&quot;, line 1799, in dispatch_request\n    return self.view_functions[rule.endpoint](**req.view_args)\n  File &quot;/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py&quot;, line 41, in get_route\n    return b'', int(id.split('bad_status-')[1])\nValueError: invalid literal for int() with base 10: '{bad_status}'</textarea>\n  </form>\n</div>\n<div class=\"explanation\">\n  The debugger caught an exception in your WSGI application.  You can now\n  look at the traceback which led to the error.  <span class=\"nojavascript\">\n  If you enable JavaScript you can also use additional features such as code\n  execution (if the evalex feature is enabled), automatic pasting of the\n  exceptions and much more.</span>\n</div>\n      <div class=\"footer\">\n        Brought to you by <strong class=\"arthur\">DON'T PANIC</strong>, your\n        friendly Werkzeug powered traceback interpreter.\n      </div>\n    </div>\n\n    <div class=\"pin-prompt\">\n      <div class=\"inner\">\n        <h3>Console Locked</h3>\n        <p>\n          The console is locked and needs to be unlocked by entering the PIN.\n          You can find the PIN printed out on the standard output of your\n          shell that runs the server.\n        <form>\n          <p>PIN:\n            <input type=text name=pin size=14>\n            <input type=submit name=btn value=\"Confirm Pin\">\n        </form>\n      </div>\n    </div>\n  </body>\n</html>\n\n<!--\n\nTraceback (most recent call last):\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2309, in __call__\n    return self.wsgi_app(environ, start_response)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2295, in wsgi_app\n    response = self.handle_exception(e)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1741, in handle_exception\n    reraise(exc_type, exc_value, tb)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\", line 35, in reraise\n    raise value\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 2292, in wsgi_app\n    response = self.full_dispatch_request()\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1815, in full_dispatch_request\n    rv = self.handle_user_exception(e)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1718, in handle_user_exception\n    reraise(exc_type, exc_value, tb)\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/_compat.py\", line 35, in reraise\n    raise value\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1813, in full_dispatch_request\n    rv = self.dispatch_request()\n  File \"/Users/chana/.virtualenvs/platform/lib/python3.6/site-packages/flask/app.py\", line 1799, in dispatch_request\n    return self.view_functions[rule.endpoint](**req.view_args)\n  File \"/Users/chana/repos/platform/archive/archive_api/src/tests/cassettes/mock_progress.py\", line 41, in get_route\n    return b'', int(id.split('bad_status-')[1])\nValueError: invalid literal for int() with base 10: '{bad_status}'\n\n-->\n"
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "X-XSS-Protection": [
+            "0"
+          ],
+          "Connection": [
+            "close"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 500,
+          "message": "INTERNAL SERVER ERROR"
+        },
+        "url": "http://localhost:6000/progress/bad_status-%7Bbad_status%7D"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "method": "GET",
+        "uri": "http://localhost:6000/progress/bad_status-404"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Content-Length": [
+            "0"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 404,
+          "message": "NOT FOUND"
+        },
+        "url": "http://localhost:6000/progress/bad_status-404"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "python-requests/2.19.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "method": "GET",
+        "uri": "http://localhost:6000/progress/notjson"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "<<notjson>>"
+        },
+        "headers": {
+          "Content-Type": [
+            "text/html; charset=utf-8"
+          ],
+          "Content-Length": [
+            "11"
+          ],
+          "Server": [
+            "Werkzeug/0.14.1 Python/3.6.1"
+          ],
+          "Date": [
+            "Wed, 03 Oct 2018 14:18:16 GMT"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "http://localhost:6000/progress/notjson"
+      },
+      "recorded_at": "2018-10-03T14:18:16"
+    }
+  ],
+  "recorded_with": "betamax/0.8.1"
+}

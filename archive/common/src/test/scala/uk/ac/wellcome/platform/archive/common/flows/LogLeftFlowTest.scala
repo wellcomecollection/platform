@@ -5,13 +5,11 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class LogLeftFlowTest
     extends FunSpec
     with Akka
     with Matchers
-    with ExtendedPatience
     with ScalaFutures {
 
   it("does not change events in the flow") {

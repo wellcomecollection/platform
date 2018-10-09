@@ -6,7 +6,7 @@ def colour_distance(colour_1, colour_2):
 
 
 def hex_to_rgb(hex):
-    return [int(hex[i: i + 2], 16) for i in range(0, 6, 2)]
+    return [int(hex[i : i + 2], 16) for i in range(0, 6, 2)]
 
 
 def rgb_to_lab(rgb_palette):
@@ -14,5 +14,5 @@ def rgb_to_lab(rgb_palette):
 
 
 def ids_to_urls(image_ids):
-    url = 'https://iiif.wellcomecollection.org/image/{}/full/300,/0/default.jpg'
+    url = "https://iiif.wellcomecollection.org/image/{}/full/300,/0/default.jpg"
     return [url.format(image_id) for image_id in image_ids]

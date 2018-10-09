@@ -9,11 +9,12 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 
 object MessageStreamModule extends AbstractModule {
+
   @Provides
-  def providesMessageStream(actorSystem: ActorSystem,
-                            sqsClient: AmazonSQSAsync,
+  def providesMessageStream(sqsClient: AmazonSQSAsync,
                             sqsConfig: SQSConfig,
-                            metricsSender: MetricsSender) = {
+                            metricsSender: MetricsSender,
+                            actorSystem: ActorSystem) = {
     new MessageStream[NotificationMessage, Unit](
       actorSystem,
       sqsClient,

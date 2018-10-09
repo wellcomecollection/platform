@@ -97,10 +97,8 @@ define test_python
 
 	$(ROOT)/docker_run.py --aws --dind -- \
 		--net=host \
-		--volume $(ROOT)/$(1)/src:/data \
 		--volume $(ROOT)/shared_conftest.py:/conftest.py \
-		--env INSTALL_DEPENDENCIES=false \
-		--env FIND_MATCH_PATHS="/data" --tty \
+		--workdir $(ROOT)/$(1) --tty \
 		wellcome/test_python_$(shell basename $(1)):latest
 endef
 
@@ -184,7 +182,7 @@ endef
 define docker_compose_up
     $(ROOT)/docker_run.py --dind --sbt --root -- \
     		--net host \
-    		docker/compose:1.21.0 -f /repo/$(1) up
+    		docker/compose:1.21.0 -f $(ROOT)/$(1) up
 endef
 
 
@@ -196,7 +194,7 @@ endef
 define docker_compose_down
     $(ROOT)/docker_run.py --dind --sbt --root -- \
         		--net host \
-        		docker/compose:1.21.0 -f /repo/$(1) down
+        		docker/compose:1.21.0 -f $(ROOT)/$(1) down
 endef
 
 

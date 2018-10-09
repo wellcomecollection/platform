@@ -4,7 +4,6 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Try
 
@@ -12,7 +11,6 @@ class ProcessLogDiscardFlowTest
     extends FunSpec
     with Akka
     with Matchers
-    with ExtendedPatience
     with ScalaFutures {
 
   it("process, logs & discards failed events") {
