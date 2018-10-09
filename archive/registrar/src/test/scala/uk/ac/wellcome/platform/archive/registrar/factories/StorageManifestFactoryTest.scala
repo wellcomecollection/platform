@@ -5,15 +5,12 @@ import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, Digi
 import uk.ac.wellcome.platform.archive.registrar.fixtures.BagLocationFixtures
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.platform.archive.registrar.models.errors.FileNotFoundError
-import uk.ac.wellcome.test.fixtures.Akka
 
-class StorageManifestFactoryTest extends FunSpec with BagLocationFixtures with Inside with Akka {
+class StorageManifestFactoryTest extends FunSpec with BagLocationFixtures with Inside {
   implicit val _ = s3Client
 
   it("returns a right of storage manifest if reading a bag location succeeds") {
-    withActorSystem { actorSystem =>
-    implicit val ec = actorSystem.dispatcher
-      withMaterializer(actorSystem){ implicit materialiser =>
+
       withLocalS3Bucket { bucket =>
         withBag(bucket) { bagLocation =>
           inside(StorageManifestFactory.create(bagLocation)) {
@@ -48,13 +45,10 @@ class StorageManifestFactoryTest extends FunSpec with BagLocationFixtures with I
         }
       }
       }
-    }
-  }
+
 
   it("returns a left of registrar error if there are no files at the specified bag location") {
-    withActorSystem { actorSystem =>
-      implicit val ec = actorSystem.dispatcher
-      withMaterializer(actorSystem) { implicit materialiser =>
+
         withLocalS3Bucket { bucket =>
           val bagLocation = BagLocation(
             bucket.name,
@@ -64,6 +58,5 @@ class StorageManifestFactoryTest extends FunSpec with BagLocationFixtures with I
           value shouldBe Left(FileNotFoundError(bagLocation))
         }
       }
-    }
-  }
+
 }

@@ -1,24 +1,21 @@
 package uk.ac.wellcome.platform.archive.registrar.factories
-import akka.stream.Materializer
-import akka.stream.scaladsl.{Sink, StreamConverters}
+import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.models.BagLocation
-import uk.ac.wellcome.platform.archive.registrar.flows.FileSplitterFlow
+import uk.ac.wellcome.platform.archive.registrar.models
 import uk.ac.wellcome.platform.archive.registrar.models._
+import uk.ac.wellcome.platform.archive.registrar.models.errors.{FileNotFoundError, InvalidBagManifestError, RegistrarError}
 import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext}
+import scala.util.Try
 
 object StorageManifestFactory extends Logging {
-  def create(bagLocation: BagLocation)(implicit s3Client: AmazonS3,
-                                       materializer: Materializer,
-                                       executionContext: ExecutionContext): Either[Throwable, StorageManifest] = {
+  def create(bagLocation: BagLocation)(implicit s3Client: AmazonS3): Either[RegistrarError, StorageManifest] = {
 
     val algorithm = "sha256"
 
-    val manifestTupleFuture = getTuples(bagLocation, s"manifest-$algorithm.txt", " +")
+    val manifestTupleFuture = getBagItems(bagLocation, s"manifest-$algorithm.txt", " +")
 //    val tagManifestTupleFuture = getTuples(s"tagmanifest-$algorithm.txt", " +")
 
     val sourceIdentifier = SourceIdentifier(
@@ -38,11 +35,11 @@ object StorageManifestFactory extends Logging {
       )
     )
 
-    val eventualManifest = for {
+    for {
       manifestTuples <- manifestTupleFuture
       fileManifest = FileManifest(
         ChecksumAlgorithm(algorithm),
-        createBagDigestFiles(manifestTuples).toList
+        manifestTuples
       )
       //tagManifestTuples <- tagManifestTupleFuture
       tagManifest = TagManifest(
@@ -58,21 +55,21 @@ object StorageManifestFactory extends Logging {
         tagManifest = tagManifest,
         locations = List(location)
       )
-    Right(Await.result(eventualManifest,10 seconds))
   }
 
-  def getTuples(bagLocation: BagLocation, name: String, delimiter: String)(implicit s3Client: AmazonS3, materializer: Materializer) = {
+  def getBagItems(bagLocation: BagLocation, name: String, delimiter: String)(implicit s3Client: AmazonS3):Either[RegistrarError, List[BagDigestFile]] = {
     val location = createBagItMetaFileLocation(bagLocation,name)
-    s3LocationToSource(location)
-      .via(FileSplitterFlow(delimiter))
-      .runWith(Sink.seq)
+    val triedLines = Try(s3Client.getObject(location.namespace, location.key)).map(
+      _.getObjectContent).toEither.leftMap(_ => FileNotFoundError(bagLocation))
+      .map(inputStream => scala.io.Source
+      .fromInputStream(inputStream)
+      .mkString.split("\n").filter(_.nonEmpty).toList)
 
-  }
-
-  def createBagDigestFiles(digestLines: Seq[(String, String)]) = {
-    digestLines.map {
-      case (checksum, path) =>
-        BagDigestFile(Checksum(checksum), BagFilePath(path))
+    triedLines.flatMap { lines: List[String]=>
+      val value:Either[InvalidBagManifestError, List[BagDigestFile]] = lines.map { line =>
+        parseManifestLine(line, delimiter, bagLocation, name)
+      }.sequence
+      value
     }
   }
 
@@ -86,9 +83,18 @@ object StorageManifestFactory extends Logging {
       ).mkString("/")
     )
 
-  def s3LocationToSource(location: ObjectLocation)(implicit s3Client: AmazonS3) = {
-    debug(s"Attempting to get ${location.namespace}/${location.key}")
-    val s3Object = s3Client.getObject(location.namespace, location.key)
-    StreamConverters.fromInputStream(() => s3Object.getObjectContent)
+  def parseManifestLine(fileChunk: String, delimiter: String, job: BagLocation, manifestName: String): Either[InvalidBagManifestError, BagDigestFile] = {
+    val splitChunk = fileChunk.split(delimiter).map(_.trim)
+
+  splitChunk match {
+    case Array(checksum: String, key: String) =>
+      Right(
+        models.BagDigestFile(
+          Checksum(checksum),
+          BagFilePath(key)
+        ))
+    case _ =>
+      Left(InvalidBagManifestError(job, manifestName))
   }
+}
 }

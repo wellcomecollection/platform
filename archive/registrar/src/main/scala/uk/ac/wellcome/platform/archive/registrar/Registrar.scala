@@ -69,9 +69,7 @@ class Registrar @Inject()(
   }
 
   private def createStorageManifest(archiveComplete: ArchiveComplete)(
-    implicit s3Client: AmazonS3,
-    materializer: ActorMaterializer,
-    executionContext: ExecutionContext) =
+    implicit s3Client: AmazonS3) =
     StorageManifestFactory
       .create(archiveComplete.bagLocation).map(manifest => (manifest, archiveComplete))
 
