@@ -61,10 +61,10 @@ cache:
 
     - archive/commmon/target
     - archive/archivist/target
-    - archive/registrar/target
-    - archive/progress/target
     - archive/notifier/target
-
+    - archive/progress_async/target
+    - archive/progress_http/target
+    - archive/registrar/target
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching

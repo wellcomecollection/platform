@@ -33,8 +33,9 @@ class ContextResponse(Response):
         rv = json.loads(response)
 
         # The @context may already be provided if we've been through the
-        # force_type method below.
-        if "@context" in rv:
+        # force_type method below.  We also don't add a context if we're
+        # looking at the healthcheck endpoint.
+        if ("@context" in rv) or (rv == {"status": "OK"}):
             return super().__init__(response, *args, **kwargs)
         else:
             rv["@context"] = self.context_url
@@ -48,6 +49,9 @@ class ContextResponse(Response):
         assert isinstance(rv, dict)
 
         assert "@context" not in rv, rv
-        rv["@context"] = cls.context_url
+
+        # We don't add a context to the healthcheck endpoint.
+        if rv != {"status": "OK"}:
+            rv["@context"] = cls.context_url
 
         return super().force_type(jsonify(rv), environ)

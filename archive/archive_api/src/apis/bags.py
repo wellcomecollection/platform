@@ -5,7 +5,7 @@ from flask_restplus import Namespace, Resource
 
 from models.bags import Bag, File, FileManifest, Source
 from models.catalogue import Error, Identifier, IdentifierType
-from storage import VHSNotFound, read_from_vhs
+from storage import VHSError, VHSNotFound, read_from_vhs
 
 
 api = Namespace("bags", description="Bag requests")
@@ -20,9 +20,9 @@ api.add_model("Source", definition=Source)
 
 
 @api.route("/<id>")
-@api.param("id", "The bag identifier")
+@api.param("id", "The bag to return")
 class BagResource(Resource):
-    @api.doc(description="The bag is returned in the body of the response")
+    @api.doc(description="Returns a single bag")
     @api.marshal_with(Bag)
     @api.response(200, "Bag found")
     @api.response(404, "Bag not found", Error)
@@ -41,3 +41,5 @@ class BagResource(Resource):
             return result
         except VHSNotFound:
             abort(404, f"Invalid id: No bag found for id={id!r}")
+        except VHSError:
+            abort(500)

@@ -22,6 +22,7 @@ from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
     InsignificantFile,
+    PythonChangeAndIsScalaApp,
     ScalaChangeAndIsScalaApp,
     ScalaChangeAndNotScalaApp,
     SignificantFile,
@@ -186,6 +187,12 @@ def does_file_affect_build_task(path, task):
         and task != "travis-format"
     ):
         raise ExclusivelyAffectsAnotherTask("travis-format")
+
+    # Changes to Python files only affect Scala apps.
+    if path.endswith(".py"):
+        for project in PROJECTS:
+            if task.startswith(project.name) and (project.type == "sbt_app"):
+                raise PythonChangeAndIsScalaApp()
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
