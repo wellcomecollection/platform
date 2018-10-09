@@ -37,8 +37,8 @@ def progress_manager(sess):
 
 class TestCreateRequest:
     @pytest.mark.parametrize("bad_status", [200, 400, 404, 500])
-    def test_not_201_from_service_is_error(self, bad_status, progress_manager):
-        with pytest.raises(ProgressServiceError, match="Expected HTTP 201"):
+    def test_not_202_from_service_is_error(self, bad_status, progress_manager):
+        with pytest.raises(ProgressServiceError, match="Expected HTTP 202"):
             progress_manager.create_request(
                 upload_url=f"http://example.org/?status={bad_status}", callback_url=None
             )

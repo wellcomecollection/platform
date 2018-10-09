@@ -1,9 +1,9 @@
 # -*- encoding: utf-8
 
-import daiquiri
 from flask import abort, make_response, request, url_for
 from flask_restplus import Namespace, Resource
 
+from ingests import models as ingest_models
 from ingests import send_new_ingest_request
 from models.catalogue import Error
 from models.ingests import Ingest, IngestType
@@ -12,7 +12,7 @@ from progress_manager import ProgressNotFoundError
 import validators
 
 
-api = Namespace("ingests", description="Ingest requests")
+api = Namespace("ingests", description="Operations around ingests")
 
 api.add_model(name="Error", definition=Error)
 
@@ -26,23 +26,22 @@ logger = daiquiri.getLogger()
 
 
 @api.route("")
-@api.doc(description="Request the ingest of a BagIt resource.")
 @api.param(
     "payload",
     "The ingest request specifying the uploadUrl where the BagIt resource can be found",
     _in="body",
 )
 class IngestCollection(Resource):
+    @api.doc(description="Request the ingest of a BagIt resource from S3")
     @api.expect(Ingest, validate=True)
     @api.response(201, "Ingest created")
     @api.response(400, "Bad request", Error)
     def post(self):
-        """Create a request to ingest a BagIt resource"""
         upload_url = request.json["uploadUrl"]
         callback_url = request.json.get("callbackUrl")
         self._validate_urls(callback_url, upload_url)
 
-        from archive_api import app
+        from archive_api import app, logger
 
         progress_manager = app.config["PROGRESS_MANAGER"]
 
@@ -84,16 +83,18 @@ class IngestCollection(Resource):
 
 
 @api.route("/<id>")
-@api.param("id", "The ingest request identifier")
+@api.param("id", "The ingest request to return")
 class IngestResource(Resource):
     @api.doc(
-        description="The ingest request id is returned in the Location header from a POSTed ingest request"
+        description=(
+            "The ingest request id is returned in the Location header from a "
+            "POSTed ingest request"
+        )
     )
     @api.marshal_with(Progress)
     @api.response(200, "Ingest found")
     @api.response(404, "Ingest not found", Error)
     def get(self, id):
-        """Get the current status of an ingest request"""
         try:
             from archive_api import app
 

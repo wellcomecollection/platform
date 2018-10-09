@@ -47,6 +47,23 @@ def test_returns_500_if_malformed_dynamodb(
     table.put_item(Item={"id": guid, "location": {"k_y": guid, "n_m_s_c_e": "bukkit"}})
 
     resp = client.get(f"/storage/v1/bags/{guid}")
+    assert resp.status_code == 500
+
+    assert json.loads(resp.data) == {
+        "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+        "errorType": "http",
+        "httpStatus": 500,
+        "label": "Internal Server Error",
+        "type": "Error",
+    }
+
+
+def test_returns_500_if_malformed_dynamodb(
+    client, dynamodb_resource, table_name_bag, guid
+):
+    table = dynamodb_resource.Table(table_name_bag)
+    table.put_item(Item={"id": guid, "location": {"k_y": guid, "n_m_s_c_e": "bukkit"}})
+    resp = client.get(f"/storage/v1/bags/{guid}")
     assert_is_error_response(resp, status=500)
 
 

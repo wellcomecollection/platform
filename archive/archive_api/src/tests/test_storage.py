@@ -74,8 +74,8 @@ def test_non_json_in_s3_is_vhserror(
 
 
 @pytest.fixture
-def vhs_table_name(dynamodb_client, random_alpha):
-    table_name = random_alpha
+def vhs_table_name(dynamodb_client, random_name):
+    table_name = random_name
 
     try:
         dynamodb_client.create_table(

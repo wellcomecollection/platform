@@ -26,6 +26,11 @@ def random_alpha():
     return "".join(random.choice(string.ascii_lowercase) for _ in range(10))
 
 
+@pytest.fixture
+def random_name():
+    return random_alpha()
+
+
 @pytest.fixture(scope="session")
 def docker_compose_file(pytestconfig):
     root_docker_compose = pytestconfig.rootdir.join("docker-compose.yml")
