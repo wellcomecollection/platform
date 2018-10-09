@@ -58,6 +58,10 @@ class CheckedByTravisLambda(SignificantFile):
     message = "File format is checked by the travis-lambda task"
 
 
+class PythonChangeAndIsScalaApp(InsignificantFile):
+    message = "Changes to Python files don't affect Scala apps"
+
+
 class ScalaChangeAndIsScalaApp(SignificantFile):
     message = "Changes to Scala common libs affect Scala apps"
 

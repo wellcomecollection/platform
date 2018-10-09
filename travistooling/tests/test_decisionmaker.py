@@ -15,6 +15,7 @@ from travistooling.decisions import (
     ExclusivelyAffectsThisTask,
     IgnoredFileFormat,
     IgnoredPath,
+    PythonChangeAndIsScalaApp,
     ScalaChangeAndIsScalaApp,
     ScalaChangeAndNotScalaApp,
     UnrecognisedFile,
@@ -313,6 +314,9 @@ from travistooling.decisions import (
             ExclusivelyAffectsAnotherTask,
             False,
         ),
+        # Chnages to Python files shouldn't trigger a Scala app
+        ("shared_conftest.py", "ingestor-test", PythonChangeAndIsScalaApp, False),
+        ("shared_conftest.py", "loris-test", UnrecognisedFile, True),
     ],
 )
 def test_does_file_affect_build_task(path, task, exc_class, is_significant):
