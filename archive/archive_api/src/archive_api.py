@@ -8,7 +8,7 @@ from flask_restplus import Api
 
 from apis import bags_api, ingests_api
 import config
-import models
+from models.catalogue import Error
 from responses import ContextResponse
 from progress_manager import ProgressManager
 
@@ -46,7 +46,7 @@ api.add_namespace(ingests_api)
 @api.errorhandler(Exception)
 @bags_api.errorhandler(Exception)
 @ingests_api.errorhandler(Exception)
-@api.marshal_with(models.Error, skip_none=True)
+@api.marshal_with(Error, skip_none=True)
 def default_error_handler(error):
     error_response = {
         "httpStatus": getattr(error, "code", 500),

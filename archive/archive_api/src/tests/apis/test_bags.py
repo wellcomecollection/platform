@@ -25,6 +25,7 @@ def test_returns_a_present_bag(
     assert (
         rv["@context"] == "https://api.wellcomecollection.org/storage/v1/context.json"
     )
+    assert rv["type"] == "Bag"
 
 
 def test_returns_500_if_s3_object_missing(
