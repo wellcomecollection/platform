@@ -49,8 +49,6 @@ class RegistrarFeatureTest
           storageBucket) { bagLocation =>
           registrar.run()
 
-          implicit val _ = s3Client
-
             eventually {
               val messages = listMessagesReceivedFromSNS(topic)
               messages should have size 1

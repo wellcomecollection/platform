@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Source}
+import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject._
@@ -12,6 +12,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
+import uk.ac.wellcome.platform.archive.registrar.factories.StorageManifestFactory
 import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlowA
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
@@ -53,7 +54,8 @@ class Registrar @Inject()(
     val flow = Flow[NotificationMessage]
       .log("notification message")
       .via(NotificationParsingFlow[ArchiveComplete])
-      .flatMapConcat(createStorageManifest)
+      .map(createStorageManifest)
+      .collect{ case Right((manifest, archiveComplete)) => (manifest,archiveComplete)}
       .mapAsync(10) {
         case (manifest, ctx) => updateStoredManifest(manifest, ctx)
       }
@@ -66,16 +68,12 @@ class Registrar @Inject()(
     messageStream.run("registrar", flow)
   }
 
-  private def createStorageManifest(requestContext: ArchiveComplete)(
+  private def createStorageManifest(archiveComplete: ArchiveComplete)(
     implicit s3Client: AmazonS3,
     materializer: ActorMaterializer,
-    executionContext: ExecutionContext,
-    adapter: LoggingAdapter) = {
-    Source.fromFuture(
-      for (manifest <- StorageManifestFactory
-             .create(requestContext.bagLocation))
-        yield (manifest, requestContext))
-  }
+    executionContext: ExecutionContext) =
+    StorageManifestFactory
+      .create(archiveComplete.bagLocation).map(manifest => (manifest, archiveComplete))
 
   private def updateStoredManifest(storageManifest: StorageManifest,
                                    requestContext: ArchiveComplete)(implicit ec: ExecutionContext) =

@@ -9,25 +9,13 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{
-  ConfigModule,
-  SNSAsyncClientModule,
-  TestAppConfigModule,
-  VHSModule
-}
+import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, SNSAsyncClientModule, TestAppConfigModule, VHSModule}
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.fixtures.{
-  LocalDynamoDb,
-  LocalVersionedHybridStore,
-  S3
-}
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Registrar
