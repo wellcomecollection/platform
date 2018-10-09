@@ -57,8 +57,8 @@ object ZipFileDownloadFlow extends Logging {
                       case Success(_) =>
                         Right(
                           ZipFileDownloadComplete(
-                            new ZipFile(tmpFile),
-                            request
+                            zipFile = new ZipFile(tmpFile),
+                            ingestBagRequest = request
                           ))
                       case Failure(ex) =>
                         warn(s"Failed downloading zipFile from $location")

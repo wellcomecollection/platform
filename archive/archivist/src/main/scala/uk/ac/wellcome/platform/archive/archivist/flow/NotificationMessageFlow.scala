@@ -28,13 +28,17 @@ object NotificationMessageFlow extends Logging {
     Flow[NotificationMessage]
       .via(NotificationParsingFlow[IngestBagRequest])
       .flatMapMerge(
-        parallelism,
+        breadth = parallelism,
         bagRequest => {
+          val progressUpdate = ProgressUpdate(
+            id = bagRequest.archiveRequestId,
+            events = List(
+              ProgressEvent(s"Started working on ingestRequest: ${bagRequest.archiveRequestId}")
+            )
+          )
+
           Source
-            .single(ProgressUpdate(
-              bagRequest.archiveRequestId,
-              List(ProgressEvent(
-                s"Started working on ingestRequest: ${bagRequest.archiveRequestId}"))))
+            .single(progressUpdate)
             .via(
               SnsPublishFlow(
                 snsClient,

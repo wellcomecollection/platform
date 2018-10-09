@@ -32,10 +32,13 @@ object ArchiveJobFlow extends Logging {
         FoldEitherFlow[
           ArchiveError[ArchiveJob],
           List[ArchiveItemJob],
-          Either[ArchiveError[ArchiveJob], ArchiveComplete]](error => {
-          warn(s"${error.job} failed creating archive item jobs")
-          Left(error)
-        })(mapReduceArchiveItemJobs(delimiter, parallelism, ingestBagRequest)))
+          Either[ArchiveError[ArchiveJob], ArchiveComplete]](
+          ifLeft = error => {
+            warn(s"${error.job} failed creating archive item jobs")
+            Left(error)
+          })(
+          ifRight = mapReduceArchiveItemJobs(delimiter, parallelism, ingestBagRequest))
+      )
 
   private def mapReduceArchiveItemJobs(delimiter: String,
                                        parallelism: Int,

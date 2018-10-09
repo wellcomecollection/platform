@@ -48,9 +48,9 @@ object ArchiveZipFileFlow extends Logging {
                 Either[ArchiveError[_], ArchiveComplete]
               ](ifLeft = Left(_))(
                 ifRight = ArchiveJobFlow(
-                  config.bagItConfig.digestDelimiterRegexp,
-                  config.parallelism,
-                  ingestRequest)))
+                  delimiter = config.bagItConfig.digestDelimiterRegexp,
+                  parallelism = config.parallelism,
+                  ingestBagRequest = ingestRequest)))
             .flatMapMerge(
               config.parallelism,
               (result: Either[ArchiveError[_], ArchiveComplete]) =>
