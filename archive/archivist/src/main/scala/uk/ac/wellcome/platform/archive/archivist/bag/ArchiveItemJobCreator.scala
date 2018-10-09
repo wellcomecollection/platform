@@ -17,17 +17,28 @@ import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 
 object ArchiveItemJobCreator extends Logging {
 
+  /** Returns a list of all the items inside a bag that the manifest(s)
+    * refer to.
+    *
+    * If any of the manifests are incorrectly formatted, it returns an error.
+    *
+    */
   def createArchiveItemJobs(job: ArchiveJob, delimiter: String)
-    : Either[ArchiveError[ArchiveJob], List[ArchiveItemJob]] = {
-    val zipLocations = job.bagManifestLocations.map(manifestLocation =>
-      ZipLocation(job.zipFile, manifestLocation.toEntryPath))
-    zipLocations
+    : Either[ArchiveError[ArchiveJob], List[ArchiveItemJob]] =
+    job.bagManifestLocations
+      .map { manifestLocation => ZipLocation(job.zipFile, manifestLocation.toEntryPath) }
       .traverse { zipLocation =>
         parseArchiveItemJobs(job, zipLocation, delimiter)
       }
-      .map(_.flatten)
-  }
+      .map { _.flatten }
 
+  /** Given the location of a single manifest inside the BagIt bag,
+    * return a list of all the items inside the bag that the manifest
+    * refers to.
+    *
+    * If the manifest is incorrectly formatted, it returns an error.
+    *
+    */
   private def parseArchiveItemJobs(job: ArchiveJob,
                                    zipLocation: ZipLocation,
                                    delimiter: String)
@@ -44,11 +55,13 @@ object ArchiveItemJobCreator extends Logging {
           .split("\n")
           .toList
       manifestFileLines
-        .filter(_.nonEmpty)
+        .filter { _.nonEmpty }
         .traverse { line =>
           BagItemCreator
             .create(line.trim(), job, zipLocation.entryPath.path, delimiter)
-            .map(bagItem => ArchiveItemJob(job, bagItem))
+            .map {
+              bagItem => ArchiveItemJob(archiveJob = job, bagDigestItem = bagItem)
+            }
         }
     }
   }
