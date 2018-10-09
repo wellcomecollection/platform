@@ -1,5 +1,5 @@
 FROM rodolpheche/wiremock
 
-ADD stubs /home/wiremock/mappings
+ADD src/stubs /home/wiremock/mappings
 
 EXPOSE 8080
