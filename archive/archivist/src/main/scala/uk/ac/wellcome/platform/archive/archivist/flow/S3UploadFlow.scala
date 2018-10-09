@@ -63,7 +63,7 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           }
 
           override def onUpstreamFinish(): Unit = {
-            uploadIfAboveMinSize(currentPart, true)
+            uploadIfAboveMinSize(currentPart, isLast = true)
             maybeUploadId.foreach { uploadId =>
               completeUpload(uploadId)
             }
@@ -139,14 +139,20 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
           }
         }
 
+      /** Mark the upload as complete.
+        *
+        * This tells S3 that we've uploaded every part of the file, and it
+        * should assemble them into a single object.
+        *
+        */
       private def completeUpload(uploadId: String): Unit = {
         debug("Completing upload")
-        val compRequest =
-          new CompleteMultipartUploadRequest(
-            uploadLocation.namespace,
-            uploadLocation.key,
-            uploadId,
-            partEtagList.asJava)
+        val compRequest = new CompleteMultipartUploadRequest(
+          uploadLocation.namespace,
+          uploadLocation.key,
+          uploadId,
+          partEtagList.asJava
+        )
         val res = Try(s3Client.completeMultipartUpload(compRequest))
         res match {
           case Success(result) =>
@@ -203,6 +209,7 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       }
 
+      // TODO: How does this work???
       private def getUploadId: Try[String] = maybeUploadId match {
         case None =>
           val triedUploadId = initializeUpload(uploadLocation)
@@ -211,14 +218,23 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         case Some(initializedId) => Try(initializedId)
 
       }
-      private def initializeUpload(uploadLocation: ObjectLocation) =
+
+      /** Start a new Multipart Upload with S3, and return the upload ID
+        * (if successful).
+        *
+        */
+      private def initializeUpload(uploadLocation: ObjectLocation): Try[String] = {
+        val initiateRequest =
+          new InitiateMultipartUploadRequest(
+            uploadLocation.namespace,
+            uploadLocation.key
+          )
         Try(
           s3Client
-            .initiateMultipartUpload(
-              new InitiateMultipartUploadRequest(
-                uploadLocation.namespace,
-                uploadLocation.key))
-            .getUploadId)
+            .initiateMultipartUpload(initiateRequest)
+            .getUploadId
+        )
+      }
     }
 
 }
