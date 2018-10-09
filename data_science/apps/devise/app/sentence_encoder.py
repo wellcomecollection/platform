@@ -1,8 +1,6 @@
-import nltk
-import numpy as np
 import torch
 from torch import nn
-from utils import sentence_to_indexes
+
 
 # sentence embedding models
 class SentenceEncoder(nn.Module):

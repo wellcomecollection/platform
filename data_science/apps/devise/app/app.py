@@ -32,6 +32,7 @@ model.load_state_dict(
 search_index = nmslib.init(method="hnsw", space="cosinesimil")
 search_index.loadIndex("../data/search_index.hnsw")
 
+
 # Define endpoint classes
 class devise_search(Resource):
     def get(self):
@@ -51,6 +52,7 @@ class devise_search(Resource):
 
 # Create search endpoint
 api.add_resource(devise_search, "/devise/search")
+
 
 # Routing
 @app.route("/devise")
