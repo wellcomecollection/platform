@@ -29,9 +29,18 @@ variable "aws_region" {
 
 variable "health_check_path" {}
 
-variable "memory" {default="2048"}
-variable "cpu" {default="1024"}
+variable "memory" {
+  default = "2048"
+}
 
-variable "task_desired_count" {default="2"}
+variable "cpu" {
+  default = "1024"
+}
 
-variable "launch_type" {default="FARGATE"}
+variable "task_desired_count" {
+  default = "2"
+}
+
+variable "launch_type" {
+  default = "FARGATE"
+}
