@@ -137,10 +137,10 @@ def main():
     source_name = args["--source"]
     reason = args["--reason"]
     total_segments = int(args["--total_segments"])
-    skip_pipeline_checks = args['--skip-pipeline-checks']
+    skip_pipeline_checks = args["--skip-pipeline-checks"]
 
     if not skip_pipeline_checks:
-        print('Checking pipeline is clear...')
+        print("Checking pipeline is clear...")
         check_tables_are_clear()
 
     print(f"Triggering a reindex in {source_name}")
