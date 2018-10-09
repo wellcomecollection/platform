@@ -5,4 +5,6 @@ sealed trait RegistrarError
 
 case class FileNotFoundError(bagLocation: BagLocation) extends RegistrarError
 
-case class InvalidBagManifestError(bagLocation: BagLocation, manifestName: String) extends RegistrarError
+case class InvalidBagManifestError(bagLocation: BagLocation,
+                                   manifestName: String)
+    extends RegistrarError

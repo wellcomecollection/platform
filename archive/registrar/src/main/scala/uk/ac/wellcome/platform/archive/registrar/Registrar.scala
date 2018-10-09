@@ -9,8 +9,14 @@ import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.messaging.{
+  MessageStream,
+  NotificationParsingFlow
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  NotificationMessage
+}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.registrar.factories.StorageManifestFactory
 import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlowA
@@ -55,7 +61,9 @@ class Registrar @Inject()(
       .log("notification message")
       .via(NotificationParsingFlow[ArchiveComplete])
       .map(createStorageManifest)
-      .collect{ case Right((manifest, archiveComplete)) => (manifest,archiveComplete)}
+      .collect {
+        case Right((manifest, archiveComplete)) => (manifest, archiveComplete)
+      }
       .mapAsync(10) {
         case (manifest, ctx) => updateStoredManifest(manifest, ctx)
       }
@@ -71,12 +79,16 @@ class Registrar @Inject()(
   private def createStorageManifest(archiveComplete: ArchiveComplete)(
     implicit s3Client: AmazonS3) =
     StorageManifestFactory
-      .create(archiveComplete.bagLocation).map(manifest => (manifest, archiveComplete))
+      .create(archiveComplete.bagLocation)
+      .map(manifest => (manifest, archiveComplete))
 
-  private def updateStoredManifest(storageManifest: StorageManifest,
-                                   requestContext: ArchiveComplete)(implicit ec: ExecutionContext) =
-    dataStore.updateRecord(storageManifest.id.value)(
-      ifNotExisting = (storageManifest, EmptyMetadata()))(
-      ifExisting = (_, _) => (storageManifest, EmptyMetadata())
-    ).map ( _ => (storageManifest, requestContext))
+  private def updateStoredManifest(
+    storageManifest: StorageManifest,
+    requestContext: ArchiveComplete)(implicit ec: ExecutionContext) =
+    dataStore
+      .updateRecord(storageManifest.id.value)(
+        ifNotExisting = (storageManifest, EmptyMetadata()))(
+        ifExisting = (_, _) => (storageManifest, EmptyMetadata())
+      )
+      .map(_ => (storageManifest, requestContext))
 }

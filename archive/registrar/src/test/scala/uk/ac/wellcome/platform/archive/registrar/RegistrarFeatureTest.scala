@@ -7,7 +7,9 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{
+  Registrar => RegistrarFixture
+}
 import uk.ac.wellcome.platform.archive.registrar.models._
 
 class RegistrarFeatureTest
@@ -16,7 +18,8 @@ class RegistrarFeatureTest
     with ScalaFutures
     with MetricsSenderFixture
     with IntegrationPatience
-    with RegistrarFixture with Inside {
+    with RegistrarFixture
+    with Inside {
   implicit val _ = s3Client
 
   private val callbackHost = "localhost"
@@ -49,51 +52,50 @@ class RegistrarFeatureTest
           storageBucket) { bagLocation =>
           registrar.run()
 
-            eventually {
-              val messages = listMessagesReceivedFromSNS(topic)
-              messages should have size 1
-              val registrationCompleteNotification =
-                fromJson[RegistrationComplete](
-                  messages.head.message).get
+          eventually {
+            val messages = listMessagesReceivedFromSNS(topic)
+            messages should have size 1
+            val registrationCompleteNotification =
+              fromJson[RegistrationComplete](messages.head.message).get
 
-              assertStored[StorageManifest](
-                hybridBucket,
-                hybridTable,
-                registrationCompleteNotification.storageManifest.id.value,
-                registrationCompleteNotification.storageManifest
-              )
+            assertStored[StorageManifest](
+              hybridBucket,
+              hybridTable,
+              registrationCompleteNotification.storageManifest.id.value,
+              registrationCompleteNotification.storageManifest
+            )
 
-              inside(registrationCompleteNotification.storageManifest) {
-                case StorageManifest(
-                    bagId,
-                    sourceIdentifier,
-                    identifiers,
-                    FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-                    TagManifest(ChecksumAlgorithm("sha256"), Nil),
-                    List(digitalLocation),
-                    _,
-                    _,
-                    _,
-                    _) =>
-                  bagId shouldBe BagId(bagLocation.bagPath.value)
-                  sourceIdentifier shouldBe SourceIdentifier(
-                    IdentifierType("source", "Label"),
-                    value = "123"
+            inside(registrationCompleteNotification.storageManifest) {
+              case StorageManifest(
+                  bagId,
+                  sourceIdentifier,
+                  identifiers,
+                  FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+                  TagManifest(ChecksumAlgorithm("sha256"), Nil),
+                  List(digitalLocation),
+                  _,
+                  _,
+                  _,
+                  _) =>
+                bagId shouldBe BagId(bagLocation.bagPath.value)
+                sourceIdentifier shouldBe SourceIdentifier(
+                  IdentifierType("source", "Label"),
+                  value = "123"
+                )
+                identifiers shouldBe List(sourceIdentifier)
+                bagDigestFiles should have size 1
+
+                digitalLocation shouldBe DigitalLocation(
+                  s"http://${storageBucket.name}.s3.amazonaws.com/${bagLocation.storagePath}/${bagLocation.bagPath.value}",
+                  LocationType(
+                    "aws-s3-standard-ia",
+                    "AWS S3 Standard IA"
                   )
-                  identifiers shouldBe List(sourceIdentifier)
-                  bagDigestFiles should have size 1
-
-                  digitalLocation shouldBe DigitalLocation(
-                    s"http://${storageBucket.name}.s3.amazonaws.com/${bagLocation.storagePath}/${bagLocation.bagPath.value}",
-                    LocationType(
-                      "aws-s3-standard-ia",
-                      "AWS S3 Standard IA"
-                    )
-                  )
-              }
+                )
+            }
           }
         }
-        }
+    }
 
   }
 }
