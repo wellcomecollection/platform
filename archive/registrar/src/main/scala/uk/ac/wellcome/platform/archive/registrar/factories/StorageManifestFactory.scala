@@ -1,20 +1,20 @@
-package uk.ac.wellcome.platform.archive.registrar.models
-
-import akka.event.LoggingAdapter
+package uk.ac.wellcome.platform.archive.registrar.factories
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.models.BagLocation
 import uk.ac.wellcome.platform.archive.registrar.flows.FileSplitterFlow
+import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext}
 
 object StorageManifestFactory extends Logging {
   def create(bagLocation: BagLocation)(implicit s3Client: AmazonS3,
                                        materializer: Materializer,
-                                       executionContext: ExecutionContext,adapter: LoggingAdapter) = {
+                                       executionContext: ExecutionContext): Either[Throwable, StorageManifest] = {
 
     val algorithm = "sha256"
 
@@ -38,7 +38,7 @@ object StorageManifestFactory extends Logging {
       )
     )
 
-    for {
+    val eventualManifest = for {
       manifestTuples <- manifestTupleFuture
       fileManifest = FileManifest(
         ChecksumAlgorithm(algorithm),
@@ -58,11 +58,11 @@ object StorageManifestFactory extends Logging {
         tagManifest = tagManifest,
         locations = List(location)
       )
+    Right(Await.result(eventualManifest,10 seconds))
   }
 
-  def getTuples(bagLocation: BagLocation, name: String, delimiter: String)(implicit s3Client: AmazonS3, materializer: Materializer, adapter: LoggingAdapter) = {
+  def getTuples(bagLocation: BagLocation, name: String, delimiter: String)(implicit s3Client: AmazonS3, materializer: Materializer) = {
     val location = createBagItMetaFileLocation(bagLocation,name)
-    identity(adapter)
     s3LocationToSource(location)
       .via(FileSplitterFlow(delimiter))
       .runWith(Sink.seq)
