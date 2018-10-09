@@ -5,7 +5,7 @@ from flask_restplus import Namespace, Resource
 
 from models.bags import Bag, File, FileManifest, Source
 from models.catalogue import Error, Identifier, IdentifierType
-from storage import VHSNotFound, read_from_vhs
+from storage import VHSError, VHSNotFound, read_from_vhs
 
 
 api = Namespace("bags", description="Bag requests")
@@ -41,3 +41,5 @@ class BagResource(Resource):
             return result
         except VHSNotFound:
             abort(404, f"Invalid id: No bag found for id={id!r}")
+        except VHSError:
+            abort(500)
