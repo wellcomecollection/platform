@@ -20,9 +20,9 @@ api.add_model("Source", definition=Source)
 
 
 @api.route("/<id>")
-@api.param("id", "The bag identifier")
+@api.param("id", "The bag to return")
 class BagResource(Resource):
-    @api.doc(description="The bag is returned in the body of the response")
+    @api.doc(description="Returns a single bag")
     @api.marshal_with(Bag)
     @api.response(200, "Bag found")
     @api.response(404, "Bag not found", Error)
