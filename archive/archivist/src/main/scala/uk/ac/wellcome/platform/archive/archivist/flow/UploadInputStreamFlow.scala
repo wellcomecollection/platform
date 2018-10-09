@@ -14,6 +14,15 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
 
 import scala.util.{Failure, Success}
 
+/** This flow uploads an individual item to S3, and ensures the checksum of
+  * the uploaded bytes matches the checksum from the manifest.
+  *
+  * It emits the original archive item job.
+  *
+  * If the upload to S3 fails or the checksum is incorrect, it returns
+  * an error instead.
+  *
+  */
 object UploadInputStreamFlow extends Logging {
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[(ArchiveItemJob, InputStream),
@@ -32,19 +41,21 @@ object UploadInputStreamFlow extends Logging {
               .log("to either")
               .map {
                 case Success(calculatedChecksum)
-                    if calculatedChecksum == checksum =>
-                  Right(job)
+                  if calculatedChecksum == checksum =>
+                    Right(job)
                 case Success(calculatedChecksum) =>
                   warn(
                     s"Checksum didn't match: $calculatedChecksum != $checksum")
                   Left(
                     ChecksumNotMatchedOnUploadError(
-                      checksum,
-                      calculatedChecksum,
-                      job))
-                case Failure(ex) =>
-                  warn("There was an exception!", ex)
-                  Left(UploadError(ex, job))
+                      expectedChecksum = checksum,
+                      actualCheckSum = calculatedChecksum,
+                      job = job
+                    )
+                  )
+                case Failure(exception) =>
+                  warn("There was an exception!", exception)
+                  Left(UploadError(exception, job))
               }
         }
       )

@@ -16,6 +16,17 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 }
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 
+/** This flow extracts an item from a ZIP file, uploads it to S3 and validates
+  * the checksum matches the manifest.
+  *
+  * It emits the original archive item job.
+  *
+  * It returns an error if:
+  *   - There's a problem getting the item from the ZIP file
+  *   - The upload to S3 fails
+  *   - The checksums don't match
+  *
+  */
 object UploadItemFlow extends Logging {
   def apply(parallelism: Int)(
     implicit s3Client: AmazonS3
