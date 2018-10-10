@@ -88,10 +88,8 @@ class ProgressManager:
             raise ProgressServiceError(
                 "Expected HTTP 200 or 404; got %d (id=%r)" % (resp.status_code, id)
             )
-
         elif resp.status_code == 404:
             raise ProgressNotFoundError(id)
-
         else:
             try:
                 return resp.json()

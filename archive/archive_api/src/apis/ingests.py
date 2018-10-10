@@ -89,7 +89,7 @@ class IngestResource(Resource):
     @api.doc(
         description="The ingest request id is returned in the Location header from a POSTed ingest request"
     )
-    @api.marshal_with(Progress)
+    @api.marshal_with(Ingest)
     @api.response(200, "Ingest found")
     @api.response(404, "Ingest not found", Error)
     def get(self, id):
@@ -99,7 +99,6 @@ class IngestResource(Resource):
 
             progress_manager = app.config["PROGRESS_MANAGER"]
 
-            result = progress_manager.lookup_progress(id=id)
-            return {"id": result["progress"]}
+            return progress_manager.lookup_progress(id=id)
         except ProgressNotFoundError as error:
             abort(404, f"Invalid id: No ingest found for id={id!r}")

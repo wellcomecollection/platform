@@ -13,6 +13,7 @@ api = Api(
         "(https://tools.ietf.org/html/draft-kunze-bagit-17) resources"
     ),
     prefix="/storage/v1",
+    doc=None,
 )
 
 api.add_namespace(bags_api)
