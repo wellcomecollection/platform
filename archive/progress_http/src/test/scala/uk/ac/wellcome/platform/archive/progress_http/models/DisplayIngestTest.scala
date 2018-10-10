@@ -5,7 +5,10 @@ import java.time.Instant
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent
+}
 
 class DisplayIngestTest extends FunSpec with Matchers {
 
@@ -36,6 +39,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
     ingest.status shouldBe DisplayIngestStatus("processing")
     ingest.createdDate shouldBe createdDate
     ingest.lastModifiedDate shouldBe modifiedDate
-    ingest.events shouldBe List(DisplayProgressEvent(eventDescription, eventDate))
+    ingest.events shouldBe List(
+      DisplayProgressEvent(eventDescription, eventDate))
   }
 }

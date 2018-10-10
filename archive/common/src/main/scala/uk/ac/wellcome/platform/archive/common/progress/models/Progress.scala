@@ -18,13 +18,13 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
 }
 
 case class Progress(
-                     id: UUID,
-                     uploadUri: URI,
-                     callbackUri: Option[URI],
-                     status: Progress.Status = Progress.None,
-                     createdDate: Instant = Instant.now,
-                     lastModifiedDate: Instant = Instant.now,
-                     events: Seq[ProgressEvent] = Seq.empty
+  id: UUID,
+  uploadUri: URI,
+  callbackUri: Option[URI],
+  status: Progress.Status = Progress.None,
+  createdDate: Instant = Instant.now,
+  lastModifiedDate: Instant = Instant.now,
+  events: Seq[ProgressEvent] = Seq.empty
 ) {
 
   def update(progressUpdate: ProgressUpdate) = {
@@ -40,7 +40,8 @@ trait StatusConverters {
   import uk.ac.wellcome.json.JsonUtil.{fromJson, toJson}
 
   implicit val enc = Encoder.instance[Progress.Status] {
-    status: Progress.Status => Json.fromString(status.toString)
+    status: Progress.Status =>
+      Json.fromString(status.toString)
   }
 
   implicit val dec = Decoder.instance[Progress.Status](cursor =>
@@ -93,7 +94,7 @@ object Progress extends URIConverters with StatusConverters {
     override def toString: String = "completed-callback-success"
   }
 
-  case object CompletedCallbackFailed extends Status  {
+  case object CompletedCallbackFailed extends Status {
     override def toString: String = "completed-callback-failed"
   }
 

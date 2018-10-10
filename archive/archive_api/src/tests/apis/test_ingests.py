@@ -26,8 +26,8 @@ class TestGETIngests:
         assert rv["type"] == "Ingest"
         assert isinstance(rv["uploadUrl"], str)
         assert isinstance(rv["callbackUrl"], str)
-        assert rv["ingestType"] == {"id": "create", "type":"IngestType"}
-        assert rv["status"] == {"id": "processing", "type":"IngestStatus"}
+        assert rv["ingestType"] == {"id": "create", "type": "IngestType"}
+        assert rv["status"] == {"id": "processing", "type": "IngestStatus"}
         assert isinstance(rv["createdDate"], str)
         assert isinstance(rv["lastModifiedDate"], str)
         assert len(rv["events"]) == 1

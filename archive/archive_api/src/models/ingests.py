@@ -59,8 +59,7 @@ Ingest = TypedModel(
             required=True,
         ),
         "status": fields.Nested(
-            IngestStatus,
-            description="Status of ingest processing",
+            IngestStatus, description="Status of ingest processing"
         ),
         "createdDate": fields.String(),
         "lastModifiedDate": fields.String(),
