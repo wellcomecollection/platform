@@ -79,7 +79,7 @@ trait ProgressMonitorFixture
         id = id,
         uploadUri = uploadUrl,
         callbackUri = Some(callbackUrl)
-    ))
+      ))
   }
 
   def givenProgressRecord(id: UUID,

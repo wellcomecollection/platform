@@ -53,7 +53,8 @@ class ProgressUpdateAndPublishFlowTest
                 status = status
               )
 
-              val eventualResult = Source.single(update)
+              val eventualResult = Source
+                .single(update)
                 .via(flow)
                 .async
                 .runWith(Sink.head)(materializer)
