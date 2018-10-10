@@ -8,9 +8,9 @@ import akka.util.ByteString
 
 import scala.concurrent.Future
 
-/** Takes a [[File]] and a source of bytes, and writes the bytes to the file.
+/** Takes a File and a source of bytes, and writes the bytes to the file.
   *
-  * It emits the [[IOResult]] from the file write.
+  * It emits the IOResult from the file write.
   *
   */
 object FileStoreFlow {
