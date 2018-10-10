@@ -53,8 +53,11 @@ class ArgsConfigurator(val arguments: Seq[String])
     opt[String]("aws-sqs-region", default = Some("eu-west-1"))
   private val awsSqsEndpoint = opt[String]("aws-sqs-endpoint")
 
-  private val snsTopicArn: ScallopOption[String] =
-    opt[String]("sns-topic-arn", required = true)
+  private val ddsSnsTopicArn: ScallopOption[String] =
+    opt[String]("dds-sns-topic-arn", required = true)
+
+  private val progressSnsTopicArn: ScallopOption[String] =
+    opt[String]("progress-sns-topic-arn", required = true)
 
   private val awsSnsAccessKey = opt[String]("aws-sns-access-key")
   private val awsSnsSecretKey = opt[String]("aws-sns-secret-key")
@@ -93,8 +96,12 @@ class ArgsConfigurator(val arguments: Seq[String])
     endpoint = awsSnsEndpoint.toOption
   )
 
-  val snsConfig = SNSConfig(
-    topicArn = snsTopicArn()
+  val ddsSnsConfig = SNSConfig(
+    topicArn = ddsSnsTopicArn()
+  )
+
+  val progressSnsConfig = SNSConfig(
+    topicArn = progressSnsTopicArn()
   )
 
   val sqsClientConfig = SQSClientConfig(
@@ -147,7 +154,8 @@ class ArgsConfigurator(val arguments: Seq[String])
     sqsClientConfig,
     sqsConfig,
     snsClientConfig,
-    snsConfig,
+    ddsSnsConfig,
+    progressSnsConfig,
     hybridStoreConfig,
     metricsConfig
   )

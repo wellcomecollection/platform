@@ -6,13 +6,14 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait BagLocationFixtures extends S3 with BagIt {
-  def withBag[R](storageBucket: Bucket, dataFileCount: Int = 1)(
+  def withBag[R](storageBucket: Bucket, dataFileCount: Int = 1, createDataManifest: List[(String, String)] => Option[FileEntry] =
+  createValidDataManifest)(
     testWith: TestWith[BagLocation, R]) = {
     val bagIdentifier = randomAlphanumeric()
 
     info(s"Creating bag $bagIdentifier")
 
-    val fileEntries = createBag(bagIdentifier, dataFileCount)
+    val fileEntries = createBag(bagIdentifier, dataFileCount, createDataManifest = createDataManifest)
     val storagePrefix = "archive"
 
     val bagLocation = BagLocation(

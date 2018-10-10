@@ -1,32 +1,38 @@
 package uk.ac.wellcome.platform.archive.registrar
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.sns.AmazonSNSAsync
+import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject._
+import com.google.inject.name.Named
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
+import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
+import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow, SnsPublishFlow}
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.registrar.factories.StorageManifestFactory
-import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlowA
+import uk.ac.wellcome.platform.archive.registrar.flows.NotifyDDSFlow
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.s3.S3ClientFactory
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 class Registrar @Inject()(
-  snsClient: AmazonSNSAsync,
-  snsConfig: SNSConfig,
+  snsClient: AmazonSNS,
+  @Named("ddsSnsConfig") ddsSnsConfig: SNSConfig,
+  @Named("progressSnsConfig") progressSnsConfig: SNSConfig,
+  s3Client: AmazonS3,
   s3ClientConfig: S3ClientConfig,
-  messageStream: MessageStream[NotificationMessage, Object],
+  messageStream: MessageStream[NotificationMessage, Unit],
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
@@ -34,8 +40,9 @@ class Registrar @Inject()(
 ) {
   def run() = {
 
-    implicit val client = snsClient
+    implicit val snsclient = snsClient
     implicit val system = actorSystem
+    implicit val s3client = s3Client
 
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
@@ -44,34 +51,36 @@ class Registrar @Inject()(
     implicit val executionContext: ExecutionContextExecutor =
       actorSystem.dispatcher
 
-    implicit val s3Client: AmazonS3 = S3ClientFactory.create(
-      region = s3ClientConfig.region,
-      endpoint = s3ClientConfig.endpoint.getOrElse(""),
-      accessKey = s3ClientConfig.accessKey.getOrElse(""),
-      secretKey = s3ClientConfig.secretKey.getOrElse("")
-    )
-
     val flow = Flow[NotificationMessage]
       .log("notification message")
       .via(NotificationParsingFlow[ArchiveComplete])
       .map(createStorageManifest)
-      .collect{ case Right((manifest, archiveComplete)) => (manifest,archiveComplete)}
-      .mapAsync(10) {
-        case (manifest, ctx) => updateStoredManifest(manifest, ctx)
-      }
-      .via(SnsPublishFlowA(snsConfig))
-      .log("published notification")
-      .filter {
-        case (_, context) => context.archiveCompleteCallbackUrl.isDefined
-      }
+      .log("created storage manifest")
+      .via(FoldEitherFlow[ArchiveError[ArchiveComplete], (StorageManifest, ArchiveComplete), Unit](ifLeft = notifyFailure(snsclient, progressSnsConfig))(ifRight = fhgsdv()))
 
     messageStream.run("registrar", flow)
   }
 
+  def notifyFailure(snsClient:AmazonSNS, snsConfig:SNSConfig) =
+    Flow[ArchiveError[ArchiveComplete]]
+      .map(error => ProgressUpdate(error.t.archiveRequestId, List(ProgressEvent(error.toString)), Progress.Failed))
+    .via(SnsPublishFlow(snsClient, snsConfig, Some("registrar_failed"))).map(_ => ())
+
+  def fhgsdv()(implicit snsClient: AmazonSNS, ec: ExecutionContext)
+    : Flow[(StorageManifest, ArchiveComplete), Unit, NotUsed]
+    = Flow[(StorageManifest, ArchiveComplete)]
+    .mapAsync(10) {
+      case (manifest, ctx) => updateStoredManifest(manifest, ctx)
+    }
+    .via(NotifyDDSFlow(ddsSnsConfig))
+    .map(archiveComplete => ProgressUpdate(archiveComplete.archiveRequestId, List(ProgressEvent("Bag registered successfully")), Progress.Completed))
+    .via(SnsPublishFlow(snsClient,progressSnsConfig, Some("registration_complete"))).map(_ => ())
+
   private def createStorageManifest(archiveComplete: ArchiveComplete)(
-    implicit s3Client: AmazonS3) =
+    implicit s3Client: AmazonS3): Either[ArchiveError[ArchiveComplete],
+                                         (StorageManifest, ArchiveComplete)] =
     StorageManifestFactory
-      .create(archiveComplete.bagLocation).map(manifest => (manifest, archiveComplete))
+      .create(archiveComplete).map(manifest => (manifest, archiveComplete))
 
   private def updateStoredManifest(storageManifest: StorageManifest,
                                    requestContext: ArchiveComplete)(implicit ec: ExecutionContext) =

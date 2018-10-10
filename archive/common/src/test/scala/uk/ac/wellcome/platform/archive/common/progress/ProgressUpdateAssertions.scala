@@ -1,15 +1,10 @@
-package uk.ac.wellcome.platform.archive.archivist.progress
+package uk.ac.wellcome.platform.archive.common.progress
 import java.util.UUID
 
 import org.scalatest.{Assertion, Inside}
-import uk.ac.wellcome.json.JsonUtil.fromJson
-import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
 
 import scala.util.Try
 
@@ -22,6 +17,7 @@ trait ProgressUpdateAssertions extends SNS with Inside {
     val progressUpdates = messages.map { messageinfo =>
       fromJson[ProgressUpdate](messageinfo.message).get
     }
+    progressUpdates.size should be > 0
 
     progressUpdates
       .map { progressUpdate =>

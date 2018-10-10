@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, SNSAsyncClientModule, TestAppConfigModule, VHSModule}
+import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule, VHSModule}
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -71,14 +71,16 @@ trait Registrar
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 topicArn: Topic)(testWith: TestWith[RegistrarApp, R]) = {
+                 ddsTopic: Topic,
+                 progressTopic: Topic)(testWith: TestWith[RegistrarApp, R]) = {
 
     class TestApp extends Logging {
 
       val appConfigModule = new TestAppConfigModule(
         queuePair.queue.url,
         storageBucket.name,
-        topicArn.arn,
+        ddsTopic.arn,
+        progressTopic.arn,
         hybridStoreTable.name,
         hybridStoreBucket.name,
         "archive"
@@ -91,7 +93,8 @@ trait Registrar
         AkkaModule,
         CloudWatchClientModule,
         SQSClientModule,
-        SNSAsyncClientModule,
+        SNSClientModule,
+        S3ClientModule,
         DynamoClientModule,
         MessageStreamModule
       )
@@ -104,36 +107,37 @@ trait Registrar
   }
 
   def withRegistrar[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
+    testWith: TestWith[(Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket, Table),
                        R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalSnsTopic {
-        snsTopic =>
-          withLocalS3Bucket {
-            storageBucket =>
-              withLocalS3Bucket {
-                hybridStoreBucket =>
-                  withLocalDynamoDbTable { hybridDynamoTable =>
-                    withApp(
+      withLocalSnsTopic { ddsSnsTopic =>
+        withLocalSnsTopic { progressTopic =>
+          withLocalS3Bucket { storageBucket =>
+            withLocalS3Bucket { hybridStoreBucket =>
+              withLocalDynamoDbTable { hybridDynamoTable =>
+                withApp(
+                  storageBucket,
+                  hybridStoreBucket,
+                  hybridDynamoTable,
+                  queuePair,
+                  ddsSnsTopic,
+                  progressTopic) { registrar =>
+                  testWith(
+                    (
                       storageBucket,
-                      hybridStoreBucket,
-                      hybridDynamoTable,
                       queuePair,
-                      snsTopic) { registrar =>
-                      testWith(
-                        (
-                          storageBucket,
-                          queuePair,
-                          snsTopic,
-                          registrar,
-                          hybridStoreBucket,
-                          hybridDynamoTable)
-                      )
-                    }
-                  }
+                      ddsSnsTopic,
+                      progressTopic,
+                      registrar,
+                      hybridStoreBucket,
+                      hybridDynamoTable)
+                  )
+                }
               }
+            }
 
           }
+        }
       }
     })
   }

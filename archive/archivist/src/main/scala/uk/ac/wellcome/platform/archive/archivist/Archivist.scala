@@ -13,12 +13,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
-import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
+import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
+import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
 
 trait Archivist extends Logging {
   val injector: Injector
@@ -74,7 +72,7 @@ trait Archivist extends Logging {
             ArchiveError[IngestBagRequest],
             ZipFileDownloadComplete,
             Unit
-          ](ifLeft = _ => ())(
+          ](ifLeft = Flow[ArchiveError[IngestBagRequest]].map(_ => ()))(
             ifRight = ArchiveAndNotifyRegistrarFlow(
               bagUploaderConfig,
               snsProgressConfig,

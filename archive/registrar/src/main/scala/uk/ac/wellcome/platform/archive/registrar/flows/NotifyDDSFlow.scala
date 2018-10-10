@@ -8,19 +8,16 @@ import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 import uk.ac.wellcome.platform.archive.registrar.models.{RegistrationComplete, StorageManifest}
 
-object SnsPublishFlowA extends Logging {
+object NotifyDDSFlow extends Logging {
 
   def apply(snsConfig: SNSConfig)(implicit snsClient: AmazonSNS) =
     Flow[(StorageManifest, ArchiveComplete)]
       .flatMapConcat({
-        case (manifest, context) =>
+        case (manifest, archiveComplete) =>
           Source
-            .single((manifest, context))
-            .map {
-              case (m, c) => RegistrationComplete(c.archiveRequestId, m)
-            }
+            .single(RegistrationComplete(archiveComplete.archiveRequestId, manifest))
             .log("notification serialised")
             .via(SnsPublishFlow(snsClient,snsConfig, Some("registrar")))
-            .map((_, context))
+            .map(_ => archiveComplete)
       })
 }

@@ -11,6 +11,7 @@ case class RegistrarConfig(s3ClientConfig: S3ClientConfig,
                            sqsClientConfig: SQSClientConfig,
                            sqsConfig: SQSConfig,
                            snsClientConfig: SnsClientConfig,
-                           snsConfig: SNSConfig,
+                           ddsSnsConfig: SNSConfig,
+                           progressSnsConfig: SNSConfig,
                            hybridStoreConfig: HybridStoreConfig,
                            metricsConfig: MetricsConfig)

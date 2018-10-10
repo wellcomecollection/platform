@@ -13,7 +13,8 @@ import scala.concurrent.duration._
 
 class TestAppConfigModule(queueUrl: String,
                           bucketName: String,
-                          topicArn: String,
+                          ddsTopicArn: String,
+                          progressTopicArn: String,
                           hybridStoreTableName: String,
                           hybridStoreBucketName: String,
                           hybridStoreGlobalPrefix: String)
@@ -47,7 +48,8 @@ class TestAppConfigModule(queueUrl: String,
       region = "localhost",
       endpoint = Some("http://localhost:9292")
     )
-    val snsConfig = SNSConfig(topicArn)
+    val ddsSnsConfig = SNSConfig(ddsTopicArn)
+    val progressSnsConfig = SNSConfig(progressTopicArn)
 
     val hybridStoreConfig = HybridStoreConfig(
       dynamoClientConfig = DynamoClientConfig(
@@ -73,7 +75,8 @@ class TestAppConfigModule(queueUrl: String,
       sqsClientConfig,
       sqsConfig,
       snsClientConfig,
-      snsConfig,
+      ddsSnsConfig,
+      progressSnsConfig,
       hybridStoreConfig,
       metricsConfig
     )

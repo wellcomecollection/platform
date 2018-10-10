@@ -5,25 +5,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
-import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveJobError,
-  ChecksumNotMatchedOnUploadError,
-  FileNotFoundError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, IngestRequestContextGenerators}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath,
-  DigitisedStorageType
-}
+import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, DigitisedStorageType}
+import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -203,7 +192,8 @@ class ArchiveZipFileFlowTest
                         Left(InvalidBagManifestError(
                           archiveJob,
                           "manifest-sha256.txt"))) =>
-                      archiveJob.bagLocation shouldBe BagLocation(
+                      archiveJob shouldBe a[ArchiveJob]
+                      archiveJob.asInstanceOf[ArchiveJob].bagLocation shouldBe BagLocation(
                         storageBucket.name,
                         "archive",
                         BagPath(s"$DigitisedStorageType/$bagName"))

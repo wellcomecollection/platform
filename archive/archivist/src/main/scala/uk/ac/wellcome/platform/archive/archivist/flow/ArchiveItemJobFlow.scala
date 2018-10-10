@@ -5,7 +5,8 @@ import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
-import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveError
+import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, OnErrorFlow}
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 object ArchiveItemJobFlow extends Logging {
   def apply(delimiter: String, parallelism: Int)(
@@ -21,11 +22,8 @@ object ArchiveItemJobFlow extends Logging {
           ArchiveError[ArchiveItemJob],
           ArchiveItemJob,
           Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](
-          ifLeft = error => {
-            warn(s"job ${error.job} uploading and verifying failed")
-            Left(error)
-          })(ifRight = DownloadItemFlow(parallelism))
-      )
+          ifLeft = OnErrorFlow())(ifRight = DownloadItemFlow(parallelism)))
       .log("download verified")
   }
 }
+

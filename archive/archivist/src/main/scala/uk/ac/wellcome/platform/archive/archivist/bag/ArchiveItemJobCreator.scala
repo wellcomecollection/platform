@@ -4,16 +4,10 @@ import java.io.InputStream
 
 import cats.implicits._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
-  FileNotFoundError
-}
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveItemJob,
-  ArchiveJob,
-  ZipLocation
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob, ZipLocation}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 object ArchiveItemJobCreator extends Logging {
 

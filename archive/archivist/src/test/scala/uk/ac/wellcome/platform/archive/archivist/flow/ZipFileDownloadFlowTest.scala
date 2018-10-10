@@ -9,16 +9,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
-  ZipFileDownloadingError
-}
-import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
+import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadingError
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
+import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 
