@@ -46,6 +46,7 @@ class ProgressHttpFeatureTest
               whenRequestReady(request) { result =>
                 result.status shouldBe StatusCodes.OK
                 getT[DisplayIngest](result.entity) shouldBe DisplayIngest(progress)
+
               }
             }
           }

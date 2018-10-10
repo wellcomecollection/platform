@@ -11,10 +11,7 @@ import com.gu.scanamo.DynamoFormat
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -74,8 +71,12 @@ trait ProgressMonitorFixture
     val id = UUID.randomUUID()
 
     progressMonitor.create(
-      Progress(id, uploadUrl, Some(callbackUrl))
-    )
+      Progress(
+        id = id,
+        uploadUri = uploadUrl,
+        callbackUri = Some(callbackUrl),
+        events = List(ProgressEvent("an event", Instant.now()))
+    ))
   }
 
   def givenProgressRecord(id: UUID,
