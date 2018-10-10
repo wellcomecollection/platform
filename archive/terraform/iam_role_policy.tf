@@ -64,6 +64,11 @@ resource "aws_iam_role_policy" "registrar_task_sns" {
   policy = "${module.registrar_completed_topic.publish_policy}"
 }
 
+resource "aws_iam_role_policy" "registrar_task_progress_async_sns" {
+  role   = "${module.registrar.task_role_name}"
+  policy = "${module.progress_async_topic.publish_policy}"
+}
+
 resource "aws_iam_role_policy" "registrar_task_sqs" {
   role   = "${module.registrar.task_role_name}"
   policy = "${data.aws_iam_policy_document.read_from_registrar_queue.json}"

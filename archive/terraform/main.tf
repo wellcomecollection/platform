@@ -68,13 +68,12 @@ module "registrar" {
   max_capacity = 1
 
   env_vars = {
-    queue_url                   = "${module.registrar_queue.id}"
-    archive_bucket              = "${aws_s3_bucket.archive_storage.id}"
-    dds_topic_arn               = "${module.registrar_completed_topic.arn}"
-    progress_topic_arn          = "${module.progress_async_topic.arn}"
-    vhs_bucket_name             = "${module.vhs_archive_manifest.bucket_name}"
-    vhs_table_name              = "${module.vhs_archive_manifest.table_name}"
-    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+    queue_url          = "${module.registrar_queue.id}"
+    archive_bucket     = "${aws_s3_bucket.archive_storage.id}"
+    dds_topic_arn      = "${module.registrar_completed_topic.arn}"
+    progress_topic_arn = "${module.progress_async_topic.arn}"
+    vhs_bucket_name    = "${module.vhs_archive_manifest.bucket_name}"
+    vhs_table_name     = "${module.vhs_archive_manifest.table_name}"
   }
 
   env_vars_length = 6
