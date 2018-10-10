@@ -94,8 +94,8 @@ trait ProgressMonitorFixture
     progress.uploadUri shouldBe expectedUploadUri
     progress.callbackUri shouldBe expectedCallbackUri
 
-    assertRecent(progress.createdAt, recentSeconds)
-    assertRecent(progress.updatedAt, recentSeconds)
+    assertRecent(progress.createddDate, recentSeconds)
+    assertRecent(progress.lastModifiedDate, recentSeconds)
   }
 
   def assertProgressRecordedRecentEvents(id: UUID,
@@ -114,6 +114,6 @@ trait ProgressMonitorFixture
                            table: LocalDynamoDb.Table) = {
     val progress = getExistingTableItem[Progress](id.toString, table)
 
-    progress.result shouldBe expectedStatus
+    progress.status shouldBe expectedStatus
   }
 }

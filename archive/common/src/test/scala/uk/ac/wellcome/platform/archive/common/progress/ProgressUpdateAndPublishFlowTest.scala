@@ -50,7 +50,7 @@ class ProgressUpdateAndPublishFlowTest
 
               val expectedProgress = progress.copy(
                 events = progress.events ++ events,
-                result = status
+                status = status
               )
 
               val source = Source.single(update)

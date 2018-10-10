@@ -135,8 +135,8 @@ class ProgressHttpFeatureTest
                     uploadUri,
                     Some(callbackUri)
                   ).copy(
-                    createdAt = progress.createdAt,
-                    updatedAt = progress.updatedAt)
+                    createddDate = progress.createddDate,
+                    lastModifiedDate = progress.lastModifiedDate)
 
                   progress shouldBe expectedProgress
                   assertTableOnlyHasItem(expectedProgress, table)

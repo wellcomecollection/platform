@@ -18,18 +18,18 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
 }
 
 case class Progress(
-  id: UUID,
-  uploadUri: URI,
-  callbackUri: Option[URI],
-  result: Progress.Status = Progress.None,
-  createdAt: Instant = Instant.now,
-  updatedAt: Instant = Instant.now,
-  events: Seq[ProgressEvent] = Seq.empty
+                     id: UUID,
+                     uploadUri: URI,
+                     callbackUri: Option[URI],
+                     status: Progress.Status = Progress.None,
+                     createddDate: Instant = Instant.now,
+                     lastModifiedDate: Instant = Instant.now,
+                     events: Seq[ProgressEvent] = Seq.empty
 ) {
 
   def update(progressUpdate: ProgressUpdate) = {
     this.copy(
-      result = progressUpdate.status,
+      status = progressUpdate.status,
       events = progressUpdate.events ++ this.events
     )
   }
