@@ -4,7 +4,11 @@ import java.util.UUID
 import org.scalatest.{Assertion, Inside}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressUpdate
+}
 
 import scala.util.Try
 

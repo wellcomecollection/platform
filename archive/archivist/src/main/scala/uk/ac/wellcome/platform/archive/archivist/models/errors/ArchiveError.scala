@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.models.errors
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveItemJob,
+  ArchiveJob
+}
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
@@ -8,7 +11,7 @@ case class ChecksumNotMatchedOnUploadError(expectedChecksum: String,
                                            t: ArchiveItemJob)
     extends ArchiveError[ArchiveItemJob] {
   override def toString =
-    s"Calculated checksum $actualCheckSum was different from $expectedChecksum for item ${ t.bagDigestItem.location} on upload"
+    s"Calculated checksum $actualCheckSum was different from $expectedChecksum for item ${t.bagDigestItem.location} on upload"
 }
 
 case class ChecksumNotMatchedOnDownloadError(expectedChecksum: String,

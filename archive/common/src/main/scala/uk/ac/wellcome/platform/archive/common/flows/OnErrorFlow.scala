@@ -4,7 +4,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 object OnErrorFlow extends Logging {
-  def apply[T]() ={
+  def apply[T]() = {
     Flow[ArchiveError[T]].map { error =>
       warn(error.toString)
       Left(error)

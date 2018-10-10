@@ -2,8 +2,15 @@ package uk.ac.wellcome.platform.archive.registrar.factories
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  DownloadError,
+  InvalidBagManifestError
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation
+}
 import uk.ac.wellcome.platform.archive.registrar.models
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectLocation
@@ -11,13 +18,13 @@ import uk.ac.wellcome.storage.ObjectLocation
 import scala.util.Try
 
 object StorageManifestFactory extends Logging {
-  def create(archiveComplete: ArchiveComplete)(
-    implicit s3Client: AmazonS3): Either[ArchiveError[ArchiveComplete], StorageManifest] = {
+  def create(archiveComplete: ArchiveComplete)(implicit s3Client: AmazonS3)
+    : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
     val bagLocation = archiveComplete.bagLocation
 
     val algorithm = "sha256"
 
-    val manifestTupleFuture =
+    val manifestTupleEither =
       getBagItems(archiveComplete, s"manifest-$algorithm.txt", " +")
 //    val tagManifestTupleFuture = getTuples(s"tagmanifest-$algorithm.txt", " +")
 
@@ -39,7 +46,7 @@ object StorageManifestFactory extends Logging {
     )
 
     for {
-      manifestTuples <- manifestTupleFuture
+      manifestTuples <- manifestTupleEither
       fileManifest = FileManifest(
         ChecksumAlgorithm(algorithm),
         manifestTuples
@@ -60,14 +67,15 @@ object StorageManifestFactory extends Logging {
       )
   }
 
-  def getBagItems(archiveComplete: ArchiveComplete, name: String, delimiter: String)(
-    implicit s3Client: AmazonS3)
+  private def getBagItems(archiveComplete: ArchiveComplete,
+                          name: String,
+                          delimiter: String)(implicit s3Client: AmazonS3)
     : Either[ArchiveError[ArchiveComplete], List[BagDigestFile]] = {
     val location = getFileObjectLocation(archiveComplete.bagLocation, name)
     val triedLines = Try(s3Client.getObject(location.namespace, location.key))
       .map(_.getObjectContent)
       .toEither
-      .leftMap(ex => DownloadError(ex, location ,archiveComplete))
+      .leftMap(ex => DownloadError(ex, location, archiveComplete))
       .map(
         inputStream =>
           scala.io.Source
@@ -84,7 +92,7 @@ object StorageManifestFactory extends Logging {
     }
   }
 
-  def getFileObjectLocation(bagLocation: BagLocation, name: String) =
+  private def getFileObjectLocation(bagLocation: BagLocation, name: String) =
     ObjectLocation(
       bagLocation.storageNamespace,
       List(
@@ -94,11 +102,11 @@ object StorageManifestFactory extends Logging {
       ).mkString("/")
     )
 
-  def parseManifestLine(
-    fileChunk: String,
-    delimiter: String,
-    archiveComplete: ArchiveComplete,
-    manifestName: String): Either[InvalidBagManifestError[ArchiveComplete], BagDigestFile] = {
+  private def parseManifestLine(fileChunk: String,
+                                delimiter: String,
+                                archiveComplete: ArchiveComplete,
+                                manifestName: String)
+    : Either[InvalidBagManifestError[ArchiveComplete], BagDigestFile] = {
     val splitChunk = fileChunk.split(delimiter).map(_.trim)
 
     splitChunk match {

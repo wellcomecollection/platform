@@ -3,7 +3,12 @@ package uk.ac.wellcome.platform.archive.registrar
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.scaladsl.Flow
-import akka.stream.{ActorAttributes, ActorMaterializer, ActorMaterializerSettings, Supervision}
+import akka.stream.{
+  ActorAttributes,
+  ActorMaterializer,
+  ActorMaterializerSettings,
+  Supervision
+}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject._
@@ -11,10 +16,19 @@ import com.google.inject.name.Named
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, NotifyFailureFlow}
-import uk.ac.wellcome.platform.archive.common.messaging.{MessageStream, NotificationParsingFlow}
+import uk.ac.wellcome.platform.archive.common.flows.{
+  FoldEitherFlow,
+  NotifyFailureFlow
+}
+import uk.ac.wellcome.platform.archive.common.messaging.{
+  MessageStream,
+  NotificationParsingFlow
+}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  NotificationMessage
+}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.registrar.factories.StorageManifestFactory
 import uk.ac.wellcome.platform.archive.registrar.flows.UpdateStoredManifestFlow
@@ -35,7 +49,7 @@ class Registrar @Inject()(
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
   actorSystem: ActorSystem
-) extends Logging{
+) extends Logging {
   def run() = {
 
     implicit val snsclient = snsClient
@@ -61,11 +75,17 @@ class Registrar @Inject()(
       .via(NotificationParsingFlow[ArchiveComplete])
       .map(createStorageManifest)
       .withAttributes(ActorAttributes.dispatcher(
-      "akka.stream.materializer.blocking-io-dispatcher"))
+        "akka.stream.materializer.blocking-io-dispatcher"))
       .log("created storage manifest")
-      .via(FoldEitherFlow[ArchiveError[ArchiveComplete], (StorageManifest, ArchiveComplete), Unit]
-        (ifLeft = NotifyFailureFlow[ArchiveComplete]("registrar_failure",progressSnsConfig)(_.archiveRequestId).map(_ => ()))
-        (ifRight = UpdateStoredManifestFlow(dataStore, ddsSnsConfig, progressSnsConfig)))
+      .via(
+        FoldEitherFlow[
+          ArchiveError[ArchiveComplete],
+          (StorageManifest, ArchiveComplete),
+          Unit](
+          ifLeft = NotifyFailureFlow[ArchiveComplete](
+            "registrar_failure",
+            progressSnsConfig)(_.archiveRequestId).map(_ => ()))(ifRight =
+          UpdateStoredManifestFlow(dataStore, ddsSnsConfig, progressSnsConfig)))
 
     messageStream.run("registrar", flow)
   }
@@ -74,6 +94,7 @@ class Registrar @Inject()(
     implicit s3Client: AmazonS3): Either[ArchiveError[ArchiveComplete],
                                          (StorageManifest, ArchiveComplete)] =
     StorageManifestFactory
-      .create(archiveComplete).map(manifest => (manifest, archiveComplete))
+      .create(archiveComplete)
+      .map(manifest => (manifest, archiveComplete))
 
 }

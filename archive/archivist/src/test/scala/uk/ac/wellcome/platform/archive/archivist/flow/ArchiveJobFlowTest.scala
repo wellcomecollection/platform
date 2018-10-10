@@ -5,7 +5,10 @@ import org.scalatest.{FunSpec, Inside}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, IngestRequestContextGenerators}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagItConfig,
+  IngestRequestContextGenerators
+}
 import uk.ac.wellcome.platform.archive.archivist.models.errors._
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models._

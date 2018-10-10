@@ -7,7 +7,10 @@ import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ChecksumNotMatchedOnDownloadError
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  DownloadError
+}
 
 import scala.util.{Failure, Success, Try}
 
@@ -31,7 +34,8 @@ object DownloadItemFlow extends Logging {
               warn(
                 s"Failed downloading object ${job.uploadLocation} from S3",
                 exception)
-              Source.single(Left(DownloadError(exception, job.uploadLocation,job)))
+              Source.single(
+                Left(DownloadError(exception, job.uploadLocation, job)))
             case Success(inputStream) =>
               StreamConverters
                 .fromInputStream(() => inputStream)

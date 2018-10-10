@@ -16,7 +16,10 @@ import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  IngestBagRequest,
+  NotificationMessage
+}
 
 trait Archivist extends Logging {
   val injector: Injector

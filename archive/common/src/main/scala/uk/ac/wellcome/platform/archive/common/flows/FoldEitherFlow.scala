@@ -15,11 +15,14 @@ import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge}
   *
   */
 object FoldEitherFlow {
-  def apply[L, R, Out](ifLeft: Flow[L,Out, NotUsed])(
+  def apply[L, R, Out](ifLeft: Flow[L, Out, NotUsed])(
     ifRight: Flow[R, Out, NotUsed]): Flow[Either[L, R], Out, NotUsed] = {
     Flow.fromGraph(
-      GraphDSL.create(ifLeft, ifRight, Broadcast[Either[L, R]](2), Merge[Out](2))(
-        (_,_, _, _) => NotUsed) { implicit builder =>
+      GraphDSL.create(
+        ifLeft,
+        ifRight,
+        Broadcast[Either[L, R]](2),
+        Merge[Out](2))((_, _, _, _) => NotUsed) { implicit builder =>
         import GraphDSL.Implicits._
         (ifLeftFlow, ifRightFlow, broadcast, merge) =>
           {

@@ -122,7 +122,7 @@ class DownloadItemFlowTest
 
             whenReady(futureResult) { result =>
               inside(result) {
-                case Left(DownloadError(exception, uploadLocation,job)) =>
+                case Left(DownloadError(exception, uploadLocation, job)) =>
                   job shouldBe archiveItemJob
                   uploadLocation shouldBe archiveItemJob.uploadLocation
                   exception shouldBe a[AmazonS3Exception]

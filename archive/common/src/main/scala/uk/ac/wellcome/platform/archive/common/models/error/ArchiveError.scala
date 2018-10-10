@@ -5,13 +5,15 @@ trait ArchiveError[T] {
   val t: T
 }
 
-case class DownloadError[T](exception: Throwable, location:ObjectLocation, t: T)
-  extends ArchiveError[T] {
+case class DownloadError[T](exception: Throwable,
+                            location: ObjectLocation,
+                            t: T)
+    extends ArchiveError[T] {
   override def toString =
     s"There was an exception while downloading object $location: ${exception.getMessage}"
 }
 
 case class InvalidBagManifestError[T](t: T, manifestName: String)
-  extends ArchiveError[T] {
+    extends ArchiveError[T] {
   override def toString = s"Invalid bag manifest $manifestName"
 }
