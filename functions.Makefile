@@ -180,9 +180,10 @@ endef
 #   $1 - Path to the docker-compose file.
 #
 define docker_compose_up
-    $(ROOT)/docker_run.py --dind --sbt --root -- \
-    		--net host \
-    		docker/compose:1.21.0 -f $(ROOT)/$(1) up
+	$(ROOT)/docker_run.py --dind --sbt --root -- \
+		--net host \
+		wellcome/sbt_wrapper \
+		"project $(1)" "dockerComposeUp"
 endef
 
 
@@ -192,9 +193,10 @@ endef
 #   $1 - Path to the docker-compose file.
 #
 define docker_compose_down
-    $(ROOT)/docker_run.py --dind --sbt --root -- \
-        		--net host \
-        		docker/compose:1.21.0 -f $(ROOT)/$(1) down
+	$(ROOT)/docker_run.py --dind --sbt --root -- \
+		--net host \
+		wellcome/sbt_wrapper \
+		"project $(1)" "dockerComposeDown"
 endef
 
 
