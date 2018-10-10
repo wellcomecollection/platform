@@ -465,5 +465,4 @@ class ArchivistFeatureTest
         }
     }
   }
-
 }

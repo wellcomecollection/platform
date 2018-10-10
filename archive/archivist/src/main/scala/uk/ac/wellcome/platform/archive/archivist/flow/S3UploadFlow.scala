@@ -37,19 +37,12 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
       private var partEtagList: List[PartETag] = Nil
       private var currentPart: ByteString = ByteString.empty
 
+      // invoked at startup
       override def preStart(): Unit = {
         maybeUploadId = None
         partNumber = 1
         partEtagList = Nil
       }
-
-      // Each part of a MultipartUpload (except the last) needs to be at least 5MB according to AWS specs
-      val minSize: Int = 5 * 1024 * 1024
-
-      // The maximum size for each part in a MultipartUpload according to AWS specs if 5GB.
-      // Setting it smaller here so we know we don't run out of memory
-      // TODO: this should be configurable
-      val maxSize: Int = 10 * 1024 * 1024
 
       setHandler(out, new OutHandler {
         override def onPull(): Unit = pull(in)
@@ -62,12 +55,15 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         new InHandler {
           override def onPush(): Unit = {
             val byteString = grab(in)
-            uploadIfAboveMinSize(currentPart ++ byteString, false)
+            uploadIfAboveMinSize(
+              currentPart ++ byteString,
+              isLast = false
+            )
             pull(in)
           }
 
           override def onUpstreamFinish(): Unit = {
-            uploadIfAboveMinSize(currentPart, true)
+            uploadIfAboveMinSize(currentPart, isLast = true)
             maybeUploadId.foreach { uploadId =>
               completeUpload(uploadId)
             }
@@ -80,9 +76,26 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       )
 
+      // The AWS docs tell us that each part of an S3 MultipartUpload can
+      // be between 5MB to 5GB, with the last part allowed to be <5MB.
+      //
+      // We set a smaller maximum size so we don't run out of memory.
+      // TODO: The maxSize should be configurable.
+      //
+      // See https://docs.aws.amazon.com/AmazonS3/latest/dev/qfacts.html
+      //
+      val minSize: Int = 5 * 1024 * 1024
+      val maxSize: Int = 10 * 1024 * 1024
+
+      /** Upload a byte string, taking into account the S3 Upload limits.
+        *
+        * In particular, it checks the string is large enough to be uploaded,
+        * and slices it into smaller pieces if it's too big.
+        *
+        */
       @tailrec
       private def uploadIfAboveMinSize(byteString: ByteString,
-                                       isLast: Boolean): Unit = {
+                                       isLast: Boolean): Unit =
         byteString.size match {
           case size if size < minSize && !isLast =>
             currentPart = byteString
@@ -94,22 +107,28 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
             uploadByteString(current)
             if (next.nonEmpty) uploadIfAboveMinSize(next, isLast)
         }
-      }
 
-      private def uploadByteString(byteString: ByteString): Unit = {
+      /** Upload a single byte string as part of a Multipart Upload.
+        *
+        * If the upload succeeds, it increments the internal counter and
+        * part number so the next part is uploaded after this one.
+        *
+        * If the upload fails, it aborts the upload and triggers a downstream
+        * exception.
+        *
+        */
+      private def uploadByteString(byteString: ByteString): Unit =
         if (byteString.nonEmpty) {
           val triedUploadResult = getUploadId.flatMap { uploadId =>
             val inputStream = new ByteArrayInputStream(byteString.toArray)
-            Try(
-              s3Client.uploadPart(
-                new UploadPartRequest()
-                  .withBucketName(uploadLocation.namespace)
-                  .withKey(uploadLocation.key)
-                  .withUploadId(uploadId)
-                  .withInputStream(inputStream)
-                  .withPartNumber(partNumber)
-                  .withPartSize(byteString.size)
-              ))
+            val uploadRequest = new UploadPartRequest()
+              .withBucketName(uploadLocation.namespace)
+              .withKey(uploadLocation.key)
+              .withUploadId(uploadId)
+              .withInputStream(inputStream)
+              .withPartNumber(partNumber)
+              .withPartSize(byteString.size)
+            Try(s3Client.uploadPart(uploadRequest))
           }
           triedUploadResult match {
             case Failure(ex) =>
@@ -119,16 +138,21 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
               partEtagList = partEtagList :+ uploadResult.getPartETag
           }
         }
-      }
 
+      /** Mark the upload as complete.
+        *
+        * This tells S3 that we've uploaded every part of the file, and it
+        * should assemble them into a single object.
+        *
+        */
       private def completeUpload(uploadId: String): Unit = {
         debug("Completing upload")
-        val compRequest =
-          new CompleteMultipartUploadRequest(
-            uploadLocation.namespace,
-            uploadLocation.key,
-            uploadId,
-            partEtagList.asJava)
+        val compRequest = new CompleteMultipartUploadRequest(
+          uploadLocation.namespace,
+          uploadLocation.key,
+          uploadId,
+          partEtagList.asJava
+        )
         val res = Try(s3Client.completeMultipartUpload(compRequest))
         res match {
           case Success(result) =>
@@ -140,11 +164,19 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       }
 
+      /** Propagate an internal failure to the person reading from this flow,
+        * and trigger a cleanup.
+        *
+        */
       private def handleInternalFailure(ex: Throwable): Unit = {
         push(out, Failure(ex))
         handleFailure(ex)
       }
 
+      /** Handle a failure in the upload process by aborting the S3 upload,
+        * and passing the exception to the Akka supervision handler.
+        *
+        */
       private def handleFailure(ex: Throwable): Unit = {
         error("There was a failure uploading to s3!", ex)
         abortUpload()
@@ -157,6 +189,11 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         }
       }
 
+      /** Abort the upload -- this prevents any further uploads to this ID,
+        * and means that nothing gets written to S3.  Any previously uploaded
+        * parts get discarded.
+        *
+        */
       private def abortUpload(): Unit = {
         debug("aborting upload")
         maybeUploadId.foreach { uploadId =>
@@ -165,10 +202,14 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
               new AbortMultipartUploadRequest(
                 uploadLocation.namespace,
                 uploadLocation.key,
-                uploadId)))
+                uploadId
+              )
+            )
+          )
         }
       }
 
+      // TODO: How does this work???
       private def getUploadId: Try[String] = maybeUploadId match {
         case None =>
           val triedUploadId = initializeUpload(uploadLocation)
@@ -177,14 +218,24 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         case Some(initializedId) => Try(initializedId)
 
       }
-      private def initializeUpload(uploadLocation: ObjectLocation) =
+
+      /** Start a new Multipart Upload with S3, and return the upload ID
+        * (if successful).
+        *
+        */
+      private def initializeUpload(
+        uploadLocation: ObjectLocation): Try[String] = {
+        val initiateRequest =
+          new InitiateMultipartUploadRequest(
+            uploadLocation.namespace,
+            uploadLocation.key
+          )
         Try(
           s3Client
-            .initiateMultipartUpload(
-              new InitiateMultipartUploadRequest(
-                uploadLocation.namespace,
-                uploadLocation.key))
-            .getUploadId)
+            .initiateMultipartUpload(initiateRequest)
+            .getUploadId
+        )
+      }
     }
 
 }

@@ -30,11 +30,11 @@ object DownloadItemFlow extends Logging {
               .getObjectContent)
 
           triedInputStream match {
-            case Failure(ex) =>
+            case Failure(exception) =>
               warn(
                 s"Failed downloading object ${job.uploadLocation} from S3",
-                ex)
-              Source.single(Left(DownloadError(ex, job)))
+                exception)
+              Source.single(Left(DownloadError(exception, job)))
             case Success(inputStream) =>
               StreamConverters
                 .fromInputStream(() => inputStream)
@@ -47,9 +47,11 @@ object DownloadItemFlow extends Logging {
                     warn(s"Failed validating checksum in download for job $job")
                     Left(
                       ChecksumNotMatchedOnDownloadError(
-                        job.bagDigestItem.checksum,
-                        calculatedChecksum,
-                        job))
+                        expectedChecksum = job.bagDigestItem.checksum,
+                        actualCheckSum = calculatedChecksum,
+                        job = job
+                      )
+                    )
                 }
           }
         }

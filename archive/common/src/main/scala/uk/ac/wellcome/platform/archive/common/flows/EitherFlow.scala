@@ -7,6 +7,14 @@ import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
 
 import scala.util.Try
 
+/** This process takes a function (In => Try[Out]), and flattens the
+  * result into an Either[FailedEvent[In], Out].
+  *
+  * It partitions the flow into Left/Right, with the failures on
+  * one side (and in particular, the _reason_ for the failures), and
+  * the successes on the other.
+  *
+  */
 object EitherFlow {
 
   def apply[In, Out](
