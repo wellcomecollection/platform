@@ -26,3 +26,8 @@ variable "env_vars" {
 }
 
 variable "env_vars_length" {}
+
+variable "command" {
+  type    = "list"
+  default = []
+}

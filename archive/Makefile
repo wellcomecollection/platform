@@ -7,7 +7,7 @@ SBT_APPS    = archivist registrar progress_async progress_http notifier
 SBT_DOCKER_LIBRARIES = archive_common
 SBT_NO_DOCKER_LIBRARIES =
 
-ECS_TASKS   = bagger archive_api
+ECS_TASKS   = bagger archive_api callback_stub_server
 LAMBDAS     =
 
 TF_NAME     = archive

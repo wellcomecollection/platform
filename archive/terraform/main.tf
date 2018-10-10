@@ -34,7 +34,7 @@ module "archivist" {
   service_name                     = "archivist"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 0
+  min_capacity = 1
   max_capacity = 1
 
   env_vars = {
@@ -64,7 +64,7 @@ module "registrar" {
   service_name                     = "registrar"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 0
+  min_capacity = 1
   max_capacity = 1
 
   env_vars = {
@@ -89,6 +89,7 @@ module "notifier" {
   source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  security_group_ids               = ["${aws_security_group.interservice_security_group.id}"]
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
@@ -96,7 +97,7 @@ module "notifier" {
   service_name                     = "notifier"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 0
+  min_capacity = 1
   max_capacity = 1
 
   env_vars = {
@@ -124,12 +125,12 @@ module "progress_async" {
   service_name                     = "progress_async"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity = 0
+  min_capacity = 1
   max_capacity = 1
 
   env_vars = {
     queue_url                   = "${module.progress_async_queue.id}"
-    topic_arn                   = "${module.caller_topic.arn}"
+    topic_arn                   = "${module.notifier_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
 
@@ -209,4 +210,27 @@ module "bagger" {
   container_image   = "${local.bagger_container_image}"
   source_queue_name = "${module.bagger_queue.name}"
   source_queue_arn  = "${module.bagger_queue.arn}"
+}
+
+# Integration testing - callback_client
+
+module "callback_stub_server" {
+  source = "internal_rest_service"
+
+  service_name = "callback_stub_server"
+
+  container_port  = "8080"
+  container_image = "${local.callback_stub_server_container_image}"
+
+  env_vars        = {}
+  env_vars_length = 0
+  command         = ["--verbose", "--disable-banner"]
+
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  private_subnets    = "${local.private_subnets}"
+
+  cluster_id = "${aws_ecs_cluster.cluster.id}"
+  vpc_id     = "${local.vpc_id}"
+
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }

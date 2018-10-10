@@ -78,7 +78,7 @@ resource "aws_iam_role_policy" "registrar_task_archive_progress_table" {
 
 resource "aws_iam_role_policy" "progress_async_task_sns" {
   role   = "${module.progress_async.task_role_name}"
-  policy = "${module.caller_topic.publish_policy}"
+  policy = "${module.notifier_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "progress_async_task_sqs" {

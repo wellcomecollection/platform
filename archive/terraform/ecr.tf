@@ -27,6 +27,11 @@ module "ecr_repository_notifier" {
   name   = "notifier"
 }
 
+module "ecr_repository_callback_stub_server" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "callback_stub_server"
+}
+
 module "ecr_repository_bagger" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "bagger"

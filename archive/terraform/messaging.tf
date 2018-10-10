@@ -58,14 +58,7 @@ module "progress_async_queue" {
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
 
-# Messaging - caller
-
-module "caller_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "${local.namespace}_caller"
-}
-
-# Messaging - callback notifier
+# Messaging - notifier
 
 module "notifier_topic" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"

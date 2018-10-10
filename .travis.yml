@@ -170,6 +170,8 @@ jobs:
     - env: TASK=progress_async-test
     - env: TASK=progress_http-test
     - env: TASK=notifier-test
+    - env: TASK=callback_stub_server-publish
+
 
     # (not under active development)
 

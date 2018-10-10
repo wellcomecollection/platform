@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/callback/ok"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "state": "success"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
