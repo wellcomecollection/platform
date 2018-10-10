@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.scaladsl.Flow
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
+import akka.stream.{ActorAttributes, ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject._
@@ -60,6 +60,8 @@ class Registrar @Inject()(
       .log("notification message")
       .via(NotificationParsingFlow[ArchiveComplete])
       .map(createStorageManifest)
+      .withAttributes(ActorAttributes.dispatcher(
+      "akka.stream.materializer.blocking-io-dispatcher"))
       .log("created storage manifest")
       .via(FoldEitherFlow[ArchiveError[ArchiveComplete], (StorageManifest, ArchiveComplete), Unit]
         (ifLeft = NotifyFailureFlow[ArchiveComplete]("registrar_failure",progressSnsConfig)(_.archiveRequestId).map(_ => ()))
