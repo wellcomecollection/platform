@@ -8,4 +8,6 @@ locals {
   vhs_full_access_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_full_access_policy}"
   vhs_table_name         = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_table_name}"
   vhs_bucket_name        = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_bucket_name}"
+
+  reindexed_items_topic_name = "${data.terraform_remote_state.reindexer.sierra_items_topic_name}"
 }
