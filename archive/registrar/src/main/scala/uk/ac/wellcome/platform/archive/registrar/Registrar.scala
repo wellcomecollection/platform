@@ -3,12 +3,13 @@ package uk.ac.wellcome.platform.archive.registrar
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject._
 import com.google.inject.name.Named
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
@@ -37,7 +38,7 @@ class Registrar @Inject()(
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
   actorSystem: ActorSystem
-) {
+) extends Logging{
   def run() = {
 
     implicit val snsclient = snsClient
@@ -47,7 +48,16 @@ class Registrar @Inject()(
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
-    implicit val materializer: ActorMaterializer = ActorMaterializer()
+    val decider: Supervision.Decider = {
+      case e => {
+        error("Stream failure", e)
+        Supervision.Resume
+      }
+    }
+
+    implicit val materializer: ActorMaterializer = ActorMaterializer(
+      ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider)
+    )
     implicit val executionContext: ExecutionContextExecutor =
       actorSystem.dispatcher
 

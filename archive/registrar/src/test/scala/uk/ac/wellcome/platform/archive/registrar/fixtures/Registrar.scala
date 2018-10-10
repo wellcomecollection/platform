@@ -141,4 +141,39 @@ trait Registrar
       }
     })
   }
+
+  def withRegistrarAndBrokenVHS[R](
+                        testWith: TestWith[(Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket),
+                          R]) = {
+    withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
+      withLocalSnsTopic { ddsSnsTopic =>
+        withLocalSnsTopic { progressTopic =>
+          withLocalS3Bucket { storageBucket =>
+            withLocalS3Bucket { hybridStoreBucket =>
+                withApp(
+                  storageBucket,
+                  hybridStoreBucket,
+                  Table("does-not-exist", ""),
+                  queuePair,
+                  ddsSnsTopic,
+                  progressTopic) { registrar =>
+                  testWith(
+                    (
+                      storageBucket,
+                      queuePair,
+                      ddsSnsTopic,
+                      progressTopic,
+                      registrar,
+                      hybridStoreBucket)
+                  )
+                }
+              }
+            }
+
+
+        }
+      }
+    })
+  }
+
 }
