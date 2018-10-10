@@ -24,5 +24,3 @@ variable "interservice_security_group_id" {}
 variable "service_egress_security_group_id" {}
 
 variable "sierra_items_bucket" {}
-
-variable "reindexed_items_topic_name" {}
