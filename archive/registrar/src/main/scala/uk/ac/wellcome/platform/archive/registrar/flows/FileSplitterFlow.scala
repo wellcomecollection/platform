@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.flows
+package uk.ac.wellcome.platform.archive.registrar.flows
 
 import akka.stream.scaladsl.{Flow, Framing}
 import akka.util.ByteString

@@ -3,28 +3,30 @@ package uk.ac.wellcome.platform.archive.registrar
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Source}
+import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNSAsync
 import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
+import uk.ac.wellcome.platform.archive.common.messaging.{
+  MessageStream,
+  NotificationParsingFlow
+}
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
-  NotificationMessage,
-  RequestContext
+  NotificationMessage
 }
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
-import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlow
+import uk.ac.wellcome.platform.archive.registrar.factories.StorageManifestFactory
+import uk.ac.wellcome.platform.archive.registrar.flows.SnsPublishFlowA
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.s3.S3ClientFactory
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
-import scala.concurrent.ExecutionContextExecutor
-import scala.util.{Failure, Success}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 class Registrar @Inject()(
   snsClient: AmazonSNSAsync,
@@ -57,47 +59,36 @@ class Registrar @Inject()(
 
     val flow = Flow[NotificationMessage]
       .log("notification message")
-      .map(parseNotification)
-      .flatMapConcat(createStorageManifest)
-      .map {
+      .via(NotificationParsingFlow[ArchiveComplete])
+      .map(createStorageManifest)
+      .collect {
+        case Right((manifest, archiveComplete)) => (manifest, archiveComplete)
+      }
+      .mapAsync(10) {
         case (manifest, ctx) => updateStoredManifest(manifest, ctx)
       }
-      .via(SnsPublishFlow(snsConfig))
+      .via(SnsPublishFlowA(snsConfig))
       .log("published notification")
       .filter {
-        case (_, context) => context.callbackUrl.isDefined
+        case (_, context) => context.archiveCompleteCallbackUrl.isDefined
       }
 
     messageStream.run("registrar", flow)
   }
 
-  private def parseNotification(message: NotificationMessage) = {
-    fromJson[ArchiveComplete](message.Message) match {
-      case Success(bagArchiveCompleteNotification: ArchiveComplete) =>
-        RequestContext(bagArchiveCompleteNotification)
-      case Failure(e) =>
-        throw new RuntimeException(
-          s"Failed to get object location from notification: ${e.getMessage}"
-        )
-    }
-  }
+  private def createStorageManifest(archiveComplete: ArchiveComplete)(
+    implicit s3Client: AmazonS3) =
+    StorageManifestFactory
+      .create(archiveComplete.bagLocation)
+      .map(manifest => (manifest, archiveComplete))
 
-  private def createStorageManifest(requestContext: RequestContext)(
-    implicit s3Client: AmazonS3,
-    materializer: ActorMaterializer,
-    executionContext: ExecutionContextExecutor) = {
-    Source.fromFuture(
-      for (manifest <- StorageManifestFactory
-             .create(requestContext.bagLocation))
-        yield (manifest, requestContext))
-  }
-
-  private def updateStoredManifest(storageManifest: StorageManifest,
-                                   requestContext: RequestContext) = {
-    dataStore.updateRecord(storageManifest.id.value)(
-      ifNotExisting = (storageManifest, EmptyMetadata()))(
-      ifExisting = (_, _) => (storageManifest, EmptyMetadata())
-    )
-    (storageManifest, requestContext)
-  }
+  private def updateStoredManifest(
+    storageManifest: StorageManifest,
+    requestContext: ArchiveComplete)(implicit ec: ExecutionContext) =
+    dataStore
+      .updateRecord(storageManifest.id.value)(
+        ifNotExisting = (storageManifest, EmptyMetadata()))(
+        ifExisting = (_, _) => (storageManifest, EmptyMetadata())
+      )
+      .map(_ => (storageManifest, requestContext))
 }

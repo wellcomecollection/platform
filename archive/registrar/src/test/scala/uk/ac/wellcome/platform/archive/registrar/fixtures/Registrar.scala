@@ -9,12 +9,9 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
-  BagLocation,
-  BagPath,
-  DigitisedStorageType
+  BagLocation
 }
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.modules.{
@@ -37,7 +34,7 @@ trait Registrar
     extends S3
     with Messaging
     with LocalVersionedHybridStore
-    with BagIt
+    with BagLocationFixtures
     with LocalDynamoDb {
 
   def sendNotification(requestId: UUID,
@@ -59,32 +56,6 @@ trait Registrar
       sendNotification(requestId, bagLocation, callbackUrl, queuePair)
       testWith(bagLocation)
     }
-  }
-
-  def withBag[R](storageBucket: Bucket, dataFileCount: Int = 1)(
-    testWith: TestWith[BagLocation, R]) = {
-    val bagIdentifier = randomAlphanumeric()
-
-    info(s"Creating bag $bagIdentifier")
-
-    val fileEntries = createBag(bagIdentifier, dataFileCount)
-    val storagePrefix = "archive"
-
-    val bagLocation = BagLocation(
-      storageBucket.name,
-      storagePrefix,
-      BagPath(s"$DigitisedStorageType/$bagIdentifier"))
-
-    fileEntries.map((entry: FileEntry) => {
-      s3Client
-        .putObject(
-          bagLocation.storageNamespace,
-          s"$storagePrefix/${bagLocation.bagPath}/${entry.name}",
-          entry.contents
-        )
-    })
-
-    testWith(bagLocation)
   }
 
   override def createTable(table: Table) = {
