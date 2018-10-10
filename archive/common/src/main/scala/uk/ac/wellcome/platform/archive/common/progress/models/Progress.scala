@@ -54,7 +54,7 @@ trait StatusConverters {
         case "completed"  => Completed
         case "failed"     => Failed
 
-        case "completed-callback-success" =>
+        case "completed-callback-succeeded" =>
           CompletedCallbackSucceeded
         case "completed-callback-failed" =>
           CompletedCallbackFailed
@@ -91,7 +91,7 @@ object Progress extends URIConverters with StatusConverters {
   }
 
   case object CompletedCallbackSucceeded extends Status {
-    override def toString: String = "completed-callback-success"
+    override def toString: String = "completed-callback-succeeded"
   }
 
   case object CompletedCallbackFailed extends Status {
