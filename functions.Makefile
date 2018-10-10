@@ -241,10 +241,10 @@ endef
 #
 define __sbt_base_docker_template
 $(1)-docker_compose_up:
-	$(call docker_compose_up,$(2)/docker-compose.yml)
+	$(call docker_compose_up,$(1))
 
 $(1)-docker_compose_down:
-	$(call docker_compose_down,$(2)/docker-compose.yml)
+	$(call docker_compose_down,$(1))
 
 $(1)-test:
 	$(call sbt_test,$(1))
