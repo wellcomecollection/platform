@@ -3,12 +3,12 @@ import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
   FileNotFoundError,
   InvalidBagInfo
 }
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 /** This flow extracts the external identifier from the metadata inside
   * the ZIP file, and emits an ArchiveJob.

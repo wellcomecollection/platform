@@ -11,12 +11,10 @@ import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
-  ZipFileDownloadingError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadingError
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
   ProgressEvent,
@@ -105,7 +103,7 @@ object ZipFileDownloadFlow extends Logging {
           List(ProgressEvent("zipFile downloaded successfully")))
       case Left(archiveError) =>
         ProgressUpdate(
-          archiveError.job.archiveRequestId,
+          archiveError.t.archiveRequestId,
           List(ProgressEvent(archiveError.toString)),
           Progress.Failed)
     }

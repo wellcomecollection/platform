@@ -12,6 +12,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 import uk.ac.wellcome.platform.archive.archivist.models.errors._
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -127,8 +128,8 @@ class ArchiveJobFlowTest
                   case List(Left(ArchiveJobError(actualArchiveJob, errors))) =>
                     actualArchiveJob shouldBe archiveJob
                     all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
-                    errors.map(_.job.bagDigestItem.location.path) should contain theSameElementsAs failedFiles
-                    errors.map(_.job.archiveJob).distinct shouldBe List(
+                    errors.map(_.t.bagDigestItem.location.path) should contain theSameElementsAs failedFiles
+                    errors.map(_.t.archiveJob).distinct shouldBe List(
                       archiveJob)
                 }
               }
@@ -169,8 +170,8 @@ class ArchiveJobFlowTest
                     error shouldBe a[ChecksumNotMatchedOnUploadError]
                     val checksumNotMatchedOnUploadError =
                       error.asInstanceOf[ChecksumNotMatchedOnUploadError]
-                    checksumNotMatchedOnUploadError.job.archiveJob shouldBe archiveJob
-                    checksumNotMatchedOnUploadError.job.bagDigestItem.location shouldBe EntryPath(
+                    checksumNotMatchedOnUploadError.t.archiveJob shouldBe archiveJob
+                    checksumNotMatchedOnUploadError.t.bagDigestItem.location shouldBe EntryPath(
                       filepath)
                     job shouldBe archiveJob
                 }

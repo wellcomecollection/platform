@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.modules
 
 import akka.actor.ActorSystem
 import com.google.inject.{AbstractModule, Provides}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.modules.{
   DynamoClientConfig,
   S3ClientConfig
@@ -11,8 +12,6 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config, S3StorageBackend}
 import uk.ac.wellcome.storage.vhs.VHSConfig
-
-import uk.ac.wellcome.json.JsonUtil._
 
 object VHSModule extends AbstractModule {
   @Provides

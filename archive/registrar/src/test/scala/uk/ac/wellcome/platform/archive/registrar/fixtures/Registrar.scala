@@ -16,7 +16,6 @@ import uk.ac.wellcome.platform.archive.common.models.{
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   ConfigModule,
-  SNSAsyncClientModule,
   TestAppConfigModule,
   VHSModule
 }
@@ -83,14 +82,16 @@ trait Registrar
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 topicArn: Topic)(testWith: TestWith[RegistrarApp, R]) = {
+                 ddsTopic: Topic,
+                 progressTopic: Topic)(testWith: TestWith[RegistrarApp, R]) = {
 
     class TestApp extends Logging {
 
       val appConfigModule = new TestAppConfigModule(
         queuePair.queue.url,
         storageBucket.name,
-        topicArn.arn,
+        ddsTopic.arn,
+        progressTopic.arn,
         hybridStoreTable.name,
         hybridStoreBucket.name,
         "archive"
@@ -103,7 +104,8 @@ trait Registrar
         AkkaModule,
         CloudWatchClientModule,
         SQSClientModule,
-        SNSAsyncClientModule,
+        SNSClientModule,
+        S3ClientModule,
         DynamoClientModule,
         MessageStreamModule
       )
@@ -116,30 +118,72 @@ trait Registrar
   }
 
   def withRegistrar[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
-                       R]) = {
+    testWith: TestWith[
+      (Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket, Table),
+      R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
-        snsTopic =>
-          withLocalS3Bucket {
-            storageBucket =>
+        ddsSnsTopic =>
+          withLocalSnsTopic {
+            progressTopic =>
               withLocalS3Bucket {
-                hybridStoreBucket =>
-                  withLocalDynamoDbTable { hybridDynamoTable =>
+                storageBucket =>
+                  withLocalS3Bucket {
+                    hybridStoreBucket =>
+                      withLocalDynamoDbTable { hybridDynamoTable =>
+                        withApp(
+                          storageBucket,
+                          hybridStoreBucket,
+                          hybridDynamoTable,
+                          queuePair,
+                          ddsSnsTopic,
+                          progressTopic) { registrar =>
+                          testWith(
+                            (
+                              storageBucket,
+                              queuePair,
+                              ddsSnsTopic,
+                              progressTopic,
+                              registrar,
+                              hybridStoreBucket,
+                              hybridDynamoTable)
+                          )
+                        }
+                      }
+                  }
+
+              }
+          }
+      }
+    })
+  }
+
+  def withRegistrarAndBrokenVHS[R](
+    testWith: TestWith[(Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket),
+                       R]) = {
+    withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
+      withLocalSnsTopic {
+        ddsSnsTopic =>
+          withLocalSnsTopic {
+            progressTopic =>
+              withLocalS3Bucket {
+                storageBucket =>
+                  withLocalS3Bucket { hybridStoreBucket =>
                     withApp(
                       storageBucket,
                       hybridStoreBucket,
-                      hybridDynamoTable,
+                      Table("does-not-exist", ""),
                       queuePair,
-                      snsTopic) { registrar =>
+                      ddsSnsTopic,
+                      progressTopic) { registrar =>
                       testWith(
                         (
                           storageBucket,
                           queuePair,
-                          snsTopic,
+                          ddsSnsTopic,
+                          progressTopic,
                           registrar,
-                          hybridStoreBucket,
-                          hybridDynamoTable)
+                          hybridStoreBucket)
                       )
                     }
                   }
@@ -149,4 +193,5 @@ trait Registrar
       }
     })
   }
+
 }

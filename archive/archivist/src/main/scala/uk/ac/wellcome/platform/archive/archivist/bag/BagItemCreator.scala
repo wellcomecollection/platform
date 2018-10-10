@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.bag
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+import uk.ac.wellcome.platform.archive.common.models.error.{
   ArchiveError,
   InvalidBagManifestError
 }

@@ -7,11 +7,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ChecksumNotMatchedOnDownloadError,
-  DownloadError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.ChecksumNotMatchedOnDownloadError
 import uk.ac.wellcome.platform.archive.common.models.DigitisedStorageType
+import uk.ac.wellcome.platform.archive.common.models.error.DownloadError
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -124,8 +122,9 @@ class DownloadItemFlowTest
 
             whenReady(futureResult) { result =>
               inside(result) {
-                case Left(DownloadError(exception, job)) =>
+                case Left(DownloadError(exception, uploadLocation, job)) =>
                   job shouldBe archiveItemJob
+                  uploadLocation shouldBe archiveItemJob.uploadLocation
                   exception shouldBe a[AmazonS3Exception]
               }
             }

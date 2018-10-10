@@ -5,14 +5,16 @@ import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveItemJobCreator
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
-  ArchiveJobError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveItemJob,
   ArchiveJob
 }
+import uk.ac.wellcome.platform.archive.common.flows.{
+  FoldEitherFlow,
+  OnErrorFlow
+}
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   IngestBagRequest
@@ -32,12 +34,8 @@ object ArchiveJobFlow extends Logging {
         FoldEitherFlow[
           ArchiveError[ArchiveJob],
           List[ArchiveItemJob],
-          Either[ArchiveError[ArchiveJob], ArchiveComplete]](ifLeft = error => {
-          warn(s"${error.job} failed creating archive item jobs")
-          Left(error)
-        })(ifRight =
-          mapReduceArchiveItemJobs(delimiter, parallelism, ingestBagRequest))
-      )
+          Either[ArchiveError[ArchiveJob], ArchiveComplete]](OnErrorFlow())(
+          mapReduceArchiveItemJobs(delimiter, parallelism, ingestBagRequest)))
 
   private def mapReduceArchiveItemJobs(delimiter: String,
                                        parallelism: Int,
@@ -50,7 +48,7 @@ object ArchiveJobFlow extends Logging {
       .via(ArchiveItemJobFlow(delimiter, parallelism))
       .groupBy(Int.MaxValue, {
         case Right(archiveItemJob) => archiveItemJob.archiveJob
-        case Left(error)           => error.job.archiveJob
+        case Left(error)           => error.t.archiveJob
       })
       .fold((Nil: List[ArchiveError[ArchiveItemJob]], None: Option[ArchiveJob])) {
         (accumulator, archiveItemJobResult) =>
@@ -58,7 +56,7 @@ object ArchiveJobFlow extends Logging {
             case ((errorList, _), Right(archiveItemJob)) =>
               (errorList, Some(archiveItemJob.archiveJob))
             case ((errorList, _), Left(error)) =>
-              (error :: errorList, Some(error.job.archiveJob))
+              (error :: errorList, Some(error.t.archiveJob))
           }
 
       }

@@ -8,15 +8,17 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
-  ArchiveJobError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveJob,
   BagUploaderConfig
 }
+import uk.ac.wellcome.platform.archive.common.flows.{
+  FoldEitherFlow,
+  OnErrorFlow
+}
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   IngestBagRequest
@@ -46,7 +48,7 @@ object ArchiveZipFileFlow extends Logging {
                 ArchiveError[IngestBagRequest],
                 ArchiveJob,
                 Either[ArchiveError[_], ArchiveComplete]
-              ](ifLeft = Left(_))(
+              ](ifLeft = OnErrorFlow())(
                 ifRight = ArchiveJobFlow(
                   delimiter = config.bagItConfig.digestDelimiterRegexp,
                   parallelism = config.parallelism,

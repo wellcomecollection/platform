@@ -10,11 +10,11 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
-import uk.ac.wellcome.platform.archive.archivist.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 import IngestBagRequest._
+import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 
 // TODO: Test file boundaries
 

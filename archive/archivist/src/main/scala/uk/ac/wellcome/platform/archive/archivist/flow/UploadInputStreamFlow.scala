@@ -7,10 +7,10 @@ import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveError,
   ChecksumNotMatchedOnUploadError,
   UploadError
 }
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 import scala.util.{Failure, Success}
 
@@ -50,7 +50,7 @@ object UploadInputStreamFlow extends Logging {
                     ChecksumNotMatchedOnUploadError(
                       expectedChecksum = checksum,
                       actualCheckSum = calculatedChecksum,
-                      job = job
+                      t = job
                     )
                   )
                 case Failure(exception) =>

@@ -6,7 +6,6 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   AppConfigModule,
   ConfigModule,
-  SNSAsyncClientModule,
   VHSModule
 }
 
@@ -21,7 +20,8 @@ object Main extends App with Logging {
     AkkaModule,
     CloudWatchClientModule,
     SQSClientModule,
-    SNSAsyncClientModule,
+    SNSClientModule,
+    S3ClientModule,
     DynamoClientModule,
     MessageStreamModule
   )
