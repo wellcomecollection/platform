@@ -94,7 +94,7 @@ trait ProgressMonitorFixture
     progress.uploadUri shouldBe expectedUploadUri
     progress.callbackUri shouldBe expectedCallbackUri
 
-    assertRecent(progress.createddDate, recentSeconds)
+    assertRecent(progress.createdDate, recentSeconds)
     assertRecent(progress.lastModifiedDate, recentSeconds)
   }
 

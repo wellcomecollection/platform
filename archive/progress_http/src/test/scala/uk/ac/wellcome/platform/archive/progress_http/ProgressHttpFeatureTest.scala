@@ -10,11 +10,9 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressCreateRequest
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressCreateRequest}
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
+import uk.ac.wellcome.platform.archive.progress_http.models.DisplayIngest
 
 class ProgressHttpFeatureTest
     extends FunSpec
@@ -47,7 +45,7 @@ class ProgressHttpFeatureTest
 
               whenRequestReady(request) { result =>
                 result.status shouldBe StatusCodes.OK
-                getT[Progress](result.entity) shouldBe progress
+                getT[DisplayIngest](result.entity) shouldBe DisplayIngest(progress)
               }
             }
           }
@@ -135,7 +133,7 @@ class ProgressHttpFeatureTest
                     uploadUri,
                     Some(callbackUri)
                   ).copy(
-                    createddDate = progress.createddDate,
+                    createdDate = progress.createdDate,
                     lastModifiedDate = progress.lastModifiedDate)
 
                   progress shouldBe expectedProgress

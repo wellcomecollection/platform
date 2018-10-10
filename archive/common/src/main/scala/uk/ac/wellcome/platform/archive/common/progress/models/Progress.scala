@@ -22,7 +22,7 @@ case class Progress(
                      uploadUri: URI,
                      callbackUri: Option[URI],
                      status: Progress.Status = Progress.None,
-                     createddDate: Instant = Instant.now,
+                     createdDate: Instant = Instant.now,
                      lastModifiedDate: Instant = Instant.now,
                      events: Seq[ProgressEvent] = Seq.empty
 ) {
@@ -39,17 +39,9 @@ trait StatusConverters {
 
   import uk.ac.wellcome.json.JsonUtil.{fromJson, toJson}
 
-  implicit val enc = Encoder.instance[Progress.Status](_ match {
-    case None       => Json.fromString("none")
-    case Processing => Json.fromString("processing")
-    case Completed  => Json.fromString("completed")
-    case Failed     => Json.fromString("failed")
-
-    case CompletedCallbackSucceeded =>
-      Json.fromString("completed-callback-success")
-    case CompletedCallbackFailed =>
-      Json.fromString("completed-callback-failure")
-  })
+  implicit val enc = Encoder.instance[Progress.Status] {
+    status: Progress.Status => Json.fromString(status.toString)
+  }
 
   implicit val dec = Decoder.instance[Progress.Status](cursor =>
     for {
@@ -63,7 +55,7 @@ trait StatusConverters {
 
         case "completed-callback-success" =>
           CompletedCallbackSucceeded
-        case "completed-callback-failure" =>
+        case "completed-callback-failed" =>
           CompletedCallbackFailed
       }
   })
@@ -81,17 +73,29 @@ object Progress extends URIConverters with StatusConverters {
 
   sealed trait Status
 
-  case object None extends Status
+  case object None extends Status {
+    override def toString: String = "none"
+  }
 
-  case object Processing extends Status
+  case object Processing extends Status {
+    override def toString: String = "processing"
+  }
 
-  case object Completed extends Status
+  case object Completed extends Status {
+    override def toString: String = "completed"
+  }
 
-  case object Failed extends Status
+  case object Failed extends Status {
+    override def toString: String = "failed"
+  }
 
-  case object CompletedCallbackSucceeded extends Status
+  case object CompletedCallbackSucceeded extends Status {
+    override def toString: String = "completed-callback-success"
+  }
 
-  case object CompletedCallbackFailed extends Status
+  case object CompletedCallbackFailed extends Status  {
+    override def toString: String = "completed-callback-failed"
+  }
 
   def apply(createRequest: ProgressCreateRequest): Progress = {
     Progress(
