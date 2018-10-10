@@ -76,7 +76,8 @@ module "items_merger" {
 
   merged_dynamo_table_name = "${local.vhs_table_name}"
 
-  updates_topic_name = "${module.items_to_dynamo.topic_name}"
+  updates_topic_name         = "${module.items_to_dynamo.topic_name}"
+  reindexed_items_topic_name = "${local.reindexed_items_topic_name}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id       = "${local.vpc_id}"
