@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models._
 
 /** This flow extracts the external identifier from the metadata inside
-  * the ZIP file, and emits an [[ArchiveJob]].
+  * the ZIP file, and emits an ArchiveJob.
   *
   * If it's unable to find the identifier, it emits a Left[ArchiveError] instead.
   *

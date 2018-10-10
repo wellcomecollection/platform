@@ -5,7 +5,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.flows.ProcessLogDiscardFlow
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 
-/** Parses a [[NotificationMessage]] as an instance of type T, and only
+/** Parses a NotificationMessage as an instance of type T, and only
   * emits the successfully parsed results.
   *
   */
