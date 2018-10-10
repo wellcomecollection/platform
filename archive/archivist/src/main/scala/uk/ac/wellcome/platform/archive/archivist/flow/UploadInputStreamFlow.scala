@@ -47,7 +47,7 @@ object UploadInputStreamFlow extends Logging {
                     ChecksumNotMatchedOnUploadError(
                       expectedChecksum = checksum,
                       actualCheckSum = calculatedChecksum,
-                      job = job
+                      t = job
                     )
                   )
                 case Failure(exception) =>
