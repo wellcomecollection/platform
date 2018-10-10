@@ -1,0 +1,40 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        DeViSE Image Search
+    </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="javascript.js"></script>
+</head>
+
+<div class="ph4 black-80">
+    <h1 class="pt2">DeViSE Image Search</h1>
+    <div class="pb2">Search Wellcome Collection's images using &nbsp; -ˏˋ machine learning ˎˊ-</div>
+    <hr class="divider divider--black" />
+    
+    <div>
+        <div class='pb3'>
+            <h2>How does this work?</h2>
+            Like most image-search interfaces, you should use the text box below to type a description of what you want to see. <br>
+            Typical image-search algorithms try to match words from your query to textual descriptions of the images and return the closest matches. The DeViSE-search, however, <i>actually sees</i> each image in the collection, and returns results using its understanding of how visual features correspond to natural language.<br>
+            As a result, the DeViSE-search doesn't need to look at any of the images' associated metadata when you search. All it sees are the images, just like you.
+        </div>
+        <div class='pv2'>
+            <input value="an old wooden boat" name="query" id="query" size="50" class="input-responsive pv2">
+            <a name="search_button" id="search_button" class="f6 link dim br-pill ba ph3 pv2 mb2 dib black" onclick="display_images(document.getElementById('query').value);">Search</a>
+        </div>
+
+    <hr class="divider divider--black" />
+
+    <section class="cf w-100 ph2">
+        <div id="images"></div>
+    </section>
+</div>
+
+</html>
