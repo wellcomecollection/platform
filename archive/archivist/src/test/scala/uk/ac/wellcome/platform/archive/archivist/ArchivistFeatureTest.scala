@@ -16,8 +16,6 @@ import uk.ac.wellcome.storage.ObjectLocation
 import IngestBagRequest._
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 
-// TODO: Test file boundaries
-
 class ArchivistFeatureTest
     extends FunSpec
     with Matchers
@@ -38,7 +36,7 @@ class ArchivistFeatureTest
           progressTopic,
           archivist) =>
         createAndSendBag(ingestBucket, Some(callbackUri), queuePair) {
-          case (requestId, uploadLocation, bagIdentifier) =>
+          case (request, bagIdentifier) =>
             archivist.run()
             eventually {
               listKeysInBucket(storageBucket) should have size 15
@@ -47,26 +45,27 @@ class ArchivistFeatureTest
 
               assertSnsReceivesOnly(
                 ArchiveComplete(
-                  requestId,
+                  request.archiveRequestId,
                   BagLocation(
                     storageBucket.name,
                     "archive",
-                    BagPath(s"$DigitisedStorageType/$bagIdentifier")),
+                    BagPath(
+                      s"${request.storageSpace}/$bagIdentifier")),
                   Some(callbackUri)
                 ),
                 registrarTopic
               )
 
               assertTopicReceivesProgressUpdate(
-                requestId,
+                request.archiveRequestId,
                 progressTopic,
                 Progress.None) { events =>
                 events should have size 1
-                events.head.description shouldBe s"Started working on ingestRequest: $requestId"
+                events.head.description shouldBe s"Started working on ingestRequest: ${request.archiveRequestId}"
               }
 
               assertTopicReceivesProgressUpdate(
-                requestId,
+                request.archiveRequestId,
                 progressTopic,
                 Progress.None) { events =>
                 events should have size 1
@@ -74,7 +73,7 @@ class ArchivistFeatureTest
               }
 
               assertTopicReceivesProgressUpdate(
-                requestId,
+                request.archiveRequestId,
                 progressTopic,
                 Progress.None) { events =>
                 events should have size 1
@@ -99,14 +98,14 @@ class ArchivistFeatureTest
           Some(callbackUri),
           queuePair,
           createDigest = _ => "bad_digest") {
-          case (requestId, uploadLocation, bagIdentifier) =>
+          case (request, bagIdentifier) =>
             archivist.run()
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
 
               assertTopicReceivesProgressUpdate(
-                requestId,
+                request.archiveRequestId,
                 progressTopic,
                 Progress.Failed)({ events =>
                 all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
@@ -133,27 +132,27 @@ class ArchivistFeatureTest
           Some(callbackUri),
           queuePair,
           dataFileCount = 1) {
-          case (validRequestId1, _, validBag1) =>
+          case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
               Some(callbackUri),
               queuePair,
               dataFileCount = 1,
               createDigest = _ => "bad_digest") {
-              case (invalidRequestId1, _, _) =>
+              case (invalidRequest1, _) =>
                 createAndSendBag(
                   ingestBucket,
                   Some(callbackUri),
                   queuePair,
                   dataFileCount = 1) {
-                  case (validRequestId2, _, validBag2) =>
+                  case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,
                       Some(callbackUri),
                       queuePair,
                       dataFileCount = 1,
                       createDigest = _ => "bad_digest") {
-                      case (invalidRequestId2, _, _) =>
+                      case (invalidRequest2, _) =>
                         eventually {
 
                           assertQueuePairSizes(queuePair, 0, 0)
@@ -161,19 +160,19 @@ class ArchivistFeatureTest
                           assertSnsReceives(
                             Set(
                               ArchiveComplete(
-                                validRequestId1,
+                                validRequest1.archiveRequestId,
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"$DigitisedStorageType/$validBag1")),
+                                  BagPath(s"${validRequest1.storageSpace}/$validBag1")),
                                 Some(callbackUri)
                               ),
                               ArchiveComplete(
-                                validRequestId2,
+                                validRequest2.archiveRequestId,
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"$DigitisedStorageType/$validBag2")),
+                                  BagPath(s"${validRequest2.storageSpace}/$validBag2")),
                                 Some(callbackUri)
                               )
                             ),
@@ -181,14 +180,14 @@ class ArchivistFeatureTest
                           )
 
                           assertTopicReceivesProgressUpdate(
-                            invalidRequestId1,
+                            invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
                           assertTopicReceivesProgressUpdate(
-                            invalidRequestId2,
+                            invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
@@ -219,28 +218,34 @@ class ArchivistFeatureTest
           Some(callbackUri),
           queuePair,
           dataFileCount = 1) {
-          case (validRequestId1, _, validBag1) =>
+          case (validRequest1, validBag1) =>
             val invalidRequestId1 = UUID.randomUUID()
             sendNotificationToSQS(
               queuePair.queue,
               IngestBagRequest(
                 invalidRequestId1,
                 ObjectLocation(ingestBucket.name, "non-existing1.zip"),
-                None))
+                None,
+                StorageSpace("not_a_real_one")
+              )
+            )
 
             createAndSendBag(
               ingestBucket,
               Some(callbackUri),
               queuePair,
               dataFileCount = 1) {
-              case (validRequestId2, _, validBag2) =>
+              case (validRequest2, validBag2) =>
                 val invalidRequestId2 = UUID.randomUUID()
                 sendNotificationToSQS(
                   queuePair.queue,
                   IngestBagRequest(
                     invalidRequestId2,
                     ObjectLocation(ingestBucket.name, "non-existing2.zip"),
-                    None))
+                    None,
+                    StorageSpace("not_a_real_one")
+                  )
+                )
 
                 eventually {
 
@@ -249,19 +254,19 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       ArchiveComplete(
-                        validRequestId1,
+                        validRequest1.archiveRequestId,
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"$DigitisedStorageType/$validBag1")),
+                          BagPath(s"${validRequest1.storageSpace}/$validBag1")),
                         Some(callbackUri)
                       ),
                       ArchiveComplete(
-                        validRequestId2,
+                        validRequest2.archiveRequestId,
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"$DigitisedStorageType/$validBag2")),
+                          BagPath(s"${validRequest2.storageSpace}/$validBag2")),
                         Some(callbackUri)
                       )
                     ),
@@ -309,27 +314,27 @@ class ArchivistFeatureTest
           Some(callbackUri),
           queuePair,
           dataFileCount = 1) {
-          case (validRequestId1, _, validBag1) =>
+          case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
               Some(callbackUri),
               queuePair,
               dataFileCount = 1,
               createDataManifest = dataManifestWithNonExistingFile) {
-              case (invalidRequestId1, _, _) =>
+              case (invalidRequest1, _) =>
                 createAndSendBag(
                   ingestBucket,
                   Some(callbackUri),
                   queuePair,
                   dataFileCount = 1) {
-                  case (validRequestId2, _, validBag2) =>
+                  case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,
                       Some(callbackUri),
                       queuePair,
                       dataFileCount = 1,
                       createDataManifest = dataManifestWithNonExistingFile) {
-                      case (invalidRequestId2, _, _) =>
+                      case (invalidRequest2, _) =>
                         eventually {
 
                           assertQueuePairSizes(queuePair, 0, 0)
@@ -337,19 +342,19 @@ class ArchivistFeatureTest
                           assertSnsReceives(
                             Set(
                               ArchiveComplete(
-                                validRequestId1,
+                                validRequest1.archiveRequestId,
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"$DigitisedStorageType/$validBag1")),
+                                  BagPath(s"${validRequest1.storageSpace}/$validBag1")),
                                 Some(callbackUri)
                               ),
                               ArchiveComplete(
-                                validRequestId2,
+                                validRequest2.archiveRequestId,
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"$DigitisedStorageType/$validBag2")),
+                                  BagPath(s"${validRequest2.storageSpace}/$validBag2")),
                                 Some(callbackUri)
                               )
                             ),
@@ -357,7 +362,7 @@ class ArchivistFeatureTest
                           )
 
                           assertTopicReceivesProgressUpdate(
-                            invalidRequestId1,
+                            invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
                             events should have size 1
@@ -365,7 +370,7 @@ class ArchivistFeatureTest
                           }
 
                           assertTopicReceivesProgressUpdate(
-                            invalidRequestId2,
+                            invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
                             events should have size 1
@@ -396,27 +401,27 @@ class ArchivistFeatureTest
           Some(callbackUri),
           queuePair,
           dataFileCount = 1) {
-          case (validRequestId1, _, validBag1) =>
+          case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
               Some(callbackUri),
               queuePair,
               dataFileCount = 1,
               createBagInfoFile = _ => None) {
-              case (invalidRequestId1, _, _) =>
+              case (invalidRequest1, _) =>
                 createAndSendBag(
                   ingestBucket,
                   Some(callbackUri),
                   queuePair,
                   dataFileCount = 1) {
-                  case (validRequestId2, _, validBag2) =>
+                  case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,
                       Some(callbackUri),
                       queuePair,
                       dataFileCount = 1,
                       createBagInfoFile = _ => None) {
-                      case (invalidRequestId2, _, _) =>
+                      case (invalidRequest2, _) =>
                         eventually {
 
                           assertQueuePairSizes(queuePair, 0, 0)
@@ -424,19 +429,19 @@ class ArchivistFeatureTest
                           assertSnsReceives(
                             Set(
                               ArchiveComplete(
-                                validRequestId1,
+                                validRequest1.archiveRequestId,
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"$DigitisedStorageType/$validBag1")),
+                                  BagPath(s"${validRequest1.storageSpace}/$validBag1")),
                                 Some(callbackUri)
                               ),
                               ArchiveComplete(
-                                validRequestId2,
+                                validRequest2.archiveRequestId,
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"$DigitisedStorageType/$validBag2")),
+                                  BagPath(s"${validRequest2.storageSpace}/$validBag2")),
                                 Some(callbackUri)
                               )
                             ),
@@ -444,7 +449,7 @@ class ArchivistFeatureTest
                           )
 
                           assertTopicReceivesProgressUpdate(
-                            invalidRequestId1,
+                            invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
                             events should have size 1
@@ -452,7 +457,7 @@ class ArchivistFeatureTest
                           }
 
                           assertTopicReceivesProgressUpdate(
-                            invalidRequestId2,
+                            invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
                             events should have size 1

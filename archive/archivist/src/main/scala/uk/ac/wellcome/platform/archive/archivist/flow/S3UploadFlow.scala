@@ -156,10 +156,10 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         val res = Try(s3Client.completeMultipartUpload(compRequest))
         res match {
           case Success(result) =>
-            debug("Upload completed successfully")
+            debug(s"Upload completed successfully: $uploadLocation")
             push(out, Try(result))
           case Failure(ex) =>
-            error("Failure while completing upload", ex)
+            error(s"Failure while completing upload: $uploadLocation", ex)
             handleInternalFailure(ex)
         }
       }
@@ -225,6 +225,9 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         */
       private def initializeUpload(
         uploadLocation: ObjectLocation): Try[String] = {
+
+        debug(s"initializeUpload: $uploadLocation")
+
         val initiateRequest =
           new InitiateMultipartUploadRequest(
             uploadLocation.namespace,

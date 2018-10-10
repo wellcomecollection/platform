@@ -10,8 +10,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 }
 import uk.ac.wellcome.platform.archive.common.models.{
   BagLocation,
-  BagPath,
-  DigitisedStorageType
+  BagPath
 }
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
@@ -26,12 +25,14 @@ class ArchiveJobCreatorTest
     withBagItZip() {
       case (bagIdentifier, zipFile) =>
         val bucketName = "bucket"
+        val ingestRequest = createIngestBagRequest
         inside(
           ArchiveJobCreator
             .create(
               zipFile,
               createBagUploaderConfig(Bucket(bucketName)),
-              createIngestBagRequest)) {
+              ingestRequest
+            )) {
           case Right(
               ArchiveJob(
                 actualZipFile,
@@ -42,7 +43,7 @@ class ArchiveJobCreatorTest
             bagLocation shouldBe BagLocation(
               bucketName,
               "archive",
-              BagPath(s"$DigitisedStorageType/$bagIdentifier"))
+              BagPath(s"${ingestRequest.storageSpace}/$bagIdentifier"))
             bagItConfig shouldBe BagItConfig()
             bagManifestLocations should contain only (BagManifestLocation(
               "tagmanifest-sha256.txt"), BagManifestLocation(

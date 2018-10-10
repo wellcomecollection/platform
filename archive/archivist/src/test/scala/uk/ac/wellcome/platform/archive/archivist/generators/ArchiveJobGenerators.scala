@@ -28,7 +28,8 @@ trait ArchiveJobGenerators {
     bucket: Bucket,
     manifestFiles: List[String] =
       List("manifest-sha256.txt", "tagmanifest-sha256.txt")) = {
-    val bagPath = BagPath(s"$DigitisedStorageType/$bagIdentifier")
+    val bagPath = BagPath(s"space/$bagIdentifier")
+
     val bagLocation = BagLocation(bucket.name, "archive", bagPath)
     ArchiveJob(
       zipFile,

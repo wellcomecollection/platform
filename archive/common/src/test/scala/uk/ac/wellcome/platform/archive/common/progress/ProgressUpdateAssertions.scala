@@ -1,18 +1,15 @@
 package uk.ac.wellcome.platform.archive.common.progress
 import java.util.UUID
 
+import grizzled.slf4j.Logging
 import org.scalatest.{Assertion, Inside}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
 
 import scala.util.Try
 
-trait ProgressUpdateAssertions extends SNS with Inside {
+trait ProgressUpdateAssertions extends SNS with Inside with Logging {
   def assertTopicReceivesProgressUpdate(
     requestId: UUID,
     progressTopic: SNS.Topic,
@@ -23,8 +20,11 @@ trait ProgressUpdateAssertions extends SNS with Inside {
     }
     progressUpdates.size should be > 0
 
-    progressUpdates
+    val (success, failure) = progressUpdates
       .map { progressUpdate =>
+
+        debug(s"Received ProgressUpdate: $progressUpdate")
+
         Try(inside(progressUpdate) {
           case ProgressUpdate(id, events, actualStatus) =>
             id shouldBe requestId
@@ -35,6 +35,8 @@ trait ProgressUpdateAssertions extends SNS with Inside {
         })
 
       }
-      .filter(_.isSuccess) should have size 1
+      .partition(_.isSuccess)
+
+      success should have size 1
   }
 }

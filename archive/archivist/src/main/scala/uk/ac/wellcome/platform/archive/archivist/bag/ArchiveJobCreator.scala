@@ -25,7 +25,7 @@ object ArchiveJobCreator {
 
     getBagIdentifier(zipFile, ingestBagRequest)
       .map { bagIdentifier =>
-        BagPath(s"$DigitisedStorageType/$bagIdentifier")
+        BagPath(s"${ingestBagRequest.storageSpace}/$bagIdentifier")
       }
       .map { bagPath =>
         ArchiveJob(

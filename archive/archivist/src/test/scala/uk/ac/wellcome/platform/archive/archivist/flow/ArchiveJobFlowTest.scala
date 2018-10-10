@@ -1,15 +1,13 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
+
 import akka.stream.scaladsl.{Sink, Source}
 import org.apache.commons.io.IOUtils
-import org.scalatest.{FunSpec, Inside}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagItConfig,
-  IngestRequestContextGenerators
-}
 import uk.ac.wellcome.platform.archive.archivist.models.errors._
+import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, IngestRequestContextGenerators}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
@@ -19,7 +17,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 import scala.collection.JavaConverters._
 
 class ArchiveJobFlowTest
-    extends FunSpec
+  extends FunSpec
     with ArchiveJobGenerators
     with S3
     with Akka
@@ -47,11 +45,11 @@ class ArchiveJobFlowTest
                 archiveJobs shouldBe List(
                   Right(
                     ArchiveComplete(
-                      BagLocation(
-                        bucket.name,
-                        "archive",
-                        BagPath(s"$DigitisedStorageType/$bagName")),
-                      ingestRequest)))
+                      archiveJob.bagLocation,
+                      ingestRequest
+                    )
+                  )
+                )
               }
           }
         }
@@ -79,12 +77,12 @@ class ArchiveJobFlowTest
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 inside(archiveJobs.toList) {
                   case List(
-                      Left(
-                        ArchiveJobError(
-                          actualArchiveJob,
-                          List(FileNotFoundError(
-                            "this/does/not/exists.jpg",
-                            archiveItemJob))))) =>
+                  Left(
+                  ArchiveJobError(
+                  actualArchiveJob,
+                  List(FileNotFoundError(
+                  "this/does/not/exists.jpg",
+                  archiveItemJob))))) =>
                     actualArchiveJob shouldBe archiveJob
                     archiveItemJob.bagDigestItem.location shouldBe EntryPath(
                       "this/does/not/exists.jpg")

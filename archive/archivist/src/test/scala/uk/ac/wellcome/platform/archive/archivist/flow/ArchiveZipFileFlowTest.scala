@@ -23,8 +23,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestErr
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   BagLocation,
-  BagPath,
-  DigitisedStorageType
+  BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -75,7 +74,7 @@ class ArchiveZipFileFlowTest
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"$DigitisedStorageType/$bagName")),
+                          BagPath(s"${ingestContext.storageSpace}/$bagName")),
                         None)))
 
                   assertTopicReceivesProgressUpdate(
@@ -212,7 +211,7 @@ class ArchiveZipFileFlowTest
                         .bagLocation shouldBe BagLocation(
                         storageBucket.name,
                         "archive",
-                        BagPath(s"$DigitisedStorageType/$bagName"))
+                        BagPath(s"${ingestContext.storageSpace}/$bagName"))
                   }
 
                   assertTopicReceivesProgressUpdate(

@@ -11,6 +11,12 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 case class IngestBagRequest(archiveRequestId: UUID,
                             zippedBagLocation: ObjectLocation,
-                            archiveCompleteCallbackUrl: Option[URI] = None)
+                            archiveCompleteCallbackUrl: Option[URI] = None,
+                            storageSpace: StorageSpace
+                           )
+
+case class StorageSpace(underlying: String) extends AnyVal {
+  override def toString: String = underlying
+}
 
 object IngestBagRequest extends URIConverters with UUIDConverters

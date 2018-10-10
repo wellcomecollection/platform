@@ -16,7 +16,6 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   UploadError
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.DigitisedStorageType
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.Akka
@@ -61,7 +60,7 @@ class UploadItemFlowTest
               result shouldBe Right(archiveItemJob)
               getContentFromS3(
                 bucket,
-                s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
+                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent
             }
 
           }
@@ -102,7 +101,7 @@ class UploadItemFlowTest
                   archiveItemJob))
               getContentFromS3(
                 bucket,
-                s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
+                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent
             }
 
           }
@@ -140,7 +139,7 @@ class UploadItemFlowTest
               val exception = intercept[AmazonS3Exception] {
                 getContentFromS3(
                   bucket,
-                  s"archive/$DigitisedStorageType/$bagIdentifier/$fileName")
+                  s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$bagIdentifier/$fileName")
               }
               exception.getErrorCode shouldBe "NoSuchKey"
             }
