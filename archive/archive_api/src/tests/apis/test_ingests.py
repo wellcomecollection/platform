@@ -34,7 +34,7 @@ class TestGETIngests:
         event = rv["events"][0]
         assert isinstance(event, dict)
         assert isinstance(event["description"], str)
-        assert isinstance(event["time"], str)
+        assert isinstance(event["createdDate"], str)
         assert event["type"] == "ProgressEvent"
 
     def test_lookup_missing_item_is_404(self, client):

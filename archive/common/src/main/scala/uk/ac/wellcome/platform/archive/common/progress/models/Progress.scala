@@ -108,7 +108,7 @@ object Progress extends URIConverters with StatusConverters {
   private def generateId = UUID.randomUUID()
 }
 
-case class ProgressEvent(description: String, time: Instant = Instant.now)
+case class ProgressEvent(description: String, createdDate: Instant = Instant.now)
 
 case class ProgressUpdate(id: UUID,
                           events: List[ProgressEvent],

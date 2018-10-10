@@ -123,7 +123,7 @@ class NotifierFeatureTest
                   id shouldBe progress.id
                   progressEvent.description shouldBe "Callback fulfilled."
                   status shouldBe Progress.CompletedCallbackSucceeded
-                  assertRecent(progressEvent.time)
+                  assertRecent(progressEvent.createdDate)
               }
             }
         }
@@ -158,7 +158,7 @@ class NotifierFeatureTest
                 id shouldBe progress.id
                 progressEvent.description shouldBe s"Callback failed for: ${progress.id}, got 404 Not Found!"
                 status shouldBe Progress.CompletedCallbackFailed
-                assertRecent(progressEvent.time)
+                assertRecent(progressEvent.createdDate)
             }
           }
       }

@@ -108,7 +108,7 @@ trait ProgressMonitorFixture
     val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
-    progress.events.foreach(event => assertRecent(event.time, recentSeconds))
+    progress.events.foreach(event => assertRecent(event.createdDate, recentSeconds))
     progress
   }
 

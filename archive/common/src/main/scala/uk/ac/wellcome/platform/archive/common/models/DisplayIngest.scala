@@ -47,7 +47,7 @@ case object DisplayIngest {
 
 case object DisplayProgressEvent {
   def apply(progressEvent: ProgressEvent): DisplayProgressEvent = {
-    DisplayProgressEvent(progressEvent.description, progressEvent.time.toString)
+    DisplayProgressEvent(progressEvent.description, progressEvent.createdDate.toString)
   }
 }
 
