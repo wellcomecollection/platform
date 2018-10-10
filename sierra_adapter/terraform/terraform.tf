@@ -28,13 +28,3 @@ data "terraform_remote_state" "catalogue_pipeline_data" {
     region = "eu-west-1"
   }
 }
-
-data "terraform_remote_state" "reindexer" {
-  backend = "s3"
-
-  config {
-    bucket = "wellcomecollection-platform-infra"
-    key    = "terraform/reindexer.tfstate"
-    region = "eu-west-1"
-  }
-}
