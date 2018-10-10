@@ -282,7 +282,7 @@ Response:
 
 ```json
 {
-  "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+  "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
   "id": "xx-xx-xx-xx",
   "source": {
@@ -419,7 +419,7 @@ Response:
 
 ```json
 {
-  "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+  "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
   "id": "yy-yy-yy-yy",
   "source": {
