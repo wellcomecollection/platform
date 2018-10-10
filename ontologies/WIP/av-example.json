@@ -1,7 +1,7 @@
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "watu9tbc",
-  "type": "Article",
+  "type": "Work",
   "workType": {
     "id": "e-video",
     "type": "WorkType",
@@ -9,10 +9,25 @@
   },
   "title": "The sheep shower.",
   "description": "With rousing music, the film opens with footage on a sheep ranch in Australia.",
-  "contributorsNotes": [
+  "credits": [
     "Cooper Engineering presents. Photography Reg Perier, Editing Mildred Crowley, A Perier Production in association with Noel Rubie PTY. Ltd. The film was made on Bandanora; Capertee, Innisfail; Ben Bullen, Warbreccan; Deniliquin, Bundure; Jerilderie."
   ],
-"3XX" : "to do" ,
+  "playingTime" : "001154" ,
+  "contentType" : {
+    "id": "tdi",
+    "type": "ContentType",
+    "label": "two-dimensional moving image"
+  } ,
+    "mediaType" : {
+    "id": "c",
+    "type": "MediaType",
+    "label": "computer"
+  } ,
+    "carrierType" : {
+    "id": "cr",
+    "type": "CarrierType",
+    "label": "online resource"
+  } ,
   "contributors": [
     {
       "type": "Contributor",
