@@ -77,8 +77,22 @@ wwork:ProductionEvent rdf:type owl:Class ;
     rdfs:label "ProductionEvent"@en ;
     rdfs:comment "An event contributing to the production, publishing or distribution of a work."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
-  
+
+wwork:ContentType rdf:type owl:Class ;
+    rdfs:label "ContentType"@en ;
+    rdfs:comment "The form of communication through which a work is expressed."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+
+wwork:MediaType rdf:type owl:Class ;
+    rdfs:label "MediaType"@en ;
+    rdfs:comment "Media type reflects the general type of intermediation device required to view, play, run, etc., the content of a resource."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
                     
+wwork:CarrierType rdf:type owl:Class ;
+    rdfs:label "CarrierType"@en ;
+    rdfs:comment "Carrier type reflects the format of the storage medium and housing of a carrier in combination with the media type (which indicates the intermediation device required to view, play, run, etc., the content of a resource)."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+                            
 #######  Object properties ##### 
     
 
@@ -89,8 +103,8 @@ wwork:items rdf:type owl:ObjectProperty ;
     rdfs:range wwork:Item ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
 
-wwork:isPartOf rdf:type owl:ObjectProperty ;
-    rdfs:label "isPartOf"@en ;
+wwork:partOf rdf:type owl:ObjectProperty ;
+    rdfs:label "partOf"@en ;
     rdfs:comment "Relates an work to its host work."@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Work ;
@@ -98,7 +112,7 @@ wwork:isPartOf rdf:type owl:ObjectProperty ;
     
 wwork:hasPart rdf:type owl:ObjectProperty ;
     rdfs:label "hasPart"@en ;
-    rdfs:comment "Relates an work to its parts."@en ;
+    rdfs:comment "Relates a work to its parts."@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Work ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .    
@@ -241,7 +255,28 @@ wwork:function rdf:type owl:DatatypeProperty ;
     rdfs:comment "Relates a production event to a specific function."@en ;
     rdfs:domain wwork:ProductionEvent ;
     rdfs:range wwork:Concept ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .                                              
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wwork:contentType rdf:type owl:DatatypeProperty ;
+    rdfs:label "contentType"@en ;
+    rdfs:comment "Relates a work to its content type."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:ContentType ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .                                                  
+
+wwork:mediaType rdf:type owl:DatatypeProperty ;
+    rdfs:label "mediaType"@en ;
+    rdfs:comment "Relates a work to its media type."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:MediaType ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+
+wwork:carrierType rdf:type owl:DatatypeProperty ;
+    rdfs:label "carrierType"@en ;
+    rdfs:comment "Relates a work to its carrier type."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:CarrierType ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
     
 #######  Data properties #####  
                         
@@ -320,6 +355,26 @@ wwork:positionInSeries rdf:type owl:DatatypeProperty ;
     rdfs:label "positionInSeries"@en ;
     rdfs:comment "Position in series or volume number."@en ;
     rdfs:domain wwork:Work ;
-    rdfs:range xsd:integer ;
+    rdfs:range rdf:langString ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .            
     
+wwork:credits rdf:type owl:DatatypeProperty ;
+    rdfs:label "credits"@en ;
+    rdfs:comment "Credits for persons or organizations, other than members of the cast, who have participated in the creation and/or production of the work."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+    
+wwork:contents rdf:type owl:DatatypeProperty ;
+    rdfs:label "contents"@en ;
+    rdfs:comment "Titles of separate works or parts of an item or the table of contents."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wwork:playingTime rdf:type owl:DatatypeProperty ;
+    rdfs:label "playingTime"@en ;
+    rdfs:comment "Six numeric characters, in the pattern hhmmss, that represent the playing time for a sound recording, videorecording, etc. or the stated duration of performance of printed or manuscript music. If the playing time is less than 1 hour, the hour (hh) is recorded as two zeroes; if less than a minute, the minute (mm) is also recorded as two zeroes."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .             
