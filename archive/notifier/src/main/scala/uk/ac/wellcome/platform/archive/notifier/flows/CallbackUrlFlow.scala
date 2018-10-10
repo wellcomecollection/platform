@@ -8,9 +8,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.scaladsl.Flow
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
+import uk.ac.wellcome.platform.archive.common.models.{CallbackNotification, DisplayIngest}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress._
 import uk.ac.wellcome.platform.archive.notifier.models.CallbackFlowResult
 
 object CallbackUrlFlow {
@@ -46,7 +45,7 @@ object CallbackUrlFlow {
     // Making a `.get` here!
     val entity = HttpEntity(
       ContentTypes.`application/json`,
-      toJson(progress).get
+      toJson(DisplayIngest(progress)).get
     )
 
     HttpRequest(

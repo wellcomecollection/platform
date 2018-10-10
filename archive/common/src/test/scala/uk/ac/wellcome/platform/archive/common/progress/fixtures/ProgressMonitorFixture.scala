@@ -13,7 +13,6 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
-  ProgressEvent,
   ProgressUpdate
 }
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor

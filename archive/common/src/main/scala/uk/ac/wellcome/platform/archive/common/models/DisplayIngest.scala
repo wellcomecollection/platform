@@ -1,11 +1,8 @@
-package uk.ac.wellcome.platform.archive.progress_http.models
+package uk.ac.wellcome.platform.archive.common.models
 
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent
-}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress._
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent}
 
 case class DisplayIngest(id: String,
                          uploadUrl: String,

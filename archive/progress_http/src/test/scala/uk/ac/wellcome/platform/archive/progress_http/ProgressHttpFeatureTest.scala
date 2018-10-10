@@ -9,13 +9,10 @@ import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressCreateRequest
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressCreateRequest}
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
-import uk.ac.wellcome.platform.archive.progress_http.models.DisplayIngest
 
 class ProgressHttpFeatureTest
     extends FunSpec
@@ -28,7 +25,6 @@ class ProgressHttpFeatureTest
 
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-  import Progress._
   import uk.ac.wellcome.json.JsonUtil._
 
   describe("GET /progress/:id") {
