@@ -17,7 +17,7 @@ class ServerTest
         withLocalS3Bucket { sierraDataBucket =>
           withLocalDynamoDbTable { table =>
             withLocalSnsTopic { topic =>
-              val flags = messageReaderLocalFlags(itemsToDynamoBucket, queue) ++ vhsLocalFlags(
+              val flags = s3LocalFlags(itemsToDynamoBucket) ++ sqsLocalFlags(queue) ++ vhsLocalFlags(
                 sierraDataBucket,
                 table) ++ snsLocalFlags(topic)
               withServer(flags) { server =>

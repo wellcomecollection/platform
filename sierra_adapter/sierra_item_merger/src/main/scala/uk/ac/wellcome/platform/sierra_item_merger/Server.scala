@@ -12,11 +12,7 @@ import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.messaging._
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.storage.{
-  DynamoClientModule,
-  S3ClientModule,
-  VHSConfigModule
-}
+import uk.ac.wellcome.finatra.storage.{DynamoClientModule, S3ClientModule, S3ConfigModule, VHSConfigModule}
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraTransformableModule
 
@@ -33,8 +29,9 @@ class Server extends HttpServer {
     SNSConfigModule,
     SNSClientModule,
     SQSClientModule,
+    SQSConfigModule,
     S3ClientModule,
-    MessageReaderConfigModule,
+    S3ConfigModule,
     AkkaModule,
     SierraItemMergerModule,
     SierraTransformableModule
