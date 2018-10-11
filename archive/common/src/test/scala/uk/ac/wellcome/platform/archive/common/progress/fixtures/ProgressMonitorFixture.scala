@@ -74,8 +74,11 @@ trait ProgressMonitorFixture
     val id = UUID.randomUUID()
 
     progressMonitor.create(
-      Progress(id, uploadUrl, Some(callbackUrl))
-    )
+      Progress(
+        id = id,
+        uploadUri = uploadUrl,
+        callbackUri = Some(callbackUrl)
+      ))
   }
 
   def givenProgressRecord(id: UUID,
@@ -94,8 +97,8 @@ trait ProgressMonitorFixture
     progress.uploadUri shouldBe expectedUploadUri
     progress.callbackUri shouldBe expectedCallbackUri
 
-    assertRecent(progress.createdAt, recentSeconds)
-    assertRecent(progress.updatedAt, recentSeconds)
+    assertRecent(progress.createdDate, recentSeconds)
+    assertRecent(progress.lastModifiedDate, recentSeconds)
   }
 
   def assertProgressRecordedRecentEvents(id: UUID,
@@ -105,7 +108,8 @@ trait ProgressMonitorFixture
     val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
-    progress.events.foreach(event => assertRecent(event.time, recentSeconds))
+    progress.events.foreach(event =>
+      assertRecent(event.createdDate, recentSeconds))
     progress
   }
 
@@ -114,6 +118,6 @@ trait ProgressMonitorFixture
                            table: LocalDynamoDb.Table) = {
     val progress = getExistingTableItem[Progress](id.toString, table)
 
-    progress.result shouldBe expectedStatus
+    progress.status shouldBe expectedStatus
   }
 }

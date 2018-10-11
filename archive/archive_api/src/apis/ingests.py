@@ -6,7 +6,7 @@ from flask_restplus import Namespace, Resource
 
 from ingests import send_new_ingest_request
 from models.catalogue import Error
-from models.ingests import Ingest, IngestType
+from models.ingests import Ingest, IngestType, IngestStatus
 from models.progress import Progress, ProgressEvent
 from progress_manager import ProgressNotFoundError
 import validators
@@ -17,6 +17,7 @@ api = Namespace("ingests", description="Ingest requests")
 api.add_model(name="Error", definition=Error)
 
 api.add_model(name="Ingest", definition=Ingest)
+api.add_model(name="IngestStatus", definition=IngestStatus)
 api.add_model(name="IngestType", definition=IngestType)
 
 api.add_model(name="Progress", definition=Progress)

@@ -15,7 +15,10 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
+import uk.ac.wellcome.platform.archive.common.models.{
+  CallbackNotification,
+  DisplayIngest
+}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
@@ -71,7 +74,8 @@ class NotifierFeatureTest
               wireMock.verifyThat(
                 1,
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
-                  .withRequestBody(equalToJson(toJson(progress).get)))
+                  .withRequestBody(
+                    equalToJson(toJson(DisplayIngest(progress)).get)))
             }
         }
       }
@@ -111,14 +115,15 @@ class NotifierFeatureTest
               wireMock.verifyThat(
                 1,
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
-                  .withRequestBody(equalToJson(toJson(progress).get)))
+                  .withRequestBody(
+                    equalToJson(toJson(DisplayIngest(progress)).get)))
 
               inside(notificationMessage[ProgressUpdate](topic)) {
                 case ProgressUpdate(id, List(progressEvent), status) =>
                   id shouldBe progress.id
                   progressEvent.description shouldBe "Callback fulfilled."
                   status shouldBe Progress.CompletedCallbackSucceeded
-                  assertRecent(progressEvent.time)
+                  assertRecent(progressEvent.createdDate)
               }
             }
         }
@@ -153,7 +158,7 @@ class NotifierFeatureTest
                 id shouldBe progress.id
                 progressEvent.description shouldBe s"Callback failed for: ${progress.id}, got 404 Not Found!"
                 status shouldBe Progress.CompletedCallbackFailed
-                assertRecent(progressEvent.time)
+                assertRecent(progressEvent.createdDate)
             }
           }
       }

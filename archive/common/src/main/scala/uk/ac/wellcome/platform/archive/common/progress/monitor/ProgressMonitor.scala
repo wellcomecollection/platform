@@ -72,7 +72,7 @@ class ProgressMonitor @Inject()(
       case Progress.None =>
         appendAll('events -> events)
       case status =>
-        appendAll('events -> events) and set('result -> status)
+        appendAll('events -> events) and set('status -> status)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)

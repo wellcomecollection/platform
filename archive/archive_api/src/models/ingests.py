@@ -44,15 +44,12 @@ Ingest = TypedModel(
     "Ingest",
     {
         "id": fields.String(),
-        "description": fields.String(),
         "uploadUrl": fields.String(
-            attribute="uploadUri",
             description="S3 URL of uploaded BagIt resource, supports only a zipped BagIt file",
             example="s3://source-bucket/source-path/source-bag.zip",
             required=True,
         ),
         "callbackUrl": fields.String(
-            attribute="callbackUri",
             description="URL to use for callback on completion or failure",
             example="https://workflow.wellcomecollection.org/callback?id=b1234567",
         ),
@@ -61,13 +58,11 @@ Ingest = TypedModel(
             description="Type of request to ingest a BagIt resource",
             required=True,
         ),
-        # "status": fields.Nested(
-        #     IngestStatus,
-        #     description="Status of ingest processing",
-        #     required=True
-        # ),
-        "createdDate": fields.String(attribute="createdAt"),
-        "lastModifiedDate": fields.String(attribute="updatedAt"),
+        "status": fields.Nested(
+            IngestStatus, description="Status of ingest processing"
+        ),
+        "createdDate": fields.String(),
+        "lastModifiedDate": fields.String(),
         "events": fields.List(fields.Nested(ProgressEvent)),
     },
 )

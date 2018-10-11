@@ -50,12 +50,11 @@ class ProgressUpdateAndPublishFlowTest
 
               val expectedProgress = progress.copy(
                 events = progress.events ++ events,
-                result = status
+                status = status
               )
 
-              val source = Source.single(update)
-
-              val eventualResult = source
+              val eventualResult = Source
+                .single(update)
                 .via(flow)
                 .async
                 .runWith(Sink.head)(materializer)

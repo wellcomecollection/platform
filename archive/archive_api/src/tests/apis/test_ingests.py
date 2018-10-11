@@ -24,7 +24,18 @@ class TestGETIngests:
         )
         assert rv["id"] == lookup_id
         assert rv["type"] == "Ingest"
-        # TODO: test additional fields
+        assert isinstance(rv["uploadUrl"], str)
+        assert isinstance(rv["callbackUrl"], str)
+        assert rv["ingestType"] == {"id": "create", "type": "IngestType"}
+        assert rv["status"] == {"id": "processing", "type": "IngestStatus"}
+        assert isinstance(rv["createdDate"], str)
+        assert isinstance(rv["lastModifiedDate"], str)
+        assert len(rv["events"]) == 1
+        event = rv["events"][0]
+        assert isinstance(event, dict)
+        assert isinstance(event["description"], str)
+        assert isinstance(event["createdDate"], str)
+        assert event["type"] == "ProgressEvent"
 
     def test_lookup_missing_item_is_404(self, client):
         lookup_id = "bad_status-404"

@@ -123,7 +123,6 @@ trait ProgressHttpFixture
       .value
       .get
       .get
-
     fromJson[T](stringBody).get
   }
 

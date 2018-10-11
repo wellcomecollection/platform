@@ -25,11 +25,11 @@ object NotificationFlow {
     implicit actorSystem: ActorSystem)
     : Flow[CallbackNotification, PublishResult, NotUsed] = {
 
-    val withCallbackUrlFlow = CallbackUrlFlow()
+    val callbackUrlFlow = CallbackUrlFlow()
     val prepareNotificationFlow = PrepareNotificationFlow()
     val snsPublishFlow = SnsPublishFlow[ProgressUpdate](snsClient, snsConfig)
 
-    withCallbackUrlFlow
+    callbackUrlFlow
       .via(prepareNotificationFlow)
       .via(snsPublishFlow)
   }

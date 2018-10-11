@@ -9,6 +9,7 @@ import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
@@ -47,7 +48,9 @@ class ProgressHttpFeatureTest
 
               whenRequestReady(request) { result =>
                 result.status shouldBe StatusCodes.OK
-                getT[Progress](result.entity) shouldBe progress
+                getT[DisplayIngest](result.entity) shouldBe DisplayIngest(
+                  progress)
+
               }
             }
           }
@@ -135,8 +138,8 @@ class ProgressHttpFeatureTest
                     uploadUri,
                     Some(callbackUri)
                   ).copy(
-                    createdAt = progress.createdAt,
-                    updatedAt = progress.updatedAt)
+                    createdDate = progress.createdDate,
+                    lastModifiedDate = progress.lastModifiedDate)
 
                   progress shouldBe expectedProgress
                   assertTableOnlyHasItem(expectedProgress, table)
