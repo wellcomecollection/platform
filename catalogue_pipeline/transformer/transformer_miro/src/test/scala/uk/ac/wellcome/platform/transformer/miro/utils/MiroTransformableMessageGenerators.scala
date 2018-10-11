@@ -8,12 +8,13 @@ trait MiroTransformableMessageGenerators
   def createValidMiroTransformableWith(
     miroId: String = "MiroId",
     miroCollection: String = "Collection-A",
-    data: String = """{
-      |         "image_cleared": "Y",
-      |        "image_copyright_cleared": "Y",
-      |        "image_tech_file_size": ["1000000"],
-      |        "image_use_restrictions": "CC-BY"
-      |        }
+    data: String = """
+      |{
+      |  "image_cleared": "Y",
+      |  "image_copyright_cleared": "Y",
+      |  "image_tech_file_size": ["1000000"],
+      |  "image_use_restrictions": "CC-BY"
+      |}
     """.stripMargin): MiroTransformable =
     MiroTransformable(
       sourceId = miroId,
