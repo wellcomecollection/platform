@@ -58,10 +58,11 @@ class ArchiveChecksumFlow(algorithm: String)
         new OutHandler {
           override def onPull(): Unit = pull(in)
 
-          // TODO: It's not clear why we need this *and* onUpstreamFinish.
-          // Removing it doesn't cause any tests to fail (at commit 8d849be),
-          // but removing it may have adverse consequences we don't realise.
-          // Investigate further!
+          // This ensures the flow emits on the checksum port even if
+          // whatever listens to the other out port cancels the stream.
+          // In practise this could happen if the s3 upload fails. In that case,
+          // we want this flow to still emit something so that higher level flows
+          // can also emit a message reporting the failure.
           override def onDownstreamFinish(): Unit = {
             push(outDigest, toStringChecksum(ByteString(digest.digest())))
 
@@ -104,9 +105,10 @@ class ArchiveChecksumFlow(algorithm: String)
             push(out, chunk)
           }
 
-          // If we don't have this method, and error in the `out` outlet
-          // will cause problems further along, because the `outDigest` outlet
-          // never emits anything.
+          // This flow can only emit a checksum when it has seen the whole stream of bytes.
+          // Before that there's no way of knowing if there are any more bytes coming.
+          // Therefore the calculated checksum can only ever be emitted when
+          // the upstream is marked as finished.
           //
           // This ensures we always emit *something* from both outlets -- and
           // further down the pipeline, we'll notice the checksum is wrong and
