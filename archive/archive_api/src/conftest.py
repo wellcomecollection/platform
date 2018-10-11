@@ -56,13 +56,16 @@ def client(
 def guid():
     return str(uuid.uuid4())
 
+
 @pytest.fixture
 def space_name():
     return "space"
 
+
 @pytest.fixture
 def bag_id(guid, space_name):
     return f"{space_name}/{guid}"
+
 
 @pytest.fixture()
 def table_name_bag(dynamodb_client):

@@ -44,7 +44,9 @@ def test_returns_500_if_malformed_dynamodb(
     client, dynamodb_resource, table_name_bag, bag_id
 ):
     table = dynamodb_resource.Table(table_name_bag)
-    table.put_item(Item={"id": bag_id, "location": {"k_y": bag_id, "n_m_s_c_e": "bukkit"}})
+    table.put_item(
+        Item={"id": bag_id, "location": {"k_y": bag_id, "n_m_s_c_e": "bukkit"}}
+    )
 
     resp = client.get(f"/storage/v1/bags/{bag_id}")
     assert_is_error_response(resp, status=500)
