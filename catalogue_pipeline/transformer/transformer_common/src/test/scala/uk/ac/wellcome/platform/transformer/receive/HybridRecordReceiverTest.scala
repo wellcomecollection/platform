@@ -18,7 +18,6 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -39,7 +38,6 @@ class HybridRecordReceiverTest
     with IntegrationPatience
     with MockitoSugar
     with ScalaFutures
-    with HybridRecordMessageGenerator
     with WorksGenerators {
 
   case class TestException(message: String) extends Exception(message)
@@ -53,10 +51,11 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sqsMessage = hybridRecordNotificationMessage(
-            message = toJson(TestTransformable()).get,
+          val sqsMessage = createHybridRecordNotificationWith(
+            TestTransformable(),
             s3Client = s3Client,
-            bucket = bucket)
+            bucket = bucket
+          )
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
             val future =
@@ -82,15 +81,16 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sierraMessage = hybridRecordNotificationMessage(
-            message = toJson(TestTransformable()).get,
+          val notification = createHybridRecordNotificationWith(
+            TestTransformable(),
             version = version,
             s3Client = s3Client,
-            bucket = bucket)
+            bucket = bucket
+          )
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
             val future =
-              recordReceiver.receiveMessage(sierraMessage, transformToWork)
+              recordReceiver.receiveMessage(notification, transformToWork)
 
             whenReady(future) { _ =>
               val works = getMessages[TransformedBaseWork](topic)
@@ -112,11 +112,11 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val invalidSqsMessage =
-            hybridRecordNotificationMessage(
-              message = "not a json string",
-              s3Client = s3Client,
-              bucket = bucket)
+          val invalidSqsMessage = createNotificationMessageWith(
+            "not a JSON string",
+            s3Client = s3Client,
+            bucket = bucket
+          )
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
             val future =
@@ -135,11 +135,11 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val failingSqsMessage =
-            hybridRecordNotificationMessage(
-              message = toJson(TestTransformable).get,
-              s3Client = s3Client,
-              bucket = bucket)
+          val failingSqsMessage = createNotificationMessageWith(
+            TestTransformable(),
+            s3Client = s3Client,
+            bucket = bucket
+          )
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
             val future =
@@ -160,10 +160,11 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val message = hybridRecordNotificationMessage(
-            message = toJson(TestTransformable).get,
+          val message = createNotificationMessageWith(
+            TestTransformable(),
             s3Client = s3Client,
-            bucket = bucket)
+            bucket = bucket
+          )
 
           withHybridRecordReceiver(
             topic,

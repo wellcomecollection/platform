@@ -12,7 +12,6 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.platform.transformer.utils.HybridRecordMessageGenerator
 import uk.ac.wellcome.storage.fixtures.S3
 
 class SierraTransformerFeatureTest
@@ -25,8 +24,7 @@ class SierraTransformerFeatureTest
     with fixtures.Server
     with Eventually
     with IntegrationPatience
-    with SierraGenerators
-    with HybridRecordMessageGenerator {
+    with SierraGenerators {
 
   it("transforms sierra records and publishes the result to the given topic") {
     val id = createSierraBibNumber
@@ -52,11 +50,11 @@ class SierraTransformerFeatureTest
               )
             )
 
-            val sierraHybridRecordMessage =
-              hybridRecordNotificationMessage(
-                message = toJson(sierraTransformable).get,
-                s3Client = s3Client,
-                bucket = storageBucket)
+            val sierraHybridRecordMessage = createHybridRecordNotificationWith(
+              sierraTransformable,
+              s3Client = s3Client,
+              bucket = storageBucket
+            )
 
             sendSqsMessage(
               queue = queue,

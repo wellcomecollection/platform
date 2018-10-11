@@ -1,6 +1,7 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
+import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
 import grizzled.slf4j.Logging
@@ -15,6 +16,9 @@ import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 import scala.util.Random
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.vhs.HybridRecord
 
 object SQS {
 
@@ -169,6 +173,23 @@ trait SQS extends Matchers with Logging {
   def createNotificationMessageWith[T](message: T)(
     implicit encoder: Encoder[T]): NotificationMessage =
     createNotificationMessageWith(body = toJson(message).get)
+
+  /** Store an object in S3 and create the HybridRecordNotification that should be sent to SNS. */
+  def createHybridRecordNotificationWith[T](t: T, version: Int = 1, s3Client: AmazonS3, bucket: Bucket)(implicit encoder: Encoder[T]): NotificationMessage = {
+    val s3key = Random.alphanumeric take 10 mkString
+    val content = toJson(t).get
+    s3Client.putObject(bucket.name, s3key, content)
+
+    val hybridRecord = HybridRecord(
+      id = Random.alphanumeric take 10 mkString,
+      version = version,
+      location = ObjectLocation(namespace = bucket.name, key = s3key)
+    )
+
+    createNotificationMessageWith(
+      message = hybridRecord
+    )
+  }
 
   def sendNotificationToSQS(queue: Queue, body: String): SendMessageResult = {
     val message = createNotificationMessageWith(body = body)
