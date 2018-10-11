@@ -17,7 +17,6 @@ module "service" {
     reindex_requests_topic_arn = "${module.hybrid_records_topic.arn}"
     metrics_namespace          = "reindex_worker-${var.namespace}"
     dynamo_table_name          = "${var.vhs_table_name}"
-    dynamo_table_index         = "reindexTracker"
 
     # The reindex worker has to send lots of SNS notifications, and we've
     # seen issues where we exhaust the HTTP connection pool.  Turning down
@@ -26,7 +25,7 @@ module "service" {
     sqs_parallelism = 5
   }
 
-  env_vars_length = 6
+  env_vars_length = 5
 
   ecs_cluster_name = "${var.ecs_cluster_name}"
   ecs_cluster_id   = "${var.ecs_cluster_id}"
