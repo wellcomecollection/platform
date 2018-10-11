@@ -24,13 +24,13 @@ object ArchiveComplete {
           case _: URISyntaxException =>
             Left(DecodingFailure("URI", cursor.history))
         }
-      case l@Left(_) => l.asInstanceOf[Decoder.Result[URI]]
+      case l @ Left(_) => l.asInstanceOf[Decoder.Result[URI]]
     }
   }
 
-  implicit val bagArchiveCompleteNotificationDecoder:
-    Decoder[ArchiveComplete] = deriveDecoder
-  implicit val bagArchiveCompleteNotificationEncoder:
-    Encoder[ArchiveComplete] = deriveEncoder
+  implicit val bagArchiveCompleteNotificationDecoder: Decoder[ArchiveComplete] =
+    deriveDecoder
+  implicit val bagArchiveCompleteNotificationEncoder: Encoder[ArchiveComplete] =
+    deriveEncoder
 
 }

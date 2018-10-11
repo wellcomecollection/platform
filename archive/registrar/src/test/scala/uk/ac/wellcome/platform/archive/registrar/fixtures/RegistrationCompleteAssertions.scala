@@ -18,8 +18,11 @@ trait RegistrationCompleteAssertions extends Inside with Matchers {
           identifiers,
           FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
           TagManifest(ChecksumAlgorithm("sha256"), Nil),
-          List(digitalLocation), _, _, _, _) =>
-
+          List(digitalLocation),
+          _,
+          _,
+          _,
+          _) =>
         actualBagId shouldBe expectedBagId
 
         sourceIdentifier shouldBe SourceIdentifier(

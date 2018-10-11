@@ -31,8 +31,8 @@ object ArchiveJobCreator {
           BagLocation(
             storageNamespace = config.uploadConfig.uploadNamespace,
             storagePath = config.uploadConfig.uploadPrefix,
-            bagPath = BagPath(s"${ingestBagRequest.storageSpace}/$externalIdentifier")
-
+            bagPath =
+              BagPath(s"${ingestBagRequest.storageSpace}/$externalIdentifier")
           ),
           config = config.bagItConfig,
           bagManifestLocations = BagManifestLocation.create(config.bagItConfig)
@@ -73,7 +73,8 @@ object ArchiveJobCreator {
 
         bagInfoLines
           .collectFirst {
-            case regex(key, value) if key == "External-Identifier" => ExternalIdentifier(value)
+            case regex(key, value) if key == "External-Identifier" =>
+              ExternalIdentifier(value)
           }
           .toRight(InvalidBagInfo(ingestBagRequest))
       }

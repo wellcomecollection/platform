@@ -7,7 +7,9 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
@@ -125,10 +127,7 @@ class ArchivistFeatureTest
 
         archivist.run()
 
-        createAndSendBag(
-          ingestBucket,
-          queuePair,
-          dataFileCount = 1) {
+        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
@@ -136,10 +135,7 @@ class ArchivistFeatureTest
               dataFileCount = 1,
               createDigest = _ => "bad_digest") {
               case (invalidRequest1, _) =>
-                createAndSendBag(
-                  ingestBucket,
-                  queuePair,
-                  dataFileCount = 1) {
+                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
                   case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,
@@ -209,10 +205,7 @@ class ArchivistFeatureTest
           archivist) =>
         archivist.run()
 
-        createAndSendBag(
-          ingestBucket,
-          queuePair,
-          dataFileCount = 1) {
+        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             val invalidRequestId1 = randomUUID
             sendNotificationToSQS(
@@ -225,10 +218,7 @@ class ArchivistFeatureTest
               )
             )
 
-            createAndSendBag(
-              ingestBucket,
-              queuePair,
-              dataFileCount = 1) {
+            createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
               case (validRequest2, validBag2) =>
                 val invalidRequestId2 = randomUUID
 
@@ -304,10 +294,7 @@ class ArchivistFeatureTest
 
         archivist.run()
 
-        createAndSendBag(
-          ingestBucket,
-          queuePair,
-          dataFileCount = 1) {
+        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
@@ -315,10 +302,7 @@ class ArchivistFeatureTest
               dataFileCount = 1,
               createDataManifest = dataManifestWithNonExistingFile) {
               case (invalidRequest1, _) =>
-                createAndSendBag(
-                  ingestBucket,
-                  queuePair,
-                  dataFileCount = 1) {
+                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
                   case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,
@@ -389,10 +373,7 @@ class ArchivistFeatureTest
           archivist) =>
         archivist.run()
 
-        createAndSendBag(
-          ingestBucket,
-          queuePair,
-          dataFileCount = 1) {
+        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
@@ -400,10 +381,7 @@ class ArchivistFeatureTest
               dataFileCount = 1,
               createBagInfoFile = _ => None) {
               case (invalidRequest1, _) =>
-                createAndSendBag(
-                  ingestBucket,
-                  queuePair,
-                  dataFileCount = 1) {
+                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
                   case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,

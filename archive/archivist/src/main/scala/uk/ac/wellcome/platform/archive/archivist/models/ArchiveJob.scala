@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.archive.archivist.models
 
 import java.util.zip.ZipFile
 
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagLocation,
+  ExternalIdentifier
+}
 
 /** Used internally by an archivist flow.
   *
@@ -15,11 +18,11 @@ import uk.ac.wellcome.platform.archive.common.models.{BagLocation, ExternalIdent
   * @param bagManifestLocations A list of manifest locations inside the bag.
   */
 case class ArchiveJob(
-                       externalIdentifier: ExternalIdentifier,
-                       zipFile: ZipFile,
-                       bagLocation: BagLocation,
-                       config: BagItConfig,
-                       bagManifestLocations: List[BagManifestLocation]
-                     ) {
+  externalIdentifier: ExternalIdentifier,
+  zipFile: ZipFile,
+  bagLocation: BagLocation,
+  config: BagItConfig,
+  bagManifestLocations: List[BagManifestLocation]
+) {
   def digestDelimiter = config.digestDelimiterRegexp
 }

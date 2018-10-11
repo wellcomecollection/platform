@@ -16,6 +16,5 @@ object ArchiveCompleteGenerator extends RandomThings {
       archiveRequestId,
       bagId,
       bagLocation
-
-  )
+    )
 }

@@ -14,16 +14,16 @@ trait BagIt extends RandomThings {
   }
 
   def createBag(
-                 bagIdentifier: ExternalIdentifier,
-                 dataFileCount: Int = 1,
-                 createDigest: String => String = createValidDigest,
-                 createDataManifest: List[(String, String)] => Option[FileEntry] =
-                 createValidDataManifest,
-                 createTagManifest: List[(String, String)] => Option[FileEntry] =
-                 createValidTagManifest,
-                 createBagItFile: => Option[FileEntry] = createValidBagItFile,
-                 createBagInfoFile: ExternalIdentifier => Option[FileEntry] = createValidBagInfoFile)
-  : Seq[FileEntry] = {
+    bagIdentifier: ExternalIdentifier,
+    dataFileCount: Int = 1,
+    createDigest: String => String = createValidDigest,
+    createDataManifest: List[(String, String)] => Option[FileEntry] =
+      createValidDataManifest,
+    createTagManifest: List[(String, String)] => Option[FileEntry] =
+      createValidTagManifest,
+    createBagItFile: => Option[FileEntry] = createValidBagItFile,
+    createBagInfoFile: ExternalIdentifier => Option[FileEntry] =
+      createValidBagInfoFile): Seq[FileEntry] = {
 
     val dataFiles = createDataFiles(dataFileCount)
     val filesAndDigest = dataFiles.map {

@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.models.{BagId, ExternalIdentifier, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagId,
+  ExternalIdentifier,
+  StorageSpace
+}
 
 import scala.util.Random
 

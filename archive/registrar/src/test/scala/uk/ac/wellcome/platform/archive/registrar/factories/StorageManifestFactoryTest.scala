@@ -3,13 +3,20 @@ package uk.ac.wellcome.platform.archive.registrar.factories
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.common.fixtures.{FileEntry, RandomThings}
-import uk.ac.wellcome.platform.archive.common.models.error.{DownloadError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  DownloadError,
+  InvalidBagManifestError
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.platform.archive.registrar.fixtures.BagLocationFixtures
 import uk.ac.wellcome.platform.archive.registrar.models._
 
 class StorageManifestFactoryTest
-  extends FunSpec
+    extends FunSpec
     with BagLocationFixtures
     with RandomThings
     with Inside {
@@ -29,14 +36,17 @@ class StorageManifestFactoryTest
 
         inside(storageManifest) {
           case Right(
-          StorageManifest(
-          actualBagId,
-          sourceIdentifier,
-          identifiers,
-          FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-          TagManifest(ChecksumAlgorithm("sha256"), Nil),
-          List(digitalLocation), _, _, _, _)) =>
-
+              StorageManifest(
+                actualBagId,
+                sourceIdentifier,
+                identifiers,
+                FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+                TagManifest(ChecksumAlgorithm("sha256"), Nil),
+                List(digitalLocation),
+                _,
+                _,
+                _,
+                _)) =>
             actualBagId shouldBe bagId
 
             sourceIdentifier shouldBe SourceIdentifier(

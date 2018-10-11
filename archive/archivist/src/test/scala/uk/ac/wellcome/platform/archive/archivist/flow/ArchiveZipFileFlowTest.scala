@@ -5,13 +5,27 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, IngestRequestContextGenerators}
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  IngestRequestContextGenerators
+}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveJobError,
+  ChecksumNotMatchedOnUploadError,
+  FileNotFoundError
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagId, BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagId,
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.test.fixtures.Akka
@@ -54,18 +68,17 @@ class ArchiveZipFileFlowTest
 
                 whenReady(verification) { result =>
                   listKeysInBucket(storageBucket) should have size 4
-                  result shouldBe List(
-                    Right(
-                      ArchiveComplete(
-                        ingestContext.archiveRequestId,
-                        BagId(
-                          ingestContext.storageSpace,
-                          bagName
-                        ),
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(s"${ingestContext.storageSpace}/$bagName")))))
+                  result shouldBe List(Right(ArchiveComplete(
+                    ingestContext.archiveRequestId,
+                    BagId(
+                      ingestContext.storageSpace,
+                      bagName
+                    ),
+                    BagLocation(
+                      storageBucket.name,
+                      "archive",
+                      BagPath(s"${ingestContext.storageSpace}/$bagName"))
+                  )))
 
                   assertTopicReceivesProgressUpdate(
                     ingestContext.archiveRequestId,

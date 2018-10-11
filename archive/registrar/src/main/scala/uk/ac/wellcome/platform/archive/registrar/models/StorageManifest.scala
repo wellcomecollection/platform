@@ -4,7 +4,6 @@ import java.time.Instant
 
 import uk.ac.wellcome.platform.archive.common.models.BagId
 
-
 // Value classes
 
 case class ChecksumAlgorithm(value: String)

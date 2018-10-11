@@ -31,15 +31,16 @@ trait ZipBagItFixture extends BagIt with Logging {
   }
 
   def withBagItZip[R](
-                       bagIdentifier: ExternalIdentifier = ExternalIdentifier(randomAlphanumeric()),
-                       dataFileCount: Int = 1,
-                       createDigest: String => String = createValidDigest,
-                       createDataManifest: List[(String, String)] => Option[FileEntry] =
+    bagIdentifier: ExternalIdentifier = ExternalIdentifier(randomAlphanumeric()),
+    dataFileCount: Int = 1,
+    createDigest: String => String = createValidDigest,
+    createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
-                       createTagManifest: List[(String, String)] => Option[FileEntry] =
+    createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
-                       createBagItFile: => Option[FileEntry] = createValidBagItFile,
-                       createBagInfoFile: ExternalIdentifier => Option[FileEntry] = createValidBagInfoFile
+    createBagItFile: => Option[FileEntry] = createValidBagItFile,
+    createBagInfoFile: ExternalIdentifier => Option[FileEntry] =
+      createValidBagInfoFile
   )(testWith: TestWith[(ExternalIdentifier, ZipFile), R]) = {
 
     info(s"Creating bag $bagIdentifier")

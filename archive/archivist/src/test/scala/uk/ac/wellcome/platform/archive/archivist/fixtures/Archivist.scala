@@ -11,26 +11,30 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.archivist.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.{ExternalIdentifier, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ExternalIdentifier,
+  IngestBagRequest
+}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Archivist
-  extends Messaging
+    extends Messaging
     with ZipBagItFixture
     with IngestRequestContextGenerators {
 
   import IngestBagRequest._
 
-  def sendBag[R](
-                  zipFile: ZipFile,
-                  ingestBucket: Bucket,
-                  queuePair: QueuePair)(testWith: TestWith[IngestBagRequest, R]) = {
+  def sendBag[R](zipFile: ZipFile, ingestBucket: Bucket, queuePair: QueuePair)(
+    testWith: TestWith[IngestBagRequest, R]) = {
 
     val ingestBagRequest = createIngestBagRequestWith(
       ingestBagLocation = ObjectLocation(
@@ -53,15 +57,16 @@ trait Archivist
   }
 
   def createAndSendBag[R](
-                           ingestBucket: Bucket,
-                           queuePair: QueuePair,
-                           dataFileCount: Int = 12,
-                           createDigest: String => String = createValidDigest,
-                           createDataManifest: List[(String, String)] => Option[FileEntry] =
-                           createValidDataManifest,
-                           createBagItFile: => Option[FileEntry] = createValidBagItFile,
-                           createBagInfoFile: ExternalIdentifier => Option[FileEntry] = createValidBagInfoFile)(
-                           testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]) =
+    ingestBucket: Bucket,
+    queuePair: QueuePair,
+    dataFileCount: Int = 12,
+    createDigest: String => String = createValidDigest,
+    createDataManifest: List[(String, String)] => Option[FileEntry] =
+      createValidDataManifest,
+    createBagItFile: => Option[FileEntry] = createValidBagItFile,
+    createBagInfoFile: ExternalIdentifier => Option[FileEntry] =
+      createValidBagInfoFile)(
+    testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]) =
     withBagItZip(
       dataFileCount = dataFileCount,
       createDigest = createDigest,
@@ -102,8 +107,8 @@ trait Archivist
   }
 
   def withArchivist[R](
-                        testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, ArchivistApp),
-                          R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, ArchivistApp),
+                       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
       withLocalSnsTopic {
         registrarTopic =>
