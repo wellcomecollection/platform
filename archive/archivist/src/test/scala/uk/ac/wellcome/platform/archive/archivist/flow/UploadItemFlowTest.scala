@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import java.nio.charset.StandardCharsets
+
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorAttributes, Supervision}
 import com.amazonaws.services.s3.model.AmazonS3Exception
@@ -149,10 +151,12 @@ class UploadItemFlowTest
   }
 
   it(
-    "sends a left of archive item job when uploading a file fails because the bucket does not exist (Resume supervision strategy)") {
+    "sends a left of archive item job when uploading a big file fails because the bucket does not exist (Resume supervision strategy)") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        val fileContent = "bah buh bih beh"
+        val bytes = Array.fill(23 * 1024 * 1024)(
+          (scala.util.Random.nextInt(256) - 128).toByte)
+        val fileContent = new String(bytes, StandardCharsets.UTF_8)
 
         val fileName = "key.txt"
         withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
