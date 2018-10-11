@@ -5,16 +5,28 @@ import java.util.UUID
 
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.{
+  IntegrationPatience,
+  PatienceConfiguration,
+  ScalaFutures
+}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, DigitisedStorageType}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation,
+  BagPath,
+  DigitisedStorageType
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{RegistrationCompleteAssertions, Registrar => RegistrarFixture}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{
+  RegistrationCompleteAssertions,
+  Registrar => RegistrarFixture
+}
 import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -68,12 +80,13 @@ class RegistrarFeatureTest
           Some(callbackUrl),
           queuePair,
           storageBucket) { bagLocation =>
-
           registrar.run()
 
           eventually {
             assertSnsReceivesOnly(
-              RegistrationCompleteNotification(requestId, BagId(bagLocation.bagPath.value)),
+              RegistrationCompleteNotification(
+                requestId,
+                BagId(bagLocation.bagPath.value)),
               ddsTopic)
 
             assertStorageManifestCorrect(
@@ -173,7 +186,8 @@ class RegistrarFeatureTest
     }
   }
 
-  private def getStoredManifest(bagLocation: BagLocation, hybridTable: Table) = {
+  private def getStoredManifest(bagLocation: BagLocation,
+                                hybridTable: Table) = {
     val hybridRecord = getHybridRecord(hybridTable, bagLocation.bagPath.value)
     getObjectFromS3[StorageManifest](hybridRecord.location)
   }

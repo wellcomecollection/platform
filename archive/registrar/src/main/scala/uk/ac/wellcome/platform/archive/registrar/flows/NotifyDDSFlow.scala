@@ -19,7 +19,9 @@ object NotifyDDSFlow extends Logging {
         case (manifest, archiveComplete) =>
           Source
             .single(
-              RegistrationCompleteNotification(archiveComplete.archiveRequestId, manifest.id))
+              RegistrationCompleteNotification(
+                archiveComplete.archiveRequestId,
+                manifest.id))
             .log("notification serialised")
             .via(SnsPublishFlow(snsClient, snsConfig, Some("registrar")))
             .map(_ => archiveComplete)
