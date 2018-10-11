@@ -1,10 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar.fixtures
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagLocation,
-  BagPath,
-  DigitisedStorageType
-}
+import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -28,7 +24,7 @@ trait BagLocationFixtures extends S3 with BagIt {
     val bagLocation = BagLocation(
       storageBucket.name,
       storagePrefix,
-      BagPath(s"$DigitisedStorageType/$bagIdentifier"))
+      BagPath(s"space/$bagIdentifier"))
 
     fileEntries.map((entry: FileEntry) => {
       s3Client

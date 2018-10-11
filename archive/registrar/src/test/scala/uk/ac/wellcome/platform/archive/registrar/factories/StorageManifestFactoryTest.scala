@@ -6,16 +6,8 @@ import java.util.UUID
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  DownloadError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath,
-  DigitisedStorageType
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{DownloadError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath}
 import uk.ac.wellcome.platform.archive.registrar.fixtures.BagLocationFixtures
 import uk.ac.wellcome.platform.archive.registrar.models._
 
@@ -86,7 +78,7 @@ class StorageManifestFactoryTest
       val bagLocation = BagLocation(
         bucket.name,
         "archive",
-        BagPath(s"$DigitisedStorageType/b1234567"))
+        BagPath(s"space/b1234567"))
       val archiveComplete = ArchiveComplete(requestId, bagLocation, callbackUrl)
       val value = StorageManifestFactory.create(archiveComplete)
 
