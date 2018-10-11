@@ -105,11 +105,12 @@ def bucket_bag(s3_client):
     except KeyError:
         pass
 
+
 @pytest.fixture
 def s3_bag(bag_id):
     file_location = "src/tests/resources/vhs_bag.json"
 
-    with open(file_location, 'r') as io:
+    with open(file_location, "r") as io:
         json_bag = json.load(io)
         json_bag["id"]["value"] = bag_id
 
