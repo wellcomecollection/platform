@@ -16,7 +16,6 @@ import uk.ac.wellcome.storage.vhs.{
   VersionedHybridStore
 }
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -78,20 +77,5 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
     listMessagesReceivedFromSNS(topic).map { info: MessageInfo =>
       fromJson[HybridRecord](info.message).get
     } should contain(hybridRecord)
-  }
-
-  def assertStoredAndSent(itemRecord: SierraItemRecord,
-                          topic: Topic,
-                          bucket: Bucket,
-                          table: Table): Assertion = {
-    val hybridRecord =
-      getHybridRecord(table, id = itemRecord.id.withoutCheckDigit)
-
-    val storedItemRecord = getObjectFromS3[SierraItemRecord](
-      Bucket(hybridRecord.location.namespace),
-      hybridRecord.location.key)
-    storedItemRecord shouldBe itemRecord
-
-    getMessages[SierraItemRecord](topic) should contain(itemRecord)
   }
 }
