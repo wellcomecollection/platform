@@ -89,7 +89,7 @@ class RegistrarFeatureTest
                 BagId(bagLocation.bagPath.value)),
               ddsTopic)
 
-            assertStorageManifestCorrect(
+            assertStorageManifestFields(
               getStoredManifest(bagLocation, hybridTable),
               storageBucket,
               bagLocation,
