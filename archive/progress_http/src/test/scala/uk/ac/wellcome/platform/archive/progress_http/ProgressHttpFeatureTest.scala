@@ -28,6 +28,7 @@ class ProgressHttpFeatureTest
 
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+  import Progress._
   import uk.ac.wellcome.json.JsonUtil._
 
   describe("GET /progress/:id") {

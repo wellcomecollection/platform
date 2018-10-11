@@ -15,20 +15,21 @@ case class DisplayIngest(id: String,
                          events: Seq[DisplayProgressEvent] = Seq.empty,
                          createdDate: String,
                          lastModifiedDate: String,
-                         @JsonKey("type") ontologyType: String = "Ingest")
+                         @JsonKey("type")
+                         ontologyType: String = "Ingest")
 
 case class DisplayIngestType(id: String = "create",
-                             @JsonKey("type") ontologyType: String =
-                               "IngestType")
+                             @JsonKey("type")
+                             ontologyType: String = "IngestType")
 
 case class DisplayIngestStatus(id: String,
-                               @JsonKey("type") ontologyType: String =
-                                 "IngestStatus")
+                               @JsonKey("type")
+                               ontologyType: String = "IngestStatus")
 
 case class DisplayProgressEvent(description: String,
-                                time: String,
-                                @JsonKey("type") ontologyType: String =
-                                  "ProgressEvent")
+                                createdDate: String,
+                                @JsonKey("type")
+                                ontologyType: String = "ProgressEvent")
 
 case object DisplayIngest {
   def apply(progress: Progress): DisplayIngest = {

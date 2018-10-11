@@ -12,15 +12,15 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 
 class DisplayIngestTest extends FunSpec with Matchers {
 
-  it("creates a DisplayIngest from Progress") {
-    val id = UUID.randomUUID()
-    val uploadUrl = "s3.example/key.zip"
-    val callbackUrl = "www.example.com/callback"
-    val createdDate = "2018-10-10T09:38:55.321Z"
-    val modifiedDate = "2018-10-10T09:38:55.322Z"
-    val eventDate = "2018-10-10T09:38:55.323Z"
-    val eventDescription = "Event description"
+  private val id = UUID.randomUUID()
+  private val uploadUrl = "s3.example/key.zip"
+  private val callbackUrl = "www.example.com/callback"
+  private val createdDate = "2018-10-10T09:38:55.321Z"
+  private val modifiedDate = "2018-10-10T09:38:55.322Z"
+  private val eventDate = "2018-10-10T09:38:55.323Z"
+  private val eventDescription = "Event description"
 
+  it("creates a DisplayIngest from Progress") {
     val progress: Progress = Progress(
       id,
       new URI(uploadUrl),
