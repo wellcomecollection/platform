@@ -20,7 +20,7 @@ api.add_model("Source", definition=Source)
 
 
 @api.route("/<space>/<id>")
-@api.param("space", "The space!")
+@api.param("space", "The namespace in which objects get stored")
 @api.param("id", "The bag to return")
 class BagResource(Resource):
     @api.doc(description="Returns a single bag")
