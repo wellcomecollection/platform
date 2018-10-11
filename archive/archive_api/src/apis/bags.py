@@ -19,16 +19,19 @@ api.add_model("IdentifierType", definition=IdentifierType)
 api.add_model("Source", definition=Source)
 
 
-@api.route("/<id>")
+@api.route("/<space>/<id>")
+@api.param("space", "The namespace in which objects get stored")
 @api.param("id", "The bag to return")
 class BagResource(Resource):
     @api.doc(description="Returns a single bag")
     @api.marshal_with(Bag)
     @api.response(200, "Bag found")
     @api.response(404, "Bag not found", Error)
-    def get(self, id):
+    def get(self, space, id):
         """Get the bag associated with an id"""
         from archive_api import app
+
+        bag_id = f"{space}/{id}"
 
         try:
             result = read_from_vhs(
@@ -36,10 +39,10 @@ class BagResource(Resource):
                 table_name=app.config["BAG_VHS_TABLE_NAME"],
                 s3_client=app.config["S3_CLIENT"],
                 bucket_name=app.config["BAG_VHS_BUCKET_NAME"],
-                id=id,
+                id=bag_id,
             )
             return result
         except VHSNotFound:
-            abort(404, f"Invalid id: No bag found for id={id!r}")
+            abort(404, f"Invalid id: No bag found for id={bag_id!r}")
         except VHSError:
             abort(500)
