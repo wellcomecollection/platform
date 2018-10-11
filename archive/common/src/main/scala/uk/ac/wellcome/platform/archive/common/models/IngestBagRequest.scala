@@ -12,8 +12,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 case class IngestBagRequest(archiveRequestId: UUID,
                             zippedBagLocation: ObjectLocation,
                             archiveCompleteCallbackUrl: Option[URI] = None,
-                            storageSpace: StorageSpace
-                           )
+                            storageSpace: StorageSpace)
 
 case class StorageSpace(underlying: String) extends AnyVal {
   override def toString: String = underlying

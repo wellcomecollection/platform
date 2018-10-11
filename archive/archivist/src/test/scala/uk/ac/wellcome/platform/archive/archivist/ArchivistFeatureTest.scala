@@ -49,8 +49,7 @@ class ArchivistFeatureTest
                   BagLocation(
                     storageBucket.name,
                     "archive",
-                    BagPath(
-                      s"${request.storageSpace}/$bagIdentifier")),
+                    BagPath(s"${request.storageSpace}/$bagIdentifier")),
                   Some(callbackUri)
                 ),
                 registrarTopic
@@ -164,7 +163,8 @@ class ArchivistFeatureTest
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"${validRequest1.storageSpace}/$validBag1")),
+                                  BagPath(
+                                    s"${validRequest1.storageSpace}/$validBag1")),
                                 Some(callbackUri)
                               ),
                               ArchiveComplete(
@@ -172,7 +172,8 @@ class ArchivistFeatureTest
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"${validRequest2.storageSpace}/$validBag2")),
+                                  BagPath(
+                                    s"${validRequest2.storageSpace}/$validBag2")),
                                 Some(callbackUri)
                               )
                             ),
@@ -346,7 +347,8 @@ class ArchivistFeatureTest
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"${validRequest1.storageSpace}/$validBag1")),
+                                  BagPath(
+                                    s"${validRequest1.storageSpace}/$validBag1")),
                                 Some(callbackUri)
                               ),
                               ArchiveComplete(
@@ -354,7 +356,8 @@ class ArchivistFeatureTest
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"${validRequest2.storageSpace}/$validBag2")),
+                                  BagPath(
+                                    s"${validRequest2.storageSpace}/$validBag2")),
                                 Some(callbackUri)
                               )
                             ),
@@ -433,7 +436,8 @@ class ArchivistFeatureTest
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"${validRequest1.storageSpace}/$validBag1")),
+                                  BagPath(
+                                    s"${validRequest1.storageSpace}/$validBag1")),
                                 Some(callbackUri)
                               ),
                               ArchiveComplete(
@@ -441,7 +445,8 @@ class ArchivistFeatureTest
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
-                                  BagPath(s"${validRequest2.storageSpace}/$validBag2")),
+                                  BagPath(
+                                    s"${validRequest2.storageSpace}/$validBag2")),
                                 Some(callbackUri)
                               )
                             ),

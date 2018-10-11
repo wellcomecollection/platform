@@ -12,7 +12,7 @@ def test_creates_bag_message_without_callback_url(guid):
     assert resp == {
         "archiveRequestId": guid,
         "zippedBagLocation": {"namespace": "example-bukkit", "key": "foo/bar.zip"},
-        "storageSpace": "digitised"
+        "storageSpace": "digitised",
     }
 
 

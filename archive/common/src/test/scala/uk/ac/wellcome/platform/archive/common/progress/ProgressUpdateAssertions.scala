@@ -5,7 +5,11 @@ import grizzled.slf4j.Logging
 import org.scalatest.{Assertion, Inside}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressUpdate
+}
 
 import scala.util.Try
 
@@ -22,7 +26,6 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
 
     val (success, failure) = progressUpdates
       .map { progressUpdate =>
-
         debug(s"Received ProgressUpdate: $progressUpdate")
 
         Try(inside(progressUpdate) {
@@ -37,6 +40,6 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
       }
       .partition(_.isSuccess)
 
-      success should have size 1
+    success should have size 1
   }
 }

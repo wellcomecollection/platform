@@ -8,10 +8,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   BagManifestLocation,
   IngestRequestContextGenerators
 }
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest
