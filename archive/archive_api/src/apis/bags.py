@@ -24,7 +24,8 @@ api.add_model("Source", definition=Source)
 @api.param("id", "The bag to return")
 class BagResource(Resource):
     @api.doc(description="Returns a single bag")
-    @api.marshal_with(Bag)
+    # TODO: Replace this marshal_with
+    # @api.marshal_with(Bag)
     @api.response(200, "Bag found")
     @api.response(404, "Bag not found", Error)
     def get(self, space, id):
@@ -41,6 +42,12 @@ class BagResource(Resource):
                 bucket_name=app.config["BAG_VHS_BUCKET_NAME"],
                 id=bag_id,
             )
+
+            # TODO: Remove the necessity to do this
+            result["id"] = result["id"]["value"]
+
+            print(result)
+
             return result
         except VHSNotFound:
             abort(404, f"Invalid id: No bag found for id={bag_id!r}")
