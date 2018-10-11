@@ -8,7 +8,14 @@ import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, CompletedCallbackFailed, CompletedCallbackSucceeded, Failed, None, Processing}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
+  Completed,
+  CompletedCallbackFailed,
+  CompletedCallbackSucceeded,
+  Failed,
+  None,
+  Processing
+}
 
 case class Progress(
   id: UUID,
@@ -101,7 +108,8 @@ object Progress extends URIConverters with StatusConverters {
   private def generateId: UUID = UUID.randomUUID()
 }
 
-case class ProgressEvent(description: String, createdDate: Instant = Instant.now)
+case class ProgressEvent(description: String,
+                         createdDate: Instant = Instant.now)
 
 case class ProgressUpdate(id: UUID,
                           events: List[ProgressEvent],
