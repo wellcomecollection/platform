@@ -10,6 +10,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.test.fixtures.Akka
@@ -21,6 +22,7 @@ class CallbackNotificationFlowTest
     with ScalaFutures
     with IntegrationPatience
     with Eventually
+    with RandomThings
     with SNS {
 
   val uploadUri = new URI("http://www.example.com/asset")
@@ -40,7 +42,7 @@ class CallbackNotificationFlowTest
           withLocalSnsTopic { topic =>
             val callbackNotificationFlow =
               CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
-            val id = UUID.randomUUID()
+            val id = randomUUID
             val progress =
               Progress(id, uploadUri, Some(callbackUri), status)
 
@@ -75,7 +77,7 @@ class CallbackNotificationFlowTest
           forAll(status) { status =>
             val callbackNotificationFlow =
               CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
-            val id = UUID.randomUUID()
+            val id = randomUUID
 
             val progress =
               Progress(id, uploadUri, Some(callbackUri), status)
@@ -100,7 +102,7 @@ class CallbackNotificationFlowTest
       withMaterializer(actorSystem) { materializer =>
         val callbackNotificationFlow =
           CallbackNotificationFlow(snsClient, SNSConfig("does-not-exist"))
-        val id = UUID.randomUUID()
+        val id = randomUUID
         val progress =
           Progress(id, uploadUri, Some(callbackUri), Progress.Completed)
 

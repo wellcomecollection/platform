@@ -6,7 +6,7 @@ import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 
 import scala.util.Random
 
-trait BagIt {
+trait BagIt extends RandomThings {
   private val bagItFileContents = {
     """BagIt-Version: 0.97
       |Tag-File-Character-Encoding: UTF-8
@@ -18,12 +18,12 @@ trait BagIt {
                  dataFileCount: Int = 1,
                  createDigest: String => String = createValidDigest,
                  createDataManifest: List[(String, String)] => Option[FileEntry] =
-      createValidDataManifest,
+                 createValidDataManifest,
                  createTagManifest: List[(String, String)] => Option[FileEntry] =
-      createValidTagManifest,
+                 createValidTagManifest,
                  createBagItFile: => Option[FileEntry] = createValidBagItFile,
                  createBagInfoFile: ExternalIdentifier => Option[FileEntry] = createValidBagInfoFile)
-    : Seq[FileEntry] = {
+  : Seq[FileEntry] = {
 
     val dataFiles = createDataFiles(dataFileCount)
     val filesAndDigest = dataFiles.map {
@@ -128,10 +128,6 @@ trait BagIt {
       val fileContents = Random.nextString(256)
       FileEntry(filePath, fileContents)
     }
-  }
-
-  def randomAlphanumeric(length: Int = 8) = {
-    Random.alphanumeric take length mkString
   }
 
   def createValidDigest(string: String) =

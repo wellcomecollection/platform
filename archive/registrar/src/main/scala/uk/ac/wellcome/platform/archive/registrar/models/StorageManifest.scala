@@ -4,6 +4,7 @@ import java.time.Instant
 
 import uk.ac.wellcome.platform.archive.common.models.BagId
 
+
 // Value classes
 
 case class ChecksumAlgorithm(value: String)
@@ -15,8 +16,6 @@ case class BagVersion(value: Int)
 case class Checksum(value: String)
 
 case class BagFilePath(value: String)
-
-case class BagId(value: String)
 
 // StorageManifest
 

@@ -5,29 +5,16 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.github.tomakehurst.wiremock.client.WireMock.{
-  equalToJson,
-  postRequestedFor,
-  urlPathEqualTo,
-  _
-}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlPathEqualTo, _}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.models.{
-  CallbackNotification,
-  DisplayIngest
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.models.{CallbackNotification, DisplayIngest}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
-import uk.ac.wellcome.platform.archive.notifier.fixtures.{
-  LocalWireMockFixture,
-  NotifierFixture
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.notifier.fixtures.{LocalWireMockFixture, NotifierFixture}
 
 class NotifierFeatureTest
     extends FunSpec
@@ -38,6 +25,7 @@ class NotifierFeatureTest
     with LocalWireMockFixture
     with NotifierFixture
     with Inside
+    with RandomThings
     with TimeTestFixture {
 
   import Progress._
@@ -53,7 +41,7 @@ class NotifierFeatureTest
       withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
         withNotifier {
           case (queuePair, _, notifier) =>
-            val requestId = UUID.randomUUID()
+            val requestId = randomUUID
 
             val callbackUri =
               new URI(s"http://$callbackHost:$callbackPort/callback/$requestId")
@@ -87,7 +75,7 @@ class NotifierFeatureTest
       withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
         withNotifier {
           case (queuePair, topic, notifier) =>
-            val requestId = UUID.randomUUID()
+            val requestId = randomUUID
 
             val callbackPath = s"/callback/$requestId"
             val callbackUri = new URI(
@@ -134,7 +122,7 @@ class NotifierFeatureTest
       "sends a ProgressUpdate when it receives Progress with a callback it cannot fulfill") {
       withNotifier {
         case (queuePair, topic, notifier) =>
-          val requestId = UUID.randomUUID()
+          val requestId = randomUUID
 
           val callbackUri = new URI(
             s"http://$callbackHost:$callbackPort/callback/$requestId"

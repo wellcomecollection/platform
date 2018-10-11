@@ -7,19 +7,19 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 import IngestBagRequest._
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 
 class ArchivistFeatureTest
     extends FunSpec
     with Matchers
     with ScalaFutures
+    with RandomThings
     with MetricsSenderFixture
     with ArchivistFixture
     with IntegrationPatience
@@ -214,7 +214,7 @@ class ArchivistFeatureTest
           queuePair,
           dataFileCount = 1) {
           case (validRequest1, validBag1) =>
-            val invalidRequestId1 = UUID.randomUUID()
+            val invalidRequestId1 = randomUUID
             sendNotificationToSQS(
               queuePair.queue,
               IngestBagRequest(
@@ -230,7 +230,8 @@ class ArchivistFeatureTest
               queuePair,
               dataFileCount = 1) {
               case (validRequest2, validBag2) =>
-                val invalidRequestId2 = UUID.randomUUID()
+                val invalidRequestId2 = randomUUID
+
                 sendNotificationToSQS(
                   queuePair.queue,
                   IngestBagRequest(

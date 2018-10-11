@@ -58,7 +58,7 @@ object StorageManifestFactory extends Logging {
       )
     } yield
       StorageManifest(
-        id = BagId(bagLocation.bagPath.value),
+        id = archiveComplete.bagId,
         source = sourceIdentifier,
         identifiers = List(sourceIdentifier),
         manifest = fileManifest,
@@ -72,7 +72,7 @@ object StorageManifestFactory extends Logging {
                           delimiter: String)(implicit s3Client: AmazonS3)
     : Either[ArchiveError[ArchiveComplete], List[BagDigestFile]] = {
     val location = getFileObjectLocation(archiveComplete.bagLocation, name)
-    val triedLines = Try(s3Client.getObject(location.namespace, location.key))
+    val triedLines: Either[DownloadError[ArchiveComplete], List[String]] = Try(s3Client.getObject(location.namespace, location.key))
       .map(_.getObjectContent)
       .toEither
       .leftMap(ex => DownloadError(ex, location, archiveComplete))

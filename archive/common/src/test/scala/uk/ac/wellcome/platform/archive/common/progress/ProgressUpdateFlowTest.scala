@@ -1,24 +1,21 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
-import java.util.UUID
-
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressEvent,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
 class ProgressUpdateFlowTest
-    extends FunSpec
+  extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with Akka
+    with RandomThings
     with ProgressMonitorFixture
     with ScalaFutures {
 
@@ -104,7 +101,7 @@ class ProgressUpdateFlowTest
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
-              val id = UUID.randomUUID()
+              val id = randomUUID
 
               val update =
                 ProgressUpdate(id, List(ProgressEvent("Such progress, wow.")))
