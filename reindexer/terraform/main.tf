@@ -30,7 +30,7 @@ module "sierra_items_reindexer" {
   source = "./reindex_worker"
 
   namespace      = "sierra_items"
-  vhs_table_name = "${local.vhs_sierra_table_name}"
+  vhs_table_name = "${local.vhs_sierra_items_table_name}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
