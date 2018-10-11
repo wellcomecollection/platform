@@ -16,7 +16,10 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{CallbackNotification, DisplayIngest}
+import uk.ac.wellcome.platform.archive.common.models.{
+  CallbackNotification,
+  DisplayIngest
+}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
