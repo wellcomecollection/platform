@@ -75,10 +75,11 @@ class RegistrarFeatureTest
             val registrationCompleteNotification =
               fromJson[RegistrationComplete](messages.head.message).get
 
+            val id = registrationCompleteNotification.storageManifest.id
             assertStored[StorageManifest](
               hybridBucket,
               hybridTable,
-              registrationCompleteNotification.storageManifest.id.toString,
+              s"${id.space}/${id.externalIdentifier.underlying}",
               registrationCompleteNotification.storageManifest
             )
 
