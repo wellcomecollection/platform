@@ -5,29 +5,18 @@ import java.util.UUID
 
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import org.scalatest.concurrent.{
-  IntegrationPatience,
-  PatienceConfiguration,
-  ScalaFutures
-}
+import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath,
-  DigitisedStorageType
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, DigitisedStorageType}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{
-  RegistrationCompleteAssertions,
-  Registrar => RegistrarFixture
-}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{RegistrationCompleteAssertions, Registrar => RegistrarFixture}
 import uk.ac.wellcome.platform.archive.registrar.models._
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 class RegistrarFeatureTest
@@ -79,26 +68,20 @@ class RegistrarFeatureTest
           Some(callbackUrl),
           queuePair,
           storageBucket) { bagLocation =>
+
           registrar.run()
 
           eventually {
-            val messages = listMessagesReceivedFromSNS(ddsTopic)
-            messages should have size 1
-            val registrationCompleteNotification =
-              fromJson[RegistrationComplete](messages.head.message).get
+            assertSnsReceivesOnly(
+              RegistrationCompleteNotification(requestId, BagId(bagLocation.bagPath.value)),
+              ddsTopic)
 
-            assertStored[StorageManifest](
-              hybridBucket,
-              hybridTable,
-              registrationCompleteNotification.storageManifest.id.value,
-              registrationCompleteNotification.storageManifest
-            )
-
-            assertRegistrationComplete(
+            assertStorageManifestCorrect(
+              getStoredManifest(bagLocation, hybridTable),
               storageBucket,
               bagLocation,
-              registrationCompleteNotification,
               filesNumber = 1)
+
             assertTopicReceivesProgressUpdate(
               requestId,
               progressTopic,
@@ -188,5 +171,10 @@ class RegistrarFeatureTest
           }
         }
     }
+  }
+
+  private def getStoredManifest(bagLocation: BagLocation, hybridTable: Table) = {
+    val hybridRecord = getHybridRecord(hybridTable, bagLocation.bagPath.value)
+    getObjectFromS3[StorageManifest](hybridRecord.location)
   }
 }

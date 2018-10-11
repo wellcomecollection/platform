@@ -7,7 +7,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 import uk.ac.wellcome.platform.archive.registrar.models.{
-  RegistrationComplete,
+  RegistrationCompleteNotification,
   StorageManifest
 }
 
@@ -19,7 +19,7 @@ object NotifyDDSFlow extends Logging {
         case (manifest, archiveComplete) =>
           Source
             .single(
-              RegistrationComplete(archiveComplete.archiveRequestId, manifest))
+              RegistrationCompleteNotification(archiveComplete.archiveRequestId, manifest.id))
             .log("notification serialised")
             .via(SnsPublishFlow(snsClient, snsConfig, Some("registrar")))
             .map(_ => archiveComplete)
