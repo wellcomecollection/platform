@@ -46,8 +46,6 @@ class BagResource(Resource):
             # TODO: Remove the necessity to do this
             result["id"] = result["id"]["value"]
 
-            print(result)
-
             return result
         except VHSNotFound:
             abort(404, f"Invalid id: No bag found for id={bag_id!r}")
