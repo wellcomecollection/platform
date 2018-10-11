@@ -143,9 +143,6 @@ def main():
         print("Checking pipeline is clear...")
         check_tables_are_clear()
 
-    print("Checking pipeline is clear...")
-    check_tables_are_clear()
-
     print(f"Triggering a reindex in {source_name}")
 
     post_to_slack(source_name=source_name, reason=reason, total_segments=total_segments)
