@@ -2,6 +2,8 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 
 import java.security.MessageDigest
 
+import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
+
 import scala.util.Random
 
 trait BagIt {
@@ -12,15 +14,15 @@ trait BagIt {
   }
 
   def createBag(
-    bagIdentifier: String,
-    dataFileCount: Int = 1,
-    createDigest: String => String = createValidDigest,
-    createDataManifest: List[(String, String)] => Option[FileEntry] =
+                 bagIdentifier: ExternalIdentifier,
+                 dataFileCount: Int = 1,
+                 createDigest: String => String = createValidDigest,
+                 createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
-    createTagManifest: List[(String, String)] => Option[FileEntry] =
+                 createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
-    createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile)
+                 createBagItFile: => Option[FileEntry] = createValidBagItFile,
+                 createBagInfoFile: ExternalIdentifier => Option[FileEntry] = createValidBagInfoFile)
     : Seq[FileEntry] = {
 
     val dataFiles = createDataFiles(dataFileCount)
@@ -47,7 +49,7 @@ trait BagIt {
   def createValidBagItFile =
     Some(FileEntry("bagit.txt", bagItFileContents))
 
-  def createValidBagInfoFile(bagIdentifier: String) =
+  def createValidBagInfoFile(bagIdentifier: ExternalIdentifier) =
     Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier)))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
@@ -103,7 +105,7 @@ trait BagIt {
           .mkString("\n")
       ))
 
-  private def bagInfoFileContents(bagIdentifier: String) = {
+  private def bagInfoFileContents(bagIdentifier: ExternalIdentifier) = {
     val date =
       new java.text.SimpleDateFormat("YYYY-MM-dd").format(new java.util.Date())
     s"""Payload-Oxum: 61798.84

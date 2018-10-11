@@ -35,7 +35,7 @@ class ArchivistFeatureTest
           registrarTopic,
           progressTopic,
           archivist) =>
-        createAndSendBag(ingestBucket, Some(callbackUri), queuePair) {
+        createAndSendBag(ingestBucket, queuePair) {
           case (request, bagIdentifier) =>
             archivist.run()
             eventually {
@@ -46,11 +46,11 @@ class ArchivistFeatureTest
               assertSnsReceivesOnly(
                 ArchiveComplete(
                   request.archiveRequestId,
+                  BagId(request.storageSpace, bagIdentifier),
                   BagLocation(
                     storageBucket.name,
                     "archive",
-                    BagPath(s"${request.storageSpace}/$bagIdentifier")),
-                  Some(callbackUri)
+                    BagPath(s"${request.storageSpace}/$bagIdentifier"))
                 ),
                 registrarTopic
               )
@@ -94,7 +94,6 @@ class ArchivistFeatureTest
           archivist) =>
         createAndSendBag(
           ingestBucket,
-          Some(callbackUri),
           queuePair,
           createDigest = _ => "bad_digest") {
           case (request, bagIdentifier) =>
@@ -128,26 +127,22 @@ class ArchivistFeatureTest
 
         createAndSendBag(
           ingestBucket,
-          Some(callbackUri),
           queuePair,
           dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
-              Some(callbackUri),
               queuePair,
               dataFileCount = 1,
               createDigest = _ => "bad_digest") {
               case (invalidRequest1, _) =>
                 createAndSendBag(
                   ingestBucket,
-                  Some(callbackUri),
                   queuePair,
                   dataFileCount = 1) {
                   case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,
-                      Some(callbackUri),
                       queuePair,
                       dataFileCount = 1,
                       createDigest = _ => "bad_digest") {
@@ -160,21 +155,21 @@ class ArchivistFeatureTest
                             Set(
                               ArchiveComplete(
                                 validRequest1.archiveRequestId,
+                                BagId(validRequest1.storageSpace, validBag1),
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1")),
-                                Some(callbackUri)
+                                    s"${validRequest1.storageSpace}/$validBag1"))
                               ),
                               ArchiveComplete(
                                 validRequest2.archiveRequestId,
+                                BagId(validRequest2.storageSpace, validBag2),
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2")),
-                                Some(callbackUri)
+                                    s"${validRequest2.storageSpace}/$validBag2"))
                               )
                             ),
                             registrarTopic
@@ -216,7 +211,6 @@ class ArchivistFeatureTest
 
         createAndSendBag(
           ingestBucket,
-          Some(callbackUri),
           queuePair,
           dataFileCount = 1) {
           case (validRequest1, validBag1) =>
@@ -233,7 +227,6 @@ class ArchivistFeatureTest
 
             createAndSendBag(
               ingestBucket,
-              Some(callbackUri),
               queuePair,
               dataFileCount = 1) {
               case (validRequest2, validBag2) =>
@@ -256,19 +249,19 @@ class ArchivistFeatureTest
                     Set(
                       ArchiveComplete(
                         validRequest1.archiveRequestId,
+                        BagId(validRequest1.storageSpace, validBag1),
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"${validRequest1.storageSpace}/$validBag1")),
-                        Some(callbackUri)
+                          BagPath(s"${validRequest1.storageSpace}/$validBag1"))
                       ),
                       ArchiveComplete(
                         validRequest2.archiveRequestId,
+                        BagId(validRequest2.storageSpace, validBag2),
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"${validRequest2.storageSpace}/$validBag2")),
-                        Some(callbackUri)
+                          BagPath(s"${validRequest2.storageSpace}/$validBag2"))
                       )
                     ),
                     registrarTopic
@@ -312,26 +305,22 @@ class ArchivistFeatureTest
 
         createAndSendBag(
           ingestBucket,
-          Some(callbackUri),
           queuePair,
           dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
-              Some(callbackUri),
               queuePair,
               dataFileCount = 1,
               createDataManifest = dataManifestWithNonExistingFile) {
               case (invalidRequest1, _) =>
                 createAndSendBag(
                   ingestBucket,
-                  Some(callbackUri),
                   queuePair,
                   dataFileCount = 1) {
                   case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,
-                      Some(callbackUri),
                       queuePair,
                       dataFileCount = 1,
                       createDataManifest = dataManifestWithNonExistingFile) {
@@ -344,21 +333,21 @@ class ArchivistFeatureTest
                             Set(
                               ArchiveComplete(
                                 validRequest1.archiveRequestId,
+                                BagId(validRequest2.storageSpace, validBag1),
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1")),
-                                Some(callbackUri)
+                                    s"${validRequest1.storageSpace}/$validBag1"))
                               ),
                               ArchiveComplete(
                                 validRequest2.archiveRequestId,
+                                BagId(validRequest2.storageSpace, validBag2),
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2")),
-                                Some(callbackUri)
+                                    s"${validRequest2.storageSpace}/$validBag2"))
                               )
                             ),
                             registrarTopic
@@ -401,26 +390,22 @@ class ArchivistFeatureTest
 
         createAndSendBag(
           ingestBucket,
-          Some(callbackUri),
           queuePair,
           dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
               ingestBucket,
-              Some(callbackUri),
               queuePair,
               dataFileCount = 1,
               createBagInfoFile = _ => None) {
               case (invalidRequest1, _) =>
                 createAndSendBag(
                   ingestBucket,
-                  Some(callbackUri),
                   queuePair,
                   dataFileCount = 1) {
                   case (validRequest2, validBag2) =>
                     createAndSendBag(
                       ingestBucket,
-                      Some(callbackUri),
                       queuePair,
                       dataFileCount = 1,
                       createBagInfoFile = _ => None) {
@@ -433,21 +418,21 @@ class ArchivistFeatureTest
                             Set(
                               ArchiveComplete(
                                 validRequest1.archiveRequestId,
+                                BagId(validRequest2.storageSpace, validBag1),
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1")),
-                                Some(callbackUri)
+                                    s"${validRequest1.storageSpace}/$validBag1"))
                               ),
                               ArchiveComplete(
                                 validRequest2.archiveRequestId,
+                                BagId(validRequest2.storageSpace, validBag2),
                                 BagLocation(
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2")),
-                                Some(callbackUri)
+                                    s"${validRequest2.storageSpace}/$validBag2"))
                               )
                             ),
                             registrarTopic

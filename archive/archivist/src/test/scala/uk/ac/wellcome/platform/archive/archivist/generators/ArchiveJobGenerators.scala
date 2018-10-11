@@ -12,7 +12,7 @@ trait ArchiveJobGenerators {
   def createArchiveItemJob(zipFile: ZipFile,
                            bucket: S3.Bucket,
                            digest: String,
-                           bagIdentifier: String,
+                           bagIdentifier: ExternalIdentifier,
                            s3Key: String) = {
     val archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket)
     val bagDigestItem =
@@ -24,7 +24,7 @@ trait ArchiveJobGenerators {
 
   def createArchiveJob(
     zipFile: ZipFile,
-    bagIdentifier: String,
+    bagIdentifier: ExternalIdentifier,
     bucket: Bucket,
     manifestFiles: List[String] =
       List("manifest-sha256.txt", "tagmanifest-sha256.txt")) = {
@@ -32,6 +32,7 @@ trait ArchiveJobGenerators {
 
     val bagLocation = BagLocation(bucket.name, "archive", bagPath)
     ArchiveJob(
+      bagIdentifier,
       zipFile,
       bagLocation,
       BagItConfig(),

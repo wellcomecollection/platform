@@ -5,3 +5,5 @@ case class BagLocation(
   storagePath: String,
   bagPath: BagPath
 )
+
+

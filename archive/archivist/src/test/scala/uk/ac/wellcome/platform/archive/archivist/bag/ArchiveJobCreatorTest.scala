@@ -32,6 +32,7 @@ class ArchiveJobCreatorTest
             )) {
           case Right(
               ArchiveJob(
+                bagIdentifier,
                 actualZipFile,
                 bagLocation,
                 bagItConfig,

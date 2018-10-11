@@ -6,19 +6,10 @@ import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveItemJobCreator
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveItemJob,
-  ArchiveJob
-}
-import uk.ac.wellcome.platform.archive.common.flows.{
-  FoldEitherFlow,
-  OnErrorFlow
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ArchiveJob}
+import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, OnErrorFlow}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  IngestBagRequest
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagId, IngestBagRequest}
 
 object ArchiveJobFlow extends Logging {
   def apply(delimiter: String,
@@ -68,8 +59,12 @@ object ArchiveJobFlow extends Logging {
         case (Nil, archiveJob) =>
           Right(
             ArchiveComplete(
-              archiveJob.bagLocation,
-              ingestBagRequest
+              ingestBagRequest.archiveRequestId,
+              BagId(
+                ingestBagRequest.storageSpace,
+                archiveJob.externalIdentifier
+              ),
+              archiveJob.bagLocation
             ))
         case (errors, archiveJob) => Left(ArchiveJobError(archiveJob, errors))
 
