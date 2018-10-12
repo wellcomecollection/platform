@@ -31,6 +31,7 @@ model.load_state_dict(torch.load('../data/sentence-encoder-2018-10-08.pt',
 search_index = nmslib.init(method='hnsw', space='cosinesimil')
 search_index.loadIndex('../data/search_index.hnsw')
 
+
 # Define endpoint classes
 class devise_search(Resource):
     def get(self):
@@ -44,6 +45,7 @@ class devise_search(Resource):
 
         return jsonify({'request': query,
                         'response': response_urls})
+
 
 # Create search endpoint
 api.add_resource(devise_search, '/devise/search')
