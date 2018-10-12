@@ -2,10 +2,16 @@ package uk.ac.wellcome.platform.archive.archivist.models
 
 import java.util.zip.ZipFile
 
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.BagLocation
 
-import scala.util.Try
-
+/** Used internally by an archivist flow.
+  *
+  * @param zipFile The downloaded ZIP file on the local disk.
+  * @param bagLocation Where to upload the new bag to.
+  * @param config Information about what meta files we expect to see in the
+  *               bag, and what formats we expect them to be in.
+  * @param bagManifestLocations A list of manifest locations inside the bag.
+  */
 case class ArchiveJob(
   zipFile: ZipFile,
   bagLocation: BagLocation,
@@ -13,44 +19,4 @@ case class ArchiveJob(
   bagManifestLocations: List[BagManifestLocation]
 ) {
   def digestDelimiter = config.digestDelimiterRegexp
-}
-
-object ArchiveJob {
-
-  def create(
-    zipFile: ZipFile,
-    config: BagUploaderConfig
-  ) = {
-
-    val maybeBagPath = findBag(zipFile).toEither
-
-    maybeBagPath
-      .map(bagPath =>
-        (bagPath, BagManifestLocation.create(config.bagItConfig, bagPath)))
-      .map {
-        case (bagPath, bagManifestLocations) =>
-          ArchiveJob(
-            zipFile,
-            BagLocation(
-              storageNamespace = config.uploadConfig.uploadNamespace,
-              storagePath = config.uploadConfig.uploadPrefix,
-              bagPath = bagPath
-            ),
-            config.bagItConfig,
-            bagManifestLocations
-          )
-      }
-  }
-
-  private def findBag(zipFile: ZipFile): Try[BagPath] = Try {
-    val entries = zipFile.entries()
-    val bagAnchor = """(.*?)\/*bagit.txt$""".r
-
-    val bagPathString = Stream
-      .continually(entries.nextElement())
-      .map(_.getName)
-      .collectFirst { case bagAnchor(path) => BagPath(path) }
-
-    bagPathString.get
-  }
 }

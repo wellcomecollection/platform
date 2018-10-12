@@ -11,9 +11,11 @@ def sentence_to_indexes(sentence, word_to_index):
 
 
 def embed(sentence, model, word_to_index, index_to_wordvec):
-    indexes = ([word_to_index['<s>']] + 
-               sentence_to_indexes(sentence, word_to_index) +
-               [word_to_index['</s>']])
+    indexes = (
+        [word_to_index["<s>"]]
+        + sentence_to_indexes(sentence, word_to_index)
+        + [word_to_index["</s>"]]
+    )
     wvs = np.stack([index_to_wordvec[i] for i in indexes])
     embedding = model(torch.Tensor([wvs])).detach().numpy()
     return embedding.squeeze()

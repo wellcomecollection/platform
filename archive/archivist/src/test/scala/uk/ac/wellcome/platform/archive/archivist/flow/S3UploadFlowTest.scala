@@ -6,15 +6,27 @@ import akka.stream.scaladsl.{Concat, Sink, Source, StreamConverters}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.util.ByteString
 import com.amazonaws.services.s3.model.ListMultipartUploadsRequest
+import org.apache.commons.io.IOUtils
 import org.scalatest.FunSpec
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
+import org.scalatest.time.{Millis, Seconds, Span}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.util.Failure
 
-class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka {
+class S3UploadFlowTest
+    extends FunSpec
+    with S3
+    with ScalaFutures
+    with Akka
+    with PatienceConfiguration {
+
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
+    timeout = scaled(Span(40, Seconds)),
+    interval = scaled(Span(150, Millis))
+  )
 
   it("writes a stream of bytestring to S3") {
     withActorSystem { implicit actorSystem =>
@@ -59,14 +71,46 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka {
     }
   }
 
-  it("uploads a big bytestring of random bytes") {
+  it("uploads a series of bytestrings smaller than the minimum size to s3") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          val res = Array.fill(13 * 1024 * 1024)(
+          val res = Array.fill(23 * 1024 * 1024)(
+            (scala.util.Random.nextInt(256) - 128).toByte)
+
+          val s3Key = "key.txt"
+
+          // list of bytestrings of 1KB each
+          val byteStringList = res.grouped(1024).map(ByteString(_))
+          val futureResult = Source
+            .fromIterator(() => byteStringList)
+            .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
+            .runWith(Sink.head)
+
+          whenReady(futureResult) { triedResult =>
+            triedResult.get.getBucketName shouldBe bucket.name
+            triedResult.get.getKey shouldBe s3Key
+
+            val actualObjectStream =
+              s3Client.getObject(bucket.name, s3Key).getObjectContent
+            val actualBytes = IOUtils.toByteArray(actualObjectStream)
+
+            actualBytes shouldBe res
+          }
+        }
+      }
+    }
+  }
+
+  it("uploads a byteString  of random bytes bigger than the max size") {
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withLocalS3Bucket { bucket =>
+          val res = Array.fill(23 * 1024 * 1024)(
             (scala.util.Random.nextInt(256) - 128).toByte)
           val s3Key = "key.txt"
           val futureResult = Source
+          // one bytestring of 23MB
             .single(ByteString(res))
             .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
             .runWith(Sink.seq)
@@ -82,6 +126,45 @@ class S3UploadFlowTest extends FunSpec with S3 with ScalaFutures with Akka {
               .takeWhile(_ != -1)
               .map(_.toByte)
               .toArray shouldBe res
+          }
+        }
+      }
+    }
+  }
+
+  it("uploads a combination of small and big bytestrings") {
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withLocalS3Bucket { bucket =>
+          val smallArray1 =
+            Array.fill(1024)((scala.util.Random.nextInt(256) - 128).toByte)
+
+          val bigArray = Array.fill(23 * 1024 * 1024)(
+            (scala.util.Random.nextInt(256) - 128).toByte)
+
+          val smallArray2 =
+            Array.fill(1024)((scala.util.Random.nextInt(256) - 128).toByte)
+
+          val s3Key = "key.txt"
+          val futureResult = Source(
+            List(
+              ByteString(smallArray1),
+              ByteString(bigArray),
+              ByteString(smallArray2)))
+            .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
+            .runWith(Sink.seq)
+
+          whenReady(futureResult) { result =>
+            result should have size 1
+            result.head.get.getBucketName shouldBe bucket.name
+            result.head.get.getKey shouldBe s3Key
+
+            val is = s3Client.getObject(bucket.name, s3Key).getObjectContent
+            Stream
+              .continually(is.read)
+              .takeWhile(_ != -1)
+              .map(_.toByte)
+              .toArray shouldBe (smallArray1 ++ bigArray ++ smallArray2)
           }
         }
       }

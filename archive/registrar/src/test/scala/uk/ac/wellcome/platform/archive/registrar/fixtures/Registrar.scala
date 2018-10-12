@@ -9,15 +9,11 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
-  BagLocation,
-  BagPath
+  BagLocation
 }
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.registrar.modules.{
   ConfigModule,
   TestAppConfigModule,
@@ -37,8 +33,7 @@ trait Registrar
     extends S3
     with Messaging
     with LocalVersionedHybridStore
-    with BagIt
-    with ProgressMonitorFixture
+    with BagLocationFixtures
     with LocalDynamoDb {
 
   def sendNotification(requestId: UUID,
@@ -60,29 +55,6 @@ trait Registrar
       sendNotification(requestId, bagLocation, callbackUrl, queuePair)
       testWith(bagLocation)
     }
-  }
-
-  def withBag[R](storageBucket: Bucket, dataFileCount: Int = 1)(
-    testWith: TestWith[BagLocation, R]) = {
-    val bagName = BagPath(randomAlphanumeric())
-
-    info(s"Creating bag $bagName")
-
-    val fileEntries = createBag(bagName, dataFileCount)
-    val storagePrefix = "archive"
-
-    val bagLocation = BagLocation(storageBucket.name, storagePrefix, bagName)
-
-    fileEntries.map((entry: FileEntry) => {
-      s3Client
-        .putObject(
-          bagLocation.storageNamespace,
-          s"${storagePrefix}/${entry.name}",
-          entry.contents
-        )
-    })
-
-    testWith(bagLocation)
   }
 
   override def createTable(table: Table) = {
@@ -110,19 +82,19 @@ trait Registrar
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 topicArn: Topic,
-                 progressTable: Table)(testWith: TestWith[RegistrarApp, R]) = {
+                 ddsTopic: Topic,
+                 progressTopic: Topic)(testWith: TestWith[RegistrarApp, R]) = {
 
     class TestApp extends Logging {
 
       val appConfigModule = new TestAppConfigModule(
         queuePair.queue.url,
         storageBucket.name,
-        topicArn.arn,
+        ddsTopic.arn,
+        progressTopic.arn,
         hybridStoreTable.name,
         hybridStoreBucket.name,
-        "archive",
-        progressTable
+        "archive"
       )
 
       val injector: Injector = Guice.createInjector(
@@ -132,9 +104,9 @@ trait Registrar
         AkkaModule,
         CloudWatchClientModule,
         SQSClientModule,
-        SNSAsyncClientModule,
+        SNSClientModule,
+        S3ClientModule,
         DynamoClientModule,
-        ProgressMonitorModule,
         MessageStreamModule
       )
 
@@ -147,42 +119,79 @@ trait Registrar
 
   def withRegistrar[R](
     testWith: TestWith[
-      (Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table, Table),
+      (Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket, Table),
       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
-        snsTopic =>
-          withLocalS3Bucket {
-            storageBucket =>
+        ddsSnsTopic =>
+          withLocalSnsTopic {
+            progressTopic =>
               withLocalS3Bucket {
-                hybridStoreBucket =>
-                  withLocalDynamoDbTable {
-                    hybridDynamoTable =>
-                      withSpecifiedLocalDynamoDbTable(
-                        createProgressMonitorTable) { progressTable =>
+                storageBucket =>
+                  withLocalS3Bucket {
+                    hybridStoreBucket =>
+                      withLocalDynamoDbTable { hybridDynamoTable =>
                         withApp(
                           storageBucket,
                           hybridStoreBucket,
                           hybridDynamoTable,
                           queuePair,
-                          snsTopic,
-                          progressTable) { registrar =>
+                          ddsSnsTopic,
+                          progressTopic) { registrar =>
                           testWith(
                             (
                               storageBucket,
                               queuePair,
-                              snsTopic,
+                              ddsSnsTopic,
+                              progressTopic,
                               registrar,
                               hybridStoreBucket,
-                              hybridDynamoTable,
-                              progressTable)
+                              hybridDynamoTable)
                           )
                         }
                       }
                   }
+
               }
           }
       }
     })
   }
+
+  def withRegistrarAndBrokenVHS[R](
+    testWith: TestWith[(Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket),
+                       R]) = {
+    withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
+      withLocalSnsTopic {
+        ddsSnsTopic =>
+          withLocalSnsTopic {
+            progressTopic =>
+              withLocalS3Bucket {
+                storageBucket =>
+                  withLocalS3Bucket { hybridStoreBucket =>
+                    withApp(
+                      storageBucket,
+                      hybridStoreBucket,
+                      Table("does-not-exist", ""),
+                      queuePair,
+                      ddsSnsTopic,
+                      progressTopic) { registrar =>
+                      testWith(
+                        (
+                          storageBucket,
+                          queuePair,
+                          ddsSnsTopic,
+                          progressTopic,
+                          registrar,
+                          hybridStoreBucket)
+                      )
+                    }
+                  }
+              }
+
+          }
+      }
+    })
+  }
+
 }

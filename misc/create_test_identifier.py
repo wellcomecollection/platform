@@ -12,13 +12,11 @@ import random
 import string
 
 allowed_chars = [
-    char
-    for char in (string.ascii_lowercase + string.digits)
-    if char not in '0oil1'
+    char for char in (string.ascii_lowercase + string.digits) if char not in "0oil1"
 ]
 
 while True:
-    x = ''.join(random.choice(allowed_chars) for _ in range(8))
+    x = "".join(random.choice(allowed_chars) for _ in range(8))
     if not x.startswith(tuple(string.digits)):
         print(x)
         break

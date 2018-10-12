@@ -36,58 +36,52 @@ def create_tags(ec2_client, ec2_instance_id, event_detail):
     Returns the SDK response to the create_tags call.
     """
 
-    cluster_arn = event_detail['clusterArn']
-    container_instance_arn = event_detail['containerInstanceArn']
+    cluster_arn = event_detail["clusterArn"]
+    container_instance_arn = event_detail["containerInstanceArn"]
 
-    print(f'Tag {ec2_instance_id} clusterArn: {cluster_arn}')
-    print(
-        f'Tag {ec2_instance_id} containerInstanceArn: {container_instance_arn}'
-    )
+    print(f"Tag {ec2_instance_id} clusterArn: {cluster_arn}")
+    print(f"Tag {ec2_instance_id} containerInstanceArn: {container_instance_arn}")
 
     return ec2_client.create_tags(
         Resources=[ec2_instance_id],
-        Tags=[{
-            "Key": "clusterArn",
-            "Value": event_detail['clusterArn']
-        }, {
-            "Key": "containerInstanceArn",
-            "Value": event_detail['containerInstanceArn']
-        }]
+        Tags=[
+            {"Key": "clusterArn", "Value": event_detail["clusterArn"]},
+            {
+                "Key": "containerInstanceArn",
+                "Value": event_detail["containerInstanceArn"],
+            },
+        ],
     )
 
 
 @log_on_error
 def main(event, _):
-    ec2_client = boto3.client('ec2')
-    s3_client = boto3.client('s3')
+    ec2_client = boto3.client("ec2")
+    s3_client = boto3.client("s3")
 
     bucket_name = os.environ["BUCKET_NAME"]
     object_path = os.environ["OBJECT_PATH"]
 
-    ec2_instance_id = event['detail']['ec2InstanceId']
+    ec2_instance_id = event["detail"]["ec2InstanceId"]
 
     try:
         s3_client.head_object(
-            Bucket=bucket_name,
-            Key=f'{object_path}/{ec2_instance_id}'
+            Bucket=bucket_name, Key=f"{object_path}/{ec2_instance_id}"
         )
     except ClientError as ex:
-        if ex.response['Error']['Code'] == '404':
-            print(f'{ec2_instance_id} not seen yet, tagging!')
+        if ex.response["Error"]["Code"] == "404":
+            print(f"{ec2_instance_id} not seen yet, tagging!")
 
-            response = create_tags(
-                ec2_client,
-                ec2_instance_id,
-                event['detail'])
+            response = create_tags(ec2_client, ec2_instance_id, event["detail"])
 
-            print(f'response = {response!r}')
+            print(f"response = {response!r}")
         else:
             raise
 
     s3_client.put_object(
         Bucket=bucket_name,
-        Key=f'{object_path}/{ec2_instance_id}',
-        Body=json.dumps(event)
+        Key=f"{object_path}/{ec2_instance_id}",
+        Body=json.dumps(event),
     )
 
-    print(f'{ec2_instance_id} tagged.')
+    print(f"{ec2_instance_id} tagged.")

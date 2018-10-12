@@ -1,7 +1,6 @@
 --sqs-queue-url=${queue_url}
---topic-arn=${topic_arn}
---upload-namespace=${archive_bucket}
+--dds-sns-topic-arn=${dds_topic_arn}
+--progress-sns-topic-arn=${progress_topic_arn}
 --hybrid-dynamo-table-name=${vhs_table_name}
 --hybrid-s3-bucket-name=${vhs_bucket_name}
---archive-progress-monitor-table-name=${archive_progress_table_name}
 --metrics-namespace=registrar

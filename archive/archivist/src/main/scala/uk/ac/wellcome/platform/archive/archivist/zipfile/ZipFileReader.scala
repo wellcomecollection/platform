@@ -6,19 +6,23 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ZipLocation
 
 object ZipFileReader extends Logging {
+
+  /** Returns an InputStream for a file inside a ZIP file.
+    *
+    * If something goes wrong (for example, the file doesn't exist),
+    * it returns None rather than throwing an exception.
+    *
+    */
   def maybeInputStream(zipLocation: ZipLocation): Option[InputStream] = {
-    val objectLocation = zipLocation.objectLocation
     val zipFile = zipLocation.zipFile
-    info(s"objectLocation: $objectLocation")
-    val name = s"${objectLocation.namespace}/${objectLocation.key}"
-    info(s"Getting ZipEntry $name")
+    debug(s"Getting ZipEntry ${zipLocation.entryPath}")
 
     val maybeInputStream = for {
-      zipEntry <- Option(zipFile.getEntry(name))
+      zipEntry <- Option(zipFile.getEntry(zipLocation.entryPath.path))
       zipStream <- Option(zipFile.getInputStream(zipEntry))
     } yield zipStream
 
-    info(s"MaybeInputStream: $maybeInputStream")
+    debug(s"MaybeInputStream: $maybeInputStream")
     maybeInputStream
   }
 }

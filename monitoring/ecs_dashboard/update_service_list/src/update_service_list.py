@@ -17,48 +17,45 @@ from wellcome_aws_utils.ecs_utils import (
     get_service_arns,
     describe_service,
     describe_cluster,
-    EcsThrottleException
+    EcsThrottleException,
 )
 from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 def _create_event_dict(event):
-    return {
-        'timestamp': event['createdAt'].timestamp(),
-        'message': event['message']
-    }
+    return {"timestamp": event["createdAt"].timestamp(), "message": event["message"]}
 
 
 def _create_cluster_dict(cluster, service_list):
     return {
-        'clusterName': cluster['clusterName'],
-        'status': cluster['status'],
-        'instanceCount': cluster['registeredContainerInstancesCount'],
-        'serviceList': service_list
+        "clusterName": cluster["clusterName"],
+        "status": cluster["status"],
+        "instanceCount": cluster["registeredContainerInstancesCount"],
+        "serviceList": service_list,
     }
 
 
 def _create_service_dict(service):
-    deployments = [_create_deployment_dict(d) for d in service['deployments']]
+    deployments = [_create_deployment_dict(d) for d in service["deployments"]]
     # Grab just the last few events to keep the file size down
-    events = [_create_event_dict(e) for e in service['events'][:5]]
+    events = [_create_event_dict(e) for e in service["events"][:5]]
 
     return {
-        'serviceName': service['serviceName'],
-        'desiredCount': service['desiredCount'],
-        'pendingCount': service['pendingCount'],
-        'runningCount': service['runningCount'],
-        'deployments': deployments,
-        'events': events,
-        'status': service['status']
+        "serviceName": service["serviceName"],
+        "desiredCount": service["desiredCount"],
+        "pendingCount": service["pendingCount"],
+        "runningCount": service["runningCount"],
+        "deployments": deployments,
+        "events": events,
+        "status": service["status"],
     }
 
 
 def _create_deployment_dict(deployment):
     return {
-        'id': deployment['id'],
-        'taskDefinition': deployment['taskDefinition'],
-        'status': deployment['status']
+        "id": deployment["id"],
+        "taskDefinition": deployment["taskDefinition"],
+        "status": deployment["status"],
     }
 
 
@@ -83,56 +80,47 @@ def get_cluster_list(ecs_client):
     return cluster_list
 
 
-def send_ecs_status_to_s3(
-        service_snapshot,
-        s3_client,
-        bucket_name,
-        object_key):
+def send_ecs_status_to_s3(service_snapshot, s3_client, bucket_name, object_key):
 
     return s3_client.put_object(
-        ACL='public-read',
+        ACL="public-read",
         Bucket=bucket_name,
         Key=object_key,
         Body=json.dumps(service_snapshot),
-        CacheControl='max-age=0',
-        ContentType='application/json'
+        CacheControl="max-age=0",
+        ContentType="application/json",
     )
 
 
 def create_boto_client(service, role_arn):
-    sts_client = boto3.client('sts')
+    sts_client = boto3.client("sts")
 
     assumed_role_object = sts_client.assume_role(
-        RoleArn=role_arn,
-        RoleSessionName="AssumeRoleSession"
+        RoleArn=role_arn, RoleSessionName="AssumeRoleSession"
     )
 
-    credentials = assumed_role_object['Credentials']
+    credentials = assumed_role_object["Credentials"]
 
     return boto3.client(
-        service_name='ecs',
-        aws_access_key_id=credentials['AccessKeyId'],
-        aws_secret_access_key=credentials['SecretAccessKey'],
-        aws_session_token=credentials['SessionToken']
+        service_name="ecs",
+        aws_access_key_id=credentials["AccessKeyId"],
+        aws_secret_access_key=credentials["SecretAccessKey"],
+        aws_session_token=credentials["SessionToken"],
     )
 
 
 @log_on_error
 def main(event, _):
-    assumable_roles = (
-        [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
-    )
+    assumable_roles = [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
     bucket_name = os.environ["BUCKET_NAME"]
     object_key = os.environ["OBJECT_KEY"]
 
     ecs_clients = (
-        [create_boto_client('ecs', role_arn) for role_arn in assumable_roles]
-    ) + [boto3.client('ecs')]
+        [create_boto_client("ecs", role_arn) for role_arn in assumable_roles]
+    ) + [boto3.client("ecs")]
 
     try:
-        cluster_lists = [
-            get_cluster_list(ecs_client) for ecs_client in ecs_clients
-        ]
+        cluster_lists = [get_cluster_list(ecs_client) for ecs_client in ecs_clients]
     except EcsThrottleException:
         # We do not wish to retry on throttle so fail gracefully
         return
@@ -140,16 +128,13 @@ def main(event, _):
     cluster_list = [item for sublist in cluster_lists for item in sublist]
 
     service_snapshot = {
-        'clusterList': cluster_list,
-        'lastUpdated': str(datetime.datetime.utcnow())
+        "clusterList": cluster_list,
+        "lastUpdated": str(datetime.datetime.utcnow()),
     }
 
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client("s3")
 
     response = send_ecs_status_to_s3(
-        service_snapshot,
-        s3_client,
-        bucket_name,
-        object_key
+        service_snapshot, s3_client, bucket_name, object_key
     )
-    assert response['HTTPStatusCode'] == 200, (service_snapshot, response)
+    assert response["HTTPStatusCode"] == 200, (service_snapshot, response)

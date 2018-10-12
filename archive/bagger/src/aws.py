@@ -35,6 +35,12 @@ def save_mets_to_side(b_number, local_tmp_file):
     client.upload_file(local_tmp_file, settings.DROP_BUCKET_NAME_METS_ONLY, key)
 
 
+def save_id_map(b_number, id_map):
+    s3_path = "_idmaps/{0}.json".format(b_number)
+    obj = get_s3().Object(settings.DROP_BUCKET_NAME_METS_ONLY, s3_path)
+    obj.put(Body=json.dumps(id_map, indent=4))
+
+
 def log_processing_error(message):
     s3_path = "{0}.json".format(message["identifier"])
     obj = get_s3().Object(settings.DROP_BUCKET_NAME_ERRORS, s3_path)
@@ -48,7 +54,9 @@ def send_bag_instruction(message):
         queue = sqs.get_queue_by_name(QueueName=settings.BAGGING_QUEUE)
     except ClientError as ce:
         if ce.response["Error"]["Code"] == "AWS.SimpleQueueService.NonExistentQueue":
-            queue = sqs.create_queue(QueueName=settings.BAGGING_QUEUE, Attributes={'DelaySeconds': '0'})
+            queue = sqs.create_queue(
+                QueueName=settings.BAGGING_QUEUE, Attributes={"DelaySeconds": "0"}
+            )
             print("Created queue - " + settings.BAGGING_QUEUE)
 
     response = queue.send_message(MessageBody=json.dumps(message))

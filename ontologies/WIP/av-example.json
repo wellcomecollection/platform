@@ -1,0 +1,86 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id": "watu9tbc",
+  "type": "Work",
+  "workType": {
+    "id": "e-video",
+    "type": "WorkType",
+    "label": "E-video"
+  },
+  "title": "The sheep shower.",
+  "description": "With rousing music, the film opens with footage on a sheep ranch in Australia.",
+  "credits": [
+    "Cooper Engineering presents. Photography Reg Perier, Editing Mildred Crowley, A Perier Production in association with Noel Rubie PTY. Ltd. The film was made on Bandanora; Capertee, Innisfail; Ben Bullen, Warbreccan; Deniliquin, Bundure; Jerilderie."
+  ],
+  "playingTime" : "001154" ,
+  "contentType" : {
+    "id": "tdi",
+    "type": "ContentType",
+    "label": "two-dimensional moving image"
+  } ,
+    "mediaType" : {
+    "id": "c",
+    "type": "MediaType",
+    "label": "computer"
+  } ,
+    "carrierType" : {
+    "id": "cr",
+    "type": "CarrierType",
+    "label": "online resource"
+  } ,
+  "contributors": [
+    {
+      "type": "Contributor",
+      "agent": {
+        "id": "a24s7qf3",
+        "label": "Perier Production Pty Ltd.,",
+        "type": "Organisation",
+        "roles": [
+          {
+            "label": "Producer",
+            "type": "ContributionRole"
+          }
+        ]
+      }
+    }
+  ],
+  "subjects": [
+    {
+      "label": "Agriculture",
+      "type": "Subject",
+      "concepts": [
+        {
+          "id": "hd2891f",
+          "label": "Agriculture",
+          "type": "Concept",
+          "identifiers": [
+            {
+              "indentifierType": {
+                "id": "lcsh",
+                "label": "LSCH",
+                "type": "IdentifierType"
+              },
+              "value": "sh85002415",
+              "type": "Identifier"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "production": [
+    {
+      "function": {
+        "label": "Publication",
+        "type": "Concept"
+      },
+      "dates": [
+        {
+          "label": "194?",
+          "type": "Period"
+        }
+      ],
+      "type": "ProductionEvent"
+    }
+  ]
+}

@@ -9,3 +9,5 @@
 # See https://github.com/requests/requests/issues/4673
 #
 urllib3==1.22
+
+betamax

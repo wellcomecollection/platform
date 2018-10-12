@@ -1,8 +1,0 @@
-dynamodb:
-  image: "peopleperhour/dynamodb"
-  ports:
-    - "8000:8000"
-sns:
-  image: "wellcome/fake-sns"
-  ports:
-    - "9292:9292"

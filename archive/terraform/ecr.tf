@@ -12,9 +12,24 @@ module "ecr_repository_registrar" {
   name   = "registrar"
 }
 
-module "ecr_repository_progress" {
+module "ecr_repository_progress_async" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "progress"
+  name   = "progress_async"
+}
+
+module "ecr_repository_progress_http" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "progress_http"
+}
+
+module "ecr_repository_notifier" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "notifier"
+}
+
+module "ecr_repository_callback_stub_server" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "callback_stub_server"
 }
 
 module "ecr_repository_bagger" {

@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.modules
 
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Injector, Provides, Singleton}
 
 import scala.concurrent.ExecutionContext
@@ -14,6 +15,13 @@ object AkkaModule extends AbstractModule {
     GuiceAkkaExtension(system).initialize(injector)
 
     system
+  }
+
+  @Singleton
+  @Provides
+  def providesActorMaterializer(
+    implicit actorSystem: ActorSystem): ActorMaterializer = {
+    ActorMaterializer()
   }
 
   @Singleton

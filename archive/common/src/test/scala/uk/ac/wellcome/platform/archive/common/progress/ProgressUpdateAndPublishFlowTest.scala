@@ -27,8 +27,7 @@ class ProgressUpdateAndPublishFlowTest
     with ProgressMonitorFixture
     with ScalaFutures {
 
-  private val uploadUrl = "uploadUrl"
-  private val callbackUrl = "http://localhost/archive/complete"
+  import Progress._
 
   it("updates progress and publishes status") {
     withLocalSnsTopic { topic =>
@@ -43,20 +42,19 @@ class ProgressUpdateAndPublishFlowTest
                 monitor
               )
 
-              val event = ProgressEvent("Run!")
+              val events = List(ProgressEvent("Run!"))
               val status = Progress.Failed
 
-              val progress = createProgress(uploadUrl, callbackUrl, monitor)
-              val update = ProgressUpdate(progress.id, event, status)
+              val progress = createProgress(monitor, callbackUri, uploadUri)
+              val update = ProgressUpdate(progress.id, events, status)
 
               val expectedProgress = progress.copy(
-                events = progress.events :+ event,
-                result = status
+                events = progress.events ++ events,
+                status = status
               )
 
-              val source = Source.single(update)
-
-              val eventualResult = source
+              val eventualResult = Source
+                .single(update)
                 .via(flow)
                 .async
                 .runWith(Sink.head)(materializer)
@@ -69,13 +67,13 @@ class ProgressUpdateAndPublishFlowTest
 
                   assertProgressCreated(
                     progress.id,
-                    uploadUrl,
-                    Some(callbackUrl),
-                    table = table)
+                    uploadUri,
+                    Some(callbackUri),
+                    table)
 
                   assertProgressRecordedRecentEvents(
                     progress.id,
-                    Seq(update.event.description),
+                    update.events.map(_.description),
                     table
                   )
 

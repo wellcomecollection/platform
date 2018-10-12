@@ -21,6 +21,10 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
+variable "interservice_security_group_id" {
+  default = ""
+}
+
 variable "service_lb_security_group_id" {
   default = ""
 }

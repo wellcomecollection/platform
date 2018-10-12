@@ -22,13 +22,13 @@ def main(event, _):
     message_data = extract_json_message(event)
 
     response = run_task(
-        ecs_client=boto3.client('ecs'),
-        cluster_name=message_data['cluster_name'],
-        container_name=message_data['container_name'],
-        task_definition=message_data['task_definition'],
-        command=message_data['command'],
-        started_by=message_data['started_by']
+        ecs_client=boto3.client("ecs"),
+        cluster_name=message_data["cluster_name"],
+        container_name=message_data["container_name"],
+        task_definition=message_data["task_definition"],
+        command=message_data["command"],
+        started_by=message_data["started_by"],
     )
 
-    print(f'response = {response!r}')
-    assert len(response['failures']) == 0
+    print(f"response = {response!r}")
+    assert len(response["failures"]) == 0

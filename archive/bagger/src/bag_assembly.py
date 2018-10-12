@@ -30,7 +30,7 @@ def prepare_bag_dir(b_number):
         "directory": os.path.join(settings.WORKING_DIRECTORY, b_number),
         "zip_file_name": zip_file_name,
         "zip_file_path": os.path.join(settings.WORKING_DIRECTORY, zip_file_name),
-        "mets_partial_path": get_mets_partial_path(b_number)
+        "mets_partial_path": get_mets_partial_path(b_number),
     }
     shutil.rmtree(bag_details["directory"], ignore_errors=True)
     try:

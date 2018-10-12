@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.modules
 
+import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.platform.archive.archivist.models.ArchivistConfig
 
@@ -20,9 +21,13 @@ object ConfigModule extends AbstractModule {
   def providesSQSClientConfig(appConfig: ArchivistConfig) =
     appConfig.sqsClientConfig
 
-  @Provides
-  def providesSNSConfig(appConfig: ArchivistConfig) =
-    appConfig.snsConfig
+  @Provides @Named("registrarSnsConfig")
+  def providesRegistrarSNSConfig(appConfig: ArchivistConfig) =
+    appConfig.registrarSnsConfig
+
+  @Provides @Named("progressSnsConfig")
+  def providesProgressSNSConfig(appConfig: ArchivistConfig) =
+    appConfig.progressSnsConfig
 
   @Provides
   def providesSNSClientConfig(appConfig: ArchivistConfig) =
@@ -35,8 +40,4 @@ object ConfigModule extends AbstractModule {
   @Provides
   def providesBagUploaderConfig(appConfig: ArchivistConfig) =
     appConfig.bagUploaderConfig
-
-  @Provides
-  def providesProgressMonitorConfig(appConfig: ArchivistConfig) =
-    appConfig.progressMonitorConfig
 }

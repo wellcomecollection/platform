@@ -97,10 +97,8 @@ define test_python
 
 	$(ROOT)/docker_run.py --aws --dind -- \
 		--net=host \
-		--volume $(ROOT)/$(1)/src:/data \
 		--volume $(ROOT)/shared_conftest.py:/conftest.py \
-		--env INSTALL_DEPENDENCIES=false \
-		--env FIND_MATCH_PATHS="/data" --tty \
+		--workdir $(ROOT)/$(1) --tty \
 		wellcome/test_python_$(shell basename $(1)):latest
 endef
 
@@ -182,9 +180,10 @@ endef
 #   $1 - Path to the docker-compose file.
 #
 define docker_compose_up
-    $(ROOT)/docker_run.py --dind --sbt --root -- \
-    		--net host \
-    		docker/compose:1.21.0 -f /repo/$(1) up
+	$(ROOT)/docker_run.py --dind --sbt --root -- \
+		--net host \
+		wellcome/sbt_wrapper \
+		"project $(1)" "dockerComposeUp"
 endef
 
 
@@ -194,9 +193,10 @@ endef
 #   $1 - Path to the docker-compose file.
 #
 define docker_compose_down
-    $(ROOT)/docker_run.py --dind --sbt --root -- \
-        		--net host \
-        		docker/compose:1.21.0 -f /repo/$(1) down
+	$(ROOT)/docker_run.py --dind --sbt --root -- \
+		--net host \
+		wellcome/sbt_wrapper \
+		"project $(1)" "dockerComposeDown"
 endef
 
 
@@ -241,10 +241,10 @@ endef
 #
 define __sbt_base_docker_template
 $(1)-docker_compose_up:
-	$(call docker_compose_up,$(2)/docker-compose.yml)
+	$(call docker_compose_up,$(1))
 
 $(1)-docker_compose_down:
-	$(call docker_compose_down,$(2)/docker-compose.yml)
+	$(call docker_compose_down,$(1))
 
 $(1)-test:
 	$(call sbt_test,$(1))

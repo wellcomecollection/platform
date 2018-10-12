@@ -30,20 +30,32 @@ def process_alto(root, bag_details, alto, skip_file_download):
         source_bucket = aws.get_s3().Bucket(settings.METS_BUCKET_NAME)
 
     for file_element in alto_file_group:
-        current_location, destination = get_flattened_destination(file_element, ALTO_KEYS, "alto", bag_details)
+        current_location, destination = get_flattened_destination(
+            file_element, ALTO_KEYS, "alto", bag_details
+        )
 
         if skip_file_download:
-            logging.info("Skipping fetch of alto from {0} to {1}".format(current_location, destination))
+            logging.info(
+                "Skipping fetch of alto from {0} to {1}".format(
+                    current_location, destination
+                )
+            )
             continue
 
         if settings.READ_METS_FROM_FILESHARE:
             # Not likely to be used much, only for running against Windows file share
-            source = os.path.join(settings.METS_FILESYSTEM_ROOT, bag_details["mets_partial_path"], current_location)
+            source = os.path.join(
+                settings.METS_FILESYSTEM_ROOT,
+                bag_details["mets_partial_path"],
+                current_location,
+            )
             logging.info("Copying alto from {0} to {1}".format(source, destination))
             shutil.copyfile(source, destination)
         else:
             source = bag_details["mets_partial_path"] + current_location
-            logging.info("Downloading S3 ALTO from {0} to {1}".format(source, destination))
+            logging.info(
+                "Downloading S3 ALTO from {0} to {1}".format(source, destination)
+            )
             source_bucket.download_file(source, destination)
 
 
@@ -68,9 +80,13 @@ def process_assets(root, bag_details, assets, skip_file_download):
 
     chunk_size = 1024 * 1024
 
-    asset_file_group = root.find("./mets:fileSec/mets:fileGrp[@USE='OBJECTS']", namespaces)
+    asset_file_group = root.find(
+        "./mets:fileSec/mets:fileGrp[@USE='OBJECTS']", namespaces
+    )
     for file_element in asset_file_group:
-        current_location, destination = get_flattened_destination(file_element, OBJECT_KEYS, "objects", bag_details)
+        current_location, destination = get_flattened_destination(
+            file_element, OBJECT_KEYS, "objects", bag_details
+        )
         # current_location is not used for objects - they're not where
         # the METS says they are! They are in Preservica instead.
         # but, when bagged, they _will_ be where the METS says they are.
@@ -98,14 +114,21 @@ def process_assets(root, bag_details, assets, skip_file_download):
             source_bucket = aws.get_s3().Bucket(bucket_name)
             bucket_key = origin_info["bucket_key"]
             logging.info(
-                "Downloading object from bucket {0}/{1} to {2}".format(bucket_name, bucket_key, destination))
+                "Downloading object from bucket {0}/{1} to {2}".format(
+                    bucket_name, bucket_key, destination
+                )
+            )
             try:
                 source_bucket.download_file(bucket_key, destination)
                 asset_downloaded = True
             except ClientError as ce:
                 alt_key = origin_info["alt_key"]
-                if ce.response['Error']['Code'] == 'NoSuchKey' and alt_key is not None:
-                    logging.info("key {0} not found, trying alternate key: {1}".format(bucket_key, alt_key))
+                if ce.response["Error"]["Code"] == "NoSuchKey" and alt_key is not None:
+                    logging.info(
+                        "key {0} not found, trying alternate key: {1}".format(
+                            bucket_key, alt_key
+                        )
+                    )
                     source_bucket.download_file(alt_key, destination)
                     asset_downloaded = True
                     # allow error to throw
@@ -116,9 +139,11 @@ def process_assets(root, bag_details, assets, skip_file_download):
             # But worth a try,
             user, password = settings.DDS_API_KEY, settings.DDS_API_SECRET
             # This is horribly slow, why?
-            resp = requests.get(origin_info["web_url"], auth=(user, password), stream=True)
+            resp = requests.get(
+                origin_info["web_url"], auth=(user, password), stream=True
+            )
             if resp.status_code == 200:
-                with open(destination, 'wb') as f:
+                with open(destination, "wb") as f:
                     for chunk in resp.iter_content(chunk_size):
                         f.write(chunk)
                 asset_downloaded = True

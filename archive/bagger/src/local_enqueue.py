@@ -36,7 +36,7 @@ def main():
         to_process = sys.argv[1]
         skip = sys.argv[2] != "bag"
         info = "for bagging"
-        if(skip):
+        if skip:
             info = "METS only"
         start = time.time()
         counter = 0
@@ -48,10 +48,7 @@ def main():
         for b_number in generator:
             counter = counter + 1
             logging.info("processing " + b_number)
-            message = {
-                "identifier": b_number,
-                "do_not_bag": skip
-            }
+            message = {"identifier": b_number, "do_not_bag": skip}
             print("{0}: enqueueing {1}, {2}".format(counter, b_number, info))
             response = aws.send_bag_instruction(message)
             message["MessageId"] = response.get("MessageId", "NO-MESSAGE-ID")

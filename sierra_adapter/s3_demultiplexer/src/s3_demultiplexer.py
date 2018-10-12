@@ -31,25 +31,24 @@ from wellcome_aws_utils import s3_utils, sns_utils
 from wellcome_aws_utils.lambda_utils import log_on_error
 
 
-daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
+daiquiri.setup(level=os.environ.get("LOG_LEVEL", "INFO"))
 
 
 @log_on_error
 def main(event, _ctxt=None, s3_client=None, sns_client=None):
     topic_arn = os.environ["TOPIC_ARN"]
 
-    s3_client = s3_client or boto3.client('s3')
-    sns_client = sns_client or boto3.client('sns')
+    s3_client = s3_client or boto3.client("s3")
+    sns_client = sns_client or boto3.client("sns")
 
     s3_events = s3_utils.parse_s3_record(event=event)
     assert len(s3_events) == 1
     s3_event = s3_events[0]
 
     resp = s3_client.get_object(
-        Bucket=s3_event['bucket_name'],
-        Key=s3_event['object_key']
+        Bucket=s3_event["bucket_name"], Key=s3_event["object_key"]
     )
-    body = resp['Body'].read()
+    body = resp["Body"].read()
 
     records = json.loads(body)
     for r in records:
@@ -57,5 +56,5 @@ def main(event, _ctxt=None, s3_client=None, sns_client=None):
             sns_client=sns_client,
             topic_arn=topic_arn,
             message=r,
-            subject='source: s3_demultiplexer.main'
+            subject="source: s3_demultiplexer.main",
         )

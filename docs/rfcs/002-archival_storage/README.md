@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 20 September 2018.**
+**Last updated: 04 October 2018.**
 
 ## Problem statement
 
@@ -109,14 +109,14 @@ Content-Type: application/json
     "type": "IngestType"
   },
   "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
-  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567"
 }
 ```
 
 Response:
 
 ```http
-202 ACCEPTED
+201 ACCEPTED
 ```
 
 Request:
@@ -142,9 +142,9 @@ Response:
     "id": "{id}",
     "type": "Bag"
   },
-  "result": {
-    "id": "success",
-    "type": "IngestResult"
+  "status": {
+    "id": "processing|failure|success",
+    "type": "IngestStatus"
   },
   "events": [ ... ]
 }
@@ -282,7 +282,7 @@ Response:
 
 ```json
 {
-  "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+  "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
   "id": "xx-xx-xx-xx",
   "source": {
@@ -419,7 +419,7 @@ Response:
 
 ```json
 {
-  "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+  "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
   "id": "yy-yy-yy-yy",
   "source": {

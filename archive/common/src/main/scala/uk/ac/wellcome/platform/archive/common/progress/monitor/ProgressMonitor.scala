@@ -1,10 +1,10 @@
 package uk.ac.wellcome.platform.archive.common.progress.monitor
 
-import java.time.Instant
-import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
+import com.google.inject.Inject
 import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
@@ -13,20 +13,31 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
   ProgressUpdate
 }
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.storage.dynamo._
 
 import scala.util.{Failure, Success, Try}
 
-class ProgressMonitor(
+class ProgressMonitor @Inject()(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
-      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
-      DateTimeFormatter.ISO_INSTANT.format(_)
-    )
+  import Progress._
+
+  def get(id: UUID) = {
+    Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
+      'id -> id
+    ) match {
+      case Some(Right(progress)) => Some(progress)
+      case Some(Left(error)) => {
+        val exception = new RuntimeException(
+          s"Failed to get progress monitor ${error.toString}")
+        warn(s"Failed to get Dynamo record: ${id}", exception)
+        throw exception
+      }
+      case scala.None => scala.None
+    }
+  }
 
   def create(progress: Progress) = {
     val progressTable = Table[Progress](dynamoConfig.table)
@@ -53,13 +64,15 @@ class ProgressMonitor(
   }
 
   def update(update: ProgressUpdate): Try[Progress] = {
-    val event = update.event
+    debug(s"Updating Dynamo record ${update.id} with: $update")
+
+    val events = update.events
 
     val mergedUpdate = update.status match {
       case Progress.None =>
-        append('events -> event)
+        appendAll('events -> events)
       case status =>
-        append('events -> event) and set('result -> status)
+        appendAll('events -> events) and set('status -> status)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)
@@ -83,7 +96,8 @@ class ProgressMonitor(
       }
 
       case r @ Right(progress) => {
-        debug(s"Successfully updated Dynamo record: ${update.id}")
+        debug(
+          s"Successfully updated Dynamo record: ${update.id}, got $progress")
 
         Success(progress)
       }

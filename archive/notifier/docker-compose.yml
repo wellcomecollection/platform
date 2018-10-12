@@ -1,0 +1,19 @@
+sns:
+  image: wellcome/fake-sns
+  ports:
+    - "9292:9292"
+sqs:
+  image: s12v/elasticmq
+  ports:
+    - "9324:9324"
+    - "4789:9324"
+dynamodb:
+  image: peopleperhour/dynamodb
+  ports:
+    - "45678:8000"
+wiremock:
+  image: rodolpheche/wiremock
+  ports:
+    - "8080:8080"
+  volumes:
+    - "${ROOT}/archive/notifier/src/test/resources/wiremock:/home/wiremock"

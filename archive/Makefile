@@ -3,12 +3,12 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= archive
 
-SBT_APPS    = archivist registrar progress
+SBT_APPS    = archivist registrar progress_async progress_http notifier
 SBT_DOCKER_LIBRARIES = archive_common
 SBT_NO_DOCKER_LIBRARIES =
 
-ECS_TASKS   = bagger archive_api
-LAMBDAS     = archive_bags archive_report_ingest_status archive_request_ingest
+ECS_TASKS   = bagger archive_api callback_stub_server
+LAMBDAS     =
 
 TF_NAME     = archive
 TF_PATH     = $(STACK_ROOT)/terraform

@@ -1,0 +1,62 @@
+{
+  "id": {
+    "value": "digitised/b22454408"
+  },
+  "source": {
+    "identifierType": {
+      "id": "source",
+      "label": "Label"
+    },
+    "ontologyType": "Identifier",
+    "value": "123"
+  },
+  "identifiers": [
+    {
+      "identifierType": {
+        "id": "source",
+        "label": "Label"
+      },
+      "ontologyType": "Identifier",
+      "value": "123"
+    }
+  ],
+  "manifest": {
+    "checksumAlgorithm": {
+      "value": "sha256"
+    },
+    "files": [
+      {
+        "checksum": {
+          "value": "6762834c8ddd433174220a8e098c82425767a2e7fe698a0125f86af5babc8c32"
+        },
+        "path": {
+          "value": "data/b22454408.xml"
+        }
+      }
+    ]
+  },
+  "tagManifest": {
+    "checksumAlgorithm": {
+      "value": "sha256"
+    },
+    "files": []
+  },
+  "locations": [
+    {
+      "url": "http://wellcomecollection-assets-archive-storage.s3.amazonaws.com/archive/digitised/b22454408",
+      "locationType": {
+        "id": "aws-s3-standard-ia",
+        "label": "AWS S3 Standard IA",
+        "ontologyType": "LocationType"
+      },
+      "ontologyType": "DigitalLocation",
+      "type": "DigitalLocation"
+    }
+  ],
+  "description": null,
+  "createdDate": "1970-01-01T00:00:00Z",
+  "lastModifiedDate": "1970-01-01T00:00:00Z",
+  "version": {
+    "value": 1
+  }
+}
