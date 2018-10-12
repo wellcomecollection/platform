@@ -10,17 +10,26 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models
-import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressUpdate, Progress => ProgressModel}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  ProgressEvent,
+  ProgressUpdate,
+  Progress => ProgressModel
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.progress_async.modules.{ConfigModule, TestAppConfigModule}
-import uk.ac.wellcome.platform.archive.progress_async.{ProgressAsync => ProgressApp}
+import uk.ac.wellcome.platform.archive.progress_async.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
+import uk.ac.wellcome.platform.archive.progress_async.{
+  ProgressAsync => ProgressApp
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressAsyncFixture
-  extends S3
+    extends S3
     with LocalDynamoDb
     with RandomThings
     with ProgressMonitorFixture
@@ -78,7 +87,7 @@ trait ProgressAsyncFixture
   }
 
   def withConfiguredApp[R](
-                            testWith: TestWith[(QueuePair, Topic, Table, ProgressApp), R]) = {
+    testWith: TestWith[(QueuePair, Topic, Table, ProgressApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15) { qPair =>
       withLocalSnsTopic { topic =>
         withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
