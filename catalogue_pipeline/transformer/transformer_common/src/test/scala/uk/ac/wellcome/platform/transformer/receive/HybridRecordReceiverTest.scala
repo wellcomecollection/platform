@@ -18,10 +18,11 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.s3.S3Config
+import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -112,10 +113,16 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val invalidSqsMessage = createHybridRecordNotificationWith(
-            "not a JSON string",
-            s3Client = s3Client,
-            bucket = bucket
+          val key = randomAlphanumeric(10)
+          s3Client.putObject(bucket.name, key, "not a JSON string")
+
+          val hybridRecord = HybridRecord(
+            id = "testId",
+            version = 1,
+            location = ObjectLocation(namespace = bucket.name, key = key)
+          )
+          val invalidSqsMessage = createNotificationMessageWith(
+            message = hybridRecord
           )
 
           withHybridRecordReceiver(topic, bucket) { recordReceiver =>
