@@ -1,34 +1,22 @@
 package uk.ac.wellcome.platform.archive.registrar
 
-import com.gu.scanamo.Scanamo
-import com.gu.scanamo.syntax._
-import org.scalatest.concurrent.{
-  IntegrationPatience,
-  PatienceConfiguration,
-  ScalaFutures
-}
+import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{
-  RegistrationCompleteAssertions,
-  Registrar => RegistrarFixture
-}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{RegistrationCompleteAssertions, Registrar => RegistrarFixture}
 import uk.ac.wellcome.platform.archive.registrar.models._
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.dynamo._
+
 
 class RegistrarFeatureTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
@@ -51,13 +39,14 @@ class RegistrarFeatureTest
     "registers an archived BagIt bag from S3 and notifies the progress monitor") {
     withRegistrar {
       case (
-          storageBucket,
-          queuePair,
-          ddsTopic,
-          progressTopic,
-          registrar,
-          hybridBucket,
-          hybridTable) =>
+        storageBucket,
+        queuePair,
+        ddsTopic,
+        progressTopic,
+        registrar,
+        vhs
+        ) =>
+
         val requestId = randomUUID
         val bagId = randomBagId
 
@@ -72,31 +61,34 @@ class RegistrarFeatureTest
           eventually {
             val messages = listMessagesReceivedFromSNS(ddsTopic)
             messages should have size 1
+
             val registrationCompleteNotification =
-              fromJson[RegistrationComplete](messages.head.message).get
+              fromJson[RegistrationCompleteNotification](messages.head.message).get
 
-            val id = registrationCompleteNotification.storageManifest.id
-            assertStored[StorageManifest](
-              hybridBucket,
-              hybridTable,
-              s"${id.space}/${id.externalIdentifier.underlying}",
-              registrationCompleteNotification.storageManifest
-            )
+            val bagId = registrationCompleteNotification.bagId
 
-            assertRegistrationComplete(
-              storageBucket,
-              bagLocation,
-              bagId,
-              registrationCompleteNotification,
-              filesNumber = 1
-            )
+            val futureMaybeManifest = vhs.getRecord(bagId.toString)
 
-            assertTopicReceivesProgressUpdate(
-              requestId,
-              progressTopic,
-              Progress.Completed) { events =>
-              events should have size 1
-              events.head.description shouldBe "Bag registered successfully"
+            whenReady(futureMaybeManifest) { maybeStorageManifest =>
+              maybeStorageManifest shouldNot be(empty)
+
+              val storageManifest = maybeStorageManifest.get
+
+              assertRegistrationComplete(
+                storageBucket,
+                bagLocation,
+                bagId,
+                storageManifest,
+                filesNumber = 1L
+              )
+
+              assertTopicReceivesProgressUpdate(
+                requestId,
+                progressTopic,
+                Progress.Completed) { events =>
+                events should have size 1
+                events.head.description shouldBe "Bag registered successfully"
+              }
             }
           }
         }
@@ -106,13 +98,12 @@ class RegistrarFeatureTest
   it("notifies the progress monitor if registering a bag fails") {
     withRegistrar {
       case (
-          storageBucket,
-          queuePair,
-          ddsTopic,
-          progressTopic,
-          registrar,
-          hybridBucket,
-          hybridTable) =>
+        storageBucket,
+        queuePair,
+        ddsTopic,
+        progressTopic,
+        registrar,
+        vhs) =>
         val requestId = randomUUID
         val bagId = randomBagId
 
@@ -132,8 +123,11 @@ class RegistrarFeatureTest
           val messages = listMessagesReceivedFromSNS(ddsTopic)
           messages shouldBe empty
 
-          Scanamo.get[HybridRecord](dynamoDbClient)(hybridTable.name)(
-            'id -> bagLocation.bagPath.value) shouldBe None
+          val futureMaybeManifest = vhs.getRecord(bagId.toString)
+
+          whenReady(futureMaybeManifest) { maybeStorageManifest =>
+            maybeStorageManifest shouldBe empty
+          }
 
           assertTopicReceivesProgressUpdate(
             requestId,
@@ -150,12 +144,12 @@ class RegistrarFeatureTest
   it("discards messages if it fails writing to the VHS") {
     withRegistrarAndBrokenVHS {
       case (
-          storageBucket,
-          queuePair @ QueuePair(queue, dlq),
-          ddsTopic,
-          progressTopic,
-          registrar,
-          _) =>
+        storageBucket,
+        queuePair@QueuePair(queue, dlq),
+        ddsTopic,
+        progressTopic,
+        registrar,
+        _) =>
         val requestId1 = randomUUID
         val requestId2 = randomUUID
 

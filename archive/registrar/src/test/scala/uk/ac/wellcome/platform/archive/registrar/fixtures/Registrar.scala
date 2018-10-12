@@ -5,32 +5,27 @@ import java.util.UUID
 import com.amazonaws.services.dynamodbv2.model._
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagId,
-  BagLocation
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagId, BagLocation}
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{
-  ConfigModule,
-  TestAppConfigModule,
-  VHSModule
-}
+import uk.ac.wellcome.platform.archive.registrar.models.StorageManifest
+import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule, VHSModule}
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.fixtures.{
-  LocalDynamoDb,
-  LocalVersionedHybridStore,
-  S3
-}
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore, S3}
+import uk.ac.wellcome.storage.s3.S3StorageBackend
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait Registrar
-    extends S3
+  extends S3
     with Messaging
     with LocalVersionedHybridStore
     with BagLocationFixtures
@@ -46,11 +41,11 @@ trait Registrar
     )
 
   def withBagNotification[R](
-    requestId: UUID,
-    bagId: BagId,
-    queuePair: QueuePair,
-    storageBucket: Bucket,
-    dataFileCount: Int = 1)(testWith: TestWith[BagLocation, R]) = {
+                              requestId: UUID,
+                              bagId: BagId,
+                              queuePair: QueuePair,
+                              storageBucket: Bucket,
+                              dataFileCount: Int = 1)(testWith: TestWith[BagLocation, R]) = {
     withBag(storageBucket, dataFileCount) { bagLocation =>
       sendNotification(requestId, bagId, bagLocation, queuePair)
       testWith(bagLocation)
@@ -117,10 +112,13 @@ trait Registrar
     testWith((new TestApp()).app)
   }
 
+  type ManifestVHS = VersionedHybridStore[
+    StorageManifest, EmptyMetadata, ObjectStore[StorageManifest]]
+
   def withRegistrar[R](
-    testWith: TestWith[
-      (Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket, Table),
-      R]) = {
+                        testWith: TestWith[
+                          (Bucket, QueuePair, Topic, Topic, RegistrarApp, ManifestVHS),
+                          R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
         ddsSnsTopic =>
@@ -138,16 +136,22 @@ trait Registrar
                           queuePair,
                           ddsSnsTopic,
                           progressTopic) { registrar =>
-                          testWith(
-                            (
-                              storageBucket,
-                              queuePair,
-                              ddsSnsTopic,
-                              progressTopic,
-                              registrar,
-                              hybridStoreBucket,
-                              hybridDynamoTable)
-                          )
+
+                          implicit val storageBackend = new S3StorageBackend(s3Client)
+
+                          withTypeVHS[StorageManifest, EmptyMetadata, R](
+                            hybridStoreBucket, hybridDynamoTable) { vhs =>
+
+                            testWith(
+                              (
+                                storageBucket,
+                                queuePair,
+                                ddsSnsTopic,
+                                progressTopic,
+                                registrar,
+                                vhs)
+                            )
+                          }
                         }
                       }
                   }
@@ -159,8 +163,8 @@ trait Registrar
   }
 
   def withRegistrarAndBrokenVHS[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket),
-                       R]) = {
+                                    testWith: TestWith[(Bucket, QueuePair, Topic, Topic, RegistrarApp, Bucket),
+                                      R]) = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
       withLocalSnsTopic {
         ddsSnsTopic =>
