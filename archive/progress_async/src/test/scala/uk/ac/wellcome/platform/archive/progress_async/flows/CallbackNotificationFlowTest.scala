@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archive.progress_async.flows
 
 import java.net.URI
-import java.util.UUID
 
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
@@ -11,24 +10,25 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.test.fixtures.Akka
 
 class CallbackNotificationFlowTest
-    extends FunSpec
+  extends FunSpec
     with Akka
     with Matchers
     with ScalaFutures
     with IntegrationPatience
     with Eventually
     with RandomThings
+    with UUIDConverters
+    with URIConverters
     with SNS {
 
   val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
-
-  import CallbackNotification._
 
   it("sends callbackNotifications") {
     val status = Table(
