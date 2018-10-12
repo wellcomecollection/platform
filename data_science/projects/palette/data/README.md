@@ -1,1 +1,0 @@
-This project uses images on [`/works`](https://wellcomecollection.org/works) (in thumbnail form), stored locally. However, it should be possible to adapt these notebooks to use the catalogue API directly.
