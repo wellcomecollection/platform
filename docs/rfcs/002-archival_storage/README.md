@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 04 October 2018.**
+**Last updated: 12 October 2018.**
 
 ## Problem statement
 
@@ -9,11 +9,9 @@ We need to provide a service for storing digital assets.
 This service should:
 
 *   Ensure the safe, long-term (i.e. decades) storage of our digital assets
-*   Support both digitised and ["born-digital"][borndigital] assets
-*   Follow industry best-practices around file integrity and audit trails
 *   Provide a scalable mechanism for identifying, retrieving, and storing content
-
-[borndigital]: https://en.wikipedia.org/wiki/Born-digital
+*   Follow industry best-practices around file integrity and audit trails
+*   Enable us to meet [NDSA Level 4](https://ndsa.org/activities/levels-of-digital-preservation/) for both digitised and ["born-digital"](https://en.wikipedia.org/wiki/Born-digital) assets
 
 ## Suggested solution
 
@@ -27,11 +25,11 @@ We will build a storage service based on Amazon S3 and DynamoDB.
 -   The event stream from S3 triggers the Archival Storage Service, which:
 
     1.  Retrieves a copy of the BagIt file from the Ingest bucket
-    2.  Decompresses the BagIt file, and copies it to a short-term Processing bucket.
-        It validates the file -- i.e., checks that the contents match those described by the BagIt metadata.
-    3.  Assuming the contents are correct, it copies the files to a long-term Storage bucket.
-    4.  It compares checksums between the short-term and long-term storage, to check the transfer was successful.
-    5.  It creates a storage manifest describing the stored object, and saves the manifest to the Versioned Hybrid Store (a transactional store for large objects using S3 and DynamoDB).
+    2.  Decompresses the BagIt file and copies it to a short-term Processing bucket
+    3.  Validates the file -- i.e., checks that the contents match those described by the BagIt metadata
+    4.  Assuming the contents are valid, copies the files to a long-term Storage bucket
+    4.  Compares checksums between the short-term and long-term storage, to check the transfer was successful
+    5.  Creates a description of the stored bag and saves it to the Versioned Hybrid Store (a transactional store for large objects using S3 and DynamoDB)
 
 [bagit]: https://en.wikipedia.org/wiki/BagIt
 
@@ -56,10 +54,10 @@ The storage service will use three S3 buckets:
 - Archival asset storage replica (Azure Blob Storage Archive, Netherlands)
 - Access asset storage (AWS S3 IA, Dublin)
 
-Within each bucket, assets will be namespaced by source and shard, e.g.:
+Within each bucket, assets will be grouped into related spaces of content and identified by source identifier e.g.:
 
-- `/digitised/00/b00000100/{bag contents}`
-- `/born_digital/00/00-00-00-00/{bag contents}`
+- `/digitised/b0000000/{bag contents}`
+- `/born_digital/0000-0000-0000-0000/{bag contents}`
 
 #### Assets
 
@@ -75,15 +73,15 @@ From: [BagIt on Wikipedia](https://en.wikipedia.org/wiki/BagIt)
 
 Access copies may be in the same format as the archival copy, or a derivative format if this is more appropriate for access. For example, we would store high bitrate video masters as archival copies and lower bitrate videos as access copies. Any additional preservation formats created during the ingest workflow will be treated in the same way as any other asset, with separate archival and access copies.
 
-#### Storage manifest
+#### Bag description
 
-The storage manifest provides a pointer to the stored accession and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession. It is defined using types from a new Storage ontology and serialised using JSON-LD. We will use this to provide resources that describe stored bags, as part of the authenticated storage API.
+The bag description created by the storage service provides a pointer to the stored accession and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession. It is defined using types from a new Storage ontology and serialised using JSON-LD. We will use this to provide resources that describe stored bags, as part of the authenticated storage API.
 
-The manifest does not contain metadata from the METS files within a bag, it is purely a storage level index. It will contain data from the `bag-info.txt` file and information about where the assets have been stored. METS files will be separately ingested in the catalogue and reporting pipelines.
+This description does not contain metadata from the METS files within a bag, it is purely a storage level index. It will contain data from the `bag-info.txt` file and information about where the assets have been stored. METS files will be separately ingested in the catalogue and reporting pipelines.
 
 ### Onward processing
 
-The Versioned Hybrid Store which holds the Storage Manifests provides an event stream of updates.
+The Versioned Hybrid Store which holds the bag descriptions provides an event stream of updates.
 
 This event stream can be used to trigger downstream tasks, for example:
 
@@ -92,9 +90,47 @@ This event stream can be used to trigger downstream tasks, for example:
 
 The Versioned Hybrid Store also includes the ability to "reindex" the entire data store. This triggers an update event for every item in the data store, allowing you to re-run a downstream pipeline.
 
-## Examples
+## API
 
-### Ingest
+The storage service will provide an API that can be used to ingest bags and retrieve information about stored bags. This API will be available publicly, but require authentication using OAuth. Only trusted applications will be granted access to this API.
+
+API base path: `https://api.wellcomecollection.org/storage/v1`
+
+### Authentication
+
+All API endpoints must require authentication using OAuth 2.0. In the first instance, the only supported OAuth grant type will be client credentials.
+
+Clients must first request a time-limited token using a client ID and secret that we will provide:
+
+```http
+POST /token
+
+grant_type=client_credentials
+&client_id=xxxxxxxxxx
+&client_secret=xxxxxxxxxx
+```
+
+This will return an access token:
+
+```http
+Content-Type: application/json
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "access_token": "MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3",
+  "token_type":" bearer",
+  "expires_in": 3600
+}
+```
+
+This token must be provided on all subsequent requests in the Authorization header:
+
+```http
+Authentication: Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
+```
+
+### Ingests
 
 Request:
 
@@ -108,6 +144,10 @@ Content-Type: application/json
     "id": "create",
     "type": "IngestType"
   },
+  "space": {
+    "id": "space-id",
+    "type": "Space"
+  },
   "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
   "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567"
 }
@@ -116,13 +156,14 @@ Content-Type: application/json
 Response:
 
 ```http
-201 ACCEPTED
+201 CREATED
+Location: /ingests/{id}
 ```
 
 Request:
 
 ```http
-GET /ingests/xx-xx-xx-xx
+GET /ingests/{id}
 ```
 
 Response:
@@ -135,6 +176,10 @@ Response:
   "ingestType": {
     "id": "create",
     "type": "IngestType"
+  },
+  "space": {
+    "id": "space-id",
+    "type": "Space"
   },
   "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
   "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
@@ -150,6 +195,20 @@ Response:
 }
 ```
 
+### Bags
+
+Request:
+
+```http
+GET /bags/{space}/{source-id}
+
+```
+
+Response:
+
+See examples below
+
+## Examples
 
 ### Digitised content
 
@@ -275,7 +334,7 @@ The existing METS structure should be change to reflect the following. The main 
 Request:
 
 ```http
-GET /bags/xx-xx-xx-xx
+GET /bags/digitised/b24923333
 ```
 
 Response:
@@ -284,11 +343,15 @@ Response:
 {
   "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
-  "id": "xx-xx-xx-xx",
+  "id": "digitised/b24923333",
   "source": {
     "type": "Source",
     "id": "goobi",
     "label": "Goobi"
+  },
+  "space": {
+    "id": "digitised",
+    "type": "Space"
   },
   "identifiers": [
     {
@@ -412,7 +475,7 @@ The METS file will be as provided out of the box by Archivematica.
 Request:
 
 ```http
-GET /bags/yy-yy-yy-yy
+GET /bags/born_digital/yy-yy-yy-yy
 ```
 
 Response:
@@ -421,11 +484,15 @@ Response:
 {
   "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
-  "id": "yy-yy-yy-yy",
+  "id": "born_digital/yy-yy-yy-yy",
   "source": {
     "type": "Source",
     "id": "archivematica",
     "label": "Archivematica"
+  },
+  "space": {
+    "id": "born_digital",
+    "type": "Space"
   },
   "identifiers": [
     {
