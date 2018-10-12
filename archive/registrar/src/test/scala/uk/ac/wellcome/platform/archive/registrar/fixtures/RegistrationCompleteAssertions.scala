@@ -5,11 +5,11 @@ import uk.ac.wellcome.platform.archive.registrar.models._
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 trait RegistrationCompleteAssertions extends Inside with Matchers {
-  def assertRegistrationComplete(storageBucket: Bucket,
-                                 bagLocation: BagLocation,
-                                 registrationComplete: RegistrationComplete,
-                                 filesNumber: Long): Unit = {
-    inside(registrationComplete.storageManifest) {
+  def assertStorageManifestFields(storageManifest: StorageManifest,
+                                  storageBucket: Bucket,
+                                  bagLocation: BagLocation,
+                                  filesNumber: Long): Unit = {
+    inside(storageManifest) {
       case StorageManifest(
           bagId,
           sourceIdentifier,

@@ -28,6 +28,7 @@ import uk.ac.wellcome.platform.archive.registrar.fixtures.{
   Registrar => RegistrarFixture
 }
 import uk.ac.wellcome.platform.archive.registrar.models._
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 class RegistrarFeatureTest
@@ -82,23 +83,18 @@ class RegistrarFeatureTest
           registrar.run()
 
           eventually {
-            val messages = listMessagesReceivedFromSNS(ddsTopic)
-            messages should have size 1
-            val registrationCompleteNotification =
-              fromJson[RegistrationComplete](messages.head.message).get
+            assertSnsReceivesOnly(
+              RegistrationCompleteNotification(
+                requestId,
+                BagId(bagLocation.bagPath.value)),
+              ddsTopic)
 
-            assertStored[StorageManifest](
-              hybridBucket,
-              hybridTable,
-              registrationCompleteNotification.storageManifest.id.value,
-              registrationCompleteNotification.storageManifest
-            )
-
-            assertRegistrationComplete(
+            assertStorageManifestFields(
+              getStoredManifest(bagLocation, hybridTable),
               storageBucket,
               bagLocation,
-              registrationCompleteNotification,
               filesNumber = 1)
+
             assertTopicReceivesProgressUpdate(
               requestId,
               progressTopic,
@@ -188,5 +184,11 @@ class RegistrarFeatureTest
           }
         }
     }
+  }
+
+  private def getStoredManifest(bagLocation: BagLocation,
+                                hybridTable: Table) = {
+    val hybridRecord = getHybridRecord(hybridTable, bagLocation.bagPath.value)
+    getObjectFromS3[StorageManifest](hybridRecord.location)
   }
 }
