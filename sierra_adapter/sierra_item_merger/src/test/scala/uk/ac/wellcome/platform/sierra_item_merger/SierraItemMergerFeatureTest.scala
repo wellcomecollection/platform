@@ -83,26 +83,26 @@ class SierraItemMergerFeatureTest
                     bibIds = List(bibId1)
                   )
 
-                  val notification = createHybridRecordNotificationWith(
+                  val notification1 = createHybridRecordNotificationWith(
                     itemRecord1,
                     s3Client = s3Client,
                     bucket = sierraItemsToDynamoBucket
                   )
 
-                  sendSqsMessage(queue = queue, notification)
+                  sendSqsMessage(queue = queue, notification1)
 
                   val bibId2 = createSierraBibNumber
                   val itemRecord2 = createSierraItemRecordWith(
                     bibIds = List(bibId2)
                   )
 
-                  val notification = createHybridRecordNotificationWith(
+                  val notification2 = createHybridRecordNotificationWith(
                     itemRecord2,
                     s3Client = s3Client,
                     bucket = sierraItemsToDynamoBucket
                   )
 
-                  sendSqsMessage(queue = queue, notification)
+                  sendSqsMessage(queue = queue, notification2)
 
                   eventually {
                     val expectedSierraTransformable1 =
