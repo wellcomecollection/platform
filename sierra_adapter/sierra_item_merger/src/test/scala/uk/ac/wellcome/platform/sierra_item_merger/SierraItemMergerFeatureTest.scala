@@ -159,11 +159,13 @@ class SierraItemMergerFeatureTest
                     bibIds = bibIds
                   )
 
-                  sendMessage(
-                    bucket = sierraItemsToDynamoBucket,
-                    queue = queue,
-                    itemRecord
+                  val notification = createHybridRecordNotificationWith(
+                    itemRecord,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
                   )
+
+                  sendSqsMessage(queue = queue, notification)
 
                   val expectedTransformables = bibIds.map { bibId =>
                     createSierraTransformableWith(
