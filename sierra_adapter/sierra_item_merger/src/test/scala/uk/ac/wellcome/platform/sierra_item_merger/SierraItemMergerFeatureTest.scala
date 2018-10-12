@@ -27,7 +27,8 @@ class SierraItemMergerFeatureTest
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
               val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(queue)
+                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
+                queue)
               withServer(flags) { _ =>
                 withSierraVHS(sierraDataBucket, table) { hybridStore =>
                   val bibId = createSierraBibNumber
@@ -75,7 +76,8 @@ class SierraItemMergerFeatureTest
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
               val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(queue)
+                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
+                queue)
               withServer(flags) { _ =>
                 withSierraVHS(sierraDataBucket, table) { _ =>
                   val bibId1 = createSierraBibNumber
@@ -148,7 +150,8 @@ class SierraItemMergerFeatureTest
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
               val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(queue)
+                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
+                queue)
               withServer(flags) { _ =>
                 withSierraVHS(sierraDataBucket, table) { _ =>
                   val bibIds = createSierraBibNumbers(3)

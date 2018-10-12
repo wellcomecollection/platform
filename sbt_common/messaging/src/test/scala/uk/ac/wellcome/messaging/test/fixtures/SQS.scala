@@ -175,7 +175,11 @@ trait SQS extends Matchers with Logging {
     createNotificationMessageWith(body = toJson(message).get)
 
   /** Store an object in S3 and create the HybridRecordNotification that should be sent to SNS. */
-  def createHybridRecordNotificationWith[T](t: T, version: Int = 1, s3Client: AmazonS3, bucket: Bucket)(implicit encoder: Encoder[T]): NotificationMessage = {
+  def createHybridRecordNotificationWith[T](
+    t: T,
+    version: Int = 1,
+    s3Client: AmazonS3,
+    bucket: Bucket)(implicit encoder: Encoder[T]): NotificationMessage = {
     val s3key = Random.alphanumeric take 10 mkString
     val content = toJson(t).get
     s3Client.putObject(bucket.name, s3key, content)

@@ -88,8 +88,7 @@ class MiroTransformerFeatureTest
                 createValidMiroTransformableWith(
                   miroId = "L0011975",
                   miroCollection = "images-L",
-                  data =
-                    """
+                  data = """
                       |{
                       |  "image_cleared": "Y",
                       |  "image_copyright_cleared": "Y",
@@ -133,10 +132,10 @@ class MiroTransformerFeatureTest
                       |  "image_use_restrictions": "CC-BY"
                       |}
                     """.stripMargin
-                  ),
-                  s3Client = s3Client,
-                  bucket = storageBucket
-                )
+                ),
+                s3Client = s3Client,
+                bucket = storageBucket
+              )
 
               sendSqsMessage(queue = queue, obj = miroHybridRecordMessage1)
               sendSqsMessage(queue = queue, obj = miroHybridRecordMessage2)

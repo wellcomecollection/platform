@@ -70,9 +70,9 @@ class SierraItemsToDynamoFeatureTest
     storedItemRecord shouldBe itemRecord
 
     val snsMessages = listMessagesReceivedFromSNS(topic)
-    val receivedHybridRecords = snsMessages
-      .map { messageInfo => fromJson[HybridRecord](messageInfo.message).get }
-      .distinct
+    val receivedHybridRecords = snsMessages.map { messageInfo =>
+      fromJson[HybridRecord](messageInfo.message).get
+    }.distinct
 
     receivedHybridRecords should have size 1
     receivedHybridRecords.head shouldBe hybridRecord
