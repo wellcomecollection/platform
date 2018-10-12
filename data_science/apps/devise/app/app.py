@@ -50,7 +50,6 @@ class devise_search(Resource):
         return jsonify({"request": query, "response": response_urls})
 
 
-
 # Create search endpoint
 api.add_resource(devise_search, "/devise/search")
 
