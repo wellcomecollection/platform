@@ -112,7 +112,7 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val invalidSqsMessage = createNotificationMessageWith(
+          val invalidSqsMessage = createHybridRecordNotificationWith(
             "not a JSON string",
             s3Client = s3Client,
             bucket = bucket
@@ -135,7 +135,7 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val failingSqsMessage = createNotificationMessageWith(
+          val failingSqsMessage = createHybridRecordNotificationWith(
             TestTransformable(),
             s3Client = s3Client,
             bucket = bucket
@@ -160,7 +160,7 @@ class HybridRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val message = createNotificationMessageWith(
+          val message = createHybridRecordNotificationWith(
             TestTransformable(),
             s3Client = s3Client,
             bucket = bucket
