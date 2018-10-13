@@ -26,8 +26,8 @@ class TroubleshootArchivistLocalBagFileTest
               "b22454408.zip"
             ).mkString("/")),
           ingestBucket,
-          None,
-          queuePair) { invalidBag =>
+          queuePair
+        ) { invalidBag =>
           archivist.run()
 
           while (true) {

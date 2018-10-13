@@ -17,6 +17,7 @@ import uk.ac.wellcome.platform.archive.common.flows.{
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
+  BagId,
   IngestBagRequest
 }
 
@@ -68,8 +69,12 @@ object ArchiveJobFlow extends Logging {
         case (Nil, archiveJob) =>
           Right(
             ArchiveComplete(
-              archiveJob.bagLocation,
-              ingestBagRequest
+              ingestBagRequest.archiveRequestId,
+              BagId(
+                ingestBagRequest.storageSpace,
+                archiveJob.externalIdentifier
+              ),
+              archiveJob.bagLocation
             ))
         case (errors, archiveJob) => Left(ArchiveJobError(archiveJob, errors))
 

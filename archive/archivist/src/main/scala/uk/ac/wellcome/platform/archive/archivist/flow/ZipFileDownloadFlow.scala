@@ -42,7 +42,7 @@ object ZipFileDownloadFlow extends Logging {
       .log("download location")
       .flatMapMerge(
         parallelism, {
-          case request @ IngestBagRequest(_, location, _) =>
+          case request @ IngestBagRequest(_, location, _, _) =>
             val triedInputStream =
               Try(s3Client.getObject(location.namespace, location.key)).map(
                 response => response.getObjectContent)

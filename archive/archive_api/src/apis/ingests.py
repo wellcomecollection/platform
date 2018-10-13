@@ -41,6 +41,7 @@ class IngestCollection(Resource):
         """Create a request to ingest a BagIt resource"""
         upload_url = request.json["uploadUrl"]
         callback_url = request.json.get("callbackUrl")
+
         self._validate_urls(callback_url, upload_url)
 
         from archive_api import app

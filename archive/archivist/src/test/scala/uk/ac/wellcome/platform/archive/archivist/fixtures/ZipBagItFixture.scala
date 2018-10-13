@@ -5,6 +5,7 @@ import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
+import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ZipBagItFixture extends BagIt with Logging {
@@ -30,7 +31,7 @@ trait ZipBagItFixture extends BagIt with Logging {
   }
 
   def withBagItZip[R](
-    bagIdentifier: String = randomAlphanumeric(),
+    bagIdentifier: ExternalIdentifier = ExternalIdentifier(randomAlphanumeric()),
     dataFileCount: Int = 1,
     createDigest: String => String = createValidDigest,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
@@ -38,8 +39,9 @@ trait ZipBagItFixture extends BagIt with Logging {
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: String => Option[FileEntry] = createValidBagInfoFile
-  )(testWith: TestWith[(String, ZipFile), R]) = {
+    createBagInfoFile: ExternalIdentifier => Option[FileEntry] =
+      createValidBagInfoFile
+  )(testWith: TestWith[(ExternalIdentifier, ZipFile), R]) = {
 
     info(s"Creating bag $bagIdentifier")
 

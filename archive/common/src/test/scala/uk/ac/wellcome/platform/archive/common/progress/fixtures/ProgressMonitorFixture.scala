@@ -10,6 +10,7 @@ import akka.stream.scaladsl.Flow
 import com.gu.scanamo.DynamoFormat
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
@@ -24,6 +25,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait ProgressMonitorFixture
     extends LocalProgressMonitorDynamoDb
     with MockitoSugar
+    with RandomThings
     with TimeTestFixture {
 
   import Progress._
@@ -71,7 +73,7 @@ trait ProgressMonitorFixture
     callbackUrl: URI = callbackUri,
     uploadUrl: URI = uploadUri
   ): Progress = {
-    val id = UUID.randomUUID()
+    val id = randomUUID
 
     progressMonitor.create(
       Progress(

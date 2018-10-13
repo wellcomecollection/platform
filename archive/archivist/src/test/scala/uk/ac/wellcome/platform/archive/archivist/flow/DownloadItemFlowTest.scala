@@ -8,7 +8,7 @@ import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ChecksumNotMatchedOnDownloadError
-import uk.ac.wellcome.platform.archive.common.models.DigitisedStorageType
+import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.platform.archive.common.models.error.DownloadError
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
@@ -33,12 +33,8 @@ class DownloadItemFlowTest
               "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
             val fileName = "key.txt"
 
-            val bagIdentifier = randomAlphanumeric()
-
-            s3Client.putObject(
-              bucket.name,
-              s"archive/$DigitisedStorageType/$bagIdentifier/$fileName",
-              fileContent)
+            val bagIdentifier =
+              ExternalIdentifier(randomAlphanumeric())
 
             val archiveItemJob = createArchiveItemJob(
               zipFile,
@@ -46,6 +42,11 @@ class DownloadItemFlowTest
               digest,
               bagIdentifier,
               fileName)
+
+            s3Client.putObject(
+              bucket.name,
+              s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName",
+              fileContent)
 
             val source = Source.single(archiveItemJob)
             val flow = DownloadItemFlow(10)(s3Client)
@@ -70,12 +71,8 @@ class DownloadItemFlowTest
             val digest = "bad-digest"
             val fileName = "key.txt"
 
-            val bagIdentifier = randomAlphanumeric()
-
-            s3Client.putObject(
-              bucket.name,
-              s"archive/$DigitisedStorageType/$bagIdentifier/$fileName",
-              fileContent)
+            val bagIdentifier =
+              ExternalIdentifier(randomAlphanumeric())
 
             val archiveItemJob = createArchiveItemJob(
               zipFile,
@@ -83,6 +80,11 @@ class DownloadItemFlowTest
               digest,
               bagIdentifier,
               fileName)
+
+            s3Client.putObject(
+              bucket.name,
+              s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName",
+              fileContent)
 
             val source = Source.single(archiveItemJob)
             val flow = DownloadItemFlow(10)(s3Client)
@@ -109,7 +111,9 @@ class DownloadItemFlowTest
             val digest = "digest"
             val fileName = "this/does/not/exist.txt"
 
-            val bagIdentifier = randomAlphanumeric()
+            val bagIdentifier =
+              ExternalIdentifier(randomAlphanumeric())
+
             val archiveItemJob = createArchiveItemJob(
               zipFile,
               bucket,

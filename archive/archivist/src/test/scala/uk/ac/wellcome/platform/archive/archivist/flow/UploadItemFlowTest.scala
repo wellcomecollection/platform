@@ -16,7 +16,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   UploadError
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.DigitisedStorageType
+import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.Akka
@@ -44,7 +44,8 @@ class UploadItemFlowTest
             val digest =
               "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
 
-            val bagIdentifier = randomAlphanumeric()
+            val bagIdentifier =
+              ExternalIdentifier(randomAlphanumeric())
 
             val archiveItemJob = createArchiveItemJob(
               zipFile,
@@ -61,7 +62,7 @@ class UploadItemFlowTest
               result shouldBe Right(archiveItemJob)
               getContentFromS3(
                 bucket,
-                s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
+                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent
             }
 
           }
@@ -81,7 +82,8 @@ class UploadItemFlowTest
             val digest =
               "wrong!"
 
-            val bagIdentifier = randomAlphanumeric()
+            val bagIdentifier =
+              ExternalIdentifier(randomAlphanumeric())
 
             val archiveItemJob = createArchiveItemJob(
               zipFile,
@@ -102,7 +104,7 @@ class UploadItemFlowTest
                   archiveItemJob))
               getContentFromS3(
                 bucket,
-                s"archive/$DigitisedStorageType/$bagIdentifier/$fileName") shouldBe fileContent
+                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent
             }
 
           }
@@ -121,7 +123,8 @@ class UploadItemFlowTest
             val digest =
               "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
 
-            val bagIdentifier = randomAlphanumeric()
+            val bagIdentifier =
+              ExternalIdentifier(randomAlphanumeric())
 
             val archiveItemJob = createArchiveItemJob(
               zipFile,
@@ -140,7 +143,7 @@ class UploadItemFlowTest
               val exception = intercept[AmazonS3Exception] {
                 getContentFromS3(
                   bucket,
-                  s"archive/$DigitisedStorageType/$bagIdentifier/$fileName")
+                  s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$bagIdentifier/$fileName")
               }
               exception.getErrorCode shouldBe "NoSuchKey"
             }
@@ -163,7 +166,8 @@ class UploadItemFlowTest
           val digest =
             "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
 
-          val bagIdentifier = randomAlphanumeric()
+          val bagIdentifier =
+            ExternalIdentifier(randomAlphanumeric())
 
           val failingArchiveItemJob = createArchiveItemJob(
             zipFile,

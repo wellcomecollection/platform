@@ -1,10 +1,5 @@
 package uk.ac.wellcome.platform.archive.registrar
 
-import java.net.URI
-import java.util.UUID
-
-import com.gu.scanamo.Scanamo
-import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.{
   IntegrationPatience,
   PatienceConfiguration,
@@ -15,11 +10,11 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   BagLocation,
-  BagPath,
-  DigitisedStorageType
+  BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -28,8 +23,7 @@ import uk.ac.wellcome.platform.archive.registrar.fixtures.{
   Registrar => RegistrarFixture
 }
 import uk.ac.wellcome.platform.archive.registrar.models._
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.dynamo._
 
 class RegistrarFeatureTest
     extends FunSpec
@@ -39,6 +33,7 @@ class RegistrarFeatureTest
     with IntegrationPatience
     with RegistrarFixture
     with Inside
+    with RandomThings
     with ProgressUpdateAssertions
     with RegistrationCompleteAssertions
     with PatienceConfiguration {
@@ -50,18 +45,6 @@ class RegistrarFeatureTest
 
   implicit val _ = s3Client
 
-  private val callbackHost = "localhost"
-  private val callbackPort = 8080
-
-  def createCallbackUrl = {
-    val requestId = UUID.randomUUID()
-    (
-      new URI(
-        s"http://$callbackHost:$callbackPort/callback/$requestId"
-      ),
-      requestId)
-  }
-
   it(
     "registers an archived BagIt bag from S3 and notifies the progress monitor") {
     withRegistrar {
@@ -71,36 +54,50 @@ class RegistrarFeatureTest
           ddsTopic,
           progressTopic,
           registrar,
-          hybridBucket,
-          hybridTable) =>
-        val (callbackUrl, requestId) = createCallbackUrl
+          vhs
+          ) =>
+        val requestId = randomUUID
+        val bagId = randomBagId
 
         withBagNotification(
           requestId,
-          Some(callbackUrl),
+          bagId,
           queuePair,
-          storageBucket) { bagLocation =>
+          storageBucket
+        ) { bagLocation =>
           registrar.run()
 
           eventually {
-            assertSnsReceivesOnly(
-              RegistrationCompleteNotification(
+            val messages = listMessagesReceivedFromSNS(ddsTopic)
+            messages should have size 1
+
+            val registrationCompleteNotification =
+              fromJson[RegistrationCompleteNotification](messages.head.message).get
+
+            val bagId = registrationCompleteNotification.bagId
+
+            val futureMaybeManifest = vhs.getRecord(bagId.toString)
+
+            whenReady(futureMaybeManifest) { maybeStorageManifest =>
+              maybeStorageManifest shouldNot be(empty)
+
+              val storageManifest = maybeStorageManifest.get
+
+              assertRegistrationComplete(
+                storageBucket,
+                bagLocation,
+                bagId,
+                storageManifest,
+                filesNumber = 1L
+              )
+
+              assertTopicReceivesProgressUpdate(
                 requestId,
-                BagId(bagLocation.bagPath.value)),
-              ddsTopic)
-
-            assertStorageManifestFields(
-              getStoredManifest(bagLocation, hybridTable),
-              storageBucket,
-              bagLocation,
-              filesNumber = 1)
-
-            assertTopicReceivesProgressUpdate(
-              requestId,
-              progressTopic,
-              Progress.Completed) { events =>
-              events should have size 1
-              events.head.description shouldBe "Bag registered successfully"
+                progressTopic,
+                Progress.Completed) { events =>
+                events should have size 1
+                events.head.description shouldBe "Bag registered successfully"
+              }
             }
           }
         }
@@ -115,18 +112,18 @@ class RegistrarFeatureTest
           ddsTopic,
           progressTopic,
           registrar,
-          hybridBucket,
-          hybridTable) =>
-        val (callbackUrl, requestId) = createCallbackUrl
+          vhs) =>
+        val requestId = randomUUID
+        val bagId = randomBagId
 
         val bagLocation = BagLocation(
           storageBucket.name,
           "archive",
-          BagPath(s"$DigitisedStorageType/does-not-exist"))
+          BagPath(s"space/does-not-exist"))
 
         sendNotificationToSQS(
           queuePair.queue,
-          ArchiveComplete(requestId, bagLocation, Some(callbackUrl))
+          ArchiveComplete(requestId, bagId, bagLocation)
         )
 
         registrar.run()
@@ -135,8 +132,11 @@ class RegistrarFeatureTest
           val messages = listMessagesReceivedFromSNS(ddsTopic)
           messages shouldBe empty
 
-          Scanamo.get[HybridRecord](dynamoDbClient)(hybridTable.name)(
-            'id -> bagLocation.bagPath.value) shouldBe None
+          val futureMaybeManifest = vhs.getRecord(bagId.toString)
+
+          whenReady(futureMaybeManifest) { maybeStorageManifest =>
+            maybeStorageManifest shouldBe empty
+          }
 
           assertTopicReceivesProgressUpdate(
             requestId,
@@ -159,36 +159,27 @@ class RegistrarFeatureTest
           progressTopic,
           registrar,
           _) =>
-        val (callbackUrl1, requestId1) = createCallbackUrl
-        val (callbackUrl2, requestId2) = createCallbackUrl
+        val requestId1 = randomUUID
+        val requestId2 = randomUUID
 
-        withBagNotification(
-          requestId1,
-          Some(callbackUrl1),
-          queuePair,
-          storageBucket) { bagLocation1 =>
-          withBagNotification(
-            requestId2,
-            Some(callbackUrl2),
-            queuePair,
-            storageBucket) { bagLocation2 =>
-            registrar.run()
+        val bagId1 = randomBagId
+        val bagId2 = randomBagId
 
-            eventually {
-              listMessagesReceivedFromSNS(ddsTopic) shouldBe empty
-              listMessagesReceivedFromSNS(progressTopic) shouldBe empty
+        withBagNotification(requestId1, bagId1, queuePair, storageBucket) {
+          bagLocation1 =>
+            withBagNotification(requestId2, bagId2, queuePair, storageBucket) {
+              bagLocation2 =>
+                registrar.run()
 
-              assertQueueEmpty(queue)
-              assertQueueHasSize(dlq, 2)
+                eventually {
+                  listMessagesReceivedFromSNS(ddsTopic) shouldBe empty
+                  listMessagesReceivedFromSNS(progressTopic) shouldBe empty
+
+                  assertQueueEmpty(queue)
+                  assertQueueHasSize(dlq, 2)
+                }
             }
-          }
         }
     }
-  }
-
-  private def getStoredManifest(bagLocation: BagLocation,
-                                hybridTable: Table) = {
-    val hybridRecord = getHybridRecord(hybridTable, bagLocation.bagPath.value)
-    getObjectFromS3[StorageManifest](hybridRecord.location)
   }
 }

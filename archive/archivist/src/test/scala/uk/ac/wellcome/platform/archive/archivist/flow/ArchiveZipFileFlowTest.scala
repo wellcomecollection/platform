@@ -22,9 +22,9 @@ import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
+  BagId,
   BagLocation,
-  BagPath,
-  DigitisedStorageType
+  BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -68,15 +68,17 @@ class ArchiveZipFileFlowTest
 
                 whenReady(verification) { result =>
                   listKeysInBucket(storageBucket) should have size 4
-                  result shouldBe List(
-                    Right(
-                      ArchiveComplete(
-                        ingestContext.archiveRequestId,
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(s"$DigitisedStorageType/$bagName")),
-                        None)))
+                  result shouldBe List(Right(ArchiveComplete(
+                    ingestContext.archiveRequestId,
+                    BagId(
+                      ingestContext.storageSpace,
+                      bagName
+                    ),
+                    BagLocation(
+                      storageBucket.name,
+                      "archive",
+                      BagPath(s"${ingestContext.storageSpace}/$bagName"))
+                  )))
 
                   assertTopicReceivesProgressUpdate(
                     ingestContext.archiveRequestId,
@@ -212,7 +214,7 @@ class ArchiveZipFileFlowTest
                         .bagLocation shouldBe BagLocation(
                         storageBucket.name,
                         "archive",
-                        BagPath(s"$DigitisedStorageType/$bagName"))
+                        BagPath(s"${ingestContext.storageSpace}/$bagName"))
                   }
 
                   assertTopicReceivesProgressUpdate(

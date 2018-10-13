@@ -49,7 +49,7 @@ object UpdateStoredManifestFlow {
     storageManifest: StorageManifest,
     requestContext: ArchiveComplete)(implicit ec: ExecutionContext) =
     dataStore
-      .updateRecord(storageManifest.id.value)(
+      .updateRecord(storageManifest.id.toString)(
         ifNotExisting = (storageManifest, EmptyMetadata()))(
         ifExisting = (_, _) => (storageManifest, EmptyMetadata())
       )

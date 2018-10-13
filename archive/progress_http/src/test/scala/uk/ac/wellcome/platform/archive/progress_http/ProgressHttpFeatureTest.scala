@@ -9,6 +9,7 @@ import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
@@ -24,6 +25,7 @@ class ProgressHttpFeatureTest
     with MetricsSenderFixture
     with ProgressMonitorFixture
     with ProgressHttpFixture
+    with RandomThings
     with IntegrationPatience {
 
   import HttpMethods._
@@ -65,7 +67,7 @@ class ProgressHttpFeatureTest
           withActorSystem { actorSystem =>
             implicit val system = actorSystem
 
-            val uuid = UUID.randomUUID().toString
+            val uuid = randomUUID
 
             val request = Http().singleRequest(
               HttpRequest(GET, s"$baseUrl/progress/$uuid")

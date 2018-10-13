@@ -24,21 +24,21 @@ object ArchiveJobCreator {
   ): Either[ArchiveError[IngestBagRequest], ArchiveJob] = {
 
     getBagIdentifier(zipFile, ingestBagRequest)
-      .map { bagIdentifier =>
-        BagPath(s"$DigitisedStorageType/$bagIdentifier")
-      }
-      .map { bagPath =>
+      .map { externalIdentifier =>
         ArchiveJob(
-          zipFile = zipFile,
-          bagLocation = BagLocation(
+          externalIdentifier,
+          zipFile,
+          BagLocation(
             storageNamespace = config.uploadConfig.uploadNamespace,
             storagePath = config.uploadConfig.uploadPrefix,
-            bagPath = bagPath
+            bagPath =
+              BagPath(s"${ingestBagRequest.storageSpace}/$externalIdentifier")
           ),
           config = config.bagItConfig,
           bagManifestLocations = BagManifestLocation.create(config.bagItConfig)
         )
       }
+
   }
 
   /** The ZIP files contain a "bag-info.txt" metadata file, with
@@ -59,7 +59,7 @@ object ArchiveJobCreator {
     */
   private def getBagIdentifier(zipFile: ZipFile,
                                ingestBagRequest: IngestBagRequest)
-    : Either[ArchiveError[IngestBagRequest], String] = {
+    : Either[ArchiveError[IngestBagRequest], ExternalIdentifier] = {
     ZipFileReader
       .maybeInputStream(ZipLocation(zipFile, EntryPath("bag-info.txt")))
       .toRight[ArchiveError[IngestBagRequest]](
@@ -73,7 +73,8 @@ object ArchiveJobCreator {
 
         bagInfoLines
           .collectFirst {
-            case regex(key, value) if key == "External-Identifier" => value
+            case regex(key, value) if key == "External-Identifier" =>
+              ExternalIdentifier(value)
           }
           .toRight(InvalidBagInfo(ingestBagRequest))
       }

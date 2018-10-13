@@ -3,7 +3,7 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.{
   BagLocation,
   BagPath,
-  DigitisedStorageType
+  ExternalIdentifier
 }
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -15,7 +15,7 @@ trait BagLocationFixtures extends S3 with BagIt {
     dataFileCount: Int = 1,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest)(testWith: TestWith[BagLocation, R]) = {
-    val bagIdentifier = randomAlphanumeric()
+    val bagIdentifier = ExternalIdentifier(randomAlphanumeric())
 
     info(s"Creating bag $bagIdentifier")
 
@@ -28,7 +28,7 @@ trait BagLocationFixtures extends S3 with BagIt {
     val bagLocation = BagLocation(
       storageBucket.name,
       storagePrefix,
-      BagPath(s"$DigitisedStorageType/$bagIdentifier"))
+      BagPath(s"space/$bagIdentifier"))
 
     fileEntries.map((entry: FileEntry) => {
       s3Client

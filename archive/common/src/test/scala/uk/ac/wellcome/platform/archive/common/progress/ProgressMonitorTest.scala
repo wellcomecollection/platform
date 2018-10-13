@@ -13,6 +13,7 @@ import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
@@ -32,6 +33,7 @@ class ProgressMonitorTest
     extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
+    with RandomThings
     with ProgressMonitorFixture
     with ScalaFutures {
 
@@ -41,7 +43,7 @@ class ProgressMonitorTest
     it("creates a progress monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
         withProgressMonitor(table) { archiveProgressMonitor =>
-          val id = UUID.randomUUID()
+          val id = randomUUID
           val archiveIngestProgress =
             Progress(id, uploadUri, Some(callbackUri), Progress.Processing)
 
@@ -87,7 +89,7 @@ class ProgressMonitorTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        val id = UUID.randomUUID()
+        val id = randomUUID
         val progress = Progress(id, uploadUri, Some(callbackUri))
 
         val result = Try(archiveProgressMonitor.create(progress))
@@ -142,7 +144,7 @@ class ProgressMonitorTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        val id = UUID.randomUUID()
+        val id = randomUUID
         val result = Try(archiveProgressMonitor.get(id))
         val failedException = result.failed.get
 

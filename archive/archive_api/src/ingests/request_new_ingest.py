@@ -22,6 +22,7 @@ def create_archive_bag_message(guid, bag_url, callback_url):
     message = {
         "archiveRequestId": guid,
         "zippedBagLocation": {"namespace": bucket, "key": key},
+        "storageSpace": "digitised",
     }
 
     if callback_url is not None:
