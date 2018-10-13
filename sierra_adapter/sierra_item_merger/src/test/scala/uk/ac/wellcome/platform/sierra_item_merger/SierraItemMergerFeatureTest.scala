@@ -27,8 +27,7 @@ class SierraItemMergerFeatureTest
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
               val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ messageReaderLocalFlags(
-                sierraItemsToDynamoBucket,
+                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
                 queue)
               withServer(flags) { _ =>
                 withSierraVHS(sierraDataBucket, table) { hybridStore =>
@@ -38,11 +37,13 @@ class SierraItemMergerFeatureTest
                     bibIds = List(bibId)
                   )
 
-                  sendMessage(
-                    bucket = sierraItemsToDynamoBucket,
-                    queue = queue,
-                    itemRecord
+                  val notification = createHybridRecordNotificationWith(
+                    itemRecord,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
                   )
+
+                  sendSqsMessage(queue = queue, notification)
 
                   val expectedSierraTransformable =
                     createSierraTransformableWith(
@@ -75,8 +76,7 @@ class SierraItemMergerFeatureTest
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
               val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ messageReaderLocalFlags(
-                sierraItemsToDynamoBucket,
+                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
                 queue)
               withServer(flags) { _ =>
                 withSierraVHS(sierraDataBucket, table) { _ =>
@@ -85,22 +85,26 @@ class SierraItemMergerFeatureTest
                     bibIds = List(bibId1)
                   )
 
-                  sendMessage(
-                    bucket = sierraItemsToDynamoBucket,
-                    queue = queue,
-                    itemRecord1
+                  val notification1 = createHybridRecordNotificationWith(
+                    itemRecord1,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
                   )
+
+                  sendSqsMessage(queue = queue, notification1)
 
                   val bibId2 = createSierraBibNumber
                   val itemRecord2 = createSierraItemRecordWith(
                     bibIds = List(bibId2)
                   )
 
-                  sendMessage(
-                    bucket = sierraItemsToDynamoBucket,
-                    queue = queue,
-                    itemRecord2
+                  val notification2 = createHybridRecordNotificationWith(
+                    itemRecord2,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
                   )
+
+                  sendSqsMessage(queue = queue, notification2)
 
                   eventually {
                     val expectedSierraTransformable1 =
@@ -146,8 +150,7 @@ class SierraItemMergerFeatureTest
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
               val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ messageReaderLocalFlags(
-                sierraItemsToDynamoBucket,
+                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
                 queue)
               withServer(flags) { _ =>
                 withSierraVHS(sierraDataBucket, table) { _ =>
@@ -156,11 +159,13 @@ class SierraItemMergerFeatureTest
                     bibIds = bibIds
                   )
 
-                  sendMessage(
-                    bucket = sierraItemsToDynamoBucket,
-                    queue = queue,
-                    itemRecord
+                  val notification = createHybridRecordNotificationWith(
+                    itemRecord,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
                   )
+
+                  sendSqsMessage(queue = queue, notification)
 
                   val expectedTransformables = bibIds.map { bibId =>
                     createSierraTransformableWith(
