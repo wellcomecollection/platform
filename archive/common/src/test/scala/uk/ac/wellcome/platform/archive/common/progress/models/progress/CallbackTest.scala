@@ -14,7 +14,7 @@ class CallbackTest extends FunSpec with Matchers {
 
   import org.scalatest.prop.TableDrivenPropertyChecks._
   private val callbackStatus = Table(
-    ("stringStatus", "parsedStatus"),
+    ("string-status", "parsed-status"),
     ("pending", Callback.Pending),
     ("succeeded", Callback.Succeeded),
     ("failed", Callback.Failed),

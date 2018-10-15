@@ -16,27 +16,27 @@ case object Callback extends URIConverters with CallbackStatusConverters {
     Callback(callbackUri = callbackUri, callbackStatus = Pending)
   }
 
-  val PendingString = "pending"
-  val SucceededString = "succeeded"
-  val FailedString = "failed"
+  val pendingString = "pending"
+  val succeededString = "succeeded"
+  val failedString = "failed"
 
   case object Pending extends Status {
-    override def toString: String = PendingString
+    override def toString: String = pendingString
   }
 
   case object Succeeded extends Status {
-    override def toString: String = SucceededString
+    override def toString: String = succeededString
   }
 
   case object Failed extends Status {
-    override def toString: String = FailedString
+    override def toString: String = failedString
   }
 
   def parseStatus(string: String): Status = {
     string match {
-      case PendingString   => Pending
-      case SucceededString => Succeeded
-      case FailedString    => Failed
+      case `pendingString` => Pending
+      case `succeededString` => Succeeded
+      case `failedString` => Failed
     }
   }
 }
@@ -45,12 +45,12 @@ trait CallbackStatusConverters {
   import uk.ac.wellcome.json.JsonUtil.{fromJson, toJson}
   import Callback._
 
-  implicit val enc: Encoder[Status] = Encoder.instance[Callback.Status] {
+  implicit val encoder: Encoder[Status] = Encoder.instance[Callback.Status] {
     status: Callback.Status =>
       Json.fromString(status.toString)
   }
 
-  implicit val dec: Decoder[Status] =
+  implicit val decoder: Decoder[Status] =
     Decoder.instance[Callback.Status](cursor =>
       for {
         status <- cursor.value.as[String]
@@ -60,7 +60,7 @@ trait CallbackStatusConverters {
 
   implicit val fmtStatus: AnyRef with DynamoFormat[Status] =
     DynamoFormat.xmap[Callback.Status, String](
-      fromJson[Callback.Status](_)(dec).toEither.left
+      fromJson[Callback.Status](_)(decoder).toEither.left
         .map(TypeCoercionError)
     )(
       toJson[Callback.Status](_).get
