@@ -4,6 +4,7 @@ import java.net.URI
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 
 import scala.util.Random
@@ -20,7 +21,9 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
   it("can be created from as create request") {
     val progressCreateRequest = ProgressCreateRequest(
       new URI("s3://ingest-bucket/bag.zip"),
-      Some(new URI("http://www.wellcomecollection.org/callback/ok")))
+      Some(new URI("http://www.wellcomecollection.org/callback/ok")),
+      StorageSpace("space-id")
+    )
 
     val progress = Progress(progressCreateRequest)
 
@@ -83,6 +86,7 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
   }
 
   import org.scalatest.prop.TableDrivenPropertyChecks._
+
   private val progressStatus = Table(
     ("string-status", "parsed-status"),
     ("initialised", Progress.Initialised),
@@ -100,13 +104,19 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
     a[MatchError] should be thrownBy Progress.parseStatus("not-valid")
   }
 
-  private def createProgress = {
+  private def createProgress =
     Progress(
       UUID.randomUUID(),
       new URI("s3://ingest-bucket/bag.zip"),
-      Some(Callback(new URI("http://www.wellcomecollection.org/callback/ok")))
+      Some(
+        Callback(
+          new URI("http://www.wellcomecollection.org/callback/ok"
+          )
+        )
+      ),
+      StorageSpace("space-id")
     )
-  }
+
 
   private def createProgressWith(events: List[ProgressEvent]) = {
     createProgress.copy(events = events)

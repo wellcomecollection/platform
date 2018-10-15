@@ -8,11 +8,13 @@ import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
+import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 
 case class Progress(
   id: UUID,
   uploadUri: URI,
   callback: Option[Callback],
+  space: StorageSpace,
   status: Progress.Status = Progress.Initialised,
   resources: Seq[Resource] = Seq.empty,
   createdDate: Instant = Instant.now,
@@ -70,7 +72,9 @@ case object Progress extends URIConverters with StatusConverters {
       id = generateId,
       uploadUri = createRequest.uploadUri,
       callback = createRequest.callbackUri.map(Callback(_)),
-      status = Progress.Initialised)
+      space = createRequest.space,
+      status = Progress.Initialised
+    )
   }
 
   def parseStatus(status: String): Status = {
