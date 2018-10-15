@@ -11,15 +11,15 @@ import uk.ac.wellcome.platform.archive.common.json.URIConverters
 import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 
 case class Progress(
-  id: UUID,
-  uploadUri: URI,
-  callback: Option[Callback],
-  space: StorageSpace,
-  status: Progress.Status = Progress.Initialised,
-  resources: Seq[Resource] = Seq.empty,
-  createdDate: Instant = Instant.now,
-  lastModifiedDate: Instant = Instant.now,
-  events: Seq[ProgressEvent] = Seq.empty
+                     id: UUID,
+                     uploadUri: URI,
+                     callback: Option[Callback],
+                     space: StorageSpace,
+                     status: Progress.Status = Progress.Initialised,
+                     resources: Seq[Resource] = Seq.empty,
+                     createdDate: Instant = Instant.now,
+                     lastModifiedDate: Instant = Instant.now,
+                     events: Seq[ProgressEvent] = Seq.empty
 ) {
 
   def update(update: ProgressUpdate): Progress = {
