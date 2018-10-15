@@ -20,13 +20,13 @@ class CallbackTest extends FunSpec with Matchers {
     ("failed", Callback.Failed),
   )
   it("parses all callback status") {
-    forAll (callbackStatus) { (statusString, status) =>
-      Callback.parseStatus(statusString)  shouldBe status
+    forAll(callbackStatus) { (statusString, status) =>
+      Callback.parseStatus(statusString) shouldBe status
     }
   }
 
   it("throws if there is a parse error") {
-    a [MatchError] should be thrownBy Callback.parseStatus("not-valid")
+    a[MatchError] should be thrownBy Callback.parseStatus("not-valid")
   }
 
 }
