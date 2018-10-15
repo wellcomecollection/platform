@@ -10,11 +10,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.json.{
-  URIConverters,
-  UUIDConverters
-}
-import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
+import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
+import uk.ac.wellcome.platform.archive.common.models.{CallbackNotification, StorageSpace}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -30,6 +27,7 @@ class CallbackNotificationFlowTest
     with URIConverters
     with SNS {
 
+  val space = StorageSpace("space-id")
   val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
 
@@ -47,7 +45,7 @@ class CallbackNotificationFlowTest
               CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
             val id = randomUUID
             val progress =
-              Progress(id, uploadUri, Some(callbackUri), status)
+              Progress(id, uploadUri, Some(callbackUri), space, status)
 
             val eventuallyResult = Source
               .single(progress)
@@ -83,7 +81,7 @@ class CallbackNotificationFlowTest
             val id = randomUUID
 
             val progress =
-              Progress(id, uploadUri, Some(callbackUri), status)
+              Progress(id, uploadUri, Some(callbackUri), space, status)
 
             val eventuallyResult = Source
               .single(progress)
@@ -107,7 +105,7 @@ class CallbackNotificationFlowTest
           CallbackNotificationFlow(snsClient, SNSConfig("does-not-exist"))
         val id = randomUUID
         val progress =
-          Progress(id, uploadUri, Some(callbackUri), Progress.Completed)
+          Progress(id, uploadUri, Some(callbackUri), space, Progress.Completed)
 
         val eventuallyResult = Source
           .single(progress)
