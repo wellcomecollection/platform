@@ -11,11 +11,9 @@ import com.gu.scanamo.DynamoFormat
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -23,13 +21,14 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressMonitorFixture
-    extends LocalProgressMonitorDynamoDb
+  extends LocalProgressMonitorDynamoDb
     with MockitoSugar
     with RandomThings
     with TimeTestFixture {
 
   import Progress._
 
+  val space = StorageSpace("space-id")
   val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
 
@@ -50,10 +49,10 @@ trait ProgressMonitorFixture
 
   def withProgressUpdateFlow[R](table: Table)(
     testWith: TestWith[(
-                         Flow[ProgressUpdate, Progress, NotUsed],
-                         ProgressMonitor
-                       ),
-                       R]): R = {
+      Flow[ProgressUpdate, Progress, NotUsed],
+        ProgressMonitor
+      ),
+      R]): R = {
 
     val progressMonitor = new ProgressMonitor(
       dynamoDbClient,
@@ -69,17 +68,18 @@ trait ProgressMonitorFixture
   }
 
   def createProgress(
-    progressMonitor: ProgressMonitor,
-    callbackUrl: URI = callbackUri,
-    uploadUrl: URI = uploadUri
-  ): Progress = {
+                      progressMonitor: ProgressMonitor,
+                      callbackUrl: URI = callbackUri,
+                      uploadUrl: URI = uploadUri
+                    ): Progress = {
     val id = randomUUID
 
     progressMonitor.create(
       Progress(
         id = id,
         uploadUri = uploadUrl,
-        callbackUri = Some(callbackUrl)
+        callbackUri = Some(callbackUrl),
+        space = space
       ))
   }
 
@@ -87,7 +87,7 @@ trait ProgressMonitorFixture
                           uploadUri: URI,
                           maybeCallbackUri: Option[URI],
                           table: Table) = {
-    givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri), table)
+    givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri, space), table)
   }
 
   def assertProgressCreated(id: UUID,

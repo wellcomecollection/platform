@@ -3,11 +3,7 @@ package uk.ac.wellcome.platform.archive.common.progress
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  GetItemRequest,
-  PutItemRequest,
-  UpdateItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest, UpdateItemRequest}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
@@ -15,22 +11,15 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{
-  IdConstraintError,
-  ProgressMonitor
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressMonitor}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 import scala.util.Try
 
 class ProgressMonitorTest
-    extends FunSpec
+  extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
     with RandomThings
@@ -45,7 +34,7 @@ class ProgressMonitorTest
         withProgressMonitor(table) { archiveProgressMonitor =>
           val id = randomUUID
           val archiveIngestProgress =
-            Progress(id, uploadUri, Some(callbackUri), Progress.Processing)
+            Progress(id, uploadUri, Some(callbackUri), space, Progress.Processing)
 
           archiveProgressMonitor.create(archiveIngestProgress)
           assertTableOnlyHasItem(archiveIngestProgress, table)
@@ -60,8 +49,8 @@ class ProgressMonitorTest
           val id = UUID.randomUUID()
 
           val monitors = List(
-            Progress(id, uploadUri, Some(callbackUri)),
-            Progress(id, uploadUri, Some(callbackUri))
+            Progress(id, uploadUri, Some(callbackUri), space),
+            Progress(id, uploadUri, Some(callbackUri), space)
           )
 
           val result = Try(monitors.map(archiveProgressMonitor.create))
@@ -90,7 +79,7 @@ class ProgressMonitorTest
         )
 
         val id = randomUUID
-        val progress = Progress(id, uploadUri, Some(callbackUri))
+        val progress = Progress(id, uploadUri, Some(callbackUri), space)
 
         val result = Try(archiveProgressMonitor.create(progress))
         val failedException = result.failed.get

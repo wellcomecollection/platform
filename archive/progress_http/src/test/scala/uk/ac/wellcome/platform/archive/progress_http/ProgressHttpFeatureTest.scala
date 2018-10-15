@@ -10,12 +10,9 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
+import uk.ac.wellcome.platform.archive.common.models.{DisplayIngest, StorageSpace}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressCreateRequest
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressCreateRequest}
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
 
 class ProgressHttpFeatureTest
@@ -93,10 +90,12 @@ class ProgressHttpFeatureTest
               implicit val mat = materializer
 
               val url = s"$baseUrl/progress"
+              val space = StorageSpace("space-id")
 
               val createProgressRequest = ProgressCreateRequest(
                 uploadUri,
-                Some(callbackUri)
+                Some(callbackUri),
+                space
               )
 
               val entity = HttpEntity(
@@ -138,7 +137,8 @@ class ProgressHttpFeatureTest
                   val expectedProgress = Progress(
                     id,
                     uploadUri,
-                    Some(callbackUri)
+                    Some(callbackUri),
+                    space
                   ).copy(
                     createdDate = progress.createdDate,
                     lastModifiedDate = progress.lastModifiedDate)
