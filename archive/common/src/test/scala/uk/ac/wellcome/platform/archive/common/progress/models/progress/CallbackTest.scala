@@ -7,7 +7,8 @@ import org.scalatest.{FunSpec, Matchers}
 class CallbackTest extends FunSpec with Matchers {
 
   it("is initialised with status pending") {
-    val callback = Callback(new URI("http://www.wellcomecollection.org/callback/ok"))
+    val callback =
+      Callback(new URI("http://www.wellcomecollection.org/callback/ok"))
 
     callback.callbackStatus shouldBe Callback.Pending
   }
@@ -31,7 +32,7 @@ class CallbackTest extends FunSpec with Matchers {
   }
 
   it("throws if there is a parse error") {
-    a [MatchError] should be thrownBy Callback.parseStatus("error")
+    a[MatchError] should be thrownBy Callback.parseStatus("error")
   }
 
 }

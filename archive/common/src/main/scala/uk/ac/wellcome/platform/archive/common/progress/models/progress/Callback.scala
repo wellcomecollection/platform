@@ -7,21 +7,18 @@ import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
 
-case class Callback(callbackUri: URI,
-                    callbackStatus: Callback.Status)
+case class Callback(callbackUri: URI, callbackStatus: Callback.Status)
 
 case object Callback extends URIConverters with CallbackStatusConverters {
   sealed trait Status
 
   def apply(callbackUri: URI): Callback = {
-    Callback(
-      callbackUri = callbackUri,
-      callbackStatus = Pending)
+    Callback(callbackUri = callbackUri, callbackStatus = Pending)
   }
 
-  val PendingString   = "pending"
+  val PendingString = "pending"
   val SucceededString = "succeeded"
-  val FailedString    = "failed"
+  val FailedString = "failed"
 
   case object Pending extends Status {
     override def toString: String = PendingString
@@ -35,11 +32,11 @@ case object Callback extends URIConverters with CallbackStatusConverters {
     override def toString: String = FailedString
   }
 
-  def parseStatus(string: String) : Status = {
+  def parseStatus(string: String): Status = {
     string match {
-      case PendingString => Pending
+      case PendingString   => Pending
       case SucceededString => Succeeded
-      case FailedString => Failed
+      case FailedString    => Failed
     }
   }
 }
@@ -53,11 +50,12 @@ trait CallbackStatusConverters {
       Json.fromString(status.toString)
   }
 
-  implicit val dec: Decoder[Status] = Decoder.instance[Callback.Status](cursor =>
-    for {
-      status <- cursor.value.as[String]
-    } yield {
-      parseStatus(status)
+  implicit val dec: Decoder[Status] =
+    Decoder.instance[Callback.Status](cursor =>
+      for {
+        status <- cursor.value.as[String]
+      } yield {
+        parseStatus(status)
     })
 
   implicit val fmtStatus: AnyRef with DynamoFormat[Status] =

@@ -4,4 +4,3 @@ import java.time.Instant
 
 case class ProgressEvent(description: String,
                          createdDate: Instant = Instant.now)
-

@@ -10,14 +10,14 @@ import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
 
 case class Progress(
-                     id: UUID,
-                     uploadUri: URI,
-                     callback: Option[Callback],
-                     status: Progress.Status,
-                     createdDate: Instant = Instant.now,
-                     lastModifiedDate: Instant = Instant.now,
-                     events: Seq[ProgressEvent] = Seq.empty
-                   ) {
+  id: UUID,
+  uploadUri: URI,
+  callback: Option[Callback],
+  status: Progress.Status,
+  createdDate: Instant = Instant.now,
+  lastModifiedDate: Instant = Instant.now,
+  events: Seq[ProgressEvent] = Seq.empty
+) {
 
   def update(progressUpdate: ProgressUpdate) = {
     this.copy(
@@ -66,15 +66,16 @@ trait StatusConverters {
       Json.fromString(status.toString)
   }
 
-  implicit val dec: Decoder[Status] = Decoder.instance[Progress.Status](cursor =>
-    for {
-      status <- cursor.value.as[String]
-    } yield {
-      status match {
-        case "processing" => Processing
-        case "completed"  => Completed
-        case "failed"     => Failed
-      }
+  implicit val dec: Decoder[Status] =
+    Decoder.instance[Progress.Status](cursor =>
+      for {
+        status <- cursor.value.as[String]
+      } yield {
+        status match {
+          case "processing" => Processing
+          case "completed"  => Completed
+          case "failed"     => Failed
+        }
     })
 
   implicit val fmtStatus: AnyRef with DynamoFormat[Status] =
@@ -85,6 +86,3 @@ trait StatusConverters {
       toJson[Progress.Status](_).get
     )
 }
-
-
-
