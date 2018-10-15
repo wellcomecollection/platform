@@ -6,7 +6,7 @@ from flask_restplus import Namespace, Resource
 
 from ingests import send_new_ingest_request
 from models.catalogue import Error
-from models.ingests import Ingest, IngestType, IngestStatus
+from models.ingests import Ingest, IngestType, IngestStatus, Space
 from models.progress import Progress, ProgressEvent
 from progress_manager import ProgressNotFoundError
 import validators
@@ -19,6 +19,7 @@ api.add_model(name="Error", definition=Error)
 api.add_model(name="Ingest", definition=Ingest)
 api.add_model(name="IngestStatus", definition=IngestStatus)
 api.add_model(name="IngestType", definition=IngestType)
+api.add_model(name="Space", definition=Space)
 
 api.add_model(name="Progress", definition=Progress)
 api.add_model(name="ProgressEvent", definition=ProgressEvent)
@@ -41,6 +42,8 @@ class IngestCollection(Resource):
         """Create a request to ingest a BagIt resource"""
         upload_url = request.json["uploadUrl"]
         callback_url = request.json.get("callbackUrl")
+        space_type = request.json.get("space")
+        space = space_type["id"]
 
         self._validate_urls(callback_url, upload_url)
 
@@ -49,7 +52,7 @@ class IngestCollection(Resource):
         progress_manager = app.config["PROGRESS_MANAGER"]
 
         ingest_request_id = progress_manager.create_request(
-            upload_url=upload_url, callback_url=callback_url
+            upload_url=upload_url, callback_uri=callback_url, space=space
         )
         logger.debug("ingest_request_id=%r", ingest_request_id)
 

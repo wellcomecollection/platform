@@ -18,13 +18,19 @@ from .progress import ProgressEvent
 #       },
 #       "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
 #       "callbackUrl": "https://example.org/callback?id=b1234567",
+#       "space": {
+#         "id": "space-id",
+#         "type": "Space"
+#       },
 #     }
 #
 IngestType = TypedModel(
     "IngestType",
     {
         "id": fields.String(
-            description="Identifier for ingest type", enum=["create"], required=True
+            description="Identifier for ingest type",
+            enum=["create"],
+            required=True
         )
     },
 )
@@ -35,6 +41,16 @@ IngestStatus = TypedModel(
         "id": fields.String(
             description="Identifier for ingest status",
             enum=["processing", "failure", "success"],
+            required=True,
+        )
+    },
+)
+
+Space = TypedModel(
+    "Space",
+    {
+        "id": fields.String(
+            description="Identifier for space",
             required=True,
         )
     },
@@ -56,6 +72,11 @@ Ingest = TypedModel(
         "ingestType": fields.Nested(
             IngestType,
             description="Type of request to ingest a BagIt resource",
+            required=True,
+        ),
+        "space": fields.Nested(
+            Space,
+            description="Name of the space in which to store Bag",
             required=True,
         ),
         "status": fields.Nested(
