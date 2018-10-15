@@ -11,8 +11,8 @@ import com.gu.scanamo.DynamoFormat
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -28,7 +28,7 @@ trait ProgressMonitorFixture
 
   import Progress._
 
-  val space = StorageSpace("space-id")
+  val space = Namespace("space-id")
   val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
 

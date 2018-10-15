@@ -48,7 +48,7 @@ class NotifierFeatureTest
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   def createProgressWith(id: UUID, callbackUri: Option[URI]): Progress =
-    Progress(id, uploadUri, callbackUri, Completed)
+    Progress(id, uploadUri, callbackUri, space, Completed)
 
   describe("Making callbacks") {
     it("makes a POST request when it receives a Progress with a callback") {

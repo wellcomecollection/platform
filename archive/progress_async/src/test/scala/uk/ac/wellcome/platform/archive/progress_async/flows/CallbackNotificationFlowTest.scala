@@ -11,12 +11,13 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
-import uk.ac.wellcome.platform.archive.common.models.{CallbackNotification, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.test.fixtures.Akka
 
 class CallbackNotificationFlowTest
-    extends FunSpec
+  extends FunSpec
     with Akka
     with Matchers
     with ScalaFutures
@@ -27,7 +28,7 @@ class CallbackNotificationFlowTest
     with URIConverters
     with SNS {
 
-  val space = StorageSpace("space-id")
+  val space = Namespace("space-id")
   val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
 

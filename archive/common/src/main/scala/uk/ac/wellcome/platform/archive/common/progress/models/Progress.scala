@@ -8,14 +8,14 @@ import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, CompletedCallbackFailed, CompletedCallbackSucceeded, Failed, None, Processing}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 
 case class Progress(
                      id: UUID,
                      uploadUri: URI,
                      callbackUri: Option[URI],
-                     space: StorageSpace,
+                     space: Namespace,
                      status: Progress.Status = Progress.None,
                      createdDate: Instant = Instant.now,
                      lastModifiedDate: Instant = Instant.now,
@@ -120,7 +120,7 @@ case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
 case class ProgressCreateRequest(
                                   uploadUri: URI,
                                   callbackUri: Option[URI],
-                                  space: StorageSpace
+                                  space: Namespace
                                 )
 
 object ProgressCreateRequest extends URIConverters
