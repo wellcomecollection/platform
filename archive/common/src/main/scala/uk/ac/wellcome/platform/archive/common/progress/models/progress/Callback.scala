@@ -34,9 +34,9 @@ case object Callback extends URIConverters with CallbackStatusConverters {
 
   def parseStatus(string: String): Status = {
     string match {
-      case `pendingString` => Pending
+      case `pendingString`   => Pending
       case `succeededString` => Succeeded
-      case `failedString` => Failed
+      case `failedString`    => Failed
     }
   }
 }

@@ -10,7 +10,6 @@ trait TimeTestFixture extends Matchers {
       .between(instant, Instant.now)
       .getSeconds should be <= recentSeconds.toLong
 
-
   def assertAllRecent(instants: Seq[Instant], recentSeconds: Int = 1): Unit =
     instants.foreach(i => assertRecent(i, recentSeconds))
 }

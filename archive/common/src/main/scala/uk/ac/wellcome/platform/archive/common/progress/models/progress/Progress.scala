@@ -23,18 +23,18 @@ case class Progress(
   def update(update: ProgressUpdate): Progress = {
     val mergedEvents = update.events ++ this.events
     update match {
-      case _: ProgressEventUpdate => this.copy(
-          events = mergedEvents)
-      case statusUpdate: ProgressStatusUpdate => this.copy(
-          status = statusUpdate.status,
-          events = mergedEvents)
-      case resourceUpdate: ProgressResourceUpdate => this.copy(
+      case _: ProgressEventUpdate => this.copy(events = mergedEvents)
+      case statusUpdate: ProgressStatusUpdate =>
+        this.copy(status = statusUpdate.status, events = mergedEvents)
+      case resourceUpdate: ProgressResourceUpdate =>
+        this.copy(
           resources = this.resources ++ resourceUpdate.affectedResources,
           events = mergedEvents
         )
-      case callbackStatusUpdate: ProgressCallbackStatusUpdate => this.copy(
-          callback = this.callback.map(
-            _.copy(callbackStatus = callbackStatusUpdate.callbackStatus)),
+      case callbackStatusUpdate: ProgressCallbackStatusUpdate =>
+        this.copy(
+          callback = this.callback
+            .map(_.copy(callbackStatus = callbackStatusUpdate.callbackStatus)),
           events = mergedEvents
         )
     }
@@ -73,12 +73,12 @@ case object Progress extends URIConverters with StatusConverters {
       status = Progress.Initialised)
   }
 
-  def parseStatus(status: String) : Status = {
+  def parseStatus(status: String): Status = {
     status match {
       case `initialisedString` => Initialised
-      case `processingString` => Processing
-      case `completedString` => Completed
-      case `failedString` => Failed
+      case `processingString`  => Processing
+      case `completedString`   => Completed
+      case `failedString`      => Failed
     }
   }
 

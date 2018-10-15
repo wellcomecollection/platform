@@ -26,7 +26,8 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
 
     progress.id shouldBe a[UUID]
     progress.uploadUri shouldBe progressCreateRequest.uploadUri
-    progress.callback shouldBe Some(Callback(progressCreateRequest.callbackUri.get))
+    progress.callback shouldBe Some(
+      Callback(progressCreateRequest.callbackUri.get))
     progress.status shouldBe Progress.Initialised
     assertRecent(progress.createdDate)
     progress.lastModifiedDate shouldBe progress.createdDate
@@ -46,7 +47,8 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
   it("updates from a progress status update") {
     val progress = createProgressWith(events = List(createProgressEvent))
 
-    val progressUpdate = ProgressStatusUpdate(Progress.Completed, List(createProgressEvent))
+    val progressUpdate =
+      ProgressStatusUpdate(Progress.Completed, List(createProgressEvent))
     val updatedProgress = progress.update(progressUpdate)
 
     updatedProgress.status shouldBe Progress.Completed
@@ -57,9 +59,8 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
   it("updates from a progress resource update") {
     val progress = createProgressWith(events = List(createProgressEvent))
 
-    val progressUpdate = ProgressResourceUpdate(
-      List(createResource),
-      List(createProgressEvent))
+    val progressUpdate =
+      ProgressResourceUpdate(List(createResource), List(createProgressEvent))
     val updatedProgress = progress.update(progressUpdate)
 
     updatedProgress.resources should contain theSameElementsAs progressUpdate.affectedResources
@@ -75,7 +76,8 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
       List(ProgressEvent("another event")))
     val updatedProgress = progress.update(progressUpdate)
 
-    updatedProgress.callback shouldBe Some(progress.callback.get.copy(callbackStatus = Callback.Succeeded))
+    updatedProgress.callback shouldBe Some(
+      progress.callback.get.copy(callbackStatus = Callback.Succeeded))
     updatedProgress.events should contain theSameElementsAs progress.events ++ progressUpdate.events
     assertAllRecent(updatedProgress.events.map(_.createdDate))
   }
@@ -83,19 +85,19 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
   import org.scalatest.prop.TableDrivenPropertyChecks._
   private val progressStatus = Table(
     ("string-status", "parsed-status"),
-    ("initialised",  Progress.Initialised),
-    ("processing",   Progress.Processing),
-    ("completed",    Progress.Completed),
-    ("failed",       Progress.Failed),
+    ("initialised", Progress.Initialised),
+    ("processing", Progress.Processing),
+    ("completed", Progress.Completed),
+    ("failed", Progress.Failed),
   )
   it("parses all status values") {
-    forAll (progressStatus) { (statusString, status) =>
+    forAll(progressStatus) { (statusString, status) =>
       Progress.parseStatus(statusString) shouldBe status
     }
   }
 
   it("throws if there is a parse error") {
-    a [MatchError] should be thrownBy Progress.parseStatus("not-valid")
+    a[MatchError] should be thrownBy Progress.parseStatus("not-valid")
   }
 
   private def createProgress = {
