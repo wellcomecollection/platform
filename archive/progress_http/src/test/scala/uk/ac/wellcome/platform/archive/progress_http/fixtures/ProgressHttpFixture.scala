@@ -13,15 +13,10 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressEvent,
-  ProgressUpdate,
-  Progress => ProgressModel
-}
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.modules._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
@@ -35,24 +30,22 @@ trait ProgressHttpFixture
     with RandomThings
     with LocalDynamoDb
     with ScalaFutures
-    with ProgressMonitorFixture
+    with ProgressTrackerFixture
+    with ProgressGenerators
     with Messaging {
 
-  import ProgressModel._
+//  import Progress._
 
-  def withProgress[R](monitor: ProgressMonitor)(
-    testWith: TestWith[models.Progress, R]) = {
-    val id = randomUUID
+  def withProgress[R](monitor: ProgressTracker)(
+    testWith: TestWith[Progress, R]) = {
+    val createdProgress = createProgress
 
-    val createdProgress =
-      ProgressModel(id, uploadUri, Some(callbackUri), space)
-
-    val storedProgress = monitor.create(createdProgress)
+    val storedProgress = monitor.initialise(createdProgress)
 
     testWith(storedProgress)
   }
 
-  def withProgressUpdate[R](id: UUID, status: Status = None)(
+  def withProgressUpdate[R](id: UUID, status: Progress.Status)(
     testWith: TestWith[ProgressUpdate, R]) = {
 
     val events = List(
@@ -60,10 +53,10 @@ trait ProgressHttpFixture
         description = randomAlphanumeric()
       ))
 
-    val progress = ProgressUpdate(
+    val progress = ProgressStatusUpdate(
       id = id,
-      events = events,
-      status = status
+      status = status,
+      events = events
     )
 
     testWith(progress)
@@ -78,7 +71,7 @@ trait ProgressHttpFixture
         ConfigModule,
         AkkaModule,
         CloudWatchClientModule,
-        ProgressMonitorModule
+        ProgressTrackerModule
       )
     }
     testWith(progress)
@@ -93,7 +86,7 @@ trait ProgressHttpFixture
 
     val serverConfig = HttpServerConfig(host, port, baseUrl)
 
-    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
       withApp(table, serverConfig) { progressHttp =>
         testWith((table, baseUrl, progressHttp))
       }

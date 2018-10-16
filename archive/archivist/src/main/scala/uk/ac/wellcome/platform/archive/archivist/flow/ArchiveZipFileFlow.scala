@@ -9,25 +9,12 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  BagUploaderConfig
-}
-import uk.ac.wellcome.platform.archive.common.flows.{
-  FoldEitherFlow,
-  OnErrorFlow
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagUploaderConfig}
+import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, OnErrorFlow}
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  IngestBagRequest
-}
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 
 object ArchiveZipFileFlow extends Logging {
   def apply(config: BagUploaderConfig, snsConfig: SNSConfig)(
@@ -74,18 +61,18 @@ object ArchiveZipFileFlow extends Logging {
     ingestBagRequest: IngestBagRequest): ProgressUpdate =
     result match {
       case Right(ArchiveComplete(id, _, _)) =>
-        ProgressUpdate(
+        ProgressEventUpdate(
           id,
           List(ProgressEvent("Bag uploaded and verified successfully")))
       case Left(ArchiveJobError(_, errors)) =>
-        ProgressUpdate(
+        ProgressStatusUpdate(
           ingestBagRequest.archiveRequestId,
-          errors.map(error => ProgressEvent(error.toString)),
-          Progress.Failed)
+          Progress.Failed,
+          errors.map(error => ProgressEvent(error.toString)))
       case Left(archiveError) =>
-        ProgressUpdate(
+        ProgressStatusUpdate(
           ingestBagRequest.archiveRequestId,
-          List(ProgressEvent(archiveError.toString)),
-          Progress.Failed)
+          Progress.Failed,
+          List(ProgressEvent(archiveError.toString)))
     }
 }

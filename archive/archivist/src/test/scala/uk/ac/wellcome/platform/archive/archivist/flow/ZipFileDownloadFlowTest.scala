@@ -17,7 +17,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadin
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -101,7 +101,7 @@ class ZipFileDownloadFlowTest
               actualBagRequest shouldBe ingestBagRequest
           }
 
-          assertTopicReceivesProgressUpdate(
+          assertTopicReceivesProgressStatusUpdate(
             ingestBagRequest.archiveRequestId,
             progressTopic,
             Progress.Failed) { events =>

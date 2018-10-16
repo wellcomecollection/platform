@@ -17,7 +17,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
 import uk.ac.wellcome.platform.archive.registrar.fixtures.{
   RegistrationCompleteAssertions,
   Registrar => RegistrarFixture
@@ -91,7 +91,7 @@ class RegistrarFeatureTest
                 filesNumber = 1L
               )
 
-              assertTopicReceivesProgressUpdate(
+              assertTopicReceivesProgressStatusUpdate(
                 requestId,
                 progressTopic,
                 Progress.Completed) { events =>
@@ -138,7 +138,7 @@ class RegistrarFeatureTest
             maybeStorageManifest shouldBe empty
           }
 
-          assertTopicReceivesProgressUpdate(
+          assertTopicReceivesProgressStatusUpdate(
             requestId,
             progressTopic,
             Progress.Failed) { events =>

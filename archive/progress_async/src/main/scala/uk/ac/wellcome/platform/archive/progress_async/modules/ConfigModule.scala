@@ -30,6 +30,6 @@ object ConfigModule extends AbstractModule {
     appConfig.metricsConfig
 
   @Provides
-  def providesProgressMonitorConfig(appConfig: ProgressAsyncConfig) =
-    appConfig.progressMonitorConfig
+  def providesProgressTrackerConfig(appConfig: ProgressAsyncConfig) =
+    appConfig.progressTrackerConfig
 }

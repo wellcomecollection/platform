@@ -4,11 +4,7 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, ProgressEvent, ProgressStatusUpdate, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.registrar.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -31,12 +27,13 @@ object UpdateStoredManifestFlow {
       .via(NotifyDDSFlow(ddsSnsConfig))
       .map(
         archiveComplete =>
-          ProgressUpdate(
+          ProgressStatusUpdate(
             archiveComplete.archiveRequestId,
-            List(ProgressEvent("Bag registered successfully")),
-            Progress.Completed))
+            Progress.Completed,
+            List(ProgressEvent("Bag registered successfully"))
+          ))
       .via(
-        SnsPublishFlow(
+        SnsPublishFlow[ProgressUpdate](
           snsClient,
           progressSnsConfig,
           Some("registration_complete")))

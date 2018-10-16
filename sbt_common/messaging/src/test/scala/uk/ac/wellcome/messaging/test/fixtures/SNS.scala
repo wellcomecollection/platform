@@ -183,7 +183,7 @@ trait SNS extends Matchers with Logging {
       .map(_.map(m => fromJson[T](m.message)))
 
     eitherT match {
-      case Left(e)  => throw (e)
+      case Left(e)  => throw e
       case Right(t) => t
     }
   }

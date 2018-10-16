@@ -28,6 +28,7 @@ object SnsPublishFlow extends Logging {
     def publish(t: T) =
       toJson[T](t)
         .map { messageString =>
+          debug(s"snsPublishMessage: ${messageString}")
           maybeSubject match {
             case Some(subject) =>
               new PublishRequest(snsConfig.topicArn, messageString, subject)

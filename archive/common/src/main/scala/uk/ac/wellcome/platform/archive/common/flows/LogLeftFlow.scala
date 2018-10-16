@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.common.flows
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.FailedEvent
 
 object LogLeftFlow extends Logging {
   def apply[In, Out](name: String): Flow[Either[FailedEvent[In], Out],

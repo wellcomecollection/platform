@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.common.flows
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.FailedEvent
 
 import scala.util.Try
 

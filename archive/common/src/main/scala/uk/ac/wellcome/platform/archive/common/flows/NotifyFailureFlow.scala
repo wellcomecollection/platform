@@ -6,12 +6,8 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, ProgressEvent, ProgressStatusUpdate, ProgressUpdate}
 
 object NotifyFailureFlow {
   def apply[T](subject: String, snsConfig: SNSConfig)(toRequestId: T => UUID)(
@@ -19,9 +15,10 @@ object NotifyFailureFlow {
     Flow[ArchiveError[T]]
       .map(
         error =>
-          ProgressUpdate(
+          ProgressStatusUpdate(
             toRequestId(error.t),
-            List(ProgressEvent(error.toString)),
-            Progress.Failed))
-      .via(SnsPublishFlow(snsClient, snsConfig, Some(subject)))
+            Progress.Failed,
+            List(ProgressEvent(error.toString))
+          )
+      ).via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig, Some(subject)))
 }

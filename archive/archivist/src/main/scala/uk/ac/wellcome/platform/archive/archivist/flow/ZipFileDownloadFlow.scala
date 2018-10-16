@@ -15,11 +15,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadin
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 
 import scala.util.{Failure, Success, Try}
 
@@ -98,14 +94,15 @@ object ZipFileDownloadFlow extends Logging {
     : ProgressUpdate =
     result match {
       case Right(ZipFileDownloadComplete(_, ingestBagRequest)) =>
-        ProgressUpdate(
+        ProgressEventUpdate(
           ingestBagRequest.archiveRequestId,
           List(ProgressEvent("zipFile downloaded successfully")))
       case Left(archiveError) =>
-        ProgressUpdate(
+        ProgressStatusUpdate(
           archiveError.t.archiveRequestId,
-          List(ProgressEvent(archiveError.toString)),
-          Progress.Failed)
+          Progress.Failed,
+          List(ProgressEvent(archiveError.toString))
+        )
     }
 }
 

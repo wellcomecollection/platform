@@ -13,8 +13,8 @@ object ConfigModule extends AbstractModule {
     appConfig.metricsConfig
 
   @Provides
-  def providesProgressMonitorConfig(appConfig: ProgressHttpConfig) =
-    appConfig.progressMonitorConfig
+  def providesProgressTrackerConfig(appConfig: ProgressHttpConfig) =
+    appConfig.progressTrackerConfig
 
   @Provides
   def providesHttpServerConfig(appConfig: ProgressHttpConfig) =

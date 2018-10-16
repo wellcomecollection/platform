@@ -15,8 +15,8 @@ import uk.ac.wellcome.platform.archive.common.messaging.{
 }
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.ProgressUpdate
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_async.flows.CallbackNotificationFlow
 
 trait ProgressAsync extends Logging {
@@ -41,11 +41,11 @@ trait ProgressAsync extends Logging {
     val messageStream =
       injector.getInstance(classOf[StreamNotice])
 
-    val progressMonitor = injector
-      .getInstance(classOf[ProgressMonitor])
+    val progressTracker = injector
+      .getInstance(classOf[ProgressTracker])
 
     val progressUpdateFlow =
-      ProgressUpdateFlow(progressMonitor)
+      ProgressUpdateFlow(progressTracker)
 
     val parseNotificationFlow =
       NotificationParsingFlow[ProgressUpdate]()

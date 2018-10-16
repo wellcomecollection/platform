@@ -3,11 +3,11 @@ package uk.ac.wellcome.platform.archive.progress_http.models
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerConfig
 
 case class ProgressHttpConfig(
-  cloudwatchClientConfig: CloudwatchClientConfig,
-  progressMonitorConfig: ProgressMonitorConfig,
-  metricsConfig: MetricsConfig,
-  httpServerConfig: HttpServerConfig,
+                               cloudwatchClientConfig: CloudwatchClientConfig,
+                               progressTrackerConfig: ProgressTrackerConfig,
+                               metricsConfig: MetricsConfig,
+                               httpServerConfig: HttpServerConfig,
 )

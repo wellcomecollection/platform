@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.archive.progress_async.flows
 
-import java.net.URI
-
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -10,13 +8,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.json.{
-  URIConverters,
-  UUIDConverters
-}
+import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressGenerators
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Callback
 import uk.ac.wellcome.test.fixtures.Akka
 
 class CallbackNotificationFlowTest
@@ -29,17 +24,13 @@ class CallbackNotificationFlowTest
     with RandomThings
     with UUIDConverters
     with URIConverters
+    with ProgressGenerators
     with SNS {
-
-  val space = Namespace("space-id")
-  val uploadUri = new URI("http://www.example.com/asset")
-  val callbackUri = new URI("http://localhost/archive/complete")
 
   it("sends callbackNotifications") {
     val status = Table(
       "status",
-      Progress.Completed,
-      Progress.Failed
+      Callback.Pending
     )
     forAll(status) { status =>
       withActorSystem { actorSystem =>
@@ -47,9 +38,8 @@ class CallbackNotificationFlowTest
           withLocalSnsTopic { topic =>
             val callbackNotificationFlow =
               CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
-            val id = randomUUID
-            val progress =
-              Progress(id, uploadUri, Some(callbackUri), space, status)
+
+            val progress = createProgressWith(callback = Some(createCallbackWith(status = status)))
 
             val eventuallyResult = Source
               .single(progress)
@@ -57,10 +47,10 @@ class CallbackNotificationFlowTest
               .runWith(Sink.seq)(materializer)
 
             whenReady(eventuallyResult) { result =>
-              result should have size (1)
+              result should have size 1
               val msg = notificationMessage[CallbackNotification](topic)
-              msg.id shouldBe id
-              msg.callbackUri shouldBe callbackUri
+              msg.id shouldBe progress.id
+              msg.callbackUri shouldBe progress.callback.get.uri
               msg.payload shouldBe progress
             }
           }
@@ -72,9 +62,8 @@ class CallbackNotificationFlowTest
   it("doesn't send callbackNotifications") {
     val status = Table(
       "status",
-      Progress.CompletedCallbackFailed,
-      Progress.CompletedCallbackSucceeded,
-      Progress.None
+      Callback.Succeeded,
+      Callback.Failed
     )
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
@@ -82,10 +71,8 @@ class CallbackNotificationFlowTest
           forAll(status) { status =>
             val callbackNotificationFlow =
               CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
-            val id = randomUUID
 
-            val progress =
-              Progress(id, uploadUri, Some(callbackUri), space, status)
+            val progress = createProgressWith(callback = Some(createCallbackWith(status = status)))
 
             val eventuallyResult = Source
               .single(progress)
@@ -107,9 +94,8 @@ class CallbackNotificationFlowTest
       withMaterializer(actorSystem) { materializer =>
         val callbackNotificationFlow =
           CallbackNotificationFlow(snsClient, SNSConfig("does-not-exist"))
-        val id = randomUUID
-        val progress =
-          Progress(id, uploadUri, Some(callbackUri), space, Progress.Completed)
+
+        val progress = createProgress()
 
         val eventuallyResult = Source
           .single(progress)

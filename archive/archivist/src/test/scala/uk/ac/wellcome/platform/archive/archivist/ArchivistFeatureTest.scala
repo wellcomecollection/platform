@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.archive.archivist
 
-import java.net.URI
-
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
@@ -10,7 +8,7 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 import IngestBagRequest._
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
@@ -26,7 +24,6 @@ class ArchivistFeatureTest
     with IntegrationPatience
     with ProgressUpdateAssertions {
 
-  val callbackUri = new URI("http://localhost/archive/complete")
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
       case (
@@ -56,26 +53,23 @@ class ArchivistFeatureTest
                 registrarTopic
               )
 
-              assertTopicReceivesProgressUpdate(
+              assertTopicReceivesProgressEventUpdate(
                 request.archiveRequestId,
-                progressTopic,
-                Progress.None) { events =>
+                progressTopic) { events =>
                 events should have size 1
                 events.head.description shouldBe s"Started working on ingestRequest: ${request.archiveRequestId}"
               }
 
-              assertTopicReceivesProgressUpdate(
+              assertTopicReceivesProgressEventUpdate(
                 request.archiveRequestId,
-                progressTopic,
-                Progress.None) { events =>
+                progressTopic) { events =>
                 events should have size 1
                 events.head.description shouldBe "zipFile downloaded successfully"
               }
 
-              assertTopicReceivesProgressUpdate(
+              assertTopicReceivesProgressEventUpdate(
                 request.archiveRequestId,
-                progressTopic,
-                Progress.None) { events =>
+                progressTopic) { events =>
                 events should have size 1
                 events.head.description shouldBe "Bag uploaded and verified successfully"
               }
@@ -103,7 +97,7 @@ class ArchivistFeatureTest
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
 
-              assertTopicReceivesProgressUpdate(
+              assertTopicReceivesProgressStatusUpdate(
                 request.archiveRequestId,
                 progressTopic,
                 Progress.Failed)({ events =>
@@ -170,14 +164,14 @@ class ArchivistFeatureTest
                             registrarTopic
                           )
 
-                          assertTopicReceivesProgressUpdate(
+                          assertTopicReceivesProgressStatusUpdate(
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
-                          assertTopicReceivesProgressUpdate(
+                          assertTopicReceivesProgressStatusUpdate(
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
@@ -257,7 +251,7 @@ class ArchivistFeatureTest
                     registrarTopic
                   )
 
-                  assertTopicReceivesProgressUpdate(
+                  assertTopicReceivesProgressStatusUpdate(
                     invalidRequestId1,
                     progressTopic,
                     Progress.Failed) { events =>
@@ -266,7 +260,7 @@ class ArchivistFeatureTest
                       s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip")
                   }
 
-                  assertTopicReceivesProgressUpdate(
+                  assertTopicReceivesProgressStatusUpdate(
                     invalidRequestId2,
                     progressTopic,
                     Progress.Failed) { events =>
@@ -337,7 +331,7 @@ class ArchivistFeatureTest
                             registrarTopic
                           )
 
-                          assertTopicReceivesProgressUpdate(
+                          assertTopicReceivesProgressStatusUpdate(
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
@@ -345,7 +339,7 @@ class ArchivistFeatureTest
                             events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
                           }
 
-                          assertTopicReceivesProgressUpdate(
+                          assertTopicReceivesProgressStatusUpdate(
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
@@ -416,7 +410,7 @@ class ArchivistFeatureTest
                             registrarTopic
                           )
 
-                          assertTopicReceivesProgressUpdate(
+                          assertTopicReceivesProgressStatusUpdate(
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>
@@ -424,7 +418,7 @@ class ArchivistFeatureTest
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }
 
-                          assertTopicReceivesProgressUpdate(
+                          assertTopicReceivesProgressStatusUpdate(
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed) { events =>

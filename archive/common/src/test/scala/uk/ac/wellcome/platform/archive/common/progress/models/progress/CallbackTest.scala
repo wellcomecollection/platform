@@ -5,11 +5,12 @@ import java.net.URI
 import org.scalatest.{FunSpec, Matchers}
 
 class CallbackTest extends FunSpec with Matchers {
-  it("is initialised with status pending") {
-    val callback =
-      Callback(new URI("http://www.wellcomecollection.org/callback/ok"))
+  val callbackUri = new URI("http://www.wellcomecollection.org/callback/ok")
 
-    callback.callbackStatus shouldBe Callback.Pending
+  it("is initialised with status pending") {
+    val callback = Callback(callbackUri)
+
+    callback.status shouldBe Callback.Pending
   }
 
   import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -22,6 +23,12 @@ class CallbackTest extends FunSpec with Matchers {
   it("parses all callback status") {
     forAll(callbackStatus) { (statusString, status) =>
       Callback.parseStatus(statusString) shouldBe status
+    }
+  }
+
+  it("converts all callback status values to strings") {
+    forAll(callbackStatus) { (statusString, status) =>
+      Callback(callbackUri, status).status.toString shouldBe statusString
     }
   }
 

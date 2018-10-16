@@ -6,18 +6,18 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
   Progress,
   ProgressUpdate
 }
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 
 object ProgressUpdateAndPublishFlow {
 
   def apply(
-    snsClient: AmazonSNS,
-    snsConfig: SNSConfig,
-    progressMonitor: ProgressMonitor
+             snsClient: AmazonSNS,
+             snsConfig: SNSConfig,
+             progressTracker: ProgressTracker
   ) = {
 
     import Progress._
@@ -26,7 +26,7 @@ object ProgressUpdateAndPublishFlow {
       SnsPublishFlow[Progress](snsClient, snsConfig, Some("progress-update"))
 
     val progressUpdateFlow: Flow[ProgressUpdate, Progress, NotUsed] =
-      ProgressUpdateFlow(progressMonitor)
+      ProgressUpdateFlow(progressTracker)
 
     progressUpdateFlow.via(snsPublishFlow)
   }
