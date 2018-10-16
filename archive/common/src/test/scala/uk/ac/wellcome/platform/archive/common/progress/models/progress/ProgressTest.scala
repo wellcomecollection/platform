@@ -4,7 +4,6 @@ import java.net.URI
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 
 import scala.util.Random
@@ -22,7 +21,7 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
     val progressCreateRequest = ProgressCreateRequest(
       new URI("s3://ingest-bucket/bag.zip"),
       Some(new URI("http://www.wellcomecollection.org/callback/ok")),
-      StorageSpace("space-id")
+      Namespace("space-id")
     )
 
     val progress = Progress(progressCreateRequest)
@@ -114,7 +113,7 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
           )
         )
       ),
-      StorageSpace("space-id")
+      Namespace("space-id")
     )
 
 
