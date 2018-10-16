@@ -46,7 +46,7 @@ class RegistrarFeatureTest
   implicit val _ = s3Client
 
   it(
-    "registers an archived BagIt bag from S3 and notifies the progress monitor") {
+    "registers an archived BagIt bag from S3 and notifies the progress tracker") {
     withRegistrar {
       case (
           storageBucket,
@@ -104,7 +104,7 @@ class RegistrarFeatureTest
     }
   }
 
-  it("notifies the progress monitor if registering a bag fails") {
+  it("notifies the progress tracker if registering a bag fails") {
     withRegistrar {
       case (
           storageBucket,
