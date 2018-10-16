@@ -3,7 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= archive
 
-SBT_APPS    = archivist registrar progress_async progress_http notifier
+SBT_APPS    = archivist registrar progress_async progress_http notifier registar_http
 SBT_DOCKER_LIBRARIES = archive_common
 SBT_NO_DOCKER_LIBRARIES =
 

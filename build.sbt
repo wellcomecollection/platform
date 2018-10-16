@@ -192,7 +192,9 @@ lazy val notifier = doServiceSetup(project, "archive/notifier")
 
 lazy val registrar = doServiceSetup(project, "archive/registrar")
   .dependsOn(archive_common % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
+
+lazy val registrar_http = doServiceSetup(project, "archive/registrar_http")
+  .dependsOn(archive_common % "compile->compile;test->test")
 
 lazy val progress_async = doServiceSetup(project, "archive/progress_async")
   .dependsOn(archive_common % "compile->compile;test->test")
@@ -243,5 +245,6 @@ lazy val root = (project in file("."))
     notifier,
     registrar,
     progress_async,
-    progress_http
+    progress_http, 
+    registrar_http
   )
