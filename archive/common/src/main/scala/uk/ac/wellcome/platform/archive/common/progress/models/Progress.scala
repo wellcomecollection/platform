@@ -8,19 +8,26 @@ import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, CompletedCallbackFailed, CompletedCallbackSucceeded, Failed, None, Processing}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
+  Completed,
+  CompletedCallbackFailed,
+  CompletedCallbackSucceeded,
+  Failed,
+  None,
+  Processing
+}
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 
 case class Progress(
-                     id: UUID,
-                     uploadUri: URI,
-                     callbackUri: Option[URI],
-                     space: Namespace,
-                     status: Progress.Status = Progress.None,
-                     createdDate: Instant = Instant.now,
-                     lastModifiedDate: Instant = Instant.now,
-                     events: Seq[ProgressEvent] = Seq.empty
-                   ) {
+  id: UUID,
+  uploadUri: URI,
+  callbackUri: Option[URI],
+  space: Namespace,
+  status: Progress.Status = Progress.None,
+  createdDate: Instant = Instant.now,
+  lastModifiedDate: Instant = Instant.now,
+  events: Seq[ProgressEvent] = Seq.empty
+) {
 
   def update(progressUpdate: ProgressUpdate) = {
     this.copy(
@@ -44,17 +51,17 @@ trait StatusConverters {
       status <- cursor.value.as[String]
     } yield {
       status match {
-        case "none" => None
+        case "none"       => None
         case "processing" => Processing
-        case "completed" => Completed
-        case "failed" => Failed
+        case "completed"  => Completed
+        case "failed"     => Failed
 
         case "completed-callback-succeeded" =>
           CompletedCallbackSucceeded
         case "completed-callback-failed" =>
           CompletedCallbackFailed
       }
-    })
+  })
 
   implicit val fmtStatus =
     DynamoFormat.xmap[Progress.Status, String](
@@ -65,9 +72,7 @@ trait StatusConverters {
     )
 }
 
-object Progress
-  extends URIConverters
-    with StatusConverters {
+object Progress extends URIConverters with StatusConverters {
 
   sealed trait Status
 
@@ -113,14 +118,14 @@ case class ProgressEvent(description: String,
 case class ProgressUpdate(id: UUID,
                           events: List[ProgressEvent],
                           status: Progress.Status = Progress.None)
-  extends StatusConverters
+    extends StatusConverters
 
 case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
 
 case class ProgressCreateRequest(
-                                  uploadUri: URI,
-                                  callbackUri: Option[URI],
-                                  space: Namespace
-                                )
+  uploadUri: URI,
+  callbackUri: Option[URI],
+  space: Namespace
+)
 
 object ProgressCreateRequest extends URIConverters

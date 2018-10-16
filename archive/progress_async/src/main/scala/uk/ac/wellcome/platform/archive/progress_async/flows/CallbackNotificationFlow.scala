@@ -39,7 +39,15 @@ object CallbackNotificationFlow extends Logging {
     }
 
     Flow[Progress].flatMapConcat {
-      case progress @ Progress(id, _, Some(callbackUri), _, Completed, _, _, _) =>
+      case progress @ Progress(
+            id,
+            _,
+            Some(callbackUri),
+            _,
+            Completed,
+            _,
+            _,
+            _) =>
         notifyFlow(progress, id, callbackUri)
       case progress @ Progress(id, _, Some(callbackUri), _, Failed, _, _, _) =>
         notifyFlow(progress, id, callbackUri)

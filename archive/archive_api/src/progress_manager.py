@@ -48,10 +48,7 @@ class ProgressManager:
         # a 202 Created and the new ID in the path parameter of the
         # Location header.
         #
-        data = {
-            "uploadUri": upload_url,
-            "storageSpace": space
-        }
+        data = {"uploadUri": upload_url, "storageSpace": space}
         if callback_uri is not None:
             data["callbackUri"] = callback_uri
 

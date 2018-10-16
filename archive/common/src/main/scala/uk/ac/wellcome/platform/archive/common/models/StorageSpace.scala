@@ -16,8 +16,7 @@ object StorageSpace {
   }
 
   implicit val spaceDec = Decoder.instance[StorageSpace](cursor =>
-    cursor.value.as[String].map(StorageSpace(_))
-  )
+    cursor.value.as[String].map(StorageSpace(_)))
 
   implicit def fmtSpace =
     DynamoFormat.xmap[StorageSpace, String](

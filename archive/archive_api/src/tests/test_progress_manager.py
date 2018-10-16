@@ -42,7 +42,7 @@ class TestCreateRequest:
             progress_manager.create_request(
                 upload_url=f"http://example.org/?status={bad_status}",
                 callback_uri=None,
-                space="space-id"
+                space="space-id",
             )
 
     def test_missing_location_header_is_error(self, progress_manager):
@@ -50,14 +50,12 @@ class TestCreateRequest:
             progress_manager.create_request(
                 upload_url="http://example.org/?location=no",
                 callback_uri=None,
-                space="space-id"
+                space="space-id",
             )
 
     def test_create_request(self, progress_manager):
         result = progress_manager.create_request(
-            upload_url="http://example.org/?id=123",
-            callback_uri=None,
-            space="space-id"
+            upload_url="http://example.org/?id=123", callback_uri=None, space="space-id"
         )
         assert result == "123"
 
@@ -65,7 +63,7 @@ class TestCreateRequest:
         result = progress_manager.create_request(
             upload_url="http://example.org/?id=567",
             callback_uri="http://callback.net/?id=b567",
-            space="space-id"
+            space="space-id",
         )
         assert result == "567"
 

@@ -11,19 +11,16 @@ case class Namespace(underlying: String) extends AnyVal {
 
 object Namespace {
   implicit val namespaceEnc =
-    Encoder.instance[Namespace] {
-      space: Namespace =>
-        Json.fromString(space.toString)
+    Encoder.instance[Namespace] { space: Namespace =>
+      Json.fromString(space.toString)
     }
 
   implicit val namespaceDec = Decoder.instance[Namespace](cursor =>
-    cursor.value.as[String].map(Namespace(_))
-  )
+    cursor.value.as[String].map(Namespace(_)))
 
   implicit def fmtNamespace =
     DynamoFormat.xmap[Namespace, String](
-      fromJson[Namespace](_)(namespaceDec)
-        .toEither.left
+      fromJson[Namespace](_)(namespaceDec).toEither.left
         .map(TypeCoercionError)
     )(
       toJson[Namespace](_).get

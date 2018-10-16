@@ -109,13 +109,11 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
       new URI("s3://ingest-bucket/bag.zip"),
       Some(
         Callback(
-          new URI("http://www.wellcomecollection.org/callback/ok"
-          )
+          new URI("http://www.wellcomecollection.org/callback/ok")
         )
       ),
       Namespace("space-id")
     )
-
 
   private def createProgressWith(events: List[ProgressEvent]) = {
     createProgress.copy(events = events)

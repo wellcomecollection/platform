@@ -13,7 +13,10 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -21,7 +24,7 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ProgressMonitorFixture
-  extends LocalProgressMonitorDynamoDb
+    extends LocalProgressMonitorDynamoDb
     with MockitoSugar
     with RandomThings
     with TimeTestFixture {
@@ -49,10 +52,10 @@ trait ProgressMonitorFixture
 
   def withProgressUpdateFlow[R](table: Table)(
     testWith: TestWith[(
-      Flow[ProgressUpdate, Progress, NotUsed],
-        ProgressMonitor
-      ),
-      R]): R = {
+                         Flow[ProgressUpdate, Progress, NotUsed],
+                         ProgressMonitor
+                       ),
+                       R]): R = {
 
     val progressMonitor = new ProgressMonitor(
       dynamoDbClient,
@@ -68,10 +71,10 @@ trait ProgressMonitorFixture
   }
 
   def createProgress(
-                      progressMonitor: ProgressMonitor,
-                      callbackUrl: URI = callbackUri,
-                      uploadUrl: URI = uploadUri
-                    ): Progress = {
+    progressMonitor: ProgressMonitor,
+    callbackUrl: URI = callbackUri,
+    uploadUrl: URI = uploadUri
+  ): Progress = {
     val id = randomUUID
 
     progressMonitor.create(

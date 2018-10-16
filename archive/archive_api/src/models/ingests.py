@@ -28,9 +28,7 @@ IngestType = TypedModel(
     "IngestType",
     {
         "id": fields.String(
-            description="Identifier for ingest type",
-            enum=["create"],
-            required=True
+            description="Identifier for ingest type", enum=["create"], required=True
         )
     },
 )
@@ -47,13 +45,7 @@ IngestStatus = TypedModel(
 )
 
 Space = TypedModel(
-    "Space",
-    {
-        "id": fields.String(
-            description="Identifier for space",
-            required=True,
-        )
-    },
+    "Space", {"id": fields.String(description="Identifier for space", required=True)}
 )
 
 Ingest = TypedModel(
@@ -75,9 +67,7 @@ Ingest = TypedModel(
             required=True,
         ),
         "space": fields.Nested(
-            Space,
-            description="Name of the space in which to store Bag",
-            required=True,
+            Space, description="Name of the space in which to store Bag", required=True
         ),
         "status": fields.Nested(
             IngestStatus, description="Status of ingest processing"

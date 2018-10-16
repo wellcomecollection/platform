@@ -229,6 +229,7 @@ class TestPOSTIngests:
             description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
+
 @pytest.fixture
 def ingest_request():
     return {

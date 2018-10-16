@@ -6,7 +6,10 @@ import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent
+}
 
 class DisplayIngestTest extends FunSpec with Matchers {
 
