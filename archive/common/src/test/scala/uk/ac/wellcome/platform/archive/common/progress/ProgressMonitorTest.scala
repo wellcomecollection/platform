@@ -45,7 +45,12 @@ class ProgressMonitorTest
         withProgressMonitor(table) { archiveProgressMonitor =>
           val id = randomUUID
           val archiveIngestProgress =
-            Progress(id, uploadUri, Some(callbackUri), Progress.Processing)
+            Progress(
+              id,
+              uploadUri,
+              Some(callbackUri),
+              space,
+              Progress.Processing)
 
           archiveProgressMonitor.create(archiveIngestProgress)
           assertTableOnlyHasItem(archiveIngestProgress, table)
@@ -60,8 +65,8 @@ class ProgressMonitorTest
           val id = UUID.randomUUID()
 
           val monitors = List(
-            Progress(id, uploadUri, Some(callbackUri)),
-            Progress(id, uploadUri, Some(callbackUri))
+            Progress(id, uploadUri, Some(callbackUri), space),
+            Progress(id, uploadUri, Some(callbackUri), space)
           )
 
           val result = Try(monitors.map(archiveProgressMonitor.create))
@@ -90,7 +95,7 @@ class ProgressMonitorTest
         )
 
         val id = randomUUID
-        val progress = Progress(id, uploadUri, Some(callbackUri))
+        val progress = Progress(id, uploadUri, Some(callbackUri), space)
 
         val result = Try(archiveProgressMonitor.create(progress))
         val failedException = result.failed.get

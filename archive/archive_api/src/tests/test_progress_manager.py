@@ -40,25 +40,30 @@ class TestCreateRequest:
     def test_not_201_from_service_is_error(self, bad_status, progress_manager):
         with pytest.raises(ProgressServiceError, match="Expected HTTP 201"):
             progress_manager.create_request(
-                upload_url=f"http://example.org/?status={bad_status}", callback_url=None
+                upload_url=f"http://example.org/?status={bad_status}",
+                callback_uri=None,
+                space="space-id",
             )
 
     def test_missing_location_header_is_error(self, progress_manager):
         with pytest.raises(ProgressServiceError, match="No Location header"):
             progress_manager.create_request(
-                upload_url="http://example.org/?location=no", callback_url=None
+                upload_url="http://example.org/?location=no",
+                callback_uri=None,
+                space="space-id",
             )
 
     def test_create_request(self, progress_manager):
         result = progress_manager.create_request(
-            upload_url="http://example.org/?id=123", callback_url=None
+            upload_url="http://example.org/?id=123", callback_uri=None, space="space-id"
         )
         assert result == "123"
 
     def test_can_create_request_with_callback(self, progress_manager):
         result = progress_manager.create_request(
             upload_url="http://example.org/?id=567",
-            callback_url="http://callback.net/?id=b567",
+            callback_uri="http://callback.net/?id=b567",
+            space="space-id",
         )
         assert result == "567"
 

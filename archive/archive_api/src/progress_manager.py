@@ -28,7 +28,7 @@ class ProgressManager:
         self.endpoint = endpoint
         self.sess = sess or requests.Session()
 
-    def create_request(self, upload_url, callback_url):
+    def create_request(self, upload_url, callback_uri, space):
         """
         Make a request to the progress service to start a new request.
 
@@ -41,15 +41,16 @@ class ProgressManager:
         #     {
         #         "uploadUrl": "...",
         #         "callbackUrl": "..."
+        #         "space": "..."
         #     }
         #
         # Here "callbackUrl" is optional.  If successful, the service returns
         # a 202 Created and the new ID in the path parameter of the
         # Location header.
         #
-        data = {"uploadUri": upload_url}
-        if callback_url is not None:
-            data["callbackUri"] = callback_url
+        data = {"uploadUri": upload_url, "storageSpace": space}
+        if callback_uri is not None:
+            data["callbackUri"] = callback_uri
 
         resp = self.sess.post(f"{self.endpoint}/progress", json=data, timeout=1)
 

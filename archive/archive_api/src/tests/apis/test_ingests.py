@@ -28,6 +28,7 @@ class TestGETIngests:
         assert isinstance(rv["callbackUrl"], str)
         assert rv["ingestType"] == {"id": "create", "type": "IngestType"}
         assert rv["status"] == {"id": "processing", "type": "IngestStatus"}
+        assert rv["space"] == {"id": "space-id", "type": "Space"}
         assert isinstance(rv["createdDate"], str)
         assert isinstance(rv["lastModifiedDate"], str)
         assert len(rv["events"]) == 1
@@ -236,4 +237,5 @@ def ingest_request():
         "ingestType": {"id": "create", "type": "IngestType"},
         "uploadUrl": "s3://example-bukkit/helloworld.zip",
         "callbackUrl": "https://example.com/post?callback",
+        "space": {"id": "space-id", "type": "Space"},
     }

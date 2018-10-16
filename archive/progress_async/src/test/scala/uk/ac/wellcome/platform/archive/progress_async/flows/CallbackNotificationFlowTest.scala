@@ -16,6 +16,7 @@ import uk.ac.wellcome.platform.archive.common.json.{
 }
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.test.fixtures.Akka
 
 class CallbackNotificationFlowTest
@@ -30,6 +31,7 @@ class CallbackNotificationFlowTest
     with URIConverters
     with SNS {
 
+  val space = Namespace("space-id")
   val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
 
@@ -47,7 +49,7 @@ class CallbackNotificationFlowTest
               CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
             val id = randomUUID
             val progress =
-              Progress(id, uploadUri, Some(callbackUri), status)
+              Progress(id, uploadUri, Some(callbackUri), space, status)
 
             val eventuallyResult = Source
               .single(progress)
@@ -83,7 +85,7 @@ class CallbackNotificationFlowTest
             val id = randomUUID
 
             val progress =
-              Progress(id, uploadUri, Some(callbackUri), status)
+              Progress(id, uploadUri, Some(callbackUri), space, status)
 
             val eventuallyResult = Source
               .single(progress)
@@ -107,7 +109,7 @@ class CallbackNotificationFlowTest
           CallbackNotificationFlow(snsClient, SNSConfig("does-not-exist"))
         val id = randomUUID
         val progress =
-          Progress(id, uploadUri, Some(callbackUri), Progress.Completed)
+          Progress(id, uploadUri, Some(callbackUri), space, Progress.Completed)
 
         val eventuallyResult = Source
           .single(progress)

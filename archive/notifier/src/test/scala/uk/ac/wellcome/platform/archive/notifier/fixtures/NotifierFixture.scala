@@ -13,6 +13,7 @@ import uk.ac.wellcome.platform.archive.notifier.modules.{
 import uk.ac.wellcome.platform.archive.notifier.Notifier
 import uk.ac.wellcome.platform.archive.common.fixtures.BagIt
 import uk.ac.wellcome.platform.archive.common.modules._
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 
@@ -21,6 +22,7 @@ trait NotifierFixture extends S3 with Messaging with BagIt {
   protected val callbackHost = "localhost"
   protected val callbackPort = 8080
 
+  val space = Namespace("space-id")
   val uploadUri = new URI(s"http://www.example.com/asset")
 
   def withApp[R](queue: Queue, topic: Topic)(

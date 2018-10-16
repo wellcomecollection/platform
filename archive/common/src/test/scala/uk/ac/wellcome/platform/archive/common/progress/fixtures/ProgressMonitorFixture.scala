@@ -12,6 +12,7 @@ import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
   ProgressUpdate
@@ -30,6 +31,7 @@ trait ProgressMonitorFixture
 
   import Progress._
 
+  val space = Namespace("space-id")
   val uploadUri = new URI("http://www.example.com/asset")
   val callbackUri = new URI("http://localhost/archive/complete")
 
@@ -79,7 +81,8 @@ trait ProgressMonitorFixture
       Progress(
         id = id,
         uploadUri = uploadUrl,
-        callbackUri = Some(callbackUrl)
+        callbackUri = Some(callbackUrl),
+        space = space
       ))
   }
 
@@ -87,7 +90,7 @@ trait ProgressMonitorFixture
                           uploadUri: URI,
                           maybeCallbackUri: Option[URI],
                           table: Table) = {
-    givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri), table)
+    givenTableHasItem(Progress(id, uploadUri, maybeCallbackUri, space), table)
   }
 
   def assertProgressCreated(id: UUID,

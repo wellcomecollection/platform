@@ -5,6 +5,7 @@ import java.time.Instant
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
   ProgressEvent
@@ -15,6 +16,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
   private val id = UUID.randomUUID()
   private val uploadUrl = "s3.example/key.zip"
   private val callbackUrl = "www.example.com/callback"
+  private val space = "space-id"
   private val createdDate = "2018-10-10T09:38:55.321Z"
   private val modifiedDate = "2018-10-10T09:38:55.322Z"
   private val eventDate = "2018-10-10T09:38:55.323Z"
@@ -25,6 +27,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
       id,
       new URI(uploadUrl),
       Some(new URI(callbackUrl)),
+      Namespace(space),
       Progress.Processing,
       Instant.parse(createdDate),
       Instant.parse(modifiedDate),

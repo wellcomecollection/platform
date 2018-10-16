@@ -16,11 +16,13 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
   None,
   Processing
 }
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 
 case class Progress(
   id: UUID,
   uploadUri: URI,
   callbackUri: Option[URI],
+  space: Namespace,
   status: Progress.Status = Progress.None,
   createdDate: Instant = Instant.now,
   lastModifiedDate: Instant = Instant.now,
@@ -39,12 +41,12 @@ trait StatusConverters {
 
   import uk.ac.wellcome.json.JsonUtil.{fromJson, toJson}
 
-  implicit val enc = Encoder.instance[Progress.Status] {
+  implicit val statusEnc = Encoder.instance[Progress.Status] {
     status: Progress.Status =>
       Json.fromString(status.toString)
   }
 
-  implicit val dec = Decoder.instance[Progress.Status](cursor =>
+  implicit val statusDec = Decoder.instance[Progress.Status](cursor =>
     for {
       status <- cursor.value.as[String]
     } yield {
@@ -63,7 +65,7 @@ trait StatusConverters {
 
   implicit val fmtStatus =
     DynamoFormat.xmap[Progress.Status, String](
-      fromJson[Progress.Status](_)(dec).toEither.left
+      fromJson[Progress.Status](_)(statusDec).toEither.left
         .map(TypeCoercionError)
     )(
       toJson[Progress.Status](_).get
@@ -102,7 +104,9 @@ object Progress extends URIConverters with StatusConverters {
     Progress(
       id = generateId,
       uploadUri = createRequest.uploadUri,
-      callbackUri = createRequest.callbackUri)
+      callbackUri = createRequest.callbackUri,
+      space = createRequest.space
+    )
   }
 
   private def generateId: UUID = UUID.randomUUID()
@@ -118,6 +122,10 @@ case class ProgressUpdate(id: UUID,
 
 case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
 
-case class ProgressCreateRequest(uploadUri: URI, callbackUri: Option[URI])
+case class ProgressCreateRequest(
+  uploadUri: URI,
+  callbackUri: Option[URI],
+  space: Namespace
+)
 
 object ProgressCreateRequest extends URIConverters
