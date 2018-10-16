@@ -5,13 +5,16 @@ import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, TimeTestFixture}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  TimeTestFixture
+}
 
 class ProgressTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with TimeTestFixture
-  with ProgressGenerators
+    with ProgressGenerators
     with RandomThings {
 
   it("can be initialised") {
@@ -33,7 +36,8 @@ class ProgressTest
 
     progress.id shouldBe a[UUID]
     progress.uploadUri shouldBe progressCreateRequest.uploadUri
-    progress.callback shouldBe Some(Callback(progressCreateRequest.callbackUri.get))
+    progress.callback shouldBe Some(
+      Callback(progressCreateRequest.callbackUri.get))
     progress.status shouldBe Progress.Initialised
     assertRecent(progress.createdDate)
     progress.lastModifiedDate shouldBe progress.createdDate
@@ -44,25 +48,25 @@ class ProgressTest
 
   private val progressStatus = Table(
     ("string-status", "parsed-status"),
-    ("initialised",  Progress.Initialised),
-    ("processing",   Progress.Processing),
-    ("completed",    Progress.Completed),
-    ("failed",       Progress.Failed),
+    ("initialised", Progress.Initialised),
+    ("processing", Progress.Processing),
+    ("completed", Progress.Completed),
+    ("failed", Progress.Failed),
   )
 
   it("parses all status values") {
-    forAll (progressStatus) { (statusString, status) =>
+    forAll(progressStatus) { (statusString, status) =>
       Progress.parseStatus(statusString) shouldBe status
     }
   }
 
   it("converts all callback status values to strings") {
-    forAll (progressStatus) { (statusString, status) =>
+    forAll(progressStatus) { (statusString, status) =>
       createProgressWith(status = status).status.toString shouldBe statusString
     }
   }
 
   it("throws if there is a parse error") {
-    a [MatchError] should be thrownBy Progress.parseStatus("not-valid")
+    a[MatchError] should be thrownBy Progress.parseStatus("not-valid")
   }
 }

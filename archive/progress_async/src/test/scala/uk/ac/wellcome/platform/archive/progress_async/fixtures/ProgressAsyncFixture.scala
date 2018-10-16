@@ -7,11 +7,18 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress => ProgressModel}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Progress => ProgressModel
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.progress_async.modules.{ConfigModule, TestAppConfigModule}
-import uk.ac.wellcome.platform.archive.progress_async.{ProgressAsync => ProgressApp}
+import uk.ac.wellcome.platform.archive.progress_async.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
+import uk.ac.wellcome.platform.archive.progress_async.{
+  ProgressAsync => ProgressApp
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith

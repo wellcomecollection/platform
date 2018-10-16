@@ -6,8 +6,8 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerConfig
 
 case class ProgressHttpConfig(
-                               cloudwatchClientConfig: CloudwatchClientConfig,
-                               progressTrackerConfig: ProgressTrackerConfig,
-                               metricsConfig: MetricsConfig,
-                               httpServerConfig: HttpServerConfig,
+  cloudwatchClientConfig: CloudwatchClientConfig,
+  progressTrackerConfig: ProgressTrackerConfig,
+  metricsConfig: MetricsConfig,
+  httpServerConfig: HttpServerConfig,
 )

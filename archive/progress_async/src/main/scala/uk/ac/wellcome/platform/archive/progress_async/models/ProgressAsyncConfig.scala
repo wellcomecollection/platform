@@ -7,11 +7,11 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerConfig
 
 case class ProgressAsyncConfig(
-                                cloudwatchClientConfig: CloudwatchClientConfig,
-                                sqsClientConfig: SQSClientConfig,
-                                sqsConfig: SQSConfig,
-                                snsClientConfig: SnsClientConfig,
-                                snsConfig: SNSConfig,
-                                progressTrackerConfig: ProgressTrackerConfig,
-                                metricsConfig: MetricsConfig
+  cloudwatchClientConfig: CloudwatchClientConfig,
+  sqsClientConfig: SQSClientConfig,
+  sqsConfig: SQSConfig,
+  snsClientConfig: SnsClientConfig,
+  snsConfig: SNSConfig,
+  progressTrackerConfig: ProgressTrackerConfig,
+  metricsConfig: MetricsConfig
 )

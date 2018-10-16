@@ -7,7 +7,9 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress.Completed
-import uk.ac.wellcome.platform.archive.progress_async.fixtures.{ProgressAsyncFixture => ProgressFixture}
+import uk.ac.wellcome.platform.archive.progress_async.fixtures.{
+  ProgressAsyncFixture => ProgressFixture
+}
 
 class ProgressAsyncFeatureTest
     extends FunSpec
@@ -33,33 +35,31 @@ class ProgressAsyncFeatureTest
                 id = progress.id,
                 status = Completed)
 
-              sendNotificationToSQS(qPair.queue, progressStatusUpdate)
+            sendNotificationToSQS(qPair.queue, progressStatusUpdate)
 
-              eventually {
-                val actualMessage = notificationMessage[CallbackNotification](topic)
-                actualMessage.id shouldBe progress.id
-                actualMessage.callbackUri shouldBe progress.callback.get.uri
+            eventually {
+              val actualMessage =
+                notificationMessage[CallbackNotification](topic)
+              actualMessage.id shouldBe progress.id
+              actualMessage.callbackUri shouldBe progress.callback.get.uri
 
-                val expectedProgress = progress.copy(
-                  status = Completed,
-                  events = progressStatusUpdate.events
-                )
-                actualMessage.payload shouldBe expectedProgress
+              val expectedProgress = progress.copy(
+                status = Completed,
+                events = progressStatusUpdate.events
+              )
+              actualMessage.payload shouldBe expectedProgress
 
-                assertProgressCreated(
-                  progress.id,
-                  progress.uploadUri,
-                  table)
+              assertProgressCreated(progress.id, progress.uploadUri, table)
 
-                assertProgressRecordedRecentEvents(
-                  progressStatusUpdate.id,
-                  progressStatusUpdate.events.map(_.description),
-                  table
-                )
-              }
+              assertProgressRecordedRecentEvents(
+                progressStatusUpdate.id,
+                progressStatusUpdate.events.map(_.description),
+                table
+              )
             }
           }
         }
       }
     }
+  }
 }

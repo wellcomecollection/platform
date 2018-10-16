@@ -19,9 +19,9 @@ case object Callback extends URIConverters {
     callbackUri.map(Callback(_))
   }
 
-  val pendingString   = "pending"
+  val pendingString = "pending"
   val succeededString = "succeeded"
-  val failedString    = "failed"
+  val failedString = "failed"
 
   case object Pending extends CallbackStatus {
     override def toString: String = pendingString
@@ -43,4 +43,3 @@ case object Callback extends URIConverters {
     }
   }
 }
-

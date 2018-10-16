@@ -70,9 +70,11 @@ class ProgressTracker @Inject()(
       case statusUpdate: ProgressStatusUpdate =>
         eventsUpdate and set('status -> statusUpdate.status)
       case resourceUpdate: ProgressResourceUpdate =>
-        eventsUpdate and appendAll('resources -> resourceUpdate.affectedResources.toList)
+        eventsUpdate and appendAll(
+          'resources -> resourceUpdate.affectedResources.toList)
       case callbackStatusUpdate: ProgressCallbackStatusUpdate =>
-        eventsUpdate and set('callback \ 'status -> callbackStatusUpdate.callbackStatus)
+        eventsUpdate and set(
+          'callback \ 'status -> callbackStatusUpdate.callbackStatus)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)

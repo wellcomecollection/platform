@@ -15,9 +15,9 @@ import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 object ProgressUpdateAndPublishFlow {
 
   def apply(
-             snsClient: AmazonSNS,
-             snsConfig: SNSConfig,
-             progressTracker: ProgressTracker
+    snsClient: AmazonSNS,
+    snsConfig: SNSConfig,
+    progressTracker: ProgressTracker
   ) = {
 
     import Progress._

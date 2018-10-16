@@ -13,7 +13,10 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Callback
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -70,8 +73,7 @@ trait ProgressTrackerFixture
 
   def initialiseProgress(progressTracker: ProgressTracker,
                          callbackUrl: URI = callbackUri,
-                         uploadUrl: URI = uploadUri
-  ) = {
+                         uploadUrl: URI = uploadUri) = {
     val progress = createProgress
     progressTracker.initialise(progress)
   }
@@ -81,7 +83,9 @@ trait ProgressTrackerFixture
                           space: Namespace,
                           maybeCallbackUri: Option[URI],
                           table: Table) = {
-    givenTableHasItem(Progress(id, uploadUri, space, Callback(maybeCallbackUri)), table)
+    givenTableHasItem(
+      Progress(id, uploadUri, space, Callback(maybeCallbackUri)),
+      table)
   }
 
   def assertProgressCreated(id: UUID,

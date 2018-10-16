@@ -3,16 +3,26 @@ package uk.ac.wellcome.platform.archive.common.progress
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest, UpdateItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  GetItemRequest,
+  PutItemRequest,
+  UpdateItemRequest
+}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
 import uk.ac.wellcome.platform.archive.common.progress.models.progress._
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressTracker}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{
+  IdConstraintError,
+  ProgressTracker
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
@@ -33,7 +43,6 @@ class ProgressTrackerTest
     it("creates a progress monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-
           val progress = progressTracker.initialise(createProgress)
 
           assertTableOnlyHasItem(progress, table)
@@ -91,7 +100,6 @@ class ProgressTrackerTest
     it("retrieves progress by id") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-
           val progress = progressTracker.initialise(createProgress())
           assertTableOnlyHasItem(progress, table)
 
@@ -136,7 +144,6 @@ class ProgressTrackerTest
     it("adds a single event to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-
           val progress = progressTracker.initialise(createProgress)
 
           val progressUpdate = ProgressEventUpdate(
@@ -146,10 +153,7 @@ class ProgressTrackerTest
 
           progressTracker.update(progressUpdate)
 
-          assertProgressCreated(
-            progress.id,
-            progress.uploadUri,
-            table)
+          assertProgressCreated(progress.id, progress.uploadUri, table)
 
           assertProgressRecordedRecentEvents(
             progressUpdate.id,
@@ -162,7 +166,6 @@ class ProgressTrackerTest
     it("adds a status update to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-
           val progress = progressTracker.initialise(createProgress)
 
           val progressUpdate = ProgressStatusUpdate(
@@ -173,10 +176,8 @@ class ProgressTrackerTest
 
           progressTracker.update(progressUpdate)
 
-          val actualProgress = assertProgressCreated(
-            progress.id,
-            progress.uploadUri,
-            table)
+          val actualProgress =
+            assertProgressCreated(progress.id, progress.uploadUri, table)
 
           actualProgress.status shouldBe Progress.Completed
 
@@ -191,8 +192,8 @@ class ProgressTrackerTest
     it("adds a resource update to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-
-          val progress = progressTracker.initialise(createProgressWith(resources = List.empty))
+          val progress = progressTracker.initialise(
+            createProgressWith(resources = List.empty))
 
           val resources = List(createResource)
           val progressUpdate = ProgressResourceUpdate(
@@ -203,10 +204,8 @@ class ProgressTrackerTest
 
           progressTracker.update(progressUpdate)
 
-          val actualProgress = assertProgressCreated(
-            progress.id,
-            progress.uploadUri,
-            table)
+          val actualProgress =
+            assertProgressCreated(progress.id, progress.uploadUri, table)
 
           actualProgress.resources should contain theSameElementsAs resources
 
@@ -221,7 +220,6 @@ class ProgressTrackerTest
     it("adds a callback status update to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-
           val progress = progressTracker.initialise(createProgress)
 
           val progressUpdate = ProgressCallbackStatusUpdate(
@@ -232,10 +230,8 @@ class ProgressTrackerTest
 
           progressTracker.update(progressUpdate)
 
-          val actualProgress = assertProgressCreated(
-            progress.id,
-            progress.uploadUri,
-            table)
+          val actualProgress =
+            assertProgressCreated(progress.id, progress.uploadUri, table)
 
           actualProgress.callback shouldBe defined
           actualProgress.callback.get.status shouldBe Callback.Succeeded
@@ -255,17 +251,12 @@ class ProgressTrackerTest
 
           val progressUpdate = ProgressEventUpdate(
             progress.id,
-            List(
-              createProgressEvent,
-              createProgressEvent)
+            List(createProgressEvent, createProgressEvent)
           )
 
           progressTracker.update(progressUpdate)
 
-          assertProgressCreated(
-            progress.id,
-            progress.uploadUri,
-            table)
+          assertProgressCreated(progress.id, progress.uploadUri, table)
 
           assertProgressRecordedRecentEvents(
             progressUpdate.id,
@@ -285,13 +276,9 @@ class ProgressTrackerTest
             createProgressEventUpdateWith(progress.id)
           )
 
-          updates.foreach(
-            progressTracker.update(_))
+          updates.foreach(progressTracker.update(_))
 
-          assertProgressCreated(
-            progress.id,
-            progress.uploadUri,
-            table)
+          assertProgressCreated(progress.id, progress.uploadUri, table)
 
           assertProgressRecordedRecentEvents(
             progress.id,

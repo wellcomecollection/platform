@@ -6,16 +6,15 @@ import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
 
-case class Progress(
-  id: UUID,
-  uploadUri: URI,
-  space: Namespace,
-  callback: Option[Callback],
-  status: Progress.Status = Progress.Initialised,
-  resources: Seq[Resource] = Seq.empty,
-  createdDate: Instant = Instant.now,
-  lastModifiedDate: Instant = Instant.now,
-  events: Seq[ProgressEvent] = Seq.empty)
+case class Progress(id: UUID,
+                    uploadUri: URI,
+                    space: Namespace,
+                    callback: Option[Callback],
+                    status: Progress.Status = Progress.Initialised,
+                    resources: Seq[Resource] = Seq.empty,
+                    createdDate: Instant = Instant.now,
+                    lastModifiedDate: Instant = Instant.now,
+                    events: Seq[ProgressEvent] = Seq.empty)
 
 case object Progress extends URIConverters {
   sealed trait Status
@@ -62,4 +61,3 @@ case object Progress extends URIConverters {
 
   private def generateId: UUID = UUID.randomUUID()
 }
-

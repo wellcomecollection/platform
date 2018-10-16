@@ -33,8 +33,9 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
     success should have size 1
   }
 
-  def assertTopicReceivesProgressEventUpdate(requestId: UUID,
-                                             progressTopic: SNS.Topic)(assert: List[ProgressEvent] => Assertion) = {
+  def assertTopicReceivesProgressEventUpdate(
+    requestId: UUID,
+    progressTopic: SNS.Topic)(assert: List[ProgressEvent] => Assertion) = {
     val messages = listMessagesReceivedFromSNS(progressTopic)
     val progressUpdates = messages.map { messageinfo =>
       fromJson[ProgressUpdate](messageinfo.message).get
@@ -42,12 +43,12 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
     progressUpdates.size should be > 0
 
     progressUpdates.map { progressUpdate =>
-        debug(s"Received ProgressUpdate: $progressUpdate")
-        Try(inside(progressUpdate) {
-          case ProgressEventUpdate(id, _) =>
-            id shouldBe requestId
-        })
-      }
+      debug(s"Received ProgressUpdate: $progressUpdate")
+      Try(inside(progressUpdate) {
+        case ProgressEventUpdate(id, _) =>
+          id shouldBe requestId
+      })
+    }
 //      .partition(_.isSuccess)
 //    success should have size 1
   }

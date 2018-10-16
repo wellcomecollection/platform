@@ -7,8 +7,7 @@ sealed trait ProgressUpdate {
   val events: Seq[ProgressEvent]
 }
 
-case class ProgressEventUpdate(id: UUID,
-                               events: Seq[ProgressEvent])
+case class ProgressEventUpdate(id: UUID, events: Seq[ProgressEvent])
     extends ProgressUpdate
 
 case class ProgressStatusUpdate(id: UUID,
@@ -31,4 +30,3 @@ case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
 case class Resource(id: ResourceIdentifier)
 
 case class ResourceIdentifier(underlying: String) extends AnyVal
-

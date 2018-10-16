@@ -7,8 +7,7 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress.Status
 import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 
-trait ProgressGenerators
-  extends RandomThings {
+trait ProgressGenerators extends RandomThings {
 
   def createProgress(): Progress = createProgressWith()
 
@@ -34,14 +33,15 @@ trait ProgressGenerators
   }
 
   def createProgressEventUpdateWith(id: UUID,
-                                    events: List[ProgressEvent] = List(createProgressEvent)) = {
+                                    events: List[ProgressEvent] = List(
+                                      createProgressEvent)) = {
     ProgressEventUpdate(id, events)
   }
 
   def createProgressStatusUpdateWith(id: UUID,
                                      status: Status = Progress.Initialised,
-                                     events:Seq[ProgressEvent] = List(createProgressEvent)
-                                    ): ProgressUpdate = {
+                                     events: Seq[ProgressEvent] = List(
+                                       createProgressEvent)): ProgressUpdate = {
     ProgressStatusUpdate(id, status, events)
   }
 
@@ -50,8 +50,9 @@ trait ProgressGenerators
 
   def createCallback(): Callback = createCallbackWith()
 
-  def createCallbackWith(uri: URI = new URI("http://www.wellcomecollection.org/callback/ok"),
-                         status: Callback.CallbackStatus = Callback.Pending): Callback =
+  def createCallbackWith(
+    uri: URI = new URI("http://www.wellcomecollection.org/callback/ok"),
+    status: Callback.CallbackStatus = Callback.Pending): Callback =
     Callback(uri = uri, status = status)
 
   def createResource: Resource = {

@@ -4,7 +4,12 @@ import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
-import uk.ac.wellcome.platform.archive.common.modules.{CloudwatchClientConfig, DynamoClientConfig, SQSClientConfig, SnsClientConfig}
+import uk.ac.wellcome.platform.archive.common.modules.{
+  CloudwatchClientConfig,
+  DynamoClientConfig,
+  SQSClientConfig,
+  SnsClientConfig
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerConfig
 import uk.ac.wellcome.platform.archive.progress_async.models.ProgressAsyncConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig

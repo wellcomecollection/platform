@@ -12,7 +12,12 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Callback, Namespace, Progress, ProgressCreateRequest}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Callback,
+  Namespace,
+  Progress,
+  ProgressCreateRequest
+}
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
 
 class ProgressHttpFeatureTest

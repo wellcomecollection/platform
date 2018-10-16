@@ -8,9 +8,16 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateAndPublishFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, ProgressEvent, ProgressStatusUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Progress,
+  ProgressEvent,
+  ProgressStatusUpdate
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -29,7 +36,7 @@ class ProgressUpdateAndPublishFlowTest
   it("updates progress and publishes status") {
     withLocalSnsTopic { topic =>
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
-        withProgressTracker(table)( tracker => {
+        withProgressTracker(table)(tracker => {
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
 
@@ -63,10 +70,7 @@ class ProgressUpdateAndPublishFlowTest
 
                   assertSnsReceivesOnly(expectedProgress, topic)
 
-                  assertProgressCreated(
-                    progress.id,
-                    progress.uploadUri,
-                    table)
+                  assertProgressCreated(progress.id, progress.uploadUri, table)
 
                   assertProgressRecordedRecentEvents(
                     progress.id,

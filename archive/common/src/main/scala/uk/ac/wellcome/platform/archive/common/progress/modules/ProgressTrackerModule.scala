@@ -8,8 +8,9 @@ import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory}
 object ProgressTrackerModule extends AbstractModule {
 
   @Provides
-  def providesArchiveProgressTracker( actorSystem: ActorSystem,
-                                      progressTrackerConfig: ProgressTrackerConfig) = {
+  def providesArchiveProgressTracker(
+    actorSystem: ActorSystem,
+    progressTrackerConfig: ProgressTrackerConfig) = {
 
     val dynamoClientConfig = progressTrackerConfig.dynamoClientConfig
 

@@ -4,7 +4,12 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, ProgressEvent, ProgressStatusUpdate, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Progress,
+  ProgressEvent,
+  ProgressStatusUpdate,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.registrar.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -31,7 +36,7 @@ object UpdateStoredManifestFlow {
             archiveComplete.archiveRequestId,
             Progress.Completed,
             List(ProgressEvent("Bag registered successfully"))
-          ))
+        ))
       .via(
         SnsPublishFlow[ProgressUpdate](
           snsClient,
