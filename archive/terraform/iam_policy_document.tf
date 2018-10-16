@@ -192,3 +192,14 @@ data "aws_iam_policy_document" "read_from_registrar_queue" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "ec2_instance_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
