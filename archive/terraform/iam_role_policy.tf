@@ -141,3 +141,10 @@ resource "aws_iam_role_policy" "bagger_task_get_s3_preservica" {
   role   = "${module.bagger.task_role_name}"
   policy = "${data.aws_iam_policy_document.bagger_get_preservica.json}"
 }
+
+# DDS access
+
+resource "aws_iam_role_policy" "dds_access_get_s3" {
+  role   = "${aws_iam_role.dds_access.name}"
+  policy = "${data.aws_iam_policy_document.archive_get.json}"
+}
