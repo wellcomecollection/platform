@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.concurrent.duration._
 
-class ArgsConfigurator(val arguments: Seq[String])
+class RegistrarAsyncArgsConfigurator(val arguments: Seq[String])
     extends ScallopConf(arguments) {
 
   val hybridDynamoAccessKey = opt[String]("hybrid-dynamo-access-key")

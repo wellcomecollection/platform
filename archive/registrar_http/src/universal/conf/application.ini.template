@@ -1,3 +1,2 @@
---archive-progress-monitor-table-name=${archive_progress_table_name}
---metrics-namespace=progress_http
---app-base-url=${app_base_url}
+--hybrid-dynamo-table-name=${vhs_table_name}
+--hybrid-s3-bucket-name=${vhs_bucket_name}

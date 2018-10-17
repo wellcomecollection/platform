@@ -1,20 +1,12 @@
-package uk.ac.wellcome.platform.archive.registrar_http
+package uk.ac.wellcome.platform.archive.registrar.http
 
 import java.util.UUID
 
 import akka.http.scaladsl.model.StatusCodes._
-import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressCreateRequest
-}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressMonitor
-import uk.ac.wellcome.platform.archive.common.progress.models.ProgressCreateRequest._
-
-import scala.util.Try
 
 class Router @Inject()(monitor: ProgressMonitor, config: HttpServerConfig) {
 

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http.modules
+package uk.ac.wellcome.platform.archive.registrar.http.modules
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -6,7 +6,7 @@ import akka.stream.ActorMaterializer
 import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
-import uk.ac.wellcome.platform.archive.registrar_http.Router
+import uk.ac.wellcome.platform.archive.registrar.http.Router
 
 import scala.concurrent.{ExecutionContext, Future}
 

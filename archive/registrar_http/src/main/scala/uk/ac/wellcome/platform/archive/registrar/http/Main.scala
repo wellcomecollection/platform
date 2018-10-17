@@ -1,19 +1,18 @@
-package uk.ac.wellcome.platform.archive.registrar_http
-
+package uk.ac.wellcome.platform.archive.registrar.http
 import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
-import uk.ac.wellcome.platform.archive.progress_http.modules._
+import uk.ac.wellcome.platform.archive.common.modules.AkkaModule
+import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
+import uk.ac.wellcome.platform.archive.registrar.http.modules.{AkkaHttpApp, AppConfigModule, ConfigModule}
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 
 object Main extends App with AkkaHttpApp {
   override val injector: Injector = Guice.createInjector(
     new AppConfigModule(args),
     ConfigModule,
-    AkkaModule,
-    ProgressMonitorModule
+    VHSModule,
+    AkkaModule
   )
 
   try {
