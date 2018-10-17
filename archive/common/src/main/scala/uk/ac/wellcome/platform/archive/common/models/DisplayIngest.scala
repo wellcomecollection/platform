@@ -7,7 +7,7 @@ case class DisplayIngest(id: String,
                          uploadUrl: String,
                          callback: Option[DisplayCallback],
                          ingestType: DisplayIngestType,
-                         space: StorageSpace,
+                         space: DisplayStorageSpace,
                          status: DisplayIngestStatus,
                          resources: Seq[DisplayIngestResource],
                          events: Seq[DisplayProgressEvent] = Seq.empty,
@@ -29,6 +29,11 @@ case class DisplayIngestResource(id: String,
                                  @JsonKey("type")
                                  ontologyType: String = "IngestResource")
 
+case class DisplayStorageSpace(id: String,
+                               @JsonKey("type")
+                               ontologyType: String = "Space")
+
+
 case class DisplayIngestStatus(id: String,
                                @JsonKey("type")
                                ontologyType: String = "IngestStatus")
@@ -44,7 +49,7 @@ case object DisplayIngest {
       id = progress.id.toString,
       uploadUrl = progress.uploadUri.toString,
       callback = progress.callback.map(DisplayCallback(_)),
-      space = StorageSpace(progress.space.toString),
+      space = DisplayStorageSpace(progress.space.toString),
       ingestType = DisplayIngestType(),
       resources = progress.resources.map(DisplayIngestResource(_)),
       status = DisplayIngestStatus(progress.status),

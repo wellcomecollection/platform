@@ -12,7 +12,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
   private val id = UUID.randomUUID()
   private val uploadUrl = "s3.example/key.zip"
   private val callbackUrl = "www.example.com/callback"
-  private val space = "space-id"
+  private val spaceId = "space-id"
   private val resourceId = "bag-id"
   private val createdDate = "2018-10-10T09:38:55.321Z"
   private val modifiedDate = "2018-10-10T09:38:55.322Z"
@@ -23,7 +23,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
     val progress: Progress = Progress(
       id,
       new URI(uploadUrl),
-      Namespace(space),
+      Namespace(spaceId),
       Some(Callback(new URI(callbackUrl))),
       Progress.Processing,
       List(Resource(ResourceIdentifier(resourceId))),
@@ -38,6 +38,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
     ingest.uploadUrl shouldBe uploadUrl
     ingest.callback shouldBe Some(
       DisplayCallback(callbackUrl, ingest.callback.get.callbackStatus.toString))
+    ingest.space shouldBe DisplayStorageSpace(spaceId)
     ingest.status shouldBe DisplayIngestStatus("processing")
     ingest.resources shouldBe List(DisplayIngestResource(resourceId))
     ingest.createdDate shouldBe createdDate
