@@ -33,6 +33,7 @@ class ProgressHttpFeatureTest
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
+  import uk.ac.wellcome.storage.dynamo._
   import Progress._
 
   describe("GET /progress/:id") {
@@ -98,8 +99,8 @@ class ProgressHttpFeatureTest
               val space = Namespace("space-id")
 
               val createProgressRequest = ProgressCreateRequest(
-                uploadUri,
-                Some(callbackUri),
+                defaultUploadUri,
+                Some(defaultCallbackUri),
                 space
               )
 
@@ -141,9 +142,9 @@ class ProgressHttpFeatureTest
                 whenReady(progressFuture) { actualProgress =>
                   val expectedProgress = Progress(
                     id,
-                    uploadUri,
+                    defaultUploadUri,
                     space,
-                    Some(Callback(callbackUri))
+                    Some(Callback(defaultCallbackUri))
                   ).copy(
                     createdDate = actualProgress.createdDate,
                     lastModifiedDate = actualProgress.lastModifiedDate)
