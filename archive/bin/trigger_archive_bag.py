@@ -52,6 +52,7 @@ def archive_bag_api_messages(bags, bucket):
         yield {
             "type": "Ingest",
             "ingestType": {"id": "create", "type": "IngestType"},
+            "space": { "id": "wellcome-test", "type": "Space"},
             "uploadUrl": f"s3://{bucket}/{bag}",
         }
 
