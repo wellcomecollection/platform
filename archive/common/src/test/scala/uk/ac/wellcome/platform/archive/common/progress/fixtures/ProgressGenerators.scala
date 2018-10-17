@@ -11,8 +11,11 @@ trait ProgressGenerators extends RandomThings {
 
   def createProgress(): Progress = createProgressWith()
 
-  def createProgressWith(id: UUID = UUID.randomUUID(),
-                         uploadUri: URI = new URI("s3://ingest-bucket/bag.zip"),
+  val defaultUploadUri = new URI("s3://ingest-bucket/bag.zip")
+  val defaultCallbackUri = new URI("http://www.wellcomecollection.org/callback/ok")
+
+  def createProgressWith(id: UUID = randomUUID,
+                         uploadUri: URI = defaultUploadUri,
                          callback: Option[Callback] = Some(createCallback()),
                          space: Namespace = createSpace,
                          status: Status = Progress.Initialised,
@@ -51,7 +54,7 @@ trait ProgressGenerators extends RandomThings {
   def createCallback(): Callback = createCallbackWith()
 
   def createCallbackWith(
-    uri: URI = new URI("http://www.wellcomecollection.org/callback/ok"),
+    uri: URI = defaultCallbackUri,
     status: Callback.CallbackStatus = Callback.Pending): Callback =
     Callback(uri = uri, status = status)
 

@@ -18,7 +18,6 @@ class ProgressTracker @Inject()(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
 ) extends Logging {
-
   import Progress._
 
   def get(id: UUID): Option[Progress] = {

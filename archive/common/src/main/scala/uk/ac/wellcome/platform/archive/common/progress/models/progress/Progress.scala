@@ -59,5 +59,5 @@ case object Progress extends URIConverters {
     }
   }
 
-  private def generateId: UUID = UUID.randomUUID()
+  private def generateId: UUID = UUID.randomUUID
 }

@@ -1,29 +1,15 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
-import java.util.UUID
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  GetItemRequest,
-  PutItemRequest,
-  UpdateItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest, UpdateItemRequest}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
-  ProgressGenerators,
-  ProgressTrackerFixture
-}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
 import uk.ac.wellcome.platform.archive.common.progress.models.progress._
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{
-  IdConstraintError,
-  ProgressTracker
-}
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressTracker}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 import scala.util.Try
@@ -32,18 +18,18 @@ class ProgressTrackerTest
     extends FunSpec
     with LocalDynamoDb
     with MockitoSugar
-    with RandomThings
     with ProgressTrackerFixture
     with ProgressGenerators
     with ScalaFutures {
 
+  import uk.ac.wellcome.storage.dynamo._
   import Progress._
 
   describe("create") {
     it("creates a progress monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress)
+          val progress = progressTracker.initialise(createProgress())
 
           assertTableOnlyHasItem(progress, table)
         }
@@ -53,11 +39,11 @@ class ProgressTrackerTest
     it("only allows the creation of one progress monitor for a given id") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val id = UUID.randomUUID()
+          val id = randomUUID
 
           val monitors = List(
-            createProgress(),
-            createProgress()
+            createProgressWith(id=id, uploadUri=defaultUploadUri),
+            createProgressWith(id=id, uploadUri=defaultUploadUri)
           )
 
           val result = Try(monitors.map(progressTracker.initialise))
@@ -65,9 +51,9 @@ class ProgressTrackerTest
 
           failedException shouldBe a[IdConstraintError]
           failedException.getMessage should include(
-            s"There is already a monitor with id:$id")
+            s"There is already a progress tracker with id:$id")
 
-          assertProgressCreated(id, uploadUri, table)
+          assertProgressCreated(id, defaultUploadUri, table)
         }
 
       }
@@ -101,7 +87,7 @@ class ProgressTrackerTest
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
           val progress = progressTracker.initialise(createProgress())
-          assertTableOnlyHasItem(progress, table)
+          assertTableOnlyHasItem[Progress](progress, table)
 
           val result = progressTracker.get(progress.id)
           result shouldBe a[Some[_]]
@@ -113,7 +99,7 @@ class ProgressTrackerTest
     it("returns None when no progress monitor matches id") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val result = progressTracker.get(UUID.randomUUID())
+          val result = progressTracker.get(randomUUID)
           result shouldBe scala.None
         }
       }
@@ -128,7 +114,7 @@ class ProgressTrackerTest
 
         val progressTracker = new ProgressTracker(
           mockDynamoDbClient,
-          DynamoConfig(table = table.name, index = table.index)
+          DynamoConfig(table.name, table.index)
         )
 
         val result = Try(progressTracker.get(randomUUID))
@@ -144,7 +130,7 @@ class ProgressTrackerTest
     it("adds a single event to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress)
+          val progress = progressTracker.initialise(createProgress())
 
           val progressUpdate = ProgressEventUpdate(
             progress.id,
@@ -166,7 +152,7 @@ class ProgressTrackerTest
     it("adds a status update to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress)
+          val progress = progressTracker.initialise(createProgress())
 
           val progressUpdate = ProgressStatusUpdate(
             progress.id,
@@ -220,7 +206,7 @@ class ProgressTrackerTest
     it("adds a callback status update to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress)
+          val progress = progressTracker.initialise(createProgress())
 
           val progressUpdate = ProgressCallbackStatusUpdate(
             progress.id,
@@ -247,7 +233,7 @@ class ProgressTrackerTest
     it("adds an update with multiple events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress)
+          val progress = progressTracker.initialise(createProgress())
 
           val progressUpdate = ProgressEventUpdate(
             progress.id,
@@ -269,7 +255,7 @@ class ProgressTrackerTest
     it("adds multiple events to a monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress)
+          val progress = progressTracker.initialise(createProgress())
 
           val updates = List(
             createProgressEventUpdateWith(progress.id),

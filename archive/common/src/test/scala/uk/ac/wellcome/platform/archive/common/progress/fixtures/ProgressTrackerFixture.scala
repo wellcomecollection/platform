@@ -1,22 +1,17 @@
 package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
 import java.net.URI
-import java.time.Instant
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import com.gu.scanamo.DynamoFormat
+import com.gu.scanamo.error.DynamoReadError
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Callback
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -29,18 +24,8 @@ trait ProgressTrackerFixture
     with RandomThings
     with ProgressGenerators
     with TimeTestFixture {
-
+  import uk.ac.wellcome.storage.dynamo._
   import Progress._
-
-  val space = Namespace("space-id")
-  val uploadUri = new URI("http://www.example.com/asset")
-  val callbackUri = new URI("http://localhost/archive/complete")
-
-  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, IllegalArgumentException](str =>
-      Instant.from(DateTimeFormatter.ISO_INSTANT.parse(str)))(
-      DateTimeFormatter.ISO_INSTANT.format(_)
-    )
 
   def withProgressTracker[R](table: Table)(
     testWith: TestWith[ProgressTracker, R]): R = {
@@ -71,18 +56,11 @@ trait ProgressTrackerFixture
     testWith(progressTracker)
   }
 
-  def initialiseProgress(progressTracker: ProgressTracker,
-                         callbackUrl: URI = callbackUri,
-                         uploadUrl: URI = uploadUri) = {
-    val progress = createProgress
-    progressTracker.initialise(progress)
-  }
-
   def givenProgressRecord(id: UUID,
                           uploadUri: URI,
                           space: Namespace,
                           maybeCallbackUri: Option[URI],
-                          table: Table) = {
+                          table: Table): Option[Either[DynamoReadError, Progress]] = {
     givenTableHasItem(
       Progress(id, uploadUri, space, Callback(maybeCallbackUri)),
       table)
