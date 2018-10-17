@@ -91,9 +91,9 @@ module "registrar_http" {
   container_image = "${local.registrar_http_container_image}"
 
   env_vars = {
-    vhs_bucket_name    = "${module.vhs_archive_manifest.bucket_name}"
-    vhs_table_name     = "${module.vhs_archive_manifest.table_name}"
-    app_base_url                = "https://api.wellcomecollection.org"
+    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
+    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
+    app_base_url    = "https://api.wellcomecollection.org"
   }
 
   env_vars_length = 3
