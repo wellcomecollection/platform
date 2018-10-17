@@ -16,6 +16,9 @@ Callback = TypedModel(
     "Callback", {"uri": fields.String(), "status": fields.String()}
 )
 
+Space = TypedModel(
+    "Space", {"id": fields.String(description="Identifier for space", required=True)}
+)
 
 Progress = TypedModel(
     "Progress",
