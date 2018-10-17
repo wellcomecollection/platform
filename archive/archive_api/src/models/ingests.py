@@ -48,6 +48,10 @@ Space = TypedModel(
     "Space", {"id": fields.String(description="Identifier for space", required=True)}
 )
 
+Callback = TypedModel(
+    "Callback", {"uri": fields.String(), "status": fields.String()}
+)
+
 Ingest = TypedModel(
     "Ingest",
     {
@@ -57,9 +61,9 @@ Ingest = TypedModel(
             example="s3://source-bucket/source-path/source-bag.zip",
             required=True,
         ),
-        "callbackUrl": fields.String(
-            description="URL to use for callback on completion or failure",
-            example="https://workflow.wellcomecollection.org/callback?id=b1234567",
+        "callback": fields.Nested(
+            Callback,
+            description="Callback details used on completion or failure",
         ),
         "ingestType": fields.Nested(
             IngestType,
