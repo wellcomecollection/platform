@@ -26,7 +26,7 @@ Progress = TypedModel(
         "id": fields.String(),
         "uploadUri": fields.String(),
         "callback": fields.Nested(Callback),
-        "space": fields.String(),
+        "space": fields.Nested(Space),
         "result": fields.String(),
         "createdAt": fields.String(),
         "updatedAt": fields.String(),
