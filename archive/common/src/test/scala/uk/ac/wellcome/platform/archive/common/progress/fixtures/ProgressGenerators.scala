@@ -54,8 +54,9 @@ trait ProgressGenerators extends RandomThings {
 
   def createCallback(): Callback = createCallbackWith()
 
-  def createCallbackWith( uri: URI = testCallbackUri,
-                          status: Callback.CallbackStatus = Callback.Pending): Callback =
+  def createCallbackWith(
+    uri: URI = testCallbackUri,
+    status: Callback.CallbackStatus = Callback.Pending): Callback =
     Callback(uri = uri, status = status)
 
   def createResource: Resource = {
