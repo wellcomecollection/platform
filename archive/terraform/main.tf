@@ -91,11 +91,12 @@ module "registrar_http" {
   container_image = "${local.registrar_http_container_image}"
 
   env_vars = {
-    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
-    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
+    vhs_bucket_name    = "${module.vhs_archive_manifest.bucket_name}"
+    vhs_table_name     = "${module.vhs_archive_manifest.table_name}"
+    app_base_url                = "https://api.wellcomecollection.org"
   }
 
-  env_vars_length = 2
+  env_vars_length = 3
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
