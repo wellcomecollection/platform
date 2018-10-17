@@ -7,9 +7,20 @@ module "ecr_repository_archivist" {
   name   = "archivist"
 }
 
+// TODO delete this before merging to master
 module "ecr_repository_registrar" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "registrar"
+}
+
+module "ecr_repository_registrar_async" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "registrar_async"
+}
+
+module "ecr_repository_registrar_http" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "registrar_http"
 }
 
 module "ecr_repository_progress_async" {
