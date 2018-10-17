@@ -203,3 +203,17 @@ data "aws_iam_policy_document" "ec2_instance_assume_role" {
     }
   }
 }
+
+data "aws_iam_policy_document" "migration_driver_queue_read" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+    ]
+
+    resources = [
+      "${module.migration_driver_queue.arn}",
+    ]
+  }
+}

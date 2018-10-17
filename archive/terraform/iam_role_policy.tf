@@ -148,3 +148,8 @@ resource "aws_iam_role_policy" "dds_access_get_s3" {
   role   = "${aws_iam_role.dds_access.name}"
   policy = "${data.aws_iam_policy_document.archive_get.json}"
 }
+
+resource "aws_iam_role_policy" "dds_access_migration_driver_queue" {
+  role   = "${aws_iam_role.dds_access.name}"
+  policy = "${data.aws_iam_policy_document.migration_driver_queue_read.json}"
+}
