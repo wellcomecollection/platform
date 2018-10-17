@@ -5,7 +5,7 @@ ADD target/universal/stage /opt/docker
 USER root
 RUN chown -R daemon:daemon /opt/docker
 
-ENV project=progress_http
+ENV project=registrar_http
 
 USER daemon
 CMD ["/run.sh"]
