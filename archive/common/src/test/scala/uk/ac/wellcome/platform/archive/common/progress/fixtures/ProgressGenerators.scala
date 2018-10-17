@@ -12,7 +12,8 @@ trait ProgressGenerators extends RandomThings {
   def createProgress(): Progress = createProgressWith()
 
   val defaultUploadUri = new URI("s3://ingest-bucket/bag.zip")
-  val defaultCallbackUri = new URI("http://www.wellcomecollection.org/callback/ok")
+  val defaultCallbackUri = new URI(
+    "http://www.wellcomecollection.org/callback/ok")
 
   def createProgressWith(id: UUID = randomUUID,
                          uploadUri: URI = defaultUploadUri,

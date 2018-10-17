@@ -11,7 +11,10 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Callback
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -56,11 +59,12 @@ trait ProgressTrackerFixture
     testWith(progressTracker)
   }
 
-  def givenProgressRecord(id: UUID,
-                          uploadUri: URI,
-                          space: Namespace,
-                          maybeCallbackUri: Option[URI],
-                          table: Table): Option[Either[DynamoReadError, Progress]] = {
+  def givenProgressRecord(
+    id: UUID,
+    uploadUri: URI,
+    space: Namespace,
+    maybeCallbackUri: Option[URI],
+    table: Table): Option[Either[DynamoReadError, Progress]] = {
     givenTableHasItem(
       Progress(id, uploadUri, space, Callback(maybeCallbackUri)),
       table)
