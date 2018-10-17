@@ -11,10 +11,12 @@ class AppConfigModule(val args: Array[String])
   debug(s"Application config loaded from args: ${args.toList}")
 
   override def configure(): Unit = {
-    bind(classOf[RegistrarHttpArgsConfigurator]).toInstance(new RegistrarHttpArgsConfigurator(args))
+    bind(classOf[RegistrarHttpArgsConfigurator])
+      .toInstance(new RegistrarHttpArgsConfigurator(args))
   }
 
   @Provides
-  def providesAppConfig(configurator: RegistrarHttpArgsConfigurator): RegistrarHttpConfig =
+  def providesAppConfig(
+    configurator: RegistrarHttpArgsConfigurator): RegistrarHttpConfig =
     configurator.appConfig
 }

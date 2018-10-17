@@ -12,7 +12,11 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
-import uk.ac.wellcome.platform.archive.registrar.http.modules.{AkkaHttpApp, ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.registrar.http.modules.{
+  AkkaHttpApp,
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -24,16 +28,24 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 trait RegistrarHttpFixture
-  extends LocalVersionedHybridStore
+    extends LocalVersionedHybridStore
     with RandomThings
-    with ScalaFutures with Akka {
+    with ScalaFutures
+    with Akka {
 
-  def withApp[R](table: Table, bucket: Bucket, s3Prefix: String, serverConfig: HttpServerConfig)(
-    testWith: TestWith[AkkaHttpApp, R]) = {
+  def withApp[R](
+    table: Table,
+    bucket: Bucket,
+    s3Prefix: String,
+    serverConfig: HttpServerConfig)(testWith: TestWith[AkkaHttpApp, R]) = {
 
     val progress = new AkkaHttpApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(serverConfig, table.name, bucket.name, s3Prefix),
+        new TestAppConfigModule(
+          serverConfig,
+          table.name,
+          bucket.name,
+          s3Prefix),
         ConfigModule,
         AkkaModule,
         VHSModule,
@@ -44,7 +56,12 @@ trait RegistrarHttpFixture
   }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(VersionedHybridStore[StorageManifest, EmptyMetadata, ObjectStore[StorageManifest]], String, AkkaHttpApp), R]) = {
+    testWith: TestWith[(VersionedHybridStore[StorageManifest,
+                                             EmptyMetadata,
+                                             ObjectStore[StorageManifest]],
+                        String,
+                        AkkaHttpApp),
+                       R]) = {
 
     val host = "localhost"
     val port = randomPort
@@ -53,14 +70,15 @@ trait RegistrarHttpFixture
     val serverConfig = HttpServerConfig(host, port, baseUrl)
 
     withLocalS3Bucket { bucket =>
-    withLocalDynamoDbTable { table =>
-      val s3Prefix = "archive"
-      withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table, s3Prefix) { vhs =>
-        withApp(table, bucket, s3Prefix, serverConfig) { progressHttp =>
-          testWith((vhs, baseUrl, progressHttp))
+      withLocalDynamoDbTable { table =>
+        val s3Prefix = "archive"
+        withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table, s3Prefix) {
+          vhs =>
+            withApp(table, bucket, s3Prefix, serverConfig) { progressHttp =>
+              testWith((vhs, baseUrl, progressHttp))
+            }
         }
       }
-    }
     }
   }
 

@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.archive.registrar.async
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.async.modules.{AppConfigModule, ConfigModule}
+import uk.ac.wellcome.platform.archive.registrar.async.modules.{
+  AppConfigModule,
+  ConfigModule
+}
 import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
 
 import scala.concurrent.Await

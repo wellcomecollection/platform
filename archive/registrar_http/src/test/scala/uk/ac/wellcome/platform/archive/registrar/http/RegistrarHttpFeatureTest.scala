@@ -46,10 +46,9 @@ class RegistrarHttpFeatureTest
                 Nil)
               val putResult = vhs.updateRecord(
                 s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
-                ifNotExisting = (storageManifest, EmptyMetadata()))(
-                ifExisting = (_,_) => fail("vhs should have been empty!"))
+                ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
+                (_, _) => fail("vhs should have been empty!"))
               whenReady(putResult) { _ =>
-
                 val request = HttpRequest(
                   GET,
                   s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
@@ -61,8 +60,8 @@ class RegistrarHttpFeatureTest
                 }
               }
             }
-            }
-    }
+          }
+      }
     }
 
     it("returns a 404 NotFound if no progress monitor matches id") {
@@ -71,10 +70,11 @@ class RegistrarHttpFeatureTest
           app.run()
 
           withActorSystem { implicit actorSystem =>
-
             val bagId = randomBagId
             val request = Http().singleRequest(
-              HttpRequest(GET, s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}")
+              HttpRequest(
+                GET,
+                s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}")
             )
 
             whenReady(request) { result: HttpResponse =>

@@ -1,6 +1,10 @@
 package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagLocation,
+  BagPath,
+  ExternalIdentifier
+}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith

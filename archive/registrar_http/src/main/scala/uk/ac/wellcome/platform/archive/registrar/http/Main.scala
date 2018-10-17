@@ -1,8 +1,15 @@
 package uk.ac.wellcome.platform.archive.registrar.http
 import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.common.modules.{AkkaModule, DynamoClientModule}
+import uk.ac.wellcome.platform.archive.common.modules.{
+  AkkaModule,
+  DynamoClientModule
+}
 import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
-import uk.ac.wellcome.platform.archive.registrar.http.modules.{AkkaHttpApp, AppConfigModule, ConfigModule}
+import uk.ac.wellcome.platform.archive.registrar.http.modules.{
+  AkkaHttpApp,
+  AppConfigModule,
+  ConfigModule
+}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

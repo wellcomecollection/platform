@@ -9,7 +9,7 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
 
 class TestAppConfigModule(
-                           serverConfig: HttpServerConfig,
+  serverConfig: HttpServerConfig,
   hybridStoreTableName: String,
   hybridStoreBucketName: String,
   hybridStoreGlobalPrefix: String

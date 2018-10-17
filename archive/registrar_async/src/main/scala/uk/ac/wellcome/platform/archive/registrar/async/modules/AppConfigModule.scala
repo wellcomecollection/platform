@@ -9,7 +9,8 @@ class AppConfigModule(val args: Array[String])
   debug(s"Application config loaded from args: ${args.toList}")
 
   override def configure(): Unit = {
-    bind(classOf[RegistrarAsyncArgsConfigurator]).toInstance(new RegistrarAsyncArgsConfigurator(args))
+    bind(classOf[RegistrarAsyncArgsConfigurator])
+      .toInstance(new RegistrarAsyncArgsConfigurator(args))
   }
 
   @Provides

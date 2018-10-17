@@ -9,7 +9,10 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.dynamo._
 
-class Router @Inject()(vhs: VersionedHybridStore[StorageManifest,EmptyMetadata, ObjectStore[StorageManifest]],config: HttpServerConfig) {
+class Router @Inject()(vhs: VersionedHybridStore[StorageManifest,
+                                                 EmptyMetadata,
+                                                 ObjectStore[StorageManifest]],
+                       config: HttpServerConfig) {
 
   def routes = {
     import akka.http.scaladsl.server.Directives._
@@ -18,9 +21,9 @@ class Router @Inject()(vhs: VersionedHybridStore[StorageManifest,EmptyMetadata, 
     pathPrefix("registrar") {
       path(Segment / Segment) { (space, id) =>
         get {
-          onSuccess(vhs.getRecord(s"$space/$id")){
+          onSuccess(vhs.getRecord(s"$space/$id")) {
             case Some(storageManifest) => complete(storageManifest)
-            case None => complete(NotFound -> "Storage manifest not found!")
+            case None                  => complete(NotFound -> "Storage manifest not found!")
           }
         }
       }

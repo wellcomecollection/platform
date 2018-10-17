@@ -84,15 +84,15 @@ module "registrar_async" {
 }
 
 module "registrar_http" {
-  source = "internal_rest_service"
+  source       = "internal_rest_service"
   service_name = "registrar_http"
 
   container_port  = "9001"
   container_image = "${local.registrar_http_container_image}"
 
   env_vars = {
-    vhs_bucket_name    = "${module.vhs_archive_manifest.bucket_name}"
-    vhs_table_name     = "${module.vhs_archive_manifest.table_name}"
+    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
+    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
   }
 
   env_vars_length = 2
