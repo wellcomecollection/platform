@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar.http
 import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.common.modules.AkkaModule
+import uk.ac.wellcome.platform.archive.common.modules.{AkkaModule, DynamoClientModule}
 import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
 import uk.ac.wellcome.platform.archive.registrar.http.modules.{AkkaHttpApp, AppConfigModule, ConfigModule}
 
@@ -12,7 +12,8 @@ object Main extends App with AkkaHttpApp {
     new AppConfigModule(args),
     ConfigModule,
     VHSModule,
-    AkkaModule
+    AkkaModule,
+    DynamoClientModule
   )
 
   try {

@@ -10,11 +10,14 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
+import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
 import uk.ac.wellcome.platform.archive.registrar.http.modules.{AkkaHttpApp, ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -25,22 +28,23 @@ trait RegistrarHttpFixture
     with RandomThings
     with ScalaFutures with Akka {
 
-  def withApp[R](table: Table, bucket: Bucket, serverConfig: HttpServerConfig)(
+  def withApp[R](table: Table, bucket: Bucket, s3Prefix: String, serverConfig: HttpServerConfig)(
     testWith: TestWith[AkkaHttpApp, R]) = {
 
     val progress = new AkkaHttpApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(serverConfig, table.name, bucket.name, "archive"),
+        new TestAppConfigModule(serverConfig, table.name, bucket.name, s3Prefix),
         ConfigModule,
         AkkaModule,
-        VHSModule
+        VHSModule,
+        DynamoClientModule
       )
     }
     testWith(progress)
   }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(Table, String, AkkaHttpApp), R]) = {
+    testWith: TestWith[(VersionedHybridStore[StorageManifest, EmptyMetadata, ObjectStore[StorageManifest]], String, AkkaHttpApp), R]) = {
 
     val host = "localhost"
     val port = randomPort
@@ -50,8 +54,11 @@ trait RegistrarHttpFixture
 
     withLocalS3Bucket { bucket =>
     withLocalDynamoDbTable { table =>
-      withApp(table, bucket ,serverConfig) { progressHttp =>
-        testWith((table, baseUrl, progressHttp))
+      val s3Prefix = "archive"
+      withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table, s3Prefix) { vhs =>
+        withApp(table, bucket, s3Prefix, serverConfig) { progressHttp =>
+          testWith((vhs, baseUrl, progressHttp))
+        }
       }
     }
     }
