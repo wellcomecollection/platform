@@ -52,8 +52,8 @@ class ProgressTrackerTest
           val id = randomUUID
 
           val monitors = List(
-            createProgressWith(id = id, uploadUri = defaultUploadUri),
-            createProgressWith(id = id, uploadUri = defaultUploadUri)
+            createProgressWith(id = id, uploadUri = testUploadUri),
+            createProgressWith(id = id, uploadUri = testUploadUri)
           )
 
           val result = Try(monitors.map(progressTracker.initialise))
@@ -63,7 +63,7 @@ class ProgressTrackerTest
           failedException.getMessage should include(
             s"There is already a progress tracker with id:$id")
 
-          assertProgressCreated(id, defaultUploadUri, table)
+          assertProgressCreated(id, testUploadUri, table)
         }
 
       }

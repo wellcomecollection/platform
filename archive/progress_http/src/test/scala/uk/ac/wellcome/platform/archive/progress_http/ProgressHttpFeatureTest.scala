@@ -99,8 +99,8 @@ class ProgressHttpFeatureTest
               val space = Namespace("space-id")
 
               val createProgressRequest = ProgressCreateRequest(
-                defaultUploadUri,
-                Some(defaultCallbackUri),
+                testUploadUri,
+                Some(testCallbackUri),
                 space
               )
 
@@ -142,9 +142,9 @@ class ProgressHttpFeatureTest
                 whenReady(progressFuture) { actualProgress =>
                   val expectedProgress = Progress(
                     id,
-                    defaultUploadUri,
+                    testUploadUri,
                     space,
-                    Some(Callback(defaultCallbackUri))
+                    Some(Callback(testCallbackUri))
                   ).copy(
                     createdDate = actualProgress.createdDate,
                     lastModifiedDate = actualProgress.lastModifiedDate)
