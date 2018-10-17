@@ -10,6 +10,7 @@ import config
 from models.catalogue import Error
 from responses import ContextResponse
 from progress_manager import ProgressManager
+from bags_manager import BagsManager
 
 app = Flask(__name__)
 app.response_class = ContextResponse
@@ -30,6 +31,10 @@ app.config["PROGRESS_MANAGER"] = ProgressManager(
     sess=app.config["PROGRESS_MANAGER_SESSION"],
 )
 
+app.config["BAGS_MANAGER"] = BagsManager(
+    endpoint=app.config["BAGS_MANAGER_ENDPOINT"],
+    sess=app.config["BAGS_MANAGER_SESSION"],
+)
 
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)

@@ -39,6 +39,9 @@ def client(
     os.environ.update(
         {"PROGRESS_MANAGER_ENDPOINT": "http://docker.for.mac.localhost:6000"}
     )
+    os.environ.update(
+        {"BAGS_MANAGER_ENDPOINT": "http://docker.for.mac.localhost:6001"}
+    )
 
     from archive_api import app
 
@@ -49,6 +52,7 @@ def client(
     app.config["BAG_VHS_TABLE_NAME"] = table_name_bag
     app.config["BAG_VHS_BUCKET_NAME"] = bucket_bag
     app.config["PROGRESS_MANAGER"].sess = recorded_sess
+    app.config["BAGS_MANAGER"].sess = recorded_sess
 
     yield app.test_client()
 
