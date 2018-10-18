@@ -1,0 +1,3 @@
+<configuration>
+  <include resource="base-logback-test.xml"/>
+</configuration>

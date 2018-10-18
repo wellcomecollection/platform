@@ -21,9 +21,9 @@ index_to_wordvec = np.load("../data/index_to_wordvec.npy")
 word_to_index = pickle.load(open("../data/word_to_index.pkl", "rb"))
 
 # Create sentence embedding model and load its pre-trained weights
-model = SentenceEncoder(index_to_wordvec)
+model = SentenceEncoder()
 model.load_state_dict(
-    torch.load("../data/sentence-encoder-2018-09-27.pt", map_location="cpu")
+    torch.load("../data/sentence-encoder-2018-10-08.pt", map_location="cpu")
 )
 
 # Initialise a search index based on the images' devise'd sentence embeddings.

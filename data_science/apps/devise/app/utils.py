@@ -4,7 +4,7 @@ from nltk.tokenize import word_tokenize
 
 
 def sentence_to_indexes(sentence, word_to_index):
-    tokenised = word_tokenize(sentence)
+    tokenised = word_tokenize(sentence.lower())
     indexes = [word_to_index[word] for word in tokenised if word in word_to_index]
     return indexes
 

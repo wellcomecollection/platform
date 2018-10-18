@@ -47,36 +47,37 @@ resource "aws_iam_role_policy" "archivist_task_archive_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
-# Registrar
+# Registrar async
 
-resource "aws_iam_role_policy" "registrar_task_get_s3" {
-  role   = "${module.registrar.task_role_name}"
+resource "aws_iam_role_policy" "registrar_async_task_get_s3" {
+  role   = "${module.registrar_async.task_role_name}"
   policy = "${data.aws_iam_policy_document.archive_get.json}"
 }
 
-resource "aws_iam_role_policy" "registrar_task_vhs" {
-  role   = "${module.registrar.task_role_name}"
+resource "aws_iam_role_policy" "registrar_async_task_vhs" {
+  role   = "${module.registrar_async.task_role_name}"
   policy = "${module.vhs_archive_manifest.full_access_policy}"
 }
 
-resource "aws_iam_role_policy" "registrar_task_sns" {
-  role   = "${module.registrar.task_role_name}"
+resource "aws_iam_role_policy" "registrar_async_task_sns" {
+  role   = "${module.registrar_async.task_role_name}"
   policy = "${module.registrar_completed_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "registrar_task_progress_async_sns" {
-  role   = "${module.registrar.task_role_name}"
+resource "aws_iam_role_policy" "registrar_async_task_progress_async_sns" {
+  role   = "${module.registrar_async.task_role_name}"
   policy = "${module.progress_async_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "registrar_task_sqs" {
-  role   = "${module.registrar.task_role_name}"
+resource "aws_iam_role_policy" "registrar_async_task_sqs" {
+  role   = "${module.registrar_async.task_role_name}"
   policy = "${data.aws_iam_policy_document.read_from_registrar_queue.json}"
 }
 
-resource "aws_iam_role_policy" "registrar_task_archive_progress_table" {
-  role   = "${module.registrar.task_role_name}"
-  policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
+# Registrar http
+resource "aws_iam_role_policy" "registrar_http_task_vhs" {
+  role   = "${module.registrar_http.task_role_name}"
+  policy = "${module.vhs_archive_manifest.read_policy}"
 }
 
 # Progress Async
