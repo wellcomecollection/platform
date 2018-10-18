@@ -24,14 +24,10 @@ class ArchiveAPIConfig(object):
                 self.SNS_TOPIC_ARN = (
                     "arn:aws:sns:eu-west-1:760097843905:archive-storage_archivist"
                 )
-                self.BAG_VHS_BUCKET_NAME = "wellcomecollection-vhs-archive-manifests"
-                self.BAG_VHS_TABLE_NAME = "vhs-archive-manifests"
                 self.PROGRESS_MANAGER_ENDPOINT = "http://localhost:6000"
                 self.BAGS_MANAGER_ENDPOINT = "http://localhost:6001"
             else:
                 self.SNS_TOPIC_ARN = os.environ["TOPIC_ARN"]
-                self.BAG_VHS_BUCKET_NAME = os.environ["BAG_VHS_BUCKET_NAME"]
-                self.BAG_VHS_TABLE_NAME = os.environ["BAG_VHS_TABLE_NAME"]
                 self.PROGRESS_MANAGER_ENDPOINT = os.environ["PROGRESS_MANAGER_ENDPOINT"]
                 self.BAGS_MANAGER_ENDPOINT = os.environ["BAGS_MANAGER_ENDPOINT"]
         except KeyError as err:
