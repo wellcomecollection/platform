@@ -40,7 +40,7 @@ def client(
         {"PROGRESS_MANAGER_ENDPOINT": "http://docker.for.mac.localhost:6000"}
     )
     os.environ.update(
-        {"BAGS_MANAGER_ENDPOINT": "http://docker.for.mac.localhost:6001"}
+        {"BAGS_MANAGER_ENDPOINT": "http://host.docker.internal:6001"}
     )
 
     from archive_api import app
@@ -63,13 +63,18 @@ def guid():
 
 
 @pytest.fixture
-def space_name():
-    return "space"
+def external_identifier():
+    return "b22454408"
 
 
 @pytest.fixture
-def bag_id(guid, space_name):
-    return f"{space_name}/{guid}"
+def space_name():
+    return "digitised"
+
+
+@pytest.fixture
+def bag_id(external_identifier, space_name):
+    return f"{space_name}/{external_identifier}"
 
 
 @pytest.fixture()
