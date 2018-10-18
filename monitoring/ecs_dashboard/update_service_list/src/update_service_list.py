@@ -70,7 +70,7 @@ def get_service_list(ecs_client, cluster_arn):
 
 
 def _enrich_cluster_list(ecs_client, cluster_arn):
-    cluster = (describe_cluster(ecs_client, cluster_arn),)
+    cluster = describe_cluster(ecs_client, cluster_arn)
     service_list = get_service_list(ecs_client, cluster_arn)
 
     return {
