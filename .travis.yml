@@ -64,7 +64,9 @@ cache:
     - archive/notifier/target
     - archive/progress_async/target
     - archive/progress_http/target
-    - archive/registrar/target
+    - archive/registrar_common/target
+    - archive/registrar_http/target
+    - archive/registrar_async/target
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
@@ -166,9 +168,11 @@ jobs:
     - env: TASK=archive_api-test
     - env: TASK=archive_common-test
     - env: TASK=archivist-test
-    - env: TASK=registrar-test
     - env: TASK=progress_async-test
     - env: TASK=progress_http-test
+    - env: TASK=registrar_common-test
+    - env: TASK=registrar_async-test
+    - env: TASK=registrar_http-test
     - env: TASK=notifier-test
     - env: TASK=callback_stub_server-publish
 

@@ -53,7 +53,7 @@ module "archivist" {
 
 # Registrar
 
-module "registrar" {
+module "registrar_async" {
   source = "internal_queue_service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
@@ -61,7 +61,7 @@ module "registrar" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "registrar"
+  service_name                     = "registrar_async"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1
@@ -78,9 +78,33 @@ module "registrar" {
 
   env_vars_length = 6
 
-  container_image   = "${local.registrar_container_image}"
+  container_image   = "${local.registrar_async_container_image}"
   source_queue_name = "${module.registrar_queue.name}"
   source_queue_arn  = "${module.registrar_queue.arn}"
+}
+
+module "registrar_http" {
+  source       = "internal_rest_service"
+  service_name = "registrar_http"
+
+  container_port  = "9001"
+  container_image = "${local.registrar_http_container_image}"
+
+  env_vars = {
+    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
+    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
+    app_base_url    = "https://api.wellcomecollection.org"
+  }
+
+  env_vars_length = 3
+
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  private_subnets    = "${local.private_subnets}"
+
+  cluster_id = "${aws_ecs_cluster.cluster.id}"
+  vpc_id     = "${local.vpc_id}"
+
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }
 
 # Notifier
