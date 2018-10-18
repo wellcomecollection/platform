@@ -193,27 +193,13 @@ data "aws_iam_policy_document" "read_from_registrar_queue" {
   }
 }
 
-data "aws_iam_policy_document" "ec2_instance_assume_role" {
+data "aws_iam_policy_document" "dds_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
 
     principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
+      type        = "AWS"
+      identifiers = ["${var.dds_external_arn}"]
     }
-  }
-}
-
-data "aws_iam_policy_document" "migration_driver_queue_read" {
-  statement {
-    actions = [
-      "sqs:DeleteMessage",
-      "sqs:ReceiveMessage",
-      "sqs:ChangeMessageVisibility",
-    ]
-
-    resources = [
-      "${module.migration_driver_queue.arn}",
-    ]
   }
 }

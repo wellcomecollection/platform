@@ -119,22 +119,3 @@ module "bagger_queue" {
 
   alarm_topic_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 }
-
-# Messaging - DDS Migration Driver
-
-module "migration_driver_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "${local.namespace}_migration_driver"
-}
-
-module "migration_driver_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${local.namespace}_migration_driver_queue"
-  aws_region  = "${var.aws_region}"
-  account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.migration_driver_topic.name}"]
-
-  max_receive_count = 1
-
-  alarm_topic_arn = "${local.dlq_alarm_arn}"
-}
