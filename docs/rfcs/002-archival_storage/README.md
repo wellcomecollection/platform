@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 12 October 2018.**
+**Last updated: 17 October 2018.**
 
 ## Problem statement
 
@@ -17,7 +17,7 @@ This service should:
 
 We will build a storage service based on Amazon S3 and DynamoDB.
 
-![archival storage service - page 1](storage-with-integration.png)
+![archival storage service - page 1](storageservice-20181017-2.png)
 
 -   New assets are uploaded to an Ingest bucket in S3.
     These assets are gzip-compressed files in the [BagIt format][bagit], a Library of Congress standard for storing collections of digital files.
