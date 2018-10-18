@@ -48,9 +48,7 @@ Space = TypedModel(
     "Space", {"id": fields.String(description="Identifier for space", required=True)}
 )
 
-Callback = TypedModel(
-    "Callback", {"uri": fields.String(), "status": fields.String()}
-)
+Callback = TypedModel("Callback", {"uri": fields.String(), "status": fields.String()})
 
 Ingest = TypedModel(
     "Ingest",
@@ -62,8 +60,7 @@ Ingest = TypedModel(
             required=True,
         ),
         "callback": fields.Nested(
-            Callback,
-            description="Callback details used on completion or failure",
+            Callback, description="Callback details used on completion or failure"
         ),
         "ingestType": fields.Nested(
             IngestType,

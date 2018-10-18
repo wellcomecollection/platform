@@ -33,7 +33,6 @@ case class DisplayStorageSpace(id: String,
                                @JsonKey("type")
                                ontologyType: String = "Space")
 
-
 case class DisplayIngestStatus(id: String,
                                @JsonKey("type")
                                ontologyType: String = "IngestStatus")
