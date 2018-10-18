@@ -23,91 +23,69 @@ from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 def _create_event_dict(event):
-    return {
-        "timestamp": event["createdAt"].timestamp(),
-        "message": event["message"]
-    }
+    return {"timestamp": event["createdAt"].timestamp(), "message": event["message"]}
 
 
 def _describe_task_definition(client, arn):
-    return client.describe_task_definition(
-        taskDefinition=arn,
-    )['taskDefinition']
+    return client.describe_task_definition(taskDefinition=arn)["taskDefinition"]
 
 
 def _enrich_deployment(deployment, task_definition):
-    task_definition_arn = deployment['taskDefinition']
+    task_definition_arn = deployment["taskDefinition"]
 
-    task_definition['taskDefinitionArn'] = task_definition_arn
-    deployment['taskDefinition'] = task_definition
+    task_definition["taskDefinitionArn"] = task_definition_arn
+    deployment["taskDefinition"] = task_definition
 
     return deployment
 
 
 def _enrich_service(client, cluster_arn, service_arn):
-    service = describe_service(
-        client, cluster_arn, service_arn
-    )
+    service = describe_service(client, cluster_arn, service_arn)
 
-    task_definitions = (
-        [_describe_task_definition(
-            client,
-            deployment['taskDefinition']
-        ) for deployment in service['deployments']]
-    )
+    task_definitions = [
+        _describe_task_definition(client, deployment["taskDefinition"])
+        for deployment in service["deployments"]
+    ]
 
-    zipped = zip(service['deployments'], task_definitions)
+    zipped = zip(service["deployments"], task_definitions)
 
-    enriched_deployments = (
-        [_enrich_deployment(
-            deployment,
-            task_definition
-        ) for deployment, task_definition in zipped]
-    )
+    enriched_deployments = [
+        _enrich_deployment(deployment, task_definition)
+        for deployment, task_definition in zipped
+    ]
 
-    enriched_events = (
-        [_create_event_dict(e) for e in service["events"][:5]]
-    )
+    enriched_events = [_create_event_dict(e) for e in service["events"][:5]]
 
-    service['events'] = enriched_events
-    service['deployments'] = enriched_deployments
+    service["events"] = enriched_events
+    service["deployments"] = enriched_deployments
 
     return service
 
 
 def get_service_list(ecs_client, cluster_arn):
-    return (
-        [_enrich_service(
-            ecs_client,
-            cluster_arn,
-            service_arn
-        ) for service_arn in get_service_arns(
-            ecs_client,
-            cluster_arn
-        )]
-    )
+    return [
+        _enrich_service(ecs_client, cluster_arn, service_arn)
+        for service_arn in get_service_arns(ecs_client, cluster_arn)
+    ]
+
 
 def _enrich_cluster_list(ecs_client, cluster_arn):
-    cluster = describe_cluster(ecs_client, cluster_arn),
+    cluster = (describe_cluster(ecs_client, cluster_arn),)
     service_list = get_service_list(ecs_client, cluster_arn)
 
     return {
         "clusterName": cluster["clusterName"],
         "status": cluster["status"],
-        "instanceCount": cluster[
-            "registeredContainerInstancesCount"
-        ],
+        "instanceCount": cluster["registeredContainerInstancesCount"],
         "serviceList": service_list,
     }
 
 
 def get_cluster_list(ecs_client):
-    return (
-        [_enrich_cluster_list(
-            ecs_client,
-            cluster_arn
-        ) for cluster_arn in get_cluster_arns(ecs_client)]
-    )
+    return [
+        _enrich_cluster_list(ecs_client, cluster_arn)
+        for cluster_arn in get_cluster_arns(ecs_client)
+    ]
 
 
 def send_ecs_status_to_s3(service_snapshot, s3_client, bucket_name, object_key):
