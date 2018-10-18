@@ -147,8 +147,8 @@ Content-Type: application/json
   "space": {
     "id": "space-id",
     "type": "Space"
-  },
-  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+  },2
+  "uploadUrl": "https://archive-bucketname.s3-region.amazonaws.com/source-path/source-bag.zip",
   "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567"
 }
 ```
@@ -181,7 +181,7 @@ Response:
     "id": "space-id",
     "type": "Space"
   },
-  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
+  "uploadUrl": "https://archive-bucketname.s3-region.amazonaws.com/source-path/source-bag.zip",
   "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
   "bag": {
     "id": "{id}",
@@ -424,9 +424,9 @@ Response:
       }
     ]
   },
-  "archiveUrl" : "s3://archivebucket/digitised/b24923333/" ,
+  "archiveUrl" : "https://archive-bucketname.s3-region.amazonaws.com/digitised/b24923333/" ,
   "replicaUrl" : "https://archivebucket-replica.blob.core.windows.net/digitised/b24923333/" ,
-  "accessUrl" : "s3://accessbucket/digitised/b24923333/" ,
+  "accessUrl" : https://access-bucketname.s3-region.amazonaws.com/digitised/b24923333/" ,
   "description": "A account of a voyage to New South Wales",
   "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
@@ -560,9 +560,9 @@ Response:
       }
     ]
   },
-  "archiveUrl" : "s3://archivebucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
+  "archiveUrl" : "https://archive-bucketname.s3-region.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
   "replicaUrl" : "https://archivebucket-replica.blob.core.windows.net/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
-  "accessUrl" : "s3://accessbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
+  "accessUrl" : "https://access-bucketname.s3-region.amazonaws.com//born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
   "description": "GC253_1046",
   "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
