@@ -4,7 +4,7 @@ import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerConfig
 import uk.ac.wellcome.platform.archive.progress_http.models.ProgressHttpConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -28,7 +28,7 @@ class TestAppConfigModule(
       flushInterval = 60 seconds
     )
 
-    val archiveProgressMonitorConfig = ProgressMonitorConfig(
+    val archiveProgressTrackerConfig = ProgressTrackerConfig(
       DynamoConfig(
         table = progressTable.name,
         index = progressTable.index
@@ -43,7 +43,7 @@ class TestAppConfigModule(
 
     ProgressHttpConfig(
       cloudwatchClientConfig,
-      archiveProgressMonitorConfig,
+      archiveProgressTrackerConfig,
       metricsConfig,
       serverConfig
     )

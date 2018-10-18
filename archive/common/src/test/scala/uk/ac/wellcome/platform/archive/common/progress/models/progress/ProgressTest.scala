@@ -4,11 +4,19 @@ import java.net.URI
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  TimeTestFixture
+}
 
-import scala.util.Random
+class ProgressTest
+    extends FunSpec
+    with Matchers
+    with TimeTestFixture
+    with ProgressGenerators
+    with RandomThings {
 
-class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
   it("can be initialised") {
     val progress = createProgress
     progress.status shouldBe Progress.Initialised
@@ -36,54 +44,6 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
     progress.events shouldBe List.empty
   }
 
-  it("updates from a progress update") {
-    val progress = createProgressWith(events = List(createProgressEvent))
-
-    val progressUpdate = ProgressEventUpdate(List(createProgressEvent))
-    val updatedProgress = progress.update(progressUpdate)
-
-    updatedProgress.events should contain theSameElementsAs progress.events ++ progressUpdate.events
-    assertAllRecent(updatedProgress.events.map(_.createdDate))
-  }
-
-  it("updates from a progress status update") {
-    val progress = createProgressWith(events = List(createProgressEvent))
-
-    val progressUpdate =
-      ProgressStatusUpdate(Progress.Completed, List(createProgressEvent))
-    val updatedProgress = progress.update(progressUpdate)
-
-    updatedProgress.status shouldBe Progress.Completed
-    updatedProgress.events should contain theSameElementsAs progress.events ++ progressUpdate.events
-    assertAllRecent(updatedProgress.events.map(_.createdDate))
-  }
-
-  it("updates from a progress resource update") {
-    val progress = createProgressWith(events = List(createProgressEvent))
-
-    val progressUpdate =
-      ProgressResourceUpdate(List(createResource), List(createProgressEvent))
-    val updatedProgress = progress.update(progressUpdate)
-
-    updatedProgress.resources should contain theSameElementsAs progressUpdate.affectedResources
-    updatedProgress.events should contain theSameElementsAs progress.events ++ progressUpdate.events
-    assertAllRecent(updatedProgress.events.map(_.createdDate))
-  }
-
-  it("updates from a progress callback status update") {
-    val progress = createProgressWith(events = List(createProgressEvent))
-
-    val progressUpdate = ProgressCallbackStatusUpdate(
-      Callback.Succeeded,
-      List(ProgressEvent("another event")))
-    val updatedProgress = progress.update(progressUpdate)
-
-    updatedProgress.callback shouldBe Some(
-      progress.callback.get.copy(callbackStatus = Callback.Succeeded))
-    updatedProgress.events should contain theSameElementsAs progress.events ++ progressUpdate.events
-    assertAllRecent(updatedProgress.events.map(_.createdDate))
-  }
-
   import org.scalatest.prop.TableDrivenPropertyChecks._
 
   private val progressStatus = Table(
@@ -93,40 +53,20 @@ class ProgressTest extends FunSpec with Matchers with TimeTestFixture {
     ("completed", Progress.Completed),
     ("failed", Progress.Failed),
   )
+
   it("parses all status values") {
     forAll(progressStatus) { (statusString, status) =>
       Progress.parseStatus(statusString) shouldBe status
     }
   }
 
+  it("converts all callback status values to strings") {
+    forAll(progressStatus) { (statusString, status) =>
+      createProgressWith(status = status).status.toString shouldBe statusString
+    }
+  }
+
   it("throws if there is a parse error") {
     a[MatchError] should be thrownBy Progress.parseStatus("not-valid")
   }
-
-  private def createProgress =
-    Progress(
-      UUID.randomUUID(),
-      new URI("s3://ingest-bucket/bag.zip"),
-      Some(
-        Callback(
-          new URI("http://www.wellcomecollection.org/callback/ok")
-        )
-      ),
-      Namespace("space-id")
-    )
-
-  private def createProgressWith(events: List[ProgressEvent]) = {
-    createProgress.copy(events = events)
-  }
-
-  private def createProgressEvent = {
-    ProgressEvent(randomAlphanumeric(15))
-  }
-
-  private def createResource = {
-    Resource(ResourceIdentifier(randomAlphanumeric(15)))
-  }
-
-  def randomAlphanumeric(length: Int): String =
-    Random.alphanumeric take length mkString
 }

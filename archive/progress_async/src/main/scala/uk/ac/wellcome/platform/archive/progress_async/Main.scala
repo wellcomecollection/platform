@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.progress_async
 
 import com.google.inject.{Guice, Injector}
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorModule
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.progress_async.modules.{
   AppConfigModule,
   ConfigModule
@@ -19,7 +19,7 @@ object Main extends App with ProgressAsync {
     CloudWatchClientModule,
     SQSClientModule,
     SNSClientModule,
-    ProgressMonitorModule,
+    ProgressTrackerModule,
     MessageStreamModule
   )
 

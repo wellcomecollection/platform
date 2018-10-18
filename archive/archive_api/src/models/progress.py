@@ -12,14 +12,19 @@ ProgressEvent = TypedModel(
     "ProgressEvent", {"description": fields.String(), "createdDate": fields.String()}
 )
 
+Callback = TypedModel("Callback", {"uri": fields.String(), "status": fields.String()})
+
+Space = TypedModel(
+    "Space", {"id": fields.String(description="Identifier for space", required=True)}
+)
 
 Progress = TypedModel(
     "Progress",
     {
         "id": fields.String(),
         "uploadUri": fields.String(),
-        "callbackUri": fields.String(),
-        "space": fields.String(),
+        "callback": fields.Nested(Callback),
+        "space": fields.Nested(Space),
         "result": fields.String(),
         "createdAt": fields.String(),
         "updatedAt": fields.String(),

@@ -10,12 +10,9 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
-  Completed,
-  Failed
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Callback.Pending
 
 object CallbackNotificationFlow extends Logging {
   import CallbackNotification._
@@ -23,7 +20,6 @@ object CallbackNotificationFlow extends Logging {
   type Publication = Flow[Progress, Unit, NotUsed]
 
   def apply(snsClient: AmazonSNS, snsConfig: SNSConfig): Publication = {
-
     val publishFlow = SnsPublishFlow[CallbackNotification](
       snsClient,
       snsConfig,
@@ -39,21 +35,13 @@ object CallbackNotificationFlow extends Logging {
     }
 
     Flow[Progress].flatMapConcat {
-      case progress @ Progress(
-            id,
-            _,
-            Some(callbackUri),
-            _,
-            Completed,
-            _,
-            _,
-            _) =>
-        notifyFlow(progress, id, callbackUri)
-      case progress @ Progress(id, _, Some(callbackUri), _, Failed, _, _, _) =>
-        notifyFlow(progress, id, callbackUri)
+      case progress @ Progress(id, _, _, Some(callback), _, _, _, _, _) =>
+        callback.status match {
+          case Pending =>
+            notifyFlow(progress, id, callback.uri)
+          case _ => Source.single(())
+        }
       case _ => Source.single(())
     }
-
   }
-
 }

@@ -5,10 +5,13 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
   ProgressEvent,
-  ProgressUpdate
+  ProgressEventUpdate
 }
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
@@ -19,20 +22,21 @@ class ProgressUpdateFlowTest
     with MockitoSugar
     with Akka
     with RandomThings
-    with ProgressMonitorFixture
+    with ProgressTrackerFixture
+    with ProgressGenerators
     with ScalaFutures {
 
   it("adds an event to a monitor with none") {
-    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
-              val progress =
-                createProgress(monitor, callbackUri, uploadUri)
+              val progress = createProgress
+              monitor.initialise(progress)
 
               val update =
-                ProgressUpdate(progress.id, List(ProgressEvent("Wow.")))
+                ProgressEventUpdate(progress.id, List(ProgressEvent("Wow.")))
 
               val updates = Source
                 .single(update)
@@ -41,11 +45,8 @@ class ProgressUpdateFlowTest
                 .runWith(Sink.ignore)(materializer)
 
               whenReady(updates) { _ =>
-                assertProgressCreated(
-                  progress.id,
-                  uploadUri,
-                  Some(callbackUri),
-                  table)
+                assertProgressCreated(progress.id, progress.uploadUri, table)
+
                 assertProgressRecordedRecentEvents(
                   update.id,
                   update.events.map(_.description),
@@ -58,19 +59,20 @@ class ProgressUpdateFlowTest
   }
 
   it("adds multiple events to a monitor") {
-    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
 
-              val progress = createProgress(monitor, callbackUri, uploadUri)
+              val progress = createProgress
+              monitor.initialise(progress)
 
               val progressUpdates = List(
-                ProgressUpdate(
+                ProgressEventUpdate(
                   progress.id,
                   List(ProgressEvent("It happened again."))),
-                ProgressUpdate(
+                ProgressEventUpdate(
                   progress.id,
                   List(ProgressEvent("Dammit Bobby.")))
               )
@@ -82,11 +84,8 @@ class ProgressUpdateFlowTest
                 .runWith(Sink.ignore)(materializer)
 
               whenReady(futureUpdates) { _ =>
-                assertProgressCreated(
-                  progress.id,
-                  uploadUri,
-                  Some(callbackUri),
-                  table)
+                assertProgressCreated(progress.id, progress.uploadUri, table)
+
                 assertProgressRecordedRecentEvents(
                   progress.id,
                   progressUpdates.flatMap(_.events.map(_.description)),
@@ -99,7 +98,7 @@ class ProgressUpdateFlowTest
   }
 
   it("continues on failure") {
-    withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
+    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
@@ -107,7 +106,9 @@ class ProgressUpdateFlowTest
               val id = randomUUID
 
               val update =
-                ProgressUpdate(id, List(ProgressEvent("Such progress, wow.")))
+                ProgressEventUpdate(
+                  id,
+                  List(ProgressEvent("Such progress, much wow.")))
 
               val updates = Source
                 .single(update)

@@ -4,7 +4,7 @@ import org.rogach.scallop.ScallopConf
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerConfig
 import uk.ac.wellcome.platform.archive.progress_http.models.ProgressHttpConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
@@ -32,19 +32,19 @@ class ArgsConfigurator(val arguments: Seq[String])
   private val appBaseUrl =
     opt[String]("app-base-url", required = true)
 
-  private val archiveProgressMonitorTableName =
-    opt[String]("archive-progress-monitor-table-name", required = true)
+  private val archiveProgressTrackerTableName =
+    opt[String]("archive-progress-tracker-table-name", required = true)
 
-  private val archiveProgressMonitorDynamoAccessKey =
-    opt[String]("archive-progress-monitor-dynamo-access-key")
-  private val archiveProgressMonitorDynamoSecretKey =
-    opt[String]("archive-progress-monitor-dynamo-secret-key")
-  private val archiveProgressMonitorDynamoRegion =
+  private val archiveProgressTrackerDynamoAccessKey =
+    opt[String]("archive-progress-tracker-dynamo-access-key")
+  private val archiveProgressTrackerDynamoSecretKey =
+    opt[String]("archive-progress-tracker-dynamo-secret-key")
+  private val archiveProgressTrackerDynamoRegion =
     opt[String](
-      "archive-progress-monitor-dynamo-region",
+      "archive-progress-tracker-dynamo-region",
       default = Some("eu-west-1"))
-  private val archiveProgressMonitorDynamoEndpoint =
-    opt[String]("archive-progress-monitor-dynamo-endpoint")
+  private val archiveProgressTrackerDynamoEndpoint =
+    opt[String]("archive-progress-tracker-dynamo-endpoint")
 
   verify()
 
@@ -64,22 +64,22 @@ class ArgsConfigurator(val arguments: Seq[String])
     externalBaseUrl = appBaseUrl(),
   )
 
-  val archiveProgressMonitorConfig = ProgressMonitorConfig(
+  val archiveProgressTrackerConfig = ProgressTrackerConfig(
     DynamoConfig(
-      table = archiveProgressMonitorTableName(),
+      table = archiveProgressTrackerTableName(),
       maybeIndex = None
     ),
     DynamoClientConfig(
-      accessKey = archiveProgressMonitorDynamoAccessKey.toOption,
-      secretKey = archiveProgressMonitorDynamoSecretKey.toOption,
-      region = archiveProgressMonitorDynamoRegion(),
-      endpoint = archiveProgressMonitorDynamoEndpoint.toOption
+      accessKey = archiveProgressTrackerDynamoAccessKey.toOption,
+      secretKey = archiveProgressTrackerDynamoSecretKey.toOption,
+      region = archiveProgressTrackerDynamoRegion(),
+      endpoint = archiveProgressTrackerDynamoEndpoint.toOption
     )
   )
 
   val appConfig = ProgressHttpConfig(
     cloudwatchClientConfig,
-    archiveProgressMonitorConfig,
+    archiveProgressTrackerConfig,
     metricsConfig,
     httpServerConfig
   )

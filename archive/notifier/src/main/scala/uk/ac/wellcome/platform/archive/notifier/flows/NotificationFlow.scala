@@ -9,7 +9,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
-import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.ProgressUpdate
 
 /** This flow receives a [[NotificationFlow]] instance, as received from
   * an SQS queue, and makes the callback request (if necessary).

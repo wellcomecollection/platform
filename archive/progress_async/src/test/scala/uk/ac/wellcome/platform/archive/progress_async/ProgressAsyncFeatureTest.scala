@@ -5,10 +5,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress => ProgressModel
-}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress.Completed
 import uk.ac.wellcome.platform.archive.progress_async.fixtures.{
   ProgressAsyncFixture => ProgressFixture
 }
@@ -18,46 +16,46 @@ class ProgressAsyncFeatureTest
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
-    with ProgressMonitorFixture
+    with ProgressTrackerFixture
     with ProgressFixture
     with IntegrationPatience {
 
   import CallbackNotification._
 
-  it("updates an existing progress monitor to Completed") {
+  it("updates an existing progress status to Completed") {
     withConfiguredApp {
       case (qPair, topic, table, app) => {
 
         app.run()
 
-        withProgressMonitor(table) { monitor =>
+        withProgressTracker(table) { monitor =>
           withProgress(monitor) { progress =>
-            withProgressUpdate(progress.id, ProgressModel.Completed) { update =>
-              sendNotificationToSQS(qPair.queue, update)
+            val progressStatusUpdate =
+              createProgressStatusUpdateWith(
+                id = progress.id,
+                status = Completed)
 
-              val updatedProgress = progress.update(update)
-              val expectedNotification =
-                CallbackNotification(
-                  updatedProgress.id,
-                  updatedProgress.callbackUri.get,
-                  updatedProgress)
+            sendNotificationToSQS(qPair.queue, progressStatusUpdate)
 
-              eventually {
-                assertSnsReceivesOnly(expectedNotification, topic)
+            eventually {
+              val actualMessage =
+                notificationMessage[CallbackNotification](topic)
+              actualMessage.id shouldBe progress.id
+              actualMessage.callbackUri shouldBe progress.callback.get.uri
 
-                assertProgressCreated(
-                  progress.id,
-                  uploadUri,
-                  Some(callbackUri),
-                  table)
+              val expectedProgress = progress.copy(
+                status = Completed,
+                events = progressStatusUpdate.events
+              )
+              actualMessage.payload shouldBe expectedProgress
 
-                assertProgressRecordedRecentEvents(
-                  update.id,
-                  update.events.map(_.description),
-                  table
-                )
+              assertProgressCreated(progress.id, progress.uploadUri, table)
 
-              }
+              assertProgressRecordedRecentEvents(
+                progressStatusUpdate.id,
+                progressStatusUpdate.events.map(_.description),
+                table
+              )
             }
           }
         }

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.common.flows
 import akka.NotUsed
 import akka.stream.FlowShape
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge, Zip}
-import uk.ac.wellcome.platform.archive.common.progress.models.FailedEvent
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.FailedEvent
 
 import scala.util.Try
 

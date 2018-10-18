@@ -13,8 +13,9 @@ import uk.ac.wellcome.platform.archive.common.models.{
   IngestBagRequest,
   NotificationMessage
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.{
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
   ProgressEvent,
+  ProgressEventUpdate,
   ProgressUpdate
 }
 
@@ -34,7 +35,7 @@ object NotificationMessageFlow extends Logging {
       .flatMapMerge(
         breadth = parallelism,
         bagRequest => {
-          val progressUpdate = ProgressUpdate(
+          val progressUpdate = ProgressEventUpdate(
             id = bagRequest.archiveRequestId,
             events = List(
               ProgressEvent(
@@ -45,7 +46,7 @@ object NotificationMessageFlow extends Logging {
           Source
             .single(progressUpdate)
             .via(
-              SnsPublishFlow(
+              SnsPublishFlow[ProgressUpdate](
                 snsClient,
                 progressSnsConfig,
                 Some("archivist_progress")))

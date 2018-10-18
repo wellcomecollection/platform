@@ -11,9 +11,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
-import uk.ac.wellcome.platform.archive.common.progress.models.{
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Callback,
+  Namespace,
   Progress,
   ProgressCreateRequest
 }
@@ -24,7 +25,7 @@ class ProgressHttpFeatureTest
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
-    with ProgressMonitorFixture
+    with ProgressTrackerFixture
     with ProgressHttpFixture
     with RandomThings
     with IntegrationPatience {
@@ -32,20 +33,21 @@ class ProgressHttpFeatureTest
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
+  import uk.ac.wellcome.storage.dynamo._
   import Progress._
 
   describe("GET /progress/:id") {
-    it("returns a progress monitor when available") {
+    it("returns a progress tracker when available") {
       withConfiguredApp {
         case (table, baseUrl, app) =>
           app.run()
-
           withActorSystem { actorSystem =>
             implicit val system = actorSystem
             implicit val actorMaterializer = ActorMaterializer()
 
-            withProgressMonitor(table) { progressMonitor =>
-              val progress = createProgress(progressMonitor)
+            withProgressTracker(table) { progressTracker =>
+              val progress = createProgress()
+              progressTracker.initialise(progress)
               val request =
                 HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
 
@@ -60,7 +62,7 @@ class ProgressHttpFeatureTest
       }
     }
 
-    it("returns a 404 NotFound if no progress monitor matches id") {
+    it("returns a 404 NotFound if no progress tracker matches id") {
       withConfiguredApp {
         case (_, baseUrl, app) =>
           app.run()
@@ -83,7 +85,7 @@ class ProgressHttpFeatureTest
   }
 
   describe("POST /progress") {
-    it("creates a progress monitor") {
+    it("creates a progress tracker") {
       withConfiguredApp {
         case (table, baseUrl, app) =>
           app.run()
@@ -97,8 +99,8 @@ class ProgressHttpFeatureTest
               val space = Namespace("space-id")
 
               val createProgressRequest = ProgressCreateRequest(
-                uploadUri,
-                Some(callbackUri),
+                testUploadUri,
+                Some(testCallbackUri),
                 space
               )
 
@@ -137,17 +139,17 @@ class ProgressHttpFeatureTest
                 val progressFuture = Unmarshal(result.entity).to[Progress]
 
                 // Check the progress is stored
-                whenReady(progressFuture) { progress =>
+                whenReady(progressFuture) { actualProgress =>
                   val expectedProgress = Progress(
                     id,
-                    uploadUri,
-                    Some(callbackUri),
-                    space
+                    testUploadUri,
+                    space,
+                    Some(Callback(testCallbackUri))
                   ).copy(
-                    createdDate = progress.createdDate,
-                    lastModifiedDate = progress.lastModifiedDate)
+                    createdDate = actualProgress.createdDate,
+                    lastModifiedDate = actualProgress.lastModifiedDate)
 
-                  progress shouldBe expectedProgress
+                  actualProgress shouldBe expectedProgress
                   assertTableOnlyHasItem(expectedProgress, table)
                 }
               }

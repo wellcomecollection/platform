@@ -5,7 +5,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressMonitorConfig
+import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerConfig
 import uk.ac.wellcome.platform.archive.progress_async.models.ProgressAsyncConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
@@ -35,19 +35,19 @@ class ArgsConfigurator(val arguments: Seq[String])
   private val snsTopicArn: ScallopOption[String] =
     opt[String]("sns-topic-arn", required = true)
 
-  private val archiveProgressMonitorTableName =
-    opt[String]("archive-progress-monitor-table-name", required = true)
+  private val archiveProgressTrackerTableName =
+    opt[String]("archive-progress-tracker-table-name", required = true)
 
-  private val archiveProgressMonitorDynamoAccessKey =
-    opt[String]("archive-progress-monitor-dynamo-access-key")
-  private val archiveProgressMonitorDynamoSecretKey =
-    opt[String]("archive-progress-monitor-dynamo-secret-key")
-  private val archiveProgressMonitorDynamoRegion =
+  private val archiveProgressTrackerDynamoAccessKey =
+    opt[String]("archive-progress-tracker-dynamo-access-key")
+  private val archiveProgressTrackerDynamoSecretKey =
+    opt[String]("archive-progress-tracker-dynamo-secret-key")
+  private val archiveProgressTrackerDynamoRegion =
     opt[String](
-      "archive-progress-monitor-dynamo-region",
+      "archive-progress-tracker-dynamo-region",
       default = Some("eu-west-1"))
-  private val archiveProgressMonitorDynamoEndpoint =
-    opt[String]("archive-progress-monitor-dynamo-endpoint")
+  private val archiveProgressTrackerDynamoEndpoint =
+    opt[String]("archive-progress-tracker-dynamo-endpoint")
 
   private val awsSqsAccessKey = opt[String]("aws-sqs-access-key")
   private val awsSqsSecretKey = opt[String]("aws-sqs-secret-key")
@@ -101,16 +101,16 @@ class ArgsConfigurator(val arguments: Seq[String])
     parallelism = sqsParallelism()
   )
 
-  val archiveProgressMonitorConfig = ProgressMonitorConfig(
+  val archiveProgressTrackerConfig = ProgressTrackerConfig(
     DynamoConfig(
-      table = archiveProgressMonitorTableName(),
+      table = archiveProgressTrackerTableName(),
       maybeIndex = None
     ),
     DynamoClientConfig(
-      accessKey = archiveProgressMonitorDynamoAccessKey.toOption,
-      secretKey = archiveProgressMonitorDynamoSecretKey.toOption,
-      region = archiveProgressMonitorDynamoRegion(),
-      endpoint = archiveProgressMonitorDynamoEndpoint.toOption
+      accessKey = archiveProgressTrackerDynamoAccessKey.toOption,
+      secretKey = archiveProgressTrackerDynamoSecretKey.toOption,
+      region = archiveProgressTrackerDynamoRegion(),
+      endpoint = archiveProgressTrackerDynamoEndpoint.toOption
     )
   )
 
@@ -120,7 +120,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     sqsConfig,
     snsClientConfig,
     snsConfig,
-    archiveProgressMonitorConfig,
+    archiveProgressTrackerConfig,
     metricsConfig
   )
 }

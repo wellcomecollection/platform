@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archive.notifier
 
 import java.net.URI
-import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -20,10 +19,13 @@ import uk.ac.wellcome.platform.archive.common.models.{
   CallbackNotification,
   DisplayIngest
 }
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  TimeTestFixture
+}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Callback,
+  _
 }
 import uk.ac.wellcome.platform.archive.notifier.fixtures.{
   LocalWireMockFixture,
@@ -40,15 +42,13 @@ class NotifierFeatureTest
     with NotifierFixture
     with Inside
     with RandomThings
+    with ProgressGenerators
     with TimeTestFixture {
 
   import Progress._
 
   implicit val system: ActorSystem = ActorSystem("test")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
-
-  def createProgressWith(id: UUID, callbackUri: Option[URI]): Progress =
-    Progress(id, uploadUri, callbackUri, space, Completed)
 
   describe("Making callbacks") {
     it("makes a POST request when it receives a Progress with a callback") {
@@ -61,8 +61,8 @@ class NotifierFeatureTest
               new URI(s"http://$callbackHost:$callbackPort/callback/$requestId")
 
             val progress = createProgressWith(
-              requestId,
-              Some(callbackUri)
+              id = requestId,
+              callback = Some(createCallbackWith(uri = callbackUri))
             )
 
             sendNotificationToSQS(
@@ -102,8 +102,8 @@ class NotifierFeatureTest
             )
 
             val progress = createProgressWith(
-              requestId,
-              Some(callbackUri)
+              id = requestId,
+              callback = Some(createCallbackWith(uri = callbackUri))
             )
 
             sendNotificationToSQS[CallbackNotification](
@@ -121,10 +121,13 @@ class NotifierFeatureTest
                     equalToJson(toJson(DisplayIngest(progress)).get)))
 
               inside(notificationMessage[ProgressUpdate](topic)) {
-                case ProgressUpdate(id, List(progressEvent), status) =>
+                case ProgressCallbackStatusUpdate(
+                    id,
+                    callbackStatus,
+                    List(progressEvent)) =>
                   id shouldBe progress.id
                   progressEvent.description shouldBe "Callback fulfilled."
-                  status shouldBe Progress.CompletedCallbackSucceeded
+                  callbackStatus shouldBe Callback.Succeeded
                   assertRecent(progressEvent.createdDate)
               }
             }
@@ -144,7 +147,7 @@ class NotifierFeatureTest
 
           val progress = createProgressWith(
             id = requestId,
-            callbackUri = Some(callbackUri)
+            callback = Some(createCallbackWith(uri = callbackUri))
           )
 
           sendNotificationToSQS[CallbackNotification](
@@ -156,10 +159,13 @@ class NotifierFeatureTest
 
           eventually {
             inside(notificationMessage[ProgressUpdate](topic)) {
-              case ProgressUpdate(id, List(progressEvent), status) =>
+              case ProgressCallbackStatusUpdate(
+                  id,
+                  callbackStatus,
+                  List(progressEvent)) =>
                 id shouldBe progress.id
                 progressEvent.description shouldBe s"Callback failed for: ${progress.id}, got 404 Not Found!"
-                status shouldBe Progress.CompletedCallbackFailed
+                callbackStatus shouldBe Callback.Failed
                 assertRecent(progressEvent.createdDate)
             }
           }

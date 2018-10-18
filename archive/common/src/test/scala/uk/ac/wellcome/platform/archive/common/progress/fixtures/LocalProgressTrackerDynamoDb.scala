@@ -8,10 +8,10 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 
 import scala.util.Random
 
-trait LocalProgressMonitorDynamoDb extends LocalDynamoDb {
+trait LocalProgressTrackerDynamoDb extends LocalDynamoDb {
   def createTable(table: LocalDynamoDb.Table): Table = Table("table", "index")
 
-  def createProgressMonitorTable(
+  def createProgressTrackerTable(
     dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
     val tableName = Random.alphanumeric.take(10).mkString
     val tableIndex = Random.alphanumeric.take(10).mkString

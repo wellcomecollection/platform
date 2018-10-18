@@ -8,12 +8,15 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressMonitorFixture
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateAndPublishFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
   Progress,
   ProgressEvent,
-  ProgressUpdate
+  ProgressStatusUpdate
 }
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
@@ -24,29 +27,31 @@ class ProgressUpdateAndPublishFlowTest
     with MockitoSugar
     with Akka
     with SNS
-    with ProgressMonitorFixture
+    with ProgressTrackerFixture
+    with ProgressGenerators
     with ScalaFutures {
 
   import Progress._
 
   it("updates progress and publishes status") {
     withLocalSnsTopic { topic =>
-      withSpecifiedLocalDynamoDbTable(createProgressMonitorTable) { table =>
-        withProgressMonitor(table)(monitor => {
+      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+        withProgressTracker(table)(tracker => {
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
 
               val flow = ProgressUpdateAndPublishFlow(
                 snsClient,
                 SNSConfig(topic.arn),
-                monitor
+                tracker
               )
 
               val events = List(ProgressEvent("Run!"))
               val status = Progress.Failed
 
-              val progress = createProgress(monitor, callbackUri, uploadUri)
-              val update = ProgressUpdate(progress.id, events, status)
+              val progress = createProgress()
+              tracker.initialise(progress)
+              val update = ProgressStatusUpdate(progress.id, status, events)
 
               val expectedProgress = progress.copy(
                 events = progress.events ++ events,
@@ -65,11 +70,7 @@ class ProgressUpdateAndPublishFlowTest
 
                   assertSnsReceivesOnly(expectedProgress, topic)
 
-                  assertProgressCreated(
-                    progress.id,
-                    uploadUri,
-                    Some(callbackUri),
-                    table)
+                  assertProgressCreated(progress.id, progress.uploadUri, table)
 
                   assertProgressRecordedRecentEvents(
                     progress.id,

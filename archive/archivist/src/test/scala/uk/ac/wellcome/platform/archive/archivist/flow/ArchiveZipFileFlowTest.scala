@@ -27,7 +27,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
 import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.collection.JavaConverters._
@@ -80,10 +80,9 @@ class ArchiveZipFileFlowTest
                       BagPath(s"${ingestContext.storageSpace}/$bagName"))
                   )))
 
-                  assertTopicReceivesProgressUpdate(
+                  assertTopicReceivesProgressEventUpdate(
                     ingestContext.archiveRequestId,
-                    reportingTopic,
-                    Progress.None) { events =>
+                    reportingTopic) { events =>
                     inside(events) {
                       case List(event) =>
                         event.description shouldBe "Bag uploaded and verified successfully"
@@ -123,7 +122,7 @@ class ArchiveZipFileFlowTest
                       all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
                   }
 
-                  assertTopicReceivesProgressUpdate(
+                  assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
                     Progress.Failed) { events =>
@@ -163,7 +162,7 @@ class ArchiveZipFileFlowTest
                   result shouldBe List(
                     Left(FileNotFoundError("bag-info.txt", ingestContext)))
 
-                  assertTopicReceivesProgressUpdate(
+                  assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
                     Progress.Failed) { events =>
@@ -217,7 +216,7 @@ class ArchiveZipFileFlowTest
                         BagPath(s"${ingestContext.storageSpace}/$bagName"))
                   }
 
-                  assertTopicReceivesProgressUpdate(
+                  assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
                     Progress.Failed) { events =>

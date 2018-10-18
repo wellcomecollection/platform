@@ -9,29 +9,25 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 import uk.ac.wellcome.storage.dynamo._
 
 import scala.util.{Failure, Success, Try}
 
-class ProgressMonitor @Inject()(
+class ProgressTracker @Inject()(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
 ) extends Logging {
-
   import Progress._
 
-  def get(id: UUID) = {
+  def get(id: UUID): Option[Progress] = {
     Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
       'id -> id
     ) match {
       case Some(Right(progress)) => Some(progress)
       case Some(Left(error)) => {
         val exception = new RuntimeException(
-          s"Failed to get progress monitor ${error.toString}")
+          s"Failed to get progress tracker ${error.toString}")
         warn(s"Failed to get Dynamo record: ${id}", exception)
         throw exception
       }
@@ -39,9 +35,9 @@ class ProgressMonitor @Inject()(
     }
   }
 
-  def create(progress: Progress) = {
+  def initialise(progress: Progress) = {
     val progressTable = Table[Progress](dynamoConfig.table)
-    debug(s"initializing archiveProgressMonitor with $progress")
+    debug(s"initializing archive progress tracker with $progress")
 
     val ops = progressTable
       .given(not(attributeExists('id)))
@@ -50,7 +46,7 @@ class ProgressMonitor @Inject()(
     Scanamo.exec(dynamoClient)(ops) match {
       case Left(e: ConditionalCheckFailedException) =>
         throw IdConstraintError(
-          s"There is already a monitor with id:${progress.id}",
+          s"There is already a progress tracker with id:${progress.id}",
           e)
       case Left(scanamoError) =>
         val exception = new RuntimeException(
@@ -66,13 +62,18 @@ class ProgressMonitor @Inject()(
   def update(update: ProgressUpdate): Try[Progress] = {
     debug(s"Updating Dynamo record ${update.id} with: $update")
 
-    val events = update.events
-
-    val mergedUpdate = update.status match {
-      case Progress.None =>
-        appendAll('events -> events)
-      case status =>
-        appendAll('events -> events) and set('status -> status)
+    val eventsUpdate = appendAll('events -> update.events.toList)
+    val mergedUpdate = update match {
+      case eventUpdate: ProgressEventUpdate =>
+        eventsUpdate
+      case statusUpdate: ProgressStatusUpdate =>
+        eventsUpdate and set('status -> statusUpdate.status)
+      case resourceUpdate: ProgressResourceUpdate =>
+        eventsUpdate and appendAll(
+          'resources -> resourceUpdate.affectedResources.toList)
+      case callbackStatusUpdate: ProgressCallbackStatusUpdate =>
+        eventsUpdate and set(
+          'callback \ 'status -> callbackStatusUpdate.callbackStatus)
     }
 
     val progressTable = Table[Progress](dynamoConfig.table)
@@ -91,14 +92,12 @@ class ProgressMonitor @Inject()(
       case Left(scanamoError) => {
         val exception = new RuntimeException(scanamoError.toString)
         warn(s"Failed to update Dynamo record: ${update.id}", exception)
-
         Failure(exception)
       }
 
       case r @ Right(progress) => {
         debug(
           s"Successfully updated Dynamo record: ${update.id}, got $progress")
-
         Success(progress)
       }
     }

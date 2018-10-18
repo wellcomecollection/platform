@@ -22,10 +22,14 @@ class TestGETIngests:
             rv["@context"]
             == "https://api.wellcomecollection.org/storage/v1/context.json"
         )
-        assert rv["id"] == lookup_id
+        assert rv["id"] == lookup_id.lower()
         assert rv["type"] == "Ingest"
         assert isinstance(rv["uploadUrl"], str)
-        assert isinstance(rv["callbackUrl"], str)
+        assert rv["callback"] == {
+            "uri": "http://www.example.com/callback",
+            "status": "pending",
+            "type": "Callback",
+        }
         assert rv["ingestType"] == {"id": "create", "type": "IngestType"}
         assert rv["status"] == {"id": "processing", "type": "IngestStatus"}
         assert rv["space"] == {"id": "space-id", "type": "Space"}
