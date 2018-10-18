@@ -424,33 +424,38 @@ Response:
       }
     ]
   },
-  "archiveLocation": {
-    "type": "DigitalLocation",
-    "locationType": {
-      "type": "LocationType",
-      "id": "aws-s3-glacier",
-      "label": "AWS S3 - Glacier"
-    },
-    "url": "s3://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
-  },
-  "replicaLocation": {
-    "type": "DigitalLocation",
-    "locationType": {
-      "type": "LocationType",
-      "id": "azure-blob-archive",
-      "label": "Azure Blob Storage - Archive"
-    },
-    "url": "https://bucketname.blob.core.windows.net/digitised/b24923333"
-  },
   "accessLocation": {
-    "type": "DigitalLocation",
-    "locationType": {
-      "type": "LocationType",
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
       "id": "aws-s3-ia",
       "label": "AWS S3 - Infrequent Access"
     },
-    "url": "s3://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
+    "bucket": "bucketname",
+    "prefix": "digitised/b24923333"
   },
+  "archiveLocations": [
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 - Glacier"
+      },
+      "bucket": "bucketname",
+      "prefix": "digitised/b24923333"
+    },
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage - Archive"
+      },
+      "bucket": "bucketname",
+      "prefix": "digitised/b24923333"
+    }
+  ],
   "description": "A account of a voyage to New South Wales",
   "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
@@ -584,33 +589,38 @@ Response:
       }
     ]
   },
-  "archiveLocation": {
-    "type": "DigitalLocation",
-    "locationType": {
-      "type": "LocationType",
-      "id": "aws-s3-glacier",
-      "label": "AWS S3 - Glacier"
-    },
-    "url": "s3://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
-  },
-  "replicaLocation": {
-    "type": "DigitalLocation",
-    "locationType": {
-      "type": "LocationType",
-      "id": "azure-blob-archive",
-      "label": "Azure Blob Storage - Archive"
-    },
-    "url": "https://bucketname.blob.core.windows.net/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
-  },
   "accessLocation": {
-    "type": "DigitalLocation",
-    "locationType": {
-      "type": "LocationType",
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
       "id": "aws-s3-ia",
       "label": "AWS S3 - Infrequent Access"
     },
-    "url": "s3://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    "bucket": "bucketname",
+    "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
   },
+  "archiveLocations": [
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 - Glacier"
+      },
+      "bucket": "bucketname",
+      "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    },
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage - Archive"
+      },
+      "bucket": "bucketname",
+      "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    }
+  ],
   "description": "GC253_1046",
   "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
