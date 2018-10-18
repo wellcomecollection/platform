@@ -23,61 +23,91 @@ from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 def _create_event_dict(event):
-    return {"timestamp": event["createdAt"].timestamp(), "message": event["message"]}
+    return {
+        "timestamp": event["createdAt"].timestamp(),
+        "message": event["message"]
+    }
 
 
-def _create_cluster_dict(cluster, service_list):
+def _describe_task_definition(client, arn):
+    return client.describe_task_definition(
+        taskDefinition=arn,
+    )['taskDefinition']
+
+
+def _enrich_deployment(deployment, task_definition):
+    task_definition_arn = deployment['taskDefinition']
+
+    task_definition['taskDefinitionArn'] = task_definition_arn
+    deployment['taskDefinition'] = task_definition
+
+    return deployment
+
+
+def _enrich_service(client, cluster_arn, service_arn):
+    service = describe_service(
+        client, cluster_arn, service_arn
+    )
+
+    task_definitions = (
+        [_describe_task_definition(
+            client,
+            deployment['taskDefinition']
+        ) for deployment in service['deployments']]
+    )
+
+    zipped = zip(service['deployments'], task_definitions)
+
+    enriched_deployments = (
+        [_enrich_deployment(
+            deployment,
+            task_definition
+        ) for deployment, task_definition in zipped]
+    )
+
+    enriched_events = (
+        [_create_event_dict(e) for e in service["events"][:5]]
+    )
+
+    service['events'] = enriched_events
+    service['deployments'] = enriched_deployments
+
+    return service
+
+
+def get_service_list(ecs_client, cluster_arn):
+    return (
+        [_enrich_service(
+            ecs_client,
+            cluster_arn,
+            service_arn
+        ) for service_arn in get_service_arns(
+            ecs_client,
+            cluster_arn
+        )]
+    )
+
+def _enrich_cluster_list(ecs_client, cluster_arn):
+    cluster = describe_cluster(ecs_client, cluster_arn),
+    service_list = get_service_list(ecs_client, cluster_arn)
+
     return {
         "clusterName": cluster["clusterName"],
         "status": cluster["status"],
-        "instanceCount": cluster["registeredContainerInstancesCount"],
+        "instanceCount": cluster[
+            "registeredContainerInstancesCount"
+        ],
         "serviceList": service_list,
     }
 
 
-def _create_service_dict(service):
-    deployments = [_create_deployment_dict(d) for d in service["deployments"]]
-    # Grab just the last few events to keep the file size down
-    events = [_create_event_dict(e) for e in service["events"][:5]]
-
-    return {
-        "serviceName": service["serviceName"],
-        "desiredCount": service["desiredCount"],
-        "pendingCount": service["pendingCount"],
-        "runningCount": service["runningCount"],
-        "deployments": deployments,
-        "events": events,
-        "status": service["status"],
-    }
-
-
-def _create_deployment_dict(deployment):
-    return {
-        "id": deployment["id"],
-        "taskDefinition": deployment["taskDefinition"],
-        "status": deployment["status"],
-    }
-
-
-def get_service_list(ecs_client, cluster_arn):
-    service_list = []
-
-    for service_arn in get_service_arns(ecs_client, cluster_arn):
-        service = describe_service(ecs_client, cluster_arn, service_arn)
-        service_list.append(_create_service_dict(service))
-
-    return service_list
-
-
 def get_cluster_list(ecs_client):
-    cluster_list = []
-
-    for cluster_arn in get_cluster_arns(ecs_client):
-        cluster = describe_cluster(ecs_client, cluster_arn)
-        service_list = get_service_list(ecs_client, cluster_arn)
-        cluster_list.append(_create_cluster_dict(cluster, service_list))
-
-    return cluster_list
+    return (
+        [_enrich_cluster_list(
+            ecs_client,
+            cluster_arn
+        ) for cluster_arn in get_cluster_arns(ecs_client)]
+    )
 
 
 def send_ecs_status_to_s3(service_snapshot, s3_client, bucket_name, object_key):
