@@ -16,8 +16,8 @@ case class DisplayIngest(id: String,
                          @JsonKey("type")
                          ontologyType: String = "Ingest")
 
-case class DisplayCallback(callbackUri: String,
-                           callbackStatus: String,
+case class DisplayCallback(uri: String,
+                           status: String,
                            @JsonKey("type")
                            ontologyType: String = "Callback")
 

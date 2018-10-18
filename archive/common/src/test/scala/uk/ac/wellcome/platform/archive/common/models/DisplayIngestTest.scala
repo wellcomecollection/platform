@@ -6,12 +6,13 @@ import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.json.JsonUtil._
 
 class DisplayIngestTest extends FunSpec with Matchers {
 
   private val id = UUID.randomUUID()
-  private val uploadUrl = "s3.example/key.zip"
-  private val callbackUrl = "www.example.com/callback"
+  private val uploadUrl = "s3://example/key.zip"
+  private val callbackUrl = "http://www.example.com/callback"
   private val spaceId = "space-id"
   private val resourceId = "bag-id"
   private val createdDate = "2018-10-10T09:38:55.321Z"
@@ -33,11 +34,12 @@ class DisplayIngestTest extends FunSpec with Matchers {
     )
 
     val ingest = DisplayIngest(progress)
+    println(toJson(ingest))
 
     ingest.id shouldBe id.toString
     ingest.uploadUrl shouldBe uploadUrl
     ingest.callback shouldBe Some(
-      DisplayCallback(callbackUrl, ingest.callback.get.callbackStatus.toString))
+      DisplayCallback(callbackUrl, ingest.callback.get.status.toString))
     ingest.space shouldBe DisplayStorageSpace(spaceId)
     ingest.status shouldBe DisplayIngestStatus("processing")
     ingest.resources shouldBe List(DisplayIngestResource(resourceId))
