@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "read_queue_attributes" {
       "sqs:GetQueueAttributes",
       "sqs:GetQueueUrl",
       "sqs:ListDeadLetterSourceQueues",
-      "sqs:ListQueues"
+      "sqs:ListQueues",
     ]
 
     resources = [

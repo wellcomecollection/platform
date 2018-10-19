@@ -30,16 +30,11 @@ class DateTimeAwareEncoder(json.JSONEncoder):
 
 
 def _create_event_dict(event):
-    return {
-        "timestamp": event["createdAt"].timestamp(),
-        "message": event["message"]
-    }
+    return {"timestamp": event["createdAt"].timestamp(), "message": event["message"]}
 
 
 def _describe_task_definition(client, arn):
-    return client.describe_task_definition(
-        taskDefinition=arn
-    )["taskDefinition"]
+    return client.describe_task_definition(taskDefinition=arn)["taskDefinition"]
 
 
 def _enrich_deployment(deployment, task_definition):
@@ -60,20 +55,17 @@ def _create_container_definition_dict(container_definition):
         "image_tag": image_tag,
         "cpu": container_definition["cpu"],
         "memory": container_definition["memory"],
-        "essential": container_definition["essential"]
+        "essential": container_definition["essential"],
     }
 
 
 def _create_task_definition_dict(task_definition):
-    raw_container_definitions = (
-        task_definition["containerDefinitions"]
-    )
+    raw_container_definitions = task_definition["containerDefinitions"]
 
-    container_definitions = (
-        [_create_container_definition_dict(
-            raw_container_definition
-        ) for raw_container_definition in raw_container_definitions]
-    )
+    container_definitions = [
+        _create_container_definition_dict(raw_container_definition)
+        for raw_container_definition in raw_container_definitions
+    ]
 
     task_definition["containerDefinitions"] = container_definitions
 
@@ -81,39 +73,28 @@ def _create_task_definition_dict(task_definition):
 
 
 def _enrich_service(client, cluster_arn, service_arn):
-    service = describe_service(
-        client,
-        cluster_arn,
-        service_arn
-    )
+    service = describe_service(client, cluster_arn, service_arn)
 
     raw_task_definitions = [
-        _describe_task_definition(
-            client,
-            deployment["taskDefinition"]
-        ) for deployment in service["deployments"]
+        _describe_task_definition(client, deployment["taskDefinition"])
+        for deployment in service["deployments"]
     ]
 
-    task_definitions = (
-        [_create_task_definition_dict(
-            raw_task_definition
-        ) for raw_task_definition in raw_task_definitions]
-    )
+    task_definitions = [
+        _create_task_definition_dict(raw_task_definition)
+        for raw_task_definition in raw_task_definitions
+    ]
 
     zipped = zip(service["deployments"], task_definitions)
 
     enriched_deployments = [
-        _enrich_deployment(
-            deployment,
-            task_definition
-        ) for deployment, task_definition in zipped
+        _enrich_deployment(deployment, task_definition)
+        for deployment, task_definition in zipped
     ]
 
     # Only get the last 5 events as out of date events
     # are not useful
-    enriched_events = (
-        [_create_event_dict(e) for e in service["events"][:5]]
-    )
+    enriched_events = [_create_event_dict(e) for e in service["events"][:5]]
 
     service["events"] = enriched_events
     service["deployments"] = enriched_deployments
@@ -123,27 +104,15 @@ def _enrich_service(client, cluster_arn, service_arn):
 
 def get_service_list(ecs_client, cluster_arn):
     return [
-        _enrich_service(
-            ecs_client,
-            cluster_arn,
-            service_arn
-        ) for service_arn in get_service_arns(
-            ecs_client,
-            cluster_arn
-        )
+        _enrich_service(ecs_client, cluster_arn, service_arn)
+        for service_arn in get_service_arns(ecs_client, cluster_arn)
     ]
 
 
 def _enrich_cluster_list(ecs_client, cluster_arn):
-    cluster = describe_cluster(
-        ecs_client,
-        cluster_arn
-    )
+    cluster = describe_cluster(ecs_client, cluster_arn)
 
-    service_list = get_service_list(
-        ecs_client,
-        cluster_arn
-    )
+    service_list = get_service_list(ecs_client, cluster_arn)
 
     return {
         "clusterName": cluster["clusterName"],
@@ -165,10 +134,7 @@ def send_ecs_status_to_s3(service_snapshot, s3_client, bucket_name, object_key):
         ACL="public-read",
         Bucket=bucket_name,
         Key=object_key,
-        Body=json.dumps(
-            service_snapshot,
-            cls=DateTimeAwareEncoder
-        ),
+        Body=json.dumps(service_snapshot, cls=DateTimeAwareEncoder),
         CacheControl="max-age=0",
         ContentType="application/json",
     )
@@ -192,33 +158,22 @@ def create_boto_client(service, role_arn):
 
 
 def main(event, _):
-    assumable_roles = (
-        [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
-    )
+    assumable_roles = [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
 
     bucket_name = os.environ["BUCKET_NAME"]
     object_key = os.environ["OBJECT_KEY"]
 
     ecs_clients = (
-        [create_boto_client(
-            "ecs",
-            role_arn
-        ) for role_arn in assumable_roles]
+        [create_boto_client("ecs", role_arn) for role_arn in assumable_roles]
     ) + [boto3.client("ecs")]
 
     try:
-        cluster_lists = (
-            [get_cluster_list(
-                ecs_client
-            ) for ecs_client in ecs_clients]
-        )
+        cluster_lists = [get_cluster_list(ecs_client) for ecs_client in ecs_clients]
     except EcsThrottleException:
         # Fail gracefully
         return
 
-    cluster_list = (
-        [item for sublist in cluster_lists for item in sublist]
-    )
+    cluster_list = [item for sublist in cluster_lists for item in sublist]
 
     service_snapshot = {
         "clusterList": cluster_list,
@@ -227,6 +182,4 @@ def main(event, _):
 
     s3_client = boto3.client("s3")
 
-    send_ecs_status_to_s3(
-        service_snapshot, s3_client, bucket_name, object_key
-    )
+    send_ecs_status_to_s3(service_snapshot, s3_client, bucket_name, object_key)
