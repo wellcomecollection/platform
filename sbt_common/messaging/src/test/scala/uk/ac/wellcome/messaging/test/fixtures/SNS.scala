@@ -6,7 +6,7 @@ import io.circe.generic.extras.JsonKey
 import io.circe.{yaml, Decoder, Json, ParsingFailure}
 import org.scalatest.Matchers
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSMessageWriter, SNSWriter}
 import uk.ac.wellcome.test.fixtures._
 
 import scala.language.higherKinds
@@ -84,10 +84,17 @@ trait SNS extends Matchers with Logging {
     }
   )
 
-  def withSNSWriter[R](topic: Topic)(testWith: TestWith[SNSWriter, R]): R = {
-    val sNSWriter = new SNSWriter(snsClient, SNSConfig(topic.arn))
-    testWith(sNSWriter)
-  }
+  def withSNSMessageWriter[R](testWith: TestWith[SNSMessageWriter, R]): R =
+    testWith(new SNSMessageWriter(snsClient = snsClient))
+
+  def withSNSWriter[R](topic: Topic)(testWith: TestWith[SNSWriter, R]): R =
+    withSNSMessageWriter { snsMessageWriter =>
+      val snsWriter = new SNSWriter(
+        snsMessageWriter = snsMessageWriter,
+        snsConfig = SNSConfig(topic.arn)
+      )
+      testWith(snsWriter)
+    }
 
   // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
   // to annotate the fields, and I don't care enough to work out why right now.

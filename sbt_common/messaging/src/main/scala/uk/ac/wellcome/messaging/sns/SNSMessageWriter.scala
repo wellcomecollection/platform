@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future, blocking}
   *
   */
 class SNSMessageWriter @Inject() (snsClient: AmazonSNS)(implicit ec: ExecutionContext) extends Logging {
-  def writeMessage(message: String, topicArn: String, subject: String): Future[PublishAttempt] =
+  def writeMessage(message: String, subject: String, topicArn: String): Future[PublishAttempt] =
     Future {
       blocking {
         debug(s"Publishing message $message to $topicArn")
@@ -32,7 +32,7 @@ class SNSMessageWriter @Inject() (snsClient: AmazonSNS)(implicit ec: ExecutionCo
           throw e
       }
 
-  def writeMessage[T](message: T, topicArn: String, subject: String)(
+  def writeMessage[T](message: T, subject: String, topicArn: String)(
     implicit encoder: Encoder[T]): Future[PublishAttempt] =
     writeMessage(
       message = toJson[T](message).get,
