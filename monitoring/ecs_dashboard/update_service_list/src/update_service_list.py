@@ -18,6 +18,7 @@ from wellcome_aws_utils.ecs_utils import (
     EcsThrottleException,
 )
 
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 class DateTimeAwareEncoder(json.JSONEncoder):
     def default(self, o):
@@ -98,7 +99,10 @@ def send_ecs_status_to_s3(service_snapshot, s3_client, bucket_name, object_key):
         ACL="public-read",
         Bucket=bucket_name,
         Key=object_key,
-        Body=json.dumps(service_snapshot),
+        Body=json.dumps(
+            service_snapshot,
+            cls=DateTimeAwareEncoder
+        ),
         CacheControl="max-age=0",
         ContentType="application/json",
     )
@@ -121,6 +125,7 @@ def create_boto_client(service, role_arn):
     )
 
 
+@log_on_error
 def main(event, _):
     assumable_roles = [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
     bucket_name = os.environ["BUCKET_NAME"]
