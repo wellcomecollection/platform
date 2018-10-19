@@ -17,7 +17,6 @@ from wellcome_aws_utils.ecs_utils import (
     describe_cluster,
     EcsThrottleException,
 )
-from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 class DateTimeAwareEncoder(json.JSONEncoder):
@@ -122,7 +121,6 @@ def create_boto_client(service, role_arn):
     )
 
 
-@log_on_error
 def main(event, _):
     assumable_roles = [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
     bucket_name = os.environ["BUCKET_NAME"]
