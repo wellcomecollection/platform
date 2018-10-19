@@ -51,7 +51,7 @@ def _enrich_deployment(deployment, task_definition):
 
 
 def _create_task_definition_dict(task_definition):
-    image_tag = task_definition["message"].split(":")[1]
+    image_tag = task_definition["image"].split(":")[1]
 
     return {
         "name": task_definition["name"],
