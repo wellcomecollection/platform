@@ -11,6 +11,10 @@ import scala.concurrent.{blocking, ExecutionContext, Future}
 
 case class PublishAttempt(id: Either[Throwable, String])
 
+/** Writes messages to SNS.  This class is configured with a single topic in
+  * `snsConfig`, and writes to the same topic on every request.
+  *
+  */
 class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)(
   implicit ec: ExecutionContext)
     extends Logging {
