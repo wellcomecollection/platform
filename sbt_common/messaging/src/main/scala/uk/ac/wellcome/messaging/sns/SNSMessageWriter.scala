@@ -7,25 +7,28 @@ import grizzled.slf4j.Logging
 import io.circe.Encoder
 import uk.ac.wellcome.json.JsonUtil._
 
-import scala.concurrent.{ExecutionContext, Future, blocking}
+import scala.concurrent.{blocking, ExecutionContext, Future}
 
 /** Writes messages to SNS.  This class can write to a different topic on
   * every request.
   *
   */
-class SNSMessageWriter @Inject() (snsClient: AmazonSNS)(implicit ec: ExecutionContext) extends Logging {
-  def writeMessage(message: String, subject: String, topicArn: String): Future[PublishAttempt] =
+class SNSMessageWriter @Inject()(snsClient: AmazonSNS)(
+  implicit ec: ExecutionContext)
+    extends Logging {
+  def writeMessage(message: String,
+                   subject: String,
+                   topicArn: String): Future[PublishAttempt] =
     Future {
       blocking {
         debug(s"Publishing message $message to $topicArn")
-        snsClient.publish(
-          new PublishRequest(topicArn, message, subject))
+        snsClient.publish(new PublishRequest(topicArn, message, subject))
       }
     }.map { publishResult =>
-      debug(
-        s"Published message $message to $topicArn (${publishResult.getMessageId})")
-      PublishAttempt(Right(message))
-    }
+        debug(
+          s"Published message $message to $topicArn (${publishResult.getMessageId})")
+        PublishAttempt(Right(message))
+      }
       .recover {
         case e: Throwable =>
           error("Failed to publish message", e)

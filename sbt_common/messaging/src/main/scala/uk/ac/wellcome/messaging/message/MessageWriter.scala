@@ -8,7 +8,12 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Encoder
-import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSMessageWriter, SNSWriter}
+import uk.ac.wellcome.messaging.sns.{
+  PublishAttempt,
+  SNSConfig,
+  SNSMessageWriter,
+  SNSWriter
+}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectStore}
 import uk.ac.wellcome.json.JsonUtil._
