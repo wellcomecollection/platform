@@ -424,9 +424,38 @@ Response:
       }
     ]
   },
-  "archiveUrl" : "s3://archivebucket/digitised/b24923333/" ,
-  "replicaUrl" : "https://archivebucket-replica.blob.core.windows.net/digitised/b24923333/" ,
-  "accessUrl" : "s3://accessbucket/digitised/b24923333/" ,
+  "accessLocation": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-ia",
+      "label": "AWS S3 - Infrequent Access"
+    },
+    "bucket": "bucketname",
+    "prefix": "digitised/b24923333"
+  },
+  "archiveLocations": [
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 - Glacier"
+      },
+      "bucket": "bucketname",
+      "prefix": "digitised/b24923333"
+    },
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage - Archive"
+      },
+      "bucket": "bucketname",
+      "prefix": "digitised/b24923333"
+    }
+  ],
   "description": "A account of a voyage to New South Wales",
   "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
@@ -560,9 +589,38 @@ Response:
       }
     ]
   },
-  "archiveUrl" : "s3://archivebucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
-  "replicaUrl" : "https://archivebucket-replica.blob.core.windows.net/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
-  "accessUrl" : "s3://accessbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/" ,
+  "accessLocation": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-ia",
+      "label": "AWS S3 - Infrequent Access"
+    },
+    "bucket": "bucketname",
+    "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+  },
+  "archiveLocations": [
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 - Glacier"
+      },
+      "bucket": "bucketname",
+      "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    },
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage - Archive"
+      },
+      "bucket": "bucketname",
+      "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    }
+  ],
   "description": "GC253_1046",
   "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
