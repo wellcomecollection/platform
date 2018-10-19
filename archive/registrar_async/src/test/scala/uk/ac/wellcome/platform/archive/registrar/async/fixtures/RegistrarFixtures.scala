@@ -87,7 +87,6 @@ trait RegistrarFixtures
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 ddsTopic: Topic,
                  progressTopic: Topic)(testWith: TestWith[Registrar, R]) = {
 
     class TestApp extends Logging {
@@ -95,7 +94,6 @@ trait RegistrarFixtures
       val appConfigModule = new TestAppConfigModule(
         queuePair.queue.url,
         storageBucket.name,
-        ddsTopic.arn,
         progressTopic.arn,
         hybridStoreTable.name,
         hybridStoreBucket.name,
@@ -126,86 +124,74 @@ trait RegistrarFixtures
                                           EmptyMetadata,
                                           ObjectStore[StorageManifest]]
 
-  def withRegistrar[R](
-    testWith: TestWith[
-      (Bucket, QueuePair, Topic, Topic, Registrar, ManifestVHS),
-      R]) = {
+  def withRegistrar[R](testWith: TestWith[
+    (Bucket, QueuePair, Topic, Registrar, ManifestVHS),
+    R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
-        ddsSnsTopic =>
-          withLocalSnsTopic {
-            progressTopic =>
+        progressTopic =>
+          withLocalS3Bucket {
+            storageBucket =>
               withLocalS3Bucket {
-                storageBucket =>
-                  withLocalS3Bucket {
-                    hybridStoreBucket =>
-                      withLocalDynamoDbTable {
-                        hybridDynamoTable =>
-                          withApp(
-                            storageBucket,
-                            hybridStoreBucket,
-                            hybridDynamoTable,
-                            queuePair,
-                            ddsSnsTopic,
-                            progressTopic) { registrar =>
-                            implicit val storageBackend =
-                              new S3StorageBackend(s3Client)
+                hybridStoreBucket =>
+                  withLocalDynamoDbTable {
+                    hybridDynamoTable =>
+                      withApp(
+                        storageBucket,
+                        hybridStoreBucket,
+                        hybridDynamoTable,
+                        queuePair,
+                        progressTopic) { registrar =>
+                        implicit val storageBackend =
+                          new S3StorageBackend(s3Client)
 
-                            withTypeVHS[StorageManifest, EmptyMetadata, R](
-                              hybridStoreBucket,
-                              hybridDynamoTable) { vhs =>
-                              testWith(
-                                (
-                                  storageBucket,
-                                  queuePair,
-                                  ddsSnsTopic,
-                                  progressTopic,
-                                  registrar,
-                                  vhs)
-                              )
-                            }
-                          }
+                        withTypeVHS[StorageManifest, EmptyMetadata, R](
+                          hybridStoreBucket,
+                          hybridDynamoTable) { vhs =>
+                          testWith(
+                            (
+                              storageBucket,
+                              queuePair,
+                              progressTopic,
+                              registrar,
+                              vhs)
+                          )
+                        }
                       }
                   }
-
               }
+
           }
+
       }
     })
   }
 
   def withRegistrarAndBrokenVHS[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Topic, Registrar, Bucket),
-                       R]) = {
+    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, Bucket), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
       withLocalSnsTopic {
-        ddsSnsTopic =>
-          withLocalSnsTopic {
-            progressTopic =>
-              withLocalS3Bucket {
-                storageBucket =>
-                  withLocalS3Bucket { hybridStoreBucket =>
-                    withApp(
-                      storageBucket,
-                      hybridStoreBucket,
-                      Table("does-not-exist", ""),
-                      queuePair,
-                      ddsSnsTopic,
-                      progressTopic) { registrar =>
-                      testWith(
-                        (
-                          storageBucket,
-                          queuePair,
-                          ddsSnsTopic,
-                          progressTopic,
-                          registrar,
-                          hybridStoreBucket)
-                      )
-                    }
-                  }
+        progressTopic =>
+          withLocalS3Bucket { storageBucket =>
+            withLocalS3Bucket { hybridStoreBucket =>
+              withApp(
+                storageBucket,
+                hybridStoreBucket,
+                Table("does-not-exist", ""),
+                queuePair,
+                progressTopic) { registrar =>
+                testWith(
+                  (
+                    storageBucket,
+                    queuePair,
+                    progressTopic,
+                    registrar,
+                    hybridStoreBucket)
+                )
               }
-
+            }
           }
+
       }
     })
   }

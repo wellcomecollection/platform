@@ -53,9 +53,6 @@ class RegistrarAsyncArgsConfigurator(val arguments: Seq[String])
     opt[String]("aws-sqs-region", default = Some("eu-west-1"))
   private val awsSqsEndpoint = opt[String]("aws-sqs-endpoint")
 
-  private val ddsSnsTopicArn: ScallopOption[String] =
-    opt[String]("dds-sns-topic-arn", required = true)
-
   private val progressSnsTopicArn: ScallopOption[String] =
     opt[String]("progress-sns-topic-arn", required = true)
 
@@ -94,10 +91,6 @@ class RegistrarAsyncArgsConfigurator(val arguments: Seq[String])
     secretKey = awsSnsSecretKey.toOption,
     region = awsSnsRegion(),
     endpoint = awsSnsEndpoint.toOption
-  )
-
-  val ddsSnsConfig = SNSConfig(
-    topicArn = ddsSnsTopicArn()
   )
 
   val progressSnsConfig = SNSConfig(
@@ -154,7 +147,6 @@ class RegistrarAsyncArgsConfigurator(val arguments: Seq[String])
     sqsClientConfig,
     sqsConfig,
     snsClientConfig,
-    ddsSnsConfig,
     progressSnsConfig,
     hybridStoreConfig,
     metricsConfig

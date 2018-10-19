@@ -14,7 +14,6 @@ import scala.concurrent.duration._
 
 class TestAppConfigModule(queueUrl: String,
                           bucketName: String,
-                          ddsTopicArn: String,
                           progressTopicArn: String,
                           hybridStoreTableName: String,
                           hybridStoreBucketName: String,
@@ -49,7 +48,6 @@ class TestAppConfigModule(queueUrl: String,
       region = "localhost",
       endpoint = Some("http://localhost:9292")
     )
-    val ddsSnsConfig = SNSConfig(ddsTopicArn)
     val progressSnsConfig = SNSConfig(progressTopicArn)
 
     val hybridStoreConfig = HybridStoreConfig(
@@ -76,7 +74,6 @@ class TestAppConfigModule(queueUrl: String,
       sqsClientConfig,
       sqsConfig,
       snsClientConfig,
-      ddsSnsConfig,
       progressSnsConfig,
       hybridStoreConfig,
       metricsConfig

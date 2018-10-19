@@ -1,12 +1,12 @@
 package uk.ac.wellcome.platform.archive.registrar.async
 
-import org.scalatest.{FunSpec, Inside, Matchers}
 import org.scalatest.concurrent.{
   IntegrationPatience,
   PatienceConfiguration,
   ScalaFutures
 }
 import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
@@ -21,9 +21,7 @@ import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{
   RegistrarFixtures,
   RegistrationCompleteAssertions
 }
-import uk.ac.wellcome.platform.archive.registrar.async.models.RegistrationCompleteNotification
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.json.JsonUtil._
 
 class RegistrarFeatureTest
     extends FunSpec
@@ -51,7 +49,6 @@ class RegistrarFeatureTest
       case (
           storageBucket,
           queuePair,
-          ddsTopic,
           progressTopic,
           registrar,
           vhs
@@ -68,18 +65,10 @@ class RegistrarFeatureTest
           registrar.run()
 
           eventually {
-            val messages = listMessagesReceivedFromSNS(ddsTopic)
-            messages should have size 1
-
-            val registrationCompleteNotification =
-              fromJson[RegistrationCompleteNotification](messages.head.message).get
-
-            val bagId = registrationCompleteNotification.bagId
-
             val futureMaybeManifest = vhs.getRecord(bagId.toString)
 
             whenReady(futureMaybeManifest) { maybeStorageManifest =>
-              maybeStorageManifest shouldNot be(empty)
+              maybeStorageManifest shouldBe defined
 
               val storageManifest = maybeStorageManifest.get
 
@@ -106,13 +95,7 @@ class RegistrarFeatureTest
 
   it("notifies the progress tracker if registering a bag fails") {
     withRegistrar {
-      case (
-          storageBucket,
-          queuePair,
-          ddsTopic,
-          progressTopic,
-          registrar,
-          vhs) =>
+      case (storageBucket, queuePair, progressTopic, registrar, vhs) =>
         val requestId = randomUUID
         val bagId = randomBagId
 
@@ -129,13 +112,10 @@ class RegistrarFeatureTest
         registrar.run()
 
         eventually {
-          val messages = listMessagesReceivedFromSNS(ddsTopic)
-          messages shouldBe empty
-
           val futureMaybeManifest = vhs.getRecord(bagId.toString)
 
           whenReady(futureMaybeManifest) { maybeStorageManifest =>
-            maybeStorageManifest shouldBe empty
+            maybeStorageManifest shouldNot be(defined)
           }
 
           assertTopicReceivesProgressStatusUpdate(
@@ -155,7 +135,6 @@ class RegistrarFeatureTest
       case (
           storageBucket,
           queuePair @ QueuePair(queue, dlq),
-          ddsTopic,
           progressTopic,
           registrar,
           _) =>
@@ -172,7 +151,6 @@ class RegistrarFeatureTest
                 registrar.run()
 
                 eventually {
-                  listMessagesReceivedFromSNS(ddsTopic) shouldBe empty
                   listMessagesReceivedFromSNS(progressTopic) shouldBe empty
 
                   assertQueueEmpty(queue)

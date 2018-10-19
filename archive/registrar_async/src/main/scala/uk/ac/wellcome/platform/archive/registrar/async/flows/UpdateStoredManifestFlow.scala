@@ -22,14 +22,12 @@ object UpdateStoredManifestFlow {
   def apply(dataStore: VersionedHybridStore[StorageManifest,
                                             EmptyMetadata,
                                             ObjectStore[StorageManifest]],
-            ddsSnsConfig: SNSConfig,
             progressSnsConfig: SNSConfig)(implicit snsClient: AmazonSNS,
                                           ec: ExecutionContext) =
     Flow[(StorageManifest, ArchiveComplete)]
       .mapAsync(10) {
         case (manifest, ctx) => updateStoredManifest(dataStore, manifest, ctx)
       }
-      .via(NotifyDDSFlow(ddsSnsConfig))
       .map(
         archiveComplete =>
           ProgressStatusUpdate(
@@ -49,11 +47,11 @@ object UpdateStoredManifestFlow {
                                     EmptyMetadata,
                                     ObjectStore[StorageManifest]],
     storageManifest: StorageManifest,
-    requestContext: ArchiveComplete)(implicit ec: ExecutionContext) =
+    archiveComplete: ArchiveComplete)(implicit ec: ExecutionContext) =
     dataStore
       .updateRecord(storageManifest.id.toString)(
         ifNotExisting = (storageManifest, EmptyMetadata()))(
         ifExisting = (_, _) => (storageManifest, EmptyMetadata())
       )
-      .map(_ => (storageManifest, requestContext))
+      .map(_ => archiveComplete)
 }
