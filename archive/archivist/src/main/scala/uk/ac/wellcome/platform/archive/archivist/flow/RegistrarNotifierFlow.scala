@@ -12,11 +12,13 @@ import uk.ac.wellcome.json.JsonUtil._
 
 object RegistrarNotifierFlow {
 
-  def apply(snsRegistrarConfig: SNSConfig, snsProgressConfig: SNSConfig)(implicit snsClient: AmazonSNS)
+  def apply(snsRegistrarConfig: SNSConfig, snsProgressConfig: SNSConfig)(
+    implicit snsClient: AmazonSNS)
     : Flow[ArchiveComplete, PublishResult, NotUsed] = {
 
     Flow[ArchiveComplete]
-      .flatMapConcat(archiveComplete =>
+      .flatMapConcat(
+        archiveComplete =>
           Source
             .single(toProgressUpdate(archiveComplete))
             .log("sending bag resource update to progress monitor")
@@ -25,8 +27,7 @@ object RegistrarNotifierFlow {
                 snsClient,
                 snsProgressConfig,
                 Some("archivist_progress")))
-            .map(_ => archiveComplete)
-      )
+            .map(_ => archiveComplete))
       .via(
         SnsPublishFlow[ArchiveComplete](
           snsClient,
@@ -35,7 +36,8 @@ object RegistrarNotifierFlow {
       .log("published notification")
   }
 
-  def toProgressUpdate(archiveComplete: ArchiveComplete): ProgressResourceUpdate = {
+  def toProgressUpdate(
+    archiveComplete: ArchiveComplete): ProgressResourceUpdate = {
     ProgressResourceUpdate(
       archiveComplete.archiveRequestId,
       List(Resource(ResourceIdentifier(archiveComplete.bagId.toString))),

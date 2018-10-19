@@ -52,9 +52,9 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
   }
 
   def assertTopicReceivesProgressResourceUpdate(
-                                              requestId: UUID,
-                                              expectedResource : Resource,
-                                              progressTopic: SNS.Topic)(assert: List[ProgressEvent] => Assertion) = {
+    requestId: UUID,
+    expectedResource: Resource,
+    progressTopic: SNS.Topic)(assert: List[ProgressEvent] => Assertion) = {
     val messages = listMessagesReceivedFromSNS(progressTopic)
     val progressUpdates = messages.map { messageinfo =>
       fromJson[ProgressUpdate](messageinfo.message).get

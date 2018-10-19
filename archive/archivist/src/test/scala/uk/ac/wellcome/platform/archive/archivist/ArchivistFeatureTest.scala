@@ -4,9 +4,15 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, Resource, ResourceIdentifier}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Progress,
+  Resource,
+  ResourceIdentifier
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import IngestBagRequest._
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
@@ -74,7 +80,8 @@ class ArchivistFeatureTest
 
               assertTopicReceivesProgressResourceUpdate(
                 request.archiveRequestId,
-                Resource(ResourceIdentifier(BagId(request.storageSpace, bagIdentifier).toString)),
+                Resource(ResourceIdentifier(
+                  BagId(request.storageSpace, bagIdentifier).toString)),
                 progressTopic) { events =>
                 events should have size 1
                 events.head.description shouldBe "Bag uploaded and verified successfully"
