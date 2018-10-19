@@ -2,5 +2,5 @@
   <include resource="base-logback-test.xml"/>
 
   <logger name="uk.ac.wellcome.messaging.message.MessageWriter" level="WARN"/>
-  <logger name="uk.ac.wellcome.messaging.sns.SNSWriter" level="WARN"/>
+  <logger name="uk.ac.wellcome.messaging.sns.SNSMessageWriter" level="WARN"/>
 </configuration>
