@@ -67,3 +67,36 @@
 .Deployment__Inactive {
   background-color: #ddd;
 }
+
+.Container--Name {
+  font-weight: bold;
+  padding: 0px 3px 0px 0px;
+}
+
+.ContainersBox {
+    background-color: #f5f5f5;
+    margin-top: 10px;
+
+    text-align: left;
+
+    padding: 3px 3px 3px 5px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+
+    visibility: hidden;
+    transition-delay:0.5s;
+
+    position: absolute;
+    z-index: 1;
+}
+
+.ContainersBox:hover {
+    visibility: visible;
+    transition-delay:0s;
+}
+
+a.Deployment--Status:hover + .ContainersBox {
+    visibility: visible;
+    transition-delay:0s;
+}
