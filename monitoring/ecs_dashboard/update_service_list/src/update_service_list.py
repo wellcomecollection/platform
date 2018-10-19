@@ -50,17 +50,31 @@ def _enrich_deployment(deployment, task_definition):
     return deployment
 
 
-def _create_task_definition_dict(task_definition):
-    image_tag = task_definition["image"].split(":")[1]
+def _create_container_definition_dict(container_definition):
+    image_tag = container_definition["image"].split(":")[1]
 
     return {
-        "name": task_definition["name"],
-        "image": task_definition["image"],
+        "name": container_definition["name"],
+        "image": container_definition["image"],
         "image_tag": image_tag,
-        "cpu": task_definition["cpu"],
-        "memory": task_definition["memory"],
-        "essential": task_definition["essential"]
+        "cpu": container_definition["cpu"],
+        "memory": container_definition["memory"],
+        "essential": container_definition["essential"]
     }
+
+
+def _create_task_definition_dict(task_definition):
+    raw_container_definitions = (
+        task_definition["containerDefinitions"]
+    )
+
+    container_definitions = _create_container_definition_dict(
+        raw_container_definitions
+    )
+
+    task_definition["containerDefinitions"] = container_definitions
+
+    return task_definition
 
 
 def _enrich_service(client, cluster_arn, service_arn):
