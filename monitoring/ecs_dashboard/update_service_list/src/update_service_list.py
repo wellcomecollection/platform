@@ -6,10 +6,11 @@ This script runs when triggered from an ECS task state change stream.
 It does not use the event data from the event.
 """
 
-import boto3
 import datetime
 import json
 import os
+
+import boto3
 
 from wellcome_aws_utils.ecs_utils import (
     get_cluster_arns,
@@ -108,7 +109,11 @@ def _enrich_service(client, cluster_arn, service_arn):
         ) for deployment, task_definition in zipped
     ]
 
-    enriched_events = [_create_event_dict(e) for e in service["events"][:5]]
+    # Only get the last 5 events as out of date events
+    # are not useful
+    enriched_events = (
+        [_create_event_dict(e) for e in service["events"][:5]]
+    )
 
     service["events"] = enriched_events
     service["deployments"] = enriched_deployments
