@@ -50,6 +50,18 @@ def _enrich_deployment(deployment, task_definition):
     return deployment
 
 
+def _create_task_definition_dict(task_definition):
+    image_tag = task_definition["message"].split(":")[1]
+
+    return {
+        "name": task_definition["message"],
+        "image": task_definition["image"],
+        "image_tag": image_tag,
+        "cpu": task_definition["cpu"],
+        "memory": task_definition["memory"],
+        "essential": task_definition["essential"]
+    }
+
 def _enrich_service(client, cluster_arn, service_arn):
     service = describe_service(
         client,
@@ -57,12 +69,18 @@ def _enrich_service(client, cluster_arn, service_arn):
         service_arn
     )
 
-    task_definitions = [
+    raw_task_definitions = [
         _describe_task_definition(
             client,
             deployment["taskDefinition"]
         ) for deployment in service["deployments"]
     ]
+
+    task_definitions = (
+        [_create_task_definition_dict(
+            raw_task_definition
+        ) for raw_task_definition in raw_task_definitions]
+    )
 
     zipped = zip(service["deployments"], task_definitions)
 
@@ -173,8 +191,7 @@ def main(event, _):
             ) for ecs_client in ecs_clients]
         )
     except EcsThrottleException:
-        # We do not wish to retry on throttle
-        # so fail gracefully
+        # Fail gracefully
         return
 
     cluster_list = (
