@@ -16,8 +16,8 @@ def filter_queue_attributes(attributes):
     }
 
 
-def put_metric(cloudwatch_client, namespace, metrics):
-    return cloudwatch_client.put_metric_data(
+def put_metric(client, namespace, metrics):
+    return client.put_metric_data(
         MetricData=metrics,
         Namespace=namespace
     )
@@ -39,7 +39,7 @@ def build_metric(queue):
     }
 
 
-def update_queue_metrics(cloudwatch_client, sqs_client, sqs_resource):
+def update_queue_metrics(client, sqs_client, sqs_resource):
     # Get queues
     queue_list_response = sqs_client.list_queues()
 
@@ -58,12 +58,12 @@ def update_queue_metrics(cloudwatch_client, sqs_client, sqs_resource):
 
     # Send metrics
     namespace = "queues/visible_and_in_flight"
-    [put_metric(cloudwatch_client, namespace, [metric]) for metric in metrics]
+    [put_metric(client, namespace, [metric]) for metric in metrics]
 
 
 def main(o, ctx):
     sqs_resource = boto3.resource('sqs')
     sqs_client = boto3.client('sqs')
-    cloudwatch_client = boto3.client('cloudwatch')
+    cw_client = boto3.client('cloudwatch')
 
-    update_queue_metrics(cloudwatch_client, sqs_client, sqs_resource)
+    update_queue_metrics(cw_client, sqs_client, sqs_resource)

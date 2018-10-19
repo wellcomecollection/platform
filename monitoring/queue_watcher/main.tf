@@ -21,11 +21,6 @@ module "trigger_post_to_slack_dlqs_not_empty" {
   lambda_function_name = "${module.lambda_queue_watcher.function_name}"
   lambda_function_arn  = "${module.lambda_queue_watcher.arn}"
 
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_minute.name}"
-}
-
-resource "aws_cloudwatch_event_rule" "every_minute" {
-  name                = "every_minute"
-  schedule_expression = "cron(* * * * * *)"
+  cloudwatch_trigger_arn  = "${var.every_minute_arn}"
+  cloudwatch_trigger_name = "${var.every_minute_name}"
 }

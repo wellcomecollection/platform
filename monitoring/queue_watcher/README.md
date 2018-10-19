@@ -1,3 +1,5 @@
-# slack_budget_bot
+# Queue Watcher
 
-Budget bot is an AWS Lambda function that checks if our predicted AWS budget is too high for the month.
+The Queue Watcher adds the count of in-flight & visible messages.
+
+This metric provides a view on "work remaining".
