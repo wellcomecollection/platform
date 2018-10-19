@@ -54,13 +54,14 @@ def _create_task_definition_dict(task_definition):
     image_tag = task_definition["message"].split(":")[1]
 
     return {
-        "name": task_definition["message"],
+        "name": task_definition["name"],
         "image": task_definition["image"],
         "image_tag": image_tag,
         "cpu": task_definition["cpu"],
         "memory": task_definition["memory"],
         "essential": task_definition["essential"]
     }
+
 
 def _enrich_service(client, cluster_arn, service_arn):
     service = describe_service(
