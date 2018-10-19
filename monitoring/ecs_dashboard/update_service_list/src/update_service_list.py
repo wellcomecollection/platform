@@ -6,12 +6,10 @@ This script runs when triggered from an ECS task state change stream.
 It does not use the event data from the event.
 """
 
+import boto3
 import datetime
 import json
 import os
-
-import boto3
-
 from wellcome_aws_utils.ecs_utils import (
     get_cluster_arns,
     get_service_arns,
@@ -20,6 +18,14 @@ from wellcome_aws_utils.ecs_utils import (
     EcsThrottleException,
 )
 from wellcome_aws_utils.lambda_utils import log_on_error
+
+
+class DateTimeAwareEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)
 
 
 def _create_event_dict(event):
@@ -89,7 +95,6 @@ def get_cluster_list(ecs_client):
 
 
 def send_ecs_status_to_s3(service_snapshot, s3_client, bucket_name, object_key):
-
     return s3_client.put_object(
         ACL="public-read",
         Bucket=bucket_name,
@@ -124,8 +129,8 @@ def main(event, _):
     object_key = os.environ["OBJECT_KEY"]
 
     ecs_clients = (
-        [create_boto_client("ecs", role_arn) for role_arn in assumable_roles]
-    ) + [boto3.client("ecs")]
+                      [create_boto_client("ecs", role_arn) for role_arn in assumable_roles]
+                  ) + [boto3.client("ecs")]
 
     try:
         cluster_lists = [get_cluster_list(ecs_client) for ecs_client in ecs_clients]
