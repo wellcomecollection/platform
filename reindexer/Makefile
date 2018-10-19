@@ -5,7 +5,7 @@ STACK_ROOT 	= reindexer
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
-SBT_APPS 	= reindex_request_creator reindex_request_processor
+SBT_APPS 	= reindex_request_creator
 ECS_TASKS 	=
 LAMBDAS 	=
 
