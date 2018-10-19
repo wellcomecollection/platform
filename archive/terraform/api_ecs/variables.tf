@@ -26,8 +26,4 @@ variable "archive_ingest_sns_topic_arn" {}
 
 variable "api_path" {}
 
-variable "bag_vhs_bucket_name" {}
-
-variable "bag_vhs_table_name" {}
-
 variable "interservice_security_group_id" {}
