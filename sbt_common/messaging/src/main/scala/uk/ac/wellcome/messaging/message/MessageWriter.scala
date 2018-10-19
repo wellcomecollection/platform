@@ -8,7 +8,12 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Encoder
-import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.sns.{
+  PublishAttempt,
+  SNSConfig,
+  SNSMessageWriter,
+  SNSWriter
+}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectStore}
 import uk.ac.wellcome.json.JsonUtil._
@@ -27,8 +32,10 @@ class MessageWriter[T] @Inject()(
 )(implicit objectStore: ObjectStore[T], ec: ExecutionContext)
     extends Logging {
 
+  private val snsMessageWriter = new SNSMessageWriter(snsClient = snsClient)
+
   private val sns = new SNSWriter(
-    snsClient = snsClient,
+    snsMessageWriter = snsMessageWriter,
     snsConfig = messageConfig.snsConfig
   )
 
