@@ -13,6 +13,7 @@ import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Callback.Pending
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress.{Completed, Failed}
 
 object CallbackNotificationFlow extends Logging {
   import CallbackNotification._
@@ -35,9 +36,9 @@ object CallbackNotificationFlow extends Logging {
     }
 
     Flow[Progress].flatMapConcat {
-      case progress @ Progress(id, _, _, Some(callback), _, _, _, _, _) =>
+      case progress @ Progress(id, _, _, Some(callback), progressStatus, _, _, _, _) =>
         callback.status match {
-          case Pending =>
+          case Pending if List(Completed, Failed) contains progressStatus =>
             notifyFlow(progress, id, callback.uri)
           case _ => Source.single(())
         }

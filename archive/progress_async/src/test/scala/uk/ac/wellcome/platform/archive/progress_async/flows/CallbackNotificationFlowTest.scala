@@ -8,13 +8,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.json.{
-  URIConverters,
-  UUIDConverters
-}
+import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressGenerators
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Callback
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Callback, Progress}
 import uk.ac.wellcome.test.fixtures.Akka
 
 class CallbackNotificationFlowTest
@@ -31,11 +28,12 @@ class CallbackNotificationFlowTest
     with SNS {
 
   it("sends callbackNotifications") {
-    val status = Table(
-      "status",
-      Callback.Pending
+    val sendsCallbackStatus = Table(
+      ("progress-status", "callback-status"),
+      (Progress.Failed,   Callback.Pending),
+      (Progress.Completed, Callback.Pending)
     )
-    forAll(status) { status =>
+    forAll(sendsCallbackStatus) { (progressStatus, callbackStatus) =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>
           withLocalSnsTopic { topic =>
@@ -43,7 +41,8 @@ class CallbackNotificationFlowTest
               CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
 
             val progress = createProgressWith(
-              callback = Some(createCallbackWith(status = status)))
+              status = progressStatus,
+              callback = Some(createCallbackWith(status = callbackStatus)))
 
             val eventuallyResult = Source
               .single(progress)
@@ -64,20 +63,32 @@ class CallbackNotificationFlowTest
   }
 
   it("doesn't send callbackNotifications") {
-    val status = Table(
-      "status",
-      Callback.Succeeded,
-      Callback.Failed
+    val doesNotSendCallbackStatus = Table(
+      ("progress-status",    "callback-status"),
+      (Progress.Initialised, Callback.Pending),
+      (Progress.Initialised, Callback.Succeeded),
+      (Progress.Initialised, Callback.Failed),
+
+      (Progress.Processing, Callback.Pending),
+      (Progress.Processing, Callback.Succeeded),
+      (Progress.Processing, Callback.Failed),
+
+      (Progress.Failed,   Callback.Succeeded),
+      (Progress.Failed,   Callback.Failed),
+
+      (Progress.Completed, Callback.Succeeded),
+      (Progress.Completed, Callback.Failed)
     )
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withLocalSnsTopic { topic =>
-          forAll(status) { status =>
+          forAll(doesNotSendCallbackStatus) { (progressStatus, callbackStatus) =>
             val callbackNotificationFlow =
               CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
 
             val progress = createProgressWith(
-              callback = Some(createCallbackWith(status = status)))
+              status = progressStatus,
+              callback = Some(createCallbackWith(status = callbackStatus)))
 
             val eventuallyResult = Source
               .single(progress)
@@ -94,23 +105,4 @@ class CallbackNotificationFlowTest
     }
   }
 
-  it("failure to send to callbackNotifications ends up on the DLQ") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        val callbackNotificationFlow =
-          CallbackNotificationFlow(snsClient, SNSConfig("does-not-exist"))
-
-        val progress = createProgress()
-
-        val eventuallyResult = Source
-          .single(progress)
-          .via(callbackNotificationFlow)
-          .runWith(Sink.seq)(materializer)
-
-        whenReady(eventuallyResult) { result =>
-          result shouldBe List.empty
-        }
-      }
-    }
-  }
 }
