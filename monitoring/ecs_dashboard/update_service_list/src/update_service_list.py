@@ -18,8 +18,6 @@ from wellcome_aws_utils.ecs_utils import (
     EcsThrottleException,
 )
 
-from wellcome_aws_utils.lambda_utils import log_on_error
-
 
 class DateTimeAwareEncoder(json.JSONEncoder):
     def default(self, o):
@@ -71,14 +69,27 @@ def _enrich_service(client, cluster_arn, service_arn):
 
 def get_service_list(ecs_client, cluster_arn):
     return [
-        _enrich_service(ecs_client, cluster_arn, service_arn)
-        for service_arn in get_service_arns(ecs_client, cluster_arn)
+        _enrich_service(
+            ecs_client,
+            cluster_arn,
+            service_arn
+        ) for service_arn in get_service_arns(
+            ecs_client,
+            cluster_arn
+        )
     ]
 
 
 def _enrich_cluster_list(ecs_client, cluster_arn):
-    cluster = describe_cluster(ecs_client, cluster_arn)
-    service_list = get_service_list(ecs_client, cluster_arn)
+    cluster = describe_cluster(
+        ecs_client,
+        cluster_arn
+    )
+
+    service_list = get_service_list(
+        ecs_client,
+        cluster_arn
+    )
 
     return {
         "clusterName": cluster["clusterName"],
@@ -126,23 +137,35 @@ def create_boto_client(service, role_arn):
     )
 
 
-@log_on_error
 def main(event, _):
-    assumable_roles = [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
+    assumable_roles = (
+        [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
+    )
+
     bucket_name = os.environ["BUCKET_NAME"]
     object_key = os.environ["OBJECT_KEY"]
 
     ecs_clients = (
-                      [create_boto_client("ecs", role_arn) for role_arn in assumable_roles]
-                  ) + [boto3.client("ecs")]
+        [create_boto_client(
+            "ecs",
+            role_arn
+        ) for role_arn in assumable_roles]
+    ) + [boto3.client("ecs")]
 
     try:
-        cluster_lists = [get_cluster_list(ecs_client) for ecs_client in ecs_clients]
+        cluster_lists = (
+            [get_cluster_list(
+                ecs_client
+            ) for ecs_client in ecs_clients]
+        )
     except EcsThrottleException:
-        # We do not wish to retry on throttle so fail gracefully
+        # We do not wish to retry on throttle
+        # so fail gracefully
         return
 
-    cluster_list = [item for sublist in cluster_lists for item in sublist]
+    cluster_list = (
+        [item for sublist in cluster_lists for item in sublist]
+    )
 
     service_snapshot = {
         "clusterList": cluster_list,
@@ -154,4 +177,9 @@ def main(event, _):
     response = send_ecs_status_to_s3(
         service_snapshot, s3_client, bucket_name, object_key
     )
-    assert response["HTTPStatusCode"] == 200, (service_snapshot, response)
+
+    assert (
+        response["HTTPStatusCode"] == 200, (
+            service_snapshot, response
+        )
+    )
