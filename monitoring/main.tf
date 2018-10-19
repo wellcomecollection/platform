@@ -13,6 +13,17 @@ module "deployment_tracking" {
   infra_bucket = "${var.infra_bucket}"
 }
 
+module "queue_watcher" {
+  source = "queue_watcher"
+
+  every_minute_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
+  every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
+
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+
+  infra_bucket = "${var.infra_bucket}"
+}
+
 module "ecs_dashboard" {
   source = "ecs_dashboard"
 
