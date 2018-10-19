@@ -36,6 +36,7 @@ app.config["BAGS_MANAGER"] = BagsManager(
     sess=app.config["BAGS_MANAGER_SESSION"],
 )
 
+
 @app.errorhandler(Exception)
 @api.errorhandler(Exception)
 @api.marshal_with(Error, skip_none=True)

@@ -5,9 +5,7 @@ import json
 from helpers import assert_is_error_response
 
 
-def test_returns_a_present_bag(
-    client, bag_id
-):
+def test_returns_a_present_bag(client, bag_id):
     resp = client.get(f"/storage/v1/bags/{bag_id}")
     assert resp.status_code == 200
 

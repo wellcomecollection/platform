@@ -4,11 +4,7 @@ import betamax
 import pytest
 import requests
 
-from bags_manager import (
-    BagsManager,
-    BagNotFoundError,
-    BagServiceError,
-)
+from bags_manager import BagsManager, BagNotFoundError, BagServiceError
 
 
 @pytest.fixture(scope="session")
@@ -30,18 +26,18 @@ def bags_manager(sess):
 
 
 def test_can_lookup_existing_id(bags_manager, space_name, external_identifier):
-    result = bags_manager.lookup_bag(space=space_name,id=external_identifier)
-    assert result['id'] == {
-        'space': space_name,
-        'externalIdentifier': external_identifier
+    result = bags_manager.lookup_bag(space=space_name, id=external_identifier)
+    assert result["id"] == {
+        "space": space_name,
+        "externalIdentifier": external_identifier,
     }
 
 
 def test_404_is_not_found(bags_manager):
     with pytest.raises(BagNotFoundError):
-        bags_manager.lookup_bag(space="nomespace",id="someid")
+        bags_manager.lookup_bag(space="nomespace", id="someid")
 
 
 def test_not_200_or_404_is_error(bags_manager, space_name):
     with pytest.raises(BagServiceError):
-        bags_manager.lookup_bag(space=space_name,id="b24923333-a")
+        bags_manager.lookup_bag(space=space_name, id="b24923333-a")

@@ -8,12 +8,12 @@ import requests
 class BagServiceError(Exception):
     pass
 
+
 class BagNotFoundError(Exception):
     pass
 
 
 class BagsManager:
-
     def __init__(self, endpoint, sess=None):
         self.endpoint = endpoint
         self.sess = sess or requests.Session()

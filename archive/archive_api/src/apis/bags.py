@@ -38,7 +38,9 @@ class BagResource(Resource):
             result = bags_manager.lookup_bag(space, id)
 
             # TODO: Remove the necessity to do this
-            result["id"] = f'{result["id"]["space"]}/{result["id"]["externalIdentifier"]}'
+            result[
+                "id"
+            ] = f'{result["id"]["space"]}/{result["id"]["externalIdentifier"]}'
 
             return result
         except BagNotFoundError:
