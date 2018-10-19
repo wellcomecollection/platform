@@ -51,7 +51,7 @@ def _enrich_deployment(deployment, task_definition):
 
 
 def _create_container_definition_dict(container_definition):
-    image_tag = container_definition["image"].split(":")[1]
+    image_tag = container_definition["image"].split(":")[-1]
 
     return {
         "name": container_definition["name"],
