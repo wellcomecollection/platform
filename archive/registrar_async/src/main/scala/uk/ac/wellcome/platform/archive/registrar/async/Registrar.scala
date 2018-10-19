@@ -82,8 +82,8 @@ class Registrar @Inject()(
           Unit](
           ifLeft = NotifyFailureFlow[ArchiveComplete](
             "registrar_failure",
-            progressSnsConfig)(_.archiveRequestId).map(_ => ()))(ifRight =
-          UpdateStoredManifestFlow(dataStore, progressSnsConfig)))
+            progressSnsConfig)(_.archiveRequestId).map(_ => ()))(
+          ifRight = UpdateStoredManifestFlow(dataStore, progressSnsConfig)))
 
     messageStream.run("registrar", flow)
   }
