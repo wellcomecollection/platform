@@ -5,7 +5,7 @@ STACK_ROOT  = monitoring
 
 SBT_APPS    =
 ECS_TASKS   = slack_budget_bot
-LAMBDAS     = post_to_slack terraform_tracker
+LAMBDAS     = post_to_slack terraform_tracker queue_watcher
 
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =

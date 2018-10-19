@@ -8,7 +8,9 @@ module "lambda_queue_watcher" {
   description = "Post custom notification for queue size on all queues"
   timeout     = 15
 
-  environment_variables = {}
+  environment_variables = {
+    PLACEHOLDER = "value"
+  }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
