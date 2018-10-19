@@ -29,4 +29,6 @@ case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
 
 case class Resource(id: ResourceIdentifier)
 
-case class ResourceIdentifier(underlying: String) extends AnyVal
+case class ResourceIdentifier(underlying: String) extends AnyVal {
+  override def toString: String = underlying
+}

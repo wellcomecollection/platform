@@ -35,7 +35,7 @@ trait Archivist extends Logging {
       Logging(actorSystem.eventStream, "customLogger")
 
     val decider: Supervision.Decider = {
-      case e => {
+      e => {
         error("Stream failure", e)
         Supervision.Resume
       }
