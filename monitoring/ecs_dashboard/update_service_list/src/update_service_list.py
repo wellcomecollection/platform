@@ -20,9 +20,10 @@ from wellcome_aws_utils.ecs_utils import (
 
 from wellcome_aws_utils.lambda_utils import log_on_error
 
+
 class DateTimeAwareEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, datetime):
+        if isinstance(o, datetime.date):
             return o.isoformat()
 
         return json.JSONEncoder.default(self, o)
