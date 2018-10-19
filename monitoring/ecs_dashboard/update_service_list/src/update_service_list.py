@@ -10,6 +10,7 @@ import boto3
 import datetime
 import json
 import os
+
 from wellcome_aws_utils.ecs_utils import (
     get_cluster_arns,
     get_service_arns,
@@ -28,11 +29,16 @@ class DateTimeAwareEncoder(json.JSONEncoder):
 
 
 def _create_event_dict(event):
-    return {"timestamp": event["createdAt"].timestamp(), "message": event["message"]}
+    return {
+        "timestamp": event["createdAt"].timestamp(),
+        "message": event["message"]
+    }
 
 
 def _describe_task_definition(client, arn):
-    return client.describe_task_definition(taskDefinition=arn)["taskDefinition"]
+    return client.describe_task_definition(
+        taskDefinition=arn
+    )["taskDefinition"]
 
 
 def _enrich_deployment(deployment, task_definition):
@@ -45,18 +51,26 @@ def _enrich_deployment(deployment, task_definition):
 
 
 def _enrich_service(client, cluster_arn, service_arn):
-    service = describe_service(client, cluster_arn, service_arn)
+    service = describe_service(
+        client,
+        cluster_arn,
+        service_arn
+    )
 
     task_definitions = [
-        _describe_task_definition(client, deployment["taskDefinition"])
-        for deployment in service["deployments"]
+        _describe_task_definition(
+            client,
+            deployment["taskDefinition"]
+        ) for deployment in service["deployments"]
     ]
 
     zipped = zip(service["deployments"], task_definitions)
 
     enriched_deployments = [
-        _enrich_deployment(deployment, task_definition)
-        for deployment, task_definition in zipped
+        _enrich_deployment(
+            deployment,
+            task_definition
+        ) for deployment, task_definition in zipped
     ]
 
     enriched_events = [_create_event_dict(e) for e in service["events"][:5]]
@@ -174,12 +188,6 @@ def main(event, _):
 
     s3_client = boto3.client("s3")
 
-    response = send_ecs_status_to_s3(
+    send_ecs_status_to_s3(
         service_snapshot, s3_client, bucket_name, object_key
-    )
-
-    assert (
-        response["HTTPStatusCode"] == 200, (
-            service_snapshot, response
-        )
     )
