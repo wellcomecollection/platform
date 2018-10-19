@@ -68,8 +68,10 @@ def _create_task_definition_dict(task_definition):
         task_definition["containerDefinitions"]
     )
 
-    container_definitions = _create_container_definition_dict(
-        raw_container_definitions
+    container_definitions = (
+        [_create_container_definition_dict(
+            raw_container_definition
+        ) for raw_container_definition in raw_container_definitions]
     )
 
     task_definition["containerDefinitions"] = container_definitions
