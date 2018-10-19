@@ -15,7 +15,6 @@ case class RegistrarAsyncConfig(s3ClientConfig: S3ClientConfig,
                                 sqsClientConfig: SQSClientConfig,
                                 sqsConfig: SQSConfig,
                                 snsClientConfig: SnsClientConfig,
-                                ddsSnsConfig: SNSConfig,
                                 progressSnsConfig: SNSConfig,
                                 hybridStoreConfig: HybridStoreConfig,
                                 metricsConfig: MetricsConfig)

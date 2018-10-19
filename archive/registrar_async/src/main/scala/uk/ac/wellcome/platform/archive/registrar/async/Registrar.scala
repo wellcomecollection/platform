@@ -11,8 +11,7 @@ import akka.stream.{
 }
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
-import com.google.inject._
-import com.google.inject.name.Named
+import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
@@ -40,8 +39,7 @@ import scala.concurrent.ExecutionContextExecutor
 
 class Registrar @Inject()(
   snsClient: AmazonSNS,
-  @Named("ddsSnsConfig") ddsSnsConfig: SNSConfig,
-  @Named("progressSnsConfig") progressSnsConfig: SNSConfig,
+  progressSnsConfig: SNSConfig,
   s3Client: AmazonS3,
   s3ClientConfig: S3ClientConfig,
   messageStream: MessageStream[NotificationMessage, Unit],
@@ -85,7 +83,7 @@ class Registrar @Inject()(
           ifLeft = NotifyFailureFlow[ArchiveComplete](
             "registrar_failure",
             progressSnsConfig)(_.archiveRequestId).map(_ => ()))(ifRight =
-          UpdateStoredManifestFlow(dataStore, ddsSnsConfig, progressSnsConfig)))
+          UpdateStoredManifestFlow(dataStore, progressSnsConfig)))
 
     messageStream.run("registrar", flow)
   }

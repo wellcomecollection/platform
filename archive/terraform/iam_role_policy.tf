@@ -44,11 +44,6 @@ resource "aws_iam_role_policy" "registrar_async_task_vhs" {
   policy = "${module.vhs_archive_manifest.full_access_policy}"
 }
 
-resource "aws_iam_role_policy" "registrar_async_task_sns" {
-  role   = "${module.registrar_async.task_role_name}"
-  policy = "${module.registrar_completed_topic.publish_policy}"
-}
-
 resource "aws_iam_role_policy" "registrar_async_task_progress_async_sns" {
   role   = "${module.registrar_async.task_role_name}"
   policy = "${module.progress_async_topic.publish_policy}"

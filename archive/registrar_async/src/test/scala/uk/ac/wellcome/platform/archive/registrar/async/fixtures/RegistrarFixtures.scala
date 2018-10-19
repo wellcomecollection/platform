@@ -87,7 +87,6 @@ trait RegistrarFixtures
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 ddsTopic: Topic,
                  progressTopic: Topic)(testWith: TestWith[Registrar, R]) = {
 
     class TestApp extends Logging {
@@ -95,7 +94,6 @@ trait RegistrarFixtures
       val appConfigModule = new TestAppConfigModule(
         queuePair.queue.url,
         storageBucket.name,
-        ddsTopic.arn,
         progressTopic.arn,
         hybridStoreTable.name,
         hybridStoreBucket.name,
@@ -128,11 +126,9 @@ trait RegistrarFixtures
 
   def withRegistrar[R](
     testWith: TestWith[
-      (Bucket, QueuePair, Topic, Topic, Registrar, ManifestVHS),
+      (Bucket, QueuePair, Topic, Registrar, ManifestVHS),
       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalSnsTopic {
-        ddsSnsTopic =>
           withLocalSnsTopic {
             progressTopic =>
               withLocalS3Bucket {
@@ -146,7 +142,6 @@ trait RegistrarFixtures
                             hybridStoreBucket,
                             hybridDynamoTable,
                             queuePair,
-                            ddsSnsTopic,
                             progressTopic) { registrar =>
                             implicit val storageBackend =
                               new S3StorageBackend(s3Client)
@@ -158,7 +153,6 @@ trait RegistrarFixtures
                                 (
                                   storageBucket,
                                   queuePair,
-                                  ddsSnsTopic,
                                   progressTopic,
                                   registrar,
                                   vhs)
@@ -169,17 +163,15 @@ trait RegistrarFixtures
                   }
 
               }
-          }
+
       }
     })
   }
 
   def withRegistrarAndBrokenVHS[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Topic, Registrar, Bucket),
+    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, Bucket),
                        R]) = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
-      withLocalSnsTopic {
-        ddsSnsTopic =>
           withLocalSnsTopic {
             progressTopic =>
               withLocalS3Bucket {
@@ -190,13 +182,11 @@ trait RegistrarFixtures
                       hybridStoreBucket,
                       Table("does-not-exist", ""),
                       queuePair,
-                      ddsSnsTopic,
                       progressTopic) { registrar =>
                       testWith(
                         (
                           storageBucket,
                           queuePair,
-                          ddsSnsTopic,
                           progressTopic,
                           registrar,
                           hybridStoreBucket)
@@ -205,7 +195,7 @@ trait RegistrarFixtures
                   }
               }
 
-          }
+
       }
     })
   }

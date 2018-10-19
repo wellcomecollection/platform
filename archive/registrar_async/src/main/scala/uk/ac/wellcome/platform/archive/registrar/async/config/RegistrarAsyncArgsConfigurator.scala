@@ -154,7 +154,6 @@ class RegistrarAsyncArgsConfigurator(val arguments: Seq[String])
     sqsClientConfig,
     sqsConfig,
     snsClientConfig,
-    ddsSnsConfig,
     progressSnsConfig,
     hybridStoreConfig,
     metricsConfig
