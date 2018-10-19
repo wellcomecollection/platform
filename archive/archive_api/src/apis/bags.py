@@ -5,7 +5,7 @@ from flask_restplus import Namespace, Resource
 
 from models.bags import Bag, File, FileManifest, Source
 from models.catalogue import Error, Identifier, IdentifierType
-from storage import VHSError, VHSNotFound, read_from_vhs
+from bags_manager import BagNotFoundError
 
 
 api = Namespace("bags", description="Bag requests")
@@ -32,22 +32,17 @@ class BagResource(Resource):
         """Get the bag associated with an id"""
         from archive_api import app
 
-        bag_id = f"{space}/{id}"
+        bags_manager = app.config["BAGS_MANAGER"]
 
         try:
-            result = read_from_vhs(
-                dynamodb_resource=app.config["DYNAMODB_RESOURCE"],
-                table_name=app.config["BAG_VHS_TABLE_NAME"],
-                s3_client=app.config["S3_CLIENT"],
-                bucket_name=app.config["BAG_VHS_BUCKET_NAME"],
-                id=bag_id,
-            )
+            result = bags_manager.lookup_bag(space, id)
 
             # TODO: Remove the necessity to do this
-            result["id"] = result["id"]["value"]
+            result[
+                "id"
+            ] = f'{result["id"]["space"]}/{result["id"]["externalIdentifier"]}'
 
             return result
-        except VHSNotFound:
+        except BagNotFoundError:
+            bag_id = f"{space}/{id}"
             abort(404, f"Invalid id: No bag found for id={bag_id!r}")
-        except VHSError:
-            abort(500)

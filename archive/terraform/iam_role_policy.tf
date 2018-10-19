@@ -5,16 +5,6 @@ resource "aws_iam_role_policy" "archive_api_task_sns" {
   policy = "${module.archivist_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "archive_api_task_progress_table" {
-  role   = "${module.api_ecs.task_role_name}"
-  policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
-}
-
-resource "aws_iam_role_policy" "archive_api_task_bag_vhs" {
-  role   = "${module.api_ecs.task_role_name}"
-  policy = "${module.vhs_archive_manifest.read_policy}"
-}
-
 # Archivist
 
 resource "aws_iam_role_policy" "archivist_task_store_s3" {
@@ -40,11 +30,6 @@ resource "aws_iam_role_policy" "archivist_task_progress_async_sns" {
 resource "aws_iam_role_policy" "archivist_task_sqs" {
   role   = "${module.archivist.task_role_name}"
   policy = "${data.aws_iam_policy_document.read_from_archivist_queue.json}"
-}
-
-resource "aws_iam_role_policy" "archivist_task_archive_progress_table" {
-  role   = "${module.archivist.task_role_name}"
-  policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
 # Registrar async

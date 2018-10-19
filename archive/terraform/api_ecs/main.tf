@@ -21,9 +21,7 @@ module "api_ecs" {
     TOPIC_ARN = "${var.archive_ingest_sns_topic_arn}"
 
     PROGRESS_MANAGER_ENDPOINT = "http://progress_http.archive-storage:9001"
-
-    BAG_VHS_TABLE_NAME  = "${var.bag_vhs_table_name}"
-    BAG_VHS_BUCKET_NAME = "${var.bag_vhs_bucket_name}"
+    BAGS_MANAGER_ENDPOINT     = "http://registrar_http.archive-storage:9001"
   }
 
   env_vars_length = 4
