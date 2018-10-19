@@ -1,4 +1,4 @@
-# RFC 007: API Filtering
+# RFC 008: API Filtering
 
 **Last updated: 19 October 2018.**
 
