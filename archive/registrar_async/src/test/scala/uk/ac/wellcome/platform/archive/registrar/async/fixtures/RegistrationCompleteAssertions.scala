@@ -1,4 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar.async.fixtures
+import java.time.Instant
+
 import org.scalatest.{Inside, Matchers}
 import uk.ac.wellcome.platform.archive.common.models.{BagId, BagLocation}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
@@ -9,40 +11,23 @@ trait RegistrationCompleteAssertions extends Inside with Matchers {
                                  bagLocation: BagLocation,
                                  expectedBagId: BagId,
                                  storageManifest: StorageManifest,
-                                 filesNumber: Long): Unit = {
+                                 filesNumber: Long,
+                                 expectedVersion: Int, createdDateAfter: Instant): Unit = {
     inside(storageManifest) {
 
       case StorageManifest(
           actualBagId,
-          sourceIdentifier,
-          identifiers,
           FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-          TagManifest(ChecksumAlgorithm("sha256"), Nil),
-          List(digitalLocation),
-          _,
-          _,
-          _,
-          _) =>
+          createdDate,
+          updatedDate,
+          BagVersion(actualVersion)) =>
         actualBagId shouldBe expectedBagId
-
-        sourceIdentifier shouldBe SourceIdentifier(
-          IdentifierType("source", "Label"),
-          value = "123"
-        )
-
-        identifiers shouldBe List(sourceIdentifier)
 
         bagDigestFiles should have size filesNumber
 
-        val bucketUri = s"http://${storageBucket.name}.s3.amazonaws.com"
-
-        digitalLocation shouldBe DigitalLocation(
-          s"$bucketUri/${bagLocation.storagePath}/${bagLocation.bagPath.value}",
-          LocationType(
-            "aws-s3-standard-ia",
-            "AWS S3 Standard IA"
-          )
-        )
+        createdDate.isAfter(createdDateAfter) shouldBe true
+      updatedDate.isAfter(createdDateAfter) shouldBe true
+      actualVersion shouldBe expectedVersion
     }
   }
 }

@@ -1,13 +1,17 @@
 package uk.ac.wellcome.platform.archive.registrar.http
 
+import java.time.Instant
+
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.models.DisplayStorageSpace
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
+import uk.ac.wellcome.platform.archive.registrar.http.models.{DisplayBag, DisplayFileManifest}
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.storage.dynamo._
 
@@ -18,13 +22,13 @@ class RegistrarHttpFeatureTest
     with MetricsSenderFixture
     with RegistrarHttpFixture
     with RandomThings
-    with IntegrationPatience {
+    with IntegrationPatience with Inside {
 
   import HttpMethods._
   import uk.ac.wellcome.json.JsonUtil._
 
   describe("GET /registrar/:space/:id") {
-    it("returns a storage manifest when available") {
+    it("returns a bag when available") {
       withConfiguredApp {
         case (vhs, baseUrl, app) =>
           app.run()
@@ -37,13 +41,18 @@ class RegistrarHttpFeatureTest
                 IdentifierType("source", "Label"),
                 value = "123"
               )
+              val checksumAlgorithm = "sha256"
               val storageManifest = StorageManifest(
-                bagId,
-                sourceIdentifier,
-                Nil,
-                FileManifest(ChecksumAlgorithm("sha256"), Nil),
-                TagManifest(ChecksumAlgorithm("sha256"), Nil),
-                Nil)
+                id = bagId,
+                source = sourceIdentifier,
+                identifiers = Nil,
+                manifest = FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
+                tagManifest = TagManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
+                locations = Nil,
+                Instant.now,
+                Instant.now,
+                BagVersion(1)
+                )
               val putResult = vhs.updateRecord(
                 s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
                 ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
@@ -54,8 +63,24 @@ class RegistrarHttpFeatureTest
                   s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
 
                 whenRequestReady(request) { result =>
+
                   result.status shouldBe StatusCodes.OK
-                  getT[StorageManifest](result.entity) shouldBe storageManifest
+                  val displayBag = getT[DisplayBag](result.entity)
+
+                  inside(displayBag) { case DisplayBag(
+                    actualBagId,
+                  DisplayStorageSpace(storageSpaceName, "Space"),
+                  DisplayFileManifest(actualChecksumAlgorithm, Nil, "FileManifest"),
+                  createdDateString,
+                    updatedDateString,
+                    1,
+                    "Bag") =>
+                    actualBagId shouldBe s"${bagId.space.underlying}/${bagId.externalIdentifier.underlying}"
+                    storageSpaceName shouldBe bagId.space.underlying
+                    actualChecksumAlgorithm shouldBe checksumAlgorithm
+                    Instant.parse(createdDateString) shouldBe storageManifest.createdDate
+                    Instant.parse(updatedDateString) shouldBe storageManifest.lastModifiedDate
+                  }
 
                 }
               }

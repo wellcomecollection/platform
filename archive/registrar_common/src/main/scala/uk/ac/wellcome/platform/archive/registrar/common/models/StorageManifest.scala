@@ -20,23 +20,13 @@ case class BagFilePath(value: String)
 
 case class StorageManifest(
   id: BagId,
-  source: SourceIdentifier,
-  identifiers: List[SourceIdentifier],
   manifest: FileManifest,
-  tagManifest: TagManifest,
-  locations: List[Location],
-  description: Option[BagDescription] = None,
-  createdDate: Instant = Instant.ofEpochMilli(0),
-  lastModifiedDate: Instant = Instant.ofEpochMilli(0),
-  version: BagVersion = BagVersion(1)
+  createdDate: Instant,
+  lastModifiedDate: Instant,
+  version: BagVersion
 )
 
 // Manifest
-
-sealed trait Manifest {
-  val checksumAlgorithm: ChecksumAlgorithm
-  val files: List[BagDigestFile]
-}
 
 case class FileManifest(
   checksumAlgorithm: ChecksumAlgorithm,

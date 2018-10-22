@@ -1,17 +1,12 @@
 package uk.ac.wellcome.platform.archive.registrar.async.factories
 
+import java.time.Instant
+
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  DownloadError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -20,30 +15,10 @@ import scala.util.Try
 object StorageManifestFactory extends Logging {
   def create(archiveComplete: ArchiveComplete)(implicit s3Client: AmazonS3)
     : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
-    val bagLocation = archiveComplete.bagLocation
-
     val algorithm = "sha256"
 
     val manifestTupleEither =
       getBagItems(archiveComplete, s"manifest-$algorithm.txt", " +")
-//    val tagManifestTupleFuture = getTuples(s"tagmanifest-$algorithm.txt", " +")
-
-    val sourceIdentifier = SourceIdentifier(
-      IdentifierType("source", "Label"),
-      value = "123"
-    )
-
-    val location = DigitalLocation(
-      List(
-        s"http://${bagLocation.storageNamespace}.s3.amazonaws.com",
-        bagLocation.storagePath,
-        bagLocation.bagPath
-      ).mkString("/"),
-      LocationType(
-        "aws-s3-standard-ia",
-        "AWS S3 Standard IA"
-      )
-    )
 
     for {
       manifestTuples <- manifestTupleEither
@@ -51,19 +26,13 @@ object StorageManifestFactory extends Logging {
         ChecksumAlgorithm(algorithm),
         manifestTuples
       )
-      //tagManifestTuples <- tagManifestTupleFuture
-      tagManifest = TagManifest(
-        ChecksumAlgorithm(algorithm),
-        Nil //createBagDigestFiles(tagManifestTuples).toList
-      )
     } yield
       StorageManifest(
         id = archiveComplete.bagId,
-        source = sourceIdentifier,
-        identifiers = List(sourceIdentifier),
         manifest = fileManifest,
-        tagManifest = tagManifest,
-        locations = List(location)
+        Instant.now(),
+        Instant.now(),
+        BagVersion(1)
       )
   }
 
