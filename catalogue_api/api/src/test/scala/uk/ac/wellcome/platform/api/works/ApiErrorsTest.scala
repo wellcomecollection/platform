@@ -12,9 +12,9 @@ class ApiErrorsTest extends ApiWorksTestBase {
       server.httpGet(
         path = "/catalogue/v567/works",
         andExpect = Status.NotFound,
-        withJsonBody = badRequest(
+        withJsonBody = notFound(
           s"catalogue/${ApiVersions.default.toString}",
-          "v567 is not a valid API version")
+          "Page not found for URL /catalogue/v567/works")
       )
     }
   }
@@ -24,9 +24,9 @@ class ApiErrorsTest extends ApiWorksTestBase {
       server.httpGet(
         path = "/foo/bar",
         andExpect = Status.NotFound,
-        withJsonBody = badRequest(
+        withJsonBody = notFound(
           s"catalogue/${ApiVersions.default.toString}",
-          "v567 is not a valid API version")
+          "Page not found for URL /foo/bar")
       )
     }
   }
