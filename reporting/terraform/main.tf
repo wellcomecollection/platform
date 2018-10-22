@@ -6,7 +6,11 @@ module "lambda_transformer_example" {
   timeout     = 25
 
   environment_variables = {
-    FOO = "bar"
+    ES_URL      = "${var.reporting_es_url}"
+    ES_USER     = "${var.reporting_es_user}"
+    ES_PASS     = "${var.reporting_es_pass}"
+    ES_INDEX    = "test_index_example"
+    ES_DOC_TYPE = "example"
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
