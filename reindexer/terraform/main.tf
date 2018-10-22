@@ -4,7 +4,7 @@ module "source_data_reindex_catalogue_pipeline" {
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-  namespace = "catalogue_pipeline"
+  namespace    = "catalogue_pipeline"
 }
 
 module "source_data_reindex_reporting_pipeline" {
@@ -13,6 +13,5 @@ module "source_data_reindex_reporting_pipeline" {
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-  namespace = "reporting_pipeline"
+  namespace    = "reporting_pipeline"
 }
-

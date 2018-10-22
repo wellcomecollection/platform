@@ -6,8 +6,8 @@ module "miro_reindexer" {
 
   reindex_worker_container_image = "${var.reindex_worker_container_image}"
 
-  ecs_cluster_name                 = "${data.aws_ecs_cluster.cluster.cluster_name}"
-  ecs_cluster_id                   = "${data.aws_ecs_cluster.cluster.id}"
+  ecs_cluster_name = "${data.aws_ecs_cluster.cluster.cluster_name}"
+  ecs_cluster_id   = "${data.aws_ecs_cluster.cluster.id}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
@@ -21,8 +21,8 @@ module "sierra_reindexer" {
 
   reindex_worker_container_image = "${var.reindex_worker_container_image}"
 
-  ecs_cluster_name                 = "${data.aws_ecs_cluster.cluster.cluster_name}"
-  ecs_cluster_id                   = "${data.aws_ecs_cluster.cluster.id}"
+  ecs_cluster_name = "${data.aws_ecs_cluster.cluster.cluster_name}"
+  ecs_cluster_id   = "${data.aws_ecs_cluster.cluster.id}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
@@ -36,8 +36,8 @@ module "sierra_items_reindexer" {
 
   reindex_worker_container_image = "${var.reindex_worker_container_image}"
 
-  ecs_cluster_name                 = "${data.aws_ecs_cluster.cluster.cluster_name}"
-  ecs_cluster_id                   = "${data.aws_ecs_cluster.cluster.id}"
+  ecs_cluster_name = "${data.aws_ecs_cluster.cluster.cluster_name}"
+  ecs_cluster_id   = "${data.aws_ecs_cluster.cluster.id}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
