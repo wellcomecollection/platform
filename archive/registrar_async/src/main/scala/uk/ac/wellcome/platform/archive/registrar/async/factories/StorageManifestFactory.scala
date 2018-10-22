@@ -30,6 +30,11 @@ object StorageManifestFactory extends Logging {
       StorageManifest(
         id = archiveComplete.bagId,
         manifest = fileManifest,
+        Location(
+          Provider("aws-s3-ia", "AWS S3 - Infrequent Access"),
+          ObjectLocation(
+            archiveComplete.bagLocation.storageNamespace,
+            s"${archiveComplete.bagLocation.storagePath}/${archiveComplete.bagLocation.bagPath.value}")),
         Instant.now()
       )
   }

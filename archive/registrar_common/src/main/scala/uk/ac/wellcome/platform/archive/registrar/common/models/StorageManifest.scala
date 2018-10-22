@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar.common.models
 import java.time.Instant
 
 import uk.ac.wellcome.platform.archive.common.models.BagId
+import uk.ac.wellcome.storage.ObjectLocation
 
 case class ChecksumAlgorithm(value: String)
 
@@ -15,7 +16,8 @@ case class BagFilePath(value: String)
 case class StorageManifest(
   id: BagId,
   manifest: FileManifest,
-  createdDate: Instant
+  accessLocation: Location,
+    createdDate: Instant
 )
 
 
@@ -36,3 +38,7 @@ case class BagDigestFile(
   checksum: Checksum,
   path: BagFilePath
 )
+
+case class Location(provider: Provider, location: ObjectLocation)
+
+case class Provider(id: String, label: String)

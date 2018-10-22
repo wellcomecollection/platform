@@ -64,11 +64,10 @@ class RegistrarFeatureTest
 
               val storageManifest = maybeStorageManifest.get
 
-              assertRegistrationComplete(
-                storageBucket = storageBucket,
-                bagLocation = bagLocation,
+              assertRegistrationComplete(storageManifest)(
                 expectedBagId = bagId,
-                storageManifest = storageManifest,
+                expectedNamespace = storageBucket.name,
+                expectedPath = s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
                 filesNumber = 1,
                 createdDateAfter = createdAfterDate
               )
@@ -138,9 +137,9 @@ class RegistrarFeatureTest
         val bagId2 = randomBagId
 
         withBagNotification(requestId1, bagId1, queuePair, storageBucket) {
-          bagLocation1 =>
+          _ =>
             withBagNotification(requestId2, bagId2, queuePair, storageBucket) {
-              bagLocation2 =>
+              _ =>
                 registrar.run()
 
                 eventually {

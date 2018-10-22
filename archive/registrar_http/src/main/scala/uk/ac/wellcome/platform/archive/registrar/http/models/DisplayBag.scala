@@ -9,6 +9,7 @@ case class DisplayBag(
   info: DisplayBagInfo,
   manifest: DisplayFileManifest,
   createdDate: String,
+
   @JsonKey("type")
   ontologyType: String = "Bag"
               )
