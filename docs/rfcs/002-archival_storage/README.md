@@ -408,7 +408,7 @@ Response:
       "label": "AWS S3 - Infrequent Access"
     },
     "bucket": "bucketname",
-    "path": "digitised/b24923333",
+    "path": "/digitised/b24923333",
     "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
   },
   "archiveLocations": [
@@ -420,7 +420,7 @@ Response:
         "label": "AWS S3 - Glacier"
       },
       "bucket": "bucketname",
-      "path": "digitised/b24923333",
+      "path": "/digitised/b24923333",
       "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
     },
     {
@@ -431,7 +431,7 @@ Response:
         "label": "Azure Blob Storage - Archive"
       },
       "bucket": "bucketname",
-      "path": "digitised/b24923333",
+      "path": "/digitised/b24923333",
       "url": "https://accountname.blob.core.windows.net/bucketname/digitised/b24923333"
     }
   ],
@@ -548,7 +548,8 @@ Response:
       "label": "AWS S3 - Infrequent Access"
     },
     "bucket": "bucketname",
-    "path": "http://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+    "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
   },
   "archiveLocations": [
     {
@@ -559,7 +560,8 @@ Response:
         "label": "AWS S3 - Glacier"
       },
       "bucket": "bucketname",
-      "path": "http://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Location",
@@ -569,7 +571,8 @@ Response:
         "label": "Azure Blob Storage - Archive"
       },
       "bucket": "bucketname",
-      "path": "https://accountname.blob.core.windows.net/bucketname/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "https://accountname.blob.core.windows.net/bucketname/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
