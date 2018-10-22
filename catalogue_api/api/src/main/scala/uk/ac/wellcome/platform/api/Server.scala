@@ -1,7 +1,8 @@
 package uk.ac.wellcome.platform.api
 
+import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.{Request, Response}
-import com.twitter.finatra.http.HttpServer
+import com.twitter.finatra.http.{Controller, HttpServer}
 import com.twitter.finatra.http.filters.{
   CommonFilters,
   LoggingMDCFilter,
@@ -24,6 +25,13 @@ import uk.ac.wellcome.platform.api.modules.ApiConfigModule
 
 object ServerMain extends Server
 
+@Singleton
+class AlexController @Inject() extends Controller {
+  get("/:*") { request: Request =>
+    response.notFound.json(Map("message" -> "ok"))
+  }
+}
+
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
   override val modules = Seq(
@@ -45,6 +53,7 @@ class Server extends HttpServer {
       .add[DocsController]
       .add[V1WorksController]
       .add[V2WorksController]
+      .add[AlexController]
       .exceptionMapper[GeneralExceptionMapper]
       .exceptionMapper[CaseClassMappingExceptionWrapper]
       .exceptionMapper[ElasticsearchResponseExceptionMapper]
