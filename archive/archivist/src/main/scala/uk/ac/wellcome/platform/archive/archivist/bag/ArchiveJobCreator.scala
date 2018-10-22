@@ -2,10 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  FileNotFoundError,
-  InvalidBagInfo
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
@@ -65,18 +62,7 @@ object ArchiveJobCreator {
       .toRight[ArchiveError[IngestBagRequest]](
         FileNotFoundError("bag-info.txt", ingestBagRequest))
       .flatMap { inputStream =>
-        val bagInfoLines = scala.io.Source
-          .fromInputStream(inputStream, "UTF-8")
-          .mkString
-          .split("\n")
-        val regex = """(.*?)\s*:\s*(.*)\s*""".r
-
-        bagInfoLines
-          .collectFirst {
-            case regex(key, value) if key == "External-Identifier" =>
-              ExternalIdentifier(value)
-          }
-          .toRight(InvalidBagInfo(ingestBagRequest))
+        BagInfoExtractor.extractBagInfo(ingestBagRequest, inputStream).map(_.externalIdentifier)
       }
   }
 }

@@ -105,13 +105,8 @@ trait BagIt extends RandomThings {
           .mkString("\n")
       ))
 
-  private def bagInfoFileContents(bagIdentifier: ExternalIdentifier) = {
-    val date =
-      new java.text.SimpleDateFormat("YYYY-MM-dd").format(new java.util.Date())
-    s"""Payload-Oxum: 61798.84
-       |Bagging-Date: $date
-       |Bag-Size: 60.5 KB
-       |External-Identifier: $bagIdentifier
+  def bagInfoFileContents(bagIdentifier: ExternalIdentifier) = {
+    s"""External-Identifier: $bagIdentifier
       """.stripMargin.trim
   }
 
