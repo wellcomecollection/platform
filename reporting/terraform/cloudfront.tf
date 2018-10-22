@@ -24,7 +24,9 @@ resource "aws_cloudfront_distribution" "reporting" {
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = []
+    # This field apparently must be non-empty
+    # OPTIONS is a fairly safe field to cache
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = "reporting"
 
     forwarded_values {
@@ -36,6 +38,9 @@ resource "aws_cloudfront_distribution" "reporting" {
 
       headers = ["*"]
     }
+
+    default_ttl = 0
+    max_ttl     = 0
 
     viewer_protocol_policy = "redirect-to-https"
   }
