@@ -19,6 +19,7 @@ include sbt_common/Makefile
 include sierra_adapter/Makefile
 include nginx/Makefile
 include archive/Makefile
+include reporting/Makefile
 
 
 travis-lambda-test:
