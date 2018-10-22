@@ -153,7 +153,7 @@ jobs:
     - env: TASK=snapshot_generator-test
 
     # Reindexer stack
-    - env: TASK=reindex_request_creator-test
+    - env: TASK=reindex_worker-test
 
     # Goobi adapter stack
     - env: TASK=goobi_reader-test
