@@ -277,9 +277,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
     }
   }
 
-  // TODO figure out what the correct behaviour should be in this case
-  ignore(
-    "returns a Not Found error if you try to get a version that doesn't exist") {
+  it("returns a Not Found error if you try to get a version that doesn't exist") {
     withServer(indexNameV1 = "not-important", indexNameV2 = "not-important") {
       server =>
         server.httpGet(
