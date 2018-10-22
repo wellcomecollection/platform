@@ -30,6 +30,7 @@ class TestGETIngests:
             "status": "pending",
             "type": "Callback",
         }
+        assert rv["resources"] == [{"id": "bag-id", "type": "IngestResource"}]
         assert rv["ingestType"] == {"id": "create", "type": "IngestType"}
         assert rv["status"] == {"id": "processing", "type": "IngestStatus"}
         assert rv["space"] == {"id": "space-id", "type": "Space"}

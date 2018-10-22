@@ -50,6 +50,8 @@ Space = TypedModel(
 
 Callback = TypedModel("Callback", {"uri": fields.String(), "status": fields.String()})
 
+IngestResource = TypedModel("IngestResource", {"id": fields.String()})
+
 Ingest = TypedModel(
     "Ingest",
     {
@@ -61,6 +63,9 @@ Ingest = TypedModel(
         ),
         "callback": fields.Nested(
             Callback, description="Callback details used on completion or failure"
+        ),
+        "resources": fields.List(
+            fields.Nested(IngestResource, description="Bag resources")
         ),
         "ingestType": fields.Nested(
             IngestType,

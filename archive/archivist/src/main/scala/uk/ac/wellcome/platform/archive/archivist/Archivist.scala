@@ -34,8 +34,8 @@ trait Archivist extends Logging {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
-    val decider: Supervision.Decider = {
-      case e => {
+    val decider: Supervision.Decider = { e =>
+      {
         error("Stream failure", e)
         Supervision.Resume
       }

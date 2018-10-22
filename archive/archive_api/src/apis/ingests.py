@@ -6,7 +6,14 @@ from flask_restplus import Namespace, Resource
 
 from ingests import send_new_ingest_request
 from models.catalogue import Error
-from models.ingests import Ingest, IngestType, IngestStatus, Space, Callback
+from models.ingests import (
+    Ingest,
+    IngestType,
+    IngestStatus,
+    Space,
+    Callback,
+    IngestResource,
+)
 from models.progress import Progress, ProgressEvent
 from progress_manager import ProgressNotFoundError
 import validators
@@ -21,6 +28,7 @@ api.add_model(name="IngestStatus", definition=IngestStatus)
 api.add_model(name="IngestType", definition=IngestType)
 api.add_model(name="Space", definition=Space)
 api.add_model(name="Callback", definition=Callback)
+api.add_model(name="IngestResource", definition=IngestResource)
 
 api.add_model(name="Progress", definition=Progress)
 api.add_model(name="ProgressEvent", definition=ProgressEvent)
