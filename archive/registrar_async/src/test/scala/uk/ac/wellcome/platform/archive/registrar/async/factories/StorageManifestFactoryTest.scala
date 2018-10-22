@@ -39,8 +39,7 @@ class StorageManifestFactoryTest
                 actualBagId,
                 FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
                 _,
-                _,
-                BagVersion(1))) =>
+                _)) =>
             actualBagId shouldBe bagId
 
             bagDigestFiles should have size 1

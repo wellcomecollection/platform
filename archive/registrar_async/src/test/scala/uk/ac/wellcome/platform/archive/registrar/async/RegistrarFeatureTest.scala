@@ -70,7 +70,6 @@ class RegistrarFeatureTest
                 expectedBagId = bagId,
                 storageManifest = storageManifest,
                 filesNumber = 1,
-                expectedVersion = 1,
                 createdDateAfter = createdAfterDate
               )
 

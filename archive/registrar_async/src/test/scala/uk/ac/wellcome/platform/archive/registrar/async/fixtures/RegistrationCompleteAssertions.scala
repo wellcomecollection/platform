@@ -11,23 +11,18 @@ trait RegistrationCompleteAssertions extends Inside with Matchers {
                                  bagLocation: BagLocation,
                                  expectedBagId: BagId,
                                  storageManifest: StorageManifest,
-                                 filesNumber: Long,
-                                 expectedVersion: Int, createdDateAfter: Instant): Unit = {
+                                 filesNumber: Long,createdDateAfter: Instant): Unit = {
     inside(storageManifest) {
 
       case StorageManifest(
           actualBagId,
           FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-          createdDate,
-          updatedDate,
-          BagVersion(actualVersion)) =>
+          createdDate) =>
         actualBagId shouldBe expectedBagId
 
         bagDigestFiles should have size filesNumber
 
         createdDate.isAfter(createdDateAfter) shouldBe true
-      updatedDate.isAfter(createdDateAfter) shouldBe true
-      actualVersion shouldBe expectedVersion
     }
   }
 }

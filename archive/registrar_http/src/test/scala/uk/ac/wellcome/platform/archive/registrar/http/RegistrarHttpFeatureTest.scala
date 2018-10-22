@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.DisplayStorageSpace
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
-import uk.ac.wellcome.platform.archive.registrar.http.models.{DisplayBag, DisplayFileManifest}
+import uk.ac.wellcome.platform.archive.registrar.http.models.{DisplayBag, DisplayBagInfo, DisplayFileManifest}
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.storage.dynamo._
 
@@ -37,21 +37,11 @@ class RegistrarHttpFeatureTest
             withMaterializer(actorSystem) { implicit actorMaterializer =>
               val bagId = randomBagId
 
-              val sourceIdentifier = SourceIdentifier(
-                IdentifierType("source", "Label"),
-                value = "123"
-              )
               val checksumAlgorithm = "sha256"
               val storageManifest = StorageManifest(
                 id = bagId,
-                source = sourceIdentifier,
-                identifiers = Nil,
                 manifest = FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                tagManifest = TagManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                locations = Nil,
-                Instant.now,
-                Instant.now,
-                BagVersion(1)
+                Instant.now
                 )
               val putResult = vhs.updateRecord(
                 s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
@@ -70,16 +60,15 @@ class RegistrarHttpFeatureTest
                   inside(displayBag) { case DisplayBag(
                     actualBagId,
                   DisplayStorageSpace(storageSpaceName, "Space"),
+                    DisplayBagInfo(externalIdentifierString, "BagInfo"),
                   DisplayFileManifest(actualChecksumAlgorithm, Nil, "FileManifest"),
                   createdDateString,
-                    updatedDateString,
-                    1,
                     "Bag") =>
                     actualBagId shouldBe s"${bagId.space.underlying}/${bagId.externalIdentifier.underlying}"
                     storageSpaceName shouldBe bagId.space.underlying
+                    externalIdentifierString shouldBe bagId.externalIdentifier.underlying
                     actualChecksumAlgorithm shouldBe checksumAlgorithm
                     Instant.parse(createdDateString) shouldBe storageManifest.createdDate
-                    Instant.parse(updatedDateString) shouldBe storageManifest.lastModifiedDate
                   }
 
                 }

@@ -30,9 +30,7 @@ object StorageManifestFactory extends Logging {
       StorageManifest(
         id = archiveComplete.bagId,
         manifest = fileManifest,
-        Instant.now(),
-        Instant.now(),
-        BagVersion(1)
+        Instant.now()
       )
   }
 

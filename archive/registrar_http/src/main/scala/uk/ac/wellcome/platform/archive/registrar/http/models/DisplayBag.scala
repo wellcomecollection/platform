@@ -6,10 +6,9 @@ import uk.ac.wellcome.platform.archive.registrar.common.models.{BagDigestFile, F
 case class DisplayBag(
   id: String,
   space: DisplayStorageSpace,
+  info: DisplayBagInfo,
   manifest: DisplayFileManifest,
   createdDate: String,
-  lastModifiedDate: String,
-  version: Int,
   @JsonKey("type")
   ontologyType: String = "Bag"
               )
@@ -18,12 +17,17 @@ object DisplayBag {
   def apply(storageManifest: StorageManifest): DisplayBag = DisplayBag(
     storageManifest.id.toString,
     DisplayStorageSpace(storageManifest.id.space.underlying),
+    DisplayBagInfo(storageManifest.id.externalIdentifier.underlying),
     DisplayFileManifest(storageManifest.manifest),
-    storageManifest.createdDate.toString,
-    storageManifest.lastModifiedDate.toString,
-    storageManifest.version.value
+    storageManifest.createdDate.toString
   )
 }
+
+case class DisplayBagInfo(
+  externalIdentifier: String,
+  @JsonKey("type")
+  ontologyType: String = "BagInfo"
+                         )
 
 case class DisplayFileManifest(
   checksumAlgorithm: String,
