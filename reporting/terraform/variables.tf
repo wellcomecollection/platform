@@ -1,7 +1,7 @@
-variable "reporting_kibana_domain_name" {}
+variable "reporting_kibana_domain_name" {
+  default = "c783b93d8b0b4b11900b5793cb2a1865.eu-west-1.aws.found.io"
+}
 
-variable "infra_bucket" {}
-variable "lambda_error_alarm_arn" {}
-
-variable "miro_topic_arn" {}
-variable "sierra_topic_arn" {}
+variable "aws_region" {
+  default = "eu-west-1"
+}

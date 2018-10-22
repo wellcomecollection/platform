@@ -69,3 +69,25 @@ output "infra_bucket_arn" {
 output "infra_bucket" {
   value = "${var.infra_bucket}"
 }
+
+# Reindexing topics
+
+## Reporting - miro
+
+output "reporting_miro_reindex_topic_arn" {
+  value = "${module.reporting_miro_reindex_topic.arn}"
+}
+
+output "reporting_miro_reindex_topic_publish_policy" {
+  value = "${module.reporting_miro_reindex_topic.publish_policy}"
+}
+
+## Reporting - sierra
+
+output "reporting_sierra_reindex_topic_arn" {
+  value = "${module.reporting_sierra_reindex_topic.arn}"
+}
+
+output "reporting_sierra_reindex_topic_publish_policy" {
+  value = "${module.reporting_sierra_reindex_topic.publish_policy}"
+}

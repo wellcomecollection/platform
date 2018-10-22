@@ -46,3 +46,17 @@ module "terraform_apply_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
   name   = "shared_terraform_apply"
 }
+
+# Shared topics for reindexing
+
+## Reporting
+
+module "reporting_miro_reindex_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "reporting_miro_reindex_topic"
+}
+
+module "reporting_sierra_reindex_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "reporting_sierra_reindex_topic"
+}

@@ -7,7 +7,7 @@ data "aws_acm_certificate" "reporting_wc_org" {
 resource "aws_cloudfront_distribution" "reporting" {
   origin {
     domain_name = "${var.reporting_kibana_domain_name}"
-    origin_id   = "loris"
+    origin_id   = "reporting"
 
     custom_origin_config {
       https_port             = 9243
