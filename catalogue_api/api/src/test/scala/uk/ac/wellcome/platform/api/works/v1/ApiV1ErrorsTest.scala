@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.api.works.v1
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
-import uk.ac.wellcome.display.models.ApiVersions
 
 class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
@@ -274,19 +273,6 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
             "Only the first 10000 works are available in the API.")
         )
 
-    }
-  }
-
-  it("returns a Not Found error if you try to get a version that doesn't exist") {
-    withServer(indexNameV1 = "not-important", indexNameV2 = "not-important") {
-      server =>
-        server.httpGet(
-          path = "/catalogue/v567/works?pageSize=100&page=101",
-          andExpect = Status.NotFound,
-          withJsonBody = badRequest(
-            s"catalogue/${ApiVersions.default.toString}",
-            "v567 is not a valid API version")
-        )
     }
   }
 }

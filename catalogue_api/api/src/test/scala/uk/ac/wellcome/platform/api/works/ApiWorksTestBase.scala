@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api.works
 import com.sksamuel.elastic4s.Indexable
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{ApiVersions, DisplaySerialisationTestBase}
+import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
@@ -14,7 +14,6 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait ApiWorksTestBase
     extends FunSpec
     with ElasticsearchFixtures
-    with DisplaySerialisationTestBase
     with WorksGenerators {
 
   implicit object IdentifiedWorkIndexable extends Indexable[IdentifiedWork] {
