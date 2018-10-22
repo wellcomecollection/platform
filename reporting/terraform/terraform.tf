@@ -18,3 +18,13 @@ data "terraform_remote_state" "shared_infra" {
     region = "eu-west-1"
   }
 }
+
+data "terraform_remote_state" "infra_critical" {
+  backend = "s3"
+
+  config {
+    bucket = "wellcomecollection-platform-infra"
+    key    = "terraform/infra_critical.tfstate"
+    region = "eu-west-1"
+  }
+}

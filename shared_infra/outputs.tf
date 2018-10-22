@@ -91,3 +91,23 @@ output "reporting_sierra_reindex_topic_arn" {
 output "reporting_sierra_reindex_topic_publish_policy" {
   value = "${module.reporting_sierra_reindex_topic.publish_policy}"
 }
+
+## Catalogue - miro
+
+output "catalogue_miro_reindex_topic_arn" {
+  value = "${module.catalogue_miro_reindex_topic.arn}"
+}
+
+output "catalogue_miro_reindex_topic_publish_policy" {
+  value = "${module.catalogue_miro_reindex_topic.publish_policy}"
+}
+
+## Catalogue - sierra
+
+output "catalogue_sierra_reindex_topic_arn" {
+  value = "${module.catalogue_sierra_reindex_topic.arn}"
+}
+
+output "catalogue_sierra_reindex_topic_publish_policy" {
+  value = "${module.catalogue_sierra_reindex_topic.publish_policy}"
+}
