@@ -8,6 +8,15 @@ import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
+/** This controller returns a 404 to any requests for an undefined path.
+  *
+  * Note: it does this by defining a wildcard route for all paths.
+  * Since Finatra resolves routes in the order they're declared, this
+  * controller must be used last, or it will break other routes.
+  *
+  * More info: https://twitter.github.io/finatra/user-guide/http/controllers.html#wildcard-parameter
+  *
+  */
 @Singleton
 class MissingPathController @Inject()(apiConfig: ApiConfig) extends Controller {
   val contextUri: String = buildContextUri(
