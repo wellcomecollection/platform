@@ -24,7 +24,7 @@ data "terraform_remote_state" "infra_critical" {
 
   config {
     bucket = "wellcomecollection-platform-infra"
-    key    = "terraform/infra_critical.tfstate"
+    key    = "terraform/catalogue_pipeline_data.tfstate"
     region = "eu-west-1"
   }
 }
