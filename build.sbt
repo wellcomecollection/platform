@@ -199,12 +199,15 @@ lazy val registrar_async = doServiceSetup(project, "archive/registrar_async")
 lazy val registrar_http = doServiceSetup(project, "archive/registrar_http")
   .dependsOn(registrar_common % "compile->compile;test->test")
 
-lazy val progress_async = doServiceSetup(project, "archive/progress_async")
+lazy val progress_common = doServiceSetup(project, "archive/progress_common")
   .dependsOn(archive_common % "compile->compile;test->test")
+
+lazy val progress_async = doServiceSetup(project, "archive/progress_async")
+  .dependsOn(progress_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
 lazy val progress_http = doServiceSetup(project, "archive/progress_http")
-  .dependsOn(archive_common % "compile->compile;test->test")
+  .dependsOn(progress_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
 lazy val root = (project in file("."))
