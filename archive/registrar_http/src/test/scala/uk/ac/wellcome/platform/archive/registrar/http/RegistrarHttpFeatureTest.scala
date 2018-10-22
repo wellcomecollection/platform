@@ -11,7 +11,8 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.DisplayStorageSpace
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
-import uk.ac.wellcome.platform.archive.registrar.http.models.{DisplayBag, DisplayBagInfo, DisplayFileManifest}
+import uk.ac.wellcome.platform.archive.registrar.http.models._
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.storage.dynamo._
 
@@ -38,9 +39,14 @@ class RegistrarHttpFeatureTest
               val bagId = randomBagId
 
               val checksumAlgorithm = "sha256"
+              val path = "path"
+              val bucket = "bucket"
+              val providerId = "provider-id"
+              val providerLabel = "provider label"
               val storageManifest = StorageManifest(
                 id = bagId,
                 manifest = FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
+                Location(Provider(providerId, providerLabel), ObjectLocation(bucket, path)),
                 Instant.now
                 )
               val putResult = vhs.updateRecord(
@@ -62,12 +68,18 @@ class RegistrarHttpFeatureTest
                   DisplayStorageSpace(storageSpaceName, "Space"),
                     DisplayBagInfo(externalIdentifierString, "BagInfo"),
                   DisplayFileManifest(actualChecksumAlgorithm, Nil, "FileManifest"),
+                    DisplayLocation(DisplayProvider(actualProviderId, actualProviderLabel, "Provider"), actualBucket, actualPath, "Location"),
                   createdDateString,
                     "Bag") =>
                     actualBagId shouldBe s"${bagId.space.underlying}/${bagId.externalIdentifier.underlying}"
                     storageSpaceName shouldBe bagId.space.underlying
                     externalIdentifierString shouldBe bagId.externalIdentifier.underlying
                     actualChecksumAlgorithm shouldBe checksumAlgorithm
+                    actualProviderId shouldBe providerId
+                    actualProviderLabel shouldBe providerLabel
+                    actualBucket shouldBe bucket
+                    actualPath shouldBe path
+
                     Instant.parse(createdDateString) shouldBe storageManifest.createdDate
                   }
 
