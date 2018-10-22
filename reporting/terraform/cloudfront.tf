@@ -12,8 +12,8 @@ resource "aws_cloudfront_distribution" "reporting" {
     custom_origin_config {
       https_port             = 9243
       http_port              = 9200
-      origin_protocol_policy = "match-viewer"
-      origin_ssl_protocols   = ["TLSv1.2"]
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2", "TLSv1", "TLSv1.1"]
     }
   }
 
@@ -26,7 +26,7 @@ resource "aws_cloudfront_distribution" "reporting" {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     # This field apparently must be non-empty
     # OPTIONS is a fairly safe field to cache
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
     target_origin_id = "reporting"
 
     forwarded_values {
@@ -35,8 +35,6 @@ resource "aws_cloudfront_distribution" "reporting" {
       cookies {
         forward = "all"
       }
-
-      headers = ["*"]
     }
 
     default_ttl = 0
