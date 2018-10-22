@@ -9,6 +9,7 @@ import os
 
 from attr import attrs, attrib
 import boto3
+
 # Required for elasticsearch-py
 import certifi
 from elasticsearch import Elasticsearch
@@ -21,6 +22,7 @@ from elasticsearch import Elasticsearch
 def _transform(record):
     # do not do this!
     return record
+
 
 # --------------------------------
 
@@ -51,89 +53,52 @@ def _extract_hybrid_record(raw_record):
 
 
 def _get_record_from_s3(s3, object_location):
-    obj = s3.get_object(
-        Bucket=object_location.namespace,
-        Key=object_location.key
-    )
+    obj = s3.get_object(Bucket=object_location.namespace, Key=object_location.key)
 
-    return obj['Body'].read().decode('utf-8')
+    return obj["Body"].read().decode("utf-8")
 
 
 def _build_es_record(s3, hybrid_record):
-    s3_record = _get_record_from_s3(
-        s3, hybrid_record.location
-    )
+    s3_record = _get_record_from_s3(s3, hybrid_record.location)
 
-    return ElasticsearchRecord(
-        id=hybrid_record.id,
-        doc=s3_record
-    )
+    return ElasticsearchRecord(id=hybrid_record.id, doc=s3_record)
 
 
 def extract_records(s3, event):
-    raw_hybrid_records = (
-        [json.loads(
-            record['Sns']['Message']
-        ) for record in event['Records']]
-    )
+    raw_hybrid_records = [
+        json.loads(record["Sns"]["Message"]) for record in event["Records"]
+    ]
 
-    hybrid_records = (
-        [_extract_hybrid_record(
-            raw_record
-        ) for raw_record in raw_hybrid_records]
-    )
+    hybrid_records = [
+        _extract_hybrid_record(raw_record) for raw_record in raw_hybrid_records
+    ]
 
-    return (
-        [_build_es_record(
-            s3, hybrid_record
-        ) for hybrid_record in hybrid_records]
-    )
+    return [_build_es_record(s3, hybrid_record) for hybrid_record in hybrid_records]
 
 
 def transform_records(records):
-    return (
-        [_transform(
-            record
-        ) for record in records]
-    )
+    return [_transform(record) for record in records]
 
 
 def _load_record(es, index, doc_type, es_record):
-    return es.index(
-        index=index,
-        doc_type=doc_type,
-        id=es_record.id,
-        body=es_record.doc
-    )
+    return es.index(index=index, doc_type=doc_type, id=es_record.id, body=es_record.doc)
 
 
 def load_records(es, index, doc_type, docs):
-    return (
-        [_load_record(
-            es, index, doc_type, doc
-        ) for doc in docs]
-    )
+    return [_load_record(es, index, doc_type, doc) for doc in docs]
 
 
 def _run(url, username, password, event, index, doc_type):
     es = Elasticsearch(
-        url,
-        http_auth=(
-            username,
-            password
-        ),
-        use_ssl=True,
-        ca_certs=certifi.where()
+        url, http_auth=(username, password), use_ssl=True, ca_certs=certifi.where()
     )
 
-    s3 = boto3.client('s3')
+    s3 = boto3.client("s3")
 
     records = extract_records(s3, event)
     transformed_records = transform_records(records)
 
-    return load_records(
-        es, index, doc_type, transformed_records
-    )
+    return load_records(es, index, doc_type, transformed_records)
 
 
 def main(event, _):
@@ -145,7 +110,7 @@ def main(event, _):
         password=os.environ["ES_PASS"],
         event=event,
         index=os.environ["ES_INDEX"],
-        doc_type=os.environ["ES_DOC_TYPE"]
+        doc_type=os.environ["ES_DOC_TYPE"],
     )
 
     print(f"Result: {results}")

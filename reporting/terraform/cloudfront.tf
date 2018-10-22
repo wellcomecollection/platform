@@ -23,10 +23,12 @@ resource "aws_cloudfront_distribution" "reporting" {
   aliases = ["reporting.wellcomecollection.org"]
 
   default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    allowed_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+
     # This field apparently must be non-empty
     # OPTIONS is a fairly safe field to cache
-    cached_methods   = ["GET", "HEAD"]
+    cached_methods = ["GET", "HEAD"]
+
     target_origin_id = "reporting"
 
     forwarded_values {

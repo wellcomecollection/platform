@@ -15,8 +15,8 @@ module "lambda_transformer_example" {
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 
-  s3_bucket       = "${local.infra_bucket}"
-  s3_key          = "lambdas/reporting/transformer_example.zip"
+  s3_bucket = "${local.infra_bucket}"
+  s3_key    = "lambdas/reporting/transformer_example.zip"
 
   log_retention_in_days = 30
 }
