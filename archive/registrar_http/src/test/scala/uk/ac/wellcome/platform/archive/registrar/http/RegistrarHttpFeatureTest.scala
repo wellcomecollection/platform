@@ -67,7 +67,7 @@ class RegistrarHttpFeatureTest
                     actualBagId,
                   DisplayStorageSpace(storageSpaceName, "Space"),
                     DisplayBagInfo(externalIdentifierString, "BagInfo"),
-                  DisplayFileManifest(actualChecksumAlgorithm, Nil, "FileManifest"),
+                  DisplayBagManifest(actualChecksumAlgorithm, Nil, "BagManifest"),
                     DisplayLocation(DisplayProvider(actualProviderId, actualProviderLabel, "Provider"), actualBucket, actualPath, "Location"),
                   createdDateString,
                     "Bag") =>

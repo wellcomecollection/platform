@@ -7,7 +7,7 @@ case class DisplayBag(
   id: String,
   space: DisplayStorageSpace,
   info: DisplayBagInfo,
-  manifest: DisplayFileManifest,
+  manifest: DisplayBagManifest,
   accessLocation: DisplayLocation,
   createdDate: String,
 
@@ -20,7 +20,7 @@ object DisplayBag {
     storageManifest.id.toString,
     DisplayStorageSpace(storageManifest.id.space.underlying),
     DisplayBagInfo(storageManifest.id.externalIdentifier.underlying),
-    DisplayFileManifest(storageManifest.manifest),
+    DisplayBagManifest(storageManifest.manifest),
     DisplayLocation(storageManifest.accessLocation),
     storageManifest.createdDate.toString
   )
