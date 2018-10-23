@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 
 trait SierraAgents {
@@ -11,8 +10,8 @@ trait SierraAgents {
   //  - subfield $a populates the person label
   //  - subfield $b populates the person numeration
   //  - subfield $c populates the person prefixes
-  def getPerson(subfields: List[MarcSubfield]) = {
-    val label = getLabel(subfields)
+  def getPerson(subfields: List[MarcSubfield]): Option[Person] = {
+    val maybeLabel = getLabel(subfields)
 
     // Extract the numeration from subfield $b.  This is also non-repeatable
     // in the MARC spec.
@@ -28,21 +27,24 @@ trait SierraAgents {
     val prefixString =
       if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-    Person(
-      label = label,
-      prefix = prefixString,
-      numeration = numeration
-    )
+    maybeLabel.map { label =>
+      Person(
+        label = label,
+        prefix = prefixString,
+        numeration = numeration
+      )
+    }
   }
 
   // This is used to construct an Organisation from MARC tags 110 and 710.
   // For all entries:
   //  - Subfield $a is "label"
   //  - Subfield $0 is used to populate "identifiers". The identifier scheme is lc-names.
-  def getOrganisation(subfields: List[MarcSubfield]) = {
-    val label = getLabel(subfields)
-    Organisation(label = label)
-  }
+  //
+  def getOrganisation(subfields: List[MarcSubfield]): Option[Organisation] =
+    getLabel(subfields).map { label =>
+      Organisation(label = label)
+    }
 
   /* Given an agent and the associated MARC subfields, look for instances of subfield $0,
    * which are used for identifiers.
@@ -88,19 +90,12 @@ trait SierraAgents {
     }
   }
 
-  private def getLabel(subfields: List[MarcSubfield]): String = {
+  private def getLabel(subfields: List[MarcSubfield]): Option[String] = {
     // Extract the label from subfield $a.  This is a non-repeatable
     // field in the MARC spec, but we have seen records where it
-    // doesn't appear.
-    val maybeSubfieldA = subfields.collectFirst {
+    // doesn't appear.  In that case, we discard the entire agent.
+    subfields.collectFirst {
       case MarcSubfield("a", content) => content
-    }
-
-    maybeSubfieldA match {
-      case Some(content) => content
-      case None =>
-        throw TransformerException(
-          s"Unable to find subfield $$a? <<$subfields>>")
     }
   }
 }

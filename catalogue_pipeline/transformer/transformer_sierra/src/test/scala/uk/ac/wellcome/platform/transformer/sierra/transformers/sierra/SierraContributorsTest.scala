@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   VarField
@@ -432,8 +431,7 @@ class SierraContributorsTest
         expectedContributors = expectedContributors)
     }
 
-    it(
-      "gets the name from MARC tags 110 and 710 subfield $$a in the right order") {
+    it("gets the name from MARC tags 110 and 710 subfield $$a in the right order") {
       val name1 = "Mary the mallow"
       val name2 = "Mike the mashua"
       val name3 = "Mickey the mozuku"
@@ -566,8 +564,7 @@ class SierraContributorsTest
         expectedContributors = expectedContributors)
     }
 
-    it(
-      "does not identify the contributor if there are multiple distinct identifiers in subfield $$0") {
+    it("does not identify the contributor if there are multiple distinct identifiers in subfield $$0") {
       val name = "Luke the lime"
       val varFields = List(
         createVarFieldWith(
@@ -592,15 +589,22 @@ class SierraContributorsTest
     }
   }
 
-  it("fails the transform if subfield $$a is missing") {
+  // This is based on transformer failures we saw in October 2018 --
+  // records 3069865, 3069866, 3069867, 3069872 all had empty instances of
+  // the 110 field.
+  it("returns an empty list if subfield $$a is missing") {
     val varFields = List(
       createVarFieldWith(
         marcTag = "100",
-        subfields = List()
+        subfields = List(
+          MarcSubfield(tag = "e", content = "")
+        )
       )
     )
 
-    assertTransformFails(varFields)
+    transformAndCheckContributors(
+      varFields = varFields,
+      expectedContributors = List())
   }
 
   private def transformAndCheckContributors(
@@ -609,13 +613,5 @@ class SierraContributorsTest
   ) = {
     val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getContributors(bibData) shouldBe expectedContributors
-  }
-
-  private def assertTransformFails(varFields: List[VarField]) = {
-    val bibData = createSierraBibDataWith(varFields = varFields)
-
-    intercept[TransformerException] {
-      transformer.getContributors(bibData)
-    }
   }
 }
