@@ -13,7 +13,6 @@ trait SierraAgents {
   //
   def getPerson(subfields: List[MarcSubfield]): Option[Person] =
     getLabel(subfields).map { label =>
-
       // Extract the numeration from subfield $b.  This is also non-repeatable
       // in the MARC spec.
       val numeration = subfields.collectFirst {

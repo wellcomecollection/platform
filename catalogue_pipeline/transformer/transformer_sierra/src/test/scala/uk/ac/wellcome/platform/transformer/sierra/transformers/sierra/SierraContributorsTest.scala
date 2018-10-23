@@ -431,7 +431,8 @@ class SierraContributorsTest
         expectedContributors = expectedContributors)
     }
 
-    it("gets the name from MARC tags 110 and 710 subfield $$a in the right order") {
+    it(
+      "gets the name from MARC tags 110 and 710 subfield $$a in the right order") {
       val name1 = "Mary the mallow"
       val name2 = "Mike the mashua"
       val name3 = "Mickey the mozuku"
@@ -564,7 +565,8 @@ class SierraContributorsTest
         expectedContributors = expectedContributors)
     }
 
-    it("does not identify the contributor if there are multiple distinct identifiers in subfield $$0") {
+    it(
+      "does not identify the contributor if there are multiple distinct identifiers in subfield $$0") {
       val name = "Luke the lime"
       val varFields = List(
         createVarFieldWith(
