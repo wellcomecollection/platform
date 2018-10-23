@@ -49,10 +49,7 @@ class ArchiveJobFlowTest
                   Right(
                     ArchiveComplete(
                       ingestRequest.archiveRequestId,
-                      BagId(
-                        ingestRequest.storageSpace,
-                        bagName
-                      ),
+                      ingestRequest.storageSpace,
                       archiveJob.bagLocation
                     )
                   )

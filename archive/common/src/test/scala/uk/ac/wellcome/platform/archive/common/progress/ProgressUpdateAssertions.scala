@@ -13,7 +13,7 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
   def assertTopicReceivesProgressStatusUpdate(
     requestId: UUID,
     progressTopic: SNS.Topic,
-    status: Progress.Status)(assert: List[ProgressEvent] => Assertion) = {
+    status: Progress.Status)(assert: Seq[ProgressEvent] => Assertion) = {
     val messages = listMessagesReceivedFromSNS(progressTopic)
     val progressUpdates = messages.map { messageinfo =>
       fromJson[ProgressUpdate](messageinfo.message).get
@@ -24,9 +24,11 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
       .map { progressUpdate =>
         debug(s"Received ProgressUpdate: $progressUpdate")
         Try(inside(progressUpdate) {
-          case ProgressStatusUpdate(id, actualStatus, _) =>
+          case ProgressStatusUpdate(id, actualStatus, events) =>
             id shouldBe requestId
             actualStatus shouldBe status
+
+            assert(events)
         })
       }
       .partition(_.isSuccess)
@@ -35,39 +37,44 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
 
   def assertTopicReceivesProgressEventUpdate(
     requestId: UUID,
-    progressTopic: SNS.Topic)(assert: List[ProgressEvent] => Assertion) = {
+    progressTopic: SNS.Topic)(assert: Seq[ProgressEvent] => Assertion) = {
     val messages = listMessagesReceivedFromSNS(progressTopic)
     val progressUpdates = messages.map { messageinfo =>
       fromJson[ProgressUpdate](messageinfo.message).get
     }
     progressUpdates.size should be > 0
 
-    progressUpdates.map { progressUpdate =>
+    val (success, failure) = progressUpdates.map { progressUpdate =>
       debug(s"Received ProgressUpdate: $progressUpdate")
       Try(inside(progressUpdate) {
-        case ProgressEventUpdate(id, _) =>
+        case ProgressEventUpdate(id, events) =>
           id shouldBe requestId
+
+          assert(events)
       })
-    }
+    }.partition(_.isSuccess)
+    success should have size 1
   }
 
   def assertTopicReceivesProgressResourceUpdate(
     requestId: UUID,
     expectedResource: Resource,
-    progressTopic: SNS.Topic)(assert: List[ProgressEvent] => Assertion) = {
+    progressTopic: SNS.Topic)(assert: Seq[ProgressEvent] => Assertion) = {
     val messages = listMessagesReceivedFromSNS(progressTopic)
     val progressUpdates = messages.map { messageinfo =>
       fromJson[ProgressUpdate](messageinfo.message).get
     }
     progressUpdates.size should be > 0
 
-    progressUpdates.map { progressUpdate =>
+    val (success, failure) = progressUpdates.map { progressUpdate =>
       debug(s"Received ProgressUpdate: $progressUpdate")
       Try(inside(progressUpdate) {
-        case ProgressResourceUpdate(id, resource, _) =>
+        case ProgressResourceUpdate(id, resource, events) =>
           id shouldBe requestId
           resource shouldBe expectedResource
+        assert(events)
       })
-    }
+    }.partition(_.isSuccess)
+    success should have size 1
   }
 }
