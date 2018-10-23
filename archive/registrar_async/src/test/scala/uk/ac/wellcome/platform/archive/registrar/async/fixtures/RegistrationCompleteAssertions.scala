@@ -7,13 +7,12 @@ import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
 trait RegistrationCompleteAssertions extends Inside with Matchers {
-  def assertRegistrationComplete(
-                                 storageManifest: StorageManifest)(
-                                 expectedBagId: BagId,
-                                 expectedNamespace: String,
-                                 expectedPath: String,
-                                 filesNumber: Long,
-                                 createdDateAfter: Instant): Unit = {
+  def assertRegistrationComplete(storageManifest: StorageManifest)(
+    expectedBagId: BagId,
+    expectedNamespace: String,
+    expectedPath: String,
+    filesNumber: Long,
+    createdDateAfter: Instant): Unit = {
     inside(storageManifest) {
 
       case StorageManifest(
@@ -25,7 +24,9 @@ trait RegistrationCompleteAssertions extends Inside with Matchers {
 
         bagDigestFiles should have size filesNumber
 
-        provider shouldBe Provider(id = "aws-s3-ia", label = "AWS S3 - Infrequent Access")
+        provider shouldBe Provider(
+          id = "aws-s3-ia",
+          label = "AWS S3 - Infrequent Access")
 
         actualNamespace shouldBe expectedNamespace
         actualPath shouldBe expectedPath

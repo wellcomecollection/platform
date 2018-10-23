@@ -5,4 +5,4 @@ case class DisplayBagInfo(
   externalIdentifier: String,
   @JsonKey("type")
   ontologyType: String = "BagInfo"
-                         )
+)

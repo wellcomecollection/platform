@@ -2,16 +2,27 @@ package uk.ac.wellcome.platform.archive.registrar.async
 
 import java.time.Instant
 
-import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.{
+  IntegrationPatience,
+  PatienceConfiguration,
+  ScalaFutures
+}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
-import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{RegistrarFixtures, RegistrationCompleteAssertions}
+import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{
+  RegistrarFixtures,
+  RegistrationCompleteAssertions
+}
 import uk.ac.wellcome.storage.dynamo._
 
 class RegistrarFeatureTest
@@ -67,7 +78,8 @@ class RegistrarFeatureTest
               assertRegistrationComplete(storageManifest)(
                 expectedBagId = bagId,
                 expectedNamespace = storageBucket.name,
-                expectedPath = s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
+                expectedPath =
+                  s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
                 filesNumber = 1,
                 createdDateAfter = createdAfterDate
               )
@@ -136,19 +148,18 @@ class RegistrarFeatureTest
         val bagId1 = randomBagId
         val bagId2 = randomBagId
 
-        withBagNotification(requestId1, bagId1, queuePair, storageBucket) {
-          _ =>
-            withBagNotification(requestId2, bagId2, queuePair, storageBucket) {
-              _ =>
-                registrar.run()
+        withBagNotification(requestId1, bagId1, queuePair, storageBucket) { _ =>
+          withBagNotification(requestId2, bagId2, queuePair, storageBucket) {
+            _ =>
+              registrar.run()
 
-                eventually {
-                  listMessagesReceivedFromSNS(progressTopic) shouldBe empty
+              eventually {
+                listMessagesReceivedFromSNS(progressTopic) shouldBe empty
 
-                  assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 2)
-                }
-            }
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 2)
+              }
+          }
         }
     }
   }

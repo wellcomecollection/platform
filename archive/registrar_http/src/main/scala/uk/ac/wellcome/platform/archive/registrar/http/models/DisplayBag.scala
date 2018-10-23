@@ -10,10 +10,9 @@ case class DisplayBag(
   manifest: DisplayBagManifest,
   accessLocation: DisplayLocation,
   createdDate: String,
-
   @JsonKey("type")
   ontologyType: String = "Bag"
-              )
+)
 
 object DisplayBag {
   def apply(storageManifest: StorageManifest): DisplayBag = DisplayBag(

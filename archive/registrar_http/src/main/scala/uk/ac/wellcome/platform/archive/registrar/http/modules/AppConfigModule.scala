@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.archive.registrar.http.modules
 
 import com.google.inject.{AbstractModule, Provides}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.registrar.http.config.{RegistrarHttpArgsConfigurator, RegistrarHttpConfig}
+import uk.ac.wellcome.platform.archive.registrar.http.config.{
+  RegistrarHttpArgsConfigurator,
+  RegistrarHttpConfig
+}
 
 class AppConfigModule(val args: Array[String])
     extends AbstractModule

@@ -17,13 +17,11 @@ case class StorageManifest(
   id: BagId,
   manifest: FileManifest,
   accessLocation: Location,
-    createdDate: Instant
+  createdDate: Instant
 )
 
-
-case class FileManifest(
-  checksumAlgorithm: ChecksumAlgorithm,
-  files: List[BagDigestFile])
+case class FileManifest(checksumAlgorithm: ChecksumAlgorithm,
+                        files: List[BagDigestFile])
 
 case class SourceIdentifier(identifierType: IdentifierType,
                             ontologyType: String = "Identifier",

@@ -23,7 +23,8 @@ class RegistrarHttpFeatureTest
     with MetricsSenderFixture
     with RegistrarHttpFixture
     with RandomThings
-    with IntegrationPatience with Inside {
+    with IntegrationPatience
+    with Inside {
 
   import HttpMethods._
   import uk.ac.wellcome.json.JsonUtil._
@@ -45,10 +46,13 @@ class RegistrarHttpFeatureTest
               val providerLabel = "provider label"
               val storageManifest = StorageManifest(
                 id = bagId,
-                manifest = FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                Location(Provider(providerId, providerLabel), ObjectLocation(bucket, path)),
+                manifest =
+                  FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
+                Location(
+                  Provider(providerId, providerLabel),
+                  ObjectLocation(bucket, path)),
                 Instant.now
-                )
+              )
               val putResult = vhs.updateRecord(
                 s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
                 ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
@@ -59,28 +63,38 @@ class RegistrarHttpFeatureTest
                   s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
 
                 whenRequestReady(request) { result =>
-
                   result.status shouldBe StatusCodes.OK
                   val displayBag = getT[DisplayBag](result.entity)
 
-                  inside(displayBag) { case DisplayBag(
-                    actualBagId,
-                  DisplayStorageSpace(storageSpaceName, "Space"),
-                    DisplayBagInfo(externalIdentifierString, "BagInfo"),
-                  DisplayBagManifest(actualChecksumAlgorithm, Nil, "BagManifest"),
-                    DisplayLocation(DisplayProvider(actualProviderId, actualProviderLabel, "Provider"), actualBucket, actualPath, "Location"),
-                  createdDateString,
-                    "Bag") =>
-                    actualBagId shouldBe s"${bagId.space.underlying}/${bagId.externalIdentifier.underlying}"
-                    storageSpaceName shouldBe bagId.space.underlying
-                    externalIdentifierString shouldBe bagId.externalIdentifier.underlying
-                    actualChecksumAlgorithm shouldBe checksumAlgorithm
-                    actualProviderId shouldBe providerId
-                    actualProviderLabel shouldBe providerLabel
-                    actualBucket shouldBe bucket
-                    actualPath shouldBe path
+                  inside(displayBag) {
+                    case DisplayBag(
+                        actualBagId,
+                        DisplayStorageSpace(storageSpaceName, "Space"),
+                        DisplayBagInfo(externalIdentifierString, "BagInfo"),
+                        DisplayBagManifest(
+                          actualChecksumAlgorithm,
+                          Nil,
+                          "BagManifest"),
+                        DisplayLocation(
+                          DisplayProvider(
+                            actualProviderId,
+                            actualProviderLabel,
+                            "Provider"),
+                          actualBucket,
+                          actualPath,
+                          "Location"),
+                        createdDateString,
+                        "Bag") =>
+                      actualBagId shouldBe s"${bagId.space.underlying}/${bagId.externalIdentifier.underlying}"
+                      storageSpaceName shouldBe bagId.space.underlying
+                      externalIdentifierString shouldBe bagId.externalIdentifier.underlying
+                      actualChecksumAlgorithm shouldBe checksumAlgorithm
+                      actualProviderId shouldBe providerId
+                      actualProviderLabel shouldBe providerLabel
+                      actualBucket shouldBe bucket
+                      actualPath shouldBe path
 
-                    Instant.parse(createdDateString) shouldBe storageManifest.createdDate
+                      Instant.parse(createdDateString) shouldBe storageManifest.createdDate
                   }
 
                 }
