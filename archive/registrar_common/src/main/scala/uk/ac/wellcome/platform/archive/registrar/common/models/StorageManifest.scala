@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.common.models
 
 import java.time.Instant
 
-import uk.ac.wellcome.platform.archive.common.models.BagId
+import uk.ac.wellcome.platform.archive.common.models.{BagId, BagInfo, StorageSpace}
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class ChecksumAlgorithm(value: String)
@@ -14,11 +14,14 @@ case class Checksum(value: String)
 case class BagFilePath(value: String)
 
 case class StorageManifest(
-  id: BagId,
+  space: StorageSpace,
+  info: BagInfo,
   manifest: FileManifest,
   accessLocation: Location,
   createdDate: Instant
-)
+) {
+  val id = BagId(space, info.externalIdentifier)
+}
 
 case class FileManifest(checksumAlgorithm: ChecksumAlgorithm,
                         files: List[BagDigestFile])

@@ -22,11 +22,10 @@ class StorageManifestFactoryTest
   implicit val _ = s3Client
 
   it("returns a right of storage manifest if reading a bag location succeeds") {
-    val bagId = randomBagId
     val requestId = randomUUID
 
     withLocalS3Bucket { bucket =>
-      withBag(bucket) { bagLocation =>
+      withBag(bucket) { case (bagLocation, bagInfo, bagId) =>
         val archiveComplete =
           ArchiveComplete(requestId, bagId, bagLocation)
 
@@ -36,12 +35,13 @@ class StorageManifestFactoryTest
         inside(storageManifest) {
           case Right(
               StorageManifest(
-                actualBagId,
+                actualStorageSpace,
+                actualBagInfo,
                 FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
                 _,
                 _)) =>
-            actualBagId shouldBe bagId
-
+            actualStorageSpace shouldBe bagId.space
+            actualBagInfo shouldBe bagInfo
             bagDigestFiles should have size 1
 
         }
@@ -81,7 +81,7 @@ class StorageManifestFactoryTest
           bucket,
           createDataManifest =
             _ => Some(FileEntry("manifest-sha256.txt", "bleeergh!"))) {
-          bagLocation =>
+          case (bagLocation, _, _) =>
             val archiveComplete =
               ArchiveComplete(requestId, bagId, bagLocation)
             val value = StorageManifestFactory.create(archiveComplete)

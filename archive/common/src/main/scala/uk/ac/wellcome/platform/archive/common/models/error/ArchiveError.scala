@@ -17,3 +17,7 @@ case class InvalidBagManifestError[T](t: T, manifestName: String)
     extends ArchiveError[T] {
   override def toString = s"Invalid bag manifest $manifestName"
 }
+
+case class InvalidBagInfo[T](t: T, keys: List[String]) extends ArchiveError[T] {
+  override def toString = s"Invalid bag-info.txt: ${keys.mkString(", ")}"
+}

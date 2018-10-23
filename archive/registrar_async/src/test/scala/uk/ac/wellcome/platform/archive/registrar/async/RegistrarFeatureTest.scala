@@ -21,7 +21,7 @@ import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
 import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{
   RegistrarFixtures,
-  RegistrationCompleteAssertions
+  StorageManifestAssertions
 }
 import uk.ac.wellcome.storage.dynamo._
 
@@ -35,7 +35,7 @@ class RegistrarFeatureTest
     with Inside
     with RandomThings
     with ProgressUpdateAssertions
-    with RegistrationCompleteAssertions
+    with StorageManifestAssertions
     with PatienceConfiguration {
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(
@@ -56,15 +56,13 @@ class RegistrarFeatureTest
           vhs
           ) =>
         val requestId = randomUUID
-        val bagId = randomBagId
         val createdAfterDate = Instant.now()
 
         withBagNotification(
           requestId,
-          bagId,
           queuePair,
           storageBucket
-        ) { bagLocation =>
+        ) { case (bagLocation, bagInfo, bagId) =>
           registrar.run()
 
           eventually {
@@ -75,8 +73,9 @@ class RegistrarFeatureTest
 
               val storageManifest = maybeStorageManifest.get
 
-              assertRegistrationComplete(storageManifest)(
-                expectedBagId = bagId,
+              assertStorageManifest(storageManifest)(
+                expectedStorageSpace = bagId.space,
+                expectedBagInfo = bagInfo,
                 expectedNamespace = storageBucket.name,
                 expectedPath =
                   s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
@@ -145,11 +144,8 @@ class RegistrarFeatureTest
         val requestId1 = randomUUID
         val requestId2 = randomUUID
 
-        val bagId1 = randomBagId
-        val bagId2 = randomBagId
-
-        withBagNotification(requestId1, bagId1, queuePair, storageBucket) { _ =>
-          withBagNotification(requestId2, bagId2, queuePair, storageBucket) {
+        withBagNotification(requestId1, queuePair, storageBucket) { _ =>
+          withBagNotification(requestId2, queuePair, storageBucket) {
             _ =>
               registrar.run()
 

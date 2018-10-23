@@ -3,11 +3,7 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 import java.security.MessageDigest
 import java.time.LocalDate
 
-import uk.ac.wellcome.platform.archive.common.models.{
-  ExternalIdentifier,
-  PayloadOxum,
-  SourceOrganisation
-}
+import uk.ac.wellcome.platform.archive.common.models.{BagInfo, ExternalIdentifier, PayloadOxum, SourceOrganisation}
 
 import scala.util.Random
 
@@ -19,7 +15,7 @@ trait BagIt extends RandomThings {
   }
 
   def createBag(
-    bagIdentifier: ExternalIdentifier,
+    bagInfo: BagInfo,
     dataFileCount: Int = 1,
     createDigest: String => String = createValidDigest,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
@@ -27,7 +23,7 @@ trait BagIt extends RandomThings {
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: ExternalIdentifier => Option[FileEntry] =
+    createBagInfoFile: (BagInfo) => Option[FileEntry] =
       createValidBagInfoFile): Seq[FileEntry] = {
 
     val dataFiles = createDataFiles(dataFileCount)
@@ -39,7 +35,7 @@ trait BagIt extends RandomThings {
 
     val maybeBagItFile = createBagItFile
 
-    val maybeBagInfoFile = createBagInfoFile(bagIdentifier)
+    val maybeBagInfoFile = createBagInfoFile(bagInfo)
 
     val tagManifestFiles = dataManifest.toList ++ maybeBagItFile.toList ++ maybeBagInfoFile.toList
 
@@ -54,15 +50,15 @@ trait BagIt extends RandomThings {
   def createValidBagItFile =
     Some(FileEntry("bagit.txt", bagItFileContents))
 
-  def createValidBagInfoFile(bagIdentifier: ExternalIdentifier) =
+  def createValidBagInfoFile(bagInfo: BagInfo) =
     Some(
       FileEntry(
         s"bag-info.txt",
         bagInfoFileContents(
-          bagIdentifier,
-          randomSourceOrganisation,
-          randomPayloadOxum,
-          randomLocalDate)))
+          bagInfo.externalIdentifier,
+          bagInfo.sourceOrganisation,
+          bagInfo.payloadOxum,
+          bagInfo.baggingDate)))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
     Some(

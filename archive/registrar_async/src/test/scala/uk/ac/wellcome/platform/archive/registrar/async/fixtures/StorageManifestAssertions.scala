@@ -2,13 +2,14 @@ package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import java.time.Instant
 
 import org.scalatest.{Inside, Matchers}
-import uk.ac.wellcome.platform.archive.common.models.BagId
+import uk.ac.wellcome.platform.archive.common.models.{BagInfo, StorageSpace}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-trait RegistrationCompleteAssertions extends Inside with Matchers {
-  def assertRegistrationComplete(storageManifest: StorageManifest)(
-    expectedBagId: BagId,
+trait StorageManifestAssertions extends Inside with Matchers {
+  def assertStorageManifest(storageManifest: StorageManifest)(
+    expectedStorageSpace: StorageSpace,
+    expectedBagInfo: BagInfo,
     expectedNamespace: String,
     expectedPath: String,
     filesNumber: Long,
@@ -16,12 +17,13 @@ trait RegistrationCompleteAssertions extends Inside with Matchers {
     inside(storageManifest) {
 
       case StorageManifest(
-          actualBagId,
+          actualStorageSpace,
+          actualBagInfo,
           FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
           Location(provider, ObjectLocation(actualNamespace, actualPath)),
           createdDate) =>
-        actualBagId shouldBe expectedBagId
-
+        actualStorageSpace shouldBe expectedStorageSpace
+        actualBagInfo shouldBe expectedBagInfo
         bagDigestFiles should have size filesNumber
 
         provider shouldBe Provider(

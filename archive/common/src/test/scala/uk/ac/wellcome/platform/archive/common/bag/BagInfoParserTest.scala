@@ -1,18 +1,18 @@
-package uk.ac.wellcome.platform.archive.archivist.bag
+package uk.ac.wellcome.platform.archive.common.bag
+
 import org.apache.commons.io.IOUtils
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.InvalidBagInfo
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, RandomThings}
 import uk.ac.wellcome.platform.archive.common.models.BagInfo
+import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagInfo
 
 class BagInfoParserTest
     extends FunSpec
     with BagIt
     with Matchers
-    with IngestRequestContextGenerators
     with RandomThings {
-  val request = createIngestBagRequest
+  case class Thing(id: String)
+  val t = Thing("a")
 
   it("extracts a BagInfo object from a valid bagInfo file") {
     val externalIdentifier = randomExternalIdentifier
@@ -26,7 +26,7 @@ class BagInfoParserTest
       baggingDate)
 
     BagInfoParser.parseBagInfo(
-      request,
+      t,
       IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
       BagInfo(externalIdentifier, sourceOrganisation, payloadOxum, baggingDate))
   }
@@ -39,9 +39,9 @@ class BagInfoParserTest
           |Bagging-Date: $randomLocalDate""".stripMargin
 
     BagInfoParser.parseBagInfo(
-      request,
+      t,
       IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
-      InvalidBagInfo(request, List("External-Identifier")))
+      InvalidBagInfo(t, List("External-Identifier")))
   }
 
   it(
@@ -52,9 +52,9 @@ class BagInfoParserTest
           |Bagging-Date: $randomLocalDate""".stripMargin
 
     BagInfoParser.parseBagInfo(
-      request,
+      t,
       IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
-      InvalidBagInfo(request, List("Source-Organization")))
+      InvalidBagInfo(t, List("Source-Organization")))
   }
 
   it(
@@ -65,9 +65,9 @@ class BagInfoParserTest
           |Bagging-Date: $randomLocalDate""".stripMargin
 
     BagInfoParser.parseBagInfo(
-      request,
+      t,
       IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
-      InvalidBagInfo(request, List("Payload-Oxum")))
+      InvalidBagInfo(t, List("Payload-Oxum")))
   }
 
   it(
@@ -79,9 +79,9 @@ class BagInfoParserTest
           |Bagging-Date: $randomLocalDate""".stripMargin
 
     BagInfoParser.parseBagInfo(
-      request,
+      t,
       IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
-      InvalidBagInfo(request, List("Payload-Oxum")))
+      InvalidBagInfo(t, List("Payload-Oxum")))
   }
 
   it(
@@ -92,9 +92,9 @@ class BagInfoParserTest
           |Payload-Oxum: ${randomPayloadOxum.payloadBytes}.${randomPayloadOxum.numberOfPayloadFiles}""".stripMargin
 
     BagInfoParser.parseBagInfo(
-      request,
+      t,
       IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
-      InvalidBagInfo(request, List("Bagging-Date")))
+      InvalidBagInfo(t, List("Bagging-Date")))
   }
 
   it(
@@ -106,19 +106,19 @@ class BagInfoParserTest
           |Bagging-Date: sdfkjghl""".stripMargin
 
     BagInfoParser.parseBagInfo(
-      request,
+      t,
       IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
-      InvalidBagInfo(request, List("Bagging-Date")))
+      InvalidBagInfo(t, List("Bagging-Date")))
   }
 
   it("returns a left of invalid bag info error if bag-info.txt is empty") {
     val bagInfoString = ""
 
     BagInfoParser.parseBagInfo(
-      request,
+      t,
       IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(
-        request,
+        t,
         List(
           "External-Identifier",
           "Source-Organization",
