@@ -10,31 +10,30 @@ trait SierraAgents {
   //  - subfield $a populates the person label
   //  - subfield $b populates the person numeration
   //  - subfield $c populates the person prefixes
-  def getPerson(subfields: List[MarcSubfield]): Option[Person] = {
-    val maybeLabel = getLabel(subfields)
+  //
+  def getPerson(subfields: List[MarcSubfield]): Option[Person] =
+    getLabel(subfields).map { label =>
 
-    // Extract the numeration from subfield $b.  This is also non-repeatable
-    // in the MARC spec.
-    val numeration = subfields.collectFirst {
-      case MarcSubfield("b", content) => content
-    }
+      // Extract the numeration from subfield $b.  This is also non-repeatable
+      // in the MARC spec.
+      val numeration = subfields.collectFirst {
+        case MarcSubfield("b", content) => content
+      }
 
-    // Extract the prefix from subfield $c.  This is a repeatable field, so
-    // we take all instances and join them.
-    val prefixes = subfields.collect {
-      case MarcSubfield("c", content) => content
-    }
-    val prefixString =
-      if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
+      // Extract the prefix from subfield $c.  This is a repeatable field, so
+      // we take all instances and join them.
+      val prefixes = subfields.collect {
+        case MarcSubfield("c", content) => content
+      }
+      val prefixString =
+        if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-    maybeLabel.map { label =>
       Person(
         label = label,
         prefix = prefixString,
         numeration = numeration
       )
     }
-  }
 
   // This is used to construct an Organisation from MARC tags 110 and 710.
   // For all entries:
