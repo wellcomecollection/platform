@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.fixtures
 
 import java.security.MessageDigest
+import java.time.LocalDate
 
 import uk.ac.wellcome.platform.archive.common.models.{ExternalIdentifier, PayloadOxum, SourceOrganisation}
 
@@ -50,7 +51,7 @@ trait BagIt extends RandomThings {
     Some(FileEntry("bagit.txt", bagItFileContents))
 
   def createValidBagInfoFile(bagIdentifier: ExternalIdentifier) =
-    Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier, randomSourceOrganisation, randomPayloadOxum)))
+    Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier, randomSourceOrganisation, randomPayloadOxum, randomLocalDate)))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
     Some(
@@ -105,10 +106,11 @@ trait BagIt extends RandomThings {
           .mkString("\n")
       ))
 
-  def bagInfoFileContents(bagIdentifier: ExternalIdentifier, sourceOrganisation: SourceOrganisation, payloadOxum: PayloadOxum) = {
+  def bagInfoFileContents(bagIdentifier: ExternalIdentifier, sourceOrganisation: SourceOrganisation, payloadOxum: PayloadOxum, baggingDate: LocalDate) = {
     s"""Source-Organization: $sourceOrganisation
        |External-Identifier: $bagIdentifier
        |Payload-Oxum: ${payloadOxum.payloadBytes}.${payloadOxum.numberOfPayloadFiles}
+       |Bagging-Date: ${baggingDate.toString}
       """.stripMargin.trim
   }
 
