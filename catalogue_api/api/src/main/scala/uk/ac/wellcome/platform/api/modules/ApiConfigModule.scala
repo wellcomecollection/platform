@@ -31,7 +31,6 @@ object ApiConfigModule extends TwitterModule {
       host = host(),
       scheme = scheme(),
       defaultPageSize = defaultPageSize(),
-      name = apiName(),
       pathPrefix = pathPrefix(),
       contextSuffix = contextSuffix()
     )

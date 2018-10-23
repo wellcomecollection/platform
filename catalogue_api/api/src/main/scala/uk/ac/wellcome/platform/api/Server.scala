@@ -45,6 +45,7 @@ class Server extends HttpServer {
       .add[DocsController]
       .add[V1WorksController]
       .add[V2WorksController]
+      .add[MissingPathController]
       .exceptionMapper[GeneralExceptionMapper]
       .exceptionMapper[CaseClassMappingExceptionWrapper]
       .exceptionMapper[ElasticsearchResponseExceptionMapper]

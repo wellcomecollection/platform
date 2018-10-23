@@ -15,7 +15,6 @@ trait WorksServiceFixture { this: Suite =>
         host = "example.org",
         scheme = "https",
         defaultPageSize = 10,
-        name = "testing",
         pathPrefix = "/catalogue/works",
         contextSuffix = "/conext.json"
       ),

@@ -20,7 +20,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
                      indexName: String): Future[GetResponse] =
     elasticClient
       .execute {
-        get(canonicalId).from(s"${indexName}/$documentType")
+        get(canonicalId).from(s"$indexName/$documentType")
       }
 
   def listResults(sortByField: String,
@@ -29,7 +29,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
                   from: Int = 0): Future[SearchResponse] =
     elasticClient
       .execute {
-        search(s"${indexName}/$documentType")
+        search(s"$indexName/$documentType")
           .query(termQuery("type", "IdentifiedWork"))
           .sortBy(fieldSort(sortByField))
           .limit(limit)
@@ -42,7 +42,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
                                indexName: String): Future[SearchResponse] =
     elasticClient
       .execute {
-        search(s"${indexName}/$documentType")
+        search(s"$indexName/$documentType")
           .query(
             must(
               simpleStringQuery(queryString),
