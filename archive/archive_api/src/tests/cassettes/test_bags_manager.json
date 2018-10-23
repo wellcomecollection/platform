@@ -26,20 +26,20 @@
       "response": {
         "body": {
           "encoding": null,
-          "string": "{\"id\":{\"space\":\"digitised\",\"externalIdentifier\":\"b22454408\"},\"source\":{\"identifierType\":{\"id\":\"source\",\"label\":\"Label\"},\"ontologyType\":\"Identifier\",\"value\":\"123\"},\"identifiers\":[{\"identifierType\":{\"id\":\"source\",\"label\":\"Label\"},\"ontologyType\":\"Identifier\",\"value\":\"123\"}],\"manifest\":{\"checksumAlgorithm\":{\"value\":\"sha256\"},\"files\":[{\"checksum\":{\"value\":\"6762834c8ddd433174220a8e098c82425767a2e7fe698a0125f86af5babc8c32\"},\"path\":{\"value\":\"data/b22454408.xml\"}},{\"checksum\":{\"value\":\"593216213fe8bc6cce960c0faf51c542bc14cfac71e953a9b1e9a322431ad5c5\"},\"path\":{\"value\":\"data/alto/b22454408_0001.xml\"}},{\"checksum\":{\"value\":\"26adb40e3267b0136bc2036834d164c4618e3c00fe16e997eab01a900806d78c\"},\"path\":{\"value\":\"data/alto/b22454408_0002.xml\"}},{\"checksum\":{\"value\":\"4d80bc45bd3aab01011ae4d110e09436a67c01f48480b74d655dd3a663390da2\"},\"path\":{\"value\":\"data/alto/b22454408_0003.xml\"}},{\"checksum\":{\"value\":\"c01bbd217a02eb516410253444b9dd863dac41b4cd86ab6353da6863b8e46cd5\"},\"path\":{\"value\":\"data/alto/b22454408_0004.xml\"}},{\"checksum\":{\"value\":\"02da8942a542fcca8b4ac9edbc6883f1e55370ea92ca6ee05c71e3ba14b570d8\"},\"path\":{\"value\":\"data/alto/b22454408_0005.xml\"}},{\"checksum\":{\"value\":\"99c312614fd98cb08d68cefaa2d40d3c038bf20f6bd05ef3e14661518f6b5a5f\"},\"path\":{\"value\":\"data/alto/b22454408_0006.xml\"}},{\"checksum\":{\"value\":\"3d901e4b140ed1ea0f3914b7f6902e7946d23e330d5a9a2bc0e4a6931536e2cd\"},\"path\":{\"value\":\"data/alto/b22454408_0007.xml\"}},{\"checksum\":{\"value\":\"e131e228df38dc6ba5dcb3b8a68b589aa432f1672088c47d1618cd8255b6f1ce\"},\"path\":{\"value\":\"data/alto/b22454408_0008.xml\"}},{\"checksum\":{\"value\":\"b81d56b8b0b6656283bbe4a8cfcd6a91cc3f5379500c1d309ac1acb54c66a97b\"},\"path\":{\"value\":\"data/alto/b22454408_0009.xml\"}},{\"checksum\":{\"value\":\"e17a70039ec3fe489c02a6f017b5728d8156ee894840e760d729f1977c686cb3\"},\"path\":{\"value\":\"data/alto/b22454408_0010.xml\"}},{\"checksum\":{\"value\":\"b7fdb3599073a8d5e7f5182b09844a2e386caf43e038cab03a4d5655442f5d09\"},\"path\":{\"value\":\"data/alto/b22454408_0011.xml\"}},{\"checksum\":{\"value\":\"f6bedf8d396f78b7f29b0d8ab1439e6c6ab4748da48c82760c06c4fa41c0c7e7\"},\"path\":{\"value\":\"data/alto/b22454408_0012.xml\"}},{\"checksum\":{\"value\":\"6d9304d3af9844430cfa09ff4befb4959bd7d42fe1c0e16df3068f9a812e420e\"},\"path\":{\"value\":\"data/objects/b22454408_0001.jp2\"}},{\"checksum\":{\"value\":\"fbb58f74c61a3eb5a1151c91aa0e29d7ebd213375bd120a7bf54ad104f4846c3\"},\"path\":{\"value\":\"data/objects/b22454408_0002.jp2\"}},{\"checksum\":{\"value\":\"402849a7cc8deff3b7cf00188d1bd4403683a4aa6eb1e43652cc81f54c916693\"},\"path\":{\"value\":\"data/objects/b22454408_0003.jp2\"}},{\"checksum\":{\"value\":\"fb3051576fd716a509dadf5937d07c428f4e3ca57128121a10cc014e8f7bd3a6\"},\"path\":{\"value\":\"data/objects/b22454408_0004.jp2\"}},{\"checksum\":{\"value\":\"d775195d2bf9083e722cfb214a64cc5b4847db48a5a690ebcc70cd9ed0af96e3\"},\"path\":{\"value\":\"data/objects/b22454408_0005.jp2\"}},{\"checksum\":{\"value\":\"5dd7188f0041c14ce07ca78e679c54464c1b541a742a5a79dc8231a96cd0dd80\"},\"path\":{\"value\":\"data/objects/b22454408_0006.jp2\"}},{\"checksum\":{\"value\":\"cdb6cac38e4bb41ff6e59da4b9b0840e785bd8d3484757731495b73a7c0ce679\"},\"path\":{\"value\":\"data/objects/b22454408_0007.jp2\"}},{\"checksum\":{\"value\":\"568e1fcd6efd5d4a4c26add6d2235e9914067b6c66a9794fc839e5a63596757c\"},\"path\":{\"value\":\"data/objects/b22454408_0008.jp2\"}},{\"checksum\":{\"value\":\"0197cbb75eb7a0dbebe68221693249b821ff008e3f918cd31daba0a1c23f9815\"},\"path\":{\"value\":\"data/objects/b22454408_0009.jp2\"}},{\"checksum\":{\"value\":\"525a5eac580a9e4d2bf331268e093452719cb127793bf21f77fb8a495a92e755\"},\"path\":{\"value\":\"data/objects/b22454408_0010.jp2\"}},{\"checksum\":{\"value\":\"156ec639d02b475db6c342a52a035a48a9284f46a61a04d8e52119beaa689baf\"},\"path\":{\"value\":\"data/objects/b22454408_0011.jp2\"}},{\"checksum\":{\"value\":\"434edc3c547dfac8451b0eec741bf2b89855c100a01f8fc885535e0a32f073c0\"},\"path\":{\"value\":\"data/objects/b22454408_0012.jp2\"}}]},\"tagManifest\":{\"checksumAlgorithm\":{\"value\":\"sha256\"},\"files\":[]},\"locations\":[{\"url\":\"http://wellcomecollection-assets-archive-storage.s3.amazonaws.com/archive/digitised/b22454408\",\"locationType\":{\"id\":\"aws-s3-standard-ia\",\"label\":\"AWS S3 Standard IA\",\"ontologyType\":\"LocationType\"},\"ontologyType\":\"DigitalLocation\",\"type\":\"DigitalLocation\"}],\"description\":null,\"createdDate\":\"1970-01-01T00:00:00Z\",\"lastModifiedDate\":\"1970-01-01T00:00:00Z\",\"version\":{\"value\":1}}"
+          "string": "{\"id\":\"digitised/b22454408\",\"space\":{\"id\":\"digitised\",\"type\":\"Space\"},\"info\":{\"externalIdentifier\":\"b22454408\",\"type\":\"BagInfo\"},\"manifest\":{\"checksumAlgorithm\":\"sha256\",\"files\":[{\"checksum\":\"6762834c8ddd433174220a8e098c82425767a2e7fe698a0125f86af5babc8c32\",\"path\":\"data/b22454408.xml\",\"type\":\"File\"},{\"checksum\":\"593216213fe8bc6cce960c0faf51c542bc14cfac71e953a9b1e9a322431ad5c5\",\"path\":\"data/alto/b22454408_0001.xml\",\"type\":\"File\"},{\"checksum\":\"26adb40e3267b0136bc2036834d164c4618e3c00fe16e997eab01a900806d78c\",\"path\":\"data/alto/b22454408_0002.xml\",\"type\":\"File\"},{\"checksum\":\"4d80bc45bd3aab01011ae4d110e09436a67c01f48480b74d655dd3a663390da2\",\"path\":\"data/alto/b22454408_0003.xml\",\"type\":\"File\"},{\"checksum\":\"c01bbd217a02eb516410253444b9dd863dac41b4cd86ab6353da6863b8e46cd5\",\"path\":\"data/alto/b22454408_0004.xml\",\"type\":\"File\"},{\"checksum\":\"02da8942a542fcca8b4ac9edbc6883f1e55370ea92ca6ee05c71e3ba14b570d8\",\"path\":\"data/alto/b22454408_0005.xml\",\"type\":\"File\"},{\"checksum\":\"99c312614fd98cb08d68cefaa2d40d3c038bf20f6bd05ef3e14661518f6b5a5f\",\"path\":\"data/alto/b22454408_0006.xml\",\"type\":\"File\"},{\"checksum\":\"3d901e4b140ed1ea0f3914b7f6902e7946d23e330d5a9a2bc0e4a6931536e2cd\",\"path\":\"data/alto/b22454408_0007.xml\",\"type\":\"File\"},{\"checksum\":\"e131e228df38dc6ba5dcb3b8a68b589aa432f1672088c47d1618cd8255b6f1ce\",\"path\":\"data/alto/b22454408_0008.xml\",\"type\":\"File\"},{\"checksum\":\"b81d56b8b0b6656283bbe4a8cfcd6a91cc3f5379500c1d309ac1acb54c66a97b\",\"path\":\"data/alto/b22454408_0009.xml\",\"type\":\"File\"},{\"checksum\":\"e17a70039ec3fe489c02a6f017b5728d8156ee894840e760d729f1977c686cb3\",\"path\":\"data/alto/b22454408_0010.xml\",\"type\":\"File\"},{\"checksum\":\"b7fdb3599073a8d5e7f5182b09844a2e386caf43e038cab03a4d5655442f5d09\",\"path\":\"data/alto/b22454408_0011.xml\",\"type\":\"File\"},{\"checksum\":\"f6bedf8d396f78b7f29b0d8ab1439e6c6ab4748da48c82760c06c4fa41c0c7e7\",\"path\":\"data/alto/b22454408_0012.xml\",\"type\":\"File\"},{\"checksum\":\"6d9304d3af9844430cfa09ff4befb4959bd7d42fe1c0e16df3068f9a812e420e\",\"path\":\"data/objects/b22454408_0001.jp2\",\"type\":\"File\"},{\"checksum\":\"fbb58f74c61a3eb5a1151c91aa0e29d7ebd213375bd120a7bf54ad104f4846c3\",\"path\":\"data/objects/b22454408_0002.jp2\",\"type\":\"File\"},{\"checksum\":\"402849a7cc8deff3b7cf00188d1bd4403683a4aa6eb1e43652cc81f54c916693\",\"path\":\"data/objects/b22454408_0003.jp2\",\"type\":\"File\"},{\"checksum\":\"fb3051576fd716a509dadf5937d07c428f4e3ca57128121a10cc014e8f7bd3a6\",\"path\":\"data/objects/b22454408_0004.jp2\",\"type\":\"File\"},{\"checksum\":\"d775195d2bf9083e722cfb214a64cc5b4847db48a5a690ebcc70cd9ed0af96e3\",\"path\":\"data/objects/b22454408_0005.jp2\",\"type\":\"File\"},{\"checksum\":\"5dd7188f0041c14ce07ca78e679c54464c1b541a742a5a79dc8231a96cd0dd80\",\"path\":\"data/objects/b22454408_0006.jp2\",\"type\":\"File\"},{\"checksum\":\"cdb6cac38e4bb41ff6e59da4b9b0840e785bd8d3484757731495b73a7c0ce679\",\"path\":\"data/objects/b22454408_0007.jp2\",\"type\":\"File\"},{\"checksum\":\"568e1fcd6efd5d4a4c26add6d2235e9914067b6c66a9794fc839e5a63596757c\",\"path\":\"data/objects/b22454408_0008.jp2\",\"type\":\"File\"},{\"checksum\":\"0197cbb75eb7a0dbebe68221693249b821ff008e3f918cd31daba0a1c23f9815\",\"path\":\"data/objects/b22454408_0009.jp2\",\"type\":\"File\"},{\"checksum\":\"525a5eac580a9e4d2bf331268e093452719cb127793bf21f77fb8a495a92e755\",\"path\":\"data/objects/b22454408_0010.jp2\",\"type\":\"File\"},{\"checksum\":\"156ec639d02b475db6c342a52a035a48a9284f46a61a04d8e52119beaa689baf\",\"path\":\"data/objects/b22454408_0011.jp2\",\"type\":\"File\"},{\"checksum\":\"434edc3c547dfac8451b0eec741bf2b89855c100a01f8fc885535e0a32f073c0\",\"path\":\"data/objects/b22454408_0012.jp2\",\"type\":\"File\"}],\"type\":\"BagManifest\"},\"accessLocation\":{\"provider\":{\"id\":\"aws-s3-ia\",\"label\":\"AWS S3 - Infrequent Access\",\"type\":\"Provider\"},\"bucket\":\"wellcomecollection-assets-archive-storage\",\"path\":\"archive/digitised/b22454408\",\"type\":\"Location\"},\"createdDate\":\"2018-10-23T09:32:03.450Z\",\"type\":\"Bag\"}"
         },
         "headers": {
           "Server": [
             "akka-http/10.1.5"
           ],
           "Date": [
-            "Thu, 18 Oct 2018 13:48:29 GMT"
+            "Tue, 23 Oct 2018 09:32:53 GMT"
           ],
           "Content-Type": [
             "application/json"
           ],
           "Content-Length": [
-            "4289"
+            "3794"
           ]
         },
         "status": {
@@ -48,7 +48,7 @@
         },
         "url": "http://localhost:6001/registrar/digitised/b22454408"
       },
-      "recorded_at": "2018-10-18T13:48:29"
+      "recorded_at": "2018-10-23T09:32:53"
     },
     {
       "request": {
@@ -83,7 +83,7 @@
             "akka-http/10.1.5"
           ],
           "Date": [
-            "Thu, 18 Oct 2018 13:48:29 GMT"
+            "Tue, 23 Oct 2018 09:32:53 GMT"
           ],
           "Content-Type": [
             "application/json"
@@ -98,7 +98,7 @@
         },
         "url": "http://localhost:6001/registrar/nomespace/someid"
       },
-      "recorded_at": "2018-10-18T13:48:29"
+      "recorded_at": "2018-10-23T09:32:53"
     },
     {
       "request": {
@@ -133,7 +133,7 @@
             "akka-http/10.1.5"
           ],
           "Date": [
-            "Thu, 18 Oct 2018 13:48:29 GMT"
+            "Tue, 23 Oct 2018 09:32:53 GMT"
           ],
           "Content-Type": [
             "text/plain; charset=UTF-8"
@@ -148,7 +148,7 @@
         },
         "url": "http://localhost:6001/registrar/digitised/b24923333-a"
       },
-      "recorded_at": "2018-10-18T13:48:29"
+      "recorded_at": "2018-10-23T09:32:53"
     }
   ],
   "recorded_with": "betamax/0.8.1"

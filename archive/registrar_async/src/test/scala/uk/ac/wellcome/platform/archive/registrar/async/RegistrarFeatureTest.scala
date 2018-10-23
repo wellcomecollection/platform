@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.registrar.async
 
+import java.time.Instant
+
 import org.scalatest.concurrent.{
   IntegrationPatience,
   PatienceConfiguration,
@@ -55,6 +57,7 @@ class RegistrarFeatureTest
           ) =>
         val requestId = randomUUID
         val bagId = randomBagId
+        val createdAfterDate = Instant.now()
 
         withBagNotification(
           requestId,
@@ -72,12 +75,13 @@ class RegistrarFeatureTest
 
               val storageManifest = maybeStorageManifest.get
 
-              assertRegistrationComplete(
-                storageBucket,
-                bagLocation,
-                bagId,
-                storageManifest,
-                filesNumber = 1L
+              assertRegistrationComplete(storageManifest)(
+                expectedBagId = bagId,
+                expectedNamespace = storageBucket.name,
+                expectedPath =
+                  s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
+                filesNumber = 1,
+                createdDateAfter = createdAfterDate
               )
 
               assertTopicReceivesProgressStatusUpdate(
@@ -144,19 +148,18 @@ class RegistrarFeatureTest
         val bagId1 = randomBagId
         val bagId2 = randomBagId
 
-        withBagNotification(requestId1, bagId1, queuePair, storageBucket) {
-          bagLocation1 =>
-            withBagNotification(requestId2, bagId2, queuePair, storageBucket) {
-              bagLocation2 =>
-                registrar.run()
+        withBagNotification(requestId1, bagId1, queuePair, storageBucket) { _ =>
+          withBagNotification(requestId2, bagId2, queuePair, storageBucket) {
+            _ =>
+              registrar.run()
 
-                eventually {
-                  listMessagesReceivedFromSNS(progressTopic) shouldBe empty
+              eventually {
+                listMessagesReceivedFromSNS(progressTopic) shouldBe empty
 
-                  assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 2)
-                }
-            }
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 2)
+              }
+          }
         }
     }
   }

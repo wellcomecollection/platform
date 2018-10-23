@@ -37,33 +37,13 @@ class StorageManifestFactoryTest
           case Right(
               StorageManifest(
                 actualBagId,
-                sourceIdentifier,
-                identifiers,
                 FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-                TagManifest(ChecksumAlgorithm("sha256"), Nil),
-                List(digitalLocation),
-                _,
-                _,
                 _,
                 _)) =>
             actualBagId shouldBe bagId
 
-            sourceIdentifier shouldBe SourceIdentifier(
-              IdentifierType("source", "Label"),
-              value = "123"
-            )
-
-            identifiers shouldBe List(sourceIdentifier)
-
             bagDigestFiles should have size 1
 
-            digitalLocation shouldBe DigitalLocation(
-              s"http://${bucket.name}.s3.amazonaws.com/${bagLocation.storagePath}/${bagLocation.bagPath.value}",
-              LocationType(
-                "aws-s3-standard-ia",
-                "AWS S3 Standard IA"
-              )
-            )
         }
       }
     }
