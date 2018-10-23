@@ -90,12 +90,11 @@ trait SierraAgents {
     }
   }
 
-  private def getLabel(subfields: List[MarcSubfield]): Option[String] = {
+  private def getLabel(subfields: List[MarcSubfield]): Option[String] =
     // Extract the label from subfield $a.  This is a non-repeatable
     // field in the MARC spec, but we have seen records where it
     // doesn't appear.  In that case, we discard the entire agent.
     subfields.collectFirst {
       case MarcSubfield("a", content) => content
     }
-  }
 }
