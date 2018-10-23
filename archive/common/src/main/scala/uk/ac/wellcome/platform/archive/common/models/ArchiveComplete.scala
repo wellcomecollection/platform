@@ -6,7 +6,7 @@ import java.util.UUID
 import uk.ac.wellcome.json.JsonUtil._
 
 case class ArchiveComplete(archiveRequestId: UUID,
-                           bagId: BagId,
+                           space: StorageSpace,
                            bagLocation: BagLocation)
 
 object ArchiveComplete {
