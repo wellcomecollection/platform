@@ -62,7 +62,7 @@ object ArchiveJobCreator {
       .toRight[ArchiveError[IngestBagRequest]](
         FileNotFoundError("bag-info.txt", ingestBagRequest))
       .flatMap { inputStream =>
-        BagInfoExtractor.extractBagInfo(ingestBagRequest, inputStream).map(_.externalIdentifier)
+        BagInfoParser.parseBagInfo(ingestBagRequest, inputStream).map(_.externalIdentifier)
       }
   }
 }

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.models.{BagId, ExternalIdentifier, SourceOrganisation, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models._
 
 import scala.util.Random
 
@@ -25,6 +25,9 @@ trait RandomThings {
 
   def randomSourceOrganisation =
     SourceOrganisation(randomAlphanumeric())
+
+  def randomPayloadOxum =
+    PayloadOxum(Random.nextLong().abs, Random.nextInt().abs)
 
   def randomStorageSpace = StorageSpace(
     randomAlphanumeric()

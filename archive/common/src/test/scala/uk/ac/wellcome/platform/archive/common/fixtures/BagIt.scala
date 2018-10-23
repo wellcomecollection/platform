@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 
 import java.security.MessageDigest
 
-import uk.ac.wellcome.platform.archive.common.models.{ExternalIdentifier, SourceOrganisation}
+import uk.ac.wellcome.platform.archive.common.models.{ExternalIdentifier, PayloadOxum, SourceOrganisation}
 
 import scala.util.Random
 
@@ -50,7 +50,7 @@ trait BagIt extends RandomThings {
     Some(FileEntry("bagit.txt", bagItFileContents))
 
   def createValidBagInfoFile(bagIdentifier: ExternalIdentifier) =
-    Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier, randomSourceOrganisation)))
+    Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier, randomSourceOrganisation, randomPayloadOxum)))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
     Some(
@@ -105,9 +105,10 @@ trait BagIt extends RandomThings {
           .mkString("\n")
       ))
 
-  def bagInfoFileContents(bagIdentifier: ExternalIdentifier, sourceOrganisation: SourceOrganisation) = {
+  def bagInfoFileContents(bagIdentifier: ExternalIdentifier, sourceOrganisation: SourceOrganisation, payloadOxum: PayloadOxum) = {
     s"""Source-Organization: $sourceOrganisation
        |External-Identifier: $bagIdentifier
+       |Payload-Oxum: ${payloadOxum.payloadBytes}.${payloadOxum.numberOfPayloadFiles}
       """.stripMargin.trim
   }
 
