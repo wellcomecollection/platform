@@ -164,9 +164,11 @@ class ProgressTrackerTest
         withProgressTracker(table) { progressTracker =>
           val progress = progressTracker.initialise(createProgress())
 
+          val resources = List(createResource)
           val progressUpdate = ProgressStatusUpdate(
             progress.id,
             Progress.Completed,
+            resources,
             List(createProgressEvent)
           )
 
@@ -176,6 +178,7 @@ class ProgressTrackerTest
             assertProgressCreated(progress.id, progress.uploadUri, table)
 
           actualProgress.status shouldBe Progress.Completed
+          actualProgress.resources should contain theSameElementsAs( progress.resources ++ resources)
 
           assertProgressRecordedRecentEvents(
             progressUpdate.id,

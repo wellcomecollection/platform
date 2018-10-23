@@ -7,7 +7,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagId, BagInfo, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.platform.archive.registrar.async.modules.{ConfigModule, TestAppConfigModule}
@@ -32,12 +32,12 @@ trait RegistrarFixtures
     with LocalDynamoDb {
 
   def sendNotification(requestId: UUID,
-                       bagId: BagId,
+                       storageSpace: StorageSpace,
                        bagLocation: BagLocation,
                        queuePair: QueuePair) =
     sendNotificationToSQS(
       queuePair.queue,
-      ArchiveComplete(requestId, bagId, bagLocation)
+      ArchiveComplete(requestId, storageSpace, bagLocation)
     )
 
   def withBagNotification[R](
@@ -46,7 +46,7 @@ trait RegistrarFixtures
     storageBucket: Bucket,
     dataFileCount: Int = 1)(testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
     withBag(storageBucket, dataFileCount) { case (bagLocation, bagInfo, bagId) =>
-      sendNotification(requestId, bagId, bagLocation, queuePair)
+      sendNotification(requestId, bagId.space, bagLocation, queuePair)
       testWith((bagLocation, bagInfo, bagId))
     }
   }

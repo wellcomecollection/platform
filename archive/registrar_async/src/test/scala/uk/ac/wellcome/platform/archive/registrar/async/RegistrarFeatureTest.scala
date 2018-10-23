@@ -2,27 +2,16 @@ package uk.ac.wellcome.platform.archive.registrar.async
 
 import java.time.Instant
 
-import org.scalatest.concurrent.{
-  IntegrationPatience,
-  PatienceConfiguration,
-  ScalaFutures
-}
+import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
-import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{
-  RegistrarFixtures,
-  StorageManifestAssertions
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{Progress, Resource, ResourceIdentifier}
+import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{RegistrarFixtures, StorageManifestAssertions}
 import uk.ac.wellcome.storage.dynamo._
 
 class RegistrarFeatureTest
@@ -86,7 +75,7 @@ class RegistrarFeatureTest
               assertTopicReceivesProgressStatusUpdate(
                 requestId,
                 progressTopic,
-                Progress.Completed) { events =>
+                Progress.Completed, List(Resource(ResourceIdentifier(bagId.toString)))) { events =>
                 events should have size 1
                 events.head.description shouldBe "Bag registered successfully"
               }
@@ -109,7 +98,7 @@ class RegistrarFeatureTest
 
         sendNotificationToSQS(
           queuePair.queue,
-          ArchiveComplete(requestId, bagId, bagLocation)
+          ArchiveComplete(requestId, bagId.space, bagLocation)
         )
 
         registrar.run()
@@ -124,7 +113,7 @@ class RegistrarFeatureTest
           assertTopicReceivesProgressStatusUpdate(
             requestId,
             progressTopic,
-            Progress.Failed) { events =>
+            Progress.Failed, Nil) { events =>
             events should have size 1
             events.head.description should startWith(
               "There was an exception while downloading object")

@@ -27,7 +27,7 @@ class StorageManifestFactoryTest
     withLocalS3Bucket { bucket =>
       withBag(bucket) { case (bagLocation, bagInfo, bagId) =>
         val archiveComplete =
-          ArchiveComplete(requestId, bagId, bagLocation)
+          ArchiveComplete(requestId, bagId.space, bagLocation)
 
         val storageManifest =
           StorageManifestFactory.create(archiveComplete)
@@ -52,13 +52,13 @@ class StorageManifestFactoryTest
   describe("returning a left of registrar error ...") {
     it("if no files are at the BagLocation") {
 
-      val bagId = randomBagId
+      val storageSpace = randomStorageSpace
       val requestId = randomUUID
 
       withLocalS3Bucket { bucket =>
         val bagLocation =
           BagLocation(bucket.name, "archive", BagPath(s"space/b1234567"))
-        val archiveComplete = ArchiveComplete(requestId, bagId, bagLocation)
+        val archiveComplete = ArchiveComplete(requestId, storageSpace, bagLocation)
         val value = StorageManifestFactory.create(archiveComplete)
 
         inside(value) {
@@ -73,7 +73,6 @@ class StorageManifestFactoryTest
     }
 
     it("if the BagLocation has an invalid manifest") {
-      val bagId = randomBagId
       val requestId = randomUUID
 
       withLocalS3Bucket { bucket =>
@@ -81,9 +80,9 @@ class StorageManifestFactoryTest
           bucket,
           createDataManifest =
             _ => Some(FileEntry("manifest-sha256.txt", "bleeergh!"))) {
-          case (bagLocation, _, _) =>
+          case (bagLocation, _, bagId) =>
             val archiveComplete =
-              ArchiveComplete(requestId, bagId, bagLocation)
+              ArchiveComplete(requestId, bagId.space, bagLocation)
             val value = StorageManifestFactory.create(archiveComplete)
             value shouldBe Left(
               InvalidBagManifestError(archiveComplete, "manifest-sha256.txt"))

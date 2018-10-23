@@ -59,6 +59,7 @@ trait ProgressHttpFixture
     val progress = ProgressStatusUpdate(
       id = id,
       status = status,
+      affectedResources = List(createResource),
       events = events
     )
 

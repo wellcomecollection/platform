@@ -20,7 +20,7 @@ trait ProgressGenerators extends RandomThings {
                          callback: Option[Callback] = Some(createCallback()),
                          space: Namespace = createSpace,
                          status: Status = Progress.Initialised,
-                         resources: Seq[Resource] = List(createResource),
+                         resources: Seq[Resource] = List.empty,
                          events: List[ProgressEvent] = List.empty): Progress = {
     Progress(
       id = id,
@@ -44,9 +44,10 @@ trait ProgressGenerators extends RandomThings {
 
   def createProgressStatusUpdateWith(id: UUID,
                                      status: Status = Progress.Initialised,
+                                     resources: List[Resource] = List(createResource),
                                      events: Seq[ProgressEvent] = List(
                                        createProgressEvent)): ProgressUpdate = {
-    ProgressStatusUpdate(id, status, events)
+    ProgressStatusUpdate(id, status, resources, events)
   }
 
   def createSpace =

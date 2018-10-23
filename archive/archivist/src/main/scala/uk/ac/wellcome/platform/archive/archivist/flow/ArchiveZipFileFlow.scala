@@ -77,11 +77,13 @@ object ArchiveZipFileFlow extends Logging {
         ProgressStatusUpdate(
           ingestBagRequest.archiveRequestId,
           Progress.Failed,
+          Nil,
           errors.map(error => ProgressEvent(error.toString)))
       case Left(archiveError) =>
         ProgressStatusUpdate(
           ingestBagRequest.archiveRequestId,
           Progress.Failed,
+          Nil,
           List(ProgressEvent(archiveError.toString)))
     }
 }

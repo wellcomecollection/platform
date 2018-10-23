@@ -108,7 +108,7 @@ class ArchiveZipFileFlowTest
                   assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
-                    Progress.Failed) { events =>
+                    Progress.Failed, Nil) { events =>
                     events should have size (zipFile.entries().asScala.size - 1)
                     all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                   }
@@ -148,7 +148,7 @@ class ArchiveZipFileFlowTest
                   assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
-                    Progress.Failed) { events =>
+                    Progress.Failed, Nil) { events =>
                     inside(events) {
                       case List(event) =>
                         event.description shouldBe result.head.left.get.toString
@@ -202,7 +202,7 @@ class ArchiveZipFileFlowTest
                   assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
-                    Progress.Failed) { events =>
+                    Progress.Failed, Nil) { events =>
                     inside(events) {
                       case List(event) =>
                         event.description shouldBe result.head.left.get.toString

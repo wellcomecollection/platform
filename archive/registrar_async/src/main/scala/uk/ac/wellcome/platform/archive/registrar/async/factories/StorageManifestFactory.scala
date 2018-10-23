@@ -29,7 +29,7 @@ object StorageManifestFactory extends Logging {
       )
     } yield
       StorageManifest(
-        space = archiveComplete.bagId.space,
+        space = archiveComplete.space,
         info = bagInfo,
         manifest = fileManifest,
         accessLocation = Location(
