@@ -13,7 +13,9 @@ import uk.ac.wellcome.platform.api.responses.ResultResponse
   * Since Finatra resolves routes in the order they're declared, this
   * controller must be used last, or it will break other routes.
   *
-  * More info: https://twitter.github.io/finatra/user-guide/http/controllers.html#wildcard-parameter
+  * More info:
+  *   https://twitter.github.io/finatra/user-guide/http/controllers.html#wildcard-parameter
+  *   https://alexwlchan.net/2018/10/finatra-404/
   *
   */
 @Singleton
