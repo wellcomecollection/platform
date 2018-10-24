@@ -10,8 +10,13 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerF
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.progress_async.modules.{ConfigModule, TestAppConfigModule}
-import uk.ac.wellcome.platform.archive.progress_async.{ProgressAsync => ProgressApp}
+import uk.ac.wellcome.platform.archive.progress_async.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
+import uk.ac.wellcome.platform.archive.progress_async.{
+  ProgressAsync => ProgressApp
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith

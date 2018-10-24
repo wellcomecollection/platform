@@ -7,10 +7,16 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
+import uk.ac.wellcome.platform.archive.common.json.{
+  URIConverters,
+  UUIDConverters
+}
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressGenerators
-import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Progress}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Callback,
+  Progress
+}
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.json.JsonUtil._
 

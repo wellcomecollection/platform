@@ -7,7 +7,9 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Completed
-import uk.ac.wellcome.platform.archive.progress_async.fixtures.{ProgressAsyncFixture => ProgressFixture}
+import uk.ac.wellcome.platform.archive.progress_async.fixtures.{
+  ProgressAsyncFixture => ProgressFixture
+}
 
 class ProgressAsyncFeatureTest
     extends FunSpec

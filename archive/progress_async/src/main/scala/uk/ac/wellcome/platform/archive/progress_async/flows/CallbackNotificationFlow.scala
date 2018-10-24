@@ -13,7 +13,10 @@ import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.progress.models.Callback.Pending
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, Failed}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
+  Completed,
+  Failed
+}
 
 object CallbackNotificationFlow extends Logging {
   import CallbackNotification._
