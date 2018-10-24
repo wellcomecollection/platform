@@ -1,6 +1,10 @@
 package uk.ac.wellcome.platform.archive.registrar.async
 
-import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.{
+  IntegrationPatience,
+  PatienceConfiguration,
+  ScalaFutures
+}
 import java.time.Instant
 
 import org.scalatest.concurrent.{
@@ -13,10 +17,20 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{Completed, Failed}
-import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{RegistrarFixtures, RegistrationCompleteAssertions}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
+  Completed,
+  Failed
+}
+import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{
+  RegistrarFixtures,
+  RegistrationCompleteAssertions
+}
 import uk.ac.wellcome.storage.dynamo._
 
 class RegistrarFeatureTest
