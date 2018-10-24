@@ -187,9 +187,13 @@ Response:
     "id": "{id}",
     "type": "Bag"
   },
-  "status": {
+  "ingestStatus": {
     "id": "processing|failure|success",
-    "type": "IngestStatus"
+    "type": "Status"
+  },
+  "callbackStatus": {
+    "id": "processing|failure|success",
+    "type": "Status"
   },
   "events": [ ... ]
 }
