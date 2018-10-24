@@ -73,12 +73,7 @@ class RegistrarHttpFeatureTest
                     case DisplayBag(
                         actualBagId,
                         DisplayStorageSpace(storageSpaceName, "Space"),
-                        DisplayBagInfo(
-                          externalIdentifierString,
-                          payloadOxum,
-                          sourceOrganization,
-                          baggingDate,
-                          "BagInfo"),
+                        DisplayBagInfo(externalIdentifierString,payloadOxum, sourceOrganization,baggingDate,_,_,_,"BagInfo"),
                         DisplayBagManifest(
                           actualChecksumAlgorithm,
                           Nil,

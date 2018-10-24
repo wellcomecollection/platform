@@ -5,7 +5,7 @@ case class BagInfo(externalIdentifier: ExternalIdentifier,
                    sourceOrganisation: SourceOrganisation,
                    payloadOxum: PayloadOxum,
                    baggingDate: LocalDate,
-                   externalBagInfo: Option[ExternalDescription] = None,
+                   externalDescription: Option[ExternalDescription] = None,
                    internalSenderIdentifier: Option[InternalSenderIdentifier] = None,
                    internalSenderDescription: Option[InternalSenderDescription] = None
                   )

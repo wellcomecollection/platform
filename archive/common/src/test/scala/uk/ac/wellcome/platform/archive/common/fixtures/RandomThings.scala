@@ -8,12 +8,7 @@ import uk.ac.wellcome.platform.archive.common.models._
 import scala.util.Random
 
 trait RandomThings {
-  def randomBagInfo =
-    BagInfo(
-      randomExternalIdentifier,
-      randomSourceOrganisation,
-      randomPayloadOxum,
-      randomLocalDate)
+  def randomBagInfo = BagInfo(randomExternalIdentifier, randomSourceOrganisation, randomPayloadOxum, randomLocalDate, Some(randomExternalDescription), Some(randomInternalSenderIdentifier), Some(randomInternalSenderDescription))
 
   def randomAlphanumeric(length: Int = 8) = {
     Random.alphanumeric take length mkString
