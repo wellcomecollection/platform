@@ -55,26 +55,4 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
     }.partition(_.isSuccess)
     success should have size 1
   }
-
-  def assertTopicReceivesProgressResourceUpdate(
-    requestId: UUID,
-    expectedResource: Resource,
-    progressTopic: SNS.Topic)(assert: Seq[ProgressEvent] => Assertion) = {
-    val messages = listMessagesReceivedFromSNS(progressTopic)
-    val progressUpdates = messages.map { messageinfo =>
-      fromJson[ProgressUpdate](messageinfo.message).get
-    }
-    progressUpdates.size should be > 0
-
-    val (success, failure) = progressUpdates.map { progressUpdate =>
-      debug(s"Received ProgressUpdate: $progressUpdate")
-      Try(inside(progressUpdate) {
-        case ProgressResourceUpdate(id, resource, events) =>
-          id shouldBe requestId
-          resource shouldBe expectedResource
-        assert(events)
-      })
-    }.partition(_.isSuccess)
-    success should have size 1
-  }
 }
