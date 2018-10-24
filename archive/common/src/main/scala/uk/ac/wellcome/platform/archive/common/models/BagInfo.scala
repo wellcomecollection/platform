@@ -4,8 +4,21 @@ import java.time.LocalDate
 case class BagInfo(externalIdentifier: ExternalIdentifier,
                    sourceOrganisation: SourceOrganisation,
                    payloadOxum: PayloadOxum,
-                   baggingDate: LocalDate)
+                   baggingDate: LocalDate,
+                   externalBagInfo: Option[ExternalDescription] = None,
+                   internalSenderIdentifier: Option[InternalSenderIdentifier] = None,
+                   internalSenderDescription: Option[InternalSenderDescription] = None
+                  )
 
+case class InternalSenderIdentifier(underlying: String) extends AnyVal {
+  override def toString: String = underlying
+}
+case class InternalSenderDescription(underlying: String) extends AnyVal {
+  override def toString: String = underlying
+}
+case class ExternalDescription(underlying: String) extends AnyVal {
+  override def toString: String = underlying
+}
 case class SourceOrganisation(underlying: String) extends AnyVal {
   override def toString: String = underlying
 }

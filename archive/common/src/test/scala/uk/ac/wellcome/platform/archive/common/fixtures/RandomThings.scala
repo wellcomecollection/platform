@@ -34,6 +34,15 @@ trait RandomThings {
   def randomSourceOrganisation =
     SourceOrganisation(randomAlphanumeric())
 
+  def randomInternalSenderIdentifier =
+    InternalSenderIdentifier(randomAlphanumeric())
+
+  def randomInternalSenderDescription =
+    InternalSenderDescription(randomAlphanumeric())
+
+  def randomExternalDescription =
+    ExternalDescription(randomAlphanumeric())
+
   def randomPayloadOxum =
     PayloadOxum(Random.nextLong().abs, Random.nextInt().abs)
 

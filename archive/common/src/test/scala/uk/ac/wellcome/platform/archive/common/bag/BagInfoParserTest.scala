@@ -14,7 +14,7 @@ class BagInfoParserTest
   case class Thing(id: String)
   val t = Thing("a")
 
-  it("extracts a BagInfo object from a valid bagInfo file") {
+  it("extracts a BagInfo object from a bagInfo file with required fields") {
     val externalIdentifier = randomExternalIdentifier
     val sourceOrganisation = randomSourceOrganisation
     val payloadOxum = randomPayloadOxum
@@ -27,6 +27,31 @@ class BagInfoParserTest
 
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
       BagInfo(externalIdentifier, sourceOrganisation, payloadOxum, baggingDate))
+  }
+
+  it("extracts a BagInfo object from a bagInfo file with required and optional fields") {
+    val externalIdentifier = randomExternalIdentifier
+    val sourceOrganisation = randomSourceOrganisation
+    val payloadOxum = randomPayloadOxum
+    val baggingDate = randomLocalDate
+    val externalDescription = Some(randomExternalDescription)
+    val internalSenderIdentifier = Some(randomInternalSenderIdentifier)
+    val internalSenderDescription = Some(randomInternalSenderDescription)
+
+    val bagInfoString = bagInfoFileContents(
+      externalIdentifier,
+      sourceOrganisation,
+      payloadOxum,
+      baggingDate,
+      externalDescription,
+      internalSenderIdentifier,
+      internalSenderDescription
+    )
+
+    BagInfoParser.parseBagInfo(
+      t,
+      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
+      BagInfo(externalIdentifier, sourceOrganisation, payloadOxum, baggingDate, externalDescription, internalSenderIdentifier, internalSenderDescription))
   }
 
   it(
