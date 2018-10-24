@@ -97,8 +97,7 @@ trait RegistrarHttpFixture
   }
 
   def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]) =
-    withActorSystem { actorSystem =>
-      implicit val system = actorSystem
+    withActorSystem { implicit actorSystem =>
 
       val request = Http().singleRequest(r)
       whenReady(request) { result =>

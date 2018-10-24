@@ -64,6 +64,7 @@ object Dependencies {
     "io.circe" %% "circe-generic"% versions.circeVersion,
     "io.circe" %% "circe-generic-extras"% versions.circeVersion,
     "io.circe" %% "circe-parser"% versions.circeVersion,
+    "io.circe" %% "circe-optics" % versions.circeVersion,
     "io.circe" %% "circe-java8" % versions.circeVersion
   )
 
@@ -140,9 +141,7 @@ object Dependencies {
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
-  val commonElasticsearchDependencies = Seq(
-    "io.circe" %% "circe-optics" % versions.circeVersion
-  ) ++ elasticsearchDependencies ++ guiceDependencies ++ scalacheckDependencies
+  val commonElasticsearchDependencies = elasticsearchDependencies ++ guiceDependencies ++ scalacheckDependencies
 
   val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
@@ -167,8 +166,7 @@ object Dependencies {
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
     "mysql" % "mysql-connector-java" % "6.0.6",
     "org.flywaydb" % "flyway-core" % "4.2.0",
-    "com.amazonaws" % "aws-java-sdk-rds" % versions.aws,
-    "io.circe" %% "circe-optics" % versions.circeVersion
+    "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
   )
 
   val snapshotGeneratorDependencies = Seq(
@@ -176,7 +174,6 @@ object Dependencies {
   )
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
-    "io.circe" %% "circe-optics" % versions.circeVersion,
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   )
 
