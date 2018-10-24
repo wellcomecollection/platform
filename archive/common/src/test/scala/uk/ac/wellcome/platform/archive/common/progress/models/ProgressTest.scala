@@ -5,10 +5,7 @@ import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
-  ProgressGenerators,
-  TimeTestFixture
-}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, TimeTestFixture}
 
 class ProgressTest
     extends FunSpec

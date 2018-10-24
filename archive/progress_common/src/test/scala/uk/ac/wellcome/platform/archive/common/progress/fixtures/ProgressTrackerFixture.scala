@@ -3,13 +3,11 @@ package uk.ac.wellcome.platform.archive.common.progress.fixtures
 import java.net.URI
 import java.util.UUID
 
-import akka.NotUsed
-import akka.stream.scaladsl.Flow
 import com.gu.scanamo.error.DynamoReadError
+import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -31,20 +29,6 @@ trait ProgressTrackerFixture
       DynamoConfig(table = table.name, index = table.index)
     )
     testWith(progressTracker)
-  }
-
-  def withProgressUpdateFlow[R](table: Table)(
-    testWith: TestWith[(
-                         Flow[ProgressUpdate, Progress, NotUsed],
-                         ProgressTracker
-                       ),
-                       R]): R = {
-
-    val progressTracker = new ProgressTracker(
-      dynamoDbClient,
-      DynamoConfig(table = table.name, index = table.index)
-    )
-    testWith((ProgressUpdateFlow(progressTracker), progressTracker))
   }
 
   def withMockProgressTracker[R]()(
@@ -89,7 +73,7 @@ trait ProgressTrackerFixture
 
   def assertProgressStatus(id: UUID,
                            expectedStatus: Status,
-                           table: LocalDynamoDb.Table) = {
+                           table: LocalDynamoDb.Table): Assertion = {
     val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.status shouldBe expectedStatus

@@ -7,6 +7,7 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
 import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressEventUpdate}
+import uk.ac.wellcome.platform.archive.progress_async.fixtures.ProgressAsyncFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -18,6 +19,7 @@ class ProgressUpdateFlowTest
     with RandomThings
     with ProgressTrackerFixture
     with ProgressGenerators
+    with ProgressAsyncFixture
     with ScalaFutures {
 
   it("adds an event to a monitor with none") {
@@ -26,7 +28,7 @@ class ProgressUpdateFlowTest
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
-              val progress = createProgress
+              val progress = createProgress()
               monitor.initialise(progress)
 
               val update =
