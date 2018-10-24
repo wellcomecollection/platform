@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.archive.registrar.common.models
 
 import java.time.Instant
 
-import uk.ac.wellcome.platform.archive.common.models.{BagId, BagInfo, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagId,
+  BagInfo,
+  StorageSpace
+}
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class ChecksumAlgorithm(value: String)

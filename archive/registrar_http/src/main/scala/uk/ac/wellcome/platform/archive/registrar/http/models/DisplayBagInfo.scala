@@ -12,9 +12,11 @@ case class DisplayBagInfo(
 )
 
 object DisplayBagInfo {
-  def apply(bagInfo: BagInfo): DisplayBagInfo = DisplayBagInfo(
-    externalIdentifier = bagInfo.externalIdentifier.underlying,
-    payloadOxum = bagInfo.payloadOxum.toString,
-    sourceOrganization = bagInfo.sourceOrganisation.underlying,
-    baggingDate = bagInfo.baggingDate.toString)
+  def apply(bagInfo: BagInfo): DisplayBagInfo =
+    DisplayBagInfo(
+      externalIdentifier = bagInfo.externalIdentifier.underlying,
+      payloadOxum = bagInfo.payloadOxum.toString,
+      sourceOrganization = bagInfo.sourceOrganisation.underlying,
+      baggingDate = bagInfo.baggingDate.toString
+    )
 }

@@ -3,7 +3,12 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 import java.security.MessageDigest
 import java.time.LocalDate
 
-import uk.ac.wellcome.platform.archive.common.models.{BagInfo, ExternalIdentifier, PayloadOxum, SourceOrganisation}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagInfo,
+  ExternalIdentifier,
+  PayloadOxum,
+  SourceOrganisation
+}
 
 import scala.util.Random
 
@@ -23,8 +28,8 @@ trait BagIt extends RandomThings {
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: (BagInfo) => Option[FileEntry] =
-      createValidBagInfoFile): Seq[FileEntry] = {
+    createBagInfoFile: (BagInfo) => Option[FileEntry] = createValidBagInfoFile)
+    : Seq[FileEntry] = {
 
     val dataFiles = createDataFiles(dataFileCount)
     val filesAndDigest = dataFiles.map {

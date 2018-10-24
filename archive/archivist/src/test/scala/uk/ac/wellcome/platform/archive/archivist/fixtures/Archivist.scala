@@ -11,10 +11,17 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
-import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.archivist.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.{BagInfo, ExternalIdentifier, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagInfo,
+  ExternalIdentifier,
+  IngestBagRequest
+}
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -58,8 +65,7 @@ trait Archivist
     createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: BagInfo => Option[FileEntry] =
-      createValidBagInfoFile)(
+    createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile)(
     testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]) =
     withBagItZip(
       dataFileCount = dataFileCount,

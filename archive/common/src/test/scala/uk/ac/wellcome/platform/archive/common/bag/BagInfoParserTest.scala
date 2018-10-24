@@ -25,9 +25,7 @@ class BagInfoParserTest
       payloadOxum,
       baggingDate)
 
-    BagInfoParser.parseBagInfo(
-      t,
-      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
+    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
       BagInfo(externalIdentifier, sourceOrganisation, payloadOxum, baggingDate))
   }
 
@@ -38,9 +36,7 @@ class BagInfoParserTest
           |Payload-Oxum: ${randomPayloadOxum.payloadBytes}.${randomPayloadOxum.numberOfPayloadFiles}
           |Bagging-Date: $randomLocalDate""".stripMargin
 
-    BagInfoParser.parseBagInfo(
-      t,
-      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
+    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(t, List("External-Identifier")))
   }
 
@@ -51,9 +47,7 @@ class BagInfoParserTest
           |Payload-Oxum: ${randomPayloadOxum.payloadBytes}.${randomPayloadOxum.numberOfPayloadFiles}
           |Bagging-Date: $randomLocalDate""".stripMargin
 
-    BagInfoParser.parseBagInfo(
-      t,
-      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
+    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(t, List("Source-Organization")))
   }
 
@@ -64,9 +58,7 @@ class BagInfoParserTest
           |Source-Organization: $randomSourceOrganisation
           |Bagging-Date: $randomLocalDate""".stripMargin
 
-    BagInfoParser.parseBagInfo(
-      t,
-      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
+    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(t, List("Payload-Oxum")))
   }
 
@@ -78,9 +70,7 @@ class BagInfoParserTest
           |Payload-Oxum: sgadfjag
           |Bagging-Date: $randomLocalDate""".stripMargin
 
-    BagInfoParser.parseBagInfo(
-      t,
-      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
+    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(t, List("Payload-Oxum")))
   }
 
@@ -91,9 +81,7 @@ class BagInfoParserTest
           |Source-Organization: $randomSourceOrganisation
           |Payload-Oxum: ${randomPayloadOxum.payloadBytes}.${randomPayloadOxum.numberOfPayloadFiles}""".stripMargin
 
-    BagInfoParser.parseBagInfo(
-      t,
-      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
+    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(t, List("Bagging-Date")))
   }
 
@@ -105,18 +93,14 @@ class BagInfoParserTest
           |Payload-Oxum: ${randomPayloadOxum.payloadBytes}.${randomPayloadOxum.numberOfPayloadFiles}
           |Bagging-Date: sdfkjghl""".stripMargin
 
-    BagInfoParser.parseBagInfo(
-      t,
-      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
+    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(t, List("Bagging-Date")))
   }
 
   it("returns a left of invalid bag info error if bag-info.txt is empty") {
     val bagInfoString = ""
 
-    BagInfoParser.parseBagInfo(
-      t,
-      IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
+    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(
         t,
         List(

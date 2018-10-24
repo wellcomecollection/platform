@@ -23,14 +23,15 @@ object UpdateStoredManifestFlow {
       .mapAsync(10) {
         case (manifest, ctx) => updateStoredManifest(dataStore, manifest, ctx)
       }
-      .map{
+      .map {
         case (requestId, bagId) =>
           ProgressStatusUpdate(
             requestId,
             Progress.Completed,
             List(Resource(ResourceIdentifier(bagId.toString))),
             List(ProgressEvent("Bag registered successfully"))
-        )}
+          )
+      }
       .via(
         SnsPublishFlow[ProgressUpdate](
           snsClient,

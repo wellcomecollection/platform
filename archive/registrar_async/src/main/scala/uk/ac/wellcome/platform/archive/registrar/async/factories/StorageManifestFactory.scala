@@ -7,8 +7,15 @@ import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.bag.BagInfoParser
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  DownloadError,
+  InvalidBagManifestError
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation
+}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -22,7 +29,10 @@ object StorageManifestFactory extends Logging {
     for {
       bagInfoInputStream <- downloadFile(archiveComplete, "bag-info.txt")
       bagInfo <- BagInfoParser.parseBagInfo(archiveComplete, bagInfoInputStream)
-      manifestTuples <- getBagItems(archiveComplete, s"manifest-$algorithm.txt", " +")
+      manifestTuples <- getBagItems(
+        archiveComplete,
+        s"manifest-$algorithm.txt",
+        " +")
       fileManifest = FileManifest(
         ChecksumAlgorithm(algorithm),
         manifestTuples
@@ -47,14 +57,14 @@ object StorageManifestFactory extends Logging {
                           delimiter: String)(implicit s3Client: AmazonS3)
     : Either[ArchiveError[ArchiveComplete], List[BagDigestFile]] = {
     val triedLines = downloadFile(archiveComplete, name)
-        .map(
-          inputStream =>
-            scala.io.Source
-              .fromInputStream(inputStream)
-              .mkString
-              .split("\n")
-              .filter(_.nonEmpty)
-              .toList)
+      .map(
+        inputStream =>
+          scala.io.Source
+            .fromInputStream(inputStream)
+            .mkString
+            .split("\n")
+            .filter(_.nonEmpty)
+            .toList)
 
     triedLines.flatMap { lines: List[String] =>
       lines.traverse { line =>
@@ -63,13 +73,14 @@ object StorageManifestFactory extends Logging {
     }
   }
 
-  private def downloadFile(archiveComplete: ArchiveComplete, filename: String)(implicit s3Client: AmazonS3)
+  private def downloadFile(archiveComplete: ArchiveComplete, filename: String)(
+    implicit s3Client: AmazonS3)
     : Either[DownloadError[ArchiveComplete], InputStream] = {
     val location = getFileObjectLocation(archiveComplete.bagLocation, filename)
     Try(s3Client.getObject(location.namespace, location.key))
-        .map(_.getObjectContent)
-        .toEither
-        .leftMap(ex => DownloadError(ex, location, archiveComplete))
+      .map(_.getObjectContent)
+      .toEither
+      .leftMap(ex => DownloadError(ex, location, archiveComplete))
   }
 
   private def getFileObjectLocation(bagLocation: BagLocation, name: String) =

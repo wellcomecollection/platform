@@ -42,11 +42,11 @@ trait ProgressGenerators extends RandomThings {
     ProgressEventUpdate(id, events)
   }
 
-  def createProgressStatusUpdateWith(id: UUID,
-                                     status: Status = Progress.Initialised,
-                                     resources: List[Resource] = List(createResource),
-                                     events: Seq[ProgressEvent] = List(
-                                       createProgressEvent)): ProgressUpdate = {
+  def createProgressStatusUpdateWith(
+    id: UUID,
+    status: Status = Progress.Initialised,
+    resources: List[Resource] = List(createResource),
+    events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
     ProgressStatusUpdate(id, status, resources, events)
   }
 

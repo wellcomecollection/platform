@@ -178,7 +178,7 @@ class ProgressTrackerTest
             assertProgressCreated(progress.id, progress.uploadUri, table)
 
           actualProgress.status shouldBe Progress.Completed
-          actualProgress.resources should contain theSameElementsAs( progress.resources ++ resources)
+          actualProgress.resources should contain theSameElementsAs (progress.resources ++ resources)
 
           assertProgressRecordedRecentEvents(
             progressUpdate.id,

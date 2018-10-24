@@ -73,7 +73,12 @@ class RegistrarHttpFeatureTest
                     case DisplayBag(
                         actualBagId,
                         DisplayStorageSpace(storageSpaceName, "Space"),
-                        DisplayBagInfo(externalIdentifierString,payloadOxum, sourceOrganization,baggingDate ,"BagInfo"),
+                        DisplayBagInfo(
+                          externalIdentifierString,
+                          payloadOxum,
+                          sourceOrganization,
+                          baggingDate,
+                          "BagInfo"),
                         DisplayBagManifest(
                           actualChecksumAlgorithm,
                           Nil,
@@ -93,7 +98,8 @@ class RegistrarHttpFeatureTest
                       externalIdentifierString shouldBe bagInfo.externalIdentifier.underlying
                       payloadOxum shouldBe s"${bagInfo.payloadOxum.payloadBytes}.${bagInfo.payloadOxum.numberOfPayloadFiles}"
                       sourceOrganization shouldBe bagInfo.sourceOrganisation.underlying
-                      baggingDate shouldBe bagInfo.baggingDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                      baggingDate shouldBe bagInfo.baggingDate.format(
+                        DateTimeFormatter.ISO_LOCAL_DATE)
 
                       actualChecksumAlgorithm shouldBe checksumAlgorithm
                       actualProviderId shouldBe providerId

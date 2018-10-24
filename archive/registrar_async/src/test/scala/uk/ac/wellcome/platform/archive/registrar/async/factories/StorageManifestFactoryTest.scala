@@ -25,26 +25,27 @@ class StorageManifestFactoryTest
     val requestId = randomUUID
 
     withLocalS3Bucket { bucket =>
-      withBag(bucket) { case (bagLocation, bagInfo, bagId) =>
-        val archiveComplete =
-          ArchiveComplete(requestId, bagId.space, bagLocation)
+      withBag(bucket) {
+        case (bagLocation, bagInfo, bagId) =>
+          val archiveComplete =
+            ArchiveComplete(requestId, bagId.space, bagLocation)
 
-        val storageManifest =
-          StorageManifestFactory.create(archiveComplete)
+          val storageManifest =
+            StorageManifestFactory.create(archiveComplete)
 
-        inside(storageManifest) {
-          case Right(
-              StorageManifest(
-                actualStorageSpace,
-                actualBagInfo,
-                FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-                _,
-                _)) =>
-            actualStorageSpace shouldBe bagId.space
-            actualBagInfo shouldBe bagInfo
-            bagDigestFiles should have size 1
+          inside(storageManifest) {
+            case Right(
+                StorageManifest(
+                  actualStorageSpace,
+                  actualBagInfo,
+                  FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+                  _,
+                  _)) =>
+              actualStorageSpace shouldBe bagId.space
+              actualBagInfo shouldBe bagInfo
+              bagDigestFiles should have size 1
 
-        }
+          }
       }
     }
   }
@@ -58,7 +59,8 @@ class StorageManifestFactoryTest
       withLocalS3Bucket { bucket =>
         val bagLocation =
           BagLocation(bucket.name, "archive", BagPath(s"space/b1234567"))
-        val archiveComplete = ArchiveComplete(requestId, storageSpace, bagLocation)
+        val archiveComplete =
+          ArchiveComplete(requestId, storageSpace, bagLocation)
         val value = StorageManifestFactory.create(archiveComplete)
 
         inside(value) {

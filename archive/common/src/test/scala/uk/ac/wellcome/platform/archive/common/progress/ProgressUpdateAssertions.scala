@@ -10,10 +10,11 @@ import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 import scala.util.Try
 
 trait ProgressUpdateAssertions extends SNS with Inside with Logging {
-  def assertTopicReceivesProgressStatusUpdate(
-    requestId: UUID,
-    progressTopic: SNS.Topic,
-    status: Progress.Status,expectedResources: Seq[Resource])(assert: Seq[ProgressEvent] => Assertion) = {
+  def assertTopicReceivesProgressStatusUpdate(requestId: UUID,
+                                              progressTopic: SNS.Topic,
+                                              status: Progress.Status,
+                                              expectedResources: Seq[Resource])(
+    assert: Seq[ProgressEvent] => Assertion) = {
     val messages = listMessagesReceivedFromSNS(progressTopic)
     val progressUpdates = messages.map { messageinfo =>
       fromJson[ProgressUpdate](messageinfo.message).get
@@ -24,7 +25,7 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
       .map { progressUpdate =>
         debug(s"Received ProgressUpdate: $progressUpdate")
         Try(inside(progressUpdate) {
-          case ProgressStatusUpdate(id, actualStatus, resources,events) =>
+          case ProgressStatusUpdate(id, actualStatus, resources, events) =>
             id shouldBe requestId
             actualStatus shouldBe status
             resources shouldBe expectedResources
@@ -44,15 +45,17 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
     }
     progressUpdates.size should be > 0
 
-    val (success, failure) = progressUpdates.map { progressUpdate =>
-      debug(s"Received ProgressUpdate: $progressUpdate")
-      Try(inside(progressUpdate) {
-        case ProgressEventUpdate(id, events) =>
-          id shouldBe requestId
+    val (success, failure) = progressUpdates
+      .map { progressUpdate =>
+        debug(s"Received ProgressUpdate: $progressUpdate")
+        Try(inside(progressUpdate) {
+          case ProgressEventUpdate(id, events) =>
+            id shouldBe requestId
 
-          assert(events)
-      })
-    }.partition(_.isSuccess)
+            assert(events)
+        })
+      }
+      .partition(_.isSuccess)
     success should have size 1
   }
 }

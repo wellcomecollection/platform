@@ -10,7 +10,8 @@ trait BagLocationFixtures extends S3 with BagIt {
     storageBucket: Bucket,
     dataFileCount: Int = 1,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
-      createValidDataManifest)(testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
+      createValidDataManifest)(
+    testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
     val bagIdentifier = ExternalIdentifier(randomAlphanumeric())
 
     info(s"Creating bag $bagIdentifier")
@@ -36,6 +37,10 @@ trait BagLocationFixtures extends S3 with BagIt {
         )
     })
 
-    testWith((bagLocation, bagInfo, BagId(randomStorageSpace, bagInfo.externalIdentifier)))
+    testWith(
+      (
+        bagLocation,
+        bagInfo,
+        BagId(randomStorageSpace, bagInfo.externalIdentifier)))
   }
 }

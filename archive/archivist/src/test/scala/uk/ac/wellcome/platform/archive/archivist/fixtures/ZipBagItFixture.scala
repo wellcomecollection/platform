@@ -5,7 +5,10 @@ import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.{BagInfo, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagInfo,
+  ExternalIdentifier
+}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ZipBagItFixture extends BagIt with Logging {
@@ -39,8 +42,7 @@ trait ZipBagItFixture extends BagIt with Logging {
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: BagInfo => Option[FileEntry] =
-      createValidBagInfoFile
+    createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile
   )(testWith: TestWith[(ExternalIdentifier, ZipFile), R]) = {
 
     info(s"Creating bag ${bagInfo.externalIdentifier}")
