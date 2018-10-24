@@ -10,11 +10,19 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.progress_async.modules.{ConfigModule, TestAppConfigModule}
-import uk.ac.wellcome.platform.archive.progress_async.{ProgressAsync => ProgressApp}
+import uk.ac.wellcome.platform.archive.progress_async.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
+import uk.ac.wellcome.platform.archive.progress_async.{
+  ProgressAsync => ProgressApp
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
@@ -36,10 +44,10 @@ trait ProgressAsyncFixture
 
   def withProgressUpdateFlow[R](table: Table)(
     testWith: TestWith[(
-      Flow[ProgressUpdate, Progress, NotUsed],
-        ProgressTracker
-      ),
-      R]): R = {
+                         Flow[ProgressUpdate, Progress, NotUsed],
+                         ProgressTracker
+                       ),
+                       R]): R = {
 
     val progressTracker = new ProgressTracker(
       dynamoDbClient,
