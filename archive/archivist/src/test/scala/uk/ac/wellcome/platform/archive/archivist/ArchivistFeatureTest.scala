@@ -7,16 +7,11 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  Resource,
-  ResourceIdentifier
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
 class ArchivistFeatureTest
     extends FunSpec

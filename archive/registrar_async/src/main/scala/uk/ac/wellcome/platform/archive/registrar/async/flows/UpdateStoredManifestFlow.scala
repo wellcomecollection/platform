@@ -4,12 +4,12 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.concurrent.ExecutionContext
 

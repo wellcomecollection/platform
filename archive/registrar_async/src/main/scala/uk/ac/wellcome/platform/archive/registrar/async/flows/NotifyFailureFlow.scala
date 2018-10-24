@@ -7,7 +7,6 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.progress.models.{
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
   Progress,
   ProgressEvent,
   ProgressStatusUpdate,
