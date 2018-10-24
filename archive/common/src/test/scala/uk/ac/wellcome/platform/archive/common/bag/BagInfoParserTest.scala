@@ -23,7 +23,7 @@ class BagInfoParserTest
       externalIdentifier,
       sourceOrganisation,
       payloadOxum,
-      baggingDate)
+      baggingDate, None, None, None)
 
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
       BagInfo(externalIdentifier, sourceOrganisation, payloadOxum, baggingDate))
