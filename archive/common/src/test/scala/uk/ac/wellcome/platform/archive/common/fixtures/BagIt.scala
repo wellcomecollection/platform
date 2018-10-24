@@ -58,7 +58,12 @@ trait BagIt extends RandomThings {
           bagInfo.externalIdentifier,
           bagInfo.sourceOrganisation,
           bagInfo.payloadOxum,
-          bagInfo.baggingDate, bagInfo.externalDescription, bagInfo.internalSenderIdentifier, bagInfo.internalSenderDescription)))
+          bagInfo.baggingDate,
+          bagInfo.externalDescription,
+          bagInfo.internalSenderIdentifier,
+          bagInfo.internalSenderDescription
+        )
+      ))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
     Some(
@@ -113,13 +118,14 @@ trait BagIt extends RandomThings {
           .mkString("\n")
       ))
 
-  def bagInfoFileContents(bagIdentifier: ExternalIdentifier,
-                          sourceOrganisation: SourceOrganisation,
-                          payloadOxum: PayloadOxum,
-                          baggingDate: LocalDate,
-                          externalDescription: Option[ExternalDescription],
-                          internalSenderIdentifier: Option[InternalSenderIdentifier],
-                          internalSenderDescription: Option[InternalSenderDescription]) = {
+  def bagInfoFileContents(
+    bagIdentifier: ExternalIdentifier,
+    sourceOrganisation: SourceOrganisation,
+    payloadOxum: PayloadOxum,
+    baggingDate: LocalDate,
+    externalDescription: Option[ExternalDescription],
+    internalSenderIdentifier: Option[InternalSenderIdentifier],
+    internalSenderDescription: Option[InternalSenderDescription]) = {
     def optionalLine[T](maybeValue: Option[T], fieldName: String) =
       maybeValue.map(value => s"$fieldName: $value").getOrElse("")
 
