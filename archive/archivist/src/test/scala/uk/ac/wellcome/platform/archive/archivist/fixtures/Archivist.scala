@@ -18,6 +18,7 @@ import uk.ac.wellcome.platform.archive.archivist.modules.{
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.{
+  BagInfo,
   ExternalIdentifier,
   IngestBagRequest
 }
@@ -64,8 +65,7 @@ trait Archivist
     createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: ExternalIdentifier => Option[FileEntry] =
-      createValidBagInfoFile)(
+    createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile)(
     testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]) =
     withBagItZip(
       dataFileCount = dataFileCount,

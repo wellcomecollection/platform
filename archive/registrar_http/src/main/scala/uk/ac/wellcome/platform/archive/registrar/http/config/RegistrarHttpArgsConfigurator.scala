@@ -4,7 +4,6 @@ import org.rogach.scallop.ScallopConf
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.modules.HybridStoreConfig
-import uk.ac.wellcome.platform.archive.registrar.http.models.RegistrarHttpConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
 

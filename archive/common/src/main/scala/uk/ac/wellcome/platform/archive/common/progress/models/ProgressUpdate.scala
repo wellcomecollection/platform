@@ -12,12 +12,8 @@ case class ProgressEventUpdate(id: UUID, events: Seq[ProgressEvent])
 
 case class ProgressStatusUpdate(id: UUID,
                                 status: Progress.Status,
+                                affectedResources: Seq[Resource],
                                 events: Seq[ProgressEvent] = List.empty)
-    extends ProgressUpdate
-
-case class ProgressResourceUpdate(id: UUID,
-                                  affectedResources: Seq[Resource],
-                                  events: Seq[ProgressEvent] = List.empty)
     extends ProgressUpdate
 
 case class ProgressCallbackStatusUpdate(id: UUID,

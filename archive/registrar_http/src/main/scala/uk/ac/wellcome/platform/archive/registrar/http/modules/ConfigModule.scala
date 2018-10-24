@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.registrar.http.modules
 
 import com.google.inject.{AbstractModule, Provides}
-import uk.ac.wellcome.platform.archive.registrar.http.models.RegistrarHttpConfig
+import uk.ac.wellcome.platform.archive.registrar.http.config.RegistrarHttpConfig
 
 object ConfigModule extends AbstractModule {
 

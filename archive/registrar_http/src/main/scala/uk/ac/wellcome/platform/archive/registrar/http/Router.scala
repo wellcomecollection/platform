@@ -7,6 +7,7 @@ import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.registrar.http.models.DisplayBag
 import uk.ac.wellcome.storage.dynamo._
 
 class Router @Inject()(vhs: VersionedHybridStore[StorageManifest,
@@ -22,7 +23,7 @@ class Router @Inject()(vhs: VersionedHybridStore[StorageManifest,
       path(Segment / Segment) { (space, id) =>
         get {
           onSuccess(vhs.getRecord(s"$space/$id")) {
-            case Some(storageManifest) => complete(storageManifest)
+            case Some(storageManifest) => complete(DisplayBag(storageManifest))
             case None                  => complete(NotFound -> "Storage manifest not found!")
           }
         }

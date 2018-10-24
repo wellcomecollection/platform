@@ -27,10 +27,7 @@ def bags_manager(sess):
 
 def test_can_lookup_existing_id(bags_manager, space_name, external_identifier):
     result = bags_manager.lookup_bag(space=space_name, id=external_identifier)
-    assert result["id"] == {
-        "space": space_name,
-        "externalIdentifier": external_identifier,
-    }
+    assert result["id"] == f"{space_name}/{external_identifier}"
 
 
 def test_404_is_not_found(bags_manager):

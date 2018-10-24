@@ -15,10 +15,7 @@ import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.flows.{
-  FoldEitherFlow,
-  NotifyFailureFlow
-}
+import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.messaging.{
   MessageStream,
   NotificationParsingFlow
@@ -30,7 +27,10 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.registrar.async.factories.StorageManifestFactory
-import uk.ac.wellcome.platform.archive.registrar.async.flows.UpdateStoredManifestFlow
+import uk.ac.wellcome.platform.archive.registrar.async.flows.{
+  NotifyFailureFlow,
+  UpdateStoredManifestFlow
+}
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}

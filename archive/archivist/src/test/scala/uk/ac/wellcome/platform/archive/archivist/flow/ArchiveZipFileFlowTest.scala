@@ -9,20 +9,19 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  IngestRequestContextGenerators
-}
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ArchiveJobError,
   ChecksumNotMatchedOnUploadError,
   FileNotFoundError
 }
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  IngestRequestContextGenerators
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
-  BagId,
   BagLocation,
   BagPath
 }
@@ -70,10 +69,7 @@ class ArchiveZipFileFlowTest
                   listKeysInBucket(storageBucket) should have size 4
                   result shouldBe List(Right(ArchiveComplete(
                     ingestContext.archiveRequestId,
-                    BagId(
-                      ingestContext.storageSpace,
-                      bagName
-                    ),
+                    ingestContext.storageSpace,
                     BagLocation(
                       storageBucket.name,
                       "archive",
@@ -125,7 +121,8 @@ class ArchiveZipFileFlowTest
                   assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
-                    Progress.Failed) { events =>
+                    Progress.Failed,
+                    Nil) { events =>
                     events should have size (zipFile.entries().asScala.size - 1)
                     all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                   }
@@ -165,7 +162,8 @@ class ArchiveZipFileFlowTest
                   assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
-                    Progress.Failed) { events =>
+                    Progress.Failed,
+                    Nil) { events =>
                     inside(events) {
                       case List(event) =>
                         event.description shouldBe result.head.left.get.toString
@@ -219,7 +217,8 @@ class ArchiveZipFileFlowTest
                   assertTopicReceivesProgressStatusUpdate(
                     ingestContext.archiveRequestId,
                     reportingTopic,
-                    Progress.Failed) { events =>
+                    Progress.Failed,
+                    Nil) { events =>
                     inside(events) {
                       case List(event) =>
                         event.description shouldBe result.head.left.get.toString

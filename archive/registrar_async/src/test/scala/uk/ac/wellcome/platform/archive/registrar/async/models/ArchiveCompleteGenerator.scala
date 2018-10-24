@@ -4,8 +4,8 @@ import java.util.UUID
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
-  BagId,
-  BagLocation
+  BagLocation,
+  StorageSpace
 }
 
 object ArchiveCompleteGenerator extends RandomThings {
@@ -13,11 +13,11 @@ object ArchiveCompleteGenerator extends RandomThings {
   def createWith(
     bagLocation: BagLocation,
     archiveRequestId: UUID = randomUUID,
-    bagId: BagId = randomBagId,
+    storageSpace: StorageSpace = randomStorageSpace,
   ) =
     ArchiveComplete(
       archiveRequestId,
-      bagId,
+      storageSpace,
       bagLocation
     )
 }

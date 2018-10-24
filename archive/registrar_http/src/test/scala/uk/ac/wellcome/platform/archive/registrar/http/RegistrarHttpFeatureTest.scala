@@ -1,15 +1,21 @@
 package uk.ac.wellcome.platform.archive.registrar.http
 
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.models.DisplayStorageSpace
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
-import uk.ac.wellcome.storage.vhs.EmptyMetadata
+import uk.ac.wellcome.platform.archive.registrar.http.models._
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
 class RegistrarHttpFeatureTest
     extends FunSpec
@@ -18,32 +24,38 @@ class RegistrarHttpFeatureTest
     with MetricsSenderFixture
     with RegistrarHttpFixture
     with RandomThings
-    with IntegrationPatience {
+    with IntegrationPatience
+    with Inside {
 
   import HttpMethods._
   import uk.ac.wellcome.json.JsonUtil._
 
   describe("GET /registrar/:space/:id") {
-    it("returns a storage manifest when available") {
+    it("returns a bag when available") {
       withConfiguredApp {
         case (vhs, baseUrl, app) =>
           app.run()
 
           withActorSystem { implicit actorSystem =>
             withMaterializer(actorSystem) { implicit actorMaterializer =>
-              val bagId = randomBagId
+              val space = randomStorageSpace
+              val bagInfo = randomBagInfo
 
-              val sourceIdentifier = SourceIdentifier(
-                IdentifierType("source", "Label"),
-                value = "123"
-              )
+              val checksumAlgorithm = "sha256"
+              val path = "path"
+              val bucket = "bucket"
+              val providerId = "provider-id"
+              val providerLabel = "provider label"
               val storageManifest = StorageManifest(
-                bagId,
-                sourceIdentifier,
-                Nil,
-                FileManifest(ChecksumAlgorithm("sha256"), Nil),
-                TagManifest(ChecksumAlgorithm("sha256"), Nil),
-                Nil)
+                space = space,
+                info = bagInfo,
+                manifest =
+                  FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
+                Location(
+                  Provider(providerId, providerLabel),
+                  ObjectLocation(bucket, path)),
+                Instant.now
+              )
               val putResult = vhs.updateRecord(
                 s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
                 ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
@@ -55,7 +67,48 @@ class RegistrarHttpFeatureTest
 
                 whenRequestReady(request) { result =>
                   result.status shouldBe StatusCodes.OK
-                  getT[StorageManifest](result.entity) shouldBe storageManifest
+                  val displayBag = getT[DisplayBag](result.entity)
+
+                  inside(displayBag) {
+                    case DisplayBag(
+                        actualBagId,
+                        DisplayStorageSpace(storageSpaceName, "Space"),
+                        DisplayBagInfo(
+                          externalIdentifierString,
+                          payloadOxum,
+                          sourceOrganization,
+                          baggingDate,
+                          "BagInfo"),
+                        DisplayBagManifest(
+                          actualChecksumAlgorithm,
+                          Nil,
+                          "BagManifest"),
+                        DisplayLocation(
+                          DisplayProvider(
+                            actualProviderId,
+                            actualProviderLabel,
+                            "Provider"),
+                          actualBucket,
+                          actualPath,
+                          "Location"),
+                        createdDateString,
+                        "Bag") =>
+                      actualBagId shouldBe s"${space.underlying}/${bagInfo.externalIdentifier.underlying}"
+                      storageSpaceName shouldBe space.underlying
+                      externalIdentifierString shouldBe bagInfo.externalIdentifier.underlying
+                      payloadOxum shouldBe s"${bagInfo.payloadOxum.payloadBytes}.${bagInfo.payloadOxum.numberOfPayloadFiles}"
+                      sourceOrganization shouldBe bagInfo.sourceOrganisation.underlying
+                      baggingDate shouldBe bagInfo.baggingDate.format(
+                        DateTimeFormatter.ISO_LOCAL_DATE)
+
+                      actualChecksumAlgorithm shouldBe checksumAlgorithm
+                      actualProviderId shouldBe providerId
+                      actualProviderLabel shouldBe providerLabel
+                      actualBucket shouldBe bucket
+                      actualPath shouldBe path
+
+                      Instant.parse(createdDateString) shouldBe storageManifest.createdDate
+                  }
 
                 }
               }
