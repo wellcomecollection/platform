@@ -9,21 +9,12 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  BagUploaderConfig
-}
-import uk.ac.wellcome.platform.archive.common.flows.{
-  FoldEitherFlow,
-  OnErrorFlow
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagUploaderConfig}
+import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, OnErrorFlow}
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  IngestBagRequest
-}
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object ArchiveZipFileFlow extends Logging {
   def apply(config: BagUploaderConfig, snsConfig: SNSConfig)(

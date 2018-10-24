@@ -9,7 +9,7 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.storage.dynamo._
 
 import scala.util.{Failure, Success, Try}

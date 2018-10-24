@@ -1,25 +1,15 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  GetItemRequest,
-  PutItemRequest,
-  UpdateItemRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest, UpdateItemRequest}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
-  ProgressGenerators,
-  ProgressTrackerFixture
-}
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{
-  IdConstraintError,
-  ProgressTracker
-}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.progress.models._
+import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressTracker}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 import scala.util.Try

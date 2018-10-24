@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.models
 
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Progress, ProgressEvent, Resource}
 
 case class DisplayIngest(id: String,
                          uploadUrl: String,

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.progress.models.progress
+package uk.ac.wellcome.platform.archive.common.progress.models
 
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError

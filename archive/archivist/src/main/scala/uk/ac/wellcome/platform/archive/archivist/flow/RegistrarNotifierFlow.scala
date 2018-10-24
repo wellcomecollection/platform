@@ -7,8 +7,8 @@ import com.amazonaws.services.sns.model.PublishResult
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object RegistrarNotifierFlow {
 

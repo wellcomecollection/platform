@@ -6,14 +6,11 @@ import com.google.inject.{Guice, Injector}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
-import uk.ac.wellcome.platform.archive.notifier.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
+import uk.ac.wellcome.platform.archive.notifier.modules.{ConfigModule, TestAppConfigModule}
 import uk.ac.wellcome.platform.archive.notifier.Notifier
 import uk.ac.wellcome.platform.archive.common.fixtures.BagIt
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Namespace
+import uk.ac.wellcome.platform.archive.common.progress.models.Namespace
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 

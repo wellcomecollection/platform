@@ -5,19 +5,9 @@ import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.common.messaging.{
-  NotificationParsingFlow,
-  SnsPublishFlow
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  NotificationMessage
-}
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
-  ProgressEvent,
-  ProgressEventUpdate,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.messaging.{NotificationParsingFlow, SnsPublishFlow}
+import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressEventUpdate, ProgressUpdate}
 
 /** Parses a NotificationMessage as an IngestBagRequest, tells the
   * progress service that it's done so, and emits the bag request.
