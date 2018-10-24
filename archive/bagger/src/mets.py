@@ -4,7 +4,11 @@ import mappings
 
 # Borrowed from Dds.Dashboard, LogicalStructDiv impl
 
-collection_types = ["MultipleManifestation", "Periodical", "PeriodicalVolume"]
+collection_types = [
+    "MultipleManifestation",
+    "Periodical",
+    "PeriodicalVolume"
+]
 
 manifestation_types = [
     "Monograph",
