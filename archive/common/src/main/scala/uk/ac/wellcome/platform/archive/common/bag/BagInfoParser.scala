@@ -1,12 +1,15 @@
-package uk.ac.wellcome.platform.archive.archivist.bag
+package uk.ac.wellcome.platform.archive.common.bag
+
 import java.io.InputStream
 import java.time.LocalDate
 
 import cats.data._
 import cats.implicits._
-import uk.ac.wellcome.platform.archive.archivist.models.errors.InvalidBagInfo
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  InvalidBagInfo
+}
 
 import scala.util.Try
 

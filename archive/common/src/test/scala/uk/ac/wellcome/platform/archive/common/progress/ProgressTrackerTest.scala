@@ -164,36 +164,10 @@ class ProgressTrackerTest
         withProgressTracker(table) { progressTracker =>
           val progress = progressTracker.initialise(createProgress())
 
+          val resources = List(createResource)
           val progressUpdate = ProgressStatusUpdate(
             progress.id,
             Progress.Completed,
-            List(createProgressEvent)
-          )
-
-          progressTracker.update(progressUpdate)
-
-          val actualProgress =
-            assertProgressCreated(progress.id, progress.uploadUri, table)
-
-          actualProgress.status shouldBe Progress.Completed
-
-          assertProgressRecordedRecentEvents(
-            progressUpdate.id,
-            progressUpdate.events.map(_.description),
-            table)
-        }
-      }
-    }
-
-    it("adds a resource update to a monitor with no events") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
-        withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(
-            createProgressWith(resources = List.empty))
-
-          val resources = List(createResource)
-          val progressUpdate = ProgressResourceUpdate(
-            progress.id,
             resources,
             List(createProgressEvent)
           )
@@ -203,7 +177,8 @@ class ProgressTrackerTest
           val actualProgress =
             assertProgressCreated(progress.id, progress.uploadUri, table)
 
-          actualProgress.resources should contain theSameElementsAs resources
+          actualProgress.status shouldBe Progress.Completed
+          actualProgress.resources should contain theSameElementsAs (progress.resources ++ resources)
 
           assertProgressRecordedRecentEvents(
             progressUpdate.id,

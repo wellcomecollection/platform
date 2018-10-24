@@ -4,12 +4,7 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
-  Progress,
-  ProgressEvent,
-  ProgressStatusUpdate,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -28,13 +23,15 @@ object UpdateStoredManifestFlow {
       .mapAsync(10) {
         case (manifest, ctx) => updateStoredManifest(dataStore, manifest, ctx)
       }
-      .map(
-        archiveComplete =>
+      .map {
+        case (requestId, bagId) =>
           ProgressStatusUpdate(
-            archiveComplete.archiveRequestId,
+            requestId,
             Progress.Completed,
+            List(Resource(ResourceIdentifier(bagId.toString))),
             List(ProgressEvent("Bag registered successfully"))
-        ))
+          )
+      }
       .via(
         SnsPublishFlow[ProgressUpdate](
           snsClient,
@@ -53,5 +50,5 @@ object UpdateStoredManifestFlow {
         ifNotExisting = (storageManifest, EmptyMetadata()))(
         ifExisting = (_, _) => (storageManifest, EmptyMetadata())
       )
-      .map(_ => archiveComplete)
+      .map(_ => (archiveComplete.archiveRequestId, storageManifest.id))
 }

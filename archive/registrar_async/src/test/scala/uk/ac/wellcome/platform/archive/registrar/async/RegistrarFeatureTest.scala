@@ -18,10 +18,14 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+  Progress,
+  Resource,
+  ResourceIdentifier
+}
 import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{
   RegistrarFixtures,
-  RegistrationCompleteAssertions
+  StorageManifestAssertions
 }
 import uk.ac.wellcome.storage.dynamo._
 
@@ -35,7 +39,7 @@ class RegistrarFeatureTest
     with Inside
     with RandomThings
     with ProgressUpdateAssertions
-    with RegistrationCompleteAssertions
+    with StorageManifestAssertions
     with PatienceConfiguration {
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(
@@ -56,43 +60,45 @@ class RegistrarFeatureTest
           vhs
           ) =>
         val requestId = randomUUID
-        val bagId = randomBagId
         val createdAfterDate = Instant.now()
 
         withBagNotification(
           requestId,
-          bagId,
           queuePair,
           storageBucket
-        ) { bagLocation =>
-          registrar.run()
+        ) {
+          case (bagLocation, bagInfo, bagId) =>
+            registrar.run()
 
-          eventually {
-            val futureMaybeManifest = vhs.getRecord(bagId.toString)
+            eventually {
+              val futureMaybeManifest = vhs.getRecord(bagId.toString)
 
-            whenReady(futureMaybeManifest) { maybeStorageManifest =>
-              maybeStorageManifest shouldBe defined
+              whenReady(futureMaybeManifest) { maybeStorageManifest =>
+                maybeStorageManifest shouldBe defined
 
-              val storageManifest = maybeStorageManifest.get
+                val storageManifest = maybeStorageManifest.get
 
-              assertRegistrationComplete(storageManifest)(
-                expectedBagId = bagId,
-                expectedNamespace = storageBucket.name,
-                expectedPath =
-                  s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
-                filesNumber = 1,
-                createdDateAfter = createdAfterDate
-              )
+                assertStorageManifest(storageManifest)(
+                  expectedStorageSpace = bagId.space,
+                  expectedBagInfo = bagInfo,
+                  expectedNamespace = storageBucket.name,
+                  expectedPath =
+                    s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
+                  filesNumber = 1,
+                  createdDateAfter = createdAfterDate
+                )
 
-              assertTopicReceivesProgressStatusUpdate(
-                requestId,
-                progressTopic,
-                Progress.Completed) { events =>
-                events should have size 1
-                events.head.description shouldBe "Bag registered successfully"
+                assertTopicReceivesProgressStatusUpdate(
+                  requestId,
+                  progressTopic,
+                  Progress.Completed,
+                  List(Resource(ResourceIdentifier(bagId.toString)))) {
+                  events =>
+                    events should have size 1
+                    events.head.description shouldBe "Bag registered successfully"
+                }
               }
             }
-          }
         }
     }
   }
@@ -110,7 +116,7 @@ class RegistrarFeatureTest
 
         sendNotificationToSQS(
           queuePair.queue,
-          ArchiveComplete(requestId, bagId, bagLocation)
+          ArchiveComplete(requestId, bagId.space, bagLocation)
         )
 
         registrar.run()
@@ -125,7 +131,8 @@ class RegistrarFeatureTest
           assertTopicReceivesProgressStatusUpdate(
             requestId,
             progressTopic,
-            Progress.Failed) { events =>
+            Progress.Failed,
+            Nil) { events =>
             events should have size 1
             events.head.description should startWith(
               "There was an exception while downloading object")
@@ -145,20 +152,16 @@ class RegistrarFeatureTest
         val requestId1 = randomUUID
         val requestId2 = randomUUID
 
-        val bagId1 = randomBagId
-        val bagId2 = randomBagId
+        withBagNotification(requestId1, queuePair, storageBucket) { _ =>
+          withBagNotification(requestId2, queuePair, storageBucket) { _ =>
+            registrar.run()
 
-        withBagNotification(requestId1, bagId1, queuePair, storageBucket) { _ =>
-          withBagNotification(requestId2, bagId2, queuePair, storageBucket) {
-            _ =>
-              registrar.run()
+            eventually {
+              listMessagesReceivedFromSNS(progressTopic) shouldBe empty
 
-              eventually {
-                listMessagesReceivedFromSNS(progressTopic) shouldBe empty
-
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 2)
-              }
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 2)
+            }
           }
         }
     }

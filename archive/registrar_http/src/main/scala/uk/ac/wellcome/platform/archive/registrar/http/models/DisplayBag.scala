@@ -17,8 +17,8 @@ case class DisplayBag(
 object DisplayBag {
   def apply(storageManifest: StorageManifest): DisplayBag = DisplayBag(
     storageManifest.id.toString,
-    DisplayStorageSpace(storageManifest.id.space.underlying),
-    DisplayBagInfo(storageManifest.id.externalIdentifier.underlying),
+    DisplayStorageSpace(storageManifest.space.underlying),
+    DisplayBagInfo(storageManifest.info),
     DisplayBagManifest(storageManifest.manifest),
     DisplayLocation(storageManifest.accessLocation),
     storageManifest.createdDate.toString

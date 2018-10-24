@@ -4,6 +4,7 @@ import java.util.zip.ZipFile
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
+import uk.ac.wellcome.platform.archive.common.bag.BagInfoParser
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 

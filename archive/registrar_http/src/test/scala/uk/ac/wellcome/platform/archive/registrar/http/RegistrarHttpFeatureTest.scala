@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.registrar.http
 
 import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
@@ -13,8 +14,8 @@ import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
 class RegistrarHttpFeatureTest
     extends FunSpec
@@ -37,7 +38,8 @@ class RegistrarHttpFeatureTest
 
           withActorSystem { implicit actorSystem =>
             withMaterializer(actorSystem) { implicit actorMaterializer =>
-              val bagId = randomBagId
+              val space = randomStorageSpace
+              val bagInfo = randomBagInfo
 
               val checksumAlgorithm = "sha256"
               val path = "path"
@@ -45,7 +47,8 @@ class RegistrarHttpFeatureTest
               val providerId = "provider-id"
               val providerLabel = "provider label"
               val storageManifest = StorageManifest(
-                id = bagId,
+                space = space,
+                info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
                 Location(
@@ -70,7 +73,12 @@ class RegistrarHttpFeatureTest
                     case DisplayBag(
                         actualBagId,
                         DisplayStorageSpace(storageSpaceName, "Space"),
-                        DisplayBagInfo(externalIdentifierString, "BagInfo"),
+                        DisplayBagInfo(
+                          externalIdentifierString,
+                          payloadOxum,
+                          sourceOrganization,
+                          baggingDate,
+                          "BagInfo"),
                         DisplayBagManifest(
                           actualChecksumAlgorithm,
                           Nil,
@@ -85,9 +93,14 @@ class RegistrarHttpFeatureTest
                           "Location"),
                         createdDateString,
                         "Bag") =>
-                      actualBagId shouldBe s"${bagId.space.underlying}/${bagId.externalIdentifier.underlying}"
-                      storageSpaceName shouldBe bagId.space.underlying
-                      externalIdentifierString shouldBe bagId.externalIdentifier.underlying
+                      actualBagId shouldBe s"${space.underlying}/${bagInfo.externalIdentifier.underlying}"
+                      storageSpaceName shouldBe space.underlying
+                      externalIdentifierString shouldBe bagInfo.externalIdentifier.underlying
+                      payloadOxum shouldBe s"${bagInfo.payloadOxum.payloadBytes}.${bagInfo.payloadOxum.numberOfPayloadFiles}"
+                      sourceOrganization shouldBe bagInfo.sourceOrganisation.underlying
+                      baggingDate shouldBe bagInfo.baggingDate.format(
+                        DateTimeFormatter.ISO_LOCAL_DATE)
+
                       actualChecksumAlgorithm shouldBe checksumAlgorithm
                       actualProviderId shouldBe providerId
                       actualProviderLabel shouldBe providerLabel

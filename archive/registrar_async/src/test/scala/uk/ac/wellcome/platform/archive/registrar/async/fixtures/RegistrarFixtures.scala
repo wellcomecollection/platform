@@ -7,11 +7,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagId,
-  BagLocation
-}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.platform.archive.registrar.async.modules.{
@@ -31,6 +27,7 @@ import uk.ac.wellcome.storage.fixtures.{
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.json.JsonUtil._
 
@@ -42,23 +39,23 @@ trait RegistrarFixtures
     with LocalDynamoDb {
 
   def sendNotification(requestId: UUID,
-                       bagId: BagId,
+                       storageSpace: StorageSpace,
                        bagLocation: BagLocation,
                        queuePair: QueuePair) =
     sendNotificationToSQS(
       queuePair.queue,
-      ArchiveComplete(requestId, bagId, bagLocation)
+      ArchiveComplete(requestId, storageSpace, bagLocation)
     )
 
-  def withBagNotification[R](
-    requestId: UUID,
-    bagId: BagId,
-    queuePair: QueuePair,
-    storageBucket: Bucket,
-    dataFileCount: Int = 1)(testWith: TestWith[BagLocation, R]) = {
-    withBag(storageBucket, dataFileCount) { bagLocation =>
-      sendNotification(requestId, bagId, bagLocation, queuePair)
-      testWith(bagLocation)
+  def withBagNotification[R](requestId: UUID,
+                             queuePair: QueuePair,
+                             storageBucket: Bucket,
+                             dataFileCount: Int = 1)(
+    testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
+    withBag(storageBucket, dataFileCount) {
+      case (bagLocation, bagInfo, bagId) =>
+        sendNotification(requestId, bagId.space, bagLocation, queuePair)
+        testWith((bagLocation, bagInfo, bagId))
     }
   }
 

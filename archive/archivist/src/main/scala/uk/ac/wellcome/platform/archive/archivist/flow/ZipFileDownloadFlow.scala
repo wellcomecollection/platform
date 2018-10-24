@@ -101,6 +101,7 @@ object ZipFileDownloadFlow extends Logging {
         ProgressStatusUpdate(
           archiveError.t.archiveRequestId,
           Progress.Failed,
+          Nil,
           List(ProgressEvent(archiveError.toString))
         )
     }

@@ -1,10 +1,12 @@
 package uk.ac.wellcome.platform.archive.registrar.async.factories
 
+import java.io.InputStream
 import java.time.Instant
 
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.common.bag.BagInfoParser
 import uk.ac.wellcome.platform.archive.common.models.error.{
   ArchiveError,
   DownloadError,
@@ -24,26 +26,29 @@ object StorageManifestFactory extends Logging {
     : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
     val algorithm = "sha256"
 
-    val manifestTupleEither =
-      getBagItems(archiveComplete, s"manifest-$algorithm.txt", " +")
-
     for {
-      manifestTuples <- manifestTupleEither
+      bagInfoInputStream <- downloadFile(archiveComplete, "bag-info.txt")
+      bagInfo <- BagInfoParser.parseBagInfo(archiveComplete, bagInfoInputStream)
+      manifestTuples <- getBagItems(
+        archiveComplete,
+        s"manifest-$algorithm.txt",
+        " +")
       fileManifest = FileManifest(
         ChecksumAlgorithm(algorithm),
         manifestTuples
       )
     } yield
       StorageManifest(
-        id = archiveComplete.bagId,
+        space = archiveComplete.space,
+        info = bagInfo,
         manifest = fileManifest,
-        Location(
+        accessLocation = Location(
           Provider("aws-s3-ia", "AWS S3 - Infrequent Access"),
           ObjectLocation(
             archiveComplete.bagLocation.storageNamespace,
             s"${archiveComplete.bagLocation.storagePath}/${archiveComplete.bagLocation.bagPath.value}")
         ),
-        Instant.now()
+        createdDate = Instant.now()
       )
   }
 
@@ -51,26 +56,31 @@ object StorageManifestFactory extends Logging {
                           name: String,
                           delimiter: String)(implicit s3Client: AmazonS3)
     : Either[ArchiveError[ArchiveComplete], List[BagDigestFile]] = {
-    val location = getFileObjectLocation(archiveComplete.bagLocation, name)
-    val triedLines: Either[DownloadError[ArchiveComplete], List[String]] =
-      Try(s3Client.getObject(location.namespace, location.key))
-        .map(_.getObjectContent)
-        .toEither
-        .leftMap(ex => DownloadError(ex, location, archiveComplete))
-        .map(
-          inputStream =>
-            scala.io.Source
-              .fromInputStream(inputStream)
-              .mkString
-              .split("\n")
-              .filter(_.nonEmpty)
-              .toList)
+    val triedLines = downloadFile(archiveComplete, name)
+      .map(
+        inputStream =>
+          scala.io.Source
+            .fromInputStream(inputStream)
+            .mkString
+            .split("\n")
+            .filter(_.nonEmpty)
+            .toList)
 
     triedLines.flatMap { lines: List[String] =>
       lines.traverse { line =>
         parseManifestLine(line, delimiter, archiveComplete, name)
       }
     }
+  }
+
+  private def downloadFile(archiveComplete: ArchiveComplete, filename: String)(
+    implicit s3Client: AmazonS3)
+    : Either[DownloadError[ArchiveComplete], InputStream] = {
+    val location = getFileObjectLocation(archiveComplete.bagLocation, filename)
+    Try(s3Client.getObject(location.namespace, location.key))
+      .map(_.getObjectContent)
+      .toEither
+      .leftMap(ex => DownloadError(ex, location, archiveComplete))
   }
 
   private def getFileObjectLocation(bagLocation: BagLocation, name: String) =
