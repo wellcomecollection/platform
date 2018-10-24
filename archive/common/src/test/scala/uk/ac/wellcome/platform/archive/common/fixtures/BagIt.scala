@@ -1,8 +1,13 @@
 package uk.ac.wellcome.platform.archive.common.fixtures
 
 import java.security.MessageDigest
+import java.time.LocalDate
 
-import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
+import uk.ac.wellcome.platform.archive.common.models.{
+  ExternalIdentifier,
+  PayloadOxum,
+  SourceOrganisation
+}
 
 import scala.util.Random
 
@@ -50,7 +55,14 @@ trait BagIt extends RandomThings {
     Some(FileEntry("bagit.txt", bagItFileContents))
 
   def createValidBagInfoFile(bagIdentifier: ExternalIdentifier) =
-    Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier)))
+    Some(
+      FileEntry(
+        s"bag-info.txt",
+        bagInfoFileContents(
+          bagIdentifier,
+          randomSourceOrganisation,
+          randomPayloadOxum,
+          randomLocalDate)))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
     Some(
@@ -105,13 +117,14 @@ trait BagIt extends RandomThings {
           .mkString("\n")
       ))
 
-  private def bagInfoFileContents(bagIdentifier: ExternalIdentifier) = {
-    val date =
-      new java.text.SimpleDateFormat("YYYY-MM-dd").format(new java.util.Date())
-    s"""Payload-Oxum: 61798.84
-       |Bagging-Date: $date
-       |Bag-Size: 60.5 KB
+  def bagInfoFileContents(bagIdentifier: ExternalIdentifier,
+                          sourceOrganisation: SourceOrganisation,
+                          payloadOxum: PayloadOxum,
+                          baggingDate: LocalDate) = {
+    s"""Source-Organization: $sourceOrganisation
        |External-Identifier: $bagIdentifier
+       |Payload-Oxum: ${payloadOxum.payloadBytes}.${payloadOxum.numberOfPayloadFiles}
+       |Bagging-Date: ${baggingDate.toString}
       """.stripMargin.trim
   }
 

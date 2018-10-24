@@ -36,9 +36,8 @@ case class ArchiveJobError(t: ArchiveJob,
                            errors: List[ArchiveError[ArchiveItemJob]])
     extends ArchiveError[ArchiveJob]
 
-case class InvalidBagInfo(t: IngestBagRequest)
-    extends ArchiveError[IngestBagRequest] {
-  override def toString = "Invalid bag-info.txt"
+case class InvalidBagInfo[T](t: T, keys: List[String]) extends ArchiveError[T] {
+  override def toString = s"Invalid bag-info.txt: ${keys.mkString(", ")}"
 }
 
 case class ZipFileDownloadingError(t: IngestBagRequest, exception: Throwable)
