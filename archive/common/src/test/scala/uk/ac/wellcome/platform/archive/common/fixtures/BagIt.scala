@@ -3,12 +3,7 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 import java.security.MessageDigest
 import java.time.LocalDate
 
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagInfo,
-  ExternalIdentifier,
-  PayloadOxum,
-  SourceOrganisation
-}
+import uk.ac.wellcome.platform.archive.common.models._
 
 import scala.util.Random
 
@@ -63,7 +58,12 @@ trait BagIt extends RandomThings {
           bagInfo.externalIdentifier,
           bagInfo.sourceOrganisation,
           bagInfo.payloadOxum,
-          bagInfo.baggingDate)))
+          bagInfo.baggingDate,
+          bagInfo.externalDescription,
+          bagInfo.internalSenderIdentifier,
+          bagInfo.internalSenderDescription
+        )
+      ))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
     Some(
@@ -118,14 +118,30 @@ trait BagIt extends RandomThings {
           .mkString("\n")
       ))
 
-  def bagInfoFileContents(bagIdentifier: ExternalIdentifier,
-                          sourceOrganisation: SourceOrganisation,
-                          payloadOxum: PayloadOxum,
-                          baggingDate: LocalDate) = {
+  def bagInfoFileContents(
+    bagIdentifier: ExternalIdentifier,
+    sourceOrganisation: SourceOrganisation,
+    payloadOxum: PayloadOxum,
+    baggingDate: LocalDate,
+    externalDescription: Option[ExternalDescription],
+    internalSenderIdentifier: Option[InternalSenderIdentifier],
+    internalSenderDescription: Option[InternalSenderDescription]) = {
+    def optionalLine[T](maybeValue: Option[T], fieldName: String) =
+      maybeValue.map(value => s"$fieldName: $value").getOrElse("")
+
+    val descriptionLine =
+      optionalLine(externalDescription, "External-Description")
+    val internalSenderIdentifierLine =
+      optionalLine(internalSenderIdentifier, "Internal-Sender-Identifier")
+    val internalSenderDescriptionLine =
+      optionalLine(internalSenderDescription, "Internal-Sender-Description")
     s"""Source-Organization: $sourceOrganisation
        |External-Identifier: $bagIdentifier
        |Payload-Oxum: ${payloadOxum.payloadBytes}.${payloadOxum.numberOfPayloadFiles}
        |Bagging-Date: ${baggingDate.toString}
+       |$descriptionLine
+       |$internalSenderIdentifierLine
+       |$internalSenderDescriptionLine
       """.stripMargin.trim
   }
 

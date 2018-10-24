@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.http
 
 import akka.http.scaladsl.model.StatusCodes._
 import com.google.inject.Inject
+import io.circe.Printer
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
@@ -18,6 +19,7 @@ class Router @Inject()(vhs: VersionedHybridStore[StorageManifest,
   def routes = {
     import akka.http.scaladsl.server.Directives._
     import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+    implicit val printer = Printer.noSpaces.copy(dropNullValues = true)
 
     pathPrefix("registrar") {
       path(Segment / Segment) { (space, id) =>

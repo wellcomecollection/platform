@@ -13,7 +13,11 @@ trait RandomThings {
       randomExternalIdentifier,
       randomSourceOrganisation,
       randomPayloadOxum,
-      randomLocalDate)
+      randomLocalDate,
+      Some(randomExternalDescription),
+      Some(randomInternalSenderIdentifier),
+      Some(randomInternalSenderDescription)
+    )
 
   def randomAlphanumeric(length: Int = 8) = {
     Random.alphanumeric take length mkString
@@ -33,6 +37,15 @@ trait RandomThings {
 
   def randomSourceOrganisation =
     SourceOrganisation(randomAlphanumeric())
+
+  def randomInternalSenderIdentifier =
+    InternalSenderIdentifier(randomAlphanumeric())
+
+  def randomInternalSenderDescription =
+    InternalSenderDescription(randomAlphanumeric())
+
+  def randomExternalDescription =
+    ExternalDescription(randomAlphanumeric())
 
   def randomPayloadOxum =
     PayloadOxum(Random.nextLong().abs, Random.nextInt().abs)

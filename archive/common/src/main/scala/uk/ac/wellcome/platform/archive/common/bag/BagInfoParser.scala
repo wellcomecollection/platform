@@ -18,6 +18,9 @@ object BagInfoKeys {
   val baggingDate = "Bagging-Date"
   val payloadOxum = "Payload-Oxum"
   val sourceOrganisation = "Source-Organization"
+  val externalDescription = "External-Description"
+  val internalSenderIdentifier = "Internal-Sender-Identifier"
+  val internalSenderDescription = "Internal-Sender-Description"
 }
 
 object BagInfoParser {
@@ -37,14 +40,32 @@ object BagInfoParser {
       extractExternalIdentifier(bagInfoLines),
       extractSourceOrganisation(bagInfoLines),
       extractPayloadOxum(bagInfoLines),
-      extractBaggingDate(bagInfoLines))
-      .mapN(BagInfo.apply)
+      extractBaggingDate(bagInfoLines),
+      extractExternalDescription(bagInfoLines),
+      extractInternalSenderIdentifier(bagInfoLines),
+      extractInternalSenderDescription(bagInfoLines)
+    ).mapN(BagInfo.apply)
 
     validated.toEither.leftMap(list => InvalidBagInfo(t, list.toList))
   }
 
+  private def extractInternalSenderIdentifier(bagInfoLines: Array[String]) =
+    extractOptionalValue(bagInfoLines, BagInfoKeys.internalSenderIdentifier)
+      .map(desc => InternalSenderIdentifier(desc))
+      .validNel
+
+  private def extractInternalSenderDescription(bagInfoLines: Array[String]) =
+    extractOptionalValue(bagInfoLines, BagInfoKeys.internalSenderDescription)
+      .map(desc => InternalSenderDescription(desc))
+      .validNel
+
+  private def extractExternalDescription(bagInfoLines: Array[String]) =
+    extractOptionalValue(bagInfoLines, BagInfoKeys.externalDescription)
+      .map(desc => ExternalDescription(desc))
+      .validNel
+
   private def extractBaggingDate(bagInfoLines: Array[String]) = {
-    extractValue(bagInfoLines, BagInfoKeys.baggingDate).andThen(
+    extractRequiredValue(bagInfoLines, BagInfoKeys.baggingDate).andThen(
       dateString =>
         Try(LocalDate.parse(dateString)).toEither
           .leftMap(_ => BagInfoKeys.baggingDate)
@@ -62,21 +83,26 @@ object BagInfoParser {
   }
 
   private def extractSourceOrganisation(bagInfoLines: Array[String]) = {
-    extractValue(bagInfoLines, BagInfoKeys.sourceOrganisation)
+    extractRequiredValue(bagInfoLines, BagInfoKeys.sourceOrganisation)
       .map(SourceOrganisation.apply)
   }
 
   private def extractExternalIdentifier(bagInfoLines: Array[String]) = {
-    extractValue(bagInfoLines, BagInfoKeys.externalIdentifier)
+    extractRequiredValue(bagInfoLines, BagInfoKeys.externalIdentifier)
       .map(ExternalIdentifier.apply)
   }
 
-  private def extractValue(bagInfoLines: Array[String], bagInfoKey: String) = {
+  private def extractRequiredValue(bagInfoLines: Array[String],
+                                   bagInfoKey: String) = {
+    extractOptionalValue(bagInfoLines, bagInfoKey)
+      .toValidNel(bagInfoKey)
+  }
+  private def extractOptionalValue(bagInfoLines: Array[String],
+                                   bagInfoKey: String) = {
     bagInfoLines
       .collectFirst {
         case bagInfoFieldRegex(key, value) if key == bagInfoKey =>
           value
       }
-      .toValidNel(bagInfoKey)
   }
 }

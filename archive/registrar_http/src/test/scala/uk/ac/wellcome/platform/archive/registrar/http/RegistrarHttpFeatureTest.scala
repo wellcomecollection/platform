@@ -5,6 +5,9 @@ import java.time.format.DateTimeFormatter
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
+import akka.stream.scaladsl.Sink
+import io.circe.optics.JsonPath._
+import io.circe.parser._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -78,6 +81,9 @@ class RegistrarHttpFeatureTest
                           payloadOxum,
                           sourceOrganization,
                           baggingDate,
+                          _,
+                          _,
+                          _,
                           "BagInfo"),
                         DisplayBagManifest(
                           actualChecksumAlgorithm,
@@ -108,6 +114,58 @@ class RegistrarHttpFeatureTest
                       actualPath shouldBe path
 
                       Instant.parse(createdDateString) shouldBe storageManifest.createdDate
+                  }
+
+                }
+              }
+            }
+          }
+      }
+    }
+    it("does not output null values") {
+      withConfiguredApp {
+        case (vhs, baseUrl, app) =>
+          app.run()
+
+          withActorSystem { implicit actorSystem =>
+            withMaterializer(actorSystem) { implicit actorMaterializer =>
+              val space = randomStorageSpace
+              val bagInfo = randomBagInfo.copy(externalDescription = None)
+
+              val checksumAlgorithm = "sha256"
+              val path = "path"
+              val bucket = "bucket"
+              val providerId = "provider-id"
+              val providerLabel = "provider label"
+              val storageManifest = StorageManifest(
+                space = space,
+                info = bagInfo,
+                manifest =
+                  FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
+                Location(
+                  Provider(providerId, providerLabel),
+                  ObjectLocation(bucket, path)),
+                Instant.now
+              )
+              val putResult = vhs.updateRecord(
+                s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
+                ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
+                (_, _) => fail("vhs should have been empty!"))
+              whenReady(putResult) { _ =>
+                val request = HttpRequest(
+                  GET,
+                  s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
+
+                whenRequestReady(request) { result =>
+                  result.status shouldBe StatusCodes.OK
+                  val value = result.entity.dataBytes.runWith(Sink.fold("") {
+                    case (acc, byteString) =>
+                      acc + byteString.utf8String
+                  })
+                  whenReady(value) { jsonString =>
+                    val infoJson =
+                      root.info.json.getOption(parse(jsonString).right.get).get
+                    infoJson.findAllByKey("externalDescription") shouldBe empty
                   }
 
                 }
