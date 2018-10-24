@@ -76,7 +76,15 @@ class RegistrarHttpFeatureTest
                     case DisplayBag(
                         actualBagId,
                         DisplayStorageSpace(storageSpaceName, "Space"),
-                        DisplayBagInfo(externalIdentifierString,payloadOxum, sourceOrganization,baggingDate,_,_,_,"BagInfo"),
+                        DisplayBagInfo(
+                          externalIdentifierString,
+                          payloadOxum,
+                          sourceOrganization,
+                          baggingDate,
+                          _,
+                          _,
+                          _,
+                          "BagInfo"),
                         DisplayBagManifest(
                           actualChecksumAlgorithm,
                           Nil,
@@ -124,7 +132,6 @@ class RegistrarHttpFeatureTest
               val space = randomStorageSpace
               val bagInfo = randomBagInfo.copy(externalDescription = None)
 
-
               val checksumAlgorithm = "sha256"
               val path = "path"
               val bucket = "bucket"
@@ -151,14 +158,15 @@ class RegistrarHttpFeatureTest
 
                 whenRequestReady(request) { result =>
                   result.status shouldBe StatusCodes.OK
-                  val value = result.entity.dataBytes.runWith(Sink.fold("") { case (acc, byteString) =>
-                    acc + byteString.utf8String
+                  val value = result.entity.dataBytes.runWith(Sink.fold("") {
+                    case (acc, byteString) =>
+                      acc + byteString.utf8String
                   })
                   whenReady(value) { jsonString =>
-                    val infoJson = root.info.json.getOption(parse(jsonString).right.get).get
+                    val infoJson =
+                      root.info.json.getOption(parse(jsonString).right.get).get
                     infoJson.findAllByKey("externalDescription") shouldBe empty
                   }
-
 
                 }
               }

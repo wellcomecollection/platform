@@ -113,19 +113,23 @@ trait BagIt extends RandomThings {
           .mkString("\n")
       ))
 
-  def bagInfoFileContents(bagIdentifier: ExternalIdentifier,
-                          sourceOrganisation: SourceOrganisation,
-                          payloadOxum: PayloadOxum,
-                          baggingDate: LocalDate,
-                          externalDescription: Option[ExternalDescription] = None,
-                          internalSenderIdentifier: Option[InternalSenderIdentifier] = None,
-                          internalSenderDescription: Option[InternalSenderDescription] = None) = {
+  def bagInfoFileContents(
+    bagIdentifier: ExternalIdentifier,
+    sourceOrganisation: SourceOrganisation,
+    payloadOxum: PayloadOxum,
+    baggingDate: LocalDate,
+    externalDescription: Option[ExternalDescription] = None,
+    internalSenderIdentifier: Option[InternalSenderIdentifier] = None,
+    internalSenderDescription: Option[InternalSenderDescription] = None) = {
     def optionalLine[T](maybeValue: Option[T], fieldName: String) =
       maybeValue.map(value => s"$fieldName: $value").getOrElse("")
 
-    val descriptionLine = optionalLine(externalDescription, "External-Description")
-    val internalSenderIdentifierLine = optionalLine(internalSenderIdentifier, "Internal-Sender-Identifier")
-    val internalSenderDescriptionLine = optionalLine(internalSenderDescription, "Internal-Sender-Description")
+    val descriptionLine =
+      optionalLine(externalDescription, "External-Description")
+    val internalSenderIdentifierLine =
+      optionalLine(internalSenderIdentifier, "Internal-Sender-Identifier")
+    val internalSenderDescriptionLine =
+      optionalLine(internalSenderDescription, "Internal-Sender-Description")
     s"""Source-Organization: $sourceOrganisation
        |External-Identifier: $bagIdentifier
        |Payload-Oxum: ${payloadOxum.payloadBytes}.${payloadOxum.numberOfPayloadFiles}

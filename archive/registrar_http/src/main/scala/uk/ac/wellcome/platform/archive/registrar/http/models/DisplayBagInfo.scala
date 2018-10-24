@@ -21,7 +21,9 @@ object DisplayBagInfo {
     sourceOrganization = bagInfo.sourceOrganisation.underlying,
     baggingDate = bagInfo.baggingDate.toString,
     externalDescription = bagInfo.externalDescription.map(_.underlying),
-    internalSenderIdentifier = bagInfo.internalSenderIdentifier.map(_.underlying),
-    internalSenderDescription = bagInfo.internalSenderDescription.map(_.underlying)
+    internalSenderIdentifier =
+      bagInfo.internalSenderIdentifier.map(_.underlying),
+    internalSenderDescription =
+      bagInfo.internalSenderDescription.map(_.underlying)
   )
 }

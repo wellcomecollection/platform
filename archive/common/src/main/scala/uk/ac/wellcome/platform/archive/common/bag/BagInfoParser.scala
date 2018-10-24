@@ -44,23 +44,25 @@ object BagInfoParser {
       extractExternalDescription(bagInfoLines),
       extractInternalSenderIdentifier(bagInfoLines),
       extractInternalSenderDescription(bagInfoLines)
-    )
-      .mapN(BagInfo.apply)
+    ).mapN(BagInfo.apply)
 
     validated.toEither.leftMap(list => InvalidBagInfo(t, list.toList))
   }
 
   private def extractInternalSenderIdentifier(bagInfoLines: Array[String]) =
     extractOptionalValue(bagInfoLines, BagInfoKeys.internalSenderIdentifier)
-      .map(desc => InternalSenderIdentifier(desc)).validNel
+      .map(desc => InternalSenderIdentifier(desc))
+      .validNel
 
   private def extractInternalSenderDescription(bagInfoLines: Array[String]) =
     extractOptionalValue(bagInfoLines, BagInfoKeys.internalSenderDescription)
-      .map(desc => InternalSenderDescription(desc)).validNel
+      .map(desc => InternalSenderDescription(desc))
+      .validNel
 
   private def extractExternalDescription(bagInfoLines: Array[String]) =
     extractOptionalValue(bagInfoLines, BagInfoKeys.externalDescription)
-      .map(desc => ExternalDescription(desc)).validNel
+      .map(desc => ExternalDescription(desc))
+      .validNel
 
   private def extractBaggingDate(bagInfoLines: Array[String]) = {
     extractRequiredValue(bagInfoLines, BagInfoKeys.baggingDate).andThen(
@@ -90,12 +92,13 @@ object BagInfoParser {
       .map(ExternalIdentifier.apply)
   }
 
-  private def extractRequiredValue(bagInfoLines: Array[String], bagInfoKey: String) = {
+  private def extractRequiredValue(bagInfoLines: Array[String],
+                                   bagInfoKey: String) = {
     extractOptionalValue(bagInfoLines, bagInfoKey)
       .toValidNel(bagInfoKey)
   }
-  private def extractOptionalValue(
-    bagInfoLines: Array[String], bagInfoKey: String) = {
+  private def extractOptionalValue(bagInfoLines: Array[String],
+                                   bagInfoKey: String) = {
     bagInfoLines
       .collectFirst {
         case bagInfoFieldRegex(key, value) if key == bagInfoKey =>

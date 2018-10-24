@@ -4,9 +4,9 @@ import java.time.format.DateTimeFormatter
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 
-class DisplayBagInfoTest extends FunSpec with RandomThings with Matchers{
+class DisplayBagInfoTest extends FunSpec with RandomThings with Matchers {
 
-  it("transforms a BagInfo with all fields into a DisplayBagInfo"){
+  it("transforms a BagInfo with all fields into a DisplayBagInfo") {
     val bagInfo = randomBagInfo
     DisplayBagInfo(bagInfo) shouldBe DisplayBagInfo(
       bagInfo.externalIdentifier.underlying,
