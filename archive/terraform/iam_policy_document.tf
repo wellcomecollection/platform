@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "ingest_get" {
 data "aws_iam_policy_document" "ingest_workflow_get" {
   statement {
     actions = [
-      "s3:GetObject*"
+      "s3:GetObject*",
     ]
 
     resources = [
