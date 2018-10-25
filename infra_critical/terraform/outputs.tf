@@ -93,3 +93,7 @@ output "alb_api_wc_https_listener_arn" {
 output "alb_api_wc_cloudwatch_id" {
   value = "${module.load_balancer.cloudwatch_id}"
 }
+
+output "cognito_user_pool_arn" {
+  value = "${aws_cognito_user_pool.pool.arn}"
+}
