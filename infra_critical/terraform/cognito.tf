@@ -11,23 +11,24 @@ resource "aws_cognito_user_pool" "pool" {
 }
 
 resource "aws_cognito_user_pool_domain" "domain" {
-  domain = "wellcomecollection"
+  domain       = "wellcomecollection"
   user_pool_id = "${aws_cognito_user_pool.pool.id}"
 }
 
 resource "aws_cognito_resource_server" "storage_api" {
   identifier = "https://api.wellcomecollection.org/storage/v1"
-  name = "Storage API V1"
+  name       = "Storage API V1"
 
   scope = [
     {
-      scope_name = "ingests"
+      scope_name        = "ingests"
       scope_description = "Read and write ingests"
     },
     {
-      scope_name = "bags"
+      scope_name        = "bags"
       scope_description = "Read bags"
-    }]
+    },
+  ]
 
   user_pool_id = "${aws_cognito_user_pool.pool.id}"
 }
@@ -36,12 +37,18 @@ resource "aws_cognito_user_pool_client" "goobi" {
   name = "Goobi"
 
   allowed_oauth_flows = [
-    "client_credentials"]
+    "client_credentials",
+  ]
+
   explicit_auth_flows = [
-    "CUSTOM_AUTH_FLOW_ONLY"]
+    "CUSTOM_AUTH_FLOW_ONLY",
+  ]
+
   allowed_oauth_scopes = [
-    "${aws_cognito_resource_server.storage_api.scope_identifiers}"]
-  generate_secret = true
+    "${aws_cognito_resource_server.storage_api.scope_identifiers}",
+  ]
+
+  generate_secret        = true
   refresh_token_validity = 1
 
   user_pool_id = "${aws_cognito_user_pool.pool.id}"
@@ -51,12 +58,18 @@ resource "aws_cognito_user_pool_client" "dds" {
   name = "DDS"
 
   allowed_oauth_flows = [
-    "client_credentials"]
+    "client_credentials",
+  ]
+
   explicit_auth_flows = [
-    "CUSTOM_AUTH_FLOW_ONLY"]
+    "CUSTOM_AUTH_FLOW_ONLY",
+  ]
+
   allowed_oauth_scopes = [
-    "${aws_cognito_resource_server.storage_api.scope_identifiers}"]
-  generate_secret = true
+    "${aws_cognito_resource_server.storage_api.scope_identifiers}",
+  ]
+
+  generate_secret        = true
   refresh_token_validity = 1
 
   user_pool_id = "${aws_cognito_user_pool.pool.id}"
