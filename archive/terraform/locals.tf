@@ -1,5 +1,6 @@
 locals {
   namespace                            = "archive-storage"
+  cognito_user_pool_arn               = "${data.terraform_remote_state.infra_critical.cognito_user_pool_arn}"
   lambda_error_alarm_arn               = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
   dlq_alarm_arn                        = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   vpc_id                               = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
