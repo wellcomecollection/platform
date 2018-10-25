@@ -47,3 +47,6 @@ variable "bagger_dds_api_key" {}
 variable "bagger_dds_api_secret" {}
 
 variable "bagger_dds_asset_prefix" {}
+variable "api_alb_cdir_blocks" {
+  type = "list"
+}

@@ -8,7 +8,7 @@ resource "aws_security_group" "external_lb_security_group" {
     from_port = 443
     to_port   = 443
 
-    cidr_blocks = ["46.102.195.182/32", "195.143.129.132/32"]
+    cidr_blocks = "${var.api_alb_cdir_blocks}"
   }
 
   ingress {
@@ -16,7 +16,7 @@ resource "aws_security_group" "external_lb_security_group" {
     from_port = 80
     to_port   = 80
 
-    cidr_blocks = ["46.102.195.182/32", "195.143.129.132/32"]
+    cidr_blocks = "${var.api_alb_cdir_blocks}"
   }
 
   egress {
