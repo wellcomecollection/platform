@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra.subjects
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 import uk.ac.wellcome.platform.transformer.sierra.generators.{
   MarcGenerators,
@@ -160,9 +159,9 @@ class SierraPersonSubjectsTest
         concepts = List(Unidentifiable(Person(label = "David Attenborough,")))))
   }
 
-  // This test case shouldn't be possible but we've seen cataloguing errors
-  // elsewhere. For now, we error in those cases so that we are able
-  // to flag cataloguing errors, so error here as well for consistency
+  // There's nothing useful we can do here.  Arguably it's a cataloguing
+  // error, but all the person will do is delete the field, so we can avoid
+  // throwing an error.
   it("errors transforming a subject 600 if subfield a is missing") {
     val sierraBibData = createSierraBibDataWith(
       varFields = List(
@@ -173,9 +172,7 @@ class SierraPersonSubjectsTest
       )
     )
 
-    intercept[TransformerException] {
-      transformer.getSubjectsWithPerson(sierraBibData)
-    }
+    transformer.getSubjectsWithPerson(sierraBibData) shouldBe List()
   }
 
   it(

@@ -45,15 +45,18 @@ trait SierraContributors extends MarcUtils with SierraAgents {
       marcSubfieldTags = List("a", "b", "c", "e", "0")
     )
 
-    persons.map { subfields =>
-      val roles = getContributionRoles(subfields)
-      val agent = getPerson(subfields)
+    persons
+      .flatMap { subfields: List[MarcSubfield] =>
+        val roles = getContributionRoles(subfields)
+        val maybePerson = getPerson(subfields)
 
-      Contributor(
-        agent = identify(subfields, agent, "Person"),
-        roles = roles
-      )
-    }
+        maybePerson.map { person =>
+          Contributor(
+            agent = identify(subfields, person, "Person"),
+            roles = roles
+          )
+        }
+      }
   }
 
   /* For a given MARC tag (110 or 710), return a list of all the Contributor[Organisation] instances
@@ -68,15 +71,18 @@ trait SierraContributors extends MarcUtils with SierraAgents {
       marcSubfieldTags = List("a", "b", "c", "e", "0")
     )
 
-    organisations.map { subfields =>
-      val roles = getContributionRoles(subfields)
-      val agent = getOrganisation(subfields)
+    organisations
+      .flatMap { subfields: List[MarcSubfield] =>
+        val roles = getContributionRoles(subfields)
+        val maybeAgent = getOrganisation(subfields)
 
-      Contributor(
-        agent = identify(subfields, agent, "Organisation"),
-        roles = roles
-      )
-    }
+        maybeAgent.map { agent =>
+          Contributor(
+            agent = identify(subfields, agent, "Organisation"),
+            roles = roles
+          )
+        }
+      }
   }
 
   private def getContributionRoles(
