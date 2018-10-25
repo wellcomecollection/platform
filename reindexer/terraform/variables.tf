@@ -7,7 +7,3 @@ variable "release_ids" {
   description = "Release tags for platform apps"
   type        = "map"
 }
-
-variable "namespace" {
-  default = "reindexer"
-}
