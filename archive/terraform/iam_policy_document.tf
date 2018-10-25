@@ -37,6 +37,18 @@ data "aws_iam_policy_document" "ingest_get" {
   }
 }
 
+data "aws_iam_policy_document" "ingest_workflow_get" {
+  statement {
+    actions = [
+      "s3:GetObject*",
+    ]
+
+    resources = [
+      "arn:aws:s3:::wellcomecollection-workflow-export-bagit/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "read_from_archivist_queue" {
   statement {
     actions = [

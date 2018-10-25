@@ -16,6 +16,7 @@ module "api_ecs" {
   private_subnets                = "${local.private_subnets}"
   public_subnets                 = "${local.public_subnets}"
   certificate_domain             = "api.wellcomecollection.org"
+  api_alb_cdir_blocks            = "${var.api_alb_cdir_blocks}"
 }
 
 # Archivist
