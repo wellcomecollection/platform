@@ -4,8 +4,8 @@ import java.net.URI
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 trait ProgressGenerators extends RandomThings {
 

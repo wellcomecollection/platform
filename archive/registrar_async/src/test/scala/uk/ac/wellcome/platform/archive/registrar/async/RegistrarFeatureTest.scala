@@ -18,15 +18,13 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
   Resource,
   ResourceIdentifier
 }
-import uk.ac.wellcome.platform.archive.registrar.async.fixtures.{
-  RegistrarFixtures,
-  StorageManifestAssertions
-}
+import uk.ac.wellcome.platform.archive.registrar.async.fixtures.StorageManifestAssertions
+import uk.ac.wellcome.platform.archive.registrar.async.fixtures.RegistrarFixtures
 import uk.ac.wellcome.storage.dynamo._
 
 class RegistrarFeatureTest

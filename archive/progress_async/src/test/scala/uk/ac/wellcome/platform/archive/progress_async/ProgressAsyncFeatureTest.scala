@@ -6,7 +6,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress.Completed
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Completed
 import uk.ac.wellcome.platform.archive.progress_async.fixtures.{
   ProgressAsyncFixture => ProgressFixture
 }

@@ -6,7 +6,7 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+import uk.ac.wellcome.platform.archive.common.progress.models.{
   Progress,
   ProgressEvent,
   ProgressStatusUpdate,

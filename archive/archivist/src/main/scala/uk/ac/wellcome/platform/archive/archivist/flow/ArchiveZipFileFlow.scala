@@ -23,7 +23,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   IngestBagRequest
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object ArchiveZipFileFlow extends Logging {
   def apply(config: BagUploaderConfig, snsConfig: SNSConfig)(

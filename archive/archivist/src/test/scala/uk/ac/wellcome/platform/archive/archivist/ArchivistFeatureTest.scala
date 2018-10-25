@@ -7,12 +7,11 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
 }
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
 import uk.ac.wellcome.storage.ObjectLocation
-import IngestBagRequest._
+import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
 class ArchivistFeatureTest
     extends FunSpec
@@ -23,6 +22,8 @@ class ArchivistFeatureTest
     with ArchivistFixture
     with IntegrationPatience
     with ProgressUpdateAssertions {
+
+  import IngestBagRequest._
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {

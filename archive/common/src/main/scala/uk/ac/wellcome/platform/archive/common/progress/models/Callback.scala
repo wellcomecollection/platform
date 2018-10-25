@@ -1,10 +1,9 @@
-package uk.ac.wellcome.platform.archive.common.progress.models.progress
+package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.net.URI
 
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Callback.Pending
-
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
+import uk.ac.wellcome.platform.archive.common.progress.models.Callback.Pending
 
 case class Callback(uri: URI, status: Callback.CallbackStatus = Pending)
 

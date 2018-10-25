@@ -62,6 +62,7 @@ cache:
     - archive/commmon/target
     - archive/archivist/target
     - archive/notifier/target
+    - archive/progress_common/target
     - archive/progress_async/target
     - archive/progress_http/target
     - archive/registrar_common/target
@@ -168,6 +169,7 @@ jobs:
     - env: TASK=archive_api-test
     - env: TASK=archive_common-test
     - env: TASK=archivist-test
+    - env: TASK=progress_common-test
     - env: TASK=progress_async-test
     - env: TASK=progress_http-test
     - env: TASK=registrar_common-test

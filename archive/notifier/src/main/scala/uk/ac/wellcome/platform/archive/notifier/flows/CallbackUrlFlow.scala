@@ -12,7 +12,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   CallbackNotification,
   DisplayIngest
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.notifier.models.CallbackFlowResult
 
 object CallbackUrlFlow {

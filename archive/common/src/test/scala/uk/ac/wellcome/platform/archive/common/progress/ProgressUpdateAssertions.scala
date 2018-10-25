@@ -5,7 +5,7 @@ import grizzled.slf4j.Logging
 import org.scalatest.{Assertion, Inside}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.util.Try
 

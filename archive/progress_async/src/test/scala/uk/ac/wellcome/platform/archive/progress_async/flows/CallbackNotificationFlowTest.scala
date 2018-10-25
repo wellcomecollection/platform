@@ -4,7 +4,6 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
@@ -14,11 +13,12 @@ import uk.ac.wellcome.platform.archive.common.json.{
 }
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressGenerators
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+import uk.ac.wellcome.platform.archive.common.progress.models.{
   Callback,
   Progress
 }
 import uk.ac.wellcome.test.fixtures.Akka
+import uk.ac.wellcome.json.JsonUtil._
 
 class CallbackNotificationFlowTest
     extends FunSpec

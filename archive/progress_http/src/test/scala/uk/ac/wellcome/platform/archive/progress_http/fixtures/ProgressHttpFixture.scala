@@ -17,7 +17,12 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressStatusUpdate,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.modules._

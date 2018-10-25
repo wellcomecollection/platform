@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.progress.models.progress
+package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.net.URI
 

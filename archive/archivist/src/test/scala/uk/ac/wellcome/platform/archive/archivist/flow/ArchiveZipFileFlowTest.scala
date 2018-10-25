@@ -26,7 +26,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.collection.JavaConverters._

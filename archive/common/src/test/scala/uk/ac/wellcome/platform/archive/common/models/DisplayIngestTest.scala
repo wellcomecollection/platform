@@ -5,8 +5,8 @@ import java.time.Instant
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 class DisplayIngestTest extends FunSpec with Matchers {
 

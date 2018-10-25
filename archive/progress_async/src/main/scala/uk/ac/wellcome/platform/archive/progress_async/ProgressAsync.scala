@@ -15,7 +15,7 @@ import uk.ac.wellcome.platform.archive.common.messaging.{
 }
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.flows.ProgressUpdateFlow
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.ProgressUpdate
+import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_async.flows.CallbackNotificationFlow
 

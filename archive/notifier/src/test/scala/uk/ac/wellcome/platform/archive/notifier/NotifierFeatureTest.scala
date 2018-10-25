@@ -23,9 +23,10 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   TimeTestFixture
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+import uk.ac.wellcome.platform.archive.common.progress.models.{
   Callback,
-  _
+  ProgressCallbackStatusUpdate,
+  ProgressUpdate
 }
 import uk.ac.wellcome.platform.archive.notifier.fixtures.{
   LocalWireMockFixture,
@@ -45,7 +46,7 @@ class NotifierFeatureTest
     with ProgressGenerators
     with TimeTestFixture {
 
-  import Progress._
+  import uk.ac.wellcome.platform.archive.common.progress.models.Progress._
 
   implicit val system: ActorSystem = ActorSystem("test")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
