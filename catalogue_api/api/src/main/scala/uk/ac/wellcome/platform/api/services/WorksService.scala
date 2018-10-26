@@ -32,6 +32,7 @@ class WorksService @Inject()(
     searchService
       .listResults(
         sortByField = "canonicalId",
+        workType = workType,
         limit = pageSize,
         from = (pageNumber - 1) * pageSize,
         indexName = indexName
@@ -53,6 +54,7 @@ class WorksService @Inject()(
     searchService
       .simpleStringQueryResults(
         query,
+        workType = workType,
         limit = pageSize,
         from = (pageNumber - 1) * pageSize,
         indexName = indexName
