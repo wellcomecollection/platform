@@ -1,5 +1,5 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=v11.8.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=allow-tcp-target-groups"
 
   service_name       = "${var.service_name}"
   task_desired_count = "1"
@@ -8,6 +8,7 @@ module "service" {
 
   security_group_ids = ["${var.security_group_ids}"]
 
+  container_name = "${module.task.task_name}"
   container_port = "${module.task.task_port}"
 
   ecs_cluster_id = "${var.cluster_id}"
