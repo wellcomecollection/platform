@@ -80,20 +80,28 @@ class WorksServiceTest
 
     it("filters records by workType") {
       val work1 = createIdentifiedWorkWith(
-        title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
+        title = "Animated artichokes",
+        workType = Some(WorkType(id = "b", label = "Books"))
       )
       val work2 = createIdentifiedWorkWith(
-        title = "Bouncing bananas", workType = Some(WorkType(id = "b", label = "Books"))
+        title = "Bouncing bananas",
+        workType = Some(WorkType(id = "b", label = "Books"))
       )
       val workWithWrongWorkType = createIdentifiedWorkWith(
-        title = "Animated artichokes", workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        title = "Animated artichokes",
+        workType = Some(WorkType(id = "m", label = "Manuscripts"))
       )
 
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             withWorksService(searchService) { worksService =>
-              insertIntoElasticsearch(indexName, itemType, work1, work2, workWithWrongWorkType)
+              insertIntoElasticsearch(
+                indexName,
+                itemType,
+                work1,
+                work2,
+                workWithWrongWorkType)
 
               val future = worksService.listWorks(
                 indexName = indexName,
@@ -101,7 +109,9 @@ class WorksServiceTest
               )
 
               whenReady(future) { resultList =>
-                resultList.results should contain theSameElementsAs List(work1, work2)
+                resultList.results should contain theSameElementsAs List(
+                  work1,
+                  work2)
               }
             }
         }
@@ -219,20 +229,28 @@ class WorksServiceTest
 
     it("filters searches by workType") {
       val matchingWork = createIdentifiedWorkWith(
-        title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
+        title = "Animated artichokes",
+        workType = Some(WorkType(id = "b", label = "Books"))
       )
       val workWithWrongTitle = createIdentifiedWorkWith(
-        title = "Bouncing bananas", workType = Some(WorkType(id = "b", label = "Books"))
+        title = "Bouncing bananas",
+        workType = Some(WorkType(id = "b", label = "Books"))
       )
       val workWithWrongWorkType = createIdentifiedWorkWith(
-        title = "Animated artichokes", workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        title = "Animated artichokes",
+        workType = Some(WorkType(id = "m", label = "Manuscripts"))
       )
 
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             withWorksService(searchService) { worksService =>
-              insertIntoElasticsearch(indexName, itemType, matchingWork, workWithWrongTitle, workWithWrongWorkType)
+              insertIntoElasticsearch(
+                indexName,
+                itemType,
+                matchingWork,
+                workWithWrongTitle,
+                workWithWrongWorkType)
 
               val searchForEmu = worksService.searchWorks(
                 query = "artichokes",

@@ -5,7 +5,11 @@ import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork, WorkType}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
+  IdentifiedWork,
+  WorkType
+}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
 
@@ -46,16 +50,24 @@ class ElasticsearchServiceTest
     it("filters search results by workType") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val workWithCorrectWorkType = createIdentifiedWorkWith(
-          title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "b", label = "Books"))
         )
         val workWithWrongTitle = createIdentifiedWorkWith(
-          title = "Bouncing bananas", workType = Some(WorkType(id = "b", label = "Books"))
+          title = "Bouncing bananas",
+          workType = Some(WorkType(id = "b", label = "Books"))
         )
         val workWithWrongWorkType = createIdentifiedWorkWith(
-          title = "Animated artichokes", workType = Some(WorkType(id = "m", label = "Manuscripts"))
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "m", label = "Manuscripts"))
         )
 
-        insertIntoElasticsearch(indexName, itemType, workWithCorrectWorkType, workWithWrongTitle, workWithWrongWorkType)
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          workWithCorrectWorkType,
+          workWithWrongTitle,
+          workWithWrongWorkType)
 
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
@@ -66,7 +78,8 @@ class ElasticsearchServiceTest
             )
 
             whenReady(searchResponseFuture) { response =>
-              searchResponseToWorks(response) shouldBe List(workWithCorrectWorkType)
+              searchResponseToWorks(response) shouldBe List(
+                workWithCorrectWorkType)
             }
         }
       }
@@ -200,16 +213,24 @@ class ElasticsearchServiceTest
     it("filters list results by workType") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val work1 = createIdentifiedWorkWith(
-          title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "b", label = "Books"))
         )
         val work2 = createIdentifiedWorkWith(
-          title = "Bouncing bananas", workType = Some(WorkType(id = "b", label = "Books"))
+          title = "Bouncing bananas",
+          workType = Some(WorkType(id = "b", label = "Books"))
         )
         val workWithWrongWorkType = createIdentifiedWorkWith(
-          title = "Animated artichokes", workType = Some(WorkType(id = "m", label = "Manuscripts"))
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "m", label = "Manuscripts"))
         )
 
-        insertIntoElasticsearch(indexName, itemType, work1, work2, workWithWrongWorkType)
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          work1,
+          work2,
+          workWithWrongWorkType)
 
         assertSliceIsCorrect(
           workType = Some("b"),
@@ -251,12 +272,11 @@ class ElasticsearchServiceTest
         }
     }
 
-  private def searchResponseToWorks(response: SearchResponse): List[IdentifiedBaseWork] =
-    response
-      .hits
-      .hits
-      .map { h: SearchHit => jsonToIdentifiedBaseWork(h.sourceAsString) }
-      .toList
+  private def searchResponseToWorks(
+    response: SearchResponse): List[IdentifiedBaseWork] =
+    response.hits.hits.map { h: SearchHit =>
+      jsonToIdentifiedBaseWork(h.sourceAsString)
+    }.toList
 
   private def jsonToIdentifiedBaseWork(document: String): IdentifiedBaseWork =
     fromJson[IdentifiedBaseWork](document).get

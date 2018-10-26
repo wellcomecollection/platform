@@ -60,7 +60,8 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
           .from(from)
       }
 
-  private def buildQuery(queryString: Option[String], workType: Option[String]): BoolQueryDefinition = {
+  private def buildQuery(queryString: Option[String],
+                         workType: Option[String]): BoolQueryDefinition = {
     val maybeQueries = List(
       queryString.map { simpleStringQuery },
       workType.map { termQuery("workType.id", _) }
