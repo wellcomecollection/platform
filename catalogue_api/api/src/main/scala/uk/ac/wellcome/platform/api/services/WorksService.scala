@@ -26,6 +26,7 @@ class WorksService @Inject()(
       }
 
   def listWorks(indexName: String,
+                workType: Option[String] = None,
                 pageSize: Int = apiConfig.defaultPageSize,
                 pageNumber: Int = 1): Future[ResultList] =
     searchService
@@ -45,6 +46,7 @@ class WorksService @Inject()(
       }
 
   def searchWorks(query: String,
+                  workType: Option[String] = None,
                   indexName: String,
                   pageSize: Int = apiConfig.defaultPageSize,
                   pageNumber: Int = 1): Future[ResultList] =
