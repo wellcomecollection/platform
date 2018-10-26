@@ -9,16 +9,6 @@ terraform {
   }
 }
 
-data "terraform_remote_state" "monitoring" {
-  backend = "s3"
-
-  config {
-    bucket = "wellcomecollection-platform-infra"
-    key    = "terraform/monitoring.tfstate"
-    region = "eu-west-1"
-  }
-}
-
 data "terraform_remote_state" "shared_infra" {
   backend = "s3"
 

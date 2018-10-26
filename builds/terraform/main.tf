@@ -5,8 +5,8 @@ module "platform" {
 
   sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
 
-  lambda_pushes_topic_name = "${local.ecr_pushes_topic_name}"
-  ecr_pushes_topic_name    = "${local.lambda_pushes_topic_name}"
+  lambda_pushes_topic_name = "${module.ecr_pushes_topic.name}"
+  ecr_pushes_topic_name    = "${module.lambda_pushes_topic.name}"
 }
 
 module "platform_cli" {

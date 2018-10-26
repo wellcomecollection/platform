@@ -8,7 +8,7 @@ SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
 ECS_TASKS 	=
-LAMBDAS 	=
+LAMBDAS 	= notify_pushes
 
 TF_NAME 	= builds
 TF_PATH 	= $(STACK_ROOT)/terraform
