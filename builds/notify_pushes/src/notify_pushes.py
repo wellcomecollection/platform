@@ -17,7 +17,7 @@ def log_event_on_error(handler):
         try:
             return handler(event, context)
         except Exception:
-            print('event = %r' % event)
+            print("event = %r" % event)
             raise
 
     return wrapper
