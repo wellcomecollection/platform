@@ -24,6 +24,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
       }
 
   def listResults(sortByField: String,
+                  workType: Option[String] = None,
                   indexName: String,
                   limit: Int = 10,
                   from: Int = 0): Future[SearchResponse] =
@@ -37,6 +38,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
       }
 
   def simpleStringQueryResults(queryString: String,
+                               workType: Option[String] = None,
                                limit: Int = 10,
                                from: Int = 0,
                                indexName: String): Future[SearchResponse] =
