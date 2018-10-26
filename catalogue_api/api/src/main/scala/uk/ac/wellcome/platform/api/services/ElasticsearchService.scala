@@ -31,7 +31,12 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
     elasticClient
       .execute {
         search(s"$indexName/$documentType")
-          .query(termQuery("type", "IdentifiedWork"))
+          .query(
+            buildQuery(
+              queryString = None,
+              workType = workType
+            )
+          )
           .sortBy(fieldSort(sortByField))
           .limit(limit)
           .from(from)
