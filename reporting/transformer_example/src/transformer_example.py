@@ -33,10 +33,15 @@ class ObjectLocation(object):
     key = attrib()
 
 
+def dict_to_location(d):
+    return ObjectLocation(**d)
+
+
 @attrs
 class HybridRecord(object):
     id = attrib()
-    location = attrib()
+    version = attrib()
+    location = attrib(converter=dict_to_location)
 
 
 @attrs
@@ -46,9 +51,6 @@ class ElasticsearchRecord(object):
 
 
 def _extract_hybrid_record(raw_record):
-    location = ObjectLocation(**raw_record["location"])
-    raw_record["location"] = location
-
     return HybridRecord(**raw_record)
 
 

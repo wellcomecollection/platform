@@ -16,3 +16,6 @@ variable "ecs_cluster_name" {}
 variable "ecs_cluster_id" {}
 
 variable "namespace_id" {}
+
+variable "hybrid_records_topic_arn" {}
+variable "hybrid_records_topic_publish_policy" {}

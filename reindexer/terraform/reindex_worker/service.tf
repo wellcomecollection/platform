@@ -14,7 +14,7 @@ module "service" {
 
   env_vars = {
     reindex_jobs_queue_id     = "${module.reindex_worker_queue.id}"
-    reindex_publish_topic_arn = "${module.hybrid_records_topic.arn}"
+    reindex_publish_topic_arn = "${var.hybrid_records_topic_arn}"
     metrics_namespace         = "reindex_worker-${var.namespace}"
     dynamo_table_name         = "${var.vhs_table_name}"
 

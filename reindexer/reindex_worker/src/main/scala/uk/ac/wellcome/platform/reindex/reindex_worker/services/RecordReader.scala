@@ -35,7 +35,10 @@ class RecordReader @Inject()(
           totalSegments = reindexJob.totalSegments
         )
 
-      recordsToReindex: List[HybridRecord] = results.map(extractRecord)
+      recordsToReindex = reindexJob.maxRecordsPerSegment match {
+        case None => results.map(extractRecord)
+        case Some(maxRecordsPerSegment) => results.take(maxRecordsPerSegment).map(extractRecord)
+      }
     } yield recordsToReindex
   }
 

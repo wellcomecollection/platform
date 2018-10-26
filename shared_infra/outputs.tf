@@ -78,6 +78,10 @@ output "reporting_miro_reindex_topic_arn" {
   value = "${module.reporting_miro_reindex_topic.arn}"
 }
 
+output "reporting_miro_reindex_topic_name" {
+  value = "${module.reporting_miro_reindex_topic.name}"
+}
+
 output "reporting_miro_reindex_topic_publish_policy" {
   value = "${module.reporting_miro_reindex_topic.publish_policy}"
 }
@@ -86,6 +90,10 @@ output "reporting_miro_reindex_topic_publish_policy" {
 
 output "reporting_sierra_reindex_topic_arn" {
   value = "${module.reporting_sierra_reindex_topic.arn}"
+}
+
+output "reporting_sierra_reindex_topic_name" {
+  value = "${module.reporting_sierra_reindex_topic.name}"
 }
 
 output "reporting_sierra_reindex_topic_publish_policy" {
@@ -98,6 +106,10 @@ output "catalogue_miro_reindex_topic_arn" {
   value = "${module.catalogue_miro_reindex_topic.arn}"
 }
 
+output "catalogue_miro_reindex_topic_name" {
+  value = "${module.catalogue_miro_reindex_topic.name}"
+}
+
 output "catalogue_miro_reindex_topic_publish_policy" {
   value = "${module.catalogue_miro_reindex_topic.publish_policy}"
 }
@@ -108,6 +120,26 @@ output "catalogue_sierra_reindex_topic_arn" {
   value = "${module.catalogue_sierra_reindex_topic.arn}"
 }
 
+output "catalogue_sierra_reindex_topic_name" {
+  value = "${module.catalogue_sierra_reindex_topic.name}"
+}
+
 output "catalogue_sierra_reindex_topic_publish_policy" {
   value = "${module.catalogue_sierra_reindex_topic.publish_policy}"
 }
+
+## Catalogue - sierra items
+
+output "catalogue_sierra_items_reindex_topic_arn" {
+  value = "${module.catalogue_sierra_items_reindex_topic.arn}"
+}
+
+output "catalogue_sierra_items_reindex_topic_name" {
+  value = "${module.catalogue_sierra_items_reindex_topic.name}"
+}
+
+output "catalogue_sierra_items_reindex_topic_publish_policy" {
+  value = "${module.catalogue_sierra_items_reindex_topic.publish_policy}"
+}
+
+

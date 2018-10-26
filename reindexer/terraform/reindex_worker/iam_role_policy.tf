@@ -10,5 +10,5 @@ resource "aws_iam_role_policy" "allow_vhs_read" {
 
 resource "aws_iam_role_policy" "allow_publish_to_sns" {
   role   = "${module.service.task_role_name}"
-  policy = "${module.hybrid_records_topic.publish_policy}"
+  policy = "${var.hybrid_records_topic_publish_policy}"
 }
