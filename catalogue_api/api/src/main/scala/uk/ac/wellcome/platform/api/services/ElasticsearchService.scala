@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.searches.queries.BoolQueryDefinition
+import com.sksamuel.elastic4s.searches.queries.term.TermQueryDefinition
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 
 import scala.concurrent.Future
@@ -60,13 +61,15 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
           .from(from)
       }
 
-  private def buildQuery(queryString: Option[String],
-                         workType: Option[String]): BoolQueryDefinition = {
-    val maybeQueries = List(
-      queryString.map { simpleStringQuery },
-      workType.map { termQuery("workType.id", _) }
-    )
+  private def buildQuery(queryString: Option[String], workType: Option[String]): BoolQueryDefinition = {
+    val queries = List(
+      queryString.map { simpleStringQuery }
+    ).flatten
 
-    must(maybeQueries.flatten :+ termQuery("type", "IdentifiedWork"))
+    val filters: List[TermQueryDefinition] = List(
+      workType.map { termQuery("workType.id", _) }
+    ).flatten :+ termQuery("type", "IdentifiedWork")
+
+    must(queries).filter(filters)
   }
 }
