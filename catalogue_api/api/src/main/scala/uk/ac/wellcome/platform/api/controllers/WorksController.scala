@@ -107,6 +107,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       case Some(queryString) =>
         worksService.searchWorks(
           queryString,
+          workType = request.workType,
           pageSize = pageSize,
           pageNumber = request.page,
           indexName = request._index
@@ -114,6 +115,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
         )
       case None =>
         worksService.listWorks(
+          workType = request.workType,
           pageSize = pageSize,
           pageNumber = request.page,
           indexName = request._index
