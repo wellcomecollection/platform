@@ -43,7 +43,7 @@ class ElasticsearchServiceTest
       }
     }
 
-    it("finds results when filtering by workType") {
+    it("filters search results by workType") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val workWithCorrectWorkType = createIdentifiedWorkWith(
           title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
