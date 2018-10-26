@@ -196,6 +196,29 @@ class ElasticsearchServiceTest
         )
       }
     }
+
+    it("filters list results by workType") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val workWithCorrectWorkType = createIdentifiedWorkWith(
+          title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val workWithWrongTitle = createIdentifiedWorkWith(
+          title = "Bouncing bananas", workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val workWithWrongWorkType = createIdentifiedWorkWith(
+          title = "Animated artichokes", workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        )
+
+        insertIntoElasticsearch(indexName, itemType, workWithCorrectWorkType, workWithWrongTitle, workWithWrongWorkType)
+
+        assertSliceIsCorrect(
+          indexName = indexName,
+          limit = 10,
+          from = 0,
+          expectedWorks = List(workWithCorrectWorkType)
+        )
+      }
+    }
   }
 
   private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
