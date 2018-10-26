@@ -37,7 +37,8 @@ class RecordReader @Inject()(
 
       recordsToReindex = reindexJob.maxRecordsPerSegment match {
         case None => results.map(extractRecord)
-        case Some(maxRecordsPerSegment) => results.take(maxRecordsPerSegment).map(extractRecord)
+        case Some(maxRecordsPerSegment) =>
+          results.take(maxRecordsPerSegment).map(extractRecord)
       }
     } yield recordsToReindex
   }

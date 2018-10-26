@@ -22,8 +22,10 @@ class ReindexWorkerFeatureTest
     with SQS
     with ScalaFutures {
 
-  private def createReindexableData(table: Table,  numberOfRecords: Int = 4): Seq[HybridRecord] = {
-      val testRecords = (1 to numberOfRecords).map(i => {
+  private def createReindexableData(
+    table: Table,
+    numberOfRecords: Int = 4): Seq[HybridRecord] = {
+    val testRecords = (1 to numberOfRecords).map(i => {
       HybridRecord(
         id = s"id$i",
         location = ObjectLocation(
@@ -82,7 +84,10 @@ class ReindexWorkerFeatureTest
           withServer(flags) { _ =>
             val testRecords = createReindexableData(table, 8)
 
-            val reindexJob = ReindexJob(segment = 0, totalSegments = 1, maxRecordsPerSegment = Some(1))
+            val reindexJob = ReindexJob(
+              segment = 0,
+              totalSegments = 1,
+              maxRecordsPerSegment = Some(1))
 
             sendNotificationToSQS(
               queue = queue,
@@ -97,7 +102,8 @@ class ReindexWorkerFeatureTest
                   .distinct
 
               actualRecords should have length 1
-              actualRecords should contain theSameElementsAs List(testRecords.head)
+              actualRecords should contain theSameElementsAs List(
+                testRecords.head)
             }
           }
         }

@@ -141,5 +141,3 @@ output "catalogue_sierra_items_reindex_topic_name" {
 output "catalogue_sierra_items_reindex_topic_publish_policy" {
   value = "${module.catalogue_sierra_items_reindex_topic.publish_policy}"
 }
-
-
