@@ -227,6 +227,11 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
         |To search for any of these special characters, they should be escaped with \.""".stripMargin,
         required = false
       )
+      .queryParam[String](
+        "workType",
+        "Filter by the workType of the searched works",
+        required = false
+      )
       .parameter(includeSwaggerParam)
     // Deliberately undocumented: we have an 'index' query param that
     // allows the user to pick which Elasticsearch index to use.  This is
