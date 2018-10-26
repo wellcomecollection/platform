@@ -61,7 +61,8 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
           .from(from)
       }
 
-  private def buildQuery(queryString: Option[String], workType: Option[String]): BoolQueryDefinition = {
+  private def buildQuery(queryString: Option[String],
+                         workType: Option[String]): BoolQueryDefinition = {
     val queries = List(
       queryString.map { simpleStringQuery }
     ).flatten
