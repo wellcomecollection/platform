@@ -31,12 +31,12 @@ class ElasticsearchServiceTest
 
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
-            val searchResultFuture = searchService.simpleStringQueryResults(
+            val searchResponseFuture = searchService.simpleStringQueryResults(
               queryString = "Aegean",
               indexName = indexName
             )
 
-            whenReady(searchResultFuture) { response =>
+            whenReady(searchResponseFuture) { response =>
               searchResponseToWorks(response) shouldBe List(work1)
             }
         }
@@ -59,13 +59,13 @@ class ElasticsearchServiceTest
 
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
-            val searchResultFuture = searchService.simpleStringQueryResults(
+            val searchResponseFuture = searchService.simpleStringQueryResults(
               queryString = "artichokes",
               workType = Some("b"),
               indexName = indexName
             )
 
-            whenReady(searchResultFuture) { response =>
+            whenReady(searchResponseFuture) { response =>
               searchResponseToWorks(response) shouldBe List(workWithCorrectWorkType)
             }
         }
@@ -214,19 +214,14 @@ class ElasticsearchServiceTest
   ) = {
     withElasticsearchService(indexName = indexName, itemType = itemType) {
       searchService =>
-        val searchResultFuture = searchService.listResults(
+        val searchResponseFuture = searchService.listResults(
           sortByField = "canonicalId",
           indexName = indexName,
           limit = limit,
           from = from
         )
-        whenReady(searchResultFuture) { result =>
-          result.hits should have size expectedWorks.length
-          val returnedWorks = result.hits.hits
-            .map { h: SearchHit =>
-              jsonToIdentifiedBaseWork(h.sourceAsString)
-            }
-          returnedWorks.toList should contain theSameElementsAs expectedWorks
+        whenReady(searchResponseFuture) { response =>
+          searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
         }
     }
   }
