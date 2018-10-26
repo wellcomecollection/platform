@@ -199,23 +199,24 @@ class ElasticsearchServiceTest
 
     it("filters list results by workType") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val workWithCorrectWorkType = createIdentifiedWorkWith(
+        val work1 = createIdentifiedWorkWith(
           title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
         )
-        val workWithWrongTitle = createIdentifiedWorkWith(
+        val work2 = createIdentifiedWorkWith(
           title = "Bouncing bananas", workType = Some(WorkType(id = "b", label = "Books"))
         )
         val workWithWrongWorkType = createIdentifiedWorkWith(
           title = "Animated artichokes", workType = Some(WorkType(id = "m", label = "Manuscripts"))
         )
 
-        insertIntoElasticsearch(indexName, itemType, workWithCorrectWorkType, workWithWrongTitle, workWithWrongWorkType)
+        insertIntoElasticsearch(indexName, itemType, work1, work2, workWithWrongWorkType)
 
         assertSliceIsCorrect(
+          workType = Some("b"),
           indexName = indexName,
           limit = 10,
           from = 0,
-          expectedWorks = List(workWithCorrectWorkType)
+          expectedWorks = List(work1, work2)
         )
       }
     }
@@ -230,15 +231,17 @@ class ElasticsearchServiceTest
   }
 
   private def assertSliceIsCorrect(
+    workType: Option[String] = None,
     indexName: String,
     limit: Int,
     from: Int,
     expectedWorks: List[IdentifiedBaseWork]
-  ) = {
+  ) =
     withElasticsearchService(indexName = indexName, itemType = itemType) {
       searchService =>
         val searchResponseFuture = searchService.listResults(
           sortByField = "canonicalId",
+          workType = workType,
           indexName = indexName,
           limit = limit,
           from = from
@@ -247,7 +250,6 @@ class ElasticsearchServiceTest
           searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
         }
     }
-  }
 
   private def searchResponseToWorks(response: SearchResponse): List[IdentifiedBaseWork] =
     response
