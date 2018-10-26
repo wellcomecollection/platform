@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.internal.WorkType
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.{
   ElasticsearchServiceFixture,
@@ -71,6 +72,36 @@ class WorksServiceTest
 
               whenReady(displayWorksFuture) { receivedWorks =>
                 receivedWorks.results shouldBe empty
+              }
+            }
+        }
+      }
+    }
+
+    it("filters records by workType") {
+      val work1 = createIdentifiedWorkWith(
+        title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
+      )
+      val work2 = createIdentifiedWorkWith(
+        title = "Bouncing bananas", workType = Some(WorkType(id = "b", label = "Books"))
+      )
+      val workWithWrongWorkType = createIdentifiedWorkWith(
+        title = "Animated artichokes", workType = Some(WorkType(id = "m", label = "Manuscripts"))
+      )
+
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        withElasticsearchService(indexName = indexName, itemType = itemType) {
+          searchService =>
+            withWorksService(searchService) { worksService =>
+              insertIntoElasticsearch(indexName, itemType, work1, work2, workWithWrongWorkType)
+
+              val future = worksService.listWorks(
+                indexName = indexName,
+                workType = Some("b")
+              )
+
+              whenReady(future) { resultList =>
+                resultList.results should contain theSameElementsAs List(work1, work2)
               }
             }
         }
@@ -180,6 +211,37 @@ class WorksServiceTest
               whenReady(searchForEmu) { works =>
                 works.results should have size 1
                 works.results.head shouldBe workEmu
+              }
+            }
+        }
+      }
+    }
+
+    it("filters searches by workType") {
+      val matchingWork = createIdentifiedWorkWith(
+        title = "Animated artichokes", workType = Some(WorkType(id = "b", label = "Books"))
+      )
+      val workWithWrongTitle = createIdentifiedWorkWith(
+        title = "Bouncing bananas", workType = Some(WorkType(id = "b", label = "Books"))
+      )
+      val workWithWrongWorkType = createIdentifiedWorkWith(
+        title = "Animated artichokes", workType = Some(WorkType(id = "m", label = "Manuscripts"))
+      )
+
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        withElasticsearchService(indexName = indexName, itemType = itemType) {
+          searchService =>
+            withWorksService(searchService) { worksService =>
+              insertIntoElasticsearch(indexName, itemType, matchingWork, workWithWrongTitle, workWithWrongWorkType)
+
+              val searchForEmu = worksService.searchWorks(
+                query = "artichokes",
+                workType = Some("b"),
+                indexName = indexName
+              )
+
+              whenReady(searchForEmu) { works =>
+                works.results shouldBe List(matchingWork)
               }
             }
         }
