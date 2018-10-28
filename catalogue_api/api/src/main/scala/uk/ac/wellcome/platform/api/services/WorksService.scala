@@ -12,8 +12,6 @@ import scala.util.{Failure, Success}
 
 case class WorksSearchOptions(
   workTypeFilter: Option[String],
-  documentType: String,
-  indexName: String,
   pageSize: Int,
   pageNumber: Int
 )
@@ -22,36 +20,29 @@ case class WorksSearchOptions(
 class WorksService @Inject()(searchService: ElasticsearchService)(
   implicit ec: ExecutionContext) {
 
-  def findWorkById(canonicalId: String,
-                   indexName: String,
-                   documentType: String): Future[Option[IdentifiedBaseWork]] =
+  def findWorkById(canonicalId: String)(documentOptions: ElasticsearchDocumentOptions): Future[Option[IdentifiedBaseWork]] =
     searchService
-      .findResultById(canonicalId, indexName = indexName, documentType = documentType)
+      .findResultById(canonicalId)(documentOptions)
       .map { result =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
         else None
       }
 
-  def listWorks(worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def listWorks(documentOptions: ElasticsearchDocumentOptions, worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .listResults(sortByField = "canonicalId")(
-        toElasticsearchQueryOptions(worksSearchOptions))
+      .listResults(sortByField = "canonicalId")(documentOptions, toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
-  def searchWorks(query: String)(
-    worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def searchWorks(query: String)(documentOptions: ElasticsearchDocumentOptions, worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .simpleStringQueryResults(query)(
-        toElasticsearchQueryOptions(worksSearchOptions))
+      .simpleStringQueryResults(query)(documentOptions, toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
   private def toElasticsearchQueryOptions(
     worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
     ElasticsearchQueryOptions(
       workTypeFilter = worksSearchOptions.workTypeFilter,
-      documentType = worksSearchOptions.documentType,
-      indexName = worksSearchOptions.indexName,
       limit = worksSearchOptions.pageSize,
       from = (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize
     )

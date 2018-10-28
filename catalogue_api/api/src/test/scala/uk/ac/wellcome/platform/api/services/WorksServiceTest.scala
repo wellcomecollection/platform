@@ -29,7 +29,8 @@ class WorksServiceTest
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
             val future = worksService.listWorks(
-              createWorksSearchOptionsWith(indexName = indexName)
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptions
             )
 
             whenReady(future) { resultList =>
@@ -45,7 +46,9 @@ class WorksServiceTest
         withElasticsearchService {  searchService =>
           withWorksService(searchService) { worksService =>
             val future = worksService.listWorks(
-              createWorksSearchOptionsWith(indexName = indexName))
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptions
+            )
 
             whenReady(future) { works =>
               works.totalResults shouldBe 0
@@ -64,10 +67,8 @@ class WorksServiceTest
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
             val future = worksService.listWorks(
-              createWorksSearchOptionsWith(
-                indexName = indexName,
-                pageNumber = 4
-              )
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptionsWith(pageNumber = 4)
             )
 
             whenReady(future) { receivedWorks =>
@@ -103,10 +104,8 @@ class WorksServiceTest
               workWithWrongWorkType)
 
             val future = worksService.listWorks(
-              createWorksSearchOptionsWith(
-                workTypeFilter = Some("b"),
-                indexName = indexName
-              )
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptionsWith(workTypeFilter = Some("b"))
             )
 
             whenReady(future) { resultList =>
@@ -129,12 +128,9 @@ class WorksServiceTest
 
             insertIntoElasticsearch(indexName, itemType, work)
 
-            val recordsFuture =
-              worksService.findWorkById(
-                canonicalId = work.canonicalId,
-                indexName = indexName,
-                documentType = itemType
-              )
+            val documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName)
+
+            val recordsFuture = worksService.findWorkById(canonicalId = work.canonicalId)(documentOptions)
 
             whenReady(recordsFuture) { records =>
               records.isDefined shouldBe true
@@ -149,11 +145,9 @@ class WorksServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         withElasticsearchService { searchService =>
           withWorksService(searchService) { worksService =>
-            val recordsFuture = worksService.findWorkById(
-              canonicalId = "1234",
-              indexName = indexName,
-              documentType = itemType
-            )
+            val documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName)
+
+            val recordsFuture = worksService.findWorkById(canonicalId = "1234")(documentOptions)
 
             whenReady(recordsFuture) { record =>
               record shouldBe None
@@ -179,7 +173,8 @@ class WorksServiceTest
             insertIntoElasticsearch(indexName, itemType, workDodo, workMouse)
 
             val searchForCat = worksService.searchWorks(query = "cat")(
-              createWorksSearchOptionsWith(indexName = indexName)
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptions
             )
 
             whenReady(searchForCat) { works =>
@@ -187,7 +182,8 @@ class WorksServiceTest
             }
 
             val searchForDodo = worksService.searchWorks(query = "dodo")(
-              createWorksSearchOptionsWith(indexName = indexName)
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptions
             )
 
             whenReady(searchForDodo) { works =>
@@ -209,9 +205,11 @@ class WorksServiceTest
             )
             insertIntoElasticsearch(indexName, itemType, workEmu)
 
-            val searchForEmu = worksService.searchWorks(query =
-              "emu \"unmatched quotes are a lexical error in the Elasticsearch parser")(
-              createWorksSearchOptionsWith(indexName = indexName)
+            val searchForEmu = worksService.searchWorks(
+              query =
+                "emu \"unmatched quotes are a lexical error in the Elasticsearch parser")(
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptions
             )
 
             whenReady(searchForEmu) { works =>
@@ -249,10 +247,8 @@ class WorksServiceTest
 
             val searchForEmu = worksService.searchWorks(
               query = "artichokes")(
-              createWorksSearchOptionsWith(
-                workTypeFilter = Some("b"),
-                indexName = indexName
-              )
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptionsWith(workTypeFilter = Some("b"))
             )
 
             whenReady(searchForEmu) { works =>
@@ -264,17 +260,22 @@ class WorksServiceTest
     }
   }
 
+  private def createElasticsearchDocumentOptionsWith(indexName: String): ElasticsearchDocumentOptions =
+    ElasticsearchDocumentOptions(
+      indexName = indexName,
+      documentType = itemType
+    )
+
   private def createWorksSearchOptionsWith(
     workTypeFilter: Option[String] = None,
-    indexName: String,
     pageSize: Int = 10,
     pageNumber: Int = 1
   ): WorksSearchOptions =
     WorksSearchOptions(
       workTypeFilter = workTypeFilter,
-      documentType = itemType,
-      indexName = indexName,
       pageSize = pageSize,
       pageNumber = pageNumber
     )
+
+  private def createWorksSearchOptions: WorksSearchOptions = createWorksSearchOptionsWith()
 }
