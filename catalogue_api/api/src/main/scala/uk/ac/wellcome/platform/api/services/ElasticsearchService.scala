@@ -13,6 +13,13 @@ import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 
 import scala.concurrent.Future
 
+case class ElasticsearchQueryOptions(
+  workTypeFilter: Option[String] = None,
+  indexName: String,
+  limit: Int = 10,
+  from: Int = 10
+)
+
 @Singleton
 class ElasticsearchService @Inject()(elasticClient: HttpClient,
                                      elasticConfig: DisplayElasticConfig) {
@@ -26,13 +33,13 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
         get(canonicalId).from(s"$indexName/$documentType")
       }
 
-  def listResults(sortByField: String) =
+  def listResults(sortByField: String): (ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = None,
       sortByField = Some(sortByField)
     )
 
-  def simpleStringQueryResults(queryString: String) =
+  def simpleStringQueryResults(queryString: String): (ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = Some(queryString),
       sortByField = None
@@ -44,15 +51,10 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
   private def executeSearch(
     maybeQueryString: Option[String],
     sortByField: Option[String]
-  )(
-    workTypeFilter: Option[String] = None,
-    indexName: String,
-    limit: Int = 10,
-    from: Int = 10
-  ): Future[SearchResponse] = {
+  )(queryOptions: ElasticsearchQueryOptions): Future[SearchResponse] = {
     val queryDefinition = buildQuery(
       maybeQueryString = maybeQueryString,
-      workTypeFilter = workTypeFilter
+      workTypeFilter = queryOptions.workTypeFilter
     )
 
     val sortDefinitions: List[FieldSortDefinition] =
@@ -62,11 +64,11 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
       }
 
     val searchDefinition: SearchDefinition =
-      search(s"$indexName/$documentType")
+      search(s"${queryOptions.indexName}/$documentType")
         .query(queryDefinition)
         .sortBy(sortDefinitions)
-        .limit(limit)
-        .from(from)
+        .limit(queryOptions.limit)
+        .from(queryOptions.from)
 
     elasticClient
       .execute { searchDefinition }
