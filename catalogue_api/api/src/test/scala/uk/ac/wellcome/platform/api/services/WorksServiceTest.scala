@@ -30,7 +30,7 @@ class WorksServiceTest
               insertIntoElasticsearch(indexName, itemType, works: _*)
 
               val future = worksService.listWorks(
-                WorksSearchOptions(indexName = indexName)
+                createWorksSearchOptionsWith(indexName = indexName)
               )
 
               whenReady(future) { resultList =>
@@ -46,7 +46,7 @@ class WorksServiceTest
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             withWorksService(searchService) { worksService =>
-              val future = worksService.listWorks(WorksSearchOptions(indexName = indexName))
+              val future = worksService.listWorks(createWorksSearchOptionsWith(indexName = indexName))
 
               whenReady(future) { works =>
                 works.totalResults shouldBe 0
@@ -66,7 +66,7 @@ class WorksServiceTest
               insertIntoElasticsearch(indexName, itemType, works: _*)
 
               val future = worksService.listWorks(
-                WorksSearchOptions(
+                createWorksSearchOptionsWith(
                   indexName = indexName,
                   pageNumber = 4
                 )
@@ -106,7 +106,7 @@ class WorksServiceTest
                 workWithWrongWorkType)
 
               val future = worksService.listWorks(
-                WorksSearchOptions(
+                createWorksSearchOptionsWith(
                   workTypeFilter = Some("b"),
                   indexName = indexName
                 )
@@ -191,7 +191,7 @@ class WorksServiceTest
               }
 
               val searchForDodo = worksService.searchWorks(query = "dodo")(
-                WorksSearchOptions(indexName = indexName)
+                createWorksSearchOptionsWith(indexName = indexName)
               )
 
               whenReady(searchForDodo) { works =>
@@ -217,7 +217,7 @@ class WorksServiceTest
               val searchForEmu = worksService.searchWorks(
                 query =
                   "emu \"unmatched quotes are a lexical error in the Elasticsearch parser")(
-                WorksSearchOptions(indexName = indexName)
+                createWorksSearchOptionsWith(indexName = indexName)
               )
 
               whenReady(searchForEmu) { works =>
@@ -256,7 +256,7 @@ class WorksServiceTest
 
               val searchForEmu = worksService.searchWorks(
                 query = "artichokes")(
-                WorksSearchOptions(
+                createWorksSearchOptionsWith(
                   workTypeFilter = Some("b"),
                   indexName = indexName
                 )
@@ -270,4 +270,17 @@ class WorksServiceTest
       }
     }
   }
+
+  private def createWorksSearchOptionsWith(
+    workTypeFilter: Option[String] = None,
+    indexName: String,
+    pageSize: Int = 10,
+    pageNumber: Int = 1
+  ): WorksSearchOptions =
+    WorksSearchOptions(
+      workTypeFilter = workTypeFilter,
+      indexName = indexName,
+      pageSize = pageSize,
+      pageNumber = pageNumber
+    )
 }

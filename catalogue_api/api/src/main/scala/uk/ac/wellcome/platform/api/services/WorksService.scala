@@ -11,10 +11,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class WorksSearchOptions(
-  workTypeFilter: Option[String] = None,
+  workTypeFilter: Option[String],
   indexName: String,
-  pageSize: Int = 10,
-  pageNumber: Int = 1
+  pageSize: Int,
+  pageNumber: Int
 )
 
 @Singleton
