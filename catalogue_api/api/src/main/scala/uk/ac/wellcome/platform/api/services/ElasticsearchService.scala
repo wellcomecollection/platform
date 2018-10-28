@@ -5,9 +5,12 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.sksamuel.elastic4s.searches.SearchDefinition
 import com.sksamuel.elastic4s.searches.queries.BoolQueryDefinition
 import com.sksamuel.elastic4s.searches.queries.term.TermQueryDefinition
+import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
+import uk.ac.wellcome.platform.api.models.ElasticsearchQueryOptions
 
 import scala.concurrent.Future
 
@@ -31,16 +34,15 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
                   from: Int = 0): Future[SearchResponse] =
     elasticClient
       .execute {
-        search(s"$indexName/$documentType")
-          .query(
-            buildQuery(
-              queryString = None,
-              workType = workType
-            )
+        buildSearch(
+          ElasticsearchQueryOptions(
+            sortByField = Some(sortByField),
+            workType = workType,
+            indexName = indexName,
+            limit = limit,
+            from = from
           )
-          .sortBy(fieldSort(sortByField))
-          .limit(limit)
-          .from(from)
+        )
       }
 
   def simpleStringQueryResults(queryString: String,
@@ -50,16 +52,39 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
                                indexName: String): Future[SearchResponse] =
     elasticClient
       .execute {
-        search(s"$indexName/$documentType")
-          .query(
-            buildQuery(
-              queryString = Some(queryString),
-              workType = workType
-            )
+        buildSearch(
+          ElasticsearchQueryOptions(
+            queryString = Some(queryString),
+            workType = workType,
+            indexName = indexName,
+            limit = limit,
+            from = from
           )
-          .limit(limit)
-          .from(from)
+        )
       }
+
+  /** Given a set of query options, but a SearchDefinition for Elasticsearch
+    * using the elastic4s query DSL.
+    *
+    */
+  private def buildSearch(queryOptions: ElasticsearchQueryOptions): SearchDefinition = {
+    val queryDefinition = buildQuery(
+      queryString = queryOptions.queryString,
+      workType = queryOptions.workType
+    )
+
+    val sortDefinitions: List[FieldSortDefinition] =
+      queryOptions.sortByField match {
+        case Some(fieldName) => List(fieldSort(fieldName))
+        case None => List()
+      }
+
+    search(s"${queryOptions.indexName}/$documentType")
+      .query(queryDefinition)
+      .sortBy(sortDefinitions)
+      .limit(queryOptions.limit)
+      .from(queryOptions.from)
+  }
 
   private def buildQuery(queryString: Option[String],
                          workType: Option[String]): BoolQueryDefinition = {
