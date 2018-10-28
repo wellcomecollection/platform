@@ -12,6 +12,7 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
+import uk.ac.wellcome.platform.api.models.ElasticsearchQueryOptions
 
 import scala.concurrent.Future
 
@@ -24,7 +25,7 @@ class ElasticsearchServiceTest
 
   val itemType = "work"
 
-  describe("simpleStringQueryResults") {
+  describe("executeSearch") {
     it("finds results for a simpleStringQuery search") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val work1 = createIdentifiedWorkWith(title = "Amid an Aegean")
@@ -33,17 +34,15 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
-        withElasticsearchService(indexName = indexName, itemType = itemType) {
-          searchService =>
-            val searchResponseFuture = searchService.simpleStringQueryResults(
-              queryString = "Aegean",
-              indexName = indexName
-            )
+        val queryOptions = ElasticsearchQueryOptions(
+          queryString = Some("Aegean"),
+          indexName = indexName
+        )
 
-            whenReady(searchResponseFuture) { response =>
-              searchResponseToWorks(response) shouldBe List(work1)
-            }
-        }
+        assertSearchReturnsExpectedWorks(
+          queryOptions = queryOptions,
+          expectedWorks = List(work1)
+        )
       }
     }
 
@@ -69,19 +68,16 @@ class ElasticsearchServiceTest
           workWithWrongTitle,
           workWithWrongWorkType)
 
-        withElasticsearchService(indexName = indexName, itemType = itemType) {
-          searchService =>
-            val searchResponseFuture = searchService.simpleStringQueryResults(
-              queryString = "artichokes",
-              workType = Some("b"),
-              indexName = indexName
-            )
+        val queryOptions = ElasticsearchQueryOptions(
+          queryString = Some("artichokes"),
+          workType = Some("b"),
+          indexName = indexName
+        )
 
-            whenReady(searchResponseFuture) { response =>
-              searchResponseToWorks(response) shouldBe List(
-                workWithCorrectWorkType)
-            }
-        }
+        assertSearchReturnsExpectedWorks(
+          queryOptions = queryOptions,
+          expectedWorks = List(workWithCorrectWorkType)
+        )
       }
     }
   }
@@ -242,6 +238,19 @@ class ElasticsearchServiceTest
       }
     }
   }
+
+  private def assertSearchReturnsExpectedWorks(
+    queryOptions: ElasticsearchQueryOptions,
+    expectedWorks: List[IdentifiedBaseWork]
+  ) =
+    withElasticsearchService(indexName = queryOptions.indexName, itemType = itemType) {
+      searchService =>
+        val searchResponseFuture = searchService.executeSearch(queryOptions)
+
+        whenReady(searchResponseFuture) { response =>
+          searchResponseToWorks(response) shouldBe expectedWorks
+        }
+    }
 
   private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
     val works = createIdentifiedWorks(count = 10)
