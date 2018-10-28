@@ -14,10 +14,10 @@ import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import scala.concurrent.Future
 
 case class ElasticsearchQueryOptions(
-  workTypeFilter: Option[String] = None,
+  workTypeFilter: Option[String],
   indexName: String,
-  limit: Int = 10,
-  from: Int = 10
+  limit: Int,
+  from: Int
 )
 
 @Singleton

@@ -35,7 +35,7 @@ class ElasticsearchServiceTest
 
         assertSearchResultsAreCorrect(
           queryString = "Aegean",
-          queryOptions = ElasticsearchQueryOptions(indexName = indexName),
+          queryOptions = createElasticsearchQueryOptionsWith(indexName = indexName),
           expectedWorks = List(work1)
         )
       }
@@ -65,7 +65,7 @@ class ElasticsearchServiceTest
 
         assertSearchResultsAreCorrect(
           queryString = "artichokes",
-          queryOptions = ElasticsearchQueryOptions(
+          queryOptions = createElasticsearchQueryOptionsWith(
             workTypeFilter = Some("b"),
             indexName = indexName
           ),
@@ -108,7 +108,7 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
-        val queryOptions = ElasticsearchQueryOptions(indexName = indexName)
+        val queryOptions = createElasticsearchQueryOptionsWith(indexName = indexName)
 
         assertListResultsAreCorrect(
           queryOptions = queryOptions,
@@ -125,7 +125,7 @@ class ElasticsearchServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val works = populateElasticsearch(indexName)
 
-        val queryOptions = ElasticsearchQueryOptions(
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
           limit = works.length + 1
         )
@@ -141,7 +141,7 @@ class ElasticsearchServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val works = populateElasticsearch(indexName)
 
-        val queryOptions = ElasticsearchQueryOptions(
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
           limit = 4
         )
@@ -157,7 +157,7 @@ class ElasticsearchServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val works = populateElasticsearch(indexName)
 
-        val queryOptions = ElasticsearchQueryOptions(
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
           limit = 4,
           from = 3
@@ -174,7 +174,7 @@ class ElasticsearchServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val works = populateElasticsearch(indexName)
 
-        val queryOptions = ElasticsearchQueryOptions(
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
           limit = 7,
           from = 5
@@ -191,7 +191,7 @@ class ElasticsearchServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val works = populateElasticsearch(indexName)
 
-        val queryOptions = ElasticsearchQueryOptions(
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
           from = works.length * 2
         )
@@ -211,7 +211,7 @@ class ElasticsearchServiceTest
         val works = visibleWorks ++ invisibleWorks
         insertIntoElasticsearch(indexName, itemType, works: _*)
 
-        val queryOptions = ElasticsearchQueryOptions(indexName = indexName)
+        val queryOptions = createElasticsearchQueryOptionsWith(indexName = indexName)
 
         assertListResultsAreCorrect(
           queryOptions = queryOptions,
@@ -242,7 +242,7 @@ class ElasticsearchServiceTest
           work2,
           workWithWrongWorkType)
 
-        val queryOptions = ElasticsearchQueryOptions(
+        val queryOptions = createElasticsearchQueryOptionsWith(
           workTypeFilter = Some("b"),
           indexName = indexName
         )
@@ -291,6 +291,19 @@ class ElasticsearchServiceTest
           searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
         }
     }
+
+  private def createElasticsearchQueryOptionsWith(
+    workTypeFilter: Option[String] = None,
+    indexName: String,
+    limit: Int = 10,
+    from: Int = 0
+  ): ElasticsearchQueryOptions =
+    ElasticsearchQueryOptions(
+      workTypeFilter = workTypeFilter,
+      indexName = indexName,
+      limit = limit,
+      from = from
+    )
 
   private def searchResponseToWorks(
     response: SearchResponse): List[IdentifiedBaseWork] =
