@@ -31,36 +31,6 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
     elasticClient
       .execute { buildSearch(queryOptions) }
 
-  def listResults(sortByField: String,
-                  workType: Option[String] = None,
-                  indexName: String,
-                  limit: Int = 10,
-                  from: Int = 0): Future[SearchResponse] =
-    executeSearch(
-      queryOptions = ElasticsearchQueryOptions(
-        sortByField = Some(sortByField),
-        workType = workType,
-        indexName = indexName,
-        limit = limit,
-        from = from
-      )
-    )
-
-  def simpleStringQueryResults(queryString: String,
-                               workType: Option[String] = None,
-                               limit: Int = 10,
-                               from: Int = 0,
-                               indexName: String): Future[SearchResponse] =
-    executeSearch(
-      queryOptions = ElasticsearchQueryOptions(
-        queryString = Some(queryString),
-        workType = workType,
-        indexName = indexName,
-        limit = limit,
-        from = from
-      )
-    )
-
   /** Given a set of query options, but a SearchDefinition for Elasticsearch
     * using the elastic4s query DSL.
     *
