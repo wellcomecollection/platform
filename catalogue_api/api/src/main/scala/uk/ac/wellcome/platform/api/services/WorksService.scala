@@ -12,6 +12,7 @@ import scala.util.{Failure, Success}
 
 case class WorksSearchOptions(
   workTypeFilter: Option[String],
+  documentType: String,
   indexName: String,
   pageSize: Int,
   pageNumber: Int
@@ -22,9 +23,10 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
   implicit ec: ExecutionContext) {
 
   def findWorkById(canonicalId: String,
-                   indexName: String): Future[Option[IdentifiedBaseWork]] =
+                   indexName: String,
+                   documentType: String): Future[Option[IdentifiedBaseWork]] =
     searchService
-      .findResultById(canonicalId, indexName = indexName)
+      .findResultById(canonicalId, indexName = indexName, documentType = documentType)
       .map { result =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
@@ -48,6 +50,7 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
     worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
     ElasticsearchQueryOptions(
       workTypeFilter = worksSearchOptions.workTypeFilter,
+      documentType = worksSearchOptions.documentType,
       indexName = worksSearchOptions.indexName,
       limit = worksSearchOptions.pageSize,
       from = (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize

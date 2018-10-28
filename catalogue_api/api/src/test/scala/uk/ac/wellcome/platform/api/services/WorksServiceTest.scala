@@ -132,7 +132,8 @@ class WorksServiceTest
             val recordsFuture =
               worksService.findWorkById(
                 canonicalId = work.canonicalId,
-                indexName = indexName
+                indexName = indexName,
+                documentType = itemType
               )
 
             whenReady(recordsFuture) { records =>
@@ -150,7 +151,8 @@ class WorksServiceTest
           withWorksService(searchService) { worksService =>
             val recordsFuture = worksService.findWorkById(
               canonicalId = "1234",
-              indexName = indexName
+              indexName = indexName,
+              documentType = itemType
             )
 
             whenReady(recordsFuture) { record =>
@@ -270,6 +272,7 @@ class WorksServiceTest
   ): WorksSearchOptions =
     WorksSearchOptions(
       workTypeFilter = workTypeFilter,
+      documentType = itemType,
       indexName = indexName,
       pageSize = pageSize,
       pageNumber = pageNumber
