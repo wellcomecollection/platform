@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
-import uk.ac.wellcome.platform.api.models.{ApiConfig, ResultList}
+import uk.ac.wellcome.platform.api.models.ResultList
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -18,9 +18,7 @@ case class WorksSearchOptions(
 )
 
 @Singleton
-class WorksService @Inject()(
-  apiConfig: ApiConfig,
-  searchService: ElasticsearchService)(implicit ec: ExecutionContext) {
+class WorksService @Inject()(searchService: ElasticsearchService)(implicit ec: ExecutionContext) {
 
   def findWorkById(canonicalId: String,
                    indexName: String): Future[Option[IdentifiedBaseWork]] =
