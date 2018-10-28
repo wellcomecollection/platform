@@ -302,6 +302,7 @@ class ElasticsearchServiceTest
   ): ElasticsearchQueryOptions =
     ElasticsearchQueryOptions(
       workTypeFilter = workTypeFilter,
+      documentType = itemType,
       indexName = indexName,
       limit = limit,
       from = from
