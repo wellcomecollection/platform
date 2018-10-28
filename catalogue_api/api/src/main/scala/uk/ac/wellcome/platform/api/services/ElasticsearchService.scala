@@ -5,8 +5,10 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.sksamuel.elastic4s.searches.SearchDefinition
 import com.sksamuel.elastic4s.searches.queries.BoolQueryDefinition
 import com.sksamuel.elastic4s.searches.queries.term.TermQueryDefinition
+import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 
 import scala.concurrent.Future
@@ -24,51 +26,61 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
         get(canonicalId).from(s"$indexName/$documentType")
       }
 
-  def listResults(sortByField: String,
-                  workType: Option[String] = None,
-                  indexName: String,
-                  limit: Int = 10,
-                  from: Int = 0): Future[SearchResponse] =
-    elasticClient
-      .execute {
-        search(s"$indexName/$documentType")
-          .query(
-            buildQuery(
-              queryString = None,
-              workType = workType
-            )
-          )
-          .sortBy(fieldSort(sortByField))
-          .limit(limit)
-          .from(from)
+  def listResults(sortByField: String) =
+    executeSearch(
+      maybeQueryString = None,
+      sortByField = Some(sortByField)
+    )
+
+  def simpleStringQueryResults(queryString: String) =
+    executeSearch(
+      maybeQueryString = Some(queryString),
+      sortByField = None
+    )
+
+  /** Given a set of query options, but a SearchDefinition for Elasticsearch
+    * using the elastic4s query DSL.
+    */
+  private def executeSearch(
+    maybeQueryString: Option[String],
+    sortByField: Option[String]
+  )(
+    workTypeFilter: Option[String] = None,
+    indexName: String,
+    limit: Int = 10,
+    from: Int = 10
+  ): Future[SearchResponse] = {
+    val queryDefinition = buildQuery(
+      maybeQueryString = maybeQueryString,
+      workTypeFilter = workTypeFilter
+    )
+
+    val sortDefinitions: List[FieldSortDefinition] =
+      sortByField match {
+        case Some(fieldName) => List(fieldSort(fieldName))
+        case None => List()
       }
 
-  def simpleStringQueryResults(queryString: String,
-                               workType: Option[String] = None,
-                               limit: Int = 10,
-                               from: Int = 0,
-                               indexName: String): Future[SearchResponse] =
-    elasticClient
-      .execute {
-        search(s"$indexName/$documentType")
-          .query(
-            buildQuery(
-              queryString = Some(queryString),
-              workType = workType
-            )
-          )
-          .limit(limit)
-          .from(from)
-      }
+    val searchDefinition: SearchDefinition =
+      search(s"$indexName/$documentType")
+        .query(queryDefinition)
+        .sortBy(sortDefinitions)
+        .limit(limit)
+        .from(from)
 
-  private def buildQuery(queryString: Option[String],
-                         workType: Option[String]): BoolQueryDefinition = {
+    elasticClient
+      .execute { searchDefinition }
+  }
+
+
+  private def buildQuery(maybeQueryString: Option[String],
+                         workTypeFilter: Option[String]): BoolQueryDefinition = {
     val queries = List(
-      queryString.map { simpleStringQuery }
+      maybeQueryString.map { simpleStringQuery }
     ).flatten
 
     val filters: List[TermQueryDefinition] = List(
-      workType.map { termQuery("workType.id", _) }
+      workTypeFilter.map { termQuery("workType.id", _) }
     ).flatten :+ termQuery("type", "IdentifiedWork")
 
     must(queries).filter(filters)
