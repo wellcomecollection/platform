@@ -45,8 +45,8 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
       sortByField = None
     )
 
-  /** Given a set of query options, but a SearchDefinition for Elasticsearch
-    * using the elastic4s query DSL.
+  /** Given a set of query options, build a SearchDefinition for Elasticsearch
+    * using the elastic4s query DSL, then execute the search.
     */
   private def executeSearch(
     maybeQueryString: Option[String],
