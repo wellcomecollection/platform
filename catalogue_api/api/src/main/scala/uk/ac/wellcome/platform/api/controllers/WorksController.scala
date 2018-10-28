@@ -8,21 +8,16 @@ import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.{
-  ApiConfig,
-  DisplayError,
-  DisplayResultList,
-  Error
-}
+import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.platform.api.requests._
 import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
   ResultResponse
 }
-import uk.ac.wellcome.platform.api.services.WorksService
+import uk.ac.wellcome.platform.api.services.{WorksSearchOptions, WorksService}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.runtime.universe.TypeTag
 
 abstract class WorksController[M <: MultipleResultsRequest[W],
@@ -102,27 +97,20 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     }
   }
 
-  private def getWorkList(request: M, pageSize: Int) = {
-    val works = request.query match {
-      case Some(queryString) =>
-        worksService.searchWorks(
-          queryString,
-          workType = request.workType,
-          pageSize = pageSize,
-          pageNumber = request.page,
-          indexName = request._index
-            .getOrElse(indexName)
-        )
-      case None =>
-        worksService.listWorks(
-          workType = request.workType,
-          pageSize = pageSize,
-          pageNumber = request.page,
-          indexName = request._index
-            .getOrElse(indexName)
-        )
+  private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
+    val worksSearchOptions = WorksSearchOptions(
+      workTypeFilter = request.workType,
+      indexName = request._index.getOrElse(indexName),
+      pageSize = pageSize,
+      pageNumber = request.page
+    )
+
+    val curriedSearch: (WorksSearchOptions) => Future[ResultList] = request.query match {
+      case Some(queryString) => worksService.searchWorks(queryString)
+      case None => worksService.listWorks
     }
-    works
+
+    curriedSearch(worksSearchOptions)
   }
 
   private def generateSingleWorkResponse[T <: DisplayWork](
