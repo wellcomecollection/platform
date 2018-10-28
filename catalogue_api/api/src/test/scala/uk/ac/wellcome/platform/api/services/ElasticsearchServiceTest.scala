@@ -82,18 +82,17 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work)
 
-        withElasticsearchService {
-          searchService =>
-            val documentOptions = createElasticsearchDocumentOptionsWith(indexName)
+        withElasticsearchService { searchService =>
+          val documentOptions = createElasticsearchDocumentOptionsWith(indexName)
 
-            val searchResultFuture: Future[GetResponse] =
-              searchService.findResultById(
-                canonicalId = work.canonicalId)(documentOptions)
+          val searchResultFuture: Future[GetResponse] =
+            searchService.findResultById(
+              canonicalId = work.canonicalId)(documentOptions)
 
-            whenReady(searchResultFuture) { result =>
-              val returnedWork = jsonToIdentifiedBaseWork(result.sourceAsString)
-              returnedWork shouldBe work
-            }
+          whenReady(searchResultFuture) { result =>
+            val returnedWork = jsonToIdentifiedBaseWork(result.sourceAsString)
+            returnedWork shouldBe work
+          }
         }
       }
     }
