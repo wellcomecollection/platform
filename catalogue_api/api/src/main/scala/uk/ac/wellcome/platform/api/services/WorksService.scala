@@ -1,11 +1,11 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
-import com.sksamuel.elastic4s.http.search.SearchHit
+import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
-import uk.ac.wellcome.platform.api.models.{ApiConfig, ResultList}
+import uk.ac.wellcome.platform.api.models.{ApiConfig, ElasticsearchQueryOptions, ResultList}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -37,14 +37,7 @@ class WorksService @Inject()(
         from = (pageNumber - 1) * pageSize,
         indexName = indexName
       )
-      .map { searchResponse =>
-        ResultList(
-          results = searchResponse.hits.hits.map { h: SearchHit =>
-            jsonTo[IdentifiedWork](h.sourceAsString)
-          }.toList,
-          totalResults = searchResponse.totalHits
-        )
-      }
+      .map { createResultList }
 
   def searchWorks(query: String,
                   workType: Option[String] = None,
@@ -59,14 +52,19 @@ class WorksService @Inject()(
         from = (pageNumber - 1) * pageSize,
         indexName = indexName
       )
-      .map { searchResponse =>
-        ResultList(
-          results = searchResponse.hits.hits.map { h: SearchHit =>
-            jsonTo[IdentifiedWork](h.sourceAsString)
-          }.toList,
-          totalResults = searchResponse.totalHits
-        )
-      }
+      .map { createResultList }
+
+  private def createResultList(searchResponse: SearchResponse): ResultList =
+    ResultList(
+      results = searchResponseToWorks(searchResponse),
+      totalResults = searchResponse.totalHits
+    )
+
+  private def searchResponseToWorks(searchResponse: SearchResponse): List[IdentifiedWork] =
+    searchResponse
+      .hits.hits
+      .map { h: SearchHit => jsonTo[IdentifiedWork](h.sourceAsString)}
+      .toList
 
   private def jsonTo[T <: IdentifiedBaseWork](document: String)(
     implicit decoder: Decoder[T]): T =
