@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
+import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
@@ -19,7 +20,7 @@ class WorksService @Inject()(
                    indexName: String): Future[Option[IdentifiedBaseWork]] =
     searchService
       .findResultById(canonicalId, indexName = indexName)
-      .map { result =>
+      .map { (result: GetResponse) =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
         else None
@@ -28,31 +29,37 @@ class WorksService @Inject()(
   def listWorks(indexName: String,
                 workType: Option[String] = None,
                 pageSize: Int = apiConfig.defaultPageSize,
-                pageNumber: Int = 1): Future[ResultList] =
+                pageNumber: Int = 1): Future[ResultList] = {
+    val queryOptions = ElasticsearchQueryOptions(
+      sortByField = Option("canonicalId"),
+      workType = workType,
+      limit = pageSize,
+      from = (pageNumber - 1) * pageSize,
+      indexName = indexName
+    )
+
     searchService
-      .listResults(
-        sortByField = "canonicalId",
-        workType = workType,
-        limit = pageSize,
-        from = (pageNumber - 1) * pageSize,
-        indexName = indexName
-      )
+      .executeSearch(queryOptions)
       .map { createResultList }
+  }
 
   def searchWorks(query: String,
                   workType: Option[String] = None,
                   indexName: String,
                   pageSize: Int = apiConfig.defaultPageSize,
-                  pageNumber: Int = 1): Future[ResultList] =
+                  pageNumber: Int = 1): Future[ResultList] = {
+    val queryOptions = ElasticsearchQueryOptions(
+      queryString = Some(query),
+      workType = workType,
+      limit = pageSize,
+      from = (pageNumber - 1) * pageSize,
+      indexName = indexName
+    )
+
     searchService
-      .simpleStringQueryResults(
-        query,
-        workType = workType,
-        limit = pageSize,
-        from = (pageNumber - 1) * pageSize,
-        indexName = indexName
-      )
+      .executeSearch(queryOptions)
       .map { createResultList }
+  }
 
   private def createResultList(searchResponse: SearchResponse): ResultList =
     ResultList(
