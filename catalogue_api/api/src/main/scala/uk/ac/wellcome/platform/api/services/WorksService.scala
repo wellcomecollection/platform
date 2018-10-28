@@ -5,10 +5,17 @@ import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
-import uk.ac.wellcome.platform.api.models.{ApiConfig, ElasticsearchQueryOptions, ResultList}
+import uk.ac.wellcome.platform.api.models.{ApiConfig, ResultList}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+
+case class WorksSearchOptions(
+  workTypeFilter: Option[String] = None,
+  indexName: String,
+  pageSize: Int = 10,
+  pageNumber: Int = 1
+)
 
 @Singleton
 class WorksService @Inject()(
@@ -25,34 +32,23 @@ class WorksService @Inject()(
         else None
       }
 
-  def listWorks(indexName: String,
-                workType: Option[String] = None,
-                pageSize: Int = apiConfig.defaultPageSize,
-                pageNumber: Int = 1): Future[ResultList] =
+  def listWorks(worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .listResults(
-        sortByField = "canonicalId",
-        workType = workType,
-        limit = pageSize,
-        from = (pageNumber - 1) * pageSize,
-        indexName = indexName
-      )
+      .listResults(sortByField = "canonicalId")(toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
-  def searchWorks(query: String,
-                  workType: Option[String] = None,
-                  indexName: String,
-                  pageSize: Int = apiConfig.defaultPageSize,
-                  pageNumber: Int = 1): Future[ResultList] =
+  def searchWorks(query: String)(worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .simpleStringQueryResults(
-        query,
-        workType = workType,
-        limit = pageSize,
-        from = (pageNumber - 1) * pageSize,
-        indexName = indexName
-      )
+      .simpleStringQueryResults(query)(toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
+
+  private def toElasticsearchQueryOptions(worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
+    ElasticsearchQueryOptions(
+      workTypeFilter = worksSearchOptions.workTypeFilter,
+      indexName = worksSearchOptions.indexName,
+      limit = worksSearchOptions.pageSize,
+      from = (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize
+    )
 
   private def createResultList(searchResponse: SearchResponse): ResultList =
     ResultList(
