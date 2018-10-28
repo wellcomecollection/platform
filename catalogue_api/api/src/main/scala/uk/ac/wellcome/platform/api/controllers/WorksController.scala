@@ -6,6 +6,7 @@ import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models._
+import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models._
@@ -24,6 +25,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
                                S <: SingleWorkRequest[W],
                                W <: WorksIncludes](
   apiConfig: ApiConfig,
+  documentType: String,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
@@ -85,8 +87,9 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       for {
         maybeWork <- worksService.findWorkById(
           canonicalId = request.id,
-          indexName = request._index
-            .getOrElse(indexName))
+          indexName = request._index.getOrElse(indexName),
+          documentType = documentType
+        )
       } yield
         generateSingleWorkResponse(
           maybeWork,
@@ -100,6 +103,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
     val worksSearchOptions = WorksSearchOptions(
       workTypeFilter = request.workType,
+      documentType = documentType,
       indexName = request._index.getOrElse(indexName),
       pageSize = pageSize,
       pageNumber = request.page
