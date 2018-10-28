@@ -183,7 +183,7 @@ class WorksServiceTest
               insertIntoElasticsearch(indexName, itemType, workDodo, workMouse)
 
               val searchForCat = worksService.searchWorks(query = "cat")(
-                WorksSearchOptions(indexName = indexName)
+                createWorksSearchOptionsWith(indexName = indexName)
               )
 
               whenReady(searchForCat) { works =>
