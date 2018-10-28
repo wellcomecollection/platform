@@ -83,12 +83,13 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work)
 
-        withElasticsearchService(indexName = indexName, itemType = itemType) {
+        withElasticsearchService {
           searchService =>
             val searchResultFuture: Future[GetResponse] =
               searchService.findResultById(
                 canonicalId = work.canonicalId,
-                indexName = indexName
+                indexName = indexName,
+                documentType = itemType
               )
 
             whenReady(searchResultFuture) { result =>
@@ -271,9 +272,7 @@ class ElasticsearchServiceTest
     queryOptions: ElasticsearchQueryOptions,
     expectedWorks: List[IdentifiedWork]
   ): Assertion =
-    withElasticsearchService(
-      indexName = queryOptions.indexName,
-      itemType = itemType) { searchService =>
+    withElasticsearchService { searchService =>
       val searchResponseFuture = searchService
         .simpleStringQueryResults(queryString)(queryOptions)
 
@@ -286,9 +285,7 @@ class ElasticsearchServiceTest
     queryOptions: ElasticsearchQueryOptions,
     expectedWorks: Seq[IdentifiedWork]
   ): Assertion =
-    withElasticsearchService(
-      indexName = queryOptions.indexName,
-      itemType = itemType) { searchService =>
+    withElasticsearchService { searchService =>
       val listResponseFuture = searchService
         .listResults(sortByField = "canonicalId")(queryOptions)
 

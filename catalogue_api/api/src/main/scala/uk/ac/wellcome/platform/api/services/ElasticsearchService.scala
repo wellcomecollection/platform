@@ -9,25 +9,23 @@ import com.sksamuel.elastic4s.searches.SearchDefinition
 import com.sksamuel.elastic4s.searches.queries.BoolQueryDefinition
 import com.sksamuel.elastic4s.searches.queries.term.TermQueryDefinition
 import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
-import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 
 import scala.concurrent.Future
 
 case class ElasticsearchQueryOptions(
   workTypeFilter: Option[String],
+  documentType: String,
   indexName: String,
   limit: Int,
   from: Int
 )
 
 @Singleton
-class ElasticsearchService @Inject()(elasticClient: HttpClient,
-                                     elasticConfig: DisplayElasticConfig) {
-
-  val documentType: String = elasticConfig.documentType
+class ElasticsearchService @Inject()(elasticClient: HttpClient) {
 
   def findResultById(canonicalId: String,
-                     indexName: String): Future[GetResponse] =
+                     indexName: String,
+                     documentType: String): Future[GetResponse] =
     elasticClient
       .execute {
         get(canonicalId).from(s"$indexName/$documentType")
@@ -66,7 +64,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
       }
 
     val searchDefinition: SearchDefinition =
-      search(s"${queryOptions.indexName}/$documentType")
+      search(s"${queryOptions.indexName}/${queryOptions.documentType}")
         .query(queryDefinition)
         .sortBy(sortDefinitions)
         .limit(queryOptions.limit)
