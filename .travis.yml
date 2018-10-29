@@ -127,7 +127,6 @@ jobs:
           drain_ecs_container_instance \
           dynamo_write_heartbeat \
           ecs_ec2_instance_tagger \
-          run_ecs_task \
           gatling_to_cloudwatch \
           notify_old_deploys \
           post_to_slack \
