@@ -31,20 +31,24 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
         else None
       }
 
-  def listWorks: (ElasticsearchDocumentOptions, WorksSearchOptions) => Future[ResultList] =
+  def listWorks
+    : (ElasticsearchDocumentOptions, WorksSearchOptions) => Future[ResultList] =
     executeSearch(
       searchService.listResults(sortByField = "canonicalId")
     )
 
-  def searchWorks(query: String): (ElasticsearchDocumentOptions, WorksSearchOptions) => Future[ResultList] =
+  def searchWorks(query: String)
+    : (ElasticsearchDocumentOptions, WorksSearchOptions) => Future[ResultList] =
     executeSearch(
       searchService.simpleStringQueryResults(query)
     )
 
   private def executeSearch(
-    searchRequest: (ElasticsearchDocumentOptions, ElasticsearchQueryOptions) => Future[SearchResponse]
+    searchRequest: (ElasticsearchDocumentOptions,
+                    ElasticsearchQueryOptions) => Future[SearchResponse]
   ): (ElasticsearchDocumentOptions, WorksSearchOptions) => Future[ResultList] =
-    (documentOptions: ElasticsearchDocumentOptions, worksSearchOptions: WorksSearchOptions) => {
+    (documentOptions: ElasticsearchDocumentOptions,
+     worksSearchOptions: WorksSearchOptions) => {
       val queryOptions = toElasticsearchQueryOptions(worksSearchOptions)
       searchRequest(documentOptions, queryOptions)
         .map { createResultList }

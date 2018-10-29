@@ -6,7 +6,10 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.searches.SearchDefinition
-import com.sksamuel.elastic4s.searches.queries.{BoolQueryDefinition, QueryDefinition}
+import com.sksamuel.elastic4s.searches.queries.{
+  BoolQueryDefinition,
+  QueryDefinition
+}
 import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
 import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
 import uk.ac.wellcome.platform.api.models.{WorkFilter, WorkTypeFilter}
@@ -81,9 +84,11 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
       .execute { searchDefinition }
   }
 
-  private def toTermQuery(workFilter: WorkFilter): TermsQueryDefinition[String] =
+  private def toTermQuery(
+    workFilter: WorkFilter): TermsQueryDefinition[String] =
     workFilter match {
-      case WorkTypeFilter(workTypeIds) => termsQuery(field = "workType.id", values = workTypeIds)
+      case WorkTypeFilter(workTypeIds) =>
+        termsQuery(field = "workType.id", values = workTypeIds)
     }
 
   private def buildQuery(maybeQueryString: Option[String],
@@ -92,7 +97,10 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
       maybeQueryString.map { simpleStringQuery }
     ).flatten
 
-    val filterDefinitions: List[QueryDefinition] = filters.map { toTermQuery } :+ termQuery("type", "IdentifiedWork")
+    val filterDefinitions
+      : List[QueryDefinition] = filters.map { toTermQuery } :+ termQuery(
+      "type",
+      "IdentifiedWork")
 
     must(queries).filter(filterDefinitions)
   }

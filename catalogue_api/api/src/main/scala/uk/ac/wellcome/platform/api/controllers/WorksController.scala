@@ -111,8 +111,12 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
   private def buildFilters(request: M): List[WorkFilter] = {
     val maybeWorkTypeFilter: Option[WorkTypeFilter] =
       request.workType
-        .map { arg => arg.split(",").map { _.trim } }
-        .map { workTypeIds: Array[String] => WorkTypeFilter(workTypeIds) }
+        .map { arg =>
+          arg.split(",").map { _.trim }
+        }
+        .map { workTypeIds: Array[String] =>
+          WorkTypeFilter(workTypeIds)
+        }
 
     List(maybeWorkTypeFilter).flatten
   }

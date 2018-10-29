@@ -4,7 +4,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.WorkType
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
-import uk.ac.wellcome.platform.api.fixtures.{ElasticsearchServiceFixture, WorksServiceFixture}
+import uk.ac.wellcome.platform.api.fixtures.{
+  ElasticsearchServiceFixture,
+  WorksServiceFixture
+}
 import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
 import uk.ac.wellcome.platform.api.models.WorkTypeFilter
 
@@ -104,7 +107,8 @@ class WorksServiceTest
               workWithWrongWorkType)
 
             val future = worksService.listWorks(
-              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              documentOptions =
+                createElasticsearchDocumentOptionsWith(indexName = indexName),
               worksSearchOptions = createWorksSearchOptionsWith(
                 filters = List(WorkTypeFilter("b"))
               )
@@ -146,7 +150,8 @@ class WorksServiceTest
               workWithWrongWorkType)
 
             val future = worksService.listWorks(
-              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              documentOptions =
+                createElasticsearchDocumentOptionsWith(indexName = indexName),
               worksSearchOptions = createWorksSearchOptionsWith(
                 filters = List(WorkTypeFilter(List("b", "a")))
               )
@@ -296,9 +301,9 @@ class WorksServiceTest
               workWithWrongTitle,
               workWithWrongWorkType)
 
-            val searchForEmu = worksService.searchWorks(
-              query = "artichokes")(
-              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+            val searchForEmu = worksService.searchWorks(query = "artichokes")(
+              documentOptions =
+                createElasticsearchDocumentOptionsWith(indexName = indexName),
               worksSearchOptions = createWorksSearchOptionsWith(
                 filters = List(WorkTypeFilter("b"))
               )
@@ -341,9 +346,9 @@ class WorksServiceTest
               work2,
               workWithWrongWorkType)
 
-            val searchForEmu = worksService.searchWorks(
-              query = "artichokes")(
-              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+            val searchForEmu = worksService.searchWorks(query = "artichokes")(
+              documentOptions =
+                createElasticsearchDocumentOptionsWith(indexName = indexName),
               worksSearchOptions = createWorksSearchOptionsWith(
                 filters = List(WorkTypeFilter(List("b", "m")))
               )

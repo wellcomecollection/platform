@@ -99,11 +99,11 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
     it("can filter by multiple workTypes") {
       withV1Api {
         case (
-          apiPrefix,
-          indexNameV1,
-          _,
-          itemType,
-          server: EmbeddedHttpServer) =>
+            apiPrefix,
+            indexNameV1,
+            _,
+            itemType,
+            server: EmbeddedHttpServer) =>
           val wrongWorkTypeWorks = (1 to 3).map { _ =>
             createIdentifiedWorkWith(
               workType = Some(WorkType(id = "m", label = "Manuscripts")))
@@ -130,7 +130,8 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
                                 |      "type": "Work",
                                 |      "id": "${matchingWork1.canonicalId}",
                                 |      "title": "${matchingWork1.title}",
-                                |      "workType": ${workType(matchingWork1.workType.get)},
+                                |      "workType": ${workType(
+                                  matchingWork1.workType.get)},
                                 |      "creators": [ ],
                                 |      "subjects": [ ],
                                 |      "genres": [ ],
@@ -141,7 +142,8 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
                                 |      "type": "Work",
                                 |      "id": "${matchingWork2.canonicalId}",
                                 |      "title": "${matchingWork2.title}",
-                                |      "workType": ${workType(matchingWork2.workType.get)},
+                                |      "workType": ${workType(
+                                  matchingWork2.workType.get)},
                                 |      "creators": [ ],
                                 |      "subjects": [ ],
                                 |      "genres": [ ],
@@ -254,7 +256,12 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
 
     it("can filter by multiple workTypes") {
       withV1Api {
-        case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
+        case (
+            apiPrefix,
+            indexNameV1,
+            _,
+            itemType,
+            server: EmbeddedHttpServer) =>
           val wrongWorkTypeWorks = (1 to 3).map { _ =>
             createIdentifiedWorkWith(
               title = "Bouncing bananas",
@@ -284,7 +291,8 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
                                 |      "type": "Work",
                                 |      "id": "${matchingWork1.canonicalId}",
                                 |      "title": "${matchingWork1.title}",
-                                |      "workType": ${workType(matchingWork1.workType.get)},
+                                |      "workType": ${workType(
+                                  matchingWork1.workType.get)},
                                 |      "creators": [ ],
                                 |      "subjects": [ ],
                                 |      "genres": [ ],
@@ -295,7 +303,8 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
                                 |      "type": "Work",
                                 |      "id": "${matchingWork2.canonicalId}",
                                 |      "title": "${matchingWork2.title}",
-                                |      "workType": ${workType(matchingWork2.workType.get)},
+                                |      "workType": ${workType(
+                                  matchingWork2.workType.get)},
                                 |      "creators": [ ],
                                 |      "subjects": [ ],
                                 |      "genres": [ ],
