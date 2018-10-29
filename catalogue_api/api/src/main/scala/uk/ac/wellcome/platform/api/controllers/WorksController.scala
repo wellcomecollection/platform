@@ -14,7 +14,11 @@ import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
   ResultResponse
 }
-import uk.ac.wellcome.platform.api.services.{ElasticsearchDocumentOptions, WorksSearchOptions, WorksService}
+import uk.ac.wellcome.platform.api.services.{
+  ElasticsearchDocumentOptions,
+  WorksSearchOptions,
+  WorksService
+}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -89,8 +93,8 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
       for {
-        maybeWork <- worksService.findWorkById(
-          canonicalId = request.id)(documentOptions)
+        maybeWork <- worksService.findWorkById(canonicalId = request.id)(
+          documentOptions)
       } yield
         generateSingleWorkResponse(
           maybeWork,
@@ -113,7 +117,8 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       pageNumber = request.page
     )
 
-    def searchFunction: (ElasticsearchDocumentOptions, WorksSearchOptions) => Future[ResultList] =
+    def searchFunction: (ElasticsearchDocumentOptions,
+                         WorksSearchOptions) => Future[ResultList] =
       request.query match {
         case Some(queryString) => worksService.searchWorks(queryString)
         case None              => worksService.listWorks

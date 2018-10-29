@@ -20,7 +20,9 @@ case class WorksSearchOptions(
 class WorksService @Inject()(searchService: ElasticsearchService)(
   implicit ec: ExecutionContext) {
 
-  def findWorkById(canonicalId: String)(documentOptions: ElasticsearchDocumentOptions): Future[Option[IdentifiedBaseWork]] =
+  def findWorkById(canonicalId: String)(
+    documentOptions: ElasticsearchDocumentOptions)
+    : Future[Option[IdentifiedBaseWork]] =
     searchService
       .findResultById(canonicalId)(documentOptions)
       .map { result =>
@@ -29,14 +31,21 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
         else None
       }
 
-  def listWorks(documentOptions: ElasticsearchDocumentOptions, worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def listWorks(documentOptions: ElasticsearchDocumentOptions,
+                worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .listResults(sortByField = "canonicalId")(documentOptions, toElasticsearchQueryOptions(worksSearchOptions))
+      .listResults(sortByField = "canonicalId")(
+        documentOptions,
+        toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
-  def searchWorks(query: String)(documentOptions: ElasticsearchDocumentOptions, worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def searchWorks(query: String)(
+    documentOptions: ElasticsearchDocumentOptions,
+    worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .simpleStringQueryResults(query)(documentOptions, toElasticsearchQueryOptions(worksSearchOptions))
+      .simpleStringQueryResults(query)(
+        documentOptions,
+        toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
   private def toElasticsearchQueryOptions(

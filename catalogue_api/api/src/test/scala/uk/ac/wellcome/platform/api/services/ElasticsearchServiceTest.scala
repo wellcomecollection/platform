@@ -83,11 +83,12 @@ class ElasticsearchServiceTest
         insertIntoElasticsearch(indexName, itemType, work)
 
         withElasticsearchService { searchService =>
-          val documentOptions = createElasticsearchDocumentOptionsWith(indexName)
+          val documentOptions =
+            createElasticsearchDocumentOptionsWith(indexName)
 
           val searchResultFuture: Future[GetResponse] =
-            searchService.findResultById(
-              canonicalId = work.canonicalId)(documentOptions)
+            searchService.findResultById(canonicalId = work.canonicalId)(
+              documentOptions)
 
           whenReady(searchResultFuture) { result =>
             val returnedWork = jsonToIdentifiedBaseWork(result.sourceAsString)
@@ -259,7 +260,8 @@ class ElasticsearchServiceTest
   private def assertSearchResultsAreCorrect(
     indexName: String,
     queryString: String,
-    queryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptionsWith(),
+    queryOptions: ElasticsearchQueryOptions =
+      createElasticsearchQueryOptionsWith(),
     expectedWorks: List[IdentifiedWork]
   ): Assertion =
     withElasticsearchService { searchService =>
@@ -275,7 +277,8 @@ class ElasticsearchServiceTest
 
   private def assertListResultsAreCorrect(
     indexName: String,
-    queryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptionsWith(),
+    queryOptions: ElasticsearchQueryOptions =
+      createElasticsearchQueryOptionsWith(),
     expectedWorks: Seq[IdentifiedWork]
   ): Assertion =
     withElasticsearchService { searchService =>
@@ -289,7 +292,8 @@ class ElasticsearchServiceTest
       }
     }
 
-  private def createElasticsearchDocumentOptionsWith(indexName: String): ElasticsearchDocumentOptions =
+  private def createElasticsearchDocumentOptionsWith(
+    indexName: String): ElasticsearchDocumentOptions =
     ElasticsearchDocumentOptions(
       indexName = indexName,
       documentType = itemType
