@@ -100,10 +100,11 @@ API base path: `https://api.wellcomecollection.org/storage/v1`
 
 All API endpoints must require authentication using OAuth 2.0. In the first instance, the only supported OAuth grant type will be client credentials.
 
-Clients must first request a time-limited token using a client ID and secret that we will provide:
+Clients must first request a time-limited token from the auth service, using a client ID and secret that we will provide:
 
 ```http
-POST /token
+POST /oauth2/token
+Host: auth.wellcomecollection.org
 
 grant_type=client_credentials
 &client_id=xxxxxxxxxx
