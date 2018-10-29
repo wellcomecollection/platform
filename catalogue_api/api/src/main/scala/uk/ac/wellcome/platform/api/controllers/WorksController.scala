@@ -105,18 +105,33 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     }
   }
 
+  /** Given a request object, return a list of WorkFilter instances that should
+    * be applied to the corresponding Elasticsearch request.
+    */
+  private def buildFilters(request: M): List[WorkFilter] = {
+    val workTypes =
+      request.workType
+        .map { arg => arg.split(",").map { _.trim } }
+        .flatten
+        .map { id: String => WorkType(id = id, label = "") }
+        .toList
+
+    val maybeWorkTypeFilter: Option[WorkTypeFilter] = workTypes match {
+      case Nil => None
+      case workTypes: List[WorkType] => Some(WorkTypeFilter(workTypes))
+    }
+
+    List(maybeWorkTypeFilter).flatten
+  }
+
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
     val documentOptions = ElasticsearchDocumentOptions(
       indexName = request._index.getOrElse(indexName),
       documentType = documentType
     )
 
-    val filters = List(
-      request.workType.map { arg => WorkTypeFilter(arg) }
-    ).flatten
-
     val worksSearchOptions = WorksSearchOptions(
-      filters = filters,
+      filters = buildFilters(request),
       pageSize = pageSize,
       pageNumber = request.page
     )
