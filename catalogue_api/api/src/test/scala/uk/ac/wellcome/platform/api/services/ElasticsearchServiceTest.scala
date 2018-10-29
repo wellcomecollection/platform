@@ -8,7 +8,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork, WorkType}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
-import uk.ac.wellcome.platform.api.models.WorkTypeFilter
+import uk.ac.wellcome.platform.api.models.{WorkFilter, WorkTypeFilter}
 
 import scala.concurrent.Future
 
@@ -64,7 +64,7 @@ class ElasticsearchServiceTest
           indexName = indexName,
           queryString = "artichokes",
           queryOptions = createElasticsearchQueryOptionsWith(
-            workTypeFilter = Some("b")
+            filters = List(WorkTypeFilter("b"))
           ),
           expectedWorks = List(workWithCorrectWorkType)
         )
@@ -99,7 +99,7 @@ class ElasticsearchServiceTest
           indexName = indexName,
           queryString = "artichokes",
           queryOptions = createElasticsearchQueryOptionsWith(
-            workTypeFilter = Some("b,m")
+            filters = List(WorkTypeFilter("b,m"))
           ),
           expectedWorks = List(work1, work2)
         )
@@ -266,7 +266,7 @@ class ElasticsearchServiceTest
           workWithWrongWorkType)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
-          workTypeFilter = Some("b")
+          filters = List(WorkTypeFilter("b"))
         )
 
         assertListResultsAreCorrect(
@@ -301,7 +301,7 @@ class ElasticsearchServiceTest
           workWithWrongWorkType)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
-          workTypeFilter = Some("b, m")
+          filters = List(WorkTypeFilter(List("b", "a")))
         )
 
         assertListResultsAreCorrect(
@@ -362,20 +362,15 @@ class ElasticsearchServiceTest
     )
 
   private def createElasticsearchQueryOptionsWith(
-    workTypeFilter: Option[String] = None,
+    filters: List[WorkFilter] = List(),
     limit: Int = 10,
     from: Int = 0
-  ): ElasticsearchQueryOptions = {
-    val filters = List(
-      workTypeFilter.map { arg => WorkTypeFilter(arg) }
-    ).flatten
-
+  ): ElasticsearchQueryOptions =
     ElasticsearchQueryOptions(
       filters = filters,
       limit = limit,
       from = from
     )
-  }
 
   private def createElasticsearchQueryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptionsWith()
 
