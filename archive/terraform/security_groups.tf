@@ -34,3 +34,16 @@ resource "aws_security_group" "interservice_security_group" {
     Name = "${local.namespace}-interservice"
   }
 }
+
+resource "aws_security_group" "tcp_access_security_group" {
+  name        = "external_lb_security_group"
+  description = "Allow traffic between load balancer and internet"
+  vpc_id      = "${local.vpc_id}"
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 9001
+    to_port     = 9001
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
