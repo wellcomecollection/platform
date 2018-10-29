@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.api.generators
 
-import uk.ac.wellcome.platform.api.models.{WorkFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.models.WorkFilter
 import uk.ac.wellcome.platform.api.services.{ElasticsearchDocumentOptions, ElasticsearchQueryOptions, WorksSearchOptions}
 
 trait SearchOptionsGenerators {
