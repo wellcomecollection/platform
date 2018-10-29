@@ -73,6 +73,41 @@ class ElasticsearchServiceTest
         )
       }
     }
+
+    it("filters search results with multiple workTypes") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val work1 = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val workWithWrongTitle = createIdentifiedWorkWith(
+          title = "Bouncing bananas",
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val work2 = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        )
+        val workWithWrongType = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "a", label = "Archives"))
+        )
+
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          work1, workWithWrongTitle, work2, workWithWrongType)
+
+        assertSearchResultsAreCorrect(
+          indexName = indexName,
+          queryString = "artichokes",
+          queryOptions = createElasticsearchQueryOptionsWith(
+            workTypeFilter = Some("b")
+          ),
+          expectedWorks = List(work1, work2)
+        )
+      }
+    }
   }
 
   describe("findResultById") {
@@ -217,15 +252,12 @@ class ElasticsearchServiceTest
     it("filters list results by workType") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val work1 = createIdentifiedWorkWith(
-          title = "Animated artichokes",
           workType = Some(WorkType(id = "b", label = "Books"))
         )
         val work2 = createIdentifiedWorkWith(
-          title = "Bouncing bananas",
           workType = Some(WorkType(id = "b", label = "Books"))
         )
         val workWithWrongWorkType = createIdentifiedWorkWith(
-          title = "Animated artichokes",
           workType = Some(WorkType(id = "m", label = "Manuscripts"))
         )
 
@@ -244,6 +276,41 @@ class ElasticsearchServiceTest
           indexName = indexName,
           queryOptions = queryOptions,
           expectedWorks = List(work1, work2)
+        )
+      }
+    }
+
+    it("filters list results with multiple workTypes") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val work1 = createIdentifiedWorkWith(
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val work2 = createIdentifiedWorkWith(
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val work3 = createIdentifiedWorkWith(
+          workType = Some(WorkType(id = "a", label = "Archives"))
+        )
+        val workWithWrongWorkType = createIdentifiedWorkWith(
+          workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        )
+
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          work1,
+          work2,
+          work3,
+          workWithWrongWorkType)
+
+        val queryOptions = createElasticsearchQueryOptionsWith(
+          workTypeFilter = Some("b")
+        )
+
+        assertListResultsAreCorrect(
+          indexName = indexName,
+          queryOptions = queryOptions,
+          expectedWorks = List(work1, work2, work3)
         )
       }
     }
