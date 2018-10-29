@@ -93,7 +93,7 @@ def prepare_slack_payload(alarm_name, state_reason, latest_snapshots_str):
     match = THRESHOLD_RE.match(state_reason)
     assert match is not None, state_reason
 
-    error_count = threshold.actual_value
+    error_count = match.group("actual_value")
     if error_count == 1:
         message = "The snapshot generator queue has 1 unprocessed item."
     else:
