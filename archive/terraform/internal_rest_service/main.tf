@@ -19,6 +19,7 @@ module "service" {
   namespace_id = "${var.namespace_id}"
 
   launch_type = "FARGATE"
+  target_group_protocol = "TCP"
 }
 
 module "task" {
