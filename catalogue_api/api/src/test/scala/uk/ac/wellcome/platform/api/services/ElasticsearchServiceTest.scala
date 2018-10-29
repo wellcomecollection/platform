@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api.services
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedBaseWork,
@@ -33,17 +33,12 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
-        withElasticsearchService(indexName = indexName, itemType = itemType) {
-          searchService =>
-            val searchResponseFuture = searchService.simpleStringQueryResults(
-              queryString = "Aegean",
-              indexName = indexName
-            )
-
-            whenReady(searchResponseFuture) { response =>
-              searchResponseToWorks(response) shouldBe List(work1)
-            }
-        }
+        assertSearchResultsAreCorrect(
+          queryString = "Aegean",
+          queryOptions =
+            createElasticsearchQueryOptionsWith(indexName = indexName),
+          expectedWorks = List(work1)
+        )
       }
     }
 
@@ -69,19 +64,14 @@ class ElasticsearchServiceTest
           workWithWrongTitle,
           workWithWrongWorkType)
 
-        withElasticsearchService(indexName = indexName, itemType = itemType) {
-          searchService =>
-            val searchResponseFuture = searchService.simpleStringQueryResults(
-              queryString = "artichokes",
-              workType = Some("b"),
-              indexName = indexName
-            )
-
-            whenReady(searchResponseFuture) { response =>
-              searchResponseToWorks(response) shouldBe List(
-                workWithCorrectWorkType)
-            }
-        }
+        assertSearchResultsAreCorrect(
+          queryString = "artichokes",
+          queryOptions = createElasticsearchQueryOptionsWith(
+            workTypeFilter = Some("b"),
+            indexName = indexName
+          ),
+          expectedWorks = List(workWithCorrectWorkType)
+        )
       }
     }
   }
@@ -119,10 +109,11 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
-        assertSliceIsCorrect(
-          indexName = indexName,
-          limit = 3,
-          from = 0,
+        val queryOptions =
+          createElasticsearchQueryOptionsWith(indexName = indexName)
+
+        assertListResultsAreCorrect(
+          queryOptions = queryOptions,
           expectedWorks = List(work3, work2, work1)
         )
 
@@ -134,60 +125,81 @@ class ElasticsearchServiceTest
 
     it("returns everything if we ask for a limit > result size") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val displayWorks = populateElasticsearch(indexName)
+        val works = populateElasticsearch(indexName)
 
-        assertSliceIsCorrect(
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
-          limit = displayWorks.length + 1,
-          from = 0,
-          expectedWorks = displayWorks
+          limit = works.length + 1
+        )
+
+        assertListResultsAreCorrect(
+          queryOptions = queryOptions,
+          expectedWorks = works
         )
       }
     }
 
     it("returns a page from the beginning of the result set") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val displayWorks = populateElasticsearch(indexName)
-        assertSliceIsCorrect(
+        val works = populateElasticsearch(indexName)
+
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
-          limit = 4,
-          from = 0,
-          expectedWorks = displayWorks.slice(0, 4)
+          limit = 4
+        )
+
+        assertListResultsAreCorrect(
+          queryOptions = queryOptions,
+          expectedWorks = works.slice(0, 4)
         )
       }
     }
 
     it("returns a page from halfway through the result set") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val displayWorks = populateElasticsearch(indexName)
-        assertSliceIsCorrect(
+        val works = populateElasticsearch(indexName)
+
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
           limit = 4,
-          from = 3,
-          expectedWorks = displayWorks.slice(3, 7)
+          from = 3
+        )
+
+        assertListResultsAreCorrect(
+          queryOptions = queryOptions,
+          expectedWorks = works.slice(3, 7)
         )
       }
     }
 
     it("returns a page from the end of the result set") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val displayWorks = populateElasticsearch(indexName)
-        assertSliceIsCorrect(
+        val works = populateElasticsearch(indexName)
+
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
           limit = 7,
-          from = 5,
-          expectedWorks = displayWorks.slice(5, 10)
+          from = 5
+        )
+
+        assertListResultsAreCorrect(
+          queryOptions = queryOptions,
+          expectedWorks = works.slice(5, 10)
         )
       }
     }
 
     it("returns an empty page if asked for a limit > result size") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val displayWorks = populateElasticsearch(indexName)
-        assertSliceIsCorrect(
+        val works = populateElasticsearch(indexName)
+
+        val queryOptions = createElasticsearchQueryOptionsWith(
           indexName = indexName,
-          limit = 10,
-          from = displayWorks.length * 2,
+          from = works.length * 2
+        )
+
+        assertListResultsAreCorrect(
+          queryOptions = queryOptions,
           expectedWorks = List()
         )
       }
@@ -201,11 +213,12 @@ class ElasticsearchServiceTest
         val works = visibleWorks ++ invisibleWorks
         insertIntoElasticsearch(indexName, itemType, works: _*)
 
-        assertSliceIsCorrect(
-          indexName = indexName,
-          limit = 10,
-          from = 0,
-          expectedWorks = visibleWorks.toList
+        val queryOptions =
+          createElasticsearchQueryOptionsWith(indexName = indexName)
+
+        assertListResultsAreCorrect(
+          queryOptions = queryOptions,
+          expectedWorks = visibleWorks
         )
       }
     }
@@ -232,11 +245,13 @@ class ElasticsearchServiceTest
           work2,
           workWithWrongWorkType)
 
-        assertSliceIsCorrect(
-          workType = Some("b"),
-          indexName = indexName,
-          limit = 10,
-          from = 0,
+        val queryOptions = createElasticsearchQueryOptionsWith(
+          workTypeFilter = Some("b"),
+          indexName = indexName
+        )
+
+        assertListResultsAreCorrect(
+          queryOptions = queryOptions,
           expectedWorks = List(work1, work2)
         )
       }
@@ -251,26 +266,49 @@ class ElasticsearchServiceTest
     works.sortBy(_.canonicalId).toList
   }
 
-  private def assertSliceIsCorrect(
-    workType: Option[String] = None,
-    indexName: String,
-    limit: Int,
-    from: Int,
-    expectedWorks: List[IdentifiedBaseWork]
-  ) =
-    withElasticsearchService(indexName = indexName, itemType = itemType) {
-      searchService =>
-        val searchResponseFuture = searchService.listResults(
-          sortByField = "canonicalId",
-          workType = workType,
-          indexName = indexName,
-          limit = limit,
-          from = from
-        )
-        whenReady(searchResponseFuture) { response =>
-          searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
-        }
+  private def assertSearchResultsAreCorrect(
+    queryString: String,
+    queryOptions: ElasticsearchQueryOptions,
+    expectedWorks: List[IdentifiedWork]
+  ): Assertion =
+    withElasticsearchService(
+      indexName = queryOptions.indexName,
+      itemType = itemType) { searchService =>
+      val searchResponseFuture = searchService
+        .simpleStringQueryResults(queryString)(queryOptions)
+
+      whenReady(searchResponseFuture) { response =>
+        searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
+      }
     }
+
+  private def assertListResultsAreCorrect(
+    queryOptions: ElasticsearchQueryOptions,
+    expectedWorks: Seq[IdentifiedWork]
+  ): Assertion =
+    withElasticsearchService(
+      indexName = queryOptions.indexName,
+      itemType = itemType) { searchService =>
+      val listResponseFuture = searchService
+        .listResults(sortByField = "canonicalId")(queryOptions)
+
+      whenReady(listResponseFuture) { response =>
+        searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
+      }
+    }
+
+  private def createElasticsearchQueryOptionsWith(
+    workTypeFilter: Option[String] = None,
+    indexName: String,
+    limit: Int = 10,
+    from: Int = 0
+  ): ElasticsearchQueryOptions =
+    ElasticsearchQueryOptions(
+      workTypeFilter = workTypeFilter,
+      indexName = indexName,
+      limit = limit,
+      from = from
+    )
 
   private def searchResponseToWorks(
     response: SearchResponse): List[IdentifiedBaseWork] =

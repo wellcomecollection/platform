@@ -29,7 +29,9 @@ class WorksServiceTest
 
               insertIntoElasticsearch(indexName, itemType, works: _*)
 
-              val future = worksService.listWorks(indexName = indexName)
+              val future = worksService.listWorks(
+                createWorksSearchOptionsWith(indexName = indexName)
+              )
 
               whenReady(future) { resultList =>
                 resultList.results should contain theSameElementsAs works
@@ -44,10 +46,10 @@ class WorksServiceTest
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             withWorksService(searchService) { worksService =>
-              val displayWorksFuture =
-                worksService.listWorks(indexName = indexName, pageSize = 10)
+              val future = worksService.listWorks(
+                createWorksSearchOptionsWith(indexName = indexName))
 
-              whenReady(displayWorksFuture) { works =>
+              whenReady(future) { works =>
                 works.totalResults shouldBe 0
               }
             }
@@ -64,13 +66,14 @@ class WorksServiceTest
 
               insertIntoElasticsearch(indexName, itemType, works: _*)
 
-              val displayWorksFuture =
-                worksService.listWorks(
+              val future = worksService.listWorks(
+                createWorksSearchOptionsWith(
                   indexName = indexName,
-                  pageSize = 1,
-                  pageNumber = 4)
+                  pageNumber = 4
+                )
+              )
 
-              whenReady(displayWorksFuture) { receivedWorks =>
+              whenReady(future) { receivedWorks =>
                 receivedWorks.results shouldBe empty
               }
             }
@@ -104,8 +107,10 @@ class WorksServiceTest
                 workWithWrongWorkType)
 
               val future = worksService.listWorks(
-                indexName = indexName,
-                workType = Some("b")
+                createWorksSearchOptionsWith(
+                  workTypeFilter = Some("b"),
+                  indexName = indexName
+                )
               )
 
               whenReady(future) { resultList =>
@@ -178,18 +183,16 @@ class WorksServiceTest
 
               insertIntoElasticsearch(indexName, itemType, workDodo, workMouse)
 
-              val searchForCat = worksService.searchWorks(
-                query = "cat",
-                indexName = indexName
+              val searchForCat = worksService.searchWorks(query = "cat")(
+                createWorksSearchOptionsWith(indexName = indexName)
               )
 
               whenReady(searchForCat) { works =>
                 works.results should have size 0
               }
 
-              val searchForDodo = worksService.searchWorks(
-                query = "dodo",
-                indexName = indexName
+              val searchForDodo = worksService.searchWorks(query = "dodo")(
+                createWorksSearchOptionsWith(indexName = indexName)
               )
 
               whenReady(searchForDodo) { works =>
@@ -212,10 +215,9 @@ class WorksServiceTest
               )
               insertIntoElasticsearch(indexName, itemType, workEmu)
 
-              val searchForEmu = worksService.searchWorks(
-                query =
-                  "emu \"unmatched quotes are a lexical error in the Elasticsearch parser",
-                indexName = indexName
+              val searchForEmu = worksService.searchWorks(query =
+                "emu \"unmatched quotes are a lexical error in the Elasticsearch parser")(
+                createWorksSearchOptionsWith(indexName = indexName)
               )
 
               whenReady(searchForEmu) { works =>
@@ -252,10 +254,11 @@ class WorksServiceTest
                 workWithWrongTitle,
                 workWithWrongWorkType)
 
-              val searchForEmu = worksService.searchWorks(
-                query = "artichokes",
-                workType = Some("b"),
-                indexName = indexName
+              val searchForEmu = worksService.searchWorks(query = "artichokes")(
+                createWorksSearchOptionsWith(
+                  workTypeFilter = Some("b"),
+                  indexName = indexName
+                )
               )
 
               whenReady(searchForEmu) { works =>
@@ -266,4 +269,17 @@ class WorksServiceTest
       }
     }
   }
+
+  private def createWorksSearchOptionsWith(
+    workTypeFilter: Option[String] = None,
+    indexName: String,
+    pageSize: Int = 10,
+    pageNumber: Int = 1
+  ): WorksSearchOptions =
+    WorksSearchOptions(
+      workTypeFilter = workTypeFilter,
+      indexName = indexName,
+      pageSize = pageSize,
+      pageNumber = pageNumber
+    )
 }
