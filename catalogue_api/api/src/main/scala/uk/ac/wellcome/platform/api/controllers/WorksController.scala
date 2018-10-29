@@ -52,7 +52,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     toDisplayWork: (IdentifiedWork, W) => T)(
     implicit evidence: TypeTag[DisplayResultList[T]],
     manifest: Manifest[M]): Unit = {
-    getWithDoc(s"$endpointSuffix") { doc =>
+    getWithDoc(endpointSuffix) { doc =>
       setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
     } { request: M =>
       val pageSize = request.pageSize.getOrElse(apiConfig.defaultPageSize)
@@ -80,7 +80,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     endpointSuffix: String,
     toDisplayWork: (IdentifiedWork, W) => T)(implicit evidence: TypeTag[T],
                                              manifest: Manifest[S]): Unit = {
-    getWithDoc(s"$endpointSuffix") { doc =>
+    getWithDoc(endpointSuffix) { doc =>
       setUpSingleWorkSwaggerDocs[T](swagger, doc)
     } { request: S =>
       val includes = request.include.getOrElse(emptyWorksIncludes)
@@ -105,6 +105,22 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     }
   }
 
+  /** Given a request object, return a list of WorkFilter instances that should
+    * be applied to the corresponding Elasticsearch request.
+    */
+  private def buildFilters(request: M): List[WorkFilter] = {
+    val maybeWorkTypeFilter: Option[WorkTypeFilter] =
+      request.workType
+        .map { arg =>
+          arg.split(",").map { _.trim }
+        }
+        .map { workTypeIds: Array[String] =>
+          WorkTypeFilter(workTypeIds)
+        }
+
+    List(maybeWorkTypeFilter).flatten
+  }
+
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
     val documentOptions = ElasticsearchDocumentOptions(
       indexName = request._index.getOrElse(indexName),
@@ -112,7 +128,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     )
 
     val worksSearchOptions = WorksSearchOptions(
-      workTypeFilter = request.workType,
+      filters = buildFilters(request),
       pageSize = pageSize,
       pageNumber = request.page
     )

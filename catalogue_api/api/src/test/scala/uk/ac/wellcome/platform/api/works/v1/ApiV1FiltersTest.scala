@@ -95,6 +95,68 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
           }
       }
     }
+
+    it("can filter by multiple workTypes") {
+      withV1Api {
+        case (
+            apiPrefix,
+            indexNameV1,
+            _,
+            itemType,
+            server: EmbeddedHttpServer) =>
+          val wrongWorkTypeWorks = (1 to 3).map { _ =>
+            createIdentifiedWorkWith(
+              workType = Some(WorkType(id = "m", label = "Manuscripts")))
+          }
+          val matchingWork1 = createIdentifiedWorkWith(
+            canonicalId = "001",
+            workType = Some(WorkType(id = "b", label = "Books")))
+          val matchingWork2 = createIdentifiedWorkWith(
+            canonicalId = "002",
+            workType = Some(WorkType(id = "a", label = "Archives")))
+
+          val works = wrongWorkTypeWorks :+ matchingWork1 :+ matchingWork2
+          insertIntoElasticsearch(indexNameV1, itemType, works: _*)
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works?workType=a,b",
+              andExpect = Status.Ok,
+              withJsonBody = s"""
+                                |{
+                                |  ${resultList(apiPrefix, totalResults = 2)},
+                                |  "results": [
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork1.canonicalId}",
+                                |      "title": "${matchingWork1.title}",
+                                |      "workType": ${workType(
+                                  matchingWork1.workType.get)},
+                                |      "creators": [ ],
+                                |      "subjects": [ ],
+                                |      "genres": [ ],
+                                |      "publishers": [ ],
+                                |      "placesOfPublication": [ ]
+                                |    },
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork2.canonicalId}",
+                                |      "title": "${matchingWork2.title}",
+                                |      "workType": ${workType(
+                                  matchingWork2.workType.get)},
+                                |      "creators": [ ],
+                                |      "subjects": [ ],
+                                |      "genres": [ ],
+                                |      "publishers": [ ],
+                                |      "placesOfPublication": [ ]
+                                |    }
+                                |  ]
+                                |}
+          """.stripMargin
+            )
+          }
+      }
+    }
   }
 
   describe("searching works") {
@@ -186,6 +248,71 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
                    |    }
                    |  ]
                    |}
+          """.stripMargin
+            )
+          }
+      }
+    }
+
+    it("can filter by multiple workTypes") {
+      withV1Api {
+        case (
+            apiPrefix,
+            indexNameV1,
+            _,
+            itemType,
+            server: EmbeddedHttpServer) =>
+          val wrongWorkTypeWorks = (1 to 3).map { _ =>
+            createIdentifiedWorkWith(
+              title = "Bouncing bananas",
+              workType = Some(WorkType(id = "m", label = "Manuscripts")))
+          }
+          val matchingWork1 = createIdentifiedWorkWith(
+            canonicalId = "001",
+            title = "Bouncing bananas",
+            workType = Some(WorkType(id = "b", label = "Books")))
+          val matchingWork2 = createIdentifiedWorkWith(
+            canonicalId = "002",
+            title = "Bouncing bananas",
+            workType = Some(WorkType(id = "a", label = "Archives")))
+
+          val works = wrongWorkTypeWorks :+ matchingWork1 :+ matchingWork2
+          insertIntoElasticsearch(indexNameV1, itemType, works: _*)
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works?query=bananas&workType=a,b",
+              andExpect = Status.Ok,
+              withJsonBody = s"""
+                                |{
+                                |  ${resultList(apiPrefix, totalResults = 2)},
+                                |  "results": [
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork1.canonicalId}",
+                                |      "title": "${matchingWork1.title}",
+                                |      "workType": ${workType(
+                                  matchingWork1.workType.get)},
+                                |      "creators": [ ],
+                                |      "subjects": [ ],
+                                |      "genres": [ ],
+                                |      "publishers": [ ],
+                                |      "placesOfPublication": [ ]
+                                |    },
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork2.canonicalId}",
+                                |      "title": "${matchingWork2.title}",
+                                |      "workType": ${workType(
+                                  matchingWork2.workType.get)},
+                                |      "creators": [ ],
+                                |      "subjects": [ ],
+                                |      "genres": [ ],
+                                |      "publishers": [ ],
+                                |      "placesOfPublication": [ ]
+                                |    }
+                                |  ]
+                                |}
           """.stripMargin
             )
           }

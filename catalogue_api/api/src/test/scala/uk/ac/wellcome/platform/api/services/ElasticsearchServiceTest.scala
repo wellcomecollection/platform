@@ -12,6 +12,8 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
+import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
+import uk.ac.wellcome.platform.api.models.WorkTypeFilter
 
 import scala.concurrent.Future
 
@@ -20,6 +22,7 @@ class ElasticsearchServiceTest
     with ElasticsearchServiceFixture
     with Matchers
     with ScalaFutures
+    with SearchOptionsGenerators
     with WorksGenerators {
 
   val itemType = "work"
@@ -67,9 +70,47 @@ class ElasticsearchServiceTest
           indexName = indexName,
           queryString = "artichokes",
           queryOptions = createElasticsearchQueryOptionsWith(
-            workTypeFilter = Some("b")
+            filters = List(WorkTypeFilter("b"))
           ),
           expectedWorks = List(workWithCorrectWorkType)
+        )
+      }
+    }
+
+    it("filters search results with multiple workTypes") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val work1 = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val workWithWrongTitle = createIdentifiedWorkWith(
+          title = "Bouncing bananas",
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val work2 = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        )
+        val workWithWrongType = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "a", label = "Archives"))
+        )
+
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          work1,
+          workWithWrongTitle,
+          work2,
+          workWithWrongType)
+
+        assertSearchResultsAreCorrect(
+          indexName = indexName,
+          queryString = "artichokes",
+          queryOptions = createElasticsearchQueryOptionsWith(
+            filters = List(WorkTypeFilter(List("b", "m")))
+          ),
+          expectedWorks = List(work1, work2)
         )
       }
     }
@@ -217,15 +258,12 @@ class ElasticsearchServiceTest
     it("filters list results by workType") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val work1 = createIdentifiedWorkWith(
-          title = "Animated artichokes",
           workType = Some(WorkType(id = "b", label = "Books"))
         )
         val work2 = createIdentifiedWorkWith(
-          title = "Bouncing bananas",
           workType = Some(WorkType(id = "b", label = "Books"))
         )
         val workWithWrongWorkType = createIdentifiedWorkWith(
-          title = "Animated artichokes",
           workType = Some(WorkType(id = "m", label = "Manuscripts"))
         )
 
@@ -237,13 +275,48 @@ class ElasticsearchServiceTest
           workWithWrongWorkType)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
-          workTypeFilter = Some("b")
+          filters = List(WorkTypeFilter("b"))
         )
 
         assertListResultsAreCorrect(
           indexName = indexName,
           queryOptions = queryOptions,
           expectedWorks = List(work1, work2)
+        )
+      }
+    }
+
+    it("filters list results with multiple workTypes") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val work1 = createIdentifiedWorkWith(
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val work2 = createIdentifiedWorkWith(
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val work3 = createIdentifiedWorkWith(
+          workType = Some(WorkType(id = "a", label = "Archives"))
+        )
+        val workWithWrongWorkType = createIdentifiedWorkWith(
+          workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        )
+
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          work1,
+          work2,
+          work3,
+          workWithWrongWorkType)
+
+        val queryOptions = createElasticsearchQueryOptionsWith(
+          filters = List(WorkTypeFilter(List("b", "a")))
+        )
+
+        assertListResultsAreCorrect(
+          indexName = indexName,
+          queryOptions = queryOptions,
+          expectedWorks = List(work1, work2, work3)
         )
       }
     }
@@ -260,8 +333,7 @@ class ElasticsearchServiceTest
   private def assertSearchResultsAreCorrect(
     indexName: String,
     queryString: String,
-    queryOptions: ElasticsearchQueryOptions =
-      createElasticsearchQueryOptionsWith(),
+    queryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptions,
     expectedWorks: List[IdentifiedWork]
   ): Assertion =
     withElasticsearchService { searchService =>
@@ -277,8 +349,7 @@ class ElasticsearchServiceTest
 
   private def assertListResultsAreCorrect(
     indexName: String,
-    queryOptions: ElasticsearchQueryOptions =
-      createElasticsearchQueryOptionsWith(),
+    queryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptions,
     expectedWorks: Seq[IdentifiedWork]
   ): Assertion =
     withElasticsearchService { searchService =>
@@ -291,24 +362,6 @@ class ElasticsearchServiceTest
         searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
       }
     }
-
-  private def createElasticsearchDocumentOptionsWith(
-    indexName: String): ElasticsearchDocumentOptions =
-    ElasticsearchDocumentOptions(
-      indexName = indexName,
-      documentType = itemType
-    )
-
-  private def createElasticsearchQueryOptionsWith(
-    workTypeFilter: Option[String] = None,
-    limit: Int = 10,
-    from: Int = 0
-  ): ElasticsearchQueryOptions =
-    ElasticsearchQueryOptions(
-      workTypeFilter = workTypeFilter,
-      limit = limit,
-      from = from
-    )
 
   private def searchResponseToWorks(
     response: SearchResponse): List[IdentifiedBaseWork] =
