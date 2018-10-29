@@ -6,7 +6,6 @@ VHS ETL Library
 
 import json
 
-from attr import attrs, attrib
 import boto3
 # Required for elasticsearch-py
 import certifi
@@ -22,32 +21,6 @@ def _transform(record):
 
 # --------------------------------
 
-
-@attrs
-class ElasticsearchConfig(object):
-    url = attrib()
-    username = attrib()
-    password = attrib()
-    index = attrib()
-    doc_type = attrib()
-
-
-@attrs
-class ObjectLocation(object):
-    namespace = attrib()
-    key = attrib()
-
-
-@attrs
-class HybridRecord(object):
-    id = attrib()
-    location = attrib()
-
-
-@attrs
-class ElasticsearchRecord(object):
-    id = attrib()
-    doc = attrib()
 
 
 def _extract_hybrid_record(raw_record):
