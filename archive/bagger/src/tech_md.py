@@ -62,9 +62,10 @@ def remodel_file_technical_metadata(root, id_map):
         composition_level.text = 0  # ??
         fixity = make_child(characteristics, "premis", "fixity")
         algorithm = make_child(fixity, "premis", "messageDigestAlgorithm")
-        algorithm.text = tessella_file.find(
+        algorithm_ref = tessella_file.find(
             "tessella:ChecksumAlgorithmRef", namespaces
         ).text
+        algorithm.text = mappings.CHECKSUM_ALGORITHMS[algorithm_ref]
         message_digest = make_child(fixity, "premis", "messageDigest")
         message_digest.text = tessella_file.find("tessella:Checksum", namespaces).text
         file_size = make_child(characteristics, "premis", "size")
