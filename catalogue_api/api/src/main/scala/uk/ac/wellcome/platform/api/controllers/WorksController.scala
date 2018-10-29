@@ -105,12 +105,12 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       pageNumber = request.page
     )
 
-    val curriedSearch: (WorksSearchOptions) => Future[ResultList] = request.query match {
+    def searchFunction: (WorksSearchOptions) => Future[ResultList] = request.query match {
       case Some(queryString) => worksService.searchWorks(queryString)
       case None => worksService.listWorks
     }
 
-    curriedSearch(worksSearchOptions)
+    searchFunction(worksSearchOptions)
   }
 
   private def generateSingleWorkResponse[T <: DisplayWork](
