@@ -128,6 +128,7 @@ data "aws_iam_policy_document" "read_from_bagger_queue" {
       "sqs:DeleteMessage",
       "sqs:ReceiveMessage",
       "sqs:ChangeMessageVisibility",
+      "sqs:GetQueueUrl",
     ]
 
     resources = [
