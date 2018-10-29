@@ -56,13 +56,11 @@ def _extract_hybrid_record(raw_record):
 
 def _get_record_from_s3(s3, object_location):
     obj = s3.get_object(Bucket=object_location.namespace, Key=object_location.key)
-
     return obj["Body"].read().decode("utf-8")
 
 
 def _build_es_record(s3, hybrid_record):
     s3_record = _get_record_from_s3(s3, hybrid_record.location)
-
     return ElasticsearchRecord(id=hybrid_record.id, doc=s3_record)
 
 
@@ -70,11 +68,9 @@ def extract_records(s3, event):
     raw_hybrid_records = [
         json.loads(record["Sns"]["Message"]) for record in event["Records"]
     ]
-
     hybrid_records = [
         _extract_hybrid_record(raw_record) for raw_record in raw_hybrid_records
     ]
-
     return [_build_es_record(s3, hybrid_record) for hybrid_record in hybrid_records]
 
 
@@ -93,7 +89,6 @@ def load_records(es, index, doc_type, docs):
 def _run(elasticsearch_client, event, index, doc_type, s3_client):
     records = extract_records(s3_client, event)
     transformed_records = transform_records(records)
-
     return load_records(elasticsearch_client, index, doc_type, transformed_records)
 
 
