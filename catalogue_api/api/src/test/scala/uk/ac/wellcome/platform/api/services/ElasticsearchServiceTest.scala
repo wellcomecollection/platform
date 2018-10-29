@@ -101,7 +101,7 @@ class ElasticsearchServiceTest
           indexName = indexName,
           queryString = "artichokes",
           queryOptions = createElasticsearchQueryOptionsWith(
-            filters = List(WorkTypeFilter("b,m"))
+            filters = List(WorkTypeFilter(List("b", "m")))
           ),
           expectedWorks = List(work1, work2)
         )
