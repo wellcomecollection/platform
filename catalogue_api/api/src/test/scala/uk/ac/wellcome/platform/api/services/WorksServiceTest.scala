@@ -5,6 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.WorkType
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.{ElasticsearchServiceFixture, WorksServiceFixture}
+import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
 import uk.ac.wellcome.platform.api.models.WorkTypeFilter
 
 class WorksServiceTest
@@ -13,6 +14,7 @@ class WorksServiceTest
     with WorksServiceFixture
     with Matchers
     with ScalaFutures
+    with SearchOptionsGenerators
     with WorksGenerators {
 
   val itemType = "work"
@@ -105,10 +107,10 @@ class WorksServiceTest
               workWithWrongWorkType)
 
             val future = worksService.listWorks(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions =
-                createWorksSearchOptionsWith(workTypeFilter = Some("b"))
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptionsWith(
+                filters = List(WorkTypeFilter("b"))
+              )
             )
 
             whenReady(future) { resultList =>
@@ -254,11 +256,12 @@ class WorksServiceTest
               workWithWrongTitle,
               workWithWrongWorkType)
 
-            val searchForEmu = worksService.searchWorks(query = "artichokes")(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions =
-                createWorksSearchOptionsWith(workTypeFilter = Some("b"))
+            val searchForEmu = worksService.searchWorks(
+              query = "artichokes")(
+              documentOptions = createElasticsearchDocumentOptionsWith(indexName = indexName),
+              worksSearchOptions = createWorksSearchOptionsWith(
+                filters = List(WorkTypeFilter("b"))
+              )
             )
 
             whenReady(searchForEmu) { works =>
@@ -269,27 +272,4 @@ class WorksServiceTest
       }
     }
   }
-
-  private def createElasticsearchDocumentOptionsWith(
-    indexName: String): ElasticsearchDocumentOptions =
-    ElasticsearchDocumentOptions(
-      indexName = indexName,
-      documentType = itemType
-    )
-
-  private def createWorksSearchOptionsWith(
-    workTypeFilter: Option[String] = None,
-    pageSize: Int = 10,
-    pageNumber: Int = 1
-  ): WorksSearchOptions =
-    WorksSearchOptions(
-      filters = List(
-        workTypeFilter.map { arg => WorkTypeFilter(arg) }
-      ).flatten,
-      pageSize = pageSize,
-      pageNumber = pageNumber
-    )
-
-  private def createWorksSearchOptions: WorksSearchOptions =
-    createWorksSearchOptionsWith()
 }

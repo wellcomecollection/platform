@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.generators
 
-import uk.ac.wellcome.platform.api.models.WorkFilter
-import uk.ac.wellcome.platform.api.services.{ElasticsearchDocumentOptions, ElasticsearchQueryOptions}
+import uk.ac.wellcome.platform.api.models.{WorkFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.services.{ElasticsearchDocumentOptions, ElasticsearchQueryOptions, WorksSearchOptions}
 
 trait SearchOptionsGenerators {
   val itemType: String
@@ -24,4 +24,17 @@ trait SearchOptionsGenerators {
     )
 
   def createElasticsearchQueryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptionsWith()
+
+  def createWorksSearchOptionsWith(
+    filters: List[WorkFilter] = List(),
+    pageSize: Int = 10,
+    pageNumber: Int = 1
+  ): WorksSearchOptions =
+    WorksSearchOptions(
+      filters = filters,
+      pageSize = pageSize,
+      pageNumber = pageNumber
+    )
+
+  def createWorksSearchOptions: WorksSearchOptions = createWorksSearchOptionsWith()
 }
