@@ -59,11 +59,7 @@ trait ApiWorksTestBase
 
   def emptyJsonResult(apiPrefix: String): String = s"""
     |{
-    |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-    |  "type": "ResultList",
-    |  "pageSize": 10,
-    |  "totalPages": 0,
-    |  "totalResults": 0,
+    |  ${resultList(apiPrefix, totalPages = 0, totalResults = 0)}
     |  "results": []
     |}""".stripMargin
 
