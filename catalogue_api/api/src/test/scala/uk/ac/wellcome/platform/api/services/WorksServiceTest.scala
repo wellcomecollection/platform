@@ -285,7 +285,9 @@ class WorksServiceTest
     pageNumber: Int = 1
   ): WorksSearchOptions =
     WorksSearchOptions(
-      workTypeFilter = workTypeFilter,
+      filters = List(
+        workTypeFilter.map { arg => WorkTypeFilter(arg) }
+      ).flatten,
       pageSize = pageSize,
       pageNumber = pageNumber
     )

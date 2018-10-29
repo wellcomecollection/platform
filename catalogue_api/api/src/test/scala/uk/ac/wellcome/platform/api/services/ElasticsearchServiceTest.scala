@@ -370,12 +370,17 @@ class ElasticsearchServiceTest
     workTypeFilter: Option[String] = None,
     limit: Int = 10,
     from: Int = 0
-  ): ElasticsearchQueryOptions =
+  ): ElasticsearchQueryOptions = {
+    val filters = List(
+      workTypeFilter.map { arg => WorkTypeFilter(arg) }
+    ).flatten
+
     ElasticsearchQueryOptions(
-      workTypeFilter = workTypeFilter,
+      filters = filters,
       limit = limit,
       from = from
     )
+  }
 
   private def searchResponseToWorks(
     response: SearchResponse): List[IdentifiedBaseWork] =

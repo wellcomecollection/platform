@@ -16,6 +16,7 @@ import uk.ac.wellcome.platform.api.responses.{
 }
 import uk.ac.wellcome.platform.api.services.{
   ElasticsearchDocumentOptions,
+  WorkTypeFilter,
   WorksSearchOptions,
   WorksService
 }
@@ -111,8 +112,12 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       documentType = documentType
     )
 
+    val filters = List(
+      request.workType.map { arg => WorkTypeFilter(arg) }
+    ).flatten
+
     val worksSearchOptions = WorksSearchOptions(
-      workTypeFilter = request.workType,
+      filters = filters,
       pageSize = pageSize,
       pageNumber = request.page
     )

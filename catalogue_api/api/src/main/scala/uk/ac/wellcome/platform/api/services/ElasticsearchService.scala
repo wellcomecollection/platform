@@ -7,7 +7,7 @@ import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.searches.SearchDefinition
 import com.sksamuel.elastic4s.searches.queries.{BoolQueryDefinition, QueryDefinition}
-import com.sksamuel.elastic4s.searches.queries.term.{TermQueryDefinition, TermsQueryDefinition}
+import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
 import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
 import uk.ac.wellcome.models.work.internal.WorkType
 
@@ -15,7 +15,14 @@ import scala.concurrent.Future
 
 sealed trait WorkFilter
 
-case class WorkTypeFilter(workTypes: List[WorkType]) extends WorkFilter
+case class WorkTypeFilter(workTypes: Seq[WorkType]) extends WorkFilter
+
+case object WorkTypeFilter {
+  def apply(arg: String): WorkTypeFilter =
+    WorkTypeFilter(
+      workTypes = arg.split(",").map { id => WorkType(id, label = "") }
+    )
+}
 
 case class ElasticsearchDocumentOptions(
   indexName: String,
@@ -23,7 +30,7 @@ case class ElasticsearchDocumentOptions(
 )
 
 case class ElasticsearchQueryOptions(
-  filters: List[WorkTypeFilter],
+  filters: List[WorkFilter],
   limit: Int,
   from: Int
 )

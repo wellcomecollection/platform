@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class WorksSearchOptions(
-  workTypeFilter: Option[String],
+  filters: List[WorkFilter],
   pageSize: Int,
   pageNumber: Int
 )
@@ -51,7 +51,7 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
   private def toElasticsearchQueryOptions(
     worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
     ElasticsearchQueryOptions(
-      workTypeFilter = worksSearchOptions.workTypeFilter,
+      filters = worksSearchOptions.filters,
       limit = worksSearchOptions.pageSize,
       from = (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize
     )
