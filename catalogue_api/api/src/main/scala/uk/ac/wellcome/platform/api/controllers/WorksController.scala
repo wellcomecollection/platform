@@ -52,7 +52,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     toDisplayWork: (IdentifiedWork, W) => T)(
     implicit evidence: TypeTag[DisplayResultList[T]],
     manifest: Manifest[M]): Unit = {
-    getWithDoc(s"$endpointSuffix") { doc =>
+    getWithDoc(endpointSuffix) { doc =>
       setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
     } { request: M =>
       val pageSize = request.pageSize.getOrElse(apiConfig.defaultPageSize)
@@ -80,7 +80,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     endpointSuffix: String,
     toDisplayWork: (IdentifiedWork, W) => T)(implicit evidence: TypeTag[T],
                                              manifest: Manifest[S]): Unit = {
-    getWithDoc(s"$endpointSuffix") { doc =>
+    getWithDoc(endpointSuffix) { doc =>
       setUpSingleWorkSwaggerDocs[T](swagger, doc)
     } { request: S =>
       val includes = request.include.getOrElse(emptyWorksIncludes)
