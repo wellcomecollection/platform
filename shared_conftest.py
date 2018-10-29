@@ -274,6 +274,7 @@ def elasticsearch_index(docker_services, elasticsearch_url, random_alpha):
 
     yield index_name
 
+
 @pytest.fixture
 def elasticsearch_client(elasticsearch_url):
     yield Elasticsearch(elasticsearch_url, http_auth=("elastic", "changeme"))

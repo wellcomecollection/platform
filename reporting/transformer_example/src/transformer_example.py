@@ -98,14 +98,23 @@ def elasticsearch_client(url, username, password):
     )
 
 
-def main(event, _, s3_client=None, elasticsearch_client=None, elasticsearch_index=None, elasticsearch_doctype=None):
+def main(
+    event,
+    _,
+    s3_client=None,
+    elasticsearch_client=None,
+    elasticsearch_index=None,
+    elasticsearch_doctype=None,
+):
     print(f"Event: {event}")
 
     s3_client = s3_client or boto3.client("s3")
 
-    elasticsearch_client = elasticsearch_client or elasticsearch_client(url=os.environ["ES_URL"],
-                                                                        username=os.environ["ES_USER"],
-                                                                        password=os.environ["ES_PASS"],)
+    elasticsearch_client = elasticsearch_client or elasticsearch_client(
+        url=os.environ["ES_URL"],
+        username=os.environ["ES_USER"],
+        password=os.environ["ES_PASS"],
+    )
 
     elasticsearch_index = elasticsearch_index or os.environ["ES_INDEX"]
 
