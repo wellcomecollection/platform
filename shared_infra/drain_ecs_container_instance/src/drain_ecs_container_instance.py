@@ -76,7 +76,7 @@ def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, sns_client,
         try:
             cluster_arn = tags_dict["clusterArn"]
             ecs_container_instance_arn = tags_dict["containerInstanceArn"]
-        except KeyError as e:
+        except KeyError:
             continue_lifecycle_action(
                 asg_client, asg_group_name, ec2_instance_id, lifecycle_hook_name
             )

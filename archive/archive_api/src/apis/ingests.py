@@ -114,5 +114,5 @@ class IngestResource(Resource):
             progress_manager = app.config["PROGRESS_MANAGER"]
 
             return progress_manager.lookup_progress(id=id)
-        except ProgressNotFoundError as error:
+        except ProgressNotFoundError:
             abort(404, f"Invalid id: No ingest found for id={id!r}")
