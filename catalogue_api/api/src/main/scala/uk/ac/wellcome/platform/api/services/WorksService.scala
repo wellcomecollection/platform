@@ -31,21 +31,22 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
         else None
       }
 
-  def listWorks(
-    documentOptions: ElasticsearchDocumentOptions,
-    worksSearchOptions: WorksSearchOptions): Future[ResultList] =
-    searchService.listResults(sortByField = "canonicalId")(
-      documentOptions,
-      toElasticsearchQueryOptions(worksSearchOptions))
+  def listWorks(documentOptions: ElasticsearchDocumentOptions,
+                worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+    searchService
+      .listResults(sortByField = "canonicalId")(
+        documentOptions,
+        toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
   def searchWorks(query: String)(
     documentOptions: ElasticsearchDocumentOptions,
     worksSearchOptions: WorksSearchOptions): Future[ResultList] =
-    searchService.simpleStringQueryResults(query)(
-      documentOptions,
-      toElasticsearchQueryOptions(worksSearchOptions))
-        .map { createResultList }
+    searchService
+      .simpleStringQueryResults(query)(
+        documentOptions,
+        toElasticsearchQueryOptions(worksSearchOptions))
+      .map { createResultList }
 
   private def toElasticsearchQueryOptions(
     worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
