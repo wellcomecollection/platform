@@ -59,7 +59,7 @@ trait ApiWorksTestBase
 
   def emptyJsonResult(apiPrefix: String): String = s"""
     |{
-    |  ${resultList(apiPrefix, totalPages = 0, totalResults = 0)}
+    |  ${resultList(apiPrefix, totalPages = 0, totalResults = 0)},
     |  "results": []
     |}""".stripMargin
 
