@@ -5,7 +5,7 @@ resource "aws_lb" "network_load_balancer" {
   subnets            = ["${var.private_subnets}"]
 }
 
-data "aws_lb_target_group" "tcp_target_group"{
+data "aws_lb_target_group" "tcp_target_group" {
   name = "${module.service.target_group_name}"
 }
 

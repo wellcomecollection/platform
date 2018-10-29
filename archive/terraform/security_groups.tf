@@ -41,9 +41,9 @@ resource "aws_security_group" "tcp_access_security_group" {
   vpc_id      = "${local.vpc_id}"
 
   ingress {
-    protocol  = "tcp"
-    from_port = 9001
-    to_port   = 9001
+    protocol    = "tcp"
+    from_port   = 9001
+    to_port     = 9001
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

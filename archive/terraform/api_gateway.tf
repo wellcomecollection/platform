@@ -21,25 +21,25 @@ resource "aws_api_gateway_deployment" "deployment" {
 module "ingests" {
   source = "api_gateway_resource"
 
-  resource_name = "ingests"
-  forward_path = "progress"
+  resource_name     = "ingests"
+  forward_path      = "progress"
   load_balancer_arn = "${module.progress_http.load_balancer_arn}"
 
-  authorizer_id = "${aws_api_gateway_authorizer.cognito.id}"
-  storage_api_root_resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
-  storage_api_id = "${aws_api_gateway_rest_api.api.id}"
+  authorizer_id                  = "${aws_api_gateway_authorizer.cognito.id}"
+  storage_api_root_resource_id   = "${aws_api_gateway_rest_api.api.root_resource_id}"
+  storage_api_id                 = "${aws_api_gateway_rest_api.api.id}"
   cognito_storage_api_identifier = "${local.cognito_storage_api_identifier}"
 }
 
 module "bags" {
   source = "api_gateway_resource"
 
-  resource_name = "bags"
-  forward_path = "registrar"
+  resource_name     = "bags"
+  forward_path      = "registrar"
   load_balancer_arn = "${module.registrar_http.load_balancer_arn}"
 
-  authorizer_id = "${aws_api_gateway_authorizer.cognito.id}"
-  storage_api_root_resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
-  storage_api_id = "${aws_api_gateway_rest_api.api.id}"
+  authorizer_id                  = "${aws_api_gateway_authorizer.cognito.id}"
+  storage_api_root_resource_id   = "${aws_api_gateway_rest_api.api.root_resource_id}"
+  storage_api_id                 = "${aws_api_gateway_rest_api.api.id}"
   cognito_storage_api_identifier = "${local.cognito_storage_api_identifier}"
 }

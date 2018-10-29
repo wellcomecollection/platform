@@ -52,6 +52,7 @@ resource "aws_api_gateway_integration" "resource_subpaths_vpc_link_integration" 
   connection_type         = "VPC_LINK"
   connection_id           = "${aws_api_gateway_vpc_link.progress.id}"
   uri                     = "${local.integration_uri}/{proxy}"
+
   request_parameters = {
     integration.request.path.proxy = "method.request.path.proxy"
   }
