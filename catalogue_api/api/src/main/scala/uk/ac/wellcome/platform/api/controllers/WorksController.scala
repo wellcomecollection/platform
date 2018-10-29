@@ -105,10 +105,11 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       pageNumber = request.page
     )
 
-    def searchFunction: (WorksSearchOptions) => Future[ResultList] = request.query match {
-      case Some(queryString) => worksService.searchWorks(queryString)
-      case None => worksService.listWorks
-    }
+    def searchFunction: (WorksSearchOptions) => Future[ResultList] =
+      request.query match {
+        case Some(queryString) => worksService.searchWorks(queryString)
+        case None              => worksService.listWorks
+      }
 
     searchFunction(worksSearchOptions)
   }

@@ -18,7 +18,8 @@ case class WorksSearchOptions(
 )
 
 @Singleton
-class WorksService @Inject()(searchService: ElasticsearchService)(implicit ec: ExecutionContext) {
+class WorksService @Inject()(searchService: ElasticsearchService)(
+  implicit ec: ExecutionContext) {
 
   def findWorkById(canonicalId: String,
                    indexName: String): Future[Option[IdentifiedBaseWork]] =
@@ -32,15 +33,19 @@ class WorksService @Inject()(searchService: ElasticsearchService)(implicit ec: E
 
   def listWorks(worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .listResults(sortByField = "canonicalId")(toElasticsearchQueryOptions(worksSearchOptions))
+      .listResults(sortByField = "canonicalId")(
+        toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
-  def searchWorks(query: String)(worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def searchWorks(query: String)(
+    worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .simpleStringQueryResults(query)(toElasticsearchQueryOptions(worksSearchOptions))
+      .simpleStringQueryResults(query)(
+        toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
-  private def toElasticsearchQueryOptions(worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
+  private def toElasticsearchQueryOptions(
+    worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
     ElasticsearchQueryOptions(
       workTypeFilter = worksSearchOptions.workTypeFilter,
       indexName = worksSearchOptions.indexName,
@@ -54,11 +59,11 @@ class WorksService @Inject()(searchService: ElasticsearchService)(implicit ec: E
       totalResults = searchResponse.totalHits
     )
 
-  private def searchResponseToWorks(searchResponse: SearchResponse): List[IdentifiedWork] =
-    searchResponse
-      .hits.hits
-      .map { h: SearchHit => jsonTo[IdentifiedWork](h.sourceAsString)}
-      .toList
+  private def searchResponseToWorks(
+    searchResponse: SearchResponse): List[IdentifiedWork] =
+    searchResponse.hits.hits.map { h: SearchHit =>
+      jsonTo[IdentifiedWork](h.sourceAsString)
+    }.toList
 
   private def jsonTo[T <: IdentifiedBaseWork](document: String)(
     implicit decoder: Decoder[T]): T =

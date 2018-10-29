@@ -46,7 +46,8 @@ class WorksServiceTest
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             withWorksService(searchService) { worksService =>
-              val future = worksService.listWorks(createWorksSearchOptionsWith(indexName = indexName))
+              val future = worksService.listWorks(
+                createWorksSearchOptionsWith(indexName = indexName))
 
               whenReady(future) { works =>
                 works.totalResults shouldBe 0
@@ -214,9 +215,8 @@ class WorksServiceTest
               )
               insertIntoElasticsearch(indexName, itemType, workEmu)
 
-              val searchForEmu = worksService.searchWorks(
-                query =
-                  "emu \"unmatched quotes are a lexical error in the Elasticsearch parser")(
+              val searchForEmu = worksService.searchWorks(query =
+                "emu \"unmatched quotes are a lexical error in the Elasticsearch parser")(
                 createWorksSearchOptionsWith(indexName = indexName)
               )
 
@@ -254,8 +254,7 @@ class WorksServiceTest
                 workWithWrongTitle,
                 workWithWrongWorkType)
 
-              val searchForEmu = worksService.searchWorks(
-                query = "artichokes")(
+              val searchForEmu = worksService.searchWorks(query = "artichokes")(
                 createWorksSearchOptionsWith(
                   workTypeFilter = Some("b"),
                   indexName = indexName

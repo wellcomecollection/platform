@@ -33,13 +33,15 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
         get(canonicalId).from(s"$indexName/$documentType")
       }
 
-  def listResults(sortByField: String): (ElasticsearchQueryOptions) => Future[SearchResponse] =
+  def listResults(sortByField: String)
+    : (ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = None,
       sortByField = Some(sortByField)
     )
 
-  def simpleStringQueryResults(queryString: String): (ElasticsearchQueryOptions) => Future[SearchResponse] =
+  def simpleStringQueryResults(queryString: String)
+    : (ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = Some(queryString),
       sortByField = None
@@ -60,7 +62,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
     val sortDefinitions: List[FieldSortDefinition] =
       sortByField match {
         case Some(fieldName) => List(fieldSort(fieldName))
-        case None => List()
+        case None            => List()
       }
 
     val searchDefinition: SearchDefinition =
@@ -74,9 +76,9 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient,
       .execute { searchDefinition }
   }
 
-
-  private def buildQuery(maybeQueryString: Option[String],
-                         workTypeFilter: Option[String]): BoolQueryDefinition = {
+  private def buildQuery(
+    maybeQueryString: Option[String],
+    workTypeFilter: Option[String]): BoolQueryDefinition = {
     val queries = List(
       maybeQueryString.map { simpleStringQuery }
     ).flatten

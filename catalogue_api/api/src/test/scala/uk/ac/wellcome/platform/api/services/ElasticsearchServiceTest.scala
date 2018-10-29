@@ -35,7 +35,8 @@ class ElasticsearchServiceTest
 
         assertSearchResultsAreCorrect(
           queryString = "Aegean",
-          queryOptions = createElasticsearchQueryOptionsWith(indexName = indexName),
+          queryOptions =
+            createElasticsearchQueryOptionsWith(indexName = indexName),
           expectedWorks = List(work1)
         )
       }
@@ -108,7 +109,8 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
-        val queryOptions = createElasticsearchQueryOptionsWith(indexName = indexName)
+        val queryOptions =
+          createElasticsearchQueryOptionsWith(indexName = indexName)
 
         assertListResultsAreCorrect(
           queryOptions = queryOptions,
@@ -211,7 +213,8 @@ class ElasticsearchServiceTest
         val works = visibleWorks ++ invisibleWorks
         insertIntoElasticsearch(indexName, itemType, works: _*)
 
-        val queryOptions = createElasticsearchQueryOptionsWith(indexName = indexName)
+        val queryOptions =
+          createElasticsearchQueryOptionsWith(indexName = indexName)
 
         assertListResultsAreCorrect(
           queryOptions = queryOptions,
@@ -268,28 +271,30 @@ class ElasticsearchServiceTest
     queryOptions: ElasticsearchQueryOptions,
     expectedWorks: List[IdentifiedWork]
   ): Assertion =
-    withElasticsearchService(indexName = queryOptions.indexName, itemType = itemType) {
-      searchService =>
-        val searchResponseFuture = searchService
-          .simpleStringQueryResults(queryString)(queryOptions)
+    withElasticsearchService(
+      indexName = queryOptions.indexName,
+      itemType = itemType) { searchService =>
+      val searchResponseFuture = searchService
+        .simpleStringQueryResults(queryString)(queryOptions)
 
-        whenReady(searchResponseFuture) { response =>
-          searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
-        }
+      whenReady(searchResponseFuture) { response =>
+        searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
+      }
     }
 
   private def assertListResultsAreCorrect(
     queryOptions: ElasticsearchQueryOptions,
     expectedWorks: Seq[IdentifiedWork]
   ): Assertion =
-    withElasticsearchService(indexName = queryOptions.indexName, itemType = itemType) {
-      searchService =>
-        val listResponseFuture = searchService
-          .listResults(sortByField = "canonicalId")(queryOptions)
+    withElasticsearchService(
+      indexName = queryOptions.indexName,
+      itemType = itemType) { searchService =>
+      val listResponseFuture = searchService
+        .listResults(sortByField = "canonicalId")(queryOptions)
 
-        whenReady(listResponseFuture) { response =>
-          searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
-        }
+      whenReady(listResponseFuture) { response =>
+        searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
+      }
     }
 
   private def createElasticsearchQueryOptionsWith(
