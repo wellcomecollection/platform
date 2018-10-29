@@ -12,7 +12,6 @@ import scala.util.{Failure, Success}
 
 case class WorksSearchOptions(
   workTypeFilter: Option[String],
-  indexName: String,
   pageSize: Int,
   pageNumber: Int
 )
@@ -21,26 +20,31 @@ case class WorksSearchOptions(
 class WorksService @Inject()(searchService: ElasticsearchService)(
   implicit ec: ExecutionContext) {
 
-  def findWorkById(canonicalId: String,
-                   indexName: String): Future[Option[IdentifiedBaseWork]] =
+  def findWorkById(canonicalId: String)(
+    documentOptions: ElasticsearchDocumentOptions)
+    : Future[Option[IdentifiedBaseWork]] =
     searchService
-      .findResultById(canonicalId, indexName = indexName)
+      .findResultById(canonicalId)(documentOptions)
       .map { result =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
         else None
       }
 
-  def listWorks(worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def listWorks(documentOptions: ElasticsearchDocumentOptions,
+                worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
       .listResults(sortByField = "canonicalId")(
+        documentOptions,
         toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
   def searchWorks(query: String)(
+    documentOptions: ElasticsearchDocumentOptions,
     worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
       .simpleStringQueryResults(query)(
+        documentOptions,
         toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
@@ -48,7 +52,6 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
     worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
     ElasticsearchQueryOptions(
       workTypeFilter = worksSearchOptions.workTypeFilter,
-      indexName = worksSearchOptions.indexName,
       limit = worksSearchOptions.pageSize,
       from = (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize
     )

@@ -14,7 +14,11 @@ import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
   ResultResponse
 }
-import uk.ac.wellcome.platform.api.services.{WorksSearchOptions, WorksService}
+import uk.ac.wellcome.platform.api.services.{
+  ElasticsearchDocumentOptions,
+  WorksSearchOptions,
+  WorksService
+}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,6 +28,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
                                S <: SingleWorkRequest[W],
                                W <: WorksIncludes](
   apiConfig: ApiConfig,
+  documentType: String,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
@@ -80,13 +85,16 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     } { request: S =>
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
+      val documentOptions = ElasticsearchDocumentOptions(
+        indexName = request._index.getOrElse(indexName),
+        documentType = documentType
+      )
+
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
       for {
-        maybeWork <- worksService.findWorkById(
-          canonicalId = request.id,
-          indexName = request._index
-            .getOrElse(indexName))
+        maybeWork <- worksService.findWorkById(canonicalId = request.id)(
+          documentOptions)
       } yield
         generateSingleWorkResponse(
           maybeWork,
@@ -98,20 +106,25 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
   }
 
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
+    val documentOptions = ElasticsearchDocumentOptions(
+      indexName = request._index.getOrElse(indexName),
+      documentType = documentType
+    )
+
     val worksSearchOptions = WorksSearchOptions(
       workTypeFilter = request.workType,
-      indexName = request._index.getOrElse(indexName),
       pageSize = pageSize,
       pageNumber = request.page
     )
 
-    def searchFunction: (WorksSearchOptions) => Future[ResultList] =
+    def searchFunction: (ElasticsearchDocumentOptions,
+                         WorksSearchOptions) => Future[ResultList] =
       request.query match {
         case Some(queryString) => worksService.searchWorks(queryString)
         case None              => worksService.listWorks
       }
 
-    searchFunction(worksSearchOptions)
+    searchFunction(documentOptions, worksSearchOptions)
   }
 
   private def generateSingleWorkResponse[T <: DisplayWork](
