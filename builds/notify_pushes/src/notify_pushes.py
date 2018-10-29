@@ -6,12 +6,11 @@ Sends Slack notifications for ECR pushes.
 import functools
 import json
 import os
-import sys
 
 from botocore.vendored import requests
 
 
-def log_event_on_error(handler):
+def log_on_error(handler):
     @functools.wraps(handler)
     def wrapper(event, context):
         try:
