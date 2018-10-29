@@ -109,16 +109,15 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     * be applied to the corresponding Elasticsearch request.
     */
   private def buildFilters(request: M): List[WorkFilter] = {
-    val workTypes =
+    val workTypeIds =
       request.workType
         .map { arg => arg.split(",").map { _.trim } }
         .flatten
-        .map { id: String => WorkType(id = id, label = "") }
         .toList
 
-    val maybeWorkTypeFilter: Option[WorkTypeFilter] = workTypes match {
+    val maybeWorkTypeFilter: Option[WorkTypeFilter] = workTypeIds match {
       case Nil => None
-      case workTypes: List[WorkType] => Some(WorkTypeFilter(workTypes))
+      case workTypes: List[WorkType] => Some(WorkTypeFilter(workTypeIds))
     }
 
     List(maybeWorkTypeFilter).flatten

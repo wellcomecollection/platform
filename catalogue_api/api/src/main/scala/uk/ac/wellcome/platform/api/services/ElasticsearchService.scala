@@ -83,7 +83,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
 
   private def toTermQuery(workFilter: WorkFilter): TermsQueryDefinition[String] =
     workFilter match {
-      case WorkTypeFilter(workTypes) => termsQuery(field = "workType.id", values = workTypes.map { _.id })
+      case WorkTypeFilter(workTypeIds) => termsQuery(field = "workType.id", values = workTypeIds)
     }
 
   private def buildQuery(maybeQueryString: Option[String],
