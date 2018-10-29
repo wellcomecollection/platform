@@ -8,7 +8,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork, WorkType}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
-import uk.ac.wellcome.platform.api.models.{WorkFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
+import uk.ac.wellcome.platform.api.models.WorkTypeFilter
 
 import scala.concurrent.Future
 
@@ -17,6 +18,7 @@ class ElasticsearchServiceTest
     with ElasticsearchServiceFixture
     with Matchers
     with ScalaFutures
+    with SearchOptionsGenerators
     with WorksGenerators {
 
   val itemType = "work"
@@ -353,26 +355,6 @@ class ElasticsearchServiceTest
         searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
       }
     }
-
-  private def createElasticsearchDocumentOptionsWith(
-    indexName: String): ElasticsearchDocumentOptions =
-    ElasticsearchDocumentOptions(
-      indexName = indexName,
-      documentType = itemType
-    )
-
-  private def createElasticsearchQueryOptionsWith(
-    filters: List[WorkFilter] = List(),
-    limit: Int = 10,
-    from: Int = 0
-  ): ElasticsearchQueryOptions =
-    ElasticsearchQueryOptions(
-      filters = filters,
-      limit = limit,
-      from = from
-    )
-
-  private def createElasticsearchQueryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptionsWith()
 
   private def searchResponseToWorks(
     response: SearchResponse): List[IdentifiedBaseWork] =
