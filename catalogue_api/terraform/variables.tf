@@ -55,3 +55,5 @@ variable "es_config_remus" {
     doc_type = "work"
   }
 }
+
+variable "critical_slack_webhook" {}
