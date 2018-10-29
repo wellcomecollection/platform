@@ -10,7 +10,7 @@ resource "aws_api_gateway_method" "resource_any_method" {
   http_method          = "ANY"
   authorization        = "COGNITO_USER_POOLS"
   authorizer_id        = "${var.authorizer_id}"
-  authorization_scopes = ["${var.cognito_storage_api_identifier}/${var.resource_name}"]
+  authorization_scopes = ["${local.authorization_scope}"]
 }
 
 resource "aws_api_gateway_integration" "resource_vpc_link_integration" {
@@ -36,7 +36,7 @@ resource "aws_api_gateway_method" "resource_subpaths_any_method" {
   http_method          = "ANY"
   authorization        = "COGNITO_USER_POOLS"
   authorizer_id        = "${var.authorizer_id}"
-  authorization_scopes = ["${var.cognito_storage_api_identifier}/${var.resource_name}"]
+  authorization_scopes = ["${local.authorization_scope}"]
 
   request_parameters = {
     "method.request.path.proxy" = true
