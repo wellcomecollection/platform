@@ -1,11 +1,15 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.http.get.GetResponse
-import com.sksamuel.elastic4s.http.search.SearchHit
+import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
+  IdentifiedWork,
+  WorkType
+}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
 
@@ -31,18 +35,51 @@ class ElasticsearchServiceTest
 
         withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
-            val searchResultFuture = searchService.simpleStringQueryResults(
+            val searchResponseFuture = searchService.simpleStringQueryResults(
               queryString = "Aegean",
               indexName = indexName
             )
 
-            whenReady(searchResultFuture) { result =>
-              result.hits should have size 1
-              val returnedWorks = result.hits.hits
-                .map { h: SearchHit =>
-                  jsonToIdentifiedBaseWork(h.sourceAsString)
-                }
-              returnedWorks.toList shouldBe List(work1)
+            whenReady(searchResponseFuture) { response =>
+              searchResponseToWorks(response) shouldBe List(work1)
+            }
+        }
+      }
+    }
+
+    it("filters search results by workType") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val workWithCorrectWorkType = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val workWithWrongTitle = createIdentifiedWorkWith(
+          title = "Bouncing bananas",
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val workWithWrongWorkType = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        )
+
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          workWithCorrectWorkType,
+          workWithWrongTitle,
+          workWithWrongWorkType)
+
+        withElasticsearchService(indexName = indexName, itemType = itemType) {
+          searchService =>
+            val searchResponseFuture = searchService.simpleStringQueryResults(
+              queryString = "artichokes",
+              workType = Some("b"),
+              indexName = indexName
+            )
+
+            whenReady(searchResponseFuture) { response =>
+              searchResponseToWorks(response) shouldBe List(
+                workWithCorrectWorkType)
             }
         }
       }
@@ -172,6 +209,38 @@ class ElasticsearchServiceTest
         )
       }
     }
+
+    it("filters list results by workType") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val work1 = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val work2 = createIdentifiedWorkWith(
+          title = "Bouncing bananas",
+          workType = Some(WorkType(id = "b", label = "Books"))
+        )
+        val workWithWrongWorkType = createIdentifiedWorkWith(
+          title = "Animated artichokes",
+          workType = Some(WorkType(id = "m", label = "Manuscripts"))
+        )
+
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          work1,
+          work2,
+          workWithWrongWorkType)
+
+        assertSliceIsCorrect(
+          workType = Some("b"),
+          indexName = indexName,
+          limit = 10,
+          from = 0,
+          expectedWorks = List(work1, work2)
+        )
+      }
+    }
   }
 
   private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
@@ -183,29 +252,31 @@ class ElasticsearchServiceTest
   }
 
   private def assertSliceIsCorrect(
+    workType: Option[String] = None,
     indexName: String,
     limit: Int,
     from: Int,
     expectedWorks: List[IdentifiedBaseWork]
-  ) = {
+  ) =
     withElasticsearchService(indexName = indexName, itemType = itemType) {
       searchService =>
-        val searchResultFuture = searchService.listResults(
+        val searchResponseFuture = searchService.listResults(
           sortByField = "canonicalId",
+          workType = workType,
           indexName = indexName,
           limit = limit,
           from = from
         )
-        whenReady(searchResultFuture) { result =>
-          result.hits should have size expectedWorks.length
-          val returnedWorks = result.hits.hits
-            .map { h: SearchHit =>
-              jsonToIdentifiedBaseWork(h.sourceAsString)
-            }
-          returnedWorks.toList should contain theSameElementsAs expectedWorks
+        whenReady(searchResponseFuture) { response =>
+          searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
         }
     }
-  }
+
+  private def searchResponseToWorks(
+    response: SearchResponse): List[IdentifiedBaseWork] =
+    response.hits.hits.map { h: SearchHit =>
+      jsonToIdentifiedBaseWork(h.sourceAsString)
+    }.toList
 
   private def jsonToIdentifiedBaseWork(document: String): IdentifiedBaseWork =
     fromJson[IdentifiedBaseWork](document).get

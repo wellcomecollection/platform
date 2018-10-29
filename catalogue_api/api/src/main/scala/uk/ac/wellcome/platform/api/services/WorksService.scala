@@ -26,11 +26,13 @@ class WorksService @Inject()(
       }
 
   def listWorks(indexName: String,
+                workType: Option[String] = None,
                 pageSize: Int = apiConfig.defaultPageSize,
                 pageNumber: Int = 1): Future[ResultList] =
     searchService
       .listResults(
         sortByField = "canonicalId",
+        workType = workType,
         limit = pageSize,
         from = (pageNumber - 1) * pageSize,
         indexName = indexName
@@ -45,12 +47,14 @@ class WorksService @Inject()(
       }
 
   def searchWorks(query: String,
+                  workType: Option[String] = None,
                   indexName: String,
                   pageSize: Int = apiConfig.defaultPageSize,
                   pageNumber: Int = 1): Future[ResultList] =
     searchService
       .simpleStringQueryResults(
         query,
+        workType = workType,
         limit = pageSize,
         from = (pageNumber - 1) * pageSize,
         indexName = indexName
