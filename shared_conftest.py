@@ -10,6 +10,7 @@ import string
 import boto3
 import pytest
 import requests
+from elasticsearch import Elasticsearch
 
 
 def pytest_runtest_setup(item):
@@ -272,3 +273,7 @@ def elasticsearch_index(docker_services, elasticsearch_url, random_alpha):
     resp.raise_for_status()
 
     yield index_name
+
+@pytest.fixture
+def elasticsearch_client(elasticsearch_url):
+    yield Elasticsearch(elasticsearch_url, http_auth=("elastic", "changeme"))
