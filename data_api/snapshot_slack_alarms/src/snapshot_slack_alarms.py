@@ -107,20 +107,15 @@ def prepare_slack_payload(alarm_name, state_reason, latest_snapshots_str):
                 "color": "danger",
                 "fallback": alarm_name,
                 "title": alarm_name,
-                "fields": [
-                    {
-                        "value": message
-                    }
-                ]
+                "fields": [{"value": message}],
             }
-        ]
+        ],
     }
 
     if latest_snapshots_str is not None:
-        slack_data["attachments"][0]["fields"].append({
-            "title": "Latest snapshots",
-            "value": latest_snapshots_str
-        })
+        slack_data["attachments"][0]["fields"].append(
+            {"title": "Latest snapshots", "value": latest_snapshots_str}
+        )
 
     return slack_data
 
@@ -139,7 +134,7 @@ def main(event, _ctxt=None):
         slack_data = prepare_slack_payload(
             alarm_name=alarm_name,
             state_reason=state_reason,
-            latest_snapshots_str=latest_snapshots_str
+            latest_snapshots_str=latest_snapshots_str,
         )
 
         resp = requests.post(
