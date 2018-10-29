@@ -9,20 +9,9 @@ import com.sksamuel.elastic4s.searches.SearchDefinition
 import com.sksamuel.elastic4s.searches.queries.{BoolQueryDefinition, QueryDefinition}
 import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
 import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
-import uk.ac.wellcome.models.work.internal.WorkType
+import uk.ac.wellcome.platform.api.models.{WorkFilter, WorkTypeFilter}
 
 import scala.concurrent.Future
-
-sealed trait WorkFilter
-
-case class WorkTypeFilter(workTypes: Seq[WorkType]) extends WorkFilter
-
-case object WorkTypeFilter {
-  def apply(arg: String): WorkTypeFilter =
-    WorkTypeFilter(
-      workTypes = arg.split(",").map { id => WorkType(id, label = "") }
-    )
-}
 
 case class ElasticsearchDocumentOptions(
   indexName: String,

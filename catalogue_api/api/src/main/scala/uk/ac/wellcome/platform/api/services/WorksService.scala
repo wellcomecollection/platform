@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
-import uk.ac.wellcome.platform.api.models.ResultList
+import uk.ac.wellcome.platform.api.models.{ResultList, WorkFilter}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

@@ -5,13 +5,10 @@ import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedBaseWork,
-  IdentifiedWork,
-  WorkType
-}
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork, WorkType}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
+import uk.ac.wellcome.platform.api.models.WorkTypeFilter
 
 import scala.concurrent.Future
 

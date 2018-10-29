@@ -16,7 +16,6 @@ import uk.ac.wellcome.platform.api.responses.{
 }
 import uk.ac.wellcome.platform.api.services.{
   ElasticsearchDocumentOptions,
-  WorkTypeFilter,
   WorksSearchOptions,
   WorksService
 }
