@@ -324,8 +324,7 @@ class ElasticsearchServiceTest
   private def assertSearchResultsAreCorrect(
     indexName: String,
     queryString: String,
-    queryOptions: ElasticsearchQueryOptions =
-      createElasticsearchQueryOptionsWith(),
+    queryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptions,
     expectedWorks: List[IdentifiedWork]
   ): Assertion =
     withElasticsearchService { searchService =>
@@ -341,8 +340,7 @@ class ElasticsearchServiceTest
 
   private def assertListResultsAreCorrect(
     indexName: String,
-    queryOptions: ElasticsearchQueryOptions =
-      createElasticsearchQueryOptionsWith(),
+    queryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptions,
     expectedWorks: Seq[IdentifiedWork]
   ): Assertion =
     withElasticsearchService { searchService =>
@@ -378,6 +376,8 @@ class ElasticsearchServiceTest
       from = from
     )
   }
+
+  private def createElasticsearchQueryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptionsWith()
 
   private def searchResponseToWorks(
     response: SearchResponse): List[IdentifiedBaseWork] =
