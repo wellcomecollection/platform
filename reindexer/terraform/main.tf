@@ -12,7 +12,7 @@ module "catalogue_miro_reindexer" {
   ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.catalogue_namespace.id}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
 }
 
 module "catalogue_sierra_reindexer" {
@@ -29,7 +29,7 @@ module "catalogue_sierra_reindexer" {
   ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.catalogue_namespace.id}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
 }
 
 module "catalogue_sierra_items_reindexer" {
@@ -46,7 +46,7 @@ module "catalogue_sierra_items_reindexer" {
   ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.catalogue_namespace.id}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
 }
 
 module "reporting_miro_reindexer" {
@@ -63,7 +63,7 @@ module "reporting_miro_reindexer" {
   ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.catalogue_namespace.id}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
 }
 
 module "reporting_sierra_reindexer" {
@@ -80,5 +80,5 @@ module "reporting_sierra_reindexer" {
   ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.catalogue_namespace.id}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
 }

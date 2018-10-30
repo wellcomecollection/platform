@@ -24,5 +24,5 @@ locals {
 
   reindex_worker_container_image = "${module.ecr_repository_reindex_worker.repository_url}:${var.release_ids["reindex_worker"]}"
 
-  vpc_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id} "
+  vpc_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
 }
