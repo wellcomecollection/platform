@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
