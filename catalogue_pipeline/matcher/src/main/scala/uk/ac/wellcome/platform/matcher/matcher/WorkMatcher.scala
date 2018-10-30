@@ -56,13 +56,12 @@ class WorkMatcher @Inject()(
       }
   }
 
-  private def singleMatchedIdentifier(w: UnidentifiedInvisibleWork) = {
+  private def singleMatchedIdentifier(work: UnidentifiedInvisibleWork) = {
     MatcherResult(
       Set(
-        MatchedIdentifiers(Set(WorkIdentifier(
-          Sourced
-            .id(w.sourceIdentifier.identifierType.id, w.sourceIdentifier.value),
-          w.version)))))
+        MatchedIdentifiers(Set(WorkIdentifier(work)))
+      )
+    )
   }
 
   private def withUpdateLocked(update: WorkUpdate,
