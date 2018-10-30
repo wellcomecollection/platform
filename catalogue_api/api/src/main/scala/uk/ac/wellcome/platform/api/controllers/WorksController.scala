@@ -208,10 +208,10 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     )
   }
 
-  private def setupResultListSwaggerDocs[T <: DisplayWork](
+  def setupResultListSwaggerDocs[T <: DisplayWork](
     endpointSuffix: String,
     swagger: Swagger,
-    doc: Operation)(implicit evidence: TypeTag[DisplayResultList[T]]) = {
+    doc: Operation)(implicit evidence: TypeTag[DisplayResultList[T]]): Operation = {
     implicit val finatraSwagger = swagger
     doc
       .summary(endpointSuffix)
@@ -245,16 +245,6 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
         |- ~N after a phrase signifies slop amount
         |
         |To search for any of these special characters, they should be escaped with \.""".stripMargin,
-        required = false
-      )
-      .queryParam[String](
-        "items.locations.locationType",
-        "Filter by the LocationType of items on the retrieved works",
-        required = false
-      )
-      .queryParam[String](
-        "workType",
-        "Filter by the workType of the searched works",
         required = false
       )
       .parameter(includeSwaggerParam)
