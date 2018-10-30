@@ -19,7 +19,7 @@ data "terraform_remote_state" "shared_infra" {
   }
 }
 
-data "terraform_remote_state" "catalogue_pipeline_data" {
+data "terraform_remote_state" "infra_crtical" {
   backend = "s3"
 
   config {

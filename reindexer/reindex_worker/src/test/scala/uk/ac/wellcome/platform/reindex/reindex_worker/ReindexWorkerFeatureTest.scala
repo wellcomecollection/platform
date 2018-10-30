@@ -52,7 +52,7 @@ class ReindexWorkerFeatureTest
           withServer(flags) { _ =>
             val testRecords = createReindexableData(table)
 
-            val reindexJob = ReindexJob(segment = 0, totalSegments = 1) // , maxRecordsPerSegment = Some(1)
+            val reindexJob = ReindexJob(segment = 0, totalSegments = 1)
 
             sendNotificationToSQS(
               queue = queue,
@@ -74,7 +74,7 @@ class ReindexWorkerFeatureTest
     }
   }
 
-  it("sends the max number of notifications if option is set") {
+  it("respects the maxRecordsPerSegment limit when sending notifications") {
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
@@ -82,7 +82,7 @@ class ReindexWorkerFeatureTest
             queue)
 
           withServer(flags) { _ =>
-            val testRecords = createReindexableData(table, 8)
+            val testRecords = createReindexableData(table, numberOfRecords = 8)
 
             val reindexJob = ReindexJob(
               segment = 0,

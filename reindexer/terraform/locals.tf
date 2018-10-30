@@ -1,7 +1,7 @@
 locals {
-  vhs_sierra_table_name       = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_table_name}"
-  vhs_miro_table_name         = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_table_name}"
-  vhs_sierra_items_table_name = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_items_table_name}"
+  vhs_sierra_table_name       = "${data.terraform_remote_state.infra_crtical.vhs_sierra_table_name}"
+  vhs_miro_table_name         = "${data.terraform_remote_state.infra_crtical.vhs_miro_table_name}"
+  vhs_sierra_items_table_name = "${data.terraform_remote_state.infra_crtical.vhs_sierra_items_table_name}"
 
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
 
@@ -24,5 +24,5 @@ locals {
 
   reindex_worker_container_image = "${module.ecr_repository_reindex_worker.repository_url}:${var.release_ids["reindex_worker"]}"
 
-  vpc_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
+  vpc_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id} "
 }
