@@ -8,12 +8,6 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 
-case class MiroTransformable(
-  sourceId: String,
-  MiroCollection: String,
-  data: String
-)
-
 case class SierraTransformable(
   sierraId: SierraBibNumber,
   maybeBibRecord: Option[SierraBibRecord] = None,

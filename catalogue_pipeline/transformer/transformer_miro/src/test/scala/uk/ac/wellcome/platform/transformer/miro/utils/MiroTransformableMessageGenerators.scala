@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro.utils
 
-import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
+import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
 
 trait MiroTransformableMessageGenerators extends IdentifiersGenerators {
   def createValidMiroTransformableWith(miroId: String = "MiroId",

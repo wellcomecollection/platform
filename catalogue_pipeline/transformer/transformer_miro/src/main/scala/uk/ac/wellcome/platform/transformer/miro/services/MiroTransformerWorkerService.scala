@@ -5,8 +5,8 @@ import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
+import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
 import uk.ac.wellcome.platform.transformer.receive.HybridRecordReceiver
 
 import scala.concurrent.Future
