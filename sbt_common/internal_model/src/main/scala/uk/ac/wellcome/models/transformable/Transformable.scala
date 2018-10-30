@@ -18,9 +18,7 @@ case class SierraTransformable(
   sierraId: SierraBibNumber,
   maybeBibRecord: Option[SierraBibRecord] = None,
   itemRecords: Map[SierraItemNumber, SierraItemRecord] = Map()
-) {
-  val sourceId: String = sierraId.withoutCheckDigit
-}
+)
 
 object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =

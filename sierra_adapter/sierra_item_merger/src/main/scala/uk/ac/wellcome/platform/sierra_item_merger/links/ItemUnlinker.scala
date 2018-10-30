@@ -9,7 +9,7 @@ object ItemUnlinker {
                        itemRecord: SierraItemRecord): SierraTransformable = {
     if (!itemRecord.unlinkedBibIds.contains(sierraTransformable.sierraId)) {
       throw new RuntimeException(
-        s"Non-matching bib id ${sierraTransformable.sourceId} in item unlink bibs ${itemRecord.unlinkedBibIds}")
+        s"Non-matching bib id ${sierraTransformable.sierraId} in item unlink bibs ${itemRecord.unlinkedBibIds}")
     }
 
     val itemRecords =
