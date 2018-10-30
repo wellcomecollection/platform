@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.archive.progress_http.modules
 
 import com.google.inject.{AbstractModule, Provides}
+import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
@@ -13,6 +15,7 @@ import scala.concurrent.duration._
 
 class TestAppConfigModule(
   progressTable: Table,
+  topic: Topic,
   serverConfig: HttpServerConfig
 ) extends AbstractModule {
 
@@ -41,11 +44,21 @@ class TestAppConfigModule(
       )
     )
 
+    val snsClientConfig = SnsClientConfig(
+      accessKey = Some("access"),
+      secretKey = Some("secret"),
+      region = "localhost",
+      endpoint = Some("http://localhost:9292")
+    )
+    val snsConfig = SNSConfig(topic.arn)
+
     ProgressHttpConfig(
       cloudwatchClientConfig,
       archiveProgressTrackerConfig,
       metricsConfig,
-      serverConfig
+      serverConfig,
+      snsClientConfig,
+      snsConfig
     )
   }
 }

@@ -14,9 +14,9 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.common.progress.models.ProgressCreateRequest._
 
-import scala.util.Try
-
-class Router @Inject()(monitor: ProgressTracker, config: HttpServerConfig) {
+class Router @Inject()(monitor: ProgressTracker,
+                       progressStarter: ProgressStarter,
+                       config: HttpServerConfig) {
 
   private def createLocationHeader(progress: Progress) =
     Location(s"${config.externalBaseUrl}/progress/${progress.id}")
@@ -29,22 +29,19 @@ class Router @Inject()(monitor: ProgressTracker, config: HttpServerConfig) {
     pathPrefix("progress") {
       post {
         entity(as[ProgressCreateRequest]) { progressCreateRequest =>
-          Try(monitor.initialise(Progress(progressCreateRequest))) match {
-            case util.Success(progress) => {
+          onSuccess(progressStarter.initialise(Progress(progressCreateRequest))) {
+            progress =>
               respondWithHeaders(List(createLocationHeader(progress))) {
                 complete(Created -> progress)
               }
-            }
-            case util.Failure(e) => failWith(e)
           }
         }
-      } ~ path(Segment) { id: String =>
+      } ~ path(JavaUUID) { id: UUID =>
         get {
-          // TODO add test for what happens if id is not a valid UUID
-          monitor.get(UUID.fromString(id)) match {
-            case scala.Some(progress) =>
+          onSuccess(monitor.get(id)) {
+            case Some(progress) =>
               complete(DisplayIngest(progress))
-            case scala.None =>
+            case None =>
               complete(NotFound -> "Progress monitor not found!")
           }
         }

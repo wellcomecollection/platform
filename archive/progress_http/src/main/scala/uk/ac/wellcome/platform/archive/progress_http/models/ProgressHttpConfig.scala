@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.progress_http.models
 
+import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
@@ -10,4 +11,6 @@ case class ProgressHttpConfig(
   progressTrackerConfig: ProgressTrackerConfig,
   metricsConfig: MetricsConfig,
   httpServerConfig: HttpServerConfig,
+  snsClientConfig: SnsClientConfig,
+  snsConfig: SNSConfig
 )

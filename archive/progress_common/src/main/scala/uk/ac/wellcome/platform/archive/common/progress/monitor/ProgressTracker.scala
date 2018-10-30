@@ -12,18 +12,19 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.storage.dynamo._
 
+import scala.concurrent.{ExecutionContext, Future, blocking}
 import scala.util.{Failure, Success, Try}
 
 class ProgressTracker @Inject()(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
-) extends Logging {
+)(implicit ex: ExecutionContext) extends Logging {
   import Progress._
 
-  def get(id: UUID): Option[Progress] = {
-    Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
+  def get(id: UUID): Future[Option[Progress]] = Future {
+    blocking(Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
       'id -> id
-    ) match {
+    )) match {
       case Some(Right(progress)) => Some(progress)
       case Some(Left(error)) => {
         val exception = new RuntimeException(
@@ -35,7 +36,7 @@ class ProgressTracker @Inject()(
     }
   }
 
-  def initialise(progress: Progress) = {
+  def initialise(progress: Progress): Future[Progress] = {
     val progressTable = Table[Progress](dynamoConfig.table)
     debug(s"initializing archive progress tracker with $progress")
 
@@ -43,20 +44,22 @@ class ProgressTracker @Inject()(
       .given(not(attributeExists('id)))
       .put(progress)
 
-    Scanamo.exec(dynamoClient)(ops) match {
-      case Left(e: ConditionalCheckFailedException) =>
-        throw IdConstraintError(
-          s"There is already a progress tracker with id:${progress.id}",
-          e)
-      case Left(scanamoError) =>
-        val exception = new RuntimeException(
-          s"Failed to create progress ${scanamoError.toString}")
-        warn(s"Failed to update Dynamo record: ${progress.id}", exception)
-        throw exception
-      case Right(a) =>
-        debug(s"Successfully updated Dynamo record: ${progress.id} $a")
+    Future {
+      blocking(Scanamo.exec(dynamoClient)(ops)) match {
+        case Left(e: ConditionalCheckFailedException) =>
+          throw IdConstraintError(
+            s"There is already a progress tracker with id:${progress.id}",
+            e)
+        case Left(scanamoError) =>
+          val exception = new RuntimeException(
+            s"Failed to create progress ${scanamoError.toString}")
+          warn(s"Failed to update Dynamo record: ${progress.id}", exception)
+          throw exception
+        case Right(a) =>
+          debug(s"Successfully updated Dynamo record: ${progress.id} $a")
+      }
+      progress
     }
-    progress
   }
 
   def update(update: ProgressUpdate): Try[Progress] = {

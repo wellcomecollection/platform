@@ -89,6 +89,11 @@ resource "aws_iam_role_policy" "progress_http_task_archive_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
+resource "aws_iam_role_policy" "progress_http_sns" {
+  role   = "${module.progress_http.task_role_name}"
+  policy = "${module.ingest_requests_topic.publish_policy}"
+}
+
 # Notifier
 
 resource "aws_iam_role_policy" "notifier_task_sqs" {

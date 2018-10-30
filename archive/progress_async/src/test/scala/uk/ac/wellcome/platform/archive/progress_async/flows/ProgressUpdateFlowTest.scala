@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.progress
+package uk.ac.wellcome.platform.archive.progress_async.flows
 
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.FunSpec
@@ -35,24 +35,30 @@ class ProgressUpdateFlowTest
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
               val progress = createProgress()
-              monitor.initialise(progress)
+              whenReady(monitor.initialise(progress)) {
+                _ =>
+                  val update =
+                    ProgressEventUpdate(
+                      progress.id,
+                      List(ProgressEvent("Wow.")))
 
-              val update =
-                ProgressEventUpdate(progress.id, List(ProgressEvent("Wow.")))
+                  val updates = Source
+                    .single(update)
+                    .via(flow)
+                    .async
+                    .runWith(Sink.ignore)(materializer)
 
-              val updates = Source
-                .single(update)
-                .via(flow)
-                .async
-                .runWith(Sink.ignore)(materializer)
+                  whenReady(updates) { _ =>
+                    assertProgressCreated(
+                      progress.id,
+                      progress.uploadUri,
+                      table)
 
-              whenReady(updates) { _ =>
-                assertProgressCreated(progress.id, progress.uploadUri, table)
-
-                assertProgressRecordedRecentEvents(
-                  update.id,
-                  update.events.map(_.description),
-                  table)
+                    assertProgressRecordedRecentEvents(
+                      update.id,
+                      update.events.map(_.description),
+                      table)
+                  }
               }
             })
           })

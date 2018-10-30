@@ -19,4 +19,12 @@ object ConfigModule extends AbstractModule {
   @Provides
   def providesHttpServerConfig(appConfig: ProgressHttpConfig) =
     appConfig.httpServerConfig
+
+  @Provides
+  def providesSNSConfig(appConfig: ProgressHttpConfig) =
+    appConfig.snsConfig
+
+  @Provides
+  def providesSNSClientConfig(appConfig: ProgressHttpConfig) =
+    appConfig.snsClientConfig
 }
