@@ -4,6 +4,8 @@ import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.models.work.internal._
 
+import scala.util.Random
+
 class ApiV2FiltersTest extends ApiV2WorksTestBase {
 
   describe("listing works") {
@@ -129,6 +131,65 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
                                 |      "title": "${matchingWork2.title}",
                                 |      "workType": ${workType(
                                   matchingWork2.workType.get)}
+                                |    }
+                                |  ]
+                                |}
+          """.stripMargin
+            )
+          }
+      }
+    }
+
+    it("filters by item LocationType") {
+      withV2Api {
+        case (
+          apiPrefix,
+          _,
+          indexNameV2,
+          itemType,
+          server: EmbeddedHttpServer) =>
+          val noItemWorks = createIdentifiedWorks(count = 3)
+          val matchingWork1 = createIdentifiedWorkWith(
+            canonicalId = "001",
+            items = List(
+              createItemWithLocationType(LocationType("iiif-image"))
+            )
+          )
+          val matchingWork2 = createIdentifiedWorkWith(
+            canonicalId = "002",
+            items = List(
+              createItemWithLocationType(LocationType("digit")),
+              createItemWithLocationType(LocationType("dimgs"))
+            )
+          )
+          val wrongLocationTypeWork = createIdentifiedWorkWith(
+            items = List(
+              createItemWithLocationType(LocationType("dpoaa"))
+            )
+          )
+
+          val works = noItemWorks :+ matchingWork1 :+ matchingWork2 :+ wrongLocationTypeWork
+          insertIntoElasticsearch(indexNameV2, itemType, works: _*)
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works?items.locations.locationType=iiif-image,digit&include=items",
+              andExpect = Status.Ok,
+              withJsonBody = s"""
+                                |{
+                                |  ${resultList(apiPrefix, totalResults = 2)},
+                                |  "results": [
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork1.canonicalId}",
+                                |      "title": "${matchingWork1.title}",
+                                |      "items": [${items(matchingWork1.items)}]
+                                |    },
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork2.canonicalId}",
+                                |      "title": "${matchingWork2.title}",
+                                |      "items": [${items(matchingWork2.items)}]
                                 |    }
                                 |  ]
                                 |}
@@ -278,5 +339,79 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
           }
       }
     }
+
+    it("filters by item LocationType") {
+      withV2Api {
+        case (
+          apiPrefix,
+          _,
+          indexNameV2,
+          itemType,
+          server: EmbeddedHttpServer) =>
+          val noItemWorks = createIdentifiedWorks(count = 3)
+          val matchingWork1 = createIdentifiedWorkWith(
+            canonicalId = "001",
+            title = "Crumbling carrots",
+            items = List(
+              createItemWithLocationType(LocationType("iiif-image"))
+            )
+          )
+          val matchingWork2 = createIdentifiedWorkWith(
+            canonicalId = "002",
+            title = "Crumbling carrots",
+            items = List(
+              createItemWithLocationType(LocationType("digit")),
+              createItemWithLocationType(LocationType("dimgs"))
+            )
+          )
+          val wrongLocationTypeWork = createIdentifiedWorkWith(
+            items = List(
+              createItemWithLocationType(LocationType("dpoaa"))
+            )
+          )
+
+          val works = noItemWorks :+ matchingWork1 :+ matchingWork2 :+ wrongLocationTypeWork
+          insertIntoElasticsearch(indexNameV2, itemType, works: _*)
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works?query=carrots&items.locations.locationType=iiif-image,digit&include=items",
+              andExpect = Status.Ok,
+              withJsonBody = s"""
+                                |{
+                                |  ${resultList(apiPrefix, totalResults = 2)},
+                                |  "results": [
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork1.canonicalId}",
+                                |      "title": "${matchingWork1.title}",
+                                |      "items": [${items(matchingWork1.items)}]
+                                |    },
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork2.canonicalId}",
+                                |      "title": "${matchingWork2.title}",
+                                |      "items": [${items(matchingWork2.items)}]
+                                |    }
+                                |  ]
+                                |}
+          """.stripMargin
+            )
+          }
+      }
+    }
   }
+
+  private def createItemWithLocationType(locationType: LocationType): Identified[Item] =
+    createIdentifiedItemWith(
+      locations = List(
+
+        // This test really shouldn't be affected by physical/digital locations;
+        // we just pick randomly here to ensure we get a good mixture.
+        Random.shuffle(List(
+          createPhysicalLocationWith(locationType = locationType),
+          createDigitalLocationWith(locationType = locationType)
+        )).head
+      )
+    )
 }
