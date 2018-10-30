@@ -20,4 +20,6 @@ module "data_api" {
   es_config_snapshot = "${local.prod_es_config}"
 
   snapshot_generator_release_id = "${local.release_id}"
+
+  critical_slack_webhook = "${var.critical_slack_webhook}"
 }

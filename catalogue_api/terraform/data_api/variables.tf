@@ -29,3 +29,5 @@ variable "namespace" {
 }
 
 variable "snapshot_generator_release_id" {}
+
+variable "critical_slack_webhook" {}

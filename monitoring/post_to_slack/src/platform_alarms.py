@@ -223,14 +223,4 @@ def get_human_message(alarm_name, state_reason):
         else:
             return f"There were {error_count} errors in the {lambda_name} Lambda."
 
-    # The snapshot generator queue filling up suggests the snapshot
-    # generator isn't running correctly.  In that case, we can be helpful
-    # and tell the user when the last snapshot was taken.
-    if alarm_name == "snapshot_scheduler_queue_not_empty":
-        error_count = threshold.actual_value
-        if error_count == 1:
-            return "The snapshot generator queue has 1 unprocessed item."
-        else:
-            return f"The snapshot generator queue has {error_count} unprocessed items."
-
     return state_reason
