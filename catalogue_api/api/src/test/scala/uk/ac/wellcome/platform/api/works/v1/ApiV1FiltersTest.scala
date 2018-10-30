@@ -4,6 +4,8 @@ import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.models.work.internal._
 
+import scala.util.Random
+
 class ApiV1FiltersTest extends ApiV1WorksTestBase {
 
   describe("listing works") {
@@ -144,6 +146,96 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
                                 |      "title": "${matchingWork2.title}",
                                 |      "workType": ${workType(
                                   matchingWork2.workType.get)},
+                                |      "creators": [ ],
+                                |      "subjects": [ ],
+                                |      "genres": [ ],
+                                |      "publishers": [ ],
+                                |      "placesOfPublication": [ ]
+                                |    }
+                                |  ]
+                                |}
+          """.stripMargin
+            )
+          }
+      }
+    }
+
+    it("can filter by image locationType") {
+      withV1Api {
+        case (
+          apiPrefix,
+          indexNameV1,
+          _,
+          itemType,
+          server: EmbeddedHttpServer) =>
+          val noItemWorks = createIdentifiedWorks(count = 3)
+
+          val matchingWork1 = createIdentifiedWorkWith(
+            canonicalId = "001",
+            items = List(
+              createItemWithLocationType(LocationType("iiif-image"))
+            )
+          )
+
+          val matchingWork2 = createIdentifiedWorkWith(
+            canonicalId = "002",
+            items = List(
+              createItemWithLocationType(LocationType("digit"))
+            )
+          )
+
+          val works = noItemWorks :+ matchingWork1 :+ matchingWork2
+          insertIntoElasticsearch(indexNameV1, itemType, works: _*)
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works?items.locations.locationType=iiif-image&includes=items",
+              andExpect = Status.Ok,
+              withJsonBody = s"""
+                                |{
+                                |  ${resultList(apiPrefix)},
+                                |  "results": [
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork1.canonicalId}",
+                                |      "title": "${matchingWork1.title}",
+                                |      "items": ${items(matchingWork1.items)}
+                                |      "creators": [ ],
+                                |      "subjects": [ ],
+                                |      "genres": [ ],
+                                |      "publishers": [ ],
+                                |      "placesOfPublication": [ ]
+                                |    }
+                                |  ]
+                                |}
+          """.stripMargin
+            )
+          }
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works?items.locations.locationType=iiif-image,digit&includes=items",
+              andExpect = Status.Ok,
+              withJsonBody = s"""
+                                |{
+                                |  ${resultList(apiPrefix)},
+                                |  "results": [
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork1.canonicalId}",
+                                |      "title": "${matchingWork1.title}",
+                                |      "items": ${items(matchingWork1.items)}
+                                |      "creators": [ ],
+                                |      "subjects": [ ],
+                                |      "genres": [ ],
+                                |      "publishers": [ ],
+                                |      "placesOfPublication": [ ]
+                                |    },
+                                |    {
+                                |      "type": "Work",
+                                |      "id": "${matchingWork2.canonicalId}",
+                                |      "title": "${matchingWork2.title}",
+                                |      "items": ${items(matchingWork2.items)}
                                 |      "creators": [ ],
                                 |      "subjects": [ ],
                                 |      "genres": [ ],
@@ -319,4 +411,17 @@ class ApiV1FiltersTest extends ApiV1WorksTestBase {
       }
     }
   }
+
+  private def createItemWithLocationType(locationType: LocationType): Identified[Item] =
+    createIdentifiedItemWith(
+      locations = List(
+
+        // This test really shouldn't be affected by physical/digital locations;
+        // we just pick randomly here to ensure we get a good mixture.
+        Random.shuffle(List(
+          createPhysicalLocationWith(locationType = locationType),
+          createDigitalLocationWith(locationType = locationType)
+        )).head
+      )
+    )
 }
