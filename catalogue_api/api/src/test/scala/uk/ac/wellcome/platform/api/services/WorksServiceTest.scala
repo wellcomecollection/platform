@@ -173,7 +173,8 @@ class WorksServiceTest
       )
 
       assertSearchResultIsCorrect(
-        query = "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"
+        query =
+          "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"
       )(
         allWorks = List(workEmu),
         expectedWorks = List(workEmu),
@@ -259,7 +260,9 @@ class WorksServiceTest
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertResultIsCorrect(
-    partialSearchFunction: (WorksService) => ((ElasticsearchDocumentOptions, WorksSearchOptions) => Future[ResultList])
+    partialSearchFunction: (WorksService) => (
+      (ElasticsearchDocumentOptions,
+       WorksSearchOptions) => Future[ResultList])
   )(
     allWorks: Seq[IdentifiedBaseWork],
     expectedWorks: Seq[IdentifiedBaseWork],
@@ -275,7 +278,9 @@ class WorksServiceTest
             indexName = indexName
           )
 
-          val future = partialSearchFunction(worksService)(documentOptions, worksSearchOptions)
+          val future = partialSearchFunction(worksService)(
+            documentOptions,
+            worksSearchOptions)
 
           whenReady(future) { works =>
             works.results should contain theSameElementsAs expectedWorks
