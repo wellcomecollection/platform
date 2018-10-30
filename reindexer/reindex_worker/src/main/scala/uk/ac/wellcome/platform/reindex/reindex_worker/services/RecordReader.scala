@@ -36,7 +36,7 @@ class RecordReader @Inject()(
         )
 
       recordsToReindex = reindexJob.maxRecordsPerSegment match {
-        case None => results.map(extractRecord)
+        case None                       => results.map(extractRecord)
         case Some(maxRecordsPerSegment) =>
           // maxRecordsPerSegment is used to test reindexing or reporting prior to running all records.
           results.take(maxRecordsPerSegment).map(extractRecord)
