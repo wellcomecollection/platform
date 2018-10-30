@@ -172,6 +172,7 @@ module "progress_http" {
 
   env_vars = {
     app_base_url                = "https://api.wellcomecollection.org"
+    topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
 
