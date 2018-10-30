@@ -1,7 +1,6 @@
 package uk.ac.wellcome.models.transformable
 
 import io.circe.{KeyDecoder, KeyEncoder}
-import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibNumber,
   SierraBibRecord,
@@ -9,7 +8,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 
-sealed trait Transformable extends Sourced
+sealed trait Transformable
 
 case class MiroTransformable(sourceId: String,
                              MiroCollection: String,
