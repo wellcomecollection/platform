@@ -53,10 +53,9 @@ class MatcherFeatureTest
 
                       identifiersList shouldBe
                         MatcherResult(
-                          Set(
-                            MatchedIdentifiers(
-                              Set(WorkIdentifier(work))
-                            )))
+                          Set(MatchedIdentifiers(
+                            Set(WorkIdentifier(work))
+                          )))
                     }
                   }
                 }

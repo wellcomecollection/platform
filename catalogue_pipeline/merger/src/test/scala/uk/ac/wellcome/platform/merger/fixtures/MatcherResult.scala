@@ -22,5 +22,7 @@ trait MatcherResultFixture {
   def worksToWorkIdentifiers(
     works: Set[TransformedBaseWork]): Set[WorkIdentifier] =
     works
-      .map { work => WorkIdentifier(work) }
+      .map { work =>
+        WorkIdentifier(work)
+      }
 }
