@@ -24,65 +24,30 @@ class WorksServiceTest
 
   describe("listWorks") {
     it("gets records in Elasticsearch") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val works = createIdentifiedWorks(count = 2)
+      val works = createIdentifiedWorks(count = 2)
 
-            insertIntoElasticsearch(indexName, itemType, works: _*)
-
-            val future = worksService.listWorks(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptions
-            )
-
-            whenReady(future) { resultList =>
-              resultList.results should contain theSameElementsAs works
-            }
-          }
-        }
-      }
+      assertListResultIsCorrect(
+        allWorks = works,
+        expectedWorks = works,
+        expectedTotalResults = 2
+      )
     }
 
     it("returns 0 pages when no results are available") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val future = worksService.listWorks(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptions
-            )
-
-            whenReady(future) { works =>
-              works.totalResults shouldBe 0
-            }
-          }
-        }
-      }
+      assertListResultIsCorrect(
+        allWorks = Seq(),
+        expectedWorks = Seq(),
+        expectedTotalResults = 0
+      )
     }
 
     it("returns an empty result set when asked for a page that does not exist") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val works = createIdentifiedWorks(count = 3)
-
-            insertIntoElasticsearch(indexName, itemType, works: _*)
-
-            val future = worksService.listWorks(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptionsWith(pageNumber = 4)
-            )
-
-            whenReady(future) { receivedWorks =>
-              receivedWorks.results shouldBe empty
-            }
-          }
-        }
-      }
+      assertListResultIsCorrect(
+        allWorks = createIdentifiedWorks(count = 3),
+        expectedWorks = Seq(),
+        expectedTotalResults = 3,
+        worksSearchOptions = createWorksSearchOptionsWith(pageNumber = 4)
+      )
     }
 
     it("filters records by workType") {
@@ -96,32 +61,14 @@ class WorksServiceTest
         workType = Some(WorkType(id = "m", label = "Manuscripts"))
       )
 
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            insertIntoElasticsearch(
-              indexName,
-              itemType,
-              work1,
-              work2,
-              workWithWrongWorkType)
-
-            val future = worksService.listWorks(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptionsWith(
-                filters = List(WorkTypeFilter("b"))
-              )
-            )
-
-            whenReady(future) { resultList =>
-              resultList.results should contain theSameElementsAs List(
-                work1,
-                work2)
-            }
-          }
-        }
-      }
+      assertListResultIsCorrect(
+        allWorks = Seq(work1, work2, workWithWrongWorkType),
+        expectedWorks = Seq(work1, work2),
+        expectedTotalResults = 2,
+        worksSearchOptions = createWorksSearchOptionsWith(
+          filters = List(WorkTypeFilter("b"))
+        )
+      )
     }
 
     it("filters records by multiple workTypes") {
@@ -138,34 +85,14 @@ class WorksServiceTest
         workType = Some(WorkType(id = "m", label = "Manuscripts"))
       )
 
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            insertIntoElasticsearch(
-              indexName,
-              itemType,
-              work1,
-              work2,
-              work3,
-              workWithWrongWorkType)
-
-            val future = worksService.listWorks(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptionsWith(
-                filters = List(WorkTypeFilter(List("b", "a")))
-              )
-            )
-
-            whenReady(future) { resultList =>
-              resultList.results should contain theSameElementsAs List(
-                work1,
-                work2,
-                work3)
-            }
-          }
-        }
-      }
+      assertListResultIsCorrect(
+        allWorks = Seq(work1, work2, work3, workWithWrongWorkType),
+        expectedWorks = Seq(work1, work2, work3),
+        expectedTotalResults = 3,
+        worksSearchOptions = createWorksSearchOptionsWith(
+          filters = List(WorkTypeFilter(List("b", "a")))
+        )
+      )
     }
   }
 
@@ -299,9 +226,37 @@ class WorksServiceTest
     }
   }
 
+  private def assertListResultIsCorrect(
+    allWorks: Seq[IdentifiedBaseWork],
+    expectedWorks: Seq[IdentifiedBaseWork],
+    expectedTotalResults: Int,
+    worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
+  ) =
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withElasticsearchService { searchService =>
+        withWorksService(searchService) { worksService =>
+          insertIntoElasticsearch(indexName, itemType, allWorks: _*)
+
+          val documentOptions = createElasticsearchDocumentOptionsWith(
+            indexName = indexName
+          )
+
+          val future = worksService.listWorks(
+            documentOptions = documentOptions,
+            worksSearchOptions = worksSearchOptions
+          )
+
+          whenReady(future) { works =>
+            works.results should contain theSameElementsAs expectedWorks
+            works.totalResults shouldBe expectedTotalResults
+          }
+        }
+      }
+    }
+
   private def assertSearchResultIsCorrect(
-    allWorks: List[IdentifiedBaseWork],
-    expectedWorks: List[IdentifiedBaseWork],
+    allWorks: Seq[IdentifiedBaseWork],
+    expectedWorks: Seq[IdentifiedBaseWork],
     query: String,
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
   ) =
