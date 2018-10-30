@@ -9,7 +9,8 @@ import com.google.inject.Guice
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
@@ -32,6 +33,7 @@ trait ProgressHttpFixture
     with ScalaFutures
     with ProgressTrackerFixture
     with ProgressGenerators
+      with SNS
     with Messaging {
 
 //  import Progress._
@@ -80,7 +82,7 @@ trait ProgressHttpFixture
   }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(Table, String, AkkaHttpApp), R]) = {
+    testWith: TestWith[(Table, Topic, String, AkkaHttpApp), R]) = {
 
     val host = "localhost"
     val port = randomPort
@@ -88,10 +90,12 @@ trait ProgressHttpFixture
 
     val serverConfig = HttpServerConfig(host, port, baseUrl)
 
+    withLocalSnsTopic { topic =>
     withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
       withApp(table, serverConfig) { progressHttp =>
-        testWith((table, baseUrl, progressHttp))
+        testWith((table, topic, baseUrl, progressHttp))
       }
+    }
     }
   }
 

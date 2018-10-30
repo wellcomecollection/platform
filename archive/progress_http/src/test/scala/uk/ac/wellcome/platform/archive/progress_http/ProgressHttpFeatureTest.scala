@@ -10,15 +10,11 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
+import uk.ac.wellcome.platform.archive.common.models.{DisplayIngest, IngestBagRequest, StorageSpace}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Callback,
-  Namespace,
-  Progress,
-  ProgressCreateRequest
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress, ProgressCreateRequest}
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
+import uk.ac.wellcome.storage.ObjectLocation
 
 class ProgressHttpFeatureTest
     extends FunSpec
@@ -39,7 +35,7 @@ class ProgressHttpFeatureTest
   describe("GET /progress/:id") {
     it("returns a progress tracker when available") {
       withConfiguredApp {
-        case (table, baseUrl, app) =>
+        case (table, _, baseUrl, app) =>
           app.run()
           withActorSystem { actorSystem =>
             implicit val system = actorSystem
@@ -64,7 +60,7 @@ class ProgressHttpFeatureTest
 
     it("returns a 404 NotFound if no progress tracker matches id") {
       withConfiguredApp {
-        case (_, baseUrl, app) =>
+        case (_, _, baseUrl, app) =>
           app.run()
 
           withActorSystem { actorSystem =>
@@ -87,7 +83,7 @@ class ProgressHttpFeatureTest
   describe("POST /progress") {
     it("creates a progress tracker") {
       withConfiguredApp {
-        case (table, baseUrl, app) =>
+        case (table, topic, baseUrl, app) =>
           app.run()
 
           withActorSystem { actorSystem =>
@@ -151,6 +147,10 @@ class ProgressHttpFeatureTest
 
                   actualProgress shouldBe expectedProgress
                   assertTableOnlyHasItem(expectedProgress, table)
+
+                  val requests = listMessagesReceivedFromSNS(topic).map(messageInfo => fromJson[IngestBagRequest](messageInfo.message))
+
+                  requests shouldBe List(IngestBagRequest(id, storageSpace = StorageSpace(space.underlying), archiveCompleteCallbackUrl = Some(testCallbackUri), zippedBagLocation = ObjectLocation("ingest-bucket","bag.zip")))
                 }
               }
             }
