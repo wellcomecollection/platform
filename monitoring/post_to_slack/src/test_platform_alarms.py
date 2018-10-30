@@ -184,16 +184,6 @@ def test_simplify_message(message, expected):
             "There were 4 errors in the post_to_slack Lambda.",
         ),
         (
-            "snapshot_scheduler_queue_not_empty",
-            "Threshold Crossed: 1 datapoint [1.0 (23/09/18 11:30:00)] was greater than the threshold (0.0).",
-            "The snapshot generator queue has 1 unprocessed item.",
-        ),
-        (
-            "snapshot_scheduler_queue_not_empty",
-            "Threshold Crossed: 1 datapoint [4.0 (23/09/18 11:30:00)] was greater than the threshold (2.0).",
-            "The snapshot generator queue has 4 unprocessed items.",
-        ),
-        (
             "unrecognised-alarm-name",
             "Threshold Crossed: 1 datapoint [1.0 (01/01/01 12:00:00)] was less than the threshold (0.0).",
             "Threshold Crossed: 1 datapoint [1.0 (01/01/01 12:00:00)] was less than the threshold (0.0).",

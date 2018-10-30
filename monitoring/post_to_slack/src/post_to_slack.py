@@ -24,7 +24,6 @@ from platform_alarms import (
     is_critical_error,
     simplify_message,
 )
-from snapshot_reports import get_snapshot_report
 
 
 @attr.s
@@ -168,13 +167,6 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
             ],
         }
     ]
-
-    if alarm.name == "snapshot_scheduler_queue_not_empty":
-        latest_snapshots_str = get_snapshot_report()
-        if latest_snapshots_str is not None:
-            slack_data["attachments"][0]["fields"].append(
-                {"title": "Latest snapshots", "value": latest_snapshots_str}
-            )
 
     messages = alarm.cloudwatch_messages()
     if messages:

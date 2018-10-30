@@ -19,11 +19,3 @@ module "ecs_ec2_instance_tagger" {
 
   infra_bucket = "${var.infra_bucket}"
 }
-
-module "run_ecs_task" {
-  source = "run_ecs_task"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-
-  infra_bucket = "${var.infra_bucket}"
-}

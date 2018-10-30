@@ -69,9 +69,8 @@ def does_file_affect_build_task(path, task):
     if task.endswith("-publish") and (
         # Scala test files
         "src/test/scala/uk/ac/wellcome" in path
-        or
         # Python test files
-        path.endswith(("conftest.py", ".coveragerc"))
+        or path.endswith(("conftest.py", ".coveragerc"))
     ):
         raise ChangesToTestsDontGetPublished()
 

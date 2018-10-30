@@ -95,7 +95,7 @@ module "registrar_http" {
 
   env_vars_length = 3
 
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
 
   cluster_id = "${aws_ecs_cluster.cluster.id}"
@@ -177,7 +177,7 @@ module "progress_http" {
 
   env_vars_length = 2
 
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
 
   cluster_id = "${aws_ecs_cluster.cluster.id}"

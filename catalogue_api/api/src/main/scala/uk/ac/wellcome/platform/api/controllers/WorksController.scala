@@ -8,27 +8,27 @@ import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.{
-  ApiConfig,
-  DisplayError,
-  DisplayResultList,
-  Error
-}
+import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.platform.api.requests._
 import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
   ResultResponse
 }
-import uk.ac.wellcome.platform.api.services.WorksService
+import uk.ac.wellcome.platform.api.services.{
+  ElasticsearchDocumentOptions,
+  WorksSearchOptions,
+  WorksService
+}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.runtime.universe.TypeTag
 
 abstract class WorksController[M <: MultipleResultsRequest[W],
                                S <: SingleWorkRequest[W],
                                W <: WorksIncludes](
   apiConfig: ApiConfig,
+  documentType: String,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
@@ -52,7 +52,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     toDisplayWork: (IdentifiedWork, W) => T)(
     implicit evidence: TypeTag[DisplayResultList[T]],
     manifest: Manifest[M]): Unit = {
-    getWithDoc(s"$endpointSuffix") { doc =>
+    getWithDoc(endpointSuffix) { doc =>
       setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
     } { request: M =>
       val pageSize = request.pageSize.getOrElse(apiConfig.defaultPageSize)
@@ -80,18 +80,21 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     endpointSuffix: String,
     toDisplayWork: (IdentifiedWork, W) => T)(implicit evidence: TypeTag[T],
                                              manifest: Manifest[S]): Unit = {
-    getWithDoc(s"$endpointSuffix") { doc =>
+    getWithDoc(endpointSuffix) { doc =>
       setUpSingleWorkSwaggerDocs[T](swagger, doc)
     } { request: S =>
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
+      val documentOptions = ElasticsearchDocumentOptions(
+        indexName = request._index.getOrElse(indexName),
+        documentType = documentType
+      )
+
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
       for {
-        maybeWork <- worksService.findWorkById(
-          canonicalId = request.id,
-          indexName = request._index
-            .getOrElse(indexName))
+        maybeWork <- worksService.findWorkById(canonicalId = request.id)(
+          documentOptions)
       } yield
         generateSingleWorkResponse(
           maybeWork,
@@ -102,25 +105,42 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     }
   }
 
-  private def getWorkList(request: M, pageSize: Int) = {
-    val works = request.query match {
-      case Some(queryString) =>
-        worksService.searchWorks(
-          queryString,
-          pageSize = pageSize,
-          pageNumber = request.page,
-          indexName = request._index
-            .getOrElse(indexName)
-        )
-      case None =>
-        worksService.listWorks(
-          pageSize = pageSize,
-          pageNumber = request.page,
-          indexName = request._index
-            .getOrElse(indexName)
-        )
-    }
-    works
+  /** Given a request object, return a list of WorkFilter instances that should
+    * be applied to the corresponding Elasticsearch request.
+    */
+  private def buildFilters(request: M): List[WorkFilter] = {
+    val maybeWorkTypeFilter: Option[WorkTypeFilter] =
+      request.workType
+        .map { arg =>
+          arg.split(",").map { _.trim }
+        }
+        .map { workTypeIds: Array[String] =>
+          WorkTypeFilter(workTypeIds)
+        }
+
+    List(maybeWorkTypeFilter).flatten
+  }
+
+  private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
+    val documentOptions = ElasticsearchDocumentOptions(
+      indexName = request._index.getOrElse(indexName),
+      documentType = documentType
+    )
+
+    val worksSearchOptions = WorksSearchOptions(
+      filters = buildFilters(request),
+      pageSize = pageSize,
+      pageNumber = request.page
+    )
+
+    def searchFunction: (ElasticsearchDocumentOptions,
+                         WorksSearchOptions) => Future[ResultList] =
+      request.query match {
+        case Some(queryString) => worksService.searchWorks(queryString)
+        case None              => worksService.listWorks
+      }
+
+    searchFunction(documentOptions, worksSearchOptions)
   }
 
   private def generateSingleWorkResponse[T <: DisplayWork](
@@ -225,6 +245,11 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
         |- ~N after a phrase signifies slop amount
         |
         |To search for any of these special characters, they should be escaped with \.""".stripMargin,
+        required = false
+      )
+      .queryParam[String](
+        "workType",
+        "Filter by the workType of the searched works",
         required = false
       )
       .parameter(includeSwaggerParam)

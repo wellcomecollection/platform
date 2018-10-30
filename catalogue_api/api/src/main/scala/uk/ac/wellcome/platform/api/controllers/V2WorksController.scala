@@ -24,6 +24,7 @@ class V2WorksController @Inject()(
       V2WorksIncludes](
       apiConfig = apiConfig,
       indexName = elasticConfig.indexV2name,
+      documentType = elasticConfig.documentType,
       worksService = worksService
     ) {
   implicit protected val swagger = ApiV2Swagger

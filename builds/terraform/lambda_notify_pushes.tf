@@ -1,24 +1,30 @@
+module "ecr_pushes_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "ecr_pushes"
+}
+
+module "lambda_pushes_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "lambda_pushes"
+}
+
 module "lambda_notify_pushes" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
   s3_bucket = "${var.infra_bucket}"
-  s3_key    = "lambdas/monitoring/deployment_tracking/notify_pushes.zip"
+  s3_key    = "lambdas/builds/notify_pushes.zip"
 
   name        = "notify_pushes"
   description = "Post notifications of ECR/Lambda pushes to Slack"
   timeout     = 10
 
   environment_variables = {
-    SLACK_WEBHOOK = "${var.slack_webhook}"
+    SLACK_WEBHOOK = "${var.non_critical_slack_webhook}"
   }
 
-  alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 
   log_retention_in_days = 30
-}
-
-data "aws_sns_topic" "ecr_trigger_topic" {
-  name = "${var.ecr_pushes_topic_name}"
 }
 
 module "trigger_ecr_pushes" {
@@ -26,11 +32,7 @@ module "trigger_ecr_pushes" {
 
   lambda_function_name = "${module.lambda_notify_pushes.function_name}"
   lambda_function_arn  = "${module.lambda_notify_pushes.arn}"
-  sns_trigger_arn      = "${data.aws_sns_topic.ecr_trigger_topic.arn}"
-}
-
-data "aws_sns_topic" "lambda_trigger_topic" {
-  name = "${var.lambda_pushes_topic_name}"
+  sns_trigger_arn      = "${module.ecr_pushes_topic.arn}"
 }
 
 module "trigger_lambda_pushes" {
@@ -38,5 +40,5 @@ module "trigger_lambda_pushes" {
 
   lambda_function_name = "${module.lambda_notify_pushes.function_name}"
   lambda_function_arn  = "${module.lambda_notify_pushes.arn}"
-  sns_trigger_arn      = "${data.aws_sns_topic.lambda_trigger_topic.arn}"
+  sns_trigger_arn      = "${module.lambda_pushes_topic.arn}"
 }

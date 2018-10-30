@@ -18,6 +18,7 @@ trait MultipleResultsRequest[W <: WorksIncludes] extends ApiRequest {
   val pageSize: Option[Int]
   val include: Option[W]
   val query: Option[String]
+  val workType: Option[String]
   val _index: Option[String]
   val request: Request
 }
@@ -27,6 +28,7 @@ case class V1MultipleResultsRequest(
   @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
   @QueryParam includes: Option[V1WorksIncludes],
   @QueryParam query: Option[String],
+  @QueryParam workType: Option[String],
   @QueryParam _index: Option[String],
   request: Request
 ) extends MultipleResultsRequest[V1WorksIncludes] {
@@ -38,6 +40,7 @@ case class V2MultipleResultsRequest(
   @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
   @QueryParam include: Option[V2WorksIncludes],
   @QueryParam query: Option[String],
+  @QueryParam workType: Option[String],
   @QueryParam _index: Option[String],
   request: Request
 ) extends MultipleResultsRequest[V2WorksIncludes]
