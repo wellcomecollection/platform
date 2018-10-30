@@ -100,10 +100,11 @@ API base path: `https://api.wellcomecollection.org/storage/v1`
 
 All API endpoints must require authentication using OAuth 2.0. In the first instance, the only supported OAuth grant type will be client credentials.
 
-Clients must first request a time-limited token using a client ID and secret that we will provide:
+Clients must first request a time-limited token from the auth service, using a client ID and secret that we will provide:
 
 ```http
-POST /token
+POST /oauth2/token
+Host: auth.wellcomecollection.org
 
 grant_type=client_credentials
 &client_id=xxxxxxxxxx
@@ -112,7 +113,7 @@ grant_type=client_credentials
 
 This will return an access token:
 
-```http
+```
 Content-Type: application/json
 Cache-Control: no-store
 Pragma: no-cache
@@ -148,8 +149,19 @@ Content-Type: application/json
     "id": "space-id",
     "type": "Space"
   },
-  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
-  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567"
+  "sourceLocation": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-standard"
+    },
+    "bucket": "source-bucket",
+    "path": "/source-path/source-bag.zip"
+  },
+  "sourceCallback": {
+    "type": "Callback",
+    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567"
+  }
 }
 ```
 
@@ -181,21 +193,38 @@ Response:
     "id": "space-id",
     "type": "Space"
   },
-  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
-  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
   "bag": {
     "id": "{id}",
     "type": "Bag"
   },
-  "ingestStatus": {
+  "status": {
     "id": "processing|failure|success",
     "type": "Status"
   },
-  "callbackStatus": {
-    "id": "processing|failure|success",
-    "type": "Status"
+  "sourceLocation": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-standard"
+    },
+    "bucket": "source-bucket",
+    "path": "/source-path/source-bag.zip"
   },
-  "events": [ ... ]
+  "sourceCallback": {
+    "type": "Callback",
+    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+    "status": {
+      "id": "processing|failure|success",
+      "type": "Status"
+    }
+  },
+  "events": [
+    {
+      "type": "ProgressEvent",
+      "createdDate": "2018-10-10T10:00:00Z",
+      "description": "Description of event"
+    }
+  ]
 }
 ```
 
