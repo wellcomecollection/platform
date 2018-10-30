@@ -30,13 +30,12 @@ class Router @Inject()(monitor: ProgressTracker, progressStarter: ProgressStarte
               }
           }
         }
-      } ~ path(Segment) { id: String =>
+      } ~ path(JavaUUID) { id: UUID =>
         get {
-          // TODO add test for what happens if id is not a valid UUID
-          monitor.get(UUID.fromString(id)) match {
-            case scala.Some(progress) =>
+          onSuccess(monitor.get(id)){
+            case Some(progress) =>
               complete(DisplayIngest(progress))
-            case scala.None =>
+            case None =>
               complete(NotFound -> "Progress monitor not found!")
           }
         }

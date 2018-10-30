@@ -94,9 +94,10 @@ class ProgressTrackerTest
           whenReady(progressTracker.initialise(createProgress())) { progress=>
             assertTableOnlyHasItem[Progress](progress, table)
 
-            val result = progressTracker.get(progress.id)
-            result shouldBe a[Some[_]]
-            result.get shouldBe progress
+            whenReady(progressTracker.get(progress.id)) { result =>
+              result shouldBe a[Some[_]]
+              result.get shouldBe progress
+            }
           }
         }
       }
@@ -105,8 +106,9 @@ class ProgressTrackerTest
     it("returns None when no progress monitor matches id") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val result = progressTracker.get(randomUUID)
-          result shouldBe scala.None
+          whenReady(progressTracker.get(randomUUID)) { result =>
+            result shouldBe None
+          }
         }
       }
     }
@@ -123,11 +125,9 @@ class ProgressTrackerTest
           DynamoConfig(table.name, table.index)
         )
 
-        val result = Try(progressTracker.get(randomUUID))
-
-        val failedException = result.failed.get
-
-        failedException shouldBe expectedException
+        whenReady(progressTracker.get(randomUUID).failed) { failedException =>
+          failedException shouldBe expectedException
+        }
       }
     }
   }

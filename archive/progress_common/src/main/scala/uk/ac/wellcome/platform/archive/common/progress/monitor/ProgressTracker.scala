@@ -21,10 +21,10 @@ class ProgressTracker @Inject()(
 )(implicit ex: ExecutionContext) extends Logging {
   import Progress._
 
-  def get(id: UUID): Option[Progress] = {
-    Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
+  def get(id: UUID): Future[Option[Progress]] = Future {
+    blocking(Scanamo.get[Progress](dynamoClient)(dynamoConfig.table)(
       'id -> id
-    ) match {
+    )) match {
       case Some(Right(progress)) => Some(progress)
       case Some(Left(error)) => {
         val exception = new RuntimeException(
