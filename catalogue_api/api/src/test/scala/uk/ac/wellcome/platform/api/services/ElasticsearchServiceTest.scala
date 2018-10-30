@@ -70,7 +70,7 @@ class ElasticsearchServiceTest
           indexName = indexName,
           queryString = "artichokes",
           queryOptions = createElasticsearchQueryOptionsWith(
-            filters = List(WorkTypeFilter("b"))
+            filters = List(WorkTypeFilter(workTypeId = "b"))
           ),
           expectedWorks = List(workWithCorrectWorkType)
         )
@@ -275,7 +275,7 @@ class ElasticsearchServiceTest
           workWithWrongWorkType)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
-          filters = List(WorkTypeFilter("b"))
+          filters = List(WorkTypeFilter(workTypeId = "b"))
         )
 
         assertListResultsAreCorrect(
