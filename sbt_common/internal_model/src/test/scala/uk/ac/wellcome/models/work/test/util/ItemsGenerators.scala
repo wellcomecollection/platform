@@ -3,7 +3,7 @@ package uk.ac.wellcome.models.work.test.util
 import uk.ac.wellcome.models.work.internal.{DigitalLocation, _}
 
 trait ItemsGenerators extends IdentifiersGenerators {
-  def createIdentifiedItem(
+  def createIdentifiedItemWith(
     canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     locations: List[Location] = List(defaultLocation)
@@ -14,9 +14,11 @@ trait ItemsGenerators extends IdentifiersGenerators {
       agent = Item(locations = locations)
     )
 
+  def createIdentifiedItem: Identified[Item] = createIdentifiedItemWith()
+
   def createIdentifiedItems(count: Int): List[Identified[Item]] =
     (1 to count).map { _ =>
-      createIdentifiedItem()
+      createIdentifiedItem
     }.toList
 
   def createIdentifiableItemWith(

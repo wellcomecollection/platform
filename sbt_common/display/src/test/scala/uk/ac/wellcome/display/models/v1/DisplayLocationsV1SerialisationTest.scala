@@ -20,7 +20,7 @@ class DisplayLocationsV1SerialisationTest
 
     val work = createIdentifiedWorkWith(
       itemsV1 = List(
-        createIdentifiedItem(locations = List(physicalLocation))
+        createIdentifiedItemWith(locations = List(physicalLocation))
       )
     )
     val displayWork =
@@ -50,7 +50,7 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      itemsV1 = List(createIdentifiedItem(locations = List(digitalLocation)))
+      itemsV1 = List(createIdentifiedItemWith(locations = List(digitalLocation)))
     )
 
     val displayWork =
@@ -80,7 +80,7 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      itemsV1 = List(createIdentifiedItem(locations = List(digitalLocation)))
+      itemsV1 = List(createIdentifiedItemWith(locations = List(digitalLocation)))
     )
 
     val displayWork =
