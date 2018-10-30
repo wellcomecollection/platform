@@ -176,7 +176,7 @@ module "progress_http" {
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 3
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
