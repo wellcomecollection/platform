@@ -9,9 +9,18 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{DisplayIngest, IngestBagRequest, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.{
+  DisplayIngest,
+  IngestBagRequest,
+  StorageSpace
+}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress, ProgressCreateRequest}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Callback,
+  Namespace,
+  Progress,
+  ProgressCreateRequest
+}
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -37,20 +46,20 @@ class ProgressHttpFeatureTest
         case (table, _, baseUrl, app) =>
           app.run()
           withActorSystem { actorSystem =>
-          withMaterializer(actorSystem) { implicit materialiser =>
+            withMaterializer(actorSystem) { implicit materialiser =>
+              withProgressTracker(table) { progressTracker =>
+                val progress = createProgress()
+                progressTracker.initialise(progress)
+                val request =
+                  HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
 
-            withProgressTracker(table) { progressTracker =>
-              val progress = createProgress()
-              progressTracker.initialise(progress)
-              val request =
-                HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
+                whenRequestReady(request) { result =>
+                  result.status shouldBe StatusCodes.OK
+                  getT[DisplayIngest](result.entity) shouldBe DisplayIngest(
+                    progress)
 
-              whenRequestReady(request) { result =>
-                result.status shouldBe StatusCodes.OK
-                getT[DisplayIngest](result.entity) shouldBe DisplayIngest(progress)
-
+                }
               }
-            }
             }
           }
       }
@@ -146,9 +155,17 @@ class ProgressHttpFeatureTest
                   actualProgress shouldBe expectedProgress
                   assertTableOnlyHasItem(expectedProgress, table)
 
-                  val requests = listMessagesReceivedFromSNS(topic).map(messageInfo => fromJson[IngestBagRequest](messageInfo.message).get)
+                  val requests =
+                    listMessagesReceivedFromSNS(topic).map(messageInfo =>
+                      fromJson[IngestBagRequest](messageInfo.message).get)
 
-                  requests shouldBe List(IngestBagRequest(id, storageSpace = StorageSpace(space.underlying), archiveCompleteCallbackUrl = Some(testCallbackUri), zippedBagLocation = ObjectLocation("ingest-bucket","bag.zip")))
+                  requests shouldBe List(IngestBagRequest(
+                    id,
+                    storageSpace = StorageSpace(space.underlying),
+                    archiveCompleteCallbackUrl = Some(testCallbackUri),
+                    zippedBagLocation =
+                      ObjectLocation("ingest-bucket", "bag.zip")
+                  ))
                 }
               }
             }

@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.archive.progress_http
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.SNSWriter
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.{
+  IngestBagRequest,
+  StorageSpace
+}
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
@@ -10,14 +13,25 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProgressStarter @Inject() (progressTracker: ProgressTracker, snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
+class ProgressStarter @Inject()(
+  progressTracker: ProgressTracker,
+  snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
   def initialise(progress: Progress): Future[Progress] =
     for {
       progress <- progressTracker.initialise(progress)
-      _ <- snsWriter.writeMessage(toIngestRequest(progress), "progress-http-request-created")
+      _ <- snsWriter.writeMessage(
+        toIngestRequest(progress),
+        "progress-http-request-created")
     } yield progress
 
   private def toIngestRequest(progress: Progress) = {
-    IngestBagRequest(progress.id, ObjectLocation(progress.uploadUri.getHost, progress.uploadUri.getPath.substring(1)), progress.callback.map(_.uri), StorageSpace(progress.space.underlying))
+    IngestBagRequest(
+      progress.id,
+      ObjectLocation(
+        progress.uploadUri.getHost,
+        progress.uploadUri.getPath.substring(1)),
+      progress.callback.map(_.uri),
+      StorageSpace(progress.space.underlying)
+    )
   }
 }

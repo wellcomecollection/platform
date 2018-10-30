@@ -14,8 +14,16 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressStatusUpdate, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressStatusUpdate,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.modules._
@@ -33,7 +41,7 @@ trait ProgressHttpFixture
     with ScalaFutures
     with ProgressTrackerFixture
     with ProgressGenerators
-      with SNS
+    with SNS
     with Messaging {
 
 //  import Progress._
@@ -42,8 +50,7 @@ trait ProgressHttpFixture
     testWith: TestWith[Progress, R]) = {
     val createdProgress = createProgress
 
-    whenReady(monitor.initialise(createdProgress)) { storedProgress=>
-
+    whenReady(monitor.initialise(createdProgress)) { storedProgress =>
       testWith(storedProgress)
     }
   }
@@ -66,7 +73,7 @@ trait ProgressHttpFixture
     testWith(progress)
   }
 
-  def withApp[R](table: Table, topic: Topic,serverConfig: HttpServerConfig)(
+  def withApp[R](table: Table, topic: Topic, serverConfig: HttpServerConfig)(
     testWith: TestWith[AkkaHttpApp, R]) = {
 
     val progress = new AkkaHttpApp {
@@ -92,11 +99,11 @@ trait ProgressHttpFixture
     val serverConfig = HttpServerConfig(host, port, baseUrl)
 
     withLocalSnsTopic { topic =>
-    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
-      withApp(table, topic, serverConfig) { progressHttp =>
-        testWith((table, topic, baseUrl, progressHttp))
+      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+        withApp(table, topic, serverConfig) { progressHttp =>
+          testWith((table, topic, baseUrl, progressHttp))
+        }
       }
-    }
     }
   }
 
@@ -116,7 +123,6 @@ trait ProgressHttpFixture
 
   def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]) =
     withActorSystem { implicit actorSystem =>
-
       val request = Http().singleRequest(r)
       whenReady(request) { result =>
         testWith(result)
