@@ -9,5 +9,5 @@ module "load_balancer" {
   certificate_domain = "api.wellcomecollection.org"
 
   top_level_host = "developers.wellcomecollection.org"
-  top_level_path = "/developers"
+  top_level_path = "/"
 }
