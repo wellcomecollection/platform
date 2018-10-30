@@ -9,8 +9,9 @@ import uk.ac.wellcome.platform.api.fixtures.{
   WorksServiceFixture
 }
 import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
-import uk.ac.wellcome.platform.api.models.WorkTypeFilter
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.platform.api.models.{ResultList, WorkTypeFilter}
+
+import scala.concurrent.Future
 
 class WorksServiceTest
     extends FunSpec
@@ -150,15 +151,19 @@ class WorksServiceTest
       )
 
       assertSearchResultIsCorrect(
+        query = "cat"
+      )(
         allWorks = List(workDodo, workMouse),
         expectedWorks = List(),
-        query = "cat"
+        expectedTotalResults = 0
       )
 
       assertSearchResultIsCorrect(
+        query = "dodo"
+      )(
         allWorks = List(workDodo, workMouse),
         expectedWorks = List(workDodo),
-        query = "dodo"
+        expectedTotalResults = 1
       )
     }
 
@@ -168,9 +173,11 @@ class WorksServiceTest
       )
 
       assertSearchResultIsCorrect(
+        query = "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"
+      )(
         allWorks = List(workEmu),
         expectedWorks = List(workEmu),
-        query = "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"
+        expectedTotalResults = 1
       )
     }
 
@@ -189,9 +196,11 @@ class WorksServiceTest
       )
 
       assertSearchResultIsCorrect(
+        query = "artichokes"
+      )(
         allWorks = List(matchingWork, workWithWrongTitle, workWithWrongWorkType),
         expectedWorks = List(matchingWork),
-        query = "artichokes",
+        expectedTotalResults = 1,
         worksSearchOptions = createWorksSearchOptionsWith(
           filters = List(WorkTypeFilter("b"))
         )
@@ -217,9 +226,11 @@ class WorksServiceTest
       )
 
       assertSearchResultIsCorrect(
+        query = "artichokes"
+      )(
         allWorks = List(work1, workWithWrongTitle, work2, workWithWrongWorkType),
         expectedWorks = List(work1, work2),
-        query = "artichokes",
+        expectedTotalResults = 2,
         worksSearchOptions = createWorksSearchOptionsWith(
           filters = List(WorkTypeFilter(List("b", "m")))
         )
@@ -233,55 +244,43 @@ class WorksServiceTest
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
   ) =
-    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withWorksService { worksService =>
-        insertIntoElasticsearch(indexName, itemType, allWorks: _*)
+    assertResultIsCorrect(
+      (worksService: WorksService) => worksService.listWorks
+    )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
-        val documentOptions = createElasticsearchDocumentOptionsWith(
-          indexName = indexName
-        )
-
-        val future = worksService.listWorks(
-          documentOptions = documentOptions,
-          worksSearchOptions = worksSearchOptions
-        )
-
-        whenReady(future) { works =>
-          works.results should contain theSameElementsAs expectedWorks
-          works.totalResults shouldBe expectedTotalResults
-        }
-      }
-    }
-
-  private def assertSearchResultIsCorrect(
+  private def assertSearchResultIsCorrect(query: String)(
     allWorks: Seq[IdentifiedBaseWork],
     expectedWorks: Seq[IdentifiedBaseWork],
-    query: String,
+    expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
   ) =
+    assertResultIsCorrect(
+      (worksService: WorksService) => worksService.searchWorks(query = query)
+    )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
+
+  private def assertResultIsCorrect(
+    partialSearchFunction: (WorksService) => ((ElasticsearchDocumentOptions, WorksSearchOptions) => Future[ResultList])
+  )(
+    allWorks: Seq[IdentifiedBaseWork],
+    expectedWorks: Seq[IdentifiedBaseWork],
+    expectedTotalResults: Int,
+    worksSearchOptions: WorksSearchOptions
+  ) =
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withWorksService { worksService =>
-        insertIntoElasticsearch(indexName, itemType, allWorks: _*)
+      withElasticsearchService { searchService =>
+        withWorksService(searchService) { worksService =>
+          insertIntoElasticsearch(indexName, itemType, allWorks: _*)
 
-        val documentOptions = createElasticsearchDocumentOptionsWith(
-          indexName = indexName
-        )
+          val documentOptions = createElasticsearchDocumentOptionsWith(
+            indexName = indexName
+          )
 
-        val future = worksService.searchWorks(query = query)(
-          documentOptions = documentOptions,
-          worksSearchOptions = worksSearchOptions
-        )
+          val future = partialSearchFunction(worksService)(documentOptions, worksSearchOptions)
 
-        whenReady(future) { works =>
-          works.results should contain theSameElementsAs expectedWorks
+          whenReady(future) { works =>
+            works.results should contain theSameElementsAs expectedWorks
+          }
         }
-      }
-    }
-
-  def withWorksService[R](testWith: TestWith[WorksService, R]): R =
-    withElasticsearchService { searchService =>
-      withWorksService(searchService) { worksService =>
-        testWith(worksService)
       }
     }
 }
