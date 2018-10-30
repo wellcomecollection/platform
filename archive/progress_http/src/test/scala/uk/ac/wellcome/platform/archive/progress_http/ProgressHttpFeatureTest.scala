@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.progress_http
 
+import java.time.Instant
 import java.util.UUID
 
 import akka.http.scaladsl.Http
@@ -11,10 +12,7 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Namespace,
-  Progress,
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress}
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -88,13 +86,10 @@ class ProgressHttpFeatureTest
         case (table, topic, baseUrl, app) =>
           app.run()
 
-          withActorSystem { actorSystem =>
-            withMaterializer(actorSystem) { materializer =>
-              implicit val system = actorSystem
-              implicit val mat = materializer
+          withActorSystem { implicit actorSystem =>
+            withMaterializer(actorSystem) { implicit materializer =>
 
               val url = s"$baseUrl/progress"
-              val space = Namespace("space-id")
 
               val someCallback = Some(
                 DisplayCallback(uri = testCallbackUri.toString, status = None))
@@ -138,17 +133,27 @@ class ProgressHttpFeatureTest
                 val progressFuture = Unmarshal(result.entity).to[DisplayIngest]
 
                 whenReady(progressFuture) { actualProgress =>
-                  val expectedProgress = DisplayIngest(
-                    Some(id),
-                    uploadUrl = testUploadUri.toString,
-                    space = storageSpace,
-                    ingestType = displayIngestType,
-                    callback = Some(
-                      DisplayCallback(testCallbackUri.toString, Some("pending")))
-                  )
 
-                  actualProgress shouldBe expectedProgress
-                  assertTableOnlyHasItem(expectedProgress, table)
+                inside(actualProgress){ case DisplayIngest(
+                  Some(actualId),
+                  actualUploadUrl,
+                  Some(DisplayCallback(actualCallbackUrl, Some(actualCallbackStatus), "Callback")),
+                  DisplayIngestType("create", "IngestType"),
+                  DisplayStorageSpace(actualSpaceId, "Space"),
+                  Some(DisplayIngestStatus("initialised","IngestStatus")),
+                  Nil,
+                  Nil,
+                  Some(actualCreatedDate), Some(actualLastModifiedDate), "Ingest") =>
+
+                  actualId shouldBe id
+                  actualUploadUrl shouldBe testUploadUri.toString
+                  actualCallbackUrl shouldBe testCallbackUri.toString
+                  actualCallbackStatus shouldBe "pending"
+                  actualSpaceId shouldBe storageSpace.id
+
+
+                  assertTableOnlyHasItem(Progress(id, testUploadUri, Namespace(storageSpace.id), Some(Callback(testCallbackUri, Callback.Pending)), Progress.Initialised, Nil, Instant.parse(actualCreatedDate), Instant.parse(actualLastModifiedDate), Nil), table)
+                }
 
                   val requests =
                     listMessagesReceivedFromSNS(topic).map(messageInfo =>
@@ -156,7 +161,7 @@ class ProgressHttpFeatureTest
 
                   requests shouldBe List(IngestBagRequest(
                     id,
-                    storageSpace = StorageSpace(space.underlying),
+                    storageSpace = StorageSpace(storageSpace.id),
                     archiveCompleteCallbackUrl = Some(testCallbackUri),
                     zippedBagLocation =
                       ObjectLocation("ingest-bucket", "bag.zip")

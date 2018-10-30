@@ -10,7 +10,7 @@ import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
 case class Progress(id: UUID,
                     uploadUri: URI,
                     space: Namespace,
-                    callback: Option[Callback],
+                    callback: Option[Callback]= None,
                     status: Progress.Status = Progress.Initialised,
                     resources: Seq[Resource] = Seq.empty,
                     createdDate: Instant = Instant.now,
