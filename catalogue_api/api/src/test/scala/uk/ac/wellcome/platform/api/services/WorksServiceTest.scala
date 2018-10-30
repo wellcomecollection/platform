@@ -279,6 +279,7 @@ class WorksServiceTest
 
           whenReady(future) { works =>
             works.results should contain theSameElementsAs expectedWorks
+            works.totalResults shouldBe expectedTotalResults
           }
         }
       }
