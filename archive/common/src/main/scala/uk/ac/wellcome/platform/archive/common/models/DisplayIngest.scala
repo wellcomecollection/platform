@@ -1,28 +1,25 @@
 package uk.ac.wellcome.platform.archive.common.models
 
-import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Callback,
-  Progress,
-  ProgressEvent,
-  Resource
-}
+import java.util.UUID
 
-case class DisplayIngest(id: String,
+import io.circe.generic.extras.JsonKey
+import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Progress, ProgressEvent, Resource}
+
+case class DisplayIngest(id: Option[UUID],
                          uploadUrl: String,
                          callback: Option[DisplayCallback],
                          ingestType: DisplayIngestType,
                          space: DisplayStorageSpace,
-                         status: DisplayIngestStatus,
-                         resources: Seq[DisplayIngestResource],
+                         status: Option[DisplayIngestStatus]= None,
+                         resources: Seq[DisplayIngestResource] = Seq.empty,
                          events: Seq[DisplayProgressEvent] = Seq.empty,
-                         createdDate: String,
-                         lastModifiedDate: String,
+                         createdDate: Option[String] = None,
+                         lastModifiedDate: Option[String] = None,
                          @JsonKey("type")
                          ontologyType: String = "Ingest")
 
 case class DisplayCallback(uri: String,
-                           status: String,
+                           status: Option[String],
                            @JsonKey("type")
                            ontologyType: String = "Callback")
 
@@ -50,16 +47,16 @@ case class DisplayProgressEvent(description: String,
 case object DisplayIngest {
   def apply(progress: Progress): DisplayIngest = {
     DisplayIngest(
-      id = progress.id.toString,
+      id = Some(progress.id),
       uploadUrl = progress.uploadUri.toString,
       callback = progress.callback.map(DisplayCallback(_)),
       space = DisplayStorageSpace(progress.space.toString),
       ingestType = DisplayIngestType(),
       resources = progress.resources.map(DisplayIngestResource(_)),
-      status = DisplayIngestStatus(progress.status),
+      status = Some(DisplayIngestStatus(progress.status)),
       events = progress.events.map(DisplayProgressEvent(_)),
-      createdDate = progress.createdDate.toString,
-      lastModifiedDate = progress.lastModifiedDate.toString
+      createdDate = Some(progress.createdDate.toString),
+      lastModifiedDate = Some(progress.lastModifiedDate.toString)
     )
   }
 }
@@ -88,7 +85,7 @@ case object DisplayCallback {
   def apply(callback: Callback): DisplayCallback = {
     DisplayCallback(
       callback.uri.toString,
-      callback.status.toString
+      Some(callback.status.toString)
     )
   }
 }

@@ -6,20 +6,14 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  DisplayIngest,
-  IngestBagRequest,
-  StorageSpace
-}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Callback,
   Namespace,
   Progress,
-  ProgressCreateRequest
 }
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
 import uk.ac.wellcome.storage.ObjectLocation
@@ -32,6 +26,7 @@ class ProgressHttpFeatureTest
     with ProgressTrackerFixture
     with ProgressHttpFixture
     with RandomThings
+    with Inside
     with IntegrationPatience {
 
   import HttpMethods._
@@ -101,10 +96,16 @@ class ProgressHttpFeatureTest
               val url = s"$baseUrl/progress"
               val space = Namespace("space-id")
 
-              val createProgressRequest = ProgressCreateRequest(
-                testUploadUri,
-                Some(testCallbackUri),
-                space
+              val someCallback = Some(
+                DisplayCallback(uri = testCallbackUri.toString, status = None))
+              val storageSpace = DisplayStorageSpace(id = "somespace")
+              val displayIngestType = DisplayIngestType(id = "create")
+              val createProgressRequest = DisplayIngest(
+                id = None,
+                uploadUrl = testUploadUri.toString,
+                callback = someCallback,
+                space = storageSpace,
+                ingestType = displayIngestType
               )
 
               val entity = HttpEntity(
@@ -124,33 +125,27 @@ class ProgressHttpFeatureTest
               val expectedLocationR = s"$url/(.+)".r
 
               whenReady(request) { result: HttpResponse =>
-                // Successful request
+
                 result.status shouldBe StatusCodes.Created
 
-                debug(result)
-
-                // Collect first location header matching pattern
                 val maybeId = result.headers.collectFirst {
                   case HttpHeader("location", expectedLocationR(id)) => id
                 }
 
-                // We should have an id
                 maybeId.isEmpty shouldBe false
                 val id = UUID.fromString(maybeId.get)
 
-                // Check progress is returned
-                val progressFuture = Unmarshal(result.entity).to[Progress]
+                val progressFuture = Unmarshal(result.entity).to[DisplayIngest]
 
-                // Check the progress is stored
                 whenReady(progressFuture) { actualProgress =>
-                  val expectedProgress = Progress(
-                    id,
-                    testUploadUri,
-                    space,
-                    Some(Callback(testCallbackUri))
-                  ).copy(
-                    createdDate = actualProgress.createdDate,
-                    lastModifiedDate = actualProgress.lastModifiedDate)
+                  val expectedProgress = DisplayIngest(
+                    Some(id),
+                    uploadUrl = testUploadUri.toString,
+                    space = storageSpace,
+                    ingestType = displayIngestType,
+                    callback = Some(
+                      DisplayCallback(testCallbackUri.toString, Some("pending")))
+                  )
 
                   actualProgress shouldBe expectedProgress
                   assertTableOnlyHasItem(expectedProgress, table)

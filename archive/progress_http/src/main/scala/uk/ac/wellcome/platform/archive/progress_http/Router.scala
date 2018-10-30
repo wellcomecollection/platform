@@ -7,12 +7,8 @@ import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressCreateRequest
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.common.progress.models.ProgressCreateRequest._
 
 class Router @Inject()(monitor: ProgressTracker,
                        progressStarter: ProgressStarter,
@@ -28,11 +24,11 @@ class Router @Inject()(monitor: ProgressTracker,
 
     pathPrefix("progress") {
       post {
-        entity(as[ProgressCreateRequest]) { progressCreateRequest =>
+        entity(as[DisplayIngest]) { progressCreateRequest =>
           onSuccess(progressStarter.initialise(Progress(progressCreateRequest))) {
             progress =>
               respondWithHeaders(List(createLocationHeader(progress))) {
-                complete(Created -> progress)
+                complete(Created -> DisplayIngest(progress))
               }
           }
         }
