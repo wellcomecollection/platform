@@ -5,6 +5,7 @@ import java.util.UUID
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
+import io.circe.Printer
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -21,6 +22,7 @@ class Router @Inject()(monitor: ProgressTracker,
     import akka.http.scaladsl.server.Directives._
     import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
     import uk.ac.wellcome.json.JsonUtil._
+    implicit val printer = Printer.noSpaces.copy(dropNullValues = true)
 
     pathPrefix("progress") {
       post {

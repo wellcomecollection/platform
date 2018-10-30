@@ -6,6 +6,8 @@ import java.util.UUID
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.stream.scaladsl.Sink
+import io.circe.parser._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -42,15 +44,45 @@ class ProgressHttpFeatureTest
             withMaterializer(actorSystem) { implicit materialiser =>
               withProgressTracker(table) { progressTracker =>
                 val progress = createProgress()
-                progressTracker.initialise(progress)
-                val request =
-                  HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
+                whenReady(progressTracker.initialise(progress)) { _ =>
+                  val request =
+                    HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
 
-                whenRequestReady(request) { result =>
-                  result.status shouldBe StatusCodes.OK
-                  getT[DisplayIngest](result.entity) shouldBe DisplayIngest(
-                    progress)
+                  whenRequestReady(request) { result =>
+                    result.status shouldBe StatusCodes.OK
+                    getT[DisplayIngest](result.entity) shouldBe DisplayIngest(progress)
 
+                  }
+                }
+              }
+            }
+          }
+      }
+    }
+    it("does not output empty values") {
+      withConfiguredApp {
+        case (table, _, baseUrl, app) =>
+          app.run()
+          withActorSystem { actorSystem =>
+            withMaterializer(actorSystem) { implicit materialiser =>
+              withProgressTracker(table) { progressTracker =>
+                val progress = createProgressWith(callback = None)
+                whenReady(progressTracker.initialise(progress)) { _ =>
+                  val request =
+                    HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
+
+                  whenRequestReady(request) { result =>
+                    result.status shouldBe StatusCodes.OK
+                    val value = result.entity.dataBytes.runWith(Sink.fold("") {
+                      case (acc, byteString) =>
+                        acc + byteString.utf8String
+                    })
+                    whenReady(value) { jsonString =>
+                      val infoJson = parse(jsonString).right.get
+                      infoJson.findAllByKey("callback") shouldBe empty
+                    }
+
+                  }
                 }
               }
             }
