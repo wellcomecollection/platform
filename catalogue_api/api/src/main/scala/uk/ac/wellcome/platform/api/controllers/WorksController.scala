@@ -248,6 +248,11 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
         required = false
       )
       .queryParam[String](
+        "items.locations.locationType",
+        "Filter by the LocationType of items on the retrieved works",
+        required = false
+      )
+      .queryParam[String](
         "workType",
         "Filter by the workType of the searched works",
         required = false
