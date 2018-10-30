@@ -143,11 +143,11 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     it("filters by item LocationType") {
       withV2Api {
         case (
-          apiPrefix,
-          _,
-          indexNameV2,
-          itemType,
-          server: EmbeddedHttpServer) =>
+            apiPrefix,
+            _,
+            indexNameV2,
+            itemType,
+            server: EmbeddedHttpServer) =>
           val noItemWorks = createIdentifiedWorks(count = 3)
           val matchingWork1 = createIdentifiedWorkWith(
             canonicalId = "001",
@@ -173,7 +173,8 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
 
           eventually {
             server.httpGet(
-              path = s"/$apiPrefix/works?items.locations.locationType=iiif-image,digit&include=items",
+              path =
+                s"/$apiPrefix/works?items.locations.locationType=iiif-image,digit&include=items",
               andExpect = Status.Ok,
               withJsonBody = s"""
                                 |{
@@ -343,11 +344,11 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     it("filters by item LocationType") {
       withV2Api {
         case (
-          apiPrefix,
-          _,
-          indexNameV2,
-          itemType,
-          server: EmbeddedHttpServer) =>
+            apiPrefix,
+            _,
+            indexNameV2,
+            itemType,
+            server: EmbeddedHttpServer) =>
           val noItemWorks = createIdentifiedWorks(count = 3)
           val matchingWork1 = createIdentifiedWorkWith(
             canonicalId = "001",
@@ -375,7 +376,8 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
 
           eventually {
             server.httpGet(
-              path = s"/$apiPrefix/works?query=carrots&items.locations.locationType=iiif-image,digit&include=items",
+              path =
+                s"/$apiPrefix/works?query=carrots&items.locations.locationType=iiif-image,digit&include=items",
               andExpect = Status.Ok,
               withJsonBody = s"""
                                 |{
@@ -402,16 +404,19 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     }
   }
 
-  private def createItemWithLocationType(locationType: LocationType): Identified[Item] =
+  private def createItemWithLocationType(
+    locationType: LocationType): Identified[Item] =
     createIdentifiedItemWith(
       locations = List(
-
         // This test really shouldn't be affected by physical/digital locations;
         // we just pick randomly here to ensure we get a good mixture.
-        Random.shuffle(List(
-          createPhysicalLocationWith(locationType = locationType),
-          createDigitalLocationWith(locationType = locationType)
-        )).head
+        Random
+          .shuffle(
+            List(
+              createPhysicalLocationWith(locationType = locationType),
+              createDigitalLocationWith(locationType = locationType)
+            ))
+          .head
       )
     )
 }

@@ -217,10 +217,10 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     )
   }
 
-  def setupResultListSwaggerDocs[T <: DisplayWork](
-    endpointSuffix: String,
-    swagger: Swagger,
-    doc: Operation)(implicit evidence: TypeTag[DisplayResultList[T]]): Operation = {
+  def setupResultListSwaggerDocs[T <: DisplayWork](endpointSuffix: String,
+                                                   swagger: Swagger,
+                                                   doc: Operation)(
+    implicit evidence: TypeTag[DisplayResultList[T]]): Operation = {
     implicit val finatraSwagger = swagger
     doc
       .summary(endpointSuffix)

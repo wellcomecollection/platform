@@ -44,10 +44,12 @@ class V2WorksController @Inject()(
   override def setupResultListSwaggerDocs[T <: DisplayWork](
     endpointSuffix: String,
     swagger: Swagger,
-    doc: Operation)(implicit evidence: TypeTag[DisplayResultList[T]]): Operation = {
+    doc: Operation)(
+    implicit evidence: TypeTag[DisplayResultList[T]]): Operation = {
     implicit val finatraSwagger = swagger
 
-    super.setupResultListSwaggerDocs(endpointSuffix, swagger, doc)(evidence)
+    super
+      .setupResultListSwaggerDocs(endpointSuffix, swagger, doc)(evidence)
       .queryParam[String](
         "items.locations.locationType",
         "Filter by the LocationType of items on the retrieved works",

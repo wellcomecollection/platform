@@ -2,7 +2,8 @@ package uk.ac.wellcome.platform.api.models
 
 sealed trait WorkFilter
 
-case class ItemLocationTypeFilter(locationTypeIds: Seq[String]) extends WorkFilter
+case class ItemLocationTypeFilter(locationTypeIds: Seq[String])
+    extends WorkFilter
 
 case object ItemLocationTypeFilter {
   def apply(locationTypeId: String): ItemLocationTypeFilter =

@@ -9,7 +9,10 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
 import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
-import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.models.{
+  ItemLocationTypeFilter,
+  WorkTypeFilter
+}
 
 import scala.concurrent.Future
 import scala.util.Random
@@ -135,7 +138,8 @@ class ElasticsearchServiceTest
           indexName = indexName,
           queryString = "tangerines",
           queryOptions = createElasticsearchQueryOptionsWith(
-            filters = List(ItemLocationTypeFilter(locationTypeId = "iiif-image"))
+            filters =
+              List(ItemLocationTypeFilter(locationTypeId = "iiif-image"))
           ),
           expectedWorks = List(work)
         )
@@ -166,13 +170,20 @@ class ElasticsearchServiceTest
           )
         )
 
-        insertIntoElasticsearch(indexName, itemType, work, notMatchingWork, work2)
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          work,
+          notMatchingWork,
+          work2)
 
         assertSearchResultsAreCorrect(
           indexName = indexName,
           queryString = "tangerines",
           queryOptions = createElasticsearchQueryOptionsWith(
-            filters = List(ItemLocationTypeFilter(locationTypeIds = List("iiif-image", "digit")))
+            filters = List(
+              ItemLocationTypeFilter(
+                locationTypeIds = List("iiif-image", "digit")))
           ),
           expectedWorks = List(work, work2)
         )
@@ -386,16 +397,19 @@ class ElasticsearchServiceTest
     }
   }
 
-  private def createItemWithLocationType(locationType: LocationType): Identified[Item] =
+  private def createItemWithLocationType(
+    locationType: LocationType): Identified[Item] =
     createIdentifiedItemWith(
       locations = List(
-
         // This test really shouldn't be affected by physical/digital locations;
         // we just pick randomly here to ensure we get a good mixture.
-        Random.shuffle(List(
-          createPhysicalLocationWith(locationType = locationType),
-          createDigitalLocationWith(locationType = locationType)
-        )).head
+        Random
+          .shuffle(
+            List(
+              createPhysicalLocationWith(locationType = locationType),
+              createDigitalLocationWith(locationType = locationType)
+            ))
+          .head
       )
     )
 
