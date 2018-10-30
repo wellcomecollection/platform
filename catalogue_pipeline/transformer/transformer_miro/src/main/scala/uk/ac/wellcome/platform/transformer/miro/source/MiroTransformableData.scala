@@ -45,16 +45,24 @@ case object MiroTransformableData {
    *
    * We need to fix them up before we decode as JSON.
    */
-  private def unescapeHtml(data: String): String =
-    StringEscapeUtils.unescapeHtml(data)
+  private def unescapeHtml(s: String): String =
+    StringEscapeUtils.unescapeHtml(s)
 
   /* Create MiroTransformableData from string */
   private def createMiroTransformableData(
-    data: String): Try[MiroTransformableData] =
-    fromJson[MiroTransformableData](data)
+    s: String): Try[MiroTransformableData] =
+    fromJson[MiroTransformableData](s)
 
-  def create(data: String): MiroTransformableData = {
-    val unescapedData = unescapeHtml(data)
+  /* Adêle Mongrédien's name has been mangled as Unicode nonsense in the
+   * Miro exports.  This presents as ugly nonsense in the API, and it affects
+   * a fair number of works, to replace it properly.
+   */
+  private def fixAdeleUnicode(s: String): String =
+    s.replaceAll("Ad\\u00c3\\u00aale", "Adêle")
+      .replaceAll("Mongr\\u00c3\\u00a9dien", "Mongrédien")
+
+  def create(jsonString: String): MiroTransformableData = {
+    val unescapedData = fixAdeleUnicode(unescapeHtml(jsonString))
 
     val tryMiroTransformableData =
       createMiroTransformableData(unescapedData)
