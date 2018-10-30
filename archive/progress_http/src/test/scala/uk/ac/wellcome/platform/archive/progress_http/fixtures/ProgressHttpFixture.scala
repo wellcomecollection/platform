@@ -66,16 +66,17 @@ trait ProgressHttpFixture
     testWith(progress)
   }
 
-  def withApp[R](table: Table, serverConfig: HttpServerConfig)(
+  def withApp[R](table: Table, topic: Topic,serverConfig: HttpServerConfig)(
     testWith: TestWith[AkkaHttpApp, R]) = {
 
     val progress = new AkkaHttpApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(table, serverConfig),
+        new TestAppConfigModule(table, topic, serverConfig),
         ConfigModule,
         AkkaModule,
         CloudWatchClientModule,
-        ProgressTrackerModule
+        ProgressTrackerModule,
+        SNSClientModule
       )
     }
     testWith(progress)
@@ -92,7 +93,7 @@ trait ProgressHttpFixture
 
     withLocalSnsTopic { topic =>
     withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
-      withApp(table, serverConfig) { progressHttp =>
+      withApp(table, topic, serverConfig) { progressHttp =>
         testWith((table, topic, baseUrl, progressHttp))
       }
     }
@@ -114,8 +115,7 @@ trait ProgressHttpFixture
   }
 
   def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]) =
-    withActorSystem { actorSystem =>
-      implicit val system = actorSystem
+    withActorSystem { implicit actorSystem =>
 
       val request = Http().singleRequest(r)
       whenReady(request) { result =>

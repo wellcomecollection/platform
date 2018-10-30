@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, Progres
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.common.progress.models.ProgressCreateRequest._
 
-class Router @Inject()(monitor: ProgressTracker, config: HttpServerConfig) {
+class Router @Inject()(monitor: ProgressTracker, progressStarter: ProgressStarter, config: HttpServerConfig) {
 
   private def createLocationHeader(progress: Progress) =
     Location(s"${config.externalBaseUrl}/progress/${progress.id}")
@@ -24,7 +24,7 @@ class Router @Inject()(monitor: ProgressTracker, config: HttpServerConfig) {
     pathPrefix("progress") {
       post {
         entity(as[ProgressCreateRequest]) { progressCreateRequest =>
-          onSuccess(monitor.initialise(Progress(progressCreateRequest))) {progress =>
+          onSuccess(progressStarter.initialise(Progress(progressCreateRequest))) {progress =>
               respondWithHeaders(List(createLocationHeader(progress))) {
                 complete(Created -> progress)
               }

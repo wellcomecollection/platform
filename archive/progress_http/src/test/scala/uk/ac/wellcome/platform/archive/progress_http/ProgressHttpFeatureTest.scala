@@ -5,7 +5,6 @@ import java.util.UUID
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -38,8 +37,7 @@ class ProgressHttpFeatureTest
         case (table, _, baseUrl, app) =>
           app.run()
           withActorSystem { actorSystem =>
-            implicit val system = actorSystem
-            implicit val actorMaterializer = ActorMaterializer()
+          withMaterializer(actorSystem) { implicit materialiser =>
 
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress()
@@ -49,10 +47,10 @@ class ProgressHttpFeatureTest
 
               whenRequestReady(request) { result =>
                 result.status shouldBe StatusCodes.OK
-                getT[DisplayIngest](result.entity) shouldBe DisplayIngest(
-                  progress)
+                getT[DisplayIngest](result.entity) shouldBe DisplayIngest(progress)
 
               }
+            }
             }
           }
       }
@@ -148,7 +146,7 @@ class ProgressHttpFeatureTest
                   actualProgress shouldBe expectedProgress
                   assertTableOnlyHasItem(expectedProgress, table)
 
-                  val requests = listMessagesReceivedFromSNS(topic).map(messageInfo => fromJson[IngestBagRequest](messageInfo.message))
+                  val requests = listMessagesReceivedFromSNS(topic).map(messageInfo => fromJson[IngestBagRequest](messageInfo.message).get)
 
                   requests shouldBe List(IngestBagRequest(id, storageSpace = StorageSpace(space.underlying), archiveCompleteCallbackUrl = Some(testCallbackUri), zippedBagLocation = ObjectLocation("ingest-bucket","bag.zip")))
                 }
