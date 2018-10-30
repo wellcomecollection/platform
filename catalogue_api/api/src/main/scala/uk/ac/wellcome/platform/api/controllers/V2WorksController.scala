@@ -5,7 +5,7 @@ import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, V2WorksIncludes}
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
-import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayResultList}
+import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.platform.api.requests.{
   V2MultipleResultsRequest,
   V2SingleWorkRequest
@@ -39,6 +39,29 @@ class V2WorksController @Inject()(
   prefix(s"${apiConfig.pathPrefix}/${ApiVersions.v2.toString}") {
     setupResultListEndpoint(ApiVersions.v2, "/works", DisplayWorkV2.apply)
     setupSingleWorkEndpoint(ApiVersions.v2, "/works/:id", DisplayWorkV2.apply)
+  }
+
+  override def buildFilters(
+    request: V2MultipleResultsRequest): List[WorkFilter] = {
+    val maybeItemLocationTypeFilter: Option[ItemLocationTypeFilter] =
+      request.itemLocationType
+        .map { arg =>
+          arg.split(",").map { _.trim }
+        }
+        .map { locationTypeIds: Array[String] =>
+          ItemLocationTypeFilter(locationTypeIds)
+        }
+
+    val maybeWorkTypeFilter: Option[WorkTypeFilter] =
+      request.workType
+        .map { arg =>
+          arg.split(",").map { _.trim }
+        }
+        .map { workTypeIds: Array[String] =>
+          WorkTypeFilter(workTypeIds)
+        }
+
+    List(maybeItemLocationTypeFilter, maybeWorkTypeFilter).flatten
   }
 
   override def setupResultListSwaggerDocs[T <: DisplayWork](

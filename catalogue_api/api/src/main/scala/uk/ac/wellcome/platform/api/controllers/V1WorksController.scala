@@ -4,7 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes}
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
-import uk.ac.wellcome.platform.api.models.ApiConfig
+import uk.ac.wellcome.platform.api.models.{ApiConfig, WorkFilter}
 import uk.ac.wellcome.platform.api.requests.{
   V1MultipleResultsRequest,
   V1SingleWorkRequest
@@ -37,4 +37,8 @@ class V1WorksController @Inject()(
     setupSingleWorkEndpoint(ApiVersions.v1, "/works/:id", DisplayWorkV1.apply)
   }
   lazy override protected val includeParameterName: String = "includes"
+
+  /* There's no requirement for any filtering in the V1 API. */
+  override def buildFilters(
+    request: V1MultipleResultsRequest): List[WorkFilter] = List()
 }
