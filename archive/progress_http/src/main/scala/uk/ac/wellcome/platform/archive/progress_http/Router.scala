@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
 import io.circe.Printer
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
-import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
+import uk.ac.wellcome.platform.archive.common.models.{RequestDisplayIngest, ResponseDisplayIngest}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 
@@ -26,11 +26,11 @@ class Router @Inject()(monitor: ProgressTracker,
 
     pathPrefix("progress") {
       post {
-        entity(as[DisplayIngest]) { progressCreateRequest =>
+        entity(as[RequestDisplayIngest]) { progressCreateRequest =>
           onSuccess(progressStarter.initialise(Progress(progressCreateRequest))) {
             progress =>
               respondWithHeaders(List(createLocationHeader(progress))) {
-                complete(Created -> DisplayIngest(progress))
+                complete(Created -> ResponseDisplayIngest(progress))
               }
           }
         }
@@ -38,7 +38,7 @@ class Router @Inject()(monitor: ProgressTracker,
         get {
           onSuccess(monitor.get(id)) {
             case Some(progress) =>
-              complete(DisplayIngest(progress))
+              complete(ResponseDisplayIngest(progress))
             case None =>
               complete(NotFound -> "Progress monitor not found!")
           }

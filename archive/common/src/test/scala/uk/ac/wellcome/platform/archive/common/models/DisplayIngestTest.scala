@@ -33,7 +33,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
       List(ProgressEvent(eventDescription, Instant.parse(eventDate)))
     )
 
-    val ingest = DisplayIngest(progress)
+    val ingest = ResponseDisplayIngest(progress)
     println(toJson(ingest))
 
     ingest.id shouldBe id.toString

@@ -5,18 +5,27 @@ import java.util.UUID
 import io.circe.generic.extras.JsonKey
 import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Progress, ProgressEvent, Resource}
 
-case class DisplayIngest(id: Option[UUID],
+sealed trait DisplayIngest
+
+case class RequestDisplayIngest(uploadUrl: String,
+                         callback: Option[DisplayCallback],
+                         ingestType: DisplayIngestType,
+                         space: DisplayStorageSpace,
+                         @JsonKey("type")
+                         ontologyType: String = "Ingest") extends DisplayIngest
+
+case class ResponseDisplayIngest(id: UUID,
                          uploadUrl: String,
                          callback: Option[DisplayCallback],
                          ingestType: DisplayIngestType,
                          space: DisplayStorageSpace,
-                         status: Option[DisplayIngestStatus]= None,
+                         status: DisplayIngestStatus,
                          resources: Seq[DisplayIngestResource] = Seq.empty,
                          events: Seq[DisplayProgressEvent] = Seq.empty,
-                         createdDate: Option[String] = None,
-                         lastModifiedDate: Option[String] = None,
+                         createdDate: String,
+                         lastModifiedDate: String,
                          @JsonKey("type")
-                         ontologyType: String = "Ingest")
+                         ontologyType: String = "Ingest") extends DisplayIngest
 
 case class DisplayCallback(uri: String,
                            status: Option[String],
@@ -44,19 +53,19 @@ case class DisplayProgressEvent(description: String,
                                 @JsonKey("type")
                                 ontologyType: String = "ProgressEvent")
 
-case object DisplayIngest {
-  def apply(progress: Progress): DisplayIngest = {
-    DisplayIngest(
-      id = Some(progress.id),
+case object ResponseDisplayIngest {
+  def apply(progress: Progress): ResponseDisplayIngest = {
+    ResponseDisplayIngest(
+      id = progress.id,
       uploadUrl = progress.uploadUri.toString,
       callback = progress.callback.map(DisplayCallback(_)),
       space = DisplayStorageSpace(progress.space.toString),
       ingestType = DisplayIngestType(),
       resources = progress.resources.map(DisplayIngestResource(_)),
-      status = Some(DisplayIngestStatus(progress.status)),
+      status = DisplayIngestStatus(progress.status),
       events = progress.events.map(DisplayProgressEvent(_)),
-      createdDate = Some(progress.createdDate.toString),
-      lastModifiedDate = Some(progress.lastModifiedDate.toString)
+      createdDate = progress.createdDate.toString,
+      lastModifiedDate = progress.lastModifiedDate.toString
     )
   }
 }

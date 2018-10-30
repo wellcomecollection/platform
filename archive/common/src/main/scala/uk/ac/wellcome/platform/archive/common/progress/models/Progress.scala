@@ -5,7 +5,7 @@ import java.time.Instant
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
+import uk.ac.wellcome.platform.archive.common.models.RequestDisplayIngest
 
 case class Progress(id: UUID,
                     uploadUri: URI,
@@ -41,7 +41,7 @@ case object Progress extends URIConverters {
     override def toString: String = failedString
   }
 
-  def apply(createRequest: DisplayIngest): Progress = {
+  def apply(createRequest: RequestDisplayIngest): Progress = {
     Progress(
       id = generateId,
       uploadUri = URI.create(createRequest.uploadUrl),

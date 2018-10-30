@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.archive.progress_http.modules
 
 import com.google.inject.{AbstractModule, Provides}
-import uk.ac.wellcome.platform.archive.progress_http.models.ProgressHttpConfig
-
+import uk.ac.wellcome.platform.archive.progress_http.config.ProgressHttpConfig
 object ConfigModule extends AbstractModule {
   @Provides
   def providesCloudwatchClientConfig(appConfig: ProgressHttpConfig) =
