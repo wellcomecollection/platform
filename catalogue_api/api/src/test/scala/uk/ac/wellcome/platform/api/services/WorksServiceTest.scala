@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.WorkType
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, WorkType}
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.{
   ElasticsearchServiceFixture,
@@ -214,67 +214,36 @@ class WorksServiceTest
 
   describe("searchWorks") {
     it("only finds results that match a query if doing a full-text search") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val workDodo = createIdentifiedWorkWith(
-              title = "A drawing of a dodo"
-            )
-            val workMouse = createIdentifiedWorkWith(
-              title = "A mezzotint of a mouse"
-            )
+      val workDodo = createIdentifiedWorkWith(
+        title = "A drawing of a dodo"
+      )
+      val workMouse = createIdentifiedWorkWith(
+        title = "A mezzotint of a mouse"
+      )
 
-            insertIntoElasticsearch(indexName, itemType, workDodo, workMouse)
+      assertSearchResultIsCorrect(
+        allWorks = List(workDodo, workMouse),
+        expectedWorks = List(),
+        query = "cat"
+      )
 
-            val searchForCat = worksService.searchWorks(query = "cat")(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptions
-            )
-
-            whenReady(searchForCat) { works =>
-              works.results should have size 0
-            }
-
-            val searchForDodo = worksService.searchWorks(query = "dodo")(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptions
-            )
-
-            whenReady(searchForDodo) { works =>
-              works.results should have size 1
-              works.results.head shouldBe workDodo
-            }
-          }
-        }
-      }
+      assertSearchResultIsCorrect(
+        allWorks = List(workDodo, workMouse),
+        expectedWorks = List(workDodo),
+        query = "dodo"
+      )
     }
 
-    it(
-      "doesn't throw an exception if passed an invalid query string for full-text search") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val workEmu = createIdentifiedWorkWith(
-              title = "An etching of an emu"
-            )
-            insertIntoElasticsearch(indexName, itemType, workEmu)
+    it("doesn't throw an exception if passed an invalid query string") {
+      val workEmu = createIdentifiedWorkWith(
+        title = "An etching of an emu"
+      )
 
-            val searchForEmu = worksService.searchWorks(query =
-              "emu \"unmatched quotes are a lexical error in the Elasticsearch parser")(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptions
-            )
-
-            whenReady(searchForEmu) { works =>
-              works.results should have size 1
-              works.results.head shouldBe workEmu
-            }
-          }
-        }
-      }
+      assertSearchResultIsCorrect(
+        allWorks = List(workEmu),
+        expectedWorks = List(workEmu),
+        query = "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"
+      )
     }
 
     it("filters searches by workType") {
@@ -291,30 +260,14 @@ class WorksServiceTest
         workType = Some(WorkType(id = "m", label = "Manuscripts"))
       )
 
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            insertIntoElasticsearch(
-              indexName,
-              itemType,
-              matchingWork,
-              workWithWrongTitle,
-              workWithWrongWorkType)
-
-            val searchForEmu = worksService.searchWorks(query = "artichokes")(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptionsWith(
-                filters = List(WorkTypeFilter("b"))
-              )
-            )
-
-            whenReady(searchForEmu) { works =>
-              works.results shouldBe List(matchingWork)
-            }
-          }
-        }
-      }
+      assertSearchResultIsCorrect(
+        allWorks = List(matchingWork, workWithWrongTitle, workWithWrongWorkType),
+        expectedWorks = List(matchingWork),
+        query = "artichokes",
+        worksSearchOptions = createWorksSearchOptionsWith(
+          filters = List(WorkTypeFilter("b"))
+        )
+      )
     }
 
     it("filters searches by multiple workTypes") {
@@ -335,31 +288,41 @@ class WorksServiceTest
         workType = Some(WorkType(id = "a", label = "Archives"))
       )
 
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            insertIntoElasticsearch(
-              indexName,
-              itemType,
-              work1,
-              workWithWrongTitle,
-              work2,
-              workWithWrongWorkType)
+      assertSearchResultIsCorrect(
+        allWorks = List(work1, workWithWrongTitle, work2, workWithWrongWorkType),
+        expectedWorks = List(work1, work2),
+        query = "artichokes",
+        worksSearchOptions = createWorksSearchOptionsWith(
+          filters = List(WorkTypeFilter(List("b", "m")))
+        )
+      )
+    }
+  }
 
-            val searchForEmu = worksService.searchWorks(query = "artichokes")(
-              documentOptions =
-                createElasticsearchDocumentOptionsWith(indexName = indexName),
-              worksSearchOptions = createWorksSearchOptionsWith(
-                filters = List(WorkTypeFilter(List("b", "m")))
-              )
-            )
+  private def assertSearchResultIsCorrect(
+    allWorks: List[IdentifiedBaseWork],
+    expectedWorks: List[IdentifiedBaseWork],
+    query: String,
+    worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
+  ) =
+    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withElasticsearchService { searchService =>
+        withWorksService(searchService) { worksService =>
+          insertIntoElasticsearch(indexName, itemType, allWorks: _*)
 
-            whenReady(searchForEmu) { works =>
-              works.results shouldBe List(work1, work2)
-            }
+          val documentOptions = createElasticsearchDocumentOptionsWith(
+            indexName = indexName
+          )
+
+          val future = worksService.searchWorks(query = query)(
+            documentOptions = documentOptions,
+            worksSearchOptions = worksSearchOptions
+          )
+
+          whenReady(future) { works =>
+            works.results should contain theSameElementsAs expectedWorks
           }
         }
       }
     }
-  }
 }
