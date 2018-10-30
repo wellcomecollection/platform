@@ -5,22 +5,14 @@ import settings
 from botocore.exceptions import ClientError
 
 boto_session = None
-_sns_client = None
+sns_client = boto3.client('sns')
 
 
 def publish(message, topic_arn):
-    return _sns_client().publish(
+    return sns_client.publish(
         Message=message,
         TopicArn=topic_arn
     )
-
-
-def sns_client():
-    global _sns_client
-    if _sns_client is None:
-        _sns_client = boto3.client('sns')
-
-    return _sns_client
 
 
 def get_boto_session():

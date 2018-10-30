@@ -5,13 +5,6 @@ import aws
 import settings
 
 
-# result = {
-#     "identifier": identifier,
-#     "upload_location": None,
-#     "duration": -1,
-#     "error": None
-# }
-
 def _publish_notification(result):
     message = json.dumps(result)
 
@@ -22,7 +15,7 @@ def _publish_notification(result):
 
 
 def bagging_complete(result):
-    logging.info(f"Bagging complete for {result['identifier']}")
+    logging.info("Bagging complete for %s", result['identifier'])
 
     if result['upload_location']:
         _publish_notification(
