@@ -16,8 +16,4 @@ def _publish_notification(result):
 
 def bagging_complete(result):
     logging.info("Bagging complete for %s", result['identifier'])
-
-    if result['upload_location']:
-        _publish_notification(
-            result['upload_location']
-        )
+    _publish_notification(result)
