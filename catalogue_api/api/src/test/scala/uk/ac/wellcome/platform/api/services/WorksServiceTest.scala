@@ -272,7 +272,9 @@ class WorksServiceTest
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticsearchService { searchService =>
         withWorksService(searchService) { worksService =>
-          insertIntoElasticsearch(indexName, itemType, allWorks: _*)
+          if (!allWorks.isEmpty) {
+            insertIntoElasticsearch(indexName, itemType, allWorks: _*)
+          }
 
           val documentOptions = createElasticsearchDocumentOptionsWith(
             indexName = indexName
