@@ -1,18 +1,12 @@
-package uk.ac.wellcome.platform.archive.common.progress
+package uk.ac.wellcome.platform.archive.progress_async.flows
 
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
-  ProgressGenerators,
-  ProgressTrackerFixture
-}
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressEvent,
-  ProgressEventUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.progress.models.{ProgressEvent, ProgressEventUpdate}
 import uk.ac.wellcome.platform.archive.progress_async.fixtures.ProgressAsyncFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
