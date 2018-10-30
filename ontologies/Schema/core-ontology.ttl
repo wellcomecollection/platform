@@ -46,7 +46,12 @@ wcore:Location rdf:type owl:Class ;
 wcore:Period rdf:type owl:Class ;
     rdfs:label "Period" ;
     rdfs:comment "A period of time."@en ;
-    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .               
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .   
+    
+wcore:Space rdf:type owl:Class ;
+    rdfs:label "Space"@en ;
+    rdfs:comment "A namespace for a collection of things."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .                 
     
 #### object properties ####
 
@@ -76,7 +81,14 @@ wcore:dates rdf:type owl:ObjectProperty ;
     rdfs:comment ""@en ;
     rdfs:domain wcore:Thing ;
     rdfs:range wcore:Period ;
-    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .    
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> . 
+    
+wcore:space rdf:type owl:ObjectProperty ;
+    rdfs:label "space"@en ;
+    rdfs:comment "Relates a thing to a designated namespace."@en ;
+    rdfs:domain wcore:Thing ;
+    rdfs:range wcore:Space ;
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .        
 
     
 ####### data properties #####
@@ -108,6 +120,13 @@ wcore:url rdf:type owl:DatatypeProperty ;
     rdfs:domain wcore:Thing ;
     rdfs:range rdfs:Literal ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
+    
+wcore:path rdf:type owl:DatatypeProperty ;
+    rdfs:label "path"@en ;
+    rdfs:comment "A path for a thing"@en ;
+    rdfs:domain wcore:Thing ;
+    rdfs:range rdfs:Literal ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .    
 
 wcore:startDate rdf:type owl:DatatypeProperty ;
     rdfs:label "startDate"@en ;
@@ -136,6 +155,20 @@ wcore:date rdf:type owl:DatatypeProperty ;
     rdfs:domain wcore:Period ;
     rdfs:range xsd:date ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wcore:createdDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "createdDate"@en ;
+    rdfs:comment "The date the thing was created."@en ;
+    rdfs:domain wcore:Thing ;
+    rdfs:range xsd:dateTime ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
+    
+wcore:lastModifiedDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "lastModifiedDate"@en ;
+    rdfs:comment "The date the thing was last modified."@en ;
+    rdfs:domain wcore:Bag ;
+    rdfs:range xsd:dateTime ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .      
     
                 
 

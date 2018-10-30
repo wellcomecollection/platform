@@ -1,0 +1,149 @@
+{
+  "@context": {
+    "wig:": "http://wellcomecollection.org/ontologies/archival-storage/",
+    "wcore": "http://wellcomecollection.org/ontologies/core/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "@base": "http://id.wellcomecollection.org/",
+    "id": {
+      "@id": "@id"
+    },
+    "type": {
+      "@id": "@type"
+    },
+    "Space": {
+      "@id": "wcore:Space"
+    },
+    "Bag": {
+      "@id": "wig:Bag"
+    },
+    "BagInfo": {
+      "@id": "wig:BagInfo"
+    },
+    "Ingest": {
+      "@id": "wig:Ingest"
+    },
+    "IngestType": {
+      "@id": "wig:IngestType"
+    },
+    "BagManifest": {
+      "@id": "wig:BagManifest"
+    },
+    "File": {
+      "@id": "wig:File"
+    },
+    "Location": {
+      "@id": "wig:Location"
+    },
+    "Provider": {
+      "@id": "wig:Provider"
+    },
+    "Status": {
+      "@id": "wig:Status"
+    },
+    "space": {
+      "@id": "wcore:space"
+    },
+    "bag": {
+      "@id": "wig:bag"
+    },
+    "info": {
+      "@id": "wig:info"
+    },
+    "tagManifest": {
+      "@id": "wig:tagManifest"
+    },
+    "manifest": {
+      "@id": "wig:manifest"
+    },
+    "files": {
+      "@id": "wig:files"
+    },
+    "archiveLocation": {
+      "@id": "wig:archiveLocation"
+    },
+    "accessLocation": {
+      "@id": "wig:accessLocation"
+    },
+    "ingestType": {
+      "@id": "wig:ingestType"
+    },
+    "provider": {
+      "@id": "wig:provider"
+    },
+    "ingestStatus": {
+      "@id": "wig:ingestStatus"
+    },
+    "callbackStatus": {
+      "@id": "wig:callbackStatus"
+    },
+    "createdDate": {
+      "@id": "wcore:createdDate",
+      "@type": "xsd:dateTime"
+    },
+    "lastModifiedDate": {
+      "@id": "wcore:lastModifiedDate",
+      "@type": "xsd:dateTime"
+    },
+    "url": {
+      "@id": "wcore:url",
+      "@type": "rdf:Literal"
+    },
+    "path": {
+      "@id": "wcore:path",
+      "@type": "rdf:Literal"
+    },
+    "uploadUrl": {
+      "@id": "wig:uploadUrl",
+      "@type": "rdfs:Literal"
+    },
+    "callbackUrl": {
+      "@id": "wig:callbackUrl",
+      "@type": "rdfs:Literal"
+    },
+    "externalDescription": {
+      "@id": "wig:externalDescription",
+      "@type": "rdf:langString"
+    },
+    "internalSenderDescription": {
+      "@id": "wig:internalSenderDescription",
+      "@type": "rdf:langString"
+    },
+    "internalSenderIdentifer": {
+      "@id": "wig:internalSenderIdentifer",
+      "@type": "rdfs:Literal"
+    },
+    "externalIdentifier": {
+      "@id": "wig:externalIdentifier",
+      "@type": "rdfs:Literal"
+    },
+    "sourceOrganisation": {
+      "@id": "wig:sourceOrganisation",
+      "@type": "rdf:langString"
+    },
+    "payloadOxum": {
+      "@id": "wig:payloadOxum",
+      "@type": "xsd:decimal"
+    },
+    "baggingDate": {
+      "@id": "wig:baggingDate",
+      "@type": "xsd:dateTime"
+    },
+    "baggingDate": {
+      "@id": "wig:baggingDate",
+      "@type": "xsd:dateTime"
+    },
+    "checksumAlgorithm": {
+      "@id": "wig:baggingDate",
+      "@type": "rdfs:Literal"
+    },
+    "checksum": {
+      "@id": "wig:checksum",
+      "@type": "rdfs:Literal"
+    },
+    "bucket": {
+      "@id": "wig:bucket",
+      "@type": "rdfs:Literal"
+    },
+  }
+}
