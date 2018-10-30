@@ -7,14 +7,9 @@ import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.models.DisplayIngest
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressCreateRequest
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressCreateRequest}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.common.progress.models.ProgressCreateRequest._
-
-import scala.util.Try
 
 class Router @Inject()(monitor: ProgressTracker, config: HttpServerConfig) {
 
@@ -29,13 +24,10 @@ class Router @Inject()(monitor: ProgressTracker, config: HttpServerConfig) {
     pathPrefix("progress") {
       post {
         entity(as[ProgressCreateRequest]) { progressCreateRequest =>
-          Try(monitor.initialise(Progress(progressCreateRequest))) match {
-            case util.Success(progress) => {
+          onSuccess(monitor.initialise(Progress(progressCreateRequest))) {progress =>
               respondWithHeaders(List(createLocationHeader(progress))) {
                 complete(Created -> progress)
               }
-            }
-            case util.Failure(e) => failWith(e)
           }
         }
       } ~ path(Segment) { id: String =>

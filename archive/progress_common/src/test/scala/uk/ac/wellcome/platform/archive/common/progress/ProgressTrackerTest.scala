@@ -12,6 +12,8 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressTracker}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util.Try
 
 class ProgressTrackerTest
@@ -29,9 +31,11 @@ class ProgressTrackerTest
     it("creates a progress monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress())
+          val futureProgress = progressTracker.initialise(createProgress())
 
-          assertTableOnlyHasItem(progress, table)
+          whenReady(futureProgress) { progress =>
+            assertTableOnlyHasItem(progress, table)
+          }
         }
       }
     }
@@ -46,14 +50,15 @@ class ProgressTrackerTest
             createProgressWith(id = id, uploadUri = testUploadUri)
           )
 
-          val result = Try(monitors.map(progressTracker.initialise))
-          val failedException = result.failed.get
+          val result = Future.sequence(monitors.map(progressTracker.initialise))
+          whenReady(result.failed) { failedException =>
 
-          failedException shouldBe a[IdConstraintError]
-          failedException.getMessage should include(
-            s"There is already a progress tracker with id:$id")
+            failedException shouldBe a[IdConstraintError]
+            failedException.getMessage should include(
+              s"There is already a progress tracker with id:$id")
 
-          assertProgressCreated(id, testUploadUri, table)
+            assertProgressCreated(id, testUploadUri, table)
+          }
         }
 
       }
@@ -73,11 +78,11 @@ class ProgressTrackerTest
 
         val progress = createProgress()
 
-        val result = Try(progressTracker.initialise(progress))
-        val failedException = result.failed.get
-
-        failedException shouldBe a[RuntimeException]
-        failedException shouldBe expectedException
+        val result = progressTracker.initialise(progress)
+        whenReady(result.failed) { failedException=>
+          failedException shouldBe a[RuntimeException]
+          failedException shouldBe expectedException
+        }
       }
     }
   }
@@ -86,12 +91,13 @@ class ProgressTrackerTest
     it("retrieves progress by id") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress())
-          assertTableOnlyHasItem[Progress](progress, table)
+          whenReady(progressTracker.initialise(createProgress())) { progress=>
+            assertTableOnlyHasItem[Progress](progress, table)
 
-          val result = progressTracker.get(progress.id)
-          result shouldBe a[Some[_]]
-          result.get shouldBe progress
+            val result = progressTracker.get(progress.id)
+            result shouldBe a[Some[_]]
+            result.get shouldBe progress
+          }
         }
       }
     }
@@ -130,21 +136,22 @@ class ProgressTrackerTest
     it("adds a single event to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress())
+          whenReady(progressTracker.initialise(createProgress())) { progress =>
 
-          val progressUpdate = ProgressEventUpdate(
-            progress.id,
-            List(createProgressEvent)
-          )
+            val progressUpdate = ProgressEventUpdate(
+              progress.id,
+              List(createProgressEvent)
+            )
 
-          progressTracker.update(progressUpdate)
+            progressTracker.update(progressUpdate)
 
-          assertProgressCreated(progress.id, progress.uploadUri, table)
+            assertProgressCreated(progress.id, progress.uploadUri, table)
 
-          assertProgressRecordedRecentEvents(
-            progressUpdate.id,
-            progressUpdate.events.map(_.description),
-            table)
+            assertProgressRecordedRecentEvents(
+              progressUpdate.id,
+              progressUpdate.events.map(_.description),
+              table)
+          }
         }
       }
     }
@@ -152,28 +159,28 @@ class ProgressTrackerTest
     it("adds a status update to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress())
+          whenReady(progressTracker.initialise(createProgress())) { progress =>
+            val resources = List(createResource)
+            val progressUpdate = ProgressStatusUpdate(
+              progress.id,
+              Progress.Completed,
+              resources,
+              List(createProgressEvent)
+            )
 
-          val resources = List(createResource)
-          val progressUpdate = ProgressStatusUpdate(
-            progress.id,
-            Progress.Completed,
-            resources,
-            List(createProgressEvent)
-          )
+            progressTracker.update(progressUpdate)
 
-          progressTracker.update(progressUpdate)
+            val actualProgress =
+              assertProgressCreated(progress.id, progress.uploadUri, table)
 
-          val actualProgress =
-            assertProgressCreated(progress.id, progress.uploadUri, table)
+            actualProgress.status shouldBe Progress.Completed
+            actualProgress.resources should contain theSameElementsAs (progress.resources ++ resources)
 
-          actualProgress.status shouldBe Progress.Completed
-          actualProgress.resources should contain theSameElementsAs (progress.resources ++ resources)
-
-          assertProgressRecordedRecentEvents(
-            progressUpdate.id,
-            progressUpdate.events.map(_.description),
-            table)
+            assertProgressRecordedRecentEvents(
+              progressUpdate.id,
+              progressUpdate.events.map(_.description),
+              table)
+          }
         }
       }
     }
@@ -181,26 +188,26 @@ class ProgressTrackerTest
     it("adds a callback status update to a monitor with no events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress())
+          whenReady(progressTracker.initialise(createProgress())) { progress =>
+            val progressUpdate = ProgressCallbackStatusUpdate(
+              progress.id,
+              Callback.Succeeded,
+              List(createProgressEvent)
+            )
 
-          val progressUpdate = ProgressCallbackStatusUpdate(
-            progress.id,
-            Callback.Succeeded,
-            List(createProgressEvent)
-          )
+            progressTracker.update(progressUpdate)
 
-          progressTracker.update(progressUpdate)
+            val actualProgress =
+              assertProgressCreated(progress.id, progress.uploadUri, table)
 
-          val actualProgress =
-            assertProgressCreated(progress.id, progress.uploadUri, table)
+            actualProgress.callback shouldBe defined
+            actualProgress.callback.get.status shouldBe Callback.Succeeded
 
-          actualProgress.callback shouldBe defined
-          actualProgress.callback.get.status shouldBe Callback.Succeeded
-
-          assertProgressRecordedRecentEvents(
-            progressUpdate.id,
-            progressUpdate.events.map(_.description),
-            table)
+            assertProgressRecordedRecentEvents(
+              progressUpdate.id,
+              progressUpdate.events.map(_.description),
+              table)
+          }
         }
       }
     }
@@ -208,21 +215,21 @@ class ProgressTrackerTest
     it("adds an update with multiple events") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress())
+          whenReady(progressTracker.initialise(createProgress())) { progress =>
+            val progressUpdate = ProgressEventUpdate(
+              progress.id,
+              List(createProgressEvent, createProgressEvent)
+            )
 
-          val progressUpdate = ProgressEventUpdate(
-            progress.id,
-            List(createProgressEvent, createProgressEvent)
-          )
+            progressTracker.update(progressUpdate)
 
-          progressTracker.update(progressUpdate)
+            assertProgressCreated(progress.id, progress.uploadUri, table)
 
-          assertProgressCreated(progress.id, progress.uploadUri, table)
-
-          assertProgressRecordedRecentEvents(
-            progressUpdate.id,
-            progressUpdate.events.map(_.description),
-            table)
+            assertProgressRecordedRecentEvents(
+              progressUpdate.id,
+              progressUpdate.events.map(_.description),
+              table)
+          }
         }
       }
     }
@@ -230,21 +237,21 @@ class ProgressTrackerTest
     it("adds multiple events to a monitor") {
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
-          val progress = progressTracker.initialise(createProgress())
+          whenReady(progressTracker.initialise(createProgress())) { progress =>
+            val updates = List(
+              createProgressEventUpdateWith(progress.id),
+              createProgressEventUpdateWith(progress.id)
+            )
 
-          val updates = List(
-            createProgressEventUpdateWith(progress.id),
-            createProgressEventUpdateWith(progress.id)
-          )
+            updates.foreach(progressTracker.update(_))
 
-          updates.foreach(progressTracker.update(_))
+            assertProgressCreated(progress.id, progress.uploadUri, table)
 
-          assertProgressCreated(progress.id, progress.uploadUri, table)
-
-          assertProgressRecordedRecentEvents(
-            progress.id,
-            updates.flatMap(_.events.map(_.description)),
-            table)
+            assertProgressRecordedRecentEvents(
+              progress.id,
+              updates.flatMap(_.events.map(_.description)),
+              table)
+          }
         }
       }
     }
