@@ -56,6 +56,8 @@ class ArgsConfigurator(val arguments: Seq[String])
   private val snsTopicArn =
     opt[String]("sns-topic-arn", required = false)
 
+  verify()
+
   val snsClientConfig = SnsClientConfig(
     accessKey = awsSnsAccessKey.toOption,
     secretKey = awsSnsSecretKey.toOption,
@@ -66,8 +68,6 @@ class ArgsConfigurator(val arguments: Seq[String])
   val snsConfig = SNSConfig(
     topicArn = snsTopicArn()
   )
-
-  verify()
 
   val cloudwatchClientConfig = CloudwatchClientConfig(
     region = awsCloudwatchRegion(),
