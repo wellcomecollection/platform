@@ -58,8 +58,7 @@ case object MiroTransformableData {
    * a fair number of works, to replace it properly.
    */
   private def fixAdeleUnicode(s: String): String =
-    s
-      .replaceAll("Ad\\u00c3\\u00aale", "Adêle")
+    s.replaceAll("Ad\\u00c3\\u00aale", "Adêle")
       .replaceAll("Mongr\\u00c3\\u00a9dien", "Mongrédien")
 
   def create(jsonString: String): MiroTransformableData = {

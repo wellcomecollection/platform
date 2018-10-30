@@ -28,6 +28,7 @@ class MiroTransformableDataTest extends FunSpec with Matchers {
         |}
       """.stripMargin
 
-    MiroTransformableData.create(jsonString).creator shouldBe Some(List(Some("Adêle Mongrédien")))
+    MiroTransformableData.create(jsonString).creator shouldBe Some(
+      List(Some("Adêle Mongrédien")))
   }
 }
