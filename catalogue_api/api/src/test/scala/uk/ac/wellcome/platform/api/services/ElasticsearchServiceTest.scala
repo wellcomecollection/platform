@@ -141,6 +141,43 @@ class ElasticsearchServiceTest
         )
       }
     }
+
+    it("filters results by multiple item locationTypes") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val work = createIdentifiedWorkWith(
+          title = "Tumbling tangerines",
+          items = List(
+            createItemWithLocationType(LocationType("iiif-image")),
+            createItemWithLocationType(LocationType("acqi"))
+          )
+        )
+
+        val notMatchingWork = createIdentifiedWorkWith(
+          title = "Tumbling tangerines",
+          items = List(
+            createItemWithLocationType(LocationType("acqi"))
+          )
+        )
+
+        val work2 = createIdentifiedWorkWith(
+          title = "Tumbling tangerines",
+          items = List(
+            createItemWithLocationType(LocationType("digit"))
+          )
+        )
+
+        insertIntoElasticsearch(indexName, itemType, work, notMatchingWork, work2)
+
+        assertSearchResultsAreCorrect(
+          indexName = indexName,
+          queryString = "tangerines",
+          queryOptions = createElasticsearchQueryOptionsWith(
+            filters = List(ItemLocationTypeFilter(locationTypeIds = List("iiif-image", "digit")))
+          ),
+          expectedWorks = List(work, work2)
+        )
+      }
+    }
   }
 
   describe("findResultById") {
