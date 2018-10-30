@@ -104,3 +104,8 @@ module "bagger_queue" {
 
   alarm_topic_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 }
+
+module "bagging_complete_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "archive-bagger_bagging_complete"
+}

@@ -5,6 +5,22 @@ import settings
 from botocore.exceptions import ClientError
 
 boto_session = None
+_sns_client = None
+
+
+def publish(message, topic_arn):
+    return _sns_client().publish(
+        Message=message,
+        TopicArn=topic_arn
+    )
+
+
+def sns_client():
+    global _sns_client
+    if _sns_client is None:
+        _sns_client = boto3.client('sns')
+
+    return _sns_client
 
 
 def get_boto_session():
@@ -21,6 +37,11 @@ def get_s3():
 def upload(source, key):
     client = get_boto_session().client("s3")
     client.upload_file(source, settings.DROP_BUCKET_NAME, key)
+
+    return {
+        "bucket": settings.DROP_BUCKET_NAME,
+        "key": key
+    }
 
 
 def get_mets_xml(s3_path):

@@ -27,10 +27,13 @@ def bag_from_identifier(identifier, skip_file_download):
     bag_details = bag_assembly.prepare_bag_dir(b_number)
     id_map = collections.OrderedDict()
     mets_path = "{0}{1}.xml".format(bag_details["mets_partial_path"], b_number)
+
     logging.info("process METS or anchor file at %s", mets_path)
+
     tree = load_xml(mets_path)
     root = tree.getroot()
     title = mets.get_title(root)
+
     logging.info("#### {0}: {1}".format(b_number, title))
     logging.info(
         "We will transform xml that involves Preservica, and the tessella namespace"
@@ -44,8 +47,10 @@ def bag_from_identifier(identifier, skip_file_download):
     struct_div = mets.get_logical_struct_div(root)
     struct_type = struct_div.get("TYPE")
     struct_label = struct_div.get("LABEL")
+
     logging.info("Found structDiv with TYPE " + struct_type)
     logging.info("LABEL: " + struct_label)
+
     root_mets_file = os.path.join(bag_details["directory"], "{0}.xml".format(b_number))
 
     # There is a huge amount of validation that can be done here.
@@ -106,12 +111,17 @@ def bag_from_identifier(identifier, skip_file_download):
         print(b_number)
         logging.info("Finished {0} without bagging".format(b_number))
         bag_assembly.cleanup_bnumber_files(b_number)
-        return
+        return None
 
     bagit.make_bag(bag_details["directory"], get_bag_info(b_number, title))
-    dispatch_bag(bag_details)
+
+    upload_location = dispatch_bag(bag_details)
+
     bag_assembly.cleanup_bnumber_files(b_number)
+
     logging.info("Finished {0}".format(b_number))
+
+    return upload_location
 
 
 def process_manifestation(root, bag_details, skip_file_download, id_map):
@@ -136,12 +146,18 @@ def load_xml(path):
 def dispatch_bag(bag_details):
     # now zip this bag in a way that will be efficient for the archiver
     logging.info("creating zip file for " + bag_details["b_number"])
+
     shutil.make_archive(
         bag_details["zip_file_path"][0:-4], "zip", bag_details["directory"]
     )
+
     logging.info("uploading " + bag_details["zip_file_name"] + " to S3")
-    aws.upload(bag_details["zip_file_path"], bag_details["zip_file_name"])
+
+    upload_location = aws.upload(bag_details["zip_file_path"], bag_details["zip_file_name"])
+
     logging.info("upload completed")
+
+    return upload_location
 
 
 def get_bag_info(b_number, title):
