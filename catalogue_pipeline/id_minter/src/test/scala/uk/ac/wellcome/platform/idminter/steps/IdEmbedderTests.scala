@@ -201,7 +201,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedItem1: Displayable[Item] = createIdentifiedItem(
+        val expectedItem1: Displayable[Item] = createIdentifiedItemWith(
           sourceIdentifier = originalItem1.sourceIdentifier,
           canonicalId = newItemCanonicalId1,
           locations = originalItem1.agent.locations

@@ -5,17 +5,17 @@ import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedBaseWork,
-  IdentifiedWork,
-  WorkType
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
 import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
-import uk.ac.wellcome.platform.api.models.WorkTypeFilter
+import uk.ac.wellcome.platform.api.models.{
+  ItemLocationTypeFilter,
+  WorkTypeFilter
+}
 
 import scala.concurrent.Future
+import scala.util.Random
 
 class ElasticsearchServiceTest
     extends FunSpec
@@ -70,7 +70,7 @@ class ElasticsearchServiceTest
           indexName = indexName,
           queryString = "artichokes",
           queryOptions = createElasticsearchQueryOptionsWith(
-            filters = List(WorkTypeFilter("b"))
+            filters = List(WorkTypeFilter(workTypeId = "b"))
           ),
           expectedWorks = List(workWithCorrectWorkType)
         )
@@ -111,6 +111,81 @@ class ElasticsearchServiceTest
             filters = List(WorkTypeFilter(List("b", "m")))
           ),
           expectedWorks = List(work1, work2)
+        )
+      }
+    }
+
+    it("filters results by item locationType") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val work = createIdentifiedWorkWith(
+          title = "Tumbling tangerines",
+          items = List(
+            createItemWithLocationType(LocationType("iiif-image")),
+            createItemWithLocationType(LocationType("acqi"))
+          )
+        )
+
+        val notMatchingWork = createIdentifiedWorkWith(
+          title = "Tumbling tangerines",
+          items = List(
+            createItemWithLocationType(LocationType("acqi"))
+          )
+        )
+
+        insertIntoElasticsearch(indexName, itemType, work, notMatchingWork)
+
+        assertSearchResultsAreCorrect(
+          indexName = indexName,
+          queryString = "tangerines",
+          queryOptions = createElasticsearchQueryOptionsWith(
+            filters =
+              List(ItemLocationTypeFilter(locationTypeId = "iiif-image"))
+          ),
+          expectedWorks = List(work)
+        )
+      }
+    }
+
+    it("filters results by multiple item locationTypes") {
+      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        val work = createIdentifiedWorkWith(
+          title = "Tumbling tangerines",
+          items = List(
+            createItemWithLocationType(LocationType("iiif-image")),
+            createItemWithLocationType(LocationType("acqi"))
+          )
+        )
+
+        val notMatchingWork = createIdentifiedWorkWith(
+          title = "Tumbling tangerines",
+          items = List(
+            createItemWithLocationType(LocationType("acqi"))
+          )
+        )
+
+        val work2 = createIdentifiedWorkWith(
+          title = "Tumbling tangerines",
+          items = List(
+            createItemWithLocationType(LocationType("digit"))
+          )
+        )
+
+        insertIntoElasticsearch(
+          indexName,
+          itemType,
+          work,
+          notMatchingWork,
+          work2)
+
+        assertSearchResultsAreCorrect(
+          indexName = indexName,
+          queryString = "tangerines",
+          queryOptions = createElasticsearchQueryOptionsWith(
+            filters = List(
+              ItemLocationTypeFilter(
+                locationTypeIds = List("iiif-image", "digit")))
+          ),
+          expectedWorks = List(work, work2)
         )
       }
     }
@@ -275,7 +350,7 @@ class ElasticsearchServiceTest
           workWithWrongWorkType)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
-          filters = List(WorkTypeFilter("b"))
+          filters = List(WorkTypeFilter(workTypeId = "b"))
         )
 
         assertListResultsAreCorrect(
@@ -321,6 +396,22 @@ class ElasticsearchServiceTest
       }
     }
   }
+
+  private def createItemWithLocationType(
+    locationType: LocationType): Identified[Item] =
+    createIdentifiedItemWith(
+      locations = List(
+        // This test really shouldn't be affected by physical/digital locations;
+        // we just pick randomly here to ensure we get a good mixture.
+        Random
+          .shuffle(
+            List(
+              createPhysicalLocationWith(locationType = locationType),
+              createDigitalLocationWith(locationType = locationType)
+            ))
+          .head
+      )
+    )
 
   private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
     val works = createIdentifiedWorks(count = 10)

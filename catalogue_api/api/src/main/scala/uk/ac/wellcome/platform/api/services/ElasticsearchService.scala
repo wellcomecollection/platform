@@ -12,7 +12,11 @@ import com.sksamuel.elastic4s.searches.queries.{
 }
 import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
 import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
-import uk.ac.wellcome.platform.api.models.{WorkFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.models.{
+  ItemLocationTypeFilter,
+  WorkFilter,
+  WorkTypeFilter
+}
 
 import scala.concurrent.Future
 
@@ -87,6 +91,10 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
   private def toTermQuery(
     workFilter: WorkFilter): TermsQueryDefinition[String] =
     workFilter match {
+      case ItemLocationTypeFilter(itemLocationTypeIds) =>
+        termsQuery(
+          field = "items.agent.locations.locationType.id",
+          values = itemLocationTypeIds)
       case WorkTypeFilter(workTypeIds) =>
         termsQuery(field = "workType.id", values = workTypeIds)
     }

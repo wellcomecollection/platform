@@ -82,7 +82,7 @@ class DisplayWorkV2SerialisationTest
       credit = Some("Wellcome Collection"),
       license = Some(License_CCBY)
     )
-    val item = createIdentifiedItem(locations = List(location))
+    val item = createIdentifiedItemWith(locations = List(location))
     val workWithCopyright = createIdentifiedWorkWith(
       items = List(item)
     )

@@ -109,6 +109,15 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     * be applied to the corresponding Elasticsearch request.
     */
   private def buildFilters(request: M): List[WorkFilter] = {
+    val maybeItemLocationTypeFilter: Option[ItemLocationTypeFilter] =
+      request.itemLocationType
+        .map { arg =>
+          arg.split(",").map { _.trim }
+        }
+        .map { locationTypeIds: Array[String] =>
+          ItemLocationTypeFilter(locationTypeIds)
+        }
+
     val maybeWorkTypeFilter: Option[WorkTypeFilter] =
       request.workType
         .map { arg =>
@@ -118,7 +127,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
           WorkTypeFilter(workTypeIds)
         }
 
-    List(maybeWorkTypeFilter).flatten
+    List(maybeItemLocationTypeFilter, maybeWorkTypeFilter).flatten
   }
 
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
@@ -208,10 +217,10 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     )
   }
 
-  private def setupResultListSwaggerDocs[T <: DisplayWork](
-    endpointSuffix: String,
-    swagger: Swagger,
-    doc: Operation)(implicit evidence: TypeTag[DisplayResultList[T]]) = {
+  def setupResultListSwaggerDocs[T <: DisplayWork](endpointSuffix: String,
+                                                   swagger: Swagger,
+                                                   doc: Operation)(
+    implicit evidence: TypeTag[DisplayResultList[T]]): Operation = {
     implicit val finatraSwagger = swagger
     doc
       .summary(endpointSuffix)
@@ -245,11 +254,6 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
         |- ~N after a phrase signifies slop amount
         |
         |To search for any of these special characters, they should be escaped with \.""".stripMargin,
-        required = false
-      )
-      .queryParam[String](
-        "workType",
-        "Filter by the workType of the searched works",
         required = false
       )
       .parameter(includeSwaggerParam)

@@ -19,6 +19,7 @@ trait MultipleResultsRequest[W <: WorksIncludes] extends ApiRequest {
   val include: Option[W]
   val query: Option[String]
   val workType: Option[String]
+  val itemLocationType: Option[String]
   val _index: Option[String]
   val request: Request
 }
@@ -28,11 +29,18 @@ case class V1MultipleResultsRequest(
   @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
   @QueryParam includes: Option[V1WorksIncludes],
   @QueryParam query: Option[String],
-  @QueryParam workType: Option[String],
   @QueryParam _index: Option[String],
   request: Request
 ) extends MultipleResultsRequest[V1WorksIncludes] {
   val include: Option[V1WorksIncludes] = includes
+
+  // Every item in the V1 API has the same workType, so this filter
+  // has no purpose.
+  override val workType = None
+
+  // Every item in the V1 API has a single item with the same LocationType,
+  // so this filter isn't very useful!
+  override val itemLocationType: Option[String] = None
 }
 
 case class V2MultipleResultsRequest(
@@ -41,6 +49,7 @@ case class V2MultipleResultsRequest(
   @QueryParam include: Option[V2WorksIncludes],
   @QueryParam query: Option[String],
   @QueryParam workType: Option[String],
+  @QueryParam("items.locations.locationType") itemLocationType: Option[String],
   @QueryParam _index: Option[String],
   request: Request
 ) extends MultipleResultsRequest[V2WorksIncludes]

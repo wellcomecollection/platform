@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.work.test.util.ItemsGenerators
 class DisplayItemV2Test extends FunSpec with Matchers with ItemsGenerators {
 
   it("reads an identified Item as a DisplayItemV2") {
-    val item = createIdentifiedItem()
+    val item = createIdentifiedItem
 
     val displayItemV2 = DisplayItemV2(
       item = item,
@@ -48,7 +48,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsGenerators {
   }
 
   it("parses an Item without any extra identifiers") {
-    val item = createIdentifiedItem()
+    val item = createIdentifiedItem
 
     val displayItemV2 = DisplayItemV2(
       item = item,
@@ -60,9 +60,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsGenerators {
   }
 
   it("parses an identified Item without any locations") {
-    val item = createIdentifiedItem(
-      locations = List()
-    )
+    val item = createIdentifiedItemWith(locations = List())
 
     val displayItemV2 = DisplayItemV2(
       item = item,

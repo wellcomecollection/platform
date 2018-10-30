@@ -77,6 +77,18 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       parameters should contain("includes")
       parameters should not contain "include"
     }
+
+    it("doesn't include any filter parameters") {
+      val parameters = v1response
+        .at("/paths")
+        .findPath(s"/catalogue/${ApiVersions.v1.toString}/works")
+        .at("/get/parameters")
+        .asScala
+        .map(_.findPath("name").asText())
+
+      parameters should not contain "items.locations.locationType"
+      parameters should not contain "workType"
+    }
   }
 
   describe("v2") {
@@ -95,6 +107,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
         .at("/get/parameters")
         .asScala
         .map(_.findPath("name").asText())
+
       parameters should contain("include")
       parameters should not contain "includes"
     }
@@ -123,6 +136,18 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       v2response
         .at("/definitions/Genre/properties/concepts/items/$ref")
         .toString shouldBe "\"#/definitions/Concept\""
+    }
+
+    it("includes the filter query parameters") {
+      val parameters = v2response
+        .at("/paths")
+        .findPath(s"/catalogue/${ApiVersions.v2.toString}/works")
+        .at("/get/parameters")
+        .asScala
+        .map(_.findPath("name").asText())
+
+      parameters should contain("items.locations.locationType")
+      parameters should contain("workType")
     }
   }
 

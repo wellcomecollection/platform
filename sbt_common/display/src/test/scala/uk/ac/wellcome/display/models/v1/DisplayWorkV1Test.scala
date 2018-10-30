@@ -20,7 +20,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksGenerators {
   }
 
   it("parses items on a work") {
-    val item = createIdentifiedItem(locations = List())
+    val item = createIdentifiedItemWith(locations = List())
     val work = createIdentifiedWorkWith(
       itemsV1 = List(item)
     )
