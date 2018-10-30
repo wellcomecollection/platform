@@ -20,11 +20,6 @@ class SierraTransformableTest
     mergedRecord.maybeBibRecord.get shouldEqual bibRecord
   }
 
-  it("has the correct ID") {
-    val sierraId = createSierraBibNumber
-    SierraTransformable(sierraId = sierraId).id shouldBe s"sierra/${sierraId.withoutCheckDigit}"
-  }
-
   it("allows looking up items by ID") {
     val itemRecords = (0 to 3).map { _ =>
       createSierraItemRecord
