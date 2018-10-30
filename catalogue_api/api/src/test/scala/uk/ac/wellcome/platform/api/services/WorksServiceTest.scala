@@ -10,6 +10,7 @@ import uk.ac.wellcome.platform.api.fixtures.{
 }
 import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
 import uk.ac.wellcome.platform.api.models.WorkTypeFilter
+import uk.ac.wellcome.test.fixtures.TestWith
 
 class WorksServiceTest
     extends FunSpec
@@ -233,23 +234,21 @@ class WorksServiceTest
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
   ) =
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticsearchService { searchService =>
-        withWorksService(searchService) { worksService =>
-          insertIntoElasticsearch(indexName, itemType, allWorks: _*)
+      withWorksService { worksService =>
+        insertIntoElasticsearch(indexName, itemType, allWorks: _*)
 
-          val documentOptions = createElasticsearchDocumentOptionsWith(
-            indexName = indexName
-          )
+        val documentOptions = createElasticsearchDocumentOptionsWith(
+          indexName = indexName
+        )
 
-          val future = worksService.listWorks(
-            documentOptions = documentOptions,
-            worksSearchOptions = worksSearchOptions
-          )
+        val future = worksService.listWorks(
+          documentOptions = documentOptions,
+          worksSearchOptions = worksSearchOptions
+        )
 
-          whenReady(future) { works =>
-            works.results should contain theSameElementsAs expectedWorks
-            works.totalResults shouldBe expectedTotalResults
-          }
+        whenReady(future) { works =>
+          works.results should contain theSameElementsAs expectedWorks
+          works.totalResults shouldBe expectedTotalResults
         }
       }
     }
@@ -261,23 +260,28 @@ class WorksServiceTest
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
   ) =
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticsearchService { searchService =>
-        withWorksService(searchService) { worksService =>
-          insertIntoElasticsearch(indexName, itemType, allWorks: _*)
+      withWorksService { worksService =>
+        insertIntoElasticsearch(indexName, itemType, allWorks: _*)
 
-          val documentOptions = createElasticsearchDocumentOptionsWith(
-            indexName = indexName
-          )
+        val documentOptions = createElasticsearchDocumentOptionsWith(
+          indexName = indexName
+        )
 
-          val future = worksService.searchWorks(query = query)(
-            documentOptions = documentOptions,
-            worksSearchOptions = worksSearchOptions
-          )
+        val future = worksService.searchWorks(query = query)(
+          documentOptions = documentOptions,
+          worksSearchOptions = worksSearchOptions
+        )
 
-          whenReady(future) { works =>
-            works.results should contain theSameElementsAs expectedWorks
-          }
+        whenReady(future) { works =>
+          works.results should contain theSameElementsAs expectedWorks
         }
+      }
+    }
+
+  def withWorksService[R](testWith: TestWith[WorksService, R]): R =
+    withElasticsearchService { searchService =>
+      withWorksService(searchService) { worksService =>
+        testWith(worksService)
       }
     }
 }
