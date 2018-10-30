@@ -53,7 +53,7 @@ define terraform_plan
 		--env BUCKET_NAME=wellcomecollection-platform-infra \
 		--env OBJECT_KEY=terraform.tfvars \
 		--env IS_PUBLIC_FACING=$(2) \
-		wellcome/terraform_wrapper:latest
+		wellcome/terraform_wrapper:13
 endef
 
 
@@ -69,7 +69,7 @@ define terraform_apply
 		--workdir $(ROOT)/$(1) \
 		--env BUCKET_NAME=wellcomecollection-platform-monitoring \
 		--env OP=apply \
-		wellcome/terraform_wrapper:latest
+		wellcome/terraform_wrapper:13
 endef
 
 
