@@ -8,22 +8,18 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 
-sealed trait Transformable
-
-case class MiroTransformable(sourceId: String,
-                             MiroCollection: String,
-                             data: String)
-    extends Transformable {
-  val sourceName = "miro"
-}
+case class MiroTransformable(
+  sourceId: String,
+  MiroCollection: String,
+  data: String
+)
 
 case class SierraTransformable(
   sierraId: SierraBibNumber,
   maybeBibRecord: Option[SierraBibRecord] = None,
   itemRecords: Map[SierraItemNumber, SierraItemRecord] = Map()
-) extends Transformable {
+) {
   val sourceId: String = sierraId.withoutCheckDigit
-  val sourceName = "sierra"
 }
 
 object SierraTransformable {
