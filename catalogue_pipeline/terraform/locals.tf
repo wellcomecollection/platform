@@ -27,6 +27,6 @@ locals {
 
   rds_access_security_group_id = "${data.terraform_remote_state.catalogue_pipeline_data.rds_access_security_group_id}"
 
-  miro_reindexer_topic_name   = "${data.terraform_remote_state.reindexer.miro_topic_name}"
-  sierra_reindexer_topic_name = "${data.terraform_remote_state.reindexer.sierra_topic_name}"
+  miro_reindexer_topic_name   = "${data.terraform_remote_state.shared_infra.catalogue_miro_reindex_topic_name}"
+  sierra_reindexer_topic_name = "${data.terraform_remote_state.shared_infra.catalogue_sierra_reindex_topic_name}"
 }

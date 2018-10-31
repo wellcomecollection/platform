@@ -22,9 +22,9 @@ class ReindexWorkerFeatureTest
     with SQS
     with ScalaFutures {
 
-  private def createReindexableData(table: Table): Seq[HybridRecord] = {
-    val numberOfRecords = 4
-
+  private def createReindexableData(
+    table: Table,
+    numberOfRecords: Int = 4): Seq[HybridRecord] = {
     val testRecords = (1 to numberOfRecords).map(i => {
       HybridRecord(
         id = s"id$i",
@@ -36,10 +36,10 @@ class ReindexWorkerFeatureTest
       )
     })
 
-    testRecords.map { testRecord =>
+    testRecords.foreach { testRecord =>
       Scanamo.put(dynamoDbClient)(table.name)(testRecord)
-      testRecord
     }
+    testRecords
   }
 
   it("sends a notification for every record that needs a reindex") {
@@ -67,6 +67,43 @@ class ReindexWorkerFeatureTest
                   .distinct
 
               actualRecords should contain theSameElementsAs testRecords
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("respects the maxRecordsPerSegment limit when sending notifications") {
+    withLocalSqsQueue { queue =>
+      withLocalDynamoDbTable { table =>
+        withLocalSnsTopic { topic =>
+          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(
+            queue)
+
+          withServer(flags) { _ =>
+            val testRecords = createReindexableData(table, numberOfRecords = 8)
+
+            val reindexJob = ReindexJob(
+              segment = 0,
+              totalSegments = 1,
+              maxRecordsPerSegment = Some(1))
+
+            sendNotificationToSQS(
+              queue = queue,
+              message = reindexJob
+            )
+
+            eventually {
+              val actualRecords: Seq[HybridRecord] =
+                listMessagesReceivedFromSNS(topic)
+                  .map { _.message }
+                  .map { fromJson[HybridRecord](_).get }
+                  .distinct
+
+              actualRecords should have length 1
+              actualRecords should contain theSameElementsAs List(
+                testRecords.head)
             }
           }
         }

@@ -33,10 +33,15 @@ class ObjectLocation(object):
     key = attrib()
 
 
+def dict_to_location(d):
+    return ObjectLocation(**d)
+
+
 @attrs
 class HybridRecord(object):
     id = attrib()
-    location = attrib()
+    version = attrib()
+    location = attrib(converter=dict_to_location)
 
 
 @attrs
@@ -46,21 +51,16 @@ class ElasticsearchRecord(object):
 
 
 def _extract_hybrid_record(raw_record):
-    location = ObjectLocation(**raw_record["location"])
-    raw_record["location"] = location
-
     return HybridRecord(**raw_record)
 
 
 def _get_record_from_s3(s3, object_location):
     obj = s3.get_object(Bucket=object_location.namespace, Key=object_location.key)
-
     return obj["Body"].read().decode("utf-8")
 
 
 def _build_es_record(s3, hybrid_record):
     s3_record = _get_record_from_s3(s3, hybrid_record.location)
-
     return ElasticsearchRecord(id=hybrid_record.id, doc=s3_record)
 
 
@@ -68,11 +68,9 @@ def extract_records(s3, event):
     raw_hybrid_records = [
         json.loads(record["Sns"]["Message"]) for record in event["Records"]
     ]
-
     hybrid_records = [
         _extract_hybrid_record(raw_record) for raw_record in raw_hybrid_records
     ]
-
     return [_build_es_record(s3, hybrid_record) for hybrid_record in hybrid_records]
 
 
@@ -88,29 +86,46 @@ def load_records(es, index, doc_type, docs):
     return [_load_record(es, index, doc_type, doc) for doc in docs]
 
 
-def _run(url, username, password, event, index, doc_type):
-    es = Elasticsearch(
+def _run(elasticsearch_client, event, index, doc_type, s3_client):
+    records = extract_records(s3_client, event)
+    transformed_records = transform_records(records)
+    return load_records(elasticsearch_client, index, doc_type, transformed_records)
+
+
+def elasticsearch_client(url, username, password):
+    return Elasticsearch(
         url, http_auth=(username, password), use_ssl=True, ca_certs=certifi.where()
     )
 
-    s3 = boto3.client("s3")
 
-    records = extract_records(s3, event)
-    transformed_records = transform_records(records)
-
-    return load_records(es, index, doc_type, transformed_records)
-
-
-def main(event, _):
+def main(
+    event,
+    _,
+    s3_client=None,
+    elasticsearch_client=None,
+    elasticsearch_index=None,
+    elasticsearch_doctype=None,
+):
     print(f"Event: {event}")
 
-    results = _run(
+    s3_client = s3_client or boto3.client("s3")
+
+    elasticsearch_client = elasticsearch_client or elasticsearch_client(
         url=os.environ["ES_URL"],
         username=os.environ["ES_USER"],
         password=os.environ["ES_PASS"],
+    )
+
+    elasticsearch_index = elasticsearch_index or os.environ["ES_INDEX"]
+
+    elasticsearch_doctype = elasticsearch_doctype or os.environ["ES_DOC_TYPE"]
+
+    results = _run(
+        elasticsearch_client=elasticsearch_client,
         event=event,
-        index=os.environ["ES_INDEX"],
-        doc_type=os.environ["ES_DOC_TYPE"],
+        index=elasticsearch_index,
+        doc_type=elasticsearch_doctype,
+        s3_client=s3_client,
     )
 
     print(f"Result: {results}")

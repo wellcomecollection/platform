@@ -53,7 +53,7 @@ define terraform_plan
 		--env BUCKET_NAME=wellcomecollection-platform-infra \
 		--env OBJECT_KEY=terraform.tfvars \
 		--env IS_PUBLIC_FACING=$(2) \
-		wellcome/terraform_wrapper:latest
+		wellcome/terraform_wrapper:13
 endef
 
 
@@ -69,7 +69,7 @@ define terraform_apply
 		--workdir $(ROOT)/$(1) \
 		--env BUCKET_NAME=wellcomecollection-platform-monitoring \
 		--env OP=apply \
-		wellcome/terraform_wrapper:latest
+		wellcome/terraform_wrapper:13
 endef
 
 
@@ -300,13 +300,13 @@ $(1)-terraform-import:
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):$(ROOT) \
 		--workdir $(ROOT)/$(2) \
-		hashicorp/terraform:0.11.7 import $(filter-out $(1)-terraform-import,$(MAKECMDGOALS))
+		hashicorp/terraform:0.11.10 import $(filter-out $(1)-terraform-import,$(MAKECMDGOALS))
 
 $(1)-terraform-state-rm:
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):$(ROOT) \
 		--workdir $(ROOT)/$(2) \
-		hashicorp/terraform:0.11.7 state rm $(filter-out $(1)-terraform-state-rm,$(MAKECMDGOALS))
+		hashicorp/terraform:0.11.10 state rm $(filter-out $(1)-terraform-state-rm,$(MAKECMDGOALS))
 
 endef
 
