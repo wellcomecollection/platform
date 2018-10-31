@@ -34,6 +34,10 @@ class WorkMatcherTest
     with ScalaFutures
     with MockitoSugar {
 
+  private val identifierA = createSierraSystemSourceIdentifierWith(value = "A")
+  private val identifierB = createSierraSystemSourceIdentifierWith(value = "B")
+  private val identifierC = createSierraSystemSourceIdentifierWith(value = "C")
+
   it(
     "matches a work with no linked identifiers to itself only A and saves the updated graph A") {
     withMockMetricSender { mockMetricsSender =>
@@ -100,8 +104,6 @@ class WorkMatcherTest
           withWorkGraphStore(graphTable) { workGraphStore =>
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
-                val identifierA = aSierraSourceIdentifier("A")
-                val identifierB = aSierraSourceIdentifier("B")
                 val work = createUnidentifiedWorkWith(
                   sourceIdentifier = identifierA,
                   mergeCandidates = List(MergeCandidate(identifierB))
@@ -164,12 +166,10 @@ class WorkMatcherTest
                 Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkB)
                 Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkC)
 
-                val bIdentifier = aSierraSourceIdentifier("B")
-                val cIdentifier = aSierraSourceIdentifier("C")
                 val work = createUnidentifiedWorkWith(
-                  sourceIdentifier = bIdentifier,
+                  sourceIdentifier = identifierB,
                   version = 2,
-                  mergeCandidates = List(MergeCandidate(cIdentifier)))
+                  mergeCandidates = List(MergeCandidate(identifierC)))
 
                 whenReady(workMatcher.matchWork(work)) { identifiersList =>
                   identifiersList shouldBe
@@ -257,8 +257,6 @@ class WorkMatcherTest
                   withWorkMatcherAndLockingService(
                     workGraphStore,
                     dynamoLockingService) { workMatcher =>
-                    val identifierA = aSierraSourceIdentifier("A")
-                    val identifierB = aSierraSourceIdentifier("B")
 
                     // A->B->C
                     workGraphStore.put(WorkGraph(Set(

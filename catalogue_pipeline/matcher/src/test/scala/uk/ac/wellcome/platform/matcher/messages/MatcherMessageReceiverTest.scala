@@ -24,9 +24,9 @@ class MatcherMessageReceiverTest
     with IntegrationPatience
     with MatcherFixtures {
 
-  private val aIdentifier = aSierraSourceIdentifier("A")
-  private val bIdentifier = aSierraSourceIdentifier("B")
-  private val cIdentifier = aSierraSourceIdentifier("C")
+  private val identifierA = createSierraSystemSourceIdentifierWith(value = "A")
+  private val identifierB = createSierraSystemSourceIdentifierWith(value = "B")
+  private val identifierC = createSierraSystemSourceIdentifierWith(value = "C")
 
   it("creates a work without identifiers") {
     withLocalSnsTopic { topic =>
@@ -89,8 +89,8 @@ class MatcherMessageReceiverTest
             // Work Av1
             val workAv1 =
               createUnidentifiedWorkWith(
-                sourceIdentifier = aIdentifier,
-                mergeCandidates = List(MergeCandidate(bIdentifier)))
+                sourceIdentifier = identifierA,
+                mergeCandidates = List(MergeCandidate(identifierB)))
             // Work Av1 matched to B (before B exists hence version 0)
             // need to match to works that do not exist to support
             // bi-directionally matched works without deadlocking (A->B, B->A)
@@ -120,7 +120,7 @@ class MatcherMessageReceiverTest
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 =
-              createUnidentifiedWorkWith(sourceIdentifier = aIdentifier)
+              createUnidentifiedWorkWith(sourceIdentifier = identifierA)
 
             val expectedMatchedWorks = MatcherResult(
               Set(
@@ -137,7 +137,7 @@ class MatcherMessageReceiverTest
 
             // Work Bv1
             val workBv1 =
-              createUnidentifiedWorkWith(sourceIdentifier = bIdentifier)
+              createUnidentifiedWorkWith(sourceIdentifier = identifierB)
 
             processAndAssertMatchedWorkIs(
               workBv1,
@@ -149,9 +149,9 @@ class MatcherMessageReceiverTest
 
             // Work Av1 matched to B
             val workAv2 = createUnidentifiedWorkWith(
-              sourceIdentifier = aIdentifier,
+              sourceIdentifier = identifierA,
               version = 2,
-              mergeCandidates = List(MergeCandidate(bIdentifier)))
+              mergeCandidates = List(MergeCandidate(identifierB)))
 
             processAndAssertMatchedWorkIs(
               workAv2,
@@ -167,7 +167,7 @@ class MatcherMessageReceiverTest
 
             // Work Cv1
             val workCv1 =
-              createUnidentifiedWorkWith(sourceIdentifier = cIdentifier)
+              createUnidentifiedWorkWith(sourceIdentifier = identifierC)
 
             processAndAssertMatchedWorkIs(
               workCv1,
@@ -179,9 +179,9 @@ class MatcherMessageReceiverTest
 
             // Work Bv2 matched to C
             val workBv2 = createUnidentifiedWorkWith(
-              sourceIdentifier = bIdentifier,
+              sourceIdentifier = identifierB,
               version = 2,
-              mergeCandidates = List(MergeCandidate(cIdentifier)))
+              mergeCandidates = List(MergeCandidate(identifierC)))
 
             processAndAssertMatchedWorkIs(
               workBv2,
@@ -209,7 +209,7 @@ class MatcherMessageReceiverTest
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 = createUnidentifiedWorkWith(
-              sourceIdentifier = aIdentifier,
+              sourceIdentifier = identifierA,
               version = 1)
 
             processAndAssertMatchedWorkIs(
@@ -222,7 +222,7 @@ class MatcherMessageReceiverTest
 
             // Work Bv1
             val workBv1 = createUnidentifiedWorkWith(
-              sourceIdentifier = bIdentifier,
+              sourceIdentifier = identifierB,
               version = 1)
 
             processAndAssertMatchedWorkIs(
@@ -235,9 +235,9 @@ class MatcherMessageReceiverTest
 
             // Match Work A to Work B
             val workAv2MatchedToB = createUnidentifiedWorkWith(
-              sourceIdentifier = aIdentifier,
+              sourceIdentifier = identifierA,
               version = 2,
-              mergeCandidates = List(MergeCandidate(bIdentifier)))
+              mergeCandidates = List(MergeCandidate(identifierB)))
 
             processAndAssertMatchedWorkIs(
               workAv2MatchedToB,
@@ -253,7 +253,7 @@ class MatcherMessageReceiverTest
 
             // A no longer matches B
             val workAv3WithNoMatchingWorks = createUnidentifiedWorkWith(
-              sourceIdentifier = aIdentifier,
+              sourceIdentifier = identifierA,
               version = 3)
 
             processAndAssertMatchedWorkIs(
@@ -282,7 +282,7 @@ class MatcherMessageReceiverTest
             _ =>
               // process Work V2
               val workAv2 = createUnidentifiedWorkWith(
-                sourceIdentifier = aIdentifier,
+                sourceIdentifier = identifierA,
                 version = 2
               )
 
@@ -299,7 +299,7 @@ class MatcherMessageReceiverTest
 
               // Work V1 is sent but not matched
               val workAv1 = createUnidentifiedWorkWith(
-                sourceIdentifier = aIdentifier,
+                sourceIdentifier = identifierA,
                 version = 1)
 
               sendMessage[TransformedBaseWork](
@@ -327,7 +327,7 @@ class MatcherMessageReceiverTest
           withLocalS3Bucket { storageBucket =>
             withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
               val workAv2 = createUnidentifiedWorkWith(
-                sourceIdentifier = aIdentifier,
+                sourceIdentifier = identifierA,
                 version = 2
               )
 
@@ -344,8 +344,8 @@ class MatcherMessageReceiverTest
 
               // Work V1 is sent but not matched
               val differentWorkAv2 = createUnidentifiedWorkWith(
-                sourceIdentifier = aIdentifier,
-                mergeCandidates = List(MergeCandidate(bIdentifier)),
+                sourceIdentifier = identifierA,
+                mergeCandidates = List(MergeCandidate(identifierB)),
                 version = 2)
 
               sendMessage[TransformedBaseWork](

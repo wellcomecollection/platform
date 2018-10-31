@@ -29,8 +29,8 @@ class WorkMatcherConcurrencyTest
                   withWorkMatcherAndLockingService(
                     workGraphStore,
                     dynamoLockingService) { workMatcher =>
-                    val identifierA = aSierraSourceIdentifier("A")
-                    val identifierB = aSierraSourceIdentifier("B")
+                    val identifierA = createSierraSystemSourceIdentifierWith(value = "A")
+                    val identifierB = createSierraSystemSourceIdentifierWith(value = "B")
 
                     val workA = createUnidentifiedWorkWith(
                       sourceIdentifier = identifierA,
