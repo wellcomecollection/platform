@@ -112,9 +112,4 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
     ]
 
     for record in es_records:
-        es_client.index(
-            index=index,
-            doc_type=doc_type,
-            id=record.id,
-            body=record.doc
-        )
+        es_client.index(index=index, doc_type=doc_type, id=record.id, body=record.doc)
