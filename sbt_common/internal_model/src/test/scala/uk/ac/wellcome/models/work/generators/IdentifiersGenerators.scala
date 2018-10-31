@@ -49,16 +49,8 @@ trait IdentifiersGenerators {
     createSierraIdentifierSourceIdentifierWith()
 
   def createIsbnSourceIdentifier: SourceIdentifier =
-    createIsbnSourceIdentifierWith()
-
-  def createIsbnSourceIdentifierWith(
-    value: String = randomAlphanumeric(length = 10),
-    ontologyType: String = "Work"
-  ): SourceIdentifier =
-    SourceIdentifier(
-      identifierType = IdentifierType("isbn"),
-      value = value,
-      ontologyType = ontologyType
+    createSourceIdentifierWith(
+      identifierType = IdentifierType("isbn")
     )
 
   def createMiroSourceIdentifierWith(
