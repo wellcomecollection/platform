@@ -17,6 +17,11 @@ wig:Bag rdf:type owl:Class ;
     rdfs:label "Bag"@en ;
     rdfs:comment "A set of opaque files contained within a specified structure defined by the BagIt packaging format."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
+
+wig:Process rdf:type owl:Class ;
+    rdfs:label "Process"@en ;
+    rdfs:comment "A process related to archive."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
     
 wig:BagInfo rdf:type owl:Class ;
     rdfs:label "BagInfo"@en ;
@@ -25,6 +30,7 @@ wig:BagInfo rdf:type owl:Class ;
     
 wig:Ingest rdf:type owl:Class ;
     rdfs:label "Ingest"@en ;
+    rdfs:subClassOf wig:Process ,
     rdfs:comment "An ingest of archival assets."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
     
@@ -56,7 +62,13 @@ wig:Provider rdf:type owl:Class ;
 wig:Status rdf:type owl:Class ;
     rdfs:label "Status"@en ;
     rdfs:comment "The status of a process."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .          
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> . 
+    
+wig:Callback rdf:type owl:Class ;
+    rdfs:label "Callback"@en ;
+    rdfs:subClassOf wig:Process ,
+    rdfs:comment "A callback."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .              
       
 #### object properties ####
 
@@ -123,36 +135,30 @@ wig:provider rdf:type owl:ObjectProperty ;
     rdfs:range wig:Provider ;
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .     
 
-wig:ingestStatus rdf:type owl:ObjectProperty ;
-    rdfs:label "ingestStatus"@en ;
-    rdfs:comment "Relates an ingest process to the ingest status."@en ;
-    rdfs:domain wig:Ingest ;
+wig:status rdf:type owl:ObjectProperty ;
+    rdfs:label "status"@en ;
+    rdfs:comment "Relates an ingest process to a status."@en ;
+    rdfs:domain wig:Process ;
     rdfs:range wig:Status ;
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .  
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .
+
+wig:sourceCallback rdf:type owl:ObjectProperty ;
+    rdfs:label "sourceCallback"@en ;
+    rdfs:comment "Relates an ingest process to a callback."@en ;
+    rdfs:domain wig:Ingest ;
+    rdfs:range wig:Callback ;
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .
     
-wig:callbackStatus rdf:type owl:ObjectProperty ;
-    rdfs:label "callbackStatus"@en ;
-    rdfs:comment "Relates an ingest process to the callback status."@en ;
+wig:sourceLocation rdf:type owl:ObjectProperty ;
+    rdfs:label "sourceLocation"@en ;
+    rdfs:comment "Relates an ingest process to a location."@en ;
     rdfs:domain wig:Ingest ;
-    rdfs:range wig:Status ;
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .      
+    rdfs:range wig:Location ;
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .        
+          
 
 ####### data properties #####
-
-    
-wig:uploadUrl rdf:type owl:DatatypeProperty ;
-    rdfs:label "uploadUrl"@en ;
-    rdfs:comment "An upload URL."@en ;
-    rdfs:domain wig:Ingest ;
-    rdfs:range rdfs:Literal ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .    
-                     
-wig:callbackUrl rdf:type owl:DatatypeProperty ;
-    rdfs:label "callbackUrl"@en ;
-    rdfs:comment "A callback url."@en ;
-    rdfs:domain wig:Ingest ;
-    rdfs:range rdfs:Literal  ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .                       
+                    
 
 wig:externalDescription rdf:type owl:DatatypeProperty ;
     rdfs:label "externalDescription"@en ;

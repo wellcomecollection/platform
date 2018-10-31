@@ -1,0 +1,88 @@
+@prefix ws: <http://wellcomecollection.org/ontologies/story/> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://wellcomecollection.org/ontologies/story>
+    rdf:type owl:Ontology ;
+    dcterms:title "Story"@en ;
+    dcterms:created "2018-01-15"^^xsd:date ;
+    dcterms:description "An ontology describing editorial stories and their relationships."@en .
+
+###### classes ###  
+    
+war:Story rdf:type owl:Class ;
+    rdfs:label "Story"@en ;
+    rdfs:comment "A editoiral story"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .
+    
+war:StoryType rdf:type owl:Class ;
+    rdfs:label "StoryType"@en ;
+    rdfs:comment "The editorial intent or form used by the creator. This is seperate from format. Example would be analysis or interview that could be a video or text based transcript."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .
+    
+war:StorySeries rdf:type owl:Class ;
+    rdfs:label "StorySeries"@en ;
+    rdfs:comment "A branded series of storys that can be taken together or individually."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .  
+
+war:StoryFormat rdf:type owl:Class ;
+    rdfs:label "StoryFormat"@en ;
+    rdfs:comment "The primary format or document type of the story. For example video, text or audio."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .  
+
+war:Thing rdf:type owl:Class ;
+    rdfs:label "Thing"@en ;
+    rdfs:comment "Any thing that an story can be about."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .  
+
+    
+#### object properties ####
+
+war:storyType rdf:type owl:ObjectProperty ;
+    rdfs:label "storyType"@en ;
+    rdfs:comment "Relates an story to its type."@en ;
+    rdfs:domain war:Story ;
+    rdfs:range war:StoryType ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .
+
+war:storyFormat rdf:type owl:ObjectProperty ;
+    rdfs:label "storyFormat"@en ;
+    rdfs:comment "Relates an story to its format."@en ;
+    rdfs:domain war:Story ;
+    rdfs:range war:StoryFormat ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .
+
+war:storySeries rdf:type owl:ObjectProperty ;
+    rdfs:label "storySeries"@en ;
+    rdfs:comment "Relates a story to a story series."@en ;
+    rdfs:domain war:Story ;
+    rdfs:range war:StorySeries ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .  
+
+war:about rdf:type owl:ObjectProperty ;
+    rdfs:label "about"@en ;
+    rdfs:comment "Relates a story to its primary focus that it has been created to support. Examples would be storys specifically created to support an exhibition, public event or exhibited item."@en ;
+    rdfs:domain war:Story ;
+    rdfs:range war:Thing ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> . 
+               
+    
+####### data properties #####
+
+war:positionInStorySeries rdf:type owl:DatatypeProperty ;
+    rdfs:label "positionInStorySeries"@en ;
+    rdfs:comment "The position of a story in a story series."@en ;
+    rdfs:domain war:Story ;
+    rdfs:range xsd:integer ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .
+    
+war:created rdf:type owl:DatatypeProperty ;
+    rdfs:label "created"@en ;
+    rdfs:comment "The date the story was created."@en ;
+    rdfs:domain war:Story ;
+    rdfs:range xsd:date ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/story> .    
+    
