@@ -4,9 +4,16 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.ParallelScanner
+import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
+  MaxRecordsScanner,
+  ParallelScanner,
+  ScanSpecScanner
+}
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.ReindexableTable
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  CompleteReindexJob,
+  PartialReindexJob
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -31,7 +38,7 @@ class RecordReaderTest
     )
   )
 
-  it("finds records in the table") {
+  it("finds records in the table with a complete reindex") {
     withLocalDynamoDbTable { table =>
       withRecordReader(table) { reader =>
         val records = List(
@@ -39,16 +46,31 @@ class RecordReaderTest
           exampleRecord.copy(id = "id2")
         )
 
-        val reindexJob = ReindexJob(segment = 0, totalSegments = 1)
-
-        val recordList = records
-
-        recordList.foreach(record =>
+        records.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
+
+        val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
 
         whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
             actualRecords should contain theSameElementsAs records
+        }
+      }
+    }
+  }
+
+  it("finds records in the table with a maxResults reindex") {
+    withLocalDynamoDbTable { table =>
+      withRecordReader(table) { reader =>
+        (1 to 15).foreach { id =>
+          val record = exampleRecord.copy(id = id.toString)
+          Scanamo.put(dynamoDbClient)(table.name)(record)
+        }
+
+        val reindexJob = PartialReindexJob(maxRecords = 5)
+
+        whenReady(reader.findRecordsForReindexing(reindexJob)) {
+          actualRecords => actualRecords should have size 5
         }
       }
     }
@@ -67,19 +89,25 @@ class RecordReaderTest
 
   private def withRecordReader[R](table: Table)(
     testWith: TestWith[RecordReader, R]): R = {
-
     val dynamoConfig = DynamoConfig(
       table = table.name,
       index = table.index
     )
 
+    val scanSpecScanner = new ScanSpecScanner(dynamoDbClient)
+
     val parallelScanner = new ParallelScanner(
-      dynamoDBClient = dynamoDbClient,
-      dynamoConfig = dynamoConfig
+      scanSpecScanner = scanSpecScanner
+    )
+
+    val maxRecordsScanner = new MaxRecordsScanner(
+      scanSpecScanner = scanSpecScanner
     )
 
     val reader = new RecordReader(
-      parallelScanner = parallelScanner
+      maxRecordsScanner = maxRecordsScanner,
+      parallelScanner = parallelScanner,
+      dynamoConfig = dynamoConfig
     )
 
     testWith(reader)

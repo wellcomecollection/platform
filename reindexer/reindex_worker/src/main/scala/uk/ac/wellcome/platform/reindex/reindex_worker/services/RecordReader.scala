@@ -6,6 +6,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.MaxRecordsScanner
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,7 +18,8 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class RecordReader @Inject()(
   maxRecordsScanner: MaxRecordsScanner,
-  parallelScanner: ParallelScanner
+  parallelScanner: ParallelScanner,
+  dynamoConfig: DynamoConfig
 )(implicit ec: ExecutionContext)
     extends Logging {
 
@@ -35,11 +37,15 @@ class RecordReader @Inject()(
           case CompleteReindexJob(segment, totalSegments) =>
             parallelScanner
               .scan[HybridRecord](
-              segment = segment,
-              totalSegments = totalSegments
-            )
+                segment = segment,
+                totalSegments = totalSegments,
+                tableName = dynamoConfig.table
+              )
           case PartialReindexJob(maxRecords) =>
-            maxRecordsScanner.scan[HybridRecord](maxRecords = maxRecords)
+            maxRecordsScanner.scan[HybridRecord](
+              maxRecords = maxRecords,
+              tableName = dynamoConfig.table
+            )
         }
 
       recordsToReindex = results.map(extractRecord)
