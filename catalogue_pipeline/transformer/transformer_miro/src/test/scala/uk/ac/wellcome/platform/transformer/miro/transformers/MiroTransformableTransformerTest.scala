@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
 
 class MiroTransformableTransformerTest
     extends FunSpec
@@ -302,9 +301,8 @@ class MiroTransformableTransformerTest
 
   private def assertTransformReturnsInvisibleWork(miroId: String = "G0000001",
                                                   data: String) = {
-    val miroTransformable = MiroTransformable(
-      sourceId = miroId,
-      MiroCollection = "TestCollection",
+    val miroTransformable = createMiroTransformableWith(
+      miroId = miroId,
       data = data
     )
 
