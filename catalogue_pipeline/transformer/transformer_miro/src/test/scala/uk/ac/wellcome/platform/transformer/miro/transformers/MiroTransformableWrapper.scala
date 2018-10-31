@@ -39,13 +39,11 @@ trait MiroTransformableWrapper extends Matchers with MiroTransformableGenerators
   }
 
   def transformWork(
-    data: String = "",
-    MiroID: String = "M0000001",
-    MiroCollection: String = "TestCollection"
+    miroId: String = "M0000001",
+    data: String = ""
   ): UnidentifiedWork = {
-    val miroTransformable = MiroTransformable(
-      sourceId = MiroID,
-      MiroCollection = MiroCollection,
+    val miroTransformable = createMiroTransformableWith(
+      miroId = miroId,
       data = buildJSONForWork(data)
     )
 
