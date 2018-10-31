@@ -16,5 +16,8 @@ def _publish_notification(result):
 
 
 def bagging_complete(result):
-    logging.info("Bagging complete for %s", result['identifier'])
+    logging.info(
+        "Bagging complete for %s",
+        result['identifier']
+    )
     _publish_notification(result)
