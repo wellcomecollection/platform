@@ -233,7 +233,7 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
     val newSierraWork = createIdentifiedWorkWith(
-      sourceIdentifier = createSierraSystemSourceIdentifier
+      sourceIdentifier = createSierraSystemSourceIdentifier,
       version = 2
     )
     val oldSierraWork = newSierraWork.copy(version = 1)
