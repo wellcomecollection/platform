@@ -32,7 +32,7 @@ def process_bagging_message(message):
 
             notifier.bagging_complete(result)
 
-        except:
+        except Exception:
             # catch any kind of error
             tb = traceback.format_exc()
             logging.warning(tb)
