@@ -67,7 +67,8 @@ class MiroTransformableTransformer
         physicalDescription = None,
         extent = None,
         lettering = miroData.suppLettering,
-        createdDate = getCreatedDate(miroData, miroId = miroTransformable.sourceId),
+        createdDate =
+          getCreatedDate(miroData, miroId = miroTransformable.sourceId),
         subjects = getSubjects(miroData),
         genres = getGenres(miroData),
         contributors = getContributors(

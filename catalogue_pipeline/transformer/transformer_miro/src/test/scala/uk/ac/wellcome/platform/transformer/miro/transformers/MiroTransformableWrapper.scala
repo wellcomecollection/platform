@@ -19,7 +19,9 @@ import scala.util.Try
   *  fields before transformation, allowing tests to focus on only the fields
   *  that are interesting for that test.
   */
-trait MiroTransformableWrapper extends Matchers with MiroTransformableGenerators { this: Suite =>
+trait MiroTransformableWrapper
+    extends Matchers
+    with MiroTransformableGenerators { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String = {
@@ -72,7 +74,8 @@ trait MiroTransformableWrapper extends Matchers with MiroTransformableGenerators
     triedWork.get
   }
 
-  def assertTransformToWorkFails(transformable: MiroTransformable): Assertion = {
+  def assertTransformToWorkFails(
+    transformable: MiroTransformable): Assertion = {
     transformer
       .transform(transformable, version = 1)
       .isSuccess shouldBe false
