@@ -57,7 +57,7 @@ def all_complete_messages(total_segments):
 
 def publish_messages(topic_arn, messages):
     """Publish a sequence of messages to an SNS topic."""
-    for m in tqdm.tqdm(messages, total=total_messages):
+    for m in tqdm.tqdm(list(messages)):
         resp = sns_client.publish(
             TopicArn=topic_arn,
             MessageStructure="json",
@@ -174,7 +174,7 @@ def main():
 
     topic_arn = build_topic_arn(topic_name=get_topic_name(source_name))
 
-    publish_messages(topic_arn=topic_arn, messages=list(messages))
+    publish_messages(topic_arn=topic_arn, messages=messages)
 
 
 if __name__ == "__main__":
