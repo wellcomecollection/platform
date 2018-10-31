@@ -3,7 +3,7 @@
 """
 Example lambda
 """
-import transform
+from transform import transform
 import json
 import os
 
@@ -109,7 +109,7 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
     index = index or os.environ["ES_INDEX"]
     doc_type = doc_type or os.environ["ES_DOC_TYPE"]
     es_client = es_client or Elasticsearch(url=os.environ["ES_URL"],
-                                           _ssl=True,
+                                           use_ssl=True,
                                            ca_certs=certifi.where(),
                                            http_auth=(os.environ["ES_USER"],
                                                       os.environ["ES_PASS"]))
@@ -122,6 +122,6 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
                   for data_dict, hybrid_record in zip(transformed_records, hybrid_records)]
 
     results = [es_client.index(index=index, doc_type=doc_type, id=record.id, body=record)
-               for record in transformed_records]
+               for record in es_records]
 
     print(f"Result: {results}")
