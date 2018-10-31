@@ -167,9 +167,7 @@ trait WorksGenerators extends ItemsGenerators {
     createUnidentifiedWorkWith(
       sourceIdentifier = createSierraSystemSourceIdentifier,
       workType = workType,
-      otherIdentifiers = List(
-        createSourceIdentifierWith(
-          identifierType = createSierraIdentifierSourceIdentifierType)),
+      otherIdentifiers = List(createSierraSystemSourceIdentifier),
       items = items
     )
 

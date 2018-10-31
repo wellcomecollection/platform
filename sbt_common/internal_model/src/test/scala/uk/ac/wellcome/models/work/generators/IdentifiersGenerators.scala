@@ -22,9 +22,6 @@ trait IdentifiersGenerators {
       ontologyType = ontologyType
     )
 
-  def createSierraSystemSourceIdentifier: SourceIdentifier =
-    createSierraSystemSourceIdentifierWith()
-
   def createSierraSystemSourceIdentifierWith(
     value: String = randomAlphanumeric(length = 10),
     ontologyType: String = "Work"
@@ -34,6 +31,22 @@ trait IdentifiersGenerators {
       value = value,
       ontologyType = ontologyType
     )
+
+  def createSierraSystemSourceIdentifier: SourceIdentifier =
+    createSierraSystemSourceIdentifierWith()
+
+  def createSierraIdentifierSourceIdentifierWith(
+    value: String = randomAlphanumeric(length = 10),
+    ontologyType: String = "Work"
+  ): SourceIdentifier =
+    SourceIdentifier(
+      identifierType = IdentifierType("sierra-identifier"),
+      value = value,
+      ontologyType = ontologyType
+    )
+
+  def createSierraIdentifierSourceIdentifier: SourceIdentifier =
+    createSierraIdentifierSourceIdentifierWith()
 
   def createIsbnSourceIdentifier: SourceIdentifier =
     createIsbnSourceIdentifierWith()
@@ -59,14 +72,6 @@ trait IdentifiersGenerators {
 
   def createMiroSourceIdentifier: SourceIdentifier =
     createMiroSourceIdentifierWith()
-
-  def createSierraIdentifierSourceIdentifier: SourceIdentifier =
-    createSourceIdentifierWith(
-      identifierType = createSierraIdentifierSourceIdentifierType)
-
-  def createSierraIdentifierSourceIdentifierType: IdentifierType = {
-    IdentifierType("sierra-identifier")
-  }
 
   def createIsbnSourceIdentifierType: IdentifierType = {
     IdentifierType("isbn")
