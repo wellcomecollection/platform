@@ -9,7 +9,6 @@ trait MiroTransformableGenerators {
   ): MiroTransformable =
     MiroTransformable(
       sourceId = miroId,
-      MiroCollection = "does-not-matter",
       data = data
     )
 }
