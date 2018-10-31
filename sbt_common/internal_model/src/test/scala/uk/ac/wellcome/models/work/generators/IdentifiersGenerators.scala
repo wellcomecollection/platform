@@ -13,7 +13,7 @@ trait IdentifiersGenerators {
   def createSourceIdentifier: SourceIdentifier = createSourceIdentifierWith()
 
   def createSourceIdentifierWith(
-    identifierType: IdentifierType = createMiroSourceIdentifierType,
+    identifierType: IdentifierType = IdentifierType("miro-image-number"),
     value: String = randomAlphanumeric(length = 10),
     ontologyType: String = "Work"): SourceIdentifier =
     SourceIdentifier(
@@ -46,8 +46,18 @@ trait IdentifiersGenerators {
       ontologyType = ontologyType
     )
 
+  def createMiroSourceIdentifierWith(
+    value: String = randomAlphanumeric(length = 10),
+    ontologyType: String = "Work"
+  ): SourceIdentifier =
+    SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      ontologyType = ontologyType,
+      value = value
+    )
+
   def createMiroSourceIdentifier: SourceIdentifier =
-    createSourceIdentifierWith(identifierType = createMiroSourceIdentifierType)
+    createMiroSourceIdentifierWith()
 
   def createMiroLibraryReferenceSourceIdentifier: SourceIdentifier =
     createSourceIdentifierWith(
@@ -63,10 +73,6 @@ trait IdentifiersGenerators {
 
   def createSierraIdentifierSourceIdentifierType: IdentifierType = {
     IdentifierType("sierra-identifier")
-  }
-
-  def createMiroSourceIdentifierType: IdentifierType = {
-    IdentifierType("miro-image-number")
   }
 
   def createIsbnSourceIdentifierType: IdentifierType = {

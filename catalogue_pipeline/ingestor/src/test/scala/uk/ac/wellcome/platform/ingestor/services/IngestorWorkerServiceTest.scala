@@ -130,12 +130,10 @@ class IngestorWorkerServiceTest
 
   it("inserts a mixture of miro and sierra works into the correct index") {
     val miroWork1 = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(
-        identifierType = createMiroSourceIdentifierType)
+      sourceIdentifier = createMiroSourceIdentifier
     )
     val miroWork2 = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(
-        identifierType = createMiroSourceIdentifierType)
+      sourceIdentifier = createMiroSourceIdentifier
     )
     val sierraWork1 = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
@@ -199,8 +197,7 @@ class IngestorWorkerServiceTest
   it(
     "inserts a mixture of miro and sierra works into the index and sends invalid messages to the dlq") {
     val miroWork = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(
-        identifierType = createMiroSourceIdentifierType)
+      sourceIdentifier = createMiroSourceIdentifier
     )
     val sierraWork = createIdentifiedWorkWith(
       sourceIdentifier = createSourceIdentifierWith(
