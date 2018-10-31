@@ -88,14 +88,10 @@ def extract_records(s3, event):
     -------
     data_dicts : dict
     """
-    raw_hybrid_records = [
-        json.loads(record["Sns"]["Message"]) for record in event["Records"]
-    ]
+    raw_hybrid_records = [json.loads(record["Sns"]["Message"]) for record in event["Records"]]
     hybrid_records = [HybridRecord(**record) for record in raw_hybrid_records]
-    data_dicts = [
-        hybrid_record_to_data_dict(s3, hybrid_record)
-        for hybrid_record in hybrid_records
-    ]
+    s3_objects = [fetch_object_from_s3(s3, hybrid_record) for hybrid_record in hybrid_records]
+    data_dicts = [s3_object_to_data_dict(s3_object) for s3_object in s3_objects]
     return data_dicts, hybrid_records
 
 
