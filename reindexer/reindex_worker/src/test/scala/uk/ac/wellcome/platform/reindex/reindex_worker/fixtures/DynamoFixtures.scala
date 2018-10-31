@@ -10,7 +10,7 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.test.fixtures.TestWith
 
-trait ReindexableFixtures extends LocalDynamoDb {
+trait DynamoFixtures extends LocalDynamoDb {
   def withScanSpecScanner[R](
     testWith: TestWith[ScanSpecScanner, R]): R = {
     val scanner = new ScanSpecScanner(dynamoDbClient)
