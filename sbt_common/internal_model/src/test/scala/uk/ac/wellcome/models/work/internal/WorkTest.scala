@@ -3,7 +3,7 @@ package uk.ac.wellcome.models.work.internal
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
-import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
+import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 
 class WorkTest extends FunSpec with Matchers with IdentifiersGenerators {
 

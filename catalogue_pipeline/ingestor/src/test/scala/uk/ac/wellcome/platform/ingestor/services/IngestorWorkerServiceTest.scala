@@ -12,8 +12,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.ingestor.{IngestElasticConfig, IngestorConfig}
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.fixtures.S3

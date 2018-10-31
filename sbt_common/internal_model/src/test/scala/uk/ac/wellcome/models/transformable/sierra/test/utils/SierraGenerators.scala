@@ -9,8 +9,8 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemNumber,
   SierraItemRecord
 }
-import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 
 import scala.util.Random
 

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.merger.rules.physicaldigital
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 
 class SierraPhysicalDigitalPartitionerTest
     extends FunSpec

@@ -2,8 +2,8 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
 class DisplayCreatorsV1SerialisationTest
     extends FunSpec

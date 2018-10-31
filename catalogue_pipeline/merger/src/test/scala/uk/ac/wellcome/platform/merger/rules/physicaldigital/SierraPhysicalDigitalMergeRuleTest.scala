@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.merger.rules.physicaldigital
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.merger.rules.physicaldigital.SierraPhysicalDigitalMergeRule.mergeAndRedirectWorks
 
 class SierraPhysicalDigitalMergeRuleTest

@@ -9,8 +9,8 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
 import uk.ac.wellcome.platform.transformer.sierra.generators.MarcGenerators

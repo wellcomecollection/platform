@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models.work.test.util
+package uk.ac.wellcome.models.work.generators
 
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 

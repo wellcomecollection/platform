@@ -11,7 +11,6 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.monitoring.fixtures.CloudWatch
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
@@ -24,6 +23,7 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 
 class SnapshotGeneratorFeatureTest
     extends FunSpec

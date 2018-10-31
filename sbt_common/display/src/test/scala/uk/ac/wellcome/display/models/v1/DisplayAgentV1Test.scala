@@ -1,8 +1,8 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal.{Agent, Identified}
-import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
 class DisplayAgentV1Test
     extends FunSpec
