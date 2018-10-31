@@ -40,9 +40,9 @@ class ElasticsearchRecord(object):
 
 
 # Moving records through the pipeline ------------------------------------------
-def hybrid_record_to_data_dict(s3, hybrid_record):
+def fetch_object_from_s3(s3, hybrid_record):
     """
-    takes an VHS/S3 location and returns its data as a record in ES format
+    fetches an object from s3 based on the data in the given HybridRecord
 
     Parameters
     ----------
@@ -51,14 +51,28 @@ def hybrid_record_to_data_dict(s3, hybrid_record):
 
     Returns
     -------
+    s3_object : dict
+    """ 
+    return s3.get_object(
+        Bucket=hybrid_record.location.namespace, 
+        Key=hybrid_record.location.key
+    )
+
+
+def s3_object_to_data_dict(s3_object)
+    """ 
+    extracts the useful data from a given s3 object. 
+
+    Parameters
+    ----------
+    s3_object : dict
+
+    Returns
+    -------
     data_dict : dict
-        object data in malleable dict format
     """
-    object_location = hybrid_record.location
-    s3_object = s3.get_object(Bucket=object_location.namespace, Key=object_location.key)
     record = s3_object["Body"].read().decode("utf-8")
-    record_data = json.loads(record)["data"]
-    return record_data
+    return json.loads(record)["data"]
 
 
 def extract_records(s3, event):
@@ -73,7 +87,6 @@ def extract_records(s3, event):
     Returns
     -------
     data_dicts : dict
-        a list of records in dict form, as specified by the input event
     """
     raw_hybrid_records = [
         json.loads(record["Sns"]["Message"]) for record in event["Records"]
