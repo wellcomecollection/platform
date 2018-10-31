@@ -97,7 +97,7 @@ class ParallelScannerTest
   private def withParallelScanner[R](table: Table)(
     testWith: TestWith[ParallelScanner, R]): R = {
     val scanner = new ParallelScanner(
-      dynamoDBClient = dynamoDbClient,
+      scanSpecScanner = new ScanSpecScanner(dynamoDbClient),
       dynamoConfig = DynamoConfig(
         table = table.name,
         index = table.index
