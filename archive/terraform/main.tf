@@ -9,8 +9,6 @@ module "api_ecs" {
   archive_api_container_image = "${local.api_ecs_container_image}"
   archive_api_container_port  = "9000"
 
-  archive_ingest_sns_topic_arn = "${module.archivist_topic.arn}"
-
   vpc_id                         = "${local.vpc_id}"
   interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
   private_subnets                = "${local.private_subnets}"
