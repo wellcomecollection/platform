@@ -89,7 +89,7 @@ def extract_records(s3, event):
 # Move records with transforms applied -----------------------------------------
 def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
     """
-    get records from VHS, apply the transformation to them, and shove them into 
+    get records from VHS, apply the transformation to them, and shove them into
     an elasticsearch index
     """
     s3_client = s3_client or boto3.client("s3")
@@ -111,7 +111,10 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
         for doc, hybrid_record in zip(transformed_dicts, hybrid_records)
     ]
 
-    results = [
-        es_client.index(index=index, doc_type=doc_type, id=record.id, body=record.doc)
-        for record in es_records
-    ]
+    for record in es_records:
+        es_client.index(
+            index=index,
+            doc_type=doc_type,
+            id=record.id,
+            body=record.doc
+        )
