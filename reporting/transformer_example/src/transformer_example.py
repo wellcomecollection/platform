@@ -79,7 +79,7 @@ def extract_records(s3, event):
     data_dicts = [hybrid_record_to_data_dict(s3, hybrid_record) 
                   for hybrid_record in hybrid_records]
     return data_dicts, hybrid_records
-    
+
     
 # Move records with transforms applied -----------------------------------------
 def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
@@ -92,7 +92,7 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
     s3_client = s3_client or boto3.client("s3")
     index = index or os.environ["ES_INDEX"]
     doc_type = doc_type or os.environ["ES_DOC_TYPE"]
-    es_client = es_client or Elasticsearch(url=os.environ["ES_URL"],
+    es_client = es_client or Elasticsearch(hosts=os.environ["ES_URL"],
                                            use_ssl=True,
                                            ca_certs=certifi.where(),
                                            http_auth=(os.environ["ES_USER"],
