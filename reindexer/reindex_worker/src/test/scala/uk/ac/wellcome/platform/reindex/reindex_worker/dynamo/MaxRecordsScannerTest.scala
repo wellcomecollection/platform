@@ -5,10 +5,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.dynamo.TestVersioned
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class MaxRecordsScannerTest
   extends FunSpec
@@ -47,7 +44,7 @@ class MaxRecordsScannerTest
         val futureResult = maxResultScanner.scan[TestVersioned](maxRecords = 10)
 
         whenReady(futureResult) { result =>
-          result.map { _.right.get } shouldBe records
+          result.map { _.right.get } should contain theSameElementsAs records
         }
       }
     }

@@ -17,7 +17,6 @@ import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
   CompleteReindexJob,
-  PartialReindexJob,
   ReindexJob
 }
 import uk.ac.wellcome.storage.ObjectLocation
@@ -59,8 +58,8 @@ class ReindexWorkerTest
               metricsSender) { sqsStream =>
               withMaxRecordsScanner(table) { maxRecordsScanner =>
                 withParallelScanner(table) { parallelScanner =>
-                  val readerService = new RecordReader(
-                    maxRecordsScanner = maxRecordsScanner
+                  val recordReader = new RecordReader(
+                    maxRecordsScanner = maxRecordsScanner,
                     parallelScanner = parallelScanner
                   )
 
@@ -70,7 +69,7 @@ class ReindexWorkerTest
                     )
 
                     val workerService = new ReindexWorker(
-                      readerService = readerService,
+                      recordReader = recordReader,
                       hybridRecordSender = hybridRecordSender,
                       sqsStream = sqsStream,
                       system = actorSystem

@@ -6,7 +6,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.dynamo.TestVersioned
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,6 +15,7 @@ class ParallelScannerTest
     extends FunSpec
     with Matchers
     with ScalaFutures
+    with DynamoFixtures
     with LocalDynamoDbVersioned {
 
   it("reads a table with a single record") {

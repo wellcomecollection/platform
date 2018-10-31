@@ -10,6 +10,8 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait DynamoFixtures extends LocalDynamoDb {
   def withScanSpecScanner[R](
     testWith: TestWith[ScanSpecScanner, R]): R = {
