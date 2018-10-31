@@ -9,12 +9,17 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.ReindexableTable
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
+  DynamoFixtures,
+  ReindexableTable
+}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.ParallelScanner
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  CompleteReindexJob,
+  PartialReindexJob,
+  ReindexJob
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -26,6 +31,7 @@ class ReindexWorkerTest
     with Matchers
     with MockitoSugar
     with Akka
+    with DynamoFixtures
     with ReindexableTable
     with MetricsSenderFixture
     with SNS
@@ -51,34 +57,31 @@ class ReindexWorkerTest
               actorSystem,
               queue,
               metricsSender) { sqsStream =>
-              val parallelScanner = new ParallelScanner(
-                dynamoDBClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(
-                  table = table.name,
-                  index = table.index
-                )
-              )
+              withMaxRecordsScanner(table) { maxRecordsScanner =>
+                withParallelScanner(table) { parallelScanner =>
+                  val readerService = new RecordReader(
+                    maxRecordsScanner = maxRecordsScanner
+                    parallelScanner = parallelScanner
+                  )
 
-              val readerService = new RecordReader(
-                parallelScanner = parallelScanner
-              )
+                  withSNSWriter(topic) { snsWriter =>
+                    val hybridRecordSender = new HybridRecordSender(
+                      snsWriter = snsWriter
+                    )
 
-              withSNSWriter(topic) { snsWriter =>
-                val hybridRecordSender = new HybridRecordSender(
-                  snsWriter = snsWriter
-                )
+                    val workerService = new ReindexWorker(
+                      readerService = readerService,
+                      hybridRecordSender = hybridRecordSender,
+                      sqsStream = sqsStream,
+                      system = actorSystem
+                    )
 
-                val workerService = new ReindexWorker(
-                  readerService = readerService,
-                  hybridRecordSender = hybridRecordSender,
-                  sqsStream = sqsStream,
-                  system = actorSystem
-                )
-
-                try {
-                  testWith((workerService, queuePair))
-                } finally {
-                  workerService.stop()
+                    try {
+                      testWith((workerService, queuePair))
+                    } finally {
+                      workerService.stop()
+                    }
+                  }
                 }
               }
             }
@@ -92,11 +95,11 @@ class ReindexWorkerTest
       withLocalSnsTopic { topic =>
         withReindexWorkerService(table, topic) {
           case (service, QueuePair(queue, dlq)) =>
-            val reindexJob = ReindexJob(segment = 0, totalSegments = 1)
+            val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
 
             Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
 
-            sendNotificationToSQS(
+            sendNotificationToSQS[ReindexJob](
               queue = queue,
               message = reindexJob
             )
@@ -142,9 +145,9 @@ class ReindexWorkerTest
 
     withReindexWorkerService(badTable, badTopic) {
       case (_, QueuePair(queue, dlq)) =>
-        val reindexJob = ReindexJob(segment = 5, totalSegments = 10)
+        val reindexJob = CompleteReindexJob(segment = 5, totalSegments = 10)
 
-        sendNotificationToSQS(
+        sendNotificationToSQS[ReindexJob](
           queue = queue,
           message = reindexJob
         )
