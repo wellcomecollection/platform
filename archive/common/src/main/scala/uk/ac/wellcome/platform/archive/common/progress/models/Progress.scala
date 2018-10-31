@@ -10,7 +10,7 @@ import uk.ac.wellcome.platform.archive.common.models.RequestDisplayIngest
 case class Progress(id: UUID,
                     uploadUri: URI,
                     space: Namespace,
-                    callback: Option[Callback]= None,
+                    callback: Option[Callback] = None,
                     status: Progress.Status = Progress.Initialised,
                     resources: Seq[Resource] = Seq.empty,
                     createdDate: Instant = Instant.now,
@@ -45,7 +45,8 @@ case object Progress extends URIConverters {
     Progress(
       id = generateId,
       uploadUri = URI.create(createRequest.uploadUrl),
-      callback = Callback(createRequest.callback.map(displayCallback => URI.create(displayCallback.uri))),
+      callback = Callback(createRequest.callback.map(displayCallback =>
+        URI.create(displayCallback.uri))),
       space = Namespace(createRequest.space.id),
       status = Progress.Initialised
     )

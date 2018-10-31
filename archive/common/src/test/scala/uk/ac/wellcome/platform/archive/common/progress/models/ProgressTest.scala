@@ -6,7 +6,10 @@ import java.util.UUID
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, TimeTestFixture}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  TimeTestFixture
+}
 
 class ProgressTest
     extends FunSpec
@@ -26,7 +29,8 @@ class ProgressTest
   it("can be created from a request display ingest") {
     val progressCreateRequest = RequestDisplayIngest(
       "s3://ingest-bucket/bag.zip",
-      Some(DisplayCallback( "http://www.wellcomecollection.org/callback/ok", None)),
+      Some(
+        DisplayCallback("http://www.wellcomecollection.org/callback/ok", None)),
       DisplayIngestType("create"),
       DisplayStorageSpace("space-id")
     )

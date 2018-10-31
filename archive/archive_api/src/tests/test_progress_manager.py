@@ -38,57 +38,41 @@ def progress_manager(sess):
 class TestCreateRequest:
     def test_not_201_from_service_is_error(self, progress_manager):
         with pytest.raises(ProgressServiceError):
-            progress_manager.create_request(
-                request_json={
-                    "type": "Ingest"
-                }
-            )
+            progress_manager.create_request(request_json={"type": "Ingest"})
 
     def test_create_request(self, progress_manager):
         (location, json) = progress_manager.create_request(
             request_json={
                 "type": "Ingest",
-                "ingestType": {
-                    "id": "create",
-                    "type": "IngestType"
-                },
-                "space": {
-                    "id": "bububa",
-                    "type": "Space"
-                },
-                "uploadUrl": "s3://wellcomecollection-workflow-export-bagit/b21508628.zip"
+                "ingestType": {"id": "create", "type": "IngestType"},
+                "space": {"id": "bububa", "type": "Space"},
+                "uploadUrl": "s3://wellcomecollection-workflow-export-bagit/b21508628.zip",
             }
         )
-        assert 'id' in json
+        assert "id" in json
         assert isinstance(location, str)
 
     def test_can_create_request_with_callback(self, progress_manager):
         (location, json) = progress_manager.create_request(
             request_json={
                 "type": "Ingest",
-                "ingestType": {
-                    "id": "create",
-                    "type": "IngestType"
-                },
-                "space": {
-                    "id": "bububa",
-                    "type": "Space"
-                },
+                "ingestType": {"id": "create", "type": "IngestType"},
+                "space": {"id": "bububa", "type": "Space"},
                 "uploadUrl": "s3://wellcomecollection-workflow-export-bagit/b21508628.zip",
-                "callback": {
-                    "uri": "http://callback.org"
-                }
+                "callback": {"uri": "http://callback.org"},
             }
         )
-        assert 'id' in json
-        assert 'callback' in json
+        assert "id" in json
+        assert "callback" in json
         assert isinstance(location, str)
 
 
 class TestLookupProgress:
     def test_can_lookup_existing_id(self, progress_manager):
-        result = progress_manager.lookup_progress(id="15d76ac8-e92e-4fb5-aea4-7e5bc98dbc20")
-        assert result['id'] == "15d76ac8-e92e-4fb5-aea4-7e5bc98dbc20"
+        result = progress_manager.lookup_progress(
+            id="15d76ac8-e92e-4fb5-aea4-7e5bc98dbc20"
+        )
+        assert result["id"] == "15d76ac8-e92e-4fb5-aea4-7e5bc98dbc20"
 
     def test_not_200_or_404_is_error(self, progress_manager):
         with pytest.raises(ProgressServiceError):

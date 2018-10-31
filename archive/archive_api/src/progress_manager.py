@@ -8,6 +8,7 @@ import requests
 
 class ProgressServiceError(Exception):
     """Raised if we get an unexpected error from the progress service."""
+
     def __init__(self, status_code, message):
         self.status_code = status_code
         self.message = message
@@ -37,8 +38,8 @@ class ProgressManager:
         # The service should return an HTTP 202 if successful.  Anything
         # else should be treated as an error.
         if resp.status_code != 201:
-            raise ProgressServiceError(resp.status_code, resp.content.decode('utf-8'))
-        return resp.headers["Location"],resp.json()
+            raise ProgressServiceError(resp.status_code, resp.content.decode("utf-8"))
+        return resp.headers["Location"], resp.json()
 
     def lookup_progress(self, id):
         """
@@ -52,13 +53,11 @@ class ProgressManager:
         # The service should return an HTTP 200 (if present) or 404 (if not).
         # Anything else should be treated as an error.
         if resp.status_code not in (200, 404):
-            raise ProgressServiceError(
-                resp.status_code, resp.content.decode('utf-8')
-            )
+            raise ProgressServiceError(resp.status_code, resp.content.decode("utf-8"))
         elif resp.status_code == 404:
             raise ProgressNotFoundError(id)
         else:
             try:
                 return resp.json()
             except json.JSONDecodeError as err:
-                raise ProgressServiceError(500,err.message)
+                raise ProgressServiceError(500, err.message)

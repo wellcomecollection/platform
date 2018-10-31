@@ -174,7 +174,8 @@ class ProgressHttpFeatureTest
                 maybeId.isEmpty shouldBe false
                 val id = UUID.fromString(maybeId.get)
 
-                val progressFuture = Unmarshal(result.entity).to[ResponseDisplayIngest]
+                val progressFuture =
+                  Unmarshal(result.entity).to[ResponseDisplayIngest]
 
                 whenReady(progressFuture) { actualProgress =>
                   inside(actualProgress) {

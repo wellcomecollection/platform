@@ -7,7 +7,10 @@ import akka.http.scaladsl.model.headers.Location
 import com.google.inject.Inject
 import io.circe.Printer
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
-import uk.ac.wellcome.platform.archive.common.models.{RequestDisplayIngest, ResponseDisplayIngest}
+import uk.ac.wellcome.platform.archive.common.models.{
+  RequestDisplayIngest,
+  ResponseDisplayIngest
+}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 

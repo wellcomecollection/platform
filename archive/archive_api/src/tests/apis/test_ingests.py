@@ -21,7 +21,9 @@ class TestGETIngests:
         assert rv["id"] == lookup_id.lower()
         assert rv["type"] == "Ingest"
         assert isinstance(rv["uploadUrl"], str)
-        assert rv["resources"] == [{"id": "digitised/b21508628", "type": "IngestResource"}]
+        assert rv["resources"] == [
+            {"id": "digitised/b21508628", "type": "IngestResource"}
+        ]
         assert rv["ingestType"] == {"id": "create", "type": "IngestType"}
         assert rv["status"] == {"id": "completed", "type": "IngestStatus"}
         assert rv["space"] == {"id": "bububa", "type": "Space"}
@@ -65,8 +67,9 @@ class TestPOSTIngests:
         del ingest_request["uploadUrl"]
         resp = client.post("/storage/v1/ingests", json=ingest_request)
         assert_is_error_response(
-            resp, status=400,
-            description="The request content was malformed:\nAttempt to decode value on failed cursor: DownField(uploadUrl)"
+            resp,
+            status=400,
+            description="The request content was malformed:\nAttempt to decode value on failed cursor: DownField(uploadUrl)",
         )
 
     def test_allows_no_callback_url(self, client, ingest_request):
@@ -95,7 +98,7 @@ class TestPOSTIngests:
         assert_is_error_response(
             resp,
             status=400,
-            description="The browser (or proxy) sent a request that this server could not understand."
+            description="The browser (or proxy) sent a request that this server could not understand.",
         )
 
 
@@ -105,7 +108,6 @@ def ingest_request():
         "type": "Ingest",
         "ingestType": {"id": "create", "type": "IngestType"},
         "uploadUrl": "s3://wellcomecollection-workflow-export-bagit/b21508628.zip",
-        "callback": {
-            "uri": "https://example.com/post?callback"},
+        "callback": {"uri": "https://example.com/post?callback"},
         "space": {"id": "space-id", "type": "Space"},
     }

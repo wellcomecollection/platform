@@ -3,29 +3,37 @@ package uk.ac.wellcome.platform.archive.common.models
 import java.util.UUID
 
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Progress, ProgressEvent, Resource}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Callback,
+  Progress,
+  ProgressEvent,
+  Resource
+}
 
 sealed trait DisplayIngest
 
 case class RequestDisplayIngest(uploadUrl: String,
-                         callback: Option[DisplayCallback],
-                         ingestType: DisplayIngestType,
-                         space: DisplayStorageSpace,
-                         @JsonKey("type")
-                         ontologyType: String = "Ingest") extends DisplayIngest
+                                callback: Option[DisplayCallback],
+                                ingestType: DisplayIngestType,
+                                space: DisplayStorageSpace,
+                                @JsonKey("type")
+                                ontologyType: String = "Ingest")
+    extends DisplayIngest
 
 case class ResponseDisplayIngest(id: UUID,
-                         uploadUrl: String,
-                         callback: Option[DisplayCallback],
-                         ingestType: DisplayIngestType,
-                         space: DisplayStorageSpace,
-                         status: DisplayIngestStatus,
-                         resources: Seq[DisplayIngestResource] = Seq.empty,
-                         events: Seq[DisplayProgressEvent] = Seq.empty,
-                         createdDate: String,
-                         lastModifiedDate: String,
-                         @JsonKey("type")
-                         ontologyType: String = "Ingest") extends DisplayIngest
+                                 uploadUrl: String,
+                                 callback: Option[DisplayCallback],
+                                 ingestType: DisplayIngestType,
+                                 space: DisplayStorageSpace,
+                                 status: DisplayIngestStatus,
+                                 resources: Seq[DisplayIngestResource] =
+                                   Seq.empty,
+                                 events: Seq[DisplayProgressEvent] = Seq.empty,
+                                 createdDate: String,
+                                 lastModifiedDate: String,
+                                 @JsonKey("type")
+                                 ontologyType: String = "Ingest")
+    extends DisplayIngest
 
 case class DisplayCallback(uri: String,
                            status: Option[String],

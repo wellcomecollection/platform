@@ -26,9 +26,7 @@ def client(sns_client, topic_arn, recorded_sess):
     # This only has to work when populating the betamax recording file;
     # although we run on Linux in Travis CI, this will still fine because
     # we use the cached recordings.
-    os.environ.update(
-        {"PROGRESS_MANAGER_ENDPOINT": "http://host.docker.internal:6002"}
-    )
+    os.environ.update({"PROGRESS_MANAGER_ENDPOINT": "http://host.docker.internal:6002"})
     os.environ.update({"BAGS_MANAGER_ENDPOINT": "http://host.docker.internal:6001"})
 
     from archive_api import app
