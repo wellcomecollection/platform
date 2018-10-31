@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models.work.test.util
+package uk.ac.wellcome.models.work.generators
 
 import uk.ac.wellcome.models.work.internal._
 
@@ -165,12 +165,9 @@ trait WorksGenerators extends ItemsGenerators {
                                        items: List[MaybeDisplayable[Item]] =
                                          List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(
-        identifierType = createSierraSystemSourceIdentifierType),
+      sourceIdentifier = createSierraSystemSourceIdentifier,
       workType = workType,
-      otherIdentifiers = List(
-        createSourceIdentifierWith(
-          identifierType = createSierraIdentifierSourceIdentifierType)),
+      otherIdentifiers = List(createSierraSystemSourceIdentifier),
       items = items
     )
 

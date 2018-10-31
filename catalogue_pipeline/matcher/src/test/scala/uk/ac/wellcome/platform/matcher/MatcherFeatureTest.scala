@@ -10,8 +10,8 @@ import uk.ac.wellcome.models.matcher.{
   WorkNode
 }
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 
 class MatcherFeatureTest

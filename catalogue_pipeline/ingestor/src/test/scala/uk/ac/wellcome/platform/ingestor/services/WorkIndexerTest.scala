@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.ingestor.services
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.Subject
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global

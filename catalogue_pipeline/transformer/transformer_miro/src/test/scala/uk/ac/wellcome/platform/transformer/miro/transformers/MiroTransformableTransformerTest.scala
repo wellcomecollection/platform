@@ -2,24 +2,24 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
 
 class MiroTransformableTransformerTest
     extends FunSpec
     with Matchers
+    with IdentifiersGenerators
     with MiroTransformableWrapper {
 
   it("passes through the Miro identifier") {
-    val MiroID = "M0000005_test"
+    val miroId = "M0000005_test"
     val work = transformWork(
       data = """"image_title": "A picture of a passing porpoise"""",
-      miroId = MiroID
+      miroId = miroId
     )
     work.identifiers shouldBe List(
-      SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        "Work",
-        MiroID))
+      createMiroSourceIdentifierWith(value = miroId)
+    )
   }
 
   it("passes through the INNOPAC ID as the Sierra system number") {
@@ -286,10 +286,12 @@ class MiroTransformableTransformerTest
     work.itemsV1 shouldBe List(
       Identifiable(
         Item(List(expectedLocation)),
-        SourceIdentifier(
-          IdentifierType("miro-image-number"),
-          "Item",
-          "B0011308")))
+        createMiroSourceIdentifierWith(
+          value = "B0011308",
+          ontologyType = "Item"
+        )
+      )
+    )
     work.items shouldBe List(Unidentifiable(Item(List(expectedLocation))))
   }
 
@@ -310,10 +312,8 @@ class MiroTransformableTransformerTest
     triedMaybeWork.isSuccess shouldBe true
 
     triedMaybeWork.get shouldBe UnidentifiedInvisibleWork(
-      sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        ontologyType = "Work",
-        value = miroTransformable.sourceId
+      sourceIdentifier = createMiroSourceIdentifierWith(
+        value = miroId
       ),
       version = 1
     )
@@ -332,14 +332,8 @@ class MiroTransformableTransformerTest
       miroId = miroID
     )
     work.identifiers shouldBe List(
-      SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        "Work",
-        miroID),
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        "Work",
-        expectedSierraNumber)
+      createMiroSourceIdentifierWith(value = miroID),
+      createSierraSystemSourceIdentifierWith(value = expectedSierraNumber)
     )
   }
 
@@ -347,24 +341,22 @@ class MiroTransformableTransformerTest
     data: String,
     expectedValues: List[String]
   ) = {
+    val miroId = "V0175278"
     val work = transformWork(
       data = s"""
         "image_title": "A fanciful frolicking of fish",
         $data
       """,
-      miroId = "V0175278"
+      miroId = miroId
     )
     val miroIDList = List(
-      SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        "Work",
-        "V0175278")
+      createMiroSourceIdentifierWith(value = miroId)
     )
-    val libraryRefList = expectedValues.map {
-      SourceIdentifier(
+    val libraryRefList = expectedValues.map { value =>
+      createSourceIdentifierWith(
         identifierType = IdentifierType("miro-library-reference"),
-        "Work",
-        _)
+        value = value
+      )
     }
     work.identifiers shouldBe (miroIDList ++ libraryRefList)
   }

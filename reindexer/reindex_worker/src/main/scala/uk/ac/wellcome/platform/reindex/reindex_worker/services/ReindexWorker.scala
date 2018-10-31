@@ -11,7 +11,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReindexWorker @Inject()(
-  readerService: RecordReader,
+  recordReader: RecordReader,
   hybridRecordSender: HybridRecordSender,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage]
@@ -22,7 +22,7 @@ class ReindexWorker @Inject()(
     for {
       reindexJob: ReindexJob <- Future.fromTry(
         fromJson[ReindexJob](message.Message))
-      outdatedRecords: List[HybridRecord] <- readerService
+      outdatedRecords: List[HybridRecord] <- recordReader
         .findRecordsForReindexing(reindexJob)
       _ <- hybridRecordSender.sendToSNS(records = outdatedRecords)
     } yield ()

@@ -11,7 +11,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Person, Subject, Unidentifiable}
 import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.json.utils.JsonAssertions
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

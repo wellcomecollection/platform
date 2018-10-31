@@ -1,7 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.test.util.ItemsGenerators
+import uk.ac.wellcome.models.work.generators.ItemsGenerators
 
 class DisplayItemV2Test extends FunSpec with Matchers with ItemsGenerators {
 
