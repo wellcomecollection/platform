@@ -13,6 +13,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier,
   WorkNode
 }
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.MergeCandidate
 import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -32,7 +33,12 @@ class WorkMatcherTest
     with Matchers
     with MatcherFixtures
     with ScalaFutures
-    with MockitoSugar {
+    with MockitoSugar
+    with WorksGenerators {
+
+  private val identifierA = createSierraSystemSourceIdentifierWith(value = "A")
+  private val identifierB = createSierraSystemSourceIdentifierWith(value = "B")
+  private val identifierC = createSierraSystemSourceIdentifierWith(value = "C")
 
   it(
     "matches a work with no linked identifiers to itself only A and saves the updated graph A") {
@@ -42,21 +48,21 @@ class WorkMatcherTest
           withWorkGraphStore(graphTable) { workGraphStore =>
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
-                whenReady(workMatcher.matchWork(anUnidentifiedSierraWork)) {
-                  matcherResult =>
-                    val workId = "sierra-system-number/id"
+                val work = createUnidentifiedSierraWork
+                val workId = work.sourceIdentifier.toString
 
-                    matcherResult shouldBe
-                      MatcherResult(
-                        Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
+                whenReady(workMatcher.matchWork(work)) { matcherResult =>
+                  matcherResult shouldBe
+                    MatcherResult(
+                      Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
 
-                    val savedLinkedWork = Scanamo
-                      .get[WorkNode](dynamoDbClient)(graphTable.name)(
-                        'id -> workId)
-                      .map(_.right.get)
+                  val savedLinkedWork = Scanamo
+                    .get[WorkNode](dynamoDbClient)(graphTable.name)(
+                      'id -> workId)
+                    .map(_.right.get)
 
-                    savedLinkedWork shouldBe Some(
-                      WorkNode(workId, 1, Nil, ciHash(workId)))
+                  savedLinkedWork shouldBe Some(
+                    WorkNode(workId, 1, Nil, ciHash(workId)))
                 }
             }
           }
@@ -99,8 +105,6 @@ class WorkMatcherTest
           withWorkGraphStore(graphTable) { workGraphStore =>
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
-                val identifierA = aSierraSourceIdentifier("A")
-                val identifierB = aSierraSourceIdentifier("B")
                 val work = createUnidentifiedWorkWith(
                   sourceIdentifier = identifierA,
                   mergeCandidates = List(MergeCandidate(identifierB))
@@ -163,12 +167,10 @@ class WorkMatcherTest
                 Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkB)
                 Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkC)
 
-                val bIdentifier = aSierraSourceIdentifier("B")
-                val cIdentifier = aSierraSourceIdentifier("C")
                 val work = createUnidentifiedWorkWith(
-                  sourceIdentifier = bIdentifier,
+                  sourceIdentifier = identifierB,
                   version = 2,
-                  mergeCandidates = List(MergeCandidate(cIdentifier)))
+                  mergeCandidates = List(MergeCandidate(identifierC)))
 
                 whenReady(workMatcher.matchWork(work)) { identifiersList =>
                   identifiersList shouldBe
@@ -219,15 +221,15 @@ class WorkMatcherTest
             withDynamoRowLockDao(dynamoDbClient, lockTable) { rowLockDao =>
               withLockingService(rowLockDao, mockMetricsSender) {
                 dynamoLockingService =>
+                  val work = createUnidentifiedSierraWork
+                  val workId = work.sourceIdentifier.toString
+
                   withWorkMatcherAndLockingService(
                     workGraphStore,
                     dynamoLockingService) { workMatcher =>
                     val failedLock = for {
-                      _ <- rowLockDao.lockRow(
-                        Identifier("sierra-system-number/id"),
-                        "processId")
-                      result <- workMatcher.matchWork(
-                        anUnidentifiedSierraWork.copy())
+                      _ <- rowLockDao.lockRow(Identifier(workId), "processId")
+                      result <- workMatcher.matchWork(work)
                     } yield result
 
                     whenReady(failedLock.failed) { failedMatch =>
@@ -254,9 +256,6 @@ class WorkMatcherTest
                   withWorkMatcherAndLockingService(
                     workGraphStore,
                     dynamoLockingService) { workMatcher =>
-                    val identifierA = aSierraSourceIdentifier("A")
-                    val identifierB = aSierraSourceIdentifier("B")
-
                     // A->B->C
                     workGraphStore.put(WorkGraph(Set(
                       WorkNode(
@@ -315,9 +314,10 @@ class WorkMatcherTest
                       FailedUnlockException("test", new RuntimeException)))
 
                   whenReady(
-                    workMatcher.matchWork(anUnidentifiedSierraWork).failed) {
-                    failedMatch =>
-                      failedMatch shouldBe a[MatcherException]
+                    workMatcher
+                      .matchWork(createUnidentifiedSierraWork)
+                      .failed) { failedMatch =>
+                    failedMatch shouldBe a[MatcherException]
                   }
                 }
             }
@@ -339,7 +339,8 @@ class WorkMatcherTest
             when(mockWorkGraphStore.put(any[WorkGraph]))
               .thenThrow(expectedException)
 
-            whenReady(workMatcher.matchWork(anUnidentifiedSierraWork).failed) {
+            whenReady(
+              workMatcher.matchWork(createUnidentifiedSierraWork).failed) {
               actualException =>
                 actualException shouldBe expectedException
             }

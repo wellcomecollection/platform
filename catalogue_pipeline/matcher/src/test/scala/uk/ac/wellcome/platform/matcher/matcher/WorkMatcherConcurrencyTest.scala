@@ -5,6 +5,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.MatcherResult
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.MergeCandidate
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 
@@ -16,7 +17,8 @@ class WorkMatcherConcurrencyTest
     with Matchers
     with MatcherFixtures
     with ScalaFutures
-    with MockitoSugar {
+    with MockitoSugar
+    with WorksGenerators {
 
   it("processes one of two conflicting concurrent updates and locks the other") {
     withMockMetricSender { metricsSender =>
@@ -29,8 +31,10 @@ class WorkMatcherConcurrencyTest
                   withWorkMatcherAndLockingService(
                     workGraphStore,
                     dynamoLockingService) { workMatcher =>
-                    val identifierA = aSierraSourceIdentifier("A")
-                    val identifierB = aSierraSourceIdentifier("B")
+                    val identifierA =
+                      createSierraSystemSourceIdentifierWith(value = "A")
+                    val identifierB =
+                      createSierraSystemSourceIdentifierWith(value = "B")
 
                     val workA = createUnidentifiedWorkWith(
                       sourceIdentifier = identifierA,

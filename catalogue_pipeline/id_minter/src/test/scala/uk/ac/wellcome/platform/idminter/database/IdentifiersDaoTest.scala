@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter.database
 
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
+import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.platform.idminter.database.exceptions.IdMinterException
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}

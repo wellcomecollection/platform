@@ -1,8 +1,8 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 
 class DisplayAbstractAgentV2Test
     extends FunSpec

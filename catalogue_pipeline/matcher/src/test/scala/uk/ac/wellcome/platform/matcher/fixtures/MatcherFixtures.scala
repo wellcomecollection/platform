@@ -9,13 +9,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  TransformedBaseWork,
-  UnidentifiedWork
-}
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
@@ -43,8 +37,7 @@ trait MatcherFixtures
     with SNS
     with LocalWorkGraphDynamoDb
     with MetricsSenderFixture
-    with S3
-    with WorksGenerators {
+    with S3 {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
@@ -181,17 +174,6 @@ trait MatcherFixtures
     )
     testWith(workNodeDao)
   }
-
-  def aSierraSourceIdentifier(id: String) =
-    SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      "Work",
-      id)
-
-  def anUnidentifiedSierraWork: UnidentifiedWork =
-    createUnidentifiedWorkWith(
-      sourceIdentifier = aSierraSourceIdentifier("id")
-    )
 
   def ciHash(str: String): String = {
     DigestUtils.sha256Hex(str)

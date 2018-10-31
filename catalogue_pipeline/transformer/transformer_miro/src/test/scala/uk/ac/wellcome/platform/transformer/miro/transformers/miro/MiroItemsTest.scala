@@ -1,11 +1,12 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroItems
 
-class MiroItemsTest extends FunSpec with Matchers {
+class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators {
   val transformer = new MiroItems {}
 
   describe("getItemsV1") {
@@ -23,10 +24,10 @@ class MiroItemsTest extends FunSpec with Matchers {
             LocationType("iiif-image"),
             Some(License_CC0),
             credit = Some("Ezra Feilden")))),
-          sourceIdentifier = SourceIdentifier(
-            IdentifierType("miro-image-number"),
-            "Item",
-            "B0011308")
+          sourceIdentifier = createMiroSourceIdentifierWith(
+            value = "B0011308",
+            ontologyType = "Item"
+          )
         ))
     }
   }

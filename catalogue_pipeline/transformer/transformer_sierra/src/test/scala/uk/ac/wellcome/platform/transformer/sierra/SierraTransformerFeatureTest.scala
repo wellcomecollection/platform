@@ -7,11 +7,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.storage.fixtures.S3
 
 class SierraTransformerFeatureTest
@@ -73,17 +69,14 @@ class SierraTransformerFeatureTest
                 val snsMessages = listMessagesReceivedFromSNS(topic)
                 snsMessages.size should be >= 1
 
-                val sourceIdentifier = SourceIdentifier(
-                  identifierType = IdentifierType("sierra-system-number"),
-                  ontologyType = "Work",
+                val sourceIdentifier = createSierraSystemSourceIdentifierWith(
                   value = id.withCheckDigit
                 )
 
-                val sierraIdentifier = SourceIdentifier(
-                  identifierType = IdentifierType("sierra-identifier"),
-                  ontologyType = "Work",
-                  value = id.withoutCheckDigit
-                )
+                val sierraIdentifier =
+                  createSierraIdentifierSourceIdentifierWith(
+                    value = id.withoutCheckDigit
+                  )
 
                 val works = getMessages[UnidentifiedWork](topic)
                 works.length shouldBe >=(1)

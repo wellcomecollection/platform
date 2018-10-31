@@ -4,7 +4,7 @@ import akka.stream.scaladsl.Sink
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.test.fixtures.Akka
 
 class ElastisearchSourceTest
