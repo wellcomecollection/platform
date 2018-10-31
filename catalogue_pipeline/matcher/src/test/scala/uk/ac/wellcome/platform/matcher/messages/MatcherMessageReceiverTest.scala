@@ -39,8 +39,7 @@ class MatcherMessageReceiverTest
             val updatedWork = createUnidentifiedSierraWork
             val expectedMatchedWorks =
               MatcherResult(
-                Set(MatchedIdentifiers(
-                  Set(WorkIdentifier(updatedWork)))))
+                Set(MatchedIdentifiers(Set(WorkIdentifier(updatedWork)))))
 
             processAndAssertMatchedWorkIs(
               updatedWork,

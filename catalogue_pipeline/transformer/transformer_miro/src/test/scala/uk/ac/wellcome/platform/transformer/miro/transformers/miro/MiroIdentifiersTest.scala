@@ -5,7 +5,10 @@ import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroIdentifiers
 
-class MiroIdentifiersTest extends FunSpec with Matchers with IdentifiersGenerators {
+class MiroIdentifiersTest
+    extends FunSpec
+    with Matchers
+    with IdentifiersGenerators {
 
   it("fixes the malformed INNOPAC ID on L0035411") {
     val miroData = MiroTransformableData(

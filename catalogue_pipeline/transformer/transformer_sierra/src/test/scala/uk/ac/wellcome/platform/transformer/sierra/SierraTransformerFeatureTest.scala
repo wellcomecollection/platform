@@ -73,9 +73,10 @@ class SierraTransformerFeatureTest
                   value = id.withCheckDigit
                 )
 
-                val sierraIdentifier = createSierraIdentifierSourceIdentifierWith(
-                  value = id.withoutCheckDigit
-                )
+                val sierraIdentifier =
+                  createSierraIdentifierSourceIdentifierWith(
+                    value = id.withoutCheckDigit
+                  )
 
                 val works = getMessages[UnidentifiedWork](topic)
                 works.length shouldBe >=(1)
