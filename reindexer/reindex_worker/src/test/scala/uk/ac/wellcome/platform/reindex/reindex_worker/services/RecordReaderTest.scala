@@ -4,18 +4,15 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
-  MaxRecordsScanner,
-  ParallelScanner,
-  ScanSpecScanner
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
+  DynamoFixtures,
+  ReindexableTable
 }
-import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.ReindexableTable
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
   CompleteReindexJob,
   PartialReindexJob
 }
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -26,6 +23,7 @@ class RecordReaderTest
     extends FunSpec
     with ScalaFutures
     with Matchers
+    with DynamoFixtures
     with ReindexableTable
     with IntegrationPatience {
 
@@ -80,7 +78,7 @@ class RecordReaderTest
     val table = Table("does-not-exist", "no-such-index")
     withRecordReader(table) { reader =>
       val future = reader.findRecordsForReindexing(
-        ReindexJob(segment = 5, totalSegments = 10))
+        CompleteReindexJob(segment = 5, totalSegments = 10))
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }
@@ -88,29 +86,15 @@ class RecordReaderTest
   }
 
   private def withRecordReader[R](table: Table)(
-    testWith: TestWith[RecordReader, R]): R = {
-    val dynamoConfig = DynamoConfig(
-      table = table.name,
-      index = table.index
-    )
+    testWith: TestWith[RecordReader, R]): R =
+    withMaxRecordsScanner(table) { maxRecordsScanner =>
+      withParallelScanner(table) { parallelScanner =>
+        val reader = new RecordReader(
+          maxRecordsScanner = maxRecordsScanner,
+          parallelScanner = parallelScanner
+        )
 
-    val scanSpecScanner = new ScanSpecScanner(dynamoDbClient)
-
-    val parallelScanner = new ParallelScanner(
-      scanSpecScanner = scanSpecScanner,
-      dynamoConfig = dynamoConfig
-    )
-
-    val maxRecordsScanner = new MaxRecordsScanner(
-      scanSpecScanner = scanSpecScanner,
-      dynamoConfig = dynamoConfig
-    )
-
-    val reader = new RecordReader(
-      maxRecordsScanner = maxRecordsScanner,
-      parallelScanner = parallelScanner
-    )
-
-    testWith(reader)
-  }
+        testWith(reader)
+      }
+    }
 }

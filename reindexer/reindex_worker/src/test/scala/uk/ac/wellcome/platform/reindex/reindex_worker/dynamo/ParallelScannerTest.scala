@@ -4,10 +4,10 @@ import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.storage.dynamo.{DynamoConfig, TestVersioned}
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.DynamoFixtures
+import uk.ac.wellcome.storage.dynamo.TestVersioned
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
-import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -92,18 +92,5 @@ class ParallelScannerTest
         }
       }
     }
-  }
-
-  private def withParallelScanner[R](table: Table)(
-    testWith: TestWith[ParallelScanner, R]): R = {
-    val scanner = new ParallelScanner(
-      scanSpecScanner = new ScanSpecScanner(dynamoDbClient),
-      dynamoConfig = DynamoConfig(
-        table = table.name,
-        index = table.index
-      )
-    )
-
-    testWith(scanner)
   }
 }
