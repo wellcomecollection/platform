@@ -3,18 +3,18 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT> [--skip-pipeline-checks]
+Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT> [--skip-pipeline-checks] [--max_records_per_segment=<MAX>]
        trigger_reindex.py -h | --help
 
 Options:
-  --source=<SOURCE_NAME>    Name of the source you want to reindex.
-  --reason=<REASON>         An explanation of why you're running this reindex.
-                            This will be printed in the Slack alert.
-  --total_segments=<COUNT>  How many segments to divide the VHS table into.
-  --skip-pipeline-checks    Don't check if the pipeline tables are clear
-                            before running.
-  -h --help                 Print this help message
-
+  --source=<SOURCE_NAME>               Name of the source you want to reindex.
+  --reason=<REASON>                    An explanation of why you're running this reindex.
+                                       This will be printed in the Slack alert.
+  --total_segments=<COUNT>             How many segments to divide the VHS table into.
+  --skip-pipeline-checks               Don't check if the pipeline tables are clear
+                                       before running.
+  -h --help                            Print this help message
+  -m --max_records_per_segment=<MAX>   How many records you want to send to ES.
 """
 
 import json
@@ -31,12 +31,13 @@ def get_topic_name(source_name):
     return f"reindex_jobs-{source_name}"
 
 
-def all_messages(total_segments):
-    """
-    Generates all the messages to be sent to SNS.
-    """
-    for i in range(total_segments):
-        yield {"segment": i, "totalSegments": total_segments}
+def all_messages(total_segments, max_records_per_segment=None):
+   """Generates all the messages to be sent to SNS."""
+   for i in range(total_segments):
+       msg = {"segment": i, "totalSegments": total_segments}
+       if max_records_per_segment:
+           msg["maxRecordsPerSegment"] = max_records_per_segment
+       yield msg
 
 
 def publish_messages(topic_arn, messages, total_segments):
@@ -137,17 +138,21 @@ def main():
     source_name = args["--source"]
     reason = args["--reason"]
     total_segments = int(args["--total_segments"])
+    try:
+        max_records_per_segment = int(args["--max_records_per_segment"])
+    except ValueError:
+        max_records_per_segment = None
     skip_pipeline_checks = args["--skip-pipeline-checks"]
 
     if not skip_pipeline_checks:
         print("Checking pipeline is clear...")
         check_tables_are_clear()
 
-    print(f"Triggering a reindex in {source_name}")
+    print(f"Triggering a reindex in {source_name} for '{reason}' with {max_records_per_segment} total records")
 
     post_to_slack(source_name=source_name, reason=reason, total_segments=total_segments)
 
-    messages = all_messages(total_segments=total_segments)
+    messages = all_messages(total_segments=total_segments, max_records_per_segment=max_records_per_segment)
 
     topic_arn = build_topic_arn(topic_name=get_topic_name(source_name))
 
