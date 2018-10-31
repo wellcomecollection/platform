@@ -79,22 +79,6 @@ def extract_records(s3, event):
     data_dicts = [hybrid_record_to_data_dict(s3, hybrid_record) 
                   for hybrid_record in hybrid_records]
     return data_dicts, hybrid_records
-
-
-def transformed_dict_to_es(transformed_dict, hybrid_record):
-    '''
-    takes a transformed dict and prepares it for ingestion into elasticsearch
-
-    Parameters
-    ----------
-    transformed_dict : dict
-    hybrid_record : HybridRecord 
-
-    Returns
-    -------
-    es_record : ElasticsearchRecord
-    '''
-    return ElasticsearchRecord(id=hybrid_record.id, doc=transformed_dict)
     
     
 # Move records with transforms applied -----------------------------------------
@@ -116,12 +100,12 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
 
     data_dicts, hybrid_records = extract_records(s3_client, event)
 
-    transformed_records = [transform(record) for record in data_dicts]
+    transformed_dicts = [transform(record) for record in data_dicts]
 
-    es_records = [transformed_dict_to_es(data_dict, hybrid_record) 
-                  for data_dict, hybrid_record in zip(transformed_records, hybrid_records)]
+    es_records = [ElasticsearchRecord(id=hybrid_record.id, doc=doc)
+                  for doc, hybrid_record in zip(transformed_dicts, hybrid_records)]
 
-    results = [es_client.index(index=index, doc_type=doc_type, id=record.id, body=record)
+    results = [es_client.index(index=index, doc_type=doc_type, id=record.id, body=record.doc)
                for record in es_records]
 
     print(f"Result: {results}")
