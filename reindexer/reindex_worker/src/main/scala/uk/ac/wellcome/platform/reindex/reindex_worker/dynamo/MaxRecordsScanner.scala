@@ -21,6 +21,6 @@ class MaxRecordsScanner @Inject()(scanSpecScanner: ScanSpecScanner, dynamoConfig
     val scanSpec = new ScanSpec()
       .withMaxResultSize(maxRecords)
 
-    scanSpecScanner.scan(scanSpec = scanSpec, tableName = dynamoConfig.tableName)
+    scanSpecScanner.scan(scanSpec = scanSpec, tableName = dynamoConfig.table)
   }
 }
