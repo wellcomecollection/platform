@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
-import org.scalatest.{Matchers, Suite}
+import org.scalatest.{Assertion, Matchers, Suite}
 import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
 }
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
 import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
 
 import scala.util.Try
@@ -18,7 +19,9 @@ import scala.util.Try
   *  fields before transformation, allowing tests to focus on only the fields
   *  that are interesting for that test.
   */
-trait MiroTransformableWrapper extends Matchers { this: Suite =>
+trait MiroTransformableWrapper
+    extends Matchers
+    with MiroTransformableGenerators { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String = {
@@ -38,27 +41,19 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
   }
 
   def transformWork(
-    data: String = "",
-    MiroID: String = "M0000001",
-    MiroCollection: String = "TestCollection"
+    miroId: String = "M0000001",
+    data: String = ""
   ): UnidentifiedWork = {
-    val miroTransformable = MiroTransformable(
-      sourceId = MiroID,
-      MiroCollection = MiroCollection,
+    val miroTransformable = createMiroTransformableWith(
+      miroId = miroId,
       data = buildJSONForWork(data)
     )
 
     transformToWork(miroTransformable).asInstanceOf[UnidentifiedWork]
   }
 
-  def assertTransformWorkFails(
-    data: String,
-    MiroID: String = "M0000001",
-    MiroCollection: String = "TestCollection"
-  ) = {
-    val miroTransformable = MiroTransformable(
-      sourceId = MiroID,
-      MiroCollection = MiroCollection,
+  def assertTransformWorkFails(data: String): Assertion = {
+    val miroTransformable = createMiroTransformableWith(
       data = buildJSONForWork(data)
     )
 
@@ -79,7 +74,8 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     triedWork.get
   }
 
-  def assertTransformToWorkFails(transformable: MiroTransformable): Unit = {
+  def assertTransformToWorkFails(
+    transformable: MiroTransformable): Assertion = {
     transformer
       .transform(transformable, version = 1)
       .isSuccess shouldBe false

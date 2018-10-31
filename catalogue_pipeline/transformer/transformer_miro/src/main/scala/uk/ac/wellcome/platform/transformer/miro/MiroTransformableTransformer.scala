@@ -67,7 +67,8 @@ class MiroTransformableTransformer
         physicalDescription = None,
         extent = None,
         lettering = miroData.suppLettering,
-        createdDate = getCreatedDate(miroData, miroTransformable.MiroCollection),
+        createdDate =
+          getCreatedDate(miroData, miroId = miroTransformable.sourceId),
         subjects = getSubjects(miroData),
         genres = getGenres(miroData),
         contributors = getContributors(
@@ -207,12 +208,12 @@ class MiroTransformableTransformer
   }
 
   private def getCreatedDate(miroData: MiroTransformableData,
-                             collection: String): Option[Period] =
-    if (collectionIsV(collection)) {
-      miroData.artworkDate.map { Period(_) }
+                             miroId: String): Option[Period] =
+    if (collectionIsV(miroId)) {
+      miroData.artworkDate.map { Period }
     } else {
       None
     }
 
-  private def collectionIsV(c: String) = c.toLowerCase.contains("images-v")
+  private def collectionIsV(miroId: String) = miroId.startsWith("V")
 }
