@@ -6,7 +6,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.platform.transformer.miro.utils.MiroTransformableMessageGenerators
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableMessageGenerators
 import uk.ac.wellcome.storage.fixtures.S3
 
 class MiroTransformerFeatureTest

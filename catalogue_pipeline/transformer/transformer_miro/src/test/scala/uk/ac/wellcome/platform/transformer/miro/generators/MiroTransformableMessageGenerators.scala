@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.miro.utils
+package uk.ac.wellcome.platform.transformer.miro.generators
 
 import uk.ac.wellcome.models.work.test.util.IdentifiersGenerators
 import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
