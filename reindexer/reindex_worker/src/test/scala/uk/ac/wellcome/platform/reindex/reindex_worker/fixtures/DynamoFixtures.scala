@@ -13,7 +13,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait ReindexableFixtures extends LocalDynamoDb {
   def withScanSpecScanner[R](
     testWith: TestWith[ScanSpecScanner, R]): R = {
-    val scanner new ScanSpecScanner(dynamoDbClient)
+    val scanner = new ScanSpecScanner(dynamoDbClient)
 
     testWith(scanner)
   }
@@ -22,7 +22,7 @@ trait ReindexableFixtures extends LocalDynamoDb {
     testWith: TestWith[ParallelScanner, R]): R = {
     withScanSpecScanner { scanSpecScanner =>
       val scanner = new ParallelScanner(
-        scanSpecScanner = withScanSpecScanner,
+        scanSpecScanner = scanSpecScanner,
         dynamoConfig = DynamoConfig(
           table = table.name,
           index = table.index
@@ -37,7 +37,7 @@ trait ReindexableFixtures extends LocalDynamoDb {
     testWith: TestWith[MaxRecordsScanner, R]): R = {
     withScanSpecScanner { scanSpecScanner =>
       val scanner = new MaxRecordsScanner(
-        scanSpecScanner = withScanSpecScanner,
+        scanSpecScanner = scanSpecScanner,
         dynamoConfig = DynamoConfig(
           table = table.name,
           index = table.index
