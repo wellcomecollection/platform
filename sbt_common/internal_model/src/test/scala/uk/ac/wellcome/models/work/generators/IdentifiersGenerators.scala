@@ -59,10 +59,6 @@ trait IdentifiersGenerators {
   def createMiroSourceIdentifier: SourceIdentifier =
     createMiroSourceIdentifierWith()
 
-  def createMiroLibraryReferenceSourceIdentifier: SourceIdentifier =
-    createSourceIdentifierWith(
-      identifierType = createMiroLibrarySourceIdentifierType)
-
   def createSierraIdentifierSourceIdentifier: SourceIdentifier =
     createSourceIdentifierWith(
       identifierType = createSierraIdentifierSourceIdentifierType)
@@ -77,10 +73,6 @@ trait IdentifiersGenerators {
 
   def createIsbnSourceIdentifierType: IdentifierType = {
     IdentifierType("isbn")
-  }
-
-  def createMiroLibrarySourceIdentifierType: IdentifierType = {
-    IdentifierType("miro-library-reference")
   }
 
   def createCalmSourceIdentifierType: IdentifierType = {

@@ -75,8 +75,9 @@ class SierraMiroMergeRuleTest
       val sierraWork =
         createUnidentifiedSierraWorkWith(items = List(sierraItem))
 
-      val miroLibraryReferenceSourceIdentifier =
-        createMiroLibraryReferenceSourceIdentifier
+      val miroLibraryReferenceSourceIdentifier = createSourceIdentifierWith(
+        identifierType = IdentifierType("miro-library-reference")
+      )
       val miroWork = createMiroWorkWith(
         otherIdentifiers = List(
           miroLibraryReferenceSourceIdentifier,
