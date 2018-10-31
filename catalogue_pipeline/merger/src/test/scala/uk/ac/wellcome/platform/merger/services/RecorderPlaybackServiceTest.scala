@@ -114,11 +114,8 @@ class RecorderPlaybackServiceTest
 
   private def getWorkIdentifiers(
     works: TransformedBaseWork*): List[WorkIdentifier] =
-    works.map { work =>
-      WorkIdentifier(
-        identifier = work.sourceIdentifier.toString,
-        version = work.version
-      )
+    works.map { w =>
+      WorkIdentifier(w)
     }.toList
 
   private def withRecorderVHS[R](

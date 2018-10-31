@@ -1,9 +1,9 @@
 package uk.ac.wellcome.platform.transformer.miro
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 
 import scala.util.Try

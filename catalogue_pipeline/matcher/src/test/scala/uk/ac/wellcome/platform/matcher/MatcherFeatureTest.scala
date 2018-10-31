@@ -53,12 +53,9 @@ class MatcherFeatureTest
 
                       identifiersList shouldBe
                         MatcherResult(
-                          Set(
-                            MatchedIdentifiers(
-                              Set(WorkIdentifier(
-                                identifier = work.sourceIdentifier.toString,
-                                version = 1))
-                            )))
+                          Set(MatchedIdentifiers(
+                            Set(WorkIdentifier(work))
+                          )))
                     }
                   }
                 }
