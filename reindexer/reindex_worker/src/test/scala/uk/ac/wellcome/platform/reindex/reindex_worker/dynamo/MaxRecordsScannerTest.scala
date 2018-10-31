@@ -12,7 +12,7 @@ import uk.ac.wellcome.test.fixtures._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MaxResultScannerTest
+class MaxRecordsScannerTest
   extends FunSpec
     with Matchers
     with ScalaFutures
@@ -20,7 +20,7 @@ class MaxResultScannerTest
 
   it("reads a table with a single record") {
     withLocalDynamoDbTable { table =>
-      withMaxResultScanner(table) { maxResultScanner =>
+      withMaxRecordsScanner(table) { maxResultScanner =>
         val record =
           TestVersioned(id = "123", data = "hello world", version = 1)
         Scanamo.put(dynamoDbClient)(table.name)(record)
@@ -36,7 +36,7 @@ class MaxResultScannerTest
 
   it("handles being asked for more records than are in the table") {
     withLocalDynamoDbTable { table =>
-      withMaxResultScanner(table) { maxResultScanner =>
+      withMaxRecordsScanner(table) { maxResultScanner =>
         val records = (1 to 5).map { id =>
           TestVersioned(id = id.toString, data = "Hello world", version = 1)
         }
@@ -54,9 +54,9 @@ class MaxResultScannerTest
     }
   }
 
-  private def withMaxResultScanner[R](table: Table)(
-    testWith: TestWith[MaxResultScanner, R]): R = {
-    val scanner = new MaxResultScanner(
+  private def withMaxRecordsScanner[R](table: Table)(
+    testWith: TestWith[MaxRecordsScanner, R]): R = {
+    val scanner = new MaxRecordsScanner(
       scanSpecScanner = new ScanSpecScanner(dynamoDbClient),
       dynamoConfig = DynamoConfig(
         table = table.name,

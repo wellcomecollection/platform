@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.reindex.reindex_worker.services
 import com.google.inject.Inject
 import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.ParallelScanner
+import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.MaxRecordsScanner
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -16,6 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * that need reindexing is the responsibility of another class.
   */
 class RecordReader @Inject()(
+  maxRecordsScanner: MaxRecordsScanner,
   parallelScanner: ParallelScanner
 )(implicit ec: ExecutionContext)
     extends Logging {
@@ -25,22 +26,23 @@ class RecordReader @Inject()(
     debug(s"Finding records that need reindexing for $reindexJob")
 
     for {
-      // We start by querying DynamoDB for every record in the reindex shard.
-      // If a shard was especially large, this might cause out-of-memory errors
-      // -- in practice, we're hoping that the shards/individual records are
-      // small enough for this not to be a problem.
-      results: List[Either[DynamoReadError, HybridRecord]] <- parallelScanner
-        .scan[HybridRecord](
-          segment = reindexJob.segment,
-          totalSegments = reindexJob.totalSegments
-        )
+      // We start by querying DynamoDB for every record we want to reindex.
+      // If we requested reindexing a particularly large shard, this might
+      // cause out-of-memory errors -- in practice, we're hoping that the
+      // shards/individual records are small enough for this not to be a problem.
+      results: List[Either[DynamoReadError, HybridRecord]] <-
+        reindexJob match {
+          case CompleteReindexJob(segment, totalSegments) =>
+            parallelScanner
+              .scan[HybridRecord](
+              segment = segment,
+              totalSegments = totalSegments
+            )
+          case PartialReindexJob(maxRecords) =>
+            maxRecordsScanner.scan[HybridRecord](maxRecords = maxRecords)
+        }
 
-      recordsToReindex = reindexJob.maxRecordsPerSegment match {
-        case None                       => results.map(extractRecord)
-        case Some(maxRecordsPerSegment) =>
-          // maxRecordsPerSegment is used to test reindexing or reporting prior to running all records.
-          results.take(maxRecordsPerSegment).map(extractRecord)
-      }
+      recordsToReindex = results.map(extractRecord)
     } yield recordsToReindex
   }
 

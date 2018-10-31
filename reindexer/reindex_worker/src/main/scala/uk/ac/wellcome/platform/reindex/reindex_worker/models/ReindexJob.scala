@@ -19,5 +19,5 @@ case class CompleteReindexJob(
 ) extends ReindexJob
 
 case class PartialReindexJob(
-  totalRecords: Int
+  maxRecords: Int
 ) extends ReindexJob
