@@ -13,8 +13,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait DynamoFixtures extends LocalDynamoDb {
-  def withScanSpecScanner[R](
-    testWith: TestWith[ScanSpecScanner, R]): R = {
+  def withScanSpecScanner[R](testWith: TestWith[ScanSpecScanner, R]): R = {
     val scanner = new ScanSpecScanner(dynamoDbClient)
 
     testWith(scanner)

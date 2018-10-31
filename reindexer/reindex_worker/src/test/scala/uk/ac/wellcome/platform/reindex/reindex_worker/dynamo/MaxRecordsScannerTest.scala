@@ -8,7 +8,7 @@ import uk.ac.wellcome.storage.dynamo.TestVersioned
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 
 class MaxRecordsScannerTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with DynamoFixtures

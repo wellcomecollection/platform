@@ -37,17 +37,16 @@ class RecordReader @Inject()(
       // If we requested reindexing a particularly large shard, this might
       // cause out-of-memory errors -- in practice, we're hoping that the
       // shards/individual records are small enough for this not to be a problem.
-      results: List[Either[DynamoReadError, HybridRecord]] <-
-        reindexJob match {
-          case CompleteReindexJob(segment, totalSegments) =>
-            parallelScanner
-              .scan[HybridRecord](
-                segment = segment,
-                totalSegments = totalSegments
-              )
-          case PartialReindexJob(maxRecords) =>
-            maxRecordsScanner.scan[HybridRecord](maxRecords = maxRecords)
-        }
+      results: List[Either[DynamoReadError, HybridRecord]] <- reindexJob match {
+        case CompleteReindexJob(segment, totalSegments) =>
+          parallelScanner
+            .scan[HybridRecord](
+              segment = segment,
+              totalSegments = totalSegments
+            )
+        case PartialReindexJob(maxRecords) =>
+          maxRecordsScanner.scan[HybridRecord](maxRecords = maxRecords)
+      }
 
       recordsToReindex = results.map(extractRecord)
     } yield recordsToReindex

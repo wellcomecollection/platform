@@ -68,7 +68,8 @@ class RecordReaderTest
         val reindexJob = PartialReindexJob(maxRecords = 5)
 
         whenReady(reader.findRecordsForReindexing(reindexJob)) {
-          actualRecords => actualRecords should have size 5
+          actualRecords =>
+            actualRecords should have size 5
         }
       }
     }

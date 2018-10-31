@@ -24,7 +24,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * For the options allowed by ScanSpec, see:
   * https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/document/spec/ScanSpec.html
   */
-class ScanSpecScanner @Inject()(dynamoDBClient: AmazonDynamoDB)(implicit ec: ExecutionContext) {
+class ScanSpecScanner @Inject()(dynamoDBClient: AmazonDynamoDB)(
+  implicit ec: ExecutionContext) {
 
   val dynamoDB = new DynamoDB(dynamoDBClient)
 
@@ -33,7 +34,9 @@ class ScanSpecScanner @Inject()(dynamoDBClient: AmazonDynamoDB)(implicit ec: Exe
     * Note that this returns a Future[List], so results will be cached in-memory.
     * Design your spec accordingly.
     */
-  def scan[T](scanSpec: ScanSpec, tableName: String)(implicit dynamoFormat: DynamoFormat[T]): Future[List[Either[DynamoReadError, T]]] = {
+  def scan[T](scanSpec: ScanSpec, tableName: String)(
+    implicit dynamoFormat: DynamoFormat[T])
+    : Future[List[Either[DynamoReadError, T]]] = {
     val table = dynamoDB.getTable(tableName)
 
     Future {

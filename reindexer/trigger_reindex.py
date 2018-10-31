@@ -51,7 +51,7 @@ def all_complete_messages(total_segments):
         yield {
             "segment": i,
             "totalSegments": total_segments,
-            "type": "CompleteReindexJob"
+            "type": "CompleteReindexJob",
         }
 
 
@@ -160,10 +160,9 @@ def main():
             f'({total_segments} segment{"s" if total_segments != 1 else ""})'
         )
     else:
-        messages = [{
-            "maxRecords": int(args["--max_records"]),
-            "type": "PartialReindexJob"
-        }]
+        messages = [
+            {"maxRecords": int(args["--max_records"]), "type": "PartialReindexJob"}
+        ]
         slack_message = (
             f"*{username}* started a partial reindex in *{source_name}*\n"
             f"Reason: *{reason}* "

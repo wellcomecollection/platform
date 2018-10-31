@@ -8,7 +8,8 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
 
-class MaxRecordsScanner @Inject()(scanSpecScanner: ScanSpecScanner, dynamoConfig: DynamoConfig) {
+class MaxRecordsScanner @Inject()(scanSpecScanner: ScanSpecScanner,
+                                  dynamoConfig: DynamoConfig) {
 
   /** Run a DynamoDB Scan that returns at most `maxResults` values.
     *
@@ -16,7 +17,7 @@ class MaxRecordsScanner @Inject()(scanSpecScanner: ScanSpecScanner, dynamoConfig
     * `maxResults` is larger than the maximum page size.
     */
   def scan[T](maxRecords: Int)(implicit dynamoFormat: DynamoFormat[T])
-  : Future[List[Either[DynamoReadError, T]]] = {
+    : Future[List[Either[DynamoReadError, T]]] = {
 
     val scanSpec = new ScanSpec()
       .withMaxResultSize(maxRecords)

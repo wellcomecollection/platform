@@ -15,7 +15,8 @@ import scala.concurrent.Future
   *
   * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.ParallelScan
   */
-class ParallelScanner @Inject()(scanSpecScanner: ScanSpecScanner, dynamoConfig: DynamoConfig) {
+class ParallelScanner @Inject()(scanSpecScanner: ScanSpecScanner,
+                                dynamoConfig: DynamoConfig) {
 
   /** Run a Parallel Scan for a single worker.
     *
