@@ -211,6 +211,7 @@ module "bagger" {
     CURRENT_PRESERVATION_BUCKET = "${var.bagger_current_preservation_bucket}"
     DLCS_SOURCE_BUCKET          = "${var.bagger_dlcs_source_bucket}"
     BAGGING_QUEUE               = "${module.bagger_queue.name}"
+    BAGGING_COMPLETE_TOPIC_ARN  = "${module.bagging_complete_topic.arn}"
 
     AWS_DEFAULT_REGION = "${var.aws_region}"
 
@@ -227,7 +228,7 @@ module "bagger" {
     DDS_ASSET_PREFIX = "${var.bagger_dds_asset_prefix}"
   }
 
-  env_vars_length = 18
+  env_vars_length = 19
 
   container_image   = "${local.bagger_container_image}"
   source_queue_name = "${module.bagger_queue.name}"

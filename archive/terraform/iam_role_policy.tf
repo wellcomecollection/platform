@@ -132,3 +132,8 @@ resource "aws_iam_role_policy" "bagger_task_get_s3_preservica" {
   role   = "${module.bagger.task_role_name}"
   policy = "${data.aws_iam_policy_document.bagger_get_preservica.json}"
 }
+
+resource "aws_iam_role_policy" "bagger_task_bagging_complete_sns" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${module.bagging_complete_topic.publish_policy}"
+}
