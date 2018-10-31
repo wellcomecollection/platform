@@ -8,9 +8,6 @@ import requests
 
 class ArchiveAPIConfig(object):
 
-    DYNAMODB_RESOURCE = boto3.resource("dynamodb")
-    SNS_CLIENT = boto3.client("sns")
-    S3_CLIENT = boto3.client("s3")
     PROGRESS_MANAGER_SESSION = requests.Session()
     BAGS_MANAGER_SESSION = requests.Session()
 
@@ -21,13 +18,9 @@ class ArchiveAPIConfig(object):
     def __init__(self, development=False):
         try:
             if development:
-                self.SNS_TOPIC_ARN = (
-                    "arn:aws:sns:eu-west-1:760097843905:archive-storage_archivist"
-                )
                 self.PROGRESS_MANAGER_ENDPOINT = "http://localhost:6000"
                 self.BAGS_MANAGER_ENDPOINT = "http://localhost:6001"
             else:
-                self.SNS_TOPIC_ARN = os.environ["TOPIC_ARN"]
                 self.PROGRESS_MANAGER_ENDPOINT = os.environ["PROGRESS_MANAGER_ENDPOINT"]
                 self.BAGS_MANAGER_ENDPOINT = os.environ["BAGS_MANAGER_ENDPOINT"]
         except KeyError as err:
