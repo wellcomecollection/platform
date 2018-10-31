@@ -15,17 +15,14 @@ def process_bagging_message(message):
         "identifier": identifier,
         "upload_location": None,
         "duration": -1,
-        "error": None
+        "error": None,
     }
 
     if identifier is not None:
         start = time.time()
         try:
-            result["upload_location"] = (
-                bagger.bag_from_identifier(
-                    identifier,
-                    do_not_bag
-                )
+            result["upload_location"] = bagger.bag_from_identifier(
+                identifier, do_not_bag
             )
             end = time.time()
             result["duration"] = end - start

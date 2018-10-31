@@ -153,7 +153,9 @@ def dispatch_bag(bag_details):
 
     logging.info("uploading " + bag_details["zip_file_name"] + " to S3")
 
-    upload_location = aws.upload(bag_details["zip_file_path"], bag_details["zip_file_name"])
+    upload_location = aws.upload(
+        bag_details["zip_file_path"], bag_details["zip_file_name"]
+    )
 
     logging.info("upload completed")
 
