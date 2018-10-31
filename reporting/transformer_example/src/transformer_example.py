@@ -3,7 +3,7 @@
 """
 Example lambda
 """
-
+import transform
 import json
 import os
 
@@ -36,23 +36,6 @@ class HybridRecord(object):
 class ElasticsearchRecord(object):
     id = attrib()
     doc = attrib()
-
-
-# Some kind of transform -------------------------------------------------------
-def transform(record):
-    '''
-    Parameters
-    ----------
-    record : dict
-        the raw data from VHS in a malleable dict format
-        
-    Returns
-    -------
-    transformed_record : dict
-        record with necessary transformations applied, ready to be formatted for
-        elasticsearch ingestion
-    '''
-    return record
 
 
 # Moving records through the pipeline ------------------------------------------
