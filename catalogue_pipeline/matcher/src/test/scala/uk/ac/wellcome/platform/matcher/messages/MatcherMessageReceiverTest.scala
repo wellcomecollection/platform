@@ -11,6 +11,7 @@ import uk.ac.wellcome.models.matcher.{
   MatcherResult,
   WorkIdentifier
 }
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -22,7 +23,8 @@ class MatcherMessageReceiverTest
     with Matchers
     with Eventually
     with IntegrationPatience
-    with MatcherFixtures {
+    with MatcherFixtures
+    with WorksGenerators {
 
   private val identifierA = createSierraSystemSourceIdentifierWith(value = "A")
   private val identifierB = createSierraSystemSourceIdentifierWith(value = "B")

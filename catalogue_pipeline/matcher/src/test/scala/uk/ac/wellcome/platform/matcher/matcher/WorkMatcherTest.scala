@@ -13,6 +13,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier,
   WorkNode
 }
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.MergeCandidate
 import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -32,7 +33,8 @@ class WorkMatcherTest
     with Matchers
     with MatcherFixtures
     with ScalaFutures
-    with MockitoSugar {
+    with MockitoSugar
+    with WorksGenerators {
 
   private val identifierA = createSierraSystemSourceIdentifierWith(value = "A")
   private val identifierB = createSierraSystemSourceIdentifierWith(value = "B")
