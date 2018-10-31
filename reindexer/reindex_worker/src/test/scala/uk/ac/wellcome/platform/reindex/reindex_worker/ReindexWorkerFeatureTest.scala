@@ -6,7 +6,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  CompleteReindexJob,
+  PartialReindexJob,
+  ReindexJob
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -52,9 +56,9 @@ class ReindexWorkerFeatureTest
           withServer(flags) { _ =>
             val testRecords = createReindexableData(table)
 
-            val reindexJob = ReindexJob(segment = 0, totalSegments = 1)
+            val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
 
-            sendNotificationToSQS(
+            sendNotificationToSQS[ReindexJob](
               queue = queue,
               message = reindexJob
             )
@@ -74,7 +78,7 @@ class ReindexWorkerFeatureTest
     }
   }
 
-  it("respects the maxRecordsPerSegment limit when sending notifications") {
+  it("can handle a partial reindex of the table") {
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
@@ -84,12 +88,9 @@ class ReindexWorkerFeatureTest
           withServer(flags) { _ =>
             val testRecords = createReindexableData(table, numberOfRecords = 8)
 
-            val reindexJob = ReindexJob(
-              segment = 0,
-              totalSegments = 1,
-              maxRecordsPerSegment = Some(1))
+            val reindexJob = PartialReindexJob(maxRecords = 1)
 
-            sendNotificationToSQS(
+            sendNotificationToSQS[ReindexJob](
               queue = queue,
               message = reindexJob
             )
