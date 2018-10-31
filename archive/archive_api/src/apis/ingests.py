@@ -1,7 +1,7 @@
 # -*- encoding: utf-8
 
 import daiquiri
-from flask import abort, make_response, request, url_for
+from flask import abort, make_response, request
 from flask_restplus import Namespace, Resource
 
 from models.catalogue import Error
