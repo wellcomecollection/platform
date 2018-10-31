@@ -23,17 +23,6 @@
     {
       "id": "b28gh7z4n",
       "type": "Item",
-      "identifiers": [
-        {
-          "value": "i11579328",
-          "type": "Identifier",
-          "indentifierType": {
-            "id": "sierra-system-number",
-            "label": "Sierra System Number",
-            "type": "IdentifierType"
-          }
-        }
-      ],
       "locations": [
         {
           "type": "Location",

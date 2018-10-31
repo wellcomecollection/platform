@@ -33,19 +33,8 @@
     {
       "id": "b28gh7z4n",
       "type": "Item",
-      "identifiers": [
-        {
-          "value": "i11579328",
-          "type": "Identifier",
-          "indentifierType": {
-            "id": "sierra-system-number",
-            "label": "Sierra System Number",
-            "type": "IdentifierType"
-          }
-        }
-      ],
       "containedIn": {
-        "type": "item",
+        "type": "Item",
         "id": "b28gh7z4n",
         "locations": [
           {
@@ -59,19 +48,7 @@
             "shelfmark": "/LAN v.392:no.10141 (2018) - v.392:no.10151 (2018)"
           }
         ]
-      },
-      "locations": [
-        {
-          "type": "Location",
-          "locationType": {
-            "id": "open-shelves",
-            "label": "Open Shelves",
-            "type": "LocationType"
-          },
-          "label": "/LAN v.392:no.10141 (2018) - v.392:no.10151 (2018)",
-          "shelfmark": "/LAN v.392:no.10141 (2018) - v.392:no.10151 (2018)"
-        }
-      ]
+      }
     }
   ]
 }

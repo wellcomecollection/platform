@@ -7,6 +7,7 @@
     "type": "ArticleType",
     "label": "Article"
   },
+  "url" : "https://wellcomecollection.org/articles/outsiders-the-stranger" ,
   "thumbnail": {
     "type": "Location",
     "locationType": "thumbnail-image",
@@ -39,25 +40,6 @@
       "id": "interview",
       "label": "Interview",
       "type": "Concept"
-    }
-  ],
-  "items": [
-    {
-      "id": "b28gh7z4n",
-      "type": "Item",
-      "locations": [
-        {
-          "type": "Location",
-          "locationType": "web",
-          "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
-          "license": {
-            "type": "License",
-            "licenseType": "CC-BY",
-            "label": "Attribution 4.0 International (CC BY 4.0)",
-            "url": "http://creativecommons.org/licenses/by/4.0/"
-          }
-        }
-      ]
     }
   ]
 }

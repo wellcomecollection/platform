@@ -56,12 +56,7 @@ wwork:Agent rdf:type owl:Class ;
 wwork:Language rdf:type owl:Class ;
     rdfs:label "Language"@en ;
     rdfs:comment "A language recognised as one of those in the ISO 639-2 language codes."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
-    
-wwork:Series rdf:type owl:Class ;
-    rdfs:label "Series"@en ;
-    rdfs:comment "A series of works."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .              
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .             
                 
 wwork:Subject rdf:type owl:Class ;
     rdfs:label "Subject"@en ;
@@ -96,8 +91,8 @@ wwork:isPartOf rdf:type owl:ObjectProperty ;
     rdfs:range wwork:Work ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
     
-wwork:hasPart rdf:type owl:ObjectProperty ;
-    rdfs:label "hasPart"@en ;
+wwork:parts rdf:type owl:ObjectProperty ;
+    rdfs:label "parts"@en ;
     rdfs:comment "Relates an work to its parts."@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Work ;
@@ -186,20 +181,6 @@ wwork:language rdf:type owl:DatatypeProperty ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Language ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
-    
-wwork:series rdf:type owl:DatatypeProperty ;
-    rdfs:label "series"@en ;
-    rdfs:comment "Relates a work to a series it is a part of"@en ;
-    rdfs:domain wwork:Work ;
-    rdfs:range wwork:Series ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
-    
-wwork:works rdf:type owl:DatatypeProperty ;
-    rdfs:label "works"@en ;
-    rdfs:comment "Relates a series to works that are part of it"@en ;
-    rdfs:domain wwork:Work ;
-    rdfs:range wwork:Series ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
     
 wwork:contributors rdf:type owl:DatatypeProperty ;
     rdfs:label "contributors"@en ;

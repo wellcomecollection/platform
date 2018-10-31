@@ -2,7 +2,11 @@
   "id": "d22e2opp",
   "type": "Person",
   "label": "Professor Michael Ashburner",
-  "gender": "Male",
+  "genderIdentity": {
+    "id" : "male" ,
+    "type" : "GenderIdentity" ,
+    "label" : "Male"
+  } ,
   "dateOfBirth": "1942-05-23" ,
   "nationality":
     {

@@ -41,6 +41,9 @@
     "Status": {
       "@id": "wig:Status"
     },
+    "Callback": {
+      "@id": "wig:Callback"
+    },
     "space": {
       "@id": "wcore:space"
     },
@@ -71,11 +74,14 @@
     "provider": {
       "@id": "wig:provider"
     },
-    "ingestStatus": {
-      "@id": "wig:ingestStatus"
+    "sourceCallback": {
+      "@id": "wig:sourceCallback"
     },
-    "callbackStatus": {
-      "@id": "wig:callbackStatus"
+    "sourceLocation": {
+      "@id": "wig:sourceLocation"
+    },
+    "status": {
+      "@id": "wig:status"
     },
     "createdDate": {
       "@id": "wcore:createdDate",
@@ -92,14 +98,6 @@
     "path": {
       "@id": "wcore:path",
       "@type": "rdf:Literal"
-    },
-    "uploadUrl": {
-      "@id": "wig:uploadUrl",
-      "@type": "rdfs:Literal"
-    },
-    "callbackUrl": {
-      "@id": "wig:callbackUrl",
-      "@type": "rdfs:Literal"
     },
     "externalDescription": {
       "@id": "wig:externalDescription",
