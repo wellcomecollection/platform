@@ -661,7 +661,7 @@ class SierraTransformableTransformerTest
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.mergeCandidates shouldBe List(
       MergeCandidate(
-        identifier = createSierraIdentifierSourceIdentifierWith(
+        identifier = createSierraSystemSourceIdentifierWith(
           value = mergeCandidateBibNumber
         ),
         reason = Some("Physical/digitised Sierra work")
