@@ -169,7 +169,7 @@ module "progress_http" {
   container_image = "${local.progress_http_container_image}"
 
   env_vars = {
-    app_base_url                = "https://api.wellcomecollection.org"
+    app_base_url                = "https://api.wellcomecollection.org/storage/v1/ingests"
     topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }

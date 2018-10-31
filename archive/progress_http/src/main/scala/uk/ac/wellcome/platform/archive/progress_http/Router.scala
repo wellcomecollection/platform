@@ -19,7 +19,7 @@ class Router @Inject()(monitor: ProgressTracker,
                        config: HttpServerConfig) {
 
   private def createLocationHeader(progress: Progress) =
-    Location(s"${config.externalBaseUrl}/progress/${progress.id}")
+    Location(s"${config.externalBaseUrl}/${progress.id}")
 
   def routes = {
     import akka.http.scaladsl.server.Directives._

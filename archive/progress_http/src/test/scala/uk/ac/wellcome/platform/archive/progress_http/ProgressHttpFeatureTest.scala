@@ -162,7 +162,7 @@ class ProgressHttpFeatureTest
 
               val request = Http().singleRequest(httpRequest)
 
-              val expectedLocationR = s"$url/(.+)".r
+              val expectedLocationR = s"$baseUrl/(.+)".r
 
               whenReady(request) { result: HttpResponse =>
                 result.status shouldBe StatusCodes.Created
