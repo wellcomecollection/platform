@@ -27,9 +27,10 @@ trait IdentifiersGenerators {
 
   def createSierraSystemSourceIdentifierWith(
     value: String = randomAlphanumeric(length = 10),
-    ontologyType: String = "Work"): SourceIdentifier =
+    ontologyType: String = "Work"
+  ): SourceIdentifier =
     SourceIdentifier(
-      identifierType = createSierraSystemSourceIdentifierType,
+      identifierType = IdentifierType("sierra-system-number"),
       value = value,
       ontologyType = ontologyType
     )
@@ -62,10 +63,6 @@ trait IdentifiersGenerators {
   def createSierraIdentifierSourceIdentifier: SourceIdentifier =
     createSourceIdentifierWith(
       identifierType = createSierraIdentifierSourceIdentifierType)
-
-  def createSierraSystemSourceIdentifierType: IdentifierType = {
-    IdentifierType("sierra-system-number")
-  }
 
   def createSierraIdentifierSourceIdentifierType: IdentifierType = {
     IdentifierType("sierra-identifier")

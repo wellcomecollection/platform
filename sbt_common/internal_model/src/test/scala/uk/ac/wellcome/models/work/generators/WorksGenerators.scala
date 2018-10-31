@@ -165,8 +165,7 @@ trait WorksGenerators extends ItemsGenerators {
                                        items: List[MaybeDisplayable[Item]] =
                                          List()): UnidentifiedWork =
     createUnidentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(
-        identifierType = createSierraSystemSourceIdentifierType),
+      sourceIdentifier = createSierraSystemSourceIdentifier,
       workType = workType,
       otherIdentifiers = List(
         createSourceIdentifierWith(
