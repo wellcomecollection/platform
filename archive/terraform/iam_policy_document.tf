@@ -5,6 +5,9 @@ data "aws_iam_policy_document" "archive_get" {
     ]
 
     resources = [
+      # Allow archivist to read bagger drop bucket
+      "arn:aws:s3:::${var.bagger_drop_bucket_name}/*",
+      # Allow archivist to read our archive ingest bucket
       "arn:aws:s3:::${local.archive_bucket_name}",
       "arn:aws:s3:::${local.archive_bucket_name}/*",
     ]
