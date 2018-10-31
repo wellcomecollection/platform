@@ -6,7 +6,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableMessageGenerators
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
 import uk.ac.wellcome.storage.fixtures.S3
 
 class MiroTransformerFeatureTest
@@ -20,7 +20,7 @@ class MiroTransformerFeatureTest
     with Eventually
     with IntegrationPatience
     with MiroTransformableWrapper
-    with MiroTransformableMessageGenerators {
+    with MiroTransformableGenerators {
 
   it("transforms miro records and publishes the result to the given topic") {
     val miroID = "M0000001"
@@ -31,9 +31,8 @@ class MiroTransformerFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
             val miroHybridRecordMessage = createHybridRecordNotificationWith(
-              createValidMiroTransformableWith(
+              createMiroTransformableWith(
                 miroId = miroID,
-                miroCollection = "foo",
                 data = buildJSONForWork(s""""image_title": "$title"""")
               ),
               s3Client = s3Client,
@@ -85,9 +84,8 @@ class MiroTransformerFeatureTest
 
             withServer(flags) { _ =>
               val miroHybridRecordMessage1 = createHybridRecordNotificationWith(
-                createValidMiroTransformableWith(
+                createMiroTransformableWith(
                   miroId = "L0011975",
-                  miroCollection = "images-L",
                   data = """
                       |{
                       |  "image_cleared": "Y",
@@ -110,9 +108,8 @@ class MiroTransformerFeatureTest
                 bucket = storageBucket
               )
               val miroHybridRecordMessage2 = createHybridRecordNotificationWith(
-                createValidMiroTransformableWith(
+                createMiroTransformableWith(
                   miroId = "L0023034",
-                  miroCollection = "images-L",
                   data =
                     """
                       |{
