@@ -4,11 +4,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibNumber,
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
@@ -37,10 +33,9 @@ class SierraTransformableTransformerTest
     )
 
     val expectedIdentifiers = itemRecords.map { record =>
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Item",
-        value = record.id.withCheckDigit
+      createSierraSystemSourceIdentifierWith(
+        value = record.id.withCheckDigit,
+        ontologyType = "Item"
       )
     }
 
@@ -120,17 +115,15 @@ class SierraTransformableTransformerTest
     val unidentifiedWork = work.asInstanceOf[UnidentifiedWork]
     unidentifiedWork.items should have size 1
 
-    val expectedSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Item",
-      value = itemId.withCheckDigit
+    val expectedSourceIdentifier = createSierraSystemSourceIdentifierWith(
+      value = itemId.withCheckDigit,
+      ontologyType = "Item"
     )
 
     val expectedOtherIdentifiers = List(
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-identifier"),
-        ontologyType = "Item",
-        value = itemId.withoutCheckDigit
+      createSierraIdentifierSourceIdentifierWith(
+        value = itemId.withoutCheckDigit,
+        ontologyType = "Item"
       )
     )
 
@@ -242,14 +235,10 @@ class SierraTransformableTransformerTest
          |}
         """.stripMargin
 
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
+    val sourceIdentifier = createSierraSystemSourceIdentifierWith(
       value = id.withCheckDigit
     )
-    val sierraIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-identifier"),
-      ontologyType = "Work",
+    val sierraIdentifier = createSierraIdentifierSourceIdentifierWith(
       value = id.withoutCheckDigit
     )
 
@@ -418,9 +407,7 @@ class SierraTransformableTransformerTest
     val id = createSierraBibNumber
     val data = s"""{"id": "$id", "title": "A title"}"""
 
-    val expectedSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
+    val expectedSourceIdentifier = createSierraSystemSourceIdentifierWith(
       value = id.withCheckDigit
     )
 
@@ -674,9 +661,7 @@ class SierraTransformableTransformerTest
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.mergeCandidates shouldBe List(
       MergeCandidate(
-        identifier = SourceIdentifier(
-          identifierType = IdentifierType("sierra-system-number"),
-          ontologyType = "Work",
+        identifier = createSierraIdentifierSourceIdentifierWith(
           value = mergeCandidateBibNumber
         ),
         reason = Some("Physical/digitised Sierra work")
@@ -713,11 +698,7 @@ class SierraTransformableTransformerTest
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.mergeCandidates shouldBe List(
       MergeCandidate(
-        identifier = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = miroId
-        ),
+        identifier = createMiroSourceIdentifierWith(value = miroId),
         reason = Some("Single page Miro/Sierra work")
       )
     )
@@ -753,11 +734,7 @@ class SierraTransformableTransformerTest
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.mergeCandidates shouldBe List(
       MergeCandidate(
-        identifier = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = miroId
-        ),
+        identifier = createMiroSourceIdentifierWith(value = miroId),
         reason = Some("Single page Miro/Sierra work")
       )
     )
@@ -896,9 +873,7 @@ class SierraTransformableTransformerTest
     triedMaybeWork.isSuccess shouldBe true
 
     triedMaybeWork.get shouldBe UnidentifiedInvisibleWork(
-      sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Work",
+      sourceIdentifier = createSierraSystemSourceIdentifierWith(
         value = id.withCheckDigit
       ),
       version = 1
