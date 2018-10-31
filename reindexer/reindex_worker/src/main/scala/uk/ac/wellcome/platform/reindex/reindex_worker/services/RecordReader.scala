@@ -18,8 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class RecordReader @Inject()(
   maxRecordsScanner: MaxRecordsScanner,
-  parallelScanner: ParallelScanner,
-  dynamoConfig: DynamoConfig
+  parallelScanner: ParallelScanner
 )(implicit ec: ExecutionContext)
     extends Logging {
 
@@ -38,14 +37,10 @@ class RecordReader @Inject()(
             parallelScanner
               .scan[HybridRecord](
                 segment = segment,
-                totalSegments = totalSegments,
-                tableName = dynamoConfig.table
+                totalSegments = totalSegments
               )
           case PartialReindexJob(maxRecords) =>
-            maxRecordsScanner.scan[HybridRecord](
-              maxRecords = maxRecords,
-              tableName = dynamoConfig.table
-            )
+            maxRecordsScanner.scan[HybridRecord](maxRecords = maxRecords)
         }
 
       recordsToReindex = results.map(extractRecord)

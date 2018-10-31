@@ -97,17 +97,18 @@ class RecordReaderTest
     val scanSpecScanner = new ScanSpecScanner(dynamoDbClient)
 
     val parallelScanner = new ParallelScanner(
-      scanSpecScanner = scanSpecScanner
+      scanSpecScanner = scanSpecScanner,
+      dynamoConfig = dynamoConfig
     )
 
     val maxRecordsScanner = new MaxRecordsScanner(
-      scanSpecScanner = scanSpecScanner
+      scanSpecScanner = scanSpecScanner,
+      dynamoConfig = dynamoConfig
     )
 
     val reader = new RecordReader(
       maxRecordsScanner = maxRecordsScanner,
-      parallelScanner = parallelScanner,
-      dynamoConfig = dynamoConfig
+      parallelScanner = parallelScanner
     )
 
     testWith(reader)

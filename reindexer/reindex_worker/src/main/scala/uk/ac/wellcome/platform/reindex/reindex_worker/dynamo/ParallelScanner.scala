@@ -42,6 +42,6 @@ class ParallelScanner @Inject()(scanSpecScanner: ScanSpecScanner, dynamoConfig: 
       .withTotalSegments(totalSegments)
       .withSegment(segment)
 
-    scanSpecScanner.scan(scanSpec = scanSpec, tableName = dynamoConfig.tableName)
+    scanSpecScanner.scan(scanSpec = scanSpec, tableName = dynamoConfig.table)
   }
 }
