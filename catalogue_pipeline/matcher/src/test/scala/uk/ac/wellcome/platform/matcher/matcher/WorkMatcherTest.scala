@@ -42,10 +42,11 @@ class WorkMatcherTest
           withWorkGraphStore(graphTable) { workGraphStore =>
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
-                whenReady(workMatcher.matchWork(anUnidentifiedSierraWork)) {
-                  matcherResult =>
-                    val workId = "sierra-system-number/id"
+                val work = createUnidentifiedSierraWork
+                val workId = work.sourceIdentifier.toString
 
+                whenReady(workMatcher.matchWork(work)) {
+                  matcherResult =>
                     matcherResult shouldBe
                       MatcherResult(
                         Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
@@ -219,15 +220,17 @@ class WorkMatcherTest
             withDynamoRowLockDao(dynamoDbClient, lockTable) { rowLockDao =>
               withLockingService(rowLockDao, mockMetricsSender) {
                 dynamoLockingService =>
+                  val work = createUnidentifiedSierraWork
+                  val workId = work.sourceIdentifier.toString
+
                   withWorkMatcherAndLockingService(
                     workGraphStore,
                     dynamoLockingService) { workMatcher =>
                     val failedLock = for {
                       _ <- rowLockDao.lockRow(
-                        Identifier("sierra-system-number/id"),
+                        Identifier(workId),
                         "processId")
-                      result <- workMatcher.matchWork(
-                        anUnidentifiedSierraWork.copy())
+                      result <- workMatcher.matchWork(work)
                     } yield result
 
                     whenReady(failedLock.failed) { failedMatch =>
@@ -315,7 +318,7 @@ class WorkMatcherTest
                       FailedUnlockException("test", new RuntimeException)))
 
                   whenReady(
-                    workMatcher.matchWork(anUnidentifiedSierraWork).failed) {
+                    workMatcher.matchWork(createUnidentifiedSierraWork).failed) {
                     failedMatch =>
                       failedMatch shouldBe a[MatcherException]
                   }
@@ -339,7 +342,7 @@ class WorkMatcherTest
             when(mockWorkGraphStore.put(any[WorkGraph]))
               .thenThrow(expectedException)
 
-            whenReady(workMatcher.matchWork(anUnidentifiedSierraWork).failed) {
+            whenReady(workMatcher.matchWork(createUnidentifiedSierraWork).failed) {
               actualException =>
                 actualException shouldBe expectedException
             }

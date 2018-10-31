@@ -34,11 +34,11 @@ class MatcherMessageReceiverTest
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             // Work Av1 created without any matched works
-            val updatedWork = anUnidentifiedSierraWork
+            val updatedWork = createUnidentifiedSierraWork
             val expectedMatchedWorks =
               MatcherResult(
                 Set(MatchedIdentifiers(
-                  Set(WorkIdentifier("sierra-system-number/id", 1)))))
+                  Set(WorkIdentifier(updatedWork)))))
 
             processAndAssertMatchedWorkIs(
               updatedWork,
