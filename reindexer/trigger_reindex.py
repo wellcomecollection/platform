@@ -3,14 +3,22 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT> [--skip-pipeline-checks]
+Usage: trigger_reindex.py complete --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT> [--skip-pipeline-checks]
+       trigger_reindex.py partial --source=<SOURCE_NAME> --reason=<REASON> --max_records=<MAX>
        trigger_reindex.py -h | --help
+
+Actions:
+  complete                  Trigger a complete reindex -- send every record in the
+                            VHS to the downstream applications.
+  partial                   Trigger a partial reindex -- only send a small number of
+                            records to the downstream application.
 
 Options:
   --source=<SOURCE_NAME>    Name of the source you want to reindex.
   --reason=<REASON>         An explanation of why you're running this reindex.
                             This will be printed in the Slack alert.
   --total_segments=<COUNT>  How many segments to divide the VHS table into.
+  --max_records=<MAX>       What's the most number of records that should be sent?
   --skip-pipeline-checks    Don't check if the pipeline tables are clear
                             before running.
   -h --help                 Print this help message
@@ -27,22 +35,29 @@ import requests
 import tqdm
 
 
+iam_client = boto3.client("iam")
+sns_client = boto3.client("sns")
+
+
 def get_topic_name(source_name):
     return f"reindex_jobs-{source_name}"
 
 
-def all_messages(total_segments):
+def all_complete_messages(total_segments):
     """
     Generates all the messages to be sent to SNS.
     """
     for i in range(total_segments):
-        yield {"segment": i, "totalSegments": total_segments}
+        yield {
+            "segment": i,
+            "totalSegments": total_segments,
+            "type": "CompleteReindexJob",
+        }
 
 
-def publish_messages(topic_arn, messages, total_segments):
+def publish_messages(topic_arn, messages):
     """Publish a sequence of messages to an SNS topic."""
-    sns_client = boto3.client("sns")
-    for m in tqdm.tqdm(messages, total=total_segments):
+    for m in tqdm.tqdm(list(messages)):
         resp = sns_client.publish(
             TopicArn=topic_arn,
             MessageStructure="json",
@@ -52,14 +67,10 @@ def publish_messages(topic_arn, messages, total_segments):
         assert resp["ResponseMetadata"]["HTTPStatusCode"] == 200, resp
 
 
-def post_to_slack(source_name, reason, total_segments):
+def post_to_slack(source_name, slack_message):
     """
     Posts a message about the reindex in Slack, so we can track them.
     """
-    # Get the name of the current user.
-    iam = boto3.client("iam")
-    username = iam.get_user()["User"]["UserName"]
-
     # Get the non-critical Slack token.
     s3 = boto3.client("s3")
     tfvars_obj = s3.get_object(
@@ -70,18 +81,12 @@ def post_to_slack(source_name, reason, total_segments):
 
     webhook_url = tfvars["non_critical_slack_webhook"]
 
-    message = (
-        f"*{username}* started a reindex in *{source_name}*\n"
-        f"Reason: *{reason}* "
-        f'({total_segments} segment{"s" if total_segments != 1 else ""})'
-    )
-
     slack_data = {
         "username": "reindex-tracker",
         "icon_emoji": ":dynamodb:",
         "color": "#2E72B8",
         "title": "reindexer",
-        "fields": [{"value": message}],
+        "fields": [{"value": slack_message}],
     }
 
     resp = requests.post(
@@ -136,8 +141,9 @@ def main():
 
     source_name = args["--source"]
     reason = args["--reason"]
-    total_segments = int(args["--total_segments"])
-    skip_pipeline_checks = args["--skip-pipeline-checks"]
+    skip_pipeline_checks = args["--skip-pipeline-checks"] or args["partial"]
+
+    username = iam_client.get_user()["User"]["UserName"]
 
     if not skip_pipeline_checks:
         print("Checking pipeline is clear...")
@@ -145,15 +151,29 @@ def main():
 
     print(f"Triggering a reindex in {source_name}")
 
-    post_to_slack(source_name=source_name, reason=reason, total_segments=total_segments)
+    if args["complete"]:
+        total_segments = int(args["--total_segments"])
+        messages = all_complete_messages(total_segments=total_segments)
+        slack_message = (
+            f"*{username}* started a complete reindex in *{source_name}*\n"
+            f"Reason: *{reason}* "
+            f'({total_segments} segment{"s" if total_segments != 1 else ""})'
+        )
+    else:
+        messages = [
+            {"maxRecords": int(args["--max_records"]), "type": "PartialReindexJob"}
+        ]
+        slack_message = (
+            f"*{username}* started a partial reindex in *{source_name}*\n"
+            f"Reason: *{reason}* "
+            f'({int(args["--max_records"])})'
+        )
 
-    messages = all_messages(total_segments=total_segments)
+    post_to_slack(source_name=source_name, slack_message=slack_message)
 
     topic_arn = build_topic_arn(topic_name=get_topic_name(source_name))
 
-    publish_messages(
-        topic_arn=topic_arn, messages=messages, total_segments=total_segments
-    )
+    publish_messages(topic_arn=topic_arn, messages=messages)
 
 
 if __name__ == "__main__":
