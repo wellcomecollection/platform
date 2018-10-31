@@ -53,9 +53,10 @@ trait IdentifiersGenerators {
 
   def createIsbnSourceIdentifierWith(
     value: String = randomAlphanumeric(length = 10),
-    ontologyType: String = "Work"): SourceIdentifier =
+    ontologyType: String = "Work"
+  ): SourceIdentifier =
     SourceIdentifier(
-      identifierType = createIsbnSourceIdentifierType,
+      identifierType = IdentifierType("isbn"),
       value = value,
       ontologyType = ontologyType
     )
@@ -72,12 +73,4 @@ trait IdentifiersGenerators {
 
   def createMiroSourceIdentifier: SourceIdentifier =
     createMiroSourceIdentifierWith()
-
-  def createIsbnSourceIdentifierType: IdentifierType = {
-    IdentifierType("isbn")
-  }
-
-  def createCalmSourceIdentifierType: IdentifierType = {
-    IdentifierType("calm-altref-no")
-  }
 }
