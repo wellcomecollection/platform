@@ -149,7 +149,7 @@ def main():
         print("Checking pipeline is clear...")
         check_tables_are_clear()
 
-    print(f"Triggering a reindex in {source_name} for '{reason}' with {max_records_per_segment} total records")
+    print(f"Triggering a reindex in {source_name}")
 
     if args["complete"]:
         total_segments = int(args["--total_segments"])

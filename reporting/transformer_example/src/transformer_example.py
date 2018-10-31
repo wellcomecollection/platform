@@ -16,7 +16,8 @@ from elasticsearch import Elasticsearch
 
 
 # Classes covering various record types ----------------------------------------
-def dict_to_location(d): return ObjectLocation(**d)
+def dict_to_location(d): 
+    return ObjectLocation(**d)
 
 
 @attrs
@@ -63,7 +64,7 @@ def hybrid_record_to_data_dict(s3, hybrid_record):
 def extract_records(s3, event):
     '''
     extracts records from VHS and prepares them for transformation
-   
+
     Parameters
     ----------
     s3 : boto3.client
@@ -76,19 +77,17 @@ def extract_records(s3, event):
     '''
     raw_hybrid_records = [json.loads(record["Sns"]["Message"]) for record in event["Records"]]
     hybrid_records = [HybridRecord(**record) for record in raw_hybrid_records]
-    data_dicts = [hybrid_record_to_data_dict(s3, hybrid_record) 
+    data_dicts = [hybrid_record_to_data_dict(s3, hybrid_record)
                   for hybrid_record in hybrid_records]
     return data_dicts, hybrid_records
 
-    
+
 # Move records with transforms applied -----------------------------------------
 def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
     '''
-    get records from VHS, apply the transformation to them, and shove them into 
+    get records from VHS, apply the transformation to them, and shove them into
     an elasticsearch index
     '''
-    print(f"Event: {event}")
-
     s3_client = s3_client or boto3.client("s3")
     index = index or os.environ["ES_INDEX"]
     doc_type = doc_type or os.environ["ES_DOC_TYPE"]
@@ -107,5 +106,3 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
 
     results = [es_client.index(index=index, doc_type=doc_type, id=record.id, body=record.doc)
                for record in es_records]
-
-    print(f"Result: {results}")

@@ -5,7 +5,7 @@ def transform(record):
     ----------
     record : dict
         the raw data from VHS in a malleable dict format
-        
+
     Returns
     -------
     transformed_record : dict
