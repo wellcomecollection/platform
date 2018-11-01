@@ -185,6 +185,8 @@ module "progress_http" {
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }
 
+# Migration services
+
 module "bagger" {
   source = "internal_queue_service"
 
@@ -231,6 +233,44 @@ module "bagger" {
   container_image   = "${local.bagger_container_image}"
   source_queue_name = "${module.bagger_queue.name}"
   source_queue_arn  = "${module.bagger_queue.arn}"
+}
+
+module "migrator" {
+  source = "../../../terraform-modules/lambda"
+
+  name = "migrator"
+  description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
+
+  lambda_type = "vpc"
+
+  timeout     = 25
+
+  environment_variables = {
+    # Private DNS
+    INGEST_API_URL = "http://archive-storage_api.archive-storage_api:9000/storage/v1/ingests"
+  }
+
+  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+
+  s3_bucket = "${local.infra_bucket}"
+  s3_key    = "lambdas/archive/migrator.zip"
+
+  security_group_ids = [
+    "${aws_security_group.interservice_security_group.id}",
+    "${aws_security_group.service_egress_security_group.id}"
+  ]
+
+  subnet_ids = "${local.private_subnets}"
+
+  log_retention_in_days = 30
+}
+
+module "trigger_migrator" {
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v10.2.2"
+
+  lambda_function_arn  = "${module.migrator.arn}"
+  lambda_function_name = "${module.migrator.function_name}"
+  sns_trigger_arn      = "${module.bagging_complete_topic.arn}"
 }
 
 # Integration testing - callback_client
