@@ -6,7 +6,9 @@ final case class VersionExpectedConflictException(
   message: String = "Version conflict!")
     extends Exception(message)
 
-case class VersionUnexpectedConflictException(e: Throwable) extends Exception(e.getMessage) with GracefulFailureException
+case class VersionUnexpectedConflictException(e: Throwable)
+    extends Exception(e.getMessage)
+    with GracefulFailureException
 
 case object VersionUnexpectedConflictException {
   def apply(message: String): VersionUnexpectedConflictException =
