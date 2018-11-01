@@ -22,6 +22,18 @@ locals {
 
   remus_enable_alb_alarm   = "${local.remus_is_prod == "true" ? 1 : 0}"
   romulus_enable_alb_alarm = "${local.romulus_is_prod == "true" ? 1 : 0}"
+
+  es_config_romulus = {
+    index_v1 = "v1-2018-09-27-marc-610-subjects"
+    index_v2 = "v2-2018-09-27-marc-610-subjects"
+    doc_type = "work"
+  }
+
+  es_config_remus = {
+    index_v1 = "v1-2018-09-27-marc-610-subjects"
+    index_v2 = "v2-2018-09-27-marc-610-subjects"
+    doc_type = "work"
+  }
 }
 
 module "romulus" {
@@ -42,7 +54,7 @@ module "romulus" {
   host_name = "${local.romulus_hostname}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
-  es_config              = "${var.es_config_romulus}"
+  es_config              = "${local.es_config_romulus}"
 
   task_desired_count         = "${local.romulus_task_number}"
   enable_alb_alarm           = "${local.romulus_enable_alb_alarm}"
@@ -71,7 +83,7 @@ module "remus" {
   host_name = "${local.remus_hostname}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
-  es_config              = "${var.es_config_remus}"
+  es_config              = "${local.es_config_remus}"
 
   task_desired_count         = "${local.remus_task_number}"
   alb_cloudwatch_id          = "${local.alb_api_wc_cloudwatch_id}"
