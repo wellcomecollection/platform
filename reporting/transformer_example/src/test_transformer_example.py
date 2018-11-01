@@ -49,7 +49,9 @@ def given_s3_has(s3_client, bucket, key, data):
     )
 
 
-def test_saves_miro_data_record_in_es(s3_client, bucket, elasticsearch_client, elasticsearch_index):
+def test_saves_miro_data_record_in_es(
+    s3_client, bucket, elasticsearch_client, elasticsearch_index
+):
     id = "V0010033"
     elasticsearch_doctype = "example"
     hybrid_data = create_miro_hybrid_data()
@@ -69,4 +71,4 @@ def test_saves_miro_data_record_in_es(s3_client, bucket, elasticsearch_client, e
 
     es_record = elasticsearch_client.get(elasticsearch_index, elasticsearch_doctype, id)
 
-    assert es_record["_source"] == json.loads(hybrid_data['data'])
+    assert es_record["_source"] == json.loads(hybrid_data["data"])
