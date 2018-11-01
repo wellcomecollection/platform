@@ -40,8 +40,6 @@ class RegistrarAsyncArgsConfigurator(val arguments: Seq[String])
 
   private val sqsQueueUrl: ScallopOption[String] =
     opt[String]("sqs-queue-url", required = true)
-  private val sqsWaitTimeSeconds =
-    opt[Int]("sqs-wait-time-seconds", required = true, default = Some(20))
   private val sqsMaxMessages =
     opt[Int]("sqs-max-messages", required = true, default = Some(10))
   private val sqsParallelism =
@@ -106,7 +104,6 @@ class RegistrarAsyncArgsConfigurator(val arguments: Seq[String])
 
   val sqsConfig = SQSConfig(
     queueUrl = sqsQueueUrl(),
-    waitTime = sqsWaitTimeSeconds() seconds,
     maxMessages = sqsMaxMessages(),
     parallelism = sqsParallelism()
   )

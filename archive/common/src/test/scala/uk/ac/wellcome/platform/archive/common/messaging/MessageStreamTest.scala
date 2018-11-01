@@ -16,8 +16,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.concurrent.duration._
-
 class MessageStreamTest
     extends FunSpec
     with Matchers
@@ -154,7 +152,6 @@ class MessageStreamTest
           withMockMetricSender { metricsSender =>
             val sqsConfig = SQSConfig(
               queueUrl = queue.url,
-              waitTime = 1 millisecond,
               maxMessages = 1
             )
 

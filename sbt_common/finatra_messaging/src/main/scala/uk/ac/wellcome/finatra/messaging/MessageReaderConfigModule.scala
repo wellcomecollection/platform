@@ -6,8 +6,6 @@ import uk.ac.wellcome.messaging.message.MessageReaderConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.storage.s3.S3Config
 
-import scala.concurrent.duration._
-
 object MessageReaderConfigModule extends TwitterModule {
   private val readerBucketName =
     flag[String](
@@ -17,10 +15,6 @@ object MessageReaderConfigModule extends TwitterModule {
     flag[String](
       "aws.message.reader.sqs.queue.url",
       "URL of the SQS Queue to read messages from")
-  private val readerWaitTime = flag(
-    "aws.message.reader.sqs.waitTime",
-    20,
-    "Time to wait (in seconds) for a message to arrive on the queue before returning")
   private val readerMaxMessages =
     flag(
       "aws.message.reader.sqs.maxMessages",
@@ -37,7 +31,6 @@ object MessageReaderConfigModule extends TwitterModule {
   def providesMessageReaderConfig(): MessageReaderConfig = {
     val sqsConfig = SQSConfig(
       queueUrl = readerQueueUrl(),
-      waitTime = readerWaitTime() seconds,
       maxMessages = readerMaxMessages(),
       parallelism = readerParallelism()
     )
