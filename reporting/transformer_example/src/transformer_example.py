@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-Example lambda
+get records from VHS, apply the transformation to them, and shove them into
+an elasticsearch index
 """
-
+from transform import transform
 import json
 import os
 
@@ -15,26 +16,15 @@ import certifi
 from elasticsearch import Elasticsearch
 
 
-# --------------------------------
-
-
-# Implement transformation here
-def _transform(record):
-    # do not do this!
-    return record
-
-
-# --------------------------------
+# Classes covering various record types ----------------------------------------
+def dict_to_location(d):
+    return ObjectLocation(**d)
 
 
 @attrs
 class ObjectLocation(object):
     namespace = attrib()
     key = attrib()
-
-
-def dict_to_location(d):
-    return ObjectLocation(**d)
 
 
 @attrs
@@ -50,82 +40,48 @@ class ElasticsearchRecord(object):
     doc = attrib()
 
 
-def _extract_hybrid_record(raw_record):
-    return HybridRecord(**raw_record)
+# Move records through the pipeline --------------------------------------------
+def extract_sns_messages_from_event(event):
+    for record in event["Records"]:
+        yield json.loads(record["Sns"]["Message"])
 
 
-def _get_record_from_s3(s3, object_location):
-    obj = s3.get_object(Bucket=object_location.namespace, Key=object_location.key)
-    return obj["Body"].read().decode("utf-8")
+def get_s3_objects_from_messages(s3, messages):
+    for message in messages:
+        hybrid_record = HybridRecord(**message)
+        s3_object = s3.get_object(
+            Bucket=hybrid_record.location.namespace, Key=hybrid_record.location.key
+        )
+        yield hybrid_record.id, s3_object
 
 
-def _build_es_record(s3, hybrid_record):
-    s3_record = _get_record_from_s3(s3, hybrid_record.location)
-    return ElasticsearchRecord(id=hybrid_record.id, doc=s3_record)
+def unpack_json_from_s3_objects(s3_objects):
+    for hybrid_record_id, s3_object in s3_objects:
+        record = s3_object["Body"].read().decode("utf-8")
+        yield hybrid_record_id, json.loads(record)
 
 
-def extract_records(s3, event):
-    raw_hybrid_records = [
-        json.loads(record["Sns"]["Message"]) for record in event["Records"]
-    ]
-    hybrid_records = [
-        _extract_hybrid_record(raw_record) for raw_record in raw_hybrid_records
-    ]
-    return [_build_es_record(s3, hybrid_record) for hybrid_record in hybrid_records]
+def transform_data_for_es(data):
+    for hybrid_record_id, data_dict in data:
+        yield ElasticsearchRecord(id=hybrid_record_id, doc=transform(data_dict))
 
 
-def transform_records(records):
-    return [_transform(record) for record in records]
-
-
-def _load_record(es, index, doc_type, es_record):
-    return es.index(index=index, doc_type=doc_type, id=es_record.id, body=es_record.doc)
-
-
-def load_records(es, index, doc_type, docs):
-    return [_load_record(es, index, doc_type, doc) for doc in docs]
-
-
-def _run(elasticsearch_client, event, index, doc_type, s3_client):
-    records = extract_records(s3_client, event)
-    transformed_records = transform_records(records)
-    return load_records(elasticsearch_client, index, doc_type, transformed_records)
-
-
-def elasticsearch_client(url, username, password):
-    return Elasticsearch(
-        url, http_auth=(username, password), use_ssl=True, ca_certs=certifi.where()
+# Move records with transforms applied -----------------------------------------
+def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
+    s3 = s3_client or boto3.client("s3")
+    index = index or os.environ["ES_INDEX"]
+    doc_type = doc_type or os.environ["ES_DOC_TYPE"]
+    es_client = es_client or Elasticsearch(
+        hosts=os.environ["ES_URL"],
+        use_ssl=True,
+        ca_certs=certifi.where(),
+        http_auth=(os.environ["ES_USER"], os.environ["ES_PASS"]),
     )
 
+    messages = extract_sns_messages_from_event(event)
+    s3_objects = get_s3_objects_from_messages(s3, messages)
+    data = unpack_json_from_s3_objects(s3_objects)
+    es_records_to_send = transform_data_for_es(data)
 
-def main(
-    event,
-    _,
-    s3_client=None,
-    elasticsearch_client=None,
-    elasticsearch_index=None,
-    elasticsearch_doctype=None,
-):
-    print(f"Event: {event}")
-
-    s3_client = s3_client or boto3.client("s3")
-
-    elasticsearch_client = elasticsearch_client or elasticsearch_client(
-        url=os.environ["ES_URL"],
-        username=os.environ["ES_USER"],
-        password=os.environ["ES_PASS"],
-    )
-
-    elasticsearch_index = elasticsearch_index or os.environ["ES_INDEX"]
-
-    elasticsearch_doctype = elasticsearch_doctype or os.environ["ES_DOC_TYPE"]
-
-    results = _run(
-        elasticsearch_client=elasticsearch_client,
-        event=event,
-        index=elasticsearch_index,
-        doc_type=elasticsearch_doctype,
-        s3_client=s3_client,
-    )
-
-    print(f"Result: {results}")
+    for record in es_records_to_send:
+        es_client.index(index=index, doc_type=doc_type, id=record.id, body=record.doc)
