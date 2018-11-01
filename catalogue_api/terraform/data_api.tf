@@ -1,4 +1,15 @@
 locals {
+
+  # In an ideal world we'd be able to pass through the map directly.  Currently
+  # Terraform can't do that, and if you try you get an error:
+  #
+  #     conditional operator cannot be used with map values
+  #
+  # It sounds like we might be getting it in 0.12:
+  # https://github.com/hashicorp/terraform/issues/12453#issuecomment-433555953
+  #
+  # If so, we should come back and clean this up!
+  #
   prod_es_config = {
     index_v1 = "${local.romulus_is_prod ? local.es_config_romulus["index_v1"] : local.es_config_remus["index_v1"]}"
     index_v2 = "${local.romulus_is_prod ? local.es_config_romulus["index_v2"] : local.es_config_remus["index_v2"]}"
