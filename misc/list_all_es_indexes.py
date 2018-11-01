@@ -9,8 +9,7 @@ import requests
 def get_terraform_vars():
     s3_client = boto3.client("s3")
     tfvars_body = s3_client.get_object(
-        Bucket="wellcomecollection-platform-infra",
-        Key="terraform.tfvars"
+        Bucket="wellcomecollection-platform-infra", Key="terraform.tfvars"
     )["Body"]
     return hcl.load(tfvars_body)
 
@@ -25,9 +24,7 @@ def build_url(es_credentials):
 
 def get_all_indexes(es_url, username, password):
     resp = requests.get(
-        f"{es_url}/_cat/indices",
-        auth=(username, password),
-        params={"format": "json"}
+        f"{es_url}/_cat/indices", auth=(username, password), params={"format": "json"}
     )
     resp.raise_for_status()
 
@@ -46,9 +43,7 @@ if __name__ == "__main__":
     indexes = get_all_indexes(es_url, username=username, password=password)
 
     print(
-        '\n'.join(sorted(
-            idx["index"]
-            for idx in indexes
-            if not idx["index"].startswith(".")
-        ))
+        "\n".join(
+            sorted(idx["index"] for idx in indexes if not idx["index"].startswith("."))
+        )
     )
