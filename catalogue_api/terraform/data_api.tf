@@ -1,5 +1,4 @@
 locals {
-
   # In an ideal world we'd be able to pass through the map directly.  Currently
   # Terraform can't do that, and if you try you get an error:
   #
