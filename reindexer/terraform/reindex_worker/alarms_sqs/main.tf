@@ -5,7 +5,7 @@ resource "aws_cloudwatch_metric_alarm" "queue_high" {
   evaluation_periods = "${var.high_period_in_minutes}"
 
   datapoints_to_alarm = "${var.high_period_in_minutes}"
-  namespace = "AWS/SQS"
+  namespace           = "AWS/SQS"
   metric_name         = "ApproximateNumberOfMessagesVisible"
 
   dimensions {
@@ -32,7 +32,7 @@ resource "aws_cloudwatch_metric_alarm" "queue_low" {
   evaluation_periods = "${var.low_period_in_minutes}"
 
   datapoints_to_alarm = "${var.low_period_in_minutes}"
-  namespace = "queues/visible_and_in_flight"
+  namespace           = "queues/visible_and_in_flight"
   metric_name         = "${var.queue_name}"
 
   statistic = "Sum"

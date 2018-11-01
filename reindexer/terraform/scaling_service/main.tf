@@ -10,7 +10,7 @@ module "appautoscaling" {
 }
 
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/service/prebuilt/default?ref=v11.11.0"
+  source       = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/service/prebuilt/default?ref=v11.11.0"
   service_name = "${var.service_name}"
 
   vpc_id              = "${var.vpc_id}"
