@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 """
-Example lambda
+get records from VHS, apply the transformation to them, and shove them into
+an elasticsearch index
 """
 from transform import transform
 import json
@@ -45,33 +46,29 @@ def extract_sns_messages_from_event(event):
         yield json.loads(record["Sns"]["Message"])
 
 
-def get_hybrid_objects_from_messages(s3, messages):
+def get_s3_objects_from_messages(s3, messages):
     for message in messages:
         hybrid_record = HybridRecord(**message)
         s3_object = s3.get_object(
             Bucket=hybrid_record.location.namespace,
             Key=hybrid_record.location.key
         )
-        yield hybrid_record, s3_object
+        yield hybrid_record.id, s3_object
 
 
-def s3_object_to_data_dict(s3_object):
-    record = s3_object["Body"].read().decode("utf-8")
-    return json.loads(record)["data"]
+def unpack_json_from_s3_objects(s3_objects):
+    for hybrid_record_id, s3_object in s3_objects:
+        record = s3_object["Body"].read().decode("utf-8")
+        yield hybrid_record_id, json.loads(record)
 
 
-def get_data_dicts_from_s3_objects(s3_objects):
-    for s3_object in s3_objects:
-        data_dict = s3_object_to_data_dict(s3_object)
-        yield data_dict
+def transform_data_for_es(data):
+    for hybrid_record_id, data_dict in data:
+        yield ElasticsearchRecord(id=hybrid_record_id, doc=transform(data_dict))
 
 
 # Move records with transforms applied -----------------------------------------
 def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
-    """
-    get records from VHS, apply the transformation to them, and shove them into
-    an elasticsearch index
-    """
     s3 = s3_client or boto3.client("s3")
     index = index or os.environ["ES_INDEX"]
     doc_type = doc_type or os.environ["ES_DOC_TYPE"]
@@ -83,14 +80,9 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
     )
 
     messages = extract_sns_messages_from_event(event)
-    hybrid_records, s3_objects = get_hybrid_objects_from_messages(s3, messages)
-    data_dicts = get_data_dicts_from_s3_objects(s3_objects)
-    transformed_dicts = [transform(data) for data in data_dicts]
-
-    es_records_to_send = [
-        ElasticsearchRecord(id=hybrid_record.id, doc=doc)
-        for doc, hybrid_record in zip(transformed_dicts, hybrid_records)
-    ]
+    s3_objects = get_s3_objects_from_messages(s3, messages)
+    data = unpack_json_from_s3_objects(s3_objects)
+    es_records_to_send = transform_data_for_es(data)
 
     for record in es_records_to_send:
         es_client.index(

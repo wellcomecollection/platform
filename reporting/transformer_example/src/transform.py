@@ -1,4 +1,5 @@
-# Some kind of transform -------------------------------------------------------
+import json
+
 def transform(record):
     """
     Parameters
@@ -12,4 +13,4 @@ def transform(record):
         record with necessary transformations applied, ready to be formatted for
         elasticsearch ingestion
     """
-    return record
+    return json.loads(record["data"])

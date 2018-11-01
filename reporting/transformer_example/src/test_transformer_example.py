@@ -27,7 +27,7 @@ def create_sns_message(bucket_name, id, key):
     }
 
 
-def create_s3_hybrid_data():
+def create_miro_hybrid_data():
     return {
         "MiroCollection": "images-2",
         "data": '{"image_image_desc":"A horse\'s neck: diagonal feathered whorl.\\nRoyal Veterinary College."}',
@@ -49,10 +49,10 @@ def given_s3_has(s3_client, bucket, key, data):
     )
 
 
-def test(s3_client, bucket, elasticsearch_client, elasticsearch_index):
+def test_saves_miro_data_record_in_es(s3_client, bucket, elasticsearch_client, elasticsearch_index):
     id = "V0010033"
     elasticsearch_doctype = "example"
-    hybrid_data = create_s3_hybrid_data()
+    hybrid_data = create_miro_hybrid_data()
     key = "33/V0010033/0.json"
 
     given_s3_has(s3_client, bucket, key, json.dumps(hybrid_data))
@@ -68,4 +68,5 @@ def test(s3_client, bucket, elasticsearch_client, elasticsearch_index):
     )
 
     es_record = elasticsearch_client.get(elasticsearch_index, elasticsearch_doctype, id)
-    assert es_record["_source"] == hybrid_data
+
+    assert es_record["_source"] == json.loads(hybrid_data['data'])
