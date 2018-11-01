@@ -150,10 +150,7 @@ class MessageStreamTest
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
-            val sqsConfig = SQSConfig(
-              queueUrl = queue.url,
-              maxMessages = 1
-            )
+            val sqsConfig = SQSConfig(queueUrl = queue.url)
 
             val stream = new MessageStream[ExampleObject, Unit](
               actorSystem = actorSystem,

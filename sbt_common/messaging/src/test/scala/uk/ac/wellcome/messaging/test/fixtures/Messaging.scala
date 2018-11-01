@@ -106,8 +106,7 @@ trait Messaging
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
     implicit objectStore: ObjectStore[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val sqsConfig =
-      SQSConfig(queueUrl = queue.url, maxMessages = 1)
+    val sqsConfig = SQSConfig(queueUrl = queue.url)
 
     val messageConfig = MessageReaderConfig(
       sqsConfig = sqsConfig,

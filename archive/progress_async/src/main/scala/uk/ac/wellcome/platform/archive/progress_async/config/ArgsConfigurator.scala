@@ -57,8 +57,6 @@ class ArgsConfigurator(val arguments: Seq[String])
 
   private val sqsQueueUrl: ScallopOption[String] =
     opt[String]("sqs-queue-url", required = true)
-  private val sqsMaxMessages =
-    opt[Int]("sqs-max-messages", required = true, default = Some(10))
   private val sqsParallelism =
     opt[Int]("sqs-parallelism", required = true, default = Some(10))
 
@@ -94,7 +92,6 @@ class ArgsConfigurator(val arguments: Seq[String])
 
   val sqsConfig = SQSConfig(
     queueUrl = sqsQueueUrl(),
-    maxMessages = sqsMaxMessages(),
     parallelism = sqsParallelism()
   )
 

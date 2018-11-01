@@ -15,11 +15,6 @@ object MessageReaderConfigModule extends TwitterModule {
     flag[String](
       "aws.message.reader.sqs.queue.url",
       "URL of the SQS Queue to read messages from")
-  private val readerMaxMessages =
-    flag(
-      "aws.message.reader.sqs.maxMessages",
-      10,
-      "Maximum number of SQS messages to return")
   private val readerParallelism =
     flag(
       name = "aws.message.reader.sqs.parallelism",
@@ -31,7 +26,6 @@ object MessageReaderConfigModule extends TwitterModule {
   def providesMessageReaderConfig(): MessageReaderConfig = {
     val sqsConfig = SQSConfig(
       queueUrl = readerQueueUrl(),
-      maxMessages = readerMaxMessages(),
       parallelism = readerParallelism()
     )
     val s3Config = S3Config(bucketName = readerBucketName())

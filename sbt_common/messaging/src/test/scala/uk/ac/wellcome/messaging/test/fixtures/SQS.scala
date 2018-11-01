@@ -145,10 +145,7 @@ trait SQS extends Matchers with Logging {
     actorSystem: ActorSystem,
     queue: Queue,
     metricsSender: MetricsSender)(testwith: TestWith[SQSStream[T], R]) = {
-    val sqsConfig = SQSConfig(
-      queueUrl = queue.url,
-      maxMessages = 1
-    )
+    val sqsConfig = SQSConfig(queueUrl = queue.url)
 
     val stream = new SQSStream[T](
       actorSystem = actorSystem,
