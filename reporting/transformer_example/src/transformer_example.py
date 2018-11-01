@@ -49,8 +49,7 @@ def get_hybrid_objects_from_messages(s3, messages):
     for message in messages:
         hybrid_record = HybridRecord(**message)
         s3_object = s3.get_object(
-            Bucket=hybrid_record.location.namespace,
-            Key=hybrid_record.location.key
+            Bucket=hybrid_record.location.namespace, Key=hybrid_record.location.key
         )
         yield hybrid_record, s3_object
 
@@ -93,9 +92,4 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
     ]
 
     for record in es_records_to_send:
-        es_client.index(
-            index=index,
-            doc_type=doc_type,
-            id=record.id,
-            body=record.doc
-        )
+        es_client.index(index=index, doc_type=doc_type, id=record.id, body=record.doc)
