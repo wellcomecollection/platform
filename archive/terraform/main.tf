@@ -9,8 +9,6 @@ module "api_ecs" {
   archive_api_container_image = "${local.api_ecs_container_image}"
   archive_api_container_port  = "9000"
 
-  archive_ingest_sns_topic_arn = "${module.archivist_topic.arn}"
-
   vpc_id                         = "${local.vpc_id}"
   interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
   private_subnets                = "${local.private_subnets}"
@@ -171,7 +169,7 @@ module "progress_http" {
   container_image = "${local.progress_http_container_image}"
 
   env_vars = {
-    app_base_url                = "https://api.wellcomecollection.org"
+    app_base_url                = "https://${module.api_ecs.alb_dns_name}/storage/v1/ingests"
     topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
