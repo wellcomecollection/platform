@@ -2,14 +2,12 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import java.io.InputStream
 
 import akka.NotUsed
+import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ChecksumNotMatchedOnUploadError,
-  UploadError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ChecksumNotMatchedOnUploadError, UploadError}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 import scala.util.{Failure, Success}
@@ -58,6 +56,11 @@ object UploadInputStreamFlow extends Logging {
                   Left(UploadError(exception, job))
               }
         }
+      )
+      .withAttributes(
+        ActorAttributes.dispatcher(
+          "akka.stream.materializer.blocking-io-dispatcher"
+        )
       )
 
 }

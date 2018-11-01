@@ -19,10 +19,7 @@ object UploadAndGetChecksumFlow {
 
         val verify = b.add(ArchiveChecksumFlow("SHA-256"))
         val flow = b.add(Flow[ByteString])
-        val upload = b.add(
-          S3UploadFlow(uploadLocation)
-            .withAttributes(ActorAttributes.dispatcher(
-              "akka.stream.materializer.blocking-io-dispatcher")))
+        val upload = b.add(S3UploadFlow(uploadLocation))
         val zip = b.add(Zip[Try[CompleteMultipartUploadResult], String])
 
         flow.out.log("calculating checksum") ~> verify.inlets.head

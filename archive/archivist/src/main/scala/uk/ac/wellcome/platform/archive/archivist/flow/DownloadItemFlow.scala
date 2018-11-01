@@ -27,7 +27,8 @@ object DownloadItemFlow extends Logging {
           val triedInputStream = Try(
             s3Client
               .getObject(job.uploadLocation.namespace, job.uploadLocation.key)
-              .getObjectContent)
+              .getObjectContent
+          )
 
           triedInputStream match {
             case Failure(exception) =>
@@ -58,7 +59,8 @@ object DownloadItemFlow extends Logging {
         }
       )
       .withAttributes(ActorAttributes.dispatcher(
-        "akka.stream.materializer.blocking-io-dispatcher"))
+        "akka.stream.materializer.blocking-io-dispatcher")
+      )
   }
 
 }
