@@ -30,8 +30,8 @@ locals {
   }
 
   es_config_remus = {
-    index_v1 = "v1-2018-09-14-miro-sierra-merging-take-5"
-    index_v2 = "v2-2018-09-14-miro-sierra-merging-take-5"
+    index_v1 = "v1-2018-09-27-marc-610-subjects"
+    index_v2 = "v2-2018-09-27-marc-610-subjects"
     doc_type = "work"
   }
 }
