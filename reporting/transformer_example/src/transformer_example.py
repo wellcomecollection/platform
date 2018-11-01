@@ -39,60 +39,31 @@ class ElasticsearchRecord(object):
     doc = attrib()
 
 
-# Moving records through the pipeline ------------------------------------------
-def fetch_object_from_s3(s3, hybrid_record):
-    """
-    fetches an object from s3 based on the data in the given HybridRecord
-
-    Parameters
-    ----------
-    s3 : boto3.client
-    hybrid_record : HybridRecord
-
-    Returns
-    -------
-    s3_object : dict
-    """ 
-    return s3.get_object(
-        Bucket=hybrid_record.location.namespace, 
-        Key=hybrid_record.location.key
-    )
+# Move records through the pipeline --------------------------------------------
+def extract_sns_messages_from_event(event):
+    for record in event["Records"]:
+        yield json.loads(record["Sns"]["Message"])
 
 
-def s3_object_to_data_dict(s3_object)
-    """ 
-    extracts the useful data from a given s3 object. 
+def get_hybrid_objects_from_messages(s3, messages):
+    for message in messages:
+        hybrid_record = HybridRecord(**message)
+        s3_object = s3.get_object(
+            Bucket=hybrid_record.location.namespace,
+            Key=hybrid_record.location.key
+        )
+        yield hybrid_record, s3_object
 
-    Parameters
-    ----------
-    s3_object : dict
 
-    Returns
-    -------
-    data_dict : dict
-    """
+def s3_object_to_data_dict(s3_object):
     record = s3_object["Body"].read().decode("utf-8")
     return json.loads(record)["data"]
 
 
-def extract_records(s3, event):
-    """
-    extracts records from VHS and prepares them for transformation
-
-    Parameters
-    ----------
-    s3 : boto3.client
-    event : dict
-
-    Returns
-    -------
-    data_dicts : dict
-    """
-    raw_hybrid_records = [json.loads(record["Sns"]["Message"]) for record in event["Records"]]
-    hybrid_records = [HybridRecord(**record) for record in raw_hybrid_records]
-    s3_objects = [fetch_object_from_s3(s3, hybrid_record) for hybrid_record in hybrid_records]
-    data_dicts = [s3_object_to_data_dict(s3_object) for s3_object in s3_objects]
-    return data_dicts, hybrid_records
+def get_data_dicts_from_s3_objects(s3_objects):
+    for s3_object in s3_objects:
+        data_dict = s3_object_to_data_dict(s3_object)
+        yield data_dict
 
 
 # Move records with transforms applied -----------------------------------------
@@ -101,7 +72,7 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
     get records from VHS, apply the transformation to them, and shove them into
     an elasticsearch index
     """
-    s3_client = s3_client or boto3.client("s3")
+    s3 = s3_client or boto3.client("s3")
     index = index or os.environ["ES_INDEX"]
     doc_type = doc_type or os.environ["ES_DOC_TYPE"]
     es_client = es_client or Elasticsearch(
@@ -111,16 +82,17 @@ def main(event, _, s3_client=None, es_client=None, index=None, doc_type=None):
         http_auth=(os.environ["ES_USER"], os.environ["ES_PASS"]),
     )
 
-    data_dicts, hybrid_records = extract_records(s3_client, event)
+    messages = extract_sns_messages_from_event(event)
+    hybrid_records, s3_objects = get_hybrid_objects_from_messages(s3, messages)
+    data_dicts = get_data_dicts_from_s3_objects(s3_objects)
+    transformed_dicts = [transform(data) for data in data_dicts]
 
-    transformed_dicts = [transform(record) for record in data_dicts]
-
-    es_records = [
+    es_records_to_send = [
         ElasticsearchRecord(id=hybrid_record.id, doc=doc)
         for doc, hybrid_record in zip(transformed_dicts, hybrid_records)
     ]
 
-    for record in es_records:
+    for record in es_records_to_send:
         es_client.index(
             index=index,
             doc_type=doc_type,
