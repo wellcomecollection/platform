@@ -59,8 +59,7 @@ object DownloadItemFlow extends Logging {
         }
       )
       .withAttributes(ActorAttributes.dispatcher(
-        "akka.stream.materializer.blocking-io-dispatcher")
-      )
+        "akka.stream.materializer.blocking-io-dispatcher"))
   }
 
 }
