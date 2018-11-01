@@ -14,11 +14,7 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Callback,
-  Namespace,
-  Progress
-}
+import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -56,7 +52,9 @@ class ProgressHttpFeatureTest
                     result.status shouldBe StatusCodes.OK
                     getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
                       progress.id,
-                      progress.uploadUri.toString,
+                      DisplayLocation(
+                        DisplayProvider(progress.sourceLocation.provider.id, progress.sourceLocation.provider.label),
+                        progress.sourceLocation.location.namespace, progress.sourceLocation.location.key),
                       progress.callback.map(DisplayCallback(_)),
                       DisplayIngestType("create"),
                       DisplayStorageSpace(progress.space.underlying),
@@ -141,8 +139,10 @@ class ProgressHttpFeatureTest
                 DisplayCallback(uri = testCallbackUri.toString, status = None))
               val storageSpace = DisplayStorageSpace(id = "somespace")
               val displayIngestType = DisplayIngestType(id = "create")
+              val displayProvider = DisplayProvider("s3", "Amazon S3")
+              val displayLocation = DisplayLocation(displayProvider, "bucket", "key.txt")
               val createProgressRequest = RequestDisplayIngest(
-                uploadUrl = testUploadUri.toString,
+                sourceLocation = displayLocation,
                 callback = someCallback,
                 space = storageSpace,
                 ingestType = displayIngestType
@@ -181,7 +181,7 @@ class ProgressHttpFeatureTest
                   inside(actualProgress) {
                     case ResponseDisplayIngest(
                         actualId,
-                        actualUploadUrl,
+                        actualSourceLocation,
                         Some(
                           DisplayCallback(
                             actualCallbackUrl,
@@ -196,7 +196,7 @@ class ProgressHttpFeatureTest
                         actualLastModifiedDate,
                         "Ingest") =>
                       actualId shouldBe id
-                      actualUploadUrl shouldBe testUploadUri.toString
+                      actualSourceLocation shouldBe displayLocation
                       actualCallbackUrl shouldBe testCallbackUri.toString
                       actualCallbackStatus shouldBe "pending"
                       actualSpaceId shouldBe storageSpace.id
@@ -204,7 +204,7 @@ class ProgressHttpFeatureTest
                       assertTableOnlyHasItem(
                         Progress(
                           id,
-                          testUploadUri,
+                          StorageLocation(StorageProvider("s3", "Amazon S3"), ObjectLocation("bucket", "key.txt")),
                           Namespace(storageSpace.id),
                           Some(Callback(testCallbackUri, Callback.Pending)),
                           Progress.Initialised,
@@ -226,7 +226,7 @@ class ProgressHttpFeatureTest
                     storageSpace = StorageSpace(storageSpace.id),
                     archiveCompleteCallbackUrl = Some(testCallbackUri),
                     zippedBagLocation =
-                      ObjectLocation("ingest-bucket", "bag.zip")
+                      ObjectLocation("bucket", "key.txt")
                   ))
                 }
               }

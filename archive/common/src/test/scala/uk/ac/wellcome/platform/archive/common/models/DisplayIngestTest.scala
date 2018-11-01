@@ -7,11 +7,11 @@ import java.util.UUID
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.progress.models._
+import uk.ac.wellcome.storage.ObjectLocation
 
 class DisplayIngestTest extends FunSpec with Matchers {
 
   private val id = UUID.randomUUID()
-  private val uploadUrl = "s3://example/key.zip"
   private val callbackUrl = "http://www.example.com/callback"
   private val spaceId = "space-id"
   private val resourceId = "bag-id"
@@ -23,7 +23,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
   it("creates a DisplayIngest from Progress") {
     val progress: Progress = Progress(
       id,
-      new URI(uploadUrl),
+      StorageLocation(StorageProvider("s3", "Amazon S3"), ObjectLocation("bukkit", "key.txt")),
       Namespace(spaceId),
       Some(Callback(new URI(callbackUrl))),
       Progress.Processing,
@@ -37,7 +37,7 @@ class DisplayIngestTest extends FunSpec with Matchers {
     println(toJson(ingest))
 
     ingest.id shouldBe id
-    ingest.uploadUrl shouldBe uploadUrl
+    ingest.sourceLocation shouldBe DisplayLocation(DisplayProvider("s3", "Amazon S3"), bucket = "bukkit", path = "key.txt")
     ingest.callback shouldBe Some(
       DisplayCallback(
         callbackUrl,

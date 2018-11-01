@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_async
+package uk.ac.wellcome.platform.archive.progress_http
 
 import com.google.inject.{Guice, Injector}
 import uk.ac.wellcome.platform.archive.common.modules._

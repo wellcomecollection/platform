@@ -7,15 +7,9 @@ import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.bag.BagInfoParser
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  DownloadError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
+import uk.ac.wellcome.platform.archive.common.progress.models.{StorageLocation, StorageProvider}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -42,8 +36,8 @@ object StorageManifestFactory extends Logging {
         space = archiveComplete.space,
         info = bagInfo,
         manifest = fileManifest,
-        accessLocation = Location(
-          Provider("aws-s3-ia", "AWS S3 - Infrequent Access"),
+        accessLocation = StorageLocation(
+          StorageProvider("aws-s3-ia", "AWS S3 - Infrequent Access"),
           ObjectLocation(
             archiveComplete.bagLocation.storageNamespace,
             s"${archiveComplete.bagLocation.storagePath}/${archiveComplete.bagLocation.bagPath.value}")

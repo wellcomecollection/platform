@@ -45,7 +45,7 @@ class ProgressStarterTest
                 p.id,
                 storageSpace = StorageSpace(p.space.underlying),
                 archiveCompleteCallbackUrl = p.callback.map(_.uri),
-                zippedBagLocation = ObjectLocation("ingest-bucket", "bag.zip")
+                zippedBagLocation = ObjectLocation(progress.sourceLocation.location.namespace, progress.sourceLocation.location.key)
               ))
 
             }

@@ -5,18 +5,21 @@ import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models._
+import uk.ac.wellcome.platform.archive.common.progress.models.{StorageLocation, _}
+import uk.ac.wellcome.storage.ObjectLocation
 
 trait ProgressGenerators extends RandomThings {
 
-  def createProgress(): Progress = createProgressWith()
+  val storageLocation = StorageLocation(
+    StorageProvider(randomAlphanumeric(), randomAlphanumeric()),
+    ObjectLocation(randomAlphanumeric(), randomAlphanumeric()))
 
-  val testUploadUri = new URI("s3://ingest-bucket/bag.zip")
+  def createProgress(): Progress = createProgressWith()
   val testCallbackUri =
     new URI("http://www.wellcomecollection.org/callback/ok")
 
   def createProgressWith(id: UUID = randomUUID,
-                         uploadUri: URI = testUploadUri,
+                         sourceLocation: StorageLocation = storageLocation,
                          callback: Option[Callback] = Some(createCallback()),
                          space: Namespace = createSpace,
                          status: Status = Progress.Initialised,
@@ -24,7 +27,7 @@ trait ProgressGenerators extends RandomThings {
                          events: List[ProgressEvent] = List.empty): Progress = {
     Progress(
       id = id,
-      uploadUri = uploadUri,
+      sourceLocation = sourceLocation,
       callback = callback,
       space = space,
       status = status,

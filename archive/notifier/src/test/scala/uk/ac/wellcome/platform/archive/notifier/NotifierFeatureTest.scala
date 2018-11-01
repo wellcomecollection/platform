@@ -76,7 +76,10 @@ class NotifierFeatureTest
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
                     progress.id,
-                    progress.uploadUri.toString,
+                    DisplayLocation(
+                      DisplayProvider(progress.sourceLocation.provider.id, progress.sourceLocation.provider.label),
+                      progress.sourceLocation.location.namespace,
+                      progress.sourceLocation.location.key),
                     progress.callback.map(DisplayCallback(_)),
                     DisplayIngestType("create"),
                     DisplayStorageSpace(progress.space.underlying),
@@ -132,7 +135,10 @@ class NotifierFeatureTest
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
                     progress.id,
-                    progress.uploadUri.toString,
+                    DisplayLocation(
+                      DisplayProvider(progress.sourceLocation.provider.id, progress.sourceLocation.provider.label),
+                      progress.sourceLocation.location.namespace,
+                      progress.sourceLocation.location.key),
                     progress.callback.map(DisplayCallback(_)),
                     DisplayIngestType("create"),
                     DisplayStorageSpace(progress.space.underlying),

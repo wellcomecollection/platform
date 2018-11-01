@@ -46,8 +46,8 @@ class ProgressTrackerTest
           val id = randomUUID
 
           val monitors = List(
-            createProgressWith(id = id, uploadUri = testUploadUri),
-            createProgressWith(id = id, uploadUri = testUploadUri)
+            createProgressWith(id = id, sourceLocation = storageLocation),
+            createProgressWith(id = id, sourceLocation = storageLocation)
           )
 
           val result = Future.sequence(monitors.map(progressTracker.initialise))
@@ -57,7 +57,7 @@ class ProgressTrackerTest
             failedException.getMessage should include(
               s"There is already a progress tracker with id:$id")
 
-            assertProgressCreated(id, testUploadUri, table)
+            assertProgressCreated(id, storageLocation, table)
           }
         }
 
@@ -145,7 +145,7 @@ class ProgressTrackerTest
 
             progressTracker.update(progressUpdate)
 
-            assertProgressCreated(progress.id, progress.uploadUri, table)
+            assertProgressCreated(progress.id, progress.sourceLocation, table)
 
             assertProgressRecordedRecentEvents(
               progressUpdate.id,
@@ -171,7 +171,7 @@ class ProgressTrackerTest
             progressTracker.update(progressUpdate)
 
             val actualProgress =
-              assertProgressCreated(progress.id, progress.uploadUri, table)
+              assertProgressCreated(progress.id, progress.sourceLocation, table)
 
             actualProgress.status shouldBe Progress.Completed
             actualProgress.resources should contain theSameElementsAs (progress.resources ++ resources)
@@ -198,7 +198,7 @@ class ProgressTrackerTest
             progressTracker.update(progressUpdate)
 
             val actualProgress =
-              assertProgressCreated(progress.id, progress.uploadUri, table)
+              assertProgressCreated(progress.id, progress.sourceLocation, table)
 
             actualProgress.callback shouldBe defined
             actualProgress.callback.get.status shouldBe Callback.Succeeded
@@ -223,7 +223,7 @@ class ProgressTrackerTest
 
             progressTracker.update(progressUpdate)
 
-            assertProgressCreated(progress.id, progress.uploadUri, table)
+            assertProgressCreated(progress.id, progress.sourceLocation, table)
 
             assertProgressRecordedRecentEvents(
               progressUpdate.id,
@@ -245,7 +245,7 @@ class ProgressTrackerTest
 
             updates.foreach(progressTracker.update(_))
 
-            assertProgressCreated(progress.id, progress.uploadUri, table)
+            assertProgressCreated(progress.id, progress.sourceLocation, table)
 
             assertProgressRecordedRecentEvents(
               progress.id,

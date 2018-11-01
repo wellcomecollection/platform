@@ -12,7 +12,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 
 sealed trait DisplayIngest
 
-case class RequestDisplayIngest(uploadUrl: String,
+case class RequestDisplayIngest(sourceLocation: DisplayLocation,
                                 callback: Option[DisplayCallback],
                                 ingestType: DisplayIngestType,
                                 space: DisplayStorageSpace,
@@ -21,7 +21,7 @@ case class RequestDisplayIngest(uploadUrl: String,
     extends DisplayIngest
 
 case class ResponseDisplayIngest(id: UUID,
-                                 uploadUrl: String,
+                                 sourceLocation: DisplayLocation,
                                  callback: Option[DisplayCallback],
                                  ingestType: DisplayIngestType,
                                  space: DisplayStorageSpace,
@@ -65,7 +65,7 @@ case object ResponseDisplayIngest {
   def apply(progress: Progress): ResponseDisplayIngest = {
     ResponseDisplayIngest(
       id = progress.id,
-      uploadUrl = progress.uploadUri.toString,
+      sourceLocation = DisplayLocation(progress.sourceLocation),
       callback = progress.callback.map(DisplayCallback(_)),
       space = DisplayStorageSpace(progress.space.toString),
       ingestType = DisplayIngestType(),

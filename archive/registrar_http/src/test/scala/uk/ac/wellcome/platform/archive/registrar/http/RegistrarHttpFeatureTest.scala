@@ -12,7 +12,8 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.DisplayStorageSpace
+import uk.ac.wellcome.platform.archive.common.models.{DisplayLocation, DisplayProvider, DisplayStorageSpace}
+import uk.ac.wellcome.platform.archive.common.progress.models.{StorageLocation, StorageProvider}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
@@ -54,8 +55,8 @@ class RegistrarHttpFeatureTest
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                Location(
-                  Provider(providerId, providerLabel),
+                StorageLocation(
+                  StorageProvider(providerId, providerLabel),
                   ObjectLocation(bucket, path)),
                 Instant.now
               )
@@ -142,8 +143,8 @@ class RegistrarHttpFeatureTest
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                Location(
-                  Provider(providerId, providerLabel),
+                StorageLocation(
+                  StorageProvider(providerId, providerLabel),
                   ObjectLocation(bucket, path)),
                 Instant.now
               )

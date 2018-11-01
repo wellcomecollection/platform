@@ -52,7 +52,7 @@ class ProgressAsyncFeatureTest
               )
               actualMessage.payload shouldBe expectedProgress
 
-              assertProgressCreated(progress.id, progress.uploadUri, table)
+              assertProgressCreated(progress.id, progress.sourceLocation, table)
 
               assertProgressRecordedRecentEvents(
                 progressStatusUpdate.id,
