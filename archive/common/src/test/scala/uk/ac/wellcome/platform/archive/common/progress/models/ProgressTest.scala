@@ -40,7 +40,7 @@ class ProgressTest
 
     progress.id shouldBe a[UUID]
     progress.sourceLocation shouldBe StorageLocation(
-      StorageProvider(displayProvider.id, displayProvider.label),
+      StorageProvider(displayProvider.id),
       ObjectLocation(bucket, path))
     progress.callback shouldBe Some(
       Callback(URI.create(progressCreateRequest.callback.get.url)))

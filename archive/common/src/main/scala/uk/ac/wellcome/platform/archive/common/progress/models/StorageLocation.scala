@@ -8,7 +8,7 @@ object StorageLocation {
     StorageLocation(StorageProvider(displayLocation.provider), ObjectLocation(displayLocation.bucket, displayLocation.path))
 }
 
-case class StorageProvider(id: String, label: String)
+case class StorageProvider(id: String)
 object StorageProvider {
-  def apply(displayProvider: DisplayProvider): StorageProvider = StorageProvider(displayProvider.id, displayProvider.label)
+  def apply(displayProvider: DisplayProvider): StorageProvider = StorageProvider(displayProvider.id)
 }

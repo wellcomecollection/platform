@@ -77,7 +77,7 @@ class NotifierFeatureTest
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
                     progress.id,
                     DisplayLocation(
-                      DisplayProvider(progress.sourceLocation.provider.id, progress.sourceLocation.provider.label),
+                      DisplayProvider(progress.sourceLocation.provider.id),
                       progress.sourceLocation.location.namespace,
                       progress.sourceLocation.location.key),
                     progress.callback.map(DisplayCallback(_)),
@@ -136,7 +136,7 @@ class NotifierFeatureTest
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
                     progress.id,
                     DisplayLocation(
-                      DisplayProvider(progress.sourceLocation.provider.id, progress.sourceLocation.provider.label),
+                      DisplayProvider(progress.sourceLocation.provider.id),
                       progress.sourceLocation.location.namespace,
                       progress.sourceLocation.location.key),
                     progress.callback.map(DisplayCallback(_)),

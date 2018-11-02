@@ -53,7 +53,7 @@ class ProgressHttpFeatureTest
                     getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
                       progress.id,
                       DisplayLocation(
-                        DisplayProvider(progress.sourceLocation.provider.id, progress.sourceLocation.provider.label),
+                        DisplayProvider(progress.sourceLocation.provider.id),
                         progress.sourceLocation.location.namespace, progress.sourceLocation.location.key),
                       progress.callback.map(DisplayCallback(_)),
                       DisplayIngestType("create"),
@@ -204,7 +204,7 @@ class ProgressHttpFeatureTest
                       assertTableOnlyHasItem(
                         Progress(
                           id,
-                          StorageLocation(StorageProvider("s3", "Amazon S3"), ObjectLocation("bucket", "key.txt")),
+                          StorageLocation(StorageProvider("s3"), ObjectLocation("bucket", "key.txt")),
                           Namespace(storageSpace.id),
                           Some(Callback(testCallbackUri, Callback.Pending)),
                           Progress.Initialised,

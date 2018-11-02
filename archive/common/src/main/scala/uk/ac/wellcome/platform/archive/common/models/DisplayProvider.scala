@@ -4,9 +4,8 @@ import io.circe.generic.extras.JsonKey
 import uk.ac.wellcome.platform.archive.common.progress.models.StorageProvider
 
 case class DisplayProvider(id: String,
-                           label: String,
                            @JsonKey("type") ontologyType: String = "Provider")
 object DisplayProvider {
   def apply(provider: StorageProvider): DisplayProvider =
-    DisplayProvider(id = provider.id, label = provider.label)
+    DisplayProvider(id = provider.id)
 }

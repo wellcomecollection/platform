@@ -24,7 +24,7 @@ class DisplayIngestTest extends FunSpec with Matchers with RandomThings {
     val bagId = randomBagId
     val progress: Progress = Progress(
       id,
-      StorageLocation(StorageProvider("s3", "Amazon S3"), ObjectLocation("bukkit", "key.txt")),
+      StorageLocation(StorageProvider("s3"), ObjectLocation("bukkit", "key.txt")),
       Namespace(spaceId),
       Some(Callback(new URI(callbackUrl))),
       Progress.Processing,

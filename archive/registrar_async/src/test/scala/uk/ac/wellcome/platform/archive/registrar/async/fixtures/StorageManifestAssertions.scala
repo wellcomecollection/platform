@@ -28,8 +28,7 @@ trait StorageManifestAssertions extends Inside with Matchers {
         bagDigestFiles should have size filesNumber
 
         provider shouldBe StorageProvider(
-          id = "aws-s3-ia",
-          label = "AWS S3 - Infrequent Access")
+          id = "aws-s3-ia")
 
         actualNamespace shouldBe expectedNamespace
         actualPath shouldBe expectedPath

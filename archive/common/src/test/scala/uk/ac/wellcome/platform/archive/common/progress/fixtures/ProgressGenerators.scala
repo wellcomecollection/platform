@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 trait ProgressGenerators extends RandomThings {
 
   val storageLocation = StorageLocation(
-    StorageProvider(randomAlphanumeric(), randomAlphanumeric()),
+    StorageProvider(randomAlphanumeric()),
     ObjectLocation(randomAlphanumeric(), randomAlphanumeric()))
 
   def createProgress(): Progress = createProgressWith()

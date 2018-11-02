@@ -49,14 +49,13 @@ class RegistrarHttpFeatureTest
               val path = "path"
               val bucket = "bucket"
               val providerId = "provider-id"
-              val providerLabel = "provider label"
               val storageManifest = StorageManifest(
                 space = space,
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
                 StorageLocation(
-                  StorageProvider(providerId, providerLabel),
+                  StorageProvider(providerId),
                   ObjectLocation(bucket, path)),
                 Instant.now
               )
@@ -93,7 +92,6 @@ class RegistrarHttpFeatureTest
                         DisplayLocation(
                           DisplayProvider(
                             actualProviderId,
-                            actualProviderLabel,
                             "Provider"),
                           actualBucket,
                           actualPath,
@@ -110,7 +108,6 @@ class RegistrarHttpFeatureTest
 
                       actualChecksumAlgorithm shouldBe checksumAlgorithm
                       actualProviderId shouldBe providerId
-                      actualProviderLabel shouldBe providerLabel
                       actualBucket shouldBe bucket
                       actualPath shouldBe path
 
@@ -137,14 +134,13 @@ class RegistrarHttpFeatureTest
               val path = "path"
               val bucket = "bucket"
               val providerId = "provider-id"
-              val providerLabel = "provider label"
               val storageManifest = StorageManifest(
                 space = space,
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
                 StorageLocation(
-                  StorageProvider(providerId, providerLabel),
+                  StorageProvider(providerId),
                   ObjectLocation(bucket, path)),
                 Instant.now
               )
