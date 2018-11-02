@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.NotUsed
-import akka.stream.{ActorAttributes, FlowShape}
+import akka.stream.FlowShape
 import akka.stream.scaladsl.{Flow, GraphDSL, Zip}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
