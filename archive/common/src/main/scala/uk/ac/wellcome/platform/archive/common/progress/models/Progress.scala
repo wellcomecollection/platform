@@ -5,14 +5,14 @@ import java.time.Instant
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.models.RequestDisplayIngest
+import uk.ac.wellcome.platform.archive.common.models.{BagId, RequestDisplayIngest}
 
 case class Progress(id: UUID,
                     sourceLocation: StorageLocation,
                     space: Namespace,
                     callback: Option[Callback] = None,
                     status: Progress.Status = Progress.Initialised,
-                    resources: Seq[Resource] = Seq.empty,
+                    bag: Option[BagId] = None,
                     createdDate: Instant = Instant.now,
                     lastModifiedDate: Instant = Instant.now,
                     events: Seq[ProgressEvent] = Seq.empty)

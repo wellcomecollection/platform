@@ -160,11 +160,11 @@ class ProgressTrackerTest
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress())) { progress =>
-            val resources = List(createResource)
+            val someBagId = Some(randomBagId)
             val progressUpdate = ProgressStatusUpdate(
               progress.id,
               Progress.Completed,
-              resources,
+              affectedBag = someBagId,
               List(createProgressEvent)
             )
 
@@ -174,7 +174,7 @@ class ProgressTrackerTest
               assertProgressCreated(progress.id, progress.sourceLocation, table)
 
             actualProgress.status shouldBe Progress.Completed
-            actualProgress.resources should contain theSameElementsAs (progress.resources ++ resources)
+            actualProgress.bag shouldBe someBagId
 
             assertProgressRecordedRecentEvents(
               progressUpdate.id,

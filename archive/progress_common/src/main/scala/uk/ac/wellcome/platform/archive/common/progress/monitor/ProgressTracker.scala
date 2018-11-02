@@ -70,8 +70,8 @@ class ProgressTracker @Inject()(
       case eventUpdate: ProgressEventUpdate =>
         eventsUpdate
       case statusUpdate: ProgressStatusUpdate =>
-        eventsUpdate and set('status -> statusUpdate.status) and appendAll(
-          'resources -> statusUpdate.affectedResources.toList)
+        eventsUpdate and set('status -> statusUpdate.status) and set(
+          'bag -> statusUpdate.affectedBag.toList)
       case callbackStatusUpdate: ProgressCallbackStatusUpdate =>
         eventsUpdate and set(
           'callback \ 'status -> callbackStatusUpdate.callbackStatus)
