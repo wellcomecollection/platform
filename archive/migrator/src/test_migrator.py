@@ -1,4 +1,4 @@
-#import migrator
+# import migrator
 
 
 def test_migrator():

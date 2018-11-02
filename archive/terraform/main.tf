@@ -238,12 +238,12 @@ module "bagger" {
 module "migrator" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v11.12.0"
 
-  name = "migrator"
+  name        = "migrator"
   description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
 
   lambda_type = "vpc"
 
-  timeout     = 25
+  timeout = 25
 
   environment_variables = {
     # Private DNS
@@ -257,7 +257,7 @@ module "migrator" {
 
   security_group_ids = [
     "${aws_security_group.interservice_security_group.id}",
-    "${aws_security_group.service_egress_security_group.id}"
+    "${aws_security_group.service_egress_security_group.id}",
   ]
 
   subnet_ids = "${local.private_subnets}"
