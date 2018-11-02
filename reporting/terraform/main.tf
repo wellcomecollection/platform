@@ -1,7 +1,7 @@
 module "lambda_miro_transformer" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
-  name        = "reporting_miro_transformer"
+  name        = "miro_transformer"
   description = "Transform source data and send to ES."
   timeout     = 25
 
