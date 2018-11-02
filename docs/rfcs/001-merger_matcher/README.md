@@ -1,6 +1,6 @@
 # RFC 001: Matcher architecture
 
-**Last updated: 12 October 2018.**
+**Last updated: 02 November 2018.**
 
 ## Background
 
