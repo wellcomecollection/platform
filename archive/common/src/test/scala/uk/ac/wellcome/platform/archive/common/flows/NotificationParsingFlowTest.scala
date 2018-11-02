@@ -31,10 +31,7 @@ class NotificationParsingFlowTest
 
         val messages = jsonStrings
           .patch(2, badStrings, 0)
-          .map(
-            body =>
-              NotificationMessage(body = body.toString
-            ))
+          .map(body => NotificationMessage(body = body.toString))
 
         val source = Source(messages)
         val parsingFlow = NotificationParsingFlow[Character]
