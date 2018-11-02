@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.registrar.http.config
 
+import java.net.URL
+
 import org.rogach.scallop.ScallopConf
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
@@ -16,6 +18,8 @@ class RegistrarHttpArgsConfigurator(val arguments: Seq[String])
     opt[String]("app-host", required = true, default = Some("0.0.0.0"))
   private val appBaseUrl =
     opt[String]("app-base-url", required = true)
+  private val contextUrl =
+    opt[URL]("context-url", required = true)
 
   val hybridDynamoAccessKey = opt[String]("hybrid-dynamo-access-key")
   val hybridDynamoSecretKey = opt[String]("hybrid-dynamo-secret-key")
@@ -40,6 +44,7 @@ class RegistrarHttpArgsConfigurator(val arguments: Seq[String])
     host = appHost(),
     port = appPort(),
     externalBaseUrl = appBaseUrl(),
+    contextUrl = contextUrl()
   )
 
   val hybridStoreConfig = HybridStoreConfig(

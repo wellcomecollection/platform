@@ -33,7 +33,7 @@ class Router @Inject()(monitor: ProgressTracker,
           onSuccess(progressStarter.initialise(Progress(progressCreateRequest))) {
             progress =>
               respondWithHeaders(List(createLocationHeader(progress))) {
-                complete(Created -> ResponseDisplayIngest(progress))
+                complete(Created -> ResponseDisplayIngest(progress, config.contextUrl))
               }
           }
         }
@@ -41,7 +41,7 @@ class Router @Inject()(monitor: ProgressTracker,
         get {
           onSuccess(monitor.get(id)) {
             case Some(progress) =>
-              complete(ResponseDisplayIngest(progress))
+              complete(ResponseDisplayIngest(progress, config.contextUrl))
             case None =>
               complete(NotFound -> "Progress monitor not found!")
           }

@@ -35,6 +35,7 @@ class ProgressHttpFeatureTest
   import uk.ac.wellcome.storage.dynamo._
   import Progress._
 
+  val contextUrl = "http://api.wellcomecollection.org/storage/v1/context.json"
   describe("GET /progress/:id") {
     it("returns a progress tracker when available") {
       withConfiguredApp {
@@ -51,6 +52,7 @@ class ProgressHttpFeatureTest
                   whenRequestReady(request) { result =>
                     result.status shouldBe StatusCodes.OK
                     getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
+                      contextUrl,
                       progress.id,
                       DisplayLocation(
                         DisplayProvider(progress.sourceLocation.provider.id),
@@ -182,6 +184,7 @@ class ProgressHttpFeatureTest
                 whenReady(progressFuture) { actualProgress =>
                   inside(actualProgress) {
                     case ResponseDisplayIngest(
+                        actualContextUrl,
                         actualId,
                         actualSourceLocation,
                         Some(
@@ -197,6 +200,7 @@ class ProgressHttpFeatureTest
                         actualCreatedDate,
                         actualLastModifiedDate,
                         "Ingest") =>
+                      actualContextUrl shouldBe contextUrl
                       actualId shouldBe id
                       actualSourceLocation shouldBe displayLocation
                       actualCallbackUrl shouldBe testCallbackUri.toString
