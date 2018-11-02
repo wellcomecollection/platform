@@ -140,9 +140,8 @@ class ProgressHttpFeatureTest
                 DisplayCallback(url = testCallbackUri.toString, status = None))
               val storageSpace = DisplayStorageSpace(id = "somespace")
               val displayIngestType = DisplayIngestType(id = "create")
-              val displayProvider = DisplayProvider("s3", "Amazon S3")
-              val displayLocation =
-                DisplayLocation(displayProvider, "bucket", "key.txt")
+              val displayProvider = DisplayProvider("s3")
+              val displayLocation = DisplayLocation(displayProvider, "bucket", "key.txt")
               val createProgressRequest = RequestDisplayIngest(
                 sourceLocation = displayLocation,
                 callback = someCallback,
