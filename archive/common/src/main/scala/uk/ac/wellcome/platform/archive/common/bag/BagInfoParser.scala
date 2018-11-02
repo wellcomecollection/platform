@@ -46,6 +46,8 @@ object BagInfoParser {
       extractInternalSenderDescription(bagInfoLines)
     ).mapN(BagInfo.apply)
 
+    inputStream.close()
+
     validated.toEither.leftMap(list => InvalidBagInfo(t, list.toList))
   }
 

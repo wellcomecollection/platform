@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.NotUsed
-import akka.stream.{ActorAttributes, FlowShape}
+import akka.stream.FlowShape
 import akka.stream.scaladsl.{Flow, GraphDSL, Zip}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
@@ -19,10 +19,7 @@ object UploadAndGetChecksumFlow {
 
         val verify = b.add(ArchiveChecksumFlow("SHA-256"))
         val flow = b.add(Flow[ByteString])
-        val upload = b.add(
-          S3UploadFlow(uploadLocation)
-            .withAttributes(ActorAttributes.dispatcher(
-              "akka.stream.materializer.blocking-io-dispatcher")))
+        val upload = b.add(S3UploadFlow(uploadLocation))
         val zip = b.add(Zip[Try[CompleteMultipartUploadResult], String])
 
         flow.out.log("calculating checksum") ~> verify.inlets.head

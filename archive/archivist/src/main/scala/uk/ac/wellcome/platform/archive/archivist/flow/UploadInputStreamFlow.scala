@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist.flow
 import java.io.InputStream
 
 import akka.NotUsed
+import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
@@ -58,6 +59,11 @@ object UploadInputStreamFlow extends Logging {
                   Left(UploadError(exception, job))
               }
         }
+      )
+      .withAttributes(
+        ActorAttributes.dispatcher(
+          "akka.stream.materializer.blocking-io-dispatcher"
+        )
       )
 
 }
