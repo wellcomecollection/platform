@@ -17,7 +17,7 @@ module "service" {
 
   namespace_id = "${var.namespace_id}"
 
-  launch_type           = "FARGATE"
+  launch_type = "FARGATE"
 }
 
 module "task" {

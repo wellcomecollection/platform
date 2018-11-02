@@ -1,7 +1,7 @@
 locals {
-  namespace                            = "archive-storage"
+  namespace = "archive-storage"
 
-  progress_http_lb_port = "6000"
+  progress_http_lb_port  = "6000"
   registrar_http_lb_port = "6001"
 
   cognito_user_pool_arn                = "${data.terraform_remote_state.infra_critical.cognito_user_pool_arn}"
