@@ -23,7 +23,6 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 
-import scala.concurrent.duration._
 import scala.util.{Random, Success}
 import uk.ac.wellcome.json.JsonUtil._
 
@@ -63,7 +62,6 @@ trait Messaging
     Map(
       "aws.message.reader.s3.bucketName" -> bucket.name,
       "aws.message.reader.sqs.queue.url" -> queue.url,
-      "aws.message.reader.sqs.waitTime" -> "1",
     ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
 
   def messageWriterLocalFlags(bucket: Bucket, topic: Topic) =
@@ -108,8 +106,7 @@ trait Messaging
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
     implicit objectStore: ObjectStore[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val sqsConfig =
-      SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
+    val sqsConfig = SQSConfig(queueUrl = queue.url)
 
     val messageConfig = MessageReaderConfig(
       sqsConfig = sqsConfig,
