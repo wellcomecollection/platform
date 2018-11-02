@@ -7,11 +7,12 @@ import com.gu.scanamo.error.DynamoReadError
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress, StorageLocation}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait ProgressTrackerFixture
@@ -40,21 +41,21 @@ trait ProgressTrackerFixture
 
   def givenProgressRecord(
     id: UUID,
-    uploadUri: URI,
+    storageLocation: StorageLocation,
     space: Namespace,
     maybeCallbackUri: Option[URI],
     table: Table): Option[Either[DynamoReadError, Progress]] = {
     givenTableHasItem(
-      Progress(id, uploadUri, space, Callback(maybeCallbackUri)),
+      Progress(id, storageLocation, space, Callback(maybeCallbackUri)),
       table)
   }
 
   def assertProgressCreated(id: UUID,
-                            expectedUploadUri: URI,
+                            expectedStorageLocation: StorageLocation,
                             table: Table,
                             recentSeconds: Int = 45): Progress = {
     val progress = getExistingTableItem[Progress](id.toString, table)
-    progress.uploadUri shouldBe expectedUploadUri
+    progress.sourceLocation shouldBe expectedStorageLocation
 
     assertRecent(progress.createdDate, recentSeconds)
     assertRecent(progress.lastModifiedDate, recentSeconds)

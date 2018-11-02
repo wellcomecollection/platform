@@ -3,6 +3,10 @@ import java.time.Instant
 
 import org.scalatest.{Inside, Matchers}
 import uk.ac.wellcome.platform.archive.common.models.{BagInfo, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  StorageLocation,
+  StorageProvider
+}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -20,15 +24,15 @@ trait StorageManifestAssertions extends Inside with Matchers {
           actualStorageSpace,
           actualBagInfo,
           FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-          Location(provider, ObjectLocation(actualNamespace, actualPath)),
+          StorageLocation(
+            provider,
+            ObjectLocation(actualNamespace, actualPath)),
           createdDate) =>
         actualStorageSpace shouldBe expectedStorageSpace
         actualBagInfo shouldBe expectedBagInfo
         bagDigestFiles should have size filesNumber
 
-        provider shouldBe Provider(
-          id = "aws-s3-ia",
-          label = "AWS S3 - Infrequent Access")
+        provider shouldBe StorageProvider(id = "aws-s3-ia")
 
         actualNamespace shouldBe expectedNamespace
         actualPath shouldBe expectedPath

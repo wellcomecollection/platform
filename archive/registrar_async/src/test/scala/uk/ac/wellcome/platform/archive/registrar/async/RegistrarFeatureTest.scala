@@ -18,11 +18,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  Resource,
-  ResourceIdentifier
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.registrar.async.fixtures.StorageManifestAssertions
 import uk.ac.wellcome.platform.archive.registrar.async.fixtures.RegistrarFixtures
 import uk.ac.wellcome.storage.dynamo._
@@ -90,10 +86,9 @@ class RegistrarFeatureTest
                   requestId,
                   progressTopic,
                   Progress.Completed,
-                  List(Resource(ResourceIdentifier(bagId.toString)))) {
-                  events =>
-                    events should have size 1
-                    events.head.description shouldBe "Bag registered successfully"
+                  Some(bagId)) { events =>
+                  events should have size 1
+                  events.head.description shouldBe "Bag registered successfully"
                 }
               }
             }
@@ -130,7 +125,7 @@ class RegistrarFeatureTest
             requestId,
             progressTopic,
             Progress.Failed,
-            Nil) { events =>
+            None) { events =>
             events should have size 1
             events.head.description should startWith(
               "There was an exception while downloading object")

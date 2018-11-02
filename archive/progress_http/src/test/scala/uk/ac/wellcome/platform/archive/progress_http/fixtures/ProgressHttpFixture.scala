@@ -66,7 +66,7 @@ trait ProgressHttpFixture
     val progress = ProgressStatusUpdate(
       id = id,
       status = status,
-      affectedResources = List(createResource),
+      affectedBag = Some(randomBagId),
       events = events
     )
 
