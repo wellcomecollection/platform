@@ -33,7 +33,10 @@ case object DisplayLicenseV1 {
     //
     // The current model uses lowercase IDs.  To preserve the V1 API,
     // we uppercase the IDs before presenting them.
-    licenseType = license.id.toUpperCase,
+    licenseType = license.id match {
+      case "copyright-not-cleared" => "copyright-not-cleared"
+      case id => id.toUpperCase
+    },
     label = license.label,
     url = license.url
   )
