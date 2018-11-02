@@ -29,6 +29,6 @@ class LicenseTest extends FunSpec with Matchers {
     val license = result.get
     license.id shouldBe id
     license.label shouldBe label
-    license.url shouldBe Some(url)
+    license.url shouldBe url
   }
 }
