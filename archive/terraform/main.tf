@@ -236,7 +236,7 @@ module "bagger" {
 }
 
 module "migrator" {
-  source = "../../../terraform-modules/lambda"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v11.12.0"
 
   name = "migrator"
   description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
