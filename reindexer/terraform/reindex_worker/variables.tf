@@ -19,3 +19,11 @@ variable "namespace_id" {}
 
 variable "hybrid_records_topic_arn" {}
 variable "hybrid_records_topic_publish_policy" {}
+
+variable "scale_up_period_in_minutes" {
+  default = 1
+}
+
+variable "scale_down_period_in_minutes" {
+  default = 10
+}
