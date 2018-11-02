@@ -23,9 +23,7 @@ class DisplayCreatorsV1SerialisationTest
         )
       )
     )
-    val displayWork = DisplayWorkV1(work)
 
-    val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
                             |{
                             |  "type": "Work",
@@ -48,6 +46,6 @@ class DisplayCreatorsV1SerialisationTest
                             |  "placesOfPublication": [ ]
                             |}""".stripMargin
 
-    assertJsonStringsAreEqual(actualJson, expectedJson)
+    assertObjectMapsToJson(DisplayWorkV1(work), expectedJson = expectedJson)
   }
 }
