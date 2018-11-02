@@ -1,25 +1,23 @@
 package uk.ac.wellcome.platform.archive.progress_http
 
+import java.time.Instant
 import java.util.UUID
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.stream.scaladsl.Sink
+import io.circe.parser._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  DisplayIngest,
-  IngestBagRequest,
-  StorageSpace
-}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Callback,
   Namespace,
-  Progress,
-  ProgressCreateRequest
+  Progress
 }
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
 import uk.ac.wellcome.storage.ObjectLocation
@@ -32,6 +30,7 @@ class ProgressHttpFeatureTest
     with ProgressTrackerFixture
     with ProgressHttpFixture
     with RandomThings
+    with Inside
     with IntegrationPatience {
 
   import HttpMethods._
@@ -49,15 +48,56 @@ class ProgressHttpFeatureTest
             withMaterializer(actorSystem) { implicit materialiser =>
               withProgressTracker(table) { progressTracker =>
                 val progress = createProgress()
-                progressTracker.initialise(progress)
-                val request =
-                  HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
+                whenReady(progressTracker.initialise(progress)) { _ =>
+                  val request =
+                    HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
 
-                whenRequestReady(request) { result =>
-                  result.status shouldBe StatusCodes.OK
-                  getT[DisplayIngest](result.entity) shouldBe DisplayIngest(
-                    progress)
+                  whenRequestReady(request) { result =>
+                    result.status shouldBe StatusCodes.OK
+                    getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
+                      progress.id,
+                      progress.uploadUri.toString,
+                      progress.callback.map(DisplayCallback(_)),
+                      DisplayIngestType("create"),
+                      DisplayStorageSpace(progress.space.underlying),
+                      DisplayIngestStatus(progress.status.toString),
+                      Nil,
+                      Nil,
+                      progress.createdDate.toString,
+                      progress.lastModifiedDate.toString
+                    )
 
+                  }
+                }
+              }
+            }
+          }
+      }
+    }
+    it("does not output empty values") {
+      withConfiguredApp {
+        case (table, _, baseUrl, app) =>
+          app.run()
+          withActorSystem { actorSystem =>
+            withMaterializer(actorSystem) { implicit materialiser =>
+              withProgressTracker(table) { progressTracker =>
+                val progress = createProgressWith(callback = None)
+                whenReady(progressTracker.initialise(progress)) { _ =>
+                  val request =
+                    HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
+
+                  whenRequestReady(request) { result =>
+                    result.status shouldBe StatusCodes.OK
+                    val value = result.entity.dataBytes.runWith(Sink.fold("") {
+                      case (acc, byteString) =>
+                        acc + byteString.utf8String
+                    })
+                    whenReady(value) { jsonString =>
+                      val infoJson = parse(jsonString).right.get
+                      infoJson.findAllByKey("callback") shouldBe empty
+                    }
+
+                  }
                 }
               }
             }
@@ -93,18 +133,19 @@ class ProgressHttpFeatureTest
         case (table, topic, baseUrl, app) =>
           app.run()
 
-          withActorSystem { actorSystem =>
-            withMaterializer(actorSystem) { materializer =>
-              implicit val system = actorSystem
-              implicit val mat = materializer
-
+          withActorSystem { implicit actorSystem =>
+            withMaterializer(actorSystem) { implicit materializer =>
               val url = s"$baseUrl/progress"
-              val space = Namespace("space-id")
 
-              val createProgressRequest = ProgressCreateRequest(
-                testUploadUri,
-                Some(testCallbackUri),
-                space
+              val someCallback = Some(
+                DisplayCallback(uri = testCallbackUri.toString, status = None))
+              val storageSpace = DisplayStorageSpace(id = "somespace")
+              val displayIngestType = DisplayIngestType(id = "create")
+              val createProgressRequest = RequestDisplayIngest(
+                uploadUrl = testUploadUri.toString,
+                callback = someCallback,
+                space = storageSpace,
+                ingestType = displayIngestType
               )
 
               val entity = HttpEntity(
@@ -121,39 +162,60 @@ class ProgressHttpFeatureTest
 
               val request = Http().singleRequest(httpRequest)
 
-              val expectedLocationR = s"$url/(.+)".r
+              val expectedLocationR = s"$baseUrl/(.+)".r
 
               whenReady(request) { result: HttpResponse =>
-                // Successful request
                 result.status shouldBe StatusCodes.Created
 
-                debug(result)
-
-                // Collect first location header matching pattern
                 val maybeId = result.headers.collectFirst {
                   case HttpHeader("location", expectedLocationR(id)) => id
                 }
 
-                // We should have an id
                 maybeId.isEmpty shouldBe false
                 val id = UUID.fromString(maybeId.get)
 
-                // Check progress is returned
-                val progressFuture = Unmarshal(result.entity).to[Progress]
+                val progressFuture =
+                  Unmarshal(result.entity).to[ResponseDisplayIngest]
 
-                // Check the progress is stored
                 whenReady(progressFuture) { actualProgress =>
-                  val expectedProgress = Progress(
-                    id,
-                    testUploadUri,
-                    space,
-                    Some(Callback(testCallbackUri))
-                  ).copy(
-                    createdDate = actualProgress.createdDate,
-                    lastModifiedDate = actualProgress.lastModifiedDate)
+                  inside(actualProgress) {
+                    case ResponseDisplayIngest(
+                        actualId,
+                        actualUploadUrl,
+                        Some(
+                          DisplayCallback(
+                            actualCallbackUrl,
+                            Some(actualCallbackStatus),
+                            "Callback")),
+                        DisplayIngestType("create", "IngestType"),
+                        DisplayStorageSpace(actualSpaceId, "Space"),
+                        DisplayIngestStatus("initialised", "IngestStatus"),
+                        Nil,
+                        Nil,
+                        actualCreatedDate,
+                        actualLastModifiedDate,
+                        "Ingest") =>
+                      actualId shouldBe id
+                      actualUploadUrl shouldBe testUploadUri.toString
+                      actualCallbackUrl shouldBe testCallbackUri.toString
+                      actualCallbackStatus shouldBe "pending"
+                      actualSpaceId shouldBe storageSpace.id
 
-                  actualProgress shouldBe expectedProgress
-                  assertTableOnlyHasItem(expectedProgress, table)
+                      assertTableOnlyHasItem(
+                        Progress(
+                          id,
+                          testUploadUri,
+                          Namespace(storageSpace.id),
+                          Some(Callback(testCallbackUri, Callback.Pending)),
+                          Progress.Initialised,
+                          Nil,
+                          Instant.parse(actualCreatedDate),
+                          Instant.parse(actualLastModifiedDate),
+                          Nil
+                        ),
+                        table
+                      )
+                  }
 
                   val requests =
                     listMessagesReceivedFromSNS(topic).map(messageInfo =>
@@ -161,7 +223,7 @@ class ProgressHttpFeatureTest
 
                   requests shouldBe List(IngestBagRequest(
                     id,
-                    storageSpace = StorageSpace(space.underlying),
+                    storageSpace = StorageSpace(storageSpace.id),
                     archiveCompleteCallbackUrl = Some(testCallbackUri),
                     zippedBagLocation =
                       ObjectLocation("ingest-bucket", "bag.zip")

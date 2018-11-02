@@ -1,10 +1,3 @@
-# Archive API (Flask)
-
-resource "aws_iam_role_policy" "archive_api_task_sns" {
-  role   = "${module.api_ecs.task_role_name}"
-  policy = "${module.archivist_topic.publish_policy}"
-}
-
 # Archivist
 
 resource "aws_iam_role_policy" "archivist_task_store_s3" {
