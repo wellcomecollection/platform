@@ -51,8 +51,8 @@ case class DisplayStorageSpace(id: String,
                                ontologyType: String = "Space")
 
 case class DisplayStatus(id: String,
-                               @JsonKey("type")
-                               ontologyType: String = "Status")
+                         @JsonKey("type")
+                         ontologyType: String = "Status")
 
 case class DisplayProgressEvent(description: String,
                                 createdDate: String,
@@ -97,5 +97,5 @@ case object DisplayCallback {
 }
 
 object IngestDisplayBag {
-  def apply(bagId: BagId):IngestDisplayBag = IngestDisplayBag(bagId.toString)
+  def apply(bagId: BagId): IngestDisplayBag = IngestDisplayBag(bagId.toString)
 }

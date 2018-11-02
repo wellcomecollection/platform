@@ -86,10 +86,9 @@ class RegistrarFeatureTest
                   requestId,
                   progressTopic,
                   Progress.Completed,
-                  Some(bagId)) {
-                  events =>
-                    events should have size 1
-                    events.head.description shouldBe "Bag registered successfully"
+                  Some(bagId)) { events =>
+                  events should have size 1
+                  events.head.description shouldBe "Bag registered successfully"
                 }
               }
             }

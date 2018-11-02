@@ -5,7 +5,10 @@ import java.time.Instant
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.models.{BagId, RequestDisplayIngest}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagId,
+  RequestDisplayIngest
+}
 
 case class Progress(id: UUID,
                     sourceLocation: StorageLocation,

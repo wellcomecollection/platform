@@ -24,7 +24,9 @@ class DisplayIngestTest extends FunSpec with Matchers with RandomThings {
     val bagId = randomBagId
     val progress: Progress = Progress(
       id,
-      StorageLocation(StorageProvider("s3"), ObjectLocation("bukkit", "key.txt")),
+      StorageLocation(
+        StorageProvider("s3"),
+        ObjectLocation("bukkit", "key.txt")),
       Namespace(spaceId),
       Some(Callback(new URI(callbackUrl))),
       Progress.Processing,
@@ -38,14 +40,16 @@ class DisplayIngestTest extends FunSpec with Matchers with RandomThings {
     println(toJson(ingest))
 
     ingest.id shouldBe id
-    ingest.sourceLocation shouldBe DisplayLocation(DisplayProvider("s3", "Amazon S3"), bucket = "bukkit", path = "key.txt")
+    ingest.sourceLocation shouldBe DisplayLocation(
+      DisplayProvider("s3", "Amazon S3"),
+      bucket = "bukkit",
+      path = "key.txt")
     ingest.callback shouldBe Some(
-      DisplayCallback(
-        callbackUrl,
-        Some(ingest.callback.get.status.get)))
+      DisplayCallback(callbackUrl, Some(ingest.callback.get.status.get)))
     ingest.space shouldBe DisplayStorageSpace(spaceId)
     ingest.status shouldBe DisplayStatus("processing")
-    ingest.bag shouldBe Some(IngestDisplayBag(s"${bagId.space}/${bagId.externalIdentifier}"))
+    ingest.bag shouldBe Some(
+      IngestDisplayBag(s"${bagId.space}/${bagId.externalIdentifier}"))
     ingest.createdDate shouldBe createdDate
     ingest.lastModifiedDate shouldBe modifiedDate
     ingest.events shouldBe List(

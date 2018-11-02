@@ -92,7 +92,10 @@ class ProgressUpdateFlowTest
                 .runWith(Sink.ignore)(materializer)
 
               whenReady(futureUpdates) { _ =>
-                assertProgressCreated(progress.id, progress.sourceLocation, table)
+                assertProgressCreated(
+                  progress.id,
+                  progress.sourceLocation,
+                  table)
 
                 assertProgressRecordedRecentEvents(
                   progress.id,

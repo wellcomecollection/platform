@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 17 October 2018.**
+**Last updated: 02 November 2018.**
 
 ## Problem statement
 

@@ -1,6 +1,6 @@
 # RFC 007: Goobi Upload
 
-**Last updated: 04 October 2018.**
+**Last updated: 12 October 2018.**
 
 ## Problem statement
 

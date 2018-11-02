@@ -54,7 +54,8 @@ class ProgressHttpFeatureTest
                       progress.id,
                       DisplayLocation(
                         DisplayProvider(progress.sourceLocation.provider.id),
-                        progress.sourceLocation.location.namespace, progress.sourceLocation.location.key),
+                        progress.sourceLocation.location.namespace,
+                        progress.sourceLocation.location.key),
                       progress.callback.map(DisplayCallback(_)),
                       DisplayIngestType("create"),
                       DisplayStorageSpace(progress.space.underlying),
@@ -140,7 +141,8 @@ class ProgressHttpFeatureTest
               val storageSpace = DisplayStorageSpace(id = "somespace")
               val displayIngestType = DisplayIngestType(id = "create")
               val displayProvider = DisplayProvider("s3", "Amazon S3")
-              val displayLocation = DisplayLocation(displayProvider, "bucket", "key.txt")
+              val displayLocation =
+                DisplayLocation(displayProvider, "bucket", "key.txt")
               val createProgressRequest = RequestDisplayIngest(
                 sourceLocation = displayLocation,
                 callback = someCallback,
@@ -204,7 +206,9 @@ class ProgressHttpFeatureTest
                       assertTableOnlyHasItem(
                         Progress(
                           id,
-                          StorageLocation(StorageProvider("s3"), ObjectLocation("bucket", "key.txt")),
+                          StorageLocation(
+                            StorageProvider("s3"),
+                            ObjectLocation("bucket", "key.txt")),
                           Namespace(storageSpace.id),
                           Some(Callback(testCallbackUri, Callback.Pending)),
                           Progress.Initialised,
@@ -221,13 +225,13 @@ class ProgressHttpFeatureTest
                     listMessagesReceivedFromSNS(topic).map(messageInfo =>
                       fromJson[IngestBagRequest](messageInfo.message).get)
 
-                  requests shouldBe List(IngestBagRequest(
-                    id,
-                    storageSpace = StorageSpace(storageSpace.id),
-                    archiveCompleteCallbackUrl = Some(testCallbackUri),
-                    zippedBagLocation =
-                      ObjectLocation("bucket", "key.txt")
-                  ))
+                  requests shouldBe List(
+                    IngestBagRequest(
+                      id,
+                      storageSpace = StorageSpace(storageSpace.id),
+                      archiveCompleteCallbackUrl = Some(testCallbackUri),
+                      zippedBagLocation = ObjectLocation("bucket", "key.txt")
+                    ))
                 }
               }
             }

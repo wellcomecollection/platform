@@ -85,7 +85,8 @@ class NotifierFeatureTest
                     DisplayStorageSpace(progress.space.underlying),
                     DisplayStatus(progress.status.toString),
                     progress.bag.map(bagId =>
-                      IngestDisplayBag(s"${bagId.space}/${bagId.externalIdentifier}")),
+                      IngestDisplayBag(
+                        s"${bagId.space}/${bagId.externalIdentifier}")),
                     progress.events.map(event =>
                       DisplayProgressEvent(
                         event.description,
@@ -144,7 +145,8 @@ class NotifierFeatureTest
                     DisplayStorageSpace(progress.space.underlying),
                     DisplayStatus(progress.status.toString),
                     progress.bag.map(bagId =>
-                      IngestDisplayBag(s"${bagId.space}/${bagId.externalIdentifier}")),
+                      IngestDisplayBag(
+                        s"${bagId.space}/${bagId.externalIdentifier}")),
                     progress.events.map(event =>
                       DisplayProgressEvent(
                         event.description,
