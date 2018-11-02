@@ -1,6 +1,5 @@
 import json
 
-
 def transform(record):
     """
     Parameters
@@ -16,11 +15,7 @@ def transform(record):
     """
     original_data = json.loads(record["data"])
     transformed = drop_redundant_fields(original_data, keys_to_drop)
-
-    for key, value in transformed.items():
-        if 'date' in key and value is not None:
-            transformed[key] = dd_mm_yyyy_to_iso_date(value)
-
+    transformed = clean_dates(transformed)
     return transformed
 
 
@@ -37,11 +32,21 @@ def drop_redundant_fields(original_data, keys_to_drop):
     return clean_data
 
 
-def dd_mm_yyyy_to_iso_date(date):
-    """
+def clean_dates(data):
+    '''
     elasticsearch's default sort is alphabetical, and sorting dd/mm/yyyy dates
     alphabetically is rubbish
-    """
+    '''
+    for key, value in data.items():
+        if 'date' in key and value is not None:
+            if type(value) == str:
+                data[key] = dd_mm_yyyy_to_iso_date(value)
+            elif type(value) == list:
+                data[key] = [dd_mm_yyyy_to_iso_date(date) for date in value]
+    return data
+
+
+def dd_mm_yyyy_to_iso_date(date):
     dd, mm, yyyy = date.split('/')
     iso_date = '-'.join([yyyy, mm, dd])
     return iso_date
@@ -72,5 +77,5 @@ keys_to_drop = [
     'image_tech_manipulated_date_to',
     'image_tech_manipulated_date',
     'image_web_img_filename',
-    'image_web_img_size',
+    'image_web_img_size'
 ]
