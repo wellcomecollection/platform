@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 def transform(record):
     """
@@ -40,16 +41,18 @@ def clean_dates(data):
     for key, value in data.items():
         if 'date' in key and value is not None:
             if type(value) == str:
-                data[key] = dd_mm_yyyy_to_iso_date(value)
+                data[key] = convert_date_to_iso(value)
             elif type(value) == list:
-                data[key] = [dd_mm_yyyy_to_iso_date(date) for date in value]
+                data[key] = [convert_date_to_iso(date) for date in value]
     return data
 
 
-def dd_mm_yyyy_to_iso_date(date):
-    dd, mm, yyyy = date.split('/')
-    iso_date = '-'.join([yyyy, mm, dd])
-    return iso_date
+def convert_date_to_iso(date_string):
+    if date_string is None or date_string is '':
+        date = None
+    else:
+        date = datetime.strptime(date_string, '%d/%m/%Y').date().isoformat()
+    return date
 
 
 keys_to_drop = [
