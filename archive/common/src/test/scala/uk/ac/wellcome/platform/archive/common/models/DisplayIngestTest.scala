@@ -40,7 +40,10 @@ class DisplayIngestTest extends FunSpec with Matchers with RandomThings {
     println(toJson(ingest))
 
     ingest.id shouldBe id
-    ingest.sourceLocation shouldBe DisplayLocation(DisplayProvider("s3"), bucket = "bukkit", path = "key.txt")
+    ingest.sourceLocation shouldBe DisplayLocation(
+      DisplayProvider("s3"),
+      bucket = "bukkit",
+      path = "key.txt")
     ingest.callback shouldBe Some(
       DisplayCallback(callbackUrl, Some(ingest.callback.get.status.get)))
     ingest.space shouldBe DisplayStorageSpace(spaceId)
