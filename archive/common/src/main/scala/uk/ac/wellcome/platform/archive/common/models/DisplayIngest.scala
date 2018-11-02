@@ -25,7 +25,7 @@ case class ResponseDisplayIngest(id: UUID,
                                  callback: Option[DisplayCallback],
                                  ingestType: DisplayIngestType,
                                  space: DisplayStorageSpace,
-                                 status: DisplayIngestStatus,
+                                 status: DisplayStatus,
                                  resources: Seq[DisplayIngestResource] =
                                    Seq.empty,
                                  events: Seq[DisplayProgressEvent] = Seq.empty,
@@ -35,8 +35,8 @@ case class ResponseDisplayIngest(id: UUID,
                                  ontologyType: String = "Ingest")
     extends DisplayIngest
 
-case class DisplayCallback(uri: String,
-                           status: Option[String],
+case class DisplayCallback(url: String,
+                           status: Option[DisplayStatus],
                            @JsonKey("type")
                            ontologyType: String = "Callback")
 
@@ -52,9 +52,9 @@ case class DisplayStorageSpace(id: String,
                                @JsonKey("type")
                                ontologyType: String = "Space")
 
-case class DisplayIngestStatus(id: String,
+case class DisplayStatus(id: String,
                                @JsonKey("type")
-                               ontologyType: String = "IngestStatus")
+                               ontologyType: String = "Status")
 
 case class DisplayProgressEvent(description: String,
                                 createdDate: String,
@@ -62,47 +62,43 @@ case class DisplayProgressEvent(description: String,
                                 ontologyType: String = "ProgressEvent")
 
 case object ResponseDisplayIngest {
-  def apply(progress: Progress): ResponseDisplayIngest = {
-    ResponseDisplayIngest(
-      id = progress.id,
-      sourceLocation = DisplayLocation(progress.sourceLocation),
-      callback = progress.callback.map(DisplayCallback(_)),
-      space = DisplayStorageSpace(progress.space.toString),
-      ingestType = DisplayIngestType(),
-      resources = progress.resources.map(DisplayIngestResource(_)),
-      status = DisplayIngestStatus(progress.status),
-      events = progress.events.map(DisplayProgressEvent(_)),
-      createdDate = progress.createdDate.toString,
-      lastModifiedDate = progress.lastModifiedDate.toString
-    )
-  }
+  def apply(progress: Progress): ResponseDisplayIngest = ResponseDisplayIngest(
+    id = progress.id,
+    sourceLocation = DisplayLocation(progress.sourceLocation),
+    callback = progress.callback.map(DisplayCallback(_)),
+    space = DisplayStorageSpace(progress.space.toString),
+    ingestType = DisplayIngestType(),
+    resources = progress.resources.map(DisplayIngestResource(_)),
+    status = DisplayStatus(progress.status),
+    events = progress.events.map(DisplayProgressEvent(_)),
+    createdDate = progress.createdDate.toString,
+    lastModifiedDate = progress.lastModifiedDate.toString
+  )
 }
 
 case object DisplayProgressEvent {
-  def apply(progressEvent: ProgressEvent): DisplayProgressEvent = {
+  def apply(progressEvent: ProgressEvent): DisplayProgressEvent =
     DisplayProgressEvent(
       progressEvent.description,
       progressEvent.createdDate.toString)
-  }
 }
 
-case object DisplayIngestStatus {
-  def apply(progressStatus: Progress.Status): DisplayIngestStatus = {
-    DisplayIngestStatus(progressStatus.toString)
-  }
+case object DisplayStatus {
+  def apply(progressStatus: Progress.Status): DisplayStatus =
+    DisplayStatus(progressStatus.toString)
+
+  def apply(callbackStatus: Callback.CallbackStatus): DisplayStatus =
+    DisplayStatus(callbackStatus.toString)
 }
 
 case object DisplayIngestResource {
-  def apply(resource: Resource): DisplayIngestResource = {
+  def apply(resource: Resource): DisplayIngestResource =
     DisplayIngestResource(resource.id.underlying)
-  }
 }
 
 case object DisplayCallback {
-  def apply(callback: Callback): DisplayCallback = {
-    DisplayCallback(
-      callback.uri.toString,
-      Some(callback.status.toString)
-    )
-  }
+  def apply(callback: Callback): DisplayCallback = DisplayCallback(
+    callback.uri.toString,
+    Some(DisplayStatus(callback.status))
+  )
 }

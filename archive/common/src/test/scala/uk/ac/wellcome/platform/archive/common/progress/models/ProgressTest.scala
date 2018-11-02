@@ -43,7 +43,7 @@ class ProgressTest
       StorageProvider(displayProvider.id, displayProvider.label),
       ObjectLocation(bucket, path))
     progress.callback shouldBe Some(
-      Callback(URI.create(progressCreateRequest.callback.get.uri)))
+      Callback(URI.create(progressCreateRequest.callback.get.url)))
     progress.status shouldBe Progress.Initialised
     assertRecent(progress.createdDate)
     progress.lastModifiedDate shouldBe progress.createdDate

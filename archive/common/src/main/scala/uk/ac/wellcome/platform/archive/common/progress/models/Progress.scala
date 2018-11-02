@@ -46,7 +46,7 @@ case object Progress extends URIConverters {
       id = generateId,
       sourceLocation = StorageLocation(createRequest.sourceLocation),
       callback = Callback(createRequest.callback.map(displayCallback =>
-        URI.create(displayCallback.uri))),
+        URI.create(displayCallback.url))),
       space = Namespace(createRequest.space.id),
       status = Progress.Initialised
     )

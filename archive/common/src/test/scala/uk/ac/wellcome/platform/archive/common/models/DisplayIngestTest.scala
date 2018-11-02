@@ -41,9 +41,9 @@ class DisplayIngestTest extends FunSpec with Matchers {
     ingest.callback shouldBe Some(
       DisplayCallback(
         callbackUrl,
-        Some(ingest.callback.get.status.get.toString)))
+        Some(ingest.callback.get.status.get)))
     ingest.space shouldBe DisplayStorageSpace(spaceId)
-    ingest.status shouldBe DisplayIngestStatus("processing")
+    ingest.status shouldBe DisplayStatus("processing")
     ingest.resources shouldBe List(DisplayIngestResource(resourceId))
     ingest.createdDate shouldBe createdDate
     ingest.lastModifiedDate shouldBe modifiedDate

@@ -83,7 +83,7 @@ class NotifierFeatureTest
                     progress.callback.map(DisplayCallback(_)),
                     DisplayIngestType("create"),
                     DisplayStorageSpace(progress.space.underlying),
-                    DisplayIngestStatus(progress.status.toString),
+                    DisplayStatus(progress.status.toString),
                     progress.resources.map(resource =>
                       DisplayIngestResource(resource.id.underlying)),
                     progress.events.map(event =>
@@ -142,7 +142,7 @@ class NotifierFeatureTest
                     progress.callback.map(DisplayCallback(_)),
                     DisplayIngestType("create"),
                     DisplayStorageSpace(progress.space.underlying),
-                    DisplayIngestStatus(progress.status.toString),
+                    DisplayStatus(progress.status.toString),
                     progress.resources.map(resource =>
                       DisplayIngestResource(resource.id.underlying)),
                     progress.events.map(event =>
