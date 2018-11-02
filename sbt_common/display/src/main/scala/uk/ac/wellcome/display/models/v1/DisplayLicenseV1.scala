@@ -20,7 +20,7 @@ case class DisplayLicenseV1(
   ) label: String,
   @ApiModelProperty(
     value = "URL to the full text of a license"
-  ) url: String
+  ) url: Option[String]
 ) {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "License"

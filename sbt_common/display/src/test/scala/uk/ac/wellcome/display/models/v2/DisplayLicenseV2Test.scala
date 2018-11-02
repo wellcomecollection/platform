@@ -9,7 +9,7 @@ class DisplayLicenseV2Test extends FunSpec with Matchers {
 
     displayLicense.id shouldBe License_CCBY.id
     displayLicense.label shouldBe License_CCBY.label
-    displayLicense.url shouldBe License_CCBY.url
+    displayLicense.url shouldBe Some(License_CCBY.url)
     displayLicense.ontologyType shouldBe "License"
   }
 }
