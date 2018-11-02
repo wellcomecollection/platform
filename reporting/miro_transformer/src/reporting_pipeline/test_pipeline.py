@@ -1,6 +1,6 @@
+import os
 import json
-import transformer_example
-
+from .hybrid_record_pipeline import process_messages
 
 def create_sns_message(bucket_name, id, key):
     return {
@@ -27,17 +27,6 @@ def create_sns_message(bucket_name, id, key):
     }
 
 
-def create_miro_hybrid_data():
-    return {
-        "MiroCollection": "images-2",
-        "data": '{"image_image_desc":"A horse\'s neck: diagonal feathered whorl.\\nRoyal Veterinary College."}',
-        "id": "miro/A0000001",
-        "sourceId": "A0000001",
-        "sourceName": "miro",
-        "version": 1,
-    }
-
-
 def given_s3_has(s3_client, bucket, key, data):
     s3_client.put_object(
         ACL="public-read",
@@ -49,20 +38,25 @@ def given_s3_has(s3_client, bucket, key, data):
     )
 
 
-def test_saves_miro_data_record_in_es(
+def identity_transform(record):
+    return record
+
+
+def test_saves_record_in_es(
     s3_client, bucket, elasticsearch_client, elasticsearch_index
 ):
+
     id = "V0010033"
     elasticsearch_doctype = "example"
-    hybrid_data = create_miro_hybrid_data()
+    hybrid_data = '{"foo": "bar"}'
     key = "33/V0010033/0.json"
 
     given_s3_has(s3_client, bucket, key, json.dumps(hybrid_data))
-
     event = create_sns_message(bucket, id, key)
-    transformer_example.main(
+    
+    process_messages(
         event,
-        {},
+        identity_transform,
         s3_client,
         elasticsearch_client,
         elasticsearch_index,
@@ -71,4 +65,6 @@ def test_saves_miro_data_record_in_es(
 
     es_record = elasticsearch_client.get(elasticsearch_index, elasticsearch_doctype, id)
 
-    assert es_record["_source"] == json.loads(hybrid_data["data"])
+    assert es_record["_source"] == json.loads(hybrid_data)
+
+
