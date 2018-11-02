@@ -236,7 +236,7 @@ module "bagger" {
 # Integration testing - callback_client
 
 module "callback_stub_server" {
-  source = "internal_rest_service"
+  source = "callback_service"
 
   service_name = "callback_stub_server"
 
