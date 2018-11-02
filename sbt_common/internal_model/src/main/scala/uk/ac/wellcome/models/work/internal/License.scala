@@ -30,8 +30,7 @@ object License {
       case s: String if s == License_PDM.id                 => License_PDM
       case s: String if s == License_CopyrightNotCleared.id => License_CopyrightNotCleared
       case id =>
-        val errorMessage = s"$id is not a valid id"
-        throw new Exception(errorMessage)
+        throw new IllegalArgumentException(s"$id is not a valid license id")
     }
   }
 }
