@@ -32,18 +32,17 @@ from mets_filesource import b_numbers_from_fileshare, b_numbers_from_s3
 def main():
 
     global sns
-    sts = boto3.client('sts')
+    sts = boto3.client("sts")
     assumed_role_object = sts.assume_role(
-        RoleArn=os.environ.get('DLCS_ROLE_ARN'),
-        RoleSessionName='migration-driver',
+        RoleArn=os.environ.get("DLCS_ROLE_ARN"), RoleSessionName="migration-driver"
     )
-    sns_credentials = assumed_role_object['Credentials']
+    sns_credentials = assumed_role_object["Credentials"]
     sns = boto3.client(
-        'sns',
-        region_name=os.environ.get('AWS_DEFAULT_REGION'),
-        aws_access_key_id = sns_credentials['AccessKeyId'],
-        aws_secret_access_key = sns_credentials['SecretAccessKey'],
-        aws_session_token = sns_credentials['SessionToken'],
+        "sns",
+        region_name=os.environ.get("AWS_DEFAULT_REGION"),
+        aws_access_key_id=sns_credentials["AccessKeyId"],
+        aws_secret_access_key=sns_credentials["SecretAccessKey"],
+        aws_session_token=sns_credentials["SessionToken"],
     )
 
     if len(sys.argv) == 2 and sys.argv[1] == "filesystem":
@@ -56,7 +55,7 @@ def main():
 
 
 def process_filter(filter):
-    if filter[0] == 'b':
+    if filter[0] == "b":
         yield filter
     return b_numbers_from_s3(filter)
 
@@ -70,7 +69,7 @@ def publish_from_s3(filter):
         publish(b)
     end = time.time()
     time_taken = end - start
-    print("retrieved {0} b numbers in {1} seconds".format(counter-1, time_taken))
+    print("retrieved {0} b numbers in {1} seconds".format(counter - 1, time_taken))
 
 
 def publish_from_filesystem():
@@ -84,8 +83,8 @@ def publish_from_filesystem():
 
 def publish(identifier):
     response = sns.publish(
-        TargetArn=os.environ.get('PUBLISH_ARN'),
-        Message=json.dumps({"identifier": identifier})
+        TargetArn=os.environ.get("PUBLISH_ARN"),
+        Message=json.dumps({"identifier": identifier}),
     )
 
 
