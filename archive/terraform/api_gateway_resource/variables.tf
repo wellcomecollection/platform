@@ -5,7 +5,9 @@ variable "storage_api_root_resource_id" {}
 variable "authorizer_id" {}
 
 variable "cognito_storage_api_identifier" {}
-variable "load_balancer_arn" {}
+variable "vpc_link_id" {}
+
+variable "load_balancer_port" {}
 
 variable "hostname" {
   default = "api.wellcomecollection.org"

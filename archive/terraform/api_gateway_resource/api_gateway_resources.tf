@@ -20,7 +20,7 @@ resource "aws_api_gateway_integration" "resource_vpc_link_integration" {
   integration_http_method = "ANY"
   type                    = "HTTP_PROXY"
   connection_type         = "VPC_LINK"
-  connection_id           = "${aws_api_gateway_vpc_link.progress.id}"
+  connection_id           = "${var.vpc_link_id}"
   uri                     = "${local.integration_uri}"
 }
 
@@ -50,7 +50,7 @@ resource "aws_api_gateway_integration" "resource_subpaths_vpc_link_integration" 
   integration_http_method = "ANY"
   type                    = "HTTP_PROXY"
   connection_type         = "VPC_LINK"
-  connection_id           = "${aws_api_gateway_vpc_link.progress.id}"
+  connection_id           = "${var.vpc_link_id}"
   uri                     = "${local.integration_uri}/{proxy}"
 
   request_parameters = {
