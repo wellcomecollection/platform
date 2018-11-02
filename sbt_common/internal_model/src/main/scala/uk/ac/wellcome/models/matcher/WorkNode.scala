@@ -5,4 +5,3 @@ case class WorkNode(id: String,
                     linkedIds: List[String],
                     componentId: String)
     extends Versioned
-    with IdentifiableWork
