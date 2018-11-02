@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.matcher
 
 import uk.ac.wellcome.models.work.internal.BaseWork
 
-case class WorkIdentifier(identifier: String, version: Int) extends Versioned
+case class WorkIdentifier(identifier: String, version: Int)
 
 case object WorkIdentifier {
   def apply(work: WorkNode): WorkIdentifier =
