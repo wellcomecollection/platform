@@ -25,7 +25,7 @@ class Router @Inject()(vhs: VersionedHybridStore[StorageManifest,
       path(Segment / Segment) { (space, id) =>
         get {
           onSuccess(vhs.getRecord(s"$space/$id")) {
-            case Some(storageManifest) => complete(DisplayBag(storageManifest))
+            case Some(storageManifest) => complete(DisplayBag(storageManifest, config.contextUrl))
             case None                  => complete(NotFound -> "Storage manifest not found!")
           }
         }

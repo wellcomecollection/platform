@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.progress_http.config
 
+import java.net.URL
+
 import org.rogach.scallop.ScallopConf
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
@@ -31,6 +33,8 @@ class ArgsConfigurator(val arguments: Seq[String])
     opt[String]("app-host", required = true, default = Some("0.0.0.0"))
   private val appBaseUrl =
     opt[String]("app-base-url", required = true)
+  private val contextUrl =
+    opt[URL]("context-url", required = true)
 
   private val archiveProgressTrackerTableName =
     opt[String]("archive-progress-tracker-table-name", required = true)
@@ -82,6 +86,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     host = appHost(),
     port = appPort(),
     externalBaseUrl = appBaseUrl(),
+    contextUrl = contextUrl()
   )
 
   val archiveProgressTrackerConfig = ProgressTrackerConfig(
