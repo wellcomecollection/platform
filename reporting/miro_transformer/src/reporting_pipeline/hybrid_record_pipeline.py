@@ -10,6 +10,8 @@ import boto3
 import certifi
 from attr import attrs, attrib
 from elasticsearch import Elasticsearch
+from wellcome_aws_utils.lambda_utils import log_on_error
+
 
 # Classes covering various record types ----------------------------------------
 def dict_to_location(d):
@@ -62,6 +64,7 @@ def transform_data_for_es(data, transform):
 
 
 # Move records with transforms applied -----------------------------------------
+@log_on_error
 def process_messages(event, transform, s3_client=None, es_client=None, index=None, doc_type=None):
     s3_client = s3_client or boto3.client("s3")
     index = index or os.environ["ES_INDEX"]
@@ -74,7 +77,7 @@ def process_messages(event, transform, s3_client=None, es_client=None, index=Non
     )
 
     _process_messages(event, transform, s3_client, es_client, index, doc_type)
- 
+
 
 def _process_messages(event, transform, s3_client, es_client, index, doc_type):
     messages = extract_sns_messages_from_event(event)
