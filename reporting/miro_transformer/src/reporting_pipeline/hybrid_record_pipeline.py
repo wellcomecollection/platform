@@ -65,7 +65,9 @@ def transform_data_for_es(data, transform):
 
 # Move records with transforms applied -----------------------------------------
 @log_on_error
-def process_messages(event, transform, s3_client=None, es_client=None, index=None, doc_type=None):
+def process_messages(
+    event, transform, s3_client=None, es_client=None, index=None, doc_type=None
+):
     s3_client = s3_client or boto3.client("s3")
     index = index or os.environ["ES_INDEX"]
     doc_type = doc_type or os.environ["ES_DOC_TYPE"]

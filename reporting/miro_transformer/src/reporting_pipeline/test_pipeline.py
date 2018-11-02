@@ -2,6 +2,7 @@ import os
 import json
 from .hybrid_record_pipeline import process_messages
 
+
 def create_sns_message(bucket_name, id, key):
     return {
         "Records": [
@@ -53,7 +54,7 @@ def test_saves_record_in_es(
 
     given_s3_has(s3_client, bucket, key, json.dumps(hybrid_data))
     event = create_sns_message(bucket, id, key)
-    
+
     process_messages(
         event,
         identity_transform,
@@ -66,5 +67,3 @@ def test_saves_record_in_es(
     es_record = elasticsearch_client.get(elasticsearch_index, elasticsearch_doctype, id)
 
     assert es_record["_source"] == json.loads(hybrid_data)
-
-
