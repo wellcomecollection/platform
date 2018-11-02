@@ -5,7 +5,12 @@ data "aws_iam_policy_document" "archive_get" {
     ]
 
     resources = [
+      # Allow archivist to read bagger drop bucket
+      "arn:aws:s3:::${var.bagger_drop_bucket_name}/*",
+
+      # Allow archivist to read our archive ingest bucket
       "arn:aws:s3:::${local.archive_bucket_name}",
+
       "arn:aws:s3:::${local.archive_bucket_name}/*",
     ]
   }
@@ -33,6 +38,18 @@ data "aws_iam_policy_document" "ingest_get" {
 
     resources = [
       "arn:aws:s3:::${local.ingest_bucket_name}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "ingest_workflow_get" {
+  statement {
+    actions = [
+      "s3:GetObject*",
+    ]
+
+    resources = [
+      "arn:aws:s3:::wellcomecollection-workflow-export-bagit/*",
     ]
   }
 }
@@ -116,6 +133,7 @@ data "aws_iam_policy_document" "read_from_bagger_queue" {
       "sqs:DeleteMessage",
       "sqs:ReceiveMessage",
       "sqs:ChangeMessageVisibility",
+      "sqs:GetQueueUrl",
     ]
 
     resources = [

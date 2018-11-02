@@ -15,9 +15,9 @@ class MiroTransformableTransformerTitleTest
   it("uses the image_title field on non-V records") {
     val title = "A picture of a parrot"
     transformRecordAndCheckTitle(
+      miroId = "A0000001",
       data = s""""image_title": "$title"""",
-      expectedTitle = title,
-      miroCollection = "Images-A"
+      expectedTitle = title
     )
   }
 
@@ -25,9 +25,9 @@ class MiroTransformableTransformerTitleTest
     it("uses image_title if image_image_desc is absent") {
       val title = "A limerick about a lemming"
       transformRecordAndCheckTitle(
+        miroId = "V0000001",
         data = s""""image_title": "$title"""",
-        expectedTitle = title,
-        miroCollection = "Images-V"
+        expectedTitle = title
       )
     }
 
@@ -35,13 +35,13 @@ class MiroTransformableTransformerTitleTest
       val title = "A tome about a turtle"
       val description = "A story of a starfish"
       transformRecordAndCheckTitle(
+        miroId = "V0000001",
         data = s"""
           "image_title": "$title",
           "image_image_desc": "$description"
         """,
         expectedTitle = title,
-        expectedDescription = Some(description),
-        miroCollection = "Images-V"
+        expectedDescription = Some(description)
       )
     }
 
@@ -50,13 +50,13 @@ class MiroTransformableTransformerTitleTest
       val title = "An icon of an iguana"
       val description = "An icon of an iguana is an intriguing image"
       transformRecordAndCheckTitle(
+        miroId = "V0000001",
         data = s"""
           "image_title": "$title",
           "image_image_desc": "$description"
         """,
         expectedTitle = description,
-        expectedDescription = None,
-        miroCollection = "Images-V"
+        expectedDescription = None
       )
     }
 
@@ -67,13 +67,13 @@ class MiroTransformableTransformerTitleTest
       val descriptionBody = "Woodcut, by A.R. Tist.  Italian.  1897."
       val description = s"$longTitle\\n\\n$descriptionBody"
       transformRecordAndCheckTitle(
+        miroId = "V0000001",
         data = s"""
           "image_title": "$title",
           "image_image_desc": "$description"
         """,
         expectedTitle = longTitle,
-        expectedDescription = Some(descriptionBody),
-        miroCollection = "Images-V"
+        expectedDescription = Some(descriptionBody)
       )
     }
   }
@@ -145,15 +145,12 @@ class MiroTransformableTransformerTitleTest
   }
 
   private def transformRecordAndCheckTitle(
+    miroId: String = "M0000001",
     data: String,
     expectedTitle: String,
-    expectedDescription: Option[String] = None,
-    miroCollection: String = "TestCollection"
+    expectedDescription: Option[String] = None
   ) = {
-    val transformedWork = transformWork(
-      MiroCollection = miroCollection,
-      data = data
-    )
+    val transformedWork = transformWork(data = data)
 
     transformedWork.title shouldBe expectedTitle
     transformedWork.description shouldBe expectedDescription

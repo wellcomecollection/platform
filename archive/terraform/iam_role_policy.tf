@@ -1,10 +1,3 @@
-# Archive API (Flask)
-
-resource "aws_iam_role_policy" "archive_api_task_sns" {
-  role   = "${module.api_ecs.task_role_name}"
-  policy = "${module.archivist_topic.publish_policy}"
-}
-
 # Archivist
 
 resource "aws_iam_role_policy" "archivist_task_store_s3" {
@@ -15,6 +8,11 @@ resource "aws_iam_role_policy" "archivist_task_store_s3" {
 resource "aws_iam_role_policy" "archivist_task_get_s3" {
   role   = "${module.archivist.task_role_name}"
   policy = "${data.aws_iam_policy_document.ingest_get.json}"
+}
+
+resource "aws_iam_role_policy" "archivist_task_get_s3_workflow" {
+  role   = "${module.archivist.task_role_name}"
+  policy = "${data.aws_iam_policy_document.ingest_workflow_get.json}"
 }
 
 resource "aws_iam_role_policy" "archivist_task_registrar_sns" {
@@ -84,6 +82,11 @@ resource "aws_iam_role_policy" "progress_http_task_archive_progress_table" {
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
+resource "aws_iam_role_policy" "progress_http_sns" {
+  role   = "${module.progress_http.task_role_name}"
+  policy = "${module.ingest_requests_topic.publish_policy}"
+}
+
 # Notifier
 
 resource "aws_iam_role_policy" "notifier_task_sqs" {
@@ -121,4 +124,9 @@ resource "aws_iam_role_policy" "bagger_task_get_s3_dlcs" {
 resource "aws_iam_role_policy" "bagger_task_get_s3_preservica" {
   role   = "${module.bagger.task_role_name}"
   policy = "${data.aws_iam_policy_document.bagger_get_preservica.json}"
+}
+
+resource "aws_iam_role_policy" "bagger_task_bagging_complete_sns" {
+  role   = "${module.bagger.task_role_name}"
+  policy = "${module.bagging_complete_topic.publish_policy}"
 }

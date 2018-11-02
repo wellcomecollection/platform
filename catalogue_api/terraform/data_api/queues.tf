@@ -27,5 +27,5 @@ resource "aws_cloudwatch_metric_alarm" "snapshot_scheduler_queue_not_empty" {
     QueueName = "${module.snapshot_generator_queue.name}"
   }
 
-  alarm_actions = ["${local.dlq_alarm_arn}"]
+  alarm_actions = ["${module.snapshot_alarm_topic.arn}"]
 }

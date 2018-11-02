@@ -12,6 +12,7 @@ object Main extends App with AkkaHttpApp {
   override val injector: Injector = Guice.createInjector(
     new AppConfigModule(args),
     ConfigModule,
+    SNSClientModule,
     AkkaModule,
     ProgressTrackerModule
   )

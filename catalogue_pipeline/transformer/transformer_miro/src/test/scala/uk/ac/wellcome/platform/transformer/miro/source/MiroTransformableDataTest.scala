@@ -18,4 +18,17 @@ class MiroTransformableDataTest extends FunSpec with Matchers {
 
     fromJson[MiroTransformableData](jsonString).isSuccess shouldBe true
   }
+
+  // This is based on bugs from data in the pipeline.
+  it("corrects the entities in Adêle Mongrédien's name") {
+    val jsonString =
+      """
+        |{
+        |  "image_creator": ["Ad\u00c3\u00aale Mongr\u00c3\u00a9dien"]
+        |}
+      """.stripMargin
+
+    MiroTransformableData.create(jsonString).creator shouldBe Some(
+      List(Some("Adêle Mongrédien")))
+  }
 }

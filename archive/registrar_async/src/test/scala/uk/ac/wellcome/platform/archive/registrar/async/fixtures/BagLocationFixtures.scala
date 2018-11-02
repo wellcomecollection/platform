@@ -1,10 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagLocation,
-  BagPath,
-  ExternalIdentifier
-}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -14,14 +10,16 @@ trait BagLocationFixtures extends S3 with BagIt {
     storageBucket: Bucket,
     dataFileCount: Int = 1,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
-      createValidDataManifest)(testWith: TestWith[BagLocation, R]) = {
+      createValidDataManifest)(
+    testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
     val bagIdentifier = ExternalIdentifier(randomAlphanumeric())
 
     info(s"Creating bag $bagIdentifier")
 
+    val bagInfo = randomBagInfo
     val fileEntries = createBag(
-      bagIdentifier,
-      dataFileCount,
+      bagInfo,
+      dataFileCount = dataFileCount,
       createDataManifest = createDataManifest)
     val storagePrefix = "archive"
 
@@ -39,6 +37,10 @@ trait BagLocationFixtures extends S3 with BagIt {
         )
     })
 
-    testWith(bagLocation)
+    testWith(
+      (
+        bagLocation,
+        bagInfo,
+        BagId(randomStorageSpace, bagInfo.externalIdentifier)))
   }
 }

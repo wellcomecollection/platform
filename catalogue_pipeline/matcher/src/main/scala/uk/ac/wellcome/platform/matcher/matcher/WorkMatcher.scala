@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
@@ -56,13 +55,12 @@ class WorkMatcher @Inject()(
       }
   }
 
-  private def singleMatchedIdentifier(w: UnidentifiedInvisibleWork) = {
+  private def singleMatchedIdentifier(work: UnidentifiedInvisibleWork) = {
     MatcherResult(
       Set(
-        MatchedIdentifiers(Set(WorkIdentifier(
-          Sourced
-            .id(w.sourceIdentifier.identifierType.id, w.sourceIdentifier.value),
-          w.version)))))
+        MatchedIdentifiers(Set(WorkIdentifier(work)))
+      )
+    )
   }
 
   private def withUpdateLocked(update: WorkUpdate,

@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   VarField
@@ -592,15 +591,22 @@ class SierraContributorsTest
     }
   }
 
-  it("fails the transform if subfield $$a is missing") {
+  // This is based on transformer failures we saw in October 2018 --
+  // records 3069865, 3069866, 3069867, 3069872 all had empty instances of
+  // the 110 field.
+  it("returns an empty list if subfield $$a is missing") {
     val varFields = List(
       createVarFieldWith(
         marcTag = "100",
-        subfields = List()
+        subfields = List(
+          MarcSubfield(tag = "e", content = "")
+        )
       )
     )
 
-    assertTransformFails(varFields)
+    transformAndCheckContributors(
+      varFields = varFields,
+      expectedContributors = List())
   }
 
   private def transformAndCheckContributors(
@@ -609,13 +615,5 @@ class SierraContributorsTest
   ) = {
     val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getContributors(bibData) shouldBe expectedContributors
-  }
-
-  private def assertTransformFails(varFields: List[VarField]) = {
-    val bibData = createSierraBibDataWith(varFields = varFields)
-
-    intercept[TransformerException] {
-      transformer.getContributors(bibData)
-    }
   }
 }

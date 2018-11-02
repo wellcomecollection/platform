@@ -1,10 +1,11 @@
 package uk.ac.wellcome.platform.api.controllers
 
 import com.google.inject.{Inject, Singleton}
-import uk.ac.wellcome.display.models.{ApiVersions, V2WorksIncludes}
+import io.swagger.models.{Operation, Swagger}
+import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, V2WorksIncludes}
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
-import uk.ac.wellcome.platform.api.models.ApiConfig
+import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.platform.api.requests.{
   V2MultipleResultsRequest,
   V2SingleWorkRequest
@@ -12,6 +13,7 @@ import uk.ac.wellcome.platform.api.requests.{
 import uk.ac.wellcome.platform.api.services.WorksService
 
 import scala.concurrent.ExecutionContext
+import scala.reflect.runtime.universe.TypeTag
 
 @Singleton
 class V2WorksController @Inject()(
@@ -24,6 +26,7 @@ class V2WorksController @Inject()(
       V2WorksIncludes](
       apiConfig = apiConfig,
       indexName = elasticConfig.indexV2name,
+      documentType = elasticConfig.documentType,
       worksService = worksService
     ) {
   implicit protected val swagger = ApiV2Swagger
@@ -38,4 +41,47 @@ class V2WorksController @Inject()(
     setupSingleWorkEndpoint(ApiVersions.v2, "/works/:id", DisplayWorkV2.apply)
   }
 
+  override def buildFilters(
+    request: V2MultipleResultsRequest): List[WorkFilter] = {
+    val maybeItemLocationTypeFilter: Option[ItemLocationTypeFilter] =
+      request.itemLocationType
+        .map { arg =>
+          arg.split(",").map { _.trim }
+        }
+        .map { locationTypeIds: Array[String] =>
+          ItemLocationTypeFilter(locationTypeIds)
+        }
+
+    val maybeWorkTypeFilter: Option[WorkTypeFilter] =
+      request.workType
+        .map { arg =>
+          arg.split(",").map { _.trim }
+        }
+        .map { workTypeIds: Array[String] =>
+          WorkTypeFilter(workTypeIds)
+        }
+
+    List(maybeItemLocationTypeFilter, maybeWorkTypeFilter).flatten
+  }
+
+  override def setupResultListSwaggerDocs[T <: DisplayWork](
+    endpointSuffix: String,
+    swagger: Swagger,
+    doc: Operation)(
+    implicit evidence: TypeTag[DisplayResultList[T]]): Operation = {
+    implicit val finatraSwagger = swagger
+
+    super
+      .setupResultListSwaggerDocs(endpointSuffix, swagger, doc)(evidence)
+      .queryParam[String](
+        "items.locations.locationType",
+        "Filter by the LocationType of items on the retrieved works",
+        required = false
+      )
+      .queryParam[String](
+        "workType",
+        "Filter by the workType of the searched works",
+        required = false
+      )
+  }
 }

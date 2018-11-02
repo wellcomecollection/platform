@@ -38,18 +38,25 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
     // than library of congress or mesh. Some MARC records have duplicated subjects
     // when the same subject has more than one authority (for example mesh and FAST),
     // which causes duplicated subjects to appear in the API.
+    //
     // So let's filter anything that is from another authority for now.
-    marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
-      val subfields = varField.subfields
-
-      val person = getPerson(subfields)
-      val label =
-        getPersonSubjectLabel(person, getRoles(subfields), getDates(subfields))
-      Subject(
-        label = label,
-        concepts = List(identifyPersonConcept(person, varField))
-      )
-    }
+    marcVarFields
+      .filterNot { _.indicator2.contains("7") }
+      .flatMap { varField: VarField =>
+        val subfields = varField.subfields
+        val maybePerson = getPerson(subfields)
+        maybePerson.map { person =>
+          val label = getPersonSubjectLabel(
+            person = person,
+            roles = getRoles(subfields),
+            dates = getDates(subfields)
+          )
+          Subject(
+            label = label,
+            concepts = List(identifyPersonConcept(person, varField))
+          )
+        }
+      }
   }
 
   private def getPersonSubjectLabel(person: Person,

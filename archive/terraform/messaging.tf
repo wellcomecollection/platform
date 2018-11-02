@@ -1,5 +1,10 @@
 # Messaging - archivist
 
+module "ingest_requests_topic" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${local.namespace}_requests"
+}
+
 module "archivist_topic" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
   name   = "${local.namespace}_archivist"
@@ -10,7 +15,7 @@ module "archivist_queue" {
   queue_name  = "${local.namespace}_archivist_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.archivist_topic.name}"]
+  topic_names = ["${module.ingest_requests_topic.name}"]
 
   visibility_timeout_seconds = 43200
   max_receive_count          = 3
@@ -98,4 +103,9 @@ module "bagger_queue" {
   visibility_timeout_seconds = 3600
 
   alarm_topic_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+}
+
+module "bagging_complete_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "archive-bagger_bagging_complete"
 }

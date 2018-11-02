@@ -18,6 +18,11 @@ wig:Bag rdf:type owl:Class ;
     rdfs:comment "A set of opaque files contained within a specified structure defined by the BagIt packaging format."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
     
+wig:BagInfo rdf:type owl:Class ;
+    rdfs:label "BagInfo"@en ;
+    rdfs:comment "Information about the bag."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .    
+    
 wig:Ingest rdf:type owl:Class ;
     rdfs:label "Ingest"@en ;
     rdfs:comment "An ingest of archival assets."@en ;
@@ -28,9 +33,9 @@ wig:IngestType rdf:type owl:Class ;
     rdfs:comment "The type of ingest. For example creation of a bag, updating a bags metadata, deleting a bag."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
     
-wig:FileManifest rdf:type owl:Class ;
-    rdfs:label "Manifest"@en ;
-    rdfs:comment " A tag file that maps filepaths to checksums. A manifest can be a payload manifest or a tag manifest"@en ;
+wig:BagManifest rdf:type owl:Class ;
+    rdfs:label "BagManifest"@en ;
+    rdfs:comment " A bag manifest maps filepaths to checksums. A manifest can be a bag manifest or a tag manifest"@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
             
 wig:File rdf:type owl:Class ;
@@ -41,14 +46,17 @@ wig:File rdf:type owl:Class ;
 wig:Location rdf:type owl:Class ;
     rdfs:label "Location"@en ;
     rdfs:comment "A location at which the archival materials is stored."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
-         
-wig:Source rdf:type owl:Class ;
-    rdfs:label "Location"@en ;
-    rdfs:comment "The source system of the archival assets."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
-         
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .        
      
+wig:Provider rdf:type owl:Class ;
+    rdfs:label "Provider"@en ;
+    rdfs:comment "A provider of assets."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .   
+    
+wig:Status rdf:type owl:Class ;
+    rdfs:label "Status"@en ;
+    rdfs:comment "The status of a process."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .          
       
 #### object properties ####
 
@@ -59,39 +67,46 @@ wig:bag rdf:type owl:ObjectProperty ;
     rdfs:range wig:Bag ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
     
+wig:info rdf:type owl:ObjectProperty ;
+    rdfs:label "info"@en ;
+    rdfs:comment "Relates a bag to information about the bag."@en ;
+    rdfs:domain wig:Bag ;
+    rdfs:range wig:BagInfo ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/archival-storage> .
+    
 wig:tagManifest rdf:type owl:ObjectProperty ;
     rdfs:label "tagManifest"@en ;
     rdfs:comment "Relates a bag to a manifest."@en ;
     rdfs:domain wig:Bag ;
-    rdfs:range wig:Manifest ;
+    rdfs:range wig:BagManifest ;
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .   
     
 wig:manifest rdf:type owl:ObjectProperty ;
     rdfs:label "manifest"@en ;
     rdfs:comment "Relates a bag to a manifest."@en ;
     rdfs:domain wig:Bag ;
-    rdfs:range wig:Mainfest ;
+    rdfs:range wig:BagMainfest ;
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .
     
 wig:files rdf:type owl:ObjectProperty ;
     rdfs:label "files"@en ;
     rdfs:comment "Relates a manifest to files."@en ;
-    rdfs:domain wig:FileManifest ;
+    rdfs:domain wig:BagManifest ;
     rdfs:range wig:Files ;
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .            
 
-wig:location rdf:type owl:ObjectProperty ;
-    rdfs:label "location"@en ;
-    rdfs:comment "Relates a bag to its location."@en ;
+wig:archiveLocation rdf:type owl:ObjectProperty ;
+    rdfs:label "archiveLocation"@en ;
+    rdfs:comment "Relates a bag to its archive location."@en ;
     rdfs:domain wig:Bag ;
     rdfs:range wig:Location ;
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
 
-wig:source rdf:type owl:ObjectProperty ;
-    rdfs:label "source"@en ;
-    rdfs:comment "Relates a bag to its source."@en ;
+wig:accessLocation rdf:type owl:ObjectProperty ;
+    rdfs:label "accessLocation"@en ;
+    rdfs:comment "Relates a bag to its access location."@en ;
     rdfs:domain wig:Bag ;
-    rdfs:range wig:Source ;
+    rdfs:range wig:Location ;
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
 
 wig:ingestType rdf:type owl:ObjectProperty ;
@@ -100,6 +115,27 @@ wig:ingestType rdf:type owl:ObjectProperty ;
     rdfs:domain wig:Ingest ;
     rdfs:range wig:IngestType ;
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .  
+    
+wig:provider rdf:type owl:ObjectProperty ;
+    rdfs:label "provider"@en ;
+    rdfs:comment "Relates a location to its provider."@en ;
+    rdfs:domain wig:Location ;
+    rdfs:range wig:Provider ;
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .     
+
+wig:ingestStatus rdf:type owl:ObjectProperty ;
+    rdfs:label "ingestStatus"@en ;
+    rdfs:comment "Relates an ingest process to the ingest status."@en ;
+    rdfs:domain wig:Ingest ;
+    rdfs:range wig:Status ;
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .  
+    
+wig:callbackStatus rdf:type owl:ObjectProperty ;
+    rdfs:label "callbackStatus"@en ;
+    rdfs:comment "Relates an ingest process to the callback status."@en ;
+    rdfs:domain wig:Ingest ;
+    rdfs:range wig:Status ;
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .      
 
 ####### data properties #####
 
@@ -118,72 +154,72 @@ wig:callbackUrl rdf:type owl:DatatypeProperty ;
     rdfs:range rdfs:Literal  ; 
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .                       
 
-wig:archiveUrl rdf:type owl:DatatypeProperty ;
-    rdfs:label "archiveUrl"@en ;
-    rdfs:comment "A url for archive."@en ;
-    rdfs:domain wig:Bag ;
-    rdfs:range rdfs:Literal  ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .  
-
-wig:accessUrl rdf:type owl:DatatypeProperty ;
-    rdfs:label "accessUrl"@en ;
-    rdfs:comment "A url for access."@en ;
-    rdfs:domain wig:Bag ;
-    rdfs:range rdfs:Literal  ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
-
-wig:replicaUrl rdf:type owl:DatatypeProperty ;
-    rdfs:label "replicaUrl"@en ;
-    rdfs:comment "A url for replica."@en ;
-    rdfs:domain wig:Bag ;
-    rdfs:range rdfs:Literal  ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
-
-wig:description rdf:type owl:DatatypeProperty ;
-    rdfs:label "description"@en ;
+wig:externalDescription rdf:type owl:DatatypeProperty ;
+    rdfs:label "externalDescription"@en ;
     rdfs:comment "A description of the bag and its assets."@en ;
-    rdfs:domain wig:Bag ;
+    rdfs:domain wig:BagInfo ;
     rdfs:range rdf:langString ; 
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
-    
-wig:version rdf:type owl:DatatypeProperty ;
-    rdfs:label "version"@en ;
-    rdfs:comment "The version of the bag."@en ;
-    rdfs:domain wig:Bag ;
-    rdfs:range xsd:integer ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .      
 
-wig:size rdf:type owl:DatatypeProperty ;
-    rdfs:label "size"@en ;
-    rdfs:comment "Size or approximate size of the bag being transferred, followed by an abbreviation such as MB (megabytes), GB, or TB."@en ;
-    rdfs:domain wig:Bag ;
+wig:internalSenderDescription rdf:type owl:DatatypeProperty ;
+    rdfs:label "internalSenderDescription"@en ;
+    rdfs:comment "An internal sender identifier for the bag."@en ;
+    rdfs:domain wig:BagInfo ;
     rdfs:range rdf:langString ; 
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
+
+wig:internalSenderIdentifer rdf:type owl:DatatypeProperty ;
+    rdfs:label "internalSenderIdentifer"@en ;
+    rdfs:comment "An internal sender identifier for the bag."@en ;
+    rdfs:domain wig:BagInfo ;
+    rdfs:range rdfs:Literal ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .
+
+wig:externalIdentifier rdf:type owl:DatatypeProperty ;
+    rdfs:label "externalIdentifier"@en ;
+    rdfs:comment "An external identifier for the bag."@en ;
+    rdfs:domain wig:BagInfo ;
+    rdfs:range rdfs:Literal ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .
+
+wig:sourceOrganisation rdf:type owl:DatatypeProperty ;
+    rdfs:label "sourceOrganisation"@en ;
+    rdfs:comment "The name of the source orgnisation."@en ;
+    rdfs:domain wig:BagInfo ;
+    rdfs:range rdf:langString ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .
+
+wig:payloadOxum rdf:type owl:DatatypeProperty ;
+    rdfs:label "payloadOxum"@en ;
+    rdfs:comment "The octetstream sum of the payload, namely, a two-part number of the form OctetCount.StreamCount, where OctetCount is the total number of octets (8-bit bytes) across all payload file content and StreamCount is the total number of payload files."@en ;
+    rdfs:domain wig:BagInfo ;
+    rdfs:range xsd:decimal ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .
     
-wig:createdDate rdf:type owl:DatatypeProperty ;
-    rdfs:label "createdDate"@en ;
-    rdfs:comment "The date the bag was created."@en ;
-    rdfs:domain wig:Bag ;
-    rdfs:range xsd:date ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
-    
-wig:lastModifiedDate rdf:type owl:DatatypeProperty ;
-    rdfs:label "lastModifiedDate"@en ;
-    rdfs:comment "The date the bag was last modified."@en ;
-    rdfs:domain wig:Bag ;
-    rdfs:range xsd:date ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .  
+wig:baggingDate rdf:type owl:DatatypeProperty ;
+    rdfs:label "baggingDate"@en ;
+    rdfs:comment "The date of bagging."@en ;
+    rdfs:domain wig:BagInfo ;
+    rdfs:range xsd:dateTime ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .    
     
 wig:checksumAlgorithm rdf:type owl:DatatypeProperty ;
     rdfs:label "checksumAlgorithm"@en ;
     rdfs:comment "Algorithm used for the manifest checksum."@en ;
-    rdfs:domain wig:FileManifest ;
-    rdfs:range xsd:date ; 
+    rdfs:domain wig:BagManifest ;
+    rdfs:range rdfs:Literal ; 
     rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
     
 wig:checksum rdf:type owl:DatatypeProperty ;
     rdfs:label "checksum"@en ;
     rdfs:comment "A checksum for the file."@en ;
     rdfs:domain wig:File ;
-    rdfs:range xsd:date ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .                 
+    rdfs:range rdfs:Literal ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> . 
+    
+wig:bucket rdf:type owl:DatatypeProperty ;
+    rdfs:label "bucket"@en ;
+    rdfs:comment "The bucket name."@en ;
+    rdfs:domain wig:Location ;
+    rdfs:range rdfs:Literal ; 
+    rdf:isDefinedBy <http://wellcomecollection.org/archival-storage> .                         

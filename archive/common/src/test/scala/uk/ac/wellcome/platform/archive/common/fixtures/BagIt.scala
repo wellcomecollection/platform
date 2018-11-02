@@ -1,8 +1,9 @@
 package uk.ac.wellcome.platform.archive.common.fixtures
 
 import java.security.MessageDigest
+import java.time.LocalDate
 
-import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
+import uk.ac.wellcome.platform.archive.common.models._
 
 import scala.util.Random
 
@@ -14,7 +15,7 @@ trait BagIt extends RandomThings {
   }
 
   def createBag(
-    bagIdentifier: ExternalIdentifier,
+    bagInfo: BagInfo,
     dataFileCount: Int = 1,
     createDigest: String => String = createValidDigest,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
@@ -22,8 +23,8 @@ trait BagIt extends RandomThings {
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: ExternalIdentifier => Option[FileEntry] =
-      createValidBagInfoFile): Seq[FileEntry] = {
+    createBagInfoFile: (BagInfo) => Option[FileEntry] = createValidBagInfoFile)
+    : Seq[FileEntry] = {
 
     val dataFiles = createDataFiles(dataFileCount)
     val filesAndDigest = dataFiles.map {
@@ -34,7 +35,7 @@ trait BagIt extends RandomThings {
 
     val maybeBagItFile = createBagItFile
 
-    val maybeBagInfoFile = createBagInfoFile(bagIdentifier)
+    val maybeBagInfoFile = createBagInfoFile(bagInfo)
 
     val tagManifestFiles = dataManifest.toList ++ maybeBagItFile.toList ++ maybeBagInfoFile.toList
 
@@ -49,8 +50,20 @@ trait BagIt extends RandomThings {
   def createValidBagItFile =
     Some(FileEntry("bagit.txt", bagItFileContents))
 
-  def createValidBagInfoFile(bagIdentifier: ExternalIdentifier) =
-    Some(FileEntry(s"bag-info.txt", bagInfoFileContents(bagIdentifier)))
+  def createValidBagInfoFile(bagInfo: BagInfo) =
+    Some(
+      FileEntry(
+        s"bag-info.txt",
+        bagInfoFileContents(
+          bagInfo.externalIdentifier,
+          bagInfo.sourceOrganisation,
+          bagInfo.payloadOxum,
+          bagInfo.baggingDate,
+          bagInfo.externalDescription,
+          bagInfo.internalSenderIdentifier,
+          bagInfo.internalSenderDescription
+        )
+      ))
 
   def dataManifestWithNonExistingFile(filesAndDigests: Seq[(String, String)]) =
     Some(
@@ -105,13 +118,30 @@ trait BagIt extends RandomThings {
           .mkString("\n")
       ))
 
-  private def bagInfoFileContents(bagIdentifier: ExternalIdentifier) = {
-    val date =
-      new java.text.SimpleDateFormat("YYYY-MM-dd").format(new java.util.Date())
-    s"""Payload-Oxum: 61798.84
-       |Bagging-Date: $date
-       |Bag-Size: 60.5 KB
+  def bagInfoFileContents(
+    bagIdentifier: ExternalIdentifier,
+    sourceOrganisation: SourceOrganisation,
+    payloadOxum: PayloadOxum,
+    baggingDate: LocalDate,
+    externalDescription: Option[ExternalDescription],
+    internalSenderIdentifier: Option[InternalSenderIdentifier],
+    internalSenderDescription: Option[InternalSenderDescription]) = {
+    def optionalLine[T](maybeValue: Option[T], fieldName: String) =
+      maybeValue.map(value => s"$fieldName: $value").getOrElse("")
+
+    val descriptionLine =
+      optionalLine(externalDescription, "External-Description")
+    val internalSenderIdentifierLine =
+      optionalLine(internalSenderIdentifier, "Internal-Sender-Identifier")
+    val internalSenderDescriptionLine =
+      optionalLine(internalSenderDescription, "Internal-Sender-Description")
+    s"""Source-Organization: $sourceOrganisation
        |External-Identifier: $bagIdentifier
+       |Payload-Oxum: ${payloadOxum.payloadBytes}.${payloadOxum.numberOfPayloadFiles}
+       |Bagging-Date: ${baggingDate.toString}
+       |$descriptionLine
+       |$internalSenderIdentifierLine
+       |$internalSenderDescriptionLine
       """.stripMargin.trim
   }
 

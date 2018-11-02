@@ -38,6 +38,8 @@ case class V2MultipleResultsRequest(
   @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
   @QueryParam include: Option[V2WorksIncludes],
   @QueryParam query: Option[String],
+  @QueryParam workType: Option[String],
+  @QueryParam("items.locations.locationType") itemLocationType: Option[String],
   @QueryParam _index: Option[String],
   request: Request
 ) extends MultipleResultsRequest[V2WorksIncludes]

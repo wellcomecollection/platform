@@ -3,8 +3,8 @@ package uk.ac.wellcome.display.models.v2
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.V2WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
 class DisplayLocationsV2SerialisationTest
     extends FunSpec
@@ -19,7 +19,7 @@ class DisplayLocationsV2SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(createIdentifiedItem(locations = List(physicalLocation)))
+      items = List(createIdentifiedItemWith(locations = List(physicalLocation)))
     )
     val displayWork =
       DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
@@ -43,7 +43,7 @@ class DisplayLocationsV2SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(createIdentifiedItem(locations = List(digitalLocation)))
+      items = List(createIdentifiedItemWith(locations = List(digitalLocation)))
     )
     val displayWork =
       DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
@@ -68,7 +68,7 @@ class DisplayLocationsV2SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(createIdentifiedItem(locations = List(digitalLocation)))
+      items = List(createIdentifiedItemWith(locations = List(digitalLocation)))
     )
     val displayWork =
       DisplayWorkV2(work, includes = V2WorksIncludes(items = true))

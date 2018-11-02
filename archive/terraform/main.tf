@@ -9,13 +9,12 @@ module "api_ecs" {
   archive_api_container_image = "${local.api_ecs_container_image}"
   archive_api_container_port  = "9000"
 
-  archive_ingest_sns_topic_arn = "${module.archivist_topic.arn}"
-
   vpc_id                         = "${local.vpc_id}"
   interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
   private_subnets                = "${local.private_subnets}"
   public_subnets                 = "${local.public_subnets}"
   certificate_domain             = "api.wellcomecollection.org"
+  api_alb_cdir_blocks            = "${var.api_alb_cdir_blocks}"
 }
 
 # Archivist
@@ -94,7 +93,7 @@ module "registrar_http" {
 
   env_vars_length = 3
 
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
 
   cluster_id = "${aws_ecs_cluster.cluster.id}"
@@ -170,13 +169,14 @@ module "progress_http" {
   container_image = "${local.progress_http_container_image}"
 
   env_vars = {
-    app_base_url                = "https://api.wellcomecollection.org"
+    app_base_url                = "https://${module.api_ecs.alb_dns_name}/storage/v1/ingests"
+    topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 3
 
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
 
   cluster_id = "${aws_ecs_cluster.cluster.id}"
@@ -209,6 +209,7 @@ module "bagger" {
     CURRENT_PRESERVATION_BUCKET = "${var.bagger_current_preservation_bucket}"
     DLCS_SOURCE_BUCKET          = "${var.bagger_dlcs_source_bucket}"
     BAGGING_QUEUE               = "${module.bagger_queue.name}"
+    BAGGING_COMPLETE_TOPIC_ARN  = "${module.bagging_complete_topic.arn}"
 
     AWS_DEFAULT_REGION = "${var.aws_region}"
 
@@ -225,7 +226,7 @@ module "bagger" {
     DDS_ASSET_PREFIX = "${var.bagger_dds_asset_prefix}"
   }
 
-  env_vars_length = 18
+  env_vars_length = 19
 
   container_image   = "${local.bagger_container_image}"
   source_queue_name = "${module.bagger_queue.name}"

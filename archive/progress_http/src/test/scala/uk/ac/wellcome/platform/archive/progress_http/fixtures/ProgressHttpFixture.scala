@@ -9,7 +9,8 @@ import com.google.inject.Guice
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
@@ -17,7 +18,12 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressStatusUpdate,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.modules._
@@ -35,6 +41,7 @@ trait ProgressHttpFixture
     with ScalaFutures
     with ProgressTrackerFixture
     with ProgressGenerators
+    with SNS
     with Messaging {
 
 //  import Progress._
@@ -43,9 +50,9 @@ trait ProgressHttpFixture
     testWith: TestWith[Progress, R]) = {
     val createdProgress = createProgress
 
-    val storedProgress = monitor.initialise(createdProgress)
-
-    testWith(storedProgress)
+    whenReady(monitor.initialise(createdProgress)) { storedProgress =>
+      testWith(storedProgress)
+    }
   }
 
   def withProgressUpdate[R](id: UUID, status: Progress.Status)(
@@ -59,29 +66,31 @@ trait ProgressHttpFixture
     val progress = ProgressStatusUpdate(
       id = id,
       status = status,
+      affectedResources = List(createResource),
       events = events
     )
 
     testWith(progress)
   }
 
-  def withApp[R](table: Table, serverConfig: HttpServerConfig)(
+  def withApp[R](table: Table, topic: Topic, serverConfig: HttpServerConfig)(
     testWith: TestWith[AkkaHttpApp, R]) = {
 
     val progress = new AkkaHttpApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(table, serverConfig),
+        new TestAppConfigModule(table, topic, serverConfig),
         ConfigModule,
         AkkaModule,
         CloudWatchClientModule,
-        ProgressTrackerModule
+        ProgressTrackerModule,
+        SNSClientModule
       )
     }
     testWith(progress)
   }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(Table, String, AkkaHttpApp), R]) = {
+    testWith: TestWith[(Table, Topic, String, AkkaHttpApp), R]) = {
 
     val host = "localhost"
     val port = randomPort
@@ -89,9 +98,11 @@ trait ProgressHttpFixture
 
     val serverConfig = HttpServerConfig(host, port, baseUrl)
 
-    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
-      withApp(table, serverConfig) { progressHttp =>
-        testWith((table, baseUrl, progressHttp))
+    withLocalSnsTopic { topic =>
+      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+        withApp(table, topic, serverConfig) { progressHttp =>
+          testWith((table, topic, baseUrl, progressHttp))
+        }
       }
     }
   }
@@ -111,9 +122,7 @@ trait ProgressHttpFixture
   }
 
   def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]) =
-    withActorSystem { actorSystem =>
-      implicit val system = actorSystem
-
+    withActorSystem { implicit actorSystem =>
       val request = Http().singleRequest(r)
       whenReady(request) { result =>
         testWith(result)

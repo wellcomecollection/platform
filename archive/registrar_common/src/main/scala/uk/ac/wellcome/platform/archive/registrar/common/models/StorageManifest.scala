@@ -2,53 +2,33 @@ package uk.ac.wellcome.platform.archive.registrar.common.models
 
 import java.time.Instant
 
-import uk.ac.wellcome.platform.archive.common.models.BagId
-
-// Value classes
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagId,
+  BagInfo,
+  StorageSpace
+}
+import uk.ac.wellcome.storage.ObjectLocation
 
 case class ChecksumAlgorithm(value: String)
 
 case class BagDescription(value: String)
 
-case class BagVersion(value: Int)
-
 case class Checksum(value: String)
 
 case class BagFilePath(value: String)
 
-// StorageManifest
-
 case class StorageManifest(
-  id: BagId,
-  source: SourceIdentifier,
-  identifiers: List[SourceIdentifier],
+  space: StorageSpace,
+  info: BagInfo,
   manifest: FileManifest,
-  tagManifest: TagManifest,
-  locations: List[Location],
-  description: Option[BagDescription] = None,
-  createdDate: Instant = Instant.ofEpochMilli(0),
-  lastModifiedDate: Instant = Instant.ofEpochMilli(0),
-  version: BagVersion = BagVersion(1)
-)
-
-// Manifest
-
-sealed trait Manifest {
-  val checksumAlgorithm: ChecksumAlgorithm
-  val files: List[BagDigestFile]
+  accessLocation: Location,
+  createdDate: Instant
+) {
+  val id = BagId(space, info.externalIdentifier)
 }
 
-case class FileManifest(
-  checksumAlgorithm: ChecksumAlgorithm,
-  files: List[BagDigestFile]
-)
-
-case class TagManifest(
-  checksumAlgorithm: ChecksumAlgorithm,
-  files: List[BagDigestFile]
-)
-
-// Identifier
+case class FileManifest(checksumAlgorithm: ChecksumAlgorithm,
+                        files: List[BagDigestFile])
 
 case class SourceIdentifier(identifierType: IdentifierType,
                             ontologyType: String = "Identifier",
@@ -59,27 +39,11 @@ case class IdentifierType(
   label: String,
 )
 
-// Location
-
-sealed trait Location {
-  val locationType: LocationType
-}
-
-case class DigitalLocation(
-  url: String,
-  locationType: LocationType,
-  ontologyType: String = "DigitalLocation"
-) extends Location
-
-case class LocationType(
-  id: String,
-  label: String,
-  ontologyType: String = "LocationType"
-)
-
-// Bag digest file
-
 case class BagDigestFile(
   checksum: Checksum,
   path: BagFilePath
 )
+
+case class Location(provider: Provider, location: ObjectLocation)
+
+case class Provider(id: String, label: String)

@@ -8,6 +8,6 @@ variable "release_ids" {
   type        = "map"
 }
 
-variable "namespace" {
+variable "ecs_cluster_name" {
   default = "reindexer"
 }

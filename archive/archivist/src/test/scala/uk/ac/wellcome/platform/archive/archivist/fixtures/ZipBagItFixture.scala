@@ -5,7 +5,10 @@ import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagInfo,
+  ExternalIdentifier
+}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ZipBagItFixture extends BagIt with Logging {
@@ -31,7 +34,7 @@ trait ZipBagItFixture extends BagIt with Logging {
   }
 
   def withBagItZip[R](
-    bagIdentifier: ExternalIdentifier = ExternalIdentifier(randomAlphanumeric()),
+    bagInfo: BagInfo = randomBagInfo,
     dataFileCount: Int = 1,
     createDigest: String => String = createValidDigest,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
@@ -39,14 +42,13 @@ trait ZipBagItFixture extends BagIt with Logging {
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
-    createBagInfoFile: ExternalIdentifier => Option[FileEntry] =
-      createValidBagInfoFile
+    createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile
   )(testWith: TestWith[(ExternalIdentifier, ZipFile), R]) = {
 
-    info(s"Creating bag $bagIdentifier")
+    info(s"Creating bag ${bagInfo.externalIdentifier}")
 
     val allFiles = createBag(
-      bagIdentifier,
+      bagInfo,
       dataFileCount,
       createDigest = createDigest,
       createDataManifest = createDataManifest,
@@ -54,9 +56,9 @@ trait ZipBagItFixture extends BagIt with Logging {
       createBagItFile = createBagItFile,
       createBagInfoFile = createBagInfoFile
     )
-    info(s"Adding files $allFiles to bag $bagIdentifier")
+    info(s"Adding files $allFiles to bag ${bagInfo.externalIdentifier}")
     withZipFile(allFiles) { zipFile =>
-      testWith((bagIdentifier, zipFile))
+      testWith((bagInfo.externalIdentifier, zipFile))
     }
   }
 }

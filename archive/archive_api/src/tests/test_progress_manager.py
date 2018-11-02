@@ -32,55 +32,55 @@ def progress_manager(sess):
     # At some point, swap out the cassettes for genuine responses from
     # a real progress app.
     #
-    return ProgressManager(endpoint="http://localhost:6000", sess=sess)
+    return ProgressManager(endpoint="http://localhost:6002", sess=sess)
 
 
 class TestCreateRequest:
-    @pytest.mark.parametrize("bad_status", [200, 400, 404, 500])
-    def test_not_201_from_service_is_error(self, bad_status, progress_manager):
-        with pytest.raises(ProgressServiceError, match="Expected HTTP 201"):
-            progress_manager.create_request(
-                upload_url=f"http://example.org/?status={bad_status}",
-                callback_uri=None,
-                space="space-id",
-            )
-
-    def test_missing_location_header_is_error(self, progress_manager):
-        with pytest.raises(ProgressServiceError, match="No Location header"):
-            progress_manager.create_request(
-                upload_url="http://example.org/?location=no",
-                callback_uri=None,
-                space="space-id",
-            )
+    def test_not_201_from_service_is_error(self, progress_manager):
+        with pytest.raises(ProgressServiceError):
+            progress_manager.create_request(request_json={"type": "Ingest"})
 
     def test_create_request(self, progress_manager):
-        result = progress_manager.create_request(
-            upload_url="http://example.org/?id=123", callback_uri=None, space="space-id"
+        (location, json) = progress_manager.create_request(
+            request_json={
+                "type": "Ingest",
+                "ingestType": {"id": "create", "type": "IngestType"},
+                "space": {"id": "bububa", "type": "Space"},
+                "uploadUrl": "s3://wellcomecollection-workflow-export-bagit/b21508628.zip",
+            }
         )
-        assert result == "123"
+        assert "id" in json
+        assert isinstance(location, str)
 
     def test_can_create_request_with_callback(self, progress_manager):
-        result = progress_manager.create_request(
-            upload_url="http://example.org/?id=567",
-            callback_uri="http://callback.net/?id=b567",
-            space="space-id",
+        (location, json) = progress_manager.create_request(
+            request_json={
+                "type": "Ingest",
+                "ingestType": {"id": "create", "type": "IngestType"},
+                "space": {"id": "bububa", "type": "Space"},
+                "uploadUrl": "s3://wellcomecollection-workflow-export-bagit/b21508628.zip",
+                "callback": {"uri": "http://callback.org"},
+            }
         )
-        assert result == "567"
+        assert "id" in json
+        assert "callback" in json
+        assert isinstance(location, str)
 
 
 class TestLookupProgress:
     def test_can_lookup_existing_id(self, progress_manager):
-        result = progress_manager.lookup_progress(id="123")
-        assert result == {"progress": "123"}
+        result = progress_manager.lookup_progress(
+            id="15d76ac8-e92e-4fb5-aea4-7e5bc98dbc20"
+        )
+        assert result["id"] == "15d76ac8-e92e-4fb5-aea4-7e5bc98dbc20"
 
-    @pytest.mark.parametrize("bad_status", [202, 400, 500])
-    def test_not_200_or_404_is_error(self, bad_status, progress_manager):
-        with pytest.raises(ProgressServiceError, match="Expected HTTP 200 or 404"):
+    def test_not_200_or_404_is_error(self, progress_manager):
+        with pytest.raises(ProgressServiceError):
             progress_manager.lookup_progress(id="bad_status-{bad_status}")
 
     def test_404_is_not_found(self, progress_manager):
         with pytest.raises(ProgressNotFoundError):
-            progress_manager.lookup_progress(id="bad_status-404")
+            progress_manager.lookup_progress(id="15d76ac8-e92e-4fb5-aea4-7e5bc98dbc21")
 
     def test_bad_json_is_error(self, progress_manager):
         with pytest.raises(ProgressServiceError):

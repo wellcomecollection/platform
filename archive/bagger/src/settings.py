@@ -52,3 +52,7 @@ BAG_INFO = {
 
 # "Internal-Sender-Identifier": "170131",             # goobi process id
 # "Internal-Sender-Description": "12324_b_b24923333"  # goobi process title
+
+# Notifier
+
+BAGGING_COMPLETE_TOPIC_ARN = os.getenv("BAGGING_COMPLETE_TOPIC_ARN")

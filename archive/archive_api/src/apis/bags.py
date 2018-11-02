@@ -35,14 +35,7 @@ class BagResource(Resource):
         bags_manager = app.config["BAGS_MANAGER"]
 
         try:
-            result = bags_manager.lookup_bag(space, id)
-
-            # TODO: Remove the necessity to do this
-            result[
-                "id"
-            ] = f'{result["id"]["space"]}/{result["id"]["externalIdentifier"]}'
-
-            return result
+            return bags_manager.lookup_bag(space, id)
         except BagNotFoundError:
             bag_id = f"{space}/{id}"
             abort(404, f"Invalid id: No bag found for id={bag_id!r}")

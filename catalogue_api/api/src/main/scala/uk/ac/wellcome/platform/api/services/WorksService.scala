@@ -1,68 +1,72 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
-import com.sksamuel.elastic4s.http.search.SearchHit
+import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
-import uk.ac.wellcome.platform.api.models.{ApiConfig, ResultList}
+import uk.ac.wellcome.platform.api.models.{ResultList, WorkFilter}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-@Singleton
-class WorksService @Inject()(
-  apiConfig: ApiConfig,
-  searchService: ElasticsearchService)(implicit ec: ExecutionContext) {
+case class WorksSearchOptions(
+  filters: List[WorkFilter],
+  pageSize: Int,
+  pageNumber: Int
+)
 
-  def findWorkById(canonicalId: String,
-                   indexName: String): Future[Option[IdentifiedBaseWork]] =
+@Singleton
+class WorksService @Inject()(searchService: ElasticsearchService)(
+  implicit ec: ExecutionContext) {
+
+  def findWorkById(canonicalId: String)(
+    documentOptions: ElasticsearchDocumentOptions)
+    : Future[Option[IdentifiedBaseWork]] =
     searchService
-      .findResultById(canonicalId, indexName = indexName)
+      .findResultById(canonicalId)(documentOptions)
       .map { result =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
         else None
       }
 
-  def listWorks(indexName: String,
-                pageSize: Int = apiConfig.defaultPageSize,
-                pageNumber: Int = 1): Future[ResultList] =
+  def listWorks(documentOptions: ElasticsearchDocumentOptions,
+                worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .listResults(
-        sortByField = "canonicalId",
-        limit = pageSize,
-        from = (pageNumber - 1) * pageSize,
-        indexName = indexName
-      )
-      .map { searchResponse =>
-        ResultList(
-          results = searchResponse.hits.hits.map { h: SearchHit =>
-            jsonTo[IdentifiedWork](h.sourceAsString)
-          }.toList,
-          totalResults = searchResponse.totalHits
-        )
-      }
+      .listResults(sortByField = "canonicalId")(
+        documentOptions,
+        toElasticsearchQueryOptions(worksSearchOptions))
+      .map { createResultList }
 
-  def searchWorks(query: String,
-                  indexName: String,
-                  pageSize: Int = apiConfig.defaultPageSize,
-                  pageNumber: Int = 1): Future[ResultList] =
+  def searchWorks(query: String)(
+    documentOptions: ElasticsearchDocumentOptions,
+    worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .simpleStringQueryResults(
-        query,
-        limit = pageSize,
-        from = (pageNumber - 1) * pageSize,
-        indexName = indexName
-      )
-      .map { searchResponse =>
-        ResultList(
-          results = searchResponse.hits.hits.map { h: SearchHit =>
-            jsonTo[IdentifiedWork](h.sourceAsString)
-          }.toList,
-          totalResults = searchResponse.totalHits
-        )
-      }
+      .simpleStringQueryResults(query)(
+        documentOptions,
+        toElasticsearchQueryOptions(worksSearchOptions))
+      .map { createResultList }
+
+  private def toElasticsearchQueryOptions(
+    worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
+    ElasticsearchQueryOptions(
+      filters = worksSearchOptions.filters,
+      limit = worksSearchOptions.pageSize,
+      from = (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize
+    )
+
+  private def createResultList(searchResponse: SearchResponse): ResultList =
+    ResultList(
+      results = searchResponseToWorks(searchResponse),
+      totalResults = searchResponse.totalHits
+    )
+
+  private def searchResponseToWorks(
+    searchResponse: SearchResponse): List[IdentifiedWork] =
+    searchResponse.hits.hits.map { h: SearchHit =>
+      jsonTo[IdentifiedWork](h.sourceAsString)
+    }.toList
 
   private def jsonTo[T <: IdentifiedBaseWork](document: String)(
     implicit decoder: Decoder[T]): T =

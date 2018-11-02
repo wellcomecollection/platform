@@ -23,9 +23,6 @@ trait MatcherResultFixture {
     works: Set[TransformedBaseWork]): Set[WorkIdentifier] =
     works
       .map { work =>
-        WorkIdentifier(
-          identifier = work.sourceIdentifier.toString,
-          version = work.version
-        )
+        WorkIdentifier(work)
       }
 }

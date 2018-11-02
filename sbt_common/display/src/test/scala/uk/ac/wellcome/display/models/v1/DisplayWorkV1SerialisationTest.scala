@@ -3,8 +3,8 @@ package uk.ac.wellcome.display.models.v1
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.V1WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
+import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.WorksGenerators
 
 class DisplayWorkV1SerialisationTest
     extends FunSpec
@@ -102,7 +102,7 @@ class DisplayWorkV1SerialisationTest
       credit = Some("Wellcome Collection"),
       license = Some(License_CCBY)
     )
-    val item = createIdentifiedItem(locations = List(location))
+    val item = createIdentifiedItemWith(locations = List(location))
     val workWithCopyright = createIdentifiedWorkWith(
       itemsV1 = List(item)
     )

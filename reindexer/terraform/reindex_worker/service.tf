@@ -13,10 +13,10 @@ module "service" {
   memory = 2048
 
   env_vars = {
-    reindex_jobs_queue_id      = "${module.reindex_worker_queue.id}"
-    reindex_requests_topic_arn = "${module.hybrid_records_topic.arn}"
-    metrics_namespace          = "reindex_worker-${var.namespace}"
-    dynamo_table_name          = "${var.vhs_table_name}"
+    reindex_jobs_queue_id     = "${module.reindex_worker_queue.id}"
+    reindex_publish_topic_arn = "${var.hybrid_records_topic_arn}"
+    metrics_namespace         = "reindex_worker-${var.namespace}"
+    dynamo_table_name         = "${var.vhs_table_name}"
 
     # The reindex worker has to send lots of SNS notifications, and we've
     # seen issues where we exhaust the HTTP connection pool.  Turning down

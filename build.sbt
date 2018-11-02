@@ -126,7 +126,7 @@ lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
   .dependsOn(finatra_akka % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.scalaGraphDependencies)
 
-lazy val reindex_request_creator = doServiceSetup(project, "reindexer/reindex_request_creator")
+lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
@@ -199,12 +199,15 @@ lazy val registrar_async = doServiceSetup(project, "archive/registrar_async")
 lazy val registrar_http = doServiceSetup(project, "archive/registrar_http")
   .dependsOn(registrar_common % "compile->compile;test->test")
 
-lazy val progress_async = doServiceSetup(project, "archive/progress_async")
+lazy val progress_common = doServiceSetup(project, "archive/progress_common")
   .dependsOn(archive_common % "compile->compile;test->test")
+
+lazy val progress_async = doServiceSetup(project, "archive/progress_async")
+  .dependsOn(progress_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
 lazy val progress_http = doServiceSetup(project, "archive/progress_http")
-  .dependsOn(archive_common % "compile->compile;test->test")
+  .dependsOn(progress_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
 lazy val root = (project in file("."))
@@ -233,7 +236,7 @@ lazy val root = (project in file("."))
     matcher,
     merger,
 
-    reindex_request_creator,
+    reindex_worker,
 
     goobi_reader,
     sierra_adapter_common,

@@ -34,24 +34,4 @@ variable "es_cluster_credentials" {
 
 variable "infra_bucket" {}
 
-variable "es_config_romulus" {
-  description = "Elasticcloud config for romulus"
-  type        = "map"
-
-  default = {
-    index_v1 = "v1-2018-09-27-marc-610-subjects"
-    index_v2 = "v2-2018-09-27-marc-610-subjects"
-    doc_type = "work"
-  }
-}
-
-variable "es_config_remus" {
-  description = "Elasticcloud config for remus"
-  type        = "map"
-
-  default = {
-    index_v1 = "v1-2018-09-14-miro-sierra-merging-take-5"
-    index_v2 = "v2-2018-09-14-miro-sierra-merging-take-5"
-    doc_type = "work"
-  }
-}
+variable "critical_slack_webhook" {}

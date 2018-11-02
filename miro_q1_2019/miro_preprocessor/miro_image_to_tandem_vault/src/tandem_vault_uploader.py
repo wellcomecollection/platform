@@ -72,7 +72,7 @@ def main():
                 logger.info(f"Uploading asset {miro_image.miro_id}")
                 asset_data = upload_asset(api, s3_client, src_bucket, miro_image)
 
-        except Exception as e:
+        except Exception:
             logger.exception("Failed uploading image to Tandem vault")
         else:
             asset_id = asset_data["id"]

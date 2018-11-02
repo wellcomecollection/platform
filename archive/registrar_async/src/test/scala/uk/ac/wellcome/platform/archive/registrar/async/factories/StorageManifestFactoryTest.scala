@@ -22,49 +22,30 @@ class StorageManifestFactoryTest
   implicit val _ = s3Client
 
   it("returns a right of storage manifest if reading a bag location succeeds") {
-    val bagId = randomBagId
     val requestId = randomUUID
 
     withLocalS3Bucket { bucket =>
-      withBag(bucket) { bagLocation =>
-        val archiveComplete =
-          ArchiveComplete(requestId, bagId, bagLocation)
+      withBag(bucket) {
+        case (bagLocation, bagInfo, bagId) =>
+          val archiveComplete =
+            ArchiveComplete(requestId, bagId.space, bagLocation)
 
-        val storageManifest =
-          StorageManifestFactory.create(archiveComplete)
+          val storageManifest =
+            StorageManifestFactory.create(archiveComplete)
 
-        inside(storageManifest) {
-          case Right(
-              StorageManifest(
-                actualBagId,
-                sourceIdentifier,
-                identifiers,
-                FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-                TagManifest(ChecksumAlgorithm("sha256"), Nil),
-                List(digitalLocation),
-                _,
-                _,
-                _,
-                _)) =>
-            actualBagId shouldBe bagId
+          inside(storageManifest) {
+            case Right(
+                StorageManifest(
+                  actualStorageSpace,
+                  actualBagInfo,
+                  FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+                  _,
+                  _)) =>
+              actualStorageSpace shouldBe bagId.space
+              actualBagInfo shouldBe bagInfo
+              bagDigestFiles should have size 1
 
-            sourceIdentifier shouldBe SourceIdentifier(
-              IdentifierType("source", "Label"),
-              value = "123"
-            )
-
-            identifiers shouldBe List(sourceIdentifier)
-
-            bagDigestFiles should have size 1
-
-            digitalLocation shouldBe DigitalLocation(
-              s"http://${bucket.name}.s3.amazonaws.com/${bagLocation.storagePath}/${bagLocation.bagPath.value}",
-              LocationType(
-                "aws-s3-standard-ia",
-                "AWS S3 Standard IA"
-              )
-            )
-        }
+          }
       }
     }
   }
@@ -72,13 +53,14 @@ class StorageManifestFactoryTest
   describe("returning a left of registrar error ...") {
     it("if no files are at the BagLocation") {
 
-      val bagId = randomBagId
+      val storageSpace = randomStorageSpace
       val requestId = randomUUID
 
       withLocalS3Bucket { bucket =>
         val bagLocation =
           BagLocation(bucket.name, "archive", BagPath(s"space/b1234567"))
-        val archiveComplete = ArchiveComplete(requestId, bagId, bagLocation)
+        val archiveComplete =
+          ArchiveComplete(requestId, storageSpace, bagLocation)
         val value = StorageManifestFactory.create(archiveComplete)
 
         inside(value) {
@@ -93,7 +75,6 @@ class StorageManifestFactoryTest
     }
 
     it("if the BagLocation has an invalid manifest") {
-      val bagId = randomBagId
       val requestId = randomUUID
 
       withLocalS3Bucket { bucket =>
@@ -101,9 +82,9 @@ class StorageManifestFactoryTest
           bucket,
           createDataManifest =
             _ => Some(FileEntry("manifest-sha256.txt", "bleeergh!"))) {
-          bagLocation =>
+          case (bagLocation, _, bagId) =>
             val archiveComplete =
-              ArchiveComplete(requestId, bagId, bagLocation)
+              ArchiveComplete(requestId, bagId.space, bagLocation)
             val value = StorageManifestFactory.create(archiveComplete)
             value shouldBe Left(
               InvalidBagManifestError(archiveComplete, "manifest-sha256.txt"))

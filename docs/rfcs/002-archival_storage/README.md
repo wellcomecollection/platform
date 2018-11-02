@@ -100,10 +100,11 @@ API base path: `https://api.wellcomecollection.org/storage/v1`
 
 All API endpoints must require authentication using OAuth 2.0. In the first instance, the only supported OAuth grant type will be client credentials.
 
-Clients must first request a time-limited token using a client ID and secret that we will provide:
+Clients must first request a time-limited token from the auth service, using a client ID and secret that we will provide:
 
 ```http
-POST /token
+POST /oauth2/token
+Host: auth.wellcomecollection.org
 
 grant_type=client_credentials
 &client_id=xxxxxxxxxx
@@ -112,7 +113,7 @@ grant_type=client_credentials
 
 This will return an access token:
 
-```http
+```
 Content-Type: application/json
 Cache-Control: no-store
 Pragma: no-cache
@@ -148,8 +149,19 @@ Content-Type: application/json
     "id": "space-id",
     "type": "Space"
   },
-  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
-  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567"
+  "sourceLocation": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-standard"
+    },
+    "bucket": "source-bucket",
+    "path": "/source-path/source-bag.zip"
+  },
+  "sourceCallback": {
+    "type": "Callback",
+    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567"
+  }
 }
 ```
 
@@ -181,17 +193,38 @@ Response:
     "id": "space-id",
     "type": "Space"
   },
-  "uploadUrl": "s3://source-bucket/source-path/source-bag.zip",
-  "callbackUrl": "https://workflow.wellcomecollection.org/callback?id=b1234567",
   "bag": {
     "id": "{id}",
     "type": "Bag"
   },
   "status": {
     "id": "processing|failure|success",
-    "type": "IngestStatus"
+    "type": "Status"
   },
-  "events": [ ... ]
+  "sourceLocation": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-standard"
+    },
+    "bucket": "source-bucket",
+    "path": "/source-path/source-bag.zip"
+  },
+  "sourceCallback": {
+    "type": "Callback",
+    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+    "status": {
+      "id": "processing|failure|success",
+      "type": "Status"
+    }
+  },
+  "events": [
+    {
+      "type": "ProgressEvent",
+      "createdDate": "2018-10-10T10:00:00Z",
+      "description": "Description of event"
+    }
+  ]
 }
 ```
 
@@ -344,46 +377,22 @@ Response:
   "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
   "id": "digitised/b24923333",
-  "source": {
-    "type": "Source",
-    "id": "goobi",
-    "label": "Goobi"
-  },
   "space": {
     "id": "digitised",
     "type": "Space"
   },
-  "identifiers": [
-    {
-      "type": "Identifier",
-      "identifierType": {
-        "id": "sierra-system-number",
-        "label": "Sierra system number",
-        "type": "IdentifierType"
-      },
-      "value": "b24923333"
-    },
-    {
-      "type": "Identifier",
-      "identifierType": {
-        "id": "goobi-process-title",
-        "label": "Goobi process title",
-        "type": "IdentifierType"
-      },
-      "value": "12324_b_b24923333"
-    },
-    {
-      "type": "Identifier",
-      "identifierType": {
-        "id": "goobi-process-id",
-        "label": "Goobi process identifier",
-        "type": "IdentifierType"
-      },
-      "value": "170131"
-    }
-  ],
+  "info": {
+    "type": "BagInfo",
+    "externalIdentifier": "b24923333",
+    "externalDescription": "A account of a voyage to New South Wales",
+    "internalSenderIdentifer": "170131",
+    "internalSenderDescription": "12324_b_b24923333",
+    "sourceOrganisation": "Intranda GmbH",
+    "payloadOxum": 435255.3,
+    "baggingDate": "2016-08-07",    
+  },
   "manifest": {
-    "type": "FileManifest",
+    "type": "BagManifest",
     "checksumAlgorithm": "sha256",
     "files": [
       {
@@ -404,7 +413,7 @@ Response:
     ]
   },
   "tagManifest": {
-    "type": "FileManifest",
+    "type": "BagManifest",
     "checksumAlgorithm": "sha256",
     "files": [
       {
@@ -432,7 +441,8 @@ Response:
       "label": "AWS S3 - Infrequent Access"
     },
     "bucket": "bucketname",
-    "prefix": "digitised/b24923333"
+    "path": "/digitised/b24923333",
+    "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
   },
   "archiveLocations": [
     {
@@ -443,7 +453,8 @@ Response:
         "label": "AWS S3 - Glacier"
       },
       "bucket": "bucketname",
-      "prefix": "digitised/b24923333"
+      "path": "/digitised/b24923333",
+      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
     },
     {
       "type": "Location",
@@ -453,14 +464,12 @@ Response:
         "label": "Azure Blob Storage - Archive"
       },
       "bucket": "bucketname",
-      "prefix": "digitised/b24923333"
+      "path": "/digitised/b24923333",
+      "url": "https://accountname.blob.core.windows.net/bucketname/digitised/b24923333"
     }
   ],
-  "description": "A account of a voyage to New South Wales",
-  "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
-  "lastModifiedDate": "2016-08-07T00:00:00Z",
-  "version": 1
+  "lastModifiedDate": "2016-08-07T00:00:00Z"
 }
 ```
 
@@ -488,6 +497,8 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
 |     9e5ad981e0d29adc278f6a294b8c2aca bagit.txt
 |     3148319ddaf49214944ec357405a8189 manifest-sha256.txt
 |-- bag-info.txt
+|     External-Identifier: a2870a2d-5111-403f-b092-45c569ef9476
+|     External-Description: AIP title
 |     Bagging-Date: 2016-08-07
 |     Payload-Oxum: 435255.8
 \-- bagit.txt
@@ -514,46 +525,19 @@ Response:
   "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
   "id": "born_digital/yy-yy-yy-yy",
-  "source": {
-    "type": "Source",
-    "id": "archivematica",
-    "label": "Archivematica"
-  },
   "space": {
     "id": "born_digital",
     "type": "Space"
   },
-  "identifiers": [
-    {
-      "type": "Identifier",
-      "identifierType": {
-        "id": "archivematica-aip-identifier",
-        "label": "Archivematica AIP identifier",
-        "type": "IdentifierType"
-      },
-      "value": "GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
-    },
-    {
-      "type": "Identifier",
-      "identifierType": {
-        "id": "archivematica-aip-guid",
-        "label": "Archivematica AIP GUID",
-        "type": "IdentifierType"
-      },
-      "value": "a2870a2d-5111-403f-b092-45c569ef9476"
-    },
-    {
-      "type": "Identifier",
-      "identifierType": {
-        "id": "calm-alt-ref-no",
-        "label": "Calm Alt Ref No",
-        "type": "IdentifierType"
-      },
-      "value": "GC253/1046"
-    }
-  ],
+  "info": {
+    "type": "BagInfo",
+    "externalIdentifier": "a2870a2d-5111-403f-b092-45c569ef9476",
+    "externalDescription": "AIP title",
+    "payloadOxum": 435255.2,
+    "baggingDate": "2016-08-07",    
+  },
   "manifest": {
-    "type": "FileManifest",
+    "type": "BagManifest",
     "checksumAlgorithm": "sha256",
     "files": [
       {
@@ -569,7 +553,7 @@ Response:
     ]
   },
   "tagManifest": {
-    "type": "FileManifest",
+    "type": "BagManifest",
     "checksumAlgorithm": "md5",
     "files": [
       {
@@ -597,7 +581,8 @@ Response:
       "label": "AWS S3 - Infrequent Access"
     },
     "bucket": "bucketname",
-    "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+    "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
   },
   "archiveLocations": [
     {
@@ -608,7 +593,8 @@ Response:
         "label": "AWS S3 - Glacier"
       },
       "bucket": "bucketname",
-      "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Location",
@@ -618,13 +604,11 @@ Response:
         "label": "Azure Blob Storage - Archive"
       },
       "bucket": "bucketname",
-      "prefix": "born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "https://accountname.blob.core.windows.net/bucketname/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     }
   ],
-  "description": "GC253_1046",
-  "size": 435255.8,
   "createdDate": "2016-08-07T00:00:00Z",
-  "lastModifiedDate": "2016-08-07T00:00:00Z",
-  "version": 1
+  "lastModifiedDate": "2016-08-07T00:00:00Z"
 }
 ```

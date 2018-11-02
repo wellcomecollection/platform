@@ -36,6 +36,7 @@ trait MiroLicenses {
           case "CC-BY"       => License_CCBY
           case "CC-BY-NC"    => License_CCBYNC
           case "CC-BY-NC-ND" => License_CCBYNCND
+          case "PDM"         => License_PDM
 
           // These mappings are defined in Christy's document
           case "Academics" => License_CCBYNC

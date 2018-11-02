@@ -1,5 +1,5 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=v11.8.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=v11.10.0"
 
   service_name       = "${var.service_name}"
   task_desired_count = "1"
@@ -8,6 +8,7 @@ module "service" {
 
   security_group_ids = ["${var.security_group_ids}"]
 
+  container_name = "${module.task.task_name}"
   container_port = "${module.task.task_port}"
 
   ecs_cluster_id = "${var.cluster_id}"
@@ -17,7 +18,8 @@ module "service" {
 
   namespace_id = "${var.namespace_id}"
 
-  launch_type = "FARGATE"
+  launch_type           = "FARGATE"
+  target_group_protocol = "TCP"
 }
 
 module "task" {

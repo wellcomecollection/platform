@@ -22,8 +22,10 @@ variable "archive_api_container_port" {}
 
 variable "certificate_domain" {}
 
-variable "archive_ingest_sns_topic_arn" {}
-
 variable "api_path" {}
 
 variable "interservice_security_group_id" {}
+
+variable "api_alb_cdir_blocks" {
+  type = "list"
+}

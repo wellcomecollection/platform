@@ -4,8 +4,8 @@ import java.net.URI
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models.progress._
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 trait ProgressGenerators extends RandomThings {
 
@@ -20,7 +20,7 @@ trait ProgressGenerators extends RandomThings {
                          callback: Option[Callback] = Some(createCallback()),
                          space: Namespace = createSpace,
                          status: Status = Progress.Initialised,
-                         resources: Seq[Resource] = List(createResource),
+                         resources: Seq[Resource] = List.empty,
                          events: List[ProgressEvent] = List.empty): Progress = {
     Progress(
       id = id,
@@ -42,11 +42,12 @@ trait ProgressGenerators extends RandomThings {
     ProgressEventUpdate(id, events)
   }
 
-  def createProgressStatusUpdateWith(id: UUID,
-                                     status: Status = Progress.Initialised,
-                                     events: Seq[ProgressEvent] = List(
-                                       createProgressEvent)): ProgressUpdate = {
-    ProgressStatusUpdate(id, status, events)
+  def createProgressStatusUpdateWith(
+    id: UUID,
+    status: Status = Progress.Initialised,
+    resources: List[Resource] = List(createResource),
+    events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
+    ProgressStatusUpdate(id, status, resources, events)
   }
 
   def createSpace =

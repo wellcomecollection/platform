@@ -18,8 +18,6 @@ module "api_ecs" {
   container_port  = "${var.archive_api_container_port}"
 
   env_vars = {
-    TOPIC_ARN = "${var.archive_ingest_sns_topic_arn}"
-
     PROGRESS_MANAGER_ENDPOINT = "http://progress_http.archive-storage:9001"
     BAGS_MANAGER_ENDPOINT     = "http://registrar_http.archive-storage:9001"
   }

@@ -13,7 +13,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   IngestBagRequest,
   NotificationMessage
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.{
+import uk.ac.wellcome.platform.archive.common.progress.models.{
   ProgressEvent,
   ProgressEventUpdate,
   ProgressUpdate

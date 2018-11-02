@@ -62,6 +62,7 @@ cache:
     - archive/commmon/target
     - archive/archivist/target
     - archive/notifier/target
+    - archive/progress_common/target
     - archive/progress_async/target
     - archive/progress_http/target
     - archive/registrar_common/target
@@ -126,7 +127,6 @@ jobs:
           drain_ecs_container_instance \
           dynamo_write_heartbeat \
           ecs_ec2_instance_tagger \
-          run_ecs_task \
           gatling_to_cloudwatch \
           notify_old_deploys \
           post_to_slack \
@@ -153,7 +153,7 @@ jobs:
     - env: TASK=snapshot_generator-test
 
     # Reindexer stack
-    - env: TASK=reindex_request_creator-test
+    - env: TASK=reindex_worker-test
 
     # Goobi adapter stack
     - env: TASK=goobi_reader-test
@@ -168,6 +168,7 @@ jobs:
     - env: TASK=archive_api-test
     - env: TASK=archive_common-test
     - env: TASK=archivist-test
+    - env: TASK=progress_common-test
     - env: TASK=progress_async-test
     - env: TASK=progress_http-test
     - env: TASK=registrar_common-test

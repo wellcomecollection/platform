@@ -17,7 +17,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadin
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.progress.Progress
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -104,7 +104,8 @@ class ZipFileDownloadFlowTest
           assertTopicReceivesProgressStatusUpdate(
             ingestBagRequest.archiveRequestId,
             progressTopic,
-            Progress.Failed) { events =>
+            Progress.Failed,
+            Nil) { events =>
             events should have size 1
             events.head.description should startWith(
               s"Failed downloading zipFile ${objectLocation.namespace}/${objectLocation.key}")
