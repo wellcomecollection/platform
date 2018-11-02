@@ -11,11 +11,6 @@ def test_returns_a_present_bag(client, bag_id):
 
     rv = json.loads(resp.data)
     assert rv["id"] == bag_id
-    assert (
-        rv["@context"] == "https://api.wellcomecollection.org/storage/v1/context.json"
-    )
-    # TODO: Replace this assertion
-    # assert rv["type"] == "Bag"
 
 
 def test_returns_404_if_no_such_bag(client):

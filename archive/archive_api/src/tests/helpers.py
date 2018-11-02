@@ -20,8 +20,7 @@ def assert_is_error_response(resp, status, description=None):
         "errorType": "http",
         "httpStatus": status,
         "label": labels[status],
-        "type": "Error",
-        "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+        "type": "Error"
     }
 
     if description is not None:
