@@ -28,7 +28,7 @@ object UpdateStoredManifestFlow {
           ProgressStatusUpdate(
             requestId,
             Progress.Completed,
-            List(Resource(ResourceIdentifier(bagId.toString))),
+            Some(bagId),
             List(ProgressEvent("Bag registered successfully"))
           )
       }

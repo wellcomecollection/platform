@@ -59,7 +59,7 @@ class ProgressHttpFeatureTest
                       DisplayIngestType("create"),
                       DisplayStorageSpace(progress.space.underlying),
                       DisplayStatus(progress.status.toString),
-                      Nil,
+                      None,
                       Nil,
                       progress.createdDate.toString,
                       progress.lastModifiedDate.toString
@@ -190,7 +190,7 @@ class ProgressHttpFeatureTest
                         DisplayIngestType("create", "IngestType"),
                         DisplayStorageSpace(actualSpaceId, "Space"),
                         DisplayStatus("initialised", "Status"),
-                        Nil,
+                        None,
                         Nil,
                         actualCreatedDate,
                         actualLastModifiedDate,
@@ -208,7 +208,7 @@ class ProgressHttpFeatureTest
                           Namespace(storageSpace.id),
                           Some(Callback(testCallbackUri, Callback.Pending)),
                           Progress.Initialised,
-                          Nil,
+                          None,
                           Instant.parse(actualCreatedDate),
                           Instant.parse(actualLastModifiedDate),
                           Nil
