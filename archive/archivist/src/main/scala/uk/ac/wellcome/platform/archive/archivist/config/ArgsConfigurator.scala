@@ -24,15 +24,6 @@ class ArgsConfigurator(val arguments: Seq[String])
     required = false,
     default = Some(20))
 
-  private val appPort =
-    opt[Int]("app-port", required = false, default = Some(9001))
-  private val appHost =
-    opt[String]("app-host", required = false, default = Some("0.0.0.0"))
-  private val appBaseUrl = opt[String](
-    "app-base-url",
-    required = false,
-    default = Some("api.wellcomecollection.org/storage/v1"))
-
   private val awsSnsAccessKey = opt[String]("aws-sns-access-key")
   private val awsSnsSecretKey = opt[String]("aws-sns-secret-key")
   private val awsSnsRegion =
@@ -79,12 +70,6 @@ class ArgsConfigurator(val arguments: Seq[String])
   val metricsConfig = MetricsConfig(
     namespace = metricsNamespace(),
     flushInterval = metricsFlushIntervalSeconds() seconds
-  )
-
-  val httpServerConfig = HttpServerConfig(
-    host = appHost(),
-    port = appPort(),
-    externalBaseUrl = appBaseUrl(),
   )
 
   val snsClientConfig = SnsClientConfig(
