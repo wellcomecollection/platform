@@ -1,6 +1,6 @@
 package uk.ac.wellcome.display.models.v2
 
-import org.scalatest.FunSpec
+import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.display.models.V2WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.generators.WorksGenerators
@@ -21,10 +21,7 @@ class DisplayLocationsV2SerialisationTest
     val work = createIdentifiedWorkWith(
       items = List(createIdentifiedItemWith(locations = List(physicalLocation)))
     )
-    val displayWork =
-      DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
 
-    val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
                             |{
                             |  "type": "Work",
@@ -33,7 +30,7 @@ class DisplayLocationsV2SerialisationTest
                             |  "items": [ ${items(work.items)} ]
                             |}""".stripMargin
 
-    assertJsonStringsAreEqual(actualJson, expectedJson)
+    assertWorkMapsToJson(work, expectedJson = expectedJson)
   }
 
   it("serialises a digital location") {
@@ -45,10 +42,7 @@ class DisplayLocationsV2SerialisationTest
     val work = createIdentifiedWorkWith(
       items = List(createIdentifiedItemWith(locations = List(digitalLocation)))
     )
-    val displayWork =
-      DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
 
-    val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
                           |{
                           |  "type": "Work",
@@ -57,7 +51,7 @@ class DisplayLocationsV2SerialisationTest
                           |  "items": [ ${items(work.items)} ]
                           |}""".stripMargin
 
-    assertJsonStringsAreEqual(actualJson, expectedJson)
+    assertWorkMapsToJson(work, expectedJson = expectedJson)
   }
 
   it("serialises a digital location with a license") {
@@ -70,10 +64,7 @@ class DisplayLocationsV2SerialisationTest
     val work = createIdentifiedWorkWith(
       items = List(createIdentifiedItemWith(locations = List(digitalLocation)))
     )
-    val displayWork =
-      DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
 
-    val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
                           |{
                           |  "type": "Work",
@@ -82,6 +73,15 @@ class DisplayLocationsV2SerialisationTest
                           |  "items": [ ${items(work.items)} ]
                           |}""".stripMargin
 
-    assertJsonStringsAreEqual(actualJson, expectedJson)
+    assertWorkMapsToJson(work, expectedJson = expectedJson)
   }
+
+  private def assertWorkMapsToJson(
+    work: IdentifiedWork,
+    expectedJson: String
+  ): Assertion =
+    assertObjectMapsToJson(
+      DisplayWorkV2(work, includes = V2WorksIncludes(items = true)),
+      expectedJson = expectedJson
+    )
 }
