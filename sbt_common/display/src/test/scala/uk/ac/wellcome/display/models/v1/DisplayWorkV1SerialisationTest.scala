@@ -34,8 +34,8 @@ class DisplayWorkV1SerialisationTest
        | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
        | "creators": [ ${identifiedOrUnidentifiable(
-                                  work.contributors(0).agent,
-                                  abstractAgent)} ],
+                            work.contributors(0).agent,
+                            abstractAgent)} ],
        | "subjects": [ ],
        | "genres": [ ],
        | "publishers": [ ],

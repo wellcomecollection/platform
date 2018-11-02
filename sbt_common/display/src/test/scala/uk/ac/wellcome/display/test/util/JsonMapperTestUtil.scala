@@ -9,9 +9,11 @@ import uk.ac.wellcome.json.utils.JsonAssertions
 trait JsonMapperTestUtil extends JsonAssertions {
 
   private val injector: Injector = Guice.createInjector(DisplayJacksonModule)
-  private val objectMapper: ObjectMapper = injector.getInstance(classOf[ObjectMapper])
+  private val objectMapper: ObjectMapper =
+    injector.getInstance(classOf[ObjectMapper])
 
-  def assertObjectMapsToJson(displayObject: Any, expectedJson: String): Assertion =
+  def assertObjectMapsToJson(displayObject: Any,
+                             expectedJson: String): Assertion =
     assertJsonStringsAreEqual(
       objectMapper.writeValueAsString(displayObject),
       expectedJson)

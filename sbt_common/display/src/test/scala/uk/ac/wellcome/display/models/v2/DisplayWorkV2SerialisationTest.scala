@@ -202,7 +202,7 @@ class DisplayWorkV2SerialisationTest
                                 | "lettering": "${work.lettering.get}",
                                 | "createdDate": ${period(work.createdDate.get)},
                                 | "contributors": [ ${contributor(
-                                  work.contributors.head)} ]
+                            work.contributors.head)} ]
                                 |}
           """.stripMargin
 
