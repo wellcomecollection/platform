@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.models
 
+import io.circe.generic.extras.JsonKey
+
 case class NotificationMessage(
-  MessageId: String,
-  TopicArn: String,
-  Subject: Option[String],
-  Message: String
+  @JsonKey("Message") body: String
 )

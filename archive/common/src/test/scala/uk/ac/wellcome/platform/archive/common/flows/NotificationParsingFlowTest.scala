@@ -33,11 +33,7 @@ class NotificationParsingFlowTest
           .patch(2, badStrings, 0)
           .map(
             body =>
-              NotificationMessage(
-                MessageId = "MessageId",
-                TopicArn = "TopicArn",
-                Subject = None,
-                Message = body.toString
+              NotificationMessage(body = body.toString
             ))
 
         val source = Source(messages)
