@@ -12,7 +12,6 @@ import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.test.fixtures._
 
-import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 import scala.util.Random
 import uk.ac.wellcome.json.JsonUtil._
@@ -50,7 +49,6 @@ trait SQS extends Matchers with Logging {
 
   def sqsLocalFlags(queue: Queue) = sqsLocalClientFlags ++ Map(
     "aws.sqs.queue.url" -> queue.url,
-    "aws.sqs.waitTime" -> "1"
   )
 
   def sqsLocalClientFlags = Map(
@@ -147,11 +145,7 @@ trait SQS extends Matchers with Logging {
     actorSystem: ActorSystem,
     queue: Queue,
     metricsSender: MetricsSender)(testwith: TestWith[SQSStream[T], R]) = {
-    val sqsConfig = SQSConfig(
-      queueUrl = queue.url,
-      waitTime = 1 millisecond,
-      maxMessages = 1
-    )
+    val sqsConfig = SQSConfig(queueUrl = queue.url)
 
     val stream = new SQSStream[T](
       actorSystem = actorSystem,
