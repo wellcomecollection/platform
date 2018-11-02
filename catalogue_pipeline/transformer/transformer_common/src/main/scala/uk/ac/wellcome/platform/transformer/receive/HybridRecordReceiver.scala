@@ -25,7 +25,7 @@ class HybridRecordReceiver[T] @Inject()(
     debug(s"Starting to process message $message")
 
     val futurePublishAttempt = for {
-      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
+      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
       transformableRecord <- getTransformable(hybridRecord)
       work <- Future.fromTry(
         transformToWork(transformableRecord, hybridRecord.version))

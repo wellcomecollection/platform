@@ -23,7 +23,7 @@ class SierraItemMergerWorkerService @Inject()(
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {
-      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
+      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
       itemRecord <- objectStore.get(hybridRecord.location)
       hybridRecords: Seq[HybridRecord] <- sierraItemMergerUpdaterService.update(
         itemRecord)

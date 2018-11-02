@@ -45,7 +45,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
       streamName = streamName,
       process = (notification: NotificationMessage) =>
         for {
-          body <- getBody(notification.Message)
+          body <- getBody(notification.body)
           result <- process(body)
         } yield result
     )
@@ -56,7 +56,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
       case (message, notification) =>
         for {
-          deserialisedObject <- getBody(notification.Message)
+          deserialisedObject <- getBody(notification.body)
         } yield (message, deserialisedObject)
     }
   }

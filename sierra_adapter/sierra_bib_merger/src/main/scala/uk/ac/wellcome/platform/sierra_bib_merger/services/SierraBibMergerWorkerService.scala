@@ -20,7 +20,7 @@ class SierraBibMergerWorkerService @Inject()(
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {
-      bibRecord <- Future.fromTry(fromJson[SierraBibRecord](message.Message))
+      bibRecord <- Future.fromTry(fromJson[SierraBibRecord](message.body))
       hybridRecord <- sierraBibMergerUpdaterService.update(bibRecord)
       _ <- snsWriter.writeMessage(
         hybridRecord,

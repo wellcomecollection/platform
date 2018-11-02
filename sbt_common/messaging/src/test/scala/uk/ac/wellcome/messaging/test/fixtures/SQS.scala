@@ -164,7 +164,7 @@ trait SQS extends Matchers with Logging {
 
   def createNotificationMessageWith(body: String): NotificationMessage =
     NotificationMessage(
-      Message = body
+      body = body
     )
 
   def createNotificationMessageWith[T](message: T)(

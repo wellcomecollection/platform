@@ -21,7 +21,7 @@ class ReindexWorker @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       reindexJob: ReindexJob <- Future.fromTry(
-        fromJson[ReindexJob](message.Message))
+        fromJson[ReindexJob](message.body))
       outdatedRecords: List[HybridRecord] <- recordReader
         .findRecordsForReindexing(reindexJob)
       _ <- hybridRecordSender.sendToSNS(records = outdatedRecords)

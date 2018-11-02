@@ -20,7 +20,7 @@ class SierraItemsToDynamoWorkerService @Inject()(
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {
-      itemRecord <- Future.fromTry(fromJson[SierraItemRecord](message.Message))
+      itemRecord <- Future.fromTry(fromJson[SierraItemRecord](message.body))
       hybridRecord <- dynamoInserter.insertIntoDynamo(itemRecord)
       _ <- snsWriter.writeMessage(
         message = hybridRecord,
