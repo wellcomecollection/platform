@@ -210,7 +210,7 @@ Response:
     "bucket": "source-bucket",
     "path": "/source-path/source-bag.zip"
   },
-  "sourceCallback": {
+  "callback": {
     "type": "Callback",
     "url": "https://workflow.wellcomecollection.org/callback?id=b1234567",
     "status": {
