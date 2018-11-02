@@ -70,3 +70,9 @@ case object License_PDM extends License {
   val label = "Public Domain Mark"
   val url = Some("https://creativecommons.org/share-your-work/public-domain/pdm/")
 }
+
+case object License_CopyrightNotCleared extends License {
+  val id = "copyright-not-cleared"
+  val label = "Copyright not cleared"
+  val url: Option[String] = None
+}
