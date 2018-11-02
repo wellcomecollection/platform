@@ -4,31 +4,38 @@ import java.net.URI
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.models.BagId
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models._
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  StorageLocation,
+  _
+}
+import uk.ac.wellcome.storage.ObjectLocation
 
 trait ProgressGenerators extends RandomThings {
 
-  def createProgress(): Progress = createProgressWith()
+  val storageLocation = StorageLocation(
+    StorageProvider(randomAlphanumeric()),
+    ObjectLocation(randomAlphanumeric(), randomAlphanumeric()))
 
-  val testUploadUri = new URI("s3://ingest-bucket/bag.zip")
+  def createProgress(): Progress = createProgressWith()
   val testCallbackUri =
     new URI("http://www.wellcomecollection.org/callback/ok")
 
   def createProgressWith(id: UUID = randomUUID,
-                         uploadUri: URI = testUploadUri,
+                         sourceLocation: StorageLocation = storageLocation,
                          callback: Option[Callback] = Some(createCallback()),
                          space: Namespace = createSpace,
                          status: Status = Progress.Initialised,
-                         resources: Seq[Resource] = List.empty,
+                         maybeBag: Option[BagId] = None,
                          events: List[ProgressEvent] = List.empty): Progress = {
     Progress(
       id = id,
-      uploadUri = uploadUri,
+      sourceLocation = sourceLocation,
       callback = callback,
       space = space,
       status = status,
-      resources = resources,
+      bag = maybeBag,
       events = events)
   }
 
@@ -45,9 +52,9 @@ trait ProgressGenerators extends RandomThings {
   def createProgressStatusUpdateWith(
     id: UUID,
     status: Status = Progress.Initialised,
-    resources: List[Resource] = List(createResource),
+    maybeBag: Option[BagId] = Some(randomBagId),
     events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
-    ProgressStatusUpdate(id, status, resources, events)
+    ProgressStatusUpdate(id, status, maybeBag, events)
   }
 
   def createSpace =
@@ -59,8 +66,4 @@ trait ProgressGenerators extends RandomThings {
     uri: URI = testCallbackUri,
     status: Callback.CallbackStatus = Callback.Pending): Callback =
     Callback(uri = uri, status = status)
-
-  def createResource: Resource = {
-    Resource(ResourceIdentifier(randomAlphanumeric(15)))
-  }
 }

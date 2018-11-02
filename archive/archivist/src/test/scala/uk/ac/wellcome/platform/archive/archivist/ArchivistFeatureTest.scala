@@ -103,7 +103,7 @@ class ArchivistFeatureTest
                 request.archiveRequestId,
                 progressTopic,
                 Progress.Failed,
-                Nil)({ events =>
+                None)({ events =>
                 all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
               })
             }
@@ -171,7 +171,7 @@ class ArchivistFeatureTest
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
@@ -179,7 +179,7 @@ class ArchivistFeatureTest
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
@@ -260,7 +260,7 @@ class ArchivistFeatureTest
                     invalidRequestId1,
                     progressTopic,
                     Progress.Failed,
-                    Nil) { events =>
+                    None) { events =>
                     events should have size 1
                     events.head.description should startWith(
                       s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip")
@@ -270,7 +270,7 @@ class ArchivistFeatureTest
                     invalidRequestId2,
                     progressTopic,
                     Progress.Failed,
-                    Nil) { events =>
+                    None) { events =>
                     events should have size 1
                     events.head.description should startWith(
                       s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip")
@@ -342,7 +342,7 @@ class ArchivistFeatureTest
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
                           }
@@ -351,7 +351,7 @@ class ArchivistFeatureTest
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
                           }
@@ -423,7 +423,7 @@ class ArchivistFeatureTest
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }
@@ -432,7 +432,7 @@ class ArchivistFeatureTest
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }

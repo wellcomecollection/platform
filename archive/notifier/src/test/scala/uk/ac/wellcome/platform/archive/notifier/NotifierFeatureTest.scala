@@ -76,13 +76,17 @@ class NotifierFeatureTest
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
                     progress.id,
-                    progress.uploadUri.toString,
+                    DisplayLocation(
+                      DisplayProvider(progress.sourceLocation.provider.id),
+                      progress.sourceLocation.location.namespace,
+                      progress.sourceLocation.location.key),
                     progress.callback.map(DisplayCallback(_)),
                     DisplayIngestType("create"),
                     DisplayStorageSpace(progress.space.underlying),
-                    DisplayIngestStatus(progress.status.toString),
-                    progress.resources.map(resource =>
-                      DisplayIngestResource(resource.id.underlying)),
+                    DisplayStatus(progress.status.toString),
+                    progress.bag.map(bagId =>
+                      IngestDisplayBag(
+                        s"${bagId.space}/${bagId.externalIdentifier}")),
                     progress.events.map(event =>
                       DisplayProgressEvent(
                         event.description,
@@ -132,13 +136,17 @@ class NotifierFeatureTest
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
                     progress.id,
-                    progress.uploadUri.toString,
+                    DisplayLocation(
+                      DisplayProvider(progress.sourceLocation.provider.id),
+                      progress.sourceLocation.location.namespace,
+                      progress.sourceLocation.location.key),
                     progress.callback.map(DisplayCallback(_)),
                     DisplayIngestType("create"),
                     DisplayStorageSpace(progress.space.underlying),
-                    DisplayIngestStatus(progress.status.toString),
-                    progress.resources.map(resource =>
-                      DisplayIngestResource(resource.id.underlying)),
+                    DisplayStatus(progress.status.toString),
+                    progress.bag.map(bagId =>
+                      IngestDisplayBag(
+                        s"${bagId.space}/${bagId.externalIdentifier}")),
                     progress.events.map(event =>
                       DisplayProgressEvent(
                         event.description,

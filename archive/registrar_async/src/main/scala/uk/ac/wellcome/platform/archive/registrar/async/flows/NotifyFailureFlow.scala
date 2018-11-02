@@ -23,7 +23,7 @@ object NotifyFailureFlow {
           ProgressStatusUpdate(
             toRequestId(error.t),
             Progress.Failed,
-            Nil,
+            None,
             List(ProgressEvent(error.toString))
         )
       )
