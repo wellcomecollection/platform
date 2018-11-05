@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier.models
 
+import java.net.URL
+
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
@@ -15,5 +17,6 @@ case class NotifierConfig(
   sqsConfig: SQSConfig,
   snsClientConfig: SnsClientConfig,
   snsConfig: SNSConfig,
-  metricsConfig: MetricsConfig
+  metricsConfig: MetricsConfig,
+  contextUrl: URL
 )

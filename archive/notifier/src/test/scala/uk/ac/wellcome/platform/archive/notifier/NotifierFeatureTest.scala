@@ -75,6 +75,7 @@ class NotifierFeatureTest
                 1,
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
+                    "http://localhost/context.json",
                     progress.id,
                     DisplayLocation(
                       DisplayProvider(progress.sourceLocation.provider.id),
@@ -135,6 +136,7 @@ class NotifierFeatureTest
                 1,
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
+                    "http://localhost/context.json",
                     progress.id,
                     DisplayLocation(
                       DisplayProvider(progress.sourceLocation.provider.id),

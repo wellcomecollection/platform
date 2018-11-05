@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.progress_http.fixtures
 
+import java.net.URL
 import java.util.UUID
 
 import akka.http.scaladsl.Http
@@ -95,8 +96,10 @@ trait ProgressHttpFixture
     val host = "localhost"
     val port = randomPort
     val baseUrl = s"http://$host:$port"
+    val contextUrl = new URL(
+      "http://api.wellcomecollection.org/storage/v1/context.json")
 
-    val serverConfig = HttpServerConfig(host, port, baseUrl)
+    val serverConfig = HttpServerConfig(host, port, baseUrl, contextUrl)
 
     withLocalSnsTopic { topic =>
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>

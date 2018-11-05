@@ -1,3 +1,4 @@
 --hybrid-dynamo-table-name=${vhs_table_name}
 --hybrid-s3-bucket-name=${vhs_bucket_name}
 --app-base-url=${app_base_url}
+--context-url=${context_url}

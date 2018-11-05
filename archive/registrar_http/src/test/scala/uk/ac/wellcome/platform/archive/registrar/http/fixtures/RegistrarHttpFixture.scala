@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.registrar.http.fixtures
 
+import java.net.URL
+
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import akka.stream.Materializer
@@ -66,8 +68,10 @@ trait RegistrarHttpFixture
     val host = "localhost"
     val port = randomPort
     val baseUrl = s"http://$host:$port"
+    val contextUrl = new URL(
+      "http://api.wellcomecollection.org/storage/v1/context.json")
 
-    val serverConfig = HttpServerConfig(host, port, baseUrl)
+    val serverConfig = HttpServerConfig(host, port, baseUrl, contextUrl)
 
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>

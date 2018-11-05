@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier
 
+import java.net.URL
+
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
@@ -27,7 +29,8 @@ class Notifier @Inject()(
   sqsConfig: SQSConfig,
   snsClient: AmazonSNS,
   snsConfig: SNSConfig,
-  metricsSender: MetricsSender
+  metricsSender: MetricsSender,
+  contextUrl: URL
 )(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
   def run() = {
 
@@ -44,7 +47,7 @@ class Notifier @Inject()(
     val notificationParsingFlow =
       NotificationParsingFlow[CallbackNotification]()
 
-    val workflow = NotificationFlow(snsClient, snsConfig)
+    val workflow = NotificationFlow(contextUrl, snsClient, snsConfig)
 
     val flow = notificationParsingFlow.via(workflow)
 

@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.common.models
 
+import java.net.URL
 import java.util.UUID
 
 import io.circe.generic.extras.JsonKey
@@ -19,7 +20,9 @@ case class RequestDisplayIngest(sourceLocation: DisplayLocation,
                                 ontologyType: String = "Ingest")
     extends DisplayIngest
 
-case class ResponseDisplayIngest(id: UUID,
+case class ResponseDisplayIngest(@JsonKey("@context")
+                                 context: String,
+                                 id: UUID,
                                  sourceLocation: DisplayLocation,
                                  callback: Option[DisplayCallback],
                                  ingestType: DisplayIngestType,
@@ -60,18 +63,20 @@ case class DisplayProgressEvent(description: String,
                                 ontologyType: String = "ProgressEvent")
 
 case object ResponseDisplayIngest {
-  def apply(progress: Progress): ResponseDisplayIngest = ResponseDisplayIngest(
-    id = progress.id,
-    sourceLocation = DisplayLocation(progress.sourceLocation),
-    callback = progress.callback.map(DisplayCallback(_)),
-    space = DisplayStorageSpace(progress.space.toString),
-    ingestType = DisplayIngestType(),
-    bag = progress.bag.map(IngestDisplayBag(_)),
-    status = DisplayStatus(progress.status),
-    events = progress.events.map(DisplayProgressEvent(_)),
-    createdDate = progress.createdDate.toString,
-    lastModifiedDate = progress.lastModifiedDate.toString
-  )
+  def apply(progress: Progress, contextUrl: URL): ResponseDisplayIngest =
+    ResponseDisplayIngest(
+      context = contextUrl.toString,
+      id = progress.id,
+      sourceLocation = DisplayLocation(progress.sourceLocation),
+      callback = progress.callback.map(DisplayCallback(_)),
+      space = DisplayStorageSpace(progress.space.toString),
+      ingestType = DisplayIngestType(),
+      bag = progress.bag.map(IngestDisplayBag(_)),
+      status = DisplayStatus(progress.status),
+      events = progress.events.map(DisplayProgressEvent(_)),
+      createdDate = progress.createdDate.toString,
+      lastModifiedDate = progress.lastModifiedDate.toString
+    )
 }
 
 case object DisplayProgressEvent {

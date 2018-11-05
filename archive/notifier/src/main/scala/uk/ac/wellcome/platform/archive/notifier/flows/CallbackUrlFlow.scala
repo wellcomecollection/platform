@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.notifier.flows
 
-import java.net.URI
+import java.net.{URI, URL}
 import java.util.UUID
 
 import akka.actor.ActorSystem
@@ -24,11 +24,11 @@ object CallbackUrlFlow {
   // a (Try[HttpResponse], String) tuple -- preserving the original
   // progress as context.
   //
-  def apply()(implicit actorSystem: ActorSystem) =
+  def apply(contextUrl: URL)(implicit actorSystem: ActorSystem) =
     Flow[CallbackNotification]
       .collect {
         case CallbackNotification(id, callbackUri, progress) =>
-          (createHttpRequest(progress, callbackUri), id)
+          (createHttpRequest(progress, callbackUri, contextUrl: URL), id)
       }
       .via(http)
       .map {
@@ -43,10 +43,11 @@ object CallbackUrlFlow {
     Http().superPool[UUID]()
 
   private def createHttpRequest(progress: Progress,
-                                callbackUri: URI): HttpRequest = {
+                                callbackUri: URI,
+                                contextUrl: URL): HttpRequest = {
     val entity = HttpEntity(
       ContentTypes.`application/json`,
-      toJson(ResponseDisplayIngest(progress)).get
+      toJson(ResponseDisplayIngest(progress, contextUrl)).get
     )
 
     HttpRequest(

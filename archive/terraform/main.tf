@@ -86,12 +86,13 @@ module "registrar_http" {
   container_image = "${local.registrar_http_container_image}"
 
   env_vars = {
+    context_url     = "https://api.wellcomecollection.org/storage/v1/context.json"
     vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
     vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
     app_base_url    = "https://api.wellcomecollection.org"
   }
 
-  env_vars_length = 3
+  env_vars_length = 4
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
@@ -120,11 +121,12 @@ module "notifier" {
   max_capacity = 1
 
   env_vars = {
+    context_url        = "https://api.wellcomecollection.org/storage/v1/context.json"
     notifier_queue_url = "${module.notifier_queue.id}"
     progress_topic_arn = "${module.progress_async_topic.arn}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 3
 
   container_image   = "${local.notifier_container_image}"
   source_queue_name = "${module.notifier_queue.name}"
@@ -169,12 +171,13 @@ module "progress_http" {
   container_image = "${local.progress_http_container_image}"
 
   env_vars = {
+    context_url                 = "https://api.wellcomecollection.org/storage/v1/context.json"
     app_base_url                = "https://${module.api_ecs.alb_dns_name}/storage/v1/ingests"
     topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
 
-  env_vars_length = 3
+  env_vars_length = 4
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
   private_subnets    = "${local.private_subnets}"

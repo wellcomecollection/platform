@@ -81,6 +81,7 @@ class RegistrarHttpFeatureTest
 
                   inside(displayBag) {
                     case DisplayBag(
+                        actualContextUrl,
                         actualBagId,
                         DisplayStorageSpace(storageSpaceName, "Space"),
                         DisplayBagInfo(
@@ -103,6 +104,7 @@ class RegistrarHttpFeatureTest
                           "Location"),
                         createdDateString,
                         "Bag") =>
+                      actualContextUrl shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
                       actualBagId shouldBe s"${space.underlying}/${bagInfo.externalIdentifier.underlying}"
                       storageSpaceName shouldBe space.underlying
                       externalIdentifierString shouldBe bagInfo.externalIdentifier.underlying

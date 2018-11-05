@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier.config
 
+import java.net.URL
+
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
@@ -48,6 +50,9 @@ class ArgsConfigurator(val arguments: Seq[String])
   private val sqsParallelism =
     opt[Int]("sqs-parallelism", required = true, default = Some(10))
 
+  private val contextUrl =
+    opt[URL]("context-url", required = true)
+
   verify()
 
   val snsConfig = SNSConfig(
@@ -89,6 +94,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     sqsConfig = sqsConfig,
     snsClientConfig = snsClientConfig,
     snsConfig = snsConfig,
-    metricsConfig = metricsConfig
+    metricsConfig = metricsConfig,
+    contextUrl = contextUrl()
   )
 }
