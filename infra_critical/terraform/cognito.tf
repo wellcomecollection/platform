@@ -48,7 +48,8 @@ resource "aws_cognito_user_pool_client" "goobi" {
     "${aws_cognito_resource_server.storage_api.scope_identifiers}",
   ]
 
-  supported_identity_providers = ["COGNITO"]
+  allowed_oauth_flows_user_pool_client = true
+  supported_identity_providers         = ["COGNITO"]
 
   generate_secret        = true
   refresh_token_validity = 1
@@ -71,7 +72,8 @@ resource "aws_cognito_user_pool_client" "dds" {
     "${aws_cognito_resource_server.storage_api.scope_identifiers}",
   ]
 
-  supported_identity_providers = ["COGNITO"]
+  allowed_oauth_flows_user_pool_client = true
+  supported_identity_providers         = ["COGNITO"]
 
   generate_secret        = true
   refresh_token_validity = 1
