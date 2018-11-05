@@ -1,5 +1,4 @@
 include makefiles/docker.Makefile
-include makefiles/formatting.Makefile
 include makefiles/python.Makefile
 include makefiles/sbt.Makefile
 include makefiles/terraform.Makefile

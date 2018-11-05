@@ -6,6 +6,10 @@ WELLCOME_MONITORING_BUCKET = wellcomecollection-platform-monitoring
 
 include functions.Makefile
 
+# This can't be included in functions.Makefile because it actually defines some
+# targets, which makes Make unhappy when the targets get overridden a dozen times!
+include makefiles/formatting.Makefile
+
 include archive/Makefile
 include assets/Makefile
 include builds/Makefile
