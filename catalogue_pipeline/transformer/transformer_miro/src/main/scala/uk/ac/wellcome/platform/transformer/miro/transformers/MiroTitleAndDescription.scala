@@ -31,7 +31,8 @@ trait MiroTitleAndDescription extends MiroTransformableUtils {
    *  Since desc_academic is exposed publicly via Sierra, we can use it
    *  here if there's nothing more useful in the other fields.
    */
-  def getTitleAndDescription(miroData: MiroTransformableData): (String, Option[String]) = {
+  def getTitleAndDescription(
+    miroData: MiroTransformableData): (String, Option[String]) = {
     val candidateDescription: String = miroData.description match {
       case Some(s) =>
         if (s == "--" || s == "-") miroData.academicDescription.getOrElse("")
@@ -72,14 +73,14 @@ trait MiroTitleAndDescription extends MiroTransformableUtils {
     //
     // For now, any other award data gets discarded.
     val wiaAwardsData: List[(String, String)] =
-    zipMiroFields(keys = miroData.award, values = miroData.awardDate)
-      .collect {
-        case (Some(label), Some(year))
-          if label == "WIA Overall Winner" ||
-            label == "Wellcome Image Awards" ||
-            label == "Biomedical Image Awards" =>
-          (label, year)
-      }
+      zipMiroFields(keys = miroData.award, values = miroData.awardDate)
+        .collect {
+          case (Some(label), Some(year))
+              if label == "WIA Overall Winner" ||
+                label == "Wellcome Image Awards" ||
+                label == "Biomedical Image Awards" =>
+            (label, year)
+        }
 
     val wiaAwardsString = wiaAwardsData match {
       // Most images have no award, or only a single award string.
@@ -99,9 +100,9 @@ trait MiroTitleAndDescription extends MiroTransformableUtils {
     // Finally, remove any leading/trailing from the description, and drop
     // the description if it's *only* whitespace.
     val description =
-    if (!(rawDescription + wiaAwardsString).trim.isEmpty) {
-      Some((rawDescription + wiaAwardsString).trim)
-    } else None
+      if (!(rawDescription + wiaAwardsString).trim.isEmpty) {
+        Some((rawDescription + wiaAwardsString).trim)
+      } else None
 
     (title, description)
   }
