@@ -15,8 +15,16 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressStatusUpdate, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressStatusUpdate,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.modules._
@@ -88,7 +96,8 @@ trait ProgressHttpFixture
     val host = "localhost"
     val port = randomPort
     val baseUrl = s"http://$host:$port"
-    val contextUrl = new URL("http://api.wellcomecollection.org/storage/v1/context.json")
+    val contextUrl = new URL(
+      "http://api.wellcomecollection.org/storage/v1/context.json")
 
     val serverConfig = HttpServerConfig(host, port, baseUrl, contextUrl)
 
