@@ -26,7 +26,6 @@ class IdMinterWorkerService @Inject()(
       )
     } yield ()
 
-  def stop(): Future[Terminated] = {
+  def stop(): Future[Terminated] =
     system.terminate()
-  }
 }
