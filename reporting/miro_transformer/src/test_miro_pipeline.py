@@ -1,11 +1,12 @@
 import os
 import json
-import transformer
+import miro_transformer
 from reporting_pipeline.test_pipeline import given_s3_has, create_sns_message
+
 
 def load_test_data():
     '''
-    load some raw MIRO json and a transformed version to test whether the 
+    load some raw MIRO json and a transformed version to test whether the
     transform is being correctly applied
     '''
     current_path = os.path.dirname(__file__)
@@ -14,7 +15,7 @@ def load_test_data():
 
     with open(raw_data_path) as f:
         raw_data = f.read()
-    
+
     with open(transformed_data_path) as f:
         transformed_data = json.load(f)
 
@@ -43,8 +44,8 @@ def test_saves_record_in_es(
 
     given_s3_has(s3_client, bucket, key, json.dumps(hybrid_data))
     event = create_sns_message(bucket, id, key)
-    
-    transformer.main(
+
+    miro_transformer.main(
         event,
         {},
         s3_client,

@@ -1,6 +1,7 @@
 import pytest
 from transform import transform
 
+
 def test_cleans_simple_date():
     test_dict = {'data': '{"date": "01/01/1970"}'}
     assert transform(test_dict) == {'date': '1970-01-01'}

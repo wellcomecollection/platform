@@ -1,6 +1,7 @@
 import json
 from dateutil.parser import parse
 
+
 def transform(miro_transformable):
     """
     Parameters
@@ -26,8 +27,8 @@ def drop_redundant_fields(original_data, keys_to_drop):
     redundantly filled, or just generally unwanted in our ES index
     """
     clean_data = {
-        key: value 
-        for key, value in original_data.items() 
+        key: value
+        for key, value in original_data.items()
         if key not in keys_to_drop
     }
     return clean_data
@@ -51,10 +52,9 @@ def clean_dates(data):
 
 def convert_date_to_iso(date_string):
     try:
-        parsed_date = parse(date_string).date().isoformat()
-    except: 
-        parsed_date = date_string
-    return parsed_date
+        return parse(date_string).date().isoformat()
+    except (ValueError, TypeError):
+        return date_string
 
 
 keys_to_drop = (
