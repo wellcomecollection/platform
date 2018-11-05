@@ -32,7 +32,7 @@ object NotificationFlow {
     val snsPublishFlow = SnsPublishFlow[ProgressUpdate](
       snsClient,
       snsConfig,
-      subject=s"Sent by ${this.getClass.getName}"
+      subject = s"Sent by ${this.getClass.getName}"
     )
 
     callbackUrlFlow
