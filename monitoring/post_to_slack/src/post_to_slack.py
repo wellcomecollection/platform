@@ -50,7 +50,7 @@ class Alarm:
 
     @property
     def should_be_sent_to_main_channel(self):
-        return self.name != 'lambda-miro_transformer-errors'
+        return self.name != "lambda-miro_transformer-errors"
 
     # Sometimes there's enough data in the alarm to make an educated guess
     # about useful CloudWatch logs to check, so we include that in the alarm.
