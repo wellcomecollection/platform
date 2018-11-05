@@ -42,4 +42,15 @@ object SnsPublishFlow extends Logging {
         ActorAttributes.dispatcher(
           "akka.stream.materializer.blocking-io-dispatcher"))
   }
+
+  def apply[T](
+    snsClient: AmazonSNS,
+    snsConfig: SNSConfig,
+    subject: String
+  )(implicit encode: Encoder[T]): Flow[T, PublishResult, NotUsed] =
+    apply(
+      snsClient = snsClient,
+      snsConfig = snsConfig,
+      maybeSubject = Some(subject)
+    )
 }
