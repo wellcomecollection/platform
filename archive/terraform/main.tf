@@ -241,8 +241,6 @@ module "migrator" {
   name        = "migrator"
   description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
 
-  lambda_type = "vpc"
-
   timeout = 25
 
   environment_variables = {
