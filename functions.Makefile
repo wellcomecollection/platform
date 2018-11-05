@@ -21,24 +21,6 @@ include makefiles/sbt.Makefile
 include makefiles/terraform.Makefile
 
 
-# Define a series of Make tasks (build, test, publish) for an ECS service.
-#
-# Args:
-#	$1 - Name of the ECS service.
-#	$2 - Path to the associated Dockerfile.
-#
-define __ecs_target_template
-$(1)-build:
-	$(call build_image,$(1),$(2))
-
-$(1)-test:
-	$(call test_python,$(STACK_ROOT)/$(1))
-
-$(1)-publish: $(1)-build
-	$(call publish_service,$(1))
-endef
-
-
 # Define all the Make tasks for a stack.
 #
 # Args:
@@ -71,7 +53,7 @@ define stack_setup
 $(foreach proj,$(SBT_APPS),$(eval $(call sbt_target_template,$(proj),$(STACK_ROOT)/$(proj))))
 $(foreach library,$(SBT_DOCKER_LIBRARIES),$(eval $(call sbt_library_docker_template,$(library),$(STACK_ROOT)/$(library))))
 $(foreach library,$(SBT_NO_DOCKER_LIBRARIES),$(eval $(call sbt_library_template,$(library))))
-$(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
+$(foreach task,$(ECS_TASKS),$(eval $(call python_ecs_target_template,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
 $(foreach lamb,$(LAMBDAS),$(eval $(call lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
 $(foreach name,$(TF_NAME),$(eval $(call terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING))))
 endef

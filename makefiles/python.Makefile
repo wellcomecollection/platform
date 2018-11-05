@@ -50,3 +50,22 @@ $(ROOT)/$(2)/test_requirements.txt: $(ROOT)/$(2)/test_requirements.in
 		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools \
 		pip-compile test_requirements.in
 endef
+
+
+# Define a series of Make tasks (build, test, publish) for an ECS service
+# written in Python.
+#
+# Args:
+#	$1 - Name of the ECS service.
+#	$2 - Path to the associated Dockerfile.
+#
+define python_ecs_target_template
+$(1)-build:
+	$(call build_image,$(1),$(2))
+
+$(1)-test:
+	$(call test_python,$(STACK_ROOT)/$(1))
+
+$(1)-publish: $(1)-build
+	$(call publish_service,$(1))
+endef
