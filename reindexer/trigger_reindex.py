@@ -4,7 +4,7 @@
 Create/update reindex shards in the reindex shard tracker table.
 
 Usage: trigger_reindex.py complete --source=<SOURCE_NAME> --reason=<REASON> --total_segments=<COUNT> [--skip-pipeline-checks]
-       trigger_reindex.py partial --source=<SOURCE_NAME> --reason=<REASON> --max_records=<MAX> [--post_to_slack]
+       trigger_reindex.py partial --source=<SOURCE_NAME> --reason=<REASON> --max_records=<MAX>
        trigger_reindex.py -h | --help
 
 Actions:
@@ -17,8 +17,6 @@ Options:
   --source=<SOURCE_NAME>    Name of the source you want to reindex.
   --reason=<REASON>         An explanation of why you're running this reindex.
                             This will be printed in the Slack alert.
-  --post_to_slack           If included, a summary message will be posted to the 
-                            digital_platform slack channel
   --total_segments=<COUNT>  How many segments to divide the VHS table into.
   --max_records=<MAX>       What's the most number of records that should be sent?
   --skip-pipeline-checks    Don't check if the pipeline tables are clear
@@ -171,8 +169,7 @@ def main():
             f'({int(args["--max_records"])})'
         )
 
-    if args["complete"] or args["post_to_slack"]:
-        post_to_slack(source_name=source_name, slack_message=slack_message)
+    post_to_slack(source_name=source_name, slack_message=slack_message)
 
     topic_arn = build_topic_arn(topic_name=get_topic_name(source_name))
 
