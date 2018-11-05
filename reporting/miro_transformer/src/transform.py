@@ -27,18 +27,16 @@ def drop_redundant_fields(original_data, keys_to_drop):
     redundantly filled, or just generally unwanted in our ES index
     """
     clean_data = {
-        key: value
-        for key, value in original_data.items()
-        if key not in keys_to_drop
+        key: value for key, value in original_data.items() if key not in keys_to_drop
     }
     return clean_data
 
 
 def clean_dates(data):
-    '''
+    """
     elasticsearch's default sort is alphabetical, and sorting dd/mm/yyyy dates
     alphabetically is rubbish
-    '''
+    """
     for key, value in data.items():
         if '_date' in key and value is not None:
             if isinstance(value, str):
