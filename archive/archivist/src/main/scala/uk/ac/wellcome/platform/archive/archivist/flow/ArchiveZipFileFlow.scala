@@ -59,7 +59,7 @@ object ArchiveZipFileFlow extends Logging {
                     SnsPublishFlow[ProgressUpdate](
                       snsClient,
                       snsConfig,
-                      Some("archivist_progress")))
+                      subject = "archivist_progress"))
                   .map(_ => result)
             )
       }

@@ -36,7 +36,7 @@ object UpdateStoredManifestFlow {
         SnsPublishFlow[ProgressUpdate](
           snsClient,
           progressSnsConfig,
-          Some("registration_complete")))
+          subject = "registration_complete"))
       .map(_ => ())
 
   private def updateStoredManifest(
