@@ -19,7 +19,8 @@ class DisplayIngestTest extends FunSpec with Matchers with RandomThings {
   private val modifiedDate = "2018-10-10T09:38:55.322Z"
   private val eventDate = "2018-10-10T09:38:55.323Z"
   private val eventDescription = "Event description"
-  private val contextUrl = new URL("http://api.wellcomecollection.org/storage/v1/context.json")
+  private val contextUrl = new URL(
+    "http://api.wellcomecollection.org/storage/v1/context.json")
 
   it("creates a DisplayIngest from Progress") {
     val bagId = randomBagId

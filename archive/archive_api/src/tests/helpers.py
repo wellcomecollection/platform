@@ -20,7 +20,7 @@ def assert_is_error_response(resp, status, description=None):
         "errorType": "http",
         "httpStatus": status,
         "label": labels[status],
-        "type": "Error"
+        "type": "Error",
     }
 
     if description is not None:

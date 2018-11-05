@@ -14,7 +14,11 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
-import uk.ac.wellcome.platform.archive.registrar.http.modules.{AkkaHttpApp, ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.registrar.http.modules.{
+  AkkaHttpApp,
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -64,7 +68,8 @@ trait RegistrarHttpFixture
     val host = "localhost"
     val port = randomPort
     val baseUrl = s"http://$host:$port"
-    val contextUrl = new URL("http://api.wellcomecollection.org/storage/v1/context.json")
+    val contextUrl = new URL(
+      "http://api.wellcomecollection.org/storage/v1/context.json")
 
     val serverConfig = HttpServerConfig(host, port, baseUrl, contextUrl)
 

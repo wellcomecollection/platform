@@ -33,7 +33,8 @@ class Router @Inject()(monitor: ProgressTracker,
           onSuccess(progressStarter.initialise(Progress(progressCreateRequest))) {
             progress =>
               respondWithHeaders(List(createLocationHeader(progress))) {
-                complete(Created -> ResponseDisplayIngest(progress, config.contextUrl))
+                complete(
+                  Created -> ResponseDisplayIngest(progress, config.contextUrl))
               }
           }
         }
