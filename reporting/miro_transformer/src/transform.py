@@ -3,21 +3,9 @@ from dateutil.parser import parse
 
 
 def transform(miro_transformable):
-    """
-    Parameters
-    ----------
-    miro_transformable : dict
-        the raw data from VHS in a malleable dict format
-
-    Returns
-    -------
-    transformed_record : dict
-        record with necessary transformations applied, ready to be formatted for
-        elasticsearch ingestion
-    """
     original_data = json.loads(miro_transformable["data"])
     transformed = drop_redundant_fields(original_data, keys_to_drop)
-    transformed = clean_dates(transformed)
+    transformed = clean_dates(transformed, keys_to_parse)
     return transformed
 
 
@@ -32,13 +20,13 @@ def drop_redundant_fields(original_data, keys_to_drop):
     return clean_data
 
 
-def clean_dates(data):
+def clean_dates(data, keys_to_parse):
     """
     elasticsearch's default sort is alphabetical, and sorting dd/mm/yyyy dates
     alphabetically is rubbish
     """
     for key, value in data.items():
-        if "_date" in key and value is not None:
+        if value_should_be_parsed(key, value, keys_to_parse):
             if isinstance(value, str):
                 data[key] = convert_date_to_iso(value)
             elif isinstance(value, list):
@@ -48,12 +36,33 @@ def clean_dates(data):
     return data
 
 
+def value_should_be_parsed(key, value, keys_to_parse):
+    """
+    checks whether:
+        - the value exists
+        - the key is date-related
+        - the key also matches a set of acceptable substrings
+    """
+    return (value and
+            "_date" in key and
+            any(substring in key for substring in keys_to_parse))
+
+
 def convert_date_to_iso(date_string):
     try:
         return parse(date_string).date().isoformat()
     except (ValueError, TypeError):
-        return date_string
+        return None
 
+
+keys_to_parse = (
+    "_from",
+    "_to",
+    "_tech",
+    "all_amendment_date",
+    "image_iap_catalog_date",
+    "image_innopac_id_date",
+)
 
 keys_to_drop = (
     "_index",
