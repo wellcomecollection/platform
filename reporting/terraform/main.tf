@@ -11,6 +11,7 @@ module "lambda_miro_transformer" {
     ES_INDEX    = "miro"
     ES_DOC_TYPE = "miro_record"
   }
-  trigger_topic_arn = "${local.miro_topic_arn}"
+
+  trigger_topic_arn     = "${local.miro_topic_arn}"
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 }
