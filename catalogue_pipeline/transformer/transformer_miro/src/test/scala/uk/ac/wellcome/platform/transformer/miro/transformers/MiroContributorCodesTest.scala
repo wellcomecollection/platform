@@ -1,8 +1,7 @@
-package uk.ac.wellcome.platform.transformer.miro.transformers.miro
+package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
-import uk.ac.wellcome.platform.transformer.miro.transformers.MiroContributorCodes
 
 class MiroContributorCodesTest extends FunSpec with Matchers {
   it("looks up a contributor code in the general map") {

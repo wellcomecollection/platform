@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.miro.transformers.miro
+package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{
@@ -8,7 +8,6 @@ import uk.ac.wellcome.models.work.internal.{
   MaybeDisplayable,
   Unidentifiable
 }
-import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
 
 class MiroGenresTest
     extends FunSpec

@@ -1,8 +1,7 @@
-package uk.ac.wellcome.platform.transformer.miro.transformers.miro
+package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
 
 /** Tests that the Miro transformer extracts the "subjects" field correctly.
   *

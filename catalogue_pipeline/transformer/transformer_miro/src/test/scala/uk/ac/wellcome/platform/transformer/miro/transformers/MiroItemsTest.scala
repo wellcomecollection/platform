@@ -1,10 +1,9 @@
-package uk.ac.wellcome.platform.transformer.miro.transformers.miro
+package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
-import uk.ac.wellcome.platform.transformer.miro.transformers.MiroItems
 
 class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators {
   val transformer = new MiroItems {}

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.miro.transformers.miro
+package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{
@@ -7,7 +7,6 @@ import uk.ac.wellcome.models.work.internal.{
   LocationType
 }
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
-import uk.ac.wellcome.platform.transformer.miro.transformers.MiroLocations
 
 class MiroLocationsTest extends FunSpec with Matchers {
   val transformer = new MiroLocations {}
