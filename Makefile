@@ -1,5 +1,4 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-INFRA_BUCKET = wellcomecollection-platform-infra
 
 WELLCOME_INFRA_BUCKET      = wellcomecollection-platform-infra
 WELLCOME_MONITORING_BUCKET = wellcomecollection-platform-monitoring
