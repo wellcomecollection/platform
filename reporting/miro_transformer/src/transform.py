@@ -1,11 +1,11 @@
 import json
-from datetime import datetime
+from dateutil.parser import parse
 
-def transform(record):
+def transform(miro_transformable):
     """
     Parameters
     ----------
-    record : dict
+    miro_transformable : dict
         the raw data from VHS in a malleable dict format
 
     Returns
@@ -14,7 +14,7 @@ def transform(record):
         record with necessary transformations applied, ready to be formatted for
         elasticsearch ingestion
     """
-    original_data = json.loads(record["data"])
+    original_data = json.loads(miro_transformable["data"])
     transformed = drop_redundant_fields(original_data, keys_to_drop)
     transformed = clean_dates(transformed)
     return transformed
@@ -39,23 +39,25 @@ def clean_dates(data):
     alphabetically is rubbish
     '''
     for key, value in data.items():
-        if 'date' in key and value is not None:
-            if type(value) == str:
+        if '_date' in key and value is not None:
+            if isinstance(value, str):
                 data[key] = convert_date_to_iso(value)
-            elif type(value) == list:
+            elif isinstance(value, list):
                 data[key] = [convert_date_to_iso(date) for date in value]
+            else:
+                pass
     return data
 
 
 def convert_date_to_iso(date_string):
-    if date_string is None or date_string is '':
-        date = None
-    else:
-        date = datetime.strptime(date_string, '%d/%m/%Y').date().isoformat()
-    return date
+    try:
+        parsed_date = parse(date_string).date().isoformat()
+    except: 
+        parsed_date = date_string
+    return parsed_date
 
 
-keys_to_drop = [
+keys_to_drop = (
     '_index',
     '_score',
     '_type',
@@ -81,4 +83,4 @@ keys_to_drop = [
     'image_tech_manipulated_date',
     'image_web_img_filename',
     'image_web_img_size'
-]
+)
