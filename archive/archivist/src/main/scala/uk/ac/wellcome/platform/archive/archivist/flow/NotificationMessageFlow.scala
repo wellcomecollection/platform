@@ -49,7 +49,7 @@ object NotificationMessageFlow extends Logging {
               SnsPublishFlow[ProgressUpdate](
                 snsClient,
                 progressSnsConfig,
-                Some("archivist_progress")))
+                subject = "archivist_progress"))
             .map(_ => bagRequest)
         }
       )

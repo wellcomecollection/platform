@@ -27,5 +27,5 @@ object NotifyFailureFlow {
             List(ProgressEvent(error.toString))
         )
       )
-      .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig, Some(subject)))
+      .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig, subject))
 }
