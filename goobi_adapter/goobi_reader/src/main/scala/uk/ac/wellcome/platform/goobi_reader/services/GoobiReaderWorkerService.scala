@@ -43,13 +43,13 @@ class GoobiReaderWorkerService @Inject()(
       // AWS events are URL encoded, which means that the object key is URL encoded
       // The s3Client.putObject method doesn't want URL encoded keys, so decode it
       urlDecodedMessage <- Future.fromTry(
-        Try(java.net.URLDecoder.decode(snsNotification.Message, "utf-8")))
+        Try(java.net.URLDecoder.decode(snsNotification.body, "utf-8")))
       eventNotification <- Future.fromTry(fromJson[S3Event](urlDecodedMessage))
       _ <- Future.sequence(eventNotification.Records.map(updateRecord))
     } yield ()
     eventuallyProcessedMessages.failed.foreach { e: Throwable =>
       error(
-        s"Error processing message with SNS-MessageId=${snsNotification.MessageId}. Exception ${e.getClass.getCanonicalName} $e.getMessage")
+        s"Error processing message. Exception ${e.getClass.getCanonicalName} ${e.getMessage}")
     }
     eventuallyProcessedMessages
   }
