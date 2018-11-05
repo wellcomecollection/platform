@@ -1,6 +1,6 @@
 import os
 import json
-import transformer
+import miro_transformer
 from reporting_pipeline.test_pipeline import given_s3_has, create_sns_message
 
 
@@ -47,7 +47,7 @@ def test_saves_record_in_es(
     given_s3_has(s3_client, bucket, key, json.dumps(hybrid_data))
     event = create_sns_message(bucket, id, key)
 
-    transformer.main(
+    miro_transformer.main(
         event,
         {},
         s3_client,

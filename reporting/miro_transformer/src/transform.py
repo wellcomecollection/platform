@@ -1,6 +1,7 @@
 import json
 from dateutil.parser import parse
 
+
 def transform(miro_transformable):
     """
     Parameters
@@ -49,10 +50,9 @@ def clean_dates(data):
 
 def convert_date_to_iso(date_string):
     try:
-        parsed_date = parse(date_string).date().isoformat()
-    except: 
-        parsed_date = date_string
-    return parsed_date
+        return parse(date_string).date().isoformat()
+    except (ValueError, TypeError):
+        return date_string
 
 
 keys_to_drop = (
