@@ -20,7 +20,7 @@ class SnapshotGeneratorWorkerService @Inject()(
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      snapshotJob <- Future.fromTry(fromJson[SnapshotJob](message.Message))
+      snapshotJob <- Future.fromTry(fromJson[SnapshotJob](message.body))
       completedSnapshotJob <- snapshotService.generateSnapshot(
         snapshotJob = snapshotJob)
       _ <- snsWriter.writeMessage(

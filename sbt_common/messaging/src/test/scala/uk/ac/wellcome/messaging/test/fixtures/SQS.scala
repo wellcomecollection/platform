@@ -157,12 +157,7 @@ trait SQS extends Matchers with Logging {
   }
 
   def createNotificationMessageWith(body: String): NotificationMessage =
-    NotificationMessage(
-      MessageId = Random.alphanumeric take 10 mkString,
-      TopicArn = Random.alphanumeric take 10 mkString,
-      Subject = Random.alphanumeric take 10 mkString,
-      Message = body
-    )
+    NotificationMessage(body = body)
 
   def createNotificationMessageWith[T](message: T)(
     implicit encoder: Encoder[T]): NotificationMessage =

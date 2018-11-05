@@ -1,8 +1,7 @@
 package uk.ac.wellcome.messaging.sns
 
+import io.circe.generic.extras.JsonKey
+
 case class NotificationMessage(
-  MessageId: String,
-  TopicArn: String,
-  Subject: String,
-  Message: String
+  @JsonKey("Message") body: String
 )
