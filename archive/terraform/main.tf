@@ -121,11 +121,12 @@ module "notifier" {
   max_capacity = 1
 
   env_vars = {
+    context_url = "https://api.wellcomecollection.org/storage/v1/context.json"
     notifier_queue_url = "${module.notifier_queue.id}"
     progress_topic_arn = "${module.progress_async_topic.arn}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 3
 
   container_image   = "${local.notifier_container_image}"
   source_queue_name = "${module.notifier_queue.name}"

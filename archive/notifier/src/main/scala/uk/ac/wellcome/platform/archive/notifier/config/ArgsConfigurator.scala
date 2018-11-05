@@ -1,14 +1,12 @@
 package uk.ac.wellcome.platform.archive.notifier.config
 
+import java.net.URL
+
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
-import uk.ac.wellcome.platform.archive.common.modules.{
-  CloudwatchClientConfig,
-  SQSClientConfig,
-  SnsClientConfig
-}
+import uk.ac.wellcome.platform.archive.common.modules.{CloudwatchClientConfig, SQSClientConfig, SnsClientConfig}
 import uk.ac.wellcome.platform.archive.notifier.models.NotifierConfig
 
 import scala.concurrent.duration._
@@ -47,6 +45,9 @@ class ArgsConfigurator(val arguments: Seq[String])
     opt[String]("sqs-queue-url", required = true)
   private val sqsParallelism =
     opt[Int]("sqs-parallelism", required = true, default = Some(10))
+
+  private val contextUrl =
+    opt[URL]("context-url", required = true)
 
   verify()
 
@@ -89,6 +90,7 @@ class ArgsConfigurator(val arguments: Seq[String])
     sqsConfig = sqsConfig,
     snsClientConfig = snsClientConfig,
     snsConfig = snsConfig,
-    metricsConfig = metricsConfig
+    metricsConfig = metricsConfig,
+    contextUrl = contextUrl()
   )
 }

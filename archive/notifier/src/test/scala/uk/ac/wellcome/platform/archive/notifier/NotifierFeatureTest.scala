@@ -4,31 +4,16 @@ import java.net.URI
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.github.tomakehurst.wiremock.client.WireMock.{
-  equalToJson,
-  postRequestedFor,
-  urlPathEqualTo,
-  _
-}
+import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlPathEqualTo, _}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
-  ProgressGenerators,
-  TimeTestFixture
-}
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Callback,
-  ProgressCallbackStatusUpdate,
-  ProgressUpdate
-}
-import uk.ac.wellcome.platform.archive.notifier.fixtures.{
-  LocalWireMockFixture,
-  NotifierFixture
-}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, TimeTestFixture}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, ProgressCallbackStatusUpdate, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.notifier.fixtures.{LocalWireMockFixture, NotifierFixture}
 
 class NotifierFeatureTest
     extends FunSpec
@@ -75,6 +60,7 @@ class NotifierFeatureTest
                 1,
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
+                    "http://localhost/context.json",
                     progress.id,
                     DisplayLocation(
                       DisplayProvider(progress.sourceLocation.provider.id),
@@ -135,6 +121,7 @@ class NotifierFeatureTest
                 1,
                 postRequestedFor(urlPathEqualTo(callbackUri.getPath))
                   .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
+                    "http://localhost/context.json",
                     progress.id,
                     DisplayLocation(
                       DisplayProvider(progress.sourceLocation.provider.id),

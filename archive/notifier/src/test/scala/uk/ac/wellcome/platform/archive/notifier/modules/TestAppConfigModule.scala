@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier.modules
 
+import java.net.URL
+
 import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
@@ -46,7 +48,8 @@ class TestAppConfigModule(queue: Queue, topic: Topic) extends AbstractModule {
       sqsConfig = sqsConfig,
       snsClientConfig = snsClientConfig,
       snsConfig = snsConfig,
-      metricsConfig = metricsConfig
+      metricsConfig = metricsConfig,
+      new URL("http://localhost/context.json")
     )
   }
 }
