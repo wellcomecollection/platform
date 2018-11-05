@@ -1,13 +1,3 @@
-ROOT = $(shell git rev-parse --show-toplevel)
-
-WELLCOME_INFRA_BUCKET = wellcomecollection-platform-infra
-
-LAMBDA_PUSHES_TOPIC_ARN = arn:aws:sns:eu-west-1:760097843905:lambda_pushes
-
-DOCKER_IMG_PUBLISH_LAMBDA    = wellcome/publish_lambda:12
-DOCKER_IMG_BUILD_TEST_PYTHON = wellcome/build_test_python
-
-
 # Publish a ZIP file containing a Lambda definition to S3.
 #
 # Args:
