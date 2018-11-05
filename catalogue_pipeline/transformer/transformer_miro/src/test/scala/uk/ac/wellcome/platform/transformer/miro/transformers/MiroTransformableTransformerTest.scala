@@ -301,6 +301,25 @@ class MiroTransformableTransformerTest
     work.workType.get.label shouldBe "Digital images"
   }
 
+  it("sets the thumbnail with the IIIF Image URL") {
+    val miroId = "A0001234"
+    val work = transformWork(
+      miroId = miroId,
+      data =
+        """
+           "image_use_restrictions": "CC-BY"
+        """
+    )
+
+    work.thumbnail shouldBe Some(
+      DigitalLocation(
+        url = s"https://iiif.wellcomecollection.org/image/$miroId.jpg/full/300,/0/default.jpg",
+        locationType = LocationType("thumbnail-image"),
+        license = Some(License_CCBY)
+      )
+    )
+  }
+
   private def assertTransformReturnsInvisibleWork(miroId: String = "G0000001",
                                                   data: String) = {
     val miroTransformable = createMiroTransformableWith(

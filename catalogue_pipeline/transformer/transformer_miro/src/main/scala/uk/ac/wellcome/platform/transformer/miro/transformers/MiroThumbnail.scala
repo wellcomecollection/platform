@@ -8,7 +8,7 @@ trait MiroThumbnail extends MiroImageApiURL with MiroLicenses {
                    miroId: String): Location =
     DigitalLocation(
       locationType = LocationType("thumbnail-image"),
-      url = buildImageApiURL(miroId, "thumbnail"),
+      url = buildImageApiURL(miroId, templateName = "thumbnail"),
       license = Some(chooseLicense(miroId, miroData.useRestrictions))
     )
 }
