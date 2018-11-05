@@ -10,6 +10,7 @@ import scala.util.Try
 
 class MiroTransformableTransformer
     extends transformers.MiroContributors
+    with transformers.MiroCreatedDate
     with transformers.MiroItems
     with transformers.MiroGenres
     with transformers.MiroIdentifiers
@@ -197,14 +198,4 @@ class MiroTransformableTransformer
 
     (title, description)
   }
-
-  private def getCreatedDate(miroData: MiroTransformableData,
-                             miroId: String): Option[Period] =
-    if (collectionIsV(miroId)) {
-      miroData.artworkDate.map { Period }
-    } else {
-      None
-    }
-
-  private def collectionIsV(miroId: String) = miroId.startsWith("V")
 }
