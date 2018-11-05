@@ -1,7 +1,5 @@
 # -*- encoding: utf-8
 
-import json
-
 from flask import Response, jsonify
 from werkzeug.wsgi import ClosingIterator
 
@@ -27,8 +25,6 @@ class ContextResponse(Response):
         # so we shouldn't try to add a parameter.
         if not response:
             return super().__init__(response, *args, **kwargs)
-
-        rv = json.loads(response)
 
         # The @context may already be provided if we've been through the
         # force_type method below.  We also don't add a context if we're
