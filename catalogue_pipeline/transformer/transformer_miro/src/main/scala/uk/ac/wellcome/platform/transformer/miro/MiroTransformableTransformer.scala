@@ -138,7 +138,7 @@ class MiroTransformableTransformer
     }
 
     val useDescriptionAsTitle =
-      (titleIsTruncatedDescription) ||
+      titleIsTruncatedDescription ||
         (miroData.title.get == "-" || miroData.title.get == "--")
 
     val title = if (useDescriptionAsTitle) {
