@@ -38,7 +38,7 @@ def clean_dates(data):
     alphabetically is rubbish
     """
     for key, value in data.items():
-        if '_date' in key and value is not None:
+        if "_date" in key and value is not None:
             if isinstance(value, str):
                 data[key] = convert_date_to_iso(value)
             elif isinstance(value, list):
@@ -56,29 +56,29 @@ def convert_date_to_iso(date_string):
 
 
 keys_to_drop = (
-    '_index',
-    '_score',
-    '_type',
-    'all_draft',
-    'all_psoft_export',
-    'image_biomed_close_up',
-    'image_corp_commissioned_by',
-    'image_corp_contact_details',
-    'image_corp_institution',
-    'image_corp_keywords',
-    'image_corp_photographer_freelance',
-    'image_corp_purpose',
-    'image_corp_shoot_sheet_number',
-    'image_funding_type',
-    'image_iap_image_no',
-    'image_iap_invalid',
-    'image_icd_note',
-    'image_no_calc',
-    'image_phys_notes',
-    'image_source',
-    'image_tech_manipulated_date_from',
-    'image_tech_manipulated_date_to',
-    'image_tech_manipulated_date',
-    'image_web_img_filename',
-    'image_web_img_size'
+    "_index",
+    "_score",
+    "_type",
+    "all_draft",
+    "all_psoft_export",
+    "image_biomed_close_up",
+    "image_corp_commissioned_by",
+    "image_corp_contact_details",
+    "image_corp_institution",
+    "image_corp_keywords",
+    "image_corp_photographer_freelance",
+    "image_corp_purpose",
+    "image_corp_shoot_sheet_number",
+    "image_funding_type",
+    "image_iap_image_no",
+    "image_iap_invalid",
+    "image_icd_note",
+    "image_no_calc",
+    "image_phys_notes",
+    "image_source",
+    "image_tech_manipulated_date_from",
+    "image_tech_manipulated_date_to",
+    "image_tech_manipulated_date",
+    "image_web_img_filename",
+    "image_web_img_size",
 )
