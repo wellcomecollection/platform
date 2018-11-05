@@ -1,20 +1,3 @@
-ROOT = $(shell git rev-parse --show-toplevel)
-INFRA_BUCKET = wellcomecollection-platform-infra
-
-WELLCOME_INFRA_BUCKET      = wellcomecollection-platform-infra
-WELLCOME_MONITORING_BUCKET = wellcomecollection-platform-monitoring
-
-LAMBDA_PUSHES_TOPIC_ARN = arn:aws:sns:eu-west-1:760097843905:lambda_pushes
-ECR_PUSHES_TOPIC_ARN    = "arn:aws:sns:eu-west-1:760097843905:ecr_pushes"
-
-DOCKER_IMG_BUILD_TEST_PYTHON = wellcome/build_test_python
-DOCKER_IMG_PUBLISH_LAMBDA    = wellcome/publish_lambda:12
-DOCKER_IMG_TERRAFORM         = hashicorp/terraform:0.11.10
-DOCKER_IMG_TERRAFORM_WRAPPER = wellcome/terraform_wrapper:13
-DOCKER_IMG_IMAGE_BUILDER     = wellcome/image_builder:latest
-DOCKER_IMG_PUBLISH_SERVICE   = wellcome/publish_service:latest
-DOCKER_IMG_SBT_WRAPPER       = wellcome/sbt_wrapper
-
 include makefiles/docker.Makefile
 include makefiles/python.Makefile
 include makefiles/sbt.Makefile
