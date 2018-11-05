@@ -13,8 +13,8 @@ class MiroTransformableTransformer
     with transformers.MiroItems
     with transformers.MiroGenres
     with transformers.MiroIdentifiers
-    with transformers.MiroLicenses
     with transformers.MiroSubjects
+    with transformers.MiroThumbnail
     with transformers.MiroTransformableUtils
     with transformers.MiroWorkType
     with Logging {
@@ -196,15 +196,6 @@ class MiroTransformableTransformer
       } else None
 
     (title, description)
-  }
-
-  private def getThumbnail(miroData: MiroTransformableData,
-                           miroId: String): Location = {
-    DigitalLocation(
-      locationType = LocationType("thumbnail-image"),
-      url = buildImageApiURL(miroId, "thumbnail"),
-      license = Some(chooseLicense(miroId, miroData.useRestrictions))
-    )
   }
 
   private def getCreatedDate(miroData: MiroTransformableData,
