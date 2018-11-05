@@ -5,14 +5,17 @@ import java.time.Instant
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.models.RequestDisplayIngest
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagId,
+  RequestDisplayIngest
+}
 
 case class Progress(id: UUID,
-                    uploadUri: URI,
+                    sourceLocation: StorageLocation,
                     space: Namespace,
                     callback: Option[Callback] = None,
                     status: Progress.Status = Progress.Initialised,
-                    resources: Seq[Resource] = Seq.empty,
+                    bag: Option[BagId] = None,
                     createdDate: Instant = Instant.now,
                     lastModifiedDate: Instant = Instant.now,
                     events: Seq[ProgressEvent] = Seq.empty)
@@ -44,9 +47,9 @@ case object Progress extends URIConverters {
   def apply(createRequest: RequestDisplayIngest): Progress = {
     Progress(
       id = generateId,
-      uploadUri = URI.create(createRequest.uploadUrl),
+      sourceLocation = StorageLocation(createRequest.sourceLocation),
       callback = Callback(createRequest.callback.map(displayCallback =>
-        URI.create(displayCallback.uri))),
+        URI.create(displayCallback.url))),
       space = Namespace(createRequest.space.id),
       status = Progress.Initialised
     )

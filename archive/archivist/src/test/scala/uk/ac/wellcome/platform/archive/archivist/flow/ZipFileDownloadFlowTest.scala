@@ -105,7 +105,7 @@ class ZipFileDownloadFlowTest
             ingestBagRequest.archiveRequestId,
             progressTopic,
             Progress.Failed,
-            Nil) { events =>
+            None) { events =>
             events should have size 1
             events.head.description should startWith(
               s"Failed downloading zipFile ${objectLocation.namespace}/${objectLocation.key}")

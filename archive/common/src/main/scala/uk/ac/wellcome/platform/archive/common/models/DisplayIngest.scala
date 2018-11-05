@@ -6,13 +6,12 @@ import io.circe.generic.extras.JsonKey
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   Callback,
   Progress,
-  ProgressEvent,
-  Resource
+  ProgressEvent
 }
 
 sealed trait DisplayIngest
 
-case class RequestDisplayIngest(uploadUrl: String,
+case class RequestDisplayIngest(sourceLocation: DisplayLocation,
                                 callback: Option[DisplayCallback],
                                 ingestType: DisplayIngestType,
                                 space: DisplayStorageSpace,
@@ -21,13 +20,12 @@ case class RequestDisplayIngest(uploadUrl: String,
     extends DisplayIngest
 
 case class ResponseDisplayIngest(id: UUID,
-                                 uploadUrl: String,
+                                 sourceLocation: DisplayLocation,
                                  callback: Option[DisplayCallback],
                                  ingestType: DisplayIngestType,
                                  space: DisplayStorageSpace,
-                                 status: DisplayIngestStatus,
-                                 resources: Seq[DisplayIngestResource] =
-                                   Seq.empty,
+                                 status: DisplayStatus,
+                                 bag: Option[IngestDisplayBag] = None,
                                  events: Seq[DisplayProgressEvent] = Seq.empty,
                                  createdDate: String,
                                  lastModifiedDate: String,
@@ -35,8 +33,12 @@ case class ResponseDisplayIngest(id: UUID,
                                  ontologyType: String = "Ingest")
     extends DisplayIngest
 
-case class DisplayCallback(uri: String,
-                           status: Option[String],
+case class IngestDisplayBag(id: String,
+                            @JsonKey("type")
+                            ontologyType: String = "Bag")
+
+case class DisplayCallback(url: String,
+                           status: Option[DisplayStatus],
                            @JsonKey("type")
                            ontologyType: String = "Callback")
 
@@ -44,17 +46,13 @@ case class DisplayIngestType(id: String = "create",
                              @JsonKey("type")
                              ontologyType: String = "IngestType")
 
-case class DisplayIngestResource(id: String,
-                                 @JsonKey("type")
-                                 ontologyType: String = "IngestResource")
-
 case class DisplayStorageSpace(id: String,
                                @JsonKey("type")
                                ontologyType: String = "Space")
 
-case class DisplayIngestStatus(id: String,
-                               @JsonKey("type")
-                               ontologyType: String = "IngestStatus")
+case class DisplayStatus(id: String,
+                         @JsonKey("type")
+                         ontologyType: String = "Status")
 
 case class DisplayProgressEvent(description: String,
                                 createdDate: String,
@@ -62,47 +60,42 @@ case class DisplayProgressEvent(description: String,
                                 ontologyType: String = "ProgressEvent")
 
 case object ResponseDisplayIngest {
-  def apply(progress: Progress): ResponseDisplayIngest = {
-    ResponseDisplayIngest(
-      id = progress.id,
-      uploadUrl = progress.uploadUri.toString,
-      callback = progress.callback.map(DisplayCallback(_)),
-      space = DisplayStorageSpace(progress.space.toString),
-      ingestType = DisplayIngestType(),
-      resources = progress.resources.map(DisplayIngestResource(_)),
-      status = DisplayIngestStatus(progress.status),
-      events = progress.events.map(DisplayProgressEvent(_)),
-      createdDate = progress.createdDate.toString,
-      lastModifiedDate = progress.lastModifiedDate.toString
-    )
-  }
+  def apply(progress: Progress): ResponseDisplayIngest = ResponseDisplayIngest(
+    id = progress.id,
+    sourceLocation = DisplayLocation(progress.sourceLocation),
+    callback = progress.callback.map(DisplayCallback(_)),
+    space = DisplayStorageSpace(progress.space.toString),
+    ingestType = DisplayIngestType(),
+    bag = progress.bag.map(IngestDisplayBag(_)),
+    status = DisplayStatus(progress.status),
+    events = progress.events.map(DisplayProgressEvent(_)),
+    createdDate = progress.createdDate.toString,
+    lastModifiedDate = progress.lastModifiedDate.toString
+  )
 }
 
 case object DisplayProgressEvent {
-  def apply(progressEvent: ProgressEvent): DisplayProgressEvent = {
+  def apply(progressEvent: ProgressEvent): DisplayProgressEvent =
     DisplayProgressEvent(
       progressEvent.description,
       progressEvent.createdDate.toString)
-  }
 }
 
-case object DisplayIngestStatus {
-  def apply(progressStatus: Progress.Status): DisplayIngestStatus = {
-    DisplayIngestStatus(progressStatus.toString)
-  }
-}
+case object DisplayStatus {
+  def apply(progressStatus: Progress.Status): DisplayStatus =
+    DisplayStatus(progressStatus.toString)
 
-case object DisplayIngestResource {
-  def apply(resource: Resource): DisplayIngestResource = {
-    DisplayIngestResource(resource.id.underlying)
-  }
+  def apply(callbackStatus: Callback.CallbackStatus): DisplayStatus =
+    DisplayStatus(callbackStatus.toString)
 }
 
 case object DisplayCallback {
-  def apply(callback: Callback): DisplayCallback = {
-    DisplayCallback(
-      callback.uri.toString,
-      Some(callback.status.toString)
-    )
-  }
+  def apply(callback: Callback): DisplayCallback = DisplayCallback(
+    callback.uri.toString,
+    Some(DisplayStatus(callback.status))
+  )
+}
+
+object IngestDisplayBag {
+  def apply(bagId: BagId): IngestDisplayBag = IngestDisplayBag(bagId.toString)
 }
