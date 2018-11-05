@@ -6,8 +6,6 @@ WELLCOME_MONITORING_BUCKET = wellcomecollection-platform-monitoring
 
 include functions.Makefile
 
-include formatting.Makefile
-
 include archive/Makefile
 include assets/Makefile
 include builds/Makefile

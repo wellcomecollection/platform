@@ -1,5 +1,3 @@
-ROOT = $(shell git rev-parse --show-toplevel)
-
 lint-python:
 	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/data \
