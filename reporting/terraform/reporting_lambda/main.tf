@@ -7,7 +7,7 @@ module "reporting_lambda" {
 
   environment_variables = "${var.environment_variables}"
 
-  alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+  alarm_topic_arn = "${var.error_alarm_topic_arn}"
 
   s3_bucket = "${data.terraform_remote_state.shared_infra.infra_bucket}"
   s3_key    = "lambdas/reporting/${var.name}.zip"
