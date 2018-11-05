@@ -29,7 +29,7 @@ class SNSPublishFlowTest
 
           val snsConfig = SNSConfig(topic.arn)
           val publishFlow =
-            SnsPublishFlow[Person](snsClient, snsConfig)
+            SnsPublishFlow[Person](snsClient, snsConfig, subject = "SNSPublishFlowTest")
 
           val publication = Source
             .single(bob)
@@ -60,7 +60,7 @@ class SNSPublishFlowTest
 
         val snsConfig = SNSConfig("bad_topic")
         val publishFlow =
-          SnsPublishFlow[Person](snsClient, snsConfig)
+          SnsPublishFlow[Person](snsClient, snsConfig, subject = "SNSPublishFlowTest")
 
         val publication = Source
           .fromIterator(bobs)
@@ -88,7 +88,7 @@ class SNSPublishFlowTest
 
           val snsConfig = SNSConfig(topic.arn)
           val publishFlow =
-            SnsPublishFlow[Person](snsClient, snsConfig)
+            SnsPublishFlow[Person](snsClient, snsConfig, subject = "SNSPublishFlowTest")
 
           val publication = Source
             .fromIterator(bobs)

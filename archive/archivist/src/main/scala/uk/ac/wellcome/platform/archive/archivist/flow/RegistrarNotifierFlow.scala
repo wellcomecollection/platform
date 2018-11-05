@@ -19,7 +19,7 @@ object RegistrarNotifierFlow {
         SnsPublishFlow[ArchiveComplete](
           snsClient,
           snsRegistrarConfig,
-          Some("archive_completed")))
+          subject = "archive_completed"))
       .log("published notification")
   }
 }
