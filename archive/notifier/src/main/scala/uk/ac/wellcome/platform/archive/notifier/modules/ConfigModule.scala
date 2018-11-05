@@ -27,4 +27,8 @@ object ConfigModule extends AbstractModule {
   @Provides
   def providesSNSClientConfig(appConfig: NotifierConfig) =
     appConfig.snsClientConfig
+
+  @Provides
+  def providesContextUrl(appConfig: NotifierConfig) =
+    appConfig.contextUrl
 }
