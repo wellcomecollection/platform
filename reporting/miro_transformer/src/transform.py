@@ -13,7 +13,7 @@ def transform(miro_transformable):
     -------
     transformed_record : dict
         record with necessary transformations applied, ready to be formatted for
-        elasticsearch ingestion
+        ingestion into elasticsearch
     """
     original_data = json.loads(miro_transformable["data"])
     transformed = drop_redundant_fields(original_data, keys_to_drop)
