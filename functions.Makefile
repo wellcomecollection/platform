@@ -5,45 +5,18 @@ WELLCOME_INFRA_BUCKET      = wellcomecollection-platform-infra
 WELLCOME_MONITORING_BUCKET = wellcomecollection-platform-monitoring
 
 LAMBDA_PUSHES_TOPIC_ARN = arn:aws:sns:eu-west-1:760097843905:lambda_pushes
+ECR_PUSHES_TOPIC_ARN    = "arn:aws:sns:eu-west-1:760097843905:ecr_pushes"
 
 DOCKER_IMG_BUILD_TEST_PYTHON = wellcome/build_test_python
 DOCKER_IMG_PUBLISH_LAMBDA    = wellcome/publish_lambda:12
 DOCKER_IMG_TERRAFORM         = hashicorp/terraform:0.11.10
 DOCKER_IMG_TERRAFORM_WRAPPER = wellcome/terraform_wrapper:13
+DOCKER_IMG_IMAGE_BUILDER     = wellcome/image_builder:latest
+DOCKER_IMG_PUBLISH_SERVICE   = wellcome/publish_service:latest
 
+include makefiles/docker.Makefile
 include makefiles/python.Makefile
 include makefiles/terraform.Makefile
-
-
-# Build and tag a Docker image.
-#
-# Args:
-#   $1 - Name of the image.
-#   $2 - Path to the Dockerfile, relative to the root of the repo.
-#
-define build_image
-	$(ROOT)/docker_run.py \
-	    --dind -- \
-	    wellcome/image_builder:latest \
-            --project=$(1) \
-            --file=$(2)
-endef
-
-
-# Publish a Docker image to ECR, and put its associated release ID in S3.
-#
-# Args:
-#   $1 - Name of the Docker image.
-#
-define publish_service
-	$(ROOT)/docker_run.py \
-	    --aws --dind -- \
-	    wellcome/publish_service:latest \
-	        --project="$(1)" \
-	        --namespace=uk.ac.wellcome \
-	        --infra-bucket="$(INFRA_BUCKET)" \
-			--sns-topic="arn:aws:sns:eu-west-1:760097843905:ecr_pushes"
-endef
 
 
 # Test an sbt project.
