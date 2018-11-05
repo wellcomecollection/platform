@@ -4,40 +4,15 @@ INFRA_BUCKET = wellcomecollection-platform-infra
 WELLCOME_INFRA_BUCKET      = wellcomecollection-platform-infra
 WELLCOME_MONITORING_BUCKET = wellcomecollection-platform-monitoring
 
-DOCKER_IMG_TERRAFORM_WRAPPER = wellcome/terraform_wrapper:13
+LAMBDA_PUSHES_TOPIC_ARN = arn:aws:sns:eu-west-1:760097843905:lambda_pushes
+
+DOCKER_IMG_BUILD_TEST_PYTHON = wellcome/build_test_python
+DOCKER_IMG_PUBLISH_LAMBDA    = wellcome/publish_lambda:12
 DOCKER_IMG_TERRAFORM         = hashicorp/terraform:0.11.10
+DOCKER_IMG_TERRAFORM_WRAPPER = wellcome/terraform_wrapper:13
 
+include makefiles/python.Makefile
 include makefiles/terraform.Makefile
-
-
-# Publish a ZIP file containing a Lambda definition to S3.
-#
-# Args:
-#   $1 - Path to the Lambda src directory, relative to the root of the repo.
-#
-define publish_lambda
-	$(ROOT)/docker_run.py --aws --root -- \
-		wellcome/publish_lambda:12 \
-		"$(1)" --key="lambdas/$(1).zip" --bucket="$(INFRA_BUCKET)" --sns-topic="arn:aws:sns:eu-west-1:760097843905:lambda_pushes"
-endef
-
-
-# Test a Python project.
-#
-# Args:
-#   $1 - Path to the Python project's directory, relative to the root
-#        of the repo.
-#
-define test_python
-	$(ROOT)/docker_run.py --aws --dind -- \
-		wellcome/build_test_python $(1)
-
-	$(ROOT)/docker_run.py --aws --dind -- \
-		--net=host \
-		--volume $(ROOT)/shared_conftest.py:/conftest.py \
-		--workdir $(ROOT)/$(1) --tty \
-		wellcome/test_python_$(shell basename $(1)):latest
-endef
 
 
 # Build and tag a Docker image.
@@ -205,30 +180,6 @@ $(1)-publish:
 endef
 
 
-# Define a series of Make tasks (test, publish) for a Python Lambda.
-#
-# Args:
-#	$1 - Name of the target.
-#	$2 - Path to the Lambda source directory.
-#
-define __lambda_target_template
-$(1)-test:
-	$(call test_python,$(2))
-
-$(1)-publish:
-	$(call publish_lambda,$(2))
-
-$(ROOT)/$(2)/src/requirements.txt: $(ROOT)/$(2)/src/requirements.in
-	$(ROOT)/docker_run.py -- \
-		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools
-
-$(ROOT)/$(2)/src/test_requirements.txt: $(ROOT)/$(2)/src/test_requirements.in
-	$(ROOT)/docker_run.py -- \
-		--volume $(ROOT)/$(2)/src:/src micktwomey/pip-tools \
-		pip-compile test_requirements.in
-endef
-
-
 # Define a series of Make tasks (build, test, publish) for an ECS service.
 #
 # Args:
@@ -280,6 +231,6 @@ $(foreach proj,$(SBT_APPS),$(eval $(call __sbt_target_template,$(proj),$(STACK_R
 $(foreach library,$(SBT_DOCKER_LIBRARIES),$(eval $(call __sbt_library_docker_template,$(library),$(STACK_ROOT)/$(library))))
 $(foreach library,$(SBT_NO_DOCKER_LIBRARIES),$(eval $(call __sbt_library_template,$(library))))
 $(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
-$(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
+$(foreach lamb,$(LAMBDAS),$(eval $(call lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
 $(foreach name,$(TF_NAME),$(eval $(call terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING))))
 endef
