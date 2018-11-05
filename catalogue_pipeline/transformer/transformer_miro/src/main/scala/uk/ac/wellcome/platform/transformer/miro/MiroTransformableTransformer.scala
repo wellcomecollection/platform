@@ -23,7 +23,7 @@ class MiroTransformableTransformer
   def transform(
     transformable: MiroTransformable,
     version: Int
-  ): Try[TransformedBaseWork] = {
+  ): Try[TransformedBaseWork] =
     doTransform(transformable, version) map { transformed =>
       debug(s"Transformed record to $transformed")
       transformed
@@ -32,7 +32,6 @@ class MiroTransformableTransformer
         error("Failed to perform transform to unified item", e)
         throw e
     }
-  }
 
   def doTransform(miroTransformable: MiroTransformable, version: Int) = {
     val sourceIdentifier = SourceIdentifier(
