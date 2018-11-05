@@ -1,3 +1,9 @@
+ECR_PUSHES_TOPIC_ARN = "arn:aws:sns:eu-west-1:760097843905:ecr_pushes"
+
+DOCKER_IMG_IMAGE_BUILDER   = wellcome/image_builder:latest
+DOCKER_IMG_PUBLISH_SERVICE = wellcome/publish_service:latest
+
+
 # Build and tag a Docker image.
 #
 # Args:

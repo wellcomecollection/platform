@@ -1,3 +1,6 @@
+DOCKER_IMG_SBT_WRAPPER = wellcome/sbt_wrapper
+
+
 # Test an sbt project.
 #
 # Args:

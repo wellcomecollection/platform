@@ -1,6 +1,9 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 MAKEFILES = $(ROOT)/makefiles
 
+DOCKER_IMG_TERRAFORM         = hashicorp/terraform:0.11.10
+DOCKER_IMG_TERRAFORM_WRAPPER = wellcome/terraform_wrapper:13
+
 include $(MAKEFILES)/git.Makefile
 
 
