@@ -11,12 +11,4 @@ import uk.ac.wellcome.platform.archive.common.modules.{
   SnsClientConfig
 }
 
-case class NotifierConfig(
-  cloudwatchClientConfig: CloudwatchClientConfig,
-  sqsClientConfig: SQSClientConfig,
-  sqsConfig: SQSConfig,
-  snsClientConfig: SnsClientConfig,
-  snsConfig: SNSConfig,
-  metricsConfig: MetricsConfig,
-  contextUrl: URL
-)
+case class NotifierConfig(contextUrl: URL)
