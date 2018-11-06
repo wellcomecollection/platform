@@ -11,13 +11,11 @@ import com.amazonaws.services.sqs.model.SendMessageResult
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
-import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
@@ -82,11 +80,9 @@ trait Messaging
                               writerSnsClient: AmazonSNS = snsClient)(
     testWith: TestWith[MessageWriter[T], R])(
     implicit store: ObjectStore[T]): R = {
-    val s3Config = S3Config(bucketName = bucket.name)
-    val snsConfig = createSNSConfigWith(topic)
     val messageConfig = MessageWriterConfig(
-      s3Config = s3Config,
-      snsConfig = snsConfig
+      s3Config = createS3ConfigWith(bucket),
+      snsConfig = createSNSConfigWith(topic)
     )
 
     val messageWriter = new MessageWriter[T](
@@ -104,12 +100,9 @@ trait Messaging
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
     implicit objectStore: ObjectStore[T]) = {
-    val s3Config = S3Config(bucketName = bucket.name)
-    val sqsConfig = createSQSConfigWith(queue)
-
     val messageConfig = MessageReaderConfig(
-      sqsConfig = sqsConfig,
-      s3Config = s3Config
+      sqsConfig = createSQSConfigWith(queue),
+      s3Config = createS3ConfigWith(bucket)
     )
 
     val stream = new MessageStream[T](
