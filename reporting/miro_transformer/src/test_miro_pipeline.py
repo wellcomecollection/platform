@@ -6,7 +6,7 @@ from reporting_pipeline.test_pipeline import given_s3_has, create_sns_message
 
 def load_test_data():
     """
-    load some raw MIRO json and a transformed version to test whether the 
+    load some raw MIRO json and a transformed version to test whether the
     transform is being correctly applied
     """
     current_path = os.path.dirname(__file__)
