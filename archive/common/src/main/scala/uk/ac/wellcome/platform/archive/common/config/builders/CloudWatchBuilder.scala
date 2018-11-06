@@ -14,6 +14,6 @@ object CloudWatchBuilder extends AWSClientConfigBuilder {
 
   def buildCloudWatchClient(config: Config): AmazonCloudWatch =
     buildCloudWatchClient(
-      awsClientConfig = buildAWSClientConfig(config)
+      awsClientConfig = buildAWSClientConfig(config, namespace = "cloudwatch")
     )
 }

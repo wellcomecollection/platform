@@ -5,13 +5,16 @@ import java.net.URL
 import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.config.builders.EnrichConfig._
-import uk.ac.wellcome.platform.archive.common.config.builders.{MetricsBuilder, SNSBuilder, SQSBuilder}
+import uk.ac.wellcome.platform.archive.common.config.builders.{AkkaBuilder, MetricsBuilder, SNSBuilder, SQSBuilder}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 object Main extends App with Logging {
   val config = ConfigFactory.load()
+
+  implicit val actorSystem = AkkaBuilder.buildActorSystem()
+  implicit val materializer = AkkaBuilder.buildActorMaterializer()
 
   val notifier = new Notifier(
     sqsClient = SQSBuilder.buildSQSAsyncClient(config),
