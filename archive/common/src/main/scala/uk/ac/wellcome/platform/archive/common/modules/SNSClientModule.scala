@@ -5,11 +5,12 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.AmazonSNSClientBuilder._
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import uk.ac.wellcome.platform.archive.common.config.models.SNSClientConfig
 
 object SNSClientModule extends AbstractModule {
   @Singleton
   @Provides
-  def providesSNSClient(snsClientConfig: SnsClientConfig): AmazonSNS = {
+  def providesSNSClient(snsClientConfig: SNSClientConfig): AmazonSNS = {
     val endpoint = snsClientConfig.endpoint.getOrElse("")
     if (endpoint.isEmpty) {
       standard()
@@ -29,10 +30,3 @@ object SNSClientModule extends AbstractModule {
     }
   }
 }
-
-case class SnsClientConfig(
-  accessKey: Option[String],
-  secretKey: Option[String],
-  endpoint: Option[String],
-  region: String
-)
