@@ -32,7 +32,7 @@ class ProgressManager:
         self.sess = sess or requests.Session()
 
     def create_request(self, request_json):
-        resp = self.sess.post(f"{self.endpoint}/progress", json=request_json, timeout=1)
+        resp = self.sess.post(f"{self.endpoint}/progress", json=request_json, timeout=5)
 
         # The service should return an HTTP 202 if successful.  Anything
         # else should be treated as an error.
@@ -47,7 +47,7 @@ class ProgressManager:
         Passes the response through directly (if any).
 
         """
-        resp = self.sess.get(f"{self.endpoint}/progress/{id}", timeout=1)
+        resp = self.sess.get(f"{self.endpoint}/progress/{id}", timeout=5)
 
         # The service should return an HTTP 200 (if present) or 404 (if not).
         # Anything else should be treated as an error.

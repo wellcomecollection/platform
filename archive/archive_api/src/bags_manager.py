@@ -19,7 +19,7 @@ class BagsManager:
         self.sess = sess or requests.Session()
 
     def lookup_bag(self, space, id):
-        resp = self.sess.get(f"{self.endpoint}/registrar/{space}/{id}", timeout=1)
+        resp = self.sess.get(f"{self.endpoint}/registrar/{space}/{id}", timeout=5)
 
         if resp.status_code not in (200, 404):
             raise BagServiceError(
