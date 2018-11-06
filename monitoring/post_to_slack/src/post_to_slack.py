@@ -48,6 +48,10 @@ class Alarm:
     def state_reason(self):
         return self.message["NewStateReason"]
 
+    @property
+    def should_be_sent_to_main_channel(self):
+        return self.name != "lambda-miro_transformer-errors"
+
     # Sometimes there's enough data in the alarm to make an educated guess
     # about useful CloudWatch logs to check, so we include that in the alarm.
     # The methods and properties below pull out the relevant info.
@@ -192,9 +196,13 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
 @log_on_error
 def main(event, _ctxt=None):
     bitly_access_token = os.environ["BITLY_ACCESS_TOKEN"]
-    webhook_url = os.environ["CRITICAL_SLACK_WEBHOOK"]
-
     alarm = Alarm(event["Records"][0]["Sns"]["Message"])
+
+    if alarm.should_be_sent_to_main_channel:
+        webhook_url = os.environ["CRITICAL_SLACK_WEBHOOK"]
+    else:
+        webhook_url = os.environ["NONCRITICAL_SLACK_WEBHOOK"]
+
     slack_data = prepare_slack_payload(alarm, bitly_access_token)
 
     print("Sending message %s" % json.dumps(slack_data))
