@@ -9,14 +9,6 @@ object ConfigModule extends AbstractModule {
     appConfig.cloudwatchClientConfig
 
   @Provides
-  def providesSQSConfig(appConfig: NotifierConfig) =
-    appConfig.sqsConfig
-
-  @Provides
-  def providesSQSClientConfig(appConfig: NotifierConfig) =
-    appConfig.sqsClientConfig
-
-  @Provides
   def providesMetricsConfig(appConfig: NotifierConfig) =
     appConfig.metricsConfig
 
