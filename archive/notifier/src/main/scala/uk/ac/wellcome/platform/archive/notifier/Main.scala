@@ -2,9 +2,8 @@ package uk.ac.wellcome.platform.archive.notifier
 
 import java.net.URL
 
-import akka.Done
 import com.typesafe.config.{Config, ConfigFactory}
-import uk.ac.wellcome.platform.archive.common.WellcomeApp
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.config.builders.EnrichConfig._
 import uk.ac.wellcome.platform.archive.common.config.builders.{
   AkkaBuilder,
@@ -13,9 +12,10 @@ import uk.ac.wellcome.platform.archive.common.config.builders.{
   SQSBuilder
 }
 
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.Await
 
-object Main extends WellcomeApp {
+object Main extends App with Logging {
   val config = ConfigFactory.load()
 
   implicit val actorSystem = AkkaBuilder.buildActorSystem()
@@ -30,8 +30,18 @@ object Main extends WellcomeApp {
     contextUrl = buildContextURL(config)
   )
 
-  def run(): Future[Done] =
-    notifier.run()
+  try {
+    info("Starting worker.")
+
+    val result = notifier.run()
+
+    Await.result(result, Duration.Inf)
+  } catch {
+    case e: Throwable =>
+      error("Fatal error:", e)
+  } finally {
+    info("Terminating worker.")
+  }
 
   private def buildContextURL(config: Config): URL =
     new URL(config.required[String]("notifier.context-url"))
