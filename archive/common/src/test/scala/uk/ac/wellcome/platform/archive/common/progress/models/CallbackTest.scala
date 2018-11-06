@@ -16,24 +16,15 @@ class CallbackTest extends FunSpec with Matchers {
   import org.scalatest.prop.TableDrivenPropertyChecks._
   private val callbackStatus = Table(
     ("string-status", "parsed-status"),
-    ("pending", Callback.Pending),
-    ("succeeded", Callback.Succeeded),
-    ("failed", Callback.Failed),
+    ("processing", Callback.Pending),
+    ("success", Callback.Succeeded),
+    ("failure", Callback.Failed),
   )
-  it("parses all callback status") {
-    forAll(callbackStatus) { (statusString, status) =>
-      Callback.parseStatus(statusString) shouldBe status
-    }
-  }
 
   it("converts all callback status values to strings") {
     forAll(callbackStatus) { (statusString, status) =>
       Callback(callbackUri, status).status.toString shouldBe statusString
     }
-  }
-
-  it("throws if there is a parse error") {
-    a[MatchError] should be thrownBy Callback.parseStatus("not-valid")
   }
 
 }
