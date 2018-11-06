@@ -12,7 +12,6 @@ import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
@@ -106,7 +105,7 @@ trait Messaging
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
     implicit objectStore: ObjectStore[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val sqsConfig = SQSConfig(queueUrl = queue.url)
+    val sqsConfig = createSQSConfigWith(queue)
 
     val messageConfig = MessageReaderConfig(
       sqsConfig = sqsConfig,
