@@ -267,9 +267,8 @@ module "migrator" {
 }
 
 module "trigger_migrator" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/modules/triggers/sns?ref=v11.12.0"
 
-  lambda_function_arn  = "${module.migrator.arn}"
   lambda_function_name = "${module.migrator.function_name}"
   sns_trigger_arn      = "${module.bagging_complete_topic.arn}"
 }
