@@ -1,32 +1,30 @@
+
 variable "es_config" {
+  type = "map"
+}
+variable "es_cluster_credentials" {
   type = "map"
 }
 variable "subnets" {
   type = "list"
 }
 
+variable "vpc_id" {}
+variable "container_image" {}
+
 variable "cluster_name" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
 
-data "template_file" "es_cluster_host" {
-  template = "$${name}.$${region}.aws.found.io"
-
-  vars {
-    name   = "${var.es_cluster_credentials["name"]}"
-    region = "${var.es_cluster_credentials["region"]}"
-  }
+variable "external_path" {
+  default = "catalogue"
 }
 
-variable "es_cluster_credentials" {
-  type = "map"
+variable "internal_port" {
+  default = "8888"
 }
 
-variable "vpc_id" {}
-variable "container_image" {}
-variable "container_port" {}
-variable "security_group_ids" {
-  type = "list"
+variable "internal_path" {
+  default = ""
 }
-variable "service_egress_security_group_id" {}
