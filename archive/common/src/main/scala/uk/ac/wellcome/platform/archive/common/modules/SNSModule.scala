@@ -1,8 +1,9 @@
 package uk.ac.wellcome.platform.archive.common.modules
 
+import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.typesafe.config.Config
-import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig}
 import uk.ac.wellcome.platform.archive.common.models.EnrichConfig._
 
 object SNSModule extends AbstractModule {
@@ -31,4 +32,18 @@ object SNSModule extends AbstractModule {
       region = region
     )
   }
+
+  @Singleton
+  @Provides
+  def providesSNSClient(snsClientConfig: SnsClientConfig): AmazonSNS =
+    SNSClientFactory.create(
+      region = snsClientConfig.region,
+      endpoint = snsClientConfig.endpoint.getOrElse(""),
+      accessKey = snsClientConfig.accessKey.getOrElse(
+        throw new RuntimeException("accessKey required")
+      ),
+      secretKey = snsClientConfig.secretKey.getOrElse(
+        throw new RuntimeException("secretKey required")
+      )
+    )
 }

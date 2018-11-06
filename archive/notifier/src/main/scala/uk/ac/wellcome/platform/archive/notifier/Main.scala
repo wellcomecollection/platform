@@ -22,8 +22,7 @@ object Main extends App with Logging {
     ConfigModule,
     AkkaModule,
     CloudWatchClientModule,
-    SQSClientModule,
-    SNSClientModule
+    SQSClientModule
   )
 
   val app = injector.getInstance(classOf[Notifier])

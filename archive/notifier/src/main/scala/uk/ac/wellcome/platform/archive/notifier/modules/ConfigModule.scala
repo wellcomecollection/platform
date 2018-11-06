@@ -21,14 +21,6 @@ object ConfigModule extends AbstractModule {
     appConfig.metricsConfig
 
   @Provides
-  def providesSNSConfig(appConfig: NotifierConfig) =
-    appConfig.snsConfig
-
-  @Provides
-  def providesSNSClientConfig(appConfig: NotifierConfig) =
-    appConfig.snsClientConfig
-
-  @Provides
   def providesContextUrl(appConfig: NotifierConfig) =
     appConfig.contextUrl
 }
