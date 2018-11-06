@@ -25,8 +25,8 @@ case object Progress extends URIConverters {
 
   private val initialisedString = "initialised"
   private val processingString = "processing"
-  private val completedString = "completed"
-  private val failedString = "failed"
+  private val successString = "success"
+  private val failureString = "failure"
 
   case object Initialised extends Status {
     override def toString: String = initialisedString
@@ -37,11 +37,11 @@ case object Progress extends URIConverters {
   }
 
   case object Completed extends Status {
-    override def toString: String = completedString
+    override def toString: String = successString
   }
 
   case object Failed extends Status {
-    override def toString: String = failedString
+    override def toString: String = failureString
   }
 
   def apply(createRequest: RequestDisplayIngest): Progress = {
@@ -59,8 +59,8 @@ case object Progress extends URIConverters {
     status match {
       case `initialisedString` => Initialised
       case `processingString`  => Processing
-      case `completedString`   => Completed
-      case `failedString`      => Failed
+      case `successString`   => Completed
+      case `failureString`      => Failed
     }
   }
 
