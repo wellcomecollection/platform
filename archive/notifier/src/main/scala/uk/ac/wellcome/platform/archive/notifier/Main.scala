@@ -1,11 +1,11 @@
 package uk.ac.wellcome.platform.archive.notifier
 
-import com.google.inject.{Guice, Injector}
-import com.typesafe.config.ConfigFactory
+import java.net.URL
+
+import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.config.builders.{SNSBuilder, SQSBuilder}
-import uk.ac.wellcome.platform.archive.notifier.modules.{AppConfigModule, ConfigModule}
-import uk.ac.wellcome.platform.archive.common.modules.{AkkaModule, CloudWatchClientModule, SNSClientModule, SQSClientModule}
+import uk.ac.wellcome.platform.archive.common.config.builders.EnrichConfig._
+import uk.ac.wellcome.platform.archive.common.config.builders.{MetricsBuilder, SNSBuilder, SQSBuilder}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -18,24 +18,14 @@ object Main extends App with Logging {
     sqsConfig = SQSBuilder.buildSQSConfig(config),
     snsClient = SNSBuilder.buildSNSClient(config),
     snsConfig = SNSBuilder.buildSNSConfig(config),
-
+    metricsSender = MetricsBuilder.buildMetricsSender(config),
+    contextUrl = buildContextURL(config)
   )
-
-  val injector: Injector = Guice.createInjector(
-    new AppConfigModule(args),
-    ConfigModule,
-    AkkaModule,
-    CloudWatchClientModule,
-    SQSClientModule,
-    SNSClientModule
-  )
-
-  val app = injector.getInstance(classOf[Notifier])
 
   try {
     info(s"Starting worker.")
 
-    val result = app.run()
+    val result = notifier.run()
 
     Await.result(result, Duration.Inf)
   } catch {
@@ -44,4 +34,7 @@ object Main extends App with Logging {
   } finally {
     info(s"Terminating worker.")
   }
+
+  private def buildContextURL(config: Config): URL =
+    new URL(config.required[String]("notifier.context-url"))
 }

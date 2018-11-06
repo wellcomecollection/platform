@@ -8,7 +8,7 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 
 import scala.concurrent.duration._
 
-object MetricsModule {
+object MetricsBuilder {
   def buildMetricsConfig(config: Config): MetricsConfig = {
     val namespace =
       config.getOrElse[String]("aws.metrics.namespace")(default = "")
