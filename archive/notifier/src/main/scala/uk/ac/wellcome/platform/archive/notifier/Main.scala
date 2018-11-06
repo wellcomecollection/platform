@@ -2,15 +2,10 @@ package uk.ac.wellcome.platform.archive.notifier
 
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.notifier.modules.{
   AppConfigModule,
   ConfigModule
-}
-import uk.ac.wellcome.platform.archive.common.modules.{
-  AkkaModule,
-  CloudWatchClientModule,
-  SNSClientModule,
-  SQSClientModule
 }
 
 import scala.concurrent.Await
@@ -22,7 +17,9 @@ object Main extends App with Logging {
     ConfigModule,
     AkkaModule,
     CloudWatchClientModule,
-    SQSClientModule
+    SQSClientModule,
+    SNSModule,
+    TypesafeConfigModule
   )
 
   val app = injector.getInstance(classOf[Notifier])
