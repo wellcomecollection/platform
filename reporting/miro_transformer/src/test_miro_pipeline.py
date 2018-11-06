@@ -35,25 +35,18 @@ def raw_data():
 
 def transformed_data():
     return {
-        "an_array": [
-            "a value",
-            "another value"
-        ],
-        "an_array_of_date": [
-            "2017-04-22",
-            "2011-12-19"
-        ],
+        "an_array": ["a value", "another value"],
+        "an_array_of_date": ["2017-04-22", "2011-12-19"],
         "string_field": "a string",
         "null_field": None,
         "single_date": "2004-04-24",
-        "dict_field": {
-            "a": "a_value"
-        }
+        "dict_field": {"a": "a_value"},
     }
 
 
 def test_saves_record_in_es(
-        s3_client, bucket, elasticsearch_client, elasticsearch_index):
+    s3_client, bucket, elasticsearch_client, elasticsearch_index
+):
     id = "V0010033"
     elasticsearch_doctype = "example"
     hybrid_data = create_miro_hybrid_data(raw_data())
