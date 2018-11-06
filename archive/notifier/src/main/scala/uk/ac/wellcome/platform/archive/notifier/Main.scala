@@ -16,7 +16,7 @@ object Main extends App with Logging {
     new AppConfigModule(args),
     ConfigModule,
     AkkaModule,
-    CloudWatchClientModule,
+    CloudWatchModule,
     SNSModule,
     SQSModule
   )
