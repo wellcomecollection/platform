@@ -204,7 +204,7 @@ class ProgressHttpFeatureTest
                       actualId shouldBe id
                       actualSourceLocation shouldBe displayLocation
                       actualCallbackUrl shouldBe testCallbackUri.toString
-                      actualCallbackStatus shouldBe "pending"
+                      actualCallbackStatus shouldBe "processing"
                       actualSpaceId shouldBe storageSpace.id
 
                       assertTableOnlyHasItem(
