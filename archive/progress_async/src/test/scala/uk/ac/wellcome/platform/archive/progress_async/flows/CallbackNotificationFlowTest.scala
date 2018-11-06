@@ -4,7 +4,6 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.json.{
@@ -43,8 +42,10 @@ class CallbackNotificationFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>
           withLocalSnsTopic { topic =>
-            val callbackNotificationFlow =
-              CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
+            val callbackNotificationFlow = CallbackNotificationFlow(
+              snsClient,
+              snsConfig = createSNSConfigWith(topic)
+            )
 
             val progress = createProgressWith(
               status = progressStatus,
@@ -87,8 +88,10 @@ class CallbackNotificationFlowTest
         withLocalSnsTopic { topic =>
           forAll(doesNotSendCallbackStatus) {
             (progressStatus, callbackStatus) =>
-              val callbackNotificationFlow =
-                CallbackNotificationFlow(snsClient, SNSConfig(topic.arn))
+              val callbackNotificationFlow = CallbackNotificationFlow(
+                snsClient,
+                snsConfig = createSNSConfigWith(topic)
+              )
 
               val progress = createProgressWith(
                 status = progressStatus,

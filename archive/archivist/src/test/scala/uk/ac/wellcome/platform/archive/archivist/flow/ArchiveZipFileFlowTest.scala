@@ -4,7 +4,6 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
@@ -263,7 +262,7 @@ class ArchiveZipFileFlowTest
     val bagUploaderConfig = createBagUploaderConfig(bucket)
     val flow = ArchiveZipFileFlow(
       config = bagUploaderConfig,
-      snsConfig = SNSConfig(topicArn = topic.arn)
+      snsConfig = createSNSConfigWith(topic)
     )
 
     testWith(flow)

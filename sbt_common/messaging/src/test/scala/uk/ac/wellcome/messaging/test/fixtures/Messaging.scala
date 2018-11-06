@@ -83,7 +83,7 @@ trait Messaging
     testWith: TestWith[MessageWriter[T], R])(
     implicit store: ObjectStore[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val snsConfig = SNSConfig(topicArn = topic.arn)
+    val snsConfig = createSNSConfigWith(topic)
     val messageConfig = MessageWriterConfig(
       s3Config = s3Config,
       snsConfig = snsConfig

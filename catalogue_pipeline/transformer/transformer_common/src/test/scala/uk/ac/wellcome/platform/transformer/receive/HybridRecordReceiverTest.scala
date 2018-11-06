@@ -9,7 +9,6 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
@@ -196,7 +195,10 @@ class HybridRecordReceiverTest
     implicit objectStore: ObjectStore[TestTransformable]) = {
     val s3Config = S3Config(bucket.name)
 
-    val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
+    val messageConfig = MessageWriterConfig(
+      snsConfig = createSNSConfigWith(topic),
+      s3Config = s3Config
+    )
 
     val messageWriter =
       new MessageWriter[TransformedBaseWork](
