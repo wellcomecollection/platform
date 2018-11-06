@@ -16,7 +16,7 @@ import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
   SierraItemData
 }
-import uk.ac.wellcome.platform.transformer.sierra.transformers.sierra._
+import uk.ac.wellcome.platform.transformer.sierra.transformers._
 import uk.ac.wellcome.platform.transformer.sierra.source.SierraMaterialType._
 
 import scala.util.{Failure, Success, Try}
