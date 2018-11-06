@@ -7,8 +7,7 @@ import uk.ac.wellcome.messaging.sqs.{SQSClientFactory, SQSConfig}
 import uk.ac.wellcome.platform.archive.common.models.EnrichConfig._
 
 object SQSModule extends AbstractModule {
-  install(TypesafeConfigModule)
-
+  
   @Singleton
   @Provides
   def providesSQSConfig(config: Config): SQSConfig = {

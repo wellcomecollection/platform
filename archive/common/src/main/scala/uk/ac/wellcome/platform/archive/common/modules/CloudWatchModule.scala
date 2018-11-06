@@ -7,7 +7,6 @@ import uk.ac.wellcome.monitoring.CloudWatchClientFactory
 import uk.ac.wellcome.platform.archive.common.models.EnrichConfig._
 
 object CloudWatchModule extends AbstractModule {
-  install(TypesafeConfigModule)
 
   @Singleton
   @Provides

@@ -10,9 +10,6 @@ import uk.ac.wellcome.platform.archive.common.models.EnrichConfig._
 import scala.concurrent.duration._
 
 object MetricsModule extends AbstractModule {
-  install(AkkaModule)
-  install(CloudWatchModule)
-  install(TypesafeConfigModule)
 
   @Singleton
   @Provides

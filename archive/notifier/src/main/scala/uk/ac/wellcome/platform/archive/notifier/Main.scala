@@ -54,7 +54,7 @@ trait WellcomeApp extends Logging {
   val configModule: Configurable
   val modules: List[AbstractModule]
 
-  val injector: Injector =
+  def injector: Injector =
     Guice.createInjector(configModule :: modules : _*)
 
   def run(): Future[Done]
