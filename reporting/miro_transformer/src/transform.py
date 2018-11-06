@@ -57,16 +57,16 @@ def convert_date_to_iso(date_string):
         return None
 
 
-keys_to_parse = (
+keys_to_parse = {
     "_from",
     "_to",
     "_tech",
     "all_amendment_date",
     "image_iap_catalog_date",
     "image_innopac_id_date",
-)
+}
 
-keys_to_drop = (
+keys_to_drop = {
     "_index",
     "_score",
     "_type",
@@ -92,4 +92,4 @@ keys_to_drop = (
     "image_tech_manipulated_date",
     "image_web_img_filename",
     "image_web_img_size",
-)
+}
