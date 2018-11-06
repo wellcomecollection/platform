@@ -1,5 +1,5 @@
 module "resource" {
-  source = "../../../../terraform-modules/api_gateway/modules/resource/no_auth"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/resource/no_auth?ref=cfbc6c413003f953768e2ff97f47fad3f1f68ea5"
 
   namespace     = "${var.namespace}"
   resource_name = "${var.external_path}"
@@ -16,7 +16,7 @@ module "resource" {
 }
 
 module "gateway" {
-  source = "../../../../modules/gateway"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/gateway?ref=f26492815b0fe25742b0d01652b8009e5db2fcbf"
 
   name = "Catalogue API"
 }
@@ -25,3 +25,4 @@ resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = "${module.gateway.id}"
   stage_name  = "prod"
 }
+
