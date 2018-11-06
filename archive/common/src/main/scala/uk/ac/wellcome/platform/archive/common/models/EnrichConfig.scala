@@ -12,12 +12,11 @@ object EnrichConfig {
       }
 
     def required[T](path: String): T =
-      get(path).get
+      get(path).getOrElse {
+        throw new RuntimeException(s"No value found for path $path")
+      }
 
     def getOrElse[T](path: String)(default: T): T =
-      get(path) match {
-        case Some(t) => t
-        case None => default
-      }
+      get(path).getOrElse(default)
   }
 }
