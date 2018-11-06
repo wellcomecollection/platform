@@ -15,7 +15,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao)
 
   def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier
-  ): Try[String] = {
+  ): Try[String] =
     Try {
       identifiersDao
         .lookupId(
@@ -26,21 +26,18 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao)
           case None     => generateAndSaveCanonicalId(identifier)
         }
     }.flatten
-  }
 
   private def generateAndSaveCanonicalId(
-    identifier: SourceIdentifier
+    sourceIdentifier: SourceIdentifier
   ): Try[String] = {
-
     val canonicalId = Identifiable.generate
     identifiersDao
       .saveIdentifier(
         Identifier(
-          CanonicalId = canonicalId,
-          OntologyType = identifier.ontologyType,
-          SourceSystem = identifier.identifierType.id,
-          SourceId = identifier.value
-        ))
+          canonicalId = canonicalId,
+          sourceIdentifier = sourceIdentifier
+        )
+      )
       .map { _ =>
         canonicalId
       }
