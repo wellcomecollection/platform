@@ -5,7 +5,7 @@ from reporting_pipeline.test_pipeline import given_s3_has, create_sns_message
 
 def create_miro_hybrid_data(raw_data):
     return {
-        "MiroCollection": "images-2",
+        "MiroCollection": "images",
         "data": raw_data,
         "id": "miro/A0000001",
         "sourceId": "A0000001",
@@ -20,12 +20,12 @@ def raw_data():
                     \"a value\",
                     \"another value\"
                 ],
-                \"an_array_of_date\": [
+                \"an_array_of_date_from\": [
                             \"22/04/2017\",
                             \"19/12/2011\"],
                 \"string_field\": \"a string\",
                 \"null_field\": null,
-                \"single_date\": \"24/04/2004\",
+                \"single_date_from\": \"24/04/2004\",
                 \"dict_field\": {
                       \"a\": \"a_value\"
                   },
@@ -36,10 +36,10 @@ def raw_data():
 def transformed_data():
     return {
         "an_array": ["a value", "another value"],
-        "an_array_of_date": ["2017-04-22", "2011-12-19"],
+        "an_array_of_date_from": ["2017-04-22", "2011-12-19"],
         "string_field": "a string",
         "null_field": None,
-        "single_date": "2004-04-24",
+        "single_date_from": "2004-04-24",
         "dict_field": {"a": "a_value"},
     }
 

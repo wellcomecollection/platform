@@ -6,21 +6,11 @@ def create_sns_message(bucket_name, id, key):
     return {
         "Records": [
             {
-                "EventSource": "aws:sns",
-                "EventSubscriptionArn": "arn:aws:sns:eu-west-1:1111111111111111:reporting_miro_reindex_topic:7f684445-0aec-4dee-b3fc-aafc0e9afd67",
-                "EventVersion": "1.0",
                 "Sns": {
-                    "Message": f'{{"id":"{id}","version":2,"location":{{"namespace":"{bucket_name}","key":"{key}"}}}}',
+                    "Message": f'{{"id":"{id}","version":1,"location":{{"namespace":"{bucket_name}","key":"{key}"}}}}',
                     "MessageAttributes": {},
-                    "MessageId": "108920ea-19a2-550f-8c2e-74a7163ad107",
-                    "Signature": "fxkrB6/WGHY8HkFqfsD4Ir6PtvIw97GZSXW7evIYposeyp/X+/TyOXOTkHo4WltsbJGL/udnRHP9gnBdZ7OWvynJMM76KPnb9/d8pRfb6EH6nD0kaTURQ1GIK7/UHiArtTqP8CHPCr+jxhcWHrX3WsxZV3jq4mkXm2PROFfvsVM3uGiinIFoXFJmBfTUvxygpOIaeg69nG+7CVkTvcggW+Tpm89KNZ+oWbkwrdMggDio23HbvgvW4caGSQ2Pha64LnW+hX1V4Opa+Sw8of47qPZJ1/YLK+NVNvyYO9ykSvbrrO1+wsj3aN60uE4DIqLPnP5fkrTydzBiw==",
-                    "SignatureVersion": "1",
-                    "SigningCertUrl": "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d992d285f9598aa1d9b.pem",
-                    "Subject": "HybridRecordSender",
-                    "Timestamp": "2018-10-26T12:49:28.829Z",
-                    "TopicArn": "arn:aws:sns:eu-west-1:1111111111111111:reporting_miro_reindex_topic",
-                    "Type": "Notification",
-                    "UnsubscribeUrl": "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe",
+                    "MessageId": "0cf7d798-64c8-45a7-a7bf-a9ebc94d1108",
+                    "Type": "Notification"
                 },
             }
         ]
@@ -46,10 +36,10 @@ def test_saves_record_in_es(
     s3_client, bucket, elasticsearch_client, elasticsearch_index
 ):
 
-    id = "V0010033"
+    id = "V0000001"
     elasticsearch_doctype = "example"
     hybrid_data = '{"foo": "bar"}'
-    key = "33/V0010033/0.json"
+    key = "00/V0000001/0.json"
 
     given_s3_has(s3_client, bucket, key, json.dumps(hybrid_data))
     event = create_sns_message(bucket, id, key)
