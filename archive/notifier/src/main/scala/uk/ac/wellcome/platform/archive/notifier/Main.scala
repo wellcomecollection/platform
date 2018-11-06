@@ -3,17 +3,9 @@ package uk.ac.wellcome.platform.archive.notifier
 import com.google.inject.{Guice, Injector}
 import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.config.builders.SQSBuilder
-import uk.ac.wellcome.platform.archive.notifier.modules.{
-  AppConfigModule,
-  ConfigModule
-}
-import uk.ac.wellcome.platform.archive.common.modules.{
-  AkkaModule,
-  CloudWatchClientModule,
-  SNSClientModule,
-  SQSClientModule
-}
+import uk.ac.wellcome.platform.archive.common.config.builders.{SNSBuilder, SQSBuilder}
+import uk.ac.wellcome.platform.archive.notifier.modules.{AppConfigModule, ConfigModule}
+import uk.ac.wellcome.platform.archive.common.modules.{AkkaModule, CloudWatchClientModule, SNSClientModule, SQSClientModule}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -24,6 +16,8 @@ object Main extends App with Logging {
   val notifier = new Notifier(
     sqsClient = SQSBuilder.buildSQSAsyncClient(config),
     sqsConfig = SQSBuilder.buildSQSConfig(config),
+    snsClient = SNSBuilder.buildSNSClient(config),
+    snsConfig = SNSBuilder.buildSNSConfig(config),
 
   )
 
