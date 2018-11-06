@@ -10,7 +10,7 @@ object CloudWatchModule extends AbstractModule {
 
   @Singleton
   @Provides
-  def providesSNSClientConfig(config: Config): CloudwatchClientConfig = {
+  def providesCloudWatchClientConfig(config: Config): CloudwatchClientConfig = {
     val endpoint = config.get[String]("aws.cloudwatch.endpoint")
     val region = config.getOrElse[String]("aws.cloudwatch.region")("eu-west-1")
 

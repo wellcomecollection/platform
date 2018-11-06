@@ -4,14 +4,10 @@ import java.net.URL
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sqs.AmazonSQSAsync
-import com.google.inject.{AbstractModule, Guice, Injector}
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.messaging.sqs.SQSConfig
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.modules._
 
 import scala.concurrent.{Await, Future}
@@ -23,26 +19,31 @@ object Main extends App {
 }
 
 class NotifierApp() extends WellcomeApp {
-  val configModule = TypesafeConfigModule
-
-  val modules: List[AbstractModule] = List(
-    AkkaModule,
-    CloudWatchModule,
-    MetricsModule,
-    SNSModule,
-    SQSModule
-  )
-
-  val injector: Injector =
-    Guice.createInjector(configModule :: modules : _*)
 
   def run(): Future[Done] = {
-    val classToGet = classOf[SQSConfig]
-    val sqsConfig = injector.getInstance(classToGet)
-    val sqsClient = injector.getInstance(classOf[AmazonSQSAsync])
-    val snsClient = injector.getInstance(classOf[AmazonSNS])
-    val snsConfig = injector.getInstance(classOf[SNSConfig])
-    val metricsSender = injector.getInstance(classOf[MetricsSender])
+    val config = ConfigFactory.load()
+
+    val sqsClientConfig = SQSModule.providesSQSClientConfig(config)
+    val sqsClient = SQSModule.providesSQSAsyncClient(sqsClientConfig)
+    val sqsConfig = SQSModule.providesSQSConfig(config)
+
+    val snsConfig = SNSModule.providesSNSConfig(config)
+    val snsClientConfig = SNSModule.providesSNSClientConfig(config)
+    val snsClient = SNSModule.providesSNSClient(snsClientConfig)
+
+    val cloudwatchClientConfig = CloudWatchModule.providesCloudWatchClientConfig(config)
+    val cloudWatchClient: AmazonCloudWatch = CloudWatchModule.providesAmazonCloudWatch(cloudwatchClientConfig)
+
+    implicit val actorSystem: ActorSystem = ActorSystem("main-actor-system")
+    val actorMaterializer = ActorMaterializer(ActorMaterializerSettings(actorSystem))
+
+    val metricsConfig = MetricsModule.providesMetricsConfig(config)
+    val metricsSender = MetricsModule.providesMetricsSender(
+      amazonCloudWatch = cloudWatchClient,
+      actorSystem = actorSystem,
+      metricsConfig = metricsConfig
+    )
+
     val notifier = new Notifier(
       sqsClient = sqsClient,
       sqsConfig = sqsConfig,
@@ -51,8 +52,8 @@ class NotifierApp() extends WellcomeApp {
       metricsSender = metricsSender,
       contextUrl = new URL("https://example.org")
     )(
-      actorSystem = injector.getInstance(classOf[ActorSystem]),
-      materializer = injector.getInstance(classOf[ActorMaterializer])
+      actorSystem = actorSystem,
+      materializer = actorMaterializer
     )
 
     notifier.run()
@@ -69,9 +70,9 @@ trait WellcomeApp extends Logging {
   } catch {
     case e: Throwable =>
       error("Fatal error:", e)
-      System.exit(1)
+//      System.exit(1)
   } finally {
     info("Terminating service.")
-    System.exit(0)
+//    System.exit(0)
   }
 }
