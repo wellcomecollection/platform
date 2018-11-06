@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.idminter.database.exceptions
+package uk.ac.wellcome.platform.idminter.exceptions
 
 import uk.ac.wellcome.exceptions.GracefulFailureException
 
