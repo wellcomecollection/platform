@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.idminter.database
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
+import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.exceptions.IdMinterException
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
@@ -37,8 +38,7 @@ class IdentifiersDaoTest
   describe("lookupID") {
     it("gets an Identifier if it finds a matching SourceSystem and SourceId") {
       val sourceIdentifier = createSourceIdentifier
-      val identifier = Identifier(
-        canonicalId = createCanonicalId,
+      val identifier = createSQLIdentifierWith(
         sourceIdentifier = sourceIdentifier
       )
 
@@ -56,10 +56,7 @@ class IdentifiersDaoTest
 
     it(
       "does not get an identifier if there is no matching SourceSystem and SourceId") {
-      val identifier = Identifier(
-        canonicalId = createCanonicalId,
-        sourceIdentifier = createSourceIdentifier
-      )
+      val identifier = createSQLIdentifier
 
       withIdentifiersDao {
         case (identifiersDao, _) =>
@@ -81,10 +78,7 @@ class IdentifiersDaoTest
 
   describe("saveIdentifier") {
     it("inserts the provided identifier into the database") {
-      val identifier = Identifier(
-        canonicalId = createCanonicalId,
-        sourceIdentifier = createSourceIdentifier
-      )
+      val identifier = createSQLIdentifier
 
       withIdentifiersDao {
         case (identifiersDao, identifiersTable) =>
@@ -106,13 +100,9 @@ class IdentifiersDaoTest
     }
 
     it("fails to insert a record with a duplicate CanonicalId") {
-      val identifier = Identifier(
-        canonicalId = createCanonicalId,
-        sourceIdentifier = createSourceIdentifier
-      )
-      val duplicateIdentifier = Identifier(
-        canonicalId = identifier.CanonicalId,
-        sourceIdentifier = createSourceIdentifier
+      val identifier = createSQLIdentifier
+      val duplicateIdentifier = createSQLIdentifierWith(
+        canonicalId = identifier.CanonicalId
       )
 
       withIdentifiersDao {
@@ -135,13 +125,11 @@ class IdentifiersDaoTest
         ontologyType = "Bar"
       )
 
-      val identifier1 = Identifier(
-        canonicalId = createCanonicalId,
+      val identifier1 = createSQLIdentifierWith(
         sourceIdentifier = sourceIdentifier1
       )
 
-      val identifier2 = Identifier(
-        canonicalId = createCanonicalId,
+      val identifier2 = createSQLIdentifierWith(
         sourceIdentifier = sourceIdentifier2
       )
 
@@ -161,13 +149,11 @@ class IdentifiersDaoTest
         value = "5678"
       )
 
-      val identifier1 = Identifier(
-        canonicalId = createCanonicalId,
+      val identifier1 = createSQLIdentifierWith(
         sourceIdentifier = sourceIdentifier1
       )
 
-      val identifier2 = Identifier(
-        canonicalId = createCanonicalId,
+      val identifier2 = createSQLIdentifierWith(
         sourceIdentifier = sourceIdentifier2
       )
 
@@ -182,12 +168,10 @@ class IdentifiersDaoTest
       "does not insert records with the same SourceId, SourceSystem and OntologyType") {
       val sourceIdentifier = createSourceIdentifier
 
-      val identifier1 = Identifier(
-        canonicalId = createCanonicalId,
+      val identifier1 = createSQLIdentifierWith(
         sourceIdentifier = sourceIdentifier
       )
-      val identifier2 = Identifier(
-        canonicalId = createCanonicalId,
+      val identifier2 = createSQLIdentifierWith(
         sourceIdentifier = sourceIdentifier
       )
 
@@ -202,4 +186,15 @@ class IdentifiersDaoTest
       }
     }
   }
+
+  def createSQLIdentifierWith(
+    canonicalId: String = createCanonicalId,
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier
+  ): Identifier =
+    Identifier(
+      canonicalId = canonicalId,
+      sourceIdentifier = sourceIdentifier
+    )
+
+  def createSQLIdentifier: Identifier = createSQLIdentifierWith()
 }
