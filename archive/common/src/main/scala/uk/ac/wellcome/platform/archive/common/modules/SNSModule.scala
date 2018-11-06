@@ -7,6 +7,7 @@ import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig}
 import uk.ac.wellcome.platform.archive.common.models.EnrichConfig._
 
 object SNSModule extends AbstractModule {
+  install(TypesafeConfigModule)
 
   @Singleton
   @Provides
