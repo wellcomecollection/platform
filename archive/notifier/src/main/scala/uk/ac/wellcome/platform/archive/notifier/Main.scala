@@ -17,6 +17,7 @@ object Main extends App with Logging {
     ConfigModule,
     AkkaModule,
     CloudWatchModule,
+    MetricsModule,
     SNSModule,
     SQSModule
   )
