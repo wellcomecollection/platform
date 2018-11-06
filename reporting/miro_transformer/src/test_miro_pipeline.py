@@ -1,27 +1,6 @@
-import os
 import json
 import miro_transformer
 from reporting_pipeline.test_pipeline import given_s3_has, create_sns_message
-
-
-def load_test_data():
-    """
-    load some raw MIRO json and a transformed version to test whether the
-    transform is being correctly applied
-    """
-    current_path = os.path.dirname(__file__)
-    raw_data_path = os.path.join(current_path, "test_data/raw_data.json")
-    transformed_data_path = os.path.join(
-        current_path, "test_data/transformed_data.json"
-    )
-
-    with open(raw_data_path) as f:
-        raw_data = f.read()
-
-    with open(transformed_data_path) as f:
-        transformed_data = json.load(f)
-
-    return raw_data, transformed_data
 
 
 def create_miro_hybrid_data(raw_data):
@@ -35,13 +14,49 @@ def create_miro_hybrid_data(raw_data):
     }
 
 
+def raw_data():
+    return """{
+                \"an_array\": [
+                    \"a value\",
+                    \"another value\"
+                ],
+                \"an_array_of_date\": [
+                            \"22/04/2017\",
+                            \"19/12/2011\"],
+                \"string_field\": \"a string\",
+                \"null_field\": null,
+                \"single_date\": \"24/04/2004\",
+                \"dict_field\": {
+                      \"a\": \"a_value\"
+                  },
+                \"image_source\": \"ignored field\"
+            }"""
+
+
+def transformed_data():
+    return {
+        "an_array": [
+            "a value",
+            "another value"
+        ],
+        "an_array_of_date": [
+            "2017-04-22",
+            "2011-12-19"
+        ],
+        "string_field": "a string",
+        "null_field": None,
+        "single_date": "2004-04-24",
+        "dict_field": {
+            "a": "a_value"
+        }
+    }
+
+
 def test_saves_record_in_es(
-    s3_client, bucket, elasticsearch_client, elasticsearch_index
-):
-    raw_data, transformed_data = load_test_data()
+        s3_client, bucket, elasticsearch_client, elasticsearch_index):
     id = "V0010033"
     elasticsearch_doctype = "example"
-    hybrid_data = create_miro_hybrid_data(raw_data)
+    hybrid_data = create_miro_hybrid_data(raw_data())
     key = "33/V0010033/0.json"
 
     given_s3_has(s3_client, bucket, key, json.dumps(hybrid_data))
@@ -58,4 +73,4 @@ def test_saves_record_in_es(
 
     es_record = elasticsearch_client.get(elasticsearch_index, elasticsearch_doctype, id)
 
-    assert es_record["_source"] == transformed_data
+    assert es_record["_source"] == transformed_data()
