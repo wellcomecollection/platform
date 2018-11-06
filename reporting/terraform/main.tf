@@ -14,8 +14,4 @@ module "lambda_miro_transformer" {
 
   trigger_topic_arn     = "${local.miro_topic_arn}"
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d6f90e184d60637d17aea899bcb2af5071603728
