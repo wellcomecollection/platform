@@ -1,11 +1,12 @@
-FROM wellcome/finatra_service_base
+FROM anapsix/alpine-java:8
 
+RUN mkdir -p /opt/docker
 ADD target/universal/stage /opt/docker
 
 USER root
 RUN chown -R daemon:daemon /opt/docker
 
-ENV project=notifier
+EXPOSE 9001
 
 USER daemon
-CMD ["/run.sh"]
+CMD ["/opt/docker/bin/notifier"]
