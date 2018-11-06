@@ -39,11 +39,7 @@ object SNSModule extends AbstractModule {
     SNSClientFactory.create(
       region = snsClientConfig.region,
       endpoint = snsClientConfig.endpoint.getOrElse(""),
-      accessKey = snsClientConfig.accessKey.getOrElse(
-        throw new RuntimeException("accessKey required")
-      ),
-      secretKey = snsClientConfig.secretKey.getOrElse(
-        throw new RuntimeException("secretKey required")
-      )
+      accessKey = snsClientConfig.accessKey.getOrElse(""),
+      secretKey = snsClientConfig.secretKey.getOrElse("")
     )
 }

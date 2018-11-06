@@ -66,7 +66,9 @@ trait WellcomeApp extends Logging {
   } catch {
     case e: Throwable =>
       error("Fatal error:", e)
+      System.exit(1)
   } finally {
     info("Terminating service.")
+    System.exit(0)
   }
 }
