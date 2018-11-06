@@ -13,7 +13,7 @@ locals {
   private_subnets                      = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
   archive_bucket_name                  = "wellcomecollection-assets-archive-storage"
   ingest_bucket_name                   = "wellcomecollection-assets-archive-ingest"
-  storage_static_content_bucket_name   = "wellcomecollection-assets-archive-static-content"
+  storage_static_content_bucket_name   = "wellcomecollection-public-archive-static"
   archivist_container_image            = "${module.ecr_repository_archivist.repository_url}:${var.release_ids["archivist"]}"
   registrar_async_container_image      = "${module.ecr_repository_registrar_async.repository_url}:${var.release_ids["registrar_async"]}"
   registrar_http_container_image       = "${module.ecr_repository_registrar_http.repository_url}:${var.release_ids["registrar_http"]}"
