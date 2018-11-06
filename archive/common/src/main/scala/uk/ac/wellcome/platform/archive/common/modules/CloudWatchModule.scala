@@ -22,7 +22,8 @@ object CloudWatchModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def providesAmazonCloudWatch(clientConfig: CloudwatchClientConfig): AmazonCloudWatch =
+  def providesAmazonCloudWatch(
+    clientConfig: CloudwatchClientConfig): AmazonCloudWatch =
     CloudWatchClientFactory.create(
       region = clientConfig.region,
       endpoint = clientConfig.endpoint.getOrElse("")

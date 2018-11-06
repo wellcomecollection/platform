@@ -14,8 +14,10 @@ object MetricsModule extends AbstractModule {
   @Singleton
   @Provides
   def providesMetricsConfig(config: Config): MetricsConfig = {
-    val namespace = config.getOrElse[String]("aws.metrics.namespace")(default = "")
-    val flushInterval = config.getOrElse[FiniteDuration]("aws.metrics.flushInterval")(default = 10 minutes)
+    val namespace =
+      config.getOrElse[String]("aws.metrics.namespace")(default = "")
+    val flushInterval = config.getOrElse[FiniteDuration](
+      "aws.metrics.flushInterval")(default = 10 minutes)
 
     MetricsConfig(
       namespace = namespace,

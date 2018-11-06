@@ -31,11 +31,14 @@ class NotifierApp() extends WellcomeApp {
     val snsClientConfig = SNSModule.providesSNSClientConfig(config)
     val snsClient = SNSModule.providesSNSClient(snsClientConfig)
 
-    val cloudwatchClientConfig = CloudWatchModule.providesCloudWatchClientConfig(config)
-    val cloudWatchClient: AmazonCloudWatch = CloudWatchModule.providesAmazonCloudWatch(cloudwatchClientConfig)
+    val cloudwatchClientConfig =
+      CloudWatchModule.providesCloudWatchClientConfig(config)
+    val cloudWatchClient: AmazonCloudWatch =
+      CloudWatchModule.providesAmazonCloudWatch(cloudwatchClientConfig)
 
     implicit val actorSystem: ActorSystem = ActorSystem("main-actor-system")
-    val actorMaterializer = ActorMaterializer(ActorMaterializerSettings(actorSystem))
+    val actorMaterializer = ActorMaterializer(
+      ActorMaterializerSettings(actorSystem))
 
     val metricsConfig = MetricsModule.providesMetricsConfig(config)
     val metricsSender = MetricsModule.providesMetricsSender(
