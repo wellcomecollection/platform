@@ -4,9 +4,9 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig}
 import EnrichConfig._
 import com.amazonaws.services.sns.AmazonSNS
-import uk.ac.wellcome.platform.archive.common.config.models.SNSClientConfig
+import uk.ac.wellcome.platform.archive.common.config.models.AWSClientConfig
 
-object SNSBuilder {
+object SNSBuilder extends AWSClientConfigBuilder {
   def buildSNSConfig(config: Config): SNSConfig = {
     val topicArn = config
       .required[String]("aws.sns.topic.arn")
@@ -14,31 +14,17 @@ object SNSBuilder {
     SNSConfig(topicArn = topicArn)
   }
 
-  def buildSNSClientConfig(config: Config): SNSClientConfig = {
-    val accessKey = config.get[String]("aws.sns.key")
-    val secretKey = config.get[String]("aws.sns.secret")
-    val endpoint = config.get[String]("aws.sns.endpoint")
-    val region = config.getOrElse[String]("aws.sns.region")("eu-west-1")
-
-    SNSClientConfig(
-      accessKey = accessKey,
-      secretKey = secretKey,
-      endpoint = endpoint,
-      region = region
-    )
-  }
-
-  def buildSNSClient(snsClientConfig: SNSClientConfig): AmazonSNS =
+  private def buildSNSClient(awsClientConfig: AWSClientConfig): AmazonSNS =
     SNSClientFactory.create(
-      region = snsClientConfig.region,
-      endpoint = snsClientConfig.endpoint.getOrElse(""),
-      accessKey = snsClientConfig.accessKey.getOrElse(""),
-      secretKey = snsClientConfig.secretKey.getOrElse("")
+      region = awsClientConfig.region,
+      endpoint = awsClientConfig.endpoint.getOrElse(""),
+      accessKey = awsClientConfig.accessKey.getOrElse(""),
+      secretKey = awsClientConfig.secretKey.getOrElse("")
     )
 
   def buildSNSClient(config: Config): AmazonSNS =
     buildSNSClient(
-      snsClientConfig = buildSNSClientConfig(config)
+      awsClientConfig = buildAWSClientConfig(config, namespace = "sns")
     )
 }
 

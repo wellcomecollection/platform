@@ -2,11 +2,11 @@ package uk.ac.wellcome.platform.archive.common.config.builders
 
 import com.typesafe.config.Config
 import uk.ac.wellcome.messaging.sqs.{SQSClientFactory, SQSConfig}
-import uk.ac.wellcome.platform.archive.common.config.models.SQSClientConfig
+import uk.ac.wellcome.platform.archive.common.config.models.{AWSClientConfig, SQSClientConfig}
 import EnrichConfig._
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync}
 
-object SQSBuilder {
+object SQSBuilder extends AWSClientConfigBuilder {
   def buildSQSConfig(config: Config): SQSConfig = {
     val queueUrl = config
       .required[String]("aws.sqs.queue.url")
@@ -19,43 +19,29 @@ object SQSBuilder {
     )
   }
 
-  def buildSQSClientConfig(config: Config): SQSClientConfig = {
-    val accessKey = config.get[String]("aws.sqs.key")
-    val secretKey = config.get[String]("aws.sqs.secret")
-    val endpoint = config.get[String]("aws.sqs.endpoint")
-    val region = config.getOrElse[String]("aws.sqs.region")("eu-west-1")
-
-    SQSClientConfig(
-      accessKey = accessKey,
-      secretKey = secretKey,
-      endpoint = endpoint,
-      region = region
-    )
-  }
-
-  def buildSQSClient(sqsClientConfig: SQSClientConfig): AmazonSQS =
+  private def buildSQSClient(awsClientConfig: AWSClientConfig): AmazonSQS =
     SQSClientFactory.createSyncClient(
-      region = sqsClientConfig.region,
-      endpoint = sqsClientConfig.endpoint.getOrElse(""),
-      accessKey = sqsClientConfig.accessKey.getOrElse(""),
-      secretKey = sqsClientConfig.secretKey.getOrElse("")
+      region = awsClientConfig.region,
+      endpoint = awsClientConfig.endpoint.getOrElse(""),
+      accessKey = awsClientConfig.accessKey.getOrElse(""),
+      secretKey = awsClientConfig.secretKey.getOrElse("")
     )
 
   def buildSQSClient(config: Config): AmazonSQS =
     buildSQSClient(
-      sqsClientConfig = buildSQSClientConfig(config)
+      awsClientConfig = buildAWSClientConfig(config, namespace = "sqs")
     )
 
-  def buildSQSAsyncClient(sqsClientConfig: SQSClientConfig): AmazonSQSAsync =
+  def buildSQSAsyncClient(awsClientConfig: AWSClientConfig): AmazonSQSAsync =
     SQSClientFactory.createAsyncClient(
-      region = sqsClientConfig.region,
-      endpoint = sqsClientConfig.endpoint.getOrElse(""),
-      accessKey = sqsClientConfig.accessKey.getOrElse(""),
-      secretKey = sqsClientConfig.secretKey.getOrElse("")
+      region = awsClientConfig.region,
+      endpoint = awsClientConfig.endpoint.getOrElse(""),
+      accessKey = awsClientConfig.accessKey.getOrElse(""),
+      secretKey = awsClientConfig.secretKey.getOrElse("")
     )
 
   def buildSQSAsyncClient(config: Config): AmazonSQSAsync =
     buildSQSAsyncClient(
-      sqsClientConfig = buildSQSClientConfig(config)
+      awsClientConfig = buildAWSClientConfig(config, namespace = "sqs")
     )
 }
