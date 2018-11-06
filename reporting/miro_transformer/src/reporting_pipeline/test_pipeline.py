@@ -10,8 +10,8 @@ def create_sns_message(bucket_name, id, key):
                     "Message": f'{{"id":"{id}","version":1,"location":{{"namespace":"{bucket_name}","key":"{key}"}}}}',
                     "MessageAttributes": {},
                     "MessageId": "0cf7d798-64c8-45a7-a7bf-a9ebc94d1108",
-                    "Type": "Notification"
-                },
+                    "Type": "Notification",
+                }
             }
         ]
     }
