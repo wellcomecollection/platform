@@ -43,9 +43,11 @@ def value_should_be_parsed(key, value, keys_to_parse):
         - the key is date-related
         - the key also matches a set of acceptable substrings
     """
-    return (value and
-            "_date" in key and
-            any(substring in key for substring in keys_to_parse))
+    return (
+        value
+        and "_date" in key
+        and any(substring in key for substring in keys_to_parse)
+    )
 
 
 def convert_date_to_iso(date_string):
