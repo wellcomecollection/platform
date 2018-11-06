@@ -33,12 +33,4 @@ case object Callback extends URIConverters {
   case object Failed extends CallbackStatus {
     override def toString: String = failureString
   }
-
-  def parseStatus(string: String): CallbackStatus = {
-    string match {
-      case `processingString`   => Pending
-      case `successString` => Succeeded
-      case `failureString`    => Failed
-    }
-  }
 }

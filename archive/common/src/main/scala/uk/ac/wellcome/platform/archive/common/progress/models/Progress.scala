@@ -55,14 +55,5 @@ case object Progress extends URIConverters {
     )
   }
 
-  def parseStatus(status: String): Status = {
-    status match {
-      case `initialisedString` => Initialised
-      case `processingString`  => Processing
-      case `successString`   => Completed
-      case `failureString`      => Failed
-    }
-  }
-
   private def generateId: UUID = UUID.randomUUID
 }

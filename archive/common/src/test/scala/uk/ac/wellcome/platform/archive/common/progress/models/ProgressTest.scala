@@ -49,7 +49,7 @@ class ProgressTest
       Callback(URI.create(progressCreateRequest.callback.get.url)))
     progress.status shouldBe Progress.Initialised
     assertRecent(progress.createdDate)
-    progress.lastModifiedDate shouldBe progress.createdDate
+    assertRecent(progress.lastModifiedDate)
     progress.events shouldBe List.empty
   }
 
@@ -59,23 +59,13 @@ class ProgressTest
     ("string-status", "parsed-status"),
     ("initialised", Progress.Initialised),
     ("processing", Progress.Processing),
-    ("completed", Progress.Completed),
-    ("failed", Progress.Failed),
+    ("success", Progress.Completed),
+    ("failure", Progress.Failed),
   )
-
-  it("parses all status values") {
-    forAll(progressStatus) { (statusString, status) =>
-      Progress.parseStatus(statusString) shouldBe status
-    }
-  }
 
   it("converts all callback status values to strings") {
     forAll(progressStatus) { (statusString, status) =>
       createProgressWith(status = status).status.toString shouldBe statusString
     }
-  }
-
-  it("throws if there is a parse error") {
-    a[MatchError] should be thrownBy Progress.parseStatus("not-valid")
   }
 }
