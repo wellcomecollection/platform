@@ -29,8 +29,8 @@ data "aws_lb_target_group" "tcp_target_group" {
 module "task" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=v11.9.0"
 
-  cpu    = 2048
-  memory = 4096
+  cpu    = 1024
+  memory = 2048
 
   env_vars        = "${var.env_vars}"
   env_vars_length = "${var.env_vars_length}"
