@@ -6,7 +6,7 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sqs.AmazonSQSAsyncClient
+import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject.{AbstractModule, Guice, Injector}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.SNSConfig
@@ -33,13 +33,22 @@ class NotifierApp() extends WellcomeApp {
     SQSModule
   )
 
+  val injector: Injector =
+    Guice.createInjector(configModule :: modules : _*)
+
   def run(): Future[Done] = {
+    val classToGet = classOf[SQSConfig]
+    val sqsConfig = injector.getInstance(classToGet)
+    val sqsClient = injector.getInstance(classOf[AmazonSQSAsync])
+    val snsClient = injector.getInstance(classOf[AmazonSNS])
+    val snsConfig = injector.getInstance(classOf[SNSConfig])
+    val metricsSender = injector.getInstance(classOf[MetricsSender])
     val notifier = new Notifier(
-      sqsClient = injector.getInstance(classOf[AmazonSQSAsyncClient]),
-      sqsConfig = injector.getInstance(classOf[SQSConfig]),
-      snsClient = injector.getInstance(classOf[AmazonSNS]),
-      snsConfig = injector.getInstance(classOf[SNSConfig]),
-      metricsSender = injector.getInstance(classOf[MetricsSender]),
+      sqsClient = sqsClient,
+      sqsConfig = sqsConfig,
+      snsClient = snsClient,
+      snsConfig = snsConfig,
+      metricsSender = metricsSender,
       contextUrl = new URL("https://example.org")
     )(
       actorSystem = injector.getInstance(classOf[ActorSystem]),
@@ -51,12 +60,6 @@ class NotifierApp() extends WellcomeApp {
 }
 
 trait WellcomeApp extends Logging {
-  val configModule: Configurable
-  val modules: List[AbstractModule]
-
-  def injector: Injector =
-    Guice.createInjector(configModule :: modules : _*)
-
   def run(): Future[Done]
 
   try {
