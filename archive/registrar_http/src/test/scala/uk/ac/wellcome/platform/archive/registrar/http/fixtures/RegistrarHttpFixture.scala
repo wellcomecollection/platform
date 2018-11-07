@@ -28,12 +28,11 @@ trait RegistrarHttpFixture
     with ScalaFutures
     with Akka {
 
-  def withApp[R](
-    table: Table,
-    bucket: Bucket,
-    s3Prefix: String,
-    httpServerConfig: HTTPServerConfig,
-    contextURL: URL)(testWith: TestWith[RegistrarHTTP, R]): R =
+  def withApp[R](table: Table,
+                 bucket: Bucket,
+                 s3Prefix: String,
+                 httpServerConfig: HTTPServerConfig,
+                 contextURL: URL)(testWith: TestWith[RegistrarHTTP, R]): R =
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table) { vhs =>
@@ -76,8 +75,9 @@ trait RegistrarHttpFixture
         val s3Prefix = "archive"
         withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table, s3Prefix) {
           vhs =>
-            withApp(table, bucket, s3Prefix, httpServerConfig, contextURL) { progressHttp =>
-              testWith((vhs, externalBaseURL, progressHttp))
+            withApp(table, bucket, s3Prefix, httpServerConfig, contextURL) {
+              progressHttp =>
+                testWith((vhs, externalBaseURL, progressHttp))
             }
         }
       }

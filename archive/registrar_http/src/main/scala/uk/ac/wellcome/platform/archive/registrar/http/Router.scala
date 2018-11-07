@@ -12,11 +12,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.registrar.http.models.DisplayBag
 import uk.ac.wellcome.storage.dynamo._
 
-class Router (
-  vhs: VersionedHybridStore[StorageManifest,
-                            EmptyMetadata,
-                            ObjectStore[StorageManifest]],
-  contextURL: URL) {
+class Router(vhs: VersionedHybridStore[StorageManifest,
+                                       EmptyMetadata,
+                                       ObjectStore[StorageManifest]],
+             contextURL: URL) {
 
   def routes: Route = {
     import akka.http.scaladsl.server.Directives._

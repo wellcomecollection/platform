@@ -19,7 +19,10 @@ class RegistrarHTTP(
                             ObjectStore[StorageManifest]],
   httpServerConfig: HTTPServerConfig,
   contextURL: URL
-)(implicit val actorSystem: ActorSystem, materializer: ActorMaterializer, executionContext: ExecutionContext) extends Logging {
+)(implicit val actorSystem: ActorSystem,
+  materializer: ActorMaterializer,
+  executionContext: ExecutionContext)
+    extends Logging {
   val router = new Router(
     vhs = vhs,
     contextURL = contextURL
