@@ -107,9 +107,9 @@ trait RegistrarFixtures
                                           EmptyMetadata,
                                           ObjectStore[StorageManifest]]
 
-  def withRegistrar[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, ManifestVHS), R])
-    : R = {
+  def withRegistrar[R](testWith: TestWith[
+    (Bucket, QueuePair, Topic, Registrar, ManifestVHS),
+    R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
         progressTopic =>
