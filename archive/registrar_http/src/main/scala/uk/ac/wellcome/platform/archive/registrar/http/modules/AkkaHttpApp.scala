@@ -26,7 +26,7 @@ trait AkkaHttpApp extends Logging {
       .bindAndHandle(router.routes, config.host, config.port)
 
     val startMessage =
-      s"Listening on ${config.host}:${config.port}"
+
 
     bindingFuture
       .map(b => {
