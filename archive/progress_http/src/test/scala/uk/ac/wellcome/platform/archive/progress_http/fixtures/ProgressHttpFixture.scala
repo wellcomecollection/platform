@@ -64,15 +64,23 @@ trait ProgressHttpFixture
   def withApp[R](table: Table, topic: Topic, httpServerConfig: HTTPServerConfig, contextURL: URL)(
     testWith: TestWith[ProgressHTTP, R]): R =
     withSNSWriter(topic) { snsWriter =>
-      val progressHTTP = new ProgressHTTP(
-        dynamoClient = dynamoDbClient,
-        dynamoConfig = createDynamoConfigWith(table),
-        snsWriter = snsWriter,
-        httpServerConfig = httpServerConfig,
-        contextURL = contextURL
-      )
+      withActorSystem { actorSystem =>
+        withMaterializer(actorSystem) { materializer =>
+          val progressHTTP = new ProgressHTTP(
+            dynamoClient = dynamoDbClient,
+            dynamoConfig = createDynamoConfigWith(table),
+            snsWriter = snsWriter,
+            httpServerConfig = httpServerConfig,
+            contextURL = contextURL
+          )(
+            actorSystem = actorSystem,
+            materializer = materializer,
+            executionContext = actorSystem.dispatcher
+          )
 
-      testWith(progressHTTP)
+          testWith(progressHTTP)
+        }
+      }
     }
 
   def withConfiguredApp[R](
