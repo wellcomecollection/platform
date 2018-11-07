@@ -8,8 +8,6 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
@@ -21,7 +19,6 @@ import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.TestWith
 
@@ -176,7 +173,7 @@ class HybridRecordReceiverTest
           withHybridRecordReceiver(
             topic,
             bucket,
-            Some(mockSnsClientFailPublishMessage)) { recordReceiver =>
+            mockSnsClientFailPublishMessage) { recordReceiver =>
             val future = recordReceiver.receiveMessage(message, transformToWork)
 
             whenReady(future.failed) { x =>
@@ -191,27 +188,20 @@ class HybridRecordReceiverTest
   def withHybridRecordReceiver[R](
     topic: Topic,
     bucket: Bucket,
-    maybeSnsClient: Option[AmazonSNS] = None
+    snsClient: AmazonSNS = snsClient
   )(testWith: TestWith[HybridRecordReceiver[TestTransformable], R])(
-    implicit objectStore: ObjectStore[TestTransformable]) = {
-    val s3Config = S3Config(bucket.name)
-
-    val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
-
-    val messageWriter =
-      new MessageWriter[TransformedBaseWork](
-        messageConfig = messageConfig,
-        snsClient = maybeSnsClient.getOrElse(snsClient),
-        s3Client = s3Client
+    implicit objectStore: ObjectStore[TestTransformable]): R =
+    withMessageWriter[TransformedBaseWork, R](
+      bucket,
+      topic,
+      writerSnsClient = snsClient) { messageWriter =>
+      val recordReceiver = new HybridRecordReceiver[TestTransformable](
+        messageWriter = messageWriter,
+        objectsStore = objectStore
       )
 
-    val recordReceiver = new HybridRecordReceiver[TestTransformable](
-      messageWriter = messageWriter,
-      objectsStore = objectStore
-    )
-
-    testWith(recordReceiver)
-  }
+      testWith(recordReceiver)
+    }
 
   private def mockSnsClientFailPublishMessage = {
     val mockSNSClient = mock[AmazonSNS]

@@ -6,8 +6,8 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -27,7 +27,7 @@ class SNSPublishFlowTest
         withMaterializer(actorSystem) { materializer =>
           val bob = Person("Bobbert", 42)
 
-          val snsConfig = SNSConfig(topic.arn)
+          val snsConfig = createSNSConfigWith(topic)
           val publishFlow =
             SnsPublishFlow[Person](
               snsClient,
@@ -61,7 +61,7 @@ class SNSPublishFlowTest
             Person("Borbbit", 40)
         )
 
-        val snsConfig = SNSConfig("bad_topic")
+        val snsConfig = createSNSConfigWith(Topic("bad_topic"))
         val publishFlow =
           SnsPublishFlow[Person](
             snsClient,
@@ -92,7 +92,7 @@ class SNSPublishFlowTest
               Person("Borbbit", 40)
           )
 
-          val snsConfig = SNSConfig(topic.arn)
+          val snsConfig = createSNSConfigWith(topic)
           val publishFlow =
             SnsPublishFlow[Person](
               snsClient,

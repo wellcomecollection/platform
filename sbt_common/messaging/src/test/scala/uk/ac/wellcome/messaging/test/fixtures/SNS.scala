@@ -205,6 +205,9 @@ trait SNS extends Matchers with Logging {
     val maybeT = listNotifications[T](topic).head
     maybeT.get
   }
+
+  def createSNSConfigWith(topic: Topic): SNSConfig =
+    SNSConfig(topicArn = topic.arn)
 }
 
 case class SNSNotificationMessage(
