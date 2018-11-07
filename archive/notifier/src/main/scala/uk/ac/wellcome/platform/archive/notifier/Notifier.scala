@@ -8,7 +8,6 @@ import akka.stream.ActorMaterializer
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishResult
 import com.amazonaws.services.sqs.AmazonSQSAsync
-import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
@@ -24,7 +23,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification._
 
-class Notifier @Inject()(
+class Notifier (
   sqsClient: AmazonSQSAsync,
   sqsConfig: SQSConfig,
   snsClient: AmazonSNS,
