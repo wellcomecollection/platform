@@ -2,8 +2,6 @@ package uk.ac.wellcome.platform.archive.notifier.fixtures
 
 import java.net.{URI, URL}
 
-import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
@@ -28,9 +26,9 @@ trait NotifierFixture extends S3 with Messaging with BagIt {
         withMetricsSender(actorSystem) { metricsSender =>
           val notifier = new Notifier(
             sqsClient = asyncSqsClient,
-            sqsConfig = SQSConfig(queue.url),
+            sqsConfig = createSQSConfigWith(queue),
             snsClient = snsClient,
-            snsConfig = SNSConfig(topic.arn),
+            snsConfig = createSNSConfigWith(topic),
             metricsSender = metricsSender,
             contextUrl = new URL("http://localhost/context.json")
           )(

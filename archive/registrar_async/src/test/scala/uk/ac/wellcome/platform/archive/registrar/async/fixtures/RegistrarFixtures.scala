@@ -22,8 +22,6 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 
 trait RegistrarFixtures
@@ -84,7 +82,7 @@ trait RegistrarFixtures
         val messageStream = new MessageStream[NotificationMessage, Unit](
           actorSystem = actorSystem,
           sqsClient = asyncSqsClient,
-          sqsConfig = SQSConfig(queueUrl = queuePair.queue.url),
+          sqsConfig = createSQSConfigWith(queuePair.queue),
           metricsSender = metricsSender
         )
         withTypeVHS[StorageManifest, EmptyMetadata, R](
@@ -93,7 +91,7 @@ trait RegistrarFixtures
         ) { dataStore =>
           val registrar = new Registrar(
             snsClient = snsClient,
-            progressSnsConfig = SNSConfig(topicArn = progressTopic.arn),
+            progressSnsConfig = createSNSConfigWith(progressTopic),
             s3Client = s3Client,
             messageStream = messageStream,
             dataStore = dataStore,
