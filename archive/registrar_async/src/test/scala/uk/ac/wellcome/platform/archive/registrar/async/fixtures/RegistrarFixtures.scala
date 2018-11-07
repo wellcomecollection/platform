@@ -2,16 +2,12 @@ package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.model._
-import com.google.inject.{Guice, Injector}
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
-import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -26,6 +22,9 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.sqs.SQSConfig
+import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 
 trait RegistrarFixtures
     extends S3
@@ -80,27 +79,32 @@ trait RegistrarFixtures
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 progressTopic: Topic)(testWith: TestWith[Registrar, R]) = {
+                 progressTopic: Topic)(testWith: TestWith[Registrar, R]): R =
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        val messageStream = new MessageStream[NotificationMessage, Unit](
+          actorSystem = actorSystem,
+          sqsClient = asyncSqsClient,
+          sqsConfig = SQSConfig(queueUrl = queuePair.queue.url),
+          metricsSender = metricsSender
+        )
+        withTypeVHS[StorageManifest, EmptyMetadata, R](
+          bucket = hybridStoreBucket,
+          table = hybridStoreTable
+        ) { dataStore =>
+          val registrar = new Registrar(
+            snsClient = snsClient,
+            progressSnsConfig = SNSConfig(topicArn = progressTopic.arn),
+            s3Client = s3Client,
+            messageStream = messageStream,
+            dataStore = dataStore,
+            actorSystem = actorSystem
+          )
 
-    class TestApp extends Logging {
-
-      val injector: Injector = Guice.createInjector(
-        VHSModule,
-        AkkaModule,
-        CloudWatchClientModule,
-        SQSClientModule,
-        SNSClientModule,
-        S3ClientModule,
-        DynamoClientModule,
-        MessageStreamModule
-      )
-
-      val app = injector.getInstance(classOf[Registrar])
-
+          testWith(registrar)
+        }
+      }
     }
-
-    testWith((new TestApp()).app)
-  }
 
   type ManifestVHS = VersionedHybridStore[StorageManifest,
                                           EmptyMetadata,
@@ -108,7 +112,7 @@ trait RegistrarFixtures
 
   def withRegistrar[R](testWith: TestWith[
     (Bucket, QueuePair, Topic, Registrar, ManifestVHS),
-    R]) = {
+    R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
         progressTopic =>
