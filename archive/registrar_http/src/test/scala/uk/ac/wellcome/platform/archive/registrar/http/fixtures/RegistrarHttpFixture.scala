@@ -5,15 +5,12 @@ import java.net.URL
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import akka.stream.Materializer
-import com.google.inject.Guice
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.config.models.{HTTPServerConfig, OldHttpServerConfig}
+import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
-import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
 import uk.ac.wellcome.platform.archive.registrar.http.RegistrarHTTP
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -36,15 +33,23 @@ trait RegistrarHttpFixture
     bucket: Bucket,
     s3Prefix: String,
     httpServerConfig: HTTPServerConfig,
-    contextURL: URL)(testWith: TestWith[RegistrarHTTP, R]): R = {
-    withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table) { vhs =>
-      val registrarHTTP = new RegistrarHTTP(
-        vhs = vhs,
-        httpServerConfig = httpServerConfig,
-        contextURL = contextURL
-      )
+    contextURL: URL)(testWith: TestWith[RegistrarHTTP, R]): R =
+    withActorSystem { actorSystem =>
+      withMaterializer(actorSystem) { materializer =>
+        withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table) { vhs =>
+          val registrarHTTP = new RegistrarHTTP(
+            vhs = vhs,
+            httpServerConfig = httpServerConfig,
+            contextURL = contextURL
+          )(
+            actorSystem = actorSystem,
+            materializer = materializer,
+            executionContext = actorSystem.dispatcher
+          )
 
-      testWith(registrarHTTP)
+          testWith(registrarHTTP)
+        }
+      }
     }
 
   def withConfiguredApp[R](
