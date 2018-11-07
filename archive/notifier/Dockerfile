@@ -1,11 +1,12 @@
-FROM wellcome/finatra_service_base
+FROM anapsix/alpine-java
 
+RUN apk add --update gettext && rm -rf /var/cache/apk
+
+RUN mkdir -p /opt/docker
 ADD target/universal/stage /opt/docker
 
-USER root
-RUN chown -R daemon:daemon /opt/docker
+EXPOSE 8888
 
-ENV project=notifier
+COPY run.sh /run.sh
 
-USER daemon
-CMD ["/run.sh"]
+ENTRYPOINT ["/run.sh"]
