@@ -6,7 +6,7 @@ import EnrichConfig._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import uk.ac.wellcome.platform.archive.common.config.models.AWSClientConfig
 
-object DynamoBuilder {
+object DynamoBuilder extends AWSClientConfigBuilder {
   def buildDynamoConfig(config: Config, namespace: String = ""): DynamoConfig = {
     val tableName = config
       .required[String](s"aws.$namespace.dynamo.tableName")

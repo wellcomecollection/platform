@@ -3,26 +3,33 @@ package uk.ac.wellcome.platform.archive.registrar.async
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.config.builders._
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
 
 object Main extends App with Logging {
   val config = ConfigFactory.load()
 
   implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
   val messageStream = new MessageStream[NotificationMessage, Unit](
     actorSystem = actorSystem,
     sqsClient = SQSBuilder.buildSQSAsyncClient(config),
     sqsConfig = SQSBuilder.buildSQSConfig(config),
     metricsSender = MetricsBuilder.buildMetricsSender(config)
+  )
+
+  implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
+    s3Client = S3Builder.buildS3Client(config)
   )
 
   val dataStore = new VersionedHybridStore[StorageManifest,
