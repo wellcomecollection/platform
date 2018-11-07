@@ -56,7 +56,6 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
-            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
             withBagItZip() {
               case (bagName, zipFile) =>
                 withArchiveZipFileFlow(storageBucket, reportingTopic) {
@@ -103,7 +102,6 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
-            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
             withBagItZip(createDigest = _ => "bad_digest") {
               case (_, zipFile) =>
                 withArchiveZipFileFlow(storageBucket, reportingTopic) {
