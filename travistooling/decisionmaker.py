@@ -148,6 +148,14 @@ def does_file_affect_build_task(path, task):
                 if project.exclusive_path.startswith(("catalogue_api/",)):
                     raise ChangeToUnusedLibrary("messaging")
 
+    # We have a library for common archive code.
+    #
+    # Only apps in the archive stack use this code.
+    if path.startswith("archive/common"):
+        if task.startswith(project.name) and (project.type == "sbt_app"):
+            if not project.exclusive_path.startswith("archive/"):
+                raise ChangeToUnusedLibrary("archive_common")
+
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
     if path.startswith(
