@@ -6,7 +6,8 @@ import uk.ac.wellcome.platform.archive.common.config.models.AWSClientConfig
 import EnrichConfig._
 
 trait AWSClientConfigBuilder {
-  protected def buildAWSClientConfig(config: Config, namespace: String): AWSClientConfig = {
+  protected def buildAWSClientConfig(config: Config,
+                                     namespace: String): AWSClientConfig = {
     val accessKey = config.get[String](s"aws.$namespace.key")
     val secretKey = config.get[String](s"aws.$namespace.secret")
     val endpoint = config.get[String](s"aws.$namespace.endpoint")

@@ -27,4 +27,3 @@ object SNSBuilder extends AWSClientConfigBuilder {
       awsClientConfig = buildAWSClientConfig(config, namespace = "sns")
     )
 }
-
