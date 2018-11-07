@@ -46,7 +46,7 @@ class WorkIndexer @Inject()(
         bulk(inserts)
       }
       .map { bulkResponse: BulkResponse =>
-        val actualFailures = filterVersionConflictErrors(bulkResponse)
+        val actualFailures = bulkResponse.failures.filterNot { isVersionConflictException }
 
         if (actualFailures.nonEmpty) {
           val failedIds = actualFailures.map(_.id)
@@ -59,21 +59,21 @@ class WorkIndexer @Inject()(
       }
   }
 
-  private def filterVersionConflictErrors(
-    bulkResponse: BulkResponse): Seq[BulkResponseItem] = {
-    bulkResponse.failures.filterNot { bulkResponseItem =>
-      // This error is returned by Elasticsearch when we try to PUT a document
-      // with a lower version than the existing version.
-      val alreadyIndexedWorkHasHigherVersion = bulkResponseItem.error
-        .exists(bulkError =>
-          bulkError.`type`.contains("version_conflict_engine_exception"))
+  /** Did we try to PUT a document with a lower version than the existing version?
+    *
+    */
+  private def isVersionConflictException(bulkResponseItem: BulkResponseItem): Boolean = {
+    // This error is returned by Elasticsearch when we try to PUT a document
+    // with a lower version than the existing version.
+    val alreadyIndexedWorkHasHigherVersion = bulkResponseItem.error
+      .exists(bulkError =>
+        bulkError.`type`.contains("version_conflict_engine_exception"))
 
-      if (alreadyIndexedWorkHasHigherVersion) {
-        info(
-          s"Skipping ${bulkResponseItem.id} because already indexed work has a higher version (${bulkResponseItem.error}")
-      }
-
-      alreadyIndexedWorkHasHigherVersion
+    if (alreadyIndexedWorkHasHigherVersion) {
+      info(
+        s"Skipping ${bulkResponseItem.id} because already indexed work has a higher version (${bulkResponseItem.error}")
     }
+
+    alreadyIndexedWorkHasHigherVersion
   }
 }

@@ -41,7 +41,6 @@ class Registrar @Inject()(
   snsClient: AmazonSNS,
   progressSnsConfig: SNSConfig,
   s3Client: AmazonS3,
-  s3ClientConfig: S3ClientConfig,
   messageStream: MessageStream[NotificationMessage, Unit],
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
