@@ -232,18 +232,8 @@ from travistooling.decisions import (
             False,
         ),
         # Changes to the Archive common don't affect all the stacks
-        (
-            "archive/common/foo.scala",
-            "api-test",
-            ChangeToUnusedLibrary,
-            False
-        ),
-        (
-            "archive/common/foo.scala",
-            "notifier-test",
-            UnrecognisedFile,
-            True
-        ),
+        ("archive/common/foo.scala", "api-test", ChangeToUnusedLibrary, False),
+        ("archive/common/foo.scala", "notifier-test", UnrecognisedFile, True),
         # Changes to Scala test files trigger a -test Scala task, but not
         # a -publish task.
         (
