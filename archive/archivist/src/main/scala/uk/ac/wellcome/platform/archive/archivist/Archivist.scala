@@ -19,15 +19,15 @@ import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, Notifica
 
 import scala.concurrent.Future
 
-class Archivist extends Logging {
-  def run(
-    s3Client: AmazonS3,
-    snsClient: AmazonSNS,
-    messageStream: MessageStream[NotificationMessage, Unit],
-    bagUploaderConfig: BagUploaderConfig,
-    snsRegistrarConfig: SNSConfig,
-    snsProgressConfig: SNSConfig
-  )(implicit actorSystem: ActorSystem): Future[Done] = {
+class Archivist(
+  s3Client: AmazonS3,
+  snsClient: AmazonSNS,
+  messageStream: MessageStream[NotificationMessage, Unit],
+  bagUploaderConfig: BagUploaderConfig,
+  snsRegistrarConfig: SNSConfig,
+  snsProgressConfig: SNSConfig
+)(implicit val actorSystem: ActorSystem) extends Logging {
+  def run(): Future[Done] = {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
