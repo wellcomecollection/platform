@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archive.common.modules
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync}
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import uk.ac.wellcome.messaging.sqs.SQSClientFactory
-import uk.ac.wellcome.platform.archive.common.config.models.SQSClientConfig
 
 object SQSClientModule extends AbstractModule {
 
@@ -27,3 +26,10 @@ object SQSClientModule extends AbstractModule {
       secretKey = sqsClientConfig.secretKey.getOrElse(""),
     )
 }
+
+case class SQSClientConfig(
+  accessKey: Option[String],
+  secretKey: Option[String],
+  endpoint: Option[String],
+  region: String
+)
