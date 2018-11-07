@@ -7,6 +7,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.test.fixtures.Akka
 
