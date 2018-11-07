@@ -7,4 +7,6 @@ ADD target/universal/stage /opt/docker
 
 EXPOSE 8888
 
-ENTRYPOINT ["/opt/docker/bin/notifier"]
+COPY run.sh /run.sh
+
+ENTRYPOINT ["/run.sh"]
