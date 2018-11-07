@@ -23,7 +23,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification._
 
-class Notifier (
+class Notifier(
   sqsClient: AmazonSQSAsync,
   sqsConfig: SQSConfig,
   snsClient: AmazonSNS,

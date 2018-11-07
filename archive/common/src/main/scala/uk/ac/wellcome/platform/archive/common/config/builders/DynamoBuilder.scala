@@ -7,7 +7,8 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import uk.ac.wellcome.platform.archive.common.config.models.AWSClientConfig
 
 object DynamoBuilder extends AWSClientConfigBuilder {
-  def buildDynamoConfig(config: Config, namespace: String = ""): DynamoConfig = {
+  def buildDynamoConfig(config: Config,
+                        namespace: String = ""): DynamoConfig = {
     val tableName = config
       .required[String](s"aws.$namespace.dynamo.tableName")
     val tableIndex = config
@@ -19,7 +20,8 @@ object DynamoBuilder extends AWSClientConfigBuilder {
     )
   }
 
-  private def buildDynamoClient(awsClientConfig: AWSClientConfig): AmazonDynamoDB =
+  private def buildDynamoClient(
+    awsClientConfig: AWSClientConfig): AmazonDynamoDB =
     DynamoClientFactory.create(
       region = awsClientConfig.region,
       endpoint = awsClientConfig.endpoint.getOrElse(""),

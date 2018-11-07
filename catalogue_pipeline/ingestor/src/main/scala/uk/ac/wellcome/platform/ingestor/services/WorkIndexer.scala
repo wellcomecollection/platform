@@ -46,7 +46,9 @@ class WorkIndexer @Inject()(
         bulk(inserts)
       }
       .map { bulkResponse: BulkResponse =>
-        val actualFailures = bulkResponse.failures.filterNot { isVersionConflictException }
+        val actualFailures = bulkResponse.failures.filterNot {
+          isVersionConflictException
+        }
 
         if (actualFailures.nonEmpty) {
           val failedIds = actualFailures.map(_.id)
@@ -62,7 +64,8 @@ class WorkIndexer @Inject()(
   /** Did we try to PUT a document with a lower version than the existing version?
     *
     */
-  private def isVersionConflictException(bulkResponseItem: BulkResponseItem): Boolean = {
+  private def isVersionConflictException(
+    bulkResponseItem: BulkResponseItem): Boolean = {
     // This error is returned by Elasticsearch when we try to PUT a document
     // with a lower version than the existing version.
     val alreadyIndexedWorkHasHigherVersion = bulkResponseItem.error

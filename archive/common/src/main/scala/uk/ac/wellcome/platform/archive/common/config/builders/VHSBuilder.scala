@@ -7,7 +7,8 @@ import EnrichConfig._
 object VHSBuilder extends AWSClientConfigBuilder {
   def buildVHSConfig(config: Config): VHSConfig = {
     val s3Config = S3Builder.buildS3Config(config, namespace = "vhs")
-    val dynamoConfig = DynamoBuilder.buildDynamoConfig(config, namespace = "vhs")
+    val dynamoConfig =
+      DynamoBuilder.buildDynamoConfig(config, namespace = "vhs")
 
     val globalS3Prefix = config
       .required[String]("aws.vhs.s3.globalPrefix")

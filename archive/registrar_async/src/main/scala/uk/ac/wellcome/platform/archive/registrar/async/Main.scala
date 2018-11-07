@@ -32,7 +32,8 @@ object Main extends App with Logging {
     s3Client = S3Builder.buildS3Client(config)
   )
 
-  val dataStore = new VersionedHybridStore[StorageManifest,
+  val dataStore = new VersionedHybridStore[
+    StorageManifest,
     EmptyMetadata,
     ObjectStore[StorageManifest]](
     vhsConfig = VHSBuilder.buildVHSConfig(config),
