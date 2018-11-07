@@ -1,11 +1,5 @@
-FROM wellcome/finatra_service_base
+FROM wellcome/typesafe_config_base:1
 
 ADD target/universal/stage /opt/docker
 
-USER root
-RUN chown -R daemon:daemon /opt/docker
-
 ENV project=registrar_async
-
-USER daemon
-CMD ["/run.sh"]
