@@ -1,26 +1,27 @@
 package uk.ac.wellcome.platform.archive.progress_http
 
-import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
+import com.typesafe.config.ConfigFactory
+import uk.ac.wellcome.platform.archive.common.config.builders.{DynamoBuilder, HTTPServerBuilder, SNSBuilder}
 import uk.ac.wellcome.platform.archive.progress_http.modules._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 object Main extends App with AkkaHttpApp {
-  override val injector: Injector = Guice.createInjector(
-    new AppConfigModule(args),
-    ConfigModule,
-    SNSClientModule,
-    AkkaModule,
-    ProgressTrackerModule
+  val config = ConfigFactory.load()
+
+  val progressHTTP = new ProgressHTTP(
+    dynamoClient = DynamoBuilder.buildDynamoClient(config),
+    dynamoConfig = DynamoBuilder.buildDynamoConfig(config),
+    snsWriter = SNSBuilder.buildSNSWriter(config),
+    httpServerConfig = HTTPServerBuilder.buildHTTPServerConfig(config),
+    contextURL = HTTPServerBuilder.buildContextURL(config)
   )
 
   try {
     info(s"Starting service.")
 
-    val app = run()
+    val app = progressHTTP.run()
 
     Await.result(app, Duration.Inf)
   } catch {
