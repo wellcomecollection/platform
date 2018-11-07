@@ -24,43 +24,5 @@ import uk.ac.wellcome.platform.archive.progress_async.flows.{
 trait ProgressAsync extends Logging {
   val injector: Injector
 
-  def run() = {
 
-    type StreamNotice = MessageStream[NotificationMessage, Unit]
-
-    implicit val snsClient: AmazonSNS =
-      injector.getInstance(classOf[AmazonSNS])
-    val snsConfig = injector.getInstance(classOf[SNSConfig])
-
-    implicit val system =
-      injector.getInstance(classOf[ActorSystem])
-
-    implicit val materializer = ActorMaterializer()
-
-    implicit val adapter =
-      Logging(system.eventStream, "customLogger")
-
-    val messageStream =
-      injector.getInstance(classOf[StreamNotice])
-
-    val progressTracker = injector
-      .getInstance(classOf[ProgressTracker])
-
-    val progressUpdateFlow =
-      ProgressUpdateFlow(progressTracker)
-
-    val parseNotificationFlow =
-      NotificationParsingFlow[ProgressUpdate]()
-
-    val callbackNotificationFlow =
-      CallbackNotificationFlow(snsClient, snsConfig)
-
-    val workFlow = Flow[NotificationMessage]
-      .log("notification message")
-      .via(parseNotificationFlow)
-      .via(progressUpdateFlow)
-      .via(callbackNotificationFlow)
-
-    messageStream.run("progress", workFlow)
-  }
 }
