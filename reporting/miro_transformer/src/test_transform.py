@@ -18,4 +18,4 @@ def test_handles_empty_datestring():
 
 def test_handles_badly_formatted_date():
     test_dict = {"data": '{"test_date_from": "a badly formatted date"}'}
-    assert transform(test_dict) == {"test_date_from": None}
+    assert transform(test_dict) == {"test_date_from": ""}

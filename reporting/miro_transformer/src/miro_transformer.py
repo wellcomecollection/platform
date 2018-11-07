@@ -1,4 +1,4 @@
-from reporting_pipeline.hybrid_record_pipeline import process_messages
+from wellcome_aws_utils.reporting_utils import process_messages
 from transform import transform
 
 
