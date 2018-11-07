@@ -14,11 +14,6 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
-import uk.ac.wellcome.platform.archive.registrar.http.modules.{
-  AkkaHttpApp,
-  ConfigModule,
-  TestAppConfigModule
-}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -43,12 +38,6 @@ trait RegistrarHttpFixture
 
     val progress = new AkkaHttpApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(
-          serverConfig,
-          table.name,
-          bucket.name,
-          s3Prefix),
-        ConfigModule,
         AkkaModule,
         VHSModule,
         DynamoClientModule
