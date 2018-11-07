@@ -20,5 +20,5 @@ object HTTPServerBuilder {
   }
 
   def buildContextURL(config: Config): URL =
-    new URL(config.required[String]("context-url"))
+    new URL(config.required[String]("contextURL"))
 }

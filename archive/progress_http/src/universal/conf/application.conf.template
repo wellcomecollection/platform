@@ -1,0 +1,5 @@
+aws.dynamo.tableMame="${archive_progress_table_name}"
+metrics.namespace=progress_http
+http.externalBaseURL="${app_base_url}"
+contextURL="${context_url}"
+aws.sns.topic.arn="${topic_arn}"
