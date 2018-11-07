@@ -90,6 +90,8 @@ trait ArchivistFixtures
           ),
           snsRegistrarConfig = createSNSConfigWith(registrarTopic),
           snsProgressConfig = createSNSConfigWith(progressTopic)
+        )(
+          actorSystem = actorSystem
         )
 
         testWith(archivist)

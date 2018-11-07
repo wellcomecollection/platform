@@ -6,9 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ArchiveJobError,
@@ -40,7 +38,7 @@ class ArchiveZipFileFlowTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with ArchivistFixture
+    with ArchivistFixtures
     with IngestRequestContextGenerators
     with BagUploaderConfigGenerator
     with Akka

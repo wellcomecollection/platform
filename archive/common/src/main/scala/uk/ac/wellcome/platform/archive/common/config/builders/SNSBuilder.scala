@@ -12,7 +12,7 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.platform.archive.common.config.models.AWSClientConfig
 
 object SNSBuilder extends AWSClientConfigBuilder {
-  def buildSNSConfig(config: Config, namespace = ""): SNSConfig = {
+  def buildSNSConfig(config: Config, namespace: String = ""): SNSConfig = {
     val topicArn = config
       .required[String](s"aws.sns.$namespace.topic.arn")
 

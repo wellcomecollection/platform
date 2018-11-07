@@ -57,7 +57,7 @@ class Archivist(
         )
         .log("download zip")
         .via(
-          ZipFileDownloadFlow(bagUploaderConfig.parallelism, snsProgressConfig))
+          ZipFileDownloadFlow(bagUploaderConfig.parallelism, snsProgressConfig)(s3Client, snsClient))
         .log("archiving zip")
         .via(
           FoldEitherFlow[
@@ -68,7 +68,7 @@ class Archivist(
             ifRight = ArchiveAndNotifyRegistrarFlow(
               bagUploaderConfig,
               snsProgressConfig,
-              snsRegistrarConfig)))
+              snsRegistrarConfig)(s3Client, snsClient)))
 
     messageStream.run("archivist", workFlow)
   }
