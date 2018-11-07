@@ -18,7 +18,9 @@ object Main extends App with Logging {
   implicit val actorSystem = AkkaBuilder.buildActorSystem()
   implicit val materializer = AkkaBuilder.buildActorMaterializer()
 
-  val messageStream = MessagingBuilder.buildMessageStream[NotificationMessage, PublishResult](config)
+  val messageStream =
+    MessagingBuilder.buildMessageStream[NotificationMessage, PublishResult](
+      config)
 
   val notifier = new Notifier(
     messageStream = messageStream,

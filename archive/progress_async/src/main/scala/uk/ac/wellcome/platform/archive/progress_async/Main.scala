@@ -19,7 +19,8 @@ object Main extends App with Logging {
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
   val progressAsync = new ProgressAsync(
-    messageStream = MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config),
+    messageStream =
+      MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config),
     progressTracker = new ProgressTracker(
       dynamoClient = DynamoBuilder.buildDynamoClient(config),
       dynamoConfig = DynamoBuilder.buildDynamoConfig(config)

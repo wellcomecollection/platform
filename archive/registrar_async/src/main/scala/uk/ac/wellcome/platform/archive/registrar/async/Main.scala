@@ -21,7 +21,8 @@ object Main extends App with Logging {
   implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
-  val messageStream = MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config)
+  val messageStream =
+    MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config)
 
   implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
     s3Client = S3Builder.buildS3Client(config)

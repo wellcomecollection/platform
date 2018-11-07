@@ -27,12 +27,13 @@ trait NotifierFixture extends S3 with Messaging with BagIt {
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withMetricsSender(actorSystem) { metricsSender =>
-          val messageStream = new MessageStream[NotificationMessage, PublishResult](
-            actorSystem = actorSystem,
-            sqsClient = asyncSqsClient,
-            sqsConfig = createSQSConfigWith(queue),
-            metricsSender = metricsSender
-          )
+          val messageStream =
+            new MessageStream[NotificationMessage, PublishResult](
+              actorSystem = actorSystem,
+              sqsClient = asyncSqsClient,
+              sqsConfig = createSQSConfigWith(queue),
+              metricsSender = metricsSender
+            )
 
           val notifier = new Notifier(
             messageStream = messageStream,
