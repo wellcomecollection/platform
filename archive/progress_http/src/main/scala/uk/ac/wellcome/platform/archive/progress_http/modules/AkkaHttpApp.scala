@@ -3,20 +3,16 @@ package uk.ac.wellcome.platform.archive.progress_http.modules
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import com.google.inject.Injector
 import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.{SNSMessageWriter, SNSWriter}
 import uk.ac.wellcome.platform.archive.common.config.builders.{AkkaBuilder, DynamoBuilder, HTTPServerBuilder, SNSBuilder}
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.{ProgressStarter, Router}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait AkkaHttpApp extends Logging {
-  val injector: Injector
-
   def run(): Future[Http.HttpTerminated] = {
     val config = ConfigFactory.load()
 
@@ -38,7 +34,8 @@ trait AkkaHttpApp extends Logging {
           snsConfig = SNSBuilder.buildSNSConfig(config)
         )
       ),
-      config = httpServerConfig
+      httpServerConfig = httpServerConfig,
+      contextURL = HTTPServerBuilder.buildContextURL(config)
     )
 
     implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
