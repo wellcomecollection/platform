@@ -10,10 +10,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
-import uk.ac.wellcome.platform.archive.registrar.async.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
 import uk.ac.wellcome.storage.ObjectStore
@@ -88,18 +84,7 @@ trait RegistrarFixtures
 
     class TestApp extends Logging {
 
-      val appConfigModule = new TestAppConfigModule(
-        queuePair.queue.url,
-        storageBucket.name,
-        progressTopic.arn,
-        hybridStoreTable.name,
-        hybridStoreBucket.name,
-        "archive"
-      )
-
       val injector: Injector = Guice.createInjector(
-        appConfigModule,
-        ConfigModule,
         VHSModule,
         AkkaModule,
         CloudWatchClientModule,
