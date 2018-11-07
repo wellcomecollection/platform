@@ -5,6 +5,7 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.google.inject.Injector
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.common.config.builders.AkkaBuilder
 import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
 import uk.ac.wellcome.platform.archive.progress_http.Router
 
@@ -13,13 +14,13 @@ import scala.concurrent.{ExecutionContext, Future}
 trait AkkaHttpApp extends Logging {
   val injector: Injector
 
-  def run() = {
+  def run(): Future[Http.HttpTerminated] = {
     val router = injector.getInstance(classOf[Router])
     val config = injector.getInstance(classOf[HttpServerConfig])
 
-    implicit val sys = injector.getInstance(classOf[ActorSystem])
-    implicit val mat = injector.getInstance(classOf[ActorMaterializer])
-    implicit val ctx = injector.getInstance(classOf[ExecutionContext])
+    implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
+    implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
     val bindingFuture: Future[Http.ServerBinding] = Http()
       .bindAndHandle(router.routes, config.host, config.port)
