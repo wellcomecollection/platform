@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.registrar.http.modules
 
 import com.google.inject.{AbstractModule, Provides}
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.config.models.OldHttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.modules.HybridStoreConfig
 import uk.ac.wellcome.platform.archive.registrar.http.config.RegistrarHttpConfig
@@ -9,10 +9,10 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
 
 class TestAppConfigModule(
-  serverConfig: HttpServerConfig,
-  hybridStoreTableName: String,
-  hybridStoreBucketName: String,
-  hybridStoreGlobalPrefix: String
+                           serverConfig: OldHttpServerConfig,
+                           hybridStoreTableName: String,
+                           hybridStoreBucketName: String,
+                           hybridStoreGlobalPrefix: String
 ) extends AbstractModule {
 
   @Provides

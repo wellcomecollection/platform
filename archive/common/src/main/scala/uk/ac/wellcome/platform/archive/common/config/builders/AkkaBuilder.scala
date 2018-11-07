@@ -3,12 +3,17 @@ package uk.ac.wellcome.platform.archive.common.config.builders
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 
-object AkkaBuilder {
-  def buildActorSystem(): ActorSystem =
-    ActorSystem("main-actor-system")
+import scala.concurrent.ExecutionContext
 
-  def buildActorMaterializer(): ActorMaterializer = {
-    implicit val actorSystem = buildActorSystem()
+object AkkaBuilder {
+  implicit val actorSystem: ActorSystem = ActorSystem("main-actor-system")
+
+  def buildActorSystem(): ActorSystem =
+    actorSystem
+
+  def buildActorMaterializer(): ActorMaterializer =
     ActorMaterializer()
-  }
+
+  def buildExecutionContext(): ExecutionContext =
+    actorSystem.dispatcher
 }

@@ -9,7 +9,7 @@ import com.google.inject.Guice
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.config.models.OldHttpServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
@@ -39,7 +39,7 @@ trait RegistrarHttpFixture
     table: Table,
     bucket: Bucket,
     s3Prefix: String,
-    serverConfig: HttpServerConfig)(testWith: TestWith[AkkaHttpApp, R]) = {
+    serverConfig: OldHttpServerConfig)(testWith: TestWith[AkkaHttpApp, R]) = {
 
     val progress = new AkkaHttpApp {
       val injector = Guice.createInjector(
@@ -71,7 +71,7 @@ trait RegistrarHttpFixture
     val contextUrl = new URL(
       "http://api.wellcomecollection.org/storage/v1/context.json")
 
-    val serverConfig = HttpServerConfig(host, port, baseUrl, contextUrl)
+    val serverConfig = OldHttpServerConfig(host, port, baseUrl, contextUrl)
 
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>

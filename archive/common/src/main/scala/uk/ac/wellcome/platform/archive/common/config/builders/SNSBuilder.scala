@@ -31,7 +31,7 @@ object SNSBuilder extends AWSClientConfigBuilder {
     new SNSWriter(
       snsMessageWriter = new SNSMessageWriter(
         snsClient = buildSNSClient(config)
-      ),
+      )(ec = AkkaBuilder.buildExecutionContext()),
       snsConfig = buildSNSConfig(config)
     )
 }

@@ -1,14 +1,20 @@
 package uk.ac.wellcome.platform.archive.progress_http
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
-import uk.ac.wellcome.platform.archive.common.config.builders.{DynamoBuilder, HTTPServerBuilder, SNSBuilder}
+import uk.ac.wellcome.platform.archive.common.config.builders.{AkkaBuilder, DynamoBuilder, HTTPServerBuilder, SNSBuilder}
 import uk.ac.wellcome.platform.archive.progress_http.modules._
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 
 object Main extends App with AkkaHttpApp {
   val config = ConfigFactory.load()
+
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val materializer: ActorMaterializer = AkkaBuilder.buildActorMaterializer()
+  implicit val executionContext: ExecutionContext = AkkaBuilder.buildExecutionContext()
 
   val progressHTTP = new ProgressHTTP(
     dynamoClient = DynamoBuilder.buildDynamoClient(config),

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar.http.config
 import java.net.URL
 
 import org.rogach.scallop.ScallopConf
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.config.models.OldHttpServerConfig
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.modules.HybridStoreConfig
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -40,7 +40,7 @@ class RegistrarHttpArgsConfigurator(val arguments: Seq[String])
 
   verify()
 
-  val httpServerConfig = HttpServerConfig(
+  val httpServerConfig = OldHttpServerConfig(
     host = appHost(),
     port = appPort(),
     externalBaseUrl = appBaseUrl(),
