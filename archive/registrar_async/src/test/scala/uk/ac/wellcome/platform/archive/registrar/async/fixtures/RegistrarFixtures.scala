@@ -75,8 +75,7 @@ trait RegistrarFixtures
     table
   }
 
-  def withApp[R](storageBucket: Bucket,
-                 hybridStoreBucket: Bucket,
+  def withApp[R](hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
                  progressTopic: Topic)(testWith: TestWith[Registrar, R]): R =
@@ -123,7 +122,6 @@ trait RegistrarFixtures
                   withLocalDynamoDbTable {
                     hybridDynamoTable =>
                       withApp(
-                        storageBucket,
                         hybridStoreBucket,
                         hybridDynamoTable,
                         queuePair,
@@ -161,7 +159,6 @@ trait RegistrarFixtures
           withLocalS3Bucket { storageBucket =>
             withLocalS3Bucket { hybridStoreBucket =>
               withApp(
-                storageBucket,
                 hybridStoreBucket,
                 Table("does-not-exist", ""),
                 queuePair,
