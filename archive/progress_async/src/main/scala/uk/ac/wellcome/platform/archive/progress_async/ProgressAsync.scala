@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.archive.progress_async
 
 import akka.Done
+import akka.actor.ActorSystem
+import akka.event.{Logging, LoggingAdapter}
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
@@ -19,8 +22,11 @@ class ProgressAsync(
   progressTracker: ProgressTracker,
   snsClient: AmazonSNS,
   snsConfig: SNSConfig
-) extends Logging {
+)(implicit val actorSystem: ActorSystem, materializer: ActorMaterializer) extends Logging {
   def run(): Future[Done] = {
+    implicit val adapter: LoggingAdapter =
+      Logging(actorSystem.eventStream, "customLogger")
+
     val parseNotificationFlow = NotificationParsingFlow[ProgressUpdate]()
 
     val progressUpdateFlow = ProgressUpdateFlow(progressTracker)

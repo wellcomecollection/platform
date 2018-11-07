@@ -55,28 +55,30 @@ trait ProgressAsyncFixture
   def withApp[R](queuePair: QueuePair, topic: Topic, table: Table)(
     testWith: TestWith[ProgressAsync, R]): R =
     withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        val progressAsync = new ProgressAsync(
-          messageStream = new MessageStream[NotificationMessage, Unit](
-            actorSystem = actorSystem,
-            sqsClient = asyncSqsClient,
-            sqsConfig = createSQSConfigWith(queuePair.queue),
-            metricsSender = metricsSender
-          ),
-          progressTracker = new ProgressTracker(
-            dynamoClient = dynamoDbClient,
-            dynamoConfig = createDynamoConfigWith(table)
-          ),
-          snsClient = snsClient,
-          snsConfig = createSNSConfigWith(topic)
-        )
+      withMaterializer(actorSystem) { materializer =>
+        withMetricsSender(actorSystem) { metricsSender =>
+          val progressAsync = new ProgressAsync(
+            messageStream = new MessageStream[NotificationMessage, Unit](
+              actorSystem = actorSystem,
+              sqsClient = asyncSqsClient,
+              sqsConfig = createSQSConfigWith(queuePair.queue),
+              metricsSender = metricsSender
+            ),
+            progressTracker = new ProgressTracker(
+              dynamoClient = dynamoDbClient,
+              dynamoConfig = createDynamoConfigWith(table)
+            ),
+            snsClient = snsClient,
+            snsConfig = createSNSConfigWith(topic)
+          )(actorSystem, materializer)
 
-        testWith(progressAsync)
+          testWith(progressAsync)
+        }
       }
     }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(QueuePair, Topic, Table, ProgressApp), R]) = {
+    testWith: TestWith[(QueuePair, Topic, Table, ProgressAsync), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15) { qPair =>
       withLocalSnsTopic { topic =>
         withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
