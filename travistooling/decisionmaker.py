@@ -165,6 +165,14 @@ def does_file_affect_build_task(path, task):
                 elif not task.startswith("progress"):
                     raise ChangeToUnusedLibrary("progress_common")
 
+    if path.startswith("archive/registrar_common"):
+        for project in PROJECTS:
+            if task.startswith(project.name) and (project.type == "sbt_app"):
+                if not project.exclusive_path.startswith("archive/"):
+                    raise ChangeToUnusedLibrary("registrar_common")
+                elif not task.startswith("registrar"):
+                    raise ChangeToUnusedLibrary("registrar_common")
+
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
     if path.endswith((".scala", ".sbt")):
