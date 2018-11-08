@@ -9,12 +9,16 @@ output "vhs_miro_read_policy" {
 output "vhs_miro_table_name" {
   value = "${module.vhs_miro.table_name}"
 }
-output "vhs_miro_inventory_table_name" {
-  value = "${module.vhs_miro_migration.table_name}"
-}
 
 output "vhs_miro_bucket_name" {
   value = "${module.vhs_miro.bucket_name}"
+}
+
+output "vhs_miro_inventory_read_policy" {
+  value = "${module.vhs_miro_inventory.read_policy}"
+}
+output "vhs_miro_inventory_table_name" {
+  value = "${module.vhs_miro_migration.table_name}"
 }
 
 output "vhs_sierra_full_access_policy" {
