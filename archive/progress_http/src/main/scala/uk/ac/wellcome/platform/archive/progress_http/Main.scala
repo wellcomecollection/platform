@@ -1,26 +1,40 @@
 package uk.ac.wellcome.platform.archive.progress_http
 
-import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
-import uk.ac.wellcome.platform.archive.progress_http.modules._
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import com.typesafe.config.ConfigFactory
+import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.common.config.builders.{
+  AkkaBuilder,
+  DynamoBuilder,
+  HTTPServerBuilder,
+  SNSBuilder
+}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 
-object Main extends App with AkkaHttpApp {
-  override val injector: Injector = Guice.createInjector(
-    new AppConfigModule(args),
-    ConfigModule,
-    SNSClientModule,
-    AkkaModule,
-    ProgressTrackerModule
+object Main extends App with Logging {
+  val config = ConfigFactory.load()
+
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val materializer: ActorMaterializer =
+    AkkaBuilder.buildActorMaterializer()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
+
+  val progressHTTP = new ProgressHTTP(
+    dynamoClient = DynamoBuilder.buildDynamoClient(config),
+    dynamoConfig = DynamoBuilder.buildDynamoConfig(config),
+    snsWriter = SNSBuilder.buildSNSWriter(config),
+    httpServerConfig = HTTPServerBuilder.buildHTTPServerConfig(config),
+    contextURL = HTTPServerBuilder.buildContextURL(config)
   )
 
   try {
     info(s"Starting service.")
 
-    val app = run()
+    val app = progressHTTP.run()
 
     Await.result(app, Duration.Inf)
   } catch {

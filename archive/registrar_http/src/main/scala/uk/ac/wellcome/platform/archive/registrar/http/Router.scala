@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar.http
 import akka.http.scaladsl.model.StatusCodes._
 import com.google.inject.Inject
 import io.circe.Printer
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.config.models.OldHttpServerConfig
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -14,7 +14,7 @@ import uk.ac.wellcome.storage.dynamo._
 class Router @Inject()(vhs: VersionedHybridStore[StorageManifest,
                                                  EmptyMetadata,
                                                  ObjectStore[StorageManifest]],
-                       config: HttpServerConfig) {
+                       config: OldHttpServerConfig) {
 
   def routes = {
     import akka.http.scaladsl.server.Directives._
