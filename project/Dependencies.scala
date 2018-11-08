@@ -162,7 +162,7 @@ object Dependencies {
     "com.typesafe" % "config" % versions.typesafe
   )
 
-  val typesafeStorageDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.storageLibrary
+  val typesafeStorageDependencies: Seq[ModuleID] = akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary
 
   val internalModelDependencies = Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
