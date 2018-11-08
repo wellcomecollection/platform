@@ -3,6 +3,8 @@ locals {
 
   miro_topic_arn = "${data.terraform_remote_state.shared_infra.reporting_miro_reindex_topic_arn}"
 
+  miro_inventory_topic_arn = "${data.terraform_remote_state.shared_infra.reporting_miro_inventory_reindex_topic_arn}"
+
   sierra_topic_arn = "${data.terraform_remote_state.shared_infra.reporting_sierra_reindex_topic_arn}"
 
   lambda_error_alarm_arn = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"

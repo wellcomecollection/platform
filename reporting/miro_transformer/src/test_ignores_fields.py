@@ -16,8 +16,7 @@ def raw_data():
                 \"dict_field\": {
                       \"a\": \"a_value\"
                   },
-                \"image_source\": \"ignored field\",
-                \"int_field\": \"200\"
+                \"image_source\": \"ignored field\"
             }"""
 
 
@@ -28,8 +27,7 @@ def transformed_data():
         "string_field": "a string",
         "null_field": None,
         "image_artwork_date_from": "2004-04-24",
-        "dict_field": {"a": "a_value"},
-        "int_field": 200,
+        "dict_field": {"a": "a_value"}
     }
 
 
