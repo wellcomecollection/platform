@@ -1,4 +1,4 @@
-package package uk.ac.wellcome.config.core.builders
+package uk.ac.wellcome.config.core.builders
 
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.models.AWSClientConfig

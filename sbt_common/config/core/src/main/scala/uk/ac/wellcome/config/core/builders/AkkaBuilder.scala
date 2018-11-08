@@ -1,4 +1,4 @@
-package package uk.ac.wellcome.config.core.builders
+package uk.ac.wellcome.config.core.builders
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
