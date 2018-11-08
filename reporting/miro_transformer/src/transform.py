@@ -26,7 +26,7 @@ def clean_dates(data, keys_to_parse):
     alphabetically is rubbish
     """
     for key, value in data.items():
-        if any(key == substring for substring in keys_to_parse):
+        if key in keys_to_parse:
             if isinstance(value, str):
                 data[key] = convert_date_to_iso(value)
             elif isinstance(value, list):
