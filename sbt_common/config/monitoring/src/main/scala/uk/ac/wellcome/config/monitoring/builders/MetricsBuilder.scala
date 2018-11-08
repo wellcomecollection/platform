@@ -1,11 +1,11 @@
-package uk.ac.wellcome.platform.archive.common.config.builders
+package uk.ac.wellcome.config.monitoring.builders
 
-import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.builders.EnrichConfig._
-import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
+import uk.ac.wellcome.config.core.builders.EnrichConfig._
+import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
 
 import scala.concurrent.duration._
 

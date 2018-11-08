@@ -1,16 +1,11 @@
-package uk.ac.wellcome.platform.archive.common.config.builders
+package uk.ac.wellcome.config.messaging.builders
 
-import com.typesafe.config.Config
-import uk.ac.wellcome.messaging.sns.{
-  SNSClientFactory,
-  SNSConfig,
-  SNSMessageWriter,
-  SNSWriter
-}
 import com.amazonaws.services.sns.AmazonSNS
-import uk.ac.wellcome.config.core.builders.{AkkaBuilder, AWSClientConfigBuilder}
+import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
+import uk.ac.wellcome.config.core.builders.{AWSClientConfigBuilder, AkkaBuilder}
 import uk.ac.wellcome.config.core.models.AWSClientConfig
+import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSMessageWriter, SNSWriter}
 
 object SNSBuilder extends AWSClientConfigBuilder {
   def buildSNSConfig(config: Config, namespace: String = ""): SNSConfig = {

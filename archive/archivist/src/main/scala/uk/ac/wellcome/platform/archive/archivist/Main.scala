@@ -5,9 +5,10 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
+import uk.ac.wellcome.config.messaging.builders.SNSBuilder
 import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.platform.archive.archivist.config.BagUploaderConfigBuilder
-import uk.ac.wellcome.platform.archive.common.config.builders.{MessagingBuilder, SNSBuilder}
+import uk.ac.wellcome.platform.archive.common.config.builders.MessagingBuilder
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 
 import scala.concurrent.{Await, ExecutionContext}

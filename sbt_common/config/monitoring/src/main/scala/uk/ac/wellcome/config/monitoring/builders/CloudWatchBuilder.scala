@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.config.builders
+package uk.ac.wellcome.config.monitoring.builders
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.typesafe.config.Config

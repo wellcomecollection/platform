@@ -247,6 +247,7 @@ lazy val root = (project in file("."))
 
     config_core,
     config_messaging,
+    config_monitoring,
     config_storage,
 
     api,
