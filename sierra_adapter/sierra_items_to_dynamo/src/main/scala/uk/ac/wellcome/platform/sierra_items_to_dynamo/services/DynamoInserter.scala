@@ -7,7 +7,7 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{
   EmptyMetadata,
-  HybridRecord,
+  VHSIndexEntry,
   VersionedHybridStore
 }
 
@@ -19,7 +19,7 @@ class DynamoInserter @Inject()(
                                              ObjectStore[SierraItemRecord]])(
   implicit ec: ExecutionContext) {
 
-  def insertIntoDynamo(record: SierraItemRecord): Future[HybridRecord] =
+  def insertIntoDynamo(record: SierraItemRecord): Future[VHSIndexEntry[EmptyMetadata]] =
     versionedHybridStore
       .updateRecord(
         id = record.id.withoutCheckDigit
@@ -35,5 +35,4 @@ class DynamoInserter @Inject()(
             existingMetadata
         )
       )
-      .map { case (hybridRecord, _) => hybridRecord }
 }
