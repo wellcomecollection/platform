@@ -158,6 +158,12 @@ object Dependencies {
 
   val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
 
+  val typesafeDependencies: Seq[ModuleID] = Seq(
+    "com.typesafe" % "config" % versions.typesafe
+  )
+
+  val typesafeStorageDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.storageLibrary
+
   val internalModelDependencies = Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
   ) ++ WellcomeDependencies.jsonLibrary
@@ -182,8 +188,7 @@ object Dependencies {
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
     "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
     "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
-    "com.typesafe" % "config" % versions.typesafe,
     "org.rogach" %% "scallop" % "3.1.3",
     "de.heikoseeberger" %% "akka-http-circe" % "1.21.1"
-  ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
+  ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 }

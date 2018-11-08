@@ -67,6 +67,13 @@ lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_
   .dependsOn(finatra_akka % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraMonitoringDependencies)
 
+lazy val config_core = doSharedLibrarySetup(project, "sbt_common/config/core")
+  .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
+
+lazy val config_storage = doSharedLibrarySetup(project, "sbt_common/config/storage")
+  .dependsOn(config_core % "compile->compile")
+  .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
+
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
@@ -160,7 +167,7 @@ lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(finatra_storage % "compile->compile;test->test")
+  .dependsOn(config_storage % "compile->compile")
 
 lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
   .dependsOn(common % "compile->compile;test->test")
@@ -181,6 +188,7 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
 lazy val archive_common = doServiceSetup(project, "archive/common")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(messaging % "compile->compile;test->test")
+  .dependsOn(config_storage % "compile->compile")
   .settings(libraryDependencies ++= Dependencies.archiveCommonDependencies)
 
 lazy val archivist = doServiceSetup(project, "archive/archivist")
