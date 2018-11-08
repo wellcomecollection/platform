@@ -2,15 +2,12 @@ package uk.ac.wellcome.platform.archive.notifier
 
 import java.net.URL
 
+import com.amazonaws.services.sns.model.PublishResult
 import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.config.builders.EnrichConfig._
-import uk.ac.wellcome.platform.archive.common.config.builders.{
-  AkkaBuilder,
-  MetricsBuilder,
-  SNSBuilder,
-  SQSBuilder
-}
+import uk.ac.wellcome.platform.archive.common.config.builders._
+import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.Await
@@ -21,12 +18,14 @@ object Main extends App with Logging {
   implicit val actorSystem = AkkaBuilder.buildActorSystem()
   implicit val materializer = AkkaBuilder.buildActorMaterializer()
 
+  val messageStream =
+    MessagingBuilder.buildMessageStream[NotificationMessage, PublishResult](
+      config)
+
   val notifier = new Notifier(
-    sqsClient = SQSBuilder.buildSQSAsyncClient(config),
-    sqsConfig = SQSBuilder.buildSQSConfig(config),
+    messageStream = messageStream,
     snsClient = SNSBuilder.buildSNSClient(config),
     snsConfig = SNSBuilder.buildSNSConfig(config),
-    metricsSender = MetricsBuilder.buildMetricsSender(config),
     contextUrl = buildContextURL(config)
   )
 

@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 class ProgressTracker @Inject()(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
-)(implicit ex: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext) extends Logging {
   import Progress._
 
   def get(id: UUID): Future[Option[Progress]] = Future {

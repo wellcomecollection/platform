@@ -1,4 +1,0 @@
---sqs-queue-url=${queue_url}
---sns-topic-arn=${topic_arn}
---archive-progress-tracker-table-name=${archive_progress_table_name}
---metrics-namespace=progress_async
