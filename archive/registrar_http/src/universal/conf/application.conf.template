@@ -1,0 +1,4 @@
+aws.vhs.dynamo.table.name="${vhs_table_name}"
+aws.vhs.s3.bucket.name="${vhs_bucket_name}"
+http.externalBaseURL="${app_base_url}"
+contextURL="${context_url}"
