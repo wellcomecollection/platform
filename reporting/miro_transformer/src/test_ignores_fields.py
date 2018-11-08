@@ -29,7 +29,7 @@ def transformed_data():
         "null_field": None,
         "image_artwork_date_from": "2004-04-24",
         "dict_field": {"a": "a_value"},
-        "int_field": 200
+        "int_field": 200,
     }
 
 
