@@ -11,7 +11,6 @@ import akka.stream.{
 }
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
@@ -25,7 +24,6 @@ import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   NotificationMessage
 }
-import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.registrar.async.factories.StorageManifestFactory
 import uk.ac.wellcome.platform.archive.registrar.async.flows.{
   NotifyFailureFlow,
@@ -37,11 +35,10 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
 import scala.concurrent.ExecutionContextExecutor
 
-class Registrar @Inject()(
+class Registrar(
   snsClient: AmazonSNS,
   progressSnsConfig: SNSConfig,
   s3Client: AmazonS3,
-  s3ClientConfig: S3ClientConfig,
   messageStream: MessageStream[NotificationMessage, Unit],
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,

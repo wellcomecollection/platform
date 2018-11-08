@@ -9,7 +9,6 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 
 object ArchiveCompleteGenerator extends RandomThings {
-
   def createWith(
     bagLocation: BagLocation,
     archiveRequestId: UUID = randomUUID,
