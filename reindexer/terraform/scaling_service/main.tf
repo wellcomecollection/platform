@@ -1,5 +1,5 @@
 module "appautoscaling" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//autoscaling/app/ecs?ref=v11.11.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//autoscaling/app/ecs?ref=v12.1.1"
   name   = "${module.service.service_name}"
 
   cluster_name = "${var.ecs_cluster_name}"
@@ -10,7 +10,7 @@ module "appautoscaling" {
 }
 
 module "service" {
-  source       = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/service/prebuilt/default?ref=v11.11.0"
+  source       = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/service/prebuilt/default?ref=v12.1.1"
   service_name = "${var.service_name}"
 
   vpc_id              = "${var.vpc_id}"
@@ -29,7 +29,7 @@ module "service" {
 }
 
 module "task" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/task/prebuilt/single_container?ref=v11.11.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/task/prebuilt/single_container?ref=v12.1.1"
 
   task_name = "${var.service_name}"
 

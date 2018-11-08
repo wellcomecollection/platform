@@ -86,6 +86,20 @@ output "reporting_miro_reindex_topic_publish_policy" {
   value = "${module.reporting_miro_reindex_topic.publish_policy}"
 }
 
+## Reporting - miro inventory
+
+output "reporting_miro_inventory_reindex_topic_arn" {
+  value = "${module.reporting_miro_inventory_reindex_topic.arn}"
+}
+
+output "reporting_miro_inventory_reindex_topic_name" {
+  value = "${module.reporting_miro_inventory_reindex_topic.name}"
+}
+
+output "reporting_miro_inventory_reindex_topic_publish_policy" {
+  value = "${module.reporting_miro_inventory_reindex_topic.publish_policy}"
+}
+
 ## Reporting - sierra
 
 output "reporting_sierra_reindex_topic_arn" {
