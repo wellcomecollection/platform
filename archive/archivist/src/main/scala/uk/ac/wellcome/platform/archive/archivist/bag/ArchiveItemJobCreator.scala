@@ -5,11 +5,7 @@ import java.io.InputStream
 import cats.implicits._
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveItemJob,
-  ArchiveJob,
-  ZipLocation
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ArchiveJob, ZipLocation}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
@@ -21,15 +17,15 @@ object ArchiveItemJobCreator extends Logging {
     * If any of the manifests are incorrectly formatted, it returns an error.
     *
     */
-  def createArchiveItemJobs(
+  def createArchiveDigestItemJobs(
     job: ArchiveJob,
-    delimiter: String): Either[ArchiveError[ArchiveJob], List[ArchiveItemJob]] =
+    delimiter: String): Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] =
     job.bagManifestLocations
       .map { manifestLocation =>
         ZipLocation(job.zipFile, manifestLocation.toEntryPath)
       }
       .traverse { zipLocation =>
-        parseArchiveItemJobs(job, zipLocation, delimiter)
+        parseArchiveDigestItemJobs(job, zipLocation, delimiter)
       }
       .map { _.flatten }
 
@@ -40,10 +36,10 @@ object ArchiveItemJobCreator extends Logging {
     * If the manifest is incorrectly formatted, it returns an error.
     *
     */
-  private def parseArchiveItemJobs(job: ArchiveJob,
-                                   zipLocation: ZipLocation,
-                                   delimiter: String)
-    : Either[ArchiveError[ArchiveJob], List[ArchiveItemJob]] = {
+  private def parseArchiveDigestItemJobs(job: ArchiveJob,
+                                         zipLocation: ZipLocation,
+                                         delimiter: String)
+    : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] = {
     val value: Either[ArchiveError[ArchiveJob], InputStream] = ZipFileReader
       .maybeInputStream(zipLocation)
       .toRight(FileNotFoundError(zipLocation.entryPath.path, job))
@@ -61,7 +57,7 @@ object ArchiveItemJobCreator extends Logging {
           BagItemCreator
             .create(line.trim(), job, zipLocation.entryPath.path, delimiter)
             .map { bagItem =>
-              ArchiveItemJob(archiveJob = job, bagDigestItem = bagItem)
+              ArchiveDigestItemJob(archiveJob = job, bagDigestItem = bagItem)
             }
         }
     }

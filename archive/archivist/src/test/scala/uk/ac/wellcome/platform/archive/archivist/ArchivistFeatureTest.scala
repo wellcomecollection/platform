@@ -38,7 +38,7 @@ class ArchivistFeatureTest
           case (request, bagIdentifier) =>
             archivist.run()
             eventually {
-              listKeysInBucket(storageBucket) should have size 15
+              listKeysInBucket(storageBucket) should have size 16
 
               assertQueuePairSizes(queuePair, 0, 0)
 

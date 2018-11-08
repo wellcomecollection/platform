@@ -13,7 +13,7 @@ import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ChecksumNotMatchedOnUploadError,
   FileNotFoundError,
-  UploadError
+  UploadDigestItemError
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
@@ -21,7 +21,7 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.Akka
 
-class UploadItemFlowTest
+class UploadDigestItemFlowTest
     extends FunSpec
     with Matchers
     with S3
@@ -47,7 +47,7 @@ class UploadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob = createArchiveItemJob(
+            val archiveItemJob = createArchiveDigestItemJob(
               zipFile,
               bucket,
               digest,
@@ -55,7 +55,7 @@ class UploadItemFlowTest
               fileName)
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadItemFlow(10)(s3Client)
+            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -85,7 +85,7 @@ class UploadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob = createArchiveItemJob(
+            val archiveItemJob = createArchiveDigestItemJob(
               zipFile,
               bucket,
               digest,
@@ -93,7 +93,7 @@ class UploadItemFlowTest
               fileName)
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadItemFlow(10)(s3Client)
+            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -126,7 +126,7 @@ class UploadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob = createArchiveItemJob(
+            val archiveItemJob = createArchiveDigestItemJob(
               zipFile,
               bucket,
               digest,
@@ -134,7 +134,7 @@ class UploadItemFlowTest
               fileName)
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadItemFlow(10)(s3Client)
+            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.seq
 
             whenReady(futureResult) { result =>
@@ -169,7 +169,7 @@ class UploadItemFlowTest
           val bagIdentifier =
             ExternalIdentifier(randomAlphanumeric())
 
-          val failingArchiveItemJob = createArchiveItemJob(
+          val failingArchiveItemJob = createArchiveDigestItemJob(
             zipFile,
             Bucket("does-not-exist"),
             digest,
@@ -181,13 +181,13 @@ class UploadItemFlowTest
             error("Stream failure", e)
             Supervision.Resume
           }
-          val flow = UploadItemFlow(10)(s3Client)
+          val flow = UploadDigestItemFlow(10)(s3Client)
             .withAttributes(ActorAttributes.supervisionStrategy(decider))
           val futureResult = source via flow runWith Sink.seq
 
           whenReady(futureResult) { result =>
             inside(result.toList) {
-              case List(Left(UploadError(exception, job))) =>
+              case List(Left(UploadDigestItemError(exception, job))) =>
                 job shouldBe failingArchiveItemJob
                 exception shouldBe a[AmazonS3Exception]
                 exception

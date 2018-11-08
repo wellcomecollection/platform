@@ -69,7 +69,7 @@ class ArchiveZipFileFlowTest
                       )
 
                     whenReady(verification) { result =>
-                      listKeysInBucket(storageBucket) should have size 4
+                      listKeysInBucket(storageBucket) should have size 5
                       result shouldBe List(Right(ArchiveComplete(
                         ingestContext.archiveRequestId,
                         ingestContext.storageSpace,

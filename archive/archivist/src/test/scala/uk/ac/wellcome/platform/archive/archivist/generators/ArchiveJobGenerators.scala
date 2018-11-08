@@ -9,16 +9,16 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 trait ArchiveJobGenerators {
 
-  def createArchiveItemJob(zipFile: ZipFile,
-                           bucket: S3.Bucket,
-                           digest: String,
-                           bagIdentifier: ExternalIdentifier,
-                           s3Key: String) = {
+  def createArchiveDigestItemJob(zipFile: ZipFile,
+                                 bucket: S3.Bucket,
+                                 digest: String,
+                                 bagIdentifier: ExternalIdentifier,
+                                 s3Key: String) = {
     val archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket)
     val bagDigestItem =
       BagItem(digest, EntryPath(s3Key))
     val archiveItemJob =
-      ArchiveItemJob(archiveJob = archiveJob, bagDigestItem = bagDigestItem)
+      ArchiveDigestItemJob(archiveJob = archiveJob, bagDigestItem = bagDigestItem)
     archiveItemJob
   }
 

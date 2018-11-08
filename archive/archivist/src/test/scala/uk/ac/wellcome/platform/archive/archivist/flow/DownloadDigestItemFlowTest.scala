@@ -13,7 +13,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.DownloadError
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
-class DownloadItemFlowTest
+class DownloadDigestItemFlowTest
     extends FunSpec
     with S3
     with ZipBagItFixture
@@ -36,7 +36,7 @@ class DownloadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob = createArchiveItemJob(
+            val archiveItemJob = createArchiveDigestItemJob(
               zipFile,
               bucket,
               digest,
@@ -49,7 +49,7 @@ class DownloadItemFlowTest
               fileContent)
 
             val source = Source.single(archiveItemJob)
-            val flow = DownloadItemFlow(10)(s3Client)
+            val flow = DownloadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -74,7 +74,7 @@ class DownloadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob = createArchiveItemJob(
+            val archiveItemJob = createArchiveDigestItemJob(
               zipFile,
               bucket,
               digest,
@@ -87,7 +87,7 @@ class DownloadItemFlowTest
               fileContent)
 
             val source = Source.single(archiveItemJob)
-            val flow = DownloadItemFlow(10)(s3Client)
+            val flow = DownloadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -114,14 +114,14 @@ class DownloadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob = createArchiveItemJob(
+            val archiveItemJob = createArchiveDigestItemJob(
               zipFile,
               bucket,
               digest,
               bagIdentifier,
               fileName)
             val source = Source.single(archiveItemJob)
-            val flow = DownloadItemFlow(10)(s3Client)
+            val flow = DownloadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
