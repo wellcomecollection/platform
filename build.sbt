@@ -74,6 +74,17 @@ lazy val config_storage = doSharedLibrarySetup(project, "sbt_common/config/stora
   .dependsOn(config_core % "compile->compile")
   .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
 
+lazy val config_monitoring = doSharedLibrarySetup(project, "sbt_common/config/monitoring")
+  .dependsOn(config_core % "compile->compile")
+  .settings(libraryDependencies ++= Dependencies.typesafeMonitoringDependencies)
+
+lazy val config_messaging = doSharedLibrarySetup(project, "sbt_common/config/messaging")
+  .dependsOn(config_core % "compile->compile")
+  .dependsOn(config_monitoring % "compile->compile")
+  .dependsOn(config_storage % "compile->compile")
+  .dependsOn(messaging % "compile->compile")
+  .settings(libraryDependencies ++= Dependencies.typesafeDependencies)
+
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
@@ -166,7 +177,7 @@ lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile")
   .dependsOn(config_storage % "compile->compile")
 
 lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
@@ -187,7 +198,7 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
 
 lazy val archive_common = doServiceSetup(project, "archive/common")
   .dependsOn(common % "compile->compile;test->test")
-  .dependsOn(messaging % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile")
   .dependsOn(config_storage % "compile->compile")
   .settings(libraryDependencies ++= Dependencies.archiveCommonDependencies)
 
@@ -233,6 +244,10 @@ lazy val root = (project in file("."))
     finatra_messaging,
     finatra_monitoring,
     finatra_storage,
+
+    config_core,
+    config_messaging,
+    config_storage,
 
     api,
     ingestor,

@@ -162,6 +162,8 @@ object Dependencies {
     "com.typesafe" % "config" % versions.typesafe
   )
 
+  val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
+
   val typesafeStorageDependencies: Seq[ModuleID] = akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary
 
   val internalModelDependencies = Seq(
