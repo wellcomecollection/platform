@@ -1,36 +1,59 @@
 package uk.ac.wellcome.platform.archive.registrar.async
-import com.google.inject.{Guice, Injector}
-import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.async.modules.{
-  AppConfigModule,
-  ConfigModule
-}
-import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
 
-import scala.concurrent.Await
+import akka.actor.ActorSystem
+import com.typesafe.config.ConfigFactory
+import grizzled.slf4j.Logging
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.common.config.builders._
+import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
+import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
+import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3StorageBackend
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
 
 object Main extends App with Logging {
-  val injector: Injector = Guice.createInjector(
-    new AppConfigModule(args),
-    ConfigModule,
-    VHSModule,
-    AkkaModule,
-    CloudWatchClientModule,
-    SQSClientModule,
-    SNSClientModule,
-    S3ClientModule,
-    DynamoClientModule,
-    MessageStreamModule
+  val config = ConfigFactory.load()
+
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+
+  val messageStream = new MessageStream[NotificationMessage, Unit](
+    actorSystem = actorSystem,
+    sqsClient = SQSBuilder.buildSQSAsyncClient(config),
+    sqsConfig = SQSBuilder.buildSQSConfig(config),
+    metricsSender = MetricsBuilder.buildMetricsSender(config)
   )
 
-  val app = injector.getInstance(classOf[Registrar])
+  implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
+    s3Client = S3Builder.buildS3Client(config)
+  )
+
+  val dataStore = new VersionedHybridStore[
+    StorageManifest,
+    EmptyMetadata,
+    ObjectStore[StorageManifest]](
+    vhsConfig = VHSBuilder.buildVHSConfig(config),
+    objectStore = ObjectStore[StorageManifest],
+    dynamoDbClient = DynamoBuilder.buildDynamoClient(config)
+  )
+
+  val registrar = new Registrar(
+    snsClient = SNSBuilder.buildSNSClient(config),
+    progressSnsConfig = SNSBuilder.buildSNSConfig(config),
+    s3Client = S3Builder.buildS3Client(config),
+    messageStream = messageStream,
+    dataStore = dataStore,
+    actorSystem = actorSystem
+  )
 
   try {
     info(s"Starting worker.")
 
-    val result = app.run()
+    val result = registrar.run()
 
     Await.result(result, Duration.Inf)
   } catch {

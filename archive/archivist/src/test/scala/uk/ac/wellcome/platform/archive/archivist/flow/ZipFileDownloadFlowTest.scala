@@ -7,7 +7,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.platform.archive.archivist.fixtures.{
   Archivist => ArchivistFixture
@@ -43,8 +42,10 @@ class ZipFileDownloadFlowTest
       withLocalSnsTopic { progressTopic =>
         withBagItZip() {
           case (bagName, zipFile) =>
-            val downloadZipFlow =
-              ZipFileDownloadFlow(10, SNSConfig(progressTopic.arn))
+            val downloadZipFlow = ZipFileDownloadFlow(
+              parallelism = 10,
+              snsConfig = createSNSConfigWith(progressTopic)
+            )
 
             val uploadKey = bagName.toString
 
@@ -82,8 +83,10 @@ class ZipFileDownloadFlowTest
       withLocalSnsTopic { progressTopic =>
         val bagIdentifier = randomAlphanumeric()
 
-        val downloadZipFlow =
-          ZipFileDownloadFlow(10, SNSConfig(progressTopic.arn))
+        val downloadZipFlow = ZipFileDownloadFlow(
+          parallelism = 10,
+          snsConfig = createSNSConfigWith(progressTopic)
+        )
 
         val objectLocation =
           ObjectLocation(storageBucket.name, bagIdentifier.toString)

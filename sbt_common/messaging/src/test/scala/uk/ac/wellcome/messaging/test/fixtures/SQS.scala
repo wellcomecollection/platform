@@ -295,4 +295,7 @@ trait SQS extends Matchers with Logging {
       .asScala
     messages
   }
+
+  def createSQSConfigWith(queue: Queue): SQSConfig =
+    SQSConfig(queueUrl = queue.url)
 }

@@ -38,7 +38,7 @@ from travistooling.decisions import (
         ("foo.txt", "snapshot_generator-publish", UnrecognisedFile, True),
         # Certain file formats are always excluded.
         ("foo.md", "ingestor-build", IgnoredFileFormat, False),
-        ("image.png", "reindex_request_creator-test", IgnoredFileFormat, False),
+        ("image.png", "reindex_worker-test", IgnoredFileFormat, False),
         ("ontology.graffle", "nginx-test", IgnoredFileFormat, False),
         ("Makefile", "travistooling-test", IgnoredFileFormat, False),
         ("monitoring/Makefile", "travistooling-test", IgnoredFileFormat, False),
@@ -133,7 +133,7 @@ from travistooling.decisions import (
         ),
         (
             "sbt_common/display/model.scala",
-            "reindex_request_creator-test",
+            "reindex_worker-test",
             ChangeToUnusedLibrary,
             False,
         ),
@@ -159,7 +159,7 @@ from travistooling.decisions import (
         ),
         (
             "sbt_common/elasticsearch/model.scala",
-            "reindex_request_creator-test",
+            "reindex_worker-test",
             ChangeToUnusedLibrary,
             False,
         ),
@@ -189,7 +189,7 @@ from travistooling.decisions import (
         ),
         (
             "sbt_common/finatra_elasticsearch/model.scala",
-            "reindex_request_creator-test",
+            "reindex_worker-test",
             ChangeToUnusedLibrary,
             False,
         ),
@@ -231,6 +231,9 @@ from travistooling.decisions import (
             ChangeToUnusedLibrary,
             False,
         ),
+        # Changes to the Archive common don't affect all the stacks
+        ("archive/common/foo.scala", "api-test", ChangeToUnusedLibrary, False),
+        ("archive/common/foo.scala", "notifier-test", UnrecognisedFile, True),
         # Changes to Scala test files trigger a -test Scala task, but not
         # a -publish task.
         (
@@ -266,20 +269,20 @@ from travistooling.decisions import (
             False,
         ),
         (
-            "reindex_request_creator/.coveragerc",
+            "reindex_worker/.coveragerc",
             "reindex_shard_generator-publish",
             ChangesToTestsDontGetPublished,
             False,
         ),
         # Changes to Lambdas trigger the travis-lambda-test task.
         (
-            "reindexer/reindex_request_creator/src/reindex_request_creator.py",
+            "reindexer/reindex_worker/src/reindex_worker.py",
             "travis-lambda-test",
             CheckedByTravisLambda,
             True,
         ),
         (
-            "reindexer/reindex_request_creator/src/reindex_request_creator.py",
+            "reindexer/reindex_worker/src/reindex_worker.py",
             "travis-lambda-publish",
             CheckedByTravisLambda,
             True,

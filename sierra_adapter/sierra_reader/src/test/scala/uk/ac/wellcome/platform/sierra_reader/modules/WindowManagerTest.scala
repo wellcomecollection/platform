@@ -10,7 +10,6 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
   SierraResourceTypes,
   WindowStatus
 }
-import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -39,7 +38,7 @@ class WindowManagerTest
 
     val windowManager = new WindowManager(
       s3client = s3Client,
-      s3Config = S3Config(bucket.name),
+      s3Config = createS3ConfigWith(bucket),
       sierraConfig = sierraConfig
     )
 
