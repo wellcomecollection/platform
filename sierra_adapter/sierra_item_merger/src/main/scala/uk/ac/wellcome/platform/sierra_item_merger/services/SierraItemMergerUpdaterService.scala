@@ -10,7 +10,7 @@ import uk.ac.wellcome.platform.sierra_item_merger.links.ItemUnlinker
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{
   EmptyMetadata,
-  HybridRecord,
+  VHSIndexEntry,
   VersionedHybridStore
 }
 import uk.ac.wellcome.storage.ObjectStore
@@ -24,8 +24,8 @@ class SierraItemMergerUpdaterService @Inject()(
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def update(itemRecord: SierraItemRecord): Future[Seq[HybridRecord]] = {
-    val mergeUpdateFutures: Seq[Future[HybridRecord]] = itemRecord.bibIds.map {
+  def update(itemRecord: SierraItemRecord): Future[List[VHSIndexEntry[EmptyMetadata]]] = {
+    val mergeUpdateFutures = itemRecord.bibIds.map {
       bibId =>
         versionedHybridStore
           .updateRecord(id = bibId.withoutCheckDigit)(
@@ -39,10 +39,9 @@ class SierraItemMergerUpdaterService @Inject()(
                 ItemLinker.linkItemRecord(existingTransformable, itemRecord),
                 existingMetadata)
             })
-          .map { case (hybridRecord, _) => hybridRecord }
     }
 
-    val unlinkUpdateFutures: Seq[Future[HybridRecord]] =
+    val unlinkUpdateFutures =
       itemRecord.unlinkedBibIds.map { unlinkedBibId =>
         versionedHybridStore
           .updateRecord(id = unlinkedBibId.withoutCheckDigit)(
@@ -55,7 +54,6 @@ class SierraItemMergerUpdaterService @Inject()(
                   .unlinkItemRecord(existingTransformable, itemRecord),
                 existingMetadata)
           )
-          .map { case (hybridRecord, _) => hybridRecord }
       }
 
     Future.sequence(mergeUpdateFutures ++ unlinkUpdateFutures)

@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.sierra_bib_merger.merger.BibMerger
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{
   EmptyMetadata,
-  HybridRecord,
+  VHSIndexEntry,
   VersionedHybridStore
 }
 import uk.ac.wellcome.storage.ObjectStore
@@ -22,7 +22,7 @@ class SierraBibMergerUpdaterService @Inject()(
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def update(bibRecord: SierraBibRecord): Future[HybridRecord] =
+  def update(bibRecord: SierraBibRecord): Future[VHSIndexEntry[EmptyMetadata]] =
     versionedHybridStore
       .updateRecord(id = bibRecord.id.withoutCheckDigit)(
         ifNotExisting = (SierraTransformable(bibRecord), EmptyMetadata()))(
@@ -32,5 +32,4 @@ class SierraBibMergerUpdaterService @Inject()(
             existingMetadata)
         }
       )
-      .map { case (hybridRecord, _) => hybridRecord }
 }

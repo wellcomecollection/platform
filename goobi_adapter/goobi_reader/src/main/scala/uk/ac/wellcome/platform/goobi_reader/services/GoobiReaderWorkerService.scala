@@ -13,7 +13,7 @@ import uk.ac.wellcome.platform.goobi_reader.GoobiRecordMetadata
 import uk.ac.wellcome.platform.goobi_reader.models.{S3Event, S3Record}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.VersionedHybridStore
+import uk.ac.wellcome.storage.vhs.{VHSIndexEntry, VersionedHybridStore}
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -54,7 +54,7 @@ class GoobiReaderWorkerService @Inject()(
     eventuallyProcessedMessages
   }
 
-  private def updateRecord(r: S3Record) = {
+  private def updateRecord(r: S3Record): Future[VHSIndexEntry[GoobiRecordMetadata]] = {
     val bucketName = r.s3.bucket.name
     val objectKey = r.s3.`object`.key
     val id = objectKey.replaceAll(".xml", "")
