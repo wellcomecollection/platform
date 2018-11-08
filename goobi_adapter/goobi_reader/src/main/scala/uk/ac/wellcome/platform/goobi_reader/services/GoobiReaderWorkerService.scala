@@ -54,7 +54,8 @@ class GoobiReaderWorkerService @Inject()(
     eventuallyProcessedMessages
   }
 
-  private def updateRecord(r: S3Record): Future[VHSIndexEntry[GoobiRecordMetadata]] = {
+  private def updateRecord(
+    r: S3Record): Future[VHSIndexEntry[GoobiRecordMetadata]] = {
     val bucketName = r.s3.bucket.name
     val objectKey = r.s3.`object`.key
     val id = objectKey.replaceAll(".xml", "")

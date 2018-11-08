@@ -25,8 +25,8 @@ class SierraItemMergerWorkerService @Inject()(
     for {
       hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
       itemRecord <- objectStore.get(hybridRecord.location)
-      vhsIndexEntries: Seq[VHSIndexEntry[EmptyMetadata]] <-
-        sierraItemMergerUpdaterService.update(itemRecord)
+      vhsIndexEntries: Seq[VHSIndexEntry[EmptyMetadata]] <- sierraItemMergerUpdaterService
+        .update(itemRecord)
       hybridRecords: Seq[HybridRecord] = vhsIndexEntries.map { _.hybridRecord }
       _ <- Future.sequence(
         hybridRecords.map { hybridRecord =>

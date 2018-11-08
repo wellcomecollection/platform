@@ -13,9 +13,9 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait SierraItemRecordVHS extends LocalVersionedHybridStore with ScalaFutures {
   def withItemRecordVHS[R](table: Table, bucket: Bucket)(
     testWith: TestWith[VersionedHybridStore[SierraItemRecord,
-      EmptyMetadata,
-      ObjectStore[SierraItemRecord]],
-      R]): R =
+                                            EmptyMetadata,
+                                            ObjectStore[SierraItemRecord]],
+                       R]): R =
     withTypeVHS[SierraItemRecord, EmptyMetadata, R](
       bucket,
       table,
@@ -26,8 +26,8 @@ trait SierraItemRecordVHS extends LocalVersionedHybridStore with ScalaFutures {
   def storeSingleRecord(
     itemRecord: SierraItemRecord,
     versionedHybridStore: VersionedHybridStore[SierraItemRecord,
-      EmptyMetadata,
-      ObjectStore[SierraItemRecord]]
+                                               EmptyMetadata,
+                                               ObjectStore[SierraItemRecord]]
   ): Assertion = {
     val putFuture =
       versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(

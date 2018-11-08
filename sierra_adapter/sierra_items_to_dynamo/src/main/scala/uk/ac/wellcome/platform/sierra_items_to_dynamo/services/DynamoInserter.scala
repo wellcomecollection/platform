@@ -19,7 +19,8 @@ class DynamoInserter @Inject()(
                                              ObjectStore[SierraItemRecord]])(
   implicit ec: ExecutionContext) {
 
-  def insertIntoDynamo(record: SierraItemRecord): Future[VHSIndexEntry[EmptyMetadata]] =
+  def insertIntoDynamo(
+    record: SierraItemRecord): Future[VHSIndexEntry[EmptyMetadata]] =
     versionedHybridStore
       .updateRecord(
         id = record.id.withoutCheckDigit

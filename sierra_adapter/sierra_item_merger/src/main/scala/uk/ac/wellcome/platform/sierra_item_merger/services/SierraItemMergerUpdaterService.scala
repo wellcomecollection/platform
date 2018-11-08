@@ -24,21 +24,21 @@ class SierraItemMergerUpdaterService @Inject()(
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def update(itemRecord: SierraItemRecord): Future[List[VHSIndexEntry[EmptyMetadata]]] = {
-    val mergeUpdateFutures = itemRecord.bibIds.map {
-      bibId =>
-        versionedHybridStore
-          .updateRecord(id = bibId.withoutCheckDigit)(
-            ifNotExisting = (
-              SierraTransformable(
-                sierraId = bibId,
-                itemRecords = Map(itemRecord.id -> itemRecord)),
-              EmptyMetadata()))(ifExisting =
-            (existingTransformable, existingMetadata) => {
-              (
-                ItemLinker.linkItemRecord(existingTransformable, itemRecord),
-                existingMetadata)
-            })
+  def update(itemRecord: SierraItemRecord)
+    : Future[List[VHSIndexEntry[EmptyMetadata]]] = {
+    val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>
+      versionedHybridStore
+        .updateRecord(id = bibId.withoutCheckDigit)(
+          ifNotExisting = (
+            SierraTransformable(
+              sierraId = bibId,
+              itemRecords = Map(itemRecord.id -> itemRecord)),
+            EmptyMetadata()))(
+          ifExisting = (existingTransformable, existingMetadata) => {
+            (
+              ItemLinker.linkItemRecord(existingTransformable, itemRecord),
+              existingMetadata)
+          })
     }
 
     val unlinkUpdateFutures =
