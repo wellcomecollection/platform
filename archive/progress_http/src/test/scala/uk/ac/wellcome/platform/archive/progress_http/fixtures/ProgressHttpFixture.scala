@@ -13,8 +13,16 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressEvent, ProgressStatusUpdate, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressEvent,
+  ProgressStatusUpdate,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.ProgressHTTP
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -61,8 +69,10 @@ trait ProgressHttpFixture
     testWith(progress)
   }
 
-  def withApp[R](table: Table, topic: Topic, httpServerConfig: HTTPServerConfig, contextURL: URL)(
-    testWith: TestWith[ProgressHTTP, R]): R =
+  def withApp[R](table: Table,
+                 topic: Topic,
+                 httpServerConfig: HTTPServerConfig,
+                 contextURL: URL)(testWith: TestWith[ProgressHTTP, R]): R =
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>

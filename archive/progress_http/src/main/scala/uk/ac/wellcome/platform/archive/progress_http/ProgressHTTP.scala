@@ -20,7 +20,10 @@ class ProgressHTTP(
   snsWriter: SNSWriter,
   httpServerConfig: HTTPServerConfig,
   contextURL: URL
-)(implicit val actorSystem: ActorSystem, materializer: ActorMaterializer, executionContext: ExecutionContext) extends Logging {
+)(implicit val actorSystem: ActorSystem,
+  materializer: ActorMaterializer,
+  executionContext: ExecutionContext)
+    extends Logging {
   val progressTracker = new ProgressTracker(
     dynamoClient = dynamoClient,
     dynamoConfig = dynamoConfig
