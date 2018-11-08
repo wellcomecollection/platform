@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.archive.common.config.builders
 import com.amazonaws.services.s3.AmazonS3
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
+import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.config.core.models.AWSClientConfig
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config}
-import EnrichConfig._
 
 object S3Builder extends AWSClientConfigBuilder {
   private def buildS3Client(awsClientConfig: AWSClientConfig): AmazonS3 =

@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.archive.common.config.builders
 
 import com.typesafe.config.Config
+import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
-import EnrichConfig._
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import uk.ac.wellcome.config.core.builders.AkkaBuilder

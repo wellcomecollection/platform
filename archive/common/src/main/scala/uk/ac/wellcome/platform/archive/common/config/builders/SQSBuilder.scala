@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.archive.common.config.builders
 import com.typesafe.config.Config
 import uk.ac.wellcome.messaging.sqs.{SQSClientFactory, SQSConfig}
 import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
+import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.config.core.models.AWSClientConfig
-import EnrichConfig._
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync}
 
 object SQSBuilder extends AWSClientConfigBuilder {

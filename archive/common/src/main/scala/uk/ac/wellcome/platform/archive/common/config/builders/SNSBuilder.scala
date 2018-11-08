@@ -7,9 +7,9 @@ import uk.ac.wellcome.messaging.sns.{
   SNSMessageWriter,
   SNSWriter
 }
-import EnrichConfig._
 import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.config.core.builders.{AkkaBuilder, AWSClientConfigBuilder}
+import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.config.core.models.AWSClientConfig
 
 object SNSBuilder extends AWSClientConfigBuilder {

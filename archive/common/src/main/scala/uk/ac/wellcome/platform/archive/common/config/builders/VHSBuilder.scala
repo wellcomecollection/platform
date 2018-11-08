@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.archive.common.config.builders
 
 import com.typesafe.config.Config
+import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.storage.vhs.VHSConfig
-import EnrichConfig._
 
 object VHSBuilder {
   def buildVHSConfig(config: Config): VHSConfig = {
