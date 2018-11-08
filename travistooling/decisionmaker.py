@@ -159,9 +159,7 @@ def does_file_affect_build_task(path, task):
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
-    if path.startswith(
-        ("sierra_adapter/common", "project/", "build.sbt", "sbt_common/")
-    ):
+    if path.endswith((".scala", ".sbt")):
         if (task in "travistooling-test") or task.startswith("travis-lambda"):
             raise ScalaChangeAndNotScalaApp()
 
