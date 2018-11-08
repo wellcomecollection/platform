@@ -7,11 +7,21 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, IngestRequestContextGenerators, UploadConfig}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagItConfig,
+  BagUploaderConfig,
+  IngestRequestContextGenerators,
+  UploadConfig
+}
 import uk.ac.wellcome.platform.archive.archivist.Archivist
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{BagInfo, ExternalIdentifier, IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagInfo,
+  ExternalIdentifier,
+  IngestBagRequest,
+  NotificationMessage
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -99,30 +109,32 @@ trait ArchivistFixtures
     }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, Archivist),
-                       R]): R = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, Archivist), R])
+    : R = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
-      withLocalSnsTopic { registrarTopic =>
-        withLocalSnsTopic { progressTopic =>
-          withLocalS3Bucket { ingestBucket =>
-            withLocalS3Bucket { storageBucket =>
-              withApp(
-                storageBucket,
-                queuePair,
-                registrarTopic,
-                progressTopic) { archivist =>
-                testWith(
-                  (
-                    ingestBucket,
+      withLocalSnsTopic {
+        registrarTopic =>
+          withLocalSnsTopic {
+            progressTopic =>
+              withLocalS3Bucket { ingestBucket =>
+                withLocalS3Bucket { storageBucket =>
+                  withApp(
                     storageBucket,
                     queuePair,
                     registrarTopic,
-                    progressTopic,
-                    archivist))
+                    progressTopic) { archivist =>
+                    testWith(
+                      (
+                        ingestBucket,
+                        storageBucket,
+                        queuePair,
+                        registrarTopic,
+                        progressTopic,
+                        archivist))
+                  }
+                }
               }
-            }
           }
-        }
       }
     })
   }

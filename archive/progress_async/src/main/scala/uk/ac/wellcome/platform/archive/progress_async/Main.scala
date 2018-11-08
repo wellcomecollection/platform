@@ -15,8 +15,10 @@ object Main extends App with Logging {
   val config = ConfigFactory.load()
 
   implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-  implicit val materializer: ActorMaterializer = AkkaBuilder.buildActorMaterializer()
-  implicit val executionContext: ExecutionContext = AkkaBuilder.buildExecutionContext()
+  implicit val materializer: ActorMaterializer =
+    AkkaBuilder.buildActorMaterializer()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
   val progressAsync = new ProgressAsync(
     messageStream =

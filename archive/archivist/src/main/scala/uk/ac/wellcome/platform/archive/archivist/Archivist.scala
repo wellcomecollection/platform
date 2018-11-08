@@ -15,7 +15,10 @@ import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  IngestBagRequest,
+  NotificationMessage
+}
 
 import scala.concurrent.Future
 
@@ -26,13 +29,14 @@ class Archivist(
   bagUploaderConfig: BagUploaderConfig,
   snsRegistrarConfig: SNSConfig,
   snsProgressConfig: SNSConfig
-)(implicit val actorSystem: ActorSystem) extends Logging {
+)(implicit val actorSystem: ActorSystem)
+    extends Logging {
   def run(): Future[Done] = {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
-    val decider: Supervision.Decider = {
-      e => {
+    val decider: Supervision.Decider = { e =>
+      {
         error("Stream failure", e)
         Supervision.Resume
       }
@@ -56,15 +60,16 @@ class Archivist(
           )
         )
         .log("download zip")
-        .via(
-          ZipFileDownloadFlow(bagUploaderConfig.parallelism, snsProgressConfig)(s3Client, snsClient))
+        .via(ZipFileDownloadFlow(
+          bagUploaderConfig.parallelism,
+          snsProgressConfig)(s3Client, snsClient))
         .log("archiving zip")
         .via(
           FoldEitherFlow[
             ArchiveError[IngestBagRequest],
             ZipFileDownloadComplete,
             Unit
-            ](ifLeft = Flow[ArchiveError[IngestBagRequest]].map(_ => ()))(
+          ](ifLeft = Flow[ArchiveError[IngestBagRequest]].map(_ => ()))(
             ifRight = ArchiveAndNotifyRegistrarFlow(
               bagUploaderConfig,
               snsProgressConfig,
