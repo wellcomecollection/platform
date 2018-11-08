@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.config.builders
+package uk.ac.wellcome.config.storage.builders
 
 import com.amazonaws.services.s3.AmazonS3
 import com.typesafe.config.Config

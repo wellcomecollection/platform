@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.config.builders
+package uk.ac.wellcome.config.storage.builders
 
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._

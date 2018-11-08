@@ -1,11 +1,11 @@
-package uk.ac.wellcome.platform.archive.common.config.builders
+package uk.ac.wellcome.config.storage.builders
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.config.core.models.AWSClientConfig
 import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, DynamoConfig}
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 
 object DynamoBuilder extends AWSClientConfigBuilder {
   def buildDynamoConfig(config: Config,
