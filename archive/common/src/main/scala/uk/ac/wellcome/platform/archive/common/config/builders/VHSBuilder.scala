@@ -4,7 +4,7 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.storage.vhs.VHSConfig
 import EnrichConfig._
 
-object VHSBuilder extends AWSClientConfigBuilder {
+object VHSBuilder {
   def buildVHSConfig(config: Config): VHSConfig = {
     val s3Config = S3Builder.buildS3Config(config, namespace = "vhs")
     val dynamoConfig =
