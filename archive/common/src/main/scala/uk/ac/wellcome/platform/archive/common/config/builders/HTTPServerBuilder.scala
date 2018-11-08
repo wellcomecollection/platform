@@ -4,7 +4,7 @@ import java.net.URL
 
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
-import uk.ac.wellcome.config.core.models.HTTPServerConfig
+import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 
 object HTTPServerBuilder {
   def buildHTTPServerConfig(config: Config): HTTPServerConfig = {
