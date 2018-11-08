@@ -26,7 +26,7 @@ def clean_dates(data, keys_to_parse):
     alphabetically is rubbish
     """
     for key, value in data.items():
-        if value_should_be_parsed(key, value, keys_to_parse):
+        if key in keys_to_parse:
             if isinstance(value, str):
                 data[key] = convert_date_to_iso(value)
             elif isinstance(value, list):
@@ -36,34 +36,37 @@ def clean_dates(data, keys_to_parse):
     return data
 
 
-def value_should_be_parsed(key, value, keys_to_parse):
-    """
-    checks whether:
-        - the value exists
-        - the key is date-related
-        - the key also matches a set of acceptable substrings
-    """
-    return (
-        value
-        and "_date" in key
-        and any(substring in key for substring in keys_to_parse)
-    )
-
-
 def convert_date_to_iso(date_string):
     try:
         return parse(date_string).date().isoformat()
     except (ValueError, TypeError):
-        return None
+        return date_string
 
 
 keys_to_parse = {
-    "_from",
-    "_to",
-    "_tech",
     "all_amendment_date",
+    "image_artwork_date_from",
+    "image_artwork_date_to",
+    "image_award_date_from",
+    "image_award_date_to",
     "image_iap_catalog_date",
     "image_innopac_id_date",
+    "image_int_date_alias.image_int_date_from",
+    "image_int_date_alias.image_int_date_to",
+    "image_int_date_from",
+    "image_int_date_to",
+    "image_pub_date_from",
+    "image_pub_date_to",
+    "image_pub_printing_date_from",
+    "image_pub_printing_date_to",
+    "image_tech_coloured_date_from",
+    "image_tech_coloured_date_to",
+    "image_tech_retouched_date_from",
+    "image_tech_retouched_date_to",
+    "image_tech_scanned_date_from",
+    "image_tech_scanned_date_to",
+    "image_wellcome_pub_date_from",
+    "image_wellcome_pub_date_to",
 }
 
 keys_to_drop = {
