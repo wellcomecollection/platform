@@ -7,7 +7,8 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 import uk.ac.wellcome.storage.ObjectLocation
 
-case class ArchiveDigestItemJob(archiveJob: ArchiveJob, bagDigestItem: BagItem) {
+case class ArchiveDigestItemJob(archiveJob: ArchiveJob,
+                                bagDigestItem: BagItem) {
   def bagName = archiveJob.bagLocation.bagPath
 
   def uploadLocation =

@@ -5,7 +5,11 @@ import java.io.InputStream
 import cats.implicits._
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ArchiveJob, ZipLocation}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveDigestItemJob,
+  ArchiveJob,
+  ZipLocation
+}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
@@ -17,9 +21,8 @@ object ArchiveItemJobCreator extends Logging {
     * If any of the manifests are incorrectly formatted, it returns an error.
     *
     */
-  def createArchiveDigestItemJobs(
-    job: ArchiveJob,
-    delimiter: String): Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] =
+  def createArchiveDigestItemJobs(job: ArchiveJob, delimiter: String)
+    : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] =
     job.bagManifestLocations
       .map { manifestLocation =>
         ZipLocation(job.zipFile, manifestLocation.toEntryPath)

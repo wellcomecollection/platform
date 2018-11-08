@@ -23,9 +23,9 @@ import scala.util.{Failure, Success}
   */
 object UploadInputStreamFlow extends Logging {
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
-  : Flow[(ArchiveItemJob, InputStream),
-    Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
-    NotUsed] =
+    : Flow[(ArchiveItemJob, InputStream),
+           Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
+           NotUsed] =
     Flow[(ArchiveItemJob, InputStream)]
       .log("uploading input stream")
       .flatMapMerge(
@@ -41,7 +41,11 @@ object UploadInputStreamFlow extends Logging {
                   Right(archiveItemJob)
                 case Failure(exception) =>
                   warn("There was an exception!", exception)
-                  Left(UploadError(archiveItemJob.uploadLocation, exception, archiveItemJob))
+                  Left(
+                    UploadError(
+                      archiveItemJob.uploadLocation,
+                      exception,
+                      archiveItemJob))
               }
         }
       )

@@ -7,9 +7,15 @@ import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveItemJob, ZipLocation}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveItemJob,
+  ZipLocation
+}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
-import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, OnErrorFlow}
+import uk.ac.wellcome.platform.archive.common.flows.{
+  FoldEitherFlow,
+  OnErrorFlow
+}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 /** This flow extracts an item from a ZIP file, uploads it to S3 and validates
@@ -26,17 +32,24 @@ object UploadItemFlow extends Logging {
   def apply(parallelism: Int)(
     implicit s3Client: AmazonS3
   ): Flow[ArchiveItemJob,
-    Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
-    NotUsed] = {
+          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
+          NotUsed] = {
     Flow[ArchiveItemJob]
-      .map(archiveItemJob =>
-          (archiveItemJob,
+      .map(
+        archiveItemJob =>
+          (
+            archiveItemJob,
             ZipFileReader.maybeInputStream(
-              ZipLocation(archiveItemJob.archiveJob.zipFile, archiveItemJob.itemLocation))))
+              ZipLocation(
+                archiveItemJob.archiveJob.zipFile,
+                archiveItemJob.itemLocation))))
       .map {
         case (archiveItemJob, option) =>
           option
-            .toRight(FileNotFoundError(archiveItemJob.itemLocation.path, archiveItemJob))
+            .toRight(
+              FileNotFoundError(
+                archiveItemJob.itemLocation.path,
+                archiveItemJob))
             .map(inputStream => (archiveItemJob, inputStream))
       }
       .via(
@@ -44,7 +57,6 @@ object UploadItemFlow extends Logging {
           ArchiveError[ArchiveItemJob],
           (ArchiveItemJob, InputStream),
           Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](
-          ifLeft = OnErrorFlow())(
-          ifRight = UploadInputStreamFlow(parallelism)))
+          ifLeft = OnErrorFlow())(ifRight = UploadInputStreamFlow(parallelism)))
   }
 }

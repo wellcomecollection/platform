@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.models.errors
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ArchiveJob}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveDigestItemJob,
+  ArchiveJob
+}
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.storage.ObjectLocation
@@ -26,14 +29,15 @@ case class UploadDigestItemError(exception: Throwable, t: ArchiveDigestItemJob)
     s"There was an exception while uploading ${t.bagDigestItem.location} to ${t.uploadLocation}: ${exception.getMessage}"
 }
 
-case class UploadError[T](objectLocation: ObjectLocation, exception: Throwable, t: T)
-  extends ArchiveError[T] {
+case class UploadError[T](objectLocation: ObjectLocation,
+                          exception: Throwable,
+                          t: T)
+    extends ArchiveError[T] {
   override def toString =
     s"There was an exception while uploading to ${objectLocation}: ${exception.getMessage}"
 }
 
-case class FileNotFoundError[T](path: String, t: T)
-  extends ArchiveError[T] {
+case class FileNotFoundError[T](path: String, t: T) extends ArchiveError[T] {
   override def toString = s"Failed reading file $path from zip file"
 }
 

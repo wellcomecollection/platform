@@ -18,7 +18,9 @@ trait ArchiveJobGenerators {
     val bagDigestItem =
       BagItem(digest, EntryPath(s3Key))
     val archiveItemJob =
-      ArchiveDigestItemJob(archiveJob = archiveJob, bagDigestItem = bagDigestItem)
+      ArchiveDigestItemJob(
+        archiveJob = archiveJob,
+        bagDigestItem = bagDigestItem)
     archiveItemJob
   }
 

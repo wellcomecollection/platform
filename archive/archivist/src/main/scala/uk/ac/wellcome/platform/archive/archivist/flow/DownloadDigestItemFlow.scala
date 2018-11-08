@@ -7,7 +7,10 @@ import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveDigestItemJob
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ChecksumNotMatchedOnDownloadError
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  DownloadError
+}
 
 import scala.util.{Failure, Success, Try}
 
