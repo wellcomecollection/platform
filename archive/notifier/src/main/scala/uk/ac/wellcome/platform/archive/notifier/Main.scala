@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.archive.notifier
 import com.amazonaws.services.sns.model.PublishResult
 import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders._
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 

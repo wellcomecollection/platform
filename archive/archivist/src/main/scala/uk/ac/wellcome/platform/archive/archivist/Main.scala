@@ -4,9 +4,9 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.platform.archive.archivist.config.BagUploaderConfigBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders.{
-  AkkaBuilder,
   MessagingBuilder,
   S3Builder,
   SNSBuilder

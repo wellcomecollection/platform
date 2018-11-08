@@ -5,6 +5,7 @@ import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
 import EnrichConfig._
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import uk.ac.wellcome.config.core.builders.AkkaBuilder
 
 import scala.concurrent.duration._
 

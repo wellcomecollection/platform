@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.config.builders
 
 import com.typesafe.config.Config
+import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 
 object MessagingBuilder {

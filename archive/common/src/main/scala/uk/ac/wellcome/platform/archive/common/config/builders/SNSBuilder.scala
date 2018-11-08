@@ -9,6 +9,7 @@ import uk.ac.wellcome.messaging.sns.{
 }
 import EnrichConfig._
 import com.amazonaws.services.sns.AmazonSNS
+import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.platform.archive.common.config.models.AWSClientConfig
 
 object SNSBuilder extends AWSClientConfigBuilder {

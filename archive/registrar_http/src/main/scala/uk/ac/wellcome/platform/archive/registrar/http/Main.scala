@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.config.builders._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
