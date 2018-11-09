@@ -24,7 +24,8 @@ object Main extends App with Logging {
   implicit val executionContext: ExecutionContext =
     AkkaBuilder.buildExecutionContext()
 
-  val versionedHybridStore = SierraTransformableVHSBuilder.buildSierraVHS(config)
+  val versionedHybridStore =
+    SierraTransformableVHSBuilder.buildSierraVHS(config)
 
   val updaterService = new SierraBibMergerUpdaterService(
     versionedHybridStore = versionedHybridStore

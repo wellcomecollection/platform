@@ -3,7 +3,11 @@ package uk.ac.wellcome.sierra_adapter.config.builders
 import com.typesafe.config.Config
 import io.circe.{KeyDecoder, KeyEncoder}
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
-import uk.ac.wellcome.config.storage.builders.{DynamoBuilder, S3Builder, VHSBuilder}
+import uk.ac.wellcome.config.storage.builders.{
+  DynamoBuilder,
+  S3Builder,
+  VHSBuilder
+}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
@@ -14,10 +18,9 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import scala.concurrent.ExecutionContext
 
 object SierraTransformableVHSBuilder {
-  type SierraVHS = VersionedHybridStore[
-    SierraTransformable,
-    EmptyMetadata,
-    ObjectStore[SierraTransformable]]
+  type SierraVHS = VersionedHybridStore[SierraTransformable,
+                                        EmptyMetadata,
+                                        ObjectStore[SierraTransformable]]
 
   implicit val keyDecoder: KeyDecoder[SierraItemNumber] =
     SierraTransformable.keyDecoder
