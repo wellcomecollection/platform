@@ -22,11 +22,12 @@ import scala.concurrent.Future
   * This class should only be doing reading -- deciding how to act on records
   * that need reindexing is the responsibility of another class.
   */
-class RecordReader @Inject()(
-  maxRecordsScanner: MaxRecordsScanner,
-  parallelScanner: ParallelScanner) extends Logging {
+class RecordReader @Inject()(maxRecordsScanner: MaxRecordsScanner,
+                             parallelScanner: ParallelScanner)
+    extends Logging {
 
-  def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[util.Map[String, AttributeValue]]] = {
+  def findRecordsForReindexing(
+    reindexJob: ReindexJob): Future[List[util.Map[String, AttributeValue]]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
 
     reindexJob match {

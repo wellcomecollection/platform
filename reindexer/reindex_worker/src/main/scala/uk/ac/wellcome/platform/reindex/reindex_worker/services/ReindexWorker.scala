@@ -44,7 +44,7 @@ class ReindexWorker @Inject()(
       items <- recordReader.findRecordsForReindexing(reindexJob)
       _ <- tableMetadata match {
         case "MiroMetadata" => processMiroMetadata(items)
-        case _ => processEmptyMetadata(items)
+        case _              => processEmptyMetadata(items)
       }
     } yield ()
 
@@ -59,12 +59,10 @@ class ReindexWorker @Inject()(
     * In particular, we send a `HybridRecord` if the row doesn't have any
     * metadata, and `VHSIndexEntry` otherwise.
     */
-
   private def processEmptyMetadata(
     items: List[util.Map[String, AttributeValue]]): Future[Unit] =
     bulkSNSWriter
       .sendToSNS(items.map { av =>
-
         // AWLC: if you're changing this code to create an instance of
         // `EmptyMetadata` to include in a `VHSIndexEntry`, don't bother
         // parsing as a case class; just create a fresh value.
@@ -74,7 +72,9 @@ class ReindexWorker @Inject()(
         //
         parseAsCaseClass[HybridRecord](av)
       })
-      .map { _ => () }
+      .map { _ =>
+        ()
+      }
 
   private def processMiroMetadata(
     items: List[util.Map[String, AttributeValue]]): Future[Unit] =
@@ -87,7 +87,9 @@ class ReindexWorker @Inject()(
           VHSIndexEntry(hybridRecord, metadata)
         }
       )
-      .map { _ => () }
+      .map { _ =>
+        ()
+      }
 
   /** Take the Map[String, AttributeValue], and convert it into an
     * instance of the case class `T`.  This is using a Scanamo helper --
