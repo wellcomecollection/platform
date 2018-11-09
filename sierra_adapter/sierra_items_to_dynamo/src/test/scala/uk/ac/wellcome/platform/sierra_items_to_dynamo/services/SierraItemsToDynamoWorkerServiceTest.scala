@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 import akka.actor.ActorSystem
 import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
@@ -13,16 +13,20 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.sierra_adapter.fixtures.SierraItemRecordVHS
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraItemsToDynamoWorkerServiceTest
     extends FunSpec
+    with LocalVersionedHybridStore
     with SNS
     with SQS
     with Matchers
@@ -31,8 +35,7 @@ class SierraItemsToDynamoWorkerServiceTest
     with Akka
     with MetricsSenderFixture
     with ScalaFutures
-    with SierraGenerators
-    with SierraItemRecordVHS {
+    with SierraGenerators {
 
   it("reads a sierra record from SQS and inserts it into DynamoDB") {
     val bibIds = createSierraBibNumbers(count = 5)
@@ -134,6 +137,30 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
+  def storeSingleRecord(
+    itemRecord: SierraItemRecord,
+    versionedHybridStore: VersionedHybridStore[SierraItemRecord,
+                                               EmptyMetadata,
+                                               ObjectStore[SierraItemRecord]]
+  ): Assertion = {
+    val putFuture =
+      versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(
+        ifNotExisting = (itemRecord, EmptyMetadata())
+      )(
+        ifExisting = (existingRecord, existingMetadata) =>
+          throw new RuntimeException(
+            s"VHS should be empty; got ($existingRecord, $existingMetadata)!")
+      )
+
+    whenReady(putFuture) { _ =>
+      val getFuture =
+        versionedHybridStore.getRecord(id = itemRecord.id.withoutCheckDigit)
+      whenReady(getFuture) { result =>
+        result.get shouldBe itemRecord
+      }
+    }
+  }
+
   private def withSierraWorkerService[R](
     versionedHybridStore: VersionedHybridStore[SierraItemRecord,
                                                EmptyMetadata,
@@ -156,5 +183,17 @@ class SierraItemsToDynamoWorkerServiceTest
 
           testWith(service)
         }
+    }
+
+  def withItemRecordVHS[R](table: Table, bucket: Bucket)(
+    testWith: TestWith[VersionedHybridStore[SierraItemRecord,
+                                            EmptyMetadata,
+                                            ObjectStore[SierraItemRecord]],
+                       R]): R =
+    withTypeVHS[SierraItemRecord, EmptyMetadata, R](
+      bucket,
+      table,
+      globalS3Prefix = "") { vhs =>
+      testWith(vhs)
     }
 }
