@@ -29,7 +29,8 @@ class MaxRecordsScannerTest
 
         val expectedRecords = List(toAttributeMap(record))
 
-        val futureResult: Future[List[util.Map[String, AttributeValue]]] = maxResultScanner.scan(maxRecords = 1)
+        val futureResult: Future[List[util.Map[String, AttributeValue]]] =
+          maxResultScanner.scan(maxRecords = 1)
 
         whenReady(futureResult) { result =>
           result shouldBe expectedRecords

@@ -85,7 +85,9 @@ class ParallelScannerTest
         }
 
         whenReady(Future.sequence(futureResults)) { results =>
-            results.flatten.toList should contain theSameElementsAs records.map { toAttributeMap }
+          results.flatten.toList should contain theSameElementsAs records.map {
+            toAttributeMap
+          }
         }
       }
     }

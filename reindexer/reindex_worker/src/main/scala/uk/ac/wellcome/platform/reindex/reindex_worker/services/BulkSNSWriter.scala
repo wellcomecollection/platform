@@ -10,7 +10,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class BulkSNSWriter @Inject()(snsWriter: SNSWriter)(
   implicit ec: ExecutionContext) {
-  def sendToSNS[T](records: List[T])(implicit encoder: Encoder[T]): Future[List[PublishAttempt]] = {
+  def sendToSNS[T](records: List[T])(
+    implicit encoder: Encoder[T]): Future[List[PublishAttempt]] = {
     Future.sequence {
       records
         .map { indexEntry: T =>

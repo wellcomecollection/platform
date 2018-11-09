@@ -32,7 +32,9 @@ class ScanSpecScanner @Inject()(dynamoDBClient: AmazonDynamoDB)(
     * Note that this returns a Future[List], so results will be cached in-memory.
     * Design your spec accordingly.
     */
-  def scan(scanSpec: ScanSpec, tableName: String): Future[List[util.Map[String, AttributeValue]]] = {
+  def scan(
+    scanSpec: ScanSpec,
+    tableName: String): Future[List[util.Map[String, AttributeValue]]] = {
     val table = dynamoDB.getTable(tableName)
 
     Future {

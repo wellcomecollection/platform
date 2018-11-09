@@ -6,7 +6,8 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.services.ReindexWorker
 
 object ReindexerWorkerModule extends TwitterModule {
 
-  flag[String]("reindexer.tableMetadata",
+  flag[String](
+    "reindexer.tableMetadata",
     default = "EmptyMetadata",
     "Table metadata of the VHS to reindex")
 

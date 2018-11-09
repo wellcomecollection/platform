@@ -4,8 +4,14 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{DynamoFixtures, ReindexableTable}
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexJob, PartialReindexJob}
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
+  DynamoFixtures,
+  ReindexableTable
+}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  CompleteReindexJob,
+  PartialReindexJob
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
@@ -21,7 +27,8 @@ class RecordReaderTest
     with ReindexableTable
     with IntegrationPatience {
 
-  implicit val emptyDynamoFormat: DynamoFormat[EmptyMetadata] = DynamoFormat[EmptyMetadata]
+  implicit val emptyDynamoFormat: DynamoFormat[EmptyMetadata] =
+    DynamoFormat[EmptyMetadata]
 
   val exampleRecord = HybridRecord(
     id = "id",

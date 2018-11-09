@@ -32,7 +32,9 @@ class ParallelScanner @Inject()(scanSpecScanner: ScanSpecScanner,
     * Note that this returns a Future[List], so results will be cached in-memory.
     * Choose segment count accordingly.
     */
-  def scan(segment: Int, totalSegments: Int): Future[List[util.Map[String, AttributeValue]]] = {
+  def scan(
+    segment: Int,
+    totalSegments: Int): Future[List[util.Map[String, AttributeValue]]] = {
 
     // Create the ScanSpec configuration and the DynamoDB table.  This is
     // based on the Java example of a Parallel Scan from the AWS docs:

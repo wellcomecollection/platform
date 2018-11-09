@@ -25,10 +25,13 @@ class ReindexWorker @Inject()(
 )(implicit ec: ExecutionContext) {
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
-  implicit val emptyMetadataDynamoFormat: DynamoFormat[EmptyMetadata] = DynamoFormat[EmptyMetadata]
+  implicit val emptyMetadataDynamoFormat: DynamoFormat[EmptyMetadata] =
+    DynamoFormat[EmptyMetadata]
 
-  implicit val emptyMetadataEncoder: Encoder[EmptyMetadata] = Encoder[EmptyMetadata]
-  implicit val miroMetadataEncoder: Encoder[MiroMetadata] = Encoder[MiroMetadata]
+  implicit val emptyMetadataEncoder: Encoder[EmptyMetadata] =
+    Encoder[EmptyMetadata]
+  implicit val miroMetadataEncoder: Encoder[MiroMetadata] =
+    Encoder[MiroMetadata]
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
@@ -36,13 +39,15 @@ class ReindexWorker @Inject()(
         fromJson[ReindexJob](message.body))
       _ <- tableMetadata match {
         case "MiroMetadata" => processReindexJob[MiroMetadata](reindexJob)
-        case _ => processReindexJob[EmptyMetadata](reindexJob)
+        case _              => processReindexJob[EmptyMetadata](reindexJob)
       }
     } yield ()
 
   def stop(): Future[Terminated] = system.terminate()
 
-  private def processReindexJob[M](reindexJob: ReindexJob)(implicit dynamoFormat: DynamoFormat[M], encoder: Encoder[VHSIndexEntry[M]]) =
+  private def processReindexJob[M](reindexJob: ReindexJob)(
+    implicit dynamoFormat: DynamoFormat[M],
+    encoder: Encoder[VHSIndexEntry[M]]) =
     for {
       recordsToSend <- recordReader.findRecordsForReindexing[M](reindexJob)
       _ <- bulkSNSWriter.sendToSNS[VHSIndexEntry[M]](recordsToSend)

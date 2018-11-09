@@ -7,9 +7,16 @@ import com.google.inject.Inject
 import com.gu.scanamo.{DynamoFormat, ScanamoFree}
 import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{MaxRecordsScanner, ParallelScanner}
+import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
+  MaxRecordsScanner,
+  ParallelScanner
+}
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexJob, PartialReindexJob, ReindexJob}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  CompleteReindexJob,
+  PartialReindexJob,
+  ReindexJob
+}
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSIndexEntry}
 
@@ -47,7 +54,9 @@ class RecordReader @Inject()(
           maxRecordsScanner.scan(maxRecords = maxRecords)
       }
 
-      recordsToReindex: List[VHSIndexEntry[M]] = attributeValues.map { av => parseResult[M](av) }
+      recordsToReindex: List[VHSIndexEntry[M]] = attributeValues.map { av =>
+        parseResult[M](av)
+      }
     } yield recordsToReindex
   }
 
@@ -60,14 +69,17 @@ class RecordReader @Inject()(
     //
     // https://github.com/scanamo/scanamo/blob/12554b8e24ef8839d5e9dd9a4f42ae130e29b42b/scanamo/src/main/scala/com/gu/scanamo/ScanamoFree.scala#L62
     //
-    val maybeHybridRecord: Either[DynamoReadError, HybridRecord] = ScanamoFree.read[HybridRecord](attributeValues)
-    val maybeMetadata: Either[DynamoReadError, M] = ScanamoFree.read[M](attributeValues)
+    val maybeHybridRecord: Either[DynamoReadError, HybridRecord] =
+      ScanamoFree.read[HybridRecord](attributeValues)
+    val maybeMetadata: Either[DynamoReadError, M] =
+      ScanamoFree.read[M](attributeValues)
 
     (maybeHybridRecord, maybeMetadata) match {
       case (Right(hybridRecord: HybridRecord), Right(metadata)) =>
         VHSIndexEntry(hybridRecord = hybridRecord, metadata = metadata)
       case _ =>
-        throw ReindexerException(s"Error when parsing $attributeValues as VHSIndexEntry")
+        throw ReindexerException(
+          s"Error when parsing $attributeValues as VHSIndexEntry")
     }
   }
 }

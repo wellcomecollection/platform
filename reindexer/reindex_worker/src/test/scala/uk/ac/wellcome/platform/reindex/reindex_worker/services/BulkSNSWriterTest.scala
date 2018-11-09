@@ -20,15 +20,16 @@ class BulkSNSWriterTest
     with IntegrationPatience
     with SNS {
 
-  val records: List[HybridRecord] = List("miro/1", "miro/2", "miro/3").map { id =>
-    HybridRecord(
-      id = id,
-      version = 1,
-      location = ObjectLocation(
-        namespace = "s3://example-bukkit",
-        key = "mykey.txt"
+  val records: List[HybridRecord] = List("miro/1", "miro/2", "miro/3").map {
+    id =>
+      HybridRecord(
+        id = id,
+        version = 1,
+        location = ObjectLocation(
+          namespace = "s3://example-bukkit",
+          key = "mykey.txt"
+        )
       )
-    )
   }
 
   it("sends messages for the provided IDs") {
