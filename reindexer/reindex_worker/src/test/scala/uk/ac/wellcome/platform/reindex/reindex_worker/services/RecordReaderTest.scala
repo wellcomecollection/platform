@@ -1,20 +1,14 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import com.amazonaws.services.dynamodbv2.model._
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
-  DynamoFixtures,
-  ReindexableTable
-}
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  PartialReindexJob
-}
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{DynamoFixtures, ReindexableTable}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexJob, PartialReindexJob}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,6 +20,8 @@ class RecordReaderTest
     with DynamoFixtures
     with ReindexableTable
     with IntegrationPatience {
+
+  implicit val emptyDynamoFormat: DynamoFormat[EmptyMetadata] = DynamoFormat[EmptyMetadata]
 
   val exampleRecord = HybridRecord(
     id = "id",
@@ -49,7 +45,7 @@ class RecordReaderTest
 
         val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
 
-        whenReady(reader.findRecordsForReindexing(reindexJob)) {
+        whenReady(reader.findRecordsForReindexing[EmptyMetadata](reindexJob)) {
           actualRecords =>
             actualRecords should contain theSameElementsAs records
         }
@@ -67,7 +63,7 @@ class RecordReaderTest
 
         val reindexJob = PartialReindexJob(maxRecords = 5)
 
-        whenReady(reader.findRecordsForReindexing(reindexJob)) {
+        whenReady(reader.findRecordsForReindexing[EmptyMetadata](reindexJob)) {
           actualRecords =>
             actualRecords should have size 5
         }

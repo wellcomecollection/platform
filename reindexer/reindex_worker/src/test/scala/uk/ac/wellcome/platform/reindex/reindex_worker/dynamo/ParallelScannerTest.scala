@@ -84,11 +84,7 @@ class ParallelScannerTest
         }
 
         whenReady(Future.sequence(futureResults)) { results =>
-          val actualRecords: List[TestVersioned] = results.flatten.toList
-            .map {
-              _.right.get
-            }
-          actualRecords should contain theSameElementsAs records
+            results.flatten.toList should contain theSameElementsAs records
         }
       }
     }

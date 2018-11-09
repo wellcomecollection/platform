@@ -64,15 +64,16 @@ class ReindexWorkerTest
                   )
 
                   withSNSWriter(topic) { snsWriter =>
-                    val hybridRecordSender = new VHSIndexEntrySender(
+                    val vhsIndexEntrySender = new VHSIndexEntrySender(
                       snsWriter = snsWriter
                     )
 
                     val workerService = new ReindexWorker(
                       recordReader = recordReader,
-                      hybridRecordSender = hybridRecordSender,
+                      vhsIndexEntrySender = vhsIndexEntrySender,
                       sqsStream = sqsStream,
-                      system = actorSystem
+                      system = actorSystem,
+                      tableMetadata = "EmptyMetadata"
                     )
 
                     try {

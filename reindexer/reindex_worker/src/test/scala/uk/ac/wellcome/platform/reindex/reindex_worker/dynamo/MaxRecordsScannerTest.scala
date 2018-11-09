@@ -44,7 +44,7 @@ class MaxRecordsScannerTest
         val futureResult = maxResultScanner.scan(maxRecords = 10)
 
         whenReady(futureResult) { result =>
-          result.map { _.right.get } should contain theSameElementsAs records
+          result should contain theSameElementsAs records
         }
       }
     }
