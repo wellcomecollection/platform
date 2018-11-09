@@ -64,7 +64,7 @@ class ReindexWorkerTest
                   )
 
                   withSNSWriter(topic) { snsWriter =>
-                    val hybridRecordSender = new HybridRecordSender(
+                    val hybridRecordSender = new VHSIndexEntrySender(
                       snsWriter = snsWriter
                     )
 

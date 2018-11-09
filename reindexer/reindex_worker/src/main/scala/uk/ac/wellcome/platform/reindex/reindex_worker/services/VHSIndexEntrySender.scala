@@ -5,19 +5,19 @@ import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSIndexEntry}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HybridRecordSender @Inject()(snsWriter: SNSWriter)(
+class VHSIndexEntrySender @Inject()(snsWriter: SNSWriter)(
   implicit ec: ExecutionContext) {
-  def sendToSNS(records: List[HybridRecord]): Future[List[PublishAttempt]] = {
+  def sendToSNS[M](records: List[VHSIndexEntry[M]]): Future[List[PublishAttempt]] = {
     Future.sequence {
       records
-        .map { record: HybridRecord =>
+        .map { indexEntry: VHSIndexEntry[M] =>
           snsWriter
             .writeMessage(
-              message = record,
+              message = indexEntry,
               subject = this.getClass.getSimpleName
             )
             .recover {

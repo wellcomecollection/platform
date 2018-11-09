@@ -34,7 +34,7 @@ class HybridRecordSenderTest
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
       withSNSWriter(topic) { snsWriter =>
-        val hybridRecordSender = new HybridRecordSender(
+        val hybridRecordSender = new VHSIndexEntrySender(
           snsWriter = snsWriter
         )
 
@@ -56,7 +56,7 @@ class HybridRecordSenderTest
 
   it("returns a failed Future[ReindexerException] if there's an SNS error") {
     withSNSWriter(Topic("no-such-topic")) { snsWriter =>
-      val hybridRecordSender = new HybridRecordSender(
+      val hybridRecordSender = new VHSIndexEntrySender(
         snsWriter = snsWriter
       )
 

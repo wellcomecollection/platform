@@ -1,9 +1,10 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.dynamo
 
+import java.util
+
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
+import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.google.inject.Inject
-import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
@@ -16,9 +17,7 @@ class MaxRecordsScanner @Inject()(scanSpecScanner: ScanSpecScanner,
     * It may return less if there aren't enough results in the table, or if
     * `maxResults` is larger than the maximum page size.
     */
-  def scan[T](maxRecords: Int)(implicit dynamoFormat: DynamoFormat[T])
-    : Future[List[Either[DynamoReadError, T]]] = {
-
+  def scan(maxRecords: Int): Future[List[util.Map[String, AttributeValue]]] = {
     val scanSpec = new ScanSpec()
       .withMaxResultSize(maxRecords)
 

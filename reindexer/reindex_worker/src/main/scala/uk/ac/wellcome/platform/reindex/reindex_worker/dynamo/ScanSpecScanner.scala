@@ -8,8 +8,6 @@ import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
 import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Item}
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.google.inject.Inject
-import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.{DynamoFormat, ScanamoFree}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,9 +32,7 @@ class ScanSpecScanner @Inject()(dynamoDBClient: AmazonDynamoDB)(
     * Note that this returns a Future[List], so results will be cached in-memory.
     * Design your spec accordingly.
     */
-  def scan[T](scanSpec: ScanSpec, tableName: String)(
-    implicit dynamoFormat: DynamoFormat[T])
-    : Future[List[Either[DynamoReadError, T]]] = {
+  def scan(scanSpec: ScanSpec, tableName: String): Future[List[util.Map[String, AttributeValue]]] = {
     val table = dynamoDB.getTable(tableName)
 
     Future {
@@ -56,16 +52,7 @@ class ScanSpecScanner @Inject()(dynamoDBClient: AmazonDynamoDB)(
         // I got this from SO, although it's an incidental part of the answer:
         // https://stackoverflow.com/a/27538483/1558022
         //
-        val attributeValues: util.Map[String, AttributeValue] =
-          InternalUtils.toAttributeValues(item)
-
-        // Take the Map[String, AttributeValue], and convert it into an
-        // instance of the case class `T`.  This is using a Scanamo helper --
-        // I worked this out by looking at [[ScanamoFree.get]].
-        //
-        // https://github.com/scanamo/scanamo/blob/12554b8e24ef8839d5e9dd9a4f42ae130e29b42b/scanamo/src/main/scala/com/gu/scanamo/ScanamoFree.scala#L62
-        //
-        ScanamoFree.read[T](attributeValues)
+        InternalUtils.toAttributeValues(item)
       }
     }
   }

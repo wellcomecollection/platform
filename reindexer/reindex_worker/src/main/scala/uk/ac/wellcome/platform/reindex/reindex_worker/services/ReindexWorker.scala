@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import com.twitter.app.Flag
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -15,7 +15,7 @@ case class MiroMetadata(showInCatalogueAPI: Boolean)
 
 class ReindexWorker @Inject()(
   recordReader: RecordReader,
-  hybridRecordSender: HybridRecordSender,
+  vhsIndexEntrySender: VHSIndexEntrySender,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   @Flag[String]("reindexer.tableMetadata") tableMetadata: String
@@ -26,10 +26,15 @@ class ReindexWorker @Inject()(
     for {
       reindexJob: ReindexJob <- Future.fromTry(
         fromJson[ReindexJob](message.body))
-      outdatedRecords: List[HybridRecord] <- recordReader
-        .findRecordsForReindexing(reindexJob)
-      _ <- hybridRecordSender.sendToSNS(records = outdatedRecords)
+      recordsToSend <- findRecordsForReindexing(reindexJob)
+      _ <- vhsIndexEntrySender.sendToSNS(records = recordsToSend)
     } yield ()
 
-  def stop() = system.terminate()
+  def stop(): Future[Terminated] = system.terminate()
+
+  private def findRecordsForReindexing(reindexJob: ReindexJob) =
+    tableMetadata match {
+      case "MiroMetadata" => recordReader.findRecordsForReindexing[MiroMetadata](reindexJob)
+      case _ => recordReader.findRecordsForReindexing[EmptyMetadata](reindexJob)
+    }
 }
