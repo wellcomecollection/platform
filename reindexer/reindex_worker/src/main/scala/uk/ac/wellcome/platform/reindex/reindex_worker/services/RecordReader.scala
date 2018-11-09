@@ -4,12 +4,13 @@ import java.util
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.google.inject.Inject
-import com.gu.scanamo.ScanamoFree
+import com.gu.scanamo.{DynamoFormat, ScanamoFree}
 import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.Logging
 import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{MaxRecordsScanner, ParallelScanner}
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexJob, PartialReindexJob, ReindexJob}
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSIndexEntry}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,8 +26,9 @@ class RecordReader @Inject()(
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def findRecordsForReindexing[M](
-    reindexJob: ReindexJob): Future[List[VHSIndexEntry[M]]] = {
+  def findRecordsForReindexing[M](reindexJob: ReindexJob)(
+    implicit hybridRecordDynamoFormat: DynamoFormat[HybridRecord],
+    metadataDynamoFormat: DynamoFormat[M]): Future[List[VHSIndexEntry[M]]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
 
     for {
@@ -49,7 +51,9 @@ class RecordReader @Inject()(
     } yield recordsToReindex
   }
 
-  private def parseResult[M](attributeValues: util.Map[String, AttributeValue]): VHSIndexEntry[M] = {
+  private def parseResult[M](attributeValues: util.Map[String, AttributeValue])(
+    implicit hybridRecordDynamoFormat: DynamoFormat[HybridRecord],
+    metadataDynamoFormat: DynamoFormat[M]): VHSIndexEntry[M] = {
     // Take the Map[String, AttributeValue], and convert it into an
     // instance of the case class `T`.  This is using a Scanamo helper --
     // I worked this out by looking at [[ScanamoFree.get]].
@@ -60,7 +64,7 @@ class RecordReader @Inject()(
     val maybeMetadata: Either[DynamoReadError, M] = ScanamoFree.read[M](attributeValues)
 
     (maybeHybridRecord, maybeMetadata) match {
-      case (Right(hybridRecord: HybridRecord), Right(metadata: M)) =>
+      case (Right(hybridRecord: HybridRecord), Right(metadata)) =>
         VHSIndexEntry(hybridRecord = hybridRecord, metadata = metadata)
       case _ =>
         throw ReindexerException(s"Error when parsing $attributeValues as VHSIndexEntry")

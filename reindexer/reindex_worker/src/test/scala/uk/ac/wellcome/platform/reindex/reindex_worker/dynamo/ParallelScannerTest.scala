@@ -25,7 +25,7 @@ class ParallelScannerTest
           TestVersioned(id = "123", data = "hello world", version = 1)
         Scanamo.put(dynamoDbClient)(table.name)(record)
 
-        val futureResult = parallelScanner.scan[TestVersioned](
+        val futureResult = parallelScanner.scan(
           segment = 0,
           totalSegments = 1
         )
@@ -49,7 +49,7 @@ class ParallelScannerTest
     "returns a failed future if asked for a segment that's greater than totalSegments") {
     withLocalDynamoDbTable { table =>
       withParallelScanner(table) { parallelScanner =>
-        val future = parallelScanner.scan[TestVersioned](
+        val future = parallelScanner.scan(
           segment = 10,
           totalSegments = 5
         )
@@ -76,8 +76,8 @@ class ParallelScannerTest
         }
 
         // Note that segments are 0-indexed
-        val futureResults = (0 to segmentCount - 1).map { segment =>
-          parallelScanner.scan[TestVersioned](
+        val futureResults = (0 until segmentCount).map { segment =>
+          parallelScanner.scan(
             segment = segment,
             totalSegments = segmentCount
           )

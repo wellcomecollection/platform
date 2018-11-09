@@ -2,19 +2,18 @@ package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import com.amazonaws.SdkClientException
 import com.google.inject.Inject
-import uk.ac.wellcome.json.JsonUtil._
+import io.circe.Encoder
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
-import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSIndexEntry}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class VHSIndexEntrySender @Inject()(snsWriter: SNSWriter)(
   implicit ec: ExecutionContext) {
-  def sendToSNS[M](records: List[VHSIndexEntry[M]]): Future[List[PublishAttempt]] = {
+  def sendToSNS[T](records: List[T])(implicit encoder: Encoder[T]): Future[List[PublishAttempt]] = {
     Future.sequence {
       records
-        .map { indexEntry: VHSIndexEntry[M] =>
+        .map { indexEntry: T =>
           snsWriter
             .writeMessage(
               message = indexEntry,
