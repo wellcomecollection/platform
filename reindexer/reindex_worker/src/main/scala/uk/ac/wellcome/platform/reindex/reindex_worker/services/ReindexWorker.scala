@@ -50,10 +50,30 @@ class ReindexWorker @Inject()(
 
   def stop(): Future[Terminated] = system.terminate()
 
+  /** These are the handlers that take the Dynamo rows, convert them into case
+    * classes, and send them to SNS.
+    *
+    * We can't commonise this code any further, because we send different types
+    * depending on whether the row has any metadata.
+    *
+    * In particular, we send a `HybridRecord` if the row doesn't have any
+    * metadata, and `VHSIndexEntry` otherwise.
+    */
+
   private def processEmptyMetadata(
     items: List[util.Map[String, AttributeValue]]): Future[Unit] =
     bulkSNSWriter
-      .sendToSNS(items.map { parseAsCaseClass[HybridRecord] })
+      .sendToSNS(items.map { av =>
+
+        // AWLC: if you're changing this code to create an instance of
+        // `EmptyMetadata` to include in a `VHSIndexEntry`, don't bother
+        // parsing as a case class; just create a fresh value.
+        //
+        // When I tried to call `parseAsCaseClass[EmptyMetadata]`, I got
+        // a NullPointerException.
+        //
+        parseAsCaseClass[HybridRecord](av)
+      })
       .map { _ => () }
 
   private def processMiroMetadata(
