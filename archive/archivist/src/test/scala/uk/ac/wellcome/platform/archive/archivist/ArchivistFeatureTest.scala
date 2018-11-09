@@ -38,7 +38,16 @@ class ArchivistFeatureTest
           case (request, bagIdentifier) =>
             archivist.run()
             eventually {
-              listKeysInBucket(storageBucket) should have size 16
+
+              val archivedObjects = listKeysInBucket(storageBucket)
+              archivedObjects should have size 16
+              val archivedObjectNames = archivedObjects.map(_.split("/").last)
+
+              archivedObjectNames should contain allElementsOf List(
+                "bag-info.txt",
+                "bagit.txt",
+                "manifest-sha256.txt",
+                "tagmanifest-sha256.txt")
 
               assertQueuePairSizes(queuePair, 0, 0)
 
@@ -104,7 +113,38 @@ class ArchivistFeatureTest
                 progressTopic,
                 Progress.Failed,
                 None)({ events =>
-                all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+                  all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+              })
+            }
+        }
+    }
+  }
+
+  it("fails when ingesting a bag with no tag manifest") {
+    withArchivist {
+      case (
+        ingestBucket,
+        storageBucket,
+        queuePair,
+        registrarTopic,
+        progressTopic,
+        archivist) =>
+        createAndSendBag(
+          ingestBucket,
+          queuePair,
+          createTagManifest = _ => None) {
+          case (request, bagIdentifier) =>
+            archivist.run()
+            eventually {
+              assertQueuePairSizes(queuePair, 0, 0)
+              assertSnsReceivesNothing(registrarTopic)
+
+              assertTopicReceivesProgressStatusUpdate(
+                request.archiveRequestId,
+                progressTopic,
+                Progress.Failed,
+                None)({ events =>
+                  all(events.map(_.description)) should include regex "Failed reading file tagmanifest-sha256.txt from zip file"
               })
             }
         }

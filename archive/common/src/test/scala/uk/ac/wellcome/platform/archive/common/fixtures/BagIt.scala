@@ -41,7 +41,7 @@ trait BagIt extends RandomThings {
 
     val tagManifestFileAndDigests = tagManifestFiles.map {
       case FileEntry(fileName, contents) => (fileName, createDigest(contents))
-    }.toList
+    }
     val metaManifest = createTagManifest(tagManifestFileAndDigests)
 
     dataFiles ++ tagManifestFiles ++ metaManifest.toList
