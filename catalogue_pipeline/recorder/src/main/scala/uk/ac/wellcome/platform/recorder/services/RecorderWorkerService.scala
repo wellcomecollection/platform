@@ -12,7 +12,11 @@ import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  EmptyMetadata,
+  VHSIndexEntry,
+  VersionedHybridStore
+}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -30,13 +34,14 @@ class RecorderWorkerService @Inject()(
 
   private def processMessage(work: TransformedBaseWork): Future[Unit] =
     for {
-      (hybridRecord, _) <- storeInVhs(work)
+      vhsEntry <- storeInVhs(work)
       _ <- snsWriter.writeMessage[MessageNotification](
-        message = RemoteNotification(hybridRecord.location),
+        message = RemoteNotification(vhsEntry.hybridRecord.location),
         subject = s"Sent from ${this.getClass.getSimpleName}")
     } yield ()
 
-  private def storeInVhs(work: TransformedBaseWork) = {
+  private def storeInVhs(
+    work: TransformedBaseWork): Future[VHSIndexEntry[EmptyMetadata]] = {
     versionedHybridStore.updateRecord(work.sourceIdentifier.toString)(
       (work, EmptyMetadata()))(
       (existingWork, existingMetadata) =>

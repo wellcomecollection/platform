@@ -7,7 +7,7 @@ import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord, VHSIndexEntry}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,8 +25,9 @@ class SierraItemMergerWorkerService @Inject()(
     for {
       hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
       itemRecord <- objectStore.get(hybridRecord.location)
-      hybridRecords: Seq[HybridRecord] <- sierraItemMergerUpdaterService.update(
-        itemRecord)
+      vhsIndexEntries: Seq[VHSIndexEntry[EmptyMetadata]] <- sierraItemMergerUpdaterService
+        .update(itemRecord)
+      hybridRecords: Seq[HybridRecord] = vhsIndexEntries.map { _.hybridRecord }
       _ <- Future.sequence(
         hybridRecords.map { hybridRecord =>
           snsWriter.writeMessage(

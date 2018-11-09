@@ -21,9 +21,9 @@ class SierraBibMergerWorkerService @Inject()(
   private def process(message: NotificationMessage): Future[Unit] =
     for {
       bibRecord <- Future.fromTry(fromJson[SierraBibRecord](message.body))
-      hybridRecord <- sierraBibMergerUpdaterService.update(bibRecord)
+      vhsIndexEntry <- sierraBibMergerUpdaterService.update(bibRecord)
       _ <- snsWriter.writeMessage(
-        hybridRecord,
+        vhsIndexEntry.hybridRecord,
         s"Sent from ${this.getClass.getSimpleName}")
     } yield ()
 
