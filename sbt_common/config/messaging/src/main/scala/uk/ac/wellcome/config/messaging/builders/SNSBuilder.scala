@@ -5,7 +5,12 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.config.core.builders.{AWSClientConfigBuilder, AkkaBuilder}
 import uk.ac.wellcome.config.core.models.AWSClientConfig
-import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSMessageWriter, SNSWriter}
+import uk.ac.wellcome.messaging.sns.{
+  SNSClientFactory,
+  SNSConfig,
+  SNSMessageWriter,
+  SNSWriter
+}
 
 object SNSBuilder extends AWSClientConfigBuilder {
   def buildSNSConfig(config: Config, namespace: String = ""): SNSConfig = {

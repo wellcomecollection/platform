@@ -6,12 +6,19 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
-import uk.ac.wellcome.config.storage.builders.{DynamoBuilder, S3Builder, VHSBuilder}
+import uk.ac.wellcome.config.storage.builders.{
+  DynamoBuilder,
+  S3Builder,
+  VHSBuilder
+}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.platform.sierra_bib_merger.services.{SierraBibMergerUpdaterService, SierraBibMergerWorkerService}
+import uk.ac.wellcome.platform.sierra_bib_merger.services.{
+  SierraBibMergerUpdaterService,
+  SierraBibMergerWorkerService
+}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -23,7 +30,8 @@ object Main extends App with Logging {
   val config = ConfigFactory.load()
 
   implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-  implicit val executionContext: ExecutionContext = AkkaBuilder.buildExecutionContext()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
   implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
     s3Client = S3Builder.buildS3Client(config)
