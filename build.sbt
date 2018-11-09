@@ -71,18 +71,18 @@ lazy val config_core = doSharedLibrarySetup(project, "sbt_common/config/core")
   .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
 
 lazy val config_storage = doSharedLibrarySetup(project, "sbt_common/config/storage")
-  .dependsOn(config_core % "compile->compile")
+  .dependsOn(config_core % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
 
 lazy val config_monitoring = doSharedLibrarySetup(project, "sbt_common/config/monitoring")
-  .dependsOn(config_core % "compile->compile")
+  .dependsOn(config_core % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeMonitoringDependencies)
 
 lazy val config_messaging = doSharedLibrarySetup(project, "sbt_common/config/messaging")
   .dependsOn(config_core % "compile->compile")
-  .dependsOn(config_monitoring % "compile->compile")
-  .dependsOn(config_storage % "compile->compile")
-  .dependsOn(messaging % "compile->compile")
+  .dependsOn(config_monitoring % "compile->compile;test->test")
+  .dependsOn(config_storage % "compile->compile;test->test")
+  .dependsOn(messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeDependencies)
 
 lazy val api = doServiceSetup(project, "catalogue_api/api")
@@ -198,8 +198,8 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
 
 lazy val archive_common = doServiceSetup(project, "archive/common")
   .dependsOn(common % "compile->compile;test->test")
-  .dependsOn(config_messaging % "compile->compile")
-  .dependsOn(config_storage % "compile->compile")
+  .dependsOn(config_messaging % "compile->compile;test->test")
+  .dependsOn(config_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.archiveCommonDependencies)
 
 lazy val archivist = doServiceSetup(project, "archive/archivist")
