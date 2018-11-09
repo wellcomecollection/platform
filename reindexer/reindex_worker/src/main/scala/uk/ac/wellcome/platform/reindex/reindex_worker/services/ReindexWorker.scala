@@ -18,7 +18,7 @@ case class MiroMetadata(showInCatalogueAPI: Boolean)
 
 class ReindexWorker @Inject()(
   recordReader: RecordReader,
-  vhsIndexEntrySender: VHSIndexEntrySender,
+  bulkSNSWriter: BulkSNSWriter,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   @Flag("reindexer.tableMetadata") tableMetadata: String
@@ -45,6 +45,6 @@ class ReindexWorker @Inject()(
   private def processReindexJob[M](reindexJob: ReindexJob)(implicit dynamoFormat: DynamoFormat[M], encoder: Encoder[VHSIndexEntry[M]]) =
     for {
       recordsToSend <- recordReader.findRecordsForReindexing[M](reindexJob)
-      _ <- vhsIndexEntrySender.sendToSNS[VHSIndexEntry[M]](recordsToSend)
+      _ <- bulkSNSWriter.sendToSNS[VHSIndexEntry[M]](recordsToSend)
     } yield ()
 }

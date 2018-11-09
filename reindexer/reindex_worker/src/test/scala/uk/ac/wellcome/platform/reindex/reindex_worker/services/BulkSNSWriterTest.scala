@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class HybridRecordSenderTest
+class BulkSNSWriterTest
     extends FunSpec
     with Matchers
     with MockitoSugar
@@ -20,7 +20,7 @@ class HybridRecordSenderTest
     with IntegrationPatience
     with SNS {
 
-  val hybridRecords = List("miro/1", "miro/2", "miro/3").map { id =>
+  val records: List[HybridRecord] = List("miro/1", "miro/2", "miro/3").map { id =>
     HybridRecord(
       id = id,
       version = 1,
@@ -34,13 +34,9 @@ class HybridRecordSenderTest
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
       withSNSWriter(topic) { snsWriter =>
-        val hybridRecordSender = new VHSIndexEntrySender(
-          snsWriter = snsWriter
-        )
+        val bulkSNSWriter = new BulkSNSWriter(snsWriter = snsWriter)
 
-        val future = hybridRecordSender.sendToSNS(
-          records = hybridRecords
-        )
+        val future = bulkSNSWriter.sendToSNS(records = records)
 
         whenReady(future) { _ =>
           val actualRecords = listMessagesReceivedFromSNS(topic)
@@ -48,7 +44,7 @@ class HybridRecordSenderTest
             .map { fromJson[HybridRecord](_).get }
             .distinct
 
-          actualRecords should contain theSameElementsAs hybridRecords
+          actualRecords should contain theSameElementsAs records
         }
       }
     }
@@ -56,11 +52,11 @@ class HybridRecordSenderTest
 
   it("returns a failed Future[ReindexerException] if there's an SNS error") {
     withSNSWriter(Topic("no-such-topic")) { snsWriter =>
-      val hybridRecordSender = new VHSIndexEntrySender(
+      val bulkSNSWriter = new BulkSNSWriter(
         snsWriter = snsWriter
       )
 
-      val future = hybridRecordSender.sendToSNS(records = hybridRecords)
+      val future = bulkSNSWriter.sendToSNS(records = records)
       whenReady(future.failed) {
         _ shouldBe a[ReindexerException]
       }

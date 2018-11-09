@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerExcept
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class VHSIndexEntrySender @Inject()(snsWriter: SNSWriter)(
+class BulkSNSWriter @Inject()(snsWriter: SNSWriter)(
   implicit ec: ExecutionContext) {
   def sendToSNS[T](records: List[T])(implicit encoder: Encoder[T]): Future[List[PublishAttempt]] = {
     Future.sequence {
