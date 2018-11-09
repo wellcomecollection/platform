@@ -15,8 +15,8 @@ module "sierra_reader_service" {
     "${var.service_egress_security_group_id}",
   ]
 
-  cpu    = 512
-  memory = 2048
+  cpu    = 256
+  memory = 1024
 
   source_queue_name = "${module.windows_queue.name}"
   source_queue_arn  = "${module.windows_queue.arn}"

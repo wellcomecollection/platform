@@ -1,13 +1,12 @@
 package uk.ac.wellcome.platform.archive.archivist
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.scaladsl.Flow
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
-import com.google.inject.name.Names
-import com.google.inject.{Injector, Key}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
@@ -21,16 +20,18 @@ import uk.ac.wellcome.platform.archive.common.models.{
   NotificationMessage
 }
 
-trait Archivist extends Logging {
-  val injector: Injector
+import scala.concurrent.Future
 
-  def run() = {
-    implicit val amazonS3: AmazonS3 = injector.getInstance(classOf[AmazonS3])
-
-    implicit val snsClient: AmazonSNS =
-      injector.getInstance(classOf[AmazonSNS])
-    implicit val actorSystem: ActorSystem =
-      injector.getInstance(classOf[ActorSystem])
+class Archivist(
+  s3Client: AmazonS3,
+  snsClient: AmazonSNS,
+  messageStream: MessageStream[NotificationMessage, Unit],
+  bagUploaderConfig: BagUploaderConfig,
+  snsRegistrarConfig: SNSConfig,
+  snsProgressConfig: SNSConfig
+)(implicit val actorSystem: ActorSystem)
+    extends Logging {
+  def run(): Future[Done] = {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
 
@@ -44,14 +45,6 @@ trait Archivist extends Logging {
     implicit val materializer: ActorMaterializer = ActorMaterializer(
       ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider)
     )
-
-    val messageStream =
-      injector.getInstance(classOf[MessageStream[NotificationMessage, Unit]])
-    val bagUploaderConfig = injector.getInstance(classOf[BagUploaderConfig])
-    val snsRegistrarConfig = injector.getInstance(
-      Key.get(classOf[SNSConfig], Names.named("registrarSnsConfig")))
-    val snsProgressConfig = injector.getInstance(
-      Key.get(classOf[SNSConfig], Names.named("progressSnsConfig")))
 
     debug(s"registrar topic: $snsRegistrarConfig")
     debug(s"progress topic: $snsProgressConfig")
@@ -67,8 +60,9 @@ trait Archivist extends Logging {
           )
         )
         .log("download zip")
-        .via(
-          ZipFileDownloadFlow(bagUploaderConfig.parallelism, snsProgressConfig))
+        .via(ZipFileDownloadFlow(
+          bagUploaderConfig.parallelism,
+          snsProgressConfig)(s3Client, snsClient))
         .log("archiving zip")
         .via(
           FoldEitherFlow[
@@ -79,7 +73,7 @@ trait Archivist extends Logging {
             ifRight = ArchiveAndNotifyRegistrarFlow(
               bagUploaderConfig,
               snsProgressConfig,
-              snsRegistrarConfig)))
+              snsRegistrarConfig)(s3Client, snsClient)))
 
     messageStream.run("archivist", workFlow)
   }
