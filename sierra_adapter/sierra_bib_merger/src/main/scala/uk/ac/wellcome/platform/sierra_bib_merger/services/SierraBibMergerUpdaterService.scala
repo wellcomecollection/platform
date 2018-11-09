@@ -13,14 +13,13 @@ import uk.ac.wellcome.storage.vhs.{
 }
 import uk.ac.wellcome.storage.ObjectStore
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class SierraBibMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              EmptyMetadata,
                                              ObjectStore[SierraTransformable]]
-)(implicit ec: ExecutionContext)
-    extends Logging {
+) extends Logging {
 
   def update(bibRecord: SierraBibRecord): Future[VHSIndexEntry[EmptyMetadata]] =
     versionedHybridStore
