@@ -8,7 +8,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{FileNotFoundError, UploadError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  FileNotFoundError,
+  UploadError
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.storage.fixtures.S3
@@ -37,11 +40,8 @@ class UploadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob = createArchiveItemJob(
-              zipFile,
-              bucket,
-              bagIdentifier,
-              fileName)
+            val archiveItemJob =
+              createArchiveItemJob(zipFile, bucket, bagIdentifier, fileName)
 
             val source = Source.single(archiveItemJob)
             val flow = UploadItemFlow(10)(s3Client)
@@ -71,11 +71,8 @@ class UploadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob = createArchiveItemJob(
-              zipFile,
-              bucket,
-              bagIdentifier,
-              fileName)
+            val archiveItemJob =
+              createArchiveItemJob(zipFile, bucket, bagIdentifier, fileName)
 
             val source = Source.single(archiveItemJob)
             val flow = UploadItemFlow(10)(s3Client)
@@ -104,7 +101,6 @@ class UploadItemFlowTest
         val fileContent = "bah buh bih beh"
         val fileName = "key.txt"
         withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-
           val bagIdentifier =
             ExternalIdentifier(randomAlphanumeric())
 

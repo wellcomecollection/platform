@@ -61,7 +61,8 @@ trait ArchivistFixtures
     queuePair: QueuePair,
     dataFileCount: Int = 12,
     createDigest: String => String = createValidDigest,
-    createTagManifest: List[(String, String)] => Option[FileEntry] = createValidTagManifest,
+    createTagManifest: List[(String, String)] => Option[FileEntry] =
+      createValidTagManifest,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,

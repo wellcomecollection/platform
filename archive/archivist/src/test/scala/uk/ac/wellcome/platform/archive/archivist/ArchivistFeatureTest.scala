@@ -111,7 +111,7 @@ class ArchivistFeatureTest
                 progressTopic,
                 Progress.Failed,
                 None)({ events =>
-                  all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+                all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
               })
             }
         }
@@ -121,16 +121,13 @@ class ArchivistFeatureTest
   it("fails when ingesting a bag with no tag manifest") {
     withArchivist {
       case (
-        ingestBucket,
-        storageBucket,
-        queuePair,
-        registrarTopic,
-        progressTopic,
-        archivist) =>
-        createAndSendBag(
           ingestBucket,
+          storageBucket,
           queuePair,
-          createTagManifest = _ => None) {
+          registrarTopic,
+          progressTopic,
+          archivist) =>
+        createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
           case (request, bagIdentifier) =>
             archivist.run()
             eventually {
@@ -142,7 +139,7 @@ class ArchivistFeatureTest
                 progressTopic,
                 Progress.Failed,
                 None)({ events =>
-                  all(events.map(_.description)) should include regex "Failed reading file tagmanifest-sha256.txt from zip file"
+                all(events.map(_.description)) should include regex "Failed reading file tagmanifest-sha256.txt from zip file"
               })
             }
         }

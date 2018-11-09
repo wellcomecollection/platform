@@ -9,14 +9,13 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 trait ArchiveJobGenerators {
 
-
   def createArchiveItemJob(zipFile: ZipFile,
                            bucket: S3.Bucket,
                            bagIdentifier: ExternalIdentifier,
                            s3Key: String) = {
     ArchiveItemJob(
-        archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
-        itemLocation = EntryPath(s3Key))
+      archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
+      itemLocation = EntryPath(s3Key))
   }
 
   def createArchiveDigestItemJob(zipFile: ZipFile,
@@ -24,9 +23,9 @@ trait ArchiveJobGenerators {
                                  digest: String,
                                  bagIdentifier: ExternalIdentifier,
                                  s3Key: String) = {
-      ArchiveDigestItemJob(
-        archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
-        bagDigestItem = BagItem(digest, EntryPath(s3Key)))
+    ArchiveDigestItemJob(
+      archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
+      bagDigestItem = BagItem(digest, EntryPath(s3Key)))
   }
 
   def createArchiveJob(
