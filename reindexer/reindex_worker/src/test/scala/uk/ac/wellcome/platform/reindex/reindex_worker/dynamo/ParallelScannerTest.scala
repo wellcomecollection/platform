@@ -16,7 +16,8 @@ class ParallelScannerTest
     with Matchers
     with ScalaFutures
     with DynamoFixtures
-    with LocalDynamoDbVersioned {
+    with LocalDynamoDbVersioned
+    with ScanSpecScannerTestBase {
 
   it("reads a table with a single record") {
     withLocalDynamoDbTable { table =>
@@ -31,7 +32,7 @@ class ParallelScannerTest
         )
 
         whenReady(futureResult) { result =>
-          result shouldBe List(Right(record))
+          result shouldBe List(toAttributeMap(record))
         }
       }
     }
@@ -84,7 +85,7 @@ class ParallelScannerTest
         }
 
         whenReady(Future.sequence(futureResults)) { results =>
-            results.flatten.toList should contain theSameElementsAs records
+            results.flatten.toList should contain theSameElementsAs records.map { toAttributeMap }
         }
       }
     }
