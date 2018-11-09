@@ -11,14 +11,12 @@ import uk.ac.wellcome.storage.vhs.{
   VersionedHybridStore
 }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class DynamoInserter @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraItemRecord,
                                              EmptyMetadata,
-                                             ObjectStore[SierraItemRecord]])(
-  implicit ec: ExecutionContext) {
-
+                                             ObjectStore[SierraItemRecord]]){
   def insertIntoDynamo(
     record: SierraItemRecord): Future[VHSIndexEntry[EmptyMetadata]] =
     versionedHybridStore
