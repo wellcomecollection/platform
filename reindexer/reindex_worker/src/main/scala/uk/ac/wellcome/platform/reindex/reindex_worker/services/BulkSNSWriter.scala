@@ -14,12 +14,9 @@ class BulkSNSWriter @Inject()(snsWriter: SNSWriter)(
     implicit encoder: Encoder[T]): Future[List[PublishAttempt]] = {
     Future.sequence {
       records
-        .map { indexEntry: T =>
+        .map { t: T =>
           snsWriter
-            .writeMessage(
-              message = indexEntry,
-              subject = this.getClass.getSimpleName
-            )
+            .writeMessage(t, subject = this.getClass.getSimpleName)
             .recover {
 
               // We've seen a lot of reindexer errors of the form:
