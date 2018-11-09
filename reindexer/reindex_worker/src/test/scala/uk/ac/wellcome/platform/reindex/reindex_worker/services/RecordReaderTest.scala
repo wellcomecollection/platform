@@ -17,8 +17,6 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class RecordReaderTest
     extends FunSpec
     with ScalaFutures
@@ -52,7 +50,7 @@ class RecordReaderTest
 
         val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
 
-        whenReady(reader.findRecordsForReindexing[EmptyMetadata](reindexJob)) {
+        whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
             actualRecords should contain theSameElementsAs records
         }
@@ -70,7 +68,7 @@ class RecordReaderTest
 
         val reindexJob = PartialReindexJob(maxRecords = 5)
 
-        whenReady(reader.findRecordsForReindexing[EmptyMetadata](reindexJob)) {
+        whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
             actualRecords should have size 5
         }

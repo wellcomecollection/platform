@@ -15,7 +15,7 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
   ReindexJob
 }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 /** Find IDs for records in the SourceData table that need reindexing.
   *
@@ -24,9 +24,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class RecordReader @Inject()(
   maxRecordsScanner: MaxRecordsScanner,
-  parallelScanner: ParallelScanner
-)(implicit ec: ExecutionContext)
-    extends Logging {
+  parallelScanner: ParallelScanner) extends Logging {
 
   def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[util.Map[String, AttributeValue]]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
