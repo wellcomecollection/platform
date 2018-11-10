@@ -15,7 +15,6 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.SierraItemsToDyna
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.TestWith
 
 class SierraItemsToDynamoFeatureTest
@@ -84,21 +83,12 @@ class SierraItemsToDynamoFeatureTest
   private def assertStoredAndSent(itemRecord: SierraItemRecord,
                                   topic: Topic,
                                   bucket: Bucket,
-                                  table: Table): Assertion = {
-    val hybridRecord =
-      getHybridRecord(table, id = itemRecord.id.withoutCheckDigit)
-
-    val storedItemRecord = getObjectFromS3[SierraItemRecord](
-      Bucket(hybridRecord.location.namespace),
-      hybridRecord.location.key)
-    storedItemRecord shouldBe itemRecord
-
-    val snsMessages = listMessagesReceivedFromSNS(topic)
-    val receivedHybridRecords = snsMessages.map { messageInfo =>
-      fromJson[HybridRecord](messageInfo.message).get
-    }.distinct
-
-    receivedHybridRecords should have size 1
-    receivedHybridRecords.head shouldBe hybridRecord
-  }
+                                  table: Table): Assertion =
+    assertStoredAndSent[SierraItemRecord](
+      itemRecord,
+      id = itemRecord.id.withoutCheckDigit,
+      topic = topic,
+      bucket = bucket,
+      table = table
+    )
 }
