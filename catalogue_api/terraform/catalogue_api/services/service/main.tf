@@ -1,8 +1,8 @@
 module "catalogue_api" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=v13.0.0"
 
-  vpc_id = "${var.vpc_id}"
-  subnets = ["${var.subnets}"]
+  vpc_id       = "${var.vpc_id}"
+  subnets      = ["${var.subnets}"]
   cluster_name = "${var.cluster_name}"
   service_name = "${var.namespace}-catalogue-api"
   namespace_id = "${var.namespace_id}"
@@ -24,6 +24,6 @@ module "catalogue_api" {
 
   env_vars_length = "9"
 
-  security_group_ids = ["${var.security_group_ids}"]
+  security_group_ids               = ["${var.security_group_ids}"]
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
 }

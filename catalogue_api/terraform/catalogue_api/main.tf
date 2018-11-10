@@ -9,7 +9,7 @@ module "services" {
   vpc_id       = "${var.vpc_id}"
   nlb_arn      = "${module.nlb.arn}"
 
-  container_port  = "${var.container_port}"
+  container_port = "${var.container_port}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
 

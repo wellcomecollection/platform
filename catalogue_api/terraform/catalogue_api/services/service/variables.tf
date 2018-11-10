@@ -1,6 +1,7 @@
 variable "es_config" {
   type = "map"
 }
+
 variable "subnets" {
   type = "list"
 }
@@ -26,7 +27,9 @@ variable "es_cluster_credentials" {
 variable "vpc_id" {}
 variable "container_image" {}
 variable "container_port" {}
+
 variable "security_group_ids" {
   type = "list"
 }
+
 variable "service_egress_security_group_id" {}
