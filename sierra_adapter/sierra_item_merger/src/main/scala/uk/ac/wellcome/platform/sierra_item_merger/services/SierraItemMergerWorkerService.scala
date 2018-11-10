@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import akka.actor.ActorSystem
-import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -11,7 +10,7 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord, VHSIndexEntry}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SierraItemMergerWorkerService @Inject()(
+class SierraItemMergerWorkerService(
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService,

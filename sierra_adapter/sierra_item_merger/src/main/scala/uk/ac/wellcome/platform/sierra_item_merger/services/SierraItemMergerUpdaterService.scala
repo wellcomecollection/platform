@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
-import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
@@ -17,7 +16,7 @@ import uk.ac.wellcome.storage.ObjectStore
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SierraItemMergerUpdaterService @Inject()(
+class SierraItemMergerUpdaterService(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              EmptyMetadata,
                                              ObjectStore[SierraTransformable]]
