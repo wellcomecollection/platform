@@ -16,6 +16,8 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait WorkerServiceFixture
     extends Akka
     with LocalVersionedHybridStore
