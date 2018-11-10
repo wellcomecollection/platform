@@ -3,7 +3,7 @@ module "remus" {
 
   namespace = "${var.namespace}"
 
-  container_image = "${var.container_image}"
+  container_image = "${var.remus_container_image}"
   container_port  = "${var.container_port}"
 
   namespace_id = "${var.namespace_id}"

@@ -11,7 +11,6 @@ resource "aws_api_gateway_rest_api" "api" {
   }
 }
 
-
 module "prod" {
   source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.0.0"
 

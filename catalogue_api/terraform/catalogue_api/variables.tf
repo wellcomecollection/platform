@@ -13,11 +13,13 @@ variable "subnets" {
 }
 
 variable "vpc_id" {}
-variable "container_image" {}
+
+variable "remus_container_image" {}
+variable "romulus_container_image" {}
+
 variable "container_port" {}
 
 variable "cluster_name" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
-variable "nlb_arn" {}
