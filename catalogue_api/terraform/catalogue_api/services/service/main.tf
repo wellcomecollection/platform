@@ -1,5 +1,5 @@
 module "catalogue_api" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=cfbc6c413003f953768e2ff97f47fad3f1f68ea5"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=v13.0.0"
 
   vpc_id = "${var.vpc_id}"
   subnets = ["${var.subnets}"]
