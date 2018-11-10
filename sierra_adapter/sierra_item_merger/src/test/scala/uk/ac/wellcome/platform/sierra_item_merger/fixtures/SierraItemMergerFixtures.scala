@@ -1,12 +1,21 @@
 package uk.ac.wellcome.platform.sierra_item_merger.fixtures
 
+import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.platform.sierra_item_merger.services.SierraItemMergerUpdaterService
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.sierra_item_merger.services.{SierraItemMergerUpdaterService, SierraItemMergerWorkerService}
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
-trait SierraItemMergerFixtures {
+trait SierraItemMergerFixtures extends Akka with LocalVersionedHybridStore with MetricsSenderFixture with SNS with SQS {
   def withSierraUpdaterService[R](
     hybridStore: VersionedHybridStore[SierraTransformable,
                                       EmptyMetadata,
@@ -17,4 +26,28 @@ trait SierraItemMergerFixtures {
     )
     testWith(sierraUpdaterService)
   }
+
+  def withSierraWorkerService[R](queue: Queue, topic: Topic, sierraDataBucket: Bucket, table: Table)(
+    testWith: TestWith[SierraItemMergerWorkerService, R]): R =
+    withTypeVHS[SierraTransformable, EmptyMetadata, R](sierraDataBucket, table) { vhs =>
+      withSierraUpdaterService(vhs) { updaterService =>
+        withActorSystem { actorSystem =>
+          withMetricsSender(actorSystem) { metricsSender =>
+            withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
+              withSNSWriter(topic) { snsWriter =>
+                val workerService = new SierraItemMergerWorkerService(
+                  system = actorSystem,
+                  sqsStream = sqsStream,
+                  sierraItemMergerUpdaterService = updaterService,
+                  objectStore = ObjectStore[SierraItemRecord],
+                  snsWriter = snsWriter
+                )
+
+                testWith(workerService)
+              }
+            }
+          }
+        }
+      }
+    }
 }

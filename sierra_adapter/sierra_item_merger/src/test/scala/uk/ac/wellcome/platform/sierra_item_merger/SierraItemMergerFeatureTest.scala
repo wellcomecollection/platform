@@ -6,6 +6,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.sierra_item_merger.fixtures.SierraItemMergerFixtures
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 
 class SierraItemMergerFeatureTest
@@ -18,7 +19,8 @@ class SierraItemMergerFeatureTest
     with S3
     with LocalVersionedHybridStore
     with SierraGenerators
-    with SierraAdapterHelpers {
+    with SierraAdapterHelpers
+    with SierraItemMergerFixtures {
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
@@ -26,10 +28,9 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
-                queue)
-              withServer(flags) { _ =>
+              withSierraWorkerService(queue, topic, sierraDataBucket, table) { service =>
+                service.run()
+
                 withSierraVHS(sierraDataBucket, table) { hybridStore =>
                   val bibId = createSierraBibNumber
 
@@ -75,10 +76,9 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
-                queue)
-              withServer(flags) { _ =>
+              withSierraWorkerService(queue, topic, sierraDataBucket, table) { service =>
+                service.run()
+
                 withSierraVHS(sierraDataBucket, table) { _ =>
                   val bibId1 = createSierraBibNumber
                   val itemRecord1 = createSierraItemRecordWith(
@@ -149,10 +149,9 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              val flags = vhsLocalFlags(sierraDataBucket, table) ++ snsLocalFlags(
-                topic) ++ s3LocalFlags(sierraItemsToDynamoBucket) ++ sqsLocalFlags(
-                queue)
-              withServer(flags) { _ =>
+              withSierraWorkerService(queue, topic, sierraDataBucket, table) { service =>
+                service.run()
+
                 withSierraVHS(sierraDataBucket, table) { _ =>
                   val bibIds = createSierraBibNumbers(3)
                   val itemRecord = createSierraItemRecordWith(
