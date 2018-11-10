@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait DynamoInserterFixture extends LocalVersionedHybridStore {
 
   def withDynamoInserter[R](table: Table, bucket: Bucket)(
-    testWith: TestWith[DynamoInserter, R]): Unit =
+    testWith: TestWith[DynamoInserter, R]): R =
     withTypeVHS[SierraItemRecord, EmptyMetadata, R](bucket, table) {
       versionedHybridStore =>
         val dynamoInserter =
