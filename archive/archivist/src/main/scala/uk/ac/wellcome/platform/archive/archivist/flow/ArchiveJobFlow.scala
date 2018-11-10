@@ -4,8 +4,6 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveItemJobCreator
-import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveItemJob,
   ArchiveJob
@@ -24,55 +22,18 @@ object ArchiveJobFlow extends Logging {
   def apply(delimiter: String,
             parallelism: Int,
             ingestBagRequest: IngestBagRequest)(implicit s3Client: AmazonS3)
-    : Flow[ArchiveJob,
-           Either[ArchiveError[ArchiveJob], ArchiveComplete],
-           NotUsed] =
+    : Flow[ArchiveJob, Either[ArchiveError[_], ArchiveComplete], NotUsed] =
     Flow[ArchiveJob]
-      .log("creating archive item jobs")
-      .map(job => ArchiveItemJobCreator.createArchiveItemJobs(job, delimiter))
+      .log("archive job")
+      .via(UploadTagManifestFlow(parallelism))
       .via(
         FoldEitherFlow[
-          ArchiveError[ArchiveJob],
-          List[ArchiveItemJob],
-          Either[ArchiveError[ArchiveJob], ArchiveComplete]](OnErrorFlow())(
-          mapReduceArchiveItemJobs(delimiter, parallelism, ingestBagRequest)))
-
-  private def mapReduceArchiveItemJobs(delimiter: String,
-                                       parallelism: Int,
-                                       ingestBagRequest: IngestBagRequest)(
-    implicit s3Client: AmazonS3): Flow[List[ArchiveItemJob],
-                                       Either[ArchiveJobError, ArchiveComplete],
-                                       NotUsed] =
-    Flow[List[ArchiveItemJob]]
-      .mapConcat(identity)
-      .via(ArchiveItemJobFlow(delimiter, parallelism))
-      .groupBy(Int.MaxValue, {
-        case Right(archiveItemJob) => archiveItemJob.archiveJob
-        case Left(error)           => error.t.archiveJob
-      })
-      .fold((Nil: List[ArchiveError[ArchiveItemJob]], None: Option[ArchiveJob])) {
-        (accumulator, archiveItemJobResult) =>
-          (accumulator, archiveItemJobResult) match {
-            case ((errorList, _), Right(archiveItemJob)) =>
-              (errorList, Some(archiveItemJob.archiveJob))
-            case ((errorList, _), Left(error)) =>
-              (error :: errorList, Some(error.t.archiveJob))
-          }
-
-      }
-      .collect {
-        case (events, Some(archiveJob)) => (events, archiveJob)
-      }
-      .mergeSubstreams
-      .map {
-        case (Nil, archiveJob) =>
-          Right(
-            ArchiveComplete(
-              ingestBagRequest.archiveRequestId,
-              ingestBagRequest.storageSpace,
-              archiveJob.bagLocation
-            ))
-        case (errors, archiveJob) => Left(ArchiveJobError(archiveJob, errors))
-
-      }
+          ArchiveError[ArchiveItemJob],
+          ArchiveJob,
+          Either[ArchiveError[_], ArchiveComplete]](
+          OnErrorFlow()
+        )(
+          ifRight =
+            ArchiveJobDigestItemsFlow(delimiter, parallelism, ingestBagRequest)
+        ))
 }

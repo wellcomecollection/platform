@@ -5,7 +5,7 @@ import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
+import uk.ac.wellcome.platform.archive.archivist.models.ArchiveDigestItemJob
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ChecksumNotMatchedOnDownloadError
 import uk.ac.wellcome.platform.archive.common.models.error.{
   ArchiveError,
@@ -14,13 +14,13 @@ import uk.ac.wellcome.platform.archive.common.models.error.{
 
 import scala.util.{Failure, Success, Try}
 
-object DownloadItemFlow extends Logging {
+object DownloadDigestItemFlow extends Logging {
 
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
-    : Flow[ArchiveItemJob,
-           Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
+    : Flow[ArchiveDigestItemJob,
+           Either[ArchiveError[ArchiveDigestItemJob], ArchiveDigestItemJob],
            NotUsed] = {
-    Flow[ArchiveItemJob]
+    Flow[ArchiveDigestItemJob]
       .log("download to verify")
       .flatMapMerge(
         parallelism, { job =>

@@ -61,6 +61,8 @@ trait ArchivistFixtures
     queuePair: QueuePair,
     dataFileCount: Int = 12,
     createDigest: String => String = createValidDigest,
+    createTagManifest: List[(String, String)] => Option[FileEntry] =
+      createValidTagManifest,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
@@ -68,6 +70,7 @@ trait ArchivistFixtures
     testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]): Boolean =
     withBagItZip(
       dataFileCount = dataFileCount,
+      createTagManifest = createTagManifest,
       createDigest = createDigest,
       createDataManifest = createDataManifest,
       createBagItFile = createBagItFile,

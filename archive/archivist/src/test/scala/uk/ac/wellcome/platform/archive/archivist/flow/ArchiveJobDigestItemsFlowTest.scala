@@ -19,7 +19,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.collection.JavaConverters._
 
-class ArchiveJobFlowTest
+class ArchiveJobDigestItemsFlowTest
     extends FunSpec
     with ArchiveJobGenerators
     with S3
@@ -39,7 +39,7 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(
+              val flow = ArchiveJobDigestItemsFlow(
                 BagItConfig().digestDelimiterRegexp,
                 10,
                 ingestRequest)
@@ -73,7 +73,7 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(
+              val flow = ArchiveJobDigestItemsFlow(
                 BagItConfig().digestDelimiterRegexp,
                 10,
                 ingestRequest)
@@ -120,7 +120,7 @@ class ArchiveJobFlowTest
                 .toList
 
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(
+              val flow = ArchiveJobDigestItemsFlow(
                 BagItConfig().digestDelimiterRegexp,
                 10,
                 ingestRequest)
@@ -161,7 +161,7 @@ class ArchiveJobFlowTest
 
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(
+              val flow = ArchiveJobDigestItemsFlow(
                 BagItConfig().digestDelimiterRegexp,
                 10,
                 ingestRequest)
@@ -193,7 +193,7 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(
+              val flow = ArchiveJobDigestItemsFlow(
                 BagItConfig().digestDelimiterRegexp,
                 10,
                 ingestRequest)
@@ -222,7 +222,7 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(
+              val flow = ArchiveJobDigestItemsFlow(
                 BagItConfig().digestDelimiterRegexp,
                 10,
                 ingestRequest)
@@ -248,7 +248,7 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(
+              val flow = ArchiveJobDigestItemsFlow(
                 BagItConfig().digestDelimiterRegexp,
                 10,
                 ingestRequest)
@@ -277,7 +277,7 @@ class ArchiveJobFlowTest
               val ingestRequest = createIngestBagRequest
               val archiveJob = createArchiveJob(zipFile, bagName, bucket)
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobFlow(
+              val flow = ArchiveJobDigestItemsFlow(
                 BagItConfig().digestDelimiterRegexp,
                 10,
                 ingestRequest)

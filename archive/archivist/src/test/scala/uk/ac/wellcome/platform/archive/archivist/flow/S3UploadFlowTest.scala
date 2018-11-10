@@ -5,7 +5,10 @@ import java.io.ByteArrayInputStream
 import akka.stream.scaladsl.{Concat, Sink, Source, StreamConverters}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.util.ByteString
-import com.amazonaws.services.s3.model.ListMultipartUploadsRequest
+import com.amazonaws.services.s3.model.{
+  CompleteMultipartUploadResult,
+  ListMultipartUploadsRequest
+}
 import org.apache.commons.io.IOUtils
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
@@ -14,7 +17,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
-import scala.util.Failure
+import scala.util.{Failure, Try}
 
 class S3UploadFlowTest
     extends FunSpec
@@ -39,11 +42,12 @@ class S3UploadFlowTest
             .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
             .runWith(Sink.head)
 
-          whenReady(futureResult) { triedResult =>
-            triedResult.get.getBucketName shouldBe bucket.name
-            triedResult.get.getKey shouldBe s3Key
+          whenReady(futureResult) {
+            triedResult: Try[CompleteMultipartUploadResult] =>
+              triedResult.get.getBucketName shouldBe bucket.name
+              triedResult.get.getKey shouldBe s3Key
 
-            getContentFromS3(bucket, s3Key) shouldBe content
+              getContentFromS3(bucket, s3Key) shouldBe content
           }
         }
       }

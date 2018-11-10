@@ -7,10 +7,7 @@ import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveItemJob
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ChecksumNotMatchedOnUploadError,
-  UploadError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.UploadError
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 import scala.util.{Failure, Success}
@@ -30,33 +27,25 @@ object UploadInputStreamFlow extends Logging {
            Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
            NotUsed] =
     Flow[(ArchiveItemJob, InputStream)]
-      .log("uploading input stream and verifying checksum")
+      .log("uploading input stream")
       .flatMapMerge(
         parallelism, {
-          case (job, inputStream) =>
-            val checksum = job.bagDigestItem.checksum
+          case (archiveItemJob, inputStream) =>
             StreamConverters
               .fromInputStream(() => inputStream)
               .log("upload bytestring")
-              .via(UploadAndGetChecksumFlow(job.uploadLocation))
+              .via(S3UploadFlow(archiveItemJob.uploadLocation))
               .log("to either")
               .map {
-                case Success(calculatedChecksum)
-                    if calculatedChecksum == checksum =>
-                  Right(job)
-                case Success(calculatedChecksum) =>
-                  warn(
-                    s"Checksum didn't match: $calculatedChecksum != $checksum")
-                  Left(
-                    ChecksumNotMatchedOnUploadError(
-                      expectedChecksum = checksum,
-                      actualCheckSum = calculatedChecksum,
-                      t = job
-                    )
-                  )
+                case Success(_) =>
+                  Right(archiveItemJob)
                 case Failure(exception) =>
                   warn("There was an exception!", exception)
-                  Left(UploadError(exception, job))
+                  Left(
+                    UploadError(
+                      archiveItemJob.uploadLocation,
+                      exception,
+                      archiveItemJob))
               }
         }
       )
@@ -65,5 +54,4 @@ object UploadInputStreamFlow extends Logging {
           "akka.stream.materializer.blocking-io-dispatcher"
         )
       )
-
 }
