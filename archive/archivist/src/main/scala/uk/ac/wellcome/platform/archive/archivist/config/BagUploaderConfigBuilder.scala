@@ -1,12 +1,12 @@
 package uk.ac.wellcome.platform.archive.archivist.config
 
 import com.typesafe.config.Config
+import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.platform.archive.archivist.models.{
   BagItConfig,
   BagUploaderConfig,
   UploadConfig
 }
-import uk.ac.wellcome.platform.archive.common.config.builders.EnrichConfig._
 
 object BagUploaderConfigBuilder {
   def buildBagUploaderConfig(config: Config): BagUploaderConfig = {

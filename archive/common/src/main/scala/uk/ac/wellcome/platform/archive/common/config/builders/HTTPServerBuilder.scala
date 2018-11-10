@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.archive.common.config.builders
 import java.net.URL
 
 import com.typesafe.config.Config
+import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import EnrichConfig._
 
 object HTTPServerBuilder {
   def buildHTTPServerConfig(config: Config): HTTPServerConfig = {
