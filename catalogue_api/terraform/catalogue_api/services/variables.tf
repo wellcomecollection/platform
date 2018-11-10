@@ -20,4 +20,11 @@ variable "cluster_name" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
+
 variable "nlb_arn" {}
+variable "romulus_listener_port" {}
+variable "remus_listener_port" {}
+
+data "aws_vpc" "vpc" {
+  id = "${var.vpc_id}"
+}
