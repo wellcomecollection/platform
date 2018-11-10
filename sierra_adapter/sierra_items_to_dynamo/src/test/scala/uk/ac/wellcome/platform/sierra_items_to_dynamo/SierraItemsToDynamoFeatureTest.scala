@@ -68,7 +68,7 @@ class SierraItemsToDynamoFeatureTest
           withDynamoInserter(table, bucket) { dynamoInserter =>
             withSNSWriter(topic) { snsWriter =>
               val workerService = new SierraItemsToDynamoWorkerService(
-                system = actorSystem,
+                actorSystem = actorSystem,
                 sqsStream = sqsStream,
                 dynamoInserter = dynamoInserter,
                 snsWriter = snsWriter

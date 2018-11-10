@@ -10,7 +10,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import scala.concurrent.{ExecutionContext, Future}
 
 class SierraItemsToDynamoWorkerService(
-  system: ActorSystem,
+  actorSystem: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   dynamoInserter: DynamoInserter,
   snsWriter: SNSWriter
@@ -29,5 +29,5 @@ class SierraItemsToDynamoWorkerService(
   def run(): Future[Done] =
     sqsStream.foreach(this.getClass.getSimpleName, process)
 
-  def stop(): Future[Terminated] = system.terminate()
+  def stop(): Future[Terminated] = actorSystem.terminate()
 }

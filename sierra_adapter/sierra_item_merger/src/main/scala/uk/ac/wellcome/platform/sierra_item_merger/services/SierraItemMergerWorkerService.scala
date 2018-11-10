@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord, VHSIndexEntry}
 import scala.concurrent.{ExecutionContext, Future}
 
 class SierraItemMergerWorkerService(
-  system: ActorSystem,
+  actorSystem: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService,
   objectStore: ObjectStore[SierraItemRecord],
@@ -39,5 +39,5 @@ class SierraItemMergerWorkerService(
   def run(): Future[Done] =
     sqsStream.foreach(this.getClass.getSimpleName, process)
 
-  def stop(): Future[Terminated] = system.terminate()
+  def stop(): Future[Terminated] = actorSystem.terminate()
 }

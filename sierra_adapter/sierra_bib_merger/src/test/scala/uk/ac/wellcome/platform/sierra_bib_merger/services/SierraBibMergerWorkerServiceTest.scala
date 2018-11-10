@@ -68,7 +68,7 @@ class SierraBibMergerWorkerServiceTest
                           new SierraBibMergerUpdaterService(vhs)
 
                         new SierraBibMergerWorkerService(
-                          system = system,
+                          actorSystem = system,
                           sqsStream = sqsStream,
                           snsWriter = snsWriter,
                           sierraBibMergerUpdaterService = mergerUpdaterService)
