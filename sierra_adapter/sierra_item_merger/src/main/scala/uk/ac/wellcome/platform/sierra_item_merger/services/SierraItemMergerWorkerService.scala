@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
-import akka.actor.ActorSystem
+import akka.Done
+import akka.actor.{ActorSystem, Terminated}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -17,8 +18,6 @@ class SierraItemMergerWorkerService(
   objectStore: ObjectStore[SierraItemRecord],
   snsWriter: SNSWriter
 )(implicit ec: ExecutionContext) {
-
-  sqsStream.foreach(this.getClass.getSimpleName, process)
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {
@@ -37,5 +36,8 @@ class SierraItemMergerWorkerService(
       )
     } yield ()
 
-  def stop() = system.terminate()
+  def run(): Future[Done] =
+    sqsStream.foreach(this.getClass.getSimpleName, process)
+
+  def stop(): Future[Terminated] = system.terminate()
 }
