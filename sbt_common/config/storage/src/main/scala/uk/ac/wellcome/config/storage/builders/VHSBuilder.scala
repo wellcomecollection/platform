@@ -11,7 +11,7 @@ object VHSBuilder {
       DynamoBuilder.buildDynamoConfig(config, namespace = "vhs")
 
     val globalS3Prefix = config
-      .required[String]("aws.vhs.s3.globalPrefix")
+      .getOrElse[String]("aws.vhs.s3.globalPrefix")(default = "")
 
     VHSConfig(
       dynamoConfig = dynamoConfig,
