@@ -8,6 +8,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_item_merger.services.{SierraItemMergerUpdaterService, SierraItemMergerWorkerService}
+import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -15,7 +16,7 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
-trait SierraItemMergerFixtures extends Akka with LocalVersionedHybridStore with MetricsSenderFixture with SNS with SQS {
+trait SierraItemMergerFixtures extends Akka with LocalVersionedHybridStore with MetricsSenderFixture with SNS with SQS with SierraAdapterHelpers {
   def withSierraUpdaterService[R](
     hybridStore: VersionedHybridStore[SierraTransformable,
                                       EmptyMetadata,
@@ -29,7 +30,7 @@ trait SierraItemMergerFixtures extends Akka with LocalVersionedHybridStore with 
 
   def withSierraWorkerService[R](queue: Queue, topic: Topic, sierraDataBucket: Bucket, table: Table)(
     testWith: TestWith[SierraItemMergerWorkerService, R]): R =
-    withTypeVHS[SierraTransformable, EmptyMetadata, R](sierraDataBucket, table) { vhs =>
+    withSierraVHS(sierraDataBucket, table) { vhs =>
       withSierraUpdaterService(vhs) { updaterService =>
         withActorSystem { actorSystem =>
           withMetricsSender(actorSystem) { metricsSender =>
