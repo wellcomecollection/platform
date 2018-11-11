@@ -5,7 +5,6 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_item_merger.services.{
@@ -17,7 +16,6 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -29,11 +27,7 @@ trait SierraItemMergerFixtures
     with SNS
     with SQS
     with SierraAdapterHelpers {
-  def withSierraUpdaterService[R](
-    hybridStore: VersionedHybridStore[SierraTransformable,
-                                      EmptyMetadata,
-                                      ObjectStore[SierraTransformable]])(
-    testWith: TestWith[SierraItemMergerUpdaterService, R]): R = {
+  def withSierraUpdaterService[R](hybridStore: SierraVHS)(testWith: TestWith[SierraItemMergerUpdaterService, R]): R = {
     val sierraUpdaterService = new SierraItemMergerUpdaterService(
       versionedHybridStore = hybridStore
     )
