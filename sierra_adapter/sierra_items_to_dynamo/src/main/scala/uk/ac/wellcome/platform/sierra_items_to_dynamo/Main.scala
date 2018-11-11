@@ -57,7 +57,6 @@ object Main extends App with Logging {
   )
 
   val workerService = new SierraItemsToDynamoWorkerService(
-    actorSystem = actorSystem,
     sqsStream = sqsStream,
     dynamoInserter = dynamoInserter,
     snsWriter = SNSBuilder.buildSNSWriter(config)
