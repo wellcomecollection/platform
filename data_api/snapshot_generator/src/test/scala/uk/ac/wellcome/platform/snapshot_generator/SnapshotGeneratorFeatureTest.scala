@@ -3,10 +3,12 @@ package uk.ac.wellcome.platform.snapshot_generator
 import java.io.File
 
 import com.amazonaws.services.s3.model.GetObjectRequest
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v1.DisplayV1SerialisationTestBase
+import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
@@ -23,7 +25,9 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.platform.snapshot_generator.services.{SnapshotGeneratorWorkerService, SnapshotService}
 
 class SnapshotGeneratorFeatureTest
     extends FunSpec
@@ -34,7 +38,6 @@ class SnapshotGeneratorFeatureTest
     with S3
     with SNS
     with SQS
-    with fixtures.Server
     with CloudWatch
     with GzipUtils
     with JsonAssertions
@@ -110,18 +113,42 @@ class SnapshotGeneratorFeatureTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
+    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]): R =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+        withLocalElasticsearchIndex(itemType = itemType) { indexV1name =>
+          withLocalElasticsearchIndex(itemType = itemType) { indexV2name =>
             withLocalS3Bucket { bucket =>
-              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
-                indexNameV1,
-                indexNameV2,
-                itemType) ++ s3ClientLocalFlags
-              withServer(flags) { _ =>
-                testWith((queue, topic, indexNameV1, indexNameV2, bucket))
+              withActorSystem { actorSystem =>
+                withMaterializer(actorSystem) { materializer =>
+                  withS3AkkaClient(actorSystem, materializer) { akkaS3Client =>
+                    val snapshotService = new SnapshotService(
+                      actorSystem = actorSystem,
+                      akkaS3Client = akkaS3Client,
+                      elasticClient = elasticClient,
+                      elasticConfig = DisplayElasticConfig(
+                        documentType = itemType,
+                        indexV1name = indexV1name,
+                        indexV2name = indexV2name
+                      ),
+                      objectMapper = new ObjectMapper
+                    )
+
+                    withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+                      withSNSWriter(topic) { snsWriter =>
+                        val service = new SnapshotGeneratorWorkerService(
+                          snapshotService = snapshotService,
+                          sqsStream = sqsStream,
+                          snsWriter = snsWriter
+                        )
+
+                        service.run()
+
+                        testWith((queue, topic, indexV1name, indexV2name, bucket))
+                      }
+                    }
+                  }
+                }
               }
             }
           }
