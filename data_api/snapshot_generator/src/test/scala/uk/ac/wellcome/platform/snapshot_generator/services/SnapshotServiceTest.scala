@@ -22,7 +22,6 @@ import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedSnapshotJob,
@@ -315,32 +314,26 @@ class SnapshotServiceTest
     it("creates the correct object location with the default S3 endpoint") {
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>
-          val s3Client = AkkaS3ClientModule.buildAkkaS3Client(
-            region = "eu-west-1",
-            actorSystem = actorSystem,
-            endpoint = "",
-            accessKey = accessKey,
-            secretKey = secretKey
-          )
+          withS3AkkaClient(actorSystem, materializer) { s3Client =>
+            val elasticConfig = DisplayElasticConfig(
+              documentType = itemType,
+              indexV1name = "indexv1",
+              indexV2name = "indexv2"
+            )
 
-          val elasticConfig = DisplayElasticConfig(
-            documentType = itemType,
-            indexV1name = "indexv1",
-            indexV2name = "indexv2"
-          )
+            val snapshotService = new SnapshotService(
+              actorSystem = actorSystem,
+              elasticClient = elasticClient,
+              elasticConfig = elasticConfig,
+              akkaS3Client = s3Client,
+              objectMapper = mapper
+            )
 
-          val snapshotService = new SnapshotService(
-            actorSystem = actorSystem,
-            elasticClient = elasticClient,
-            elasticConfig = elasticConfig,
-            akkaS3Client = s3Client,
-            objectMapper = mapper
-          )
-
-          snapshotService.buildLocation(
-            bucketName = "bukkit",
-            objectKey = "snapshot.json.gz"
-          ) shouldBe Uri("s3://bukkit/snapshot.json.gz")
+            snapshotService.buildLocation(
+              bucketName = "bukkit",
+              objectKey = "snapshot.json.gz"
+            ) shouldBe Uri("s3://bukkit/snapshot.json.gz")
+          }
         }
       }
     }
