@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_reader.services
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
 import io.circe.parser.parse
