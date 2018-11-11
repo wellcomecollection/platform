@@ -68,21 +68,18 @@ class SierraItemsToDynamoFeatureTest
     bucket: Bucket,
     topic: Topic)(testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
     withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) {
-          sqsStream =>
-            withDynamoInserter(table, bucket) { dynamoInserter =>
-              withSNSWriter(topic) { snsWriter =>
-                val workerService = new SierraItemsToDynamoWorkerService(
-                  actorSystem = actorSystem,
-                  sqsStream = sqsStream,
-                  dynamoInserter = dynamoInserter,
-                  snsWriter = snsWriter
-                )
+      withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+        withDynamoInserter(table, bucket) { dynamoInserter =>
+          withSNSWriter(topic) { snsWriter =>
+            val workerService = new SierraItemsToDynamoWorkerService(
+              actorSystem = actorSystem,
+              sqsStream = sqsStream,
+              dynamoInserter = dynamoInserter,
+              snsWriter = snsWriter
+            )
 
-                testWith(workerService)
-              }
-            }
+            testWith(workerService)
+          }
         }
       }
     }
