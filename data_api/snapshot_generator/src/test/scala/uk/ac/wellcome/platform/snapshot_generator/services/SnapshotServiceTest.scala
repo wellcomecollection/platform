@@ -74,7 +74,7 @@ class SnapshotServiceTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[(SnapshotService, String, String, Bucket), R]) =
+    testWith: TestWith[(SnapshotService, String, String, Bucket), R]): R =
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
