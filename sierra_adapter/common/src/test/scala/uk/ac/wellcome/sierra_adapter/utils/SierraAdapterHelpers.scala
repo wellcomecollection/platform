@@ -1,5 +1,6 @@
 package uk.ac.wellcome.sierra_adapter.utils
 
+import io.circe.Decoder
 import org.scalatest.Assertion
 import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -66,7 +67,7 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
                              id: String,
                              topic: Topic,
                              bucket: Bucket,
-                             table: Table): Assertion = {
+                             table: Table)(implicit decoder: Decoder[T]): Assertion = {
     val hybridRecord = getHybridRecord(table, id = id)
 
     val storedTransformable = getObjectFromS3[T](
