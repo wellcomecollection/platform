@@ -11,22 +11,14 @@ import grizzled.slf4j.Logging
 import io.circe.Json
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{
-  ReaderConfig,
-  SierraConfig,
-  SierraResourceTypes,
-  WindowStatus
-}
+import uk.ac.wellcome.platform.sierra_reader.models.{SierraResourceTypes, WindowStatus}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.transformable.sierra.{
-  AbstractSierraRecord,
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.sierra_reader.config.models.{ReaderConfig, SierraAPIConfig}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -38,17 +30,15 @@ class SierraReaderWorkerService(
   s3client: AmazonS3,
   s3Config: S3Config,
   readerConfig: ReaderConfig,
-  sierraConfig: SierraConfig
+  sierraAPIConfig: SierraAPIConfig
 ) extends Logging {
-
-  implicit val actorSystem = actorSystem
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = actorSystem.dispatcher
 
   val windowManager = new WindowManager(
     s3client = s3client,
     s3Config = s3Config,
-    sierraConfig = sierraConfig
+    readerConfig = readerConfig
   )
 
   def run(): Future[Done] =
@@ -73,7 +63,7 @@ class SierraReaderWorkerService(
     info(s"Running the stream with window=$window and status=$windowStatus")
 
     val baseParams =
-      Map("updatedDate" -> window, "fields" -> sierraConfig.fields)
+      Map("updatedDate" -> window, "fields" -> readerConfig.fields)
     val params = windowStatus.id match {
       case Some(id) => baseParams ++ Map("id" -> s"[$id,]")
       case None     => baseParams
@@ -87,12 +77,12 @@ class SierraReaderWorkerService(
     )
 
     val sierraSource = SierraSource(
-      apiUrl = sierraConfig.apiUrl,
-      oauthKey = sierraConfig.oauthKey,
-      oauthSecret = sierraConfig.oauthSec,
+      apiUrl = sierraAPIConfig.apiURL,
+      oauthKey = sierraAPIConfig.oauthKey,
+      oauthSecret = sierraAPIConfig.oauthSec,
       throttleRate = ThrottleRate(3, per = 1.second),
       timeoutMs = 60000)(
-      resourceType = sierraConfig.resourceType.toString,
+      resourceType = readerConfig.resourceType.toString,
       params)
 
     val outcome = sierraSource
@@ -107,20 +97,20 @@ class SierraReaderWorkerService(
     outcome.map { _ =>
       s3client.putObject(
         s3Config.bucketName,
-        s"windows_${sierraConfig.resourceType.toString}_complete/${windowManager
+        s"windows_${readerConfig.resourceType.toString}_complete/${windowManager
           .buildWindowLabel(window)}",
         "")
     }
   }
 
   private def createRecord: (String, String, Instant) => AbstractSierraRecord =
-    sierraConfig.resourceType match {
+    readerConfig.resourceType match {
       case SierraResourceTypes.bibs  => SierraBibRecord.apply
       case SierraResourceTypes.items => SierraItemRecord.apply
     }
 
   private def toJson(records: Seq[AbstractSierraRecord]): Json =
-    sierraConfig.resourceType match {
+    readerConfig.resourceType match {
       case SierraResourceTypes.bibs =>
         records.asInstanceOf[Seq[SierraBibRecord]].asJson
       case SierraResourceTypes.items =>

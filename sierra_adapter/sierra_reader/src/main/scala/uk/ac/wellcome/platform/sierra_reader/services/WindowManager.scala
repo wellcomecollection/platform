@@ -4,8 +4,9 @@ import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.UntypedSierraRecordNumber
+import uk.ac.wellcome.platform.sierra_reader.config.models.ReaderConfig
 import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
-import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, WindowStatus}
+import uk.ac.wellcome.platform.sierra_reader.models.WindowStatus
 import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.collection.JavaConverters._
@@ -15,7 +16,7 @@ import scala.util.{Failure, Success}
 class WindowManager(
   s3client: AmazonS3,
   s3Config: S3Config,
-  sierraConfig: SierraConfig
+  readerConfig: ReaderConfig
 )(implicit ec: ExecutionContext) extends Logging {
 
   def getCurrentStatus(window: String): Future[WindowStatus] = Future {
@@ -65,7 +66,7 @@ class WindowManager(
   }
 
   def buildWindowShard(window: String) =
-    s"records_${sierraConfig.resourceType.toString}/${buildWindowLabel(window)}/"
+    s"records_${readerConfig.resourceType.toString}/${buildWindowLabel(window)}/"
 
   def buildWindowLabel(window: String) =
     // Window is a string like [2013-12-01T01:01:01Z,2013-12-01T01:01:01Z].
