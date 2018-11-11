@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.exceptions.SierraItemMergerException
