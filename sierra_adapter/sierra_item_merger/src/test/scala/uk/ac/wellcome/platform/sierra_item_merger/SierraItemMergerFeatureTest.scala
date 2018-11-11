@@ -27,38 +27,39 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              withSierraWorkerService(queue, topic, sierraDataBucket, table) { service =>
-                service.run()
+              withSierraWorkerService(queue, topic, sierraDataBucket, table) {
+                service =>
+                  service.run()
 
-                val bibId = createSierraBibNumber
+                  val bibId = createSierraBibNumber
 
-                val itemRecord = createSierraItemRecordWith(
-                  bibIds = List(bibId)
-                )
-
-                val notification = createHybridRecordNotificationWith(
-                  itemRecord,
-                  s3Client = s3Client,
-                  bucket = sierraItemsToDynamoBucket
-                )
-
-                sendSqsMessage(queue = queue, notification)
-
-                val expectedSierraTransformable =
-                  createSierraTransformableWith(
-                    sierraId = bibId,
-                    maybeBibRecord = None,
-                    itemRecords = List(itemRecord)
+                  val itemRecord = createSierraItemRecordWith(
+                    bibIds = List(bibId)
                   )
 
-                eventually {
-                  assertStoredAndSent(
-                    transformable = expectedSierraTransformable,
-                    topic = topic,
-                    bucket = sierraDataBucket,
-                    table = table
+                  val notification = createHybridRecordNotificationWith(
+                    itemRecord,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
                   )
-                }
+
+                  sendSqsMessage(queue = queue, notification)
+
+                  val expectedSierraTransformable =
+                    createSierraTransformableWith(
+                      sierraId = bibId,
+                      maybeBibRecord = None,
+                      itemRecords = List(itemRecord)
+                    )
+
+                  eventually {
+                    assertStoredAndSent(
+                      transformable = expectedSierraTransformable,
+                      topic = topic,
+                      bucket = sierraDataBucket,
+                      table = table
+                    )
+                  }
               }
             }
           }
@@ -73,63 +74,64 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              withSierraWorkerService(queue, topic, sierraDataBucket, table) { service =>
-                service.run()
+              withSierraWorkerService(queue, topic, sierraDataBucket, table) {
+                service =>
+                  service.run()
 
-                val bibId1 = createSierraBibNumber
-                val itemRecord1 = createSierraItemRecordWith(
-                  bibIds = List(bibId1)
-                )
-
-                val notification1 = createHybridRecordNotificationWith(
-                  itemRecord1,
-                  s3Client = s3Client,
-                  bucket = sierraItemsToDynamoBucket
-                )
-
-                sendSqsMessage(queue = queue, notification1)
-
-                val bibId2 = createSierraBibNumber
-                val itemRecord2 = createSierraItemRecordWith(
-                  bibIds = List(bibId2)
-                )
-
-                val notification2 = createHybridRecordNotificationWith(
-                  itemRecord2,
-                  s3Client = s3Client,
-                  bucket = sierraItemsToDynamoBucket
-                )
-
-                sendSqsMessage(queue = queue, notification2)
-
-                eventually {
-                  val expectedSierraTransformable1 =
-                    createSierraTransformableWith(
-                      sierraId = bibId1,
-                      maybeBibRecord = None,
-                      itemRecords = List(itemRecord1)
-                    )
-
-                  val expectedSierraTransformable2 =
-                    createSierraTransformableWith(
-                      sierraId = bibId2,
-                      maybeBibRecord = None,
-                      itemRecords = List(itemRecord2)
-                    )
-
-                  assertStoredAndSent(
-                    transformable = expectedSierraTransformable1,
-                    topic = topic,
-                    bucket = sierraDataBucket,
-                    table = table
+                  val bibId1 = createSierraBibNumber
+                  val itemRecord1 = createSierraItemRecordWith(
+                    bibIds = List(bibId1)
                   )
-                  assertStoredAndSent(
-                    transformable = expectedSierraTransformable2,
-                    topic = topic,
-                    bucket = sierraDataBucket,
-                    table = table
+
+                  val notification1 = createHybridRecordNotificationWith(
+                    itemRecord1,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
                   )
-                }
+
+                  sendSqsMessage(queue = queue, notification1)
+
+                  val bibId2 = createSierraBibNumber
+                  val itemRecord2 = createSierraItemRecordWith(
+                    bibIds = List(bibId2)
+                  )
+
+                  val notification2 = createHybridRecordNotificationWith(
+                    itemRecord2,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
+                  )
+
+                  sendSqsMessage(queue = queue, notification2)
+
+                  eventually {
+                    val expectedSierraTransformable1 =
+                      createSierraTransformableWith(
+                        sierraId = bibId1,
+                        maybeBibRecord = None,
+                        itemRecords = List(itemRecord1)
+                      )
+
+                    val expectedSierraTransformable2 =
+                      createSierraTransformableWith(
+                        sierraId = bibId2,
+                        maybeBibRecord = None,
+                        itemRecords = List(itemRecord2)
+                      )
+
+                    assertStoredAndSent(
+                      transformable = expectedSierraTransformable1,
+                      topic = topic,
+                      bucket = sierraDataBucket,
+                      table = table
+                    )
+                    assertStoredAndSent(
+                      transformable = expectedSierraTransformable2,
+                      topic = topic,
+                      bucket = sierraDataBucket,
+                      table = table
+                    )
+                  }
               }
             }
           }
@@ -144,40 +146,41 @@ class SierraItemMergerFeatureTest
         withLocalS3Bucket { sierraItemsToDynamoBucket =>
           withLocalSnsTopic { topic =>
             withLocalDynamoDbTable { table =>
-              withSierraWorkerService(queue, topic, sierraDataBucket, table) { service =>
-                service.run()
+              withSierraWorkerService(queue, topic, sierraDataBucket, table) {
+                service =>
+                  service.run()
 
-                val bibIds = createSierraBibNumbers(3)
-                val itemRecord = createSierraItemRecordWith(
-                  bibIds = bibIds
-                )
-
-                val notification = createHybridRecordNotificationWith(
-                  itemRecord,
-                  s3Client = s3Client,
-                  bucket = sierraItemsToDynamoBucket
-                )
-
-                sendSqsMessage(queue = queue, notification)
-
-                val expectedTransformables = bibIds.map { bibId =>
-                  createSierraTransformableWith(
-                    sierraId = bibId,
-                    maybeBibRecord = None,
-                    itemRecords = List(itemRecord)
+                  val bibIds = createSierraBibNumbers(3)
+                  val itemRecord = createSierraItemRecordWith(
+                    bibIds = bibIds
                   )
-                }
 
-                eventually {
-                  expectedTransformables.map { tranformable =>
-                    assertStoredAndSent(
-                      transformable = tranformable,
-                      topic = topic,
-                      bucket = sierraDataBucket,
-                      table = table
+                  val notification = createHybridRecordNotificationWith(
+                    itemRecord,
+                    s3Client = s3Client,
+                    bucket = sierraItemsToDynamoBucket
+                  )
+
+                  sendSqsMessage(queue = queue, notification)
+
+                  val expectedTransformables = bibIds.map { bibId =>
+                    createSierraTransformableWith(
+                      sierraId = bibId,
+                      maybeBibRecord = None,
+                      itemRecords = List(itemRecord)
                     )
                   }
-                }
+
+                  eventually {
+                    expectedTransformables.map { tranformable =>
+                      assertStoredAndSent(
+                        transformable = tranformable,
+                        topic = topic,
+                        bucket = sierraDataBucket,
+                        table = table
+                      )
+                    }
+                  }
               }
             }
           }
