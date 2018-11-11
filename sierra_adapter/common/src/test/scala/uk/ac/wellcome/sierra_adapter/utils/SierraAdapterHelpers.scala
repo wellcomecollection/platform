@@ -63,11 +63,12 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       id = transformable.sierraId.withoutCheckDigit,
       record = transformable)
 
-  def assertStoredAndSent[T](t: T,
-                             id: String,
-                             topic: Topic,
-                             bucket: Bucket,
-                             table: Table)(implicit decoder: Decoder[T]): Assertion = {
+  def assertStoredAndSent[T](
+    t: T,
+    id: String,
+    topic: Topic,
+    bucket: Bucket,
+    table: Table)(implicit decoder: Decoder[T]): Assertion = {
     val hybridRecord = getHybridRecord(table, id = id)
 
     val storedTransformable = getObjectFromS3[T](
