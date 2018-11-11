@@ -1,7 +1,7 @@
 module "catalogue_api" {
   source = "catalogue_api"
 
-  namespace = "catalogue-api-test-api-gw"
+  namespace = "test-api-gw"
 
   vpc_id  = "${local.vpc_id}"
   subnets = ["${local.private_subnets}"]
