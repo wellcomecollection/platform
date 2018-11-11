@@ -162,9 +162,7 @@ lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common"
   .dependsOn(config_storage % "compile->compile;test->test")
 
 lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_reader")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(finatra_storage % "compile->compile;test->test")
+  .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraReaderDependencies)
 
 lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_items_to_dynamo")

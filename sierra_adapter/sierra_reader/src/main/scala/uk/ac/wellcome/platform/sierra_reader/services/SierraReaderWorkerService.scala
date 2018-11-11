@@ -2,12 +2,12 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import java.time.Instant
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
-import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.Json
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
@@ -27,30 +27,35 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
-class SierraReaderWorkerService @Inject()(
-  system: ActorSystem,
+class SierraReaderWorkerService(
+  actorSystem: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
-  windowManager: WindowManager,
   s3client: AmazonS3,
   s3Config: S3Config,
   readerConfig: ReaderConfig,
   sierraConfig: SierraConfig
 ) extends Logging {
 
-  implicit val actorSystem = system
+  implicit val actorSystem = actorSystem
   implicit val materialiser = ActorMaterializer()
-  implicit val executionContext = system.dispatcher
+  implicit val executionContext = actorSystem.dispatcher
 
-  sqsStream.foreach(
-    streamName = this.getClass.getSimpleName,
-    process = processMessage
+  val windowManager = new WindowManager(
+    s3client = s3client,
+    s3Config = s3Config,
+    sierraConfig = sierraConfig
   )
+
+  def run(): Future[Done] =
+    sqsStream.foreach(
+      streamName = this.getClass.getSimpleName,
+      process = processMessage
+    )
 
   def processMessage(notificationMessage: NotificationMessage): Future[Unit] =
     for {
