@@ -47,37 +47,34 @@ class SierraReaderWorkerServiceTest
     resourceType: SierraResourceTypes.Value = SierraResourceTypes.bibs
   )(testWith: TestWith[FixtureParams, Assertion]) = {
     withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueue { queue =>
-          withLocalS3Bucket { bucket =>
-            val sierraConfig = SierraConfig(
-              resourceType = resourceType,
-              apiUrl = apiUrl,
-              oauthKey = "key",
-              oauthSec = "secret",
-              fields = fields
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { bucket =>
+          val sierraConfig = SierraConfig(
+            resourceType = resourceType,
+            apiUrl = apiUrl,
+            oauthKey = "key",
+            oauthSec = "secret",
+            fields = fields
+          )
+
+          withSQSStream[NotificationMessage, Assertion](
+            actorSystem,
+            queue) { sqsStream =>
+            val worker = new SierraReaderWorkerService(
+              actorSystem = actorSystem,
+              sqsStream = sqsStream,
+              s3client = s3Client,
+              s3Config = createS3ConfigWith(bucket),
+              windowManager = new WindowManager(
+                s3Client,
+                createS3ConfigWith(bucket),
+                sierraConfig = sierraConfig
+              ),
+              readerConfig = ReaderConfig(batchSize = batchSize),
+              sierraConfig = sierraConfig
             )
 
-            withSQSStream[NotificationMessage, Assertion](
-              actorSystem,
-              queue,
-              metricsSender) { sqsStream =>
-              val worker = new SierraReaderWorkerService(
-                actorSystem = actorSystem,
-                sqsStream = sqsStream,
-                s3client = s3Client,
-                s3Config = createS3ConfigWith(bucket),
-                windowManager = new WindowManager(
-                  s3Client,
-                  createS3ConfigWith(bucket),
-                  sierraConfig = sierraConfig
-                ),
-                readerConfig = ReaderConfig(batchSize = batchSize),
-                sierraConfig = sierraConfig
-              )
-
-              testWith(FixtureParams(worker, queue, bucket))
-            }
+            testWith(FixtureParams(worker, queue, bucket))
           }
         }
       }
