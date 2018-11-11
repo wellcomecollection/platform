@@ -11,14 +11,17 @@ import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.services.{SierraItemMergerUpdaterService, SierraItemMergerWorkerService}
 import uk.ac.wellcome.sierra_adapter.config.builders.SierraTransformableVHSBuilder
+import uk.ac.wellcome.storage.ObjectStore
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
 
 object Main extends App with Logging {
   val config: Config = ConfigFactory.load()
 
   implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
   val sqsStream = new SQSStream[NotificationMessage](
     actorSystem = actorSystem,

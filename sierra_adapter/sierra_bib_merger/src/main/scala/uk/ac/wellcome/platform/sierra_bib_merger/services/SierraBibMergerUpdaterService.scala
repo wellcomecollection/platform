@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.platform.sierra_bib_merger.merger.BibMerger
