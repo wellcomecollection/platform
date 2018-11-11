@@ -26,10 +26,6 @@ class SierraReaderWorkerServiceTest
     with ScalaFutures
     with WorkerServiceFixture {
 
-  case class FixtureParams(worker: SierraReaderWorkerService,
-                           queue: Queue,
-                           bucket: Bucket)
-
   it(
     "reads a window message from SQS, retrieves the bibs from Sierra and writes them to S3") {
     val body =
