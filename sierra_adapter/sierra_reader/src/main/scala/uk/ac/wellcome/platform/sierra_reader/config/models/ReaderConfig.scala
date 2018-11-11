@@ -5,5 +5,5 @@ import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 case class ReaderConfig(
   resourceType: SierraResourceTypes.Value,
   fields: String,
-  batchSize: Int
+  batchSize: Int = 50
 )
