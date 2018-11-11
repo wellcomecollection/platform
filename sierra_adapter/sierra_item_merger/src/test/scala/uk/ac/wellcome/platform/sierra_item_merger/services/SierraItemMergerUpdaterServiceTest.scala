@@ -3,16 +3,11 @@ package uk.ac.wellcome.platform.sierra_item_merger.services
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.platform.sierra_item_merger.fixtures.SierraItemMergerFixtures
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
-import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
@@ -21,18 +16,8 @@ class SierraItemMergerUpdaterServiceTest
     with LocalVersionedHybridStore
     with SQS
     with SierraAdapterHelpers
-    with SierraGenerators {
-
-  def withSierraUpdaterService[R](
-    hybridStore: VersionedHybridStore[SierraTransformable,
-                                      EmptyMetadata,
-                                      ObjectStore[SierraTransformable]])(
-    testWith: TestWith[SierraItemMergerUpdaterService, R]): R = {
-    val sierraUpdaterService = new SierraItemMergerUpdaterService(
-      versionedHybridStore = hybridStore
-    )
-    testWith(sierraUpdaterService)
-  }
+    with SierraGenerators
+    with SierraItemMergerFixtures {
 
   it("creates a record if it receives an item with a bibId that doesn't exist") {
     withLocalS3Bucket { bucket =>
