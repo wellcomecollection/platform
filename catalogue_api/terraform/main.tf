@@ -1,7 +1,7 @@
 module "catalogue_api" {
   source = "catalogue_api"
 
-  namespace = "test-api-gw"
+  namespace = "catalogue_api_gw"
 
   vpc_id  = "${local.vpc_id}"
   subnets = ["${local.private_subnets}"]
@@ -14,8 +14,10 @@ module "catalogue_api" {
   es_cluster_credentials = "${var.es_cluster_credentials}"
 
   romulus_container_image = "${local.romulus_app_uri}"
-  remus_container_image   = "${local.romulus_app_uri}"
+  remus_container_image   = "${local.remus_app_uri}"
 
   romulus_es_config = "${local.es_config_romulus}"
   remus_es_config   = "${local.es_config_remus}"
+
+  production_api = "${local.production_api}"
 }

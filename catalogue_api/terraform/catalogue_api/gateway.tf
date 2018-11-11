@@ -4,7 +4,7 @@ resource "aws_api_gateway_vpc_link" "link" {
 }
 
 resource "aws_api_gateway_rest_api" "api" {
-  name = "${var.namespace}_id"
+  name = "Catalogue API"
 
   endpoint_configuration = {
     types = ["REGIONAL"]
@@ -21,7 +21,7 @@ module "prod" {
   api_id     = "${aws_api_gateway_rest_api.api.id}"
 
   variables = {
-    port = "${local.remus_listener_port}"
+    port = "${local.prod_listener_port}"
   }
 }
 
@@ -35,7 +35,7 @@ module "stage" {
   api_id     = "${aws_api_gateway_rest_api.api.id}"
 
   variables = {
-    port = "${local.remus_listener_port}"
+    port = "${local.stage_listener_port}"
   }
 }
 

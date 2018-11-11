@@ -19,5 +19,5 @@ module "services" {
 
   romulus_container_image = "${var.romulus_container_image}"
   romulus_es_config       = "${var.romulus_es_config}"
-  romulus_listener_port   = "${local.remus_listener_port}"
+  romulus_listener_port   = "${local.romulus_listener_port}"
 }

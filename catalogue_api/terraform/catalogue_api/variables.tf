@@ -25,3 +25,5 @@ variable "cluster_name" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
+
+variable "production_api" {}

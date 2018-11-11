@@ -1,7 +1,7 @@
 module "romulus" {
   source = "service"
 
-  namespace = "${var.namespace}"
+  namespace = "${var.namespace}-romulus"
 
   container_image = "${var.romulus_container_image}"
   container_port  = "${var.container_port}"

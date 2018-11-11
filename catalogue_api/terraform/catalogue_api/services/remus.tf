@@ -1,7 +1,7 @@
 module "remus" {
   source = "service"
 
-  namespace = "${var.namespace}"
+  namespace = "${var.namespace}-remus"
 
   container_image = "${var.remus_container_image}"
   container_port  = "${var.container_port}"
