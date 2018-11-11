@@ -9,6 +9,7 @@ import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
+import uk.ac.wellcome.platform.sierra_reader.config.builders.{ReaderConfigBuilder, SierraAPIConfigBuilder}
 import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
 
 import scala.concurrent.Await
@@ -33,8 +34,8 @@ object Main extends App with Logging {
     sqsStream = sqsStream,
     s3client = S3Builder.buildS3Client(config),
     s3Config = S3Builder.buildS3Config(config),
-    readerConfig = readerConfig,
-    sierraConfig = sierraConfig
+    readerConfig = ReaderConfigBuilder.buildReaderConfig(config),
+    sierraAPIConfig = SierraAPIConfigBuilder.buildSierraConfig(config)
   )
 
   try {
