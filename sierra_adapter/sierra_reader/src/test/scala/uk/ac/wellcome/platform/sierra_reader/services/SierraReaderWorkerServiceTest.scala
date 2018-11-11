@@ -6,7 +6,6 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import org.scalatest.compatible.Assertion
@@ -64,7 +63,7 @@ class SierraReaderWorkerServiceTest
               queue,
               metricsSender) { sqsStream =>
               val worker = new SierraReaderWorkerService(
-                system = actorSystem,
+                actorSystem = actorSystem,
                 sqsStream = sqsStream,
                 s3client = s3Client,
                 s3Config = createS3ConfigWith(bucket),
