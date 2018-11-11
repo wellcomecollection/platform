@@ -9,8 +9,6 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
     with IntegrationPatience
