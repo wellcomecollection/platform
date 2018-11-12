@@ -6,15 +6,14 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query.Condition
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
+import com.gu.scanamo.{Scanamo, Table}
 import grizzled.slf4j.Logging
-import javax.inject.Inject
 import uk.ac.wellcome.storage.dynamo._
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
-class DynamoRowLockDao @Inject()(
+class DynamoRowLockDao(
   dynamoDBClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
     extends Logging {
