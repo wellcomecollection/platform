@@ -12,8 +12,8 @@ module "deployment_tracking" {
 module "queue_watcher" {
   source = "queue_watcher"
 
-  trigger_arn  = "${aws_cloudwatch_event_rule.every_2_minutes.arn}"
-  trigger_name = "${aws_cloudwatch_event_rule.every_2_minutes.name}"
+  trigger_arn  = "${aws_cloudwatch_event_rule.every_5_minutes.arn}"
+  trigger_name = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
