@@ -54,7 +54,7 @@ trait MatcherFixtures
                       messageStream = messageStream,
                       snsWriter = snsWriter,
                       workMatcher = workMatcher
-                    )
+                    )(actorSystem = actorSystem, ec = actorSystem.dispatcher)
 
                     workerService.run()
 

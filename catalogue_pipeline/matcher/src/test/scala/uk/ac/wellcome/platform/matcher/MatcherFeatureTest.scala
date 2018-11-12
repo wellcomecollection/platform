@@ -14,6 +14,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class MatcherFeatureTest
     extends FunSpec
     with Matchers
