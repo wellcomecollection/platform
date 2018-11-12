@@ -4,7 +4,7 @@ from transform import transform
 
 def raw_data():
     return json.loads(
-        '''
+        """
         {
         "catalogue_api_derivative": true,
         "catalogue_api_derivative.bucket": "some-bucket",
@@ -23,7 +23,7 @@ def raw_data():
         "tandem_vault.key": null,
         "tandem_vault_master": false
         }
-        '''
+        """
     )
 
 

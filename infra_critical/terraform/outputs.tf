@@ -24,6 +24,7 @@ output "vhs_miro_inventory_dynamodb_update_policy" {
 output "vhs_miro_inventory_read_policy" {
   value = "${module.vhs_miro_migration.read_policy}"
 }
+
 output "vhs_miro_inventory_table_name" {
   value = "${module.vhs_miro_migration.table_name}"
 }

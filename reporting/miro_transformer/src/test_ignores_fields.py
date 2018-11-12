@@ -27,7 +27,7 @@ def transformed_data():
         "string_field": "a string",
         "null_field": None,
         "image_artwork_date_from": "2004-04-24",
-        "dict_field": {"a": "a_value"}
+        "dict_field": {"a": "a_value"},
     }
 
 
