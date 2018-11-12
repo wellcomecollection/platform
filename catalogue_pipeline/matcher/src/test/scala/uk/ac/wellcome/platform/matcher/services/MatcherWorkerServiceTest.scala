@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.matcher.messages
+package uk.ac.wellcome.platform.matcher.services
 
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
@@ -18,7 +18,7 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class MatcherMessageReceiverTest
+class MatcherWorkerServiceTest
     extends FunSpec
     with Matchers
     with Eventually
