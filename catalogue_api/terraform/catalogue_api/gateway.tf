@@ -11,33 +11,35 @@ resource "aws_api_gateway_rest_api" "api" {
   }
 }
 
-//module "prod" {
-//  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.0.0"
-//
-//  domain_name      = "api.wellcomecollection.org"
-//  cert_domain_name = "api.wellcomecollection.org"
-//
-//  stage_name = "prod"
-//  api_id     = "${aws_api_gateway_rest_api.api.id}"
-//
-//  variables = {
-//    port = "${local.prod_listener_port}"
-//  }
-//}
-//
-//module "stage" {
-//  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.0.0"
-//
-//  domain_name      = "api-stage.wellcomecollection.org"
-//  cert_domain_name = "api.wellcomecollection.org"
-//
-//  stage_name = "stage"
-//  api_id     = "${aws_api_gateway_rest_api.api.id}"
-//
-//  variables = {
-//    port = "${local.stage_listener_port}"
-//  }
-//}
+# Stages
+
+module "prod" {
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=290a16393da3018435edcb26ba144582b6fb1b2b"
+  domain_name = "api.wellcomecollection.ac.uk"
+
+  stage_name = "prod"
+  api_id     = "${aws_api_gateway_rest_api.api.id}"
+
+  variables = {
+    port = "${local.prod_listener_port}"
+  }
+
+  base_path = "catalogue"
+}
+
+module "stage" {
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=290a16393da3018435edcb26ba144582b6fb1b2b"
+  domain_name = "api-stage.wellcomecollection.ac.uk"
+
+  stage_name = "stage"
+  api_id     = "${aws_api_gateway_rest_api.api.id}"
+
+  variables = {
+    port = "${local.stage_listener_port}"
+  }
+
+  base_path = "catalogue"
+}
 
 module "root_resource_method" {
   source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/method?ref=v13.0.0"

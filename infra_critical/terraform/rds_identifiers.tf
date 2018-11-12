@@ -1,5 +1,5 @@
 module "identifiers_delta_rds_cluster" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//rds?ref=v1.0.5"
+  source             = "git::https://github.com/wellcometrust/terraform.git//rds?ref=v13.0.0"
   cluster_identifier = "identifiers-delta"
   database_name      = "identifiers"
   username           = "${var.rds_username}"
