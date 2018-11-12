@@ -6,14 +6,18 @@ import java.time.Instant
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.platform.goobi_reader.models.GoobiRecordMetadata
 import uk.ac.wellcome.platform.goobi_reader.services.GoobiReaderWorkerService
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class GoobiReaderFeatureTest
     extends FunSpec
@@ -22,7 +26,11 @@ class GoobiReaderFeatureTest
     with Matchers
     with IntegrationPatience
     with GoobiReaderFixtures
-    with Inside {
+    with Inside
+    with LocalDynamoDb
+    with LocalVersionedHybridStore
+    with SQS
+    with S3 {
   private val eventTime = Instant.parse("2018-01-01T01:00:00.000Z")
 
   it("gets an S3 notification and puts the new record in VHS") {

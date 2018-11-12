@@ -20,6 +20,7 @@ import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.platform.goobi_reader.models.GoobiRecordMetadata
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
@@ -37,7 +38,9 @@ class GoobiReaderWorkerServiceTest
     with GoobiReaderFixtures
     with Messaging
     with SQS
-    with Inside {
+    with Inside
+    with LocalDynamoDb
+    with LocalVersionedHybridStore {
 
   private val id = "mets-0001"
   private val goobiS3Prefix = "goobi"
@@ -300,11 +303,14 @@ class GoobiReaderWorkerServiceTest
               mockMetricsSender) { sqsStream =>
               withS3StreamStoreFixtures {
                 case (bucket, table, versionedHybridStore) =>
-                  new GoobiReaderWorkerService(
+                  val service = new GoobiReaderWorkerService(
                     s3Client = s3Client,
                     sqsStream = sqsStream,
                     versionedHybridStore = versionedHybridStore
-                  )
+                  )(actorSystem = actorSystem)
+
+                  service.run()
+
                   testWith((bucket, queuePair, mockMetricsSender, table, versionedHybridStore))
               }
             }
