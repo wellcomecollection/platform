@@ -25,12 +25,7 @@ object Main extends App with Logging {
 
   val metricsSender = MetricsBuilder.buildMetricsSender(config)
 
-  val sqsStream = new SQSStream[NotificationMessage](
-    actorSystem = actorSystem,
-    sqsClient = SQSBuilder.buildSQSAsyncClient(config),
-    sqsConfig = SQSBuilder.buildSQSConfig(config),
-    metricsSender = metricsSender
-  )
+  val sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
 
   val workerService = new SierraReaderWorkerService(
     sqsStream = sqsStream,
