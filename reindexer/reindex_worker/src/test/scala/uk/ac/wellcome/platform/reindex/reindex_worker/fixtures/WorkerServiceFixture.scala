@@ -8,6 +8,8 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.services.{HybridRecordSend
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait WorkerServiceFixture extends Akka with DynamoFixtures with SNS with SQS {
   def withWorkerService[R](queue: Queue, table: Table, topic: Topic)(
     testWith: TestWith[ReindexWorkerService, R]): R =
@@ -30,7 +32,7 @@ trait WorkerServiceFixture extends Akka with DynamoFixtures with SNS with SQS {
                   recordReader = recordReader,
                   hybridRecordSender = hybridRecordSender,
                   sqsStream = sqsStream
-                )(actorSystem = actorSystem)
+                )(actorSystem = actorSystem, ec = global)
 
                 workerService.run()
 
