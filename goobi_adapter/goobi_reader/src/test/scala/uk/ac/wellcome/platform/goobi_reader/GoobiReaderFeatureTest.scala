@@ -65,7 +65,7 @@ class GoobiReaderFeatureTest
             s3Client = s3Client,
             sqsStream = sqsStream,
             versionedHybridStore = vhs
-          )
+          )(actorSystem = actorSystem)
 
           workerService.run()
 

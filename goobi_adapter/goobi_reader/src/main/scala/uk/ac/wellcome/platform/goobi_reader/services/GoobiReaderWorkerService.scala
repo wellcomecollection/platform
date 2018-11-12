@@ -6,7 +6,6 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
