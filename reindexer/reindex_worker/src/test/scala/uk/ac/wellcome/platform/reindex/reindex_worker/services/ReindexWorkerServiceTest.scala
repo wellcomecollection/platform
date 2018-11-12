@@ -24,7 +24,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ReindexWorkerTest
+class ReindexWorkerServiceTest
     extends FunSpec
     with Matchers
     with MockitoSugar
@@ -45,7 +45,7 @@ class ReindexWorkerTest
   )
 
   def withReindexWorkerService[R](table: Table, topic: Topic)(
-    testWith: TestWith[(ReindexWorker, QueuePair), R]): R =
+    testWith: TestWith[(ReindexWorkerService, QueuePair), R]): R =
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, dlq) =>
@@ -63,7 +63,7 @@ class ReindexWorkerTest
                       snsWriter = snsWriter
                     )
 
-                    val workerService = new ReindexWorker(
+                    val workerService = new ReindexWorkerService(
                       recordReader = recordReader,
                       hybridRecordSender = hybridRecordSender,
                       sqsStream = sqsStream,

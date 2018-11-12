@@ -10,7 +10,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReindexWorker @Inject()(
+class ReindexWorkerService @Inject()(
   recordReader: RecordReader,
   hybridRecordSender: HybridRecordSender,
   system: ActorSystem,
