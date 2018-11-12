@@ -11,7 +11,7 @@ resource "aws_api_gateway_rest_api" "api" {
 # Stages
 
 module "prod" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.1.0"
+  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.1.0"
   domain_name = "api.wellcomecollection.org"
 
   stage_name = "prod"
@@ -25,7 +25,7 @@ module "prod" {
 }
 
 module "stage" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.1.0"
+  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.1.0"
   domain_name = "api-stage.wellcomecollection.org"
 
   stage_name = "stage"
