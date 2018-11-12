@@ -1,4 +1,5 @@
 package uk.ac.wellcome.platform.matcher.locking
+
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import org.mockito.Matchers.any
@@ -9,6 +10,7 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.dynamo._
 
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global
