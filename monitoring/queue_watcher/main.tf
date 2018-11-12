@@ -6,7 +6,7 @@ module "lambda_queue_watcher" {
 
   name        = "queue_watcher"
   description = "Post custom notification for queue size on all queues"
-  timeout     = 15
+  timeout     = 30
 
   environment_variables = {
     PLACEHOLDER = "value"
@@ -23,6 +23,6 @@ module "trigger_post_to_slack_dlqs_not_empty" {
   lambda_function_name = "${module.lambda_queue_watcher.function_name}"
   lambda_function_arn  = "${module.lambda_queue_watcher.arn}"
 
-  cloudwatch_trigger_arn  = "${var.every_minute_arn}"
-  cloudwatch_trigger_name = "${var.every_minute_name}"
+  cloudwatch_trigger_arn  = "${var.trigger_arn}"
+  cloudwatch_trigger_name = "${var.trigger_name}"
 }
