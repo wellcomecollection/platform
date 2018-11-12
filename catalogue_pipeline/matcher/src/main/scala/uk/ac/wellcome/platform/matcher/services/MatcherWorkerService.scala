@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.matcher.messages
+package uk.ac.wellcome.platform.matcher.services
 
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
@@ -12,7 +12,7 @@ import uk.ac.wellcome.platform.matcher.models.VersionExpectedConflictException
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MatcherMessageReceiver @Inject()(
+class MatcherWorkerService @Inject()(
   messageStream: MessageStream[TransformedBaseWork],
   snsWriter: SNSWriter,
   actorSystem: ActorSystem,
