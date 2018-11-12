@@ -85,6 +85,7 @@ class ReindexWorkerServiceTest
               assertQueueEmpty(queue)
               assertQueueHasSize(dlq, 1)
             }
+          }
         }
       }
     }
