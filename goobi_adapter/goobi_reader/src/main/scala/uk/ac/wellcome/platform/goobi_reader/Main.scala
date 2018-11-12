@@ -23,7 +23,8 @@ object Main extends App with Logging {
   val workerService = new GoobiReaderWorkerService(
     s3Client = S3Builder.buildS3Client(config),
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
-    versionedHybridStore = VHSBuilder.buildVHS[InputStream, GoobiRecordMetadata](config)
+    versionedHybridStore =
+      VHSBuilder.buildVHS[InputStream, GoobiRecordMetadata](config)
   )
 
   try {

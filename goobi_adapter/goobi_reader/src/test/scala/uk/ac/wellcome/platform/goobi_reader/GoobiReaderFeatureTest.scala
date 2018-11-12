@@ -12,7 +12,11 @@ import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.platform.goobi_reader.models.GoobiRecordMetadata
 import uk.ac.wellcome.platform.goobi_reader.services.GoobiReaderWorkerService
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore, S3}
+import uk.ac.wellcome.storage.fixtures.{
+  LocalDynamoDb,
+  LocalVersionedHybridStore,
+  S3
+}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -65,7 +69,8 @@ class GoobiReaderFeatureTest
     }
   }
 
-  private def withWorkerService[R](queue: Queue, bucket: Bucket, table: Table)(testWith: TestWith[GoobiReaderWorkerService, R]): R =
+  private def withWorkerService[R](queue: Queue, bucket: Bucket, table: Table)(
+    testWith: TestWith[GoobiReaderWorkerService, R]): R =
     withActorSystem { actorSystem =>
       withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
         withTypeVHS[InputStream, GoobiRecordMetadata, R](bucket, table) { vhs =>

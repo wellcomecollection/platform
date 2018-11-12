@@ -9,7 +9,11 @@ import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
-import uk.ac.wellcome.platform.goobi_reader.models.{GoobiRecordMetadata, S3Event, S3Record}
+import uk.ac.wellcome.platform.goobi_reader.models.{
+  GoobiRecordMetadata,
+  S3Event,
+  S3Record
+}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{VHSIndexEntry, VersionedHybridStore}
@@ -24,10 +28,12 @@ class GoobiReaderWorkerService(
   versionedHybridStore: VersionedHybridStore[InputStream,
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]
-)(implicit val actorSystem: ActorSystem) extends Logging {
+)(implicit val actorSystem: ActorSystem)
+    extends Logging {
 
   implicit val materialiser: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
+  implicit val executionContext: ExecutionContextExecutor =
+    actorSystem.dispatcher
 
   def run(): Future[Done] =
     sqsStream.foreach(

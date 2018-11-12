@@ -26,7 +26,9 @@ object VHSBuilder {
     )
   }
 
-  def buildVHS[T, M](config: Config)(implicit serialisationStrategy: SerialisationStrategy[T]): VersionedHybridStore[T, M, ObjectStore[T]] = {
+  def buildVHS[T, M](config: Config)(
+    implicit serialisationStrategy: SerialisationStrategy[T])
+    : VersionedHybridStore[T, M, ObjectStore[T]] = {
     implicit val executionContext: ExecutionContext =
       AkkaBuilder.buildExecutionContext()
 

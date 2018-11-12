@@ -20,7 +20,10 @@ import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.platform.goobi_reader.models.GoobiRecordMetadata
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore}
+import uk.ac.wellcome.storage.fixtures.{
+  LocalDynamoDb,
+  LocalVersionedHybridStore
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
@@ -311,7 +314,13 @@ class GoobiReaderWorkerServiceTest
 
                   service.run()
 
-                  testWith((bucket, queuePair, mockMetricsSender, table, versionedHybridStore))
+                  testWith(
+                    (
+                      bucket,
+                      queuePair,
+                      mockMetricsSender,
+                      table,
+                      versionedHybridStore))
               }
             }
           }
