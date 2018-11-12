@@ -57,7 +57,4 @@ trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
         |     }
         | ]
         |}""".stripMargin
-
-  def goobiReaderLocalFlags(queue: Queue, bucket: Bucket, table: Table) =
-    sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table, "goobi")
 }
