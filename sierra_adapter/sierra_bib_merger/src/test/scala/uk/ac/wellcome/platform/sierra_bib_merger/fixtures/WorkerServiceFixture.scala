@@ -33,17 +33,18 @@ trait WorkerServiceFixture
             versionedHybridStore = versionedHybridStore
           )
 
-          withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
-            withSNSWriter(topic) { snsWriter =>
-              val workerService = new SierraBibMergerWorkerService(
-                actorSystem = actorSystem,
-                sqsStream = sqsStream,
-                snsWriter = snsWriter,
-                sierraBibMergerUpdaterService = updaterService
-              )
+          withSQSStream[NotificationMessage, R](actorSystem, queue) {
+            sqsStream =>
+              withSNSWriter(topic) { snsWriter =>
+                val workerService = new SierraBibMergerWorkerService(
+                  actorSystem = actorSystem,
+                  sqsStream = sqsStream,
+                  snsWriter = snsWriter,
+                  sierraBibMergerUpdaterService = updaterService
+                )
 
-              testWith(workerService)
-            }
+                testWith(workerService)
+              }
           }
       }
     }

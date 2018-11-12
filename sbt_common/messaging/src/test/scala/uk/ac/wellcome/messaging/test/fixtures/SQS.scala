@@ -157,7 +157,8 @@ trait SQS extends Matchers with Logging with MetricsSenderFixture {
     testWith(stream)
   }
 
-  def withSQSStream[T, R](actorSystem: ActorSystem, queue: Queue)(testWith: TestWith[SQSStream[T], R]): R =
+  def withSQSStream[T, R](actorSystem: ActorSystem, queue: Queue)(
+    testWith: TestWith[SQSStream[T], R]): R =
     withMetricsSender(actorSystem) { metricsSender =>
       withSQSStream[T, R](actorSystem, queue, metricsSender) { stream =>
         testWith(stream)

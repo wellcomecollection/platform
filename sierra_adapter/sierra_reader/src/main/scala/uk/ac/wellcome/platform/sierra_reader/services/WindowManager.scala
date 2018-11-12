@@ -17,7 +17,8 @@ class WindowManager(
   s3client: AmazonS3,
   s3Config: S3Config,
   readerConfig: ReaderConfig
-)(implicit ec: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def getCurrentStatus(window: String): Future[WindowStatus] = Future {
     info(

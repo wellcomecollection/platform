@@ -11,14 +11,24 @@ import grizzled.slf4j.Logging
 import io.circe.Json
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{SierraResourceTypes, WindowStatus}
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  SierraResourceTypes,
+  WindowStatus
+}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  AbstractSierraRecord,
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.config.models.{ReaderConfig, SierraAPIConfig}
+import uk.ac.wellcome.platform.sierra_reader.config.models.{
+  ReaderConfig,
+  SierraAPIConfig
+}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -30,7 +40,8 @@ class SierraReaderWorkerService(
   s3Config: S3Config,
   readerConfig: ReaderConfig,
   sierraAPIConfig: SierraAPIConfig
-)(implicit val actorSystem: ActorSystem) extends Logging {
+)(implicit val actorSystem: ActorSystem)
+    extends Logging {
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = actorSystem.dispatcher
 
@@ -80,9 +91,8 @@ class SierraReaderWorkerService(
       oauthKey = sierraAPIConfig.oauthKey,
       oauthSecret = sierraAPIConfig.oauthSec,
       throttleRate = ThrottleRate(3, per = 1.second),
-      timeoutMs = 60000)(
-      resourceType = readerConfig.resourceType.toString,
-      params)
+      timeoutMs = 60000
+    )(resourceType = readerConfig.resourceType.toString, params)
 
     val outcome = sierraSource
       .via(SierraRecordWrapperFlow(createRecord))

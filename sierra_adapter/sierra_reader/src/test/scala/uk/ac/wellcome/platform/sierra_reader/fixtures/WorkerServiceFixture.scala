@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.sierra_reader.fixtures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.sierra_reader.config.models.{ReaderConfig, SierraAPIConfig}
+import uk.ac.wellcome.platform.sierra_reader.config.models.{
+  ReaderConfig,
+  SierraAPIConfig
+}
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
 import uk.ac.wellcome.storage.fixtures.S3
@@ -14,7 +17,8 @@ trait WorkerServiceFixture extends Akka with SQS with S3 {
   def withWorkerService[R](bucket: Bucket,
                            queue: Queue,
                            readerConfig: ReaderConfig = bibsReaderConfig,
-                           sierraAPIConfig: SierraAPIConfig = sierraAPIConfig)(testWith: TestWith[SierraReaderWorkerService, R]): R =
+                           sierraAPIConfig: SierraAPIConfig = sierraAPIConfig)(
+    testWith: TestWith[SierraReaderWorkerService, R]): R =
     withActorSystem { actorSystem =>
       withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
         val workerService = new SierraReaderWorkerService(

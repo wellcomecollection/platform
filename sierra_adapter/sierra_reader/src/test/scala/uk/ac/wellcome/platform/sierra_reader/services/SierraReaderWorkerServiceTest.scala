@@ -9,7 +9,10 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
 import uk.ac.wellcome.platform.sierra_reader.fixtures.WorkerServiceFixture
 
@@ -37,11 +40,15 @@ class SierraReaderWorkerServiceTest
 
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
-        withWorkerService(bucket, queue, readerConfig = bibsReaderConfig.copy(batchSize = 10)) { service =>
+        withWorkerService(
+          bucket,
+          queue,
+          readerConfig = bibsReaderConfig.copy(batchSize = 10)) { service =>
           sendNotificationToSQS(queue = queue, body = body)
 
-          val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
-            s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
+          val pageNames = List("0000.json", "0001.json", "0002.json").map {
+            label =>
+              s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
           } ++ List(
             "windows_bibs_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
@@ -70,24 +77,29 @@ class SierraReaderWorkerServiceTest
 
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
-        withWorkerService(bucket, queue, readerConfig = itemsReaderConfig) { service =>
-          sendNotificationToSQS(queue = queue, body = body)
+        withWorkerService(bucket, queue, readerConfig = itemsReaderConfig) {
+          service =>
+            sendNotificationToSQS(queue = queue, body = body)
 
-          val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
-            .map { label =>
-              s"records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
-            } ++ List(
-            "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
+            val pageNames = List(
+              "0000.json",
+              "0001.json",
+              "0002.json",
+              "0003.json")
+              .map { label =>
+                s"records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
+              } ++ List(
+              "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
-          eventually {
-            // There are 157 item records in the Sierra wiremock so we expect 4 files
-            listKeysInBucket(bucket = bucket) shouldBe pageNames
+            eventually {
+              // There are 157 item records in the Sierra wiremock so we expect 4 files
+              listKeysInBucket(bucket = bucket) shouldBe pageNames
 
-            getItemRecordsFromS3(bucket, pageNames(0)) should have size 50
-            getItemRecordsFromS3(bucket, pageNames(1)) should have size 50
-            getItemRecordsFromS3(bucket, pageNames(2)) should have size 50
-            getItemRecordsFromS3(bucket, pageNames(3)) should have size 7
-          }
+              getItemRecordsFromS3(bucket, pageNames(0)) should have size 50
+              getItemRecordsFromS3(bucket, pageNames(1)) should have size 50
+              getItemRecordsFromS3(bucket, pageNames(2)) should have size 50
+              getItemRecordsFromS3(bucket, pageNames(3)) should have size 7
+            }
         }
       }
     }
@@ -104,43 +116,43 @@ class SierraReaderWorkerServiceTest
 
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
-        withWorkerService(bucket, queue, readerConfig = itemsReaderConfig) { service =>
+        withWorkerService(bucket, queue, readerConfig = itemsReaderConfig) {
+          service =>
+            // Do a complete run of the reader -- this gives us a set of JSON files
+            // to compare to.
+            sendNotificationToSQS(queue = queue, body = body)
 
-          // Do a complete run of the reader -- this gives us a set of JSON files
-          // to compare to.
-          sendNotificationToSQS(queue = queue, body = body)
+            eventually {
+              assertQueueEmpty(queue = queue)
 
-          eventually {
-            assertQueueEmpty(queue = queue)
-
-            // There are 157 item records in the Sierra wiremock, so we expect
-            // 5 files -- the four JSON files, and a window marker.
-            listKeysInBucket(bucket = bucket) should have size 5
-          }
-
-          val expectedContents = getAllObjectContents(bucket = bucket)
-
-          // Now, let's delete every key in the bucket _except_ the first --
-          // which we'll use to restart the window.
-          listKeysInBucket(bucket = bucket)
-            .filterNot {
-              _.endsWith("0000.json")
-            }
-            .foreach { key =>
-              s3Client.deleteObject(bucket.name, key)
+              // There are 157 item records in the Sierra wiremock, so we expect
+              // 5 files -- the four JSON files, and a window marker.
+              listKeysInBucket(bucket = bucket) should have size 5
             }
 
-          eventually {
-            listKeysInBucket(bucket = bucket) should have size 1
-          }
+            val expectedContents = getAllObjectContents(bucket = bucket)
 
-          // Now, send a second message to the reader, and we'll see if it completes
-          // the window successfully.
-          sendNotificationToSQS(queue = queue, body = body)
+            // Now, let's delete every key in the bucket _except_ the first --
+            // which we'll use to restart the window.
+            listKeysInBucket(bucket = bucket)
+              .filterNot {
+                _.endsWith("0000.json")
+              }
+              .foreach { key =>
+                s3Client.deleteObject(bucket.name, key)
+              }
 
-          eventually {
-            getAllObjectContents(bucket = bucket) shouldBe expectedContents
-          }
+            eventually {
+              listKeysInBucket(bucket = bucket) should have size 1
+            }
+
+            // Now, send a second message to the reader, and we'll see if it completes
+            // the window successfully.
+            sendNotificationToSQS(queue = queue, body = body)
+
+            eventually {
+              getAllObjectContents(bucket = bucket) shouldBe expectedContents
+            }
         }
       }
     }
@@ -166,11 +178,12 @@ class SierraReaderWorkerServiceTest
 
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
-        withWorkerService(bucket, queue, readerConfig = itemsReaderConfig) { service =>
-          whenReady(service.processMessage(notificationMessage).failed) {
-            ex =>
-              ex shouldBe a[SierraReaderException]
-          }
+        withWorkerService(bucket, queue, readerConfig = itemsReaderConfig) {
+          service =>
+            whenReady(service.processMessage(notificationMessage).failed) {
+              ex =>
+                ex shouldBe a[SierraReaderException]
+            }
         }
       }
     }
@@ -189,10 +202,13 @@ class SierraReaderWorkerServiceTest
 
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
-        withWorkerService(bucket, queue, sierraAPIConfig = sierraAPIConfig.copy(apiURL = "http://localhost:5050")) { service =>
-          whenReady(service.processMessage(notificationMessage).failed) {
-            ex =>
-              ex shouldNot be(a[SierraReaderException])
+        withWorkerService(
+          bucket,
+          queue,
+          sierraAPIConfig =
+            sierraAPIConfig.copy(apiURL = "http://localhost:5050")) { service =>
+          whenReady(service.processMessage(notificationMessage).failed) { ex =>
+            ex shouldNot be(a[SierraReaderException])
           }
         }
       }

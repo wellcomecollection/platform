@@ -48,37 +48,36 @@ class ReindexWorkerTest
     testWith: TestWith[(ReindexWorker, QueuePair), Assertion]) = {
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq {
-        case queuePair@QueuePair(queue, dlq) =>
-          withSQSStream[NotificationMessage, Assertion](
-            actorSystem,
-            queue) { sqsStream =>
-            withMaxRecordsScanner(table) { maxRecordsScanner =>
-              withParallelScanner(table) { parallelScanner =>
-                val recordReader = new RecordReader(
-                  maxRecordsScanner = maxRecordsScanner,
-                  parallelScanner = parallelScanner
-                )
-
-                withSNSWriter(topic) { snsWriter =>
-                  val hybridRecordSender = new HybridRecordSender(
-                    snsWriter = snsWriter
+        case queuePair @ QueuePair(queue, dlq) =>
+          withSQSStream[NotificationMessage, Assertion](actorSystem, queue) {
+            sqsStream =>
+              withMaxRecordsScanner(table) { maxRecordsScanner =>
+                withParallelScanner(table) { parallelScanner =>
+                  val recordReader = new RecordReader(
+                    maxRecordsScanner = maxRecordsScanner,
+                    parallelScanner = parallelScanner
                   )
 
-                  val workerService = new ReindexWorker(
-                    recordReader = recordReader,
-                    hybridRecordSender = hybridRecordSender,
-                    sqsStream = sqsStream,
-                    system = actorSystem
-                  )
+                  withSNSWriter(topic) { snsWriter =>
+                    val hybridRecordSender = new HybridRecordSender(
+                      snsWriter = snsWriter
+                    )
 
-                  try {
-                    testWith((workerService, queuePair))
-                  } finally {
-                    workerService.stop()
+                    val workerService = new ReindexWorker(
+                      recordReader = recordReader,
+                      hybridRecordSender = hybridRecordSender,
+                      sqsStream = sqsStream,
+                      system = actorSystem
+                    )
+
+                    try {
+                      testWith((workerService, queuePair))
+                    } finally {
+                      workerService.stop()
+                    }
                   }
                 }
               }
-            }
           }
       }
     }

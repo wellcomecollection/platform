@@ -7,7 +7,10 @@ import uk.ac.wellcome.models.transformable.sierra.SierraBibNumber
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.platform.sierra_reader.config.models.ReaderConfig
 import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
-import uk.ac.wellcome.platform.sierra_reader.models.{SierraResourceTypes, WindowStatus}
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  SierraResourceTypes,
+  WindowStatus
+}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -22,7 +25,8 @@ class WindowManagerTest
     with IntegrationPatience
     with SierraGenerators {
 
-  private def withWindowManager[R](bucket: Bucket)(testWith: TestWith[WindowManager, R]) = {
+  private def withWindowManager[R](bucket: Bucket)(
+    testWith: TestWith[WindowManager, R]) = {
     val windowManager = new WindowManager(
       s3client = s3Client,
       s3Config = createS3ConfigWith(bucket),
