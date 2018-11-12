@@ -15,6 +15,7 @@ import uk.ac.wellcome.test.fixtures._
 import scala.collection.JavaConverters._
 import scala.util.Random
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -29,7 +30,7 @@ object SQS {
 
 }
 
-trait SQS extends Matchers with Logging {
+trait SQS extends Matchers with Logging with MetricsSenderFixture {
 
   import SQS._
 
@@ -144,7 +145,7 @@ trait SQS extends Matchers with Logging {
   def withSQSStream[T, R](
     actorSystem: ActorSystem,
     queue: Queue,
-    metricsSender: MetricsSender)(testwith: TestWith[SQSStream[T], R]) = {
+    metricsSender: MetricsSender)(testWith: TestWith[SQSStream[T], R]): R = {
     val sqsConfig = SQSConfig(queueUrl = queue.url)
 
     val stream = new SQSStream[T](
@@ -153,8 +154,16 @@ trait SQS extends Matchers with Logging {
       sqsConfig = sqsConfig,
       metricsSender = metricsSender)
 
-    testwith(stream)
+    testWith(stream)
   }
+
+  def withSQSStream[T, R](actorSystem: ActorSystem, queue: Queue)(
+    testWith: TestWith[SQSStream[T], R]): R =
+    withMetricsSender(actorSystem) { metricsSender =>
+      withSQSStream[T, R](actorSystem, queue, metricsSender) { stream =>
+        testWith(stream)
+      }
+    }
 
   def createNotificationMessageWith(body: String): NotificationMessage =
     NotificationMessage(body = body)

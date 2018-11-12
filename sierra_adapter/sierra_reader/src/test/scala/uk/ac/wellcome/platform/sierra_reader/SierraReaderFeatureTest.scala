@@ -3,37 +3,32 @@ package uk.ac.wellcome.platform.sierra_reader
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.platform.sierra_reader.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.storage.fixtures.S3
 
 class SierraReaderFeatureTest
     extends FunSpec
-    with fixtures.Server
     with S3
     with SQS
     with Eventually
     with Matchers
-    with IntegrationPatience {
+    with IntegrationPatience
+    with WorkerServiceFixture {
 
   it("reads bibs from Sierra and writes files to S3") {
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
-        val flags = s3LocalFlags(bucket) ++ sqsLocalFlags(queue) ++ Map(
-          "reader.resourceType" -> "bibs",
-          "sierra.apiUrl" -> "http://localhost:8080",
-          "sierra.oauthKey" -> "key",
-          "sierra.oauthSecret" -> "secret",
-          "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title"
-        )
+        withWorkerService(bucket, queue) { service =>
+          service.run()
 
-        val body =
-          """
-            |{
-            | "start": "2013-12-10T17:16:35Z",
-            | "end": "2013-12-13T21:34:35Z"
-            |}
-          """.stripMargin
+          val body =
+            """
+              |{
+              | "start": "2013-12-10T17:16:35Z",
+              | "end": "2013-12-13T21:34:35Z"
+              |}
+            """.stripMargin
 
-        withServer(flags) { _ =>
           sendNotificationToSQS(queue = queue, body = body)
 
           eventually {

@@ -1,23 +1,22 @@
-package uk.ac.wellcome.platform.sierra_reader.modules
+package uk.ac.wellcome.platform.sierra_reader.services
 
 import com.amazonaws.services.s3.AmazonS3
-import com.google.inject.Inject
-import com.twitter.inject.Logging
-import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, WindowStatus}
-import uk.ac.wellcome.models.transformable.sierra.UntypedSierraRecordNumber
-import uk.ac.wellcome.storage.s3.S3Config
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.transformable.sierra.UntypedSierraRecordNumber
+import uk.ac.wellcome.platform.sierra_reader.config.models.ReaderConfig
 import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
+import uk.ac.wellcome.platform.sierra_reader.models.WindowStatus
+import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class WindowManager @Inject()(
+class WindowManager(
   s3client: AmazonS3,
   s3Config: S3Config,
-  sierraConfig: SierraConfig
+  readerConfig: ReaderConfig
 )(implicit ec: ExecutionContext)
     extends Logging {
 
@@ -47,8 +46,12 @@ class WindowManager @Inject()(
             throw SierraReaderException(s"Unable to determine offset in $key")
         }
 
-        val lastBody = IOUtils.toString(
-          s3client.getObject(s3Config.bucketName, key).getObjectContent)
+        val lastBody =
+          scala.io.Source
+            .fromInputStream(
+              s3client.getObject(s3Config.bucketName, key).getObjectContent
+            )
+            .mkString
 
         val maybeLastId = getLastId(lastBody)
 
@@ -68,7 +71,7 @@ class WindowManager @Inject()(
   }
 
   def buildWindowShard(window: String) =
-    s"records_${sierraConfig.resourceType.toString}/${buildWindowLabel(window)}/"
+    s"records_${readerConfig.resourceType.toString}/${buildWindowLabel(window)}/"
 
   def buildWindowLabel(window: String) =
     // Window is a string like [2013-12-01T01:01:01Z,2013-12-01T01:01:01Z].

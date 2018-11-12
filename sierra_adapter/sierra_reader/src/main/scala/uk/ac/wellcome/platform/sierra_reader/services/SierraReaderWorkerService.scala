@@ -2,18 +2,16 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import java.time.Instant
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
-import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.Json
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
 import uk.ac.wellcome.platform.sierra_reader.models.{
-  ReaderConfig,
-  SierraConfig,
   SierraResourceTypes,
   WindowStatus
 }
@@ -27,30 +25,37 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
+import uk.ac.wellcome.platform.sierra_reader.config.models.{
+  ReaderConfig,
+  SierraAPIConfig
+}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
-class SierraReaderWorkerService @Inject()(
-  system: ActorSystem,
+class SierraReaderWorkerService(
   sqsStream: SQSStream[NotificationMessage],
-  windowManager: WindowManager,
   s3client: AmazonS3,
   s3Config: S3Config,
   readerConfig: ReaderConfig,
-  sierraConfig: SierraConfig
-) extends Logging {
-
-  implicit val actorSystem = system
+  sierraAPIConfig: SierraAPIConfig
+)(implicit val actorSystem: ActorSystem)
+    extends Logging {
   implicit val materialiser = ActorMaterializer()
-  implicit val executionContext = system.dispatcher
+  implicit val executionContext = actorSystem.dispatcher
 
-  sqsStream.foreach(
-    streamName = this.getClass.getSimpleName,
-    process = processMessage
+  val windowManager = new WindowManager(
+    s3client = s3client,
+    s3Config = s3Config,
+    readerConfig = readerConfig
   )
+
+  def run(): Future[Done] =
+    sqsStream.foreach(
+      streamName = this.getClass.getSimpleName,
+      process = processMessage
+    )
 
   def processMessage(notificationMessage: NotificationMessage): Future[Unit] =
     for {
@@ -68,7 +73,7 @@ class SierraReaderWorkerService @Inject()(
     info(s"Running the stream with window=$window and status=$windowStatus")
 
     val baseParams =
-      Map("updatedDate" -> window, "fields" -> sierraConfig.fields)
+      Map("updatedDate" -> window, "fields" -> readerConfig.fields)
     val params = windowStatus.id match {
       case Some(id) => baseParams ++ Map("id" -> s"[$id,]")
       case None     => baseParams
@@ -82,13 +87,12 @@ class SierraReaderWorkerService @Inject()(
     )
 
     val sierraSource = SierraSource(
-      apiUrl = sierraConfig.apiUrl,
-      oauthKey = sierraConfig.oauthKey,
-      oauthSecret = sierraConfig.oauthSec,
+      apiUrl = sierraAPIConfig.apiURL,
+      oauthKey = sierraAPIConfig.oauthKey,
+      oauthSecret = sierraAPIConfig.oauthSec,
       throttleRate = ThrottleRate(3, per = 1.second),
-      timeoutMs = 60000)(
-      resourceType = sierraConfig.resourceType.toString,
-      params)
+      timeoutMs = 60000
+    )(resourceType = readerConfig.resourceType.toString, params)
 
     val outcome = sierraSource
       .via(SierraRecordWrapperFlow(createRecord))
@@ -102,20 +106,20 @@ class SierraReaderWorkerService @Inject()(
     outcome.map { _ =>
       s3client.putObject(
         s3Config.bucketName,
-        s"windows_${sierraConfig.resourceType.toString}_complete/${windowManager
+        s"windows_${readerConfig.resourceType.toString}_complete/${windowManager
           .buildWindowLabel(window)}",
         "")
     }
   }
 
   private def createRecord: (String, String, Instant) => AbstractSierraRecord =
-    sierraConfig.resourceType match {
+    readerConfig.resourceType match {
       case SierraResourceTypes.bibs  => SierraBibRecord.apply
       case SierraResourceTypes.items => SierraItemRecord.apply
     }
 
   private def toJson(records: Seq[AbstractSierraRecord]): Json =
-    sierraConfig.resourceType match {
+    readerConfig.resourceType match {
       case SierraResourceTypes.bibs =>
         records.asInstanceOf[Seq[SierraBibRecord]].asJson
       case SierraResourceTypes.items =>

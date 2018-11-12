@@ -48,11 +48,8 @@ trait SierraItemMergerFixtures
     withSierraVHS(sierraDataBucket, table) { vhs =>
       withSierraUpdaterService(vhs) { updaterService =>
         withActorSystem { actorSystem =>
-          withMetricsSender(actorSystem) { metricsSender =>
-            withSQSStream[NotificationMessage, R](
-              actorSystem,
-              queue,
-              metricsSender) { sqsStream =>
+          withSQSStream[NotificationMessage, R](actorSystem, queue) {
+            sqsStream =>
               withSNSWriter(topic) { snsWriter =>
                 val workerService = new SierraItemMergerWorkerService(
                   actorSystem = actorSystem,
@@ -64,7 +61,6 @@ trait SierraItemMergerFixtures
 
                 testWith(workerService)
               }
-            }
           }
         }
       }

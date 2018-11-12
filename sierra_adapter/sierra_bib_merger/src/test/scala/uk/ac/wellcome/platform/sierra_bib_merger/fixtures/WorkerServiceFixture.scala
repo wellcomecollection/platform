@@ -7,7 +7,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
-import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_bib_merger.services.{
   SierraBibMergerUpdaterService,
   SierraBibMergerWorkerService
@@ -23,23 +22,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait WorkerServiceFixture
     extends Akka
     with LocalVersionedHybridStore
-    with MetricsSenderFixture
     with SNS
     with SQS {
   def withApp[R](bucket: Bucket, table: Table, queue: Queue, topic: Topic)(
     testWith: TestWith[SierraBibMergerWorkerService, R]): R =
     withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withTypeVHS[SierraTransformable, EmptyMetadata, R](bucket, table) {
-          versionedHybridStore =>
-            val updaterService = new SierraBibMergerUpdaterService(
-              versionedHybridStore = versionedHybridStore
-            )
+      withTypeVHS[SierraTransformable, EmptyMetadata, R](bucket, table) {
+        versionedHybridStore =>
+          val updaterService = new SierraBibMergerUpdaterService(
+            versionedHybridStore = versionedHybridStore
+          )
 
-            withSQSStream[NotificationMessage, R](
-              actorSystem,
-              queue,
-              metricsSender) { sqsStream =>
+          withSQSStream[NotificationMessage, R](actorSystem, queue) {
+            sqsStream =>
               withSNSWriter(topic) { snsWriter =>
                 val workerService = new SierraBibMergerWorkerService(
                   actorSystem = actorSystem,
@@ -50,8 +45,7 @@ trait WorkerServiceFixture
 
                 testWith(workerService)
               }
-            }
-        }
+          }
       }
     }
 }
