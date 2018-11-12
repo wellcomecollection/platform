@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.reindex.reindex_worker
 
 import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.config.messaging.{SNSBuilder, SQSBuilder}
-import uk.ac.wellcome.config.storage.{DynamoBuilder, S3Builder}
+import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
+import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{MaxRecordsScanner, ParallelScanner, ScanSpecScanner}
 import uk.ac.wellcome.platform.reindex.reindex_worker.services.{HybridRecordSender, RecordReader, ReindexWorkerService}

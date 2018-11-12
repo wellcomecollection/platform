@@ -6,11 +6,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  PartialReindexJob,
-  ReindexJob
-}
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.WorkerServiceFixture
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexJob, PartialReindexJob, ReindexJob}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -20,11 +17,11 @@ class ReindexWorkerFeatureTest
     with Matchers
     with Eventually
     with IntegrationPatience
-    with fixtures.Server
     with LocalDynamoDbVersioned
     with SNS
     with SQS
-    with ScalaFutures {
+    with ScalaFutures
+    with WorkerServiceFixture {
 
   private def createReindexableData(
     table: Table,
@@ -50,10 +47,7 @@ class ReindexWorkerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(
-            queue)
-
-          withServer(flags) { _ =>
+          withWorkerService(queue, table, topic) { _ =>
             val testRecords = createReindexableData(table)
 
             val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
@@ -82,10 +76,7 @@ class ReindexWorkerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(
-            queue)
-
-          withServer(flags) { _ =>
+          withWorkerService(queue, table, topic) { _ =>
             val testRecords = createReindexableData(table, numberOfRecords = 8)
 
             val reindexJob = PartialReindexJob(maxRecords = 1)

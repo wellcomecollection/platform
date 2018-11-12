@@ -4,25 +4,16 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
-  DynamoFixtures,
-  ReindexableTable
-}
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{DynamoFixtures, ReindexableTable, WorkerServiceFixture}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  ReindexJob
-}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexJob, ReindexJob}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReindexWorkerServiceTest
     extends FunSpec
@@ -33,7 +24,8 @@ class ReindexWorkerServiceTest
     with ReindexableTable
     with SNS
     with SQS
-    with ScalaFutures {
+    with ScalaFutures
+    with WorkerServiceFixture {
 
   val exampleRecord = HybridRecord(
     id = "id",
@@ -44,49 +36,11 @@ class ReindexWorkerServiceTest
     )
   )
 
-  def withReindexWorkerService[R](table: Table, topic: Topic)(
-    testWith: TestWith[(ReindexWorkerService, QueuePair), R]): R =
-    withActorSystem { actorSystem =>
-      withLocalSqsQueueAndDlq {
-        case queuePair @ QueuePair(queue, dlq) =>
-          withSQSStream[NotificationMessage, R](actorSystem, queue) {
-            sqsStream =>
-              withMaxRecordsScanner(table) { maxRecordsScanner =>
-                withParallelScanner(table) { parallelScanner =>
-                  val recordReader = new RecordReader(
-                    maxRecordsScanner = maxRecordsScanner,
-                    parallelScanner = parallelScanner
-                  )
-
-                  withSNSWriter(topic) { snsWriter =>
-                    val hybridRecordSender = new HybridRecordSender(
-                      snsWriter = snsWriter
-                    )
-
-                    val workerService = new ReindexWorkerService(
-                      recordReader = recordReader,
-                      hybridRecordSender = hybridRecordSender,
-                      sqsStream = sqsStream,
-                      system = actorSystem
-                    )
-
-                    try {
-                      testWith((workerService, queuePair))
-                    } finally {
-                      workerService.stop()
-                    }
-                  }
-                }
-              }
-          }
-      }
-    }
-
   it("completes a reindex") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(table, topic) {
-          case (service, QueuePair(queue, dlq)) =>
+        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+          withWorkerService(queue, table, topic) { _ =>
             val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
 
             Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
@@ -99,14 +53,19 @@ class ReindexWorkerServiceTest
             eventually {
               val actualRecords: Seq[HybridRecord] =
                 listMessagesReceivedFromSNS(topic)
-                  .map { _.message }
-                  .map { fromJson[HybridRecord](_).get }
+                  .map {
+                    _.message
+                  }
+                  .map {
+                    fromJson[HybridRecord](_).get
+                  }
                   .distinct
 
               actualRecords shouldBe List(exampleRecord)
               assertQueueEmpty(queue)
               assertQueueEmpty(dlq)
             }
+          }
         }
       }
     }
@@ -115,8 +74,8 @@ class ReindexWorkerServiceTest
   it("fails if it cannot parse the SQS message as a ReindexJob") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(table, topic) {
-          case (_, QueuePair(queue, dlq)) =>
+        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+          withWorkerService(queue, table, topic) { _ =>
             sendNotificationToSQS(
               queue = queue,
               body = "<xml>What is JSON.</xl?>"
@@ -135,8 +94,8 @@ class ReindexWorkerServiceTest
     val badTable = Table(name = "doesnotexist", index = "whatindex")
     val badTopic = Topic("does-not-exist")
 
-    withReindexWorkerService(badTable, badTopic) {
-      case (_, QueuePair(queue, dlq)) =>
+    withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+      withWorkerService(queue, badTable, badTopic) { _ =>
         val reindexJob = CompleteReindexJob(segment = 5, totalSegments = 10)
 
         sendNotificationToSQS[ReindexJob](
@@ -148,6 +107,7 @@ class ReindexWorkerServiceTest
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, 1)
         }
+      }
     }
   }
 }
