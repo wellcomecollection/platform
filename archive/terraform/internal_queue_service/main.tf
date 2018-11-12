@@ -17,8 +17,8 @@ module "service" {
   ecs_cluster_id   = "${data.aws_ecs_cluster.cluster.id}"
   ecs_cluster_name = "${var.cluster_name}"
 
-  cpu    = 1024
-  memory = 2048
+  cpu    = 512
+  memory = 1024
 
   env_vars        = "${var.env_vars}"
   env_vars_length = "${var.env_vars_length}"

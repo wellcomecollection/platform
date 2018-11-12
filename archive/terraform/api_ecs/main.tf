@@ -32,6 +32,6 @@ module "api_ecs" {
   service_discovery_namespace = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   health_check_path           = "${var.api_path}/healthcheck"
 
-  cpu    = 1024
-  memory = 2048
+  cpu    = 512
+  memory = 1024
 }

@@ -18,8 +18,8 @@ module "goobi_reader_service" {
 
   env_vars_length = 4
 
-  cpu    = 512
-  memory = 2048
+  cpu    = 256
+  memory = 1024
 
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
 
