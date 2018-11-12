@@ -27,17 +27,17 @@ class DynamoRowLockDao @Inject()(
     )
 
   private val defaultDuration = Duration.ofSeconds(180)
-  private val table = Table[RowLock](config.tableName)
-  private val index = config.indexName
+  private val table = Table[RowLock](dynamoConfig.table)
+  private val index = dynamoConfig.index
 
-  private def getExpiry = {
+  private def getExpiry: (Instant, Instant) = {
     val created = Instant.now()
     val expires = created.plus(defaultDuration)
 
     (created, expires)
   }
 
-  def lockRow(id: Identifier, contextId: String) =
+  def lockRow(id: Identifier, contextId: String): Future[RowLock] =
     Future {
       val (created, expires) = getExpiry
       val rowLock = RowLock(id.id, contextId, created, expires)
@@ -52,15 +52,14 @@ class DynamoRowLockDao @Inject()(
 
       result match {
         case Right(_) => rowLock
-        case Left(error) => {
+        case Left(error) =>
           debug(s"Failed to lock $rowLock $error")
           throw FailedLockException(s"Failed to lock $id", error)
-        }
       }
     }.recover {
       case exception: Exception =>
         val errorMsg =
-          s"Problem locking row ${id} in context [$contextId], ${exception.getClass.getSimpleName} ${exception.getMessage}"
+          s"Problem locking row $id in context [$contextId], ${exception.getClass.getSimpleName} ${exception.getMessage}"
         debug(errorMsg)
         throw FailedLockException(errorMsg, exception)
     }
