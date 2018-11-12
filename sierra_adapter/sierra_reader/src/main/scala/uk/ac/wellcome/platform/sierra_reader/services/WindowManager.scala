@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
+import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.UntypedSierraRecordNumber
 import uk.ac.wellcome.platform.sierra_reader.config.models.ReaderConfig

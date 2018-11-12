@@ -30,7 +30,6 @@ object Main extends App with Logging {
   )
 
   val workerService = new SierraReaderWorkerService(
-    actorSystem = actorSystem,
     sqsStream = sqsStream,
     s3client = S3Builder.buildS3Client(config),
     s3Config = S3Builder.buildS3Config(config),

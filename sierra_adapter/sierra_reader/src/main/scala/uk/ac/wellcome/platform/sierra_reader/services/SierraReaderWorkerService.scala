@@ -25,13 +25,12 @@ import scala.concurrent.duration._
 import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
 class SierraReaderWorkerService(
-  actorSystem: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   s3client: AmazonS3,
   s3Config: S3Config,
   readerConfig: ReaderConfig,
   sierraAPIConfig: SierraAPIConfig
-) extends Logging {
+)(implicit val actorSystem: ActorSystem) extends Logging {
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = actorSystem.dispatcher
 

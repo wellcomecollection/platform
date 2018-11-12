@@ -20,17 +20,15 @@ trait WorkerServiceFixture extends Akka with SQS with S3 {
     withActorSystem { actorSystem =>
       withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
         val workerService = new SierraReaderWorkerService(
-          actorSystem = actorSystem,
           sqsStream = sqsStream,
           s3client = s3Client,
           s3Config = createS3ConfigWith(bucket),
           readerConfig = ReaderConfig(
             resourceType = SierraResourceTypes.bibs,
-            fields = "updatedDate,deletedDate,deleted,suppressed,author,title",
-            batchSize = 50
+            fields = "updatedDate,deletedDate,deleted,suppressed,author,title"
           ),
           sierraAPIConfig =
-        )
+        )(actorSystem)
 
         testWith(workerService)
       }
@@ -38,14 +36,12 @@ trait WorkerServiceFixture extends Akka with SQS with S3 {
 
   val bibsReaderConfig: ReaderConfig = ReaderConfig(
     resourceType = SierraResourceTypes.bibs,
-    fields = "updatedDate,deletedDate,deleted,suppressed,author,title",
-    batchSize = 50
+    fields = "updatedDate,deletedDate,deleted,suppressed,author,title"
   )
 
   val itemsReaderConfig: ReaderConfig = ReaderConfig(
     resourceType = SierraResourceTypes.items,
-    fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
-    batchSize = 50
+    fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields"
   )
 
   val sierraAPIConfig: SierraAPIConfig = SierraAPIConfig(

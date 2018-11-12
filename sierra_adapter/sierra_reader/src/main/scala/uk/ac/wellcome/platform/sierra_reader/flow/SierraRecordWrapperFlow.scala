@@ -5,7 +5,7 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
 import uk.ac.wellcome.models.transformable.sierra.AbstractSierraRecord
