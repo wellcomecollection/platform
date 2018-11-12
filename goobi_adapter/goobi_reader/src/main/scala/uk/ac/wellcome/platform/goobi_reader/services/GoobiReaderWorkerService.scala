@@ -2,11 +2,12 @@ package uk.ac.wellcome.platform.goobi_reader.services
 
 import java.io.InputStream
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.goobi_reader.models.{GoobiRecordMetadata, S3Event, S3Record}
@@ -18,23 +19,22 @@ import uk.ac.wellcome.json.JsonUtil._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.Try
 
-class GoobiReaderWorkerService @Inject()(
+class GoobiReaderWorkerService(
   s3Client: AmazonS3,
-  system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   versionedHybridStore: VersionedHybridStore[InputStream,
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]
-) extends Logging {
+)(implicit val actorSystem: ActorSystem) extends Logging {
 
-  implicit val actorSystem: ActorSystem = system
   implicit val materialiser: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
+  implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
 
-  sqsStream.foreach(
-    streamName = this.getClass.getSimpleName,
-    process = processMessage
-  )
+  def run(): Future[Done] =
+    sqsStream.foreach(
+      streamName = this.getClass.getSimpleName,
+      process = processMessage
+    )
 
   private def processMessage(snsNotification: NotificationMessage) = {
     debug(s"Received notification: $snsNotification")

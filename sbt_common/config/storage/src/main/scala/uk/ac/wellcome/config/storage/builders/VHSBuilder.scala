@@ -2,7 +2,8 @@ package uk.ac.wellcome.config.storage.builders
 
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
-import uk.ac.wellcome.storage.vhs.VHSConfig
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.vhs.{VHSConfig, VersionedHybridStore}
 
 object VHSBuilder {
   def buildVHSConfig(config: Config): VHSConfig = {
@@ -19,4 +20,11 @@ object VHSBuilder {
       globalS3Prefix = globalS3Prefix
     )
   }
+
+  def buildVHS[T, M](config: Config): VersionedHybridStore[T, M, ObjectStore[T]] =
+    new VersionedHybridStore[T, M, ObjectStore[T]](
+      vhsConfig = buildVHSConfig(config),
+      objectStore = ObjectStore[T],
+      dynamoDbClient = DynamoBuilder.buildDynamoClient(config)
+    )
 }
