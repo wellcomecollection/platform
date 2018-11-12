@@ -1,7 +1,4 @@
-resource "aws_api_gateway_vpc_link" "link" {
-  name        = "${var.namespace}_vpc_link"
-  target_arns = ["${module.nlb.arn}"]
-}
+# API
 
 resource "aws_api_gateway_rest_api" "api" {
   name = "Catalogue API"
@@ -14,7 +11,7 @@ resource "aws_api_gateway_rest_api" "api" {
 # Stages
 
 module "prod" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=290a16393da3018435edcb26ba144582b6fb1b2b"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.1.0"
   domain_name = "api.wellcomecollection.org"
 
   stage_name = "prod"
@@ -28,7 +25,7 @@ module "prod" {
 }
 
 module "stage" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=290a16393da3018435edcb26ba144582b6fb1b2b"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v13.1.0"
   domain_name = "api-stage.wellcomecollection.org"
 
   stage_name = "stage"
@@ -41,15 +38,17 @@ module "stage" {
   base_path = "catalogue"
 }
 
+# Resources
+
 module "root_resource_method" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/method?ref=v13.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/method?ref=v13.1.0"
 
   api_id      = "${aws_api_gateway_rest_api.api.id}"
   resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
 }
 
 module "root_resource_integration" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v13.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v13.1.0"
 
   api_id        = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_rest_api.api.root_resource_id}"
@@ -63,7 +62,7 @@ module "root_resource_integration" {
 }
 
 module "simple_resource" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/resource?ref=v13.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/resource?ref=v13.1.0"
 
   api_id = "${aws_api_gateway_rest_api.api.id}"
 
@@ -76,7 +75,7 @@ module "simple_resource" {
 }
 
 module "simple_integration" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v13.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v13.1.0"
 
   api_id        = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${module.simple_resource.resource_id}"
@@ -91,4 +90,11 @@ module "simple_integration" {
   request_parameters = {
     integration.request.path.proxy = "method.request.path.proxy"
   }
+}
+
+# Link
+
+resource "aws_api_gateway_vpc_link" "link" {
+  name        = "${var.namespace}_vpc_link"
+  target_arns = ["${module.nlb.arn}"]
 }
