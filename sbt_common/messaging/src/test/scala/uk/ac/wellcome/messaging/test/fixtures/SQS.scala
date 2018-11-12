@@ -146,7 +146,7 @@ trait SQS extends Matchers with Logging with MetricsSenderFixture {
     actorSystem: ActorSystem,
     queue: Queue,
     metricsSender: MetricsSender)(testWith: TestWith[SQSStream[T], R]): R = {
-    val sqsConfig = SQSConfig(queueUrl = queue.url)
+    val sqsConfig = createSQSConfigWith(queue)
 
     val stream = new SQSStream[T](
       sqsClient = asyncSqsClient,
@@ -160,8 +160,8 @@ trait SQS extends Matchers with Logging with MetricsSenderFixture {
   def withSQSStream[T, R](actorSystem: ActorSystem, queue: Queue)(
     testWith: TestWith[SQSStream[T], R]): R =
     withMetricsSender(actorSystem) { metricsSender =>
-      withSQSStream[T, R](actorSystem, queue, metricsSender) { stream =>
-        testWith(stream)
+      withSQSStream[T, R](actorSystem, queue, metricsSender) { sqsStream =>
+        testWith(sqsStream)
       }
     }
 

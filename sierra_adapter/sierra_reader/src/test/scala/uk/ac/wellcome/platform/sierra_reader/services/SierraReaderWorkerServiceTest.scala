@@ -5,7 +5,6 @@ import org.scalatest.Matchers
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.messaging.test.fixtures.SQS
@@ -24,7 +23,6 @@ class SierraReaderWorkerServiceTest
     with Eventually
     with Matchers
     with IntegrationPatience
-    with MetricsSenderFixture
     with ScalaFutures
     with WorkerServiceFixture {
 

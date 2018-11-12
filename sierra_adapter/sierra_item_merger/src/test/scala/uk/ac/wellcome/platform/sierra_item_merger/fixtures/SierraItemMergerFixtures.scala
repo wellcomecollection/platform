@@ -7,7 +7,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_item_merger.services.{
   SierraItemMergerUpdaterService,
   SierraItemMergerWorkerService
@@ -25,7 +24,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait SierraItemMergerFixtures
     extends Akka
     with LocalVersionedHybridStore
-    with MetricsSenderFixture
     with SNS
     with SQS
     with SierraAdapterHelpers {

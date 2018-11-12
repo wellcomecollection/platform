@@ -7,7 +7,6 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.platform.goobi_reader.models.GoobiRecordMetadata
 import uk.ac.wellcome.platform.goobi_reader.services.GoobiReaderWorkerService
@@ -21,7 +20,6 @@ class GoobiReaderFeatureTest
     with Akka
     with Eventually
     with Matchers
-    with MetricsSenderFixture
     with IntegrationPatience
     with GoobiReaderFixtures
     with Inside {
@@ -61,19 +59,17 @@ class GoobiReaderFeatureTest
 
   private def withWorkerService[R](queue: Queue, bucket: Bucket, table: Table)(testWith: TestWith[GoobiReaderWorkerService, R]): R =
     withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
-          withTypeVHS[InputStream, GoobiRecordMetadata, R](bucket, table) { vhs =>
-            val workerService = new GoobiReaderWorkerService(
-              s3Client = s3Client,
-              sqsStream = sqsStream,
-              versionedHybridStore = vhs
-            )
+      withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+        withTypeVHS[InputStream, GoobiRecordMetadata, R](bucket, table) { vhs =>
+          val workerService = new GoobiReaderWorkerService(
+            s3Client = s3Client,
+            sqsStream = sqsStream,
+            versionedHybridStore = vhs
+          )
 
-            workerService.run()
+          workerService.run()
 
-            testWith(workerService)
-          }
+          testWith(workerService)
         }
       }
     }
