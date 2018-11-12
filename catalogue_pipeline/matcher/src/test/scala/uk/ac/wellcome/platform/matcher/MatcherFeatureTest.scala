@@ -26,87 +26,68 @@ class MatcherFeatureTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) {
-              graphTable =>
-                withMatcherServer(
-                  queue,
-                  storageBucket,
-                  topic,
-                  graphTable,
-                  lockTable) { _ =>
-                  val work = createUnidentifiedWork
+          withWorkerService(queue, storageBucket, topic) { _ =>
+            val work = createUnidentifiedWork
 
-                  sendMessage[TransformedBaseWork](
-                    bucket = storageBucket,
-                    queue = queue,
-                    work
-                  )
+            sendMessage[TransformedBaseWork](
+              bucket = storageBucket,
+              queue = queue,
+              work
+            )
 
-                  eventually {
-                    val snsMessages = listMessagesReceivedFromSNS(topic)
-                    snsMessages.size should be >= 1
+            eventually {
+              val snsMessages = listMessagesReceivedFromSNS(topic)
+              snsMessages.size should be >= 1
 
-                    snsMessages.map { snsMessage =>
-                      val identifiersList =
-                        fromJson[MatcherResult](snsMessage.message).get
+              snsMessages.map { snsMessage =>
+                val identifiersList =
+                  fromJson[MatcherResult](snsMessage.message).get
 
-                      identifiersList shouldBe
-                        MatcherResult(
-                          Set(MatchedIdentifiers(
-                            Set(WorkIdentifier(work))
-                          )))
-                    }
-                  }
-                }
+                identifiersList shouldBe
+                  MatcherResult(
+                    Set(MatchedIdentifiers(
+                      Set(WorkIdentifier(work))
+                    )))
+              }
             }
           }
         }
       }
     }
-  }
 
   it(
     "does not process a message if the work version is older than that already stored") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
-          withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) {
-              graphTable =>
-                withMatcherServer(
-                  queuePair.queue,
-                  storageBucket,
-                  topic,
-                  graphTable,
-                  lockTable) { _ =>
-                  val existingWorkVersion = 2
-                  val updatedWorkVersion = 1
+          withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
+            withWorkerService(queuePair.queue, storageBucket, topic, graphTable) { _ =>
+              val existingWorkVersion = 2
+              val updatedWorkVersion = 1
 
-                  val workAv1 = createUnidentifiedWorkWith(
-                    version = updatedWorkVersion
-                  )
+              val workAv1 = createUnidentifiedWorkWith(
+                version = updatedWorkVersion
+              )
 
-                  val existingWorkAv2 = WorkNode(
-                    id = workAv1.sourceIdentifier.toString,
-                    version = existingWorkVersion,
-                    linkedIds = Nil,
-                    componentId = workAv1.sourceIdentifier.toString
-                  )
-                  Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
+              val existingWorkAv2 = WorkNode(
+                id = workAv1.sourceIdentifier.toString,
+                version = existingWorkVersion,
+                linkedIds = Nil,
+                componentId = workAv1.sourceIdentifier.toString
+              )
+              Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
-                  sendMessage[TransformedBaseWork](
-                    bucket = storageBucket,
-                    queue = queuePair.queue,
-                    workAv1
-                  )
+              sendMessage[TransformedBaseWork](
+                bucket = storageBucket,
+                queue = queuePair.queue,
+                workAv1
+              )
 
-                  eventually {
-                    noMessagesAreWaitingIn(queuePair.queue)
-                    noMessagesAreWaitingIn(queuePair.dlq)
-                    listMessagesReceivedFromSNS(topic).size shouldBe 0
-                  }
-                }
+              eventually {
+                noMessagesAreWaitingIn(queuePair.queue)
+                noMessagesAreWaitingIn(queuePair.dlq)
+                listMessagesReceivedFromSNS(topic).size shouldBe 0
+              }
             }
           }
         }

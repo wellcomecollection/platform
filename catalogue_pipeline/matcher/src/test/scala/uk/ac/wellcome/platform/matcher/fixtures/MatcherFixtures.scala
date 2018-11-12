@@ -34,38 +34,47 @@ trait MatcherFixtures
   def withWorkerService[R](
     queue: SQS.Queue,
     storageBucket: Bucket,
-    topic: Topic)(testWith: TestWith[MatcherWorkerService, R])(
+    topic: Topic,
+    graphTable: Table)(testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { actorSystem =>
         withMockMetricSender { metricsSender =>
           withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) {
-              graphTable =>
-                withWorkGraphStore(graphTable) { workGraphStore =>
-                  withWorkMatcher(workGraphStore, lockTable, metricsSender) {
-                    workMatcher =>
-                      withMessageStream[TransformedBaseWork, R](
-                        actorSystem = actorSystem,
-                        bucket = storageBucket,
-                        queue = queue,
-                        metricsSender = metricsSender
-                      ) { messageStream =>
-                        val workerService = new MatcherWorkerService(
-                          messageStream = messageStream,
-                          snsWriter = snsWriter,
-                          workMatcher = workMatcher
-                        )
+            withWorkGraphStore(graphTable) { workGraphStore =>
+              withWorkMatcher(workGraphStore, lockTable, metricsSender) {
+                workMatcher =>
+                  withMessageStream[TransformedBaseWork, R](
+                    actorSystem = actorSystem,
+                    bucket = storageBucket,
+                    queue = queue,
+                    metricsSender = metricsSender
+                  ) { messageStream =>
+                    val workerService = new MatcherWorkerService(
+                      messageStream = messageStream,
+                      snsWriter = snsWriter,
+                      workMatcher = workMatcher
+                    )
 
-                        workerService.run()
+                    workerService.run()
 
-                        testWith(workerService)
-                      }
+                    testWith(workerService)
                   }
-                }
+              }
             }
           }
         }
+      }
+    }
+
+  def withWorkerService[R](
+    queue: SQS.Queue,
+    storageBucket: Bucket,
+    topic: Topic)(testWith: TestWith[MatcherWorkerService, R])(
+    implicit objectStore: ObjectStore[TransformedBaseWork]): R =
+    withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
+      withWorkerService(queue, storageBucket, topic, graphTable) { service =>
+        testWith(service)
       }
     }
 

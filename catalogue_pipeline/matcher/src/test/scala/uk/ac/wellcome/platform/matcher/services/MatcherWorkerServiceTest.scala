@@ -34,7 +34,7 @@ class MatcherWorkerServiceTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             // Work Av1 created without any matched works
             val updatedWork = createUnidentifiedSierraWork
             val expectedMatchedWorks =
@@ -58,7 +58,7 @@ class MatcherWorkerServiceTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             val invisibleWork = createUnidentifiedInvisibleWork
             val expectedMatchedWorks =
               MatcherResult(
@@ -86,7 +86,7 @@ class MatcherWorkerServiceTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 =
               createUnidentifiedWorkWith(
@@ -118,7 +118,7 @@ class MatcherWorkerServiceTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 =
               createUnidentifiedWorkWith(sourceIdentifier = identifierA)
@@ -207,7 +207,7 @@ class MatcherWorkerServiceTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 = createUnidentifiedWorkWith(
               sourceIdentifier = identifierA,
@@ -279,8 +279,7 @@ class MatcherWorkerServiceTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queuePair.queue, storageBucket, topic) {
-            _ =>
+          withWorkerService(queuePair.queue, storageBucket, topic) { _ =>
               // process Work V2
               val workAv2 = createUnidentifiedWorkWith(
                 sourceIdentifier = identifierA,

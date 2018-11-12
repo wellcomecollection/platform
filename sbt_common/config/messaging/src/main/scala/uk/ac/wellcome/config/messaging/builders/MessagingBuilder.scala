@@ -5,6 +5,8 @@ import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.messaging.message.{MessageReaderConfig, MessageStream}
+import uk.ac.wellcome.storage.s3.S3StorageBackend
+import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
 
 object MessagingBuilder {
   def buildMessageReaderConfig(config: Config): MessageReaderConfig =
@@ -14,7 +16,11 @@ object MessagingBuilder {
 
     )
 
-  def buildMessageStream[T](config: Config): MessageStream[T] =
+  def buildMessageStream[T](config: Config)(implicit serialisationStrategy: SerialisationStrategy[T]): MessageStream[T] = {
+    implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
+      s3Client = S3Builder.buildS3Client(config)
+    )
+
     new MessageStream[T](
       actorSystem = AkkaBuilder.buildActorSystem(),
       sqsClient = SQSBuilder.buildSQSAsyncClient(config),
@@ -22,4 +28,5 @@ object MessagingBuilder {
       messageReaderConfig = buildMessageReaderConfig(config),
       metricsSender = MetricsBuilder.buildMetricsSender(config)
     )
+  }
 }
