@@ -181,6 +181,8 @@ class SierraItemsToDynamoWorkerServiceTest
             snsWriter = snsWriter
           )
 
+          service.run()
+
           testWith(service)
         }
     }
