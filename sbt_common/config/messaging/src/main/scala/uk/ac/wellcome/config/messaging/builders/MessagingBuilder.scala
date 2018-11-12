@@ -8,6 +8,8 @@ import uk.ac.wellcome.messaging.message.{MessageReaderConfig, MessageStream}
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
 
+import scala.concurrent.ExecutionContext
+
 object MessagingBuilder {
   def buildMessageReaderConfig(config: Config): MessageReaderConfig =
     MessageReaderConfig(
@@ -17,6 +19,9 @@ object MessagingBuilder {
     )
 
   def buildMessageStream[T](config: Config)(implicit serialisationStrategy: SerialisationStrategy[T]): MessageStream[T] = {
+    implicit val executionContext: ExecutionContext =
+      AkkaBuilder.buildExecutionContext()
+
     implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
       s3Client = S3Builder.buildS3Client(config)
     )

@@ -54,6 +54,7 @@ class MatcherFeatureTest
         }
       }
     }
+  }
 
   it(
     "does not process a message if the work version is older than that already stored") {

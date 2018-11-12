@@ -7,13 +7,14 @@ import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SNSBuilder}
 import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.matcher.locking.{DynamoLockingService, DynamoRowLockDao}
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.services.MatcherWorkerService
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
 
 object Main extends App with Logging {
@@ -21,6 +22,8 @@ object Main extends App with Logging {
 
   implicit val actorSystem: ActorSystem =
     AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
   val dynamoClient = DynamoBuilder.buildDynamoClient(config)
 
