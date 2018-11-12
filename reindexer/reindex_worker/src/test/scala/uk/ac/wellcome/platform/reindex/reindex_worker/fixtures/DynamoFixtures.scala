@@ -7,7 +7,6 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
 }
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,10 +23,7 @@ trait DynamoFixtures extends LocalDynamoDb {
     withScanSpecScanner { scanSpecScanner =>
       val scanner = new ParallelScanner(
         scanSpecScanner = scanSpecScanner,
-        dynamoConfig = DynamoConfig(
-          table = table.name,
-          index = table.index
-        )
+        dynamoConfig = createDynamoConfigWith(table)
       )
 
       testWith(scanner)
@@ -39,10 +35,7 @@ trait DynamoFixtures extends LocalDynamoDb {
     withScanSpecScanner { scanSpecScanner =>
       val scanner = new MaxRecordsScanner(
         scanSpecScanner = scanSpecScanner,
-        dynamoConfig = DynamoConfig(
-          table = table.name,
-          index = table.index
-        )
+        dynamoConfig = createDynamoConfigWith(table)
       )
 
       testWith(scanner)
