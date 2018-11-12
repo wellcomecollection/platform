@@ -1,14 +1,13 @@
 package uk.ac.wellcome.platform.matcher.storage
 
-import com.google.inject.Inject
 import com.gu.scanamo.error.DynamoReadError
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WorkGraphStore @Inject()(workNodeDao: WorkNodeDao)(
+class WorkGraphStore(workNodeDao: WorkNodeDao)(
   implicit ec: ExecutionContext)
     extends Logging {
 

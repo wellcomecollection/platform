@@ -3,13 +3,12 @@ package uk.ac.wellcome.platform.matcher.locking
 import java.util.UUID.randomUUID
 
 import grizzled.slf4j.Logging
-import javax.inject.Inject
 import uk.ac.wellcome.monitoring.MetricsSender
 
 import scala.collection.Set
 import scala.concurrent.{ExecutionContext, Future}
 
-class DynamoLockingService @Inject()(
+class DynamoLockingService(
   dynamoRowLockDao: DynamoRowLockDao,
   metricsSender: MetricsSender)(implicit ec: ExecutionContext)
     extends Logging {
