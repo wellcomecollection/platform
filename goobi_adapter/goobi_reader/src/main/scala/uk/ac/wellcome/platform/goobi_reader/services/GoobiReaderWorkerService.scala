@@ -9,8 +9,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
-import uk.ac.wellcome.platform.goobi_reader.GoobiRecordMetadata
-import uk.ac.wellcome.platform.goobi_reader.models.{S3Event, S3Record}
+import uk.ac.wellcome.platform.goobi_reader.models.{GoobiRecordMetadata, S3Event, S3Record}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{VHSIndexEntry, VersionedHybridStore}
