@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client}
 import com.gu.scanamo.Scanamo
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.{FunSpec, Inside}
+import org.scalatest.{Assertion, FunSpec, Inside}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -237,8 +237,7 @@ class GoobiReaderWorkerServiceTest
                                  expectedMetadata: GoobiRecordMetadata,
                                  expectedContents: String,
                                  table: Table,
-                                 bucket: Bucket) = {
-
+                                 bucket: Bucket): Assertion =
     inside(getHybridRecord(table, id)) {
       case HybridRecord(actualId, actualVersion, location) =>
         actualId shouldBe id
@@ -246,7 +245,6 @@ class GoobiReaderWorkerServiceTest
         getRecordMetadata[GoobiRecordMetadata](table, id) shouldBe expectedMetadata
         getContentFromS3(location) shouldBe expectedContents
     }
-  }
 
   private def assertMessageSentToDlq(queue: Queue, dlq: Queue) = {
     assertQueueEmpty(queue)
@@ -301,13 +299,13 @@ class GoobiReaderWorkerServiceTest
               queue,
               mockMetricsSender) { sqsStream =>
               withS3StreamStoreFixtures {
-                case (bucket, table, vhs) =>
+                case (bucket, table, versionedHybridStore) =>
                   new GoobiReaderWorkerService(
-                    s3Client,
-                    actorSystem,
-                    sqsStream,
-                    vhs)
-                  testWith((bucket, queuePair, mockMetricsSender, table, vhs))
+                    s3Client = s3Client,
+                    sqsStream = sqsStream,
+                    versionedHybridStore = versionedHybridStore
+                  )
+                  testWith((bucket, queuePair, mockMetricsSender, table, versionedHybridStore))
               }
             }
           }
