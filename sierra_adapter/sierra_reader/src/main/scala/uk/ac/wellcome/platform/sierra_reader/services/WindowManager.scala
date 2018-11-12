@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.UntypedSierraRecordNumber
 import uk.ac.wellcome.platform.sierra_reader.config.models.ReaderConfig
@@ -46,8 +45,12 @@ class WindowManager(
             throw SierraReaderException(s"Unable to determine offset in $key")
         }
 
-        val lastBody = IOUtils.toString(
-          s3client.getObject(s3Config.bucketName, key).getObjectContent)
+        val lastBody =
+          scala.io.Source
+            .fromInputStream(
+              s3client.getObject(s3Config.bucketName, key).getObjectContent
+            )
+            .mkString
 
         val maybeLastId = getLastId(lastBody)
 
