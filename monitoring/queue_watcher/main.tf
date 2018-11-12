@@ -6,7 +6,7 @@ module "lambda_queue_watcher" {
 
   name        = "queue_watcher"
   description = "Post custom notification for queue size on all queues"
-  timeout     = 15
+  timeout     = 30
 
   environment_variables = {
     PLACEHOLDER = "value"

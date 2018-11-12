@@ -9,3 +9,9 @@ resource "aws_cloudwatch_event_rule" "every_minute" {
   description         = "Fires every minute"
   schedule_expression = "rate(1 minute)"
 }
+
+resource "aws_cloudwatch_event_rule" "every_2_minutes" {
+  name                = "every_other_minute_lambdas"
+  description         = "Fires every other minute"
+  schedule_expression = "rate(2 minute)"
+}
