@@ -9,13 +9,14 @@ import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import grizzled.slf4j.Logging
 import javax.inject.Inject
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class DynamoRowLockDao @Inject()(
   dynamoDBClient: AmazonDynamoDB,
-  config: DynamoLockingServiceConfig)(implicit ec: ExecutionContext)
+  dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
@@ -106,8 +107,6 @@ class DynamoRowLockDao @Inject()(
     }
   }
 }
-
-case class DynamoLockingServiceConfig(tableName: String, indexName: String)
 
 case class FailedLockException(message: String, cause: Throwable)
     extends Exception(message, cause)
