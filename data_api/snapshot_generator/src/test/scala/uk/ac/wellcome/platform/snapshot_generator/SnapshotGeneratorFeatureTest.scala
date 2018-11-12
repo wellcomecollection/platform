@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.snapshot_generator
 import java.io.File
 
 import com.amazonaws.services.s3.model.GetObjectRequest
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
@@ -28,6 +27,8 @@ import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.platform.snapshot_generator.services.{SnapshotGeneratorWorkerService, SnapshotService}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SnapshotGeneratorFeatureTest
     extends FunSpec
@@ -130,8 +131,7 @@ class SnapshotGeneratorFeatureTest
                         documentType = itemType,
                         indexV1name = indexV1name,
                         indexV2name = indexV2name
-                      ),
-                      objectMapper = new ObjectMapper
+                      )
                     )
 
                     withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>

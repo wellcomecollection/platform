@@ -7,9 +7,9 @@ import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions.AwsRegionProvider
-import com.twitter.finagle.client.MethodBuilder.Config
+import com.typesafe.config.Config
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
+import uk.ac.wellcome.config.core.builders.{AkkaBuilder, AWSClientConfigBuilder}
 import uk.ac.wellcome.config.core.models.AWSClientConfig
 
 object AkkaS3Builder extends AWSClientConfigBuilder with Logging {

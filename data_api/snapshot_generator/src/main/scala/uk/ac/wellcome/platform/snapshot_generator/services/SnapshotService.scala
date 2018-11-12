@@ -7,6 +7,7 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.Logging
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
@@ -31,12 +32,13 @@ class SnapshotService(
   actorSystem: ActorSystem,
   akkaS3Client: S3Client,
   elasticClient: HttpClient,
-  elasticConfig: DisplayElasticConfig,
-  objectMapper: ObjectMapper)(
+  elasticConfig: DisplayElasticConfig)(
   implicit ec: ExecutionContext
 ) extends Logging {
   implicit val system: ActorSystem = actorSystem
   implicit val materializer = ActorMaterializer()
+
+  val objectMapper = new ObjectMapper with ScalaObjectMapper
 
   val s3Endpoint = akkaS3Client.s3Settings.endpointUrl.getOrElse("s3:/")
 

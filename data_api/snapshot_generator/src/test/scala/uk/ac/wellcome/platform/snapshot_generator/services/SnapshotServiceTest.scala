@@ -46,9 +46,9 @@ class SnapshotServiceTest
     with ElasticsearchFixtures
     with WorksGenerators {
 
-  val mapper = new ObjectMapper with ScalaObjectMapper
-
   val itemType = "work"
+
+  val mapper = new ObjectMapper with ScalaObjectMapper
 
   private def withSnapshotService[R](
     actorSystem: ActorSystem,
@@ -65,8 +65,7 @@ class SnapshotServiceTest
       actorSystem = actorSystem,
       elasticClient = elasticClient,
       elasticConfig = elasticConfig,
-      akkaS3Client = s3AkkaClient,
-      objectMapper = mapper
+      akkaS3Client = s3AkkaClient
     )
 
     testWith(snapshotService)
@@ -280,8 +279,7 @@ class SnapshotServiceTest
               actorSystem = actorSystem,
               elasticClient = elasticClient,
               elasticConfig = elasticConfig,
-              akkaS3Client = s3Client,
-              objectMapper = mapper
+              akkaS3Client = s3Client
             )
             val snapshotJob = SnapshotJob(
               publicBucketName = bucket.name,
@@ -325,14 +323,13 @@ class SnapshotServiceTest
               actorSystem = actorSystem,
               elasticClient = elasticClient,
               elasticConfig = elasticConfig,
-              akkaS3Client = s3Client,
-              objectMapper = mapper
+              akkaS3Client = s3Client
             )
 
             snapshotService.buildLocation(
               bucketName = "bukkit",
               objectKey = "snapshot.json.gz"
-            ) shouldBe Uri("s3://bukkit/snapshot.json.gz")
+            ) shouldBe Uri("http://localhost:33333/bukkit/snapshot.json.gz")
           }
         }
       }
