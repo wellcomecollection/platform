@@ -19,7 +19,7 @@ trait DynamoFixtures extends LocalDynamoDb {
   }
 
   def withParallelScanner[R](table: Table)(
-    testWith: TestWith[ParallelScanner, R]): R = {
+    testWith: TestWith[ParallelScanner, R]): R =
     withScanSpecScanner { scanSpecScanner =>
       val scanner = new ParallelScanner(
         scanSpecScanner = scanSpecScanner,
@@ -28,10 +28,9 @@ trait DynamoFixtures extends LocalDynamoDb {
 
       testWith(scanner)
     }
-  }
 
   def withMaxRecordsScanner[R](table: Table)(
-    testWith: TestWith[MaxRecordsScanner, R]): R = {
+    testWith: TestWith[MaxRecordsScanner, R]): R =
     withScanSpecScanner { scanSpecScanner =>
       val scanner = new MaxRecordsScanner(
         scanSpecScanner = scanSpecScanner,
@@ -40,5 +39,4 @@ trait DynamoFixtures extends LocalDynamoDb {
 
       testWith(scanner)
     }
-  }
 }
