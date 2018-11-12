@@ -5,11 +5,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
-import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.services.{
   SierraItemMergerUpdaterService,
@@ -29,13 +27,6 @@ object Main extends App with Logging {
   implicit val executionContext: ExecutionContext =
     AkkaBuilder.buildExecutionContext()
 
-  val sqsStream = new SQSStream[NotificationMessage](
-    actorSystem = actorSystem,
-    sqsClient = SQSBuilder.buildSQSAsyncClient(config),
-    sqsConfig = SQSBuilder.buildSQSConfig(config),
-    metricsSender = MetricsBuilder.buildMetricsSender(config)
-  )
-
   val versionedHybridStore =
     SierraTransformableVHSBuilder.buildSierraVHS(config)
 
@@ -49,7 +40,7 @@ object Main extends App with Logging {
 
   val workerService = new SierraItemMergerWorkerService(
     actorSystem = actorSystem,
-    sqsStream = sqsStream,
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
     sierraItemMergerUpdaterService = updaterService,
     objectStore = ObjectStore[SierraItemRecord],
     snsWriter = SNSBuilder.buildSNSWriter(config)
