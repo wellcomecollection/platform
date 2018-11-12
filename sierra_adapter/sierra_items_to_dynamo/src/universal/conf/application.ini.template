@@ -1,6 +1,0 @@
--aws.sns.topic.arn=${topic_arn}
--aws.vhs.dynamo.tableName=${vhs_table_name}
--aws.vhs.s3.bucketName=${vhs_bucket_name}
--aws.vhs.s3.globalPrefix=
--aws.sqs.queue.url=${demultiplexer_queue_url}
--aws.metrics.namespace=${metrics_namespace}

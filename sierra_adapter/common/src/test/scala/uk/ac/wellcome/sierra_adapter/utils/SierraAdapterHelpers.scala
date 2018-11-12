@@ -1,5 +1,6 @@
 package uk.ac.wellcome.sierra_adapter.utils
 
+import io.circe.Decoder
 import org.scalatest.Assertion
 import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -62,20 +63,33 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       id = transformable.sierraId.withoutCheckDigit,
       record = transformable)
 
-  def assertStoredAndSent(transformable: SierraTransformable,
-                          topic: Topic,
-                          bucket: Bucket,
-                          table: Table): Assertion = {
-    val hybridRecord =
-      getHybridRecord(table, id = transformable.sierraId.withoutCheckDigit)
+  def assertStoredAndSent[T](
+    t: T,
+    id: String,
+    topic: Topic,
+    bucket: Bucket,
+    table: Table)(implicit decoder: Decoder[T]): Assertion = {
+    val hybridRecord = getHybridRecord(table, id = id)
 
-    val storedTransformable = getObjectFromS3[SierraTransformable](
+    val storedTransformable = getObjectFromS3[T](
       Bucket(hybridRecord.location.namespace),
       hybridRecord.location.key)
-    storedTransformable shouldBe transformable
+    storedTransformable shouldBe t
 
     listMessagesReceivedFromSNS(topic).map { info: MessageInfo =>
       fromJson[HybridRecord](info.message).get
     } should contain(hybridRecord)
   }
+
+  def assertStoredAndSent(transformable: SierraTransformable,
+                          topic: Topic,
+                          bucket: Bucket,
+                          table: Table): Assertion =
+    assertStoredAndSent[SierraTransformable](
+      transformable,
+      id = transformable.sierraId.withoutCheckDigit,
+      topic = topic,
+      bucket = bucket,
+      table = table
+    )
 }

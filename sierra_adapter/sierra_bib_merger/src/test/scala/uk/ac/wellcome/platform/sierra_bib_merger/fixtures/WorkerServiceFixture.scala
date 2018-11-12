@@ -42,7 +42,7 @@ trait WorkerServiceFixture
               metricsSender) { sqsStream =>
               withSNSWriter(topic) { snsWriter =>
                 val workerService = new SierraBibMergerWorkerService(
-                  system = actorSystem,
+                  actorSystem = actorSystem,
                   sqsStream = sqsStream,
                   snsWriter = snsWriter,
                   sierraBibMergerUpdaterService = updaterService

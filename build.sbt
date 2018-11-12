@@ -168,21 +168,13 @@ lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_rea
   .settings(libraryDependencies ++= Dependencies.sierraReaderDependencies)
 
 lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_items_to_dynamo")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(finatra_storage % "compile->compile;test->test")
+  .dependsOn(common % "compile->compile;test->test")
 
 lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_bib_merger")
   .dependsOn(common % "compile->compile;test->test")
-  .dependsOn(internal_model % "compile->compile;test->test")
-  .dependsOn(config_messaging % "compile->compile;test->test")
-  .dependsOn(config_storage % "compile->compile;test->test")
 
 lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
   .dependsOn(common % "compile->compile;test->test")
-  .dependsOn(internal_model % "compile->compile;test->test")
-  .dependsOn(config_messaging % "compile->compile;test->test")
-  .dependsOn(config_storage % "compile->compile;test->test")
 
 lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generator")
   .dependsOn(common % "compile->compile;test->test")

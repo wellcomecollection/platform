@@ -10,7 +10,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import scala.concurrent.{ExecutionContext, Future}
 
 class SierraBibMergerWorkerService(
-  system: ActorSystem,
+  actorSystem: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter,
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
@@ -27,5 +27,5 @@ class SierraBibMergerWorkerService(
   def run(): Future[Done] =
     sqsStream.foreach(this.getClass.getSimpleName, process)
 
-  def stop(): Future[Terminated] = system.terminate()
+  def stop(): Future[Terminated] = actorSystem.terminate()
 }
