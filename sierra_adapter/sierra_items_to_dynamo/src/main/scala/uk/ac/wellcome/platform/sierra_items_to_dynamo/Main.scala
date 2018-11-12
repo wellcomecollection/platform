@@ -38,7 +38,7 @@ object Main extends App with Logging {
     EmptyMetadata,
     ObjectStore[SierraItemRecord]](
     vhsConfig = VHSBuilder.buildVHSConfig(config),
-    s3ObjectStore = ObjectStore[SierraItemRecord],
+    objectStore = ObjectStore[SierraItemRecord],
     dynamoDbClient = DynamoBuilder.buildDynamoClient(config)
   )
 
