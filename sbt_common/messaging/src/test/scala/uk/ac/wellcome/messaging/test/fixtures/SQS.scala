@@ -149,10 +149,10 @@ trait SQS extends Matchers with Logging with MetricsSenderFixture {
     val sqsConfig = SQSConfig(queueUrl = queue.url)
 
     val stream = new SQSStream[T](
-      actorSystem = actorSystem,
       sqsClient = asyncSqsClient,
       sqsConfig = sqsConfig,
-      metricsSender = metricsSender)
+      metricsSender = metricsSender)(
+      actorSystem = actorSystem)
 
     testWith(stream)
   }

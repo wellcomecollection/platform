@@ -35,15 +35,12 @@ import scala.concurrent.Future
 //        process = processMessage
 //      )
 //
-class SQSStream[T] @Inject()(actorSystem: ActorSystem,
-                             sqsClient: AmazonSQSAsync,
+class SQSStream[T] @Inject()(sqsClient: AmazonSQSAsync,
                              sqsConfig: SQSConfig,
-                             metricsSender: MetricsSender)
+                             metricsSender: MetricsSender)(implicit val actorSystem: ActorSystem)
     extends Logging {
 
-  implicit val system = actorSystem
-
-  implicit val dispatcher = system.dispatcher
+  implicit val dispatcher = actorSystem.dispatcher
 
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
@@ -68,7 +65,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     val metricName = s"${streamName}_ProcessMessage"
 
     implicit val materializer = ActorMaterializer(
-      ActorMaterializerSettings(system)
+      ActorMaterializerSettings(actorSystem)
         .withSupervisionStrategy(decider(metricName)))
 
     val src: Source[Message, NotUsed] = modifySource(source.map { message =>
