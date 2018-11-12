@@ -9,7 +9,6 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
 import uk.ac.wellcome.platform.sierra_reader.fixtures.WorkerServiceFixture
@@ -39,8 +38,6 @@ class SierraReaderWorkerServiceTest
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
         withWorkerService(bucket, queue, readerConfig = bibsReaderConfig.copy(batchSize = 10)) { service =>
-          service.run()
-
           sendNotificationToSQS(queue = queue, body = body)
 
           val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
@@ -74,8 +71,6 @@ class SierraReaderWorkerServiceTest
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
         withWorkerService(bucket, queue, readerConfig = itemsReaderConfig) { service =>
-          service.run()
-
           sendNotificationToSQS(queue = queue, body = body)
 
           val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
@@ -110,7 +105,6 @@ class SierraReaderWorkerServiceTest
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
         withWorkerService(bucket, queue, readerConfig = itemsReaderConfig) { service =>
-          service.run()
 
           // Do a complete run of the reader -- this gives us a set of JSON files
           // to compare to.

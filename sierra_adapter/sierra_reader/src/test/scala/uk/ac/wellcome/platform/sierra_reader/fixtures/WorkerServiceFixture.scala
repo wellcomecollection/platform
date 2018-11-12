@@ -10,8 +10,6 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 trait WorkerServiceFixture extends Akka with SQS with S3 {
   def withWorkerService[R](bucket: Bucket,
                            queue: Queue,
@@ -23,12 +21,11 @@ trait WorkerServiceFixture extends Akka with SQS with S3 {
           sqsStream = sqsStream,
           s3client = s3Client,
           s3Config = createS3ConfigWith(bucket),
-          readerConfig = ReaderConfig(
-            resourceType = SierraResourceTypes.bibs,
-            fields = "updatedDate,deletedDate,deleted,suppressed,author,title"
-          ),
-          sierraAPIConfig =
-        )(actorSystem)
+          readerConfig = readerConfig,
+          sierraAPIConfig = sierraAPIConfig
+        )(actorSystem = actorSystem)
+
+        workerService.run()
 
         testWith(workerService)
       }
