@@ -60,6 +60,7 @@ cache:
     - sierra_adapter/sierra_item_merger/target
 
     - archive/commmon/target
+    - archive/display/target
     - archive/archivist/target
     - archive/notifier/target
     - archive/progress_common/target
@@ -166,6 +167,7 @@ jobs:
 
     # Archive
     - env: TASK=archive_api-test
+    - env: TASK=archive_display-test
     - env: TASK=archive_common-test
     - env: TASK=archivist-test
     - env: TASK=progress_common-test

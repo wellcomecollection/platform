@@ -1,14 +1,10 @@
 package uk.ac.wellcome.platform.archive.common.progress.models
 
-import java.net.URI
 import java.time.Instant
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagId,
-  RequestDisplayIngest
-}
+import uk.ac.wellcome.platform.archive.common.models.BagId
 
 case class Progress(id: UUID,
                     sourceLocation: StorageLocation,
@@ -44,16 +40,4 @@ case object Progress extends URIConverters {
     override def toString: String = failureString
   }
 
-  def apply(createRequest: RequestDisplayIngest): Progress = {
-    Progress(
-      id = generateId,
-      sourceLocation = StorageLocation(createRequest.sourceLocation),
-      callback = Callback(createRequest.callback.map(displayCallback =>
-        URI.create(displayCallback.url))),
-      space = Namespace(createRequest.space.id),
-      status = Progress.Initialised
-    )
-  }
-
-  private def generateId: UUID = UUID.randomUUID
 }
