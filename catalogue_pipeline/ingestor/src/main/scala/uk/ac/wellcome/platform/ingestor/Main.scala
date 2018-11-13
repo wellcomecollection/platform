@@ -7,10 +7,10 @@ import uk.ac.wellcome.config.elasticsearch.builders.ElasticBuilder
 import uk.ac.wellcome.config.messaging.builders.MessagingBuilder
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.platform.ingestor.config.builders.IngestorConfigBuilder
-import uk.ac.wellcome.platform.ingestor.services.{IngestorWorkerService, WorkIndexer}
+import uk.ac.wellcome.platform.ingestor.services.IngestorWorkerService
 
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext}
 
 object Main extends App with Logging {
   val config: Config = ConfigFactory.load()
@@ -19,10 +19,8 @@ object Main extends App with Logging {
     AkkaBuilder.buildExecutionContext()
 
   val workerService = new IngestorWorkerService(
+    elasticClient = ElasticBuilder.buildHttpClient(config),
     ingestorConfig = IngestorConfigBuilder.buildIngestorConfig(config),
-    identifiedWorkIndexer = new WorkIndexer(
-      elasticClient = ElasticBuilder.buildHttpClient(config)
-    ),
     messageStream = MessagingBuilder.buildMessageStream[IdentifiedBaseWork](config)
   )
 

@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import akka.actor.ActorSystem
 import com.sksamuel.elastic4s.http.HttpClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
@@ -14,7 +13,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType, Subject}
-import uk.ac.wellcome.platform.ingestor.IngestElasticConfig
 import uk.ac.wellcome.platform.ingestor.config.models.{IngestElasticConfig, IngestorConfig}
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -295,7 +293,6 @@ class IngestorWorkerServiceTest
 
               withIngestorWorkerService[Assertion](
                 indexName = "works-v1",
-                actorSystem,
                 brokenWorkIndexer,
                 messageStream) { _ =>
                 val work = createIdentifiedWork
@@ -326,7 +323,6 @@ class IngestorWorkerServiceTest
                 metricsSender) { messageStream =>
                 withIngestorWorkerService[R](
                   indexName,
-                  actorSystem,
                   workIndexer,
                   messageStream) { _ =>
                   testWith(queuePair)
@@ -340,7 +336,6 @@ class IngestorWorkerServiceTest
 
   private def withIngestorWorkerService[R](
     indexName: String,
-    actorSystem: ActorSystem,
     workIndexer: WorkIndexer,
     messageStream: MessageStream[IdentifiedBaseWork])(
     testWith: TestWith[IngestorWorkerService, R]): R = {
@@ -356,9 +351,8 @@ class IngestorWorkerServiceTest
 
     val ingestorWorkerService = new IngestorWorkerService(
       ingestorConfig = ingestorConfig,
-      identifiedWorkIndexer = workIndexer,
-      messageStream = messageStream,
-      system = actorSystem
+      elasticClient = elasticClient,
+      messageStream = messageStream
     )
 
     testWith(ingestorWorkerService)
