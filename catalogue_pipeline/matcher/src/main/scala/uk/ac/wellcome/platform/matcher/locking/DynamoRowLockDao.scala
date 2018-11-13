@@ -6,9 +6,9 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query.Condition
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.{Scanamo, Table}
+import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,6 +17,13 @@ class DynamoRowLockDao(
   dynamoDBClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
     extends Logging {
+
+  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
+    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
+      Instant.ofEpochSecond
+    )(
+      _.getEpochSecond
+    )
 
   private val defaultDuration = Duration.ofSeconds(180)
   private val table = Table[RowLock](dynamoConfig.table)
