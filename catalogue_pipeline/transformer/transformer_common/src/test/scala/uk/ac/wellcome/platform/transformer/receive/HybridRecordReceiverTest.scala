@@ -197,7 +197,7 @@ class HybridRecordReceiverTest
       writerSnsClient = snsClient) { messageWriter =>
       val recordReceiver = new HybridRecordReceiver[TestTransformable](
         messageWriter = messageWriter,
-        objectsStore = objectStore
+        objectStore = objectStore
       )
 
       testWith(recordReceiver)

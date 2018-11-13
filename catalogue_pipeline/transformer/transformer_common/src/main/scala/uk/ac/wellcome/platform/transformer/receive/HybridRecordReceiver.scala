@@ -16,7 +16,7 @@ import scala.util.Try
 
 class HybridRecordReceiver[T] @Inject()(
   messageWriter: MessageWriter[TransformedBaseWork],
-  objectsStore: ObjectStore[T])(implicit ec: ExecutionContext)
+  objectStore: ObjectStore[T])(implicit ec: ExecutionContext)
     extends Logging {
 
   def receiveMessage(
@@ -45,7 +45,7 @@ class HybridRecordReceiver[T] @Inject()(
   }
 
   private def getTransformable(hybridRecord: HybridRecord): Future[T] =
-    objectsStore.get(hybridRecord.location)
+    objectStore.get(hybridRecord.location)
 
   private def publishMessage(
     work: TransformedBaseWork): Future[PublishAttempt] =
