@@ -24,7 +24,6 @@ class SierraTransformerFeatureTest
     with SNS
     with S3
     with Messaging
-    with fixtures.Server
     with Eventually
     with HybridRecordReceiverFixture
     with IntegrationPatience
