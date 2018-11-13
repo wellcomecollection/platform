@@ -61,6 +61,11 @@ module "reporting_sierra_reindex_topic" {
   name   = "reporting_sierra_reindex_topic"
 }
 
+module "reporting_miro_inventory_reindex_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "reporting_miro_inventory_reindex_topic"
+}
+
 ## Catalogue
 
 module "catalogue_miro_reindex_topic" {

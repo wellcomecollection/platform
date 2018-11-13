@@ -66,6 +66,23 @@ module "reporting_miro_reindexer" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
 }
 
+module "reporting_miro_inventory_reindexer" {
+  source = "./reindex_worker"
+
+  namespace                           = "reporting_pipeline_miro_inventory"
+  vhs_table_name                      = "${local.vhs_miro_inventory_table_name}"
+  hybrid_records_topic_arn            = "${local.reporting_miro_inventory_hybrid_records_topic_arn}"
+  hybrid_records_topic_publish_policy = "${local.reporting_miro_inventory_hybrid_records_topic_publish_policy}"
+
+  reindex_worker_container_image = "${local.reindex_worker_container_image}"
+
+  ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
+  ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
+
+  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
+}
+
 module "reporting_sierra_reindexer" {
   source = "./reindex_worker"
 
