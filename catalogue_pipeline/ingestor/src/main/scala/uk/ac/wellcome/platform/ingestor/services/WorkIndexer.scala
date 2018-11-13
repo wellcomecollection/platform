@@ -1,11 +1,10 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.google.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.Indexable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -13,8 +12,7 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class WorkIndexer @Inject()(
+class WorkIndexer(
   elasticClient: HttpClient
 )(implicit ec: ExecutionContext)
     extends Logging

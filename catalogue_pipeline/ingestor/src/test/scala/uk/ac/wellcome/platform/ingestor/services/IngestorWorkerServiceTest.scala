@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import akka.actor.ActorSystem
 import com.sksamuel.elastic4s.http.HttpClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
@@ -14,7 +13,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType, Subject}
-import uk.ac.wellcome.platform.ingestor.IngestElasticConfig
 import uk.ac.wellcome.platform.ingestor.config.models.{IngestElasticConfig, IngestorConfig}
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.fixtures.S3
@@ -308,7 +306,7 @@ class IngestorWorkerServiceTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalSqsQueueAndDlq {
-          case queuePair @ QueuePair(queue, dlq) =>
+          case QueuePair(queue, dlq) =>
             withLocalS3Bucket { bucket =>
               withMessageStream[IdentifiedBaseWork, Assertion](
                 actorSystem,
@@ -330,7 +328,6 @@ class IngestorWorkerServiceTest
 
                 withIngestorWorkerService[Assertion](
                   indexName = "works-v1",
-                  actorSystem,
                   brokenWorkIndexer,
                   messageStream) { _ =>
                   val work = createIdentifiedWork
@@ -367,10 +364,9 @@ class IngestorWorkerServiceTest
                   queue,
                   metricsSender) { messageStream =>
                   withIngestorWorkerService[R](
-                    indexName,
-                    actorSystem,
-                    workIndexer,
-                    messageStream) { _ =>
+                    indexName = indexName,
+                    workIndexer = workIndexer,
+                    messageStream = messageStream) { _ =>
                     testWith((queuePair, bucket))
                   }
                 }
@@ -383,7 +379,6 @@ class IngestorWorkerServiceTest
 
   private def withIngestorWorkerService[R](
     indexName: String,
-    actorSystem: ActorSystem,
     workIndexer: WorkIndexer,
     messageStream: MessageStream[IdentifiedBaseWork])(
     testWith: TestWith[IngestorWorkerService, R]): R = {
@@ -399,9 +394,8 @@ class IngestorWorkerServiceTest
 
     val ingestorWorkerService = new IngestorWorkerService(
       ingestorConfig = ingestorConfig,
-      identifiedWorkIndexer = workIndexer,
-      messageStream = messageStream,
-      system = actorSystem
+      elasticClient = elasticClient,
+      messageStream = messageStream
     )
 
     testWith(ingestorWorkerService)
