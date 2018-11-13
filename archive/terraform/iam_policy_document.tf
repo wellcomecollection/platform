@@ -54,6 +54,31 @@ data "aws_iam_policy_document" "ingest_workflow_get" {
   }
 }
 
+data "aws_iam_policy_document" "archive_dlcs_get" {
+  statement {
+    effect = "ALLOW"
+
+    principals {
+      type = "AWS"
+
+      identifiers = [
+        "arn:aws:iam::653428163053:user/echo-fs",
+        "arn:aws:iam::653428163053:user/api",
+      ]
+    }
+
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.archive_bucket_name}",
+      "arn:aws:s3:::${local.archive_bucket_name}/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "read_from_archivist_queue" {
   statement {
     actions = [
