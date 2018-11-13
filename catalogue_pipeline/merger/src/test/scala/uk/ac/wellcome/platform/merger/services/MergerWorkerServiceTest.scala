@@ -16,10 +16,7 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.fixtures.{LocalWorksVhs, MatcherResultFixture, WorkerServiceFixture}
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class MergerWorkerServiceTest
     extends FunSpec
@@ -274,28 +271,21 @@ class MergerWorkerServiceTest
   }
 
   def withMergerWorkerServiceFixtures[R](
-    testWith: TestWith[(TransformedBaseWorkVHS, QueuePair, Topic, MetricsSender), R]): R = {
-    withLocalS3Bucket { storageBucket =>
-      withLocalDynamoDbTable { table =>
-        withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
-          storageBucket,
-          table) { vhs =>
-          withLocalSqsQueueAndDlq {
-            case queuePair@QueuePair(queue, dlq) =>
-              withLocalSnsTopic { topic =>
-                withMockMetricSender { mockMetricsSender =>
-                  withWorkerService(
-                    vhs = vhs,
-                    topic = topic,
-                    queue = queue,
-                    metricsSender = mockMetricsSender) { _ =>
-                    testWith((vhs, queuePair, topic, mockMetricsSender))
-                  }
-                }
+    testWith: TestWith[(TransformedBaseWorkVHS, QueuePair, Topic, MetricsSender), R]): R =
+    withTransformedBaseWorkVHS { vhs =>
+      withLocalSqsQueueAndDlq {
+        case queuePair@QueuePair(queue, dlq) =>
+          withLocalSnsTopic { topic =>
+            withMockMetricSender { mockMetricsSender =>
+              withWorkerService(
+                vhs = vhs,
+                topic = topic,
+                queue = queue,
+                metricsSender = mockMetricsSender) { _ =>
+                testWith((vhs, queuePair, topic, mockMetricsSender))
               }
+            }
           }
-        }
       }
     }
-  }
 }

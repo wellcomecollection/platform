@@ -26,30 +26,24 @@ class MergerFeatureTest
 
   it("reads matcher result messages off a queue and deletes them") {
     withLocalSnsTopic { topic =>
-      withLocalS3Bucket { storageBucket =>
-        withLocalDynamoDbTable { table =>
-          withTypeVHS[TransformedBaseWork, EmptyMetadata, Assertion](
-            storageBucket,
-            table) { vhs =>
-            withLocalSqsQueueAndDlq {
-              case QueuePair(queue, dlq) =>
-                withWorkerService(vhs, topic, queue) { _ =>
-                  val work = createUnidentifiedWork
+      withTransformedBaseWorkVHS { vhs =>
+        withLocalSqsQueueAndDlq {
+          case QueuePair(queue, dlq) =>
+            withWorkerService(vhs, topic, queue) { _ =>
+              val work = createUnidentifiedWork
 
-                  givenStoredInVhs(vhs, work)
+              givenStoredInVhs(vhs, work)
 
-                  val matcherResult = matcherResultWith(Set(Set(work)))
-                  sendNotificationToSQS(queue, matcherResult)
+              val matcherResult = matcherResultWith(Set(Set(work)))
+              sendNotificationToSQS(queue, matcherResult)
 
-                  eventually {
-                    assertQueueEmpty(queue)
-                    assertQueueEmpty(dlq)
-                    val worksSent = getMessages[TransformedBaseWork](topic)
-                    worksSent should contain only work
-                  }
-                }
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueEmpty(dlq)
+                val worksSent = getMessages[TransformedBaseWork](topic)
+                worksSent should contain only work
+              }
             }
-          }
         }
       }
     }

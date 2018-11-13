@@ -7,11 +7,26 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.test.fixtures.TestWith
 
 trait LocalWorksVhs
     extends LocalVersionedHybridStore
     with Eventually
     with ScalaFutures {
+
+  type TransformedBaseWorkVHS = VersionedHybridStore[
+    TransformedBaseWork,
+    EmptyMetadata,
+    ObjectStore[TransformedBaseWork]]
+
+  def withTransformedBaseWorkVHS[R](testWith: TestWith[TransformedBaseWorkVHS, R]): R =
+    withLocalS3Bucket { storageBucket =>
+      withLocalDynamoDbTable { table =>
+        withTypeVHS[TransformedBaseWork, EmptyMetadata, R](storageBucket, table) { vhs =>
+          testWith(vhs)
+        }
+      }
+    }
 
   def givenStoredInVhs(
     vhs: VersionedHybridStore[TransformedBaseWork,
