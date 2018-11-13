@@ -118,8 +118,7 @@ lazy val transformer_sierra = doServiceSetup(project, "catalogue_pipeline/transf
 lazy val merger = doServiceSetup(project, "catalogue_pipeline/merger")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile;test->test")
 
 lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .dependsOn(common % "compile->compile;test->test")
