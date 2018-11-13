@@ -35,8 +35,23 @@ trait WorkerServiceFixture extends Messaging with S3 {
               messageWriter = messageWriter
             )
 
+            workerService.run()
+
             testWith(workerService)
           }
+        }
+      }
+    }
+
+  def withWorkerService[R](
+    vhs: TransformedBaseWorkVHS,
+    topic: Topic,
+    queue: Queue)(
+    testWith: TestWith[MergerWorkerService, R]): R =
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        withWorkerService(vhs, topic, queue, metricsSender) { workerService =>
+          testWith(workerService)
         }
       }
     }

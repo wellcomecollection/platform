@@ -6,7 +6,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -16,9 +15,8 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.fixtures.{LocalWorksVhs, MatcherResultFixture, WorkerServiceFixture}
-import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
