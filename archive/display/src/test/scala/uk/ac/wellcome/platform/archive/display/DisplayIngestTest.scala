@@ -11,7 +11,11 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-class DisplayIngestTest extends FunSpec with Matchers with RandomThings with TimeTestFixture{
+class DisplayIngestTest
+    extends FunSpec
+    with Matchers
+    with RandomThings
+    with TimeTestFixture {
 
   private val id = UUID.randomUUID()
   private val callbackUrl = "http://www.example.com/callback"

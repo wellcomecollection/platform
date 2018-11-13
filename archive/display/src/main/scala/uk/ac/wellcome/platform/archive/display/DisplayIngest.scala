@@ -20,8 +20,8 @@ case class RequestDisplayIngest(sourceLocation: DisplayLocation,
     Progress(
       id = UUID.randomUUID,
       sourceLocation = sourceLocation.toStorageLocation,
-      callback = Callback(callback.map(displayCallback =>
-        URI.create(displayCallback.url))),
+      callback = Callback(
+        callback.map(displayCallback => URI.create(displayCallback.url))),
       space = Namespace(space.id),
       status = Progress.Initialised
     )
