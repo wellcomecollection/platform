@@ -16,7 +16,6 @@ class IngestorFeatureTest
     with Matchers
     with JsonAssertions
     with ScalaFutures
-    with fixtures.Server
     with ElasticsearchFixtures
     with Messaging
     with SQS
