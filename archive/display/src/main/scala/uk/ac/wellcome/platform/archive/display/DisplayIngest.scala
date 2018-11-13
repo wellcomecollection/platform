@@ -4,16 +4,21 @@ import java.net.{URI, URL}
 import java.util.UUID
 
 import io.circe.generic.extras.JsonKey
+import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.platform.archive.common.models.BagId
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
+import scala.annotation.meta.field
+
 sealed trait DisplayIngest
 
+@ApiModel(value = "RequestIngest")
 case class RequestDisplayIngest(sourceLocation: DisplayLocation,
                                 callback: Option[DisplayCallback],
                                 ingestType: DisplayIngestType,
                                 space: DisplayStorageSpace,
                                 @JsonKey("type")
+                                @(ApiModelProperty @field)(name = "type", allowableValues = "Ingest")
                                 ontologyType: String = "Ingest")
     extends DisplayIngest {
   def toProgress: Progress = {
@@ -28,7 +33,9 @@ case class RequestDisplayIngest(sourceLocation: DisplayLocation,
   }
 }
 
+@ApiModel(value = "ResponseIngest")
 case class ResponseDisplayIngest(@JsonKey("@context")
+                                 @(ApiModelProperty @field)(name = "@context", required = true)
                                  context: String,
                                  id: UUID,
                                  sourceLocation: DisplayLocation,
@@ -41,33 +48,45 @@ case class ResponseDisplayIngest(@JsonKey("@context")
                                  createdDate: String,
                                  lastModifiedDate: String,
                                  @JsonKey("type")
+                                 @(ApiModelProperty @field)(name = "type", allowableValues = "Ingest")
                                  ontologyType: String = "Ingest")
     extends DisplayIngest
 
+@ApiModel(value = "Bag")
 case class IngestDisplayBag(id: String,
                             @JsonKey("type")
+                            @(ApiModelProperty @field)(name = "type", allowableValues = "Bag")
                             ontologyType: String = "Bag")
 
+@ApiModel(value = "Callback")
 case class DisplayCallback(url: String,
                            status: Option[DisplayStatus],
                            @JsonKey("type")
+                           @(ApiModelProperty @field)(name="type", allowableValues = "Callback")
                            ontologyType: String = "Callback")
 
+@ApiModel(value = "IngestType")
 case class DisplayIngestType(id: String = "create",
                              @JsonKey("type")
+                             @(ApiModelProperty @field)(name="type", allowableValues = "IngestType")
                              ontologyType: String = "IngestType")
 
+@ApiModel(value = "Space")
 case class DisplayStorageSpace(id: String,
                                @JsonKey("type")
+                               @(ApiModelProperty @field)(name="type", allowableValues = "Space")
                                ontologyType: String = "Space")
-
+@ApiModel(value = "Status")
 case class DisplayStatus(id: String,
                          @JsonKey("type")
+                         @(ApiModelProperty @field)(name="type", allowableValues = "Status")
                          ontologyType: String = "Status")
 
+@ApiModel(value = "ProgressEvent")
 case class DisplayProgressEvent(description: String,
                                 createdDate: String,
                                 @JsonKey("type")
+                                @(ApiModelProperty @field)(name="type", allowableValues = "Status")
                                 ontologyType: String = "ProgressEvent")
 
 case object ResponseDisplayIngest {

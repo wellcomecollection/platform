@@ -184,6 +184,7 @@ lazy val archive_common = doServiceSetup(project, "archive/common")
 
 lazy val archive_display = doServiceSetup(project, "archive/display")
   .dependsOn(archive_common % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.akkaHttpSwagger)
 
 lazy val archivist = doServiceSetup(project, "archive/archivist")
   .dependsOn(archive_common % "compile->compile;test->test")
@@ -202,7 +203,6 @@ lazy val registrar_async = doServiceSetup(project, "archive/registrar_async")
 lazy val registrar_http = doServiceSetup(project, "archive/registrar_http")
   .dependsOn(registrar_common % "compile->compile;test->test")
   .dependsOn(archive_display % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.akkaHttpSwagger)
 
 lazy val progress_common = doServiceSetup(project, "archive/progress_common")
   .dependsOn(archive_common % "compile->compile;test->test")
@@ -214,7 +214,6 @@ lazy val progress_async = doServiceSetup(project, "archive/progress_async")
 lazy val progress_http = doServiceSetup(project, "archive/progress_http")
   .dependsOn(progress_common % "compile->compile;test->test")
   .dependsOn(archive_display % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.akkaHttpSwagger)
 
 lazy val root = (project in file("."))
   .aggregate(

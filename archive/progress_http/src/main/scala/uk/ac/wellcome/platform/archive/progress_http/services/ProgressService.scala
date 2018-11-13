@@ -40,7 +40,7 @@ class ProgressService(
 
   @ApiOperation(httpMethod = "GET", value = "Returns an ingest request status", response = classOf[ResponseDisplayIngest])
   @ApiImplicitParams(Array(
-    new ApiImplicitParam(name = "id", required = true, dataType = "string", value = "The id of the request", paramType = "path")
+    new ApiImplicitParam(name = "id", required = true, dataType = "string", value = "The id of the request", paramType = "path", format = "UUID")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 404, message = "Not Found Error"))
