@@ -5,7 +5,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import scalikejdbc.{AutoSession, ConnectionPool, DB, SQLSyntax}
 import uk.ac.wellcome.test.fixtures.TestWith
 import scalikejdbc._
-import uk.ac.wellcome.platform.idminter.config.models.{IdentifiersTableConfig, RDSClientConfig}
+import uk.ac.wellcome.platform.idminter.config.models.{
+  IdentifiersTableConfig,
+  RDSClientConfig
+}
 import uk.ac.wellcome.platform.idminter.database.FieldDescription
 
 import scala.util.Random
@@ -20,46 +23,47 @@ trait IdentifiersDatabase
   val username = "root"
   val password = "password"
 
-  def eventuallyTableExists(tableConfig: IdentifiersTableConfig): Assertion = eventually {
-    val database: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.database)
-    val table: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.tableName)
+  def eventuallyTableExists(tableConfig: IdentifiersTableConfig): Assertion =
+    eventually {
+      val database: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.database)
+      val table: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.tableName)
 
-    val fields = DB readOnly { implicit session =>
-      sql"DESCRIBE $database.$table"
-        .map(
-          rs =>
-            FieldDescription(
-              rs.string("Field"),
-              rs.string("Type"),
-              rs.string("Null"),
-              rs.string("Key")))
-        .list()
-        .apply()
+      val fields = DB readOnly { implicit session =>
+        sql"DESCRIBE $database.$table"
+          .map(
+            rs =>
+              FieldDescription(
+                rs.string("Field"),
+                rs.string("Type"),
+                rs.string("Null"),
+                rs.string("Key")))
+          .list()
+          .apply()
+      }
+
+      fields.sortBy(_.field) shouldBe Seq(
+        FieldDescription(
+          field = "CanonicalId",
+          dataType = "varchar(255)",
+          nullable = "NO",
+          key = "PRI"),
+        FieldDescription(
+          field = "OntologyType",
+          dataType = "varchar(255)",
+          nullable = "NO",
+          key = "MUL"),
+        FieldDescription(
+          field = "SourceSystem",
+          dataType = "varchar(255)",
+          nullable = "NO",
+          key = ""),
+        FieldDescription(
+          field = "SourceId",
+          dataType = "varchar(255)",
+          nullable = "NO",
+          key = "")
+      ).sortBy(_.field)
     }
-
-    fields.sortBy(_.field) shouldBe Seq(
-      FieldDescription(
-        field = "CanonicalId",
-        dataType = "varchar(255)",
-        nullable = "NO",
-        key = "PRI"),
-      FieldDescription(
-        field = "OntologyType",
-        dataType = "varchar(255)",
-        nullable = "NO",
-        key = "MUL"),
-      FieldDescription(
-        field = "SourceSystem",
-        dataType = "varchar(255)",
-        nullable = "NO",
-        key = ""),
-      FieldDescription(
-        field = "SourceId",
-        dataType = "varchar(255)",
-        nullable = "NO",
-        key = "")
-    ).sortBy(_.field)
-  }
 
   // This is based on the implementation of alphanumeric in Scala.util.Random.
   def alphabetic: Stream[Char] = {

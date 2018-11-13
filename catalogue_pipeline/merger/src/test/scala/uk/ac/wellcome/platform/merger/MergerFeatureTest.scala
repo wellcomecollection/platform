@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.merger.fixtures.{LocalWorksVhs, MatcherResultFixture, WorkerServiceFixture}
+import uk.ac.wellcome.platform.merger.fixtures.{
+  LocalWorksVhs,
+  MatcherResultFixture,
+  WorkerServiceFixture
+}
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 
 class MergerFeatureTest

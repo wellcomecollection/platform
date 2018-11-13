@@ -8,8 +8,7 @@ import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
 import scala.util.Try
 
-class IdentifierGenerator(identifiersDao: IdentifiersDao)
-    extends Logging {
+class IdentifierGenerator(identifiersDao: IdentifiersDao) extends Logging {
 
   def retrieveOrGenerateCanonicalId(
     identifier: SourceIdentifier

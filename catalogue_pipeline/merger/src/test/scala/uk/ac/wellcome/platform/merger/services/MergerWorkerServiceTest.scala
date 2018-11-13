@@ -14,7 +14,11 @@ import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.merger.fixtures.{LocalWorksVhs, MatcherResultFixture, WorkerServiceFixture}
+import uk.ac.wellcome.platform.merger.fixtures.{
+  LocalWorksVhs,
+  MatcherResultFixture,
+  WorkerServiceFixture
+}
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
@@ -60,7 +64,7 @@ class MergerWorkerServiceTest
           assertQueueEmpty(dlq)
 
           val worksSent = getMessages[BaseWork](topic)
-          worksSent should contain only(work1, work2, work3)
+          worksSent should contain only (work1, work2, work3)
 
           verify(metricsSender, atLeastOnce)
             .countSuccess(any[String])
@@ -271,10 +275,12 @@ class MergerWorkerServiceTest
   }
 
   def withMergerWorkerServiceFixtures[R](
-    testWith: TestWith[(TransformedBaseWorkVHS, QueuePair, Topic, MetricsSender), R]): R =
+    testWith: TestWith[
+      (TransformedBaseWorkVHS, QueuePair, Topic, MetricsSender),
+      R]): R =
     withTransformedBaseWorkVHS { vhs =>
       withLocalSqsQueueAndDlq {
-        case queuePair@QueuePair(queue, dlq) =>
+        case queuePair @ QueuePair(queue, dlq) =>
           withLocalSnsTopic { topic =>
             withMockMetricSender { mockMetricsSender =>
               withWorkerService(

@@ -5,7 +5,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
+import uk.ac.wellcome.platform.idminter.database.{
+  FieldDescription,
+  IdentifiersDao
+}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.storage.fixtures.S3
@@ -29,7 +32,12 @@ class IdMinterWorkerServiceTest
         withIdentifiersDatabase { identifiersTableConfig =>
           withLocalS3Bucket { bucket =>
             val identifiersDao = mock[IdentifiersDao]
-            withWorkerService(bucket, topic, queue, identifiersDao, identifiersTableConfig) { _ =>
+            withWorkerService(
+              bucket,
+              topic,
+              queue,
+              identifiersDao,
+              identifiersTableConfig) { _ =>
               val database: SQLSyntax =
                 SQLSyntax.createUnsafely(identifiersTableConfig.database)
               val table: SQLSyntax =

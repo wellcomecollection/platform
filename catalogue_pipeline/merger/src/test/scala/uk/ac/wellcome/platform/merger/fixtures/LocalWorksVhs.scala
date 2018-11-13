@@ -17,16 +17,18 @@ trait LocalWorksVhs
     with Eventually
     with ScalaFutures {
 
-  type TransformedBaseWorkVHS = VersionedHybridStore[
-    TransformedBaseWork,
-    EmptyMetadata,
-    ObjectStore[TransformedBaseWork]]
+  type TransformedBaseWorkVHS =
+    VersionedHybridStore[TransformedBaseWork,
+                         EmptyMetadata,
+                         ObjectStore[TransformedBaseWork]]
 
-  def withTransformedBaseWorkVHS[R](testWith: TestWith[TransformedBaseWorkVHS, R]): R =
+  def withTransformedBaseWorkVHS[R](
+    testWith: TestWith[TransformedBaseWorkVHS, R]): R =
     withLocalS3Bucket { storageBucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[TransformedBaseWork, EmptyMetadata, R](storageBucket, table) { vhs =>
-          testWith(vhs)
+        withTypeVHS[TransformedBaseWork, EmptyMetadata, R](storageBucket, table) {
+          vhs =>
+            testWith(vhs)
         }
       }
     }
