@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.matcher.fixtures
 import java.time.Instant
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.apache.commons.codec.digest.DigestUtils
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -30,6 +30,13 @@ trait MatcherFixtures
     with LocalWorkGraphDynamoDb
     with MetricsSenderFixture
     with S3 {
+
+  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
+    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
+      Instant.ofEpochSecond
+    )(
+      _.getEpochSecond
+    )
 
   def withWorkerService[R](
     queue: SQS.Queue,
