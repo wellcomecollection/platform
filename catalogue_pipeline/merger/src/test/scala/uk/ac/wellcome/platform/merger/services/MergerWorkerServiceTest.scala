@@ -1,15 +1,12 @@
 package uk.ac.wellcome.platform.merger.services
 
-import akka.actor.ActorSystem
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{atLeastOnce, times, verify}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -42,6 +39,7 @@ class MergerWorkerServiceTest
     with Matchers
     with MockitoSugar
     with WorkerServiceFixture {
+
   case class TestObject(something: String)
 
   it(
@@ -67,7 +65,7 @@ class MergerWorkerServiceTest
           assertQueueEmpty(dlq)
 
           val worksSent = getMessages[BaseWork](topic)
-          worksSent should contain only (work1, work2, work3)
+          worksSent should contain only(work1, work2, work3)
 
           verify(metricsSender, atLeastOnce)
             .countSuccess(any[String])
@@ -278,42 +276,25 @@ class MergerWorkerServiceTest
   }
 
   def withMergerWorkerServiceFixtures[R](
-    testWith: TestWith[(VersionedHybridStore[TransformedBaseWork,
-                                             EmptyMetadata,
-                                             ObjectStore[TransformedBaseWork]],
-                        QueuePair,
-                        Topic,
-                        MetricsSender),
-                       R]): R = {
+    testWith: TestWith[(TransformedBaseWorkVHS, QueuePair, Topic, MetricsSender), R]): R = {
     withLocalS3Bucket { storageBucket =>
-      withLocalS3Bucket { messageBucket =>
-        withLocalDynamoDbTable { table =>
-          withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
-            storageBucket,
-            table) { vhs =>
-            withActorSystem { actorSystem =>
-              withLocalSqsQueueAndDlq {
-                case queuePair @ QueuePair(queue, dlq) =>
-                  withLocalSnsTopic { topic =>
-                    withMockMetricSender { metricsSender =>
-                      withSQSStream[NotificationMessage, R](
-                        actorSystem,
-                        queue,
-                        metricsSender) { sqsStream =>
-                        withMessageWriter[BaseWork, R](messageBucket, topic) {
-                          snsWriter =>
-                            withWorkerService(
-                              sqsStream = sqsStream,
-                              vhs = vhs,
-                              messageWriter = snsWriter) { _ =>
-                              testWith((vhs, queuePair, topic, metricsSender))
-                            }
-                        }
-                      }
-                    }
+      withLocalDynamoDbTable { table =>
+        withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
+          storageBucket,
+          table) { vhs =>
+          withLocalSqsQueueAndDlq {
+            case queuePair@QueuePair(queue, dlq) =>
+              withLocalSnsTopic { topic =>
+                withMockMetricSender { mockMetricsSender =>
+                  withWorkerService(
+                    vhs = vhs,
+                    topic = topic,
+                    queue = queue,
+                    metricsSender = mockMetricsSender) { _ =>
+                    testWith((vhs, queuePair, topic, mockMetricsSender))
                   }
+                }
               }
-            }
           }
         }
       }
