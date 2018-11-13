@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import com.amazonaws.SdkClientException
-import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
@@ -9,8 +8,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HybridRecordSender @Inject()(snsWriter: SNSWriter)(
-  implicit ec: ExecutionContext) {
+class HybridRecordSender(snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
   def sendToSNS(records: List[HybridRecord]): Future[List[PublishAttempt]] = {
     Future.sequence {
       records

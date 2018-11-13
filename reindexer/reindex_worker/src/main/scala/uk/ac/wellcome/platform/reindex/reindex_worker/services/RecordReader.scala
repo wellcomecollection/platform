@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
-import com.google.inject.Inject
 import com.gu.scanamo.error.DynamoReadError
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
   MaxRecordsScanner,
   ParallelScanner
@@ -22,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * This class should only be doing reading -- deciding how to act on records
   * that need reindexing is the responsibility of another class.
   */
-class RecordReader @Inject()(
+class RecordReader(
   maxRecordsScanner: MaxRecordsScanner,
   parallelScanner: ParallelScanner
 )(implicit ec: ExecutionContext)

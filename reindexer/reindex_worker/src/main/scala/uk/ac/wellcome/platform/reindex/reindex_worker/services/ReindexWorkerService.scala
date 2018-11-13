@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
+import akka.Done
 import akka.actor.ActorSystem
-import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJob
@@ -10,13 +10,11 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReindexWorker @Inject()(
+class ReindexWorkerService(
   recordReader: RecordReader,
   hybridRecordSender: HybridRecordSender,
-  system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage]
-)(implicit ec: ExecutionContext) {
-  sqsStream.foreach(this.getClass.getSimpleName, processMessage)
+)(implicit val actorSystem: ActorSystem, ec: ExecutionContext) {
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
@@ -27,5 +25,6 @@ class ReindexWorker @Inject()(
       _ <- hybridRecordSender.sendToSNS(records = outdatedRecords)
     } yield ()
 
-  def stop() = system.terminate()
+  def run(): Future[Done] =
+    sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 }
