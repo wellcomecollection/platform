@@ -2,10 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.http.models
 import java.net.URL
 
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.common.models.{
-  DisplayLocation,
-  DisplayStorageSpace
-}
+import uk.ac.wellcome.platform.archive.display.{DisplayLocation, DisplayStorageSpace}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 
 case class DisplayBag(
