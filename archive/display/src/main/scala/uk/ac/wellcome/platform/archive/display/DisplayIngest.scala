@@ -1,14 +1,11 @@
-package uk.ac.wellcome.platform.archive.common.models
+package uk.ac.wellcome.platform.archive.display
 
-import java.net.URL
+import java.net.{URI, URL}
 import java.util.UUID
 
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Callback,
-  Progress,
-  ProgressEvent
-}
+import uk.ac.wellcome.platform.archive.common.models.BagId
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 sealed trait DisplayIngest
 
@@ -18,7 +15,18 @@ case class RequestDisplayIngest(sourceLocation: DisplayLocation,
                                 space: DisplayStorageSpace,
                                 @JsonKey("type")
                                 ontologyType: String = "Ingest")
-    extends DisplayIngest
+    extends DisplayIngest {
+  def toProgress: Progress = {
+    Progress(
+      id = UUID.randomUUID,
+      sourceLocation = sourceLocation.toStorageLocation,
+      callback = Callback(
+        callback.map(displayCallback => URI.create(displayCallback.url))),
+      space = Namespace(space.id),
+      status = Progress.Initialised
+    )
+  }
+}
 
 case class ResponseDisplayIngest(@JsonKey("@context")
                                  context: String,

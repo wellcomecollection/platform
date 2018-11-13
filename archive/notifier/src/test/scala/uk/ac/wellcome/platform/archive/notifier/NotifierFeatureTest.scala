@@ -25,6 +25,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   ProgressCallbackStatusUpdate,
   ProgressUpdate
 }
+import uk.ac.wellcome.platform.archive.display._
 import uk.ac.wellcome.platform.archive.notifier.fixtures.{
   LocalWireMockFixture,
   NotifierFixture

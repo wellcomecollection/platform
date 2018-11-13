@@ -8,12 +8,12 @@ import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.server.Route
 import io.circe.Printer
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.models.{
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
+import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
+import uk.ac.wellcome.platform.archive.display.{
   RequestDisplayIngest,
   ResponseDisplayIngest
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 
 class Router(
   monitor: ProgressTracker,
@@ -34,7 +34,8 @@ class Router(
     pathPrefix("progress") {
       post {
         entity(as[RequestDisplayIngest]) { progressCreateRequest =>
-          onSuccess(progressStarter.initialise(Progress(progressCreateRequest))) {
+          onSuccess(
+            progressStarter.initialise(progressCreateRequest.toProgress)) {
             progress =>
               respondWithHeaders(List(createLocationHeader(progress))) {
                 complete(Created -> ResponseDisplayIngest(progress, contextURL))

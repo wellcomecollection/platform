@@ -12,14 +12,14 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  DisplayLocation,
-  DisplayProvider,
-  DisplayStorageSpace
-}
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   StorageLocation,
   StorageProvider
+}
+import uk.ac.wellcome.platform.archive.display.{
+  DisplayLocation,
+  DisplayProvider,
+  DisplayStorageSpace
 }
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
