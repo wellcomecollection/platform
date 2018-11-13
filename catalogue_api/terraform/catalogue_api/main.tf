@@ -20,4 +20,7 @@ module "services" {
   romulus_container_image = "${var.romulus_container_image}"
   romulus_es_config       = "${var.romulus_es_config}"
   romulus_listener_port   = "${local.romulus_listener_port}"
+
+  nginx_container_image = "${var.nginx_container_image}"
+  nginx_container_port  = "${var.nginx_container_port}"
 }

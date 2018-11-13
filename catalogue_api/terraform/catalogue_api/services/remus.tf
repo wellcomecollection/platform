@@ -21,6 +21,9 @@ module "remus" {
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
   es_config              = "${var.remus_es_config}"
+
+  nginx_container_image = "${var.nginx_container_image}"
+  nginx_container_port  = "${var.nginx_container_port}"
 }
 
 module "remus_listener" {

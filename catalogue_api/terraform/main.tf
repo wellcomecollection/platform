@@ -15,9 +15,11 @@ module "catalogue_api" {
 
   romulus_container_image = "${local.romulus_app_uri}"
   remus_container_image   = "${local.remus_app_uri}"
+  nginx_container_image   = "${local.nginx_container_uri}"
 
   romulus_es_config = "${local.es_config_romulus}"
   remus_es_config   = "${local.es_config_remus}"
 
   production_api = "${local.production_api}"
+
 }
