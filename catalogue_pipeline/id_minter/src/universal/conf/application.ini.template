@@ -3,7 +3,7 @@
 -aws.rds.identifiers.table=identifiers
 -aws.rds.password=${db_password}
 -aws.rds.port=${db_port}
--aws.rds.userName=${db_username}
+-aws.rds.username=${db_username}
 -aws.rds.maxConnections=${max_connections}
 -aws.metrics.namespace=${metrics_namespace}
 -aws.message.reader.s3.bucketName=${message_bucket_name}

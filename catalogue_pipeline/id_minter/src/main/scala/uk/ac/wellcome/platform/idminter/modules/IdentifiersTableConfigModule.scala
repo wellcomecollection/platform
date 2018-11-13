@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter.modules
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.platform.idminter.models.IdentifiersTableConfig
+import uk.ac.wellcome.platform.idminter.config.models.IdentifiersTableConfig
 
 object IdentifiersTableConfigModule extends TwitterModule {
   val database = flag[String](

@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.idminter.models
 
 import com.google.inject.Inject
 import scalikejdbc._
+import uk.ac.wellcome.platform.idminter.config.models.IdentifiersTableConfig
 
 class IdentifiersTable @Inject()(identifiersTableConfig: IdentifiersTableConfig)
     extends SQLSyntaxSupport[Identifier] {

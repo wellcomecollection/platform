@@ -2,7 +2,9 @@ package uk.ac.wellcome.platform.idminter
 
 import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.idminter.config.builders.{IdentifiersTableBuilder, RDSBuilder}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.models.IdentifiersTable
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 import uk.ac.wellcome.platform.idminter.steps.{IdEmbedder, IdentifierGenerator}
 
@@ -14,7 +16,8 @@ object Main extends App with Logging {
 
   val identifierGenerator = new IdentifierGenerator(
     identifiersDao = new IdentifiersDao(
-
+      db = RDSBuilder.buildDB(config),
+      identifiers = IdentifiersTableBuilder.buildTable(config)
     )
   )
 

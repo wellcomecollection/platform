@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.idminter.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
+import uk.ac.wellcome.platform.idminter.config.models.IdentifiersTableConfig
 import uk.ac.wellcome.platform.idminter.database.TableProvisioner
-import uk.ac.wellcome.platform.idminter.models.IdentifiersTableConfig
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 
 object IdMinterWorkerModule extends TwitterModule {
