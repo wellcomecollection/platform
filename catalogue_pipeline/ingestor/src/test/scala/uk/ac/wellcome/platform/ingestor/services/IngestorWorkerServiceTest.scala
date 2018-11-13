@@ -14,7 +14,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType, Subject}
 import uk.ac.wellcome.platform.ingestor.config.models.{IngestElasticConfig, IngestorConfig}
-import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
+import uk.ac.wellcome.platform.ingestor.fixtures.{WorkIndexerFixtures, WorkerServiceFixture}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -30,6 +30,7 @@ class IngestorWorkerServiceTest
     with ElasticsearchFixtures
     with SQS
     with S3
+    with WorkerServiceFixture
     with WorkIndexerFixtures
     with WorksGenerators
     with CustomElasticsearchMapping {
@@ -39,17 +40,7 @@ class IngestorWorkerServiceTest
 
     val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
-    withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, _), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
-
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-      }
-    }
+    assertWorkIsIndexedCorrectly(work)
   }
 
   it("inserts an Sierra identified Work into the index") {
@@ -57,17 +48,7 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
 
-    withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, _), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
-
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-      }
-    }
+    assertWorkIsIndexedCorrectly(work)
   }
 
   it("inserts an Sierra identified invisible Work into the index") {
@@ -75,17 +56,7 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
 
-    withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, _), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
-
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-      }
-    }
+    assertWorkIsIndexedCorrectly(work)
   }
 
   it("inserts an Sierra identified redirected Work into the index") {
@@ -93,17 +64,7 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
 
-    withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, _), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
-
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-      }
-    }
+    assertWorkIsIndexedCorrectly(work)
   }
 
   it("inserts a mixture of miro and sierra works into the correct index") {
@@ -122,21 +83,7 @@ class IngestorWorkerServiceTest
 
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
 
-    withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, dlq), bucket) =>
-          works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
-          }
-
-          assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
-
-          assertQueueEmpty(dlq)
-      }
-    }
+    assertWorksAreIndexedCorrectly(works)
   }
 
   it("Inserts a non sierra or miro identified work") {
@@ -146,22 +93,7 @@ class IngestorWorkerServiceTest
       )
     )
 
-    withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, dlq), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
-
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
-          }
-      }
-    }
+    assertWorkIsIndexedCorrectly(work)
   }
 
   it(
@@ -180,28 +112,7 @@ class IngestorWorkerServiceTest
 
     val works = List(miroWork, sierraWork, otherWork)
 
-    withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, dlq), bucket) =>
-          works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
-          }
-
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            miroWork,
-            sierraWork,
-            otherWork)
-
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
-          }
-      }
-    }
+    assertWorksAreIndexedCorrectly(works)
   }
 
   it(
@@ -217,24 +128,27 @@ class IngestorWorkerServiceTest
 
     val works = List(sierraWork, oldSierraWork)
 
-    withLocalElasticsearchIndex { indexName =>
-      insertIntoElasticsearch(indexName = indexName, newSierraWork)
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, dlq), bucket) =>
-          works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
-          }
+    withLocalS3Bucket { bucket =>
+      withLocalSqsQueueAndDlq {
+        case QueuePair(queue, dlq) =>
+          withLocalElasticsearchIndex { indexName =>
+            withWorkerService(bucket, queue, indexName) { _ =>
+              works.foreach { work =>
+                sendMessage[IdentifiedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
+              }
 
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            sierraWork,
-            newSierraWork)
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
+              assertElasticsearchEventuallyHasWork(
+                indexName = indexName,
+                sierraWork,
+                newSierraWork)
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueEmpty(dlq)
+              }
+            }
           }
       }
     }
@@ -243,28 +157,7 @@ class IngestorWorkerServiceTest
   it("ingests lots of works") {
     val works = createIdentifiedWorks(count = 250)
 
-    withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, dlq), bucket) =>
-          works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
-          }
-
-          eventually {
-            works.foreach { work =>
-              assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-            }
-          }
-
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
-          }
-      }
-    }
+    assertWorksAreIndexedCorrectly(works)
   }
 
   it("only deletes successfully ingested works from the queue") {
@@ -280,124 +173,110 @@ class IngestorWorkerServiceTest
 
     val works = List(work, workDoesNotMatchMapping)
 
-    withLocalElasticsearchIndex(subsetOfFieldsIndex) { indexName =>
-      withIngestorWorkerService(indexName) {
-        case (QueuePair(queue, dlq), bucket) =>
-          works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
-          }
+    withLocalS3Bucket { bucket =>
+      withLocalSqsQueueAndDlq {
+        case QueuePair(queue, dlq) =>
+          withLocalElasticsearchIndex { indexName =>
+            withWorkerService(bucket, queue, indexName) { _ =>
+              works.foreach { work =>
+                sendMessage[IdentifiedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
+              }
 
-          assertElasticsearchNeverHasWork(
-            indexName = indexName,
-            workDoesNotMatchMapping)
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
+              assertElasticsearchNeverHasWork(
+                indexName = indexName,
+                workDoesNotMatchMapping)
+              assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 1)
+              }
+            }
           }
       }
     }
   }
 
   it("returns a failed Future if indexing into Elasticsearch fails") {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueueAndDlq {
-          case QueuePair(queue, dlq) =>
-            withLocalS3Bucket { bucket =>
-              withMessageStream[IdentifiedBaseWork, Assertion](
-                actorSystem,
-                bucket,
-                queue,
-                metricsSender) { messageStream =>
-                val brokenRestClient: RestClient = RestClient
-                  .builder(new HttpHost("localhost", 9800, "http"))
-                  .setHttpClientConfigCallback(
-                    new ElasticCredentials("elastic", "changeme"))
-                  .build()
+    withLocalSqsQueueAndDlq {
+      case QueuePair(queue, dlq) =>
+        withLocalS3Bucket { bucket =>
+          val brokenRestClient: RestClient = RestClient
+            .builder(new HttpHost("localhost", 9800, "http"))
+            .setHttpClientConfigCallback(
+              new ElasticCredentials("elastic", "changeme"))
+            .build()
 
-                val brokenElasticClient: HttpClient =
-                  HttpClient.fromRestClient(brokenRestClient)
+          val brokenElasticClient: HttpClient =
+            HttpClient.fromRestClient(brokenRestClient)
 
-                val brokenWorkIndexer = new WorkIndexer(
-                  elasticClient = brokenElasticClient
-                )
+          withWorkerService(bucket, queue, indexName = "works-v1", elasticClient = brokenElasticClient) { _ =>
+            val work = createIdentifiedWork
 
-                withIngestorWorkerService[Assertion](
-                  indexName = "works-v1",
-                  brokenWorkIndexer,
-                  messageStream) { _ =>
-                  val work = createIdentifiedWork
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
-                  sendMessage[IdentifiedBaseWork](
-                    bucket = bucket,
-                    queue = queue,
-                    obj = work)
-
-                  eventually {
-                    assertQueueEmpty(queue)
-                    assertQueueHasSize(dlq, 1)
-                  }
-                }
-              }
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
             }
-
+          }
         }
-      }
     }
   }
 
-  private def withIngestorWorkerService[R](indexName: String)(
-    testWith: TestWith[(QueuePair, Bucket), R]): R = {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueueAndDlqAndTimeout(10) {
-          case queuePair @ QueuePair(queue, dlq) =>
-            withLocalS3Bucket { bucket =>
-              withWorkIndexer { workIndexer =>
-                withMessageStream[IdentifiedBaseWork, R](
-                  actorSystem,
-                  bucket,
-                  queue,
-                  metricsSender) { messageStream =>
-                  withIngestorWorkerService[R](
-                    indexName = indexName,
-                    workIndexer = workIndexer,
-                    messageStream = messageStream) { _ =>
-                    testWith((queuePair, bucket))
-                  }
-                }
-              }
-            }
+  private def withIngestorWorkerService[R](esIndex: String)(
+    testWith: TestWith[(QueuePair, Bucket), R]): R =
+    withLocalSqsQueueAndDlqAndTimeout(10) {
+      case queuePair@QueuePair(queue, dlq) =>
+        withLocalS3Bucket { bucket =>
+          withWorkerService(bucket, queue, indexName = esIndex) { _ =>
+            testWith((queuePair, bucket))
+          }
+        }
+
+    }
+
+  private def assertWorkIsIndexedCorrectly(work: IdentifiedBaseWork): Seq[Assertion] =
+    withLocalElasticsearchIndex { indexName =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { bucket =>
+          withWorkerService(bucket, queue, indexName) { _ =>
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
+
+            assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+          }
         }
       }
     }
-  }
 
-  private def withIngestorWorkerService[R](
-    indexName: String,
-    workIndexer: WorkIndexer,
-    messageStream: MessageStream[IdentifiedBaseWork])(
-    testWith: TestWith[IngestorWorkerService, R]): R = {
+  private def assertWorksAreIndexedCorrectly(works: Seq[IdentifiedBaseWork]) =
+    withLocalS3Bucket { bucket =>
+      withLocalSqsQueueAndDlq {
+        case QueuePair(queue, dlq) =>
+          withLocalElasticsearchIndex { indexName =>
+            withWorkerService(bucket, queue, indexName) { _ =>
+              works.foreach { work =>
+                sendMessage[IdentifiedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
+              }
 
-    val ingestorConfig = IngestorConfig(
-      batchSize = 100,
-      flushInterval = 5 seconds,
-      elasticConfig = IngestElasticConfig(
-        documentType = documentType,
-        indexName = indexName
-      )
-    )
-
-    val ingestorWorkerService = new IngestorWorkerService(
-      ingestorConfig = ingestorConfig,
-      elasticClient = elasticClient,
-      messageStream = messageStream
-    )
-
-    testWith(ingestorWorkerService)
-  }
+              assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueEmpty(dlq)
+              }
+            }
+          }
+      }
+    }
 }
