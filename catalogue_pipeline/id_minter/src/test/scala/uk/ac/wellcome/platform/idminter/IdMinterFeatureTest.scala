@@ -8,6 +8,7 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.platform.idminter.fixtures.WorkerServiceFixture
 
 import scala.collection.JavaConverters._
 
@@ -18,10 +19,10 @@ class IdMinterFeatureTest
     with S3
     with Messaging
     with fixtures.IdentifiersDatabase
-    with fixtures.Server
     with IntegrationPatience
     with Eventually
     with Matchers
+    with WorkerServiceFixture
     with WorksGenerators {
 
   it("mints the same IDs where source identifiers match") {
@@ -29,15 +30,7 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
-
-
-
-
-            val flags =
-              identifiersLocalDbFlags(identifiersTableConfig) ++
-                messagingLocalFlags(bucket, topic, queue)
-
-            withServer(flags) { _ =>
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
               eventuallyTableExists(identifiersTableConfig)
               val work = createUnidentifiedWork
 
@@ -77,11 +70,7 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
-            val flags =
-              identifiersLocalDbFlags(identifiersTableConfig) ++
-                messagingLocalFlags(bucket, topic, queue)
-
-            withServer(flags) { _ =>
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
               eventuallyTableExists(identifiersTableConfig)
               val work = createUnidentifiedInvisibleWork
 
@@ -113,11 +102,7 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
-            val flags =
-              identifiersLocalDbFlags(identifiersTableConfig) ++
-                messagingLocalFlags(bucket, topic, queue)
-
-            withServer(flags) { _ =>
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
               eventuallyTableExists(identifiersTableConfig)
 
               val work = createUnidentifiedRedirectedWork
@@ -151,11 +136,7 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { identifiersTableConfig =>
           withLocalS3Bucket { bucket =>
-            val flags =
-              identifiersLocalDbFlags(identifiersTableConfig) ++
-                messagingLocalFlags(bucket, topic, queue)
-
-            withServer(flags) { _ =>
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
               sendInvalidJSONto(queue)
 
               val work = createUnidentifiedWork

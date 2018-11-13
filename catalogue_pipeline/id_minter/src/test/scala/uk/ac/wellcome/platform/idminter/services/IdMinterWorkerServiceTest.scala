@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.idminter.modules
+package uk.ac.wellcome.platform.idminter.services
 
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.mockito.MockitoSugar
@@ -17,7 +17,6 @@ class IdMinterWorkerServiceTest
     with S3
     with Messaging
     with fixtures.IdentifiersDatabase
-    with fixtures.Server
     with Eventually
     with IntegrationPatience
     with Matchers

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.idminter.fixtures
 
-import org.scalatest.Matchers
+import org.scalatest.{Assertion, Matchers}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import scalikejdbc.{AutoSession, ConnectionPool, DB, SQLSyntax}
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -16,11 +16,11 @@ trait IdentifiersDatabase
     with Matchers {
 
   val host = "localhost"
-  val port = "3307"
+  val port = 3307
   val username = "root"
   val password = "password"
 
-  def eventuallyTableExists(tableConfig: IdentifiersTableConfig) = eventually {
+  def eventuallyTableExists(tableConfig: IdentifiersTableConfig): Assertion = eventually {
     val database: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.database)
     val table: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.tableName)
 

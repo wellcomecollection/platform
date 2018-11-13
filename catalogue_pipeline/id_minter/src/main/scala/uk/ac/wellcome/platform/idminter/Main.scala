@@ -6,13 +6,13 @@ import io.circe.Json
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.MessagingBuilder
 import uk.ac.wellcome.platform.idminter.config.builders.{IdentifiersTableBuilder, RDSBuilder}
-import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, TableProvisioner}
+import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.models.IdentifiersTable
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 import uk.ac.wellcome.platform.idminter.steps.{IdEmbedder, IdentifierGenerator}
 
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext}
 
 object Main extends App with Logging {
   val config: Config = ConfigFactory.load()

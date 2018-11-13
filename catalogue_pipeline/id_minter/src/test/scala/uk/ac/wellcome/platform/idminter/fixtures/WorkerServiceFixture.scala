@@ -2,12 +2,14 @@ package uk.ac.wellcome.platform.idminter.fixtures
 
 import io.circe.Json
 import org.scalatest.Assertion
+import scalikejdbc.DB
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.idminter.config.models.IdentifiersTableConfig
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.models.IdentifiersTable
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 import uk.ac.wellcome.platform.idminter.steps.{IdEmbedder, IdentifierGenerator}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -38,4 +40,16 @@ trait WorkerServiceFixture extends Akka with IdentifiersDatabase with Messaging 
         }
       }
     }
+
+  def withWorkerService[R](bucket: Bucket, topic: Topic, queue: Queue, identifiersTableConfig: IdentifiersTableConfig)(testWith: TestWith[IdMinterWorkerService, R]): R = {
+    val identifiersDao = new IdentifiersDao(
+      db = DB.connect(),
+      identifiers = new IdentifiersTable(
+        identifiersTableConfig = identifiersTableConfig
+      )
+    )
+    withWorkerService(bucket, topic, queue, identifiersDao, identifiersTableConfig) { service =>
+      testWith(service)
+    }
+  }
 }
