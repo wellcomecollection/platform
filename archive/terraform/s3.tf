@@ -5,6 +5,8 @@ data "aws_s3_bucket" "storage_manifests" {
 resource "aws_s3_bucket" "archive_storage" {
   bucket = "${local.archive_bucket_name}"
   acl    = "private"
+
+  policy = "${data.aws_iam_policy_document.archive_dlcs_get.json}"
 }
 
 resource "aws_s3_bucket" "ingest_storage" {
