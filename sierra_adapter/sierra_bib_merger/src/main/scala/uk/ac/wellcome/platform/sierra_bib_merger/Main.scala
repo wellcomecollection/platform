@@ -5,9 +5,7 @@ import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
-import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.sierra_bib_merger.services.{
   SierraBibMergerUpdaterService,
   SierraBibMergerWorkerService
@@ -31,16 +29,9 @@ object Main extends App with Logging {
     versionedHybridStore = versionedHybridStore
   )
 
-  val sqsStream = new SQSStream[NotificationMessage](
-    actorSystem = actorSystem,
-    sqsClient = SQSBuilder.buildSQSAsyncClient(config),
-    sqsConfig = SQSBuilder.buildSQSConfig(config),
-    metricsSender = MetricsBuilder.buildMetricsSender(config)
-  )
-
   val workerService = new SierraBibMergerWorkerService(
     actorSystem = actorSystem,
-    sqsStream = sqsStream,
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
     snsWriter = SNSBuilder.buildSNSWriter(config),
     sierraBibMergerUpdaterService = updaterService
   )

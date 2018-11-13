@@ -8,7 +8,6 @@ import uk.ac.wellcome.config.messaging.builders.SQSBuilder
 import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.sierra_reader.config.builders.{
   ReaderConfigBuilder,
   SierraAPIConfigBuilder
@@ -25,12 +24,7 @@ object Main extends App with Logging {
 
   val metricsSender = MetricsBuilder.buildMetricsSender(config)
 
-  val sqsStream = new SQSStream[NotificationMessage](
-    actorSystem = actorSystem,
-    sqsClient = SQSBuilder.buildSQSAsyncClient(config),
-    sqsConfig = SQSBuilder.buildSQSConfig(config),
-    metricsSender = metricsSender
-  )
+  val sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
 
   val workerService = new SierraReaderWorkerService(
     sqsStream = sqsStream,

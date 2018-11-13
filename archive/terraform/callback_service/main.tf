@@ -23,8 +23,8 @@ module "service" {
 module "task" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=v11.9.0"
 
-  cpu    = 1024
-  memory = 2048
+  cpu    = 512
+  memory = 1024
 
   env_vars        = "${var.env_vars}"
   env_vars_length = "${var.env_vars_length}"

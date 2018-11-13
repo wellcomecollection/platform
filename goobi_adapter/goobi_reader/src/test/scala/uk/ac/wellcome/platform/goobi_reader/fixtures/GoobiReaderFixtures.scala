@@ -3,13 +3,7 @@ package uk.ac.wellcome.platform.goobi_reader.fixtures
 import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
-import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
-
-trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
+trait GoobiReaderFixtures {
 
   private val dateTimeFormatter: DateTimeFormatter =
     DateTimeFormatter
@@ -18,7 +12,7 @@ trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
 
   def anS3Notification(sourceKey: String,
                        bucketName: String,
-                       eventTime: Instant) =
+                       eventTime: Instant): String =
     s"""{
         | "Records": [
         |     {
@@ -57,7 +51,4 @@ trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
         |     }
         | ]
         |}""".stripMargin
-
-  def goobiReaderLocalFlags(queue: Queue, bucket: Bucket, table: Table) =
-    sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table, "goobi")
 }

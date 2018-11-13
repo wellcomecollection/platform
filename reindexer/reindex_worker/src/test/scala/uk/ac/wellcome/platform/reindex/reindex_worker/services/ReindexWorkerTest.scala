@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.reindex.reindex_worker.services
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
@@ -44,12 +44,12 @@ class ReindexWorkerTest
     )
   )
 
-  def withReindexWorkerService(table: Table, topic: Topic)(
-    testWith: TestWith[(ReindexWorker, QueuePair), Assertion]) = {
+  def withReindexWorkerService[R](table: Table, topic: Topic)(
+    testWith: TestWith[(ReindexWorker, QueuePair), R]): R =
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, dlq) =>
-          withSQSStream[NotificationMessage, Assertion](actorSystem, queue) {
+          withSQSStream[NotificationMessage, R](actorSystem, queue) {
             sqsStream =>
               withMaxRecordsScanner(table) { maxRecordsScanner =>
                 withParallelScanner(table) { parallelScanner =>
@@ -81,7 +81,6 @@ class ReindexWorkerTest
           }
       }
     }
-  }
 
   it("completes a reindex") {
     withLocalDynamoDbTable { table =>

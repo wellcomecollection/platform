@@ -31,8 +31,8 @@ module "snapshot_generator" {
 
   env_vars_length = 11
 
-  memory = 4096
-  cpu    = 2048
+  memory = 1024
+  cpu    = 256
 
   vpc_id = "${local.vpc_id}"
 

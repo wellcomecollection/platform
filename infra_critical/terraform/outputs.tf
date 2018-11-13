@@ -1,3 +1,4 @@
+# miro 
 output "vhs_miro_dynamodb_update_policy" {
   value = "${module.vhs_miro.dynamodb_update_policy}"
 }
@@ -13,6 +14,26 @@ output "vhs_miro_table_name" {
 output "vhs_miro_bucket_name" {
   value = "${module.vhs_miro.bucket_name}"
 }
+
+# miro inventory
+
+output "vhs_miro_inventory_dynamodb_update_policy" {
+  value = "${module.vhs_miro_migration.dynamodb_update_policy}"
+}
+
+output "vhs_miro_inventory_read_policy" {
+  value = "${module.vhs_miro_migration.read_policy}"
+}
+
+output "vhs_miro_inventory_table_name" {
+  value = "${module.vhs_miro_migration.table_name}"
+}
+
+output "vhs_miro_inventory_bucket_name" {
+  value = "${module.vhs_miro_migration.bucket_name}"
+}
+
+# sierra
 
 output "vhs_sierra_full_access_policy" {
   value = "${module.vhs_sierra.full_access_policy}"
@@ -34,6 +55,8 @@ output "vhs_sierra_bucket_name" {
   value = "${module.vhs_sierra.bucket_name}"
 }
 
+# sierra items
+
 output "vhs_sierra_items_full_access_policy" {
   value = "${module.vhs_sierra_items.full_access_policy}"
 }
@@ -46,6 +69,8 @@ output "vhs_sierra_items_bucket_name" {
   value = "${module.vhs_sierra_items.bucket_name}"
 }
 
+# goobi
+
 output "vhs_goobi_full_access_policy" {
   value = "${module.vhs_goobi_mets.full_access_policy}"
 }
@@ -57,6 +82,8 @@ output "vhs_goobi_table_name" {
 output "vhs_goobi_bucket_name" {
   value = "${module.vhs_goobi_mets.bucket_name}"
 }
+
+# --------
 
 output "rds_access_security_group_id" {
   value = "${aws_security_group.rds_access_security_group.id}"
