@@ -7,8 +7,7 @@ import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WorkGraphStore(workNodeDao: WorkNodeDao)(
-  implicit ec: ExecutionContext)
+class WorkGraphStore(workNodeDao: WorkNodeDao)(implicit ec: ExecutionContext)
     extends Logging {
 
   def findAffectedWorks(workUpdate: WorkUpdate): Future[WorkGraph] = {

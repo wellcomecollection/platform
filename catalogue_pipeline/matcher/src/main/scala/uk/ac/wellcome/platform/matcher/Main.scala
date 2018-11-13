@@ -9,7 +9,10 @@ import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.matcher.locking.{DynamoLockingService, DynamoRowLockDao}
+import uk.ac.wellcome.platform.matcher.locking.{
+  DynamoLockingService,
+  DynamoRowLockDao
+}
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.services.MatcherWorkerService
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
@@ -37,7 +40,8 @@ object Main extends App with Logging {
   val lockingService = new DynamoLockingService(
     dynamoRowLockDao = new DynamoRowLockDao(
       dynamoDBClient = dynamoClient,
-      dynamoConfig = DynamoBuilder.buildDynamoConfig(config, namespace = "locking.service")
+      dynamoConfig =
+        DynamoBuilder.buildDynamoConfig(config, namespace = "locking.service")
     ),
     metricsSender = MetricsBuilder.buildMetricsSender(config)
   )
@@ -48,7 +52,8 @@ object Main extends App with Logging {
   )
 
   val workerService = new MatcherWorkerService(
-    messageStream = MessagingBuilder.buildMessageStream[TransformedBaseWork](config),
+    messageStream =
+      MessagingBuilder.buildMessageStream[TransformedBaseWork](config),
     snsWriter = SNSBuilder.buildSNSWriter(config),
     workMatcher = workMatcher
   )

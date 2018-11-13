@@ -64,33 +64,34 @@ class MatcherFeatureTest
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
           withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
-            withWorkerService(queuePair.queue, storageBucket, topic, graphTable) { _ =>
-              val existingWorkVersion = 2
-              val updatedWorkVersion = 1
+            withWorkerService(queuePair.queue, storageBucket, topic, graphTable) {
+              _ =>
+                val existingWorkVersion = 2
+                val updatedWorkVersion = 1
 
-              val workAv1 = createUnidentifiedWorkWith(
-                version = updatedWorkVersion
-              )
+                val workAv1 = createUnidentifiedWorkWith(
+                  version = updatedWorkVersion
+                )
 
-              val existingWorkAv2 = WorkNode(
-                id = workAv1.sourceIdentifier.toString,
-                version = existingWorkVersion,
-                linkedIds = Nil,
-                componentId = workAv1.sourceIdentifier.toString
-              )
-              Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
+                val existingWorkAv2 = WorkNode(
+                  id = workAv1.sourceIdentifier.toString,
+                  version = existingWorkVersion,
+                  linkedIds = Nil,
+                  componentId = workAv1.sourceIdentifier.toString
+                )
+                Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
-              sendMessage[TransformedBaseWork](
-                bucket = storageBucket,
-                queue = queuePair.queue,
-                workAv1
-              )
+                sendMessage[TransformedBaseWork](
+                  bucket = storageBucket,
+                  queue = queuePair.queue,
+                  workAv1
+                )
 
-              eventually {
-                noMessagesAreWaitingIn(queuePair.queue)
-                noMessagesAreWaitingIn(queuePair.dlq)
-                listMessagesReceivedFromSNS(topic).size shouldBe 0
-              }
+                eventually {
+                  noMessagesAreWaitingIn(queuePair.queue)
+                  noMessagesAreWaitingIn(queuePair.dlq)
+                  listMessagesReceivedFromSNS(topic).size shouldBe 0
+                }
             }
           }
         }

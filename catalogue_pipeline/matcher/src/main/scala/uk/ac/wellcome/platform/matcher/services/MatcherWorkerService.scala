@@ -12,10 +12,11 @@ import uk.ac.wellcome.platform.matcher.models.VersionExpectedConflictException
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MatcherWorkerService(
-  messageStream: MessageStream[TransformedBaseWork],
-  snsWriter: SNSWriter,
-  workMatcher: WorkMatcher)(implicit val actorSystem: ActorSystem, ec: ExecutionContext)
+class MatcherWorkerService(messageStream: MessageStream[TransformedBaseWork],
+                           snsWriter: SNSWriter,
+                           workMatcher: WorkMatcher)(
+  implicit val actorSystem: ActorSystem,
+  ec: ExecutionContext)
     extends Logging {
 
   def run(): Future[Done] =

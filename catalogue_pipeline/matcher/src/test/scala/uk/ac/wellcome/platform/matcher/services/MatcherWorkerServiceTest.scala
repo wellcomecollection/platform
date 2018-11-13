@@ -280,40 +280,40 @@ class MatcherWorkerServiceTest
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
           withWorkerService(queuePair.queue, storageBucket, topic) { _ =>
-              // process Work V2
-              val workAv2 = createUnidentifiedWorkWith(
-                sourceIdentifier = identifierA,
-                version = 2
+            // process Work V2
+            val workAv2 = createUnidentifiedWorkWith(
+              sourceIdentifier = identifierA,
+              version = 2
+            )
+
+            val expectedMatchedWorkAv2 = MatcherResult(
+              Set(MatchedIdentifiers(
+                Set(WorkIdentifier("sierra-system-number/A", 2)))))
+
+            processAndAssertMatchedWorkIs(
+              workAv2,
+              expectedMatchedWorkAv2,
+              queuePair.queue,
+              storageBucket,
+              topic)
+
+            // Work V1 is sent but not matched
+            val workAv1 = createUnidentifiedWorkWith(
+              sourceIdentifier = identifierA,
+              version = 1)
+
+            sendMessage[TransformedBaseWork](
+              bucket = storageBucket,
+              queue = queuePair.queue,
+              workAv1)
+            eventually {
+              noMessagesAreWaitingIn(queuePair.queue)
+              noMessagesAreWaitingIn(queuePair.dlq)
+              assertLastMatchedResultIs(
+                topic = topic,
+                expectedMatcherResult = expectedMatchedWorkAv2
               )
-
-              val expectedMatchedWorkAv2 = MatcherResult(
-                Set(MatchedIdentifiers(
-                  Set(WorkIdentifier("sierra-system-number/A", 2)))))
-
-              processAndAssertMatchedWorkIs(
-                workAv2,
-                expectedMatchedWorkAv2,
-                queuePair.queue,
-                storageBucket,
-                topic)
-
-              // Work V1 is sent but not matched
-              val workAv1 = createUnidentifiedWorkWith(
-                sourceIdentifier = identifierA,
-                version = 1)
-
-              sendMessage[TransformedBaseWork](
-                bucket = storageBucket,
-                queue = queuePair.queue,
-                workAv1)
-              eventually {
-                noMessagesAreWaitingIn(queuePair.queue)
-                noMessagesAreWaitingIn(queuePair.dlq)
-                assertLastMatchedResultIs(
-                  topic = topic,
-                  expectedMatcherResult = expectedMatchedWorkAv2
-                )
-              }
+            }
           }
         }
       }

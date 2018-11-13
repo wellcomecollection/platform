@@ -10,7 +10,11 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.matcher.locking.{DynamoLockingService, DynamoRowLockDao, RowLock}
+import uk.ac.wellcome.platform.matcher.locking.{
+  DynamoLockingService,
+  DynamoRowLockDao,
+  RowLock
+}
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.services.MatcherWorkerService
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}

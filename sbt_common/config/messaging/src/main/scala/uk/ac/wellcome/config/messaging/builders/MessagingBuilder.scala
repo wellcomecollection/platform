@@ -13,12 +13,14 @@ import scala.concurrent.ExecutionContext
 object MessagingBuilder {
   def buildMessageReaderConfig(config: Config): MessageReaderConfig =
     MessageReaderConfig(
-      sqsConfig = SQSBuilder.buildSQSConfig(config, namespace = "message.reader"),
+      sqsConfig =
+        SQSBuilder.buildSQSConfig(config, namespace = "message.reader"),
       s3Config = S3Builder.buildS3Config(config, namespace = "message.reader")
-
     )
 
-  def buildMessageStream[T](config: Config)(implicit serialisationStrategy: SerialisationStrategy[T]): MessageStream[T] = {
+  def buildMessageStream[T](config: Config)(
+    implicit serialisationStrategy: SerialisationStrategy[T])
+    : MessageStream[T] = {
     implicit val executionContext: ExecutionContext =
       AkkaBuilder.buildExecutionContext()
 
