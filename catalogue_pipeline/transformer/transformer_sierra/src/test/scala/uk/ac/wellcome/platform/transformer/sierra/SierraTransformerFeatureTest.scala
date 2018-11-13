@@ -17,6 +17,8 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class SierraTransformerFeatureTest
     extends FunSpec
     with Matchers

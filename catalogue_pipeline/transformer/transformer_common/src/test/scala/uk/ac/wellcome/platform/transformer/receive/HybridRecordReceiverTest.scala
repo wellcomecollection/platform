@@ -8,17 +8,14 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.fixtures.HybridRecordReceiverFixture
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
@@ -85,7 +82,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable, List[Assertion]](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(notification, transformToWork)
 

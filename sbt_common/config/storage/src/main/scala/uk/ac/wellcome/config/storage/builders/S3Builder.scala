@@ -9,6 +9,8 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config, S3StorageBackend}
 import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
 
+import scala.concurrent.ExecutionContext
+
 object S3Builder extends AWSClientConfigBuilder {
   private def buildS3Client(awsClientConfig: AWSClientConfig): AmazonS3 =
     S3ClientFactory.create(
@@ -33,11 +35,11 @@ object S3Builder extends AWSClientConfigBuilder {
   }
 
   def buildObjectStore[T](config: Config)(
-    implicit serialisationStrategy: SerialisationStrategy[T]): ObjectStore[T] = {
+    implicit serialisationStrategy: SerialisationStrategy[T], ec: ExecutionContext): ObjectStore[T] = {
     implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
       s3Client = buildS3Client(config)
     )
 
-    ObjectStore[StorageManifest]
+    ObjectStore[T]
   }
 }
