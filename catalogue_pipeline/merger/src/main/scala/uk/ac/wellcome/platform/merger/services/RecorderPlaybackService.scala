@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.merger.services
 
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.matcher.WorkIdentifier
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
@@ -17,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * so the merger has everything it needs to work with.
   *
   */
-class RecorderPlaybackService @Inject()(
+class RecorderPlaybackService(
   versionedHybridStore: VersionedHybridStore[TransformedBaseWork,
                                              EmptyMetadata,
                                              ObjectStore[TransformedBaseWork]],

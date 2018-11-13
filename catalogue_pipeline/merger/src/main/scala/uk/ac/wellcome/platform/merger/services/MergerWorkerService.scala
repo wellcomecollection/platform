@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.merger.services
 
-import akka.actor.{ActorSystem, Terminated}
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -12,8 +10,7 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MergerWorkerService @Inject()(
-  system: ActorSystem,
+class MergerWorkerService(
   sqsStream: SQSStream[NotificationMessage],
   playbackService: RecorderPlaybackService,
   mergerManager: MergerManager,
@@ -44,6 +41,4 @@ class MergerWorkerService @Inject()(
           messageWriter.write(_, "merged-work")
         ))
   }
-
-  def stop(): Future[Terminated] = system.terminate()
 }
