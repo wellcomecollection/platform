@@ -13,7 +13,6 @@ import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.storage.dynamo._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
