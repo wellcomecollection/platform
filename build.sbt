@@ -110,6 +110,7 @@ lazy val transformer_common = doServiceSetup(project, "catalogue_pipeline/transf
 
 lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
   .dependsOn(transformer_common % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.miroTransformerDependencies)
 
 lazy val transformer_sierra = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_sierra")
   .dependsOn(transformer_common % "compile->compile;test->test")

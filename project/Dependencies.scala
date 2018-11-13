@@ -178,6 +178,10 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
   )
 
+  val miroTransformerDependencies: Seq[ModuleID] = Seq(
+    "org.apache.commons" % "commons-lang3" % "3.0"
+  )
+
   val snapshotGeneratorDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka
   )
