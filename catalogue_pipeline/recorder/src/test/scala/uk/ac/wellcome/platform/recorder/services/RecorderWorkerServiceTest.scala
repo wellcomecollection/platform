@@ -7,18 +7,17 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
+import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.recorder.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.test.fixtures.Akka
 
 class RecorderWorkerServiceTest
     extends FunSpec
@@ -31,6 +30,7 @@ class RecorderWorkerServiceTest
     with Messaging
     with MetricsSenderFixture
     with IntegrationPatience
+    with WorkerServiceFixture
     with WorksGenerators {
 
   it("records an UnidentifiedWork") {
@@ -46,7 +46,7 @@ class RecorderWorkerServiceTest
                   queue = queue,
                   obj = work
                 )
-                withRecorderWorkerService(
+                withWorkerService(
                   table,
                   storageBucket,
                   messagesBucket,
@@ -71,7 +71,7 @@ class RecorderWorkerServiceTest
           withLocalS3Bucket { messagesBucket =>
             withLocalSqsQueue { queue =>
               withLocalSnsTopic { topic =>
-                withRecorderWorkerService(
+                withWorkerService(
                   table,
                   storageBucket,
                   messagesBucket,
@@ -105,12 +105,12 @@ class RecorderWorkerServiceTest
           withLocalS3Bucket { messagesBucket =>
             withLocalSqsQueue { queue =>
               withLocalSnsTopic { topic =>
-                withRecorderWorkerService(
+                withWorkerService(
                   table,
                   storageBucket,
                   messagesBucket,
                   topic,
-                  queue) { service =>
+                  queue) { _ =>
                   sendMessage[TransformedBaseWork](
                     bucket = messagesBucket,
                     queue = queue,
@@ -145,7 +145,7 @@ class RecorderWorkerServiceTest
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
             withLocalSnsTopic { topic =>
-              withRecorderWorkerService(
+              withWorkerService(
                 table,
                 storageBucket,
                 messagesBucket,
@@ -186,22 +186,18 @@ class RecorderWorkerServiceTest
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueueAndDlq {
             case QueuePair(queue, dlq) =>
-              withRecorderWorkerService(
-                table,
-                badBucket,
-                messagesBucket,
-                topic,
-                queue) { service =>
-                val work = createUnidentifiedWork
-                sendMessage[TransformedBaseWork](
-                  bucket = messagesBucket,
-                  queue = queue,
-                  obj = work
-                )
-                eventually {
-                  assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 1)
-                }
+              withWorkerService(table, badBucket, messagesBucket, topic, queue) {
+                _ =>
+                  val work = createUnidentifiedWork
+                  sendMessage[TransformedBaseWork](
+                    bucket = messagesBucket,
+                    queue = queue,
+                    obj = work
+                  )
+                  eventually {
+                    assertQueueEmpty(queue)
+                    assertQueueHasSize(dlq, 1)
+                  }
               }
           }
         }
@@ -216,7 +212,7 @@ class RecorderWorkerServiceTest
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueueAndDlq {
             case QueuePair(queue, dlq) =>
-              withRecorderWorkerService(
+              withWorkerService(
                 badTable,
                 storageBucket,
                 messagesBucket,
@@ -262,41 +258,5 @@ class RecorderWorkerServiceTest
 
     actualEntry shouldBe expectedWork
     getMessages[T](topic) should contain(expectedWork)
-  }
-
-  private def withRecorderWorkerService[R](
-    table: Table,
-    storageBucket: Bucket,
-    messagesBucket: Bucket,
-    topic: Topic,
-    queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withSNSWriter(topic) { snsWriter =>
-          withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
-            bucket = storageBucket,
-            table = table) { versionedHybridStore =>
-            withMessageStream[TransformedBaseWork, R](
-              actorSystem,
-              messagesBucket,
-              queue,
-              metricsSender) { messageStream =>
-              val workerService = new RecorderWorkerService(
-                versionedHybridStore = versionedHybridStore,
-                messageStream = messageStream,
-                snsWriter = snsWriter,
-                system = actorSystem
-              )
-
-              try {
-                testWith(workerService)
-              } finally {
-                workerService.stop()
-              }
-            }
-          }
-        }
-      }
-    }
   }
 }
