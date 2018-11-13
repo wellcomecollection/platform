@@ -15,7 +15,12 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends Akka with LocalVersionedHybridStore with Messaging with MetricsSenderFixture with SNS {
+trait WorkerServiceFixture
+    extends Akka
+    with LocalVersionedHybridStore
+    with Messaging
+    with MetricsSenderFixture
+    with SNS {
   def withWorkerService[R](
     table: Table,
     storageBucket: Bucket,

@@ -3,12 +3,20 @@ package uk.ac.wellcome.platform.recorder.services
 import akka.Done
 import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.{MessageNotification, MessageStream, RemoteNotification}
+import uk.ac.wellcome.messaging.message.{
+  MessageNotification,
+  MessageStream,
+  RemoteNotification
+}
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VHSIndexEntry, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  EmptyMetadata,
+  VHSIndexEntry,
+  VersionedHybridStore
+}
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -184,24 +184,21 @@ class RecorderWorkerServiceTest
       withLocalSnsTopic { topic =>
         val badBucket = Bucket(name = "bad-bukkit")
         withLocalS3Bucket { messagesBucket =>
-          withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-            withWorkerService(
-              table,
-              badBucket,
-              messagesBucket,
-              topic,
-              queue) { _ =>
-              val work = createUnidentifiedWork
-              sendMessage[TransformedBaseWork](
-                bucket = messagesBucket,
-                queue = queue,
-                obj = work
-              )
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
+          withLocalSqsQueueAndDlq {
+            case QueuePair(queue, dlq) =>
+              withWorkerService(table, badBucket, messagesBucket, topic, queue) {
+                _ =>
+                  val work = createUnidentifiedWork
+                  sendMessage[TransformedBaseWork](
+                    bucket = messagesBucket,
+                    queue = queue,
+                    obj = work
+                  )
+                  eventually {
+                    assertQueueEmpty(queue)
+                    assertQueueHasSize(dlq, 1)
+                  }
               }
-            }
           }
         }
       }
@@ -213,24 +210,25 @@ class RecorderWorkerServiceTest
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
-          withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-            withWorkerService(
-              badTable,
-              storageBucket,
-              messagesBucket,
-              topic,
-              queue) { service =>
-              val work = createUnidentifiedWork
-              sendMessage[TransformedBaseWork](
-                bucket = messagesBucket,
-                queue = queue,
-                obj = work
-              )
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
+          withLocalSqsQueueAndDlq {
+            case QueuePair(queue, dlq) =>
+              withWorkerService(
+                badTable,
+                storageBucket,
+                messagesBucket,
+                topic,
+                queue) { service =>
+                val work = createUnidentifiedWork
+                sendMessage[TransformedBaseWork](
+                  bucket = messagesBucket,
+                  queue = queue,
+                  obj = work
+                )
+                eventually {
+                  assertQueueEmpty(queue)
+                  assertQueueHasSize(dlq, 1)
+                }
               }
-            }
           }
         }
       }

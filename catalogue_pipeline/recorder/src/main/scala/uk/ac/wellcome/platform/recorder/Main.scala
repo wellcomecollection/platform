@@ -23,8 +23,10 @@ object Main extends App with Logging {
     AkkaBuilder.buildExecutionContext()
 
   val workerService = new RecorderWorkerService(
-    versionedHybridStore = VHSBuilder.buildVHS[TransformedBaseWork, EmptyMetadata](config),
-    messageStream = MessagingBuilder.buildMessageStream[TransformedBaseWork](config),
+    versionedHybridStore =
+      VHSBuilder.buildVHS[TransformedBaseWork, EmptyMetadata](config),
+    messageStream =
+      MessagingBuilder.buildMessageStream[TransformedBaseWork](config),
     snsWriter = SNSBuilder.buildSNSWriter(config)
   )
 
