@@ -325,7 +325,7 @@ class MatcherWorkerServiceTest
       withLocalSqsQueueAndDlq {
         case QueuePair(queue, dlq) =>
           withLocalS3Bucket { storageBucket =>
-            withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            withWorkerService(queue, storageBucket, topic) { _ =>
               val workAv2 = createUnidentifiedWorkWith(
                 sourceIdentifier = identifierA,
                 version = 2
