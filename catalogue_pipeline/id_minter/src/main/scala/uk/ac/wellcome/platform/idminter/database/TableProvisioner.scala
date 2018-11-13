@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.idminter.database
 
 import org.flywaydb.core.Flyway
-import uk.ac.wellcome.platform.idminter.models.RDSClientConfig
+import uk.ac.wellcome.platform.idminter.config.models.RDSClientConfig
 
 import scala.collection.JavaConverters._
 

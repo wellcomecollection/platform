@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter.modules
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.platform.idminter.models.RDSClientConfig
+import uk.ac.wellcome.platform.idminter.config.models.RDSClientConfig
 
 object RDSClientConfigModule extends TwitterModule {
 

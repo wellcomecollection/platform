@@ -5,11 +5,9 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import scalikejdbc.{AutoSession, ConnectionPool, DB, SQLSyntax}
 import uk.ac.wellcome.test.fixtures.TestWith
 import scalikejdbc._
+import uk.ac.wellcome.platform.idminter.config.models.RDSClientConfig
 import uk.ac.wellcome.platform.idminter.database.FieldDescription
-import uk.ac.wellcome.platform.idminter.models.{
-  IdentifiersTableConfig,
-  RDSClientConfig
-}
+import uk.ac.wellcome.platform.idminter.models.IdentifiersTableConfig
 
 import scala.util.Random
 

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.idminter.modules
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import scalikejdbc.{ConnectionPool, ConnectionPoolSettings, DB}
-import uk.ac.wellcome.platform.idminter.models.RDSClientConfig
+import uk.ac.wellcome.platform.idminter.config.models.RDSClientConfig
 
 object MysqlModule extends TwitterModule {
   override val modules = Seq(RDSClientConfigModule)
