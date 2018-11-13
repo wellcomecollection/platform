@@ -1,6 +1,5 @@
-package uk.ac.wellcome.platform.idminter.modules
+package uk.ac.wellcome.platform.idminter.services
 
-import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -11,37 +10,34 @@ import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao
 }
 import uk.ac.wellcome.platform.idminter.fixtures
+import uk.ac.wellcome.platform.idminter.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.storage.fixtures.S3
 
-class IdMinterWorkerTest
+class IdMinterWorkerServiceTest
     extends FunSpec
     with SQS
     with SNS
     with S3
     with Messaging
     with fixtures.IdentifiersDatabase
-    with fixtures.Server
     with Eventually
     with IntegrationPatience
     with Matchers
-    with MockitoSugar {
+    with MockitoSugar
+    with WorkerServiceFixture {
 
   it("creates the Identifiers table in MySQL upon startup") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { identifiersTableConfig =>
           withLocalS3Bucket { bucket =>
-            val flags =
-              messagingLocalFlags(bucket, topic, queue) ++ identifiersLocalDbFlags(
-                identifiersTableConfig)
-
             val identifiersDao = mock[IdentifiersDao]
-
-            withModifiedServer(
-              flags,
-              modifyServer = (server: EmbeddedHttpServer) => {
-                server.bind[IdentifiersDao].toInstance(identifiersDao)
-              }) { _ =>
+            withWorkerService(
+              bucket,
+              topic,
+              queue,
+              identifiersDao,
+              identifiersTableConfig) { _ =>
               val database: SQLSyntax =
                 SQLSyntax.createUnsafely(identifiersTableConfig.database)
               val table: SQLSyntax =

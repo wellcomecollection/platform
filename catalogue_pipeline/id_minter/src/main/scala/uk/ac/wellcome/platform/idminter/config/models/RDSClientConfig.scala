@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.idminter.models
+package uk.ac.wellcome.platform.idminter.config.models
 
 case class RDSClientConfig(
   host: String,
-  port: String,
+  port: Int,
   username: String,
   password: String
 )

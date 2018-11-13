@@ -59,7 +59,7 @@ object Main extends App with Logging {
   )
 
   try {
-    info(s"Starting worker.")
+    info("Starting worker.")
 
     val result = workerService.run()
 
@@ -68,6 +68,6 @@ object Main extends App with Logging {
     case e: Throwable =>
       error("Fatal error:", e)
   } finally {
-    info(s"Terminating worker.")
+    info("Terminating worker.")
   }
 }
