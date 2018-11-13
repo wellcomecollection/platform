@@ -59,7 +59,11 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
-
+  
+  val akkaHttpSwagger: Seq[ModuleID] = Seq(
+    "com.github.swagger-akka-http" %% "swagger-akka-http" % "1.0.0"
+  )
+  
   val circeDependencies = Seq(
     "io.circe" %% "circe-core" % versions.circeVersion,
     "io.circe" %% "circe-generic"% versions.circeVersion,
@@ -194,6 +198,7 @@ object Dependencies {
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
     "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
     "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
+    "com.typesafe.akka" %% "akka-http-testkit" % versions.akkaHttp % "test",
     "org.rogach" %% "scallop" % "3.1.3",
     "de.heikoseeberger" %% "akka-http-circe" % "1.21.1"
   ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
