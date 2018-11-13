@@ -30,34 +30,35 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
-            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
-              eventuallyTableExists(identifiersTableConfig)
-              val work = createUnidentifiedWork
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) {
+              _ =>
+                eventuallyTableExists(identifiersTableConfig)
+                val work = createUnidentifiedWork
 
-              val messageCount = 5
+                val messageCount = 5
 
-              (1 to messageCount).foreach { _ =>
-                sendMessage(
-                  bucket = bucket,
-                  queue = queue,
-                  obj = work
-                )
-              }
-
-              eventually {
-                val works = getMessages[IdentifiedBaseWork](topic)
-                works.length shouldBe >=(messageCount)
-
-                works.map(_.canonicalId).distinct should have size 1
-                works.foreach { receivedWork =>
-                  receivedWork
-                    .asInstanceOf[IdentifiedWork]
-                    .sourceIdentifier shouldBe work.sourceIdentifier
-                  receivedWork
-                    .asInstanceOf[IdentifiedWork]
-                    .title shouldBe work.title
+                (1 to messageCount).foreach { _ =>
+                  sendMessage(
+                    bucket = bucket,
+                    queue = queue,
+                    obj = work
+                  )
                 }
-              }
+
+                eventually {
+                  val works = getMessages[IdentifiedBaseWork](topic)
+                  works.length shouldBe >=(messageCount)
+
+                  works.map(_.canonicalId).distinct should have size 1
+                  works.foreach { receivedWork =>
+                    receivedWork
+                      .asInstanceOf[IdentifiedWork]
+                      .sourceIdentifier shouldBe work.sourceIdentifier
+                    receivedWork
+                      .asInstanceOf[IdentifiedWork]
+                      .title shouldBe work.title
+                  }
+                }
             }
           }
         }
@@ -70,26 +71,27 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
-            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
-              eventuallyTableExists(identifiersTableConfig)
-              val work = createUnidentifiedInvisibleWork
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) {
+              _ =>
+                eventuallyTableExists(identifiersTableConfig)
+                val work = createUnidentifiedInvisibleWork
 
-              sendMessage(
-                bucket = bucket,
-                queue = queue,
-                obj = work
-              )
+                sendMessage(
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work
+                )
 
-              eventually {
-                val works = getMessages[IdentifiedBaseWork](topic)
-                works.length shouldBe >=(1)
+                eventually {
+                  val works = getMessages[IdentifiedBaseWork](topic)
+                  works.length shouldBe >=(1)
 
-                val receivedWork = works.head
-                val invisibleWork =
-                  receivedWork.asInstanceOf[IdentifiedInvisibleWork]
-                invisibleWork.sourceIdentifier shouldBe work.sourceIdentifier
-                invisibleWork.canonicalId shouldNot be(empty)
-              }
+                  val receivedWork = works.head
+                  val invisibleWork =
+                    receivedWork.asInstanceOf[IdentifiedInvisibleWork]
+                  invisibleWork.sourceIdentifier shouldBe work.sourceIdentifier
+                  invisibleWork.canonicalId shouldNot be(empty)
+                }
             }
           }
         }
@@ -102,28 +104,29 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
-            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
-              eventuallyTableExists(identifiersTableConfig)
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) {
+              _ =>
+                eventuallyTableExists(identifiersTableConfig)
 
-              val work = createUnidentifiedRedirectedWork
+                val work = createUnidentifiedRedirectedWork
 
-              sendMessage(
-                bucket = bucket,
-                queue = queue,
-                obj = work
-              )
+                sendMessage(
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work
+                )
 
-              eventually {
-                val works = getMessages[IdentifiedBaseWork](topic)
-                works.length shouldBe >=(1)
+                eventually {
+                  val works = getMessages[IdentifiedBaseWork](topic)
+                  works.length shouldBe >=(1)
 
-                val receivedWork = works.head
-                val redirectedWork =
-                  receivedWork.asInstanceOf[IdentifiedRedirectedWork]
-                redirectedWork.sourceIdentifier shouldBe work.sourceIdentifier
-                redirectedWork.canonicalId shouldNot be(empty)
-                redirectedWork.redirect.canonicalId shouldNot be(empty)
-              }
+                  val receivedWork = works.head
+                  val redirectedWork =
+                    receivedWork.asInstanceOf[IdentifiedRedirectedWork]
+                  redirectedWork.sourceIdentifier shouldBe work.sourceIdentifier
+                  redirectedWork.canonicalId shouldNot be(empty)
+                  redirectedWork.redirect.canonicalId shouldNot be(empty)
+                }
             }
           }
         }
@@ -136,23 +139,24 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { identifiersTableConfig =>
           withLocalS3Bucket { bucket =>
-            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
-              sendInvalidJSONto(queue)
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) {
+              _ =>
+                sendInvalidJSONto(queue)
 
-              val work = createUnidentifiedWork
+                val work = createUnidentifiedWork
 
-              sendMessage(
-                bucket = bucket,
-                queue = queue,
-                obj = work
-              )
+                sendMessage(
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work
+                )
 
-              eventually {
-                val snsMessages = listMessagesReceivedFromSNS(topic)
-                snsMessages.size should be >= 1
+                eventually {
+                  val snsMessages = listMessagesReceivedFromSNS(topic)
+                  snsMessages.size should be >= 1
 
-                assertMessageIsNotDeleted(queue)
-              }
+                  assertMessageIsNotDeleted(queue)
+                }
             }
           }
         }

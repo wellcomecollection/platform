@@ -16,33 +16,48 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends Akka with IdentifiersDatabase with Messaging with MetricsSenderFixture with SNS {
-  def withWorkerService[R](bucket: Bucket, topic: Topic, queue: Queue, identifiersDao: IdentifiersDao, identifiersTableConfig: IdentifiersTableConfig)(testWith: TestWith[IdMinterWorkerService, R]): R =
+trait WorkerServiceFixture
+    extends Akka
+    with IdentifiersDatabase
+    with Messaging
+    with MetricsSenderFixture
+    with SNS {
+  def withWorkerService[R](bucket: Bucket,
+                           topic: Topic,
+                           queue: Queue,
+                           identifiersDao: IdentifiersDao,
+                           identifiersTableConfig: IdentifiersTableConfig)(
+    testWith: TestWith[IdMinterWorkerService, R]): R =
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withMessageWriter[Json, R](bucket, topic, snsClient) { messageWriter =>
-          withMessageStream[Json, R](actorSystem, bucket, queue, metricsSender) { messageStream =>
-            val workerService = new IdMinterWorkerService(
-              idEmbedder = new IdEmbedder(
-                identifierGenerator = new IdentifierGenerator(
-                  identifiersDao = identifiersDao
-                )
-              ),
-              writer = messageWriter,
-              messageStream = messageStream,
-              rdsClientConfig = rdsClientConfig,
-              identifiersTableConfig = identifiersTableConfig
-            )
+          withMessageStream[Json, R](actorSystem, bucket, queue, metricsSender) {
+            messageStream =>
+              val workerService = new IdMinterWorkerService(
+                idEmbedder = new IdEmbedder(
+                  identifierGenerator = new IdentifierGenerator(
+                    identifiersDao = identifiersDao
+                  )
+                ),
+                writer = messageWriter,
+                messageStream = messageStream,
+                rdsClientConfig = rdsClientConfig,
+                identifiersTableConfig = identifiersTableConfig
+              )
 
-            workerService.run()
+              workerService.run()
 
-            testWith(workerService)
+              testWith(workerService)
           }
         }
       }
     }
 
-  def withWorkerService[R](bucket: Bucket, topic: Topic, queue: Queue, identifiersTableConfig: IdentifiersTableConfig)(testWith: TestWith[IdMinterWorkerService, R]): R = {
+  def withWorkerService[R](bucket: Bucket,
+                           topic: Topic,
+                           queue: Queue,
+                           identifiersTableConfig: IdentifiersTableConfig)(
+    testWith: TestWith[IdMinterWorkerService, R]): R = {
     Class.forName("com.mysql.jdbc.Driver")
     ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
 
@@ -52,7 +67,12 @@ trait WorkerServiceFixture extends Akka with IdentifiersDatabase with Messaging 
         identifiersTableConfig = identifiersTableConfig
       )
     )
-    withWorkerService(bucket, topic, queue, identifiersDao, identifiersTableConfig) { service =>
+    withWorkerService(
+      bucket,
+      topic,
+      queue,
+      identifiersDao,
+      identifiersTableConfig) { service =>
       testWith(service)
     }
   }
