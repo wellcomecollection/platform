@@ -43,12 +43,11 @@ module "nginx" {
   container_port  = "${var.nginx_container_port}"
 
   env_vars = {
-    HOST_PATH = ""
-    APP_HOST  = "${var.namespace}.${var.namespace_id}"
+    APP_HOST  = "${var.namespace}.${var.namespace_tld}"
     APP_PORT  = "${var.container_port}"
   }
 
-  env_vars_length = "3"
+  env_vars_length = "2"
 
   security_group_ids               = ["${var.security_group_ids}"]
   service_egress_security_group_id = "${var.service_egress_security_group_id}"

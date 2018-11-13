@@ -3,7 +3,9 @@ module "services" {
 
   namespace = "${var.namespace}"
 
-  namespace_id = "${var.namespace_id}"
+  namespace_id  = "${var.namespace_id}"
+  namespace_tld = "${var.namespace_tld}"
+
   subnets      = ["${var.subnets}"]
   cluster_name = "${var.cluster_name}"
   vpc_id       = "${var.vpc_id}"

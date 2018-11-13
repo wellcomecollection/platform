@@ -10,6 +10,7 @@ variable "cluster_name" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
+variable "namespace_tld" {}
 
 data "template_file" "es_cluster_host" {
   template = "$${name}.$${region}.aws.found.io"

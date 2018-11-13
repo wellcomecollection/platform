@@ -8,8 +8,9 @@ module "catalogue_api" {
 
   container_port = "8888"
 
-  namespace_id = "${local.namespace_id}"
-  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  namespace_id  = "${local.namespace_id}"
+  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  cluster_name  = "${aws_ecs_cluster.cluster.name}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
 
