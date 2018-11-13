@@ -11,11 +11,9 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.models.work.internal.{
-  TransformedBaseWork,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.fixtures.HybridRecordReceiverFixture
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -33,6 +31,7 @@ class HybridRecordReceiverTest
     with S3
     with Messaging
     with Eventually
+    with HybridRecordReceiverFixture
     with IntegrationPatience
     with MockitoSugar
     with ScalaFutures
@@ -55,7 +54,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver(topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(sqsMessage, transformToWork)
 
@@ -86,7 +85,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver(topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(notification, transformToWork)
 
@@ -122,7 +121,7 @@ class HybridRecordReceiverTest
             message = hybridRecord
           )
 
-          withHybridRecordReceiver(topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(invalidSqsMessage, transformToWork)
 
@@ -145,7 +144,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver(topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(
                 failingSqsMessage,
@@ -170,7 +169,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver(
+          withHybridRecordReceiver[TestTransformable](
             topic,
             bucket,
             mockSnsClientFailPublishMessage) { recordReceiver =>
@@ -184,24 +183,6 @@ class HybridRecordReceiverTest
       }
     }
   }
-
-  def withHybridRecordReceiver[R](
-    topic: Topic,
-    bucket: Bucket,
-    snsClient: AmazonSNS = snsClient
-  )(testWith: TestWith[HybridRecordReceiver[TestTransformable], R])(
-    implicit objectStore: ObjectStore[TestTransformable]): R =
-    withMessageWriter[TransformedBaseWork, R](
-      bucket,
-      topic,
-      writerSnsClient = snsClient) { messageWriter =>
-      val recordReceiver = new HybridRecordReceiver[TestTransformable](
-        messageWriter = messageWriter,
-        objectStore = objectStore
-      )
-
-      testWith(recordReceiver)
-    }
 
   private def mockSnsClientFailPublishMessage = {
     val mockSNSClient = mock[AmazonSNS]

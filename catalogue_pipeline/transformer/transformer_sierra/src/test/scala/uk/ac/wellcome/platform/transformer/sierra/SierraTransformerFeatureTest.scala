@@ -8,6 +8,8 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.platform.transformer.receive.HybridRecordReceiver
+import uk.ac.wellcome.platform.transformer.sierra.services.SierraTransformerWorkerService
 import uk.ac.wellcome.storage.fixtures.S3
 
 class SierraTransformerFeatureTest
@@ -55,6 +57,12 @@ class SierraTransformerFeatureTest
             sendSqsMessage(
               queue = queue,
               obj = sierraHybridRecordMessage
+            )
+
+            val workerService = new SierraTransformerWorkerService(
+              messageReceiver = new HybridRecordReceiver[SierraTransformable](
+
+              )
             )
 
             val flags: Map[String, String] = Map(
