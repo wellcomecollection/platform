@@ -1,41 +1,40 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import akka.actor.{ActorSystem, Terminated}
+import akka.Done
 import com.amazonaws.services.sqs.model.Message
-import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.platform.ingestor.IngestorConfig
+import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IngestorWorkerService @Inject()(
+class IngestorWorkerService(
   ingestorConfig: IngestorConfig,
   identifiedWorkIndexer: WorkIndexer,
-  messageStream: MessageStream[IdentifiedBaseWork],
-  system: ActorSystem)(implicit ec: ExecutionContext) {
+  messageStream: MessageStream[IdentifiedBaseWork])(implicit ec: ExecutionContext) {
 
   case class MessageBundle(message: Message, work: IdentifiedBaseWork)
 
   val index = ingestorConfig.elasticConfig.indexName
 
-  messageStream.runStream(
-    this.getClass.getSimpleName,
-    source =>
-      source
-        .map {
-          case (message, identifiedWork) =>
-            MessageBundle(message, identifiedWork)
-        }
-        .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval)
-        .mapAsyncUnordered(10) { messages =>
-          for {
-            successfulMessageBundles <- processMessages(messages.toList)
-          } yield successfulMessageBundles.map(_.message)
-        }
-        .mapConcat(identity)
-  )
+  def run(): Future[Done] =
+    messageStream.runStream(
+      this.getClass.getSimpleName,
+      source =>
+        source
+          .map {
+            case (message, identifiedWork) =>
+              MessageBundle(message, identifiedWork)
+          }
+          .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval)
+          .mapAsyncUnordered(10) { messages =>
+            for {
+              successfulMessageBundles <- processMessages(messages.toList)
+            } yield successfulMessageBundles.map(_.message)
+          }
+          .mapConcat(identity)
+    )
 
   private def processMessages(
     messageBundles: List[MessageBundle]): Future[List[MessageBundle]] = {
@@ -54,9 +53,4 @@ class IngestorWorkerService @Inject()(
       }
     }
   }
-
-  def stop(): Future[Terminated] = {
-    system.terminate()
-  }
-
 }

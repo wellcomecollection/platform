@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.ingestor.modules
 import com.google.inject.Provides
 import com.twitter.app.Flaggable
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.platform.ingestor.{IngestElasticConfig, IngestorConfig}
+import uk.ac.wellcome.platform.ingestor.IngestElasticConfig
+import uk.ac.wellcome.platform.ingestor.config.models.{IngestElasticConfig, IngestorConfig}
 
 import scala.concurrent.duration.{Duration, FiniteDuration, _}
 
