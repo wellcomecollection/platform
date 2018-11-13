@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.matcher.messages
+package uk.ac.wellcome.platform.matcher.services
 
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
@@ -18,7 +18,7 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class MatcherMessageReceiverTest
+class MatcherWorkerServiceTest
     extends FunSpec
     with Matchers
     with Eventually
@@ -34,7 +34,7 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             // Work Av1 created without any matched works
             val updatedWork = createUnidentifiedSierraWork
             val expectedMatchedWorks =
@@ -58,7 +58,7 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             val invisibleWork = createUnidentifiedInvisibleWork
             val expectedMatchedWorks =
               MatcherResult(
@@ -86,7 +86,7 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 =
               createUnidentifiedWorkWith(
@@ -118,7 +118,7 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 =
               createUnidentifiedWorkWith(sourceIdentifier = identifierA)
@@ -207,7 +207,7 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withWorkerService(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 = createUnidentifiedWorkWith(
               sourceIdentifier = identifierA,
@@ -279,42 +279,41 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queuePair.queue, storageBucket, topic) {
-            _ =>
-              // process Work V2
-              val workAv2 = createUnidentifiedWorkWith(
-                sourceIdentifier = identifierA,
-                version = 2
+          withWorkerService(queuePair.queue, storageBucket, topic) { _ =>
+            // process Work V2
+            val workAv2 = createUnidentifiedWorkWith(
+              sourceIdentifier = identifierA,
+              version = 2
+            )
+
+            val expectedMatchedWorkAv2 = MatcherResult(
+              Set(MatchedIdentifiers(
+                Set(WorkIdentifier("sierra-system-number/A", 2)))))
+
+            processAndAssertMatchedWorkIs(
+              workAv2,
+              expectedMatchedWorkAv2,
+              queuePair.queue,
+              storageBucket,
+              topic)
+
+            // Work V1 is sent but not matched
+            val workAv1 = createUnidentifiedWorkWith(
+              sourceIdentifier = identifierA,
+              version = 1)
+
+            sendMessage[TransformedBaseWork](
+              bucket = storageBucket,
+              queue = queuePair.queue,
+              workAv1)
+            eventually {
+              noMessagesAreWaitingIn(queuePair.queue)
+              noMessagesAreWaitingIn(queuePair.dlq)
+              assertLastMatchedResultIs(
+                topic = topic,
+                expectedMatcherResult = expectedMatchedWorkAv2
               )
-
-              val expectedMatchedWorkAv2 = MatcherResult(
-                Set(MatchedIdentifiers(
-                  Set(WorkIdentifier("sierra-system-number/A", 2)))))
-
-              processAndAssertMatchedWorkIs(
-                workAv2,
-                expectedMatchedWorkAv2,
-                queuePair.queue,
-                storageBucket,
-                topic)
-
-              // Work V1 is sent but not matched
-              val workAv1 = createUnidentifiedWorkWith(
-                sourceIdentifier = identifierA,
-                version = 1)
-
-              sendMessage[TransformedBaseWork](
-                bucket = storageBucket,
-                queue = queuePair.queue,
-                workAv1)
-              eventually {
-                noMessagesAreWaitingIn(queuePair.queue)
-                noMessagesAreWaitingIn(queuePair.dlq)
-                assertLastMatchedResultIs(
-                  topic = topic,
-                  expectedMatcherResult = expectedMatchedWorkAv2
-                )
-              }
+            }
           }
         }
       }
@@ -326,7 +325,7 @@ class MatcherMessageReceiverTest
       withLocalSqsQueueAndDlq {
         case QueuePair(queue, dlq) =>
           withLocalS3Bucket { storageBucket =>
-            withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            withWorkerService(queue, storageBucket, topic) { _ =>
               val workAv2 = createUnidentifiedWorkWith(
                 sourceIdentifier = identifierA,
                 version = 2

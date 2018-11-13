@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.matcher.messages
+package uk.ac.wellcome.platform.matcher.services
 
-import akka.actor.{ActorSystem, Terminated}
-import com.google.inject.Inject
-import com.twitter.inject.Logging
+import akka.Done
+import akka.actor.ActorSystem
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.sns.SNSWriter
@@ -12,14 +12,15 @@ import uk.ac.wellcome.platform.matcher.models.VersionExpectedConflictException
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MatcherMessageReceiver @Inject()(
-  messageStream: MessageStream[TransformedBaseWork],
-  snsWriter: SNSWriter,
-  actorSystem: ActorSystem,
-  workMatcher: WorkMatcher)(implicit ec: ExecutionContext)
+class MatcherWorkerService(messageStream: MessageStream[TransformedBaseWork],
+                           snsWriter: SNSWriter,
+                           workMatcher: WorkMatcher)(
+  implicit val actorSystem: ActorSystem,
+  ec: ExecutionContext)
     extends Logging {
 
-  messageStream.foreach(this.getClass.getSimpleName, processMessage)
+  def run(): Future[Done] =
+    messageStream.foreach(this.getClass.getSimpleName, processMessage)
 
   def processMessage(work: TransformedBaseWork): Future[Unit] = {
     (for {
@@ -33,9 +34,5 @@ class MatcherMessageReceiver @Inject()(
         debug(
           s"Not matching work due to version conflict exception: ${e.getMessage}")
     }
-  }
-
-  def stop(): Future[Terminated] = {
-    actorSystem.terminate()
   }
 }

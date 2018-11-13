@@ -8,14 +8,14 @@ import com.gu.scanamo.query.Condition
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import grizzled.slf4j.Logging
-import javax.inject.Inject
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
-class DynamoRowLockDao @Inject()(
+class DynamoRowLockDao(
   dynamoDBClient: AmazonDynamoDB,
-  config: DynamoLockingServiceConfig)(implicit ec: ExecutionContext)
+  dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
@@ -26,17 +26,17 @@ class DynamoRowLockDao @Inject()(
     )
 
   private val defaultDuration = Duration.ofSeconds(180)
-  private val table = Table[RowLock](config.tableName)
-  private val index = config.indexName
+  private val table = Table[RowLock](dynamoConfig.table)
+  private val index = dynamoConfig.index
 
-  private def getExpiry = {
+  private def getExpiry: (Instant, Instant) = {
     val created = Instant.now()
     val expires = created.plus(defaultDuration)
 
     (created, expires)
   }
 
-  def lockRow(id: Identifier, contextId: String) =
+  def lockRow(id: Identifier, contextId: String): Future[RowLock] =
     Future {
       val (created, expires) = getExpiry
       val rowLock = RowLock(id.id, contextId, created, expires)
@@ -51,15 +51,14 @@ class DynamoRowLockDao @Inject()(
 
       result match {
         case Right(_) => rowLock
-        case Left(error) => {
+        case Left(error) =>
           debug(s"Failed to lock $rowLock $error")
           throw FailedLockException(s"Failed to lock $id", error)
-        }
       }
     }.recover {
       case exception: Exception =>
         val errorMsg =
-          s"Problem locking row ${id} in context [$contextId], ${exception.getClass.getSimpleName} ${exception.getMessage}"
+          s"Problem locking row $id in context [$contextId], ${exception.getClass.getSimpleName} ${exception.getMessage}"
         debug(errorMsg)
         throw FailedLockException(errorMsg, exception)
     }
@@ -106,8 +105,6 @@ class DynamoRowLockDao @Inject()(
     }
   }
 }
-
-case class DynamoLockingServiceConfig(tableName: String, indexName: String)
 
 case class FailedLockException(message: String, cause: Throwable)
     extends Exception(message, cause)

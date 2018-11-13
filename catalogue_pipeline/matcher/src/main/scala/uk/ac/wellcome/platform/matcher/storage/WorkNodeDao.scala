@@ -2,20 +2,18 @@ package uk.ac.wellcome.platform.matcher.storage
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException
-import com.google.inject.Inject
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WorkNodeDao @Inject()(
-  dynamoDbClient: AmazonDynamoDB,
-  dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
+class WorkNodeDao(dynamoDbClient: AmazonDynamoDB, dynamoConfig: DynamoConfig)(
+  implicit ec: ExecutionContext)
     extends Logging {
 
   private val index = dynamoConfig.index
