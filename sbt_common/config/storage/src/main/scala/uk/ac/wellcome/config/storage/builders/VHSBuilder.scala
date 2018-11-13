@@ -1,8 +1,14 @@
 package uk.ac.wellcome.config.storage.builders
 
 import com.typesafe.config.Config
+import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
-import uk.ac.wellcome.storage.vhs.VHSConfig
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3StorageBackend
+import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
+import uk.ac.wellcome.storage.vhs.{VHSConfig, VersionedHybridStore}
+
+import scala.concurrent.ExecutionContext
 
 object VHSBuilder {
   def buildVHSConfig(config: Config): VHSConfig = {
@@ -17,6 +23,23 @@ object VHSBuilder {
       dynamoConfig = dynamoConfig,
       s3Config = s3Config,
       globalS3Prefix = globalS3Prefix
+    )
+  }
+
+  def buildVHS[T, M](config: Config)(
+    implicit serialisationStrategy: SerialisationStrategy[T])
+    : VersionedHybridStore[T, M, ObjectStore[T]] = {
+    implicit val executionContext: ExecutionContext =
+      AkkaBuilder.buildExecutionContext()
+
+    implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
+      s3Client = S3Builder.buildS3Client(config)
+    )
+
+    new VersionedHybridStore[T, M, ObjectStore[T]](
+      vhsConfig = buildVHSConfig(config),
+      objectStore = ObjectStore[T],
+      dynamoDbClient = DynamoBuilder.buildDynamoClient(config)
     )
   }
 }

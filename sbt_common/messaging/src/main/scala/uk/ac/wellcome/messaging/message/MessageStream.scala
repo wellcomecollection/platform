@@ -25,11 +25,10 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
   ec: ExecutionContext) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
-    actorSystem = actorSystem,
     sqsClient = sqsClient,
     sqsConfig = messageReaderConfig.sqsConfig,
     metricsSender = metricsSender
-  )
+  )(actorSystem = actorSystem)
 
   def runStream(
     streamName: String,

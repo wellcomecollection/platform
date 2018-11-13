@@ -1,11 +1,13 @@
 package uk.ac.wellcome.config.messaging.builders
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync}
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.config.core.models.AWSClientConfig
-import uk.ac.wellcome.messaging.sqs.{SQSClientFactory, SQSConfig}
+import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
+import uk.ac.wellcome.messaging.sqs.{SQSClientFactory, SQSConfig, SQSStream}
 
 object SQSBuilder extends AWSClientConfigBuilder {
   def buildSQSConfig(config: Config): SQSConfig = {
@@ -44,5 +46,13 @@ object SQSBuilder extends AWSClientConfigBuilder {
   def buildSQSAsyncClient(config: Config): AmazonSQSAsync =
     buildSQSAsyncClient(
       awsClientConfig = buildAWSClientConfig(config, namespace = "sqs")
+    )
+
+  def buildSQSStream[T](config: Config)(
+    implicit actorSystem: ActorSystem): SQSStream[T] =
+    new SQSStream[T](
+      sqsClient = buildSQSAsyncClient(config),
+      sqsConfig = buildSQSConfig(config),
+      metricsSender = MetricsBuilder.buildMetricsSender(config)
     )
 }
