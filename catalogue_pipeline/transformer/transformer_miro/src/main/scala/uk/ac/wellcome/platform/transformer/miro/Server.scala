@@ -22,7 +22,6 @@ import uk.ac.wellcome.platform.transformer.miro.modules.{
   MiroTransformableModule,
   MiroTransformerWorkerModule
 }
-import uk.ac.wellcome.platform.transformer.modules.TransformedBaseWorkModule
 
 object ServerMain extends Server
 

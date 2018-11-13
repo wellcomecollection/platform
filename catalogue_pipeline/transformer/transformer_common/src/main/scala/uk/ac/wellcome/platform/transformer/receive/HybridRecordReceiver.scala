@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.receive
 
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.json.JsonUtil._
@@ -14,7 +13,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class HybridRecordReceiver[T] @Inject()(
+class HybridRecordReceiver[T](
   messageWriter: MessageWriter[TransformedBaseWork],
   objectStore: ObjectStore[T])(implicit ec: ExecutionContext)
     extends Logging {
