@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.idminter.fixtures
 
 import io.circe.Json
-import org.scalatest.Assertion
-import scalikejdbc.DB
+import scalikejdbc.{ConnectionPool, DB}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
@@ -14,6 +13,8 @@ import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 import uk.ac.wellcome.platform.idminter.steps.{IdEmbedder, IdentifierGenerator}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait WorkerServiceFixture extends Akka with IdentifiersDatabase with Messaging with MetricsSenderFixture with SNS {
   def withWorkerService[R](bucket: Bucket, topic: Topic, queue: Queue, identifiersDao: IdentifiersDao, identifiersTableConfig: IdentifiersTableConfig)(testWith: TestWith[IdMinterWorkerService, R]): R =
@@ -42,6 +43,9 @@ trait WorkerServiceFixture extends Akka with IdentifiersDatabase with Messaging 
     }
 
   def withWorkerService[R](bucket: Bucket, topic: Topic, queue: Queue, identifiersTableConfig: IdentifiersTableConfig)(testWith: TestWith[IdMinterWorkerService, R]): R = {
+    Class.forName("com.mysql.jdbc.Driver")
+    ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
+
     val identifiersDao = new IdentifiersDao(
       db = DB.connect(),
       identifiers = new IdentifiersTable(
