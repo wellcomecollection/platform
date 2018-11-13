@@ -18,10 +18,7 @@ import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.merger.fixtures.{
-  LocalWorksVhs,
-  MatcherResultFixture
-}
+import uk.ac.wellcome.platform.merger.fixtures.{LocalWorksVhs, MatcherResultFixture, WorkerServiceFixture}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -43,7 +40,8 @@ class MergerWorkerServiceTest
     with LocalWorksVhs
     with MatcherResultFixture
     with Matchers
-    with MockitoSugar {
+    with MockitoSugar
+    with WorkerServiceFixture {
   case class TestObject(something: String)
 
   it(
@@ -304,11 +302,10 @@ class MergerWorkerServiceTest
                         metricsSender) { sqsStream =>
                         withMessageWriter[BaseWork, R](messageBucket, topic) {
                           snsWriter =>
-                            withMergerWorkerService(
-                              actorSystem,
-                              sqsStream,
-                              vhs,
-                              snsWriter) { _ =>
+                            withWorkerService(
+                              sqsStream = sqsStream,
+                              vhs = vhs,
+                              messageWriter = snsWriter) { _ =>
                               testWith((vhs, queuePair, topic, metricsSender))
                             }
                         }
@@ -321,22 +318,5 @@ class MergerWorkerServiceTest
         }
       }
     }
-  }
-
-  private def withMergerWorkerService[R](
-    actorSystem: ActorSystem,
-    sqsStream: SQSStream[NotificationMessage],
-    vhs: VersionedHybridStore[TransformedBaseWork,
-                              EmptyMetadata,
-                              ObjectStore[TransformedBaseWork]],
-    messageWriter: MessageWriter[BaseWork])(
-    testWith: TestWith[MergerWorkerService, R]) = {
-    testWith(
-      new MergerWorkerService(
-        actorSystem,
-        sqsStream,
-        playbackService = new RecorderPlaybackService(vhs),
-        mergerManager = new MergerManager(new Merger()),
-        messageWriter))
   }
 }
