@@ -8,8 +8,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HybridRecordSender(snsWriter: SNSWriter)(
-  implicit ec: ExecutionContext) {
+class HybridRecordSender(snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
   def sendToSNS(records: List[HybridRecord]): Future[List[PublishAttempt]] = {
     Future.sequence {
       records

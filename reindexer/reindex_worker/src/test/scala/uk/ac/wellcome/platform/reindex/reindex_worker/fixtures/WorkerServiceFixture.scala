@@ -4,7 +4,11 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.reindex.reindex_worker.services.{HybridRecordSender, RecordReader, ReindexWorkerService}
+import uk.ac.wellcome.platform.reindex.reindex_worker.services.{
+  HybridRecordSender,
+  RecordReader,
+  ReindexWorkerService
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
@@ -14,32 +18,31 @@ trait WorkerServiceFixture extends Akka with DynamoFixtures with SNS with SQS {
   def withWorkerService[R](queue: Queue, table: Table, topic: Topic)(
     testWith: TestWith[ReindexWorkerService, R]): R =
     withActorSystem { actorSystem =>
-      withSQSStream[NotificationMessage, R](actorSystem, queue) {
-        sqsStream =>
-          withMaxRecordsScanner(table) { maxRecordsScanner =>
-            withParallelScanner(table) { parallelScanner =>
-              val recordReader = new RecordReader(
-                maxRecordsScanner = maxRecordsScanner,
-                parallelScanner = parallelScanner
+      withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+        withMaxRecordsScanner(table) { maxRecordsScanner =>
+          withParallelScanner(table) { parallelScanner =>
+            val recordReader = new RecordReader(
+              maxRecordsScanner = maxRecordsScanner,
+              parallelScanner = parallelScanner
+            )
+
+            withSNSWriter(topic) { snsWriter =>
+              val hybridRecordSender = new HybridRecordSender(
+                snsWriter = snsWriter
               )
 
-              withSNSWriter(topic) { snsWriter =>
-                val hybridRecordSender = new HybridRecordSender(
-                  snsWriter = snsWriter
-                )
+              val workerService = new ReindexWorkerService(
+                recordReader = recordReader,
+                hybridRecordSender = hybridRecordSender,
+                sqsStream = sqsStream
+              )(actorSystem = actorSystem, ec = global)
 
-                val workerService = new ReindexWorkerService(
-                  recordReader = recordReader,
-                  hybridRecordSender = hybridRecordSender,
-                  sqsStream = sqsStream
-                )(actorSystem = actorSystem, ec = global)
+              workerService.run()
 
-                workerService.run()
-
-                testWith(workerService)
-              }
+              testWith(workerService)
             }
           }
+        }
       }
     }
 }

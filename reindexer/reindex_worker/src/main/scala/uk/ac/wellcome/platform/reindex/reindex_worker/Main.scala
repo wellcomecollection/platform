@@ -7,8 +7,16 @@ import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{MaxRecordsScanner, ParallelScanner, ScanSpecScanner}
-import uk.ac.wellcome.platform.reindex.reindex_worker.services.{HybridRecordSender, RecordReader, ReindexWorkerService}
+import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
+  MaxRecordsScanner,
+  ParallelScanner,
+  ScanSpecScanner
+}
+import uk.ac.wellcome.platform.reindex.reindex_worker.services.{
+  HybridRecordSender,
+  RecordReader,
+  ReindexWorkerService
+}
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
