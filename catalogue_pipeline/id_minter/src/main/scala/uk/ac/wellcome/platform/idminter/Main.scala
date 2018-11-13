@@ -5,7 +5,8 @@ import grizzled.slf4j.Logging
 import io.circe.Json
 import uk.ac.wellcome.config.messaging.builders.MessagingBuilder
 import uk.ac.wellcome.platform.idminter.config.builders.{IdentifiersTableBuilder, RDSBuilder}
-import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, TableProvisioner}
+import uk.ac.wellcome.platform.idminter.models.IdentifiersTable
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 import uk.ac.wellcome.platform.idminter.steps.{IdEmbedder, IdentifierGenerator}
 
@@ -15,11 +16,24 @@ import scala.concurrent.duration.Duration
 object Main extends App with Logging {
   val config: Config = ConfigFactory.load()
 
+  val identifiersTableConfig = IdentifiersTableBuilder.buildConfig(config)
+
   val identifierGenerator = new IdentifierGenerator(
     identifiersDao = new IdentifiersDao(
       db = RDSBuilder.buildDB(config),
-      identifiers = IdentifiersTableBuilder.buildTable(config)
+      identifiers = new IdentifiersTable(
+        identifiersTableConfig = identifiersTableConfig
+      )
     )
+  )
+
+  val tableProvisioner = new TableProvisioner(
+    rdsClientConfig = RDSBuilder.buildRDSClientConfig(config)
+  )
+
+  tableProvisioner.provision(
+    database = identifiersTableConfig.database,
+    tableName = identifiersTableConfig.tableName
   )
 
   val idEmbedder = new IdEmbedder(
