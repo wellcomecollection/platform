@@ -1,5 +1,3 @@
 <configuration>
   <include resource="base-logback-test.xml"/>
-
-  <logger name="uk.ac.wellcome.platform.merger.Server" level="INFO"/>
 </configuration>
