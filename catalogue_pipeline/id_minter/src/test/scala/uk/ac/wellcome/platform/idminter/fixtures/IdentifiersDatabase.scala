@@ -78,22 +78,8 @@ trait IdentifiersDatabase
     password = password
   )
 
-  val rdsClientFlags = Map(
-    "aws.rds.host" -> host,
-    "aws.rds.port" -> port,
-    "aws.rds.userName" -> username,
-    "aws.rds.password" -> password,
-    "aws.rds.maxConnections" -> "8"
-  )
-
-  def identifiersLocalDbFlags(identifiersTableConfig: IdentifiersTableConfig) =
-    rdsClientFlags ++ Map(
-      "aws.rds.identifiers.table" -> identifiersTableConfig.tableName,
-      "aws.rds.identifiers.database" -> identifiersTableConfig.database
-    )
-
   def withIdentifiersDatabase[R](
-    testWith: TestWith[IdentifiersTableConfig, R]) = {
+    testWith: TestWith[IdentifiersTableConfig, R]): R = {
     Class.forName("com.mysql.jdbc.Driver")
     ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
 
