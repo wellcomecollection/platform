@@ -11,7 +11,7 @@ resource "aws_api_gateway_rest_api" "api" {
 # Stages
 
 module "prod" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=43369f09f18a1b2c77b5423ce2f4c3befa79a108"
+  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=8863b1dd46371249574af2924ced9dc976ee5a47"
   domain_name = "api.wellcomecollection.org"
 
   stage_name = "prod"
@@ -30,7 +30,7 @@ module "prod" {
 }
 
 module "stage" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=43369f09f18a1b2c77b5423ce2f4c3befa79a108"
+  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=8863b1dd46371249574af2924ced9dc976ee5a47"
   domain_name = "api-stage.wellcomecollection.org"
 
   stage_name = "stage"
@@ -58,7 +58,7 @@ module "root_resource_method" {
 }
 
 module "root_resource_integration" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=43369f09f18a1b2c77b5423ce2f4c3befa79a108"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=8863b1dd46371249574af2924ced9dc976ee5a47"
 
   api_id        = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_rest_api.api.root_resource_id}"
@@ -85,7 +85,7 @@ module "simple_resource" {
 }
 
 module "simple_integration" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=43369f09f18a1b2c77b5423ce2f4c3befa79a108"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=8863b1dd46371249574af2924ced9dc976ee5a47"
 
   api_id        = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${module.simple_resource.resource_id}"
