@@ -34,23 +34,23 @@ object UploadDigestInputStreamFlow extends Logging {
       .flatMapMerge(
         parallelism, {
           case (job, inputStream) =>
-            val checksum = job.bagDigestItem.checksum
+            val digest = job.bagDigestItem.checksum
             StreamConverters
               .fromInputStream(() => inputStream)
               .log("upload bytestring")
-              .via(UploadAndGetChecksumFlow(job.uploadLocation))
+              .via(UploadAndCalculateDigestFlow(job.uploadLocation))
               .log("to either")
               .map {
-                case Success(calculatedChecksum)
-                    if calculatedChecksum == checksum =>
+                case Success(calculatedDigest)
+                    if calculatedDigest == digest =>
                   Right(job)
-                case Success(calculatedChecksum) =>
+                case Success(calculatedDigest) =>
                   warn(
-                    s"Checksum didn't match: $calculatedChecksum != $checksum")
+                    s"Digests didn't match: $calculatedDigest != $digest")
                   Left(
                     ChecksumNotMatchedOnUploadError(
-                      expectedChecksum = checksum,
-                      actualCheckSum = calculatedChecksum,
+                      expectedChecksum = digest,
+                      actualCheckSum = calculatedDigest,
                       t = job
                     )
                   )

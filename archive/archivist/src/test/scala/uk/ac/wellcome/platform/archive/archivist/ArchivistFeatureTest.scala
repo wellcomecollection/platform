@@ -146,7 +146,7 @@ class ArchivistFeatureTest
     }
   }
 
-  it("continues after bag with bad checksum") {
+  it("continues after bag with bad digest") {
     withArchivist {
       case (
           ingestBucket,
