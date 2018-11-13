@@ -23,9 +23,7 @@ import scala.util.{Failure, Success}
 object UploadInputStreamFlow extends Logging {
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[(ArchiveItemJob, InputStream),
-           Either[
-             ArchiveError[ArchiveItemJob],
-             (ArchiveItemJob, String)],
+           Either[ArchiveError[ArchiveItemJob], (ArchiveItemJob, String)],
            NotUsed] =
     Flow[(ArchiveItemJob, InputStream)]
       .log("uploading input stream")

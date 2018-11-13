@@ -4,8 +4,15 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveItemJobError, ArchiveJobError}
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ArchiveItemJob, ArchiveJob}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveItemJobError,
+  ArchiveJobError
+}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveDigestItemJob,
+  ArchiveItemJob,
+  ArchiveJob
+}
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.models.{BagItem, EntryPath}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
@@ -21,9 +28,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
   */
 object ArchiveTagManifestFlow extends Logging {
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
-    : Flow[ArchiveJob,
-           Either[ArchiveError[ArchiveJob], ArchiveJob],
-           NotUsed] =
+    : Flow[ArchiveJob, Either[ArchiveError[ArchiveJob], ArchiveJob], NotUsed] =
     Flow[ArchiveJob]
       .log("archiving tag manifest")
       .map(archiveTagManifestItemJob)
@@ -50,8 +55,11 @@ object ArchiveTagManifestFlow extends Logging {
     ArchiveItemJob(archiveJob, EntryPath(tagManifestFileName))
   }
 
-  private def archiveDigestItemJob(archiveItemJob: ArchiveItemJob, digest: String): ArchiveDigestItemJob =
-    ArchiveDigestItemJob(archiveItemJob.archiveJob, BagItem(digest, archiveItemJob.itemLocation))
+  private def archiveDigestItemJob(archiveItemJob: ArchiveItemJob,
+                                   digest: String): ArchiveDigestItemJob =
+    ArchiveDigestItemJob(
+      archiveItemJob.archiveJob,
+      BagItem(digest, archiveItemJob.itemLocation))
 
   private def extractArchiveJobFlow = {
     FoldEitherFlow[
@@ -61,9 +69,8 @@ object ArchiveTagManifestFlow extends Logging {
       ifLeft = Flow[ArchiveError[ArchiveDigestItemJob]].map { error =>
         warn(error.toString)
         Left(ArchiveJobError(error.t.archiveJob, List(error)))
-      })(
-      ifRight = Flow[ArchiveDigestItemJob].map { archiveDigestItemJob =>
-        Right(archiveDigestItemJob.archiveJob)
-      })
+      })(ifRight = Flow[ArchiveDigestItemJob].map { archiveDigestItemJob =>
+      Right(archiveDigestItemJob.archiveJob)
+    })
   }
 }

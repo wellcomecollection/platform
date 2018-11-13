@@ -4,9 +4,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob}
 import uk.ac.wellcome.platform.archive.common.flows.{
   FoldEitherFlow,
   OnErrorFlow
@@ -21,7 +19,9 @@ object ArchiveJobFlow extends Logging {
   def apply(delimiter: String,
             parallelism: Int,
             ingestBagRequest: IngestBagRequest)(implicit s3Client: AmazonS3)
-    : Flow[ArchiveJob, Either[ArchiveError[ArchiveJob], ArchiveComplete], NotUsed] =
+    : Flow[ArchiveJob,
+           Either[ArchiveError[ArchiveJob], ArchiveComplete],
+           NotUsed] =
     Flow[ArchiveJob]
       .log("archive job")
       .via(ArchiveTagManifestFlow(parallelism))

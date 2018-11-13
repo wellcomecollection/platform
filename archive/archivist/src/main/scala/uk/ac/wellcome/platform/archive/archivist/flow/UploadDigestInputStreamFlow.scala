@@ -41,12 +41,10 @@ object UploadDigestInputStreamFlow extends Logging {
               .via(UploadAndCalculateDigestFlow(job.uploadLocation))
               .log("to either")
               .map {
-                case Success(calculatedDigest)
-                    if calculatedDigest == digest =>
+                case Success(calculatedDigest) if calculatedDigest == digest =>
                   Right(job)
                 case Success(calculatedDigest) =>
-                  warn(
-                    s"Digests didn't match: $calculatedDigest != $digest")
+                  warn(s"Digests didn't match: $calculatedDigest != $digest")
                   Left(
                     ChecksumNotMatchedOnUploadError(
                       expectedChecksum = digest,

@@ -31,9 +31,7 @@ object UploadItemFlow extends Logging {
   def apply(parallelism: Int)(
     implicit s3Client: AmazonS3
   ): Flow[ArchiveItemJob,
-          Either[
-            ArchiveError[ArchiveItemJob],
-            (ArchiveItemJob, String)],
+          Either[ArchiveError[ArchiveItemJob], (ArchiveItemJob, String)],
           NotUsed] = {
     Flow[ArchiveItemJob]
       .map(
@@ -57,9 +55,7 @@ object UploadItemFlow extends Logging {
         FoldEitherFlow[
           ArchiveError[ArchiveItemJob],
           (ArchiveItemJob, InputStream),
-          Either[
-            ArchiveError[ArchiveItemJob],
-            (ArchiveItemJob, String)]](
+          Either[ArchiveError[ArchiveItemJob], (ArchiveItemJob, String)]](
           ifLeft = OnErrorFlow())(ifRight = UploadInputStreamFlow(parallelism)))
   }
 }

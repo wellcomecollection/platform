@@ -1,5 +1,9 @@
 package uk.ac.wellcome.platform.archive.archivist.models.errors
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ArchiveItemJob, ArchiveJob}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveDigestItemJob,
+  ArchiveItemJob,
+  ArchiveJob
+}
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.storage.ObjectLocation
@@ -44,7 +48,7 @@ case class ArchiveJobError(t: ArchiveJob,
 
 case class ArchiveItemJobError(t: ArchiveJob,
                                errors: List[ArchiveError[ArchiveItemJob]])
-  extends ArchiveError[ArchiveJob]
+    extends ArchiveError[ArchiveJob]
 
 case class ZipFileDownloadingError(t: IngestBagRequest, exception: Throwable)
     extends ArchiveError[IngestBagRequest] {

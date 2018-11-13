@@ -8,7 +8,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveItemJobError, UploadError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveItemJobError,
+  UploadError
+}
 import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
@@ -30,29 +33,28 @@ class ArchiveTagManifestFlowTest
     withLocalS3Bucket { bucket =>
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
-          withBagItZip(dataFileCount = 2) { case (bagName, zipFile) =>
+          withBagItZip(dataFileCount = 2) {
+            case (bagName, zipFile) =>
+              val bagIdentifier =
+                ExternalIdentifier(randomAlphanumeric())
 
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
+              val archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket)
 
-            val archiveJob = createArchiveJob(
-              zipFile,
-              bagIdentifier,
-              bucket)
+              val source = Source.single(archiveJob)
+              val flow = ArchiveTagManifestFlow(10)(s3Client)
+              val futureResult = source via flow runWith Sink.head
 
-            val source = Source.single(archiveJob)
-            val flow = ArchiveTagManifestFlow(10)(s3Client)
-            val futureResult = source via flow runWith Sink.head
+              whenReady(futureResult) { result =>
+                result shouldBe Right(archiveJob)
 
-            whenReady(futureResult) { result =>
-              result shouldBe Right(archiveJob)
+                val expectedTagManifestStream = fromInputStream(
+                  zipFile.getInputStream(
+                    new ZipEntry("tagmanifest-sha256.txt"))).mkString
 
-              val expectedTagManifestStream = fromInputStream(zipFile.getInputStream(new ZipEntry("tagmanifest-sha256.txt"))).mkString
-
-              getContentFromS3(
-                bucket,
-                s"archive/${archiveJob.bagLocation.bagPath}/tagmanifest-sha256.txt") shouldBe expectedTagManifestStream
-            }
+                getContentFromS3(
+                  bucket,
+                  s"archive/${archiveJob.bagLocation.bagPath}/tagmanifest-sha256.txt") shouldBe expectedTagManifestStream
+              }
           }
         }
       }
@@ -60,10 +62,10 @@ class ArchiveTagManifestFlowTest
   }
 
   it("fails uploading the tag manifest") {
-      withActorSystem { implicit actorSystem =>
-        withMaterializer(actorSystem) { implicit materializer =>
-          withBagItZip(dataFileCount = 2) { case (bagName, zipFile) =>
-
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withBagItZip(dataFileCount = 2) {
+          case (bagName, zipFile) =>
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
@@ -87,12 +89,14 @@ class ArchiveTagManifestFlowTest
                       exception
                         .asInstanceOf[AmazonS3Exception]
                         .getErrorCode shouldBe "NoSuchBucket"
-                      location shouldBe ObjectLocation("not-a-valid-bucket", s"archive/space/${bagIdentifier}/tagmanifest-sha256.txt")
+                      location shouldBe ObjectLocation(
+                        "not-a-valid-bucket",
+                        s"archive/space/${bagIdentifier}/tagmanifest-sha256.txt")
                   }
               }
             }
-          }
         }
       }
     }
+  }
 }
