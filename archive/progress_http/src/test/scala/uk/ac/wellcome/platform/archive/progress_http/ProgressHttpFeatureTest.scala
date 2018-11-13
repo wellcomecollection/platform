@@ -129,6 +129,35 @@ class ProgressHttpFeatureTest
     }
   }
 
+  describe("GET /progress/swagger.json") {
+    it("returns a swagger docs") {
+      withConfiguredApp {
+        case (table, _, baseUrl, app) =>
+          app.run()
+          withActorSystem { actorSystem =>
+            withMaterializer(actorSystem) { implicit materialiser =>
+              withProgressTracker(table) { progressTracker =>
+                  val request =
+                    HttpRequest(GET, s"$baseUrl/progress/swagger.json")
+
+                  whenRequestReady(request) { result =>
+                    result.status shouldBe StatusCodes.OK
+                    val value = result.entity.dataBytes.runWith(Sink.fold("") {
+                      case (acc, byteString) =>
+                        acc + byteString.utf8String
+                    })
+                    whenReady(value) { jsonString =>
+                      parse(jsonString).toOption shouldBe defined
+                    }
+                  }
+                }
+
+            }
+          }
+      }
+    }
+  }
+
   describe("POST /progress") {
     it("creates a progress tracker") {
       withConfiguredApp {

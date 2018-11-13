@@ -10,8 +10,9 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.progress_http.services.ProgressService
+import uk.ac.wellcome.platform.archive.progress_http.services.{ProgressService, SwaggerDocService}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import akka.http.scaladsl.server.Directives._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,9 +40,10 @@ class ProgressHTTP(
     httpServerConfig = httpServerConfig,
     contextURL = contextURL
   )
+  val routes = progressService.routes ~ SwaggerDocService.routes
 
   val bindingFuture: Future[Http.ServerBinding] = Http()
-    .bindAndHandle(progressService.routes, httpServerConfig.host, httpServerConfig.port)
+    .bindAndHandle(routes, httpServerConfig.host, httpServerConfig.port)
 
   def run(): Future[Http.HttpTerminated] =
     bindingFuture
