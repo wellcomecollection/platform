@@ -6,7 +6,7 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -54,7 +54,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver[TestTransformable](topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable, List[Assertion]](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(sqsMessage, transformToWork)
 
@@ -85,7 +85,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver[TestTransformable](topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(notification, transformToWork)
 
@@ -121,7 +121,7 @@ class HybridRecordReceiverTest
             message = hybridRecord
           )
 
-          withHybridRecordReceiver[TestTransformable](topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(invalidSqsMessage, transformToWork)
 
@@ -144,7 +144,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver[TestTransformable](topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(
                 failingSqsMessage,
@@ -169,7 +169,7 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver[TestTransformable](
+          withHybridRecordReceiver[TestTransformable, Assertion](
             topic,
             bucket,
             mockSnsClientFailPublishMessage) { recordReceiver =>

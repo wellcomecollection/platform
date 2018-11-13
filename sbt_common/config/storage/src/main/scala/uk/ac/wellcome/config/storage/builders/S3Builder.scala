@@ -5,7 +5,9 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.config.core.models.AWSClientConfig
-import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config}
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config, S3StorageBackend}
+import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
 
 object S3Builder extends AWSClientConfigBuilder {
   private def buildS3Client(awsClientConfig: AWSClientConfig): AmazonS3 =
@@ -28,5 +30,14 @@ object S3Builder extends AWSClientConfigBuilder {
     S3Config(
       bucketName = bucketName
     )
+  }
+
+  def buildObjectStore[T](config: Config)(
+    implicit serialisationStrategy: SerialisationStrategy[T]): ObjectStore[T] = {
+    implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
+      s3Client = buildS3Client(config)
+    )
+
+    ObjectStore[StorageManifest]
   }
 }
