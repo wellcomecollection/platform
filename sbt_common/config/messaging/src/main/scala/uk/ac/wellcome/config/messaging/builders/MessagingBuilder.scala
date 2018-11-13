@@ -43,7 +43,14 @@ object MessagingBuilder {
       s3Config = S3Builder.buildS3Config(config, namespace = "message.reader")
     )
 
-  def buildMessageWriter[T](config: Config): MessageWriter[T] = {
+  def buildMessageWriter[T](config: Config)(implicit serialisationStrategy: SerialisationStrategy[T]): MessageWriter[T] = {
+    implicit val executionContext: ExecutionContext =
+      AkkaBuilder.buildExecutionContext()
+
+    implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
+      s3Client = S3Builder.buildS3Client(config)
+    )
+
     new MessageWriter[T](
       messageConfig = buildMessageWriterConfig(config),
       snsClient = SNSBuilder.buildSNSClient(config),

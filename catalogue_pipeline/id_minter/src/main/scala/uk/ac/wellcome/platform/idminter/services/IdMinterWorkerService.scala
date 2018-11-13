@@ -3,6 +3,9 @@ package uk.ac.wellcome.platform.idminter.services
 import akka.Done
 import io.circe.Json
 import uk.ac.wellcome.messaging.message.{MessageStream, MessageWriter}
+import uk.ac.wellcome.platform.idminter.Main.identifiersTableConfig
+import uk.ac.wellcome.platform.idminter.config.models.{IdentifiersTableConfig, RDSClientConfig}
+import uk.ac.wellcome.platform.idminter.database.TableProvisioner
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -10,11 +13,23 @@ import scala.concurrent.{ExecutionContext, Future}
 class IdMinterWorkerService(
   idEmbedder: IdEmbedder,
   writer: MessageWriter[Json],
-  messageStream: MessageStream[Json]
+  messageStream: MessageStream[Json],
+  rdsClientConfig: RDSClientConfig,
+  identifiersTableConfig: IdentifiersTableConfig
 )(implicit ec: ExecutionContext) {
 
-  def run(): Future[Done] =
+  def run(): Future[Done] = {
+    val tableProvisioner = new TableProvisioner(
+      rdsClientConfig = rdsClientConfig
+    )
+
+    tableProvisioner.provision(
+      database = identifiersTableConfig.database,
+      tableName = identifiersTableConfig.tableName
+    )
+
     messageStream.foreach(this.getClass.getSimpleName, processMessage)
+  }
 
   def processMessage(json: Json): Future[Unit] =
     for {

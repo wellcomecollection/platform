@@ -1,0 +1,41 @@
+package uk.ac.wellcome.platform.idminter.fixtures
+
+import io.circe.Json
+import org.scalatest.Assertion
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.idminter.config.models.IdentifiersTableConfig
+import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
+import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
+import uk.ac.wellcome.platform.idminter.steps.{IdEmbedder, IdentifierGenerator}
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+
+trait WorkerServiceFixture extends Akka with IdentifiersDatabase with Messaging with MetricsSenderFixture with SNS {
+  def withWorkerService[R](bucket: Bucket, topic: Topic, queue: Queue, identifiersDao: IdentifiersDao, identifiersTableConfig: IdentifiersTableConfig)(testWith: TestWith[IdMinterWorkerService, R]): R =
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        withMessageWriter[Json, R](bucket, topic, snsClient) { messageWriter =>
+          withMessageStream[Json, R](actorSystem, bucket, queue, metricsSender) { messageStream =>
+            val workerService = new IdMinterWorkerService(
+              idEmbedder = new IdEmbedder(
+                identifierGenerator = new IdentifierGenerator(
+                  identifiersDao = identifiersDao
+                )
+              ),
+              writer = messageWriter,
+              messageStream = messageStream,
+              rdsClientConfig = rdsClientConfig,
+              identifiersTableConfig = identifiersTableConfig
+            )
+
+            workerService.run()
+
+            testWith(workerService)
+          }
+        }
+      }
+    }
+}

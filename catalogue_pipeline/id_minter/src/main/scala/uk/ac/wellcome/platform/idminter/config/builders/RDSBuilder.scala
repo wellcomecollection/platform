@@ -16,7 +16,7 @@ object RDSBuilder {
       s"jdbc:mysql://${rdsClientConfig.host}:${rdsClientConfig.port}",
       user = rdsClientConfig.username,
       password = rdsClientConfig.password,
-      settings = ConnectionPoolSettings(maxSize = maxSize())
+      settings = ConnectionPoolSettings(maxSize = maxSize)
     )
     DB.connect()
   }

@@ -29,6 +29,10 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
+
+
+
+
             val flags =
               identifiersLocalDbFlags(identifiersTableConfig) ++
                 messagingLocalFlags(bucket, topic, queue)
