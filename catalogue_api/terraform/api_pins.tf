@@ -1,6 +1,6 @@
 locals {
   production_api       = "romulus"
-  pinned_nginx         = "025b2708fdd28920fed6b7289dffafc9b7cb638c"
+  pinned_nginx         = "bad0dbfa548874938d16496e313b05adb71268b7"
   pinned_remus_api     = ""
   pinned_remus_nginx   = ""
   pinned_romulus_api   = "5d753c10ca58846ca67df73dd9998771b700757b"

@@ -20,7 +20,7 @@ nginx-build-api-delta:
 	$(call nginx_build_image,api-delta,Dockerfile)
 
 nginx-build-api-gw:
-	$(call nginx_build_image,api-gw,Dockerfile)
+	$(call nginx_build_image,api-gw,api-gw.Dockerfile.template)
 
 nginx-build-loris:
 	$(call nginx_build_image,loris,Dockerfile)
