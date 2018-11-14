@@ -60,7 +60,7 @@ class MatcherFeatureTest
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
           withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
-            withWorkerService(queuePair.queue, storageBucket, topic, graphTable) {
+            withWorkerService(queuePair.queue, topic, graphTable) {
               _ =>
                 val existingWorkVersion = 2
                 val updatedWorkVersion = 1

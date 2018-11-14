@@ -44,7 +44,6 @@ trait MatcherFixtures
 
   def withWorkerService[R](
     queue: SQS.Queue,
-    storageBucket: Bucket,
     topic: Topic,
     graphTable: Table)(testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
@@ -57,7 +56,6 @@ trait MatcherFixtures
                 workMatcher =>
                   withMessageStream[TransformedBaseWork, R](
                     actorSystem = actorSystem,
-                    bucket = storageBucket,
                     queue = queue,
                     metricsSender = metricsSender
                   ) { messageStream =>
@@ -84,7 +82,7 @@ trait MatcherFixtures
     topic: Topic)(testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
-      withWorkerService(queue, storageBucket, topic, graphTable) { service =>
+      withWorkerService(queue, topic, graphTable) { service =>
         testWith(service)
       }
     }
