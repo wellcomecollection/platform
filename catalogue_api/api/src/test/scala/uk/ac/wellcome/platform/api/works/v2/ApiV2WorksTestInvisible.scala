@@ -7,10 +7,10 @@ import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedInvisibleWork
 
-        insertIntoElasticsearch(indexNameV2, itemType, work)
+        insertIntoElasticsearch(indexNameV2, work)
 
         eventually {
           server.httpGet(
@@ -24,12 +24,12 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
 
   it("excludes works with visible=false from list results") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
         val deletedWork = createIdentifiedInvisibleWork
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val worksToIndex = Seq[IdentifiedBaseWork](deletedWork) ++ works
-        insertIntoElasticsearch(indexNameV2, itemType, worksToIndex: _*)
+        insertIntoElasticsearch(indexNameV2, worksToIndex: _*)
 
         eventually {
           server.httpGet(
@@ -59,12 +59,12 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
 
   it("excludes works with visible=false from search results") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           title = "This shouldn't be deleted!"
         )
         val deletedWork = createIdentifiedInvisibleWork
-        insertIntoElasticsearch(indexNameV2, itemType, work, deletedWork)
+        insertIntoElasticsearch(indexNameV2, work, deletedWork)
 
         eventually {
           server.httpGet(

@@ -12,17 +12,13 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Server extends CloudWatch with Messaging with ElasticsearchFixtures {
   this: Suite =>
-  def withServer[R](
-    queue: Queue,
-    bucket: Bucket,
-    indexName: String,
-    itemType: String)(testWith: TestWith[EmbeddedHttpServer, R]): R = {
+  def withServer[R](queue: Queue, bucket: Bucket, indexName: String)(
+    testWith: TestWith[EmbeddedHttpServer, R]): R = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new AppServer(),
       flags = messageReaderLocalFlags(bucket, queue) ++ ingestEsLocalFlags(
-        indexName,
-        itemType) ++ cloudWatchLocalFlags ++ Map(
+        indexName) ++ cloudWatchLocalFlags ++ Map(
         "es.ingest.flushInterval" -> "5 seconds")
     )
 

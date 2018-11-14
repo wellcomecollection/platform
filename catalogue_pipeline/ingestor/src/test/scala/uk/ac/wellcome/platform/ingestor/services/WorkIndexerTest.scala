@@ -9,7 +9,6 @@ import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Random
 
 class WorkIndexerTest
     extends FunSpec
@@ -20,21 +19,20 @@ class WorkIndexerTest
     with WorkIndexerFixtures
     with CustomElasticsearchMapping {
 
-  val esType = "work"
-
   it("inserts an identified Work into Elasticsearch") {
     val work = createIdentifiedWork
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
-        val future = workIndexer.indexWorks(List(work), indexName, esType)
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
+        val future = workIndexer.indexWorks(
+          works = List(work),
+          indexName = indexName,
+          documentType = documentType
+        )
 
         whenReady(future) { result =>
           result.right.get should contain(work)
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            itemType = esType,
-            work)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
         }
       }
     }
@@ -43,23 +41,20 @@ class WorkIndexerTest
   it("only adds one record when the same ID is ingested multiple times") {
     val work = createIdentifiedWork
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
         val future = Future.sequence(
           (1 to 2).map(
             _ =>
               workIndexer.indexWorks(
                 works = List(work),
-                esIndex = indexName,
-                esType = esType
+                indexName = indexName,
+                documentType = documentType
             ))
         )
 
         whenReady(future) { _ =>
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            itemType = esType,
-            work)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
         }
       }
     }
@@ -69,14 +64,14 @@ class WorkIndexerTest
     val work = createIdentifiedWorkWith(version = 3)
     val olderWork = work.copy(version = 1)
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
+    withLocalElasticsearchIndex { indexName =>
+      insertIntoElasticsearch(indexName = indexName, work)
 
-      withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
+      withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(
           works = List(olderWork),
-          esIndex = indexName,
-          esType = esType
+          indexName = indexName,
+          documentType = documentType
         )
 
         whenReady(future) { result =>
@@ -84,10 +79,7 @@ class WorkIndexerTest
           Thread.sleep(700)
           result.right.get should contain(olderWork)
 
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            itemType = esType,
-            work)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
         }
       }
     }
@@ -97,21 +89,20 @@ class WorkIndexerTest
     val work = createIdentifiedWorkWith(version = 3)
     val updatedWork = work.copy(title = "a different title")
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
+    withLocalElasticsearchIndex { indexName =>
+      insertIntoElasticsearch(indexName = indexName, work)
 
-      withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
+      withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(
           works = List(updatedWork),
-          esIndex = indexName,
-          esType = esType
+          indexName = indexName,
+          documentType = documentType
         )
 
         whenReady(future) { result =>
           result.right.get should contain(updatedWork)
           assertElasticsearchEventuallyHasWork(
             indexName = indexName,
-            itemType = esType,
             updatedWork)
         }
       }
@@ -121,15 +112,16 @@ class WorkIndexerTest
   it("inserts a list of works into elasticsearch and returns them") {
     val works = createIdentifiedWorks(count = 5)
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
-        val future = workIndexer.indexWorks(works, indexName, esType)
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
+        val future = workIndexer.indexWorks(
+          works = works,
+          indexName = indexName,
+          documentType = documentType
+        )
 
         whenReady(future) { successfullyInserted =>
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            itemType = esType,
-            works: _*)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
           successfullyInserted.right.get should contain theSameElementsAs works
         }
       }
@@ -138,8 +130,10 @@ class WorkIndexerTest
 
   it(
     "inserts a list of works into elasticsearch and return the list of works that failed inserting") {
-    val subsetOfFieldsIndex =
-      new SubsetOfFieldsWorksIndex(elasticClient, esType)
+    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(
+      elasticClient = elasticClient,
+      documentType = documentType
+    )
 
     val validWorks = createIdentifiedWorks(count = 5)
     val notMatchingMappingWork = createIdentifiedWorkWith(
@@ -148,25 +142,24 @@ class WorkIndexerTest
 
     val works = validWorks :+ notMatchingMappingWork
 
-    withLocalElasticsearchIndex(
-      subsetOfFieldsIndex,
-      indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
-      indexName =>
-        withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
-          val future = workIndexer.indexWorks(works, indexName, esType)
+    withLocalElasticsearchIndex(subsetOfFieldsIndex) { indexName =>
+      withWorkIndexer { workIndexer =>
+        val future = workIndexer.indexWorks(
+          works = works,
+          indexName = indexName,
+          documentType = documentType
+        )
 
-          whenReady(future) { result =>
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              itemType = esType,
-              validWorks: _*)
-            assertElasticsearchNeverHasWork(
-              indexName = indexName,
-              itemType = esType,
-              notMatchingMappingWork)
-            result.left.get should contain(notMatchingMappingWork)
-          }
+        whenReady(future) { result =>
+          assertElasticsearchEventuallyHasWork(
+            indexName = indexName,
+            validWorks: _*)
+          assertElasticsearchNeverHasWork(
+            indexName = indexName,
+            notMatchingMappingWork)
+          result.left.get should contain(notMatchingMappingWork)
         }
+      }
     }
   }
 }
