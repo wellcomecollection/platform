@@ -35,7 +35,7 @@ class IngestorFeatureTest
           queue = queue,
           obj = work)
         withLocalElasticsearchIndex { indexName =>
-          withServer(queue, bucket, indexName, itemType) { _ =>
+          withServer(queue, bucket, indexName) { _ =>
             assertElasticsearchEventuallyHasWork(indexName, itemType, work)
           }
         }
@@ -56,7 +56,7 @@ class IngestorFeatureTest
           queue = queue,
           obj = work)
         withLocalElasticsearchIndex { indexName =>
-          withServer(queue, bucket, indexName, itemType) { _ =>
+          withServer(queue, bucket, indexName) { _ =>
             assertElasticsearchNeverHasWork(indexName, itemType, work)
           }
         }
@@ -68,7 +68,7 @@ class IngestorFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalElasticsearchIndex { indexName =>
-          withServer(queue, bucket, indexName, itemType) { _ =>
+          withServer(queue, bucket, indexName) { _ =>
             sendNotificationToSQS(
               queue = queue,
               body = "not a json string -- this will fail parsing"
