@@ -5,11 +5,11 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
-import uk.ac.wellcome.config.storage.builders.{S3Builder, VHSBuilder}
+import uk.ac.wellcome.config.storage.builders.VHSBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.config.builders._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
