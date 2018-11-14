@@ -8,6 +8,7 @@ import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
 
 import scala.collection.JavaConverters._
 
@@ -19,6 +20,7 @@ class IngestorFeatureTest
     with ElasticsearchFixtures
     with Messaging
     with SQS
+    with WorkerServiceFixture
     with WorksGenerators {
 
   it(
@@ -32,7 +34,7 @@ class IngestorFeatureTest
           queue = queue,
           obj = work)
         withLocalElasticsearchIndex { indexName =>
-          withServer(queue, bucket, indexName) { _ =>
+          withWorkerService(bucket, queue, indexName) { _ =>
             assertElasticsearchEventuallyHasWork(indexName, work)
           }
         }
@@ -53,8 +55,8 @@ class IngestorFeatureTest
           queue = queue,
           obj = work)
         withLocalElasticsearchIndex { indexName =>
-          withServer(queue, bucket, indexName) { _ =>
-            assertElasticsearchNeverHasWork(indexName, work)
+          withWorkerService(bucket, queue, indexName) { _ =>
+            assertElasticsearchNeverHasWork(indexName, itemType, work)
           }
         }
       }
@@ -65,7 +67,7 @@ class IngestorFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalElasticsearchIndex { indexName =>
-          withServer(queue, bucket, indexName) { _ =>
+          withWorkerService(bucket, queue, indexName) { _ =>
             sendNotificationToSQS(
               queue = queue,
               body = "not a json string -- this will fail parsing"

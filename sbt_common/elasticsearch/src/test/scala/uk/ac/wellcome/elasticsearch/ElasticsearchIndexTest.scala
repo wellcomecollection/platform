@@ -2,6 +2,7 @@ package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
@@ -44,7 +45,7 @@ class ElasticsearchIndexTest
 
   object TestIndex extends ElasticsearchIndex {
     val httpClient: HttpClient = elasticClient
-    val mappingDefinition = mapping(testType)
+    val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
         keywordField("id"),
@@ -56,8 +57,8 @@ class ElasticsearchIndexTest
   }
 
   object CompatibleTestIndex extends ElasticsearchIndex {
-    val httpClient = elasticClient
-    val mappingDefinition = mapping(testType)
+    val httpClient: HttpClient = elasticClient
+    val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
         keywordField("id"),
