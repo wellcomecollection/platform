@@ -14,8 +14,6 @@ import uk.ac.wellcome.platform.sierra_item_merger.services.{
   SierraItemMergerWorkerService
 }
 import uk.ac.wellcome.sierra_adapter.config.builders.SierraTransformableVHSBuilder
-import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.s3.S3StorageBackend
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
@@ -34,15 +32,11 @@ object Main extends App with Logging {
     versionedHybridStore = versionedHybridStore
   )
 
-  implicit val storageBackend: S3StorageBackend = new S3StorageBackend(
-    s3Client = S3Builder.buildS3Client(config)
-  )
-
   val workerService = new SierraItemMergerWorkerService(
     actorSystem = actorSystem,
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
     sierraItemMergerUpdaterService = updaterService,
-    objectStore = ObjectStore[SierraItemRecord],
+    objectStore = S3Builder.buildObjectStore[SierraItemRecord](config),
     snsWriter = SNSBuilder.buildSNSWriter(config)
   )
 

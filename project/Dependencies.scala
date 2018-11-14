@@ -59,7 +59,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
-  
+
   val circeDependencies = Seq(
     "io.circe" %% "circe-core" % versions.circeVersion,
     "io.circe" %% "circe-generic"% versions.circeVersion,
@@ -176,6 +176,10 @@ object Dependencies {
     "mysql" % "mysql-connector-java" % "6.0.6",
     "org.flywaydb" % "flyway-core" % "4.2.0",
     "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
+  )
+
+  val miroTransformerDependencies: Seq[ModuleID] = Seq(
+    "org.apache.commons" % "commons-lang3" % "3.1"
   )
 
   val snapshotGeneratorDependencies = Seq(

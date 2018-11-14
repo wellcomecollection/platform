@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro.source
 
 import io.circe.generic.extras.JsonKey
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang3.StringEscapeUtils
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.util.{Failure, Success, Try}
@@ -46,7 +46,7 @@ case object MiroTransformableData {
    * We need to fix them up before we decode as JSON.
    */
   private def unescapeHtml(s: String): String =
-    StringEscapeUtils.unescapeHtml(s)
+    StringEscapeUtils.unescapeHtml3(s)
 
   /* Create MiroTransformableData from string */
   private def createMiroTransformableData(

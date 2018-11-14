@@ -105,12 +105,12 @@ lazy val ingestor = doServiceSetup(project, "catalogue_pipeline/ingestor")
 lazy val transformer_common = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_common")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(finatra_storage % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile;test->test")
+  .dependsOn(config_storage % "compile->compile;test->test")
 
 lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
   .dependsOn(transformer_common % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.miroTransformerDependencies)
 
 lazy val transformer_sierra = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_sierra")
   .dependsOn(transformer_common % "compile->compile;test->test")
@@ -260,8 +260,8 @@ lazy val root = (project in file("."))
     archivist,
     notifier,
     registrar_async,
-    progress_async, 
+    progress_async,
       registrar_common,
-    progress_http, 
+    progress_http,
     registrar_http
   )
