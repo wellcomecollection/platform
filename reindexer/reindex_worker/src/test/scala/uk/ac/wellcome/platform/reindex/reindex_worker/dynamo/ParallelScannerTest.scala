@@ -84,8 +84,9 @@ class ParallelScannerTest
           )
         }
 
-        whenReady(Future.sequence(futureResults)) { actualRecords: Seq[List[String]] =>
-          actualRecords.flatten.map { fromJson[TestVersioned](_).get } should contain theSameElementsAs records
+        whenReady(Future.sequence(futureResults)) {
+          actualRecords: Seq[List[String]] =>
+            actualRecords.flatten.map { fromJson[TestVersioned](_).get } should contain theSameElementsAs records
         }
       }
     }

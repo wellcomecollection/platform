@@ -20,7 +20,9 @@ class BulkSNSSenderTest
     with IntegrationPatience
     with SNS {
 
-  val messages: List[String] = (1 to 3).map { _ => randomAlphanumeric(15) }.toList
+  val messages: List[String] = (1 to 3).map { _ =>
+    randomAlphanumeric(15)
+  }.toList
 
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
@@ -28,9 +30,9 @@ class BulkSNSSenderTest
         val future = bulkSNSSender.sendToSNS(messages = messages)
 
         whenReady(future) { _ =>
-          val actualRecords = listMessagesReceivedFromSNS(topic)
-            .map { _.message }
-            .distinct
+          val actualRecords = listMessagesReceivedFromSNS(topic).map {
+            _.message
+          }.distinct
 
           actualRecords should contain theSameElementsAs messages
         }
@@ -47,7 +49,8 @@ class BulkSNSSenderTest
     }
   }
 
-  private def withBulkSNSSender[R](topic: Topic)(testWith: TestWith[BulkSNSSender, R]): R =
+  private def withBulkSNSSender[R](topic: Topic)(
+    testWith: TestWith[BulkSNSSender, R]): R =
     withSNSWriter(topic) { snsWriter =>
       val bulkSNSSender = new BulkSNSSender(snsWriter = snsWriter)
       testWith(bulkSNSSender)

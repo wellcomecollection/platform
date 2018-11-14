@@ -5,9 +5,8 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
 
-class MaxRecordsScanner(
-  scanSpecScanner: ScanSpecScanner,
-  dynamoConfig: DynamoConfig) {
+class MaxRecordsScanner(scanSpecScanner: ScanSpecScanner,
+                        dynamoConfig: DynamoConfig) {
 
   /** Run a DynamoDB Scan that returns at most `maxResults` values.
     *

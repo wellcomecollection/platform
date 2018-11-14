@@ -121,23 +121,26 @@ class ReindexWorkerFeatureTest
     )
 
     val hybridRecords = createHybridRecords
-    val metadataEntries = hybridRecords.map { hr => Metadata(success = Random.nextFloat() < 0.5) }
-
-    val recordsToIndex: Seq[CombinedRecord] = hybridRecords.zip(metadataEntries).map {
-      case (hr: HybridRecord, m: Metadata) =>
-        CombinedRecord(
-          id = hr.id,
-          location = hr.location,
-          version = hr.version,
-          success = m.success
-        )
+    val metadataEntries = hybridRecords.map { hr =>
+      Metadata(success = Random.nextFloat() < 0.5)
     }
+
+    val recordsToIndex: Seq[CombinedRecord] =
+      hybridRecords.zip(metadataEntries).map {
+        case (hr: HybridRecord, m: Metadata) =>
+          CombinedRecord(
+            id = hr.id,
+            location = hr.location,
+            version = hr.version,
+            success = m.success
+          )
+      }
 
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         recordsToIndex.foreach { record =>
-            Scanamo.put(dynamoDbClient)(table.name)(record)
-          }
+          Scanamo.put(dynamoDbClient)(table.name)(record)
+        }
         withLocalSnsTopic { topic =>
           withWorkerService(queue, table, topic) { _ =>
             val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
@@ -149,9 +152,7 @@ class ReindexWorkerFeatureTest
 
             eventually {
               val messages: Seq[String] =
-                listMessagesReceivedFromSNS(topic)
-                  .map { _.message }
-                  .distinct
+                listMessagesReceivedFromSNS(topic).map { _.message }.distinct
 
               val actualHybridRecords: Seq[HybridRecord] =
                 messages.map { fromJson[HybridRecord](_).get }
