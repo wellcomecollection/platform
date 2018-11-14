@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext
 
 trait CustomElasticsearchMapping {
 
-  class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, esType: String)(
+  class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, documentType: String)(
     implicit val ec: ExecutionContext)
       extends ElasticsearchIndex {
     val httpClient: HttpClient = elasticClient
@@ -63,7 +63,7 @@ trait CustomElasticsearchMapping {
         keywordField("type")
       )
 
-    override val mappingDefinition: MappingDefinition = mapping(esType)
+    override val mappingDefinition: MappingDefinition = mapping(documentType)
       .dynamic(DynamicMapping.Strict)
       .as(rootIndexFields)
   }

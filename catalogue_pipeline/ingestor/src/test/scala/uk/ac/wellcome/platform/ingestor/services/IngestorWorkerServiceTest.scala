@@ -55,10 +55,7 @@ class IngestorWorkerServiceTest
             queue = queue,
             obj = work)
 
-          assertElasticsearchEventuallyHasWork(
-            indexName = esIndex,
-            itemType = itemType,
-            work)
+          assertElasticsearchEventuallyHasWork(indexName = esIndex, work)
       }
     }
   }
@@ -76,10 +73,7 @@ class IngestorWorkerServiceTest
             queue = queue,
             obj = work)
 
-          assertElasticsearchEventuallyHasWork(
-            indexName = esIndex,
-            itemType = itemType,
-            work)
+          assertElasticsearchEventuallyHasWork(indexName = esIndex, work)
       }
     }
   }
@@ -97,10 +91,7 @@ class IngestorWorkerServiceTest
             queue = queue,
             obj = work)
 
-          assertElasticsearchEventuallyHasWork(
-            indexName = esIndex,
-            itemType = itemType,
-            work)
+          assertElasticsearchEventuallyHasWork(indexName = esIndex, work)
       }
     }
   }
@@ -118,10 +109,7 @@ class IngestorWorkerServiceTest
             queue = queue,
             obj = work)
 
-          assertElasticsearchEventuallyHasWork(
-            indexName = esIndex,
-            itemType = itemType,
-            work)
+          assertElasticsearchEventuallyHasWork(indexName = esIndex, work)
       }
     }
   }
@@ -152,10 +140,7 @@ class IngestorWorkerServiceTest
               obj = work)
           }
 
-          assertElasticsearchEventuallyHasWork(
-            indexName = esIndex,
-            itemType = itemType,
-            works: _*)
+          assertElasticsearchEventuallyHasWork(indexName = esIndex, works: _*)
 
           assertQueueEmpty(dlq)
       }
@@ -177,10 +162,7 @@ class IngestorWorkerServiceTest
             queue = queue,
             obj = work)
 
-          assertElasticsearchEventuallyHasWork(
-            indexName = esIndex,
-            itemType = itemType,
-            work)
+          assertElasticsearchEventuallyHasWork(indexName = esIndex, work)
 
           eventually {
             assertQueueEmpty(queue)
@@ -218,7 +200,6 @@ class IngestorWorkerServiceTest
 
           assertElasticsearchEventuallyHasWork(
             indexName = esIndex,
-            itemType = itemType,
             miroWork,
             sierraWork,
             otherWork)
@@ -247,7 +228,6 @@ class IngestorWorkerServiceTest
     withLocalElasticsearchIndex { esIndex =>
       insertIntoElasticsearch(
         indexName = esIndex,
-        itemType = itemType,
         newSierraWork)
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, dlq), bucket) =>
@@ -260,7 +240,6 @@ class IngestorWorkerServiceTest
 
           assertElasticsearchEventuallyHasWork(
             indexName = esIndex,
-            itemType = itemType,
             sierraWork,
             newSierraWork)
           eventually {
@@ -286,10 +265,7 @@ class IngestorWorkerServiceTest
 
           eventually {
             works.foreach { work =>
-              assertElasticsearchEventuallyHasWork(
-                indexName = esIndex,
-                itemType = itemType,
-                work)
+              assertElasticsearchEventuallyHasWork(indexName = esIndex, work)
             }
           }
 
@@ -302,8 +278,10 @@ class IngestorWorkerServiceTest
   }
 
   it("only deletes successfully ingested works from the queue") {
-    val subsetOfFieldsIndex =
-      new SubsetOfFieldsWorksIndex(elasticClient, itemType)
+    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(
+      elasticClient = elasticClient,
+      documentType = documentType
+    )
 
     val work = createIdentifiedWork
     val workDoesNotMatchMapping = createIdentifiedWorkWith(
@@ -322,14 +300,8 @@ class IngestorWorkerServiceTest
               obj = work)
           }
 
-          assertElasticsearchNeverHasWork(
-            indexName = indexName,
-            itemType = itemType,
-            workDoesNotMatchMapping)
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            itemType = itemType,
-            work)
+          assertElasticsearchNeverHasWork(indexName = indexName, workDoesNotMatchMapping)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
           eventually {
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, 1)
