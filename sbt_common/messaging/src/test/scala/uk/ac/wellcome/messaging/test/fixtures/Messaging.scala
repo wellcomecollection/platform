@@ -123,8 +123,7 @@ trait Messaging
 
   def withMessageStreamFixtures[T, R](
     testWith: TestWith[(Bucket, MessageStream[T], QueuePair, MetricsSender), R]
-  )(implicit objectStore: ObjectStore[T]) = {
-
+  )(implicit objectStore: ObjectStore[T]): R =
     withActorSystem { actorSystem =>
       withLocalS3Bucket { bucket =>
         withLocalSqsQueueAndDlq {
@@ -134,12 +133,10 @@ trait Messaging
                 stream =>
                   testWith((bucket, stream, queuePair, metricsSender))
               }
-
             }
         }
       }
     }
-  }
 
   /** Given a topic ARN which has received notifications containing pointers
     * to objects in S3, return the unpacked objects.
