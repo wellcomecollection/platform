@@ -4,7 +4,6 @@ import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.messaging.message.MessageReaderConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
-import uk.ac.wellcome.storage.s3.S3Config
 
 object MessageReaderConfigModule extends TwitterModule {
   private val readerQueueUrl =
