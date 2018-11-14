@@ -26,7 +26,6 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.util.Random
 
 class IngestorWorkerServiceTest
     extends FunSpec

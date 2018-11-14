@@ -9,7 +9,6 @@ import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Random
 
 class WorkIndexerTest
     extends FunSpec
