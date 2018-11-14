@@ -1,0 +1,165 @@
+{
+  "@context": "/v0/context.json",
+  "id": "f4uu00",
+  "type": "Work",
+  "workType": {
+    "id": "record",
+    "type": "WorkType",
+    "label": "Record"
+  },
+  "identifiers": [
+    {
+      "value": "PPMIA/H/1/1",
+      "type": "Identifier",
+      "indentifierType": {
+        "id": "ref-no",
+        "label": "CALM reference Number",
+        "type": "IdentifierType"
+      }
+    }
+  ],
+  "title": "Correspondence: A 1977",
+  "hasCreatedDate": "December 1967-May 1978",
+  "production": [
+    {
+      "places": [
+        {
+          "label": "",
+          "type": "Place"
+        }
+      ],
+      "function": {
+        "label": "Production/Creation",
+        "type": "Concept"
+      },
+      "dates": [
+        {
+          "label": "December 1967-May 1978",
+          "type": "Period"
+        }
+      ],
+      "agents": [
+        {
+          "id": "a24s7qf3",
+          "label": "Michael Ashburner",
+          "type": "Person"
+        }
+      ],
+      "type": "ProductionEvent"
+    }
+  ],
+  "physicalExtent": "1 file",
+  "contributors": [
+    {
+      "type": "Contributor",
+      "agent": {
+        "id": "a24s7qf3",
+        "label": "Michael Ashburner",
+        "type": "Person",
+        "roles": [
+          {
+            "id": "author",
+            "label": "Author",
+            "type": "ContributionRole"
+          }
+        ]
+      }
+    }
+  ],
+  "subjects": [
+    {
+      "id": "90820",
+      "label": "Genetics",
+      "type": "Concept"
+    } ,
+    {
+      "id": "9uud9d",
+      "label": "Bioinformatics",
+      "type": "Concept"
+    }
+  ],
+  "genres": {
+    "id": "correspondence",
+    "label": "Correspondence",
+    "type": "Concept"
+  },
+  "isAssociatedWith": [
+    {
+      "id": "a24s7qf3",
+      "label": "Michael Ashburner",
+      "type": "Person"
+    },
+    {
+      "label": "University lecturer",
+      "type": "Position",
+      "start": "1973",
+      "end": "1980",
+      "positionAt": {
+        "id": "e28y1y9",
+        "label": "Department of Genetics at the University of Cambridge",
+        "type": "Group"
+      }
+    }
+  ],
+  "isMemberOf": {
+    "id": "83hdh99",
+    "title": "Correspondence pre-1977",
+    "type": "Work",
+    "workType": {
+      "id": "record-set",
+      "type": "WorkType",
+      "label": "RecordSet"
+    },
+    "identifiers": [
+      {
+        "value": "PP/MIA/H/1",
+        "type": "Identifier",
+        "identifierScheme": "ref-no"
+      }
+    ],
+    "isMemberOf": {
+      "id": "83hdh99",
+      "name": "Correspondence",
+      "type": "Work",
+      "workType": {
+        "id": "record-set",
+        "type": "WorkType",
+        "label": "RecordSet"
+      },
+      "identifiers": [
+        {
+          "value": "PP/MIA/H",
+          "type": "Identifier",
+          "identifierScheme": "ref-no"
+        }
+      ],
+      "isMemberOf": {
+        "id": "73189",
+        "name": "Professor Michael Ashburner: archives",
+        "type": "Work",
+        "workType": {
+          "id": "record-set",
+          "type": "WorkType",
+          "label": "RecordSet"
+        },
+        "identifiers": [
+          {
+            "value": "PP/MIA",
+            "type": "Identifier",
+            "identifierScheme": "ref-no"
+          }
+        ]
+      }
+    }
+  },
+  "locations": [
+    {
+      "type": "Location",
+      "locationType": {
+        "id": "online",
+        "label": "Online",
+        "type": "LocationType"
+      }
+    }
+  ]
+}
