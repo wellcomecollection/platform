@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.dynamo.TestVersioned
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
@@ -31,7 +32,7 @@ class ParallelScannerTest
         )
 
         whenReady(futureResult) { result =>
-          result shouldBe List(Right(record))
+          result.map { fromJson[TestVersioned](_).get } shouldBe List(record)
         }
       }
     }
@@ -83,8 +84,8 @@ class ParallelScannerTest
           )
         }
 
-        whenReady(Future.sequence(futureResults)) { actualRecords =>
-          actualRecords should contain theSameElementsAs records
+        whenReady(Future.sequence(futureResults)) { actualRecords: Seq[List[String]] =>
+          actualRecords.flatten.map { fromJson[TestVersioned](_).get } should contain theSameElementsAs records
         }
       }
     }
