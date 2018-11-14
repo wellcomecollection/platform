@@ -71,7 +71,7 @@
       "type": "ProductionEvent"
     }
   ],
-  "hasPart": [
+  "parts": [
     {
       "id": "1u90d2u",
       "type": "Work",

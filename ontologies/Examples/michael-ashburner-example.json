@@ -14,7 +14,7 @@
     "label": "Sussex",
     "type": "Place"
   },
-  "occupation": [
+  "occupation/pursues": [
     {
       "id": "dj9120d1io",
       "label": "Bioinformatician",
@@ -45,49 +45,77 @@
       "year": "1990"
     }
   ],
-  "position": [
+  "occupies/positions": [
     {
       "label": "Cambridge Fellow",
+      "type" : "Position" ,
       "start": "1980",
       "positionAt": "Cambridge"
     },
     {
       "label": "Postdoctoral research",
       "start": "1968",
+      "type" : "Position" ,
       "positionAt": "California Institute of Technology"
     },
     {
       "label": "Research assistant",
       "start": "1966",
       "end": "1968",
-      "positionAt": "Department of Genetics at the University of Cambridge"
+      "type" : "Position" ,
+      "positionAt": {
+        "id": "e28y1y9",
+        "label": "Department of Genetics at the University of Cambridge",
+        "type": "Group"
+      }
     },
     {
       "label": "University demonstrator",
+      "type" : "Position" ,
       "start": "1968",
       "end": "1973",
-      "positionAt": "Department of Genetics at the University of Cambridge"
+      "positionAt": {
+        "id": "e28y1y9",
+        "label": "Department of Genetics at the University of Cambridge",
+        "type": "Group"
+      }
     },
     {
       "label": "University lecturer",
+      "type" : "Position" ,
       "start": "1973",
       "end": "1980",
-      "positionAt": "Department of Genetics at the University of Cambridge"
+      "positionAt": {
+        "id": "e28y1y9",
+        "label": "Department of Genetics at the University of Cambridge",
+        "type": "Group"
+      }
     },
     {
       "label": "Reader in Developmental Genetics",
+      "type" : "Position" ,
       "start": "1980",
       "end": "1991",
-      "positionAt": "Department of Genetics at the University of Cambridge"
+      "positionAt": {
+        "id": "e28y1y9",
+        "label": "Department of Genetics at the University of Cambridge",
+        "type": "Group"
+      }
     },
     {
       "label": "Professor of Biology",
+      "type" : "Position" ,
       "start": "1991",
       "end": "2009",
-      "positionAt": "Department of Genetics at the University of Cambridge"
+      "positionAt": {
+        "id": "e28y1y9",
+        "label": "Department of Genetics at the University of Cambridge",
+        "type": "Group"
+      }
     },
     {
       "label": "Professor Emeritus",
+      "type" : "Position" ,
       "start": "2010",
       "positionAt": "Cambridge"
     }

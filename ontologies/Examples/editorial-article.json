@@ -1,16 +1,17 @@
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "watu9tbc",
-  "type": "Work",
-  "workType": {
+  "type": "Story",
+  "storyType": {
     "id": "article",
-    "type": "WorkType",
+    "type": "StoryType",
     "label": "Article"
   },
+  "url": "https://wellcomecollection.org/articles/WsT4Ex8AAHruGfXj",
   "thumbnail": {
     "type": "Location",
     "locationType": "thumbnail-image",
-    "url": "https://mosaicscience.com/sites/default/files/styles/hero_extralarge/public/HERO_parent-school-leaving-for-school-16-9_0.jpg?itok=LrQQK1ih",
+    "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
     "license": {
       "type": "License",
       "licenseType": "CC-BY",
@@ -18,27 +19,17 @@
       "url": "http://creativecommons.org/licenses/by/4.0/"
     }
   },
-  "title": "A brief history of childcare advice",
-  "description": "From the wisdom of family to doctors\u2019 advice from the late 19th century, trends in parenting have waxed and waned.",
+  "title": "The tradesman who confronted the pestilence",
+  "description": "New Orleans, 1853. James McGuigan arrives in the port city and succumbs to yellow fever.",
   "creators": [
     {
       "id": "2dh819d",
-      "label": "Linda Geddes",
-      "Type": "People"
-    },
-    {
-      "id": "d9j20d9j",
-      "label": "Kirsty Strawbridge",
-      "Type": "People"
-    },
-    {
-      "id": "j9ssbnn",
-      "label": "Mun-Keat Looi",
+      "label": "Anna Faherty",
       "Type": "People"
     }
   ],
   "publicationDate": {
-    "label": "03 February 2015",
+    "label": "15 June 2017",
     "type": "Period"
   },
   "genres": [
@@ -48,13 +39,12 @@
       "type": "Concept"
     }
   ],
-  "series": [
-    {
-      "id": "j9s11j9j",
-      "label": "Do you need to go to parent school?",
-      "type": "Series"
-    }
-  ],
+  "series": {
+    "id": "j19s1sj01",
+
+    "title": "Outsiders",
+    "type": "Series"
+  },
   "items": [
     {
       "id": "b28gh7z4n",
@@ -63,7 +53,7 @@
         {
           "type": "Location",
           "locationType": "web",
-          "url": "https://mosaicscience.com/extra/brief-history-childcare-advice",
+          "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
           "license": {
             "type": "License",
             "licenseType": "CC-BY",

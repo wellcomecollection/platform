@@ -1,12 +1,13 @@
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "watu9tbc",
-  "type": "Work",
-  "workType": {
+  "type": "Story",
+  "storyType": {
     "id": "article",
-    "type": "WorkType",
+    "type": "StoryType",
     "label": "Article"
   },
+  "url": "https://wellcomecollection.org/articles/WsT4Ex8AAHruGfXj",
   "thumbnail": {
     "type": "Location",
     "locationType": "thumbnail-image",
@@ -40,7 +41,8 @@
   ],
   "series": {
     "id": "j19s1sj01",
-    "label": "Outsiders",
+
+    "title": "Outsiders",
     "type": "Series"
   },
   "items": [
