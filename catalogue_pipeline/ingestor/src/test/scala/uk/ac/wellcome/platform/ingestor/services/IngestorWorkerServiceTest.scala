@@ -8,19 +8,16 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType, Subject}
-import uk.ac.wellcome.platform.ingestor.config.models.{IngestElasticConfig, IngestorConfig}
 import uk.ac.wellcome.platform.ingestor.fixtures.{WorkIndexerFixtures, WorkerServiceFixture}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 
 class IngestorWorkerServiceTest
     extends FunSpec
@@ -173,28 +170,25 @@ class IngestorWorkerServiceTest
 
     val works = List(work, workDoesNotMatchMapping)
 
-    withLocalS3Bucket { bucket =>
-      withLocalSqsQueueAndDlq {
-        case QueuePair(queue, dlq) =>
-          withLocalElasticsearchIndex { indexName =>
-            withWorkerService(bucket, queue, indexName) { _ =>
-              works.foreach { work =>
-                sendMessage[IdentifiedBaseWork](
-                  bucket = bucket,
-                  queue = queue,
-                  obj = work)
-              }
+    withLocalElasticsearchIndex(subsetOfFieldsIndex) { indexName =>
+      withLocalS3Bucket { bucket =>
+        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+          withWorkerService(bucket, queue, indexName) { _ =>
+            works.foreach { work =>
+              sendMessage[IdentifiedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
+            }
 
-              assertElasticsearchNeverHasWork(
-                indexName = indexName,
-                workDoesNotMatchMapping)
-              assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
-              }
+            assertElasticsearchNeverHasWork(indexName = indexName, workDoesNotMatchMapping)
+            assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
             }
           }
+        }
       }
     }
   }
