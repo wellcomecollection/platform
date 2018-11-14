@@ -15,12 +15,12 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 
-import scala.util.{Random, Success}
+import scala.util.Success
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -154,32 +154,22 @@ trait Messaging
       }
     }.toList
 
-  /** Store an object in S3 and send the notification to SQS.
+  /** Send a MessageNotification to SQS.
     *
     * As if another application had used a MessageWriter to send the message
     * to an SNS topic, which was forwarded to the queue.  We don't use a
     * MessageWriter instance because that sends to SNS, not SQS.
     *
-    * Also, MessageWriter contains some extra logic for sending some messages
-    * over S3, some over SNS, which is tested separately -- and which we don't
-    * need to replicate here.
+    * We always send an InlineNotification regardless of size, which makes for
+    * slightly easier debugging if queue messages ever fail.
     *
     */
-  def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(
-    implicit encoder: Encoder[T]): SendMessageResult = {
-    val s3key = Random.alphanumeric take 10 mkString
-
-    val location = ObjectLocation(namespace = bucket.name, key = s3key)
-
-    s3Client.putObject(
-      location.namespace,
-      location.key,
-      toJson(obj).get
-    )
-
+  def sendMessage[T](queue: Queue, obj: T)(implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS[MessageNotification](
       queue = queue,
-      message = RemoteNotification(location)
+      message = InlineNotification(jsonString = toJson(obj).get)
     )
-  }
+
+  def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(implicit encoder: Encoder[T]): SendMessageResult =
+    sendMessage[T](queue = queue, obj = obj)
 }
