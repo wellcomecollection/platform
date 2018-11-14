@@ -96,16 +96,6 @@ trait Messaging
 
   def withMessageStream[T, R](
     actorSystem: ActorSystem,
-    bucket: Bucket,
-    queue: SQS.Queue,
-    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
-    implicit objectStore: ObjectStore[T]): R =
-    withMessageStream(actorSystem, queue, metricsSender) { messageStream =>
-      testWith(messageStream)
-    }
-
-  def withMessageStream[T, R](
-    actorSystem: ActorSystem,
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
     implicit objectStore: ObjectStore[T]): R = {
