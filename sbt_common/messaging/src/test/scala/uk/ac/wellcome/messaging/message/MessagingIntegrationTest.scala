@@ -63,7 +63,8 @@ class MessagingIntegrationTest
     testWith: TestWith[(MessageStream[ExampleObject],
                         MessageWriter[ExampleObject]),
                        R]): R = {
-    withLocalStackMessageStreamFixtures[R] { case (queue, messageStream) =>
+    withLocalStackMessageStreamFixtures[R] {
+      case (queue, messageStream) =>
         withLocalS3Bucket { bucket =>
           withLocalStackSnsTopic { topic =>
             withLocalStackSubscription(queue, topic) { _ =>
@@ -82,11 +83,9 @@ class MessagingIntegrationTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalStackSqsQueue { queue =>
-          withMessageStream[ExampleObject, R](
-            actorSystem,
-            queue,
-            metricsSender) { messageStream =>
-            testWith((queue, messageStream))
+          withMessageStream[ExampleObject, R](actorSystem, queue, metricsSender) {
+            messageStream =>
+              testWith((queue, messageStream))
           }
         }
       }

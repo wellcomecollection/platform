@@ -41,10 +41,8 @@ trait MatcherFixtures
       _.getEpochSecond
     )
 
-  def withWorkerService[R](
-    queue: SQS.Queue,
-    topic: Topic,
-    graphTable: Table)(testWith: TestWith[MatcherWorkerService, R])(
+  def withWorkerService[R](queue: SQS.Queue, topic: Topic, graphTable: Table)(
+    testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { actorSystem =>
@@ -75,9 +73,8 @@ trait MatcherFixtures
       }
     }
 
-  def withWorkerService[R](
-    queue: SQS.Queue,
-    topic: Topic)(testWith: TestWith[MatcherWorkerService, R])(
+  def withWorkerService[R](queue: SQS.Queue, topic: Topic)(
+    testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
       withWorkerService(queue, topic, graphTable) { service =>

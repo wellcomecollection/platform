@@ -116,7 +116,7 @@ trait Messaging
   )(implicit objectStore: ObjectStore[T]): R =
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq {
-        case queuePair@QueuePair(queue, _) =>
+        case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
             withMessageStream[T, R](actorSystem, queue, metricsSender) {
               stream =>
@@ -156,7 +156,8 @@ trait Messaging
     * slightly easier debugging if queue messages ever fail.
     *
     */
-  def sendMessage[T](queue: Queue, obj: T)(implicit encoder: Encoder[T]): SendMessageResult =
+  def sendMessage[T](queue: Queue, obj: T)(
+    implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS[MessageNotification](
       queue = queue,
       message = InlineNotification(jsonString = toJson(obj).get)

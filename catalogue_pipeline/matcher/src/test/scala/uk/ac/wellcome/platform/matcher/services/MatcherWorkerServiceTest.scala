@@ -130,8 +130,9 @@ class MatcherWorkerServiceTest
 
           processAndAssertMatchedWorkIs(
             workBv1,
-            MatcherResult(Set(MatchedIdentifiers(
-              Set(WorkIdentifier("sierra-system-number/B", 1))))),
+            MatcherResult(
+              Set(MatchedIdentifiers(
+                Set(WorkIdentifier("sierra-system-number/B", 1))))),
             queue,
             topic)
 
@@ -158,8 +159,9 @@ class MatcherWorkerServiceTest
 
           processAndAssertMatchedWorkIs(
             workCv1,
-            MatcherResult(Set(MatchedIdentifiers(
-              Set(WorkIdentifier("sierra-system-number/C", 1))))),
+            MatcherResult(
+              Set(MatchedIdentifiers(
+                Set(WorkIdentifier("sierra-system-number/C", 1))))),
             queue,
             topic)
 
@@ -197,8 +199,9 @@ class MatcherWorkerServiceTest
 
           processAndAssertMatchedWorkIs(
             workAv1,
-            MatcherResult(Set(MatchedIdentifiers(
-              Set(WorkIdentifier("sierra-system-number/A", 1))))),
+            MatcherResult(
+              Set(MatchedIdentifiers(
+                Set(WorkIdentifier("sierra-system-number/A", 1))))),
             queue,
             topic)
 
@@ -209,8 +212,9 @@ class MatcherWorkerServiceTest
 
           processAndAssertMatchedWorkIs(
             workBv1,
-            MatcherResult(Set(MatchedIdentifiers(
-              Set(WorkIdentifier("sierra-system-number/B", 1))))),
+            MatcherResult(
+              Set(MatchedIdentifiers(
+                Set(WorkIdentifier("sierra-system-number/B", 1))))),
             queue,
             topic)
 
