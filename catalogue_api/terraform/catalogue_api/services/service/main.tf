@@ -1,5 +1,5 @@
 module "catalogue_api" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=v13.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=v14.2.0"
 
   vpc_id       = "${var.vpc_id}"
   subnets      = ["${var.subnets}"]
@@ -31,7 +31,7 @@ module "catalogue_api" {
 }
 
 module "nginx" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=v13.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=v14.2.0"
 
   vpc_id       = "${var.vpc_id}"
   subnets      = ["${var.subnets}"]
