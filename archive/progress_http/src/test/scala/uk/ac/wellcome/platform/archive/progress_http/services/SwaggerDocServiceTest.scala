@@ -21,7 +21,7 @@ class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTe
   it("documents the get endpoint for progress") {
     Get("/progress/swagger.json") ~> SwaggerDocService.routes ~> check {
       val json = entityAs[Json]
-      root.paths.`/progress`.get.parameters.json.getOption(json) shouldBe parse("""[{
+      root.paths.`/progress/{id}`.get.parameters.json.getOption(json) shouldBe parse("""[{
                                                                                   |"name": "id",
                                                                                   |"in": "path",
                                                                                   |"required": true,
@@ -29,8 +29,8 @@ class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTe
                                                                                   |"format": "UUID",
                                                                                   |"description" : "The id of the request"
                                                                                   |}]""".stripMargin).toOption
-      root.paths.`/progress`.get.responses.json.getOption(json).get.asObject.get.keys.toSet shouldBe Set("200", "404")
-      root.paths.`/progress`.get.responses.`200`.schema.`$ref`.string.getOption(json) shouldBe Some("""#/definitions/ResponseIngest""")
+      root.paths.`/progress/{id}`.get.responses.json.getOption(json).get.asObject.get.keys.toSet shouldBe Set("200", "404")
+      root.paths.`/progress/{id}`.get.responses.`200`.schema.`$ref`.string.getOption(json) shouldBe Some("""#/definitions/ResponseIngest""")
     }
   }
 

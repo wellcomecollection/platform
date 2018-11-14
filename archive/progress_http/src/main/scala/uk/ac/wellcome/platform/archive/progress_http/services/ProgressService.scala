@@ -38,6 +38,8 @@ class ProgressService(
     }
   }
 
+
+  @Path("/{id}")
   @ApiOperation(httpMethod = "GET", value = "Returns an ingest request status", response = classOf[ResponseDisplayIngest])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "id", required = true, dataType = "string", value = "The id of the request", paramType = "path", format = "UUID")
@@ -60,7 +62,7 @@ class ProgressService(
     new ResponseHeader(name = "Location", description="The URL of the created ingest request", response = classOf[URL]) )
   )
   @ApiImplicitParams(Array(
-    new ApiImplicitParam(name = "progressCreateRequest", required = true, dataTypeClass = classOf[RequestDisplayIngest], value = "The request to initialise", paramType = "body")
+    new ApiImplicitParam(name = "ingestRequest", required = true, dataTypeClass = classOf[RequestDisplayIngest], value = "The request to initialise", paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 400, message = "Invalid request"))
