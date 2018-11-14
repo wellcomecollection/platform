@@ -43,8 +43,8 @@ module "nginx" {
   container_port  = "${var.nginx_container_port}"
 
   env_vars = {
-    APP_HOST  = "${var.namespace}.${var.namespace_tld}"
-    APP_PORT  = "${var.container_port}"
+    APP_HOST = "${var.namespace}.${var.namespace_tld}"
+    APP_PORT = "${var.container_port}"
   }
 
   env_vars_length = "2"

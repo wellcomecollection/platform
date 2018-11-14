@@ -25,7 +25,6 @@ module "remus" {
 
   nginx_container_image = "${var.nginx_container_image}"
   nginx_container_port  = "${var.nginx_container_port}"
-
 }
 
 module "remus_listener" {

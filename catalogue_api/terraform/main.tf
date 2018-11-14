@@ -22,5 +22,4 @@ module "catalogue_api" {
   remus_es_config   = "${local.es_config_remus}"
 
   production_api = "${local.production_api}"
-
 }
