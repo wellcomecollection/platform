@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "ingest_workflow_get" {
 
 data "aws_iam_policy_document" "archive_dlcs_get" {
   statement {
-    effect = "ALLOW"
+    effect = "Allow"
 
     principals {
       type = "AWS"
