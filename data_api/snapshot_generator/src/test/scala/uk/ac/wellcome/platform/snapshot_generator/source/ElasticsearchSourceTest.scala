@@ -7,7 +7,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.test.fixtures.Akka
 
-class ElastisearchSourceTest
+class ElasticsearchSourceTest
     extends FunSpec
     with Matchers
     with ScalaFutures
