@@ -20,17 +20,32 @@ def transform(input_data):
     # unpack fixedFields
     if 'fixedFields' in bib_record:
         for key, value in bib_record['fixedFields'].items():
-            bib_record[f"fixedFields_{key}_{value['label']}"] = value['value']
+            bib_record[f"fixed_field_{key}_{value['label']}"] = value['value']
         del bib_record['fixedFields']
 
     # unpack language
     if 'lang' in bib_record:
-        bib_record['lang'] = bib_record['lang']['name']
+        try:
+            bib_record['lang'] = bib_record['lang']['name']
+        except KeyError:
+            bib_record['lang'] = None
 
     # unpack locations
     if 'locations' in bib_record:
         bib_record['locations'] = [
             location['name'] for location in bib_record['locations']
         ]
+
+    # unpack material types
+    if 'materialType' in bib_record:
+        bib_record['materialType'] = bib_record['materialType']['code']
+
+    # get rid of redundant norm fields
+    norm_fields = [
+        field for field in bib_record if field.startswith('norm')
+    ]
+
+    for field in norm_fields:
+        del bib_record[field]
 
     return bib_record
