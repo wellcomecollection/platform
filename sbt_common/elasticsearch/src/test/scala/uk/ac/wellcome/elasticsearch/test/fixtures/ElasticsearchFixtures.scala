@@ -39,6 +39,8 @@ trait ElasticsearchFixtures
   private val esHost = "localhost"
   private val esPort = 9200
 
+  val documentType = "work"
+
   def displayEsLocalFlags(indexNameV1: String,
                           indexNameV2: String,
                           itemType: String) =

@@ -45,10 +45,10 @@ trait ApiWorksTestBase
   }
 
   def withApiFixtures[R](apiVersion: ApiVersions.Value,
-                         apiName: String = "catalogue/",
-                         itemType: String = "work")(
+                         apiName: String = "catalogue/")(
     testWith: TestWith[(String, String, String, String, EmbeddedHttpServer),
-                       R]) =
+                       R]): R = {
+    val itemType = documentType
     withLocalElasticsearchIndex(itemType = itemType) { indexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { indexV2 =>
         withServer(indexV1, indexV2, itemType) { server =>
@@ -56,6 +56,7 @@ trait ApiWorksTestBase
         }
       }
     }
+  }
 
   def emptyJsonResult(apiPrefix: String): String = s"""
     |{
