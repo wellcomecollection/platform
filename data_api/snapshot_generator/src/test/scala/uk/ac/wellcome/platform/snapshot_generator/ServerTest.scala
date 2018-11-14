@@ -17,7 +17,6 @@ class ServerTest
     with SQS
     with ScalaFutures
     with ElasticsearchFixtures {
-  val itemType = documentType
 
   it("shows the healthcheck message") {
     withFixtures { server =>

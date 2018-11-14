@@ -165,6 +165,13 @@ trait ElasticsearchFixtures
     }
   }
 
+  def createDisplayElasticConfigWith(indexV1name: String, indexV2name: String): DisplayElasticConfig =
+    DisplayElasticConfig(
+      documentType = documentType,
+      indexV1name = indexV1name,
+      indexV2name = indexV2name
+    )
+
   private def createIndexName: String =
     (Random.alphanumeric take 10 mkString) toLowerCase
 }
