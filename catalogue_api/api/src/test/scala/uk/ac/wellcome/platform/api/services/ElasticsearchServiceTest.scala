@@ -25,8 +25,6 @@ class ElasticsearchServiceTest
     with SearchOptionsGenerators
     with WorksGenerators {
 
-  val itemType = documentType
-
   describe("simpleStringQueryResults") {
     it("finds results for a simpleStringQuery search") {
       withLocalElasticsearchIndex { indexName =>
@@ -34,7 +32,7 @@ class ElasticsearchServiceTest
         val work2 = createIdentifiedWorkWith(title = "Before a Bengal")
         val work3 = createIdentifiedWorkWith(title = "Circling a Cheetah")
 
-        insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
+        insertIntoElasticsearch(indexName, work1, work2, work3)
 
         assertSearchResultsAreCorrect(
           indexName = indexName,
@@ -61,7 +59,6 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(
           indexName,
-          itemType,
           workWithCorrectWorkType,
           workWithWrongTitle,
           workWithWrongWorkType)
@@ -98,7 +95,6 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(
           indexName,
-          itemType,
           work1,
           workWithWrongTitle,
           work2,
@@ -132,7 +128,7 @@ class ElasticsearchServiceTest
           )
         )
 
-        insertIntoElasticsearch(indexName, itemType, work, notMatchingWork)
+        insertIntoElasticsearch(indexName, work, notMatchingWork)
 
         assertSearchResultsAreCorrect(
           indexName = indexName,
@@ -172,7 +168,6 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(
           indexName,
-          itemType,
           work,
           notMatchingWork,
           work2)
@@ -196,7 +191,7 @@ class ElasticsearchServiceTest
       withLocalElasticsearchIndex { indexName =>
         val work = createIdentifiedWork
 
-        insertIntoElasticsearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexName, work)
 
         withElasticsearchService { searchService =>
           val documentOptions =
@@ -222,7 +217,7 @@ class ElasticsearchServiceTest
         val work2 = createIdentifiedWorkWith(canonicalId = "000Y")
         val work3 = createIdentifiedWorkWith(canonicalId = "000X")
 
-        insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
+        insertIntoElasticsearch(indexName, work1, work2, work3)
 
         assertListResultsAreCorrect(
           indexName = indexName,
@@ -321,7 +316,7 @@ class ElasticsearchServiceTest
         val invisibleWorks = createIdentifiedInvisibleWorks(count = 2)
 
         val works = visibleWorks ++ invisibleWorks
-        insertIntoElasticsearch(indexName, itemType, works: _*)
+        insertIntoElasticsearch(indexName, works: _*)
 
         assertListResultsAreCorrect(
           indexName = indexName,
@@ -344,7 +339,6 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(
           indexName,
-          itemType,
           work1,
           work2,
           workWithWrongWorkType)
@@ -378,7 +372,6 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(
           indexName,
-          itemType,
           work1,
           work2,
           work3,
@@ -416,7 +409,7 @@ class ElasticsearchServiceTest
   private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
     val works = createIdentifiedWorks(count = 10)
 
-    insertIntoElasticsearch(indexName, itemType, works: _*)
+    insertIntoElasticsearch(indexName, works: _*)
 
     works.sortBy(_.canonicalId).toList
   }

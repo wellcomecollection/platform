@@ -3,19 +3,10 @@ package uk.ac.wellcome.elasticsearch.test.fixtures
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
-import org.scalatest.concurrent.{
-  Eventually,
-  PatienceConfiguration,
-  ScalaFutures
-}
+import org.scalatest.concurrent.{Eventually, PatienceConfiguration, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.{
-  DisplayElasticConfig,
-  ElasticClientBuilder,
-  ElasticsearchIndex,
-  WorksIndex
-}
+import org.scalatest.{Assertion, Matchers, Suite}
+import uk.ac.wellcome.elasticsearch.{DisplayElasticConfig, ElasticClientBuilder, ElasticsearchIndex, WorksIndex}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -114,14 +105,13 @@ trait ElasticsearchFixtures
   }
 
   def assertElasticsearchEventuallyHasWork(indexName: String,
-                                           itemType: String,
                                            works: IdentifiedBaseWork*) = {
     works.map { work =>
       val workJson = toJson(work).get
 
       eventually {
         val getResponse = elasticClient
-          .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
+          .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
           .await
 
         getResponse.exists shouldBe true
@@ -132,7 +122,6 @@ trait ElasticsearchFixtures
   }
 
   def assertElasticsearchNeverHasWork(indexName: String,
-                                      itemType: String,
                                       works: IdentifiedBaseWork*) = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
@@ -140,7 +129,7 @@ trait ElasticsearchFixtures
 
     works.foreach { work =>
       val hit = elasticClient
-        .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
+        .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
         .await
 
       hit.found shouldBe false
@@ -148,14 +137,13 @@ trait ElasticsearchFixtures
   }
 
   def insertIntoElasticsearch(indexName: String,
-                              itemType: String,
-                              works: IdentifiedBaseWork*) = {
+                              works: IdentifiedBaseWork*): Assertion = {
     val result = elasticClient.execute(
       bulk(
         works.map { work =>
           val jsonDoc = toJson(work).get
 
-          indexInto(indexName / itemType)
+          indexInto(indexName / documentType)
             .version(work.version)
             .versionType(VersionType.EXTERNAL_GTE)
             .id(work.canonicalId)
