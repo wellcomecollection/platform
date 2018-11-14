@@ -19,8 +19,7 @@ object MessagingBuilder {
   def buildMessageReaderConfig(config: Config): MessageReaderConfig =
     MessageReaderConfig(
       sqsConfig =
-        SQSBuilder.buildSQSConfig(config, namespace = "message.reader"),
-      s3Config = S3Builder.buildS3Config(config, namespace = "message.reader")
+        SQSBuilder.buildSQSConfig(config, namespace = "message.reader")
     )
 
   def buildMessageStream[T](config: Config)(

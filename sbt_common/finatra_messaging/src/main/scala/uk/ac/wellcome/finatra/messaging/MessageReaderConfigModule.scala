@@ -7,10 +7,6 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.storage.s3.S3Config
 
 object MessageReaderConfigModule extends TwitterModule {
-  private val readerBucketName =
-    flag[String](
-      "aws.message.reader.s3.bucketName",
-      "Name of the S3 bucket where message bodies are read from")
   private val readerQueueUrl =
     flag[String](
       "aws.message.reader.sqs.queue.url",
@@ -28,8 +24,7 @@ object MessageReaderConfigModule extends TwitterModule {
       queueUrl = readerQueueUrl(),
       parallelism = readerParallelism()
     )
-    val s3Config = S3Config(bucketName = readerBucketName())
 
-    MessageReaderConfig(sqsConfig = sqsConfig, s3Config = s3Config)
+    MessageReaderConfig(sqsConfig = sqsConfig)
   }
 }
