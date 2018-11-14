@@ -7,7 +7,7 @@
     "type": "WorkType",
     "label": "Journal"
   },
-  "description" : "Subtitle: <1917- , A journal of British and foreign medicine, surgery, obstetrics, physiology, chemistry, pharmacology, public health, and news" ,
+  "description": "Subtitle: <1917- , A journal of British and foreign medicine, surgery, obstetrics, physiology, chemistry, pharmacology, public health, and news",
   "subjects": [
     {
       "label": "Medicine",
