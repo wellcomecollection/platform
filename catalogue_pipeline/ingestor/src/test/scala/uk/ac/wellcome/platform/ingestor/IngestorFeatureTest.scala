@@ -22,8 +22,6 @@ class IngestorFeatureTest
     with SQS
     with WorksGenerators {
 
-  val itemType = documentType
-
   it(
     "reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
     val work = createIdentifiedWork
@@ -36,7 +34,7 @@ class IngestorFeatureTest
           obj = work)
         withLocalElasticsearchIndex { indexName =>
           withServer(queue, bucket, indexName) { _ =>
-            assertElasticsearchEventuallyHasWork(indexName, itemType, work)
+            assertElasticsearchEventuallyHasWork(indexName, work)
           }
         }
       }
@@ -57,7 +55,7 @@ class IngestorFeatureTest
           obj = work)
         withLocalElasticsearchIndex { indexName =>
           withServer(queue, bucket, indexName) { _ =>
-            assertElasticsearchNeverHasWork(indexName, itemType, work)
+            assertElasticsearchNeverHasWork(indexName, work)
           }
         }
       }
