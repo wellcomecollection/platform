@@ -22,6 +22,7 @@ variable "security_group_ids" {
 
 variable "service_egress_security_group_id" {}
 variable "env_vars_length" {}
+
 variable "env_vars" {
   type = "map"
 }

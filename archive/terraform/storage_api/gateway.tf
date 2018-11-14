@@ -25,9 +25,7 @@ module "prod" {
   base_path = "catalogue"
 
   # All integrations
-  depends_on = [
-
-  ]
+  depends_on = []
 }
 
 # Resources
