@@ -14,7 +14,6 @@ import uk.ac.wellcome.models.matcher.{
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -45,7 +44,6 @@ class MatcherWorkerServiceTest
               updatedWork,
               expectedMatchedWorks,
               queue,
-              storageBucket,
               topic)
           }
         }
@@ -72,7 +70,6 @@ class MatcherWorkerServiceTest
               workToMatch = invisibleWork,
               expectedMatchedWorks = expectedMatchedWorks,
               queue = queue,
-              storageBucket = storageBucket,
               topic = topic
             )
           }
@@ -105,7 +102,6 @@ class MatcherWorkerServiceTest
               workAv1,
               expectedMatchedWorks,
               queue,
-              storageBucket,
               topic)
           }
         }
@@ -133,7 +129,6 @@ class MatcherWorkerServiceTest
               workAv1,
               expectedMatchedWorks,
               queue,
-              storageBucket,
               topic)
 
             // Work Bv1
@@ -145,7 +140,6 @@ class MatcherWorkerServiceTest
               MatcherResult(Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/B", 1))))),
               queue,
-              storageBucket,
               topic)
 
             // Work Av1 matched to B
@@ -162,7 +156,6 @@ class MatcherWorkerServiceTest
                     WorkIdentifier("sierra-system-number/A", 2),
                     WorkIdentifier("sierra-system-number/B", 1))))),
               queue,
-              storageBucket,
               topic
             )
 
@@ -175,7 +168,6 @@ class MatcherWorkerServiceTest
               MatcherResult(Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/C", 1))))),
               queue,
-              storageBucket,
               topic)
 
             // Work Bv2 matched to C
@@ -194,7 +186,6 @@ class MatcherWorkerServiceTest
                       WorkIdentifier("sierra-system-number/B", 2),
                       WorkIdentifier("sierra-system-number/C", 1))))),
               queue,
-              storageBucket,
               topic
             )
           }
@@ -218,7 +209,6 @@ class MatcherWorkerServiceTest
               MatcherResult(Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/A", 1))))),
               queue,
-              storageBucket,
               topic)
 
             // Work Bv1
@@ -231,7 +221,6 @@ class MatcherWorkerServiceTest
               MatcherResult(Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/B", 1))))),
               queue,
-              storageBucket,
               topic)
 
             // Match Work A to Work B
@@ -248,7 +237,6 @@ class MatcherWorkerServiceTest
                     WorkIdentifier("sierra-system-number/A", 2),
                     WorkIdentifier("sierra-system-number/B", 1))))),
               queue,
-              storageBucket,
               topic
             )
 
@@ -266,7 +254,6 @@ class MatcherWorkerServiceTest
                   MatchedIdentifiers(
                     Set(WorkIdentifier("sierra-system-number/B", 1))))),
               queue,
-              storageBucket,
               topic
             )
           }
@@ -294,7 +281,6 @@ class MatcherWorkerServiceTest
               workAv2,
               expectedMatchedWorkAv2,
               queuePair.queue,
-              storageBucket,
               topic)
 
             // Work V1 is sent but not matched
@@ -336,7 +322,6 @@ class MatcherWorkerServiceTest
                 workAv2,
                 expectedMatchedWorkAv2,
                 queue,
-                storageBucket,
                 topic)
 
               // Work V1 is sent but not matched
@@ -359,7 +344,6 @@ class MatcherWorkerServiceTest
   private def processAndAssertMatchedWorkIs(workToMatch: TransformedBaseWork,
                                             expectedMatchedWorks: MatcherResult,
                                             queue: SQS.Queue,
-                                            storageBucket: Bucket,
                                             topic: Topic): Any = {
     sendMessage(queue = queue, workToMatch)
     eventually {
