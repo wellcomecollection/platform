@@ -23,15 +23,14 @@ trait ApiWorksTestBase
 
   def withServer[R](
     indexNameV1: String,
-    indexNameV2: String,
-    itemType: String = "work")(testWith: TestWith[EmbeddedHttpServer, R]) = {
+    indexNameV2: String)(testWith: TestWith[EmbeddedHttpServer, R]) = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
       flags = displayEsLocalFlags(
         indexNameV1 = indexNameV1,
         indexNameV2 = indexNameV2,
-        itemType = itemType
+        itemType = documentType
       )
     )
 
@@ -51,7 +50,7 @@ trait ApiWorksTestBase
     val itemType = documentType
     withLocalElasticsearchIndex(itemType = itemType) { indexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { indexV2 =>
-        withServer(indexV1, indexV2, itemType) { server =>
+        withServer(indexV1, indexV2) { server =>
           testWith((apiName + apiVersion, indexV1, indexV2, itemType, server))
         }
       }
