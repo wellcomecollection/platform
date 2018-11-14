@@ -323,7 +323,7 @@ module "storage_api" {
     vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
     app_base_url    = "https://api.wellcomecollection.org"
   }
-  bags_env_vars_length = 4
+  bags_env_vars_length       = 4
   bags_nginx_container_image = "${local.nginx_image_uri}"
   bags_nginx_container_port  = "9000"
 
@@ -337,7 +337,7 @@ module "storage_api" {
     topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
-  ingests_env_vars_length = 4
+  ingests_env_vars_length       = 4
   ingests_nginx_container_image = "${local.nginx_image_uri}"
   ingests_nginx_container_port  = "9000"
 }
