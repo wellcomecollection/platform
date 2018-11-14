@@ -17,7 +17,8 @@ trait HybridRecordReceiverFixture extends Messaging with SNS {
     topic: Topic,
     bucket: Bucket,
     snsClient: AmazonSNS = snsClient
-  )(testWith: TestWith[HybridRecordReceiver[T], R])(implicit objectStore: ObjectStore[T]): R =
+  )(testWith: TestWith[HybridRecordReceiver[T], R])(
+    implicit objectStore: ObjectStore[T]): R =
     withMessageWriter[TransformedBaseWork, R](
       bucket,
       topic,

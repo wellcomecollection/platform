@@ -25,7 +25,8 @@ object Main extends App with Logging {
     AkkaBuilder.buildExecutionContext()
 
   val messageReceiver = new HybridRecordReceiver[MiroTransformable](
-    messageWriter = MessagingBuilder.buildMessageWriter[TransformedBaseWork](config),
+    messageWriter =
+      MessagingBuilder.buildMessageWriter[TransformedBaseWork](config),
     objectStore = S3Builder.buildObjectStore[MiroTransformable](config)
   )
 

@@ -143,20 +143,23 @@ class MiroTransformerFeatureTest
     }
   }
 
-  def withWorkerService[R](topic: Topic, bucket: Bucket, queue: Queue)(testWith: TestWith[MiroTransformerWorkerService, R]): R =
-    withHybridRecordReceiver[MiroTransformable, R](topic, bucket) { messageReceiver =>
-      withActorSystem { actorSystem =>
-        withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
-          val workerService = new MiroTransformerWorkerService(
-            messageReceiver = messageReceiver,
-            miroTransformer = new MiroTransformableTransformer,
-            sqsStream = sqsStream
-          )
+  def withWorkerService[R](topic: Topic, bucket: Bucket, queue: Queue)(
+    testWith: TestWith[MiroTransformerWorkerService, R]): R =
+    withHybridRecordReceiver[MiroTransformable, R](topic, bucket) {
+      messageReceiver =>
+        withActorSystem { actorSystem =>
+          withSQSStream[NotificationMessage, R](actorSystem, queue) {
+            sqsStream =>
+              val workerService = new MiroTransformerWorkerService(
+                messageReceiver = messageReceiver,
+                miroTransformer = new MiroTransformableTransformer,
+                sqsStream = sqsStream
+              )
 
-          workerService.run()
+              workerService.run()
 
-          testWith(workerService)
+              testWith(workerService)
+          }
         }
-      }
     }
 }

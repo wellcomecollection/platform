@@ -10,7 +10,10 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.fixtures.HybridRecordReceiverFixture
 import uk.ac.wellcome.storage.ObjectLocation
@@ -51,7 +54,9 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver[TestTransformable, List[Assertion]](topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable, List[Assertion]](
+            topic,
+            bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(sqsMessage, transformToWork)
 
@@ -82,7 +87,9 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver[TestTransformable, List[Assertion]](topic, bucket) { recordReceiver =>
+          withHybridRecordReceiver[TestTransformable, List[Assertion]](
+            topic,
+            bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(notification, transformToWork)
 
@@ -118,13 +125,16 @@ class HybridRecordReceiverTest
             message = hybridRecord
           )
 
-          withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) { recordReceiver =>
-            val future =
-              recordReceiver.receiveMessage(invalidSqsMessage, transformToWork)
+          withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) {
+            recordReceiver =>
+              val future =
+                recordReceiver.receiveMessage(
+                  invalidSqsMessage,
+                  transformToWork)
 
-            whenReady(future.failed) { x =>
-              x shouldBe a[TransformerException]
-            }
+              whenReady(future.failed) { x =>
+                x shouldBe a[TransformerException]
+              }
           }
         }
       }
@@ -141,15 +151,16 @@ class HybridRecordReceiverTest
             bucket = bucket
           )
 
-          withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) { recordReceiver =>
-            val future =
-              recordReceiver.receiveMessage(
-                failingSqsMessage,
-                failingTransformToWork)
+          withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) {
+            recordReceiver =>
+              val future =
+                recordReceiver.receiveMessage(
+                  failingSqsMessage,
+                  failingTransformToWork)
 
-            whenReady(future.failed) { x =>
-              x shouldBe a[TestException]
-            }
+              whenReady(future.failed) { x =>
+                x shouldBe a[TestException]
+              }
           }
         }
       }

@@ -25,7 +25,8 @@ object Main extends App with Logging {
   implicit val executionContext: ExecutionContext =
     AkkaBuilder.buildExecutionContext()
 
-  val versionedHybridStore = VHSBuilder.buildVHS[SierraItemRecord, EmptyMetadata](config)
+  val versionedHybridStore =
+    VHSBuilder.buildVHS[SierraItemRecord, EmptyMetadata](config)
 
   val dynamoInserter = new DynamoInserter(
     versionedHybridStore = versionedHybridStore
