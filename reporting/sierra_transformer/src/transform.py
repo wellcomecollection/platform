@@ -11,7 +11,10 @@ def transform(input_data):
 
     # unpack bibLevel
     if 'bibLevel' in bib_record:
-        bib_record['bibLevel'] = bib_record['bibLevel']['value']
+        try:
+            bib_record['bibLevel'] = bib_record['bibLevel']['value']
+        except KeyError:
+            bib_record['bibLevel'] = None
 
     # unpack country
     if 'country' in bib_record:
