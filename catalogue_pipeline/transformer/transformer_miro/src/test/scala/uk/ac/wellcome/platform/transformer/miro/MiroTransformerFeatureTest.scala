@@ -17,6 +17,8 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class MiroTransformerFeatureTest
     extends FunSpec
     with Matchers
@@ -75,66 +77,58 @@ class MiroTransformerFeatureTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
+          val miroHybridRecordMessage1 = createHybridRecordNotificationWith(
+            createMiroTransformableWith(
+              miroId = "L0011975",
+              data = """
+                  |{
+                  |  "image_cleared": "Y",
+                  |  "image_copyright_cleared": "Y",
+                  |  "image_credit_line": "Wellcome Library, London",
+                  |  "image_image_desc": "Antonio Dionisi",
+                  |  "image_innopac_id": "12917175",
+                  |  "image_library_dept": "General Collections",
+                  |  "image_no_calc": "L0011975",
+                  |  "image_phys_format": "Book",
+                  |  "image_tech_file_size": [
+                  |    "5247788"
+                  |  ],
+                  |  "image_title": "Antonio Dionisi",
+                  |  "image_use_restrictions": "CC-BY"
+                  |}
+                """.stripMargin
+            ),
+            s3Client = s3Client,
+            bucket = storageBucket
+          )
+          val miroHybridRecordMessage2 = createHybridRecordNotificationWith(
+            createMiroTransformableWith(
+              miroId = "L0023034",
+              data =
+                """
+                  |{
+                  |  "image_cleared": "Y",
+                  |  "image_copyright_cleared": "Y",
+                  |  "image_image_desc": "Use of the guillotine",
+                  |  "image_innopac_id": "12074536",
+                  |  "image_keywords": [
+                  |    "Surgery"
+                  |  ],
+                  |  "image_library_dept": "General Collections",
+                  |  "image_no_calc": "L0023034",
+                  |  "image_tech_file_size": [
+                  |    "5710662"
+                  |  ],
+                  |  "image_title": "Greenfield Sluder, Tonsillectomy..., use of guillotine",
+                  |  "image_use_restrictions": "CC-BY"
+                  |}
+                """.stripMargin
+            ),
+            s3Client = s3Client,
+            bucket = storageBucket
+          )
           withLocalS3Bucket { messageBucket =>
-            val flags: Map[String, String] = Map(
-              "aws.metrics.namespace" -> "miro-transformer"
-            ) ++ s3ClientLocalFlags ++
-              sqsLocalFlags(queue) ++ messageWriterLocalFlags(
-              messageBucket,
-              topic)
-
-            withServer(flags) { _ =>
-              val miroHybridRecordMessage1 = createHybridRecordNotificationWith(
-                createMiroTransformableWith(
-                  miroId = "L0011975",
-                  data = """
-                      |{
-                      |  "image_cleared": "Y",
-                      |  "image_copyright_cleared": "Y",
-                      |  "image_credit_line": "Wellcome Library, London",
-                      |  "image_image_desc": "Antonio Dionisi",
-                      |  "image_innopac_id": "12917175",
-                      |  "image_library_dept": "General Collections",
-                      |  "image_no_calc": "L0011975",
-                      |  "image_phys_format": "Book",
-                      |  "image_tech_file_size": [
-                      |    "5247788"
-                      |  ],
-                      |  "image_title": "Antonio Dionisi",
-                      |  "image_use_restrictions": "CC-BY"
-                      |}
-                    """.stripMargin
-                ),
-                s3Client = s3Client,
-                bucket = storageBucket
-              )
-              val miroHybridRecordMessage2 = createHybridRecordNotificationWith(
-                createMiroTransformableWith(
-                  miroId = "L0023034",
-                  data =
-                    """
-                      |{
-                      |  "image_cleared": "Y",
-                      |  "image_copyright_cleared": "Y",
-                      |  "image_image_desc": "Use of the guillotine",
-                      |  "image_innopac_id": "12074536",
-                      |  "image_keywords": [
-                      |    "Surgery"
-                      |  ],
-                      |  "image_library_dept": "General Collections",
-                      |  "image_no_calc": "L0023034",
-                      |  "image_tech_file_size": [
-                      |    "5710662"
-                      |  ],
-                      |  "image_title": "Greenfield Sluder, Tonsillectomy..., use of guillotine",
-                      |  "image_use_restrictions": "CC-BY"
-                      |}
-                    """.stripMargin
-                ),
-                s3Client = s3Client,
-                bucket = storageBucket
-              )
-
+            withWorkerService(topic, messageBucket, queue) { _ =>
               sendSqsMessage(queue = queue, obj = miroHybridRecordMessage1)
               sendSqsMessage(queue = queue, obj = miroHybridRecordMessage2)
 

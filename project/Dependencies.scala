@@ -59,7 +59,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
-  
+
   val circeDependencies = Seq(
     "io.circe" %% "circe-core" % versions.circeVersion,
     "io.circe" %% "circe-generic"% versions.circeVersion,
@@ -179,7 +179,7 @@ object Dependencies {
   )
 
   val miroTransformerDependencies: Seq[ModuleID] = Seq(
-    "org.apache.commons" % "commons-lang3" % "3.0"
+    "org.apache.commons" % "commons-lang3" % "3.1"
   )
 
   val snapshotGeneratorDependencies = Seq(

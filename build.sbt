@@ -260,8 +260,8 @@ lazy val root = (project in file("."))
     archivist,
     notifier,
     registrar_async,
-    progress_async, 
+    progress_async,
       registrar_common,
-    progress_http, 
+    progress_http,
     registrar_http
   )
