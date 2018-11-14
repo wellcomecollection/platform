@@ -30,7 +30,7 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
-            withWorkerService(bucket, topic, queue, identifiersTableConfig) {
+            withWorkerService(topic, queue, identifiersTableConfig) {
               _ =>
                 eventuallyTableExists(identifiersTableConfig)
                 val work = createUnidentifiedWork

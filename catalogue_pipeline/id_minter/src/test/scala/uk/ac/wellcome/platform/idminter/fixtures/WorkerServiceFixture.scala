@@ -31,7 +31,7 @@ trait WorkerServiceFixture
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withMessageWriter[Json, R](bucket, topic, snsClient) { messageWriter =>
-          withMessageStream[Json, R](actorSystem, bucket, queue, metricsSender) {
+          withMessageStream[Json, R](actorSystem, queue, metricsSender) {
             messageStream =>
               val workerService = new IdMinterWorkerService(
                 idEmbedder = new IdEmbedder(
