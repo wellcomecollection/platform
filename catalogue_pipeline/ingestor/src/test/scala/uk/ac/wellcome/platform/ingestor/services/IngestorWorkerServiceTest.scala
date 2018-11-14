@@ -16,7 +16,7 @@ import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   Subject
 }
-import uk.ac.wellcome.platform.ingestor.fixtures.{WorkIndexerFixtures, WorkerServiceFixture}
+import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
 
 class IngestorWorkerServiceTest
     extends FunSpec
@@ -26,7 +26,6 @@ class IngestorWorkerServiceTest
     with ElasticsearchFixtures
     with SQS
     with WorkerServiceFixture
-    with WorkIndexerFixtures
     with WorksGenerators
     with CustomElasticsearchMapping {
 
