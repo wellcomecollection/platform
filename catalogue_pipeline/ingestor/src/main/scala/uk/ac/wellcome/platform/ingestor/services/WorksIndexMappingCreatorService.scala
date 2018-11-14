@@ -8,5 +8,4 @@ class WorksIndexMappingCreatorService(
   worksIndex: WorksIndex) {
 
   worksIndex.create(elasticConfig.indexName)
-
 }

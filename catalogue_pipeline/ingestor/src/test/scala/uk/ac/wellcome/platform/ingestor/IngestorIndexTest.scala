@@ -6,15 +6,16 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
 
 class IngestorIndexTest
     extends FunSpec
-    with fixtures.Server
     with SQS
     with Matchers
     with ScalaFutures
     with Messaging
-    with ElasticsearchFixtures {
+    with ElasticsearchFixtures
+    with WorkerServiceFixture {
 
   it("creates the index at startup if it doesn't already exist") {
     val indexName = "works"
@@ -22,7 +23,7 @@ class IngestorIndexTest
     deleteIndexIfExists(indexName)
 
     withLocalSqsQueue { queue =>
-      withServer(queue, indexName) { _ =>
+      withWorkerService(queue, indexName) { _ =>
         eventuallyIndexExists(indexName)
       }
     }

@@ -11,9 +11,12 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType, Subject}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
+  IdentifierType,
+  Subject
+}
 import uk.ac.wellcome.platform.ingestor.fixtures.{WorkIndexerFixtures, WorkerServiceFixture}
-import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -280,25 +283,25 @@ class IngestorWorkerServiceTest
 
   it("returns a failed Future if indexing into Elasticsearch fails") {
     withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-        val brokenRestClient: RestClient = RestClient
-          .builder(new HttpHost("localhost", 9800, "http"))
-          .setHttpClientConfigCallback(
-            new ElasticCredentials("elastic", "changeme"))
-          .build()
+      val brokenRestClient: RestClient = RestClient
+        .builder(new HttpHost("localhost", 9800, "http"))
+        .setHttpClientConfigCallback(
+          new ElasticCredentials("elastic", "changeme"))
+        .build()
 
-        val brokenElasticClient: HttpClient =
-          HttpClient.fromRestClient(brokenRestClient)
+      val brokenElasticClient: HttpClient =
+        HttpClient.fromRestClient(brokenRestClient)
 
-        withWorkerService(queue, indexName = "works-v1", elasticClient = brokenElasticClient) { _ =>
-          val work = createIdentifiedWork
+      withWorkerService(queue, indexName = "works-v1", elasticClient = brokenElasticClient) { _ =>
+        val work = createIdentifiedWork
 
-          sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
+        sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
-          }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
         }
+      }
     }
   }
 }

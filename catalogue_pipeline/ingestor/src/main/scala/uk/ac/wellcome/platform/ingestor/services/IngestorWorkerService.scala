@@ -7,8 +7,6 @@ import uk.ac.wellcome.elasticsearch.WorksIndex
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.platform.ingestor.Main.{config, elasticClient}
-import uk.ac.wellcome.platform.ingestor.config.builders.IngestorConfigBuilder
 import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,16 +18,16 @@ class IngestorWorkerService(
 
   case class MessageBundle(message: Message, work: IdentifiedBaseWork)
 
-  val index = ingestorConfig.elasticConfig.indexName
-
   val identifiedWorkIndexer = new WorkIndexer(
     elasticClient = elasticClient
   )
 
-  new WorksIndex(
+  val worksIndex = new WorksIndex(
     client = elasticClient,
     rootIndexType = ingestorConfig.elasticConfig.documentType
   )
+
+  worksIndex.create(indexName = ingestorConfig.elasticConfig.indexName)
 
   def run(): Future[Done] =
     messageStream.runStream(
@@ -55,7 +53,7 @@ class IngestorWorkerService(
       works <- Future.successful(messageBundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
         works = works,
-        indexName = index,
+        indexName = ingestorConfig.elasticConfig.indexName,
         documentType = ingestorConfig.elasticConfig.documentType
       )
 
