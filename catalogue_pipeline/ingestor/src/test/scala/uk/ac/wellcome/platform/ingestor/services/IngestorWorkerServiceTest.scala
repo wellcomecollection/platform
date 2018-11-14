@@ -35,11 +35,12 @@ class IngestorWorkerServiceTest
     val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
     withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, _) =>
+      withLocalSqsQueue { queue =>
+        withWorkerService(queue, indexName) {
           sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+        }
       }
     }
   }
@@ -50,11 +51,12 @@ class IngestorWorkerServiceTest
     )
 
     withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, _) =>
+      withLocalSqsQueue { queue =>
+        withWorkerService(queue, indexName) {
           sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+        }
       }
     }
   }
@@ -65,11 +67,12 @@ class IngestorWorkerServiceTest
     )
 
     withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, _) =>
+      withLocalSqsQueue { queue =>
+        withWorkerService(queue, indexName) {
           sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+        }
       }
     }
   }
@@ -80,11 +83,12 @@ class IngestorWorkerServiceTest
     )
 
     withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, _) =>
+      withLocalSqsQueue { queue =>
+        withWorkerService(queue, indexName) {
           sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+        }
       }
     }
   }
@@ -106,8 +110,9 @@ class IngestorWorkerServiceTest
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
 
     withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, dlq) =>
+      withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+        withWorkerService(queue, indexName) { _ =>
+
           works.foreach { work =>
             sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
@@ -115,6 +120,7 @@ class IngestorWorkerServiceTest
           assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
 
           assertQueueEmpty(dlq)
+        }
       }
     }
   }
@@ -127,8 +133,8 @@ class IngestorWorkerServiceTest
     )
 
     withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, dlq) =>
+      withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+        withWorkerService(queue, indexName) { _ =>
           sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
@@ -137,6 +143,7 @@ class IngestorWorkerServiceTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
           }
+        }
       }
     }
   }
@@ -158,8 +165,8 @@ class IngestorWorkerServiceTest
     val works = List(miroWork, sierraWork, otherWork)
 
     withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, dlq) =>
+      withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+        withWorkerService(queue, indexName) { _ =>
           works.foreach { work =>
             sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
@@ -174,6 +181,7 @@ class IngestorWorkerServiceTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
           }
+        }
       }
     }
   }
@@ -192,9 +200,9 @@ class IngestorWorkerServiceTest
     val works = List(sierraWork, oldSierraWork)
 
     withLocalElasticsearchIndex { indexName =>
-      insertIntoElasticsearch(indexName = indexName, newSierraWork)
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, dlq) =>
+      withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+        withWorkerService(queue, indexName) { _ =>
+          insertIntoElasticsearch(indexName = indexName, newSierraWork)
           works.foreach { work =>
             sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
@@ -207,6 +215,7 @@ class IngestorWorkerServiceTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
           }
+        }
       }
     }
   }
@@ -215,8 +224,8 @@ class IngestorWorkerServiceTest
     val works = createIdentifiedWorks(count = 250)
 
     withLocalElasticsearchIndex { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, dlq) =>
+      withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+        withWorkerService(queue, indexName) { _ =>
           works.foreach { work =>
             sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
@@ -231,6 +240,7 @@ class IngestorWorkerServiceTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
           }
+        }
       }
     }
   }
@@ -248,9 +258,9 @@ class IngestorWorkerServiceTest
 
     val works = List(work, workDoesNotMatchMapping)
 
-    withLocalElasticsearchIndex(subsetOfFieldsIndex) { indexName =>
-      withIngestorWorkerService(indexName) {
-        case QueuePair(queue, dlq) =>
+    withLocalElasticsearchIndex { indexName =>
+      withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+        withWorkerService(queue, indexName) { _ =>
           works.foreach { work =>
             sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
@@ -263,6 +273,7 @@ class IngestorWorkerServiceTest
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, 1)
           }
+        }
       }
     }
   }
@@ -287,16 +298,6 @@ class IngestorWorkerServiceTest
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, 1)
           }
-        }
-    }
-  }
-
-  private def withIngestorWorkerService[R](indexName: String)(
-    testWith: TestWith[QueuePair, R]): R =
-    withLocalSqsQueueAndDlqAndTimeout(10) {
-      case queuePair@QueuePair(queue, dlq) =>
-        withWorkerService(queue, indexName = indexName) { _ =>
-          testWith(queuePair)
         }
     }
   }
