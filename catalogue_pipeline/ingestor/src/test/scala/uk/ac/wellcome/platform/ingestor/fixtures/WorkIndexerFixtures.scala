@@ -12,10 +12,4 @@ trait WorkIndexerFixtures extends ElasticsearchFixtures { this: Suite =>
     val workIndexer = new WorkIndexer(elasticClient = elasticClient)
     testWith(workIndexer)
   }
-
-  def withWorkIndexerFixtures[R](esType: String)(
-    testWith: TestWith[WorkIndexer, R]): R =
-    withWorkIndexer { workIndexer =>
-      testWith(workIndexer)
-    }
 }

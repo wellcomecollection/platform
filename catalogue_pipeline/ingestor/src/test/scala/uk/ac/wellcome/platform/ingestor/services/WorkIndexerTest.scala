@@ -26,7 +26,7 @@ class WorkIndexerTest
     val work = createIdentifiedWork
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      withWorkIndexerFixtures(esType) { workIndexer =>
+      withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(List(work), indexName, esType)
 
         whenReady(future) { result =>
@@ -44,7 +44,7 @@ class WorkIndexerTest
     val work = createIdentifiedWork
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      withWorkIndexerFixtures(esType) { workIndexer =>
+      withWorkIndexer { workIndexer =>
         val future = Future.sequence(
           (1 to 2).map(
             _ =>
@@ -72,7 +72,7 @@ class WorkIndexerTest
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
 
-      withWorkIndexerFixtures(esType) { workIndexer =>
+      withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(
           works = List(olderWork),
           esIndex = indexName,
@@ -100,7 +100,7 @@ class WorkIndexerTest
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
 
-      withWorkIndexerFixtures(esType) { workIndexer =>
+      withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(
           works = List(updatedWork),
           esIndex = indexName,
@@ -122,7 +122,7 @@ class WorkIndexerTest
     val works = createIdentifiedWorks(count = 5)
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      withWorkIndexerFixtures(esType) { workIndexer =>
+      withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(works, indexName, esType)
 
         whenReady(future) { successfullyInserted =>
@@ -152,7 +152,7 @@ class WorkIndexerTest
       subsetOfFieldsIndex,
       indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
       indexName =>
-        withWorkIndexerFixtures(esType) { workIndexer =>
+        withWorkIndexer { workIndexer =>
           val future = workIndexer.indexWorks(works, indexName, esType)
 
           whenReady(future) { result =>
