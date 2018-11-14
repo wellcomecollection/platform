@@ -62,12 +62,8 @@ class ReindexWorkerServiceTest
               eventually {
                 val actualRecords: Seq[HybridRecord] =
                   listMessagesReceivedFromSNS(topic)
-                    .map {
-                      _.message
-                    }
-                    .map {
-                      fromJson[HybridRecord](_).get
-                    }
+                    .map { _.message }
+                    .map { fromJson[HybridRecord](_).get }
                     .distinct
 
                 actualRecords shouldBe List(exampleRecord)
