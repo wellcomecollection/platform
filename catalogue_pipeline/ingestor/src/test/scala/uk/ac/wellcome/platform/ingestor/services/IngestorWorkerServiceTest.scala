@@ -312,32 +312,29 @@ class IngestorWorkerServiceTest
 
     val works = List(work, workDoesNotMatchMapping)
 
-    withLocalElasticsearchIndex(
-      subsetOfFieldsIndex,
-      indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
-      esIndex =>
-        withIngestorWorkerService(esIndex) {
-          case (QueuePair(queue, dlq), bucket) =>
-            works.foreach { work =>
-              sendMessage[IdentifiedBaseWork](
-                bucket = bucket,
-                queue = queue,
-                obj = work)
-            }
+    withLocalElasticsearchIndex(subsetOfFieldsIndex) { indexName =>
+      withIngestorWorkerService(indexName) {
+        case (QueuePair(queue, dlq), bucket) =>
+          works.foreach { work =>
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
+          }
 
-            assertElasticsearchNeverHasWork(
-              indexName = esIndex,
-              itemType = itemType,
-              workDoesNotMatchMapping)
-            assertElasticsearchEventuallyHasWork(
-              indexName = esIndex,
-              itemType = itemType,
-              work)
-            eventually {
-              assertQueueEmpty(queue)
-              assertQueueHasSize(dlq, 1)
-            }
-        }
+          assertElasticsearchNeverHasWork(
+            indexName = indexName,
+            itemType = itemType,
+            workDoesNotMatchMapping)
+          assertElasticsearchEventuallyHasWork(
+            indexName = indexName,
+            itemType = itemType,
+            work)
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueHasSize(dlq, 1)
+          }
+      }
     }
   }
 

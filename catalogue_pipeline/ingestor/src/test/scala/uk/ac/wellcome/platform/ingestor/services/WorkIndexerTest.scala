@@ -148,25 +148,22 @@ class WorkIndexerTest
 
     val works = validWorks :+ notMatchingMappingWork
 
-    withLocalElasticsearchIndex(
-      subsetOfFieldsIndex,
-      indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
-      indexName =>
-        withWorkIndexer { workIndexer =>
-          val future = workIndexer.indexWorks(works, indexName, esType)
+    withLocalElasticsearchIndex(subsetOfFieldsIndex) { indexName =>
+      withWorkIndexer { workIndexer =>
+        val future = workIndexer.indexWorks(works, indexName, esType)
 
-          whenReady(future) { result =>
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              itemType = esType,
-              validWorks: _*)
-            assertElasticsearchNeverHasWork(
-              indexName = indexName,
-              itemType = esType,
-              notMatchingMappingWork)
-            result.left.get should contain(notMatchingMappingWork)
-          }
+        whenReady(future) { result =>
+          assertElasticsearchEventuallyHasWork(
+            indexName = indexName,
+            itemType = esType,
+            validWorks: _*)
+          assertElasticsearchNeverHasWork(
+            indexName = indexName,
+            itemType = esType,
+            notMatchingMappingWork)
+          result.left.get should contain(notMatchingMappingWork)
         }
+      }
     }
   }
 }

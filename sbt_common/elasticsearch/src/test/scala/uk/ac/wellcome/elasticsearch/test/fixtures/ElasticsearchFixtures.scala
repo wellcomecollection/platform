@@ -93,7 +93,7 @@ trait ElasticsearchFixtures
 
   def withLocalElasticsearchIndex[R](
     index: ElasticsearchIndex,
-    indexName: String)(testWith: TestWith[String, R]): R = {
+    indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
 
     index.create(indexName).await
 

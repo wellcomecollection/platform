@@ -70,8 +70,7 @@ class ElasticsearchIndexTest
   }
 
   it("creates an index into which doc of the expected type can be put") {
-    val indexName = "working-index"
-    withLocalElasticsearchIndex(TestIndex, indexName = indexName) { indexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       val testObject = TestObject("id", "description", true)
       val testObjectJson = toJson(testObject).get
 
@@ -92,8 +91,7 @@ class ElasticsearchIndexTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    val indexName = "unexpected-type-index"
-    withLocalElasticsearchIndex(TestIndex, indexName = indexName) { indexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
@@ -110,8 +108,7 @@ class ElasticsearchIndexTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    val indexName = "existing-index"
-    withLocalElasticsearchIndex(TestIndex, indexName = indexName) { _ =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       withLocalElasticsearchIndex(CompatibleTestIndex, indexName = indexName) {
         testIndexName =>
           val compatibleTestObject =
