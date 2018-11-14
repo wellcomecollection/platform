@@ -1,10 +1,10 @@
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "watu9tbc",
-  "type": "Article",
-  "articleType": {
+  "type": "Story",
+  "storyType": {
     "id": "video",
-    "type": "ArticleType",
+    "type": "StoryType",
     "label": "Video"
   },
   "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
@@ -28,9 +28,9 @@
   "about": {
     "id": "e32y8y",
     "type": "Exhibition",
-    "label": " Ayurvedic Man: Encounters with Indian medicine"
+    "title": " Ayurvedic Man: Encounters with Indian medicine"
   },
-  "articleFormat": [
+  "storyFormat": [
     {
       "id": "a24s7qf3",
       "label": "Highlights",

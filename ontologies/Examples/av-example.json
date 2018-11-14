@@ -12,22 +12,22 @@
   "credits": [
     "Cooper Engineering presents. Photography Reg Perier, Editing Mildred Crowley, A Perier Production in association with Noel Rubie PTY. Ltd. The film was made on Bandanora; Capertee, Innisfail; Ben Bullen, Warbreccan; Deniliquin, Bundure; Jerilderie."
   ],
-  "playingTime" : "001154" ,
-  "contentType" : {
+  "playingTime": "001154",
+  "contentType": {
     "id": "tdi",
     "type": "ContentType",
     "label": "two-dimensional moving image"
-  } ,
-    "mediaType" : {
+  },
+  "mediaType": {
     "id": "c",
     "type": "MediaType",
     "label": "computer"
-  } ,
-    "carrierType" : {
+  },
+  "carrierType": {
     "id": "cr",
     "type": "CarrierType",
     "label": "online resource"
-  } ,
+  },
   "contributors": [
     {
       "type": "Contributor",

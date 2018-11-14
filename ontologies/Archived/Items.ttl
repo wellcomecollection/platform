@@ -6,11 +6,7 @@
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 
-TBC
-    rdf:type owl:Ontology ;
-    dcterms:title "Items"@en ;
-    dcterms:created "2017-02-13"^^xsd:date ;
-    dcterms:description "Ontology describing the properties of items"@en .
+
 	
 
 #######  Classes ##### 	
@@ -22,7 +18,7 @@ wi:Item rdf:type owl:Class ;
 	
 wi:Work rdf:type owl:Class ;
 	rdfs:label "Work"@en ;
-	rdfs:comment "An individual work such as a text, archive item or picture; or a grouping of individual works (so, for instance, an archive collection counts as a work, as do all the series and individual files within it).  Each work may exist in multiple instances (e.g. copies of the same book).  N.B. this is not synonymous with "work" as that is understood in the International Federation of Library Associations and Institutions' Functional Requirements for Bibliographic Records model (FRBR) but represents something lower down the FRBR hierarchy, namely manifestation. Groups of related items are also included as works because they have similar properties to the individual ones."@en ;
+	rdfs:comment "An individual work such as a text, archive item or picture; or a grouping of individual works (so, for instance, an archive collection counts as a work, as do all the series and individual files within it).  Each work may exist in multiple instances (e.g. copies of the same book).  N.B. this is not synonymous with work as that is understood in the International Federation of Library Associations and Institutions' Functional Requirements for Bibliographic Records model (FRBR) but represents something lower down the FRBR hierarchy, namely manifestation. Groups of related items are also included as works because they have similar properties to the individual ones."@en ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
   
 wi:Identifier rdf:type owl:Class ;
@@ -36,7 +32,7 @@ wi:SourceIdentifier rdf:type owl:Class ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .    
 
 wi:SourceIdentifierAuthority rdf:type owl:Class;
-	rdfs:label "SourceIdentifierAuthority"
+	rdfs:label "SourceIdentifierAuthority" ;
 	rdfs:comment "An indication of the origin of SourceIdentifiers: that is, a note of whether this identifier originates in the Sierra bibliographic system, the CALM archive management system, and so forth, and thus an indication of the basic assumptions that lie behind it."@en ;
 	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 
@@ -64,23 +60,23 @@ wi:Status rdf:type owl:Class ;
   
 wi:hasIdentifier rdf:type owl:ObjectProperty ;
 	rdfs:label "hasIdentifier"@en ;
-	rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."@en ; 
+	rdfs:comment "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."@en ;
 	rdfs:domain wi:Item ;
 	rdfs:range wi:Identifier ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 
 wi:hasSourceIdentifier rdf:type owl:ObjectProperty ;
 	rdfs:label "hasSourceIdentifier"@en ;
-	rdfs:comment "Relates an item to an identifier used within one of the Wellcome Library's databases or other systems to refer to works or items within the Library's holdings, whether for internal technical purposes or for human citation."@
-	rdfs:domain wi:Item
-	rdfs:range wi:SourceIdentifier
+	rdfs:comment "Relates an item to an identifier used within one of the Wellcome Library's databases or other systems to refer to works or items within the Library's holdings, whether for internal technical purposes or for human citation."@en ;
+	rdfs:domain wi:Item ;
+	rdfs:range wi:SourceIdentifier ;
 	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 
 wi:hasSourceIdentifierAuthority rdf:type owl:ObjectProperty ;
-	rdfs:label "hasSourceIdentifierAuthority" @en ;
+	rdfs:label "hasSourceIdentifierAuthority"@en ;
 	rdfs:comment "Relates a SourceIdentifier to a particular authoritative source of such identifiers: for example, if the SourceIdentifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;
-	rdfs:domain wi:SourceIdentifier
-	rdfs:range wi:SourceIdentifierAuthority
+	rdfs:domain wi:SourceIdentifier ;
+	rdfs:range wi:SourceIdentifierAuthority ;
 	rdfs:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 
 wi:hasClassmark rdf:type owl:ObjectProperty ;
@@ -111,11 +107,11 @@ wi:hasStatus rdf:type owl:ObjectProperty ;
 	rdfs:range wi:Status ;
   	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 
-ww:hasLicence rdf:type owl:ObjectProperty ;
+wi:hasLicence rdf:type owl:ObjectProperty ;
 	rdfs:label "hasLicence"@en ;
 	rdfs:comment "Relates an item to the specific licence under which the item in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise licence to which a link can be made."@en ;
-	rdfs:domain ww:Item ;
-	rdfs:range ww:Licence ;
+	rdfs:domain wi:Item ;
+	rdfs:range wi:Licence ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/works> .
   
 #######  Data properties #####  
@@ -183,17 +179,17 @@ wi:itemNote rdf:type owl:DatatypeProperty ;
 	rdfs:range rdf:langString ;
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 
-ww:accessRightsStatement rdf:type owl:DatatypeProperty ;
+wi:accessRightsStatement rdf:type owl:DatatypeProperty ;
 	rdfs:label "accessRightsStatement"@en ;
 	rdfs:comment "A statement recording the conditions that apply to a researcher seeking access to the item: whether it is open or closed, or requires certain conditions to be met such as obtaining the permission of a depositor."@en ;
-	rdfs:domain ww:Item ;
+	rdfs:domain wi:Item ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 	
-ww:accessStatus rdf:type owl:DatatypeProperty ;
+wi:accessStatus rdf:type owl:DatatypeProperty ;
 	rdfs:label "accessStatus"@en ;
 	rdfs:comment "A statement of whether an item may be used by researchers or not, relating this to one of a set of defined options such as Open, Closed, Restricted Access etc."@en ;
-	rdfs:domain ww:Item ;
+	rdfs:domain wi:Item ;
 	rdfs:range rdf:langString ; 
 	rdf:isDefinedBy <http://www.wellcomecollection.org/ontologies/items> .
 	

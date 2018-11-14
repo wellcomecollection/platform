@@ -3,11 +3,10 @@
   "id": "watu9tbc",
   "type": "Story",
   "storyType": {
-    "id": "article",
+    "id": "image-gallery",
     "type": "StoryType",
-    "label": "Article"
+    "label": "Image gallery"
   },
-  "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
   "thumbnail": {
     "type": "Location",
     "locationType": "thumbnail-image",
@@ -19,8 +18,8 @@
       "url": "http://creativecommons.org/licenses/by/4.0/"
     }
   },
-  "title": "Inside the minds of Teeth’s two curators, James Peto and Emily Scott-Dearing",
-  "description": "Why did they pick that topic, and what are the best stories within? The exhibition's curators open up.",
+  "title": "Exhibition highlights from Ayurvedic Man",
+  "description": "Whether you\u2019re planning your visit or seeking a taste of our exhibition from afar, take a look at this selection of objects and consider the influence of global traditions on medical knowledge.",
   "contributors": [
     {
       "type": "Contributor",
@@ -38,19 +37,38 @@
     }
   ],
   "created": {
-    "label": "25-07-2018",
+    "label": "21-12-2017",
     "type": "Date"
   },
   "about": {
     "id": "e32y8y",
-    "type": "Exhibition",
-    "title": "Teeth"
+    "type": "Work",
+    "title": "Bombay plague"
   },
   "storyFormat": [
     {
-      "id": "a24s7qf3",
+      "id": "interview",
       "label": "Interview",
       "type": "Concept"
+    }
+  ],
+  "items": [
+    {
+      "id": "b28gh7z4n",
+      "type": "Item",
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": "web",
+          "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
+          "license": {
+            "type": "License",
+            "licenseType": "CC-BY",
+            "label": "Attribution 4.0 International (CC BY 4.0)",
+            "url": "http://creativecommons.org/licenses/by/4.0/"
+          }
+        }
+      ]
     }
   ]
 }
