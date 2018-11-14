@@ -5,7 +5,6 @@ import akka.stream.scaladsl.Source
 import akka.{Done, NotUsed}
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
-import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
@@ -15,10 +14,10 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MessageStream[T] @Inject()(actorSystem: ActorSystem,
-                                 sqsClient: AmazonSQSAsync,
-                                 sqsConfig: SQSConfig,
-                                 metricsSender: MetricsSender)(
+class MessageStream[T](actorSystem: ActorSystem,
+                       sqsClient: AmazonSQSAsync,
+                       sqsConfig: SQSConfig,
+                       metricsSender: MetricsSender)(
   implicit objectStore: ObjectStore[T],
   ec: ExecutionContext) {
 
