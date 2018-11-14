@@ -93,14 +93,18 @@ module "registrar_http" {
   }
 
   env_vars_length = 4
-
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
 
-  cluster_id = "${aws_ecs_cluster.cluster.id}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id     = "${local.vpc_id}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace = "${local.namespace}"
+  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  nginx_container_image = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
+  nginx_container_port = "9000"
+  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
 }
 
 # Notifier
@@ -179,13 +183,18 @@ module "progress_http" {
 
   env_vars_length = 4
 
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
 
-  cluster_id = "${aws_ecs_cluster.cluster.id}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id     = "${local.vpc_id}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace = "${local.namespace}"
+  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  nginx_container_image = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
+  nginx_container_port = "9000"
+  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
 }
 
 # Migration services

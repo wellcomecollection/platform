@@ -1,0 +1,24 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Storage service documentation",
+    "version": "v1",
+    "title": "Storage"
+  },
+  "host": "api.wellcomecollection.org",
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json",
+    "application/ld+json"
+  ],
+  "paths": {
+    "/storage/v1/ingests/{id}": {
+      "$ref": "https://l8owz611f4.execute-api.eu-west-1.amazonaws.com/v1/ingests/swagger.json#/paths/~1progress/{id}"
+    },
+    "/storage/v1/ingests": {
+      "$ref": "https://l8owz611f4.execute-api.eu-west-1.amazonaws.com/v1/ingests/swagger.json#/paths/~1progress"
+    }
+  }
+}

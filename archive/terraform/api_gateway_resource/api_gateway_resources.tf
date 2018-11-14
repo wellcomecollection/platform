@@ -57,3 +57,27 @@ resource "aws_api_gateway_integration" "resource_subpaths_vpc_link_integration" 
     integration.request.path.proxy = "method.request.path.proxy"
   }
 }
+
+resource "aws_api_gateway_resource" "resource_swagger" {
+  rest_api_id = "${var.storage_api_id}"
+  parent_id   = "${aws_api_gateway_resource.resource.id}"
+  path_part   = "swagger.json"
+}
+
+resource "aws_api_gateway_method" "resource_swagger_any_method" {
+  rest_api_id          = "${var.storage_api_id}"
+  resource_id          = "${aws_api_gateway_resource.resource_swagger.id}"
+  http_method          = "GET"
+  authorization        = "NONE"
+}
+
+resource "aws_api_gateway_integration" "resource_swagger_vpc_link_integration" {
+  rest_api_id             = "${var.storage_api_id}"
+  resource_id             = "${aws_api_gateway_resource.resource_swagger.id}"
+  http_method             = "${aws_api_gateway_method.resource_swagger_any_method.http_method}"
+  integration_http_method = "GET"
+  type                    = "HTTP_PROXY"
+  connection_type         = "VPC_LINK"
+  connection_id           = "${var.vpc_link_id}"
+  uri                     = "${local.integration_uri}/swagger.json"
+}
