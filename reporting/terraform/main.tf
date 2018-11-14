@@ -12,6 +12,7 @@ module "lambda_miro_transformer" {
     ES_DOC_TYPE = "miro_record"
   }
 
+  vhs_read_policy       = "${local.miro_vhs_read_policy}"
   trigger_topic_arn     = "${local.miro_topic_arn}"
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 }
@@ -30,6 +31,7 @@ module "lambda_miro_inventory_transformer" {
     ES_DOC_TYPE = "miro_inventory_record"
   }
 
+  vhs_read_policy       = "${local.miro_inventory_vhs_read_policy}"
   trigger_topic_arn     = "${local.miro_inventory_topic_arn}"
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 }
@@ -48,6 +50,7 @@ module "lambda_sierra_transformer" {
     ES_DOC_TYPE = "sierra_record"
   }
 
+  vhs_read_policy       = "${local.sierra_vhs_read_policy}"
   trigger_topic_arn     = "${local.sierra_topic_arn}"
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 }
