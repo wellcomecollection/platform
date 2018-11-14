@@ -25,7 +25,7 @@ class RecorderFeatureTest
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
           withLocalSnsTopic { topic =>
-            withWorkerService(table, bucket, bucket, topic, queue) { _ =>
+            withWorkerService(table, bucket, topic, queue) { _ =>
               sendMessage[TransformedBaseWork](queue = queue, obj = work)
 
               eventually {

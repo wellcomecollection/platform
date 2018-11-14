@@ -24,7 +24,6 @@ trait WorkerServiceFixture
   def withWorkerService[R](
     table: Table,
     storageBucket: Bucket,
-    messagesBucket: Bucket,
     topic: Topic,
     queue: Queue)(testWith: TestWith[RecorderWorkerService, R]): R =
     withActorSystem { actorSystem =>
@@ -35,7 +34,6 @@ trait WorkerServiceFixture
             table = table) { versionedHybridStore =>
             withMessageStream[TransformedBaseWork, R](
               actorSystem,
-              messagesBucket,
               queue,
               metricsSender) { messageStream =>
               val workerService = new RecorderWorkerService(
