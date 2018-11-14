@@ -34,3 +34,21 @@ resource "aws_security_group" "interservice_security_group" {
     Name = "${local.namespace}-interservice"
   }
 }
+
+data "aws_subnet" "private" {
+  count = "${length(local.private_subnets)}"
+  id    = "${element(local.private_subnets, count.index)}"
+}
+
+resource "aws_security_group" "nginx_tcp_access_security_group" {
+  name        = "archive_nlb_nginx_security_group"
+  description = "Allow traffic between load balancer and internet"
+  vpc_id      = "${local.vpc_id}"
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = "9000"
+    to_port     = "9000"
+    cidr_blocks = ["${data.aws_subnet.private.*.cidr_block}"]
+  }
+}

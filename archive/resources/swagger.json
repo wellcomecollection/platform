@@ -15,7 +15,7 @@
   ],
   "paths": {
     "/storage/v1/ingests/{id}": {
-      "$ref": "https://l8owz611f4.execute-api.eu-west-1.amazonaws.com/v1/ingests/swagger.json#/paths/~1progress/{id}"
+      "$ref": "https://l8owz611f4.execute-api.eu-west-1.amazonaws.com/v1/ingests/swagger.json#/paths/~1progress~1{id}"
     },
     "/storage/v1/ingests": {
       "$ref": "https://l8owz611f4.execute-api.eu-west-1.amazonaws.com/v1/ingests/swagger.json#/paths/~1progress"

@@ -105,6 +105,8 @@ module "registrar_http" {
   nginx_container_image = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
   nginx_container_port = "9000"
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+
+  nginx_tcp_security_group_id = "${aws_security_group.nginx_tcp_access_security_group.id}"
 }
 
 # Notifier
@@ -195,6 +197,8 @@ module "progress_http" {
   nginx_container_image = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
   nginx_container_port = "9000"
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+
+  nginx_tcp_security_group_id = "${aws_security_group.nginx_tcp_access_security_group.id}"
 }
 
 # Migration services
