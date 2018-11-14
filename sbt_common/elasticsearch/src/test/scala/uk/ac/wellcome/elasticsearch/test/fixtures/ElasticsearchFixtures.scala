@@ -50,14 +50,6 @@ trait ElasticsearchFixtures
       "es.type" -> documentType
     )
 
-  def ingestEsLocalFlags(indexName: String) =
-    Map(
-      "es.host" -> esHost,
-      "es.port" -> esPort.toString,
-      "es.index" -> indexName,
-      "es.type" -> documentType
-    )
-
   val elasticClient: HttpClient = ElasticClientBuilder.create(
     hostname = esHost,
     port = esPort,
