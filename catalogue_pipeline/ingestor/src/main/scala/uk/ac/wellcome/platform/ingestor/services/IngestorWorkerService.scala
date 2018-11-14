@@ -43,8 +43,8 @@ class IngestorWorkerService @Inject()(
       works <- Future.successful(messageBundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
         works = works,
-        esIndex = index,
-        esType = ingestorConfig.elasticConfig.documentType
+        indexName = index,
+        documentType = ingestorConfig.elasticConfig.documentType
       )
 
     } yield {
