@@ -99,7 +99,16 @@ trait Messaging
     bucket: Bucket,
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
-    implicit objectStore: ObjectStore[T]) = {
+    implicit objectStore: ObjectStore[T]): R =
+    withMessageStream(actorSystem, queue, metricsSender) { messageStream =>
+      testWith(messageStream)
+    }
+
+  def withMessageStream[T, R](
+    actorSystem: ActorSystem,
+    queue: SQS.Queue,
+    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
+    implicit objectStore: ObjectStore[T]): R = {
     val messageConfig = MessageReaderConfig(
       sqsConfig = createSQSConfigWith(queue)
     )
