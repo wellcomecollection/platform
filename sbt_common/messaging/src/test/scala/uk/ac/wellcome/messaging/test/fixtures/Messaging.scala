@@ -107,7 +107,6 @@ trait Messaging
     val stream = new MessageStream[T](
       actorSystem,
       asyncSqsClient,
-      s3Client,
       messageConfig,
       metricsSender)
     testWith(stream)

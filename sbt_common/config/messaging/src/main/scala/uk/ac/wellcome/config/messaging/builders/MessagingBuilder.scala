@@ -35,7 +35,6 @@ object MessagingBuilder {
     new MessageStream[T](
       actorSystem = AkkaBuilder.buildActorSystem(),
       sqsClient = SQSBuilder.buildSQSAsyncClient(config),
-      s3Client = S3Builder.buildS3Client(config),
       messageReaderConfig = buildMessageReaderConfig(config),
       metricsSender = MetricsBuilder.buildMetricsSender(config)
     )
