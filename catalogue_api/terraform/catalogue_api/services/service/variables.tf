@@ -10,6 +10,7 @@ variable "cluster_name" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
+variable "namespace_tld" {}
 
 data "template_file" "es_cluster_host" {
   template = "$${name}.$${region}.aws.found.io"
@@ -25,8 +26,12 @@ variable "es_cluster_credentials" {
 }
 
 variable "vpc_id" {}
+
 variable "container_image" {}
 variable "container_port" {}
+
+variable "nginx_container_image" {}
+variable "nginx_container_port" {}
 
 variable "security_group_ids" {
   type = "list"
