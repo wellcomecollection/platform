@@ -72,9 +72,8 @@ trait ElasticsearchFixtures
     elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   }
 
-  def withLocalElasticsearchIndex[R](
-    indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,
-    itemType: String)(testWith: TestWith[String, R]): R = {
+  def withLocalElasticsearchIndex[R](itemType: String)(testWith: TestWith[String, R]): R = {
+    val indexName = createIndexName
 
     val elasticConfig = DisplayElasticConfig(
       documentType = itemType,
@@ -87,7 +86,9 @@ trait ElasticsearchFixtures
       rootIndexType = elasticConfig.documentType
     )
 
-    withLocalElasticsearchIndex(index, indexName)(testWith)
+    withLocalElasticsearchIndex(index, indexName) { indexName =>
+      testWith(indexName)
+    }
   }
 
   def withLocalElasticsearchIndex[R](
@@ -175,4 +176,7 @@ trait ElasticsearchFixtures
       }
     }
   }
+
+  private def createIndexName: String =
+    (Random.alphanumeric take 10 mkString) toLowerCase
 }
