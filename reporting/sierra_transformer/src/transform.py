@@ -40,6 +40,13 @@ def transform(input_data):
     if 'materialType' in bib_record:
         bib_record['materialType'] = bib_record['materialType']['code']
 
+    # unpack orders
+    if 'orders' in bib_record:
+        for order in bib_record['orders']:
+            bib_record['order_locations'] = order['location']
+            bib_record['order_dates'] = order['date']
+        del bib_record['orders']
+
     # get rid of redundant norm fields
     norm_fields = [
         field for field in bib_record if field.startswith('norm')
