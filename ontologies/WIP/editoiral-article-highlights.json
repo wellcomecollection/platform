@@ -1,10 +1,10 @@
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "watu9tbc",
-  "type": "Article",
-  "articleType": {
+  "type": "Story",
+  "storyType": {
     "id": "image-gallery",
-    "type": "ArticleType",
+    "type": "StoryType",
     "label": "Image gallery"
   },
   "thumbnail": {
@@ -42,10 +42,10 @@
   },
   "about": {
     "id" : "e32y8y" ,
-    "type" : "Item" ,
-    "label": "Bombay plague"
+    "type" : "Work" ,
+    "title": "Bombay plague"
   } ,
-  "articleFormat": [
+  "storyFormat": [
     {
       "id": "interview",
       "label": "Interview",
