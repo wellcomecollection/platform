@@ -63,24 +63,26 @@ class MessageStreamTest
   describe("large messages (>256KB)") {
     it("reads messages off a queue, processes them and deletes them") {
       withMessageStreamFixtures[ExampleObject, Assertion] {
-        case (bucket, messageStream, QueuePair(queue, dlq), _) =>
-          val messages = createMessages(count = 3)
+        case (_, messageStream, QueuePair(queue, dlq), _) =>
+          withLocalS3Bucket { bucket =>
+            val messages = createMessages(count = 3)
 
-          messages.foreach { exampleObject =>
-            sendRemoteNotification(bucket, queue, exampleObject)
-          }
+            messages.foreach { exampleObject =>
+              sendRemoteNotification(bucket, queue, exampleObject)
+            }
 
-          val received = new ConcurrentLinkedQueue[ExampleObject]()
+            val received = new ConcurrentLinkedQueue[ExampleObject]()
 
-          messageStream.foreach(
-            streamName = "test-stream",
-            process = process(received))
+            messageStream.foreach(
+              streamName = "test-stream",
+              process = process(received))
 
-          eventually {
-            received should contain theSameElementsAs messages
+            eventually {
+              received should contain theSameElementsAs messages
 
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
+              assertQueueEmpty(queue)
+              assertQueueEmpty(dlq)
+            }
           }
       }
     }
