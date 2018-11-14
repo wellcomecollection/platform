@@ -15,7 +15,6 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.recorder.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.Akka
 
@@ -251,10 +250,7 @@ class RecorderWorkerServiceTest
     hybridRecord.id shouldBe expectedWork.sourceIdentifier.toString
     hybridRecord.version shouldBe expectedVhsVersion
 
-    val actualEntry = getObjectFromS3[T](
-      bucket = Bucket(hybridRecord.location.namespace),
-      key = hybridRecord.location.key
-    )
+    val actualEntry = getObjectFromS3[T](hybridRecord.location)
 
     actualEntry shouldBe expectedWork
     getMessages[T](topic) should contain(expectedWork)
