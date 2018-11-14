@@ -27,7 +27,7 @@ module "catalogue_api" {
   security_group_ids               = ["${var.security_group_ids}"]
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
 
-  target_group_protocol = "TCP"
+  target_group_protocol = "NONE"
 }
 
 module "nginx" {
