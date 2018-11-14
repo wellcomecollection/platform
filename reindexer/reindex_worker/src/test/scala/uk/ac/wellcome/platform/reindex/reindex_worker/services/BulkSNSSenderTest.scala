@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class HybridRecordSenderTest
+class BulkSNSSenderTest
     extends FunSpec
     with Matchers
     with MockitoSugar
@@ -34,7 +34,7 @@ class HybridRecordSenderTest
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
       withSNSWriter(topic) { snsWriter =>
-        val hybridRecordSender = new HybridRecordSender(
+        val hybridRecordSender = new BulkSNSSender(
           snsWriter = snsWriter
         )
 
@@ -56,7 +56,7 @@ class HybridRecordSenderTest
 
   it("returns a failed Future[ReindexerException] if there's an SNS error") {
     withSNSWriter(Topic("no-such-topic")) { snsWriter =>
-      val hybridRecordSender = new HybridRecordSender(
+      val hybridRecordSender = new BulkSNSSender(
         snsWriter = snsWriter
       )
 
