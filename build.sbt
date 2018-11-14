@@ -56,12 +56,8 @@ lazy val finatra_elasticsearch = doSharedLibrarySetup(project, "sbt_common/finat
 
 lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra_messaging")
   .dependsOn(messaging % "compile->compile;test->test")
-  .dependsOn(finatra_storage % "compile->compile;test->test")
   .dependsOn(finatra_monitoring % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
-
-lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_storage")
-  .settings(libraryDependencies ++= Dependencies.finatraStorageDependencies)
 
 lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_monitoring")
   .dependsOn(finatra_akka % "compile->compile;test->test")
@@ -232,7 +228,6 @@ lazy val root = (project in file("."))
     finatra_elasticsearch,
     finatra_messaging,
     finatra_monitoring,
-    finatra_storage,
 
     config_core,
     config_messaging,
