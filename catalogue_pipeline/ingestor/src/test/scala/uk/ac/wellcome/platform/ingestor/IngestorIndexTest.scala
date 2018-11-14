@@ -6,13 +6,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.storage.fixtures.S3
 
 class IngestorIndexTest
     extends FunSpec
     with fixtures.Server
     with SQS
-    with S3
     with Matchers
     with ScalaFutures
     with Messaging
@@ -24,10 +22,8 @@ class IngestorIndexTest
     deleteIndexIfExists(indexName)
 
     withLocalSqsQueue { queue =>
-      withLocalS3Bucket { bucket =>
-        withServer(queue, bucket, indexName) { _ =>
-          eventuallyIndexExists(indexName)
-        }
+      withServer(queue, indexName) { _ =>
+        eventuallyIndexExists(indexName)
       }
     }
   }
