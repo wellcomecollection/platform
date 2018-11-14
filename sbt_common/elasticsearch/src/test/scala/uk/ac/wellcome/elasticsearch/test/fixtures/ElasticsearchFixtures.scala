@@ -42,14 +42,13 @@ trait ElasticsearchFixtures
   val documentType = "work"
 
   def displayEsLocalFlags(indexNameV1: String,
-                          indexNameV2: String,
-                          itemType: String) =
+                          indexNameV2: String) =
     Map(
       "es.host" -> esHost,
       "es.port" -> esPort.toString,
       "es.index.v1" -> indexNameV1,
       "es.index.v2" -> indexNameV2,
-      "es.type" -> itemType
+      "es.type" -> documentType
     )
 
   def ingestEsLocalFlags(indexName: String, itemType: String) =

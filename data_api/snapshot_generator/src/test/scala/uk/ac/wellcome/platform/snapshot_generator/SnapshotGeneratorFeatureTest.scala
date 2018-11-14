@@ -43,7 +43,7 @@ class SnapshotGeneratorFeatureTest
     with DisplayV1SerialisationTestBase
     with WorksGenerators {
 
-  val itemType = "work"
+  val itemType = documentType
 
   it("completes a snapshot generation") {
     withFixtures {
@@ -118,8 +118,7 @@ class SnapshotGeneratorFeatureTest
             withLocalS3Bucket { bucket =>
               val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
                 indexNameV1,
-                indexNameV2,
-                itemType) ++ s3ClientLocalFlags
+                indexNameV2) ++ s3ClientLocalFlags
               withServer(flags) { _ =>
                 testWith((queue, topic, indexNameV1, indexNameV2, bucket))
               }
