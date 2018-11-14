@@ -17,8 +17,6 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class RecordReaderTest
     extends FunSpec
     with ScalaFutures

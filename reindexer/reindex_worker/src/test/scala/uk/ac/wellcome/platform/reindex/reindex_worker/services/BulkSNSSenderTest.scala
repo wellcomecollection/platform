@@ -5,10 +5,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
-import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -17,53 +16,40 @@ class BulkSNSSenderTest
     with Matchers
     with MockitoSugar
     with ScalaFutures
+    with IdentifiersGenerators
     with IntegrationPatience
     with SNS {
 
-  val hybridRecords = List("miro/1", "miro/2", "miro/3").map { id =>
-    HybridRecord(
-      id = id,
-      version = 1,
-      location = ObjectLocation(
-        namespace = "s3://example-bukkit",
-        key = "mykey.txt"
-      )
-    )
-  }
+  val messages: List[String] = (1 to 3).map { _ => randomAlphanumeric(15) }.toList
 
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
-      withSNSWriter(topic) { snsWriter =>
-        val hybridRecordSender = new BulkSNSSender(
-          snsWriter = snsWriter
-        )
-
-        val future = hybridRecordSender.sendToSNS(
-          records = hybridRecords
-        )
+      withBulkSNSSender(topic) { bulkSNSSender =>
+        val future = bulkSNSSender.sendToSNS(messages = messages)
 
         whenReady(future) { _ =>
           val actualRecords = listMessagesReceivedFromSNS(topic)
             .map { _.message }
-            .map { fromJson[HybridRecord](_).get }
             .distinct
 
-          actualRecords should contain theSameElementsAs hybridRecords
+          actualRecords should contain theSameElementsAs messages
         }
       }
     }
   }
 
   it("returns a failed Future[ReindexerException] if there's an SNS error") {
-    withSNSWriter(Topic("no-such-topic")) { snsWriter =>
-      val hybridRecordSender = new BulkSNSSender(
-        snsWriter = snsWriter
-      )
-
-      val future = hybridRecordSender.sendToSNS(records = hybridRecords)
+    withBulkSNSSender(Topic("no-such-topic")) { bulkSNSSender =>
+      val future = bulkSNSSender.sendToSNS(messages = messages)
       whenReady(future.failed) {
         _ shouldBe a[ReindexerException]
       }
     }
   }
+
+  private def withBulkSNSSender[R](topic: Topic)(testWith: TestWith[BulkSNSSender, R]): R =
+    withSNSWriter(topic) { snsWriter =>
+      val bulkSNSSender = new BulkSNSSender(snsWriter = snsWriter)
+      testWith(bulkSNSSender)
+    }
 }
