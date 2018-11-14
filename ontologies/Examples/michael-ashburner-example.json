@@ -48,21 +48,21 @@
   "occupies/positions": [
     {
       "label": "Cambridge Fellow",
-      "type" : "Position" ,
+      "type": "Position",
       "start": "1980",
       "positionAt": "Cambridge"
     },
     {
       "label": "Postdoctoral research",
       "start": "1968",
-      "type" : "Position" ,
+      "type": "Position",
       "positionAt": "California Institute of Technology"
     },
     {
       "label": "Research assistant",
       "start": "1966",
       "end": "1968",
-      "type" : "Position" ,
+      "type": "Position",
       "positionAt": {
         "id": "e28y1y9",
         "label": "Department of Genetics at the University of Cambridge",
@@ -71,7 +71,7 @@
     },
     {
       "label": "University demonstrator",
-      "type" : "Position" ,
+      "type": "Position",
       "start": "1968",
       "end": "1973",
       "positionAt": {
@@ -82,7 +82,7 @@
     },
     {
       "label": "University lecturer",
-      "type" : "Position" ,
+      "type": "Position",
       "start": "1973",
       "end": "1980",
       "positionAt": {
@@ -93,7 +93,7 @@
     },
     {
       "label": "Reader in Developmental Genetics",
-      "type" : "Position" ,
+      "type": "Position",
       "start": "1980",
       "end": "1991",
       "positionAt": {
@@ -104,7 +104,7 @@
     },
     {
       "label": "Professor of Biology",
-      "type" : "Position" ,
+      "type": "Position",
       "start": "1991",
       "end": "2009",
       "positionAt": {
@@ -115,7 +115,7 @@
     },
     {
       "label": "Professor Emeritus",
-      "type" : "Position" ,
+      "type": "Position",
       "start": "2010",
       "positionAt": "Cambridge"
     }

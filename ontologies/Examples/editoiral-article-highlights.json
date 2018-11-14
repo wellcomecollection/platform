@@ -19,7 +19,7 @@
     }
   },
   "title": "Exhibition highlights from Ayurvedic Man",
-  "description": "Whether you’re planning your visit or seeking a taste of our exhibition from afar, take a look at this selection of objects and consider the influence of global traditions on medical knowledge.",
+  "description": "Whether you\u2019re planning your visit or seeking a taste of our exhibition from afar, take a look at this selection of objects and consider the influence of global traditions on medical knowledge.",
   "contributors": [
     {
       "type": "Contributor",
@@ -41,10 +41,10 @@
     "type": "Date"
   },
   "about": {
-    "id" : "e32y8y" ,
-    "type" : "Work" ,
+    "id": "e32y8y",
+    "type": "Work",
     "title": "Bombay plague"
-  } ,
+  },
   "storyFormat": [
     {
       "id": "interview",
