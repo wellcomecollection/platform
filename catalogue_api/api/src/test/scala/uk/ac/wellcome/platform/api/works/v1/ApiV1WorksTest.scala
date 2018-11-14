@@ -219,7 +219,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("ignores parameters that are unused when making an API request") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?foo=bar",
           andExpect = Status.Ok,
@@ -368,10 +368,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           insertIntoElasticsearch(indexNameV1, work)
 
           val work_alt = createIdentifiedWork
-          insertIntoElasticsearch(
-            indexName = otherIndex,
-            itemType = itemType,
-            work_alt)
+          insertIntoElasticsearch(indexName = otherIndex, work_alt)
 
           eventually {
             server.httpGet(
@@ -429,10 +426,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           val work_alt = createIdentifiedWorkWith(
             title = work.title
           )
-          insertIntoElasticsearch(
-            indexName = otherIndex,
-            itemType = itemType,
-            work_alt)
+          insertIntoElasticsearch(indexName = otherIndex, work_alt)
 
           eventually {
             server.httpGet(
@@ -533,7 +527,6 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           apiPrefix,
           indexNameV1,
           indexNameV2,
-          itemType,
           server: EmbeddedHttpServer) =>
         val work1 = createIdentifiedWorkWith(
           title = "One orange ocelot"

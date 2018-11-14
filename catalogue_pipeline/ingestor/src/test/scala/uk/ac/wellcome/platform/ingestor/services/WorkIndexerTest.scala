@@ -113,7 +113,11 @@ class WorkIndexerTest
 
     withLocalElasticsearchIndex { indexName =>
       withWorkIndexer { workIndexer =>
-        val future = workIndexer.indexWorks(works, indexName, esType)
+        val future = workIndexer.indexWorks(
+          works = works,
+          indexName = indexName,
+          documentType = documentType
+        )
 
         whenReady(future) { successfullyInserted =>
           assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
@@ -125,8 +129,10 @@ class WorkIndexerTest
 
   it(
     "inserts a list of works into elasticsearch and return the list of works that failed inserting") {
-    val subsetOfFieldsIndex =
-      new SubsetOfFieldsWorksIndex(elasticClient, esType)
+    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(
+      elasticClient = elasticClient,
+      documentType = documentType
+    )
 
     val validWorks = createIdentifiedWorks(count = 5)
     val notMatchingMappingWork = createIdentifiedWorkWith(
@@ -137,7 +143,11 @@ class WorkIndexerTest
 
     withLocalElasticsearchIndex(subsetOfFieldsIndex) { indexName =>
       withWorkIndexer { workIndexer =>
-        val future = workIndexer.indexWorks(works, indexName, esType)
+        val future = workIndexer.indexWorks(
+          works = works,
+          indexName = indexName,
+          documentType = documentType
+        )
 
         whenReady(future) { result =>
           assertElasticsearchEventuallyHasWork(indexName = indexName, validWorks: _*)

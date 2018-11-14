@@ -23,14 +23,13 @@ trait ApiWorksTestBase
 
   def withServer[R](
     indexNameV1: String,
-    indexNameV2: String)(testWith: TestWith[EmbeddedHttpServer, R]) = {
+    indexNameV2: String)(testWith: TestWith[EmbeddedHttpServer, R]): R = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
       flags = displayEsLocalFlags(
         indexNameV1 = indexNameV1,
-        indexNameV2 = indexNameV2,
-        itemType = documentType
+        indexNameV2 = indexNameV2
       )
     )
 
