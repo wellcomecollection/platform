@@ -48,7 +48,9 @@ class UploadItemFlowTest
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
-              result shouldBe Right(archiveItemJob)
+              result shouldBe 'right
+              result.right.get._1 shouldBe archiveItemJob
+
               getContentFromS3(
                 bucket,
                 s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent

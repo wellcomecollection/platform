@@ -12,19 +12,18 @@ import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 import scala.util.{Failure, Success}
 
-/** This flow uploads an individual item to S3, and ensures the checksum of
-  * the uploaded bytes matches the checksum from the manifest.
+/** This flow uploads an individual item to S3, and calculates the checksum of
+  * the uploaded bytes.
   *
-  * It emits the original archive item job.
+  * It emits the original archive item job and the items checksum.
   *
-  * If the upload to S3 fails or the checksum is incorrect, it returns
-  * an error instead.
+  * If the upload to S3 fails it returns an error instead.
   *
   */
 object UploadInputStreamFlow extends Logging {
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[(ArchiveItemJob, InputStream),
-           Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
+           Either[ArchiveError[ArchiveItemJob], (ArchiveItemJob, String)],
            NotUsed] =
     Flow[(ArchiveItemJob, InputStream)]
       .log("uploading input stream")
@@ -34,11 +33,11 @@ object UploadInputStreamFlow extends Logging {
             StreamConverters
               .fromInputStream(() => inputStream)
               .log("upload bytestring")
-              .via(S3UploadFlow(archiveItemJob.uploadLocation))
+              .via(UploadAndCalculateDigestFlow(archiveItemJob.uploadLocation))
               .log("to either")
               .map {
-                case Success(_) =>
-                  Right(archiveItemJob)
+                case Success(digest) =>
+                  Right((archiveItemJob, digest))
                 case Failure(exception) =>
                   warn("There was an exception!", exception)
                   Left(

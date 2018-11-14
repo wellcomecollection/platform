@@ -10,7 +10,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.util.Try
 
-object UploadAndGetChecksumFlow {
+object UploadAndCalculateDigestFlow {
   def apply(uploadLocation: ObjectLocation)(
     implicit s3Client: AmazonS3): Flow[ByteString, Try[String], NotUsed] = {
     Flow.fromGraph(

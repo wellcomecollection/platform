@@ -18,10 +18,9 @@ import uk.ac.wellcome.platform.archive.common.flows.{
 }
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
-/** This flow extracts an item from a ZIP file, uploads it to S3 and validates
-  * the checksum matches the manifest.
+/** This flow extracts an item from a ZIP file, uploads it to S3 and calculates the checksum
   *
-  * It emits the original archive job.
+  * It emits the original archive job and the checksum.
   *
   * It returns an error if:
   *   - There's a problem getting the item from the ZIP file
@@ -32,7 +31,7 @@ object UploadItemFlow extends Logging {
   def apply(parallelism: Int)(
     implicit s3Client: AmazonS3
   ): Flow[ArchiveItemJob,
-          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob],
+          Either[ArchiveError[ArchiveItemJob], (ArchiveItemJob, String)],
           NotUsed] = {
     Flow[ArchiveItemJob]
       .map(
@@ -56,7 +55,7 @@ object UploadItemFlow extends Logging {
         FoldEitherFlow[
           ArchiveError[ArchiveItemJob],
           (ArchiveItemJob, InputStream),
-          Either[ArchiveError[ArchiveItemJob], ArchiveItemJob]](
+          Either[ArchiveError[ArchiveItemJob], (ArchiveItemJob, String)]](
           ifLeft = OnErrorFlow())(ifRight = UploadInputStreamFlow(parallelism)))
   }
 }
