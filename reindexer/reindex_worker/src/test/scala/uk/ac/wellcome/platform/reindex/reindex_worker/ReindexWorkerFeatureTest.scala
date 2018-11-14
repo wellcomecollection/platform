@@ -16,6 +16,8 @@ import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
+import scala.util.Random
+
 class ReindexWorkerFeatureTest
     extends FunSpec
     with Matchers
@@ -27,10 +29,8 @@ class ReindexWorkerFeatureTest
     with ScalaFutures
     with WorkerServiceFixture {
 
-  private def createReindexableData(
-    table: Table,
-    numberOfRecords: Int = 4): Seq[HybridRecord] = {
-    val testRecords = (1 to numberOfRecords).map(i => {
+  private def createHybridRecords: Seq[HybridRecord] =
+    (1 to 10).map(i => {
       HybridRecord(
         id = s"id$i",
         location = ObjectLocation(
@@ -40,6 +40,9 @@ class ReindexWorkerFeatureTest
         version = 1
       )
     })
+
+  private def createReindexableData(table: Table): Seq[HybridRecord] = {
+    val testRecords = createHybridRecords
 
     testRecords.foreach { testRecord =>
       Scanamo.put(dynamoDbClient)(table.name)(testRecord)
@@ -81,7 +84,7 @@ class ReindexWorkerFeatureTest
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
           withWorkerService(queue, table, topic) { _ =>
-            val testRecords = createReindexableData(table, numberOfRecords = 8)
+            val testRecords = createReindexableData(table)
 
             val reindexJob = PartialReindexJob(maxRecords = 1)
 
@@ -100,6 +103,63 @@ class ReindexWorkerFeatureTest
               actualRecords should have length 1
               actualRecords should contain theSameElementsAs List(
                 testRecords.head)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("includes metadata for the rows") {
+    case class Metadata(success: Boolean)
+
+    case class CombinedRecord(
+      id: String,
+      location: ObjectLocation,
+      version: Int,
+      success: Boolean
+    )
+
+    val hybridRecords = createHybridRecords
+    val metadataEntries = hybridRecords.map { hr => Metadata(success = Random.nextFloat() < 0.5) }
+
+    val recordsToIndex: Seq[CombinedRecord] = hybridRecords.zip(metadataEntries).map {
+      case (hr: HybridRecord, m: Metadata) =>
+        CombinedRecord(
+          id = hr.id,
+          location = hr.location,
+          version = hr.version,
+          success = m.success
+        )
+    }
+
+    withLocalSqsQueue { queue =>
+      withLocalDynamoDbTable { table =>
+        recordsToIndex.foreach { record =>
+            Scanamo.put(dynamoDbClient)(table.name)(record)
+          }
+        withLocalSnsTopic { topic =>
+          withWorkerService(queue, table, topic) { _ =>
+            val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
+
+            sendNotificationToSQS[ReindexJob](
+              queue = queue,
+              message = reindexJob
+            )
+
+            eventually {
+              val messages: Seq[String] =
+                listMessagesReceivedFromSNS(topic)
+                  .map { _.message }
+                  .distinct
+
+              val actualHybridRecords: Seq[HybridRecord] =
+                messages.map { fromJson[HybridRecord](_).get }
+              actualHybridRecords should contain theSameElementsAs hybridRecords
+
+              val actualMetadataEntries: Seq[Metadata] =
+                messages.map { fromJson[Metadata](_).get }
+              actualMetadataEntries should contain theSameElementsAs metadataEntries
             }
           }
         }
