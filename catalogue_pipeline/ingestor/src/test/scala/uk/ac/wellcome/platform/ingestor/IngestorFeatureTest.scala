@@ -28,10 +28,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        sendMessage[IdentifiedBaseWork](
-          bucket = bucket,
-          queue = queue,
-          obj = work)
+        sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
         withLocalElasticsearchIndex { indexName =>
           withServer(queue, bucket, indexName) { _ =>
             assertElasticsearchEventuallyHasWork(indexName, work)
@@ -49,10 +46,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        sendMessage[IdentifiedBaseWork](
-          bucket = bucket,
-          queue = queue,
-          obj = work)
+        sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
         withLocalElasticsearchIndex { indexName =>
           withServer(queue, bucket, indexName) { _ =>
             assertElasticsearchNeverHasWork(indexName, work)

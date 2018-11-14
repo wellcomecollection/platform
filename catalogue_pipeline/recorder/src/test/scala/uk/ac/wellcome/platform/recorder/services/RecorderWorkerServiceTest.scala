@@ -41,11 +41,7 @@ class RecorderWorkerServiceTest
             withLocalSqsQueue { queue =>
               withLocalSnsTopic { topic =>
                 val work = createUnidentifiedWork
-                sendMessage[TransformedBaseWork](
-                  bucket = messagesBucket,
-                  queue = queue,
-                  obj = work
-                )
+                sendMessage[TransformedBaseWork](queue = queue, obj = work)
                 withWorkerService(
                   table,
                   storageBucket,
@@ -78,11 +74,7 @@ class RecorderWorkerServiceTest
                   topic,
                   queue) { service =>
                   val invisibleWork = createUnidentifiedInvisibleWork
-                  sendMessage[TransformedBaseWork](
-                    bucket = messagesBucket,
-                    queue = queue,
-                    obj = invisibleWork
-                  )
+                  sendMessage[TransformedBaseWork](queue = queue, invisibleWork)
                   eventually {
                     assertStoredSingleWork(topic, table, invisibleWork)
                   }
@@ -111,18 +103,10 @@ class RecorderWorkerServiceTest
                   messagesBucket,
                   topic,
                   queue) { _ =>
-                  sendMessage[TransformedBaseWork](
-                    bucket = messagesBucket,
-                    queue = queue,
-                    obj = newerWork
-                  )
+                  sendMessage[TransformedBaseWork](queue = queue, newerWork)
                   eventually {
                     assertStoredSingleWork(topic, table, newerWork)
-                    sendMessage(
-                      bucket = messagesBucket,
-                      queue = queue,
-                      obj = olderWork
-                    )
+                    sendMessage[TransformedBaseWork](queue = queue, obj = olderWork)
                     eventually {
                       assertStoredSingleWork(topic, table, newerWork)
                     }
@@ -151,18 +135,10 @@ class RecorderWorkerServiceTest
                 messagesBucket,
                 topic,
                 queue) { _ =>
-                sendMessage[TransformedBaseWork](
-                  bucket = messagesBucket,
-                  queue = queue,
-                  obj = olderWork
-                )
+                sendMessage[TransformedBaseWork](queue = queue, obj = olderWork)
                 eventually {
                   assertStoredSingleWork(topic, table, olderWork)
-                  sendMessage[TransformedBaseWork](
-                    bucket = messagesBucket,
-                    queue = queue,
-                    obj = newerWork
-                  )
+                  sendMessage[TransformedBaseWork](queue = queue, obj = newerWork)
                   eventually {
                     assertStoredSingleWork(
                       topic,
@@ -189,11 +165,7 @@ class RecorderWorkerServiceTest
               withWorkerService(table, badBucket, messagesBucket, topic, queue) {
                 _ =>
                   val work = createUnidentifiedWork
-                  sendMessage[TransformedBaseWork](
-                    bucket = messagesBucket,
-                    queue = queue,
-                    obj = work
-                  )
+                  sendMessage[TransformedBaseWork](queue = queue, obj = work)
                   eventually {
                     assertQueueEmpty(queue)
                     assertQueueHasSize(dlq, 1)
@@ -219,11 +191,7 @@ class RecorderWorkerServiceTest
                 topic,
                 queue) { service =>
                 val work = createUnidentifiedWork
-                sendMessage[TransformedBaseWork](
-                  bucket = messagesBucket,
-                  queue = queue,
-                  obj = work
-                )
+                sendMessage[TransformedBaseWork](queue = queue, obj = work)
                 eventually {
                   assertQueueEmpty(queue)
                   assertQueueHasSize(dlq, 1)

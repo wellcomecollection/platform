@@ -38,11 +38,7 @@ class IdMinterFeatureTest
                 val messageCount = 5
 
                 (1 to messageCount).foreach { _ =>
-                  sendMessage(
-                    bucket = bucket,
-                    queue = queue,
-                    obj = work
-                  )
+                  sendMessage(queue = queue, obj = work)
                 }
 
                 eventually {
@@ -76,11 +72,7 @@ class IdMinterFeatureTest
                 eventuallyTableExists(identifiersTableConfig)
                 val work = createUnidentifiedInvisibleWork
 
-                sendMessage(
-                  bucket = bucket,
-                  queue = queue,
-                  obj = work
-                )
+                sendMessage(queue = queue, obj = work)
 
                 eventually {
                   val works = getMessages[IdentifiedBaseWork](topic)
@@ -110,11 +102,7 @@ class IdMinterFeatureTest
 
                 val work = createUnidentifiedRedirectedWork
 
-                sendMessage(
-                  bucket = bucket,
-                  queue = queue,
-                  obj = work
-                )
+                sendMessage(queue = queue, obj = work)
 
                 eventually {
                   val works = getMessages[IdentifiedBaseWork](topic)
@@ -145,11 +133,7 @@ class IdMinterFeatureTest
 
                 val work = createUnidentifiedWork
 
-                sendMessage(
-                  bucket = bucket,
-                  queue = queue,
-                  obj = work
-                )
+                sendMessage(queue = queue, obj = work)
 
                 eventually {
                   val snsMessages = listMessagesReceivedFromSNS(topic)

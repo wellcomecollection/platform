@@ -47,10 +47,7 @@ class IngestorWorkerServiceTest
     withLocalElasticsearchIndex { indexName =>
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, _), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
+          sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
       }
@@ -65,10 +62,7 @@ class IngestorWorkerServiceTest
     withLocalElasticsearchIndex { indexName =>
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, _), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
+          sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
       }
@@ -83,10 +77,7 @@ class IngestorWorkerServiceTest
     withLocalElasticsearchIndex { indexName =>
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, _), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
+          sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
       }
@@ -101,10 +92,7 @@ class IngestorWorkerServiceTest
     withLocalElasticsearchIndex { indexName =>
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, _), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
+          sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
       }
@@ -131,10 +119,7 @@ class IngestorWorkerServiceTest
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
+            sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
@@ -154,10 +139,7 @@ class IngestorWorkerServiceTest
     withLocalElasticsearchIndex { indexName =>
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, dlq), bucket) =>
-          sendMessage[IdentifiedBaseWork](
-            bucket = bucket,
-            queue = queue,
-            obj = work)
+          sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
 
@@ -189,10 +171,7 @@ class IngestorWorkerServiceTest
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
+            sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
 
           assertElasticsearchEventuallyHasWork(
@@ -227,10 +206,7 @@ class IngestorWorkerServiceTest
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
+            sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
 
           assertElasticsearchEventuallyHasWork(
@@ -252,10 +228,7 @@ class IngestorWorkerServiceTest
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>
-            sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
-              queue = queue,
-              obj = work)
+            sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
           }
 
           eventually {
@@ -290,7 +263,6 @@ class IngestorWorkerServiceTest
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>
             sendMessage[IdentifiedBaseWork](
-              bucket = bucket,
               queue = queue,
               obj = work)
           }
@@ -338,10 +310,7 @@ class IngestorWorkerServiceTest
                   messageStream) { _ =>
                   val work = createIdentifiedWork
 
-                  sendMessage[IdentifiedBaseWork](
-                    bucket = bucket,
-                    queue = queue,
-                    obj = work)
+                  sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
 
                   eventually {
                     assertQueueEmpty(queue)

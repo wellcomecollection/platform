@@ -169,7 +169,4 @@ trait Messaging
       queue = queue,
       message = InlineNotification(jsonString = toJson(obj).get)
     )
-
-  def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(implicit encoder: Encoder[T]): SendMessageResult =
-    sendMessage[T](queue = queue, obj = obj)
 }

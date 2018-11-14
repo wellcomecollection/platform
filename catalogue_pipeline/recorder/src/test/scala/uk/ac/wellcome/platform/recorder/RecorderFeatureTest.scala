@@ -26,10 +26,7 @@ class RecorderFeatureTest
         withLocalDynamoDbTable { table =>
           withLocalSnsTopic { topic =>
             withWorkerService(table, bucket, bucket, topic, queue) { _ =>
-              sendMessage[TransformedBaseWork](
-                bucket = bucket,
-                queue = queue,
-                obj = work)
+              sendMessage[TransformedBaseWork](queue = queue, obj = work)
 
               eventually {
                 assertStored[TransformedBaseWork](

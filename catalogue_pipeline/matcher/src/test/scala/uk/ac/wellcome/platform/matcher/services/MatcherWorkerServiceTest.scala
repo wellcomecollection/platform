@@ -302,10 +302,7 @@ class MatcherWorkerServiceTest
               sourceIdentifier = identifierA,
               version = 1)
 
-            sendMessage[TransformedBaseWork](
-              bucket = storageBucket,
-              queue = queuePair.queue,
-              workAv1)
+            sendMessage[TransformedBaseWork](queue = queuePair.queue, workAv1)
             eventually {
               noMessagesAreWaitingIn(queuePair.queue)
               noMessagesAreWaitingIn(queuePair.dlq)
@@ -348,11 +345,7 @@ class MatcherWorkerServiceTest
                 mergeCandidates = List(MergeCandidate(identifierB)),
                 version = 2)
 
-              sendMessage[TransformedBaseWork](
-                bucket = storageBucket,
-                queue = queue,
-                differentWorkAv2
-              )
+              sendMessage[TransformedBaseWork](queue = queue, differentWorkAv2)
               eventually {
                 assertQueueEmpty(queue)
                 assertQueueHasSize(dlq, 1)
@@ -368,7 +361,7 @@ class MatcherWorkerServiceTest
                                             queue: SQS.Queue,
                                             storageBucket: Bucket,
                                             topic: Topic): Any = {
-    sendMessage(bucket = storageBucket, queue = queue, workToMatch)
+    sendMessage(queue = queue, workToMatch)
     eventually {
       assertLastMatchedResultIs(
         topic = topic,

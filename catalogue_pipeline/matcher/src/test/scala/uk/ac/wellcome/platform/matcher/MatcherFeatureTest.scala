@@ -31,11 +31,7 @@ class MatcherFeatureTest
           withWorkerService(queue, storageBucket, topic) { _ =>
             val work = createUnidentifiedWork
 
-            sendMessage[TransformedBaseWork](
-              bucket = storageBucket,
-              queue = queue,
-              work
-            )
+            sendMessage[TransformedBaseWork](queue = queue, work)
 
             eventually {
               val snsMessages = listMessagesReceivedFromSNS(topic)
@@ -81,11 +77,7 @@ class MatcherFeatureTest
                 )
                 Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
-                sendMessage[TransformedBaseWork](
-                  bucket = storageBucket,
-                  queue = queuePair.queue,
-                  workAv1
-                )
+                sendMessage[TransformedBaseWork](queue = queuePair.queue, workAv1)
 
                 eventually {
                   noMessagesAreWaitingIn(queuePair.queue)
