@@ -65,10 +65,10 @@ resource "aws_api_gateway_resource" "resource_swagger" {
 }
 
 resource "aws_api_gateway_method" "resource_swagger_any_method" {
-  rest_api_id          = "${var.storage_api_id}"
-  resource_id          = "${aws_api_gateway_resource.resource_swagger.id}"
-  http_method          = "GET"
-  authorization        = "NONE"
+  rest_api_id   = "${var.storage_api_id}"
+  resource_id   = "${aws_api_gateway_resource.resource_swagger.id}"
+  http_method   = "GET"
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "resource_swagger_vpc_link_integration" {

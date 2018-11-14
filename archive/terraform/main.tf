@@ -92,18 +92,18 @@ module "registrar_http" {
     app_base_url    = "https://api.wellcomecollection.org"
   }
 
-  env_vars_length = 4
+  env_vars_length    = 4
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
   private_subnets    = "${local.private_subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-  vpc_id     = "${local.vpc_id}"
+  vpc_id       = "${local.vpc_id}"
 
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  namespace = "${local.namespace}"
-  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
-  nginx_container_image = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
-  nginx_container_port = "9000"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace                        = "${local.namespace}"
+  namespace_tld                    = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  nginx_container_image            = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
+  nginx_container_port             = "9000"
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
 
   nginx_tcp_security_group_id = "${aws_security_group.nginx_tcp_access_security_group.id}"
@@ -189,13 +189,13 @@ module "progress_http" {
   private_subnets    = "${local.private_subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-  vpc_id     = "${local.vpc_id}"
+  vpc_id       = "${local.vpc_id}"
 
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  namespace = "${local.namespace}"
-  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
-  nginx_container_image = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
-  nginx_container_port = "9000"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace                        = "${local.namespace}"
+  namespace_tld                    = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  nginx_container_image            = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
+  nginx_container_port             = "9000"
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
 
   nginx_tcp_security_group_id = "${aws_security_group.nginx_tcp_access_security_group.id}"

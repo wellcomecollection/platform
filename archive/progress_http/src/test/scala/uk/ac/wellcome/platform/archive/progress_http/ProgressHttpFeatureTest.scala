@@ -137,20 +137,20 @@ class ProgressHttpFeatureTest
           withActorSystem { actorSystem =>
             withMaterializer(actorSystem) { implicit materialiser =>
               withProgressTracker(table) { progressTracker =>
-                  val request =
-                    HttpRequest(GET, s"$baseUrl/progress/swagger.json")
+                val request =
+                  HttpRequest(GET, s"$baseUrl/progress/swagger.json")
 
-                  whenRequestReady(request) { result =>
-                    result.status shouldBe StatusCodes.OK
-                    val value = result.entity.dataBytes.runWith(Sink.fold("") {
-                      case (acc, byteString) =>
-                        acc + byteString.utf8String
-                    })
-                    whenReady(value) { jsonString =>
-                      parse(jsonString).toOption shouldBe defined
-                    }
+                whenRequestReady(request) { result =>
+                  result.status shouldBe StatusCodes.OK
+                  val value = result.entity.dataBytes.runWith(Sink.fold("") {
+                    case (acc, byteString) =>
+                      acc + byteString.utf8String
+                  })
+                  whenReady(value) { jsonString =>
+                    parse(jsonString).toOption shouldBe defined
                   }
                 }
+              }
 
             }
           }

@@ -34,12 +34,10 @@ variable "command" {
   default = []
 }
 
-variable "nginx_container_image" {
-}
-variable "nginx_container_port" {
-}
-variable "service_egress_security_group_id" {
-}
+variable "nginx_container_image" {}
 
-variable "nginx_tcp_security_group_id" {
-}
+variable "nginx_container_port" {}
+
+variable "service_egress_security_group_id" {}
+
+variable "nginx_tcp_security_group_id" {}

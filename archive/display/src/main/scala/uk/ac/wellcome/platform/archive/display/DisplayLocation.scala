@@ -8,16 +8,15 @@ import uk.ac.wellcome.storage.ObjectLocation
 import scala.annotation.meta.field
 
 @ApiModel(value = "Location")
-case class DisplayLocation(provider: DisplayProvider,
-                           bucket: String,
-                           path: String,
-                           @JsonKey("type")
-                           @(ApiModelProperty @field)(name="type", allowableValues = "Location")
-                           ontologyType: String = "Location") {
-  def toStorageLocation : StorageLocation =
-  StorageLocation(
-    provider.toStorageProvider,
-    ObjectLocation(bucket, path))
+case class DisplayLocation(
+  provider: DisplayProvider,
+  bucket: String,
+  path: String,
+  @JsonKey("type")
+  @(ApiModelProperty @field)(name = "type", allowableValues = "Location")
+  ontologyType: String = "Location") {
+  def toStorageLocation: StorageLocation =
+    StorageLocation(provider.toStorageProvider, ObjectLocation(bucket, path))
 }
 object DisplayLocation {
   def apply(location: StorageLocation): DisplayLocation =

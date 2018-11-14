@@ -7,7 +7,10 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.optics.JsonPath.root
 import io.circe.parser._
 
-class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTest {
+class SwaggerDocServiceTest
+    extends FunSpec
+    with Matchers
+    with ScalatestRouteTest {
   it("exposes a swagger endpoint") {
     Get("/progress/swagger.json") ~> SwaggerDocService.routes ~> check {
       contentType shouldBe ContentTypes.`application/json`
@@ -21,7 +24,8 @@ class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTe
   it("documents the get endpoint for progress") {
     Get("/progress/swagger.json") ~> SwaggerDocService.routes ~> check {
       val json = entityAs[Json]
-      root.paths.`/progress/{id}`.get.parameters.json.getOption(json) shouldBe parse("""[{
+      root.paths.`/progress/{id}`.get.parameters.json
+        .getOption(json) shouldBe parse("""[{
                                                                                   |"name": "id",
                                                                                   |"in": "path",
                                                                                   |"required": true,
@@ -29,15 +33,24 @@ class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTe
                                                                                   |"format": "UUID",
                                                                                   |"description" : "The id of the request"
                                                                                   |}]""".stripMargin).toOption
-      root.paths.`/progress/{id}`.get.responses.json.getOption(json).get.asObject.get.keys.toSet shouldBe Set("200", "404")
-      root.paths.`/progress/{id}`.get.responses.`200`.schema.`$ref`.string.getOption(json) shouldBe Some("""#/definitions/ResponseIngest""")
+      root.paths.`/progress/{id}`.get.responses.json
+        .getOption(json)
+        .get
+        .asObject
+        .get
+        .keys
+        .toSet shouldBe Set("200", "404")
+      root.paths.`/progress/{id}`.get.responses.`200`.schema.`$ref`.string
+        .getOption(json) shouldBe Some("""#/definitions/ResponseIngest""")
     }
   }
 
   it("documents the post endpoint for progress") {
     Get("/progress/swagger.json") ~> SwaggerDocService.routes ~> check {
       val json = entityAs[Json]
-      root.paths.`/progress`.post.parameters.json.getOption(json) shouldBe parse("""[{
+      root.paths.`/progress`.post.parameters.json
+        .getOption(json) shouldBe parse(
+        """[{
                                                                                   |"name": "progressCreateRequest",
                                                                                   |"in": "body",
                                                                                   |"required": true,
@@ -46,9 +59,18 @@ class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTe
                                                                                   | "$ref": "#/definitions/RequestIngest"
                                                                                   |}
                                                                                   |}]""".stripMargin).toOption
-      root.paths.`/progress`.post.responses.json.getOption(json).get.asObject.get.keys.toSet shouldBe Set("201", "400")
-      root.paths.`/progress`.post.responses.`201`.schema.`$ref`.string.getOption(json) shouldBe Some("""#/definitions/ResponseIngest""")
-      root.paths.`/progress`.post.responses.`201`.headers.Location.json.getOption(json) shouldBe parse("""{
+      root.paths.`/progress`.post.responses.json
+        .getOption(json)
+        .get
+        .asObject
+        .get
+        .keys
+        .toSet shouldBe Set("201", "400")
+      root.paths.`/progress`.post.responses.`201`.schema.`$ref`.string
+        .getOption(json) shouldBe Some("""#/definitions/ResponseIngest""")
+      root.paths.`/progress`.post.responses.`201`.headers.Location.json
+        .getOption(json) shouldBe parse(
+        """{
           |"type": "string",
           |"format":"url",
           |"description": "The URL of the created ingest request"
@@ -60,8 +82,10 @@ class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTe
     Get("/progress/swagger.json") ~> SwaggerDocService.routes ~> check {
       contentType shouldBe ContentTypes.`application/json`
       val json = entityAs[Json]
-      root.definitions.RequestIngest.`type`.string.getOption(json) shouldBe Some("object")
-      root.definitions.RequestIngest.properties.json.getOption(json) shouldBe parse(
+      root.definitions.RequestIngest.`type`.string
+        .getOption(json) shouldBe Some("object")
+      root.definitions.RequestIngest.properties.json
+        .getOption(json) shouldBe parse(
         """
           |{
           |        "sourceLocation" : {
@@ -84,7 +108,13 @@ class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTe
           |        }
           |      }
         """.stripMargin).toOption
-      root.definitions.RequestIngest.required.arr.getOption(json).get.map(_.asString.get) should contain theSameElementsAs List("sourceLocation", "ingestType", "space")
+      root.definitions.RequestIngest.required.arr
+        .getOption(json)
+        .get
+        .map(_.asString.get) should contain theSameElementsAs List(
+        "sourceLocation",
+        "ingestType",
+        "space")
 
     }
   }
@@ -93,11 +123,24 @@ class SwaggerDocServiceTest extends FunSpec  with Matchers with ScalatestRouteTe
     Get("/progress/swagger.json") ~> SwaggerDocService.routes ~> check {
       contentType shouldBe ContentTypes.`application/json`
       val json = entityAs[Json]
-      root.definitions.ResponseIngest.`type`.string.getOption(json) shouldBe Some("object")
+      root.definitions.ResponseIngest.`type`.string
+        .getOption(json) shouldBe Some("object")
 
-      root.definitions.ResponseIngest.required.arr.getOption(json).get.map(_.asString.get) should contain theSameElementsAs List("@context", "id", "space", "sourceLocation", "ingestType", "status", "createdDate", "lastModifiedDate", "events")
-      root.definitions.ResponseIngest.properties.`type`.json.getOption(json) shouldBe parse(
-        """
+      root.definitions.ResponseIngest.required.arr
+        .getOption(json)
+        .get
+        .map(_.asString.get) should contain theSameElementsAs List(
+        "@context",
+        "id",
+        "space",
+        "sourceLocation",
+        "ingestType",
+        "status",
+        "createdDate",
+        "lastModifiedDate",
+        "events")
+      root.definitions.ResponseIngest.properties.`type`.json
+        .getOption(json) shouldBe parse("""
           |{
           |"type" : "string",
           |"enum" : [
