@@ -5,14 +5,12 @@ import java.io.ByteArrayInputStream
 import akka.stream.scaladsl.{Concat, Sink, Source, StreamConverters}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.util.ByteString
-import com.amazonaws.services.s3.model.{
-  CompleteMultipartUploadResult,
-  ListMultipartUploadsRequest
-}
+import com.amazonaws.services.s3.model.{CompleteMultipartUploadResult, ListMultipartUploadsRequest}
 import org.apache.commons.io.IOUtils
-import org.scalatest.FunSpec
+import org.scalatest.{Entry, FunSpec}
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
+import uk.ac.wellcome.platform.archive.archivist.models.storage.ObjectMetadata
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
@@ -245,6 +243,33 @@ class S3UploadFlowTest
       whenReady(futureResult) { result =>
         result should have size 1
         result.head shouldBe a[Failure[_]]
+      }
+    }
+  }
+
+  it("writes a stream of bytestring to S3 with metadata") {
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withLocalS3Bucket { bucket =>
+          val content = "dsrkjgherg"
+          val s3Key = "key.txt"
+          val metadata = ObjectMetadata(userMetaData = Map("metadata" -> "1234"))
+          val futureResult = StreamConverters
+            .fromInputStream(() => new ByteArrayInputStream(content.getBytes()))
+            .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key), Some(metadata))(s3Client))
+            .runWith(Sink.head)
+
+          whenReady(futureResult) {
+            triedResult: Try[CompleteMultipartUploadResult] =>
+              triedResult.get.getBucketName shouldBe bucket.name
+              triedResult.get.getKey shouldBe s3Key
+
+              val storedObject = s3Client.getObject(bucket.name, s3Key)
+              storedObject.getObjectMetadata.getUserMetadata should contain only Entry("metadata", "1234")
+
+              getContentFromS3(bucket, s3Key) shouldBe content
+          }
+        }
       }
     }
   }

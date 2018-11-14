@@ -6,12 +6,13 @@ import akka.stream.scaladsl.{Flow, GraphDSL, Zip}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.CompleteMultipartUploadResult
+import uk.ac.wellcome.platform.archive.archivist.models.storage.ObjectMetadata
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.util.Try
 
 object UploadAndCalculateDigestFlow {
-  def apply(uploadLocation: ObjectLocation)(
+  def apply(uploadLocation: ObjectLocation, maybeObjectMetadata: Option[ObjectMetadata] = None)(
     implicit s3Client: AmazonS3): Flow[ByteString, Try[String], NotUsed] = {
     Flow.fromGraph(
       GraphDSL.create() { implicit b =>
@@ -19,7 +20,7 @@ object UploadAndCalculateDigestFlow {
 
         val verify = b.add(ArchiveChecksumFlow("SHA-256"))
         val flow = b.add(Flow[ByteString])
-        val upload = b.add(S3UploadFlow(uploadLocation))
+        val upload = b.add(S3UploadFlow(uploadLocation, maybeObjectMetadata))
         val zip = b.add(Zip[Try[CompleteMultipartUploadResult], String])
 
         flow.out.log("calculating checksum") ~> verify.inlets.head
@@ -35,5 +36,4 @@ object UploadAndCalculateDigestFlow {
       }
     )
   }
-
 }
