@@ -21,7 +21,6 @@ import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
@@ -78,7 +77,6 @@ trait MatcherFixtures
 
   def withWorkerService[R](
     queue: SQS.Queue,
-    storageBucket: Bucket,
     topic: Topic)(testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>

@@ -32,20 +32,18 @@ class MatcherWorkerServiceTest
   it("creates a work without identifiers") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { storageBucket =>
-          withWorkerService(queue, storageBucket, topic) { _ =>
-            // Work Av1 created without any matched works
-            val updatedWork = createUnidentifiedSierraWork
-            val expectedMatchedWorks =
-              MatcherResult(
-                Set(MatchedIdentifiers(Set(WorkIdentifier(updatedWork)))))
+        withWorkerService(queue, topic) { _ =>
+          // Work Av1 created without any matched works
+          val updatedWork = createUnidentifiedSierraWork
+          val expectedMatchedWorks =
+            MatcherResult(
+              Set(MatchedIdentifiers(Set(WorkIdentifier(updatedWork)))))
 
-            processAndAssertMatchedWorkIs(
-              updatedWork,
-              expectedMatchedWorks,
-              queue,
-              topic)
-          }
+          processAndAssertMatchedWorkIs(
+            updatedWork,
+            expectedMatchedWorks,
+            queue,
+            topic)
         }
       }
     }
@@ -55,24 +53,22 @@ class MatcherWorkerServiceTest
     "sends an invisible work as a single matched result with no other matched identifiers") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { storageBucket =>
-          withWorkerService(queue, storageBucket, topic) { _ =>
-            val invisibleWork = createUnidentifiedInvisibleWork
-            val expectedMatchedWorks =
-              MatcherResult(
-                Set(
-                  MatchedIdentifiers(
-                    Set(WorkIdentifier(invisibleWork))
-                  ))
-              )
-
-            processAndAssertMatchedWorkIs(
-              workToMatch = invisibleWork,
-              expectedMatchedWorks = expectedMatchedWorks,
-              queue = queue,
-              topic = topic
+        withWorkerService(queue, topic) { _ =>
+          val invisibleWork = createUnidentifiedInvisibleWork
+          val expectedMatchedWorks =
+            MatcherResult(
+              Set(
+                MatchedIdentifiers(
+                  Set(WorkIdentifier(invisibleWork))
+                ))
             )
-          }
+
+          processAndAssertMatchedWorkIs(
+            workToMatch = invisibleWork,
+            expectedMatchedWorks = expectedMatchedWorks,
+            queue = queue,
+            topic = topic
+          )
         }
       }
     }
@@ -82,28 +78,26 @@ class MatcherWorkerServiceTest
     "work A with one link to B and no existing works returns a single matched work") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { storageBucket =>
-          withWorkerService(queue, storageBucket, topic) { _ =>
-            // Work Av1
-            val workAv1 =
-              createUnidentifiedWorkWith(
-                sourceIdentifier = identifierA,
-                mergeCandidates = List(MergeCandidate(identifierB)))
-            // Work Av1 matched to B (before B exists hence version 0)
-            // need to match to works that do not exist to support
-            // bi-directionally matched works without deadlocking (A->B, B->A)
-            val expectedMatchedWorks = MatcherResult(
-              Set(
-                MatchedIdentifiers(Set(
-                  WorkIdentifier("sierra-system-number/A", 1),
-                  WorkIdentifier("sierra-system-number/B", 0)))))
+        withWorkerService(queue, topic) { _ =>
+          // Work Av1
+          val workAv1 =
+            createUnidentifiedWorkWith(
+              sourceIdentifier = identifierA,
+              mergeCandidates = List(MergeCandidate(identifierB)))
+          // Work Av1 matched to B (before B exists hence version 0)
+          // need to match to works that do not exist to support
+          // bi-directionally matched works without deadlocking (A->B, B->A)
+          val expectedMatchedWorks = MatcherResult(
+            Set(
+              MatchedIdentifiers(Set(
+                WorkIdentifier("sierra-system-number/A", 1),
+                WorkIdentifier("sierra-system-number/B", 0)))))
 
-            processAndAssertMatchedWorkIs(
-              workAv1,
-              expectedMatchedWorks,
-              queue,
-              topic)
-          }
+          processAndAssertMatchedWorkIs(
+            workAv1,
+            expectedMatchedWorks,
+            queue,
+            topic)
         }
       }
     }
@@ -113,82 +107,80 @@ class MatcherWorkerServiceTest
     "matches a work with one link then matches the combined work to a new work") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { storageBucket =>
-          withWorkerService(queue, storageBucket, topic) { _ =>
-            // Work Av1
-            val workAv1 =
-              createUnidentifiedWorkWith(sourceIdentifier = identifierA)
+        withWorkerService(queue, topic) { _ =>
+          // Work Av1
+          val workAv1 =
+            createUnidentifiedWorkWith(sourceIdentifier = identifierA)
 
-            val expectedMatchedWorks = MatcherResult(
+          val expectedMatchedWorks = MatcherResult(
+            Set(
+              MatchedIdentifiers(Set(
+                WorkIdentifier("sierra-system-number/A", 1)
+              ))))
+
+          processAndAssertMatchedWorkIs(
+            workAv1,
+            expectedMatchedWorks,
+            queue,
+            topic)
+
+          // Work Bv1
+          val workBv1 =
+            createUnidentifiedWorkWith(sourceIdentifier = identifierB)
+
+          processAndAssertMatchedWorkIs(
+            workBv1,
+            MatcherResult(Set(MatchedIdentifiers(
+              Set(WorkIdentifier("sierra-system-number/B", 1))))),
+            queue,
+            topic)
+
+          // Work Av1 matched to B
+          val workAv2 = createUnidentifiedWorkWith(
+            sourceIdentifier = identifierA,
+            version = 2,
+            mergeCandidates = List(MergeCandidate(identifierB)))
+
+          processAndAssertMatchedWorkIs(
+            workAv2,
+            MatcherResult(
               Set(
                 MatchedIdentifiers(Set(
-                  WorkIdentifier("sierra-system-number/A", 1)
-                ))))
+                  WorkIdentifier("sierra-system-number/A", 2),
+                  WorkIdentifier("sierra-system-number/B", 1))))),
+            queue,
+            topic
+          )
 
-            processAndAssertMatchedWorkIs(
-              workAv1,
-              expectedMatchedWorks,
-              queue,
-              topic)
+          // Work Cv1
+          val workCv1 =
+            createUnidentifiedWorkWith(sourceIdentifier = identifierC)
 
-            // Work Bv1
-            val workBv1 =
-              createUnidentifiedWorkWith(sourceIdentifier = identifierB)
+          processAndAssertMatchedWorkIs(
+            workCv1,
+            MatcherResult(Set(MatchedIdentifiers(
+              Set(WorkIdentifier("sierra-system-number/C", 1))))),
+            queue,
+            topic)
 
-            processAndAssertMatchedWorkIs(
-              workBv1,
-              MatcherResult(Set(MatchedIdentifiers(
-                Set(WorkIdentifier("sierra-system-number/B", 1))))),
-              queue,
-              topic)
+          // Work Bv2 matched to C
+          val workBv2 = createUnidentifiedWorkWith(
+            sourceIdentifier = identifierB,
+            version = 2,
+            mergeCandidates = List(MergeCandidate(identifierC)))
 
-            // Work Av1 matched to B
-            val workAv2 = createUnidentifiedWorkWith(
-              sourceIdentifier = identifierA,
-              version = 2,
-              mergeCandidates = List(MergeCandidate(identifierB)))
-
-            processAndAssertMatchedWorkIs(
-              workAv2,
-              MatcherResult(
-                Set(
-                  MatchedIdentifiers(Set(
+          processAndAssertMatchedWorkIs(
+            workBv2,
+            MatcherResult(
+              Set(
+                MatchedIdentifiers(
+                  Set(
                     WorkIdentifier("sierra-system-number/A", 2),
-                    WorkIdentifier("sierra-system-number/B", 1))))),
-              queue,
-              topic
-            )
-
-            // Work Cv1
-            val workCv1 =
-              createUnidentifiedWorkWith(sourceIdentifier = identifierC)
-
-            processAndAssertMatchedWorkIs(
-              workCv1,
-              MatcherResult(Set(MatchedIdentifiers(
-                Set(WorkIdentifier("sierra-system-number/C", 1))))),
-              queue,
-              topic)
-
-            // Work Bv2 matched to C
-            val workBv2 = createUnidentifiedWorkWith(
-              sourceIdentifier = identifierB,
-              version = 2,
-              mergeCandidates = List(MergeCandidate(identifierC)))
-
-            processAndAssertMatchedWorkIs(
-              workBv2,
-              MatcherResult(
-                Set(
-                  MatchedIdentifiers(
-                    Set(
-                      WorkIdentifier("sierra-system-number/A", 2),
-                      WorkIdentifier("sierra-system-number/B", 2),
-                      WorkIdentifier("sierra-system-number/C", 1))))),
-              queue,
-              topic
-            )
-          }
+                    WorkIdentifier("sierra-system-number/B", 2),
+                    WorkIdentifier("sierra-system-number/C", 1))))),
+            queue,
+            topic
+          )
         }
       }
     }
@@ -197,66 +189,64 @@ class MatcherWorkerServiceTest
   it("breaks matched works into individual works") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { storageBucket =>
-          withWorkerService(queue, storageBucket, topic) { _ =>
-            // Work Av1
-            val workAv1 = createUnidentifiedWorkWith(
-              sourceIdentifier = identifierA,
-              version = 1)
+        withWorkerService(queue, topic) { _ =>
+          // Work Av1
+          val workAv1 = createUnidentifiedWorkWith(
+            sourceIdentifier = identifierA,
+            version = 1)
 
-            processAndAssertMatchedWorkIs(
-              workAv1,
-              MatcherResult(Set(MatchedIdentifiers(
-                Set(WorkIdentifier("sierra-system-number/A", 1))))),
-              queue,
-              topic)
+          processAndAssertMatchedWorkIs(
+            workAv1,
+            MatcherResult(Set(MatchedIdentifiers(
+              Set(WorkIdentifier("sierra-system-number/A", 1))))),
+            queue,
+            topic)
 
-            // Work Bv1
-            val workBv1 = createUnidentifiedWorkWith(
-              sourceIdentifier = identifierB,
-              version = 1)
+          // Work Bv1
+          val workBv1 = createUnidentifiedWorkWith(
+            sourceIdentifier = identifierB,
+            version = 1)
 
-            processAndAssertMatchedWorkIs(
-              workBv1,
-              MatcherResult(Set(MatchedIdentifiers(
-                Set(WorkIdentifier("sierra-system-number/B", 1))))),
-              queue,
-              topic)
+          processAndAssertMatchedWorkIs(
+            workBv1,
+            MatcherResult(Set(MatchedIdentifiers(
+              Set(WorkIdentifier("sierra-system-number/B", 1))))),
+            queue,
+            topic)
 
-            // Match Work A to Work B
-            val workAv2MatchedToB = createUnidentifiedWorkWith(
-              sourceIdentifier = identifierA,
-              version = 2,
-              mergeCandidates = List(MergeCandidate(identifierB)))
+          // Match Work A to Work B
+          val workAv2MatchedToB = createUnidentifiedWorkWith(
+            sourceIdentifier = identifierA,
+            version = 2,
+            mergeCandidates = List(MergeCandidate(identifierB)))
 
-            processAndAssertMatchedWorkIs(
-              workAv2MatchedToB,
-              MatcherResult(
-                Set(
-                  MatchedIdentifiers(Set(
-                    WorkIdentifier("sierra-system-number/A", 2),
-                    WorkIdentifier("sierra-system-number/B", 1))))),
-              queue,
-              topic
-            )
+          processAndAssertMatchedWorkIs(
+            workAv2MatchedToB,
+            MatcherResult(
+              Set(
+                MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/A", 2),
+                  WorkIdentifier("sierra-system-number/B", 1))))),
+            queue,
+            topic
+          )
 
-            // A no longer matches B
-            val workAv3WithNoMatchingWorks = createUnidentifiedWorkWith(
-              sourceIdentifier = identifierA,
-              version = 3)
+          // A no longer matches B
+          val workAv3WithNoMatchingWorks = createUnidentifiedWorkWith(
+            sourceIdentifier = identifierA,
+            version = 3)
 
-            processAndAssertMatchedWorkIs(
-              workAv3WithNoMatchingWorks,
-              MatcherResult(
-                Set(
-                  MatchedIdentifiers(
-                    Set(WorkIdentifier("sierra-system-number/A", 3))),
-                  MatchedIdentifiers(
-                    Set(WorkIdentifier("sierra-system-number/B", 1))))),
-              queue,
-              topic
-            )
-          }
+          processAndAssertMatchedWorkIs(
+            workAv3WithNoMatchingWorks,
+            MatcherResult(
+              Set(
+                MatchedIdentifiers(
+                  Set(WorkIdentifier("sierra-system-number/A", 3))),
+                MatchedIdentifiers(
+                  Set(WorkIdentifier("sierra-system-number/B", 1))))),
+            queue,
+            topic
+          )
         }
       }
     }
@@ -265,9 +255,47 @@ class MatcherWorkerServiceTest
   it("does not match a lower version") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueueAndDlq { queuePair =>
-        withLocalS3Bucket { storageBucket =>
-          withWorkerService(queuePair.queue, storageBucket, topic) { _ =>
-            // process Work V2
+        withWorkerService(queuePair.queue, topic) { _ =>
+          // process Work V2
+          val workAv2 = createUnidentifiedWorkWith(
+            sourceIdentifier = identifierA,
+            version = 2
+          )
+
+          val expectedMatchedWorkAv2 = MatcherResult(
+            Set(MatchedIdentifiers(
+              Set(WorkIdentifier("sierra-system-number/A", 2)))))
+
+          processAndAssertMatchedWorkIs(
+            workAv2,
+            expectedMatchedWorkAv2,
+            queuePair.queue,
+            topic)
+
+          // Work V1 is sent but not matched
+          val workAv1 = createUnidentifiedWorkWith(
+            sourceIdentifier = identifierA,
+            version = 1)
+
+          sendMessage[TransformedBaseWork](queue = queuePair.queue, workAv1)
+          eventually {
+            noMessagesAreWaitingIn(queuePair.queue)
+            noMessagesAreWaitingIn(queuePair.dlq)
+            assertLastMatchedResultIs(
+              topic = topic,
+              expectedMatcherResult = expectedMatchedWorkAv2
+            )
+          }
+        }
+      }
+    }
+  }
+
+  it("does not match an existing version with different information") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueueAndDlq {
+        case QueuePair(queue, dlq) =>
+          withWorkerService(queue, topic) { _ =>
             val workAv2 = createUnidentifiedWorkWith(
               sourceIdentifier = identifierA,
               version = 2
@@ -280,61 +308,19 @@ class MatcherWorkerServiceTest
             processAndAssertMatchedWorkIs(
               workAv2,
               expectedMatchedWorkAv2,
-              queuePair.queue,
+              queue,
               topic)
 
             // Work V1 is sent but not matched
-            val workAv1 = createUnidentifiedWorkWith(
+            val differentWorkAv2 = createUnidentifiedWorkWith(
               sourceIdentifier = identifierA,
-              version = 1)
+              mergeCandidates = List(MergeCandidate(identifierB)),
+              version = 2)
 
-            sendMessage[TransformedBaseWork](queue = queuePair.queue, workAv1)
+            sendMessage[TransformedBaseWork](queue = queue, differentWorkAv2)
             eventually {
-              noMessagesAreWaitingIn(queuePair.queue)
-              noMessagesAreWaitingIn(queuePair.dlq)
-              assertLastMatchedResultIs(
-                topic = topic,
-                expectedMatcherResult = expectedMatchedWorkAv2
-              )
-            }
-          }
-        }
-      }
-    }
-  }
-
-  it("does not match an existing version with different information") {
-    withLocalSnsTopic { topic =>
-      withLocalSqsQueueAndDlq {
-        case QueuePair(queue, dlq) =>
-          withLocalS3Bucket { storageBucket =>
-            withWorkerService(queue, storageBucket, topic) { _ =>
-              val workAv2 = createUnidentifiedWorkWith(
-                sourceIdentifier = identifierA,
-                version = 2
-              )
-
-              val expectedMatchedWorkAv2 = MatcherResult(
-                Set(MatchedIdentifiers(
-                  Set(WorkIdentifier("sierra-system-number/A", 2)))))
-
-              processAndAssertMatchedWorkIs(
-                workAv2,
-                expectedMatchedWorkAv2,
-                queue,
-                topic)
-
-              // Work V1 is sent but not matched
-              val differentWorkAv2 = createUnidentifiedWorkWith(
-                sourceIdentifier = identifierA,
-                mergeCandidates = List(MergeCandidate(identifierB)),
-                version = 2)
-
-              sendMessage[TransformedBaseWork](queue = queue, differentWorkAv2)
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
-              }
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
             }
           }
       }
