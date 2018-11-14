@@ -30,30 +30,31 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { identifiersTableConfig =>
-            withWorkerService(bucket, topic, queue, identifiersTableConfig) { _ =>
-              eventuallyTableExists(identifiersTableConfig)
-              val work = createUnidentifiedWork
+            withWorkerService(bucket, topic, queue, identifiersTableConfig) {
+              _ =>
+                eventuallyTableExists(identifiersTableConfig)
+                val work = createUnidentifiedWork
 
-              val messageCount = 5
+                val messageCount = 5
 
-              (1 to messageCount).foreach { _ =>
-                sendMessage(queue = queue, obj = work)
-              }
-
-              eventually {
-                val works = getMessages[IdentifiedBaseWork](topic)
-                works.length shouldBe >=(messageCount)
-
-                works.map(_.canonicalId).distinct should have size 1
-                works.foreach { receivedWork =>
-                  receivedWork
-                    .asInstanceOf[IdentifiedWork]
-                    .sourceIdentifier shouldBe work.sourceIdentifier
-                  receivedWork
-                    .asInstanceOf[IdentifiedWork]
-                    .title shouldBe work.title
+                (1 to messageCount).foreach { _ =>
+                  sendMessage(queue = queue, obj = work)
                 }
-              }
+
+                eventually {
+                  val works = getMessages[IdentifiedBaseWork](topic)
+                  works.length shouldBe >=(messageCount)
+
+                  works.map(_.canonicalId).distinct should have size 1
+                  works.foreach { receivedWork =>
+                    receivedWork
+                      .asInstanceOf[IdentifiedWork]
+                      .sourceIdentifier shouldBe work.sourceIdentifier
+                    receivedWork
+                      .asInstanceOf[IdentifiedWork]
+                      .title shouldBe work.title
+                  }
+                }
             }
           }
         }
