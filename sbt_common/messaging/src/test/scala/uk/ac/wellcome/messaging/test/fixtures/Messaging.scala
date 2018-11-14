@@ -50,14 +50,8 @@ trait Messaging
       }
     )
 
-  def messagingLocalFlags(bucket: Bucket, topic: Topic, queue: Queue) =
-    messageReaderLocalFlags(bucket, queue) ++ messageWriterLocalFlags(
-      bucket,
-      topic)
-
-  def messageReaderLocalFlags(bucket: Bucket, queue: Queue) =
+  def messageReaderLocalFlags(queue: Queue): Map[String, String] =
     Map(
-      "aws.message.reader.s3.bucketName" -> bucket.name,
       "aws.message.reader.sqs.queue.url" -> queue.url,
     ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
 

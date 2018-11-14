@@ -17,7 +17,7 @@ trait Server extends CloudWatch with Messaging with ElasticsearchFixtures {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new AppServer(),
-      flags = messageReaderLocalFlags(bucket, queue) ++ ingestEsLocalFlags(
+      flags = messageReaderLocalFlags(queue) ++ ingestEsLocalFlags(
         indexName) ++ cloudWatchLocalFlags ++ Map(
         "es.ingest.flushInterval" -> "5 seconds")
     )
