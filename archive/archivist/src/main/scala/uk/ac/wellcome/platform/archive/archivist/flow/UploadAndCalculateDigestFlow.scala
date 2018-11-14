@@ -12,7 +12,8 @@ import uk.ac.wellcome.storage.ObjectLocation
 import scala.util.Try
 
 object UploadAndCalculateDigestFlow {
-  def apply(uploadLocation: ObjectLocation, maybeObjectMetadata: Option[ObjectMetadata] = None)(
+  def apply(uploadLocation: ObjectLocation,
+            maybeObjectMetadata: Option[ObjectMetadata] = None)(
     implicit s3Client: AmazonS3): Flow[ByteString, Try[String], NotUsed] = {
     Flow.fromGraph(
       GraphDSL.create() { implicit b =>

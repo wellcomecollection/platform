@@ -6,8 +6,14 @@ import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ItemDigest}
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ChecksumNotMatchedOnUploadError, UploadDigestItemError}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveDigestItemJob,
+  ItemDigest
+}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ChecksumNotMatchedOnUploadError,
+  UploadDigestItemError
+}
 import uk.ac.wellcome.platform.archive.archivist.models.storage.ObjectMetadata
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
@@ -36,10 +42,13 @@ object UploadDigestInputStreamFlow extends Logging {
             StreamConverters
               .fromInputStream(() => inputStream)
               .log("upload bytestring")
-              .via(UploadAndCalculateDigestFlow(job.uploadLocation, uploadMetadata(digest)))
+              .via(UploadAndCalculateDigestFlow(
+                job.uploadLocation,
+                uploadMetadata(digest)))
               .log("to either")
               .map {
-                case Success(calculatedDigest) if calculatedDigest == digest.value =>
+                case Success(calculatedDigest)
+                    if calculatedDigest == digest.value =>
                   Right(job)
                 case Success(calculatedDigest) =>
                   warn(s"Digests didn't match: $calculatedDigest != $digest")
@@ -63,7 +72,9 @@ object UploadDigestInputStreamFlow extends Logging {
       )
 
   def uploadMetadata(digest: ItemDigest): Option[ObjectMetadata] = {
-    Some(ObjectMetadata(userMetaData = Map(digest.algorithm.toString -> digest.value)))
+    Some(
+      ObjectMetadata(
+        userMetaData = Map(digest.algorithm.toString -> digest.value)))
   }
 
 }

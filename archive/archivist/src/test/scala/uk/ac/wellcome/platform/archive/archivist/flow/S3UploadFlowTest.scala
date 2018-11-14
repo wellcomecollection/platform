@@ -5,7 +5,10 @@ import java.io.ByteArrayInputStream
 import akka.stream.scaladsl.{Concat, Sink, Source, StreamConverters}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.util.ByteString
-import com.amazonaws.services.s3.model.{CompleteMultipartUploadResult, ListMultipartUploadsRequest}
+import com.amazonaws.services.s3.model.{
+  CompleteMultipartUploadResult,
+  ListMultipartUploadsRequest
+}
 import org.apache.commons.io.IOUtils
 import org.scalatest.{Entry, FunSpec}
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
@@ -253,10 +256,13 @@ class S3UploadFlowTest
         withLocalS3Bucket { bucket =>
           val content = "dsrkjgherg"
           val s3Key = "key.txt"
-          val metadata = ObjectMetadata(userMetaData = Map("metadata" -> "1234"))
+          val metadata =
+            ObjectMetadata(userMetaData = Map("metadata" -> "1234"))
           val futureResult = StreamConverters
             .fromInputStream(() => new ByteArrayInputStream(content.getBytes()))
-            .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key), Some(metadata))(s3Client))
+            .via(
+              S3UploadFlow(ObjectLocation(bucket.name, s3Key), Some(metadata))(
+                s3Client))
             .runWith(Sink.head)
 
           whenReady(futureResult) {
@@ -265,7 +271,9 @@ class S3UploadFlowTest
               triedResult.get.getKey shouldBe s3Key
 
               val storedObject = s3Client.getObject(bucket.name, s3Key)
-              storedObject.getObjectMetadata.getUserMetadata should contain only Entry("metadata", "1234")
+              storedObject.getObjectMetadata.getUserMetadata should contain only Entry(
+                "metadata",
+                "1234")
 
               getContentFromS3(bucket, s3Key) shouldBe content
           }
