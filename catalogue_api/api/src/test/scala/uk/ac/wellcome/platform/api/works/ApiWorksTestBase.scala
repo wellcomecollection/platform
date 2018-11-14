@@ -48,8 +48,8 @@ trait ApiWorksTestBase
     testWith: TestWith[(String, String, String, String, EmbeddedHttpServer),
                        R]): R = {
     val itemType = documentType
-    withLocalElasticsearchIndex(itemType = itemType) { indexV1 =>
-      withLocalElasticsearchIndex(itemType = itemType) { indexV2 =>
+    withLocalElasticsearchIndex { indexV1 =>
+      withLocalElasticsearchIndex { indexV2 =>
         withServer(indexV1, indexV2) { server =>
           testWith((apiName + apiVersion, indexV1, indexV2, itemType, server))
         }

@@ -20,12 +20,12 @@ class WorkIndexerTest
     with WorkIndexerFixtures
     with CustomElasticsearchMapping {
 
-  val esType = "work"
+  val esType = documentType
 
   it("inserts an identified Work into Elasticsearch") {
     val work = createIdentifiedWork
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
+    withLocalElasticsearchIndex { indexName =>
       withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(List(work), indexName, esType)
 
@@ -43,7 +43,7 @@ class WorkIndexerTest
   it("only adds one record when the same ID is ingested multiple times") {
     val work = createIdentifiedWork
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
+    withLocalElasticsearchIndex { indexName =>
       withWorkIndexer { workIndexer =>
         val future = Future.sequence(
           (1 to 2).map(
@@ -69,7 +69,7 @@ class WorkIndexerTest
     val work = createIdentifiedWorkWith(version = 3)
     val olderWork = work.copy(version = 1)
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
+    withLocalElasticsearchIndex { indexName =>
       insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
 
       withWorkIndexer { workIndexer =>
@@ -97,7 +97,7 @@ class WorkIndexerTest
     val work = createIdentifiedWorkWith(version = 3)
     val updatedWork = work.copy(title = "a different title")
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
+    withLocalElasticsearchIndex { indexName =>
       insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
 
       withWorkIndexer { workIndexer =>
@@ -121,7 +121,7 @@ class WorkIndexerTest
   it("inserts a list of works into elasticsearch and returns them") {
     val works = createIdentifiedWorks(count = 5)
 
-    withLocalElasticsearchIndex(itemType = esType) { indexName =>
+    withLocalElasticsearchIndex { indexName =>
       withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(works, indexName, esType)
 

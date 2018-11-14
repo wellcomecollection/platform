@@ -47,7 +47,7 @@ class IngestorWorkerServiceTest
 
     val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, _), bucket) =>
           sendMessage[IdentifiedBaseWork](
@@ -68,7 +68,7 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, _), bucket) =>
           sendMessage[IdentifiedBaseWork](
@@ -89,7 +89,7 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, _), bucket) =>
           sendMessage[IdentifiedBaseWork](
@@ -110,7 +110,7 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, _), bucket) =>
           sendMessage[IdentifiedBaseWork](
@@ -142,7 +142,7 @@ class IngestorWorkerServiceTest
 
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>
@@ -169,7 +169,7 @@ class IngestorWorkerServiceTest
       )
     )
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, dlq), bucket) =>
           sendMessage[IdentifiedBaseWork](
@@ -206,7 +206,7 @@ class IngestorWorkerServiceTest
 
     val works = List(miroWork, sierraWork, otherWork)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>
@@ -244,7 +244,7 @@ class IngestorWorkerServiceTest
 
     val works = List(sierraWork, oldSierraWork)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       insertIntoElasticsearch(
         indexName = esIndex,
         itemType = itemType,
@@ -274,7 +274,7 @@ class IngestorWorkerServiceTest
   it("ingests lots of works") {
     val works = createIdentifiedWorks(count = 250)
 
-    withLocalElasticsearchIndex(itemType = itemType) { esIndex =>
+    withLocalElasticsearchIndex { esIndex =>
       withIngestorWorkerService(esIndex) {
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>

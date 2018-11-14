@@ -25,11 +25,11 @@ class ElasticsearchServiceTest
     with SearchOptionsGenerators
     with WorksGenerators {
 
-  val itemType = "work"
+  val itemType = documentType
 
   describe("simpleStringQueryResults") {
     it("finds results for a simpleStringQuery search") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val work1 = createIdentifiedWorkWith(title = "Amid an Aegean")
         val work2 = createIdentifiedWorkWith(title = "Before a Bengal")
         val work3 = createIdentifiedWorkWith(title = "Circling a Cheetah")
@@ -45,7 +45,7 @@ class ElasticsearchServiceTest
     }
 
     it("filters search results by workType") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val workWithCorrectWorkType = createIdentifiedWorkWith(
           title = "Animated artichokes",
           workType = Some(WorkType(id = "b", label = "Books"))
@@ -78,7 +78,7 @@ class ElasticsearchServiceTest
     }
 
     it("filters search results with multiple workTypes") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val work1 = createIdentifiedWorkWith(
           title = "Animated artichokes",
           workType = Some(WorkType(id = "b", label = "Books"))
@@ -116,7 +116,7 @@ class ElasticsearchServiceTest
     }
 
     it("filters results by item locationType") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val work = createIdentifiedWorkWith(
           title = "Tumbling tangerines",
           items = List(
@@ -147,7 +147,7 @@ class ElasticsearchServiceTest
     }
 
     it("filters results by multiple item locationTypes") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val work = createIdentifiedWorkWith(
           title = "Tumbling tangerines",
           items = List(
@@ -193,7 +193,7 @@ class ElasticsearchServiceTest
 
   describe("findResultById") {
     it("finds a result by ID") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val work = createIdentifiedWork
 
         insertIntoElasticsearch(indexName, itemType, work)
@@ -217,7 +217,7 @@ class ElasticsearchServiceTest
 
   describe("listResults") {
     it("sorts results from Elasticsearch in the correct order") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val work1 = createIdentifiedWorkWith(canonicalId = "000Z")
         val work2 = createIdentifiedWorkWith(canonicalId = "000Y")
         val work3 = createIdentifiedWorkWith(canonicalId = "000X")
@@ -236,7 +236,7 @@ class ElasticsearchServiceTest
     }
 
     it("returns everything if we ask for a limit > result size") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val works = populateElasticsearch(indexName)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
@@ -252,7 +252,7 @@ class ElasticsearchServiceTest
     }
 
     it("returns a page from the beginning of the result set") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val works = populateElasticsearch(indexName)
 
         val queryOptions = createElasticsearchQueryOptionsWith(limit = 4)
@@ -266,7 +266,7 @@ class ElasticsearchServiceTest
     }
 
     it("returns a page from halfway through the result set") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val works = populateElasticsearch(indexName)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
@@ -283,7 +283,7 @@ class ElasticsearchServiceTest
     }
 
     it("returns a page from the end of the result set") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val works = populateElasticsearch(indexName)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
@@ -300,7 +300,7 @@ class ElasticsearchServiceTest
     }
 
     it("returns an empty page if asked for a limit > result size") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val works = populateElasticsearch(indexName)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
@@ -316,7 +316,7 @@ class ElasticsearchServiceTest
     }
 
     it("does not list works that have visible=false") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val visibleWorks = createIdentifiedWorks(count = 8)
         val invisibleWorks = createIdentifiedInvisibleWorks(count = 2)
 
@@ -331,7 +331,7 @@ class ElasticsearchServiceTest
     }
 
     it("filters list results by workType") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val work1 = createIdentifiedWorkWith(
           workType = Some(WorkType(id = "b", label = "Books"))
         )
@@ -362,7 +362,7 @@ class ElasticsearchServiceTest
     }
 
     it("filters list results with multiple workTypes") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val work1 = createIdentifiedWorkWith(
           workType = Some(WorkType(id = "b", label = "Books"))
         )

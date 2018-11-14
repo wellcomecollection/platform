@@ -31,8 +31,8 @@ class ServerTest
   private def withFixtures[R](testWith: TestWith[EmbeddedHttpServer, R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+        withLocalElasticsearchIndex { indexNameV1 =>
+          withLocalElasticsearchIndex { indexNameV2 =>
             val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
               indexNameV1,
               indexNameV2)

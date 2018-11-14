@@ -72,11 +72,11 @@ trait ElasticsearchFixtures
     elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   }
 
-  def withLocalElasticsearchIndex[R](itemType: String)(testWith: TestWith[String, R]): R = {
+  def withLocalElasticsearchIndex[R](testWith: TestWith[String, R]): R = {
     val indexName = createIndexName
 
     val elasticConfig = DisplayElasticConfig(
-      documentType = itemType,
+      documentType = documentType,
       indexV1name = indexName,
       indexV2name = s"$indexName-v2"
     )

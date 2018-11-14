@@ -78,8 +78,8 @@ class SnapshotServiceTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+          withLocalElasticsearchIndex { indexNameV1 =>
+            withLocalElasticsearchIndex { indexNameV2 =>
               withLocalS3Bucket { bucket =>
                 withSnapshotService(
                   actorSystem,

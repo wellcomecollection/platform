@@ -22,7 +22,7 @@ class IngestorFeatureTest
     with SQS
     with WorksGenerators {
 
-  val itemType = "work"
+  val itemType = documentType
 
   it(
     "reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
@@ -34,7 +34,7 @@ class IngestorFeatureTest
           bucket = bucket,
           queue = queue,
           obj = work)
-        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        withLocalElasticsearchIndex { indexName =>
           withServer(queue, bucket, indexName, itemType) { _ =>
             assertElasticsearchEventuallyHasWork(indexName, itemType, work)
           }
@@ -55,7 +55,7 @@ class IngestorFeatureTest
           bucket = bucket,
           queue = queue,
           obj = work)
-        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        withLocalElasticsearchIndex { indexName =>
           withServer(queue, bucket, indexName, itemType) { _ =>
             assertElasticsearchNeverHasWork(indexName, itemType, work)
           }
@@ -67,7 +67,7 @@ class IngestorFeatureTest
   it("does not delete a message from the queue if it fails processing") {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+        withLocalElasticsearchIndex { indexName =>
           withServer(queue, bucket, indexName, itemType) { _ =>
             sendNotificationToSQS(
               queue = queue,
