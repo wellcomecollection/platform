@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.reindex.reindex_worker.dynamo
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.document._
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
-import com.google.inject.Inject
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * For the options allowed by ScanSpec, see:
   * https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/document/spec/ScanSpec.html
   */
-class ScanSpecScanner @Inject()(dynamoDBClient: AmazonDynamoDB)(
+class ScanSpecScanner(dynamoDBClient: AmazonDynamoDB)(
   implicit ec: ExecutionContext) {
 
   val dynamoDB = new DynamoDB(dynamoDBClient)
