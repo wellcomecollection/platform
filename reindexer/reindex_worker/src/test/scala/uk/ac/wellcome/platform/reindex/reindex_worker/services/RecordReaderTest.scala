@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
   DynamoFixtures,
   ReindexableTable
@@ -49,7 +50,7 @@ class RecordReaderTest
 
         whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
-            actualRecords should contain theSameElementsAs records
+            actualRecords.map { fromJson[HybridRecord](_).get } should contain theSameElementsAs records
         }
       }
     }

@@ -30,7 +30,7 @@ class ReindexWorkerFeatureTest
     with WorkerServiceFixture {
 
   private def createHybridRecords: Seq[HybridRecord] =
-    (1 to 10).map(i => {
+    (1 to 4).map(i => {
       HybridRecord(
         id = s"id$i",
         location = ObjectLocation(
