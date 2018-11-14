@@ -296,3 +296,55 @@ module "callback_stub_server" {
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }
+
+# Storage API
+
+module "storage_api" {
+  source = "storage_api"
+
+  cognito_id = ""
+  vpc_id = "${local.vpc_id}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  subnets = "${local.private_subnets}"
+
+  namespace     = "storage-api"
+  namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace_tld = ""
+
+  auth_scopes = ""
+
+  # Bags endpoint
+
+  bags_container_image = "${local.registrar_http_container_image}"
+  bags_container_port  = "9001"
+
+  bags_env_vars = {
+    context_url     = "https://api.wellcomecollection.org/storage/v1/context.json"
+    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
+    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
+    app_base_url    = "https://api.wellcomecollection.org"
+  }
+
+  bags_env_vars_length = 4
+
+  bags_nginx_container_image = "${local.nginx_image_uri}"
+  bags_nginx_container_port  = "9000"
+
+
+  # Ingests endpoint
+
+  ingests_container_image = "${local.progress_http_container_image}"
+  ingests_container_port  = "9001"
+
+  ingests_env_vars = {
+    context_url                 = "https://api.wellcomecollection.org/storage/v1/context.json"
+    app_base_url                = "https://${module.api_ecs.alb_dns_name}/storage/v1/ingests"
+    topic_arn                   = "${module.ingest_requests_topic.arn}"
+    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+  }
+  
+  ingests_env_vars_length = 4
+
+  ingests_nginx_container_image = "${local.nginx_image_uri}"
+  ingests_nginx_container_port  = "9000"
+}

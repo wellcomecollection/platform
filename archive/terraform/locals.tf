@@ -24,4 +24,6 @@ locals {
   bagger_container_image               = "${module.ecr_repository_bagger.repository_url}:${var.release_ids["bagger"]}"
   api_ecs_container_image              = "${module.ecr_repository_archive_api.repository_url}:${var.release_ids["archive_api"]}"
   infra_bucket                         = "${data.terraform_remote_state.shared_infra.infra_bucket}"
+
+  nginx_image_uri = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:8322c88784d2dd40de270fe7d0c456fc528669a4"
 }
