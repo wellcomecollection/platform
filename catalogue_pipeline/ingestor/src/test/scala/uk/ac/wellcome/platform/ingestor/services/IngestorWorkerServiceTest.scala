@@ -18,8 +18,6 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.platform.ingestor.fixtures.{WorkIndexerFixtures, WorkerServiceFixture}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class IngestorWorkerServiceTest
     extends FunSpec
     with ScalaFutures
@@ -254,7 +252,7 @@ class IngestorWorkerServiceTest
       documentType = documentType
     )
 
-    val work = createIdentifiedWork
+    val work = createIdentifiedInvisibleWork
     val workDoesNotMatchMapping = createIdentifiedWorkWith(
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )

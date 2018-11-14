@@ -1,14 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.analyzers.EnglishLanguageAnalyzer
-import com.sksamuel.elastic4s.http.ElasticDsl.{
-  booleanField,
-  intField,
-  keywordField,
-  mapping,
-  objectField,
-  textField
-}
+import com.sksamuel.elastic4s.http.ElasticDsl.{intField, keywordField, mapping, objectField}
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
@@ -40,27 +32,6 @@ trait CustomElasticsearchMapping {
         intField("version"),
         objectField("sourceIdentifier")
           .fields(sourceIdentifierFields),
-        textField("title").fields(
-          textField("english").analyzer(EnglishLanguageAnalyzer)),
-        booleanField("visible"),
-        objectField("mergeCandidates"),
-        objectField("otherIdentifiers"),
-        objectField("subjects"),
-        keywordField("workType"),
-        keywordField("description"),
-        keywordField("physicalDescription"),
-        keywordField("extent"),
-        keywordField("lettering"),
-        keywordField("createdDate"),
-        keywordField("language"),
-        keywordField("thumbnail"),
-        keywordField("dimensions"),
-        objectField("contributors"),
-        objectField("genres"),
-        objectField("items"),
-        objectField("itemsV1"),
-        objectField("production"),
-        keywordField("ontologyType"),
         keywordField("type")
       )
 
