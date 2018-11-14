@@ -18,8 +18,9 @@ import scala.concurrent.ExecutionContext
 
 trait CustomElasticsearchMapping {
 
-  class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, documentType: String)(
-    implicit val ec: ExecutionContext)
+  class SubsetOfFieldsWorksIndex(
+    elasticClient: HttpClient,
+    documentType: String)(implicit val ec: ExecutionContext)
       extends ElasticsearchIndex {
     val httpClient: HttpClient = elasticClient
 

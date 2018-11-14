@@ -62,12 +62,12 @@ class ElasticsearchSourceTest
     }
   }
 
-  private def withSource[R](actorSystem: ActorSystem, indexName: String)(testWith: TestWith[Source[IdentifiedWork, NotUsed], R]): R = {
+  private def withSource[R](actorSystem: ActorSystem, indexName: String)(
+    testWith: TestWith[Source[IdentifiedWork, NotUsed], R]): R = {
     val source = ElasticsearchWorksSource(
       elasticClient = elasticClient,
       indexName = indexName,
-      documentType = documentType)(
-      actorSystem)
+      documentType = documentType)(actorSystem)
     testWith(source)
   }
 

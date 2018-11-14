@@ -166,11 +166,7 @@ class ElasticsearchServiceTest
           )
         )
 
-        insertIntoElasticsearch(
-          indexName,
-          work,
-          notMatchingWork,
-          work2)
+        insertIntoElasticsearch(indexName, work, notMatchingWork, work2)
 
         assertSearchResultsAreCorrect(
           indexName = indexName,
@@ -337,11 +333,7 @@ class ElasticsearchServiceTest
           workType = Some(WorkType(id = "m", label = "Manuscripts"))
         )
 
-        insertIntoElasticsearch(
-          indexName,
-          work1,
-          work2,
-          workWithWrongWorkType)
+        insertIntoElasticsearch(indexName, work1, work2, workWithWrongWorkType)
 
         val queryOptions = createElasticsearchQueryOptionsWith(
           filters = List(WorkTypeFilter(workTypeId = "b"))

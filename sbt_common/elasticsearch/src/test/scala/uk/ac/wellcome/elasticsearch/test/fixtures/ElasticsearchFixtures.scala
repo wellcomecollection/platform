@@ -3,10 +3,19 @@ package uk.ac.wellcome.elasticsearch.test.fixtures
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
-import org.scalatest.concurrent.{Eventually, PatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.{
+  Eventually,
+  PatienceConfiguration,
+  ScalaFutures
+}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.{DisplayElasticConfig, ElasticClientBuilder, ElasticsearchIndex, WorksIndex}
+import uk.ac.wellcome.elasticsearch.{
+  DisplayElasticConfig,
+  ElasticClientBuilder,
+  ElasticsearchIndex,
+  WorksIndex
+}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -32,8 +41,7 @@ trait ElasticsearchFixtures
 
   val documentType = "work"
 
-  def displayEsLocalFlags(indexNameV1: String,
-                          indexNameV2: String) =
+  def displayEsLocalFlags(indexNameV1: String, indexNameV2: String) =
     Map(
       "es.host" -> esHost,
       "es.port" -> esPort.toString,
@@ -164,7 +172,9 @@ trait ElasticsearchFixtures
     }
   }
 
-  def createDisplayElasticConfigWith(indexV1name: String, indexV2name: String): DisplayElasticConfig =
+  def createDisplayElasticConfigWith(
+    indexV1name: String,
+    indexV2name: String): DisplayElasticConfig =
     DisplayElasticConfig(
       documentType = documentType,
       indexV1name = indexV1name,

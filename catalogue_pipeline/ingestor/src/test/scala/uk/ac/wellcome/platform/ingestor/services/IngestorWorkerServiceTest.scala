@@ -223,9 +223,7 @@ class IngestorWorkerServiceTest
     val works = List(sierraWork, oldSierraWork)
 
     withLocalElasticsearchIndex { indexName =>
-      insertIntoElasticsearch(
-        indexName = indexName,
-        newSierraWork)
+      insertIntoElasticsearch(indexName = indexName, newSierraWork)
       withIngestorWorkerService(indexName) {
         case (QueuePair(queue, dlq), bucket) =>
           works.foreach { work =>
@@ -297,7 +295,9 @@ class IngestorWorkerServiceTest
               obj = work)
           }
 
-          assertElasticsearchNeverHasWork(indexName = indexName, workDoesNotMatchMapping)
+          assertElasticsearchNeverHasWork(
+            indexName = indexName,
+            workDoesNotMatchMapping)
           assertElasticsearchEventuallyHasWork(indexName = indexName, work)
           eventually {
             assertQueueEmpty(queue)

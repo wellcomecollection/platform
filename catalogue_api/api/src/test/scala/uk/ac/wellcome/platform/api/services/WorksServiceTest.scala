@@ -4,7 +4,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, WorkType}
-import uk.ac.wellcome.platform.api.fixtures.{ElasticsearchServiceFixture, WorksServiceFixture}
+import uk.ac.wellcome.platform.api.fixtures.{
+  ElasticsearchServiceFixture,
+  WorksServiceFixture
+}
 import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
 import uk.ac.wellcome.platform.api.models.{ResultList, WorkTypeFilter}
 
@@ -255,8 +258,9 @@ class WorksServiceTest
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertResultIsCorrect(
-    partialSearchFunction: WorksService => (ElasticsearchDocumentOptions,
-     WorksSearchOptions) => Future[ResultList]
+    partialSearchFunction: WorksService => (
+      ElasticsearchDocumentOptions,
+      WorksSearchOptions) => Future[ResultList]
   )(
     allWorks: Seq[IdentifiedBaseWork],
     expectedWorks: Seq[IdentifiedBaseWork],

@@ -523,11 +523,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("only returns works from the v1 index") {
     withV1Api {
-      case (
-          apiPrefix,
-          indexNameV1,
-          indexNameV2,
-          server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexNameV1, indexNameV2, server: EmbeddedHttpServer) =>
         val work1 = createIdentifiedWorkWith(
           title = "One orange ocelot"
         )
