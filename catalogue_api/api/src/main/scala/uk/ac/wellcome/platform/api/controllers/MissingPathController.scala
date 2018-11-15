@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.api.controllers
 import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import uk.ac.wellcome.display.json.DisplayJsonUtil
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
@@ -28,8 +29,10 @@ class MissingPathController @Inject()(apiConfig: ApiConfig) extends Controller {
       description = Some(s"Page not found for URL ${request.uri}")
     )
 
-    response.notFound.json(
-      ResultResponse(context = contextUri, result = DisplayError(result))
+    response.notFound.body(
+      bodyStr = DisplayJsonUtil.toJson(
+        ResultResponse(context = contextUri, result = DisplayError(result))
+      )
     )
   }
 }

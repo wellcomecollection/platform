@@ -8,11 +8,11 @@ import com.twitter.finatra.http.Controller
 class ManagementController @Inject()() extends Controller {
   val appName = scala.util.Properties.envOrElse("APP_NAME", "not-specified")
 
-  get("/management/healthcheck") { request: Request =>
-    response.ok.json(Map("message" -> "ok"))
+  get("/management/healthcheck") { _: Request =>
+    response.ok.body(Map("message" -> "ok"))
   }
 
-  get("/management/manifest") { request: Request =>
+  get("/management/manifest") { _: Request =>
     response.ok.json(Map("name" -> appName))
   }
 }

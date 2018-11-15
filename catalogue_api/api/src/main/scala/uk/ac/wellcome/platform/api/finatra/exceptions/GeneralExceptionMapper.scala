@@ -5,6 +5,7 @@ import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.inject.Logging
+import uk.ac.wellcome.display.json.DisplayJsonUtil
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
@@ -28,6 +29,8 @@ class GeneralExceptionMapper @Inject()(response: ResponseBuilder,
     val errorResponse = ResultResponse(
       context = buildContextUri(apiConfig = apiConfig, version = version),
       result = result)
-    response.internalServerError.json(errorResponse)
+    response.internalServerError.body(
+      bodyStr = DisplayJsonUtil.toJson(errorResponse)
+    )
   }
 }

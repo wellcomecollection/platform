@@ -1,18 +1,19 @@
 package uk.ac.wellcome.platform.api.responses
 
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
+import io.circe.generic.extras.JsonKey
 import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.platform.api.models.DisplayResultList
 import uk.ac.wellcome.platform.api.requests.{ApiRequest, MultipleResultsRequest}
 
-case class ResultResponse(
-  @JsonProperty("@context") context: String,
-  @JsonUnwrapped result: Any
+case class ResultResponse[T](
+  @JsonProperty("@context") @JsonKey("@context") context: String,
+  @JsonUnwrapped result: T
 )
 
 case class ResultListResponse(
   @JsonProperty("@context") context: String,
-  @JsonProperty("type") ontologyType: String,
+  @JsonProperty("type") @JsonKey("@context") ontologyType: String,
   pageSize: Int = 10,
   totalPages: Int = 10,
   totalResults: Int = 100,

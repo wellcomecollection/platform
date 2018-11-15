@@ -34,6 +34,6 @@ class CaseClassMappingExceptionWrapper @Inject()(response: ResponseBuilder,
       result = result
     )
 
-    response.badRequest.json(errorResponse)
+    response.badRequest.body(bodyStr = DisplayJsonUtil.toJson(errorResponse))
   }
 }

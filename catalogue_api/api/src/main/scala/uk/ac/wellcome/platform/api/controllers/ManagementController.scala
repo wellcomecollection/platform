@@ -5,6 +5,7 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import uk.ac.wellcome.display.json.DisplayJsonUtil
 
 import scala.concurrent.ExecutionContext
 
@@ -15,12 +16,16 @@ class ManagementController @Inject()(
     extends Controller {
 
   get("/management/healthcheck") { request: Request =>
-    response.ok.json(Map("message" -> "ok"))
+    response.ok.body(
+      bodyStr = DisplayJsonUtil.toJson("message" -> "ok")
+    )
   }
 
   get("/management/clusterhealth") { request: Request =>
     elasticClient
       .execute { clusterHealth() }
-      .map(health => response.ok.json(health.status))
+      .map { health =>
+        response.ok.body(bodyStr = DisplayJsonUtil.toJson(health.status))
+      }
   }
 }

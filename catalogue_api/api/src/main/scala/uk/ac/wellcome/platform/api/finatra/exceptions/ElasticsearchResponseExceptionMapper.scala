@@ -6,8 +6,8 @@ import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.inject.Logging
-
 import org.elasticsearch.client.ResponseException
+import uk.ac.wellcome.display.json.DisplayJsonUtil
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
@@ -38,11 +38,16 @@ class ElasticsearchResponseExceptionMapper @Inject()(response: ResponseBuilder,
     val errorResponse = ResultResponse(
       context = buildContextUri(apiConfig = apiConfig, version = version),
       result = result)
-    result.httpStatus.get match {
-      case 500 => response.internalServerError.json(errorResponse)
-      case 404 => response.notFound.json(errorResponse)
-      case 400 => response.badRequest.json(errorResponse)
+
+    val responseHandler = result.httpStatus.get match {
+      case 500 => response.internalServerError
+      case 404 => response.notFound
+      case 400 => response.badRequest
     }
+
+    responseHandler.body(
+      bodyStr = DisplayJsonUtil.toJson(errorResponse)
+    )
   }
 
   private def toError(exception: ResponseException): DisplayError = {

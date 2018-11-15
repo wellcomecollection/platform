@@ -5,20 +5,14 @@ import com.twitter.finatra.http.Controller
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import io.swagger.models.{Operation, Swagger}
+import uk.ac.wellcome.display.json.DisplayJsonUtil
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{
-  ResultListResponse,
-  ResultResponse
-}
-import uk.ac.wellcome.platform.api.services.{
-  ElasticsearchDocumentOptions,
-  WorksSearchOptions,
-  WorksService
-}
+import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.services.{ElasticsearchDocumentOptions, WorksSearchOptions, WorksService}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -152,9 +146,10 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     }
 
   private def respondWithWork[T <: DisplayWork](result: T,
-                                                contextUri: String) = {
-    response.ok.json(ResultResponse(context = contextUri, result = result))
-  }
+                                                contextUri: String) =
+    response.ok.body(
+      bodyStr = DisplayJsonUtil.toJson(ResultResponse(context = contextUri, result = result))
+    )
 
   /** Create a 302 Redirect to a new Work.
     *
@@ -179,10 +174,9 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       variant = "http-410",
       description = Some("This work has been deleted")
     )
-    response.gone.json(
-      ResultResponse(
-        context = contextUri,
-        result = DisplayError(result)
+    response.gone.body(
+      bodyStr = DisplayJsonUtil.toJson(
+        ResultResponse(context = contextUri, result = DisplayError(result))
       )
     )
   }
