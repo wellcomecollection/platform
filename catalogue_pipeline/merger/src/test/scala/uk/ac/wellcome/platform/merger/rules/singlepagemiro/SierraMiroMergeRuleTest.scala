@@ -81,6 +81,12 @@ class SierraMiroMergeRuleTest
           )
         ))
       }
+
+      it("copies across the thumbnail from the Miro work") {
+        miroWork.thumbnail.isDefined shouldBe true
+        mergedWork.thumbnail.isDefined shouldBe true
+        mergedWork.thumbnail shouldBe miroWork.thumbnail
+      }
     }
 
     describe("order: sierraWork, miroWork (order doesn't matter)") {
