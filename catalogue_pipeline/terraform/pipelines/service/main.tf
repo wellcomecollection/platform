@@ -19,7 +19,7 @@ module "service" {
   ecs_cluster_name = "${var.cluster_name}"
 
   cpu    = 256
-  memory = 1024
+  memory = 512
 
   env_vars        = "${var.env_vars}"
   env_vars_length = "${var.env_vars_length}"

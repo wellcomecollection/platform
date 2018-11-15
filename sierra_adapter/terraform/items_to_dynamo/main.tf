@@ -22,7 +22,7 @@ module "sierra_to_dynamo_service" {
   ecs_cluster_name = "${var.cluster_name}"
 
   cpu    = 256
-  memory = 1024
+  memory = 512
 
   env_vars = {
     demultiplexer_queue_url = "${module.demultiplexer_queue.id}"
