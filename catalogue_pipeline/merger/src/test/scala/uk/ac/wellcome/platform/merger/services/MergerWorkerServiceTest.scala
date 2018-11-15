@@ -274,7 +274,7 @@ class MergerWorkerServiceTest
       R]): R =
     withTransformedBaseWorkVHS { vhs =>
       withLocalSqsQueueAndDlq {
-        case queuePair @ QueuePair(queue, dlq) =>
+        case queuePair @ QueuePair(queue, _) =>
           withLocalSnsTopic { topic =>
             withMockMetricSender { mockMetricsSender =>
               withWorkerService(
