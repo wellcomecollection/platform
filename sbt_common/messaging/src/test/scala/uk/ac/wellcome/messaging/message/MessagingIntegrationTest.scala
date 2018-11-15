@@ -6,9 +6,8 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -56,7 +55,7 @@ class MessagingIntegrationTest
           "integration-test-stream",
           obj => Future { receivedMessages.push(obj) })
         eventually {
-          receivedMessages should contain theSameElementsAs (messages)
+          receivedMessages should contain theSameElementsAs messages
         }
     }
 
@@ -65,12 +64,14 @@ class MessagingIntegrationTest
                         MessageWriter[ExampleObject]),
                        R]): R = {
     withLocalStackMessageStreamFixtures[R] {
-      case (queue, bucket, messageStream) =>
-        withLocalStackSnsTopic { topic =>
-          withLocalStackSubscription(queue, topic) { _ =>
-            withExampleObjectMessageWriter(bucket, topic, localStackSnsClient) {
-              messageWriter =>
-                testWith((messageStream, messageWriter))
+      case (queue, messageStream) =>
+        withLocalS3Bucket { bucket =>
+          withLocalStackSnsTopic { topic =>
+            withLocalStackSubscription(queue, topic) { _ =>
+              withExampleObjectMessageWriter(bucket, topic, localStackSnsClient) {
+                messageWriter =>
+                  testWith((messageStream, messageWriter))
+              }
             }
           }
         }
@@ -78,24 +79,15 @@ class MessagingIntegrationTest
   }
 
   def withLocalStackMessageStreamFixtures[R](
-    testWith: TestWith[(Queue, Bucket, MessageStream[ExampleObject]), R]) = {
+    testWith: TestWith[(Queue, MessageStream[ExampleObject]), R]): R =
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalS3Bucket { bucket =>
-          withLocalStackSqsQueue { queue =>
-            withMessageStream[ExampleObject, R](
-              actorSystem,
-              bucket,
-              queue,
-              metricsSender) { messageStream =>
-              testWith((queue, bucket, messageStream))
-            }
+        withLocalStackSqsQueue { queue =>
+          withMessageStream[ExampleObject, R](actorSystem, queue, metricsSender) {
+            messageStream =>
+              testWith((queue, messageStream))
           }
-
         }
-
       }
     }
-  }
-
 }
