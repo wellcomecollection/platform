@@ -103,8 +103,9 @@ trait ElasticsearchFixtures
     }
   }
 
-  def assertElasticsearchEventuallyHasWork(indexName: String,
-                                           works: IdentifiedBaseWork*): Seq[Assertion] =
+  def assertElasticsearchEventuallyHasWork(
+    indexName: String,
+    works: IdentifiedBaseWork*): Seq[Assertion] =
     works.map { work =>
       val workJson = toJson(work).get
 
