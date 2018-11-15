@@ -26,6 +26,6 @@ module "romulus" {
   nginx_container_image = "${var.nginx_container_image}"
   nginx_container_port  = "${var.nginx_container_port}"
 
-  lb_arn           = "${var.nlb_arn}"
-  listener_port     = "${var.romulus_listener_port}"
+  lb_arn        = "${var.nlb_arn}"
+  listener_port = "${var.romulus_listener_port}"
 }
