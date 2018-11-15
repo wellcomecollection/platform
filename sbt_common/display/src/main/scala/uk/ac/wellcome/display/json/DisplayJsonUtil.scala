@@ -3,7 +3,11 @@ package uk.ac.wellcome.display.json
 import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe.{Encoder, Printer}
 import io.circe.syntax._
-import uk.ac.wellcome.display.models.v1.{DisplayDigitalLocationV1, DisplayLocationV1, DisplayPhysicalLocationV1}
+import uk.ac.wellcome.display.models.v1.{
+  DisplayDigitalLocationV1,
+  DisplayLocationV1,
+  DisplayPhysicalLocationV1
+}
 import uk.ac.wellcome.display.models.v2._
 
 /** Format JSON objects as suitable for display.
@@ -34,29 +38,30 @@ object DisplayJsonUtil extends AutoDerivation {
   // https://circe.github.io/circe/codecs/adt.html
 
   implicit val locationV1Encoder: Encoder[DisplayLocationV1] = {
-    case digitalLocation: DisplayDigitalLocationV1 => digitalLocation.asJson
+    case digitalLocation: DisplayDigitalLocationV1   => digitalLocation.asJson
     case physicalLocation: DisplayPhysicalLocationV1 => physicalLocation.asJson
   }
 
   implicit val abstractAgentEncoder: Encoder[DisplayAbstractAgentV2] = {
-    case agent: DisplayAgentV2 => agent.asJson
-    case person: DisplayPersonV2 => person.asJson
+    case agent: DisplayAgentV2               => agent.asJson
+    case person: DisplayPersonV2             => person.asJson
     case organisation: DisplayOrganisationV2 => organisation.asJson
   }
 
   implicit val abstractConceptEncoder: Encoder[DisplayAbstractConcept] = {
     case concept: DisplayConcept => concept.asJson
-    case place: DisplayPlace => place.asJson
-    case period: DisplayPeriod => period.asJson
+    case place: DisplayPlace     => place.asJson
+    case period: DisplayPeriod   => period.asJson
   }
 
-  implicit val abstractRootConceptEncoder: Encoder[DisplayAbstractRootConcept] = {
-    case agent: DisplayAbstractAgentV2 => agent.asJson
+  implicit val abstractRootConceptEncoder
+    : Encoder[DisplayAbstractRootConcept] = {
+    case agent: DisplayAbstractAgentV2   => agent.asJson
     case concept: DisplayAbstractConcept => concept.asJson
   }
 
   implicit val locationV2Encoder: Encoder[DisplayLocationV2] = {
-    case digitalLocation: DisplayDigitalLocationV2 => digitalLocation.asJson
+    case digitalLocation: DisplayDigitalLocationV2   => digitalLocation.asJson
     case physicalLocation: DisplayPhysicalLocationV2 => physicalLocation.asJson
   }
 

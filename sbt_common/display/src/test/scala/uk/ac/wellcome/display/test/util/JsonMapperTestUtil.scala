@@ -14,14 +14,11 @@ trait JsonMapperTestUtil extends JsonAssertions {
   private val objectMapper: ObjectMapper =
     injector.getInstance(classOf[ObjectMapper])
 
-  def assertObjectMapsToJson[T](
-    value: T,
-    expectedJson: String)(implicit encoder: Encoder[T]): Assertion = {
+  def assertObjectMapsToJson[T](value: T, expectedJson: String)(
+    implicit encoder: Encoder[T]): Assertion = {
 
     // First test it with Circe...
-    assertJsonStringsAreEqual(
-      DisplayJsonUtil.toJson(value),
-      expectedJson)
+    assertJsonStringsAreEqual(DisplayJsonUtil.toJson(value), expectedJson)
 
     // ...and then with Jackson
     assertJsonStringsAreEqual(

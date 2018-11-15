@@ -3,7 +3,11 @@ package uk.ac.wellcome.display.models.v2
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal.{DigitalLocation, Location, PhysicalLocation}
+import uk.ac.wellcome.models.work.internal.{
+  DigitalLocation,
+  Location,
+  PhysicalLocation
+}
 
 @ApiModel(
   value = "Location",
@@ -51,7 +55,8 @@ case class DisplayDigitalLocationV2(
       "The specific license under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise license to which a link can be made."
   ) license: Option[DisplayLicenseV2] = None,
   @ApiModelProperty(readOnly = true, value = "A type of thing")
-  @JsonProperty("type") @JsonKey("type") ontologyType: String = "DigitalLocation"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String =
+    "DigitalLocation"
 ) extends DisplayLocationV2
 
 @ApiModel(
@@ -68,5 +73,6 @@ case class DisplayPhysicalLocationV2(
     value = "The title or other short name of the location."
   ) label: String,
   @ApiModelProperty(readOnly = true, value = "A type of thing")
-  @JsonProperty("type") @JsonKey("type") ontologyType: String = "PhysicalLocation"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String =
+    "PhysicalLocation"
 ) extends DisplayLocationV2

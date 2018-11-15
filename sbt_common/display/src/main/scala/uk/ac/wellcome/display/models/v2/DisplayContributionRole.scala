@@ -13,7 +13,8 @@ case class DisplayContributionRole(
   @ApiModelProperty(
     value = "The name of the agent"
   ) label: String,
-  @JsonProperty("type") @JsonKey("type") ontologyType: String = "ContributionRole"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String =
+    "ContributionRole"
 )
 
 object DisplayContributionRole {
