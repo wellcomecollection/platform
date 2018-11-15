@@ -52,7 +52,7 @@ class MergerWorkerServiceTest
         val matcherResult =
           matcherResultWith(Set(Set(work3), Set(work1, work2)))
 
-        givenStoredInVhs(vhs, entries = List(work1, work2, work3))
+        givenStoredInVhs(vhs, work1, work2, work3)
 
         sendNotificationToSQS(
           queue = queue,
@@ -131,9 +131,7 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(work, olderWork)))
 
-        givenStoredInVhs(
-          vhs,
-          entries = List[TransformedBaseWork](work, newerWork))
+        givenStoredInVhs(vhs, work, newerWork)
 
         sendNotificationToSQS(
           queue = queue,
@@ -186,7 +184,7 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        givenStoredInVhs(vhs, works)
+        givenStoredInVhs(vhs, works: _*)
 
         val matcherResult = MatcherResult(
           Set(
@@ -224,10 +222,11 @@ class MergerWorkerServiceTest
   it("splits the received works into multiple merged works if required") {
     val workPair1 = List(createSierraPhysicalWork, createSierraDigitalWork)
     val workPair2 = List(createSierraPhysicalWork, createSierraDigitalWork)
+    val works = workPair1 ++ workPair2
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        givenStoredInVhs(vhs, entries = workPair1 ++ workPair2)
+        givenStoredInVhs(vhs, works: _*)
 
         val matcherResult = MatcherResult(
           Set(

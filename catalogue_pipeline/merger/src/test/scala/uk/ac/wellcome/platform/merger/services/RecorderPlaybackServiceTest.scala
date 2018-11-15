@@ -99,7 +99,7 @@ class RecorderPlaybackServiceTest
     val storedWorks = (unchangedWorks ++ updatedWorks ++ zeroWorks).toList
 
     withRecorderVHS { vhs =>
-      givenStoredInVhs(vhs, storedWorks)
+      givenStoredInVhs(vhs, storedWorks: _*)
 
       val service = new RecorderPlaybackService(vhs)
 
