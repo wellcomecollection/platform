@@ -13,7 +13,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.DownloadError
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
-class DownloadDigestItemFlowTest
+class DownloadAndVerifyDigestItemFlowTest
     extends FunSpec
     with S3
     with ZipBagItFixture
@@ -49,7 +49,7 @@ class DownloadDigestItemFlowTest
               fileContent)
 
             val source = Source.single(archiveItemJob)
-            val flow = DownloadDigestItemFlow(10)(s3Client)
+            val flow = DownloadAndVerifyDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -87,7 +87,7 @@ class DownloadDigestItemFlowTest
               fileContent)
 
             val source = Source.single(archiveItemJob)
-            val flow = DownloadDigestItemFlow(10)(s3Client)
+            val flow = DownloadAndVerifyDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -121,7 +121,7 @@ class DownloadDigestItemFlowTest
               bagIdentifier,
               fileName)
             val source = Source.single(archiveItemJob)
-            val flow = DownloadDigestItemFlow(10)(s3Client)
+            val flow = DownloadAndVerifyDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
