@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.merger.rules.singlepagemiro
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.merger.rules.singlepagemiro.SierraMiroMergeRule.mergeAndRedirectWorks
 
 class SierraMiroMergeRuleTest
     extends FunSpec
@@ -19,11 +18,7 @@ class SierraMiroMergeRuleTest
         createUnidentifiedSierraWorkWith(items = List(sierraItem))
       val miroWork = createMiroWork
 
-      val result = mergeAndRedirectWorks(
-        Seq(
-          sierraWork,
-          miroWork
-        ))
+      val result = mergeAndRedirectWorks(sierraWork, miroWork)
 
       val expectedMergedWork = sierraWork.copy(
         otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers,
@@ -47,11 +42,7 @@ class SierraMiroMergeRuleTest
         createUnidentifiedSierraWorkWith(items = List(sierraItem))
       val miroWork = createMiroWork
 
-      val result = mergeAndRedirectWorks(
-        Seq(
-          miroWork,
-          sierraWork,
-        ))
+      val result = mergeAndRedirectWorks(miroWork, sierraWork)
 
       val expectedMergedWork = sierraWork.copy(
         otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers,
@@ -85,11 +76,7 @@ class SierraMiroMergeRuleTest
           createSierraIdentifierSourceIdentifier,
           createSierraSystemSourceIdentifier))
 
-      val result = mergeAndRedirectWorks(
-        Seq(
-          sierraWork,
-          miroWork
-        ))
+      val result = mergeAndRedirectWorks(sierraWork, miroWork)
 
       val expectedMergedWork = sierraWork.copy(
         otherIdentifiers =
@@ -117,11 +104,7 @@ class SierraMiroMergeRuleTest
         createUnidentifiedSierraWorkWith(items = List(sierraItem))
       val miroWork = createMiroWork
 
-      val result = mergeAndRedirectWorks(
-        Seq(
-          sierraWork,
-          miroWork
-        ))
+      val result = mergeAndRedirectWorks(sierraWork, miroWork)
 
       val expectedMergedWork = sierraWork.copy(
         otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers
@@ -154,8 +137,7 @@ class SierraMiroMergeRuleTest
     }
 
     it("does not merge multiple Miro works") {
-      val works =
-        List(createMiroWork, createMiroWork)
+      val works = List(createMiroWork, createMiroWork)
 
       mergeAndRedirectWorks(works) shouldBe works
     }
@@ -184,4 +166,10 @@ class SierraMiroMergeRuleTest
       mergeAndRedirectWorks(works) shouldBe works
     }
   }
+
+  private def mergeAndRedirectWorks(works: BaseWork*): Seq[BaseWork] =
+    mergeAndRedirectWorks(works)
+
+  private def mergeAndRedirectWorks(works: Seq[BaseWork]): Seq[BaseWork] =
+    SierraMiroMergeRule.mergeAndRedirectWorks(works)
 }
