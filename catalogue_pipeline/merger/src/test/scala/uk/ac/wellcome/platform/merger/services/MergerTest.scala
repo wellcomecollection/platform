@@ -54,6 +54,7 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
 
     val expectedMergedWork = sierraPhysicalWork.copy(
       otherIdentifiers = sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers,
+      thumbnail = miroWork.thumbnail,
       items = List(
         sierraItem.copy(
           agent = sierraItem.agent.copy(
@@ -79,7 +80,15 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
     result.size shouldBe 2
 
     val expectedMergedWork = sierraDigitalWork.copy(
-      otherIdentifiers = sierraDigitalWork.otherIdentifiers ++ miroWork.identifiers
+      otherIdentifiers = sierraDigitalWork.otherIdentifiers ++ miroWork.identifiers,
+      thumbnail = miroWork.thumbnail,
+      items = List(
+        sierraItem.copy(
+          agent = sierraItem.agent.copy(
+            locations = sierraItem.agent.locations ++ miroItem.agent.locations
+          )
+        )
+      )
     )
 
     val expectedRedirectedWork =
@@ -104,10 +113,11 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
 
     val expectedMergedWork = sierraPhysicalWork.copy(
       otherIdentifiers = sierraPhysicalWork.otherIdentifiers ++ sierraDigitalWork.identifiers ++ miroWork.identifiers,
+      thumbnail = miroWork.thumbnail,
       items = List(
         sierraItem.copy(
           agent = sierraItem.agent.copy(
-            locations = sierraItem.agent.locations ++ digitalItem.agent.locations
+            locations = sierraItem.agent.locations ++ digitalItem.agent.locations ++ miroItem.agent.locations
           )
         )
       )
