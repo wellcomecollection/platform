@@ -48,7 +48,13 @@ trait SierraMiroMerger extends Logging with MergerLogging {
 
         val mergedWork = sierraWork.copy(
           otherIdentifiers = mergeIdentifiers(sierraWork, miroWork),
-          items = mergeItems(sierraItem, miroItem)
+          items = mergeItems(sierraItem, miroItem),
+
+          // We always copy across the thumbnail from the Miro work, at least
+          // for now -- it's never populated on Sierra, always populated in Miro.
+          // Later we may use the iiif-presentation item location to populate
+          // this field, but right now it's empty on all Sierra works.
+          thumbnail = miroWork.thumbnail
         )
 
         Some(
