@@ -27,7 +27,7 @@ class RecorderPlaybackServiceTest
       givenStoredInVhs(vhs, work)
 
       whenReady(fetchAllWorks(vhs = vhs, work)) { result =>
-        result shouldBe List(Some(work))
+        result shouldBe Seq(Some(work))
       }
     }
   }
@@ -48,7 +48,7 @@ class RecorderPlaybackServiceTest
 
     withRecorderVHS { vhs =>
       whenReady(fetchAllWorks(vhs = vhs, work)) { result =>
-        result shouldBe List(None)
+        result shouldBe Seq(None)
       }
     }
   }
@@ -65,7 +65,7 @@ class RecorderPlaybackServiceTest
       givenStoredInVhs(vhs, workToStore)
 
       whenReady(fetchAllWorks(vhs = vhs, work)) { result =>
-        result shouldBe List(None)
+        result shouldBe Seq(None)
       }
     }
   }
@@ -101,7 +101,7 @@ class RecorderPlaybackServiceTest
 
   private def fetchAllWorks(
     vhs: TransformedBaseWorkVHS,
-    works: TransformedBaseWork*): Future[List[Option[TransformedBaseWork]]] = {
+    works: TransformedBaseWork*): Future[Seq[Option[TransformedBaseWork]]] = {
     val service = new RecorderPlaybackService(vhs)
 
     val workIdentifiers = works

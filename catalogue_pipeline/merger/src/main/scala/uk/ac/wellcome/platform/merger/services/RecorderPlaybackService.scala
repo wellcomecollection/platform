@@ -27,7 +27,7 @@ class RecorderPlaybackService(
     * corresponding works from VHS.
     */
   def fetchAllWorks(workIdentifiers: Seq[WorkIdentifier])
-    : Future[List[Option[TransformedBaseWork]]] = {
+    : Future[Seq[Option[TransformedBaseWork]]] = {
     Future.sequence(
       workIdentifiers
         .map { getWorkForIdentifier }

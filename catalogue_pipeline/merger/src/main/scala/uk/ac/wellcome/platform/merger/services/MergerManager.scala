@@ -15,7 +15,7 @@ class MergerManager(mergerRules: MergerRules) {
     * wrong versions), we skip the merge and return the original works.
     */
   def applyMerge(
-    maybeWorks: List[Option[TransformedBaseWork]]): Seq[BaseWork] = {
+    maybeWorks: Seq[Option[TransformedBaseWork]]): Seq[BaseWork] = {
     val unidentifiedWorks = maybeWorks
       .collect {
         case Some(unidentifiedWork: UnidentifiedWork) => unidentifiedWork
