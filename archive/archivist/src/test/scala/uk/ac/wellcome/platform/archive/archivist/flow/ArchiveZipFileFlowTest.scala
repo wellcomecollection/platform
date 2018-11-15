@@ -10,11 +10,25 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, IngestRequestContextGenerators}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveJobError,
+  ChecksumNotMatchedOnUploadError,
+  FileNotFoundError
+}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  IngestRequestContextGenerators
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  InvalidBagManifestError
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.fixtures.S3.Bucket

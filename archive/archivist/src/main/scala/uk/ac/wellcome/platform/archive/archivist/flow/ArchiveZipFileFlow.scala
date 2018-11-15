@@ -12,11 +12,20 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagUploaderConfig}
-import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, OnErrorFlow}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  BagUploaderConfig
+}
+import uk.ac.wellcome.platform.archive.common.flows.{
+  FoldEitherFlow,
+  OnErrorFlow
+}
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  IngestBagRequest
+}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object ArchiveZipFileFlow extends Logging {
@@ -44,7 +53,7 @@ object ArchiveZipFileFlow extends Logging {
                   delimiter = config.bagItConfig.digestDelimiterRegexp,
                   parallelism = config.parallelism,
                   ingestBagRequest = ingestRequest)))
-              .map(deleteZipFile(_, zipFile))
+            .map(deleteZipFile(_, zipFile))
             .flatMapMerge(
               config.parallelism,
               (result: Either[ArchiveError[_], ArchiveComplete]) =>
@@ -61,7 +70,9 @@ object ArchiveZipFileFlow extends Logging {
       }
     )
 
-  private def deleteZipFile(passContext: Either[ArchiveError[_], ArchiveComplete], zipFile: ZipFile)= {
+  private def deleteZipFile(
+    passContext: Either[ArchiveError[_], ArchiveComplete],
+    zipFile: ZipFile) = {
     debug(s"Deleting zipfile ${zipFile.getName}")
     new File(zipFile.getName).delete()
     passContext
