@@ -20,6 +20,9 @@ object DisplayJsonUtil extends AutoDerivation {
     dropNullValues = true
   )
 
+  implicit val customConfig: Configuration =
+    Configuration.default.withDefaults
+
   implicit val abstractRootConceptEncoder: Encoder[DisplayAbstractRootConcept] = {
     case agent: DisplayAbstractAgentV2 => agent.asJson
     case concept: DisplayAbstractConcept => concept.asJson

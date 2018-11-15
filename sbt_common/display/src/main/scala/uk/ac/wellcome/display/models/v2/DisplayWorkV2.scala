@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
@@ -78,15 +79,14 @@ case class DisplayWorkV2(
   ) language: Option[DisplayLanguage] = None,
   @ApiModelProperty(
     dataType = "String"
-  ) dimensions: Option[String] = None
-) extends DisplayWork {
+  ) dimensions: Option[String] = None,
   @ApiModelProperty(
     readOnly = true,
     value =
       "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."
   )
-  @JsonProperty("type") val ontologyType: String = "Work"
-}
+  @JsonKey("type") @JsonProperty("type") ontologyType: String = "Work"
+) extends DisplayWork
 
 case object DisplayWorkV2 {
 
