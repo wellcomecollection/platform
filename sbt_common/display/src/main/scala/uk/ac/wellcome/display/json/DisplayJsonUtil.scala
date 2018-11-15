@@ -44,11 +44,15 @@ object DisplayJsonUtil extends AutoDerivation {
     case organisation: DisplayOrganisationV2 => organisation.asJson
   }
 
-  implicit val abstractRootConceptEncoder: Encoder[DisplayAbstractRootConcept] = {
-    case agent: DisplayAbstractAgentV2 => agent.asJson
+  implicit val abstractConceptEncoder: Encoder[DisplayAbstractConcept] = {
     case concept: DisplayConcept => concept.asJson
     case place: DisplayPlace => place.asJson
     case period: DisplayPeriod => period.asJson
+  }
+
+  implicit val abstractRootConceptEncoder: Encoder[DisplayAbstractRootConcept] = {
+    case agent: DisplayAbstractAgentV2 => agent.asJson
+    case concept: DisplayAbstractConcept => concept.asJson
   }
 
   implicit val locationV2Encoder: Encoder[DisplayLocationV2] = {
