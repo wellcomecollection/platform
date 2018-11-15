@@ -15,9 +15,8 @@ import scala.concurrent.ExecutionContext
 
 trait CustomElasticsearchMapping {
 
-  class OnlyInvisibleWorksIndex(
-    elasticClient: HttpClient,
-    documentType: String)(implicit val ec: ExecutionContext)
+  class OnlyInvisibleWorksIndex(elasticClient: HttpClient, documentType: String)(
+    implicit val ec: ExecutionContext)
       extends ElasticsearchIndex {
     val httpClient: HttpClient = elasticClient
 

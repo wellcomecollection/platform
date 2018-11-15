@@ -176,7 +176,8 @@ class IngestorWorkerServiceTest
     }
   }
 
-  private def assertWorksIndexedCorrectly(works: IdentifiedBaseWork*): Assertion =
+  private def assertWorksIndexedCorrectly(
+    works: IdentifiedBaseWork*): Assertion =
     withLocalElasticsearchIndex { indexName =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>
@@ -185,7 +186,9 @@ class IngestorWorkerServiceTest
               sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
             }
 
-            assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
+            assertElasticsearchEventuallyHasWork(
+              indexName = indexName,
+              works: _*)
 
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
