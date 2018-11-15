@@ -17,7 +17,8 @@ case class DisplayProductionEvent(
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.v2.DisplayAbstractConcept"
   ) function: Option[DisplayAbstractConcept],
-  @JsonProperty("type") @JsonKey("type") ontologyType: String = "ProductionEvent"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String =
+    "ProductionEvent"
 )
 
 object DisplayProductionEvent {
