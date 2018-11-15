@@ -6,7 +6,7 @@ def transform(input_data):
     try:
         json_string = input_data['maybeBibRecord']['data']
         bib_record = json.loads(json_string)
-    except KeyError, TypeError:
+    except (KeyError, TypeError):
         bib_record = {}
 
     # ignore varFields on first pass
@@ -61,7 +61,7 @@ def transform(input_data):
             order['location'] for order in bib_record['orders']
         ]
         bib_record['order_dates'] = [
-            order['date'] for order in bib_record['orders']]
+            order['date'] for order in bib_record['orders']
         ]
         del bib_record['orders']
     except KeyError:
