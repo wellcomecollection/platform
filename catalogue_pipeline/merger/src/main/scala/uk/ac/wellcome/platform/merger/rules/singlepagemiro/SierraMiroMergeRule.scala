@@ -62,23 +62,25 @@ trait SierraMiroMerger extends Logging with MergerLogging {
   }
 
   private def mergeItems(sierraItem: MaybeDisplayable[Item],
-                         miroItem: Unidentifiable[Item]) = {
-    val sierraDigitalLocations = sierraItem.agent.locations.collect {
-      case location: DigitalLocation => location
-    }
+                         miroItem: Unidentifiable[Item]): List[MaybeDisplayable[Item]] = {
 
-    val items = sierraDigitalLocations match {
-      case Nil =>
-        val agent: Item = sierraItem.agent.copy(
-          locations = sierraItem.agent.locations ++ miroItem.agent.locations
-        )
-        List(copyItem(sierraItem, agent))
-      case _ =>
-        debug(
-          s"Sierra work already has digital location $sierraDigitalLocations takes precedence over Miro location.")
-        List(sierraItem)
-    }
-    items
+    // We always use the locations from the Sierra and the Miro records.
+    //
+    // We may sometimes have digital locations from both records:
+    //
+    //   * a iiif-image location from Miro
+    //   * a iiif-presentation location from Sierra
+    //
+    // This is when an image has been through the digitisation workflow
+    // after it came from Sierra.  We may remove the iiif-image later
+    // (strictly speaking the -presentation replaces it), but we leave
+    // it for now, so the website can still use it.
+    val locations = sierraItem.agent.locations ++ miroItem.agent.locations
+
+    val agent: Item = sierraItem.agent.copy(
+      locations = locations
+    )
+    List(copyItem(sierraItem, agent))
   }
 
   /**
