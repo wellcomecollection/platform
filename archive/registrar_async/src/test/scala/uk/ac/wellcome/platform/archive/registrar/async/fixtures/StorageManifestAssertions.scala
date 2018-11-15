@@ -24,6 +24,7 @@ trait StorageManifestAssertions extends Inside with Matchers {
           actualStorageSpace,
           actualBagInfo,
           FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+          FileManifest(ChecksumAlgorithm(_), _),
           StorageLocation(
             provider,
             ObjectLocation(actualNamespace, actualPath)),

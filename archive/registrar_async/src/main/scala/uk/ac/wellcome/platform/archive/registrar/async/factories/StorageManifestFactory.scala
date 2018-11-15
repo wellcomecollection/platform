@@ -37,15 +37,20 @@ object StorageManifestFactory extends Logging {
         archiveComplete,
         s"manifest-$algorithm.txt",
         " +")
-      fileManifest = FileManifest(
-        ChecksumAlgorithm(algorithm),
-        manifestTuples
-      )
+      tagManifestTuples <- getBagItems(
+        archiveComplete,
+        s"tagmanifest-$algorithm.txt",
+        " +")
+
     } yield
       StorageManifest(
         space = archiveComplete.space,
         info = bagInfo,
-        manifest = fileManifest,
+        manifest = FileManifest(
+          ChecksumAlgorithm(algorithm),
+          manifestTuples
+        ),
+        tagManifest = FileManifest(ChecksumAlgorithm(algorithm), tagManifestTuples),
         accessLocation = StorageLocation(
           StorageProvider("aws-s3-ia"),
           ObjectLocation(
