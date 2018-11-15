@@ -22,7 +22,8 @@ object Main extends App with Logging {
   val workerService = new IngestorWorkerService(
     elasticClient = ElasticBuilder.buildHttpClient(config),
     ingestorConfig = IngestorConfigBuilder.buildIngestorConfig(config),
-    messageStream = MessagingBuilder.buildMessageStream[IdentifiedBaseWork](config)
+    messageStream =
+      MessagingBuilder.buildMessageStream[IdentifiedBaseWork](config)
   )
 
   try {

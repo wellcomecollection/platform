@@ -11,10 +11,10 @@ import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IngestorWorkerService(
-  elasticClient: HttpClient,
-  ingestorConfig: IngestorConfig,
-  messageStream: MessageStream[IdentifiedBaseWork])(implicit ec: ExecutionContext) {
+class IngestorWorkerService(elasticClient: HttpClient,
+                            ingestorConfig: IngestorConfig,
+                            messageStream: MessageStream[IdentifiedBaseWork])(
+  implicit ec: ExecutionContext) {
 
   case class MessageBundle(message: Message, work: IdentifiedBaseWork)
 

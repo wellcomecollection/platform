@@ -28,7 +28,8 @@ object MessagingBuilder {
     new MessageStream[T](
       actorSystem = AkkaBuilder.buildActorSystem(),
       sqsClient = SQSBuilder.buildSQSAsyncClient(config),
-      sqsConfig = SQSBuilder.buildSQSConfig(config, namespace = "message.reader"),
+      sqsConfig =
+        SQSBuilder.buildSQSConfig(config, namespace = "message.reader"),
       metricsSender = MetricsBuilder.buildMetricsSender(config)
     )
   }

@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.ingestor.config.builders
 
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
-import uk.ac.wellcome.platform.ingestor.config.models.{IngestElasticConfig, IngestorConfig}
+import uk.ac.wellcome.platform.ingestor.config.models.{
+  IngestElasticConfig,
+  IngestorConfig
+}
 
 import scala.concurrent.duration._
 
