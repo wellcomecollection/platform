@@ -23,7 +23,7 @@ class DisplayJsonUtilTest extends FunSpec with Matchers with JsonAssertions {
     val triangle = Shape(name = "triangle", colours = None, sides = 3)
     assertJsonStringsAreEqual(
       DisplayJsonUtil.toJson(triangle),
-      """{"name":"triangle", "colours": [], "sides": 3}"""
+      """{"name":"triangle", "sides": 3}"""
     )
   }
 }
