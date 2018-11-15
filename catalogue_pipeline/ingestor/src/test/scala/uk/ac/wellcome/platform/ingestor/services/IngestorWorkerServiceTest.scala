@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.cat.CatCount
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
@@ -18,6 +20,7 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class IngestorWorkerServiceTest
     extends FunSpec
@@ -132,26 +135,19 @@ class IngestorWorkerServiceTest
   }
 
   it("only deletes successfully ingested works from the queue") {
-    val onlyInvisibleWorksIndex = new OnlyInvisibleWorksIndex(
-      elasticClient = elasticClient,
-      documentType = documentType
-    )
+    case class Shape(sides: Int, colour: String)
+    val square = Shape(sides = 4, colour = "red")
 
-    val work = createIdentifiedInvisibleWork
-    val workDoesNotMatchMapping = createIdentifiedWork
+    val work = createIdentifiedWork
 
-    val works = List(work, workDoesNotMatchMapping)
-
-    withLocalElasticsearchIndex(onlyInvisibleWorksIndex) { indexName =>
+    withLocalElasticsearchIndex { indexName =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>
           withWorkerService(queue, indexName) { _ =>
-            works.map { work =>
-              sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
-            }
+            sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
+            sendMessage(queue = queue, obj = square)
 
             assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-            assertElasticsearchNeverHasWork(indexName = indexName, workDoesNotMatchMapping)
 
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, 1)
