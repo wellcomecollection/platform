@@ -10,109 +10,115 @@ class SierraMiroMergeRuleTest
     with WorksGenerators {
 
   describe("merges a single-page Miro work into a Sierra work") {
-    it(
-      "merges locations and identifiers from the Miro work into the Sierra work") {
-      val sierraItem =
-        createIdentifiableItemWith(locations = List(createPhysicalLocation))
-      val sierraWork =
-        createUnidentifiedSierraWorkWith(items = List(sierraItem))
-      val miroWork = createMiroWork
+    val sierraPhysicalItem =
+      createIdentifiableItemWith(locations = List(createPhysicalLocation))
 
-      val result = mergeAndRedirectWorks(sierraWork, miroWork)
+    val sierraPhysicalWork = createUnidentifiedSierraWorkWith(
+      items = List(sierraPhysicalItem)
+    )
 
-      val expectedMergedWork = sierraWork.copy(
-        otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers,
-        items = List(sierraItem.copy(
-          agent = sierraItem.agent.copy(
+    val sierraDigitalItem = createIdentifiableItemWith(
+      locations = List(createDigitalLocation)
+    )
+    val sierraDigitalWork = createUnidentifiedSierraWorkWith(
+      items = List(sierraDigitalItem)
+    )
+
+    val miroWork = createMiroWork
+
+    describe("order: miroWork, sierraWork") {
+      val redirectedWork = getRedirectedWork(sierraPhysicalWork, miroWork)
+      val mergedWork = getMergedWork(sierraPhysicalWork, miroWork)
+
+      it("creates a redirect from the Miro work to the Sierra work") {
+        redirectedWork shouldBe UnidentifiedRedirectedWork(
+          source = miroWork,
+          target = sierraPhysicalWork
+        )
+      }
+
+      it("copies identifiers from the Miro work to the Sierra work") {
+        mergedWork.identifiers shouldBe sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers
+      }
+
+      it("copies item locations from the Miro work to a physical Sierra work") {
+        mergedWork.items shouldBe List(sierraPhysicalItem.copy(
+          agent = sierraPhysicalItem.agent.copy(
             locations =
-              sierraItem.agent.locations ++ miroWork.items.head.agent.locations
+              sierraPhysicalItem.agent.locations ++ miroWork.items.head.agent.locations
           )
         ))
-      )
-
-      result shouldBe List(
-        expectedMergedWork,
-        UnidentifiedRedirectedWork(miroWork, sierraWork))
+      }
     }
 
-    it("merges a Miro work and a Sierra work, order does not matter") {
-      val sierraItem =
-        createIdentifiableItemWith(locations = List(createPhysicalLocation))
-      val sierraWork =
-        createUnidentifiedSierraWorkWith(items = List(sierraItem))
-      val miroWork = createMiroWork
+    describe("order: sierraWork, miroWork (order doesn't matter)") {
+      val redirectedWork = getRedirectedWork(miroWork, sierraPhysicalWork)
+      val mergedWork = getMergedWork(miroWork, sierraPhysicalWork)
 
-      val result = mergeAndRedirectWorks(miroWork, sierraWork)
+      it("creates a redirect from the Miro work to the Sierra work") {
+        redirectedWork shouldBe UnidentifiedRedirectedWork(
+          source = miroWork,
+          target = sierraPhysicalWork
+        )
+      }
 
-      val expectedMergedWork = sierraWork.copy(
-        otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers,
-        items = List(sierraItem.copy(
-          agent = sierraItem.agent.copy(
+      it("copies identifiers from the Miro work to the Sierra work") {
+        mergedWork.identifiers shouldBe sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers
+      }
+
+      it("copies item locations from the Miro work to a physical Sierra work") {
+        mergedWork.items shouldBe List(sierraPhysicalItem.copy(
+          agent = sierraPhysicalItem.agent.copy(
             locations =
-              sierraItem.agent.locations ++ miroWork.items.head.agent.locations
+              sierraPhysicalItem.agent.locations ++ miroWork.items.head.agent.locations
           )
         ))
-      )
-
-      result shouldBe List(
-        expectedMergedWork,
-        UnidentifiedRedirectedWork(miroWork, sierraWork))
+      }
     }
 
     it(
       "merges otherIdentifiers from the Miro work, except for any Sierra identifiers, to the Sierra work") {
-      val sierraItem =
-        createIdentifiableItemWith(locations = List(createPhysicalLocation))
-      val sierraWork =
-        createUnidentifiedSierraWorkWith(items = List(sierraItem))
-
       val miroLibraryReferenceSourceIdentifier = createSourceIdentifierWith(
         identifierType = IdentifierType("miro-library-reference")
       )
-      val miroWork = createMiroWorkWith(
+      val miroWorkWithExtraIdentifiers = createMiroWorkWith(
         otherIdentifiers = List(
           miroLibraryReferenceSourceIdentifier,
-          sierraWork.sourceIdentifier,
+          sierraPhysicalWork.sourceIdentifier,
           createSierraIdentifierSourceIdentifier,
           createSierraSystemSourceIdentifier))
 
-      val result = mergeAndRedirectWorks(sierraWork, miroWork)
+      val result = mergeAndRedirectWorks(sierraPhysicalWork, miroWorkWithExtraIdentifiers)
 
-      val expectedMergedWork = sierraWork.copy(
+      val expectedMergedWork = sierraPhysicalWork.copy(
         otherIdentifiers =
-          sierraWork.otherIdentifiers :+
-            miroWork.sourceIdentifier :+
+          sierraPhysicalWork.otherIdentifiers :+
+            miroWorkWithExtraIdentifiers.sourceIdentifier :+
             miroLibraryReferenceSourceIdentifier,
-        items = List(sierraItem.copy(
-          agent = sierraItem.agent.copy(
+        items = List(sierraPhysicalItem.copy(
+          agent = sierraPhysicalItem.agent.copy(
             locations =
-              sierraItem.agent.locations ++ miroWork.items.head.agent.locations
+              sierraPhysicalItem.agent.locations ++ miroWorkWithExtraIdentifiers.items.head.agent.locations
           )
         ))
       )
 
       result shouldBe List(
         expectedMergedWork,
-        UnidentifiedRedirectedWork(miroWork, sierraWork))
+        UnidentifiedRedirectedWork(miroWorkWithExtraIdentifiers, sierraPhysicalWork))
     }
 
     it(
       "does not merge Miro DigitalLocation if the Sierra work already has a DigitalLocation") {
-      val sierraItem =
-        createIdentifiableItemWith(locations = List(createDigitalLocation))
-      val sierraWork =
-        createUnidentifiedSierraWorkWith(items = List(sierraItem))
-      val miroWork = createMiroWork
+      val result = mergeAndRedirectWorks(sierraDigitalWork, miroWork)
 
-      val result = mergeAndRedirectWorks(sierraWork, miroWork)
-
-      val expectedMergedWork = sierraWork.copy(
-        otherIdentifiers = sierraWork.otherIdentifiers ++ miroWork.identifiers
+      val expectedMergedWork = sierraDigitalWork.copy(
+        otherIdentifiers = sierraDigitalWork.otherIdentifiers ++ miroWork.identifiers
       )
 
       result shouldBe List(
         expectedMergedWork,
-        UnidentifiedRedirectedWork(miroWork, sierraWork))
+        UnidentifiedRedirectedWork(miroWork, sierraDigitalWork))
     }
   }
 
@@ -155,6 +161,26 @@ class SierraMiroMergeRuleTest
         createUnidentifiedSierraWork
       )
     }
+  }
+
+  def getMergedWork(works: BaseWork*): UnidentifiedWork = {
+    val result = mergeAndRedirectWorks(works)
+
+    result should have size 2
+    result.head shouldBe a[UnidentifiedWork]
+    result.tail.head shouldBe a[UnidentifiedRedirectedWork]
+
+    result.head
+  }
+
+  def getRedirectedWork(works: BaseWork*): UnidentifiedRedirectedWork = {
+    val result = mergeAndRedirectWorks(works)
+
+    result should have size 2
+    result.head shouldBe a[UnidentifiedWork]
+    result.tail.head shouldBe a[UnidentifiedRedirectedWork]
+
+    result.tail.head
   }
 
   private def assertWorksAreNotMerged(works: BaseWork*): Assertion =
