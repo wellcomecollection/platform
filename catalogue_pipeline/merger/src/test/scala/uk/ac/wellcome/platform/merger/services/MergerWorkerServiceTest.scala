@@ -19,17 +19,14 @@ import uk.ac.wellcome.platform.merger.fixtures.{
   MatcherResultFixture,
   WorkerServiceFixture
 }
-import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.test.fixtures.TestWith
 
 class MergerWorkerServiceTest
     extends FunSpec
     with ScalaFutures
     with SQS
-    with Akka
     with IntegrationPatience
     with MetricsSenderFixture
-    with LocalVersionedHybridStore
     with SNS
     with Messaging
     with WorksGenerators
