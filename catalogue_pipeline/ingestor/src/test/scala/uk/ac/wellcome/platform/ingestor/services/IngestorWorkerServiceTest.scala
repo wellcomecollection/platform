@@ -268,7 +268,7 @@ class IngestorWorkerServiceTest
 
     val works = List(work, workDoesNotMatchMapping)
 
-    withLocalElasticsearchIndex { indexName =>
+    withLocalElasticsearchIndex(subsetOfFieldsIndex) { indexName =>
       withLocalSqsQueueAndDlq {
         case QueuePair(queue, dlq) =>
           withWorkerService(queue, indexName) { _ =>
