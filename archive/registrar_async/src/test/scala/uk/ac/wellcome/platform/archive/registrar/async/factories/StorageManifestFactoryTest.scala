@@ -39,14 +39,19 @@ class StorageManifestFactoryTest
                   actualStorageSpace,
                   actualBagInfo,
                   FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-                  FileManifest(ChecksumAlgorithm("sha256"), tagManifestDigestFiles),
+                  FileManifest(
+                    ChecksumAlgorithm("sha256"),
+                    tagManifestDigestFiles),
                   _,
                   _)) =>
               actualStorageSpace shouldBe bagId.space
               actualBagInfo shouldBe bagInfo
               bagDigestFiles should have size 1
               tagManifestDigestFiles should have size 3
-              tagManifestDigestFiles.map(_.path.value) should contain theSameElementsAs List("manifest-sha256.txt", "bag-info.txt", "bagit.txt")
+              tagManifestDigestFiles.map(_.path.value) should contain theSameElementsAs List(
+                "manifest-sha256.txt",
+                "bag-info.txt",
+                "bagit.txt")
           }
       }
     }
@@ -107,7 +112,9 @@ class StorageManifestFactoryTest
               ArchiveComplete(requestId, bagId.space, bagLocation)
             val value = StorageManifestFactory.create(archiveComplete)
             value shouldBe Left(
-              InvalidBagManifestError(archiveComplete, "tagmanifest-sha256.txt"))
+              InvalidBagManifestError(
+                archiveComplete,
+                "tagmanifest-sha256.txt"))
         }
       }
     }

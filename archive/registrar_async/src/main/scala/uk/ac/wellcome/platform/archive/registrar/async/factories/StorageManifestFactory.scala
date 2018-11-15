@@ -55,7 +55,8 @@ object StorageManifestFactory extends Logging {
             s"${archiveComplete.bagLocation.storagePath}/${archiveComplete.bagLocation.bagPath.value}")
         ),
         createdDate = Instant.now()
-      )}
+      )
+    }
   }
 
   private def getBagItems(archiveComplete: ArchiveComplete,

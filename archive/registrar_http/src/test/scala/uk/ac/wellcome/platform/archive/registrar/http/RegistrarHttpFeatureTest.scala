@@ -61,7 +61,10 @@ class RegistrarHttpFeatureTest
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                tagManifest = FileManifest(ChecksumAlgorithm(checksumAlgorithm), List(BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
+                tagManifest = FileManifest(
+                  ChecksumAlgorithm(checksumAlgorithm),
+                  List(
+                    BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
                 StorageLocation(
                   StorageProvider(providerId),
                   ObjectLocation(bucket, path)),
@@ -99,7 +102,7 @@ class RegistrarHttpFeatureTest
                           Nil,
                           "BagManifest"),
                         DisplayBagManifest(
-                        actualTagManifestChecksumAlgorithm,
+                          actualTagManifestChecksumAlgorithm,
                           List(DisplayFileDigest("a", "bag-info.txt", "File")),
                           "BagManifest"),
                         DisplayLocation(
@@ -152,7 +155,10 @@ class RegistrarHttpFeatureTest
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                tagManifest = FileManifest(ChecksumAlgorithm(checksumAlgorithm), List(BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
+                tagManifest = FileManifest(
+                  ChecksumAlgorithm(checksumAlgorithm),
+                  List(
+                    BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
                 StorageLocation(
                   StorageProvider(providerId),
                   ObjectLocation(bucket, path)),
