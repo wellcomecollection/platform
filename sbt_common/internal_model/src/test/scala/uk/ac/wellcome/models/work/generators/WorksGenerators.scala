@@ -192,11 +192,12 @@ trait WorksGenerators extends ItemsGenerators {
     createUnidentifiedWorkWith(
       sourceIdentifier = createMiroSourceIdentifier,
       otherIdentifiers = otherIdentifiers,
-      thumbnail = Some(DigitalLocation(
-        url = "https://iiif.wellcomecollection.org/V01234.jpg",
-        locationType = LocationType("thumbnail-image"),
-        license = Some(License_CCBY)
-      )),
+      thumbnail = Some(
+        DigitalLocation(
+          url = "https://iiif.wellcomecollection.org/V01234.jpg",
+          locationType = LocationType("thumbnail-image"),
+          license = Some(License_CCBY)
+        )),
       items = List(
         createUnidentifiableItemWith(locations = List(
           createDigitalLocationWith(locationType = createImageLocationType))))
