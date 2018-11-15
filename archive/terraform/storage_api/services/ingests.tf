@@ -26,12 +26,7 @@ module "ingests" {
   env_vars = "${var.ingests_env_vars}"
 
   env_vars_length = "${var.ingests_env_vars_length}"
-}
 
-module "ingests_listener" {
-  source = "listener"
-
-  nlb_arn           = "${var.nlb_arn}"
-  listener_port     = "${var.ingests_listener_port}"
-  target_group_name = "${module.ingests.target_group_name}"
+  lb_arn        = "${var.nlb_arn}"
+  listener_port = "${var.ingests_listener_port}"
 }

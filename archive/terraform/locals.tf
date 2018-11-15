@@ -26,4 +26,7 @@ locals {
   infra_bucket                         = "${data.terraform_remote_state.shared_infra.infra_bucket}"
 
   nginx_image_uri = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:8322c88784d2dd40de270fe7d0c456fc528669a4"
+
+  storage_vpc_delta_id              = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  storage_vpc_delta_private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 }

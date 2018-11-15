@@ -303,9 +303,9 @@ module "storage_api" {
   source = "storage_api"
 
   cognito_id   = ""
-  vpc_id       = "${local.vpc_id}"
+  vpc_id       = "${local.storage_vpc_delta_id}"
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-  subnets      = "${local.private_subnets}"
+  subnets      = "${local.storage_vpc_delta_private_subnets}"
 
   namespace     = "storage-api"
   namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
@@ -337,9 +337,7 @@ module "storage_api" {
     topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
-
-  ingests_env_vars_length = 4
-
+  ingests_env_vars_length       = 4
   ingests_nginx_container_image = "${local.nginx_image_uri}"
   ingests_nginx_container_port  = "9000"
 }

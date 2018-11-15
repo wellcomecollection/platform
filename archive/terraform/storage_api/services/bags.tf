@@ -26,12 +26,7 @@ module "bags" {
   env_vars = "${var.bags_env_vars}"
 
   env_vars_length = "${var.bags_env_vars_length}"
-}
 
-module "bags_listener" {
-  source = "listener"
-
-  nlb_arn           = "${var.nlb_arn}"
-  listener_port     = "${var.bags_listener_port}"
-  target_group_name = "${module.bags.target_group_name}"
+  lb_arn        = "${var.nlb_arn}"
+  listener_port = "${var.bags_listener_port}"
 }

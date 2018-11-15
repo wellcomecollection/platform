@@ -58,8 +58,14 @@ resource "aws_iam_role_policy" "registrar_async_task_sqs" {
 }
 
 # Registrar http
+
 resource "aws_iam_role_policy" "registrar_http_task_vhs" {
   role   = "${module.registrar_http.task_role_name}"
+  policy = "${module.vhs_archive_manifest.read_policy}"
+}
+
+resource "aws_iam_role_policy" "bags_vhs" {
+  role   = "${module.storage_api.bags_role_name}"
   policy = "${module.vhs_archive_manifest.read_policy}"
 }
 
@@ -89,6 +95,16 @@ resource "aws_iam_role_policy" "progress_http_task_archive_progress_table" {
 
 resource "aws_iam_role_policy" "progress_http_sns" {
   role   = "${module.progress_http.task_role_name}"
+  policy = "${module.ingest_requests_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "ingests_archive_progress_table" {
+  role   = "${module.storage_api.ingests_role_name}"
+  policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
+}
+
+resource "aws_iam_role_policy" "ingests_sns" {
+  role   = "${module.storage_api.ingests_role_name}"
   policy = "${module.ingest_requests_topic.publish_policy}"
 }
 
