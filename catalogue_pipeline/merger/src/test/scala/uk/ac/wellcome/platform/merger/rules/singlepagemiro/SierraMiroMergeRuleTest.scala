@@ -38,7 +38,7 @@ class SierraMiroMergeRuleTest
       }
 
       it("copies identifiers from the Miro work to the Sierra work") {
-        mergedWork.identifiers shouldBe sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers
+        mergedWork.otherIdentifiers shouldBe sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers
       }
 
       it("doesn't copy Sierra identifiers from the Miro work") {
@@ -87,7 +87,7 @@ class SierraMiroMergeRuleTest
       }
 
       it("copies identifiers from the Miro work to the Sierra work") {
-        mergedWork.identifiers shouldBe sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers
+        mergedWork.otherIdentifiers shouldBe sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers
       }
 
       it("copies item locations from the Miro work to a physical Sierra work") {
