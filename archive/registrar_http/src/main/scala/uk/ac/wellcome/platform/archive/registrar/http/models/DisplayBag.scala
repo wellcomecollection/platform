@@ -15,6 +15,7 @@ case class DisplayBag(
   space: DisplayStorageSpace,
   info: DisplayBagInfo,
   manifest: DisplayBagManifest,
+  tagManifest: DisplayBagManifest,
   accessLocation: DisplayLocation,
   createdDate: String,
   @JsonKey("type")
@@ -29,6 +30,7 @@ object DisplayBag {
       DisplayStorageSpace(storageManifest.space.underlying),
       DisplayBagInfo(storageManifest.info),
       DisplayBagManifest(storageManifest.manifest),
+      DisplayBagManifest(storageManifest.tagManifest),
       DisplayLocation(storageManifest.accessLocation),
       storageManifest.createdDate.toString
     )
