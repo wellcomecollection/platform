@@ -3,52 +3,67 @@ import json
 
 def transform(input_data):
     # only look at the bib data for now
-    json_string = input_data['maybeBibRecord']['data']
-    bib_record = json.loads(json_string)
+    try:
+        json_string = input_data['maybeBibRecord']['data']
+        bib_record = json.loads(json_string)
+    except KeyError:
+        bib_record = {}
 
     # ignore varFields on first pass
-    del bib_record['varFields']
+    try:
+        del bib_record['varFields']
+    except KeyError:
+        pass
 
     # unpack bibLevel
-    if 'bibLevel' in bib_record:
-        try:
-            bib_record['bibLevel'] = bib_record['bibLevel']['value']
-        except KeyError:
-            bib_record['bibLevel'] = None
+    try:
+        bib_record['bibLevel'] = bib_record['bibLevel']['value']
+    except KeyError:
+        bib_record['bibLevel'] = None
 
     # unpack country
-    if 'country' in bib_record:
+    try:
         bib_record['country'] = bib_record['country']['name']
+    except KeyError:
+        bib_record['country'] = None
 
     # unpack fixedFields
-    if 'fixedFields' in bib_record:
+    try:
         for key, value in bib_record['fixedFields'].items():
             bib_record[f"fixed_field_{key}_{value['label']}"] = value['value']
         del bib_record['fixedFields']
+    except KeyError:
+        pass
 
     # unpack language
-    if 'lang' in bib_record:
-        try:
-            bib_record['lang'] = bib_record['lang']['name']
-        except KeyError:
-            bib_record['lang'] = None
+    try:
+        bib_record['lang'] = bib_record['lang']['name']
+    except KeyError:
+        bib_record['lang'] = None
 
     # unpack locations
-    if 'locations' in bib_record:
+    try:
         bib_record['locations'] = [
             location['name'] for location in bib_record['locations']
         ]
+    except KeyError:
+        pass
 
     # unpack material types
-    if 'materialType' in bib_record:
+    try:
         bib_record['materialType'] = bib_record['materialType']['code']
+    except KeyError:
+        pass
 
     # unpack orders
-    if 'orders' in bib_record:
+    try:
         for order in bib_record['orders']:
             bib_record['order_locations'] = order['location']
             bib_record['order_dates'] = order['date']
         del bib_record['orders']
+    except KeyError:
+        bib_record['order_locations'] = None
+        bib_record['order_dates'] = None
 
     # get rid of redundant norm fields
     norm_fields = [
