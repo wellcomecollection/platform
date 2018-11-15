@@ -7,8 +7,7 @@ import uk.ac.wellcome.models.matcher.WorkIdentifier
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.merger.fixtures.LocalWorksVhs
-import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.ExecutionContext.Implicits.global
