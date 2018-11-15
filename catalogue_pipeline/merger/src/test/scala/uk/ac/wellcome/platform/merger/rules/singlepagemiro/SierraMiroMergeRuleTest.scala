@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.merger.rules.singlepagemiro
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
 
@@ -118,54 +118,50 @@ class SierraMiroMergeRuleTest
 
   describe("does not merge unless passed a Sierra and a Miro work") {
     it("does not merge a single Sierra  work") {
-      val works = List(createUnidentifiedSierraWork)
-
-      mergeAndRedirectWorks(works) shouldBe works
+      assertWorksAreNotMerged(Seq(createUnidentifiedSierraWork))
     }
 
     it("does not merge a single Sierra physical work") {
-      val works = List(createMiroWork)
-
-      mergeAndRedirectWorks(works) shouldBe works
+      assertWorksAreNotMerged(Seq(createMiroWork))
     }
 
     it("does not merge multiple Sierra works") {
-      val works =
-        List(createUnidentifiedSierraWork, createUnidentifiedSierraWork)
-
-      mergeAndRedirectWorks(works) shouldBe works
+      assertWorksAreNotMerged(
+        createUnidentifiedSierraWork,
+        createUnidentifiedSierraWork)
     }
 
     it("does not merge multiple Miro works") {
-      val works = List(createMiroWork, createMiroWork)
-
-      mergeAndRedirectWorks(works) shouldBe works
+      assertWorksAreNotMerged(createMiroWork, createMiroWork)
     }
 
     it("does not merge if there are no Sierra works") {
-      val works = createIsbnWorks(5)
-
-      mergeAndRedirectWorks(works) shouldBe works
+      assertWorksAreNotMerged(createIsbnWorks(5))
     }
 
     it(
       "does not merge if there are multiple Sierra works with a single Miro work") {
-      val works = List(
+      assertWorksAreNotMerged(
         createMiroWork,
         createUnidentifiedSierraWork,
         createUnidentifiedSierraWork)
-
-      mergeAndRedirectWorks(works) shouldBe works
     }
 
     it(
       "does not merge if there are multiple Miro works with a single Sierra work") {
-      val works =
-        List(createMiroWork, createMiroWork, createUnidentifiedSierraWork)
-
-      mergeAndRedirectWorks(works) shouldBe works
+      assertWorksAreNotMerged(
+        createMiroWork,
+        createMiroWork,
+        createUnidentifiedSierraWork
+      )
     }
   }
+
+  private def assertWorksAreNotMerged(works: BaseWork*): Assertion =
+    assertWorksAreNotMerged(works)
+
+  private def assertWorksAreNotMerged(works: Seq[BaseWork]): Assertion =
+    mergeAndRedirectWorks(works) shouldBe works
 
   private def mergeAndRedirectWorks(works: BaseWork*): Seq[BaseWork] =
     mergeAndRedirectWorks(works)
