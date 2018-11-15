@@ -33,17 +33,17 @@ trait LocalWorksVhs
       }
     }
 
-  def givenStoredInVhs(
-    vhs: TransformedBaseWorkVHS,
-    works: TransformedBaseWork*): Seq[Assertion] =
+  def givenStoredInVhs(vhs: TransformedBaseWorkVHS,
+                       works: TransformedBaseWork*): Seq[Assertion] =
     works.map { work =>
       vhs.updateRecord(work.sourceIdentifier.toString)(
         ifNotExisting = (work, EmptyMetadata()))((_, _) =>
         throw new RuntimeException("Not possible, VHS is empty!"))
 
       eventually {
-        whenReady(vhs.getRecord(id = work.sourceIdentifier.toString)) { result =>
-          result.get shouldBe work
+        whenReady(vhs.getRecord(id = work.sourceIdentifier.toString)) {
+          result =>
+            result.get shouldBe work
         }
       }
     }

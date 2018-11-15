@@ -90,11 +90,10 @@ class RecorderPlaybackServiceTest
     withRecorderVHS { vhs =>
       givenStoredInVhs(vhs, storedWorks: _*)
 
-      whenReady(fetchAllWorks(vhs = vhs, lookupWorks: _*)) {
-        result =>
-          result shouldBe (unchangedWorks.map { Some(_) } ++ (4 to 7).map { _ =>
-            None
-          })
+      whenReady(fetchAllWorks(vhs = vhs, lookupWorks: _*)) { result =>
+        result shouldBe (unchangedWorks.map { Some(_) } ++ (4 to 7).map { _ =>
+          None
+        })
       }
     }
   }
@@ -105,7 +104,9 @@ class RecorderPlaybackServiceTest
     val service = new RecorderPlaybackService(vhs)
 
     val workIdentifiers = works
-      .map { w => WorkIdentifier(w)}
+      .map { w =>
+        WorkIdentifier(w)
+      }
 
     service.fetchAllWorks(workIdentifiers)
   }

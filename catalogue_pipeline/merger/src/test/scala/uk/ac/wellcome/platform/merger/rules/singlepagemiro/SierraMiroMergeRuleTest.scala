@@ -53,7 +53,8 @@ class SierraMiroMergeRuleTest
             createSierraIdentifierSourceIdentifier,
             createSierraSystemSourceIdentifier))
 
-        val mergedWork = getMergedWork(sierraPhysicalWork, miroWorkWithExtraIdentifiers)
+        val mergedWork =
+          getMergedWork(sierraPhysicalWork, miroWorkWithExtraIdentifiers)
 
         mergedWork.otherIdentifiers shouldBe sierraPhysicalWork.otherIdentifiers :+
           miroWorkWithExtraIdentifiers.sourceIdentifier :+
@@ -61,12 +62,13 @@ class SierraMiroMergeRuleTest
       }
 
       it("copies item locations from the Miro work to a physical Sierra work") {
-        mergedWork.items shouldBe List(sierraPhysicalItem.copy(
-          agent = sierraPhysicalItem.agent.copy(
-            locations =
-              sierraPhysicalItem.agent.locations ++ miroWork.items.head.agent.locations
-          )
-        ))
+        mergedWork.items shouldBe List(
+          sierraPhysicalItem.copy(
+            agent = sierraPhysicalItem.agent.copy(
+              locations =
+                sierraPhysicalItem.agent.locations ++ miroWork.items.head.agent.locations
+            )
+          ))
       }
 
       it("doesn't copy across the Miro location if the Sierra work already has a DigitalLocation") {
@@ -93,12 +95,13 @@ class SierraMiroMergeRuleTest
       }
 
       it("copies item locations from the Miro work to a physical Sierra work") {
-        mergedWork.items shouldBe List(sierraPhysicalItem.copy(
-          agent = sierraPhysicalItem.agent.copy(
-            locations =
-              sierraPhysicalItem.agent.locations ++ miroWork.items.head.agent.locations
-          )
-        ))
+        mergedWork.items shouldBe List(
+          sierraPhysicalItem.copy(
+            agent = sierraPhysicalItem.agent.copy(
+              locations =
+                sierraPhysicalItem.agent.locations ++ miroWork.items.head.agent.locations
+            )
+          ))
       }
     }
 
@@ -174,7 +177,8 @@ class SierraMiroMergeRuleTest
     result.size shouldBe works.size
 
     // Stronger: the source identifiers are preserved on the way through.
-    result.map { _.sourceIdentifier } should contain theSameElementsAs works.map { _.sourceIdentifier }
+    result.map { _.sourceIdentifier } should contain theSameElementsAs works
+      .map { _.sourceIdentifier }
 
     result
   }
