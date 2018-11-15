@@ -1,7 +1,7 @@
 package uk.ac.wellcome.display.json
 
+import io.circe.generic.auto._
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.json.DisplayJsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 
 class DisplayJsonUtilTest extends FunSpec with Matchers with JsonAssertions {

@@ -1,5 +1,6 @@
 package uk.ac.wellcome.display.models.v1
 
+import io.circe.generic.auto._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.generators.WorksGenerators

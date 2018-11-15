@@ -1,8 +1,9 @@
 package uk.ac.wellcome.display.json
 
 import io.circe.{Encoder, Printer}
-import io.circe.generic.extras.AutoDerivation
+import io.circe.generic.extras._
 import io.circe.syntax._
+import uk.ac.wellcome.display.models.v2._
 
 /** Format JSON objects as suitable for display.
   *
@@ -19,9 +20,22 @@ object DisplayJsonUtil extends AutoDerivation {
     dropNullValues = true
   )
 
+  implicit val customConfig: Configuration =
+    Configuration.default.withDefaults
+      .withDiscriminator("type")
+
+  implicit val abstractRootConceptEncoder: Encoder[DisplayAbstractRootConcept] = {
+    case agent: DisplayAbstractAgentV2 => agent.asJson
+    case concept: DisplayAbstractConcept => concept.asJson
+  }
+
+  implicit val digitalLocationEncoder: Encoder[DisplayLocationV2] = {
+    case digitalLocation: DisplayDigitalLocationV2 => digitalLocation.asJson
+    case physicalLocation: DisplayPhysicalLocationV2 => physicalLocation.asJson
+  }
+
   def toJson[T](value: T)(implicit encoder: Encoder[T]): String = {
     assert(encoder != null)
-
     printer.pretty(value.asJson)
   }
 }
