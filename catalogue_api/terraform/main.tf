@@ -3,13 +3,13 @@ module "catalogue_api" {
 
   namespace = "catalogue_api_gw"
 
-  vpc_id  = "${local.vpc_id}"
-  subnets = ["${local.private_subnets}"]
+  vpc_id  = "${local.catalogue_vpc_delta_id}"
+  subnets = ["${local.vpc_delta_private_subnets}"]
 
   container_port = "8888"
 
   namespace_id  = "${local.namespace_id}"
-  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  namespace_tld = "${local.namespace_tld}"
   cluster_name  = "${aws_ecs_cluster.cluster.name}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"

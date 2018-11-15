@@ -155,3 +155,17 @@ output "catalogue_sierra_items_reindex_topic_name" {
 output "catalogue_sierra_items_reindex_topic_publish_policy" {
   value = "${module.catalogue_sierra_items_reindex_topic.publish_policy}"
 }
+
+# Catalogue VPC
+
+output "catalogue_vpc_delta_private_subnets" {
+  value = ["${module.catalogue_vpc_delta.private_subnets}"]
+}
+
+output "catalogue_vpc_delta_public_subnets" {
+  value = ["${module.catalogue_vpc_delta.public_subnets}"]
+}
+
+output "catalogue_vpc_delta_id" {
+  value = "${module.catalogue_vpc_delta.vpc_id}"
+}

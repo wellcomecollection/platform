@@ -25,12 +25,7 @@ module "romulus" {
 
   nginx_container_image = "${var.nginx_container_image}"
   nginx_container_port  = "${var.nginx_container_port}"
-}
 
-module "romulus_listener" {
-  source = "listener"
-
-  nlb_arn           = "${var.nlb_arn}"
+  lb_arn           = "${var.nlb_arn}"
   listener_port     = "${var.romulus_listener_port}"
-  target_group_name = "${module.romulus.target_group_name}"
 }
