@@ -12,10 +12,9 @@ import uk.ac.wellcome.platform.merger.logging.MergerLogging
   *
   *   - We copy across all the identifiers from the Miro work (except
   *     those which contain Sierra identifiers)
-  *   - We copy across the Miro location to the Sierra work *if* the
-  *     Sierra work doesn't already have a digital location.
-  *     In this case, the Sierra digital location supersedes the one
-  *     from Miro.
+  *
+  *   - We combine the locations on the items, and use the Miro iiif-image
+  *     location for the thumbnail.
   *
   */
 object SierraMiroMergeRule extends SierraMiroMerger with SierraMiroPartitioner {
