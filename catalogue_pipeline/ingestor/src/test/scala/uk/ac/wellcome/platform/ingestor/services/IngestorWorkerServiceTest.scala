@@ -4,7 +4,7 @@ import com.sksamuel.elastic4s.http.HttpClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
@@ -17,6 +17,8 @@ import uk.ac.wellcome.models.work.internal.{
   Subject
 }
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class IngestorWorkerServiceTest
     extends FunSpec
