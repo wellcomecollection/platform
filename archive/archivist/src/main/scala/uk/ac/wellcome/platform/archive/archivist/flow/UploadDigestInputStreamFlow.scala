@@ -6,11 +6,15 @@ import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.ArchiveDigestItemJob
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveDigestItemJob,
+  ItemDigest
+}
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ChecksumNotMatchedOnUploadError,
   UploadDigestItemError
 }
+import uk.ac.wellcome.platform.archive.archivist.models.storage.ObjectMetadata
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 import scala.util.{Failure, Success}
@@ -34,20 +38,23 @@ object UploadDigestInputStreamFlow extends Logging {
       .flatMapMerge(
         parallelism, {
           case (job, inputStream) =>
-            val digest = job.bagDigestItem.checksum
+            val digest = ItemDigest(job.bagDigestItem.checksum)
             StreamConverters
               .fromInputStream(() => inputStream)
               .log("upload bytestring")
-              .via(UploadAndCalculateDigestFlow(job.uploadLocation))
+              .via(UploadAndCalculateDigestFlow(
+                job.uploadLocation,
+                uploadMetadata(digest)))
               .log("to either")
               .map {
-                case Success(calculatedDigest) if calculatedDigest == digest =>
+                case Success(calculatedDigest)
+                    if calculatedDigest == digest.value =>
                   Right(job)
                 case Success(calculatedDigest) =>
                   warn(s"Digests didn't match: $calculatedDigest != $digest")
                   Left(
                     ChecksumNotMatchedOnUploadError(
-                      expectedChecksum = digest,
+                      expectedChecksum = digest.value,
                       actualCheckSum = calculatedDigest,
                       t = job
                     )
@@ -63,5 +70,11 @@ object UploadDigestInputStreamFlow extends Logging {
           "akka.stream.materializer.blocking-io-dispatcher"
         )
       )
+
+  def uploadMetadata(digest: ItemDigest): Option[ObjectMetadata] = {
+    Some(
+      ObjectMetadata(
+        userMetadata = Map(digest.algorithm.toString -> digest.value)))
+  }
 
 }

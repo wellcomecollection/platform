@@ -9,6 +9,7 @@ import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model._
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.archivist.models.storage.ObjectMetadata
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.annotation.tailrec
@@ -16,11 +17,15 @@ import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 object S3UploadFlow extends Logging {
-  def apply(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3) =
-    new S3UploadFlow(uploadLocation)(s3Client)
+  def apply(uploadLocation: ObjectLocation,
+            maybeUploadMetadata: Option[ObjectMetadata] = None)(
+    implicit s3Client: AmazonS3) =
+    new S3UploadFlow(uploadLocation, maybeUploadMetadata)(s3Client)
 }
 
-class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
+class S3UploadFlow(
+  uploadLocation: ObjectLocation,
+  maybeUploadMetadata: Option[ObjectMetadata])(implicit s3Client: AmazonS3)
     extends GraphStage[
       FlowShape[ByteString, Try[CompleteMultipartUploadResult]]]
     with Logging {
@@ -212,7 +217,8 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
       // TODO: How does this work???
       private def getUploadId: Try[String] = maybeUploadId match {
         case None =>
-          val triedUploadId = initializeUpload(uploadLocation)
+          val triedUploadId =
+            initializeUpload(uploadLocation, maybeUploadMetadata)
           triedUploadId.foreach(uploadId => maybeUploadId = Some(uploadId))
           triedUploadId
         case Some(initializedId) => Try(initializedId)
@@ -224,15 +230,25 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         *
         */
       private def initializeUpload(
-        uploadLocation: ObjectLocation): Try[String] = {
+        uploadLocation: ObjectLocation,
+        maybeUploadMetadata: Option[ObjectMetadata]): Try[String] = {
 
         debug(s"initializeUpload: $uploadLocation")
 
-        val initiateRequest =
-          new InitiateMultipartUploadRequest(
-            uploadLocation.namespace,
-            uploadLocation.key
-          )
+        val initiateRequest = maybeUploadMetadata match {
+          case None =>
+            new InitiateMultipartUploadRequest(
+              uploadLocation.namespace,
+              uploadLocation.key
+            )
+          case Some(objectMetadata) =>
+            debug(s"upload with metadata: $objectMetadata")
+            new InitiateMultipartUploadRequest(
+              uploadLocation.namespace,
+              uploadLocation.key,
+              objectMetadata.toS3ObjectMetadata
+            )
+        }
         Try(
           s3Client
             .initiateMultipartUpload(initiateRequest)
@@ -240,5 +256,4 @@ class S3UploadFlow(uploadLocation: ObjectLocation)(implicit s3Client: AmazonS3)
         )
       }
     }
-
 }

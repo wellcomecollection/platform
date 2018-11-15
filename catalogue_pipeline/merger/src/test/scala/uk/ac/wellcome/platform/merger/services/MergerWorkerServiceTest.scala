@@ -19,17 +19,14 @@ import uk.ac.wellcome.platform.merger.fixtures.{
   MatcherResultFixture,
   WorkerServiceFixture
 }
-import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.test.fixtures.TestWith
 
 class MergerWorkerServiceTest
     extends FunSpec
     with ScalaFutures
     with SQS
-    with Akka
     with IntegrationPatience
     with MetricsSenderFixture
-    with LocalVersionedHybridStore
     with SNS
     with Messaging
     with WorksGenerators
@@ -38,8 +35,6 @@ class MergerWorkerServiceTest
     with Matchers
     with MockitoSugar
     with WorkerServiceFixture {
-
-  case class TestObject(something: String)
 
   it(
     "reads matcher result messages, retrieves the works from vhs and sends them to sns") {
@@ -52,7 +47,7 @@ class MergerWorkerServiceTest
         val matcherResult =
           matcherResultWith(Set(Set(work3), Set(work1, work2)))
 
-        givenStoredInVhs(vhs, entries = List(work1, work2, work3))
+        givenStoredInVhs(vhs, work1, work2, work3)
 
         sendNotificationToSQS(
           queue = queue,
@@ -131,9 +126,7 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(work, olderWork)))
 
-        givenStoredInVhs(
-          vhs,
-          entries = List[TransformedBaseWork](work, newerWork))
+        givenStoredInVhs(vhs, work, newerWork)
 
         sendNotificationToSQS(
           queue = queue,
@@ -185,8 +178,8 @@ class MergerWorkerServiceTest
     val works = List(physicalWork, digitalWork)
 
     withMergerWorkerServiceFixtures {
-      case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        givenStoredInVhs(vhs, works)
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
+        givenStoredInVhs(vhs, works: _*)
 
         val matcherResult = MatcherResult(
           Set(
@@ -224,10 +217,11 @@ class MergerWorkerServiceTest
   it("splits the received works into multiple merged works if required") {
     val workPair1 = List(createSierraPhysicalWork, createSierraDigitalWork)
     val workPair2 = List(createSierraPhysicalWork, createSierraDigitalWork)
+    val works = workPair1 ++ workPair2
 
     withMergerWorkerServiceFixtures {
-      case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        givenStoredInVhs(vhs, entries = workPair1 ++ workPair2)
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
+        givenStoredInVhs(vhs, works: _*)
 
         val matcherResult = MatcherResult(
           Set(
@@ -260,10 +254,7 @@ class MergerWorkerServiceTest
   it("fails if the message sent is not a matcher result") {
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), _, metricsSender) =>
-        sendNotificationToSQS(
-          queue = queue,
-          message = TestObject("not-a-matcher-result")
-        )
+        sendInvalidJSONto(queue)
 
         eventually {
           assertQueueEmpty(queue)
@@ -280,7 +271,7 @@ class MergerWorkerServiceTest
       R]): R =
     withTransformedBaseWorkVHS { vhs =>
       withLocalSqsQueueAndDlq {
-        case queuePair @ QueuePair(queue, dlq) =>
+        case queuePair @ QueuePair(queue, _) =>
           withLocalSnsTopic { topic =>
             withMockMetricSender { mockMetricsSender =>
               withWorkerService(
