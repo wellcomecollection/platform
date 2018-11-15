@@ -127,9 +127,8 @@ class WorkIndexerTest
     }
   }
 
-  it(
-    "inserts a list of works into elasticsearch and return the list of works that failed inserting") {
-    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(
+  it("returns a list of Works that weren't indexed correctly") {
+    val subsetOfFieldsIndex = new OnlyInvisibleWorksIndex(
       elasticClient = elasticClient,
       documentType = documentType
     )
