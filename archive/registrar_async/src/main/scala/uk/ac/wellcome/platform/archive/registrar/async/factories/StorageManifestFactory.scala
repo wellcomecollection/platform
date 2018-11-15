@@ -42,12 +42,12 @@ object StorageManifestFactory extends Logging {
         s"tagmanifest-$algorithm.txt",
         " +")
     } yield {
-      val algorithm = ChecksumAlgorithm(algorithm)
+      val checksumAlgorithm = ChecksumAlgorithm(algorithm)
       StorageManifest(
         space = archiveComplete.space,
         info = bagInfo,
-        manifest = FileManifest(algorithm, manifestTuples),
-        tagManifest = FileManifest(algorithm, tagManifestTuples),
+        manifest = FileManifest(checksumAlgorithm, manifestTuples),
+        tagManifest = FileManifest(checksumAlgorithm, tagManifestTuples),
         accessLocation = StorageLocation(
           StorageProvider("aws-s3-ia"),
           ObjectLocation(
