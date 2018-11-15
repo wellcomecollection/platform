@@ -34,9 +34,7 @@ trait LocalWorksVhs
     }
 
   def givenStoredInVhs(
-    vhs: VersionedHybridStore[TransformedBaseWork,
-                              EmptyMetadata,
-                              ObjectStore[TransformedBaseWork]],
+    vhs: TransformedBaseWorkVHS,
     work: TransformedBaseWork): Assertion = {
     vhs.updateRecord(work.sourceIdentifier.toString)(
       ifNotExisting = (work, EmptyMetadata()))((_, _) =>
@@ -50,9 +48,7 @@ trait LocalWorksVhs
   }
 
   def givenStoredInVhs(
-    vhs: VersionedHybridStore[TransformedBaseWork,
-                              EmptyMetadata,
-                              ObjectStore[TransformedBaseWork]],
+    vhs: TransformedBaseWorkVHS,
     entries: List[TransformedBaseWork]): List[Assertion] =
     entries.map { work =>
       givenStoredInVhs(vhs = vhs, work = work)
