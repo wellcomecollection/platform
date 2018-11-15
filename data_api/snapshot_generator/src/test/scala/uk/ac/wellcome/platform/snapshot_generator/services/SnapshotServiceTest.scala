@@ -7,11 +7,11 @@ import akka.http.scaladsl.model.Uri
 import akka.stream.alpakka.s3.S3Exception
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.display.json.DisplayJsonUtil
+import uk.ac.wellcome.display.json.DisplayJsonUtil._
 import uk.ac.wellcome.display.models.{
   ApiVersions,
   V1WorksIncludes,
@@ -46,8 +46,6 @@ class SnapshotServiceTest
     with ElasticsearchFixtures
     with WorksGenerators {
 
-  val mapper = new ObjectMapper with ScalaObjectMapper
-
   private def withSnapshotService[R](
     actorSystem: ActorSystem,
     s3AkkaClient: S3Client,
@@ -62,8 +60,7 @@ class SnapshotServiceTest
       actorSystem = actorSystem,
       elasticClient = elasticClient,
       elasticConfig = elasticConfig,
-      akkaS3Client = s3AkkaClient,
-      objectMapper = mapper
+      akkaS3Client = s3AkkaClient
     )
 
     testWith(snapshotService)
@@ -126,9 +123,7 @@ class SnapshotServiceTest
             .map {
               DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
             }
-            .map {
-              mapper.writeValueAsString(_)
-            }
+            .map { DisplayJsonUtil.toJson(_) }
             .mkString("\n") + "\n"
 
           contents shouldBe expectedContents
@@ -174,9 +169,7 @@ class SnapshotServiceTest
             .map {
               DisplayWorkV2(_, includes = V2WorksIncludes.includeAll())
             }
-            .map {
-              mapper.writeValueAsString(_)
-            }
+            .map { DisplayJsonUtil.toJson(_) }
             .mkString("\n") + "\n"
 
           contents shouldBe expectedContents
@@ -223,9 +216,7 @@ class SnapshotServiceTest
             .map {
               DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
             }
-            .map {
-              mapper.writeValueAsString(_)
-            }
+            .map { DisplayJsonUtil.toJson(_) }
             .mkString("\n") + "\n"
 
           contents shouldBe expectedContents
@@ -276,8 +267,7 @@ class SnapshotServiceTest
               actorSystem = actorSystem,
               elasticClient = elasticClient,
               elasticConfig = elasticConfig,
-              akkaS3Client = s3Client,
-              objectMapper = mapper
+              akkaS3Client = s3Client
             )
             val snapshotJob = SnapshotJob(
               publicBucketName = bucket.name,
@@ -327,8 +317,7 @@ class SnapshotServiceTest
             actorSystem = actorSystem,
             elasticClient = elasticClient,
             elasticConfig = elasticConfig,
-            akkaS3Client = s3Client,
-            objectMapper = mapper
+            akkaS3Client = s3Client
           )
 
           snapshotService.buildLocation(
