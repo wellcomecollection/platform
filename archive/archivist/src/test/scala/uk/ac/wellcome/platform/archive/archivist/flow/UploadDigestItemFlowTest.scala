@@ -7,7 +7,7 @@ import akka.stream.{ActorAttributes, Supervision}
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSpec, Inside, Matchers}
+import org.scalatest.{Entry, FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
@@ -60,9 +60,15 @@ class UploadDigestItemFlowTest
 
             whenReady(futureResult) { result =>
               result shouldBe Right(archiveItemJob)
-              getContentFromS3(
-                bucket,
-                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent
+              val s3Key =
+                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName"
+
+              val storedObject = s3Client.getObject(bucket.name, s3Key)
+              storedObject.getObjectMetadata.getUserMetadata should contain only Entry(
+                "sha-256",
+                digest)
+
+              getContentFromS3(bucket, s3Key) shouldBe fileContent
             }
 
           }
