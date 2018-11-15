@@ -6,7 +6,7 @@ def transform(input_data):
     try:
         json_string = input_data['maybeBibRecord']['data']
         bib_record = json.loads(json_string)
-    except KeyError:
+    except KeyError, TypeError:
         bib_record = {}
 
     # ignore varFields on first pass
