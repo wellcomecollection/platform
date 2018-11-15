@@ -12,6 +12,7 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RecorderPlaybackServiceTest
     extends FunSpec
@@ -26,9 +27,7 @@ class RecorderPlaybackServiceTest
     withRecorderVHS { vhs =>
       givenStoredInVhs(vhs, work)
 
-      val service = new RecorderPlaybackService(vhs)
-
-      whenReady(service.fetchAllWorks(getWorkIdentifiers(work))) { result =>
+      whenReady(fetchAllWorks(vhs = vhs, work)) { result =>
         result shouldBe List(Some(work))
       }
     }
@@ -38,12 +37,7 @@ class RecorderPlaybackServiceTest
     val work = createUnidentifiedWork
 
     withRecorderVHS { vhs =>
-      val service = new RecorderPlaybackService(vhs)
-
-      whenReady(
-        service
-          .fetchAllWorks(getWorkIdentifiers(work))
-          .failed) { result =>
+      whenReady(fetchAllWorks(vhs = vhs, work).failed) { result =>
         result shouldBe a[NoSuchElementException]
         result.getMessage shouldBe s"Work ${work.sourceIdentifier} is not in VHS!"
       }
@@ -54,9 +48,7 @@ class RecorderPlaybackServiceTest
     val work = createUnidentifiedWorkWith(version = 0)
 
     withRecorderVHS { vhs =>
-      val service = new RecorderPlaybackService(vhs)
-
-      whenReady(service.fetchAllWorks(getWorkIdentifiers(work))) { result =>
+      whenReady(fetchAllWorks(vhs = vhs, work)) { result =>
         result shouldBe List(None)
       }
     }
@@ -73,9 +65,7 @@ class RecorderPlaybackServiceTest
     withRecorderVHS { vhs =>
       givenStoredInVhs(vhs, workToStore)
 
-      val service = new RecorderPlaybackService(vhs)
-
-      whenReady(service.fetchAllWorks(getWorkIdentifiers(work))) { result =>
+      whenReady(fetchAllWorks(vhs = vhs, work)) { result =>
         result shouldBe List(None)
       }
     }
@@ -101,9 +91,7 @@ class RecorderPlaybackServiceTest
     withRecorderVHS { vhs =>
       givenStoredInVhs(vhs, storedWorks: _*)
 
-      val service = new RecorderPlaybackService(vhs)
-
-      whenReady(service.fetchAllWorks(getWorkIdentifiers(lookupWorks: _*))) {
+      whenReady(fetchAllWorks(vhs = vhs, lookupWorks: _*)) {
         result =>
           result shouldBe (unchangedWorks.map { Some(_) } ++ (4 to 7).map { _ =>
             None
@@ -112,17 +100,19 @@ class RecorderPlaybackServiceTest
     }
   }
 
-  private def getWorkIdentifiers(
-    works: TransformedBaseWork*): List[WorkIdentifier] =
-    works.map { w =>
-      WorkIdentifier(w)
-    }.toList
+  private def fetchAllWorks(
+    vhs: TransformedBaseWorkVHS,
+    works: TransformedBaseWork*): Future[List[Option[TransformedBaseWork]]] = {
+    val service = new RecorderPlaybackService(vhs)
+
+    val workIdentifiers = works
+      .map { w => WorkIdentifier(w)}
+
+    service.fetchAllWorks(workIdentifiers)
+  }
 
   private def withRecorderVHS[R](
-    testWith: TestWith[VersionedHybridStore[TransformedBaseWork,
-                                            EmptyMetadata,
-                                            ObjectStore[TransformedBaseWork]],
-                       R]): R = {
+    testWith: TestWith[TransformedBaseWorkVHS, R]): R = {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
         withTypeVHS[TransformedBaseWork, EmptyMetadata, R](bucket, table) {
