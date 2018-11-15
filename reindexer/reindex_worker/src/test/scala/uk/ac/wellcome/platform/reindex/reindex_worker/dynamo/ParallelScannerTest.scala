@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.dynamo.TestVersioned
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
@@ -25,13 +26,13 @@ class ParallelScannerTest
           TestVersioned(id = "123", data = "hello world", version = 1)
         Scanamo.put(dynamoDbClient)(table.name)(record)
 
-        val futureResult = parallelScanner.scan[TestVersioned](
+        val futureResult = parallelScanner.scan(
           segment = 0,
           totalSegments = 1
         )
 
         whenReady(futureResult) { result =>
-          result shouldBe List(Right(record))
+          result.map { fromJson[TestVersioned](_).get } shouldBe List(record)
         }
       }
     }
@@ -49,7 +50,7 @@ class ParallelScannerTest
     "returns a failed future if asked for a segment that's greater than totalSegments") {
     withLocalDynamoDbTable { table =>
       withParallelScanner(table) { parallelScanner =>
-        val future = parallelScanner.scan[TestVersioned](
+        val future = parallelScanner.scan(
           segment = 10,
           totalSegments = 5
         )
@@ -76,19 +77,16 @@ class ParallelScannerTest
         }
 
         // Note that segments are 0-indexed
-        val futureResults = (0 to segmentCount - 1).map { segment =>
-          parallelScanner.scan[TestVersioned](
+        val futureResults = (0 until segmentCount).map { segment =>
+          parallelScanner.scan(
             segment = segment,
             totalSegments = segmentCount
           )
         }
 
-        whenReady(Future.sequence(futureResults)) { results =>
-          val actualRecords: List[TestVersioned] = results.flatten.toList
-            .map {
-              _.right.get
-            }
-          actualRecords should contain theSameElementsAs records
+        whenReady(Future.sequence(futureResults)) {
+          actualRecords: Seq[List[String]] =>
+            actualRecords.flatten.map { fromJson[TestVersioned](_).get } should contain theSameElementsAs records
         }
       }
     }

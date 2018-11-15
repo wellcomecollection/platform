@@ -5,7 +5,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.reindex.reindex_worker.services.{
-  HybridRecordSender,
+  BulkSNSSender,
   RecordReader,
   ReindexWorkerService
 }
@@ -27,13 +27,13 @@ trait WorkerServiceFixture extends Akka with DynamoFixtures with SNS with SQS {
             )
 
             withSNSWriter(topic) { snsWriter =>
-              val hybridRecordSender = new HybridRecordSender(
+              val hybridRecordSender = new BulkSNSSender(
                 snsWriter = snsWriter
               )
 
               val workerService = new ReindexWorkerService(
                 recordReader = recordReader,
-                hybridRecordSender = hybridRecordSender,
+                bulkSNSSender = hybridRecordSender,
                 sqsStream = sqsStream
               )(actorSystem = actorSystem, ec = global)
 

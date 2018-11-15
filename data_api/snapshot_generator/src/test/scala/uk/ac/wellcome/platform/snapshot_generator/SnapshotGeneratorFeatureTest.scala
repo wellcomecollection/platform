@@ -43,14 +43,12 @@ class SnapshotGeneratorFeatureTest
     with DisplayV1SerialisationTestBase
     with WorksGenerators {
 
-  val itemType = "work"
-
   it("completes a snapshot generation") {
     withFixtures {
       case (queue, topic, indexNameV1, _, publicBucket: Bucket) =>
         val works = createIdentifiedWorks(count = 3)
 
-        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
+        insertIntoElasticsearch(indexNameV1, works: _*)
 
         val publicObjectKey = "target.txt.gz"
 
@@ -113,13 +111,12 @@ class SnapshotGeneratorFeatureTest
     testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+        withLocalElasticsearchIndex { indexNameV1 =>
+          withLocalElasticsearchIndex { indexNameV2 =>
             withLocalS3Bucket { bucket =>
               val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
                 indexNameV1,
-                indexNameV2,
-                itemType) ++ s3ClientLocalFlags
+                indexNameV2) ++ s3ClientLocalFlags
               withServer(flags) { _ =>
                 testWith((queue, topic, indexNameV1, indexNameV2, bucket))
               }

@@ -17,7 +17,6 @@ class ServerTest
     with SQS
     with ScalaFutures
     with ElasticsearchFixtures {
-  val itemType = "work"
 
   it("shows the healthcheck message") {
     withFixtures { server =>
@@ -31,12 +30,11 @@ class ServerTest
   private def withFixtures[R](testWith: TestWith[EmbeddedHttpServer, R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+        withLocalElasticsearchIndex { indexNameV1 =>
+          withLocalElasticsearchIndex { indexNameV2 =>
             val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
               indexNameV1,
-              indexNameV2,
-              itemType)
+              indexNameV2)
             withServer(flags) { server =>
               testWith(server)
             }

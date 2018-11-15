@@ -21,7 +21,6 @@ import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
@@ -42,11 +41,8 @@ trait MatcherFixtures
       _.getEpochSecond
     )
 
-  def withWorkerService[R](
-    queue: SQS.Queue,
-    storageBucket: Bucket,
-    topic: Topic,
-    graphTable: Table)(testWith: TestWith[MatcherWorkerService, R])(
+  def withWorkerService[R](queue: SQS.Queue, topic: Topic, graphTable: Table)(
+    testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { actorSystem =>
@@ -57,7 +53,6 @@ trait MatcherFixtures
                 workMatcher =>
                   withMessageStream[TransformedBaseWork, R](
                     actorSystem = actorSystem,
-                    bucket = storageBucket,
                     queue = queue,
                     metricsSender = metricsSender
                   ) { messageStream =>
@@ -78,13 +73,11 @@ trait MatcherFixtures
       }
     }
 
-  def withWorkerService[R](
-    queue: SQS.Queue,
-    storageBucket: Bucket,
-    topic: Topic)(testWith: TestWith[MatcherWorkerService, R])(
+  def withWorkerService[R](queue: SQS.Queue, topic: Topic)(
+    testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
-      withWorkerService(queue, storageBucket, topic, graphTable) { service =>
+      withWorkerService(queue, topic, graphTable) { service =>
         testWith(service)
       }
     }

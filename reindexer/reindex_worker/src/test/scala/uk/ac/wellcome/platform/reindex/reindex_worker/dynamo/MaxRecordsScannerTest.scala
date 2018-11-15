@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.reindex.reindex_worker.dynamo
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.DynamoFixtures
 import uk.ac.wellcome.storage.dynamo.TestVersioned
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
@@ -21,10 +22,10 @@ class MaxRecordsScannerTest
           TestVersioned(id = "123", data = "hello world", version = 1)
         Scanamo.put(dynamoDbClient)(table.name)(record)
 
-        val futureResult = maxResultScanner.scan[TestVersioned](maxRecords = 1)
+        val futureResult = maxResultScanner.scan(maxRecords = 1)
 
         whenReady(futureResult) { result =>
-          result shouldBe List(Right(record))
+          result.map { fromJson[TestVersioned](_).get } shouldBe List(record)
         }
       }
     }
@@ -41,10 +42,10 @@ class MaxRecordsScannerTest
           Scanamo.put(dynamoDbClient)(table.name)(record)
         }
 
-        val futureResult = maxResultScanner.scan[TestVersioned](maxRecords = 10)
+        val futureResult = maxResultScanner.scan(maxRecords = 10)
 
         whenReady(futureResult) { result =>
-          result.map { _.right.get } should contain theSameElementsAs records
+          result.map { fromJson[TestVersioned](_).get } should contain theSameElementsAs records
         }
       }
     }

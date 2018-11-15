@@ -13,7 +13,7 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
   ScanSpecScanner
 }
 import uk.ac.wellcome.platform.reindex.reindex_worker.services.{
-  HybridRecordSender,
+  BulkSNSSender,
   RecordReader,
   ReindexWorkerService
 }
@@ -44,13 +44,13 @@ object Main extends App with Logging {
     )
   )
 
-  val hybridRecordSender = new HybridRecordSender(
+  val hybridRecordSender = new BulkSNSSender(
     snsWriter = SNSBuilder.buildSNSWriter(config)
   )
 
   val workerService = new ReindexWorkerService(
     recordReader = recordReader,
-    hybridRecordSender = hybridRecordSender,
+    bulkSNSSender = hybridRecordSender,
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
   )
 

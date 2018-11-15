@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, WorkType}
 import uk.ac.wellcome.platform.api.fixtures.{
@@ -21,8 +21,6 @@ class WorksServiceTest
     with ScalaFutures
     with SearchOptionsGenerators
     with WorksGenerators {
-
-  val itemType = "work"
 
   describe("listWorks") {
     it("gets records in Elasticsearch") {
@@ -100,12 +98,12 @@ class WorksServiceTest
 
   describe("findWorkById") {
     it("gets a DisplayWork by id") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         withElasticsearchService { searchService =>
           withWorksService(searchService) { worksService =>
             val work = createIdentifiedWork
 
-            insertIntoElasticsearch(indexName, itemType, work)
+            insertIntoElasticsearch(indexName, work)
 
             val documentOptions =
               createElasticsearchDocumentOptionsWith(indexName = indexName)
@@ -123,7 +121,7 @@ class WorksServiceTest
     }
 
     it("returns a future of None if it cannot get a record by id") {
-      withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         withElasticsearchService { searchService =>
           withWorksService(searchService) { worksService =>
             val documentOptions =
@@ -260,20 +258,20 @@ class WorksServiceTest
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertResultIsCorrect(
-    partialSearchFunction: (WorksService) => (
-      (ElasticsearchDocumentOptions,
-       WorksSearchOptions) => Future[ResultList])
+    partialSearchFunction: WorksService => (
+      ElasticsearchDocumentOptions,
+      WorksSearchOptions) => Future[ResultList]
   )(
     allWorks: Seq[IdentifiedBaseWork],
     expectedWorks: Seq[IdentifiedBaseWork],
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions
-  ) =
-    withLocalElasticsearchIndex(itemType = itemType) { indexName =>
+  ): Assertion =
+    withLocalElasticsearchIndex { indexName =>
       withElasticsearchService { searchService =>
         withWorksService(searchService) { worksService =>
           if (!allWorks.isEmpty) {
-            insertIntoElasticsearch(indexName, itemType, allWorks: _*)
+            insertIntoElasticsearch(indexName, allWorks: _*)
           }
 
           val documentOptions = createElasticsearchDocumentOptionsWith(

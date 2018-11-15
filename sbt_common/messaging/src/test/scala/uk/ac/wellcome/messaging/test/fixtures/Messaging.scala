@@ -15,12 +15,12 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 
-import scala.util.{Random, Success}
+import scala.util.Success
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -50,14 +50,8 @@ trait Messaging
       }
     )
 
-  def messagingLocalFlags(bucket: Bucket, topic: Topic, queue: Queue) =
-    messageReaderLocalFlags(bucket, queue) ++ messageWriterLocalFlags(
-      bucket,
-      topic)
-
-  def messageReaderLocalFlags(bucket: Bucket, queue: Queue) =
+  def messageReaderLocalFlags(queue: Queue): Map[String, String] =
     Map(
-      "aws.message.reader.s3.bucketName" -> bucket.name,
       "aws.message.reader.sqs.queue.url" -> queue.url,
     ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
 
@@ -96,43 +90,35 @@ trait Messaging
 
   def withMessageStream[T, R](
     actorSystem: ActorSystem,
-    bucket: Bucket,
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
-    implicit objectStore: ObjectStore[T]) = {
+    implicit objectStore: ObjectStore[T]): R = {
     val messageConfig = MessageReaderConfig(
-      sqsConfig = createSQSConfigWith(queue),
-      s3Config = createS3ConfigWith(bucket)
+      sqsConfig = createSQSConfigWith(queue)
     )
 
     val stream = new MessageStream[T](
       actorSystem,
       asyncSqsClient,
-      s3Client,
       messageConfig,
       metricsSender)
     testWith(stream)
   }
 
   def withMessageStreamFixtures[T, R](
-    testWith: TestWith[(Bucket, MessageStream[T], QueuePair, MetricsSender), R]
-  )(implicit objectStore: ObjectStore[T]) = {
-
+    testWith: TestWith[(MessageStream[T], QueuePair, MetricsSender), R]
+  )(implicit objectStore: ObjectStore[T]): R =
     withActorSystem { actorSystem =>
-      withLocalS3Bucket { bucket =>
-        withLocalSqsQueueAndDlq {
-          case queuePair @ QueuePair(queue, _) =>
-            withMockMetricSender { metricsSender =>
-              withMessageStream[T, R](actorSystem, bucket, queue, metricsSender) {
-                stream =>
-                  testWith((bucket, stream, queuePair, metricsSender))
-              }
-
+      withLocalSqsQueueAndDlq {
+        case queuePair @ QueuePair(queue, _) =>
+          withMockMetricSender { metricsSender =>
+            withMessageStream[T, R](actorSystem, queue, metricsSender) {
+              stream =>
+                testWith((stream, queuePair, metricsSender))
             }
-        }
+          }
       }
     }
-  }
 
   /** Given a topic ARN which has received notifications containing pointers
     * to objects in S3, return the unpacked objects.
@@ -154,32 +140,20 @@ trait Messaging
       }
     }.toList
 
-  /** Store an object in S3 and send the notification to SQS.
+  /** Send a MessageNotification to SQS.
     *
     * As if another application had used a MessageWriter to send the message
     * to an SNS topic, which was forwarded to the queue.  We don't use a
     * MessageWriter instance because that sends to SNS, not SQS.
     *
-    * Also, MessageWriter contains some extra logic for sending some messages
-    * over S3, some over SNS, which is tested separately -- and which we don't
-    * need to replicate here.
+    * We always send an InlineNotification regardless of size, which makes for
+    * slightly easier debugging if queue messages ever fail.
     *
     */
-  def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(
-    implicit encoder: Encoder[T]): SendMessageResult = {
-    val s3key = Random.alphanumeric take 10 mkString
-
-    val location = ObjectLocation(namespace = bucket.name, key = s3key)
-
-    s3Client.putObject(
-      location.namespace,
-      location.key,
-      toJson(obj).get
-    )
-
+  def sendMessage[T](queue: Queue, obj: T)(
+    implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS[MessageNotification](
       queue = queue,
-      message = RemoteNotification(location)
+      message = InlineNotification(jsonString = toJson(obj).get)
     )
-  }
 }

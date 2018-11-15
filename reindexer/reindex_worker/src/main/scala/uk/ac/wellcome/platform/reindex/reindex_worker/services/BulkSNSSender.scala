@@ -1,21 +1,19 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import com.amazonaws.SdkClientException
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
-import uk.ac.wellcome.storage.vhs.HybridRecord
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HybridRecordSender(snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
-  def sendToSNS(records: List[HybridRecord]): Future[List[PublishAttempt]] = {
+class BulkSNSSender(snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
+  def sendToSNS(messages: List[String]): Future[List[PublishAttempt]] = {
     Future.sequence {
-      records
-        .map { record: HybridRecord =>
+      messages
+        .map { message: String =>
           snsWriter
             .writeMessage(
-              message = record,
+              message = message,
               subject = this.getClass.getSimpleName
             )
             .recover {
