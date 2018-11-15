@@ -134,7 +134,7 @@ class WorkIndexerTest
       documentType = documentType
     )
 
-    val validWorks = createIdentifiedWorks(count = 5)
+    val validWorks = createIdentifiedInvisibleWorks(count = 5)
     val notMatchingMappingWork = createIdentifiedWorkWith(
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
