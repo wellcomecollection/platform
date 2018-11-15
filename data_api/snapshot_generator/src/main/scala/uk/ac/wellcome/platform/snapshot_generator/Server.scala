@@ -8,7 +8,6 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.elasticsearch.{
@@ -47,8 +46,6 @@ class Server extends HttpServer {
     AkkaModule,
     ExecutionContextModule
   )
-
-  override def jacksonModule = DisplayJacksonModule
 
   override def configureHttp(router: HttpRouter) {
     router
