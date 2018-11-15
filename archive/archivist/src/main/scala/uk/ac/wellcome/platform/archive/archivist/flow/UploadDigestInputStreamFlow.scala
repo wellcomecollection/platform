@@ -74,7 +74,7 @@ object UploadDigestInputStreamFlow extends Logging {
   def uploadMetadata(digest: ItemDigest): Option[ObjectMetadata] = {
     Some(
       ObjectMetadata(
-        userMetaData = Map(digest.algorithm.toString -> digest.value)))
+        userMetadata = Map(digest.algorithm.toString -> digest.value)))
   }
 
 }

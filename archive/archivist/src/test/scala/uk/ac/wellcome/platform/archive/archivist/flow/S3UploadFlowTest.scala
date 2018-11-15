@@ -257,7 +257,7 @@ class S3UploadFlowTest
           val content = "dsrkjgherg"
           val s3Key = "key.txt"
           val metadata =
-            ObjectMetadata(userMetaData = Map("metadata" -> "1234"))
+            ObjectMetadata(userMetadata = Map("metadata" -> "1234"))
           val futureResult = StreamConverters
             .fromInputStream(() => new ByteArrayInputStream(content.getBytes()))
             .via(

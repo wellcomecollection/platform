@@ -7,7 +7,7 @@ import akka.stream._
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{ObjectMetadata => S3ObjectMetadata, _}
+import com.amazonaws.services.s3.model._
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.storage.ObjectMetadata
 import uk.ac.wellcome.storage.ObjectLocation
@@ -246,7 +246,7 @@ class S3UploadFlow(
             new InitiateMultipartUploadRequest(
               uploadLocation.namespace,
               uploadLocation.key,
-              toS3ObjectMetadata(objectMetadata)
+              objectMetadata.toS3ObjectMetadata
             )
         }
         Try(
@@ -255,14 +255,5 @@ class S3UploadFlow(
             .getUploadId
         )
       }
-
-      private def toS3ObjectMetadata(
-        metadata: ObjectMetadata): S3ObjectMetadata = {
-        val objectMetadata = new S3ObjectMetadata()
-        for ((k, v) <- metadata.userMetaData)
-          objectMetadata.addUserMetadata(k, v)
-        objectMetadata
-      }
     }
-
 }
