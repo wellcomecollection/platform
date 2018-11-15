@@ -79,6 +79,10 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
 
     result.size shouldBe 2
 
+    val sierraItem =
+      sierraDigitalWork.items.head.asInstanceOf[Identifiable[Item]]
+    val miroItem = miroWork.items.head
+
     val expectedMergedWork = sierraDigitalWork.copy(
       otherIdentifiers = sierraDigitalWork.otherIdentifiers ++ miroWork.identifiers,
       thumbnail = miroWork.thumbnail,
@@ -110,6 +114,7 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
     val sierraItem =
       sierraPhysicalWork.items.head.asInstanceOf[Identifiable[Item]]
     val digitalItem = sierraDigitalWork.items.head
+    val miroItem = miroWork.items.head
 
     val expectedMergedWork = sierraPhysicalWork.copy(
       otherIdentifiers = sierraPhysicalWork.otherIdentifiers ++ sierraDigitalWork.identifiers ++ miroWork.identifiers,
