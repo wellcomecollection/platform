@@ -97,7 +97,7 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
     // This source generates JSON strings of DisplayWork instances, which
     // should be written to the destination snapshot.
     val jsonStrings: Source[String, Any] = displayWorks
-      .via(DisplayWorkToJsonStringFlow(mapper = objectMapper))
+      .via(DisplayWorkToJsonStringFlow())
 
     // This source generates gzip-compressed JSON strings, corresponding to
     // the DisplayWork instances from the source snapshot.
