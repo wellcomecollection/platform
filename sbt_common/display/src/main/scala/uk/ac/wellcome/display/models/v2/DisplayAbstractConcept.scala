@@ -96,10 +96,9 @@ case class DisplayConcept(
   ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     dataType = "String"
-  ) label: String
-) extends DisplayAbstractConcept {
-  @JsonProperty("type") val ontologyType: String = "Concept"
-}
+  ) label: String,
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Concept"
+) extends DisplayAbstractConcept
 
 @ApiModel(
   value = "Period",
@@ -118,7 +117,7 @@ case class DisplayPeriod(
   @ApiModelProperty(
     dataType = "String"
   ) label: String,
-  @JsonProperty("type") @JsonKey("type") val ontologyType: String = "Period"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Period"
 ) extends DisplayAbstractConcept
 
 case object DisplayPeriod {

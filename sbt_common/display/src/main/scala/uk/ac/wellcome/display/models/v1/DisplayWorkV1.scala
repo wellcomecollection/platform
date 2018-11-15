@@ -93,7 +93,7 @@ case class DisplayWorkV1(
     value =
       "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."
   )
-  @JsonKey("type") @JsonProperty("type") ontologyType: String = "Work"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Work"
 ) extends DisplayWork
 
 case object DisplayWorkV1 {
