@@ -38,6 +38,7 @@ class SierraMiroMergeRuleTest
       }
 
       it("copies identifiers from the Miro work to the Sierra work") {
+        mergedWork.sourceIdentifier shouldBe sierraPhysicalWork.sourceIdentifier
         mergedWork.otherIdentifiers shouldBe sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers
       }
 
@@ -87,6 +88,7 @@ class SierraMiroMergeRuleTest
       }
 
       it("copies identifiers from the Miro work to the Sierra work") {
+        mergedWork.sourceIdentifier shouldBe sierraPhysicalWork.sourceIdentifier
         mergedWork.otherIdentifiers shouldBe sierraPhysicalWork.otherIdentifiers ++ miroWork.identifiers
       }
 
