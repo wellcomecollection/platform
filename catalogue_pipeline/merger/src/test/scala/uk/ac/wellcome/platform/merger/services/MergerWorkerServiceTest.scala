@@ -39,8 +39,6 @@ class MergerWorkerServiceTest
     with MockitoSugar
     with WorkerServiceFixture {
 
-  case class TestObject(something: String)
-
   it(
     "reads matcher result messages, retrieves the works from vhs and sends them to sns") {
     withMergerWorkerServiceFixtures {
@@ -259,10 +257,7 @@ class MergerWorkerServiceTest
   it("fails if the message sent is not a matcher result") {
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), _, metricsSender) =>
-        sendNotificationToSQS(
-          queue = queue,
-          message = TestObject("not-a-matcher-result")
-        )
+        sendInvalidJSONto(queue)
 
         eventually {
           assertQueueEmpty(queue)
