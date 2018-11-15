@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import java.io.File
+
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
@@ -8,25 +10,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveJobError,
-  ChecksumNotMatchedOnUploadError,
-  FileNotFoundError
-}
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  IngestRequestContextGenerators
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, IngestRequestContextGenerators}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -85,6 +73,8 @@ class ArchiveZipFileFlowTest
                             event.description shouldBe "Bag uploaded and verified successfully"
                         }
                       }
+
+                      new File(zipFile.getName).exists() shouldBe false
                     }
                 }
             }
