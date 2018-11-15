@@ -183,7 +183,7 @@ class MergerWorkerServiceTest
     val works = List(physicalWork, digitalWork)
 
     withMergerWorkerServiceFixtures {
-      case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
         givenStoredInVhs(vhs, works: _*)
 
         val matcherResult = MatcherResult(
@@ -225,7 +225,7 @@ class MergerWorkerServiceTest
     val works = workPair1 ++ workPair2
 
     withMergerWorkerServiceFixtures {
-      case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
         givenStoredInVhs(vhs, works: _*)
 
         val matcherResult = MatcherResult(
