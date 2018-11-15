@@ -123,11 +123,11 @@ class SierraMiroMergeRuleTest
 
   describe("does not merge unless passed exactly one Sierra and one Miro work") {
     it("does not merge a single Sierra  work") {
-      assertWorksAreNotMerged(Seq(createUnidentifiedSierraWork))
+      assertWorksAreNotMerged(createUnidentifiedSierraWork)
     }
 
     it("does not merge a single Sierra physical work") {
-      assertWorksAreNotMerged(Seq(createMiroWork))
+      assertWorksAreNotMerged(createMiroWork)
     }
 
     it("does not merge multiple Sierra works") {
@@ -141,7 +141,7 @@ class SierraMiroMergeRuleTest
     }
 
     it("does not merge if there are no Sierra works") {
-      assertWorksAreNotMerged(createIsbnWorks(5))
+      assertWorksAreNotMerged(createIsbnWorks(5): _*)
     }
 
     it(
@@ -163,9 +163,6 @@ class SierraMiroMergeRuleTest
   }
 
   private def assertWorksAreNotMerged(works: BaseWork*): Assertion =
-    assertWorksAreNotMerged(works)
-
-  private def assertWorksAreNotMerged(works: Seq[BaseWork]): Assertion =
     mergeAndRedirectWorks(works) shouldBe works
 
   private def mergeAndRedirectWorks(works: Seq[BaseWork]): Seq[BaseWork] = {
