@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal._
 
@@ -20,11 +21,10 @@ case class DisplayItemV1(
   ) identifiers: Option[List[DisplayIdentifierV1]] = None,
   @ApiModelProperty(
     value = "List of locations that provide access to the item"
-  ) locations: List[DisplayLocationV1] = List()
-) {
+  ) locations: List[DisplayLocationV1] = List(),
   @ApiModelProperty(readOnly = true, value = "A type of thing")
-  @JsonProperty("type") val ontologyType: String = "Item"
-}
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Item"
+)
 
 object DisplayItemV1 {
   def apply(item: Identified[Item],

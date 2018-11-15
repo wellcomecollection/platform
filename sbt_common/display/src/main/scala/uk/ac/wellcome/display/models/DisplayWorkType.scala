@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal.WorkType
 
@@ -15,10 +16,9 @@ case class DisplayWorkType(
   ) id: String,
   @ApiModelProperty(
     dataType = "String"
-  ) label: String
-) {
-  @JsonProperty("type") val ontologyType: String = "WorkType"
-}
+  ) label: String,
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "WorkType"
+)
 
 case object DisplayWorkType {
   def apply(workType: WorkType): DisplayWorkType = DisplayWorkType(

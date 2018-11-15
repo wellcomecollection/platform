@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal.License
 
@@ -20,11 +21,10 @@ case class DisplayLicenseV1(
   ) label: String,
   @ApiModelProperty(
     value = "URL to the full text of a license"
-  ) url: String
-) {
+  ) url: String,
   @ApiModelProperty(readOnly = true, value = "A type of thing")
-  @JsonProperty("type") val ontologyType: String = "License"
-}
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "License"
+)
 
 case object DisplayLicenseV1 {
   def apply(license: License): DisplayLicenseV1 = DisplayLicenseV1(
