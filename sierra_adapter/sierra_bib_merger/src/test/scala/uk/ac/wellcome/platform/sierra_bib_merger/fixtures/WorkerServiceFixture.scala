@@ -34,7 +34,6 @@ trait WorkerServiceFixture
           sqsStream =>
             withSNSWriter(topic) { snsWriter =>
               val workerService = new SierraBibMergerWorkerService(
-                actorSystem = actorSystem,
                 sqsStream = sqsStream,
                 snsWriter = snsWriter,
                 sierraBibMergerUpdaterService = updaterService

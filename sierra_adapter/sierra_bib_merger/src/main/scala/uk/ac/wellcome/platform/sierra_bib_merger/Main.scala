@@ -30,7 +30,6 @@ object Main extends App with Logging {
   )
 
   val workerService = new SierraBibMergerWorkerService(
-    actorSystem = actorSystem,
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
     snsWriter = SNSBuilder.buildSNSWriter(config),
     sierraBibMergerUpdaterService = updaterService
