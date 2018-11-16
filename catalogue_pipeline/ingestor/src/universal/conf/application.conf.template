@@ -1,5 +1,5 @@
 es.host="${es_host}"
-es.port="${es_port}"
+es.port=${es_port}
 es.index="${es_index}"
 es.type="${es_doc_type}"
 aws.metrics.namespace="${metrics_namespace}"
