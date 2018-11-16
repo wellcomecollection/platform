@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.services
 
 import akka.Done
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -14,11 +15,10 @@ class SierraTransformerWorkerService(
   messageReceiver: HybridRecordReceiver[SierraTransformable],
   sierraTransformer: SierraTransformableTransformer,
   sqsStream: SQSStream[NotificationMessage]
-) {
+) extends WorkerService {
 
   def run(): Future[Done] =
-    sqsStream.foreach(this.getClass.getSimpleName, processMessage)
-
-  private def processMessage(message: NotificationMessage): Future[Unit] =
-    messageReceiver.receiveMessage(message, sierraTransformer.transform)
+    sqsStream.foreach(
+      this.getClass.getSimpleName,
+      (message: NotificationMessage) => messageReceiver.receiveMessage(message, sierraTransformer.transform))
 }

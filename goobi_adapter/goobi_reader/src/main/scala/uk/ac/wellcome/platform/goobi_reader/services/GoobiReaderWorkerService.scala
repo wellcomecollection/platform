@@ -7,6 +7,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.goobi_reader.models.{
@@ -29,7 +30,7 @@ class GoobiReaderWorkerService(
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]
 )(implicit val actorSystem: ActorSystem)
-    extends Logging {
+    extends Logging with WorkerService {
 
   implicit val materialiser: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContextExecutor =
