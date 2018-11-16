@@ -93,7 +93,7 @@ trait SQS extends Matchers with Logging with MetricsSenderFixture {
   )
 
   def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]): R =
-    withLocalSqsQueueAndDlqAndTimeout(1)(testWith)
+    withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 1)(testWith)
 
   def withLocalSqsQueueAndDlqAndTimeout[R](visibilityTimeout: Int)(
     testWith: TestWith[QueuePair, R]): R =

@@ -3,11 +3,11 @@ package uk.ac.wellcome.platform.ingestor
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
 
 import scala.collection.JavaConverters._
 
@@ -16,28 +16,24 @@ class IngestorFeatureTest
     with Matchers
     with JsonAssertions
     with ScalaFutures
-    with fixtures.Server
+    with WorkerServiceFixture
     with ElasticsearchFixtures
-    with Messaging
-    with SQS
     with WorksGenerators {
 
-  it(
-    "reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
+  it("ingests a Miro work") {
     val work = createIdentifiedWork
 
     withLocalSqsQueue { queue =>
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
       withLocalElasticsearchIndex { indexName =>
-        withServer(queue, indexName) { _ =>
+        withWorkerService(queue, indexName) { _ =>
           assertElasticsearchEventuallyHasWork(indexName, work)
         }
       }
     }
   }
 
-  it(
-    "reads a sierra identified work from the queue and ingests it in the v2 index only") {
+  it("ingests a Sierra work") {
     val work = createIdentifiedWorkWith(
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
@@ -45,8 +41,8 @@ class IngestorFeatureTest
     withLocalSqsQueue { queue =>
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
       withLocalElasticsearchIndex { indexName =>
-        withServer(queue, indexName) { _ =>
-          assertElasticsearchNeverHasWork(indexName, work)
+        withWorkerService(queue, indexName) { _ =>
+          assertElasticsearchEventuallyHasWork(indexName, work)
         }
       }
     }
@@ -55,7 +51,7 @@ class IngestorFeatureTest
   it("does not delete a message from the queue if it fails processing") {
     withLocalSqsQueue { queue =>
       withLocalElasticsearchIndex { indexName =>
-        withServer(queue, indexName) { _ =>
+        withWorkerService(queue, indexName) { _ =>
           sendNotificationToSQS(
             queue = queue,
             body = "not a json string -- this will fail parsing"

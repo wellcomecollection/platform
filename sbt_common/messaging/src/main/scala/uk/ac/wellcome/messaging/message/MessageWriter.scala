@@ -5,7 +5,6 @@ import java.util.Date
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Encoder
 import uk.ac.wellcome.messaging.sns.{
@@ -25,7 +24,7 @@ case class MessageWriterConfig(
   s3Config: S3Config
 )
 
-class MessageWriter[T] @Inject()(
+class MessageWriter[T](
   messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3
