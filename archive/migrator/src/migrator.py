@@ -45,14 +45,12 @@ def call_ingest_api(bucket_name, bags, api, space):
         if status_code != 201:
             print_result(f"ERROR calling {api}", response)
         else:
-            print(f"{message} -> {api} [{status_code}]")
-            location = response.headers.get("Location")
-            ingest = session.get(location)
-            if location:
-                print_result(location, ingest)
+            print(
+                f"{message} -> {api} [{status_code} {response.headers.get('Location')}]"
+            )
 
 
-def lambda_handler(event, _):
+def main(event, _):
     ingest_api_url = os.getenv("INGEST_API_URL")
     space = os.getenv("ARCHIVE_SPACE")
 
