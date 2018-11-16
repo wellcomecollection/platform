@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.ingestor
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
@@ -17,14 +16,11 @@ class IngestorFeatureTest
     with Matchers
     with JsonAssertions
     with ScalaFutures
-    with ElasticsearchFixtures
-    with Messaging
-    with SQS
     with WorkerServiceFixture
+    with ElasticsearchFixtures
     with WorksGenerators {
 
-  it(
-    "reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
+  it("ingests a Miro work") {
     val work = createIdentifiedWork
 
     withLocalSqsQueue { queue =>
@@ -37,8 +33,7 @@ class IngestorFeatureTest
     }
   }
 
-  it(
-    "reads a sierra identified work from the queue and ingests it in the v2 index only") {
+  it("ingests a Sierra work") {
     val work = createIdentifiedWorkWith(
       sourceIdentifier = createSierraSystemSourceIdentifier
     )
@@ -47,7 +42,7 @@ class IngestorFeatureTest
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
       withLocalElasticsearchIndex { indexName =>
         withWorkerService(queue, indexName) { _ =>
-          assertElasticsearchNeverHasWork(indexName, work)
+          assertElasticsearchEventuallyHasWork(indexName, work)
         }
       }
     }
