@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.merger.services
 
 import akka.Done
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -17,7 +18,7 @@ class MergerWorkerService(
   mergerManager: MergerManager,
   messageWriter: MessageWriter[BaseWork]
 )(implicit ec: ExecutionContext)
-    extends Logging {
+    extends Logging with WorkerService {
 
   def run(): Future[Done] =
     sqsStream.foreach(this.getClass.getSimpleName, processMessage)
