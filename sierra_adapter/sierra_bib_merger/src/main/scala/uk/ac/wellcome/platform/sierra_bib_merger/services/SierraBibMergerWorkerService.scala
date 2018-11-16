@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
 import akka.Done
-import akka.actor.{ActorSystem, Terminated}
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -13,7 +13,7 @@ class SierraBibMergerWorkerService(
   sqsStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter,
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext) extends WorkerService {
   private def process(message: NotificationMessage): Future[Unit] =
     for {
       bibRecord <- Future.fromTry(fromJson[SierraBibRecord](message.body))

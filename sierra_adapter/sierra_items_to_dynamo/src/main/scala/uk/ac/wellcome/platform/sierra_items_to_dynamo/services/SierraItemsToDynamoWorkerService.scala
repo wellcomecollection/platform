@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import akka.Done
 import akka.actor.{ActorSystem, Terminated}
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
@@ -14,7 +15,7 @@ class SierraItemsToDynamoWorkerService(
   sqsStream: SQSStream[NotificationMessage],
   dynamoInserter: DynamoInserter,
   snsWriter: SNSWriter
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext) extends WorkerService {
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {

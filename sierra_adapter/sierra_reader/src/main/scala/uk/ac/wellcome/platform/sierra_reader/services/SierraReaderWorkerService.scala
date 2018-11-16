@@ -11,26 +11,17 @@ import grizzled.slf4j.Logging
 import io.circe.Json
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{
-  SierraResourceTypes,
-  WindowStatus
-}
+import uk.ac.wellcome.platform.sierra_reader.models.{SierraResourceTypes, WindowStatus}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.transformable.sierra.{
-  AbstractSierraRecord,
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.config.models.{
-  ReaderConfig,
-  SierraAPIConfig
-}
+import uk.ac.wellcome.platform.sierra_reader.config.models.{ReaderConfig, SierraAPIConfig}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
@@ -41,9 +32,9 @@ class SierraReaderWorkerService(
   readerConfig: ReaderConfig,
   sierraAPIConfig: SierraAPIConfig
 )(implicit val actorSystem: ActorSystem)
-    extends Logging {
-  implicit val materialiser = ActorMaterializer()
-  implicit val executionContext = actorSystem.dispatcher
+    extends Logging with WorkerService {
+  implicit val materialiser: ActorMaterializer = ActorMaterializer()
+  implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
 
   val windowManager = new WindowManager(
     s3client = s3client,
