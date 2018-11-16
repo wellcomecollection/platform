@@ -21,7 +21,7 @@ module "prod" {
   source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v14.2.0"
   domain_name = "api.wellcomecollection.org"
 
-  stage_name = "prod"
+  stage_name = "default"
   api_id     = "${aws_api_gateway_rest_api.api.id}"
 
   variables = {
@@ -29,7 +29,7 @@ module "prod" {
     ingests_port = "${local.ingests_listener_port}"
   }
 
-  base_path = "catalogue"
+  base_path = "storage"
 
   # All integrations
   depends_on = "${concat(module.bags.integration_uris,module.ingests.integration_uris)}"
