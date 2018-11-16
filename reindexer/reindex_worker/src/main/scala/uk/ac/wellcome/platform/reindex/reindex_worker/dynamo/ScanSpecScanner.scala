@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.reindex.reindex_worker.dynamo
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.document._
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,9 +26,9 @@ class ScanSpecScanner(dynamoDBClient: AmazonDynamoDB)(
     * Note that this returns a Future[List], so results will be cached in-memory.
     * Design your spec accordingly.
     */
-  def scan(scanSpec: ScanSpec, tableName: String): Future[List[String]] = {
+  def scan(scanSpec: ScanSpec)(dynamoConfig: DynamoConfig): Future[List[String]] = {
     for {
-      table <- Future.successful { dynamoDB.getTable(tableName) }
+      table <- Future.successful { dynamoDB.getTable(dynamoConfig.table) }
       scanResult: ItemCollection[ScanOutcome] <- Future { table.scan(scanSpec) }
       items: List[Item] = scanResult.asScala.toList
       jsonStrings = items.map { _.toJSON }
