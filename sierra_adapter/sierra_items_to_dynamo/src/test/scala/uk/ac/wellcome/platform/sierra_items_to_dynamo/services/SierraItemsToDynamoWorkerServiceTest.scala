@@ -11,12 +11,11 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
-import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -100,7 +99,7 @@ class SierraItemsToDynamoWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withItemRecordVHS(table, bucket) { versionedHybridStore =>
           withLocalSqsQueueAndDlq {
-            case queuePair @ QueuePair(queue, dlq) =>
+            case QueuePair(queue, dlq) =>
               withActorSystem { actorSystem =>
                 withMockMetricSender { metricsSender =>
                   withLocalSnsTopic { topic =>
@@ -137,9 +136,7 @@ class SierraItemsToDynamoWorkerServiceTest
 
   def storeSingleRecord(
     itemRecord: SierraItemRecord,
-    versionedHybridStore: VersionedHybridStore[SierraItemRecord,
-                                               EmptyMetadata,
-                                               ObjectStore[SierraItemRecord]]
+    versionedHybridStore: SierraItemsVHS
   ): Assertion = {
     val putFuture =
       versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(
@@ -160,10 +157,7 @@ class SierraItemsToDynamoWorkerServiceTest
   }
 
   def withItemRecordVHS[R](table: Table, bucket: Bucket)(
-    testWith: TestWith[VersionedHybridStore[SierraItemRecord,
-                                            EmptyMetadata,
-                                            ObjectStore[SierraItemRecord]],
-                       R]): R =
+    testWith: TestWith[SierraItemsVHS, R]): R =
     withTypeVHS[SierraItemRecord, EmptyMetadata, R](
       bucket,
       table,
