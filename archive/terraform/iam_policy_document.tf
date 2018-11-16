@@ -42,7 +42,6 @@ data "aws_iam_policy_document" "ingest_get" {
   }
 }
 
-
 data "aws_iam_policy_document" "ingest_get_bagger" {
   statement {
     actions = [

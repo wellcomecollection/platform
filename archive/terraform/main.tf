@@ -249,7 +249,7 @@ module "migrator" {
   environment_variables = {
     # Private DNS
     INGEST_API_URL = "http://progress_http.archive-storage:9001/progress"
-    ARCHIVE_SPACE = "digitised"
+    ARCHIVE_SPACE  = "digitised"
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"

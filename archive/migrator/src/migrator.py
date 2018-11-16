@@ -19,15 +19,12 @@ def archive_bag_api_messages(bags, bucket, space):
             "type": "Ingest",
             "ingestType": {"id": "create", "type": "IngestType"},
             "space": {"id": f"{space}", "type": "Space"},
-            "sourceLocation":{
+            "sourceLocation": {
                 "type": "Location",
-                "provider": {
-                    "type": "Provider",
-                    "id": "aws-s3-standard"
-                },
+                "provider": {"type": "Provider", "id": "aws-s3-standard"},
                 "bucket": f"{bucket}",
-                "path": f"{bag}"
-            }
+                "path": f"{bag}",
+            },
         }
 
 
@@ -48,7 +45,10 @@ def call_ingest_api(bucket_name, bags, api, space):
         if status_code != 201:
             print_result(f"ERROR calling {api}", response)
         else:
-            print(f"{message} -> {api} [{status_code} {response.headers.get('Location')}]")
+            print(
+                f"{message} -> {api} [{status_code} {response.headers.get('Location')}]"
+            )
+
 
 def main(event, _):
     ingest_api_url = os.getenv("INGEST_API_URL")
