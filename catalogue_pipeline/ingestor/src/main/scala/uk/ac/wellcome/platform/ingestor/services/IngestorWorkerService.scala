@@ -48,7 +48,7 @@ class IngestorWorkerService(elasticClient: HttpClient,
     )
 
   private def processMessages(
-    messageBundles: List[MessageBundle]): Future[List[MessageBundle]] = {
+    messageBundles: List[MessageBundle]): Future[List[MessageBundle]] =
     for {
       works <- Future.successful(messageBundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
@@ -56,12 +56,10 @@ class IngestorWorkerService(elasticClient: HttpClient,
         indexName = ingestorConfig.elasticConfig.indexName,
         documentType = ingestorConfig.elasticConfig.documentType
       )
-
     } yield {
       val failedWorks = either.left.getOrElse(Nil)
       messageBundles.filterNot {
         case MessageBundle(_, work) => failedWorks.contains(work)
       }
     }
-  }
 }
