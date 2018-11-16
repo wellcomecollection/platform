@@ -39,7 +39,6 @@ object Dependencies {
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
     val elastic4s = "5.6.5"
-    val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
     val scalaCsv = "1.3.5"
@@ -58,15 +57,6 @@ object Dependencies {
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-stream" % versions.akka
-  )
-
-  val circeDependencies = Seq(
-    "io.circe" %% "circe-core" % versions.circeVersion,
-    "io.circe" %% "circe-generic"% versions.circeVersion,
-    "io.circe" %% "circe-generic-extras"% versions.circeVersion,
-    "io.circe" %% "circe-parser"% versions.circeVersion,
-    "io.circe" %% "circe-optics" % versions.circeVersion,
-    "io.circe" %% "circe-java8" % versions.circeVersion
   )
 
   val swaggerDependencies = Seq(
@@ -127,18 +117,22 @@ object Dependencies {
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion % "test"
   )
 
+  val typesafeDependencies: Seq[ModuleID] = Seq(
+    "com.typesafe" % "config" % versions.typesafe
+  )
+
   val wiremockDependencies = Seq(
     "com.github.tomakehurst" % "wiremock" % versions.wiremockVersion % "test"
   )
 
   // Internal Library dependency groups
-  val commonDependencies =
+  val commonDependencies: Seq[ModuleID] =
     testDependencies ++
-      loggingDependencies ++
-      circeDependencies ++ Seq(
+      loggingDependencies ++ Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
     "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
-  ) ++ apacheCommons
+  ) ++ apacheCommons ++ typesafeDependencies
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
@@ -155,10 +149,6 @@ object Dependencies {
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val finatraMonitoringDependencies = finatraDependencies ++ WellcomeDependencies.monitoringLibrary
-
-  val typesafeDependencies: Seq[ModuleID] = Seq(
-    "com.typesafe" % "config" % versions.typesafe
-  )
 
   val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
 
