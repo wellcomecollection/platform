@@ -10,8 +10,8 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
   ReindexableTable
 }
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  PartialReindexJob
+  CompleteReindexParameters,
+  PartialReindexParameters
 }
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -46,7 +46,7 @@ class RecordReaderTest
         records.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
+        val reindexJob = CompleteReindexParameters(segment = 0, totalSegments = 1)
 
         whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
@@ -64,7 +64,7 @@ class RecordReaderTest
           Scanamo.put(dynamoDbClient)(table.name)(record)
         }
 
-        val reindexJob = PartialReindexJob(maxRecords = 5)
+        val reindexJob = PartialReindexParameters(maxRecords = 5)
 
         whenReady(reader.findRecordsForReindexing(reindexJob)) {
           actualRecords =>
@@ -78,7 +78,7 @@ class RecordReaderTest
     val table = Table("does-not-exist", "no-such-index")
     withRecordReader(table) { reader =>
       val future = reader.findRecordsForReindexing(
-        CompleteReindexJob(segment = 5, totalSegments = 10))
+        CompleteReindexParameters(segment = 5, totalSegments = 10))
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }

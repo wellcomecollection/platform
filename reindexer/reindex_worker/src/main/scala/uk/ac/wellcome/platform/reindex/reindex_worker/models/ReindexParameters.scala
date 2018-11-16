@@ -11,13 +11,13 @@ package uk.ac.wellcome.platform.reindex.reindex_worker.models
   *      applications without swamping them with records.  Use this for smoke tests.
   *
   */
-sealed trait ReindexJob
+sealed trait ReindexParameters
 
-case class CompleteReindexJob(
+case class CompleteReindexParameters(
   segment: Int,
   totalSegments: Int
-) extends ReindexJob
+) extends ReindexParameters
 
-case class PartialReindexJob(
+case class PartialReindexParameters(
   maxRecords: Int
-) extends ReindexJob
+) extends ReindexParameters

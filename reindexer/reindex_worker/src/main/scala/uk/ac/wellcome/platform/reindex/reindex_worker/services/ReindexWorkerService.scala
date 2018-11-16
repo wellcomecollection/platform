@@ -4,7 +4,7 @@ import akka.Done
 import akka.actor.ActorSystem
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexParameters
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,8 +17,8 @@ class ReindexWorkerService(
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexJob: ReindexJob <- Future.fromTry(
-        fromJson[ReindexJob](message.body))
+      reindexJob: ReindexParameters <- Future.fromTry(
+        fromJson[ReindexParameters](message.body))
       recordsToSend: List[String] <- recordReader
         .findRecordsForReindexing(reindexJob)
       _ <- bulkSNSSender.sendToSNS(messages = recordsToSend)

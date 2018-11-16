@@ -15,8 +15,8 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  ReindexJob
+  CompleteReindexParameters,
+  ReindexParameters
 }
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -50,11 +50,11 @@ class ReindexWorkerServiceTest
           case QueuePair(queue, dlq) =>
             withWorkerService(queue, table, topic) { _ =>
               val reindexJob =
-                CompleteReindexJob(segment = 0, totalSegments = 1)
+                CompleteReindexParameters(segment = 0, totalSegments = 1)
 
               Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
 
-              sendNotificationToSQS[ReindexJob](
+              sendNotificationToSQS[ReindexParameters](
                 queue = queue,
                 message = reindexJob
               )
@@ -104,9 +104,9 @@ class ReindexWorkerServiceTest
     withLocalSqsQueueAndDlq {
       case QueuePair(queue, dlq) =>
         withWorkerService(queue, badTable, badTopic) { _ =>
-          val reindexJob = CompleteReindexJob(segment = 5, totalSegments = 10)
+          val reindexJob = CompleteReindexParameters(segment = 5, totalSegments = 10)
 
-          sendNotificationToSQS[ReindexJob](
+          sendNotificationToSQS[ReindexParameters](
             queue = queue,
             message = reindexJob
           )

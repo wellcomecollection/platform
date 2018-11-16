@@ -6,9 +6,9 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
   ParallelScanner
 }
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  PartialReindexJob,
-  ReindexJob
+  CompleteReindexParameters,
+  PartialReindexParameters,
+  ReindexParameters
 }
 
 import scala.concurrent.Future
@@ -23,17 +23,17 @@ class RecordReader(
   parallelScanner: ParallelScanner
 ) extends Logging {
 
-  def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[String]] = {
+  def findRecordsForReindexing(reindexJob: ReindexParameters): Future[List[String]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
 
     reindexJob match {
-      case CompleteReindexJob(segment, totalSegments) =>
+      case CompleteReindexParameters(segment, totalSegments) =>
         parallelScanner
           .scan(
             segment = segment,
             totalSegments = totalSegments
           )
-      case PartialReindexJob(maxRecords) =>
+      case PartialReindexParameters(maxRecords) =>
         maxRecordsScanner.scan(maxRecords = maxRecords)
     }
   }
