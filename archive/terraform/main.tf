@@ -249,7 +249,7 @@ module "migrator" {
   environment_variables = {
     # Private DNS
     INGEST_API_URL = "http://archive-storage_api.archive-storage_api:9000/storage/v1/ingests"
-    ARCHIVE_SPACE  = "alice-test"
+    ARCHIVE_SPACE = "alice-test"
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
