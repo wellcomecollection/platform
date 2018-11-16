@@ -1,13 +1,10 @@
 package uk.ac.wellcome.display.json
 
-import io.circe.generic.extras.{AutoDerivation, Configuration}
+import io.circe.generic.extras.AutoDerivation
 import io.circe.{Encoder, Printer}
 import io.circe.syntax._
-import uk.ac.wellcome.display.models.v1.{
-  DisplayDigitalLocationV1,
-  DisplayLocationV1,
-  DisplayPhysicalLocationV1
-}
+import uk.ac.wellcome.display.models.DisplayWork
+import uk.ac.wellcome.display.models.v1._
 import uk.ac.wellcome.display.models.v2._
 
 /** Format JSON objects as suitable for display.
@@ -25,9 +22,10 @@ object DisplayJsonUtil extends AutoDerivation {
     dropNullValues = true
   )
 
-  implicit val customConfig: Configuration =
-    Configuration.default.withDefaults
-//      .withDiscriminator("type2")
+  def toJson[T](value: T)(implicit encoder: Encoder[T]): String = {
+    assert(encoder != null)
+    printer.pretty(value.asJson)
+  }
 
   // Circe wants to add a type discriminator, and we don't want it to!  Doing so
   // would expose internal names like "DisplayDigitalLocationV1" in the public JSON.
@@ -65,8 +63,8 @@ object DisplayJsonUtil extends AutoDerivation {
     case physicalLocation: DisplayPhysicalLocationV2 => physicalLocation.asJson
   }
 
-  def toJson[T](value: T)(implicit encoder: Encoder[T]): String = {
-    assert(encoder != null)
-    printer.pretty(value.asJson)
+  implicit val displayWorkEncoder: Encoder[DisplayWork] = {
+    case work: DisplayWorkV1 => work.asJson
+    case work: DisplayWorkV2 => work.asJson
   }
 }
