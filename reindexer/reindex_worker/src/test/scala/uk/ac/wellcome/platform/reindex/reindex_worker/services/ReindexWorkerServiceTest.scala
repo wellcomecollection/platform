@@ -7,17 +7,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
-  DynamoFixtures,
-  ReindexableTable,
-  WorkerServiceFixture
-}
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{DynamoFixtures, ReindexableTable, WorkerServiceFixture}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexParameters,
-  ReindexParameters
-}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexParameters, ReindexJob}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -49,12 +42,15 @@ class ReindexWorkerServiceTest
         withLocalSqsQueueAndDlq {
           case QueuePair(queue, dlq) =>
             withWorkerService(queue) { _ =>
-              val reindexJob =
-                CompleteReindexParameters(segment = 0, totalSegments = 1)
+              val reindexJob = ReindexJob(
+                parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+                dynamoConfig = createDynamoConfigWith(table),
+                snsConfig = createSNSConfigWith(topic)
+              )
 
               Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
 
-              sendNotificationToSQS[ReindexParameters](
+              sendNotificationToSQS(
                 queue = queue,
                 message = reindexJob
               )
@@ -96,15 +92,19 @@ class ReindexWorkerServiceTest
   }
 
   it("fails if the reindex job fails") {
-    Table(name = "doesnotexist", index = "whatindex")
-    Topic("does-not-exist")
+    val badTable = Table(name = "doesnotexist", index = "whatindex")
+    val badTopic = Topic("does-not-exist")
 
     withLocalSqsQueueAndDlq {
       case QueuePair(queue, dlq) =>
         withWorkerService(queue) { _ =>
-          val reindexJob = CompleteReindexParameters(segment = 5, totalSegments = 10)
+          val reindexJob = ReindexJob(
+            parameters = CompleteReindexParameters(segment = 5, totalSegments = 10),
+            dynamoConfig = createDynamoConfigWith(badTable),
+            snsConfig = createSNSConfigWith(badTopic)
+          )
 
-          sendNotificationToSQS[ReindexParameters](
+          sendNotificationToSQS(
             queue = queue,
             message = reindexJob
           )
