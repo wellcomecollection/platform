@@ -61,6 +61,10 @@ class RegistrarHttpFeatureTest
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
+                tagManifest = FileManifest(
+                  ChecksumAlgorithm(checksumAlgorithm),
+                  List(
+                    BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
                 StorageLocation(
                   StorageProvider(providerId),
                   ObjectLocation(bucket, path)),
@@ -94,8 +98,12 @@ class RegistrarHttpFeatureTest
                           _,
                           "BagInfo"),
                         DisplayBagManifest(
-                          actualChecksumAlgorithm,
+                          actualDataManifestChecksumAlgorithm,
                           Nil,
+                          "BagManifest"),
+                        DisplayBagManifest(
+                          actualTagManifestChecksumAlgorithm,
+                          List(DisplayFileDigest("a", "bag-info.txt", "File")),
                           "BagManifest"),
                         DisplayLocation(
                           DisplayProvider(actualProviderId, "Provider"),
@@ -113,7 +121,8 @@ class RegistrarHttpFeatureTest
                       baggingDate shouldBe bagInfo.baggingDate.format(
                         DateTimeFormatter.ISO_LOCAL_DATE)
 
-                      actualChecksumAlgorithm shouldBe checksumAlgorithm
+                      actualDataManifestChecksumAlgorithm shouldBe checksumAlgorithm
+                      actualTagManifestChecksumAlgorithm shouldBe checksumAlgorithm
                       actualProviderId shouldBe providerId
                       actualBucket shouldBe bucket
                       actualPath shouldBe path
@@ -146,6 +155,10 @@ class RegistrarHttpFeatureTest
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
+                tagManifest = FileManifest(
+                  ChecksumAlgorithm(checksumAlgorithm),
+                  List(
+                    BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
                 StorageLocation(
                   StorageProvider(providerId),
                   ObjectLocation(bucket, path)),

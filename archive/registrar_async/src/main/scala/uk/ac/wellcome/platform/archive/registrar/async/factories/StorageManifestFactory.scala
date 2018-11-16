@@ -37,15 +37,17 @@ object StorageManifestFactory extends Logging {
         archiveComplete,
         s"manifest-$algorithm.txt",
         " +")
-      fileManifest = FileManifest(
-        ChecksumAlgorithm(algorithm),
-        manifestTuples
-      )
-    } yield
+      tagManifestTuples <- getBagItems(
+        archiveComplete,
+        s"tagmanifest-$algorithm.txt",
+        " +")
+    } yield {
+      val checksumAlgorithm = ChecksumAlgorithm(algorithm)
       StorageManifest(
         space = archiveComplete.space,
         info = bagInfo,
-        manifest = fileManifest,
+        manifest = FileManifest(checksumAlgorithm, manifestTuples),
+        tagManifest = FileManifest(checksumAlgorithm, tagManifestTuples),
         accessLocation = StorageLocation(
           StorageProvider("aws-s3-ia"),
           ObjectLocation(
@@ -54,6 +56,7 @@ object StorageManifestFactory extends Logging {
         ),
         createdDate = Instant.now()
       )
+    }
   }
 
   private def getBagItems(archiveComplete: ArchiveComplete,
