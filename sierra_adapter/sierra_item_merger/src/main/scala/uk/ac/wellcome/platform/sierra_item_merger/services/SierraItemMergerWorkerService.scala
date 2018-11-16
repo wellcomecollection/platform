@@ -16,7 +16,8 @@ class SierraItemMergerWorkerService(
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService,
   objectStore: ObjectStore[SierraItemRecord],
   snsWriter: SNSWriter
-)(implicit ec: ExecutionContext) extends WorkerService {
+)(implicit ec: ExecutionContext)
+    extends WorkerService {
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {

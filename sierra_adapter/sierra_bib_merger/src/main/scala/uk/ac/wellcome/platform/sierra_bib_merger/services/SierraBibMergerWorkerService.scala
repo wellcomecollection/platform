@@ -13,7 +13,8 @@ class SierraBibMergerWorkerService(
   sqsStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter,
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
-)(implicit ec: ExecutionContext) extends WorkerService {
+)(implicit ec: ExecutionContext)
+    extends WorkerService {
   private def process(message: NotificationMessage): Future[Unit] =
     for {
       bibRecord <- Future.fromTry(fromJson[SierraBibRecord](message.body))

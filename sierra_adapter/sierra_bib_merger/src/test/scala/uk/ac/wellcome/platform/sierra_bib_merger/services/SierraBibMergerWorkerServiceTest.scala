@@ -54,7 +54,7 @@ class SierraBibMergerWorkerServiceTest
       withMockMetricSender { metricsSender =>
         withLocalSnsTopic { topic =>
           withLocalSqsQueueAndDlq {
-            case queuePair@QueuePair(queue, _) =>
+            case queuePair @ QueuePair(queue, _) =>
               withLocalDynamoDbTable { table =>
                 withLocalS3Bucket { bucket =>
                   withWorkerService(bucket, table, queue, topic) { _ =>

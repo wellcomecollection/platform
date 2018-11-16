@@ -4,12 +4,20 @@ import akka.Done
 import com.google.inject.Inject
 import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.{MessageNotification, MessageStream, RemoteNotification}
+import uk.ac.wellcome.messaging.message.{
+  MessageNotification,
+  MessageStream,
+  RemoteNotification
+}
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VHSIndexEntry, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  EmptyMetadata,
+  VHSIndexEntry,
+  VersionedHybridStore
+}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -18,7 +26,8 @@ class RecorderWorkerService @Inject()(
                                              EmptyMetadata,
                                              ObjectStore[TransformedBaseWork]],
   messageStream: MessageStream[TransformedBaseWork],
-  snsWriter: SNSWriter)(implicit executionContext: ExecutionContext) extends WorkerService {
+  snsWriter: SNSWriter)(implicit executionContext: ExecutionContext)
+    extends WorkerService {
 
   def run(): Future[Done] =
     messageStream.foreach(this.getClass.getSimpleName, processMessage)

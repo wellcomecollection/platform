@@ -24,7 +24,8 @@ class ProgressHTTP(
 )(implicit val actorSystem: ActorSystem,
   materializer: ActorMaterializer,
   executionContext: ExecutionContext)
-    extends Logging with WorkerService {
+    extends Logging
+    with WorkerService {
   val progressTracker = new ProgressTracker(
     dynamoClient = dynamoClient,
     dynamoConfig = dynamoConfig

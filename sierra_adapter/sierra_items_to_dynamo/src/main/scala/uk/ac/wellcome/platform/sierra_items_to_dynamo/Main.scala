@@ -9,7 +9,10 @@ import uk.ac.wellcome.config.storage.builders.VHSBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.{DynamoInserter, SierraItemsToDynamoWorkerService}
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.{
+  DynamoInserter,
+  SierraItemsToDynamoWorkerService
+}
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
 import scala.concurrent.ExecutionContext
@@ -17,22 +20,22 @@ import scala.concurrent.ExecutionContext
 object Main extends WellcomeApp {
   val config: Config = ConfigFactory.load()
 
-    implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val executionContext: ExecutionContext =
-      AkkaBuilder.buildExecutionContext()
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
-    val versionedHybridStore =
-      VHSBuilder.buildVHS[SierraItemRecord, EmptyMetadata](config)
+  val versionedHybridStore =
+    VHSBuilder.buildVHS[SierraItemRecord, EmptyMetadata](config)
 
-    val dynamoInserter = new DynamoInserter(
-      versionedHybridStore = versionedHybridStore
-    )
+  val dynamoInserter = new DynamoInserter(
+    versionedHybridStore = versionedHybridStore
+  )
 
   val workerService = new SierraItemsToDynamoWorkerService(
-      sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
-      dynamoInserter = dynamoInserter,
-      snsWriter = SNSBuilder.buildSNSWriter(config)
-    )
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
+    dynamoInserter = dynamoInserter,
+    snsWriter = SNSBuilder.buildSNSWriter(config)
+  )
 
   run(workerService)
 }

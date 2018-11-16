@@ -5,7 +5,10 @@ import io.circe.Json
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.MessagingBuilder
-import uk.ac.wellcome.platform.idminter.config.builders.{IdentifiersTableBuilder, RDSBuilder}
+import uk.ac.wellcome.platform.idminter.config.builders.{
+  IdentifiersTableBuilder,
+  RDSBuilder
+}
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.models.IdentifiersTable
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService

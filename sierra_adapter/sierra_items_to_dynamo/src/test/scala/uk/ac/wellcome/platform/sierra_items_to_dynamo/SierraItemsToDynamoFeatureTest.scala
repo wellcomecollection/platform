@@ -8,7 +8,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.{DynamoInserterFixture, WorkerServiceFixture}
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.{
+  DynamoInserterFixture,
+  WorkerServiceFixture
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.SierraItemsToDynamoWorkerService
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -68,8 +71,9 @@ class SierraItemsToDynamoFeatureTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withItemRecordVHS(table, bucket) { vhs =>
-          withWorkerService(vhs, topic, queue, actorSystem, metricsSender) { workerService =>
-            testWith(workerService)
+          withWorkerService(vhs, topic, queue, actorSystem, metricsSender) {
+            workerService =>
+              testWith(workerService)
           }
         }
       }

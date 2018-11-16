@@ -6,7 +6,10 @@ import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.sierra_bib_merger.services.{SierraBibMergerUpdaterService, SierraBibMergerWorkerService}
+import uk.ac.wellcome.platform.sierra_bib_merger.services.{
+  SierraBibMergerUpdaterService,
+  SierraBibMergerWorkerService
+}
 import uk.ac.wellcome.sierra_adapter.config.builders.SierraTransformableVHSBuilder
 
 import scala.concurrent.ExecutionContext

@@ -15,7 +15,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class IngestorWorkerService(elasticClient: HttpClient,
                             ingestorConfig: IngestorConfig,
                             messageStream: MessageStream[IdentifiedBaseWork])(
-  implicit ec: ExecutionContext) extends WorkerService {
+  implicit ec: ExecutionContext)
+    extends WorkerService {
 
   case class MessageBundle(message: Message, work: IdentifiedBaseWork)
 

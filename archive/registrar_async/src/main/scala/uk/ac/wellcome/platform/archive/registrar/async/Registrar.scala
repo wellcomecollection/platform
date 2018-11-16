@@ -45,7 +45,8 @@ class Registrar(
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]],
   actorSystem: ActorSystem
-) extends Logging with WorkerService {
+) extends Logging
+    with WorkerService {
   def run() = {
     implicit val snsclient = snsClient
     implicit val system = actorSystem

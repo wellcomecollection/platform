@@ -9,7 +9,12 @@ import uk.ac.wellcome.config.storage.builders.VHSBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.work.internal.{BaseWork, TransformedBaseWork}
-import uk.ac.wellcome.platform.merger.services.{Merger, MergerManager, MergerWorkerService, RecorderPlaybackService}
+import uk.ac.wellcome.platform.merger.services.{
+  Merger,
+  MergerManager,
+  MergerWorkerService,
+  RecorderPlaybackService
+}
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
 import scala.concurrent.ExecutionContext

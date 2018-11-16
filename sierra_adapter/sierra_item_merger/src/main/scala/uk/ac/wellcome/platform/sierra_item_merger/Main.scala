@@ -9,7 +9,10 @@ import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.platform.sierra_item_merger.services.{SierraItemMergerUpdaterService, SierraItemMergerWorkerService}
+import uk.ac.wellcome.platform.sierra_item_merger.services.{
+  SierraItemMergerUpdaterService,
+  SierraItemMergerWorkerService
+}
 import uk.ac.wellcome.sierra_adapter.config.builders.SierraTransformableVHSBuilder
 
 import scala.concurrent.ExecutionContext
@@ -17,23 +20,23 @@ import scala.concurrent.ExecutionContext
 object Main extends WellcomeApp {
   val config: Config = ConfigFactory.load()
 
-    implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val executionContext: ExecutionContext =
-      AkkaBuilder.buildExecutionContext()
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
-    val versionedHybridStore =
-      SierraTransformableVHSBuilder.buildSierraVHS(config)
+  val versionedHybridStore =
+    SierraTransformableVHSBuilder.buildSierraVHS(config)
 
-    val updaterService = new SierraItemMergerUpdaterService(
-      versionedHybridStore = versionedHybridStore
-    )
+  val updaterService = new SierraItemMergerUpdaterService(
+    versionedHybridStore = versionedHybridStore
+  )
 
-    val workerService = new SierraItemMergerWorkerService(
-      sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
-      sierraItemMergerUpdaterService = updaterService,
-      objectStore = S3Builder.buildObjectStore[SierraItemRecord](config),
-      snsWriter = SNSBuilder.buildSNSWriter(config)
-    )
+  val workerService = new SierraItemMergerWorkerService(
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
+    sierraItemMergerUpdaterService = updaterService,
+    objectStore = S3Builder.buildObjectStore[SierraItemRecord](config),
+    snsWriter = SNSBuilder.buildSNSWriter(config)
+  )
 
   run(workerService)
 }

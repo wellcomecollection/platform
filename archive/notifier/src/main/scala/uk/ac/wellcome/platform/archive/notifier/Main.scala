@@ -14,7 +14,8 @@ object Main extends WellcomeApp {
   val config: Config = ConfigFactory.load()
 
   implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-  implicit val materializer: ActorMaterializer = AkkaBuilder.buildActorMaterializer()
+  implicit val materializer: ActorMaterializer =
+    AkkaBuilder.buildActorMaterializer()
 
   val messageStream =
     MessagingBuilder.buildMessageStream[NotificationMessage, PublishResult](

@@ -20,6 +20,7 @@ class MiroTransformerWorkerService(
   def run(): Future[Done] =
     sqsStream.foreach(
       this.getClass.getSimpleName,
-      (message: NotificationMessage) => messageReceiver.receiveMessage(message, miroTransformer.transform)
+      (message: NotificationMessage) =>
+        messageReceiver.receiveMessage(message, miroTransformer.transform)
     )
 }

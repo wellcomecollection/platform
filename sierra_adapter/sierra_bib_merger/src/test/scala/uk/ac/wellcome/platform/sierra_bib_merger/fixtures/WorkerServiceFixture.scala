@@ -22,27 +22,29 @@ trait WorkerServiceFixture
     with SierraAdapterHelpers
     with SNS
     with SQS {
-  def withWorkerService[R](bucket: Bucket, table: Table, queue: Queue, topic: Topic)(
-    testWith: TestWith[SierraBibMergerWorkerService, R]): R =
+  def withWorkerService[R](
+    bucket: Bucket,
+    table: Table,
+    queue: Queue,
+    topic: Topic)(testWith: TestWith[SierraBibMergerWorkerService, R]): R =
     withActorSystem { actorSystem =>
       withSierraVHS(bucket, table) { versionedHybridStore =>
         val updaterService = new SierraBibMergerUpdaterService(
           versionedHybridStore = versionedHybridStore
         )
 
-        withSQSStream[NotificationMessage, R](actorSystem, queue) {
-          sqsStream =>
-            withSNSWriter(topic) { snsWriter =>
-              val workerService = new SierraBibMergerWorkerService(
-                sqsStream = sqsStream,
-                snsWriter = snsWriter,
-                sierraBibMergerUpdaterService = updaterService
-              )
+        withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+          withSNSWriter(topic) { snsWriter =>
+            val workerService = new SierraBibMergerWorkerService(
+              sqsStream = sqsStream,
+              snsWriter = snsWriter,
+              sierraBibMergerUpdaterService = updaterService
+            )
 
-              workerService.run()
+            workerService.run()
 
-              testWith(workerService)
-            }
+            testWith(workerService)
+          }
         }
       }
     }

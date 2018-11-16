@@ -31,7 +31,8 @@ class Archivist(
   snsRegistrarConfig: SNSConfig,
   snsProgressConfig: SNSConfig
 )(implicit val actorSystem: ActorSystem)
-    extends Logging with WorkerService {
+    extends Logging
+    with WorkerService {
   def run(): Future[Done] = {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")

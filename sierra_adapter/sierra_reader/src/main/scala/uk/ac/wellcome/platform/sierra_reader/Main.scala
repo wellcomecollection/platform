@@ -8,7 +8,10 @@ import uk.ac.wellcome.config.messaging.builders.SQSBuilder
 import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.sierra_reader.config.builders.{ReaderConfigBuilder, SierraAPIConfigBuilder}
+import uk.ac.wellcome.platform.sierra_reader.config.builders.{
+  ReaderConfigBuilder,
+  SierraAPIConfigBuilder
+}
 import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
 
 object Main extends WellcomeApp {

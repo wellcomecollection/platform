@@ -14,7 +14,8 @@ class ReindexWorkerService(
   recordReader: RecordReader,
   bulkSNSSender: BulkSNSSender,
   sqsStream: SQSStream[NotificationMessage]
-)(implicit val actorSystem: ActorSystem, ec: ExecutionContext) extends WorkerService {
+)(implicit val actorSystem: ActorSystem, ec: ExecutionContext)
+    extends WorkerService {
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {

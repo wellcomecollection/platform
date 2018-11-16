@@ -30,7 +30,8 @@ class GoobiReaderWorkerService(
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]
 )(implicit val actorSystem: ActorSystem)
-    extends Logging with WorkerService {
+    extends Logging
+    with WorkerService {
 
   implicit val materialiser: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContextExecutor =

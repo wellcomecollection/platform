@@ -20,5 +20,6 @@ class SierraTransformerWorkerService(
   def run(): Future[Done] =
     sqsStream.foreach(
       this.getClass.getSimpleName,
-      (message: NotificationMessage) => messageReceiver.receiveMessage(message, sierraTransformer.transform))
+      (message: NotificationMessage) =>
+        messageReceiver.receiveMessage(message, sierraTransformer.transform))
 }
