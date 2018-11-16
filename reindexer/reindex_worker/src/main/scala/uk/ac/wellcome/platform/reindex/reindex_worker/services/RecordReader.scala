@@ -17,11 +17,11 @@ class RecordReader(
   parallelScanner: ParallelScanner
 ) extends Logging {
 
-  def findRecordsForReindexing(dynamoConfig: DynamoConfig, reindexJob: ReindexParameters): Future[List[String]] = {
-    debug(s"Finding records that need reindexing for $reindexJob")
+  def findRecordsForReindexing(dynamoConfig: DynamoConfig, reindexParameters: ReindexParameters): Future[List[String]] = {
+    debug(s"Finding records that need reindexing for $reindexParameters")
 
     val scannerMethod =
-      reindexJob match {
+      reindexParameters match {
         case CompleteReindexParameters(segment, totalSegments) =>
           parallelScanner
             .scan(

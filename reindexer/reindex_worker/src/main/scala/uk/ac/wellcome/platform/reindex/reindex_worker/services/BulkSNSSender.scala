@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import com.amazonaws.SdkClientException
-import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSMessageWriter, SNSWriter}
+import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSMessageWriter}
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
 
 import scala.concurrent.{ExecutionContext, Future}
