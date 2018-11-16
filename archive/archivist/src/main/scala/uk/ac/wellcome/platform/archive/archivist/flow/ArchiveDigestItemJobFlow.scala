@@ -26,7 +26,7 @@ object ArchiveDigestItemJobFlow extends Logging {
           ArchiveDigestItemJob,
           Either[ArchiveError[ArchiveDigestItemJob], ArchiveDigestItemJob]](
           ifLeft = OnErrorFlow())(
-          ifRight = DownloadDigestItemFlow(parallelism)))
+          ifRight = DownloadAndVerifyDigestItemFlow(parallelism)))
       .log("download verified")
   }
 }

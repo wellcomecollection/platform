@@ -44,7 +44,7 @@ object ArchiveTagManifestFlow extends Logging {
           })(
           ifRight = Flow[(ArchiveItemJob, String)]
             .map(context => archiveDigestItemJob _ tupled context)
-            .via(DownloadDigestItemFlow(parallelism))
+            .via(DownloadAndVerifyDigestItemFlow(parallelism))
             .via(extractArchiveJobFlow)
         )
       )

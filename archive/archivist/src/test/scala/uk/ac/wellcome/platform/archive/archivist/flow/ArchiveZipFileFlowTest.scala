@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import java.io.File
+
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
@@ -85,6 +87,8 @@ class ArchiveZipFileFlowTest
                             event.description shouldBe "Bag uploaded and verified successfully"
                         }
                       }
+
+                      new File(zipFile.getName).exists() shouldBe false
                     }
                 }
             }

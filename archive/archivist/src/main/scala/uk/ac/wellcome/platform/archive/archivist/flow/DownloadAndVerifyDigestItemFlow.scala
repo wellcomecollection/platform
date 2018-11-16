@@ -14,7 +14,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.{
 
 import scala.util.{Failure, Success, Try}
 
-object DownloadDigestItemFlow extends Logging {
+object DownloadAndVerifyDigestItemFlow extends Logging {
 
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[ArchiveDigestItemJob,
