@@ -28,7 +28,6 @@ object Main extends WellcomeApp {
     )
 
     new SierraItemsToDynamoWorkerService(
-      actorSystem = actorSystem,
       sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
       dynamoInserter = dynamoInserter,
       snsWriter = SNSBuilder.buildSNSWriter(config)
