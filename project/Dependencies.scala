@@ -32,6 +32,7 @@ object Dependencies {
     val akkaStreamAlpakka = "0.20"
     val aws = "1.11.95"
     val apacheLogging = "2.8.2"
+    val circe = "0.9.0"
     val finatra = "18.4.0"
     val guice = "4.2.0"
     val logback = "1.1.8"
@@ -136,7 +137,9 @@ object Dependencies {
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
-  val commonElasticsearchDependencies = elasticsearchDependencies ++ guiceDependencies ++ scalacheckDependencies
+  val commonElasticsearchDependencies = elasticsearchDependencies ++ guiceDependencies ++ scalacheckDependencies ++ Seq(
+    "io.circe" %% "circe-yaml" % "0.8.0"
+  )
 
   val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
@@ -163,7 +166,8 @@ object Dependencies {
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
     "mysql" % "mysql-connector-java" % "6.0.6",
     "org.flywaydb" % "flyway-core" % "4.2.0",
-    "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
+    "com.amazonaws" % "aws-java-sdk-rds" % versions.aws,
+    "io.circe" %% "circe-optics" % versions.circe
   )
 
   val miroTransformerDependencies: Seq[ModuleID] = Seq(
@@ -175,7 +179,8 @@ object Dependencies {
   )
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
+    "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion,
+    "io.circe" %% "circe-optics" % versions.circe
   )
 
   val archiveCommonDependencies: Seq[ModuleID] = Seq(
@@ -185,4 +190,8 @@ object Dependencies {
     "org.rogach" %% "scallop" % "3.1.3",
     "de.heikoseeberger" %% "akka-http-circe" % "1.21.1"
   ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
+
+  val registrarHttpDependencies: Seq[ModuleID] = Seq(
+    "io.circe" %% "circe-optics" % versions.circe
+  )
 }
