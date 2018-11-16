@@ -1,5 +1,5 @@
 module "auth_resource" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/resource?ref=v14.2.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/resource?ref=v16.1.0"
 
   api_id = "${var.api_id}"
 
@@ -12,7 +12,7 @@ module "auth_resource" {
 }
 
 module "auth_resource_integration" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v14.2.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v16.1.0"
 
   api_id        = "${var.api_id}}"
   resource_id   = "${module.auth_resource.resource_id}"
@@ -26,7 +26,7 @@ module "auth_resource_integration" {
 }
 
 module "auth_subresource" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/method?ref=v14.2.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/resource?ref=v16.1.0"
 
   api_id = "${var.api_id}"
 
@@ -43,7 +43,7 @@ module "auth_subresource" {
 }
 
 module "auth_subresource_integration" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v14.2.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v16.1.0"
 
   api_id        = "${var.api_id}"
   resource_id   = "${module.auth_subresource.resource_id}"

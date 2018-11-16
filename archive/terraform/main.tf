@@ -309,9 +309,12 @@ module "storage_api" {
 
   namespace     = "storage-api"
   namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  namespace_tld = ""
+  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
 
-  auth_scopes = ""
+  auth_scopes = [
+    "${local.cognito_storage_api_identifier}/ingests",
+    "${local.cognito_storage_api_identifier}/bags"
+  ]
 
   # Bags endpoint
 
