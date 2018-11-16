@@ -66,6 +66,8 @@ trait ElasticsearchFixtures
   // patience trying to work out why.  Feel free to put it back if you can solve
   // this particular mystery!
   //
+  // This was the relevant patch: https://github.com/wellcometrust/platform/pull/3025
+  //
   // eventually {
   //   elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   // }
