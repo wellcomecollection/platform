@@ -48,7 +48,7 @@ class ReindexWorkerServiceTest
       withLocalSnsTopic { topic =>
         withLocalSqsQueueAndDlq {
           case QueuePair(queue, dlq) =>
-            withWorkerService(queue, table) { _ =>
+            withWorkerService(queue) { _ =>
               val reindexJob =
                 CompleteReindexParameters(segment = 0, totalSegments = 1)
 
@@ -78,32 +78,30 @@ class ReindexWorkerServiceTest
 
   it("fails if it cannot parse the SQS message as a ReindexJob") {
     withLocalDynamoDbTable { table =>
-      withLocalSnsTopic { topic =>
-        withLocalSqsQueueAndDlq {
-          case QueuePair(queue, dlq) =>
-            withWorkerService(queue, table) { _ =>
-              sendNotificationToSQS(
-                queue = queue,
-                body = "<xml>What is JSON.</xl?>"
-              )
+      withLocalSqsQueueAndDlq {
+        case QueuePair(queue, dlq) =>
+          withWorkerService(queue) { _ =>
+            sendNotificationToSQS(
+              queue = queue,
+              body = "<xml>What is JSON.</xl?>"
+            )
 
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
-              }
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
             }
-        }
+          }
       }
     }
   }
 
   it("fails if the reindex job fails") {
-    val badTable = Table(name = "doesnotexist", index = "whatindex")
+    Table(name = "doesnotexist", index = "whatindex")
     Topic("does-not-exist")
 
     withLocalSqsQueueAndDlq {
       case QueuePair(queue, dlq) =>
-        withWorkerService(queue, badTable) { _ =>
+        withWorkerService(queue) { _ =>
           val reindexJob = CompleteReindexParameters(segment = 5, totalSegments = 10)
 
           sendNotificationToSQS[ReindexParameters](

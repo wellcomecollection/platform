@@ -35,12 +35,10 @@ object Main extends App with Logging {
 
   val recordReader = new RecordReader(
     maxRecordsScanner = new MaxRecordsScanner(
-      scanSpecScanner = scanSpecScanner,
-      dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
+      scanSpecScanner = scanSpecScanner
     ),
     parallelScanner = new ParallelScanner(
-      scanSpecScanner = scanSpecScanner,
-      dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
+      scanSpecScanner = scanSpecScanner
     )
   )
 

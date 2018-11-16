@@ -4,18 +4,17 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.reindex.reindex_worker.services.{BulkSNSSender, RecordReader, ReindexWorkerService}
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait WorkerServiceFixture extends Akka with DynamoFixtures with SNS with SQS {
-  def withWorkerService[R](queue: Queue, table: Table)(
+  def withWorkerService[R](queue: Queue)(
     testWith: TestWith[ReindexWorkerService, R]): R =
     withActorSystem { actorSystem =>
       withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
-        withMaxRecordsScanner(table) { maxRecordsScanner =>
-          withParallelScanner(table) { parallelScanner =>
+        withMaxRecordsScanner { maxRecordsScanner =>
+          withParallelScanner { parallelScanner =>
             val recordReader = new RecordReader(
               maxRecordsScanner = maxRecordsScanner,
               parallelScanner = parallelScanner
