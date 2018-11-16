@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal._
 
@@ -18,7 +19,7 @@ case class DisplayAgentV2(
   @ApiModelProperty(
     value = "The name of the agent"
   ) label: String,
-  @JsonProperty("type") ontologyType: String = "Agent"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Agent"
 ) extends DisplayAbstractAgentV2
 
 case object DisplayAbstractAgentV2 {
@@ -114,7 +115,7 @@ case class DisplayPersonV2(
     dataType = "String",
     value = "The numeration of the person"
   ) numeration: Option[String] = None,
-  @JsonProperty("type") ontologyType: String = "Person")
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Person")
     extends DisplayAbstractAgentV2
 
 @ApiModel(
@@ -133,5 +134,5 @@ case class DisplayOrganisationV2(
   @ApiModelProperty(
     value = "The name of the organisation"
   ) label: String,
-  @JsonProperty("type") ontologyType: String = "Organisation")
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Organisation")
     extends DisplayAbstractAgentV2

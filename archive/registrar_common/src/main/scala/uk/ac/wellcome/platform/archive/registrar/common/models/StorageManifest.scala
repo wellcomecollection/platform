@@ -21,6 +21,7 @@ case class StorageManifest(
   space: StorageSpace,
   info: BagInfo,
   manifest: FileManifest,
+  tagManifest: FileManifest,
   accessLocation: StorageLocation,
   createdDate: Instant
 ) {

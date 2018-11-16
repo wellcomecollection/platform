@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal.{
   AbstractAgent,
@@ -16,7 +17,7 @@ case class DisplayContributor(
   @ApiModelProperty(value = "The agent.") agent: DisplayAbstractAgentV2,
   @ApiModelProperty(value = "The list of contribution roles.") roles: List[
     DisplayContributionRole],
-  @JsonProperty("type") ontologyType: String = "Contributor"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Contributor"
 )
 
 object DisplayContributor {

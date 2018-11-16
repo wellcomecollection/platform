@@ -56,12 +56,8 @@ lazy val finatra_elasticsearch = doSharedLibrarySetup(project, "sbt_common/finat
 
 lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra_messaging")
   .dependsOn(messaging % "compile->compile;test->test")
-  .dependsOn(finatra_storage % "compile->compile;test->test")
   .dependsOn(finatra_monitoring % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
-
-lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_storage")
-  .settings(libraryDependencies ++= Dependencies.finatraStorageDependencies)
 
 lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_monitoring")
   .dependsOn(finatra_akka % "compile->compile;test->test")
@@ -85,6 +81,10 @@ lazy val config_messaging = doSharedLibrarySetup(project, "sbt_common/config/mes
   .dependsOn(messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeDependencies)
 
+lazy val config_elasticsearch = doSharedLibrarySetup(project, "sbt_common/config/elasticsearch")
+  .dependsOn(config_core % "compile->compile;test->test")
+  .dependsOn(elasticsearch % "compile->compile;test->test")
+
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
@@ -97,9 +97,9 @@ lazy val api = doServiceSetup(project, "catalogue_api/api")
 
 lazy val ingestor = doServiceSetup(project, "catalogue_pipeline/ingestor")
   .dependsOn(internal_model % "compile->compile;test->test")
-  .dependsOn(finatra_elasticsearch % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
+  .dependsOn(config_elasticsearch % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile;test->test")
+  .dependsOn(config_storage % "compile->compile;test->test")
   .settings(Search.settings: _*)
 
 lazy val transformer_common = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_common")
@@ -228,7 +228,6 @@ lazy val root = (project in file("."))
     finatra_elasticsearch,
     finatra_messaging,
     finatra_monitoring,
-    finatra_storage,
 
     config_core,
     config_messaging,

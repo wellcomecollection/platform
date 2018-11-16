@@ -10,6 +10,11 @@ resource "aws_iam_role_policy" "archivist_task_get_s3" {
   policy = "${data.aws_iam_policy_document.ingest_get.json}"
 }
 
+resource "aws_iam_role_policy" "archivist_task_get_s3_bagger" {
+  role   = "${module.archivist.task_role_name}"
+  policy = "${data.aws_iam_policy_document.ingest_get_bagger.json}"
+}
+
 resource "aws_iam_role_policy" "archivist_task_get_s3_workflow" {
   role   = "${module.archivist.task_role_name}"
   policy = "${data.aws_iam_policy_document.ingest_workflow_get.json}"

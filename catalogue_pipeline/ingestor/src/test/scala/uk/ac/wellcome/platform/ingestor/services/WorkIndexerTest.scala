@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.Subject
-import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
+import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,7 +16,6 @@ class WorkIndexerTest
     with Matchers
     with ElasticsearchFixtures
     with WorksGenerators
-    with WorkIndexerFixtures
     with CustomElasticsearchMapping {
 
   it("inserts an identified Work into Elasticsearch") {
@@ -128,14 +127,13 @@ class WorkIndexerTest
     }
   }
 
-  it(
-    "inserts a list of works into elasticsearch and return the list of works that failed inserting") {
-    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(
+  it("returns a list of Works that weren't indexed correctly") {
+    val subsetOfFieldsIndex = new OnlyInvisibleWorksIndex(
       elasticClient = elasticClient,
       documentType = documentType
     )
 
-    val validWorks = createIdentifiedWorks(count = 5)
+    val validWorks = createIdentifiedInvisibleWorks(count = 5)
     val notMatchingMappingWork = createIdentifiedWorkWith(
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
@@ -161,5 +159,10 @@ class WorkIndexerTest
         }
       }
     }
+  }
+
+  private def withWorkIndexer[R](testWith: TestWith[WorkIndexer, R]): R = {
+    val workIndexer = new WorkIndexer(elasticClient = elasticClient)
+    testWith(workIndexer)
   }
 }

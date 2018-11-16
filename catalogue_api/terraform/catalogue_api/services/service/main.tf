@@ -1,5 +1,5 @@
 module "catalogue_api" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=v14.2.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest/container_with_sidecar?ref=v16.1.0"
 
   vpc_id       = "${var.vpc_id}"
   subnets      = ["${var.subnets}"]
@@ -7,10 +7,15 @@ module "catalogue_api" {
   service_name = "${var.namespace}"
   namespace_id = "${var.namespace_id}"
 
-  container_image = "${var.container_image}"
-  container_port  = "${var.container_port}"
+  security_group_ids               = ["${var.security_group_ids}"]
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
 
-  env_vars = {
+  target_group_protocol = "TCP"
+
+  app_container_image = "${var.container_image}"
+  app_container_port  = "${var.container_port}"
+
+  app_env_vars = {
     api_host    = "api.wellcomecollection.org"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
     es_port     = "${var.es_cluster_credentials["port"]}"
@@ -22,35 +27,20 @@ module "catalogue_api" {
     es_doc_type = "${var.es_config["doc_type"]}"
   }
 
-  env_vars_length = "9"
+  app_env_vars_length = "9"
 
-  security_group_ids               = ["${var.security_group_ids}"]
-  service_egress_security_group_id = "${var.service_egress_security_group_id}"
+  sidecar_container_image = "${var.nginx_container_image}"
+  sidecar_container_port  = "${var.nginx_container_port}"
 
-  target_group_protocol = "NONE"
-}
-
-module "nginx" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest?ref=v14.2.0"
-
-  vpc_id       = "${var.vpc_id}"
-  subnets      = ["${var.subnets}"]
-  cluster_name = "${var.cluster_name}"
-  service_name = "${var.namespace}-nginx"
-  namespace_id = "${var.namespace_id}"
-
-  container_image = "${var.nginx_container_image}"
-  container_port  = "${var.nginx_container_port}"
-
-  env_vars = {
-    APP_HOST = "${var.namespace}.${var.namespace_tld}"
+  sidecar_env_vars = {
+    APP_HOST = "localhost"
     APP_PORT = "${var.container_port}"
   }
 
-  env_vars_length = "2"
+  sidecar_env_vars_length = "2"
 
-  security_group_ids               = ["${var.security_group_ids}"]
-  service_egress_security_group_id = "${var.service_egress_security_group_id}"
+  lb_arn        = "${var.lb_arn}"
+  listener_port = "${var.listener_port}"
 
-  target_group_protocol = "TCP"
+  target_container = "sidecar"
 }

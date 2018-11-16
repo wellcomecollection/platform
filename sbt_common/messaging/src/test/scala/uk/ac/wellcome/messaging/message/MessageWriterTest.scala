@@ -111,10 +111,7 @@ class MessageWriterTest
               objectLocation.namespace shouldBe bucket.name
 
               assertJsonStringsAreEqual(
-                getContentFromS3(
-                  bucket = Bucket(objectLocation.namespace),
-                  key = objectLocation.key
-                ),
+                getContentFromS3(objectLocation),
                 toJson(largeMessage).get
               )
             }
@@ -141,10 +138,7 @@ class MessageWriterTest
               objectLocation.namespace shouldBe bucket.name
 
               assertJsonStringsAreEqual(
-                getContentFromS3(
-                  bucket = Bucket(objectLocation.namespace),
-                  key = objectLocation.key
-                ),
+                getContentFromS3(objectLocation),
                 toJson(message).get
               )
             }

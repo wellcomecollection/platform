@@ -5,7 +5,6 @@ import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.messaging.message.{
-  MessageReaderConfig,
   MessageStream,
   MessageWriter,
   MessageWriterConfig
@@ -16,12 +15,6 @@ import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
 import scala.concurrent.ExecutionContext
 
 object MessagingBuilder {
-  def buildMessageReaderConfig(config: Config): MessageReaderConfig =
-    MessageReaderConfig(
-      sqsConfig =
-        SQSBuilder.buildSQSConfig(config, namespace = "message.reader")
-    )
-
   def buildMessageStream[T](config: Config)(
     implicit serialisationStrategy: SerialisationStrategy[T])
     : MessageStream[T] = {
@@ -35,7 +28,8 @@ object MessagingBuilder {
     new MessageStream[T](
       actorSystem = AkkaBuilder.buildActorSystem(),
       sqsClient = SQSBuilder.buildSQSAsyncClient(config),
-      messageReaderConfig = buildMessageReaderConfig(config),
+      sqsConfig =
+        SQSBuilder.buildSQSConfig(config, namespace = "message.reader"),
       metricsSender = MetricsBuilder.buildMetricsSender(config)
     )
   }

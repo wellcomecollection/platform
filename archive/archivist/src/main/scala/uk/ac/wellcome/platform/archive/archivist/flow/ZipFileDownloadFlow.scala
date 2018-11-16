@@ -49,7 +49,8 @@ object ZipFileDownloadFlow extends Logging {
                 Source.single(Left(ZipFileDownloadingError(request, ex)))
               case Success(inputStream) =>
                 val tmpFile = File.createTempFile("archivist", ".tmp")
-
+                tmpFile.deleteOnExit()
+                debug(s"Downloading zip file to $tmpFile")
                 StreamConverters
                   .fromInputStream(() => inputStream)
                   .via(FileStoreFlow(tmpFile, parallelism))

@@ -25,12 +25,7 @@ module "remus" {
 
   nginx_container_image = "${var.nginx_container_image}"
   nginx_container_port  = "${var.nginx_container_port}"
-}
 
-module "remus_listener" {
-  source = "listener"
-
-  nlb_arn           = "${var.nlb_arn}"
-  listener_port     = "${var.remus_listener_port}"
-  target_group_name = "${module.remus.target_group_name}"
+  lb_arn        = "${var.nlb_arn}"
+  listener_port = "${var.remus_listener_port}"
 }

@@ -39,12 +39,19 @@ class StorageManifestFactoryTest
                   actualStorageSpace,
                   actualBagInfo,
                   FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+                  FileManifest(
+                    ChecksumAlgorithm("sha256"),
+                    tagManifestDigestFiles),
                   _,
                   _)) =>
               actualStorageSpace shouldBe bagId.space
               actualBagInfo shouldBe bagInfo
               bagDigestFiles should have size 1
-
+              tagManifestDigestFiles should have size 3
+              tagManifestDigestFiles.map(_.path.value) should contain theSameElementsAs List(
+                "manifest-sha256.txt",
+                "bag-info.txt",
+                "bagit.txt")
           }
       }
     }
@@ -88,6 +95,26 @@ class StorageManifestFactoryTest
             val value = StorageManifestFactory.create(archiveComplete)
             value shouldBe Left(
               InvalidBagManifestError(archiveComplete, "manifest-sha256.txt"))
+        }
+      }
+    }
+
+    it("if the BagLocation has an invalid tagmanifest") {
+      val requestId = randomUUID
+
+      withLocalS3Bucket { bucket =>
+        withBag(
+          bucket,
+          createTagManifest =
+            _ => Some(FileEntry("tagmanifest-sha256.txt", "blaaargh!"))) {
+          case (bagLocation, _, bagId) =>
+            val archiveComplete =
+              ArchiveComplete(requestId, bagId.space, bagLocation)
+            val value = StorageManifestFactory.create(archiveComplete)
+            value shouldBe Left(
+              InvalidBagManifestError(
+                archiveComplete,
+                "tagmanifest-sha256.txt"))
         }
       }
     }

@@ -42,6 +42,19 @@ data "aws_iam_policy_document" "ingest_get" {
   }
 }
 
+data "aws_iam_policy_document" "ingest_get_bagger" {
+  statement {
+    actions = [
+      "s3:GetObject*",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.bagger_drop_bucket_name}/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "ingest_workflow_get" {
   statement {
     actions = [

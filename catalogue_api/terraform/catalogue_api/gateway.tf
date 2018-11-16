@@ -107,4 +107,8 @@ module "simple_integration" {
 resource "aws_api_gateway_vpc_link" "link" {
   name        = "${var.namespace}_vpc_link"
   target_arns = ["${module.nlb.arn}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

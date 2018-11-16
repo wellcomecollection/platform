@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal.ContributionRole
 
@@ -12,7 +13,8 @@ case class DisplayContributionRole(
   @ApiModelProperty(
     value = "The name of the agent"
   ) label: String,
-  @JsonProperty("type") ontologyType: String = "ContributionRole"
+  @JsonProperty("type") @JsonKey("type") ontologyType: String =
+    "ContributionRole"
 )
 
 object DisplayContributionRole {

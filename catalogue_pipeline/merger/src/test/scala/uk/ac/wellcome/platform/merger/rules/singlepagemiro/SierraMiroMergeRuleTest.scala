@@ -71,10 +71,22 @@ class SierraMiroMergeRuleTest
           ))
       }
 
-      it("doesn't copy across the Miro location if the Sierra work already has a DigitalLocation") {
+      it("copies across the Miro location if the Sierra work already has a DigitalLocation") {
         val mergedWork = getMergedWork(sierraDigitalWork, miroWork)
 
-        mergedWork.items shouldBe sierraDigitalWork.items
+        mergedWork.items shouldBe List(
+          sierraDigitalItem.copy(
+            agent = sierraDigitalItem.agent.copy(
+              locations =
+                sierraDigitalItem.agent.locations ++ miroWork.items.head.agent.locations
+            )
+          ))
+      }
+
+      it("copies across the thumbnail from the Miro work") {
+        miroWork.thumbnail.isDefined shouldBe true
+        mergedWork.thumbnail.isDefined shouldBe true
+        mergedWork.thumbnail shouldBe miroWork.thumbnail
       }
     }
 

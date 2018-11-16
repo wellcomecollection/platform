@@ -93,14 +93,10 @@ trait Messaging
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
     implicit objectStore: ObjectStore[T]): R = {
-    val messageConfig = MessageReaderConfig(
-      sqsConfig = createSQSConfigWith(queue)
-    )
-
     val stream = new MessageStream[T](
       actorSystem,
       asyncSqsClient,
-      messageConfig,
+      sqsConfig = createSQSConfigWith(queue),
       metricsSender)
     testWith(stream)
   }
@@ -127,10 +123,7 @@ trait Messaging
     listMessagesReceivedFromSNS(topic).map { messageInfo =>
       fromJson[MessageNotification](messageInfo.message) match {
         case Success(RemoteNotification(location)) =>
-          getObjectFromS3[T](
-            bucket = Bucket(location.namespace),
-            key = location.key
-          )
+          getObjectFromS3[T](location)
         case Success(InlineNotification(jsonString)) =>
           fromJson[T](jsonString).get
         case _ =>

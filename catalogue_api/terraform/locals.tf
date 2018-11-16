@@ -14,5 +14,10 @@ locals {
 
   nginx_container_uri = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
 
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+
+  catalogue_vpc_delta_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+
+  vpc_delta_private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 }
