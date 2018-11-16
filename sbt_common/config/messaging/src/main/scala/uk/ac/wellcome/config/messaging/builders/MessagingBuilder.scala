@@ -37,8 +37,8 @@ object MessagingBuilder {
   def buildMessageWriterConfig(config: Config): MessageWriterConfig =
     MessageWriterConfig(
       snsConfig =
-        SNSBuilder.buildSNSConfig(config, namespace = "message.reader"),
-      s3Config = S3Builder.buildS3Config(config, namespace = "message.reader")
+        SNSBuilder.buildSNSConfig(config, namespace = "message.writer"),
+      s3Config = S3Builder.buildS3Config(config, namespace = "message.writer")
     )
 
   def buildMessageWriter[T](config: Config)(
