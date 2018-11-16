@@ -41,6 +41,9 @@ sns = boto3.client("sns")
 sts = boto3.client("sts")
 
 
+TOPIC_ARN = "..."
+
+
 def run_reindex(
     *,
     reason,
@@ -78,14 +81,19 @@ def run_reindex(
 
     post_to_slack(slack_message=slack_message)
 
-    for p in parameters:
-        message = {
+    messages = (
+        {
             "dynamoConfig": {"table": table_name},
             "snsConfig": {"topicArn": build_topic_arn(topic_name)},
             "parameters": p
         }
+        for p in parameters
+    )
 
-        print(message)
+    for m in messages:
+        print(m)
+
+    # publish_messages(topic_arn=TOPIC_ARN, messages=messages)
 
 
 def main():
@@ -126,20 +134,20 @@ def all_complete_parameters(total_segments):
             "totalSegments": total_segments,
             "type": "CompleteReindexParameters",
         }
-#
-#
-# def publish_messages(topic_arn, messages):
-#     """Publish a sequence of messages to an SNS topic."""
-#     for m in tqdm.tqdm(list(messages)):
-#         resp = sns.publish(
-#             TopicArn=topic_arn,
-#             MessageStructure="json",
-#             Message=json.dumps({"default": json.dumps(m)}),
-#             Subject=f"Source: {__file__}",
-#         )
-#         assert resp["ResponseMetadata"]["HTTPStatusCode"] == 200, resp
-#
-#
+
+
+def publish_messages(topic_arn, messages):
+    """Publish a sequence of messages to an SNS topic."""
+    for m in tqdm.tqdm(list(messages)):
+        resp = sns.publish(
+            TopicArn=topic_arn,
+            MessageStructure="json",
+            Message=json.dumps({"default": json.dumps(m)}),
+            Subject=f"Source: {__file__}",
+        )
+        assert resp["ResponseMetadata"]["HTTPStatusCode"] == 200, resp
+
+
 def post_to_slack(slack_message):
     """
     Posts a message about the reindex in Slack, so we can track them.
