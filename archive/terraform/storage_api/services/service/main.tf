@@ -18,7 +18,7 @@ module "service" {
   sidecar_container_port  = "${var.nginx_container_port}"
 
   sidecar_env_vars = {
-    APP_HOST = "${var.namespace}.${var.namespace_tld}"
+    APP_HOST = "localhost"
     APP_PORT = "${var.container_port}"
   }
 
