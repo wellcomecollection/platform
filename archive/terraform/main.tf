@@ -314,9 +314,8 @@ module "storage_api" {
 
   auth_scopes = [
     "${local.cognito_storage_api_identifier}/ingests",
-    "${local.cognito_storage_api_identifier}/bags"
+    "${local.cognito_storage_api_identifier}/bags",
   ]
-
   cognito_user_pool_arn = "${local.cognito_user_pool_arn}"
 
   # Bags endpoint
