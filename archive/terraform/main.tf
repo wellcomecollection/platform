@@ -239,7 +239,7 @@ module "bagger" {
 }
 
 module "migrator" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v11.12.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v16.1.0"
 
   name        = "migrator"
   description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
@@ -249,6 +249,7 @@ module "migrator" {
   environment_variables = {
     # Private DNS
     INGEST_API_URL = "http://archive-storage_api.archive-storage_api:9000/storage/v1/ingests"
+    ARCHIVE_SPACE = "alice-test"
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
