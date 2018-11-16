@@ -239,7 +239,7 @@ module "bagger" {
 }
 
 module "migrator" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v16.1.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v16.1.2"
 
   name        = "migrator"
   description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
@@ -268,7 +268,7 @@ module "migrator" {
 }
 
 module "trigger_migrator" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/modules/triggers/sns?ref=v16.1.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/modules/triggers/sns?ref=v16.1.2"
 
   lambda_function_name = "${module.migrator.function_name}"
   sns_trigger_arn      = "${module.bagging_complete_topic.arn}"
