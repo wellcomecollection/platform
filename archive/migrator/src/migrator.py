@@ -19,15 +19,12 @@ def archive_bag_api_messages(bags, bucket, space):
             "type": "Ingest",
             "ingestType": {"id": "create", "type": "IngestType"},
             "space": {"id": f"{space}", "type": "Space"},
-            "sourceLocation":{
+            "sourceLocation": {
                 "type": "Location",
-                "provider": {
-                    "type": "Provider",
-                    "id": "aws-s3-standard"
-                },
+                "provider": {"type": "Provider", "id": "aws-s3-standard"},
                 "bucket": f"{bucket}",
-                "path": f"{bag}"
-            }
+                "path": f"{bag}",
+            },
         }
 
 
