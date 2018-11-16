@@ -127,10 +127,7 @@ trait Messaging
     listMessagesReceivedFromSNS(topic).map { messageInfo =>
       fromJson[MessageNotification](messageInfo.message) match {
         case Success(RemoteNotification(location)) =>
-          getObjectFromS3[T](
-            bucket = Bucket(location.namespace),
-            key = location.key
-          )
+          getObjectFromS3[T](location)
         case Success(InlineNotification(jsonString)) =>
           fromJson[T](jsonString).get
         case _ =>
