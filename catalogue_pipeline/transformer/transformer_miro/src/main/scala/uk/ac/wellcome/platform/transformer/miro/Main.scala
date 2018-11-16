@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SQSBuilder}
@@ -16,24 +16,24 @@ import uk.ac.wellcome.platform.transformer.receive.HybridRecordReceiver
 import scala.concurrent.ExecutionContext
 
 object Main extends WellcomeApp {
-  def buildWorkerService(config: Config): MiroTransformerWorkerService = {
-    implicit val actorSystem: ActorSystem =
-      AkkaBuilder.buildActorSystem()
-    implicit val executionContext: ExecutionContext =
-      AkkaBuilder.buildExecutionContext()
+  val config: Config = ConfigFactory.load()
 
-    val messageReceiver = new HybridRecordReceiver[MiroTransformable](
-      messageWriter =
-        MessagingBuilder.buildMessageWriter[TransformedBaseWork](config),
-      objectStore = S3Builder.buildObjectStore[MiroTransformable](config)
-    )
+  implicit val actorSystem: ActorSystem =
+    AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
-    new MiroTransformerWorkerService(
-      messageReceiver = messageReceiver,
-      miroTransformer = new MiroTransformableTransformer,
-      sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
-    )
-  }
+  val messageReceiver = new HybridRecordReceiver[MiroTransformable](
+    messageWriter =
+      MessagingBuilder.buildMessageWriter[TransformedBaseWork](config),
+    objectStore = S3Builder.buildObjectStore[MiroTransformable](config)
+  )
 
-  run()
+  val workerService = new MiroTransformerWorkerService(
+    messageReceiver = messageReceiver,
+    miroTransformer = new MiroTransformableTransformer,
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
+  )
+
+  run(workerService)
 }

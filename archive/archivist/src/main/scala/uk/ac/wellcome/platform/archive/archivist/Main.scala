@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.SNSBuilder
@@ -14,25 +14,25 @@ import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import scala.concurrent.ExecutionContext
 
 object Main extends WellcomeApp {
-  def buildWorkerService(config: Config): Archivist = {
-    implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val materializer: ActorMaterializer =
-      AkkaBuilder.buildActorMaterializer()
-    implicit val executionContext: ExecutionContext =
-      AkkaBuilder.buildExecutionContext()
+  val config: Config = ConfigFactory.load()
 
-    new Archivist(
-      s3Client = S3Builder.buildS3Client(config),
-      snsClient = SNSBuilder.buildSNSClient(config),
-      messageStream =
-        MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config),
-      bagUploaderConfig = BagUploaderConfigBuilder.buildBagUploaderConfig(config),
-      snsRegistrarConfig =
-        SNSBuilder.buildSNSConfig(config, namespace = "registrar"),
-      snsProgressConfig =
-        SNSBuilder.buildSNSConfig(config, namespace = "progress")
-    )
-  }
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val materializer: ActorMaterializer =
+    AkkaBuilder.buildActorMaterializer()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
-  run()
+  val archivist = new Archivist(
+    s3Client = S3Builder.buildS3Client(config),
+    snsClient = SNSBuilder.buildSNSClient(config),
+    messageStream =
+      MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config),
+    bagUploaderConfig = BagUploaderConfigBuilder.buildBagUploaderConfig(config),
+    snsRegistrarConfig =
+      SNSBuilder.buildSNSConfig(config, namespace = "registrar"),
+    snsProgressConfig =
+      SNSBuilder.buildSNSConfig(config, namespace = "progress")
+  )
+
+  run(archivist)
 }

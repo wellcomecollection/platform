@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.registrar.async
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.SNSBuilder
@@ -15,24 +15,24 @@ import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import scala.concurrent.ExecutionContext
 
 object Main extends WellcomeApp {
-  def buildWorkerService(config: Config): Registrar = {
-    implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  val config: Config = ConfigFactory.load()
 
-    val messageStream =
-      MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config)
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
-    val dataStore = VHSBuilder.buildVHS[StorageManifest, EmptyMetadata](config)
+  val messageStream =
+    MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config)
 
-    new Registrar(
-      snsClient = SNSBuilder.buildSNSClient(config),
-      progressSnsConfig = SNSBuilder.buildSNSConfig(config),
-      s3Client = S3Builder.buildS3Client(config),
-      messageStream = messageStream,
-      dataStore = dataStore,
-      actorSystem = actorSystem
-    )
-  }
+  val dataStore = VHSBuilder.buildVHS[StorageManifest, EmptyMetadata](config)
 
-  run()
+  val registrar = new Registrar(
+    snsClient = SNSBuilder.buildSNSClient(config),
+    progressSnsConfig = SNSBuilder.buildSNSConfig(config),
+    s3Client = S3Builder.buildS3Client(config),
+    messageStream = messageStream,
+    dataStore = dataStore,
+    actorSystem = actorSystem
+  )
+
+  run(registrar)
 }

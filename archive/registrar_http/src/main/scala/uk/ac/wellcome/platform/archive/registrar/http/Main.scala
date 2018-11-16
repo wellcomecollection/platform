@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.http
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.storage.builders.VHSBuilder
@@ -14,21 +14,21 @@ import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import scala.concurrent.ExecutionContext
 
 object Main extends WellcomeApp {
-  override def buildWorkerService(config: Config): RegistrarHTTP = {
-    implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val materializer: ActorMaterializer =
-      AkkaBuilder.buildActorMaterializer()
-    implicit val executionContext: ExecutionContext =
-      AkkaBuilder.buildExecutionContext()
+  val config: Config = ConfigFactory.load()
 
-    val vhs = VHSBuilder.buildVHS[StorageManifest, EmptyMetadata](config)
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val materializer: ActorMaterializer =
+    AkkaBuilder.buildActorMaterializer()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
-    new RegistrarHTTP(
-      vhs = vhs,
-      httpServerConfig = HTTPServerBuilder.buildHTTPServerConfig(config),
-      contextURL = HTTPServerBuilder.buildContextURL(config)
-    )
-  }
+  val vhs = VHSBuilder.buildVHS[StorageManifest, EmptyMetadata](config)
 
-  run()
+  val registrarHTTP = new RegistrarHTTP(
+    vhs = vhs,
+    httpServerConfig = HTTPServerBuilder.buildHTTPServerConfig(config),
+    contextURL = HTTPServerBuilder.buildContextURL(config)
+  )
+
+  run(registrarHTTP)
 }

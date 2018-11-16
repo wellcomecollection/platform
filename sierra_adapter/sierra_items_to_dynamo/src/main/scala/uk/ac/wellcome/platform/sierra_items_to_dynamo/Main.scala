@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
@@ -15,7 +15,8 @@ import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import scala.concurrent.ExecutionContext
 
 object Main extends WellcomeApp {
-  def buildWorkerService(config: Config): SierraItemsToDynamoWorkerService = {
+  val config: Config = ConfigFactory.load()
+
     implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
     implicit val executionContext: ExecutionContext =
       AkkaBuilder.buildExecutionContext()
@@ -27,12 +28,11 @@ object Main extends WellcomeApp {
       versionedHybridStore = versionedHybridStore
     )
 
-    new SierraItemsToDynamoWorkerService(
+  val workerService = new SierraItemsToDynamoWorkerService(
       sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
       dynamoInserter = dynamoInserter,
       snsWriter = SNSBuilder.buildSNSWriter(config)
     )
-  }
 
-  run()
+  run(workerService)
 }

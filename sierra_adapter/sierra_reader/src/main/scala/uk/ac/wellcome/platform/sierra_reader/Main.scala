@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.SQSBuilder
@@ -12,21 +12,21 @@ import uk.ac.wellcome.platform.sierra_reader.config.builders.{ReaderConfigBuilde
 import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
 
 object Main extends WellcomeApp {
-  def buildWorkerService(config: Config): SierraReaderWorkerService = {
-    implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  val config: Config = ConfigFactory.load()
 
-    val metricsSender = MetricsBuilder.buildMetricsSender(config)
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
 
-    val sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
+  val metricsSender = MetricsBuilder.buildMetricsSender(config)
 
-    new SierraReaderWorkerService(
-      sqsStream = sqsStream,
-      s3client = S3Builder.buildS3Client(config),
-      s3Config = S3Builder.buildS3Config(config),
-      readerConfig = ReaderConfigBuilder.buildReaderConfig(config),
-      sierraAPIConfig = SierraAPIConfigBuilder.buildSierraConfig(config)
-    )
-  }
+  val sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
 
-  run()
+  val workerService = new SierraReaderWorkerService(
+    sqsStream = sqsStream,
+    s3client = S3Builder.buildS3Client(config),
+    s3Config = S3Builder.buildS3Config(config),
+    readerConfig = ReaderConfigBuilder.buildReaderConfig(config),
+    sierraAPIConfig = SierraAPIConfigBuilder.buildSierraConfig(config)
+  )
+
+  run(workerService)
 }

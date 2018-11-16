@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
@@ -13,37 +13,37 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.services.{BulkSNSSender, R
 import scala.concurrent.ExecutionContext
 
 object Main extends WellcomeApp {
-  def buildWorkerService(config: Config): ReindexWorkerService = {
-    implicit val actorSystem: ActorSystem =
-      AkkaBuilder.buildActorSystem()
-    implicit val executionContext: ExecutionContext =
-      AkkaBuilder.buildExecutionContext()
+  val config: Config = ConfigFactory.load()
 
-    val scanSpecScanner = new ScanSpecScanner(
-      dynamoDBClient = DynamoBuilder.buildDynamoClient(config)
+  implicit val actorSystem: ActorSystem =
+    AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
+
+  val scanSpecScanner = new ScanSpecScanner(
+    dynamoDBClient = DynamoBuilder.buildDynamoClient(config)
+  )
+
+  val recordReader = new RecordReader(
+    maxRecordsScanner = new MaxRecordsScanner(
+      scanSpecScanner = scanSpecScanner,
+      dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
+    ),
+    parallelScanner = new ParallelScanner(
+      scanSpecScanner = scanSpecScanner,
+      dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
     )
+  )
 
-    val recordReader = new RecordReader(
-      maxRecordsScanner = new MaxRecordsScanner(
-        scanSpecScanner = scanSpecScanner,
-        dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
-      ),
-      parallelScanner = new ParallelScanner(
-        scanSpecScanner = scanSpecScanner,
-        dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
-      )
-    )
+  val hybridRecordSender = new BulkSNSSender(
+    snsWriter = SNSBuilder.buildSNSWriter(config)
+  )
 
-    val hybridRecordSender = new BulkSNSSender(
-      snsWriter = SNSBuilder.buildSNSWriter(config)
-    )
+  val workerService = new ReindexWorkerService(
+    recordReader = recordReader,
+    bulkSNSSender = hybridRecordSender,
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
+  )
 
-    new ReindexWorkerService(
-      recordReader = recordReader,
-      bulkSNSSender = hybridRecordSender,
-      sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
-    )
-  }
-
-  run()
+  run(workerService)
 }

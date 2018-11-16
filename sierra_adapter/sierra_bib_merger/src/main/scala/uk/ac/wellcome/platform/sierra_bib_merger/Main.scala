@@ -1,38 +1,35 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.sierra_bib_merger.services.{
-  SierraBibMergerUpdaterService,
-  SierraBibMergerWorkerService
-}
+import uk.ac.wellcome.platform.sierra_bib_merger.services.{SierraBibMergerUpdaterService, SierraBibMergerWorkerService}
 import uk.ac.wellcome.sierra_adapter.config.builders.SierraTransformableVHSBuilder
 
 import scala.concurrent.ExecutionContext
 
 object Main extends WellcomeApp {
-  def buildWorkerService(config: Config): SierraBibMergerWorkerService = {
-    implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val executionContext: ExecutionContext =
-      AkkaBuilder.buildExecutionContext()
+  val config: Config = ConfigFactory.load()
 
-    val versionedHybridStore =
-      SierraTransformableVHSBuilder.buildSierraVHS(config)
+  implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
-    val updaterService = new SierraBibMergerUpdaterService(
-      versionedHybridStore = versionedHybridStore
-    )
+  val versionedHybridStore =
+    SierraTransformableVHSBuilder.buildSierraVHS(config)
 
-    new SierraBibMergerWorkerService(
-      sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
-      snsWriter = SNSBuilder.buildSNSWriter(config),
-      sierraBibMergerUpdaterService = updaterService
-    )
-  }
+  val updaterService = new SierraBibMergerUpdaterService(
+    versionedHybridStore = versionedHybridStore
+  )
 
-  run()
+  val workerService = new SierraBibMergerWorkerService(
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
+    snsWriter = SNSBuilder.buildSNSWriter(config),
+    sierraBibMergerUpdaterService = updaterService
+  )
+
+  run(workerService)
 }

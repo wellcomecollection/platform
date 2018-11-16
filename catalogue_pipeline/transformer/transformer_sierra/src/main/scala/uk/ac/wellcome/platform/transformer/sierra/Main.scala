@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import uk.ac.wellcome.WellcomeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SQSBuilder}
@@ -17,24 +17,24 @@ import uk.ac.wellcome.platform.transformer.sierra.services.SierraTransformerWork
 import scala.concurrent.ExecutionContext
 
 object Main extends WellcomeApp {
-  def buildWorkerService(config: Config): SierraTransformerWorkerService = {
-    implicit val actorSystem: ActorSystem =
-      AkkaBuilder.buildActorSystem()
-    implicit val executionContext: ExecutionContext =
-      AkkaBuilder.buildExecutionContext()
+  val config: Config = ConfigFactory.load()
 
-    val messageReceiver = new HybridRecordReceiver[SierraTransformable](
-      messageWriter =
-        MessagingBuilder.buildMessageWriter[TransformedBaseWork](config),
-      objectStore = S3Builder.buildObjectStore[SierraTransformable](config)
-    )
+  implicit val actorSystem: ActorSystem =
+    AkkaBuilder.buildActorSystem()
+  implicit val executionContext: ExecutionContext =
+    AkkaBuilder.buildExecutionContext()
 
-    new SierraTransformerWorkerService(
-      messageReceiver = messageReceiver,
-      sierraTransformer = new SierraTransformableTransformer(),
-      sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
-    )
-  }
+  val messageReceiver = new HybridRecordReceiver[SierraTransformable](
+    messageWriter =
+      MessagingBuilder.buildMessageWriter[TransformedBaseWork](config),
+    objectStore = S3Builder.buildObjectStore[SierraTransformable](config)
+  )
 
-  run()
+  val workerService = new SierraTransformerWorkerService(
+    messageReceiver = messageReceiver,
+    sierraTransformer = new SierraTransformableTransformer(),
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
+  )
+
+  run(workerService)
 }

@@ -132,7 +132,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
     "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
-  ) ++ apacheCommons ++ typesafeDependencies
+  ) ++ apacheCommons
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
