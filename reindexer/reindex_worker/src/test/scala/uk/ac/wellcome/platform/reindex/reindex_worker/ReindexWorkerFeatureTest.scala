@@ -7,7 +7,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.WorkerServiceFixture
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexParameters, PartialReindexParameters, ReindexJob, ReindexParameters}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexParameters, PartialReindexParameters, ReindexJob}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -169,6 +169,87 @@ class ReindexWorkerFeatureTest
               val actualMetadataEntries: Seq[Metadata] =
                 messages.map { fromJson[Metadata](_).get }
               actualMetadataEntries should contain theSameElementsAs metadataEntries
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("decides which table to read from based on the ReindexJob it receives") {
+    withLocalSqsQueue { queue =>
+      withLocalDynamoDbTable { table =>
+        withLocalDynamoDbTable { altTable =>
+          withLocalSnsTopic { topic =>
+            withWorkerService(queue, altTable, topic) { _ =>
+              val testRecords = createReindexableData(table)
+              createReindexableData(altTable)
+
+              val reindexJob = ReindexJob(
+                parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+                dynamoConfig = createDynamoConfigWith(table),
+                snsConfig = createSNSConfigWith(topic)
+              )
+
+              sendNotificationToSQS(
+                queue = queue,
+                message = reindexJob
+              )
+
+              eventually {
+                val actualRecords: Seq[HybridRecord] =
+                  listMessagesReceivedFromSNS(topic)
+                    .map {
+                      _.message
+                    }
+                    .map {
+                      fromJson[HybridRecord](_).get
+                    }
+                    .distinct
+
+                actualRecords should contain theSameElementsAs testRecords
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("decides which topic to send to based on the ReindexJob it receives") {
+    withLocalSqsQueue { queue =>
+      withLocalDynamoDbTable { table =>
+          withLocalSnsTopic { topic =>
+            withLocalSnsTopic { altTopic =>
+            withWorkerService(queue, table, altTopic) { _ =>
+              val testRecords = createReindexableData(table)
+
+              val reindexJob = ReindexJob(
+                parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+                dynamoConfig = createDynamoConfigWith(table),
+                snsConfig = createSNSConfigWith(topic)
+              )
+
+              sendNotificationToSQS(
+                queue = queue,
+                message = reindexJob
+              )
+
+              eventually {
+                val actualRecords: Seq[HybridRecord] =
+                  listMessagesReceivedFromSNS(topic)
+                    .map {
+                      _.message
+                    }
+                    .map {
+                      fromJson[HybridRecord](_).get
+                    }
+                    .distinct
+
+                actualRecords should contain theSameElementsAs testRecords
+
+                listMessagesReceivedFromSNS(altTopic) shouldBe empty
+              }
             }
           }
         }
