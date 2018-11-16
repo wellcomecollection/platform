@@ -53,7 +53,7 @@ class Alarm:
         return self.name not in [
             "lambda-miro_transformer-errors",
             "lambda-miro_inventory_transformer-errors",
-            "lambda-sierra_transformer-errors"
+            "lambda-sierra_transformer-errors",
         ]
 
     # Sometimes there's enough data in the alarm to make an educated guess
