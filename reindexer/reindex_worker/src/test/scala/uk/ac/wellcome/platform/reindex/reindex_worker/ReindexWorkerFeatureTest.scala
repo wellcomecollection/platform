@@ -7,11 +7,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.WorkerServiceFixture
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  PartialReindexJob,
-  ReindexJob
-}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexParameters, PartialReindexParameters, ReindexJob, ReindexParameters}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -57,9 +53,13 @@ class ReindexWorkerFeatureTest
           withWorkerService(queue, table, topic) { _ =>
             val testRecords = createReindexableData(table)
 
-            val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
+            val reindexJob = ReindexJob(
+              parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+              dynamoConfig = createDynamoConfigWith(table),
+              snsConfig = createSNSConfigWith(topic)
+            )
 
-            sendNotificationToSQS[ReindexJob](
+            sendNotificationToSQS(
               queue = queue,
               message = reindexJob
             )
@@ -86,9 +86,13 @@ class ReindexWorkerFeatureTest
           withWorkerService(queue, table, topic) { _ =>
             val testRecords = createReindexableData(table)
 
-            val reindexJob = PartialReindexJob(maxRecords = 1)
+            val reindexJob = ReindexJob(
+              parameters = PartialReindexParameters(maxRecords = 1),
+              dynamoConfig = createDynamoConfigWith(table),
+              snsConfig = createSNSConfigWith(topic)
+            )
 
-            sendNotificationToSQS[ReindexJob](
+            sendNotificationToSQS(
               queue = queue,
               message = reindexJob
             )
@@ -143,9 +147,13 @@ class ReindexWorkerFeatureTest
         }
         withLocalSnsTopic { topic =>
           withWorkerService(queue, table, topic) { _ =>
-            val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
+            val reindexJob = ReindexJob(
+              parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+              dynamoConfig = createDynamoConfigWith(table),
+              snsConfig = createSNSConfigWith(topic)
+            )
 
-            sendNotificationToSQS[ReindexJob](
+            sendNotificationToSQS(
               queue = queue,
               message = reindexJob
             )
