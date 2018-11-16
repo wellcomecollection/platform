@@ -22,6 +22,7 @@ module "catalogue_vpc_delta" {
 
 module "storage_vpc_delta" {
   source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.0"
+
   name = "storage-172-30-0-0-16"
 
   cidr_block_vpc = "172.30.0.0/16"

@@ -28,4 +28,6 @@ module "romulus" {
 
   lb_arn        = "${var.nlb_arn}"
   listener_port = "${var.romulus_listener_port}"
+
+  task_desired_count = "${var.romulus_task_number}"
 }

@@ -25,4 +25,7 @@ module "services" {
 
   nginx_container_image = "${var.nginx_container_image}"
   nginx_container_port  = "${var.nginx_container_port}"
+
+  remus_task_number   = "${local.remus_task_number}"
+  romulus_task_number = "${local.romulus_task_number}"
 }

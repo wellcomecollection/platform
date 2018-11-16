@@ -8,6 +8,13 @@ resource "aws_api_gateway_rest_api" "api" {
   }
 }
 
+resource "aws_api_gateway_authorizer" "cognito" {
+  name          = "cognito"
+  type          = "COGNITO_USER_POOLS"
+  rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
+  provider_arns = ["${var.cognito_user_pool_arn}"]
+}
+
 # Stages
 
 module "prod" {
@@ -25,7 +32,7 @@ module "prod" {
   base_path = "catalogue"
 
   # All integrations
-  depends_on = []
+  depends_on = "${concat(module.bags.integration_uris,module.ingests.integration_uris)}"
 }
 
 # Resources
@@ -39,7 +46,7 @@ module "bags" {
   root_resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
   connection_id    = "${aws_api_gateway_vpc_link.link.id}"
 
-  cognito_id  = "${var.cognito_id}"
+  cognito_id  = "${aws_api_gateway_authorizer.cognito.id}"
   auth_scopes = ["${var.auth_scopes}"]
 
   forward_port = "${local.bags_listener_port}"
@@ -54,7 +61,7 @@ module "ingests" {
   root_resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
   connection_id    = "${aws_api_gateway_vpc_link.link.id}"
 
-  cognito_id  = "${var.cognito_id}"
+  cognito_id  = "${aws_api_gateway_authorizer.cognito.id}"
   auth_scopes = ["${var.auth_scopes}"]
 
   forward_port = "${local.ingests_listener_port}"

@@ -32,7 +32,7 @@ variable "ingests_env_vars_length" {}
 variable "ingests_nginx_container_port" {}
 variable "ingests_nginx_container_image" {}
 
-variable "cognito_id" {}
+variable "cognito_user_pool_arn" {}
 
 variable "auth_scopes" {
   type = "list"

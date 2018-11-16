@@ -14,7 +14,7 @@ module "auth_resource" {
 module "auth_resource_integration" {
   source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v16.1.0"
 
-  api_id        = "${var.api_id}}"
+  api_id        = "${var.api_id}"
   resource_id   = "${module.auth_resource.resource_id}"
   connection_id = "${var.connection_id}"
 

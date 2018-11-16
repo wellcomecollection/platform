@@ -302,7 +302,6 @@ module "callback_stub_server" {
 module "storage_api" {
   source = "storage_api"
 
-  cognito_id   = ""
   vpc_id       = "${local.storage_vpc_delta_id}"
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   subnets      = "${local.storage_vpc_delta_private_subnets}"
@@ -311,10 +310,14 @@ module "storage_api" {
   namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
 
+  # Auth
+
   auth_scopes = [
     "${local.cognito_storage_api_identifier}/ingests",
     "${local.cognito_storage_api_identifier}/bags"
   ]
+
+  cognito_user_pool_arn = "${local.cognito_user_pool_arn}"
 
   # Bags endpoint
 

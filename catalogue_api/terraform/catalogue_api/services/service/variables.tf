@@ -49,3 +49,5 @@ variable "memory" {
 
 variable "lb_arn" {}
 variable "listener_port" {}
+
+variable "task_desired_count" {}
