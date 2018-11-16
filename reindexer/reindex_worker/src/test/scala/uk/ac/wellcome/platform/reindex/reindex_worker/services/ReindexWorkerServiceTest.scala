@@ -48,7 +48,7 @@ class ReindexWorkerServiceTest
       withLocalSnsTopic { topic =>
         withLocalSqsQueueAndDlq {
           case QueuePair(queue, dlq) =>
-            withWorkerService(queue, table, topic) { _ =>
+            withWorkerService(queue, table) { _ =>
               val reindexJob =
                 CompleteReindexParameters(segment = 0, totalSegments = 1)
 
@@ -81,7 +81,7 @@ class ReindexWorkerServiceTest
       withLocalSnsTopic { topic =>
         withLocalSqsQueueAndDlq {
           case QueuePair(queue, dlq) =>
-            withWorkerService(queue, table, topic) { _ =>
+            withWorkerService(queue, table) { _ =>
               sendNotificationToSQS(
                 queue = queue,
                 body = "<xml>What is JSON.</xl?>"
@@ -99,11 +99,11 @@ class ReindexWorkerServiceTest
 
   it("fails if the reindex job fails") {
     val badTable = Table(name = "doesnotexist", index = "whatindex")
-    val badTopic = Topic("does-not-exist")
+    Topic("does-not-exist")
 
     withLocalSqsQueueAndDlq {
       case QueuePair(queue, dlq) =>
-        withWorkerService(queue, badTable, badTopic) { _ =>
+        withWorkerService(queue, badTable) { _ =>
           val reindexJob = CompleteReindexParameters(segment = 5, totalSegments = 10)
 
           sendNotificationToSQS[ReindexParameters](

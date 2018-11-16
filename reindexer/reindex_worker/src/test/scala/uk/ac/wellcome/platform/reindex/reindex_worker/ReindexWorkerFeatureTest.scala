@@ -50,7 +50,7 @@ class ReindexWorkerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          withWorkerService(queue, table, topic) { _ =>
+          withWorkerService(queue, table) { _ =>
             val testRecords = createReindexableData(table)
 
             val reindexJob = ReindexJob(
@@ -83,7 +83,7 @@ class ReindexWorkerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          withWorkerService(queue, table, topic) { _ =>
+          withWorkerService(queue, table) { _ =>
             val testRecords = createReindexableData(table)
 
             val reindexJob = ReindexJob(
@@ -146,7 +146,7 @@ class ReindexWorkerFeatureTest
           Scanamo.put(dynamoDbClient)(table.name)(record)
         }
         withLocalSnsTopic { topic =>
-          withWorkerService(queue, table, topic) { _ =>
+          withWorkerService(queue, table) { _ =>
             val reindexJob = ReindexJob(
               parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
               dynamoConfig = createDynamoConfigWith(table),
@@ -181,7 +181,7 @@ class ReindexWorkerFeatureTest
       withLocalDynamoDbTable { table =>
         withLocalDynamoDbTable { altTable =>
           withLocalSnsTopic { topic =>
-            withWorkerService(queue, altTable, topic) { _ =>
+            withWorkerService(queue, altTable) { _ =>
               val testRecords = createReindexableData(table)
               createReindexableData(altTable)
 
@@ -221,7 +221,7 @@ class ReindexWorkerFeatureTest
       withLocalDynamoDbTable { table =>
           withLocalSnsTopic { topic =>
             withLocalSnsTopic { altTopic =>
-            withWorkerService(queue, table, altTopic) { _ =>
+            withWorkerService(queue, table) { _ =>
               val testRecords = createReindexableData(table)
 
               val reindexJob = ReindexJob(

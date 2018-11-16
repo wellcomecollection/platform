@@ -26,8 +26,11 @@ class BulkSNSSenderTest
 
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
-      withBulkSNSSender(topic) { bulkSNSSender =>
-        val future = bulkSNSSender.sendToSNS(messages = messages)
+      withBulkSNSSender { bulkSNSSender =>
+        val future = bulkSNSSender.sendToSNS(
+          snsConfig = createSNSConfigWith(topic),
+          messages = messages
+        )
 
         whenReady(future) { _ =>
           val actualRecords = listMessagesReceivedFromSNS(topic).map {
@@ -41,18 +44,22 @@ class BulkSNSSenderTest
   }
 
   it("returns a failed Future[ReindexerException] if there's an SNS error") {
-    withBulkSNSSender(Topic("no-such-topic")) { bulkSNSSender =>
-      val future = bulkSNSSender.sendToSNS(messages = messages)
+    withBulkSNSSender { bulkSNSSender =>
+      val future = bulkSNSSender.sendToSNS(
+        snsConfig = createSNSConfigWith(Topic("no-such-topic")),
+        messages = messages
+      )
       whenReady(future.failed) {
         _ shouldBe a[ReindexerException]
       }
     }
   }
 
-  private def withBulkSNSSender[R](topic: Topic)(
-    testWith: TestWith[BulkSNSSender, R]): R =
-    withSNSWriter(topic) { snsWriter =>
-      val bulkSNSSender = new BulkSNSSender(snsWriter = snsWriter)
+  private def withBulkSNSSender[R](testWith: TestWith[BulkSNSSender, R]): R =
+    withSNSMessageWriter { snsMessageWriter =>
+      val bulkSNSSender = new BulkSNSSender(
+        snsMessageWriter = snsMessageWriter
+      )
       testWith(bulkSNSSender)
     }
 }

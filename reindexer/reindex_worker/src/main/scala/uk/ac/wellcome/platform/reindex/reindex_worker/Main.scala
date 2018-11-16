@@ -45,7 +45,7 @@ object Main extends App with Logging {
   )
 
   val hybridRecordSender = new BulkSNSSender(
-    snsWriter = SNSBuilder.buildSNSWriter(config)
+    snsMessageWriter = SNSBuilder.buildSNSMessageWriter(config)
   )
 
   val workerService = new ReindexWorkerService(
