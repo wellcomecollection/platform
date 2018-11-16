@@ -82,7 +82,7 @@ def publish_from_filesystem():
 
 
 def publish(identifier):
-    response = sns.publish(
+    _ = sns.publish(
         TargetArn=os.environ.get("PUBLISH_ARN"),
         Message=json.dumps({"identifier": identifier}),
     )
