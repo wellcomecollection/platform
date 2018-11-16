@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.WorkerServiceFixture
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexParameters, PartialReindexParameters, ReindexJob}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  CompleteReindexParameters,
+  PartialReindexParameters,
+  ReindexJob
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -54,7 +58,8 @@ class ReindexWorkerFeatureTest
             val testRecords = createReindexableData(table)
 
             val reindexJob = ReindexJob(
-              parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+              parameters =
+                CompleteReindexParameters(segment = 0, totalSegments = 1),
               dynamoConfig = createDynamoConfigWith(table),
               snsConfig = createSNSConfigWith(topic)
             )
@@ -148,7 +153,8 @@ class ReindexWorkerFeatureTest
         withLocalSnsTopic { topic =>
           withWorkerService(queue) { _ =>
             val reindexJob = ReindexJob(
-              parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+              parameters =
+                CompleteReindexParameters(segment = 0, totalSegments = 1),
               dynamoConfig = createDynamoConfigWith(table),
               snsConfig = createSNSConfigWith(topic)
             )
@@ -186,7 +192,8 @@ class ReindexWorkerFeatureTest
               createReindexableData(altTable)
 
               val reindexJob = ReindexJob(
-                parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+                parameters =
+                  CompleteReindexParameters(segment = 0, totalSegments = 1),
                 dynamoConfig = createDynamoConfigWith(table),
                 snsConfig = createSNSConfigWith(topic)
               )
@@ -219,13 +226,14 @@ class ReindexWorkerFeatureTest
   it("decides which topic to send to based on the ReindexJob it receives") {
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
-          withLocalSnsTopic { topic =>
-            withLocalSnsTopic { altTopic =>
+        withLocalSnsTopic { topic =>
+          withLocalSnsTopic { altTopic =>
             withWorkerService(queue) { _ =>
               val testRecords = createReindexableData(table)
 
               val reindexJob = ReindexJob(
-                parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+                parameters =
+                  CompleteReindexParameters(segment = 0, totalSegments = 1),
                 dynamoConfig = createDynamoConfigWith(table),
                 snsConfig = createSNSConfigWith(topic)
               )

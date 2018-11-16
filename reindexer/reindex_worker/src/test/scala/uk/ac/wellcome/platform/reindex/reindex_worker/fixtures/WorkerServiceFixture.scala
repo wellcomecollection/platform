@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.reindex.reindex_worker.fixtures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.reindex.reindex_worker.services.{BulkSNSSender, RecordReader, ReindexWorkerService}
+import uk.ac.wellcome.platform.reindex.reindex_worker.services.{
+  BulkSNSSender,
+  RecordReader,
+  ReindexWorkerService
+}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global

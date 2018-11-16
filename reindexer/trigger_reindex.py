@@ -20,9 +20,7 @@ from send_reindex_messages import run_reindex
 def main():
     args = docopt.docopt(__doc__)
 
-    kwargs = {
-        "reason": args["--reason"]
-    }
+    kwargs = {"reason": args["--reason"]}
 
     for src in ("miro", "miro_migration", "sierra", "sierra_items"):
         if args[src]:
@@ -48,7 +46,7 @@ def main():
         "miro": "vhs-miro-complete",
         "miro_migration": "vhs-miro-migration",
         "sierra": "vhs-sourcedata-sierra",
-        "sierra_items": "vhs-sourcedata-sierra-items"
+        "sierra_items": "vhs-sourcedata-sierra-items",
     }
 
     kwargs["table_name"] = table_names[source]
@@ -66,7 +64,7 @@ def main():
             "miro": 250,
             "miro_migration": 500,
             "sierra": 2500,
-            "sierra_items": 1500
+            "sierra_items": 1500,
         }[source]
         kwargs["is_complete"] = True
 

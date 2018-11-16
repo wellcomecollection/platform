@@ -1,8 +1,15 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{MaxRecordsScanner, ParallelScanner}
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexParameters, PartialReindexParameters, ReindexParameters}
+import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
+  MaxRecordsScanner,
+  ParallelScanner
+}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  CompleteReindexParameters,
+  PartialReindexParameters,
+  ReindexParameters
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
@@ -17,7 +24,9 @@ class RecordReader(
   parallelScanner: ParallelScanner
 ) extends Logging {
 
-  def findRecordsForReindexing(dynamoConfig: DynamoConfig, reindexParameters: ReindexParameters): Future[List[String]] = {
+  def findRecordsForReindexing(
+    dynamoConfig: DynamoConfig,
+    reindexParameters: ReindexParameters): Future[List[String]] = {
     debug(s"Finding records that need reindexing for $reindexParameters")
 
     val scannerMethod =

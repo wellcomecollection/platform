@@ -53,7 +53,7 @@ def run_reindex(
     is_complete,
     is_partial,
     total_segments=None,
-    max_records=None
+    max_records=None,
 ):
     username = iam.get_user()["User"]["UserName"]
 
@@ -85,7 +85,7 @@ def run_reindex(
         {
             "dynamoConfig": {"table": table_name},
             "snsConfig": {"topicArn": build_topic_arn(topic_name)},
-            "parameters": p
+            "parameters": p,
         }
         for p in parameters
     )
@@ -113,15 +113,12 @@ def main():
         is_complete=args["complete"],
         total_segments=int_or_none(args["--total_segments"]),
         is_partial=args["partial"],
-        max_records=int_or_none(args["--max_records"])
+        max_records=int_or_none(args["--max_records"]),
     )
 
 
 def all_partial_parameters(max_records):
-    yield {
-        "maxRecords": max_records,
-        "type": "PartialReindexParameters"
-    }
+    yield {"maxRecords": max_records, "type": "PartialReindexParameters"}
 
 
 def all_complete_parameters(total_segments):

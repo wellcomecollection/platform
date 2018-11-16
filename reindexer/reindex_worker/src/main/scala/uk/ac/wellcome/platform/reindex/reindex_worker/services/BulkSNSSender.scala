@@ -1,13 +1,19 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import com.amazonaws.SdkClientException
-import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSMessageWriter}
+import uk.ac.wellcome.messaging.sns.{
+  PublishAttempt,
+  SNSConfig,
+  SNSMessageWriter
+}
 import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BulkSNSSender(snsMessageWriter: SNSMessageWriter)(implicit ec: ExecutionContext) {
-  def sendToSNS(snsConfig: SNSConfig, messages: List[String]): Future[List[PublishAttempt]] = {
+class BulkSNSSender(snsMessageWriter: SNSMessageWriter)(
+  implicit ec: ExecutionContext) {
+  def sendToSNS(snsConfig: SNSConfig,
+                messages: List[String]): Future[List[PublishAttempt]] = {
     Future.sequence {
       messages
         .map { message: String =>

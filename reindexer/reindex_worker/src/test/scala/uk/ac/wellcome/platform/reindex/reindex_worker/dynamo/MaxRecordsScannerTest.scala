@@ -22,7 +22,8 @@ class MaxRecordsScannerTest
           TestVersioned(id = "123", data = "hello world", version = 1)
         Scanamo.put(dynamoDbClient)(table.name)(record)
 
-        val futureResult = maxResultScanner.scan(maxRecords = 1)(createDynamoConfigWith(table))
+        val futureResult =
+          maxResultScanner.scan(maxRecords = 1)(createDynamoConfigWith(table))
 
         whenReady(futureResult) { result =>
           result.map { fromJson[TestVersioned](_).get } shouldBe List(record)
@@ -42,7 +43,8 @@ class MaxRecordsScannerTest
           Scanamo.put(dynamoDbClient)(table.name)(record)
         }
 
-        val futureResult = maxResultScanner.scan(maxRecords = 10)(createDynamoConfigWith(table))
+        val futureResult =
+          maxResultScanner.scan(maxRecords = 10)(createDynamoConfigWith(table))
 
         whenReady(futureResult) { result =>
           result.map { fromJson[TestVersioned](_).get } should contain theSameElementsAs records

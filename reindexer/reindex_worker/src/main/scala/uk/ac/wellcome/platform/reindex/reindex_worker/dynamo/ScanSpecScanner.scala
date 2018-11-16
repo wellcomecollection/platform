@@ -26,7 +26,8 @@ class ScanSpecScanner(dynamoDBClient: AmazonDynamoDB)(
     * Note that this returns a Future[List], so results will be cached in-memory.
     * Design your spec accordingly.
     */
-  def scan(scanSpec: ScanSpec)(dynamoConfig: DynamoConfig): Future[List[String]] = {
+  def scan(scanSpec: ScanSpec)(
+    dynamoConfig: DynamoConfig): Future[List[String]] = {
     for {
       table <- Future.successful { dynamoDB.getTable(dynamoConfig.table) }
       scanResult: ItemCollection[ScanOutcome] <- Future { table.scan(scanSpec) }

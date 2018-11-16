@@ -46,7 +46,8 @@ class RecordReaderTest
         records.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        val reindexParameters = CompleteReindexParameters(segment = 0, totalSegments = 1)
+        val reindexParameters =
+          CompleteReindexParameters(segment = 0, totalSegments = 1)
 
         val future = reader.findRecordsForReindexing(
           dynamoConfig = createDynamoConfigWith(table),
@@ -85,8 +86,8 @@ class RecordReaderTest
   it("returns a failed Future if there's a DynamoDB error") {
     val table = Table("does-not-exist", "no-such-index")
     withRecordReader { reader =>
-
-      val reindexParameters = CompleteReindexParameters(segment = 5, totalSegments = 10)
+      val reindexParameters =
+        CompleteReindexParameters(segment = 5, totalSegments = 10)
 
       val future = reader.findRecordsForReindexing(
         dynamoConfig = createDynamoConfigWith(table),

@@ -34,7 +34,8 @@ object SNSBuilder extends AWSClientConfigBuilder {
     )
 
   def buildSNSMessageWriter(config: Config): SNSMessageWriter =
-    new SNSMessageWriter(snsClient = buildSNSClient(config))(ec = AkkaBuilder.buildExecutionContext())
+    new SNSMessageWriter(snsClient = buildSNSClient(config))(
+      ec = AkkaBuilder.buildExecutionContext())
 
   def buildSNSWriter(config: Config): SNSWriter =
     new SNSWriter(

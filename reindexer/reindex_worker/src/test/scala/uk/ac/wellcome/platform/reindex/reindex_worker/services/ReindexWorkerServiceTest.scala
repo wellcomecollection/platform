@@ -7,10 +7,17 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{DynamoFixtures, ReindexableTable, WorkerServiceFixture}
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
+  DynamoFixtures,
+  ReindexableTable,
+  WorkerServiceFixture
+}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexParameters, ReindexJob}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  CompleteReindexParameters,
+  ReindexJob
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -43,7 +50,8 @@ class ReindexWorkerServiceTest
           case QueuePair(queue, dlq) =>
             withWorkerService(queue) { _ =>
               val reindexJob = ReindexJob(
-                parameters = CompleteReindexParameters(segment = 0, totalSegments = 1),
+                parameters =
+                  CompleteReindexParameters(segment = 0, totalSegments = 1),
                 dynamoConfig = createDynamoConfigWith(table),
                 snsConfig = createSNSConfigWith(topic)
               )
@@ -99,7 +107,8 @@ class ReindexWorkerServiceTest
       case QueuePair(queue, dlq) =>
         withWorkerService(queue) { _ =>
           val reindexJob = ReindexJob(
-            parameters = CompleteReindexParameters(segment = 5, totalSegments = 10),
+            parameters =
+              CompleteReindexParameters(segment = 5, totalSegments = 10),
             dynamoConfig = createDynamoConfigWith(badTable),
             snsConfig = createSNSConfigWith(badTopic)
           )
