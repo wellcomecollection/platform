@@ -156,12 +156,5 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
-  def withItemRecordVHS[R](table: Table, bucket: Bucket)(
-    testWith: TestWith[SierraItemsVHS, R]): R =
-    withTypeVHS[SierraItemRecord, EmptyMetadata, R](
-      bucket,
-      table,
-      globalS3Prefix = "") { vhs =>
-      testWith(vhs)
-    }
+
 }

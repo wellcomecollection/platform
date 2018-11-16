@@ -9,10 +9,13 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.{DynamoInserter, SierraItemsToDynamoWorkerService}
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
 
-trait WorkerServiceFixture extends SNS with SQS {
+trait WorkerServiceFixture extends LocalVersionedHybridStore with SNS with SQS {
   type SierraItemsVHS = VersionedHybridStore[SierraItemRecord,
     EmptyMetadata,
     ObjectStore[SierraItemRecord]]
@@ -38,5 +41,11 @@ trait WorkerServiceFixture extends SNS with SQS {
 
           testWith(service)
         }
+    }
+
+  def withItemRecordVHS[R](table: Table, bucket: Bucket)(
+    testWith: TestWith[SierraItemsVHS, R]): R =
+    withTypeVHS[SierraItemRecord, EmptyMetadata, R](bucket, table) { vhs =>
+      testWith(vhs)
     }
 }
