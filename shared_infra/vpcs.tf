@@ -25,7 +25,7 @@ module "storage_vpc_delta" {
 
   name = "storage-172-30-0-0-16"
 
-  cidr_block_vpc = "172.30.0.0/16"
+  cidr_block_vpc            = "172.30.0.0/16"
   cidr_block_public         = "172.30.0.0/17"
   cidrsubnet_newbits_public = "2"
 
