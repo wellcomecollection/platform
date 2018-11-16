@@ -31,7 +31,6 @@ object Main extends WellcomeApp {
     )
 
     new SierraItemMergerWorkerService(
-      actorSystem = actorSystem,
       sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
       sierraItemMergerUpdaterService = updaterService,
       objectStore = S3Builder.buildObjectStore[SierraItemRecord](config),
