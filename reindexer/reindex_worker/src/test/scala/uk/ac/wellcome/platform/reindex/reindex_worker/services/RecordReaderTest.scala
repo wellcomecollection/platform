@@ -37,7 +37,7 @@ class RecordReaderTest
 
   it("finds records in the table with a complete reindex") {
     withLocalDynamoDbTable { table =>
-      withRecordReader(table) { reader =>
+      withRecordReader { reader =>
         val records = List(
           exampleRecord.copy(id = "id1"),
           exampleRecord.copy(id = "id2")
@@ -46,11 +46,15 @@ class RecordReaderTest
         records.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        val reindexJob = CompleteReindexParameters(segment = 0, totalSegments = 1)
+        val reindexParameters = CompleteReindexParameters(segment = 0, totalSegments = 1)
 
-        whenReady(reader.findRecordsForReindexing(reindexJob)) {
-          actualRecords =>
-            actualRecords.map { fromJson[HybridRecord](_).get } should contain theSameElementsAs records
+        val future = reader.findRecordsForReindexing(
+          dynamoConfig = createDynamoConfigWith(table),
+          reindexParameters = reindexParameters
+        )
+
+        whenReady(future) { actualRecords =>
+          actualRecords.map { fromJson[HybridRecord](_).get } should contain theSameElementsAs records
         }
       }
     }
@@ -58,17 +62,21 @@ class RecordReaderTest
 
   it("finds records in the table with a maxResults reindex") {
     withLocalDynamoDbTable { table =>
-      withRecordReader(table) { reader =>
+      withRecordReader { reader =>
         (1 to 15).foreach { id =>
           val record = exampleRecord.copy(id = id.toString)
           Scanamo.put(dynamoDbClient)(table.name)(record)
         }
 
-        val reindexJob = PartialReindexParameters(maxRecords = 5)
+        val reindexParameters = PartialReindexParameters(maxRecords = 5)
 
-        whenReady(reader.findRecordsForReindexing(reindexJob)) {
-          actualRecords =>
-            actualRecords should have size 5
+        val future = reader.findRecordsForReindexing(
+          dynamoConfig = createDynamoConfigWith(table),
+          reindexParameters = reindexParameters
+        )
+
+        whenReady(future) { actualRecords =>
+          actualRecords should have size 5
         }
       }
     }
@@ -76,19 +84,24 @@ class RecordReaderTest
 
   it("returns a failed Future if there's a DynamoDB error") {
     val table = Table("does-not-exist", "no-such-index")
-    withRecordReader(table) { reader =>
+    withRecordReader { reader =>
+
+      val reindexParameters = CompleteReindexParameters(segment = 5, totalSegments = 10)
+
       val future = reader.findRecordsForReindexing(
-        CompleteReindexParameters(segment = 5, totalSegments = 10))
+        dynamoConfig = createDynamoConfigWith(table),
+        reindexParameters = reindexParameters
+      )
+
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }
     }
   }
 
-  private def withRecordReader[R](table: Table)(
-    testWith: TestWith[RecordReader, R]): R =
-    withMaxRecordsScanner(table) { maxRecordsScanner =>
-      withParallelScanner(table) { parallelScanner =>
+  private def withRecordReader[R](testWith: TestWith[RecordReader, R]): R =
+    withMaxRecordsScanner { maxRecordsScanner =>
+      withParallelScanner { parallelScanner =>
         val reader = new RecordReader(
           maxRecordsScanner = maxRecordsScanner,
           parallelScanner = parallelScanner
