@@ -9,7 +9,7 @@ resource "aws_api_gateway_rest_api" "api" {
 }
 
 module "root_resource_method_static" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/static?ref=v16.1.5"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/prebuilt/method/static?ref=v16.1.5"
 
   api_id      = "${aws_api_gateway_rest_api.api.id}"
   resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
