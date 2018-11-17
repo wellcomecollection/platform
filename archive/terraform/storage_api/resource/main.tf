@@ -22,7 +22,7 @@ module "auth_resource_integration" {
   http_method = "${module.auth_resource.http_method}"
 
   forward_port = "${var.forward_port}"
-  forward_path = ""
+  forward_path = "${var.forward_path}"
 }
 
 module "auth_subresource" {
@@ -52,8 +52,8 @@ module "auth_subresource_integration" {
   hostname    = "www.example.com"
   http_method = "${module.auth_subresource.http_method}"
 
-  forward_port = "$${stageVariables.port}"
-  forward_path = "{proxy}"
+  forward_port = "${var.forward_port}"
+  forward_path = "${var.forward_path}/{proxy}"
 
   request_parameters = {
     integration.request.path.proxy = "method.request.path.proxy"

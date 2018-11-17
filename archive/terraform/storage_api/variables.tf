@@ -2,6 +2,10 @@ variable "subnets" {
   type = "list"
 }
 
+variable "aws_region" {
+  default = "eu-west-1"
+}
+
 variable "vpc_id" {}
 
 variable "cluster_name" {}
@@ -37,3 +41,5 @@ variable "cognito_user_pool_arn" {}
 variable "auth_scopes" {
   type = "list"
 }
+
+variable "storage_static_content_bucket_name" {}

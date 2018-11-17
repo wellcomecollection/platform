@@ -345,4 +345,5 @@ module "storage_api" {
   ingests_env_vars_length       = 4
   ingests_nginx_container_image = "${local.nginx_image_uri}"
   ingests_nginx_container_port  = "9000"
+  storage_static_content_bucket_name = "${local.storage_static_content_bucket_name}"
 }

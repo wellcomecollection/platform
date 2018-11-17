@@ -14,3 +14,4 @@ variable "hostname" {
 }
 
 variable "forward_port" {}
+variable "forward_path" {}

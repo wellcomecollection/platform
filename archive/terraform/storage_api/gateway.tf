@@ -8,6 +8,19 @@ resource "aws_api_gateway_rest_api" "api" {
   }
 }
 
+module "root_resource_method_static" {
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v16.1.5"
+
+  api_id      = "${aws_api_gateway_rest_api.api.id}"
+  resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
+
+  aws_region  = "${var.aws_region}"
+  bucket_name = "${aws_s3_bucket_object.context.bucket}"
+  s3_key      = "${aws_s3_bucket_object.context.key}"
+
+  static_resource_role_arn = "${aws_iam_role.static_resource_role.arn}"
+}
+
 resource "aws_api_gateway_authorizer" "cognito" {
   name          = "cognito"
   type          = "COGNITO_USER_POOLS"
@@ -17,22 +30,26 @@ resource "aws_api_gateway_authorizer" "cognito" {
 
 # Stages
 
-module "prod" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v14.2.0"
-  domain_name = "api.wellcomecollection.org"
+module "v1" {
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v16.1.5"
 
-  stage_name = "default"
-  api_id     = "${aws_api_gateway_rest_api.api.id}"
+  stage_name = "v1"
+
+  api_id = "${aws_api_gateway_rest_api.api.id}"
 
   variables = {
     bags_port    = "${local.bags_listener_port}"
     ingests_port = "${local.ingests_listener_port}"
   }
 
-  base_path = "storage"
-
   # All integrations
   depends_on = "${concat(module.bags.integration_uris,module.ingests.integration_uris)}"
+}
+
+resource "aws_api_gateway_base_path_mapping" "stage" {
+  api_id      = "${aws_api_gateway_rest_api.api.id}"
+  domain_name = "${local.domain_name}"
+  base_path   = "storage"
 }
 
 # Resources
@@ -49,7 +66,8 @@ module "bags" {
   cognito_id  = "${aws_api_gateway_authorizer.cognito.id}"
   auth_scopes = ["${var.auth_scopes}"]
 
-  forward_port = "${local.bags_listener_port}"
+  forward_port = "$${stageVariables.bags_port}"
+  forward_path = "registrar"
 }
 
 module "ingests" {
@@ -64,7 +82,8 @@ module "ingests" {
   cognito_id  = "${aws_api_gateway_authorizer.cognito.id}"
   auth_scopes = ["${var.auth_scopes}"]
 
-  forward_port = "${local.ingests_listener_port}"
+  forward_port = "$${stageVariables.ingests_port}"
+  forward_path = "progress"
 }
 
 # Link
