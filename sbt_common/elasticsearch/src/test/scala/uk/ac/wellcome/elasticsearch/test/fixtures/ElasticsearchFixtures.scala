@@ -6,7 +6,7 @@ import org.elasticsearch.index.VersionType
 import org.scalactic.source.Position
 import org.scalatest.concurrent.{
   Eventually,
-  PatienceConfiguration,
+  IntegrationPatience,
   ScalaFutures
 }
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -27,15 +27,9 @@ import scala.util.Random
 
 trait ElasticsearchFixtures
     extends Eventually
-    with PatienceConfiguration
     with ScalaFutures
     with Matchers
-    with JsonAssertions { this: Suite =>
-
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
-    timeout = scaled(Span(40, Seconds)),
-    interval = scaled(Span(150, Millis))
-  )
+    with JsonAssertions with IntegrationPatience { this: Suite =>
 
   private val esHost = "localhost"
   private val esPort = 9200
