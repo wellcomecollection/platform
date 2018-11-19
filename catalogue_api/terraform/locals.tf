@@ -15,7 +15,7 @@ locals {
   remus_api_release_id     = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
   remus_nginx_release_id   = "${local.pinned_remus_nginx != "" ? local.pinned_remus_nginx : var.release_ids["nginx_api-delta"]}"
   romulus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
-  remus_app_uri = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
+  remus_app_uri            = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
   romulus_is_prod          = "${local.production_api == "romulus" ? "true" : "false"}"
   remus_is_prod            = "${local.production_api == "remus" ? "true" : "false"}"
   remus_hostname           = "${local.remus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
@@ -37,18 +37,18 @@ locals {
 
   # Catalogue API
 
-  namespace = "catalogue-api"
-  vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
-  public_subnets  = "${data.terraform_remote_state.shared_infra.catalogue_public_subnets}"
-  private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
+  namespace                               = "catalogue-api"
+  vpc_id                                  = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
+  public_subnets                          = "${data.terraform_remote_state.shared_infra.catalogue_public_subnets}"
+  private_subnets                         = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
   alb_api_wc_service_lb_security_group_id = "${data.terraform_remote_state.infra_critical.alb_api_wc_service_lb_security_group_id}"
   alb_api_wc_https_listener_arn           = "${data.terraform_remote_state.infra_critical.alb_api_wc_https_listener_arn}"
   alb_api_wc_cloudwatch_id                = "${data.terraform_remote_state.infra_critical.alb_api_wc_cloudwatch_id}"
-  nginx_container_uri = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
-  namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
-  catalogue_vpc_delta_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
-  vpc_delta_private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
+  nginx_container_uri                     = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
+  namespace_id                            = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace_tld                           = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  catalogue_vpc_delta_id                  = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  vpc_delta_private_subnets               = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 
   # Data API
 
