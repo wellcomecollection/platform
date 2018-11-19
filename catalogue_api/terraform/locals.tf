@@ -15,9 +15,7 @@ locals {
   remus_api_release_id     = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
   remus_nginx_release_id   = "${local.pinned_remus_nginx != "" ? local.pinned_remus_nginx : var.release_ids["nginx_api-delta"]}"
   romulus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
-
-  remus_app_uri            = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
-
+  remus_app_uri = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
   romulus_is_prod          = "${local.production_api == "romulus" ? "true" : "false"}"
   remus_is_prod            = "${local.production_api == "remus" ? "true" : "false"}"
   remus_hostname           = "${local.remus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
@@ -26,7 +24,6 @@ locals {
   romulus_task_number      = "${local.romulus_is_prod == "true" ? 3 : 1}"
   remus_enable_alb_alarm   = "${local.remus_is_prod == "true" ? 1 : 0}"
   romulus_enable_alb_alarm = "${local.romulus_is_prod == "true" ? 1 : 0}"
-
   es_config_romulus = {
     index_v1 = "v1-2018-09-27-marc-610-subjects"
     index_v2 = "v2-2018-09-27-marc-610-subjects"
@@ -41,22 +38,16 @@ locals {
   # Catalogue API
 
   namespace = "catalogue-api"
-
   vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
   public_subnets  = "${data.terraform_remote_state.shared_infra.catalogue_public_subnets}"
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
-
   alb_api_wc_service_lb_security_group_id = "${data.terraform_remote_state.infra_critical.alb_api_wc_service_lb_security_group_id}"
   alb_api_wc_https_listener_arn           = "${data.terraform_remote_state.infra_critical.alb_api_wc_https_listener_arn}"
   alb_api_wc_cloudwatch_id                = "${data.terraform_remote_state.infra_critical.alb_api_wc_cloudwatch_id}"
-
   nginx_container_uri = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
-
   namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
-
   catalogue_vpc_delta_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
-
   vpc_delta_private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 
   # Data API
@@ -66,7 +57,6 @@ locals {
     index_v2 = "${local.romulus_is_prod == "true" ? local.es_config_romulus["index_v2"] : local.es_config_remus["index_v2"]}"
     doc_type = "${local.romulus_is_prod == "true" ? local.es_config_romulus["doc_type"] : local.es_config_remus["doc_type"]}"
   }
-
   release_id = "${local.romulus_is_prod == "true" ? local.pinned_romulus_api : local.pinned_remus_api}"
 
   # Update API docs
