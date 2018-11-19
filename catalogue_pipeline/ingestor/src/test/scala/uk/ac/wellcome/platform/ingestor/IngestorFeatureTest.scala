@@ -16,8 +16,8 @@ class IngestorFeatureTest
     with Matchers
     with JsonAssertions
     with ScalaFutures
-      with ElasticsearchFixtures
-      with WorkerServiceFixture
+    with WorkerServiceFixture
+    with ElasticsearchFixtures
     with WorksGenerators {
 
   it("ingests a Miro work") {
