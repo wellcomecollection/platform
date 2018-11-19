@@ -4,11 +4,7 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
 import org.scalactic.source.Position
-import org.scalatest.concurrent.{
-  Eventually,
-  IntegrationPatience,
-  ScalaFutures
-}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.{
@@ -29,7 +25,8 @@ trait ElasticsearchFixtures
     extends Eventually
     with ScalaFutures
     with Matchers
-    with JsonAssertions with IntegrationPatience { this: Suite =>
+    with JsonAssertions
+    with IntegrationPatience { this: Suite =>
 
   private val esHost = "localhost"
   private val esPort = 9200
