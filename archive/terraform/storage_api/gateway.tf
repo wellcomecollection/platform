@@ -49,7 +49,10 @@ module "v1" {
   }
 
   # All integrations
-  depends_on = "${concat(module.bags.integration_uris,module.ingests.integration_uris)}"
+  depends_on = [
+    "${module.root_resource_method_static.integration_id}",
+    "${concat(module.bags.integration_uris,module.ingests.integration_uris)}"
+    ]
 }
 
 resource "aws_api_gateway_base_path_mapping" "stage" {
