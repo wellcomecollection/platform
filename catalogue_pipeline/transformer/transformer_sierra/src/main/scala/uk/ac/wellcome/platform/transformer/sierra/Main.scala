@@ -17,7 +17,7 @@ import uk.ac.wellcome.platform.transformer.sierra.services.SierraTransformerWork
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
 
-class Main extends App with Logging {
+object Main extends App with Logging {
   val config: Config = ConfigFactory.load()
 
   implicit val actorSystem: ActorSystem =
