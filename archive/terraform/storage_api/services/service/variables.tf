@@ -1,7 +1,3 @@
-variable "es_config" {
-  type = "map"
-}
-
 variable "subnets" {
   type = "list"
 }
@@ -11,19 +7,6 @@ variable "cluster_name" {}
 variable "namespace" {}
 variable "namespace_id" {}
 variable "namespace_tld" {}
-
-data "template_file" "es_cluster_host" {
-  template = "$${name}.$${region}.aws.found.io"
-
-  vars {
-    name   = "${var.es_cluster_credentials["name"]}"
-    region = "${var.es_cluster_credentials["region"]}"
-  }
-}
-
-variable "es_cluster_credentials" {
-  type = "map"
-}
 
 variable "vpc_id" {}
 
@@ -38,16 +21,11 @@ variable "security_group_ids" {
 }
 
 variable "service_egress_security_group_id" {}
+variable "env_vars_length" {}
 
-variable "cpu" {
-  default = "2048"
-}
-
-variable "memory" {
-  default = "4096"
+variable "env_vars" {
+  type = "map"
 }
 
 variable "lb_arn" {}
 variable "listener_port" {}
-
-variable "task_desired_count" {}

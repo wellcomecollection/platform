@@ -37,3 +37,6 @@ variable "remus_listener_port" {}
 data "aws_vpc" "vpc" {
   id = "${var.vpc_id}"
 }
+
+variable "remus_task_number" {}
+variable "romulus_task_number" {}

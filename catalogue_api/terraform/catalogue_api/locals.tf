@@ -6,4 +6,10 @@ locals {
 
   stage_listener_port = "${var.production_api == "remus" ? local.romulus_listener_port : local.remus_listener_port}"
   prod_listener_port  = "${var.production_api == "remus" ? local.remus_listener_port : local.romulus_listener_port}"
+
+  romulus_is_prod = "${var.production_api == "romulus" ? "true" : "false"}"
+  remus_is_prod   = "${var.production_api == "remus" ? "true" : "false"}"
+
+  remus_task_number   = "${local.remus_is_prod == "true" ? 3 : 1}"
+  romulus_task_number = "${local.romulus_is_prod == "true" ? 3 : 1}"
 }
