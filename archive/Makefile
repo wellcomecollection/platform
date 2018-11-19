@@ -7,7 +7,7 @@ SBT_APPS    = archivist progress_async progress_http notifier registrar_async re
 SBT_DOCKER_LIBRARIES = archive_common progress_common
 SBT_NO_DOCKER_LIBRARIES = registrar_common archive_display
 
-ECS_TASKS   = bagger archive_api callback_stub_server
+ECS_TASKS   = bagger callback_stub_server
 LAMBDAS     = migrator
 
 TF_NAME     = archive
@@ -15,5 +15,3 @@ TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))
-
-include $(ROOT)/$(STACK_ROOT)/archive_api/Makefile

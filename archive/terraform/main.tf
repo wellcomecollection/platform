@@ -1,22 +1,3 @@
-# API
-
-module "api_ecs" {
-  source = "api_ecs"
-
-  namespace = "${local.namespace}"
-  api_path  = "/storage/v1"
-
-  archive_api_container_image = "${local.api_ecs_container_image}"
-  archive_api_container_port  = "9000"
-
-  vpc_id                         = "${local.vpc_id}"
-  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
-  private_subnets                = "${local.private_subnets}"
-  public_subnets                 = "${local.public_subnets}"
-  certificate_domain             = "api.wellcomecollection.org"
-  api_alb_cdir_blocks            = "${var.api_alb_cdir_blocks}"
-}
-
 # Archivist
 
 module "archivist" {
@@ -78,31 +59,6 @@ module "registrar_async" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
-module "registrar_http" {
-  source       = "internal_rest_service"
-  service_name = "registrar_http"
-
-  container_port  = "9001"
-  container_image = "${local.registrar_http_container_image}"
-
-  env_vars = {
-    context_url     = "https://api.wellcomecollection.org/storage/v1/context.json"
-    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
-    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
-    app_base_url    = "https://api.wellcomecollection.org"
-  }
-
-  env_vars_length = 4
-
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
-  private_subnets    = "${local.private_subnets}"
-
-  cluster_id = "${aws_ecs_cluster.cluster.id}"
-  vpc_id     = "${local.vpc_id}"
-
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-}
-
 # Notifier
 
 module "notifier" {
@@ -160,32 +116,6 @@ module "progress_async" {
   container_image   = "${local.progress_async_container_image}"
   source_queue_name = "${module.progress_async_queue.name}"
   source_queue_arn  = "${module.progress_async_queue.arn}"
-}
-
-module "progress_http" {
-  source = "internal_rest_service"
-
-  service_name = "progress_http"
-
-  container_port  = "9001"
-  container_image = "${local.progress_http_container_image}"
-
-  env_vars = {
-    context_url                 = "https://api.wellcomecollection.org/storage/v1/context.json"
-    app_base_url                = "https://${module.api_ecs.alb_dns_name}/storage/v1/ingests"
-    topic_arn                   = "${module.ingest_requests_topic.arn}"
-    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
-  }
-
-  env_vars_length = 4
-
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
-  private_subnets    = "${local.private_subnets}"
-
-  cluster_id = "${aws_ecs_cluster.cluster.id}"
-  vpc_id     = "${local.vpc_id}"
-
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }
 
 # Migration services
@@ -326,7 +256,7 @@ module "storage_api" {
     context_url     = "https://api.wellcomecollection.org/storage/v1/context.json"
     vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
     vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
-    app_base_url    = "https://api.wellcomecollection.org"
+    app_base_url    = "https://api.wellcomecollection.org/storage/v1/bags"
   }
   bags_env_vars_length       = 4
   bags_nginx_container_image = "${local.nginx_image_uri}"
@@ -338,7 +268,7 @@ module "storage_api" {
   ingests_container_port  = "9001"
   ingests_env_vars = {
     context_url                 = "https://api.wellcomecollection.org/storage/v1/context.json"
-    app_base_url                = "https://${module.api_ecs.alb_dns_name}/storage/v1/ingests"
+    app_base_url                = "https://api.wellcomecollection.org/storage/v1/ingests"
     topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
