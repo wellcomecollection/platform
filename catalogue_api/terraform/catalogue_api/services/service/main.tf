@@ -1,5 +1,5 @@
 module "catalogue_api" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest/container_with_sidecar?ref=v16.1.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest/container_with_sidecar?ref=v16.1.3"
 
   vpc_id       = "${var.vpc_id}"
   subnets      = ["${var.subnets}"]
@@ -43,4 +43,6 @@ module "catalogue_api" {
   listener_port = "${var.listener_port}"
 
   target_container = "sidecar"
+
+  task_desired_count = "${var.task_desired_count}"
 }

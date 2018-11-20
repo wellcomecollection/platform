@@ -3,11 +3,8 @@ package uk.ac.wellcome.elasticsearch.test.fixtures
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
-import org.scalatest.concurrent.{
-  Eventually,
-  PatienceConfiguration,
-  ScalaFutures
-}
+import org.scalactic.source.Position
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.{
@@ -26,15 +23,10 @@ import scala.util.Random
 
 trait ElasticsearchFixtures
     extends Eventually
-    with PatienceConfiguration
     with ScalaFutures
     with Matchers
-    with JsonAssertions { this: Suite =>
-
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
-    timeout = scaled(Span(40, Seconds)),
-    interval = scaled(Span(150, Millis))
-  )
+    with JsonAssertions
+    with IntegrationPatience { this: Suite =>
 
   private val esHost = "localhost"
   private val esPort = 9200
@@ -60,17 +52,14 @@ trait ElasticsearchFixtures
 
   // Elasticsearch takes a while to start up so check that it actually started
   // before running tests.
-  //
-  // AWLC: I have commented this out because it was throwing an inexplicable
-  // NullPointerException in the ingestor feature test, and I'd exhausted my
-  // patience trying to work out why.  Feel free to put it back if you can solve
-  // this particular mystery!
-  //
-  // This was the relevant patch: https://github.com/wellcometrust/platform/pull/3025
-  //
-  // eventually {
-  //   elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
-  // }
+  eventually {
+    elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
+  }(
+    PatienceConfig(
+      timeout = scaled(Span(40, Seconds)),
+      interval = scaled(Span(150, Millis))
+    ),
+    implicitly[Position])
 
   def withLocalElasticsearchIndex[R](testWith: TestWith[String, R]): R = {
     val indexName = createIndexName

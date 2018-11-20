@@ -28,4 +28,6 @@ module "remus" {
 
   lb_arn        = "${var.nlb_arn}"
   listener_port = "${var.remus_listener_port}"
+
+  task_desired_count = "${var.remus_task_number}"
 }
