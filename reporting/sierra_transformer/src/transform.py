@@ -69,7 +69,7 @@ def transform(input_data):
     transformed = unpack(
         view_record=bib_record,
         edit_record=transformed,
-        field_name="location",
+        field_name="locations",
         subfields_to_keep=["name", "code"],
     )
 
