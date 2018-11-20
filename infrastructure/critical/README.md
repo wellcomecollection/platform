@@ -1,6 +1,6 @@
-# catalogue_pipeline
+# Critical Infrastructure
 
-The stack contains the permanent data stores used by the catalogue pipeline.
+Any infrastructure where extreme care must be taken to prevent deletion of data.
 
 This includes:
 

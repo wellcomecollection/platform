@@ -1,19 +1,17 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 include $(ROOT)/functions.Makefile
 
-STACK_ROOT  = shared_infra
+STACK_ROOT  = infrastructure/shared
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
 SBT_APPS    =
-ECS_TASKS   = sqs_freezeray sqs_redrive
-LAMBDAS     = drain_ecs_container_instance \
-              dynamo_to_sns \
-              dynamo_write_heartbeat \
-              ecs_ec2_instance_tagger
+ECS_TASKS   =
+LAMBDAS     = lambdas/drain_ecs_container_instance \
+              lambdas/ecs_ec2_instance_tagger
 
-TF_NAME     = shared_infra
-TF_PATH     = $(STACK_ROOT)
+TF_NAME     = infra_shared
+TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))

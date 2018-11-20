@@ -16,6 +16,4 @@ TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))
 
-include $(ROOT)/monitoring/deployment_tracking/Makefile
 include $(ROOT)/monitoring/ecs_dashboard/Makefile
-include $(ROOT)/monitoring/load_test/Makefile
