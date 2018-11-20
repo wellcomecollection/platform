@@ -2,6 +2,8 @@
 # - Catalogue Pipeline
 # - Catalogue API
 # - IIIF Image server (Loris)
+# - Reindexer
+# - Sierra Adapter
 
 module "catalogue_vpc_delta" {
   source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.0"
