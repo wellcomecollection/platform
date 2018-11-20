@@ -19,6 +19,8 @@ resource "aws_cognito_user_pool_domain" "domain" {
   domain          = "auth.wellcomecollection.org"
   certificate_arn = "${data.aws_acm_certificate.auth.arn}"
   user_pool_id    = "${aws_cognito_user_pool.pool.id}"
+
+  provider = "aws.us-east-1"
 }
 
 resource "aws_cognito_resource_server" "storage_api" {
