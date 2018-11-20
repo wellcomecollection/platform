@@ -75,7 +75,7 @@ MARC field and 2nd indicator,Term
 655_7,Books printed as advertisements.|2rbgenr 
 655_7,Booksellers' advertisements.|2rbgenr 
 655_7,Booksellers' catalogues.|2rbgenr 
-655_0,Borders, Ornamental (Decorative arts). 
+655_0,"Borders, Ornamental (Decorative arts). "
 655_0,Boxes. 
 655_7,Broadsides.|2gmgpc 
 655_0,Bronze sculpture. 
@@ -137,7 +137,7 @@ MARC field and 2nd indicator,Term
 655_0,Concert programs.
 655_7,Concordances.|2rbgenr
 655_0,Condoms|xPackaging. 
-655 7,Conference proceedings.|2local	
+655 7,"Conference proceedings.|2local	"
 655_7,Conference programs.|2rbgenr 
 655_7,Conjectural works.|2gmgpc 
 655_7,Contracts.|2rbgenr
@@ -160,7 +160,7 @@ MARC field and 2nd indicator,Term
 655_7,Diagrams.|2gmgpc 
 655_7,Diaries.|2rbgenr 
 655_7,Dictionaries.|2rbgenr (See note 1 below)
-655_7,Dictionaries, Medical.|2local
+655_7,"Dictionaries, Medical.|2local"
 655_7,Diplomas.|2gmgpc 
 655_7,Direct mail.|2gmgpc 
 655_7,Directories.|2rbgenr 
@@ -228,7 +228,7 @@ MARC field and 2nd indicator,Term
 655_7,Genre paintings.|2gmgpc 
 655_7,Genre photographs.|2gmgpc 
 655_7,Genre prints.|2gmgpc 
-655_0,German wit and humor, Pictorial.
+655_0,"German wit and humor, Pictorial. "
 655_7,Ghost stories.|2rbgenr
 655_7,Glamour photographs.|2gmgpc
 655_0,Glass containers. 
@@ -260,8 +260,8 @@ MARC field and 2nd indicator,Term
 655_7,Humorous pictures.|2gmgpc 
 655_7,Hymns.|2rbgenr 
 655_0,Icons.
-655_0,Icons, Greek.
-655_0,Icons, Russian.
+655_0,"Icons, Greek."
+655_0,"Icons, Russian."
 655_7,Illustrated works.|2rbgenr 
 655_7,Illustrations.|2gmgpc 
 655_7,Imaginary conversations.|2rbgenr 
@@ -271,9 +271,9 @@ MARC field and 2nd indicator,Term
 655_7,Inkjet prints.|2gmgpc 
 655_7,Intaglio prints.|2gmgpc 
 655_7,Interviews.|2rbgenr
-655_7,Interviews, Recorded.|2local 
+655_7,"Interviews, Recorded.|2local "
 655_7,Invitations.|2local
-655_0,Irish wit and humor, Pictorial. 
+655_0,"Irish wit and humor, Pictorial. "
 655_0,Ironwork. 
 655_0,Ivory carving.
 655_0,Jacquard weaving.
@@ -296,7 +296,7 @@ MARC field and 2nd indicator,Term
 655_7,Leaflets.|2gmgpc 
 655_7,Lecture notes.|2rbgenr
 655_7,Lectures.|2rbgenr 
-655_7,Lectures, Recorded.|2local
+655_7,"Lectures, Recorded.|2local"
 655_7,Legal proceedings.|2local 
 655_7,Legislative proceedings.|2rbgenr 
 655_7,Letter pictures.|2gmgpc 
@@ -382,7 +382,7 @@ MARC field and 2nd indicator,Term
 655_0,Outlines. 
 655_7,Packaging.|2gmgpc 
 655_0,Painted signs and signboards.
-655_0,Painting, Kalighat.
+655_0,"Painting, Kalighat."
 655_7,Paintings.|2gmgpc 
 655_7,Pamphlets.|2gmgpc 
 655_7,Panoramic views.|2gmgpc 
@@ -435,7 +435,7 @@ MARC field and 2nd indicator,Term
 655_7,Posters.|2gmgpc
 655_7,Postmortem photographs|2gmgpc
 655_7,Pouncing.|2aat 
-655_0,Powders.	
+655_0,"Powders.	"
 655_7,Prayer books.|2rbgenr 
 655_7,Prayers.|2rbgenr 
 655_7,Predellas.|2aat. 
@@ -511,7 +511,7 @@ MARC field and 2nd indicator,Term
 655_7,Soft-ground etchings.|2gmgpc 
 655_7,Song sheets.|2rbgenr
 655_7,Songs.|2rbgenr 
-655_0,Songs, Irish. 
+655_0,"Songs, Irish. "
 655_0,Sound recordings. 
 655_7,Souvenir programs.|2rbgenr 
 655_7,Standard specifications.|2local 
