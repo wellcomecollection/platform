@@ -3,8 +3,8 @@ module "services" {
 
   namespace = "${var.namespace}"
 
-  namespace_id  = "${var.namespace_id}"
-  namespace_tld = "${var.namespace_tld}"
+  namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
 
   subnets      = ["${var.subnets}"]
   cluster_name = "${var.cluster_name}"
@@ -28,4 +28,9 @@ module "services" {
 
   remus_task_number   = "${local.remus_task_number}"
   romulus_task_number = "${local.romulus_task_number}"
+}
+
+resource "aws_service_discovery_private_dns_namespace" "namespace" {
+  name = "${var.namespace}"
+  vpc  = "${var.vpc_id}"
 }

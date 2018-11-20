@@ -3,8 +3,8 @@ module "catalogue_api" {
 
   namespace = "catalogue_api_gw"
 
-  vpc_id  = "${local.catalogue_vpc_delta_id}"
-  subnets = ["${local.vpc_delta_private_subnets}"]
+  vpc_id  = "${local.vpc_id}"
+  subnets = ["${local.private_subnets}"]
 
   container_port = "8888"
 

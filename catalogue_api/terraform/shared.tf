@@ -15,13 +15,6 @@ module "ecr_repository_update_api_docs" {
   name   = "update_api_docs"
 }
 
-# Service Discovery
-
-resource "aws_service_discovery_private_dns_namespace" "namespace" {
-  name = "${local.namespace}"
-  vpc  = "${local.vpc_id}"
-}
-
 # ECS Cluster
 
 resource "aws_ecs_cluster" "cluster" {
