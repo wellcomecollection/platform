@@ -4,8 +4,6 @@ locals {
   vhs_miro_inventory_table_name = "${data.terraform_remote_state.infra_crtical.vhs_miro_inventory_table_name}"
   vhs_sierra_items_table_name   = "${data.terraform_remote_state.infra_crtical.vhs_sierra_items_table_name}"
 
-  private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
-
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   reporting_miro_hybrid_records_topic_arn            = "${data.terraform_remote_state.shared_infra.reporting_miro_reindex_topic_arn}"
@@ -28,5 +26,7 @@ locals {
 
   reindex_worker_container_image = "${module.ecr_repository_reindex_worker.repository_url}:${var.release_ids["reindex_worker"]}"
 
-  vpc_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  vpc_id                               = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  public_subnets                       = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_public_subnets}"
+  private_subnets                      = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 }
