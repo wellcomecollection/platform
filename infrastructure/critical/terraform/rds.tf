@@ -61,4 +61,3 @@ resource "aws_security_group" "rds_ingress_security_group" {
     Name = "pipeline-rds-access"
   }
 }
-

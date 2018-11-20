@@ -18,4 +18,3 @@ resource "aws_service_discovery_private_dns_namespace" "namespace" {
 resource "aws_ecs_cluster" "monitoring" {
   name = "monitoring_cluster"
 }
-fi

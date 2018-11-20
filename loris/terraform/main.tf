@@ -11,7 +11,7 @@ module "loris" {
   private_subnets = "${local.private_subnets_new}"
   public_subnets  = "${local.public_subnets_new}"
 
-  key_name                  = "${var.key_name}"
+  key_name = "${var.key_name}"
 
   sidecar_container_image = "${module.ecr_nginx_loris_delta.repository_url}:${var.release_ids["nginx_loris-delta"]}"
   app_container_image     = "${module.ecr_loris.repository_url}:${var.release_ids["loris"]}"

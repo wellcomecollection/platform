@@ -10,9 +10,15 @@ resource "aws_cognito_user_pool" "pool" {
   }
 }
 
+data "aws_acm_certificate" "auth" {
+  domain   = "auth.wellcomecollection.org"
+  statuses = ["ISSUED"]
+}
+
 resource "aws_cognito_user_pool_domain" "domain" {
-  domain       = "wellcomecollection"
-  user_pool_id = "${aws_cognito_user_pool.pool.id}"
+  domain          = "auth.wellcomecollection.org"
+  certificate_arn = "${data.aws_acm_certificate.auth.arn}"
+  user_pool_id    = "${aws_cognito_user_pool.pool.id}"
 }
 
 resource "aws_cognito_resource_server" "storage_api" {
