@@ -1,6 +1,7 @@
 import json
 import datetime
-from transform import transform, unpack, parse_year_int_to_date
+from copy import deepcopy
+from transform import transform, unpack
 
 
 def build_test_data(full=False):
@@ -12,8 +13,8 @@ def build_test_data(full=False):
                                                      {"a": "c"}],
                   "multiple_dicts_multiple_subfields": [{"a": "b", "x": "y"},
                                                         {"a": "c", "x": "z"}],
-                  "iso_date": "1970-01-01T00:00:00Z",
-                  "date_year": 1970,
+                  "orders_date": ["1970-01-01T00:00:00"],
+                  "publishYear": 1970,
                   "empty_string": ""}
 
     if full:
@@ -35,16 +36,20 @@ def build_test_data(full=False):
         return bib_record
 
 
-def test_parses_year_int_to_date_from():
-    raw_data = build_test_data()
-    parsed_from, _ = parse_year_int_to_date(raw_data, "date_year")
-    assert parsed_from == datetime.datetime(1970, 1, 1, 0, 0, 0)
+def test_parses_year_int_to_date():
+    raw_data = build_test_data(full=True)
+    transformed = transform(raw_data)
+    from_date = transformed['publishYear_from']
+    to_date = transformed['publishYear_to']
+    assert from_date == datetime.datetime(1970, 1, 1, 0, 0, 0)
+    assert to_date == datetime.datetime(1970, 12, 31, 23, 59, 59)
 
 
-def test_parses_year_int_to_date_to():
-    raw_data = build_test_data()
-    _, parsed_to = parse_year_int_to_date(raw_data, "date_year")
-    assert parsed_to == datetime.datetime(1970, 12, 31, 23, 59, 59)
+def test_parses_order_dates():
+    raw_data = build_test_data(full=True)
+    transformed = transform(raw_data)
+    order_dates = transformed['orders_date']
+    assert order_dates == [datetime.datetime(1970, 1, 1, 0, 0, 0)]
 
 
 def test_transform_preserves_unspecified_fields():
@@ -56,23 +61,52 @@ def test_transform_preserves_unspecified_fields():
 
 def test_unpacks_single_dict_single_subfield():
     raw_data = build_test_data()
-    unpacked = unpack(raw_data, "single_dict_single_subfield", "a")
-    assert unpacked == [["b"]]
+    transformed = deepcopy(raw_data)
+    transformed = unpack(view_record=raw_data,
+                         edit_record=transformed,
+                         field_name="single_dict_single_subfield",
+                         subfields_to_keep="a")
+    assert transformed["single_dict_single_subfield_a"] == ["b"]
 
 
 def test_unpacks_single_dict_multiple_subfields():
     raw_data = build_test_data()
-    unpacked = unpack(raw_data, "single_dict_multiple_subfields", ["a", "x"])
-    assert unpacked == [["b"], ["y"]]
+    transformed = deepcopy(raw_data)
+    transformed = unpack(view_record=raw_data,
+                         edit_record=transformed,
+                         field_name="single_dict_multiple_subfields",
+                         subfields_to_keep=["a", "x"])
+    assert transformed["single_dict_multiple_subfields_a"] == ["b"]
+    assert transformed["single_dict_multiple_subfields_x"] == ["y"]
 
 
 def test_unpacks_multiple_dicts_single_subfield():
     raw_data = build_test_data()
-    unpacked = unpack(raw_data, "multiple_dicts_single_subfield", "a")
-    assert unpacked == [["b", "c"]]
+    transformed = deepcopy(raw_data)
+    transformed = unpack(view_record=raw_data,
+                         edit_record=transformed,
+                         field_name="multiple_dicts_single_subfield",
+                         subfields_to_keep="a")
+    assert transformed["multiple_dicts_single_subfield_a"] == ["b", "c"]
 
 
 def test_unpacks_multiple_dicts_multiple_subfields():
     raw_data = build_test_data()
-    unpacked = unpack(raw_data, "multiple_dicts_multiple_subfields", ["a", "x"])
-    assert unpacked == [["b", "c"], ["y", "z"]]
+    transformed = deepcopy(raw_data)
+    transformed = unpack(view_record=raw_data,
+                         edit_record=transformed,
+                         field_name="multiple_dicts_multiple_subfields",
+                         subfields_to_keep=["a", "x"])
+    assert transformed["multiple_dicts_multiple_subfields_a"] == ["b", "c"]
+    assert transformed["multiple_dicts_multiple_subfields_x"] == ["y", "z"]
+
+
+def test_leaves_missing_subfield_empty():
+    raw_data = build_test_data()
+    transformed = deepcopy(raw_data)
+    transformed = unpack(view_record=raw_data,
+                         edit_record=transformed,
+                         field_name="single_dict_single_subfield",
+                         subfields_to_keep=["a", 'missing_subfield'])
+    assert transformed["single_dict_single_subfield_a"] == ["b"]
+    assert transformed['single_dict_single_subfield_missing_subfield'] == []
