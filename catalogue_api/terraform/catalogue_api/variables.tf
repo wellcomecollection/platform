@@ -29,7 +29,5 @@ variable "nginx_container_port" {
 variable "cluster_name" {}
 
 variable "namespace" {}
-variable "namespace_id" {}
-variable "namespace_tld" {}
 
 variable "production_api" {}

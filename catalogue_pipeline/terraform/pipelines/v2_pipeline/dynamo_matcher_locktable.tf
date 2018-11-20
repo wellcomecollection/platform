@@ -55,7 +55,7 @@ module "matcher_lock_table_dynamo_autoscaling" {
 }
 
 module "lambda_dynamodb_write_heartbeat" {
-  source = "../../../../shared_infra/dynamo_write_heartbeat"
+  source = "../../../../infrastructure/critical/terraform/dynamo_write_heartbeat"
 
   name               = "${var.namespace}_locktable_heartbeat"
   dynamo_table_names = ["${aws_dynamodb_table.matcher_lock_table.name}"]

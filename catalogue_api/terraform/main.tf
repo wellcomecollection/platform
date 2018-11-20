@@ -7,10 +7,7 @@ module "catalogue_api" {
   subnets = ["${local.private_subnets}"]
 
   container_port = "8888"
-
-  namespace_id  = "${local.namespace_id}"
-  namespace_tld = "${local.namespace_tld}"
-  cluster_name  = "${aws_ecs_cluster.cluster.name}"
+  cluster_name   = "${aws_ecs_cluster.cluster.name}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
 

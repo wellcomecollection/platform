@@ -41,8 +41,6 @@ locals {
   private_subnets     = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
   namespace           = "catalogue-api"
   nginx_container_uri = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
-  namespace_id        = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  namespace_tld       = "${aws_service_discovery_private_dns_namespace.namespace.name}"
 
   # Data API
 

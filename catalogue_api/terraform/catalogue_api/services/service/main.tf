@@ -4,6 +4,7 @@ module "catalogue_api" {
   vpc_id       = "${var.vpc_id}"
   subnets      = ["${var.subnets}"]
   cluster_name = "${var.cluster_name}"
+
   service_name = "${var.namespace}"
   namespace_id = "${var.namespace_id}"
 
