@@ -1,14 +1,3 @@
-module "deployment_tracking" {
-  source = "deployment_tracking"
-
-  every_minute_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
-  every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
-
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-
-  infra_bucket = "${var.infra_bucket}"
-}
-
 module "queue_watcher" {
   source = "queue_watcher"
 
@@ -28,21 +17,6 @@ module "ecs_dashboard" {
 
   every_minute_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
   every_minute_name = "${aws_cloudwatch_event_rule.every_minute.name}"
-
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-
-  infra_bucket = "${var.infra_bucket}"
-}
-
-module "load_test" {
-  source = "load_test"
-
-  monitoring_bucket_id = "${aws_s3_bucket.monitoring.id}"
-
-  release_ids             = "${var.release_ids}"
-  every_5_minutes_name    = "${aws_cloudwatch_event_rule.every_5_minutes.name}"
-  aws_region              = "${var.aws_region}"
-  ecs_services_cluster_id = "${local.ecs_services_cluster_id}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 

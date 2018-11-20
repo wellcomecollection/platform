@@ -27,7 +27,9 @@ class IngestorWorkerService(elasticClient: HttpClient,
     rootIndexType = ingestorConfig.elasticConfig.documentType
   )
 
-  worksIndex.create(indexName = ingestorConfig.elasticConfig.indexName)
+  worksIndex.create(
+    indexName = ingestorConfig.elasticConfig.indexName
+  )
 
   def run(): Future[Done] =
     messageStream.runStream(

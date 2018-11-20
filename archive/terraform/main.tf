@@ -232,9 +232,9 @@ module "callback_stub_server" {
 module "storage_api" {
   source = "storage_api"
 
-  vpc_id       = "${local.storage_vpc_delta_id}"
+  vpc_id       = "${local.vpc_id}"
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-  subnets      = "${local.storage_vpc_delta_private_subnets}"
+  subnets      = "${local.private_subnets}"
 
   namespace     = "storage-api"
   namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
