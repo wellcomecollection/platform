@@ -1,8 +1,8 @@
 locals {
   lambda_error_alarm_arn             = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
   dlq_alarm_arn                      = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  vpc_id                             = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
-  private_subnets                    = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
+  vpc_id                             = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  private_subnets                    = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
   transformer_miro_container_image   = "${module.ecr_repository_transformer_miro.repository_url}:${var.release_ids["transformer_miro"]}"
   transformer_sierra_container_image = "${module.ecr_repository_transformer_sierra.repository_url}:${var.release_ids["transformer_sierra"]}"
   recorder_container_image           = "${module.ecr_repository_recorder.repository_url}:${var.release_ids["recorder"]}"
