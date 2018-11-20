@@ -16,15 +16,15 @@ def transform(input_data):
 
     # ignore varFields on this first pass
     try:
-        del bib_record["varFields"]
+        del transformed["varFields"]
     except KeyError:
         pass
 
     # unpack fixedFields
     try:
+        del transformed["fixedFields"]
         for key, value in bib_record["fixedFields"].items():
-            bib_record[f"fixed_field_{key}_{value['label']}"] = value["value"]
-        del bib_record["fixedFields"]
+            transformed[f"fixed_field_{key}_{value['label']}"] = value["value"]
     except KeyError:
         pass
 
