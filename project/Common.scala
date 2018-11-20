@@ -25,7 +25,8 @@ object Common {
       "-Xfatal-warnings",
       "-feature",
       "-language:postfixOps",
-      "-Ypartial-unification"
+      "-Ypartial-unification",
+      "-Xcheckinit"
       
     ),
     parallelExecution in Test := false,

@@ -166,7 +166,6 @@ jobs:
     - env: TASK=sierra_item_merger-test
 
     # Archive
-    - env: TASK=archive_api-test
     - env: TASK=archive_display-test
     - env: TASK=archive_common-test
     - env: TASK=archivist-test
