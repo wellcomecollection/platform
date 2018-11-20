@@ -19,17 +19,13 @@ def build_test_data(full=False):
 
     if full:
         return {
-            "sierraId": {
-                "recordNumber": "3075974"
-            },
+            "sierraId": {"recordNumber": "3075974"},
             "maybeBibRecord": {
-                "id": {
-                    "recordNumber": "3075974"
-                },
+                "id": {"recordNumber": "3075974"},
                 "data": json.dumps(bib_record),
-                "modifiedDate": "2018-11-12T11:55:59Z"
+                "modifiedDate": "2018-11-12T11:55:59Z",
             },
-            "itemRecords": {}
+            "itemRecords": {},
         }
 
     else:
@@ -55,7 +51,7 @@ def test_parses_order_dates():
 def test_transform_preserves_unspecified_fields():
     raw_data = build_test_data(full=True)
     transformed = transform(raw_data)
-    raw_bib_record = json.loads(raw_data['maybeBibRecord']['data'])
+    raw_bib_record = json.loads(raw_data["maybeBibRecord"]["data"])
     assert transformed["string_field"] == raw_bib_record["string_field"]
 
 

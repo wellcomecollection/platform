@@ -7,7 +7,7 @@ from dateutil.parser import parse
 def transform(input_data):
     # only look at the bib data for now
     try:
-        json_string = input_data['maybeBibRecord']['data']
+        json_string = input_data["maybeBibRecord"]["data"]
         bib_record = json.loads(json_string)
     except (KeyError, TypeError):
         bib_record = {}
@@ -16,15 +16,15 @@ def transform(input_data):
 
     # ignore varFields on this first pass
     try:
-        del bib_record['varFields']
+        del bib_record["varFields"]
     except KeyError:
         pass
 
     # unpack fixedFields
     try:
-        for key, value in bib_record['fixedFields'].items():
-            bib_record[f"fixed_field_{key}_{value['label']}"] = value['value']
-        del bib_record['fixedFields']
+        for key, value in bib_record["fixedFields"].items():
+            bib_record[f"fixed_field_{key}_{value['label']}"] = value["value"]
+        del bib_record["fixedFields"]
     except KeyError:
         pass
 
