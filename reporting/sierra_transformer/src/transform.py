@@ -1,7 +1,7 @@
+import json
+from copy import deepcopy
 from datetime import datetime, timedelta
 from dateutil.parser import parse
-import json
-
 
 def transform(input_data):
     # only look at the bib data for now
@@ -10,6 +10,8 @@ def transform(input_data):
         bib_record = json.loads(json_string)
     except (KeyError, TypeError):
         bib_record = {}
+    
+    transformed = deepcopy(bib_record)
 
     # ignore varFields on first pass
     try:
@@ -26,85 +28,46 @@ def transform(input_data):
         pass
 
     # unpack bibLevel
-    bib_record['bibLevel_value'] = unpack(
-        record=bib_record,
-        field_name='bibLevel',
-        subfields_to_keep='value'
-    )
-    try:
-        del bib_record['bibLevel']
-    except KeyError:
-        pass
+    transformed = unpack(view_record=bib_record,
+                         edit_record=transformed,
+                         field_name='bibLevel', 
+                         subfields_to_keep='value')
 
     # unpack country
-    bib_record['country_name'] = unpack(
-        record=bib_record,
-        field_name='country',
-        subfields_to_keep='name'
-    )
-    try:
-        del bib_record['country']
-    except KeyError:
-        pass
+    transformed = unpack(view_record=bib_record,
+                         edit_record=transformed,
+                         field_name='country', 
+                         subfields_to_keep='name')
 
     # unpack language
-    bib_record['lang_name'] = unpack(
-        record=bib_record,
-        field_name='lang',
-        subfields_to_keep='name'
-    )
-    try:
-        del bib_record['lang']
-    except KeyError:
-        pass
+    transformed = unpack(view_record=bib_record,
+                         edit_record=transformed,
+                         field_name='lang', 
+                         subfields_to_keep='name')
 
     # unpack material types
-    bib_record['materialType_code'] = unpack(
-        record=bib_record,
-        field_name='materialType',
-        subfields_to_keep='code'
-    )
-    try:
-        del bib_record['materialType']
-    except KeyError:
-        pass
+    transformed = unpack(view_record=bib_record,
+                         edit_record=transformed,
+                         field_name='materialType', 
+                         subfields_to_keep='code')
 
     # unpack locations
-    locations_name, locations_code = unpack(
-        record=bib_record,
-        field_name='locations',
-        subfields_to_keep=['name', 'code']
-    )
-    bib_record['locations_name'] = locations_name
-    bib_record['locations_code'] = locations_code
-    try:
-        del bib_record['locations']
-    except KeyError:
-        pass
+    transformed = unpack(view_record=bib_record,
+                         edit_record=transformed,
+                         field_name='locations', 
+                         subfields_to_keep=['name', 'code'])
 
     # unpack orders
-    orders_date = unpack(
-        record=bib_record,
-        field_name='orders',
-        subfields_to_keep='date'
-    )
-    try:
-        bib_record['orders_date'] = [parse(date) for date in orders_date]
-    except:
-        pass
+    transformed = unpack(view_record=transformed,
+                         edit_record=transformed,
+                         field_name='orders', 
+                         subfields_to_keep=['date', 
+                                            'location_name', 
+                                            'location_code'])
 
-    try:
-        orders = bib_record['orders']
-        order_location_codes, order_location_names = unpack(
-            record=orders,
-            field_name='location',
-            subfields_to_keep=['name', 'code']
-        )
-        bib_record['order_location_codes'] = order_location_codes
-        bib_record['order_location_names'] = order_location_names
-        del bib_record['orders']
-    except KeyError:
-        pass
+    transformed['orders_date'] = [
+        parse(date) for date in transformed['orders_date']
+    ]
 
     # parse publish year
     year_from, year_to = parse_year_int_to_date(bib_record, 'publishYear')
@@ -118,7 +81,7 @@ def transform(input_data):
     # get rid of redundant norm fields
     norm_fields = [field for field in bib_record if field.startswith('norm')]
     for field in norm_fields:
-        del bib_record[field]
+        del transformed[field]
 
     return bib_record
 
@@ -133,21 +96,47 @@ def parse_year_int_to_date(bib_record, field_name):
     return year_from, year_to
 
 
-def unpack(record, field_name, subfields_to_keep):
-    if isinstance(subfields_to_keep, str):
-        subfields_to_keep = [subfields_to_keep]
-
+def unpack(view_record, edit_record, field_name, subfields_to_keep):
+    '''
+    Parameters
+    ----------
+    view_record : dict
+        original, unchanged record to inspect 
+    edit_record : dict
+        a modified/modifiable copy of the original record, to which we will 
+        make changes. this is ultimately the unpacked version of the record 
+        which we will pass to elasticsearch
+    field_name : str
+        the field whose data we want to unpack
+    subfields to keep : str, list
+        the subfields of the field_name which we want to retain in the 
+        modified, flatter version of the data
+    delete : bool
+        should the field be deleted from the transformed record
+    
+    Returns
+    -------
+    edit_record : dict
+        the modified record with an unpacked form of the specified field
+    '''
     try:
-        data_to_unpack = record[field_name]
+        data_to_unpack = deepcopy(view_record[field_name])
+        del edit_record[field_name]
+
+        if isinstance(subfields_to_keep, str):
+            subfields_to_keep = [subfields_to_keep]
+
         if isinstance(data_to_unpack, dict):
             data_to_unpack = [data_to_unpack]
 
-        unpacked = [
-            [field[subfield] for field in data_to_unpack]
-            for subfield in subfields_to_keep
-        ]
+        for subfield in subfields_to_keep:
+            edit_record[field_name + '_' + subfield] = [
+                field[subfield] for field in data_to_unpack if subfield in field
+            ]
 
-    except (KeyError, TypeError):
-        unpacked = [[None] for subfield in subfields_to_keep]
+    except KeyError:
+        pass
 
-    return unpacked
+    return edit_record
+
+
