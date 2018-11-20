@@ -36,8 +36,8 @@ resource "aws_security_group" "interservice_security_group" {
 }
 
 data "aws_subnet" "private" {
-  count = "${length(local.private_subnets)}"
-  id    = "${element(local.private_subnets, count.index)}"
+  count = "${length(local.storage_vpc_delta_private_subnets)}"
+  id    = "${element(local.storage_vpc_delta_private_subnets, count.index)}"
 }
 
 resource "aws_security_group" "tcp_access_security_group" {

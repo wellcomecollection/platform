@@ -3,11 +3,6 @@ module "lambda_error_alarm" {
   name   = "lambda_error_alarm"
 }
 
-module "old_deployments" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "old_deployments"
-}
-
 # Shared topic for terminating instances
 
 module "ec2_terminating_topic" {

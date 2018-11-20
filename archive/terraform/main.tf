@@ -6,8 +6,8 @@ module "archivist" {
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${local.private_subnets}"
-  vpc_id                           = "${local.vpc_id}"
+  subnets                          = "${local.storage_vpc_delta_private_subnets}"
+  vpc_id                           = "${local.storage_vpc_delta_private_subnets}"
   service_name                     = "archivist"
   aws_region                       = "${var.aws_region}"
 
@@ -36,8 +36,8 @@ module "registrar_async" {
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${local.private_subnets}"
-  vpc_id                           = "${local.vpc_id}"
+  subnets                          = "${local.storage_vpc_delta_private_subnets}"
+  vpc_id                           = "${local.storage_vpc_delta_private_subnets}"
   service_name                     = "registrar_async"
   aws_region                       = "${var.aws_region}"
 
@@ -68,8 +68,8 @@ module "notifier" {
   security_group_ids               = ["${aws_security_group.interservice_security_group.id}"]
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${local.private_subnets}"
-  vpc_id                           = "${local.vpc_id}"
+  subnets                          = "${local.storage_vpc_delta_private_subnets}"
+  vpc_id                           = "${local.storage_vpc_delta_private_subnets}"
   service_name                     = "notifier"
   aws_region                       = "${var.aws_region}"
 
@@ -97,8 +97,8 @@ module "progress_async" {
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${local.private_subnets}"
-  vpc_id                           = "${local.vpc_id}"
+  subnets                          = "${local.storage_vpc_delta_private_subnets}"
+  vpc_id                           = "${local.storage_vpc_delta_private_subnets}"
   service_name                     = "progress_async"
   aws_region                       = "${var.aws_region}"
 
@@ -126,8 +126,8 @@ module "bagger" {
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${local.private_subnets}"
-  vpc_id                           = "${local.vpc_id}"
+  subnets                          = "${local.storage_vpc_delta_private_subnets}"
+  vpc_id                           = "${local.storage_vpc_delta_private_subnets}"
   service_name                     = "bagger"
   aws_region                       = "${var.aws_region}"
 
@@ -192,7 +192,7 @@ module "migrator" {
     "${aws_security_group.service_egress_security_group.id}",
   ]
 
-  subnet_ids = "${local.private_subnets}"
+  subnet_ids = "${local.storage_vpc_delta_private_subnets}"
 
   log_retention_in_days = 30
 }
@@ -219,10 +219,10 @@ module "callback_stub_server" {
   command         = ["--verbose", "--disable-banner"]
 
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}"]
-  private_subnets    = "${local.private_subnets}"
+  private_subnets    = "${local.storage_vpc_delta_private_subnets}"
 
   cluster_id = "${aws_ecs_cluster.cluster.id}"
-  vpc_id     = "${local.vpc_id}"
+  vpc_id     = "${local.storage_vpc_delta_private_subnets}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 }
