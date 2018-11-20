@@ -26,7 +26,7 @@ locals {
 
   reindex_worker_container_image = "${module.ecr_repository_reindex_worker.repository_url}:${var.release_ids["reindex_worker"]}"
 
-  vpc_id                               = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
-  public_subnets                       = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_public_subnets}"
-  private_subnets                      = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
+  vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  public_subnets  = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_public_subnets}"
+  private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 }

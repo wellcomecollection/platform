@@ -4,14 +4,14 @@ locals {
   progress_http_lb_port  = "6000"
   registrar_http_lb_port = "6001"
 
-  cognito_user_pool_arn                = "${data.terraform_remote_state.infra_critical.cognito_user_pool_arn}"
-  cognito_storage_api_identifier       = "${data.terraform_remote_state.infra_critical.cognito_storage_api_identifier}"
-  lambda_error_alarm_arn               = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
-  dlq_alarm_arn                        = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  cognito_user_pool_arn          = "${data.terraform_remote_state.infra_critical.cognito_user_pool_arn}"
+  cognito_storage_api_identifier = "${data.terraform_remote_state.infra_critical.cognito_storage_api_identifier}"
+  lambda_error_alarm_arn         = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
+  dlq_alarm_arn                  = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
-  vpc_id                               = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
-  public_subnets                       = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_public_subnets}"
-  private_subnets                      = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
+  vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  public_subnets  = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_public_subnets}"
+  private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 
   archive_bucket_name                  = "wellcomecollection-assets-archive-storage"
   ingest_bucket_name                   = "wellcomecollection-assets-archive-ingest"
