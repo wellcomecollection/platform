@@ -29,64 +29,78 @@ def transform(input_data):
         pass
 
     # get rid of redundant norm fields
-    norm_fields = [field for field in bib_record if field.startswith('norm')]
+    norm_fields = [field for field in bib_record if field.startswith("norm")]
     for field in norm_fields:
         del transformed[field]
 
     # unpack bibLevel
-    transformed = unpack(view_record=bib_record,
-                         edit_record=transformed,
-                         field_name='bibLevel',
-                         subfields_to_keep='value')
+    transformed = unpack(
+        view_record=bib_record,
+        edit_record=transformed,
+        field_name="bibLevel",
+        subfields_to_keep="value",
+    )
 
     # unpack country
-    transformed = unpack(view_record=bib_record,
-                         edit_record=transformed,
-                         field_name='country',
-                         subfields_to_keep='name')
+    transformed = unpack(
+        view_record=bib_record,
+        edit_record=transformed,
+        field_name="country",
+        subfields_to_keep="name",
+    )
 
     # unpack language
-    transformed = unpack(view_record=bib_record,
-                         edit_record=transformed,
-                         field_name='lang',
-                         subfields_to_keep='name')
+    transformed = unpack(
+        view_record=bib_record,
+        edit_record=transformed,
+        field_name="lang",
+        subfields_to_keep="name",
+    )
 
     # unpack material types
-    transformed = unpack(view_record=bib_record,
-                         edit_record=transformed,
-                         field_name='materialType',
-                         subfields_to_keep='code')
+    transformed = unpack(
+        view_record=bib_record,
+        edit_record=transformed,
+        field_name="materialType",
+        subfields_to_keep="code",
+    )
 
     # unpack locations
-    transformed = unpack(view_record=bib_record,
-                         edit_record=transformed,
-                         field_name='location',
-                         subfields_to_keep=['name', 'code'])
+    transformed = unpack(
+        view_record=bib_record,
+        edit_record=transformed,
+        field_name="location",
+        subfields_to_keep=["name", "code"],
+    )
 
     # unpack orders. note that in the second `unpack()` we view the transformed
     # record in order to flatten the semi-unpacked order locations
-    transformed = unpack(view_record=bib_record,
-                         edit_record=transformed,
-                         field_name='orders',
-                         subfields_to_keep=['location', 'date'])
+    transformed = unpack(
+        view_record=bib_record,
+        edit_record=transformed,
+        field_name="orders",
+        subfields_to_keep=["location", "date"],
+    )
 
-    transformed = unpack(view_record=transformed,
-                         edit_record=transformed,
-                         field_name='orders_location',
-                         subfields_to_keep=['name', 'code'])
+    transformed = unpack(
+        view_record=transformed,
+        edit_record=transformed,
+        field_name="orders_location",
+        subfields_to_keep=["name", "code"],
+    )
 
     # parse the order dates
     try:
-        transformed['orders_date'] = [
-            parse(date) for date in transformed['orders_date']
+        transformed["orders_date"] = [
+            parse(date) for date in transformed["orders_date"]
         ]
     except KeyError:
         pass
 
     # parse publish year
-    transformed = parse_year_int_to_date(view_record=bib_record,
-                                         edit_record=transformed,
-                                         field_name='publishYear')
+    transformed = parse_year_int_to_date(
+        view_record=bib_record, edit_record=transformed, field_name="publishYear"
+    )
 
     return transformed
 
@@ -96,8 +110,8 @@ def parse_year_int_to_date(view_record, edit_record, field_name):
         date_to_parse = deepcopy(view_record[field_name])
         del edit_record[field_name]
         year_from = datetime(date_to_parse, 1, 1)
-        edit_record[field_name + '_from'] = year_from
-        edit_record[field_name + '_to'] = (
+        edit_record[field_name + "_from"] = year_from
+        edit_record[field_name + "_to"] = (
             year_from + timedelta(days=365) - timedelta(seconds=1)
         )
 
@@ -108,7 +122,7 @@ def parse_year_int_to_date(view_record, edit_record, field_name):
 
 
 def unpack(view_record, edit_record, field_name, subfields_to_keep):
-    '''
+    """
     Parameters
     ----------
     view_record : dict
@@ -129,7 +143,7 @@ def unpack(view_record, edit_record, field_name, subfields_to_keep):
     -------
     edit_record : dict
         the modified record with an unpacked form of the specified field
-    '''
+    """
     try:
         data_to_unpack = deepcopy(view_record[field_name])
         del edit_record[field_name]
@@ -141,7 +155,7 @@ def unpack(view_record, edit_record, field_name, subfields_to_keep):
             data_to_unpack = [data_to_unpack]
 
         for subfield in subfields_to_keep:
-            edit_record[field_name + '_' + subfield] = [
+            edit_record[field_name + "_" + subfield] = [
                 field[subfield] for field in data_to_unpack if subfield in field
             ]
 
