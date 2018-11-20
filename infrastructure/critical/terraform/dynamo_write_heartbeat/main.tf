@@ -13,7 +13,7 @@ module "lambda_dynamo_write_heartbeat" {
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
   s3_bucket       = "${var.infra_bucket}"
-  s3_key          = "lambdas/infrastructure/shared/lambdas/dynamo_write_heartbeat.zip"
+  s3_key          = "lambdas/infrastructure/critical/lambdas/dynamo_write_heartbeat.zip"
 
   log_retention_in_days = 30
 }

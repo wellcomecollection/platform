@@ -1,3 +1,8 @@
+# Used by:
+# - Catalogue Pipeline
+# - Catalogue API
+# - IIIF Image server (Loris)
+
 module "catalogue_vpc_delta" {
   source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.0"
 
@@ -11,6 +16,9 @@ module "catalogue_vpc_delta" {
   cidr_block_private         = "172.31.128.0/17"
   cidrsubnet_newbits_private = "2"
 }
+
+# Used by:
+# - Storage service
 
 module "storage_vpc_delta" {
   source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.0"

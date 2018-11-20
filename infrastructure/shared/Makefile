@@ -1,7 +1,8 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 include $(ROOT)/functions.Makefile
 
-STACK_ROOT  = infrastructure/shared
+STACK_ROOT = infrastructure/shared
+
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 

@@ -1,4 +1,5 @@
-# miro 
+# Miro Hybrid Store
+
 output "vhs_miro_dynamodb_update_policy" {
   value = "${module.vhs_miro.dynamodb_update_policy}"
 }
@@ -15,7 +16,7 @@ output "vhs_miro_bucket_name" {
   value = "${module.vhs_miro.bucket_name}"
 }
 
-# miro inventory
+# Miro Inventory Hybrid Store
 
 output "vhs_miro_inventory_dynamodb_update_policy" {
   value = "${module.vhs_miro_migration.dynamodb_update_policy}"
@@ -33,7 +34,7 @@ output "vhs_miro_inventory_bucket_name" {
   value = "${module.vhs_miro_migration.bucket_name}"
 }
 
-# sierra
+# Sierra Hybrid Store
 
 output "vhs_sierra_full_access_policy" {
   value = "${module.vhs_sierra.full_access_policy}"
@@ -55,7 +56,7 @@ output "vhs_sierra_bucket_name" {
   value = "${module.vhs_sierra.bucket_name}"
 }
 
-# sierra items
+# Sierra Items Hybrid Store
 
 output "vhs_sierra_items_full_access_policy" {
   value = "${module.vhs_sierra_items.full_access_policy}"
@@ -69,7 +70,7 @@ output "vhs_sierra_items_bucket_name" {
   value = "${module.vhs_sierra_items.bucket_name}"
 }
 
-# goobi
+# Goobi Hybrid Store
 
 output "vhs_goobi_full_access_policy" {
   value = "${module.vhs_goobi_mets.full_access_policy}"
@@ -83,43 +84,29 @@ output "vhs_goobi_bucket_name" {
   value = "${module.vhs_goobi_mets.bucket_name}"
 }
 
-# --------
+# RDS
 
 output "rds_access_security_group_id" {
-  value = "${aws_security_group.rds_access_security_group.id}"
+  value = "${aws_security_group.rds_ingress_security_group.id}"
 }
 
 output "identifiers_rds_cluster_password" {
-  value = "${module.identifiers_delta_rds_cluster.password}"
+  value = "${module.identifiers_rds_cluster.password}"
 }
 
 output "identifiers_rds_cluster_username" {
-  value = "${module.identifiers_delta_rds_cluster.username}"
+  value = "${module.identifiers_rds_cluster.username}"
 }
 
 output "identifiers_rds_cluster_port" {
-  value = "${module.identifiers_delta_rds_cluster.port}"
+  value = "${module.identifiers_rds_cluster.port}"
 }
 
 output "identifiers_rds_cluster_host" {
-  value = "${module.identifiers_delta_rds_cluster.host}"
+  value = "${module.identifiers_rds_cluster.host}"
 }
 
-output "alb_api_wc_service_lb_security_group_id" {
-  value = "${module.load_balancer.service_lb_security_group_id}"
-}
-
-output "alb_api_wc_http_listener_arn" {
-  value = "${module.load_balancer.http_listener_arn}"
-}
-
-output "alb_api_wc_https_listener_arn" {
-  value = "${module.load_balancer.https_listener_arn}"
-}
-
-output "alb_api_wc_cloudwatch_id" {
-  value = "${module.load_balancer.cloudwatch_id}"
-}
+# Cognito
 
 output "cognito_user_pool_arn" {
   value = "${aws_cognito_user_pool.pool.arn}"

@@ -1,5 +1,5 @@
 module "heartbeat" {
-  source = "../../lambdas/dynamo_write_heartbeat"
+  source = "../dynamo_write_heartbeat"
 
   name               = "${local.table_name}-heartbeat"
   dynamo_table_names = ["${local.table_name}"]
