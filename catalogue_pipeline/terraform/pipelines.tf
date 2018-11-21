@@ -17,8 +17,8 @@ module "catalogue_pipelines" {
 
   sierra_adapter_topic_count = 3
 
-  index_v1 = "v1-2018-09-27-marc-610-subjects"
-  index_v2 = "v2-2018-09-27-marc-610-subjects"
+  index_v1 = "v1-2018-11-20-thumbnails"
+  index_v2 = "v2-2018-11-20-thumbnails"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"

@@ -15,7 +15,7 @@ import uk.ac.wellcome.messaging.sns.{
 object SNSBuilder extends AWSClientConfigBuilder {
   def buildSNSConfig(config: Config, namespace: String = ""): SNSConfig = {
     val topicArn = config
-      .required[String](s"aws.sns.$namespace.topic.arn")
+      .required[String](s"aws.$namespace.sns.topic.arn")
 
     SNSConfig(topicArn = topicArn)
   }
