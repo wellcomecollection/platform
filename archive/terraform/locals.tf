@@ -10,7 +10,6 @@ locals {
   dlq_alarm_arn                  = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
-  public_subnets  = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_public_subnets}"
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 
   archive_bucket_name                  = "wellcomecollection-assets-archive-storage"
