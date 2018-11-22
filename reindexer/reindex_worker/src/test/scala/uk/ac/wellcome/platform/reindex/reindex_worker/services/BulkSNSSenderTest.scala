@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
+import com.amazonaws.SdkClientException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -35,6 +36,15 @@ class BulkSNSSenderTest
 
           actualRecords should contain theSameElementsAs messages
         }
+      }
+    }
+  }
+
+  it("returns a failed Future[SdkClientException] if there's an SNS error") {
+    withBulkSNSSender(Topic("no-such-topic")) { bulkSNSSender =>
+      val future = bulkSNSSender.sendToSNS(messages = messages)
+      whenReady(future.failed) {
+        _ shouldBe a[SdkClientException]
       }
     }
   }
