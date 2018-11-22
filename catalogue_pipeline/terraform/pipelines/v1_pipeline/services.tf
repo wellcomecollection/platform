@@ -68,7 +68,7 @@ module "ingestor" {
     ingest_queue_id     = "${module.es_ingest_queue.id}"
   }
 
-  env_vars_length   = 11
+  env_vars_length   = 10
   container_image   = "${var.ingestor_container_image}"
   source_queue_name = "${module.es_ingest_queue.name}"
   source_queue_arn  = "${module.es_ingest_queue.arn}"
