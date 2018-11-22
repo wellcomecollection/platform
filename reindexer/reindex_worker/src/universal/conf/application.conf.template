@@ -1,5 +1,4 @@
 akka {
-  log-config-on-start = on
   actor {
     default-dispatcher {
       executor = "thread-pool-executor"
