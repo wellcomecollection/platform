@@ -22,11 +22,15 @@ module "service" {
   target_group_protocol = "TCP"
 }
 
+data "aws_lb_target_group" "tcp_target_group" {
+  name = "${module.service.target_group_name}"
+}
+
 module "task" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container?ref=v11.9.0"
 
-  cpu    = 2048
-  memory = 4096
+  cpu    = 512
+  memory = 1024
 
   env_vars        = "${var.env_vars}"
   env_vars_length = "${var.env_vars_length}"

@@ -49,7 +49,8 @@ object ZipFileDownloadFlow extends Logging {
                 Source.single(Left(ZipFileDownloadingError(request, ex)))
               case Success(inputStream) =>
                 val tmpFile = File.createTempFile("archivist", ".tmp")
-
+                tmpFile.deleteOnExit()
+                debug(s"Downloading zip file to $tmpFile")
                 StreamConverters
                   .fromInputStream(() => inputStream)
                   .via(FileStoreFlow(tmpFile, parallelism))
@@ -83,7 +84,7 @@ object ZipFileDownloadFlow extends Logging {
               SnsPublishFlow[ProgressUpdate](
                 snsClient,
                 snsConfig,
-                Some("archivist_progress")))
+                subject = "archivist_progress"))
             .map(_ => result)
       )
       .log("downloaded zipfile")
@@ -101,7 +102,7 @@ object ZipFileDownloadFlow extends Logging {
         ProgressStatusUpdate(
           archiveError.t.archiveRequestId,
           Progress.Failed,
-          Nil,
+          None,
           List(ProgressEvent(archiveError.toString))
         )
     }

@@ -1,12 +1,11 @@
 package uk.ac.wellcome.platform.idminter.database
 
-import com.google.inject.Inject
 import org.flywaydb.core.Flyway
-import uk.ac.wellcome.platform.idminter.models.RDSClientConfig
+import uk.ac.wellcome.platform.idminter.config.models.RDSClientConfig
 
 import scala.collection.JavaConverters._
 
-class TableProvisioner @Inject()(rdsClientConfig: RDSClientConfig) {
+class TableProvisioner(rdsClientConfig: RDSClientConfig) {
 
   def provision(database: String, tableName: String): Unit = {
     val flyway = new Flyway()

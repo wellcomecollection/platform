@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.common.flows
 
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.{FunSpec, Matchers}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.json.JsonUtil._
@@ -12,7 +12,8 @@ class NotificationParsingFlowTest
     extends FunSpec
     with Akka
     with Matchers
-    with ScalaFutures {
+    with ScalaFutures
+    with IntegrationPatience {
 
   it("parses T from a message body") {
     withActorSystem { actorSystem =>
@@ -31,14 +32,7 @@ class NotificationParsingFlowTest
 
         val messages = jsonStrings
           .patch(2, badStrings, 0)
-          .map(
-            body =>
-              NotificationMessage(
-                MessageId = "MessageId",
-                TopicArn = "TopicArn",
-                Subject = None,
-                Message = body.toString
-            ))
+          .map(body => NotificationMessage(body = body.toString))
 
         val source = Source(messages)
         val parsingFlow = NotificationParsingFlow[Character]

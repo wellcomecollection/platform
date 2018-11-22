@@ -148,11 +148,34 @@ def does_file_affect_build_task(path, task):
                 if project.exclusive_path.startswith(("catalogue_api/",)):
                     raise ChangeToUnusedLibrary("messaging")
 
+    # We have a library for common archive code.
+    #
+    # Only apps in the archive stack use this code.
+    if path.startswith("archive/common"):
+        for project in PROJECTS:
+            if task.startswith(project.name) and (project.type == "sbt_app"):
+                if not project.exclusive_path.startswith("archive/"):
+                    raise ChangeToUnusedLibrary("archive_common")
+
+    if path.startswith("archive/progress_common"):
+        for project in PROJECTS:
+            if task.startswith(project.name) and (project.type == "sbt_app"):
+                if not project.exclusive_path.startswith("archive/"):
+                    raise ChangeToUnusedLibrary("progress_common")
+                elif not task.startswith("progress"):
+                    raise ChangeToUnusedLibrary("progress_common")
+
+    if path.startswith("archive/registrar_common"):
+        for project in PROJECTS:
+            if task.startswith(project.name) and (project.type == "sbt_app"):
+                if not project.exclusive_path.startswith("archive/"):
+                    raise ChangeToUnusedLibrary("registrar_common")
+                elif not task.startswith("registrar"):
+                    raise ChangeToUnusedLibrary("registrar_common")
+
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
-    if path.startswith(
-        ("sierra_adapter/common", "project/", "build.sbt", "sbt_common/")
-    ):
+    if path.endswith((".scala", ".sbt")):
         if (task in "travistooling-test") or task.startswith("travis-lambda"):
             raise ScalaChangeAndNotScalaApp()
 

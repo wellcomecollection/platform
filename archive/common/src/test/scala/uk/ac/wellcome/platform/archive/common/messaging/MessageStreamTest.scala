@@ -10,13 +10,10 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.test.fixtures.TestWith
-
-import scala.concurrent.duration._
 
 class MessageStreamTest
     extends FunSpec
@@ -152,11 +149,7 @@ class MessageStreamTest
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
-            val sqsConfig = SQSConfig(
-              queueUrl = queue.url,
-              waitTime = 1 millisecond,
-              maxMessages = 1
-            )
+            val sqsConfig = createSQSConfigWith(queue)
 
             val stream = new MessageStream[ExampleObject, Unit](
               actorSystem = actorSystem,

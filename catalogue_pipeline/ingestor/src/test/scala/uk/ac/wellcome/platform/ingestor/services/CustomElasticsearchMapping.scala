@@ -1,13 +1,10 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.analyzers.EnglishLanguageAnalyzer
 import com.sksamuel.elastic4s.http.ElasticDsl.{
-  booleanField,
   intField,
   keywordField,
   mapping,
-  objectField,
-  textField
+  objectField
 }
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
@@ -18,7 +15,7 @@ import scala.concurrent.ExecutionContext
 
 trait CustomElasticsearchMapping {
 
-  class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, esType: String)(
+  class OnlyInvisibleWorksIndex(elasticClient: HttpClient, documentType: String)(
     implicit val ec: ExecutionContext)
       extends ElasticsearchIndex {
     val httpClient: HttpClient = elasticClient
@@ -39,31 +36,10 @@ trait CustomElasticsearchMapping {
         intField("version"),
         objectField("sourceIdentifier")
           .fields(sourceIdentifierFields),
-        textField("title").fields(
-          textField("english").analyzer(EnglishLanguageAnalyzer)),
-        booleanField("visible"),
-        objectField("mergeCandidates"),
-        objectField("otherIdentifiers"),
-        objectField("subjects"),
-        keywordField("workType"),
-        keywordField("description"),
-        keywordField("physicalDescription"),
-        keywordField("extent"),
-        keywordField("lettering"),
-        keywordField("createdDate"),
-        keywordField("language"),
-        keywordField("thumbnail"),
-        keywordField("dimensions"),
-        objectField("contributors"),
-        objectField("genres"),
-        objectField("items"),
-        objectField("itemsV1"),
-        objectField("production"),
-        keywordField("ontologyType"),
         keywordField("type")
       )
 
-    override val mappingDefinition: MappingDefinition = mapping(esType)
+    override val mappingDefinition: MappingDefinition = mapping(documentType)
       .dynamic(DynamicMapping.Strict)
       .as(rootIndexFields)
   }

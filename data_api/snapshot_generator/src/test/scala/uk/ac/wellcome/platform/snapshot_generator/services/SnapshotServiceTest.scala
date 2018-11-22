@@ -19,7 +19,6 @@ import uk.ac.wellcome.display.models.{
 }
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule
@@ -49,15 +48,12 @@ class SnapshotServiceTest
 
   val mapper = new ObjectMapper with ScalaObjectMapper
 
-  val itemType = "work"
-
   private def withSnapshotService[R](
     actorSystem: ActorSystem,
     s3AkkaClient: S3Client,
     indexNameV1: String,
-    indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
-    val elasticConfig = DisplayElasticConfig(
-      documentType = itemType,
+    indexNameV2: String)(testWith: TestWith[SnapshotService, R]): R = {
+    val elasticConfig = createDisplayElasticConfigWith(
       indexV1name = indexNameV1,
       indexV2name = indexNameV2
     )
@@ -78,8 +74,8 @@ class SnapshotServiceTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+          withLocalElasticsearchIndex { indexNameV1 =>
+            withLocalElasticsearchIndex { indexNameV2 =>
               withLocalS3Bucket { bucket =>
                 withSnapshotService(
                   actorSystem,
@@ -106,7 +102,7 @@ class SnapshotServiceTest
 
         val works = visibleWorks ++ notVisibleWorks
 
-        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
+        insertIntoElasticsearch(indexNameV1, works: _*)
 
         val publicObjectKey = "target.txt.gz"
 
@@ -154,7 +150,7 @@ class SnapshotServiceTest
 
         val works = visibleWorks ++ notVisibleWorks
 
-        insertIntoElasticsearch(indexNameV2, itemType, works: _*)
+        insertIntoElasticsearch(indexNameV2, works: _*)
 
         val publicObjectKey = "target.txt.gz"
 
@@ -204,7 +200,7 @@ class SnapshotServiceTest
           )
         }
 
-        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
+        insertIntoElasticsearch(indexNameV1, works: _*)
 
         val publicObjectKey = "target.txt.gz"
         val snapshotJob = SnapshotJob(
@@ -248,7 +244,7 @@ class SnapshotServiceTest
       case (snapshotService: SnapshotService, indexNameV1, _, _) =>
         val works = createIdentifiedWorks(count = 3)
 
-        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
+        insertIntoElasticsearch(indexNameV1, works: _*)
 
         val snapshotJob = SnapshotJob(
           publicBucketName = "wrongBukkit",
@@ -271,8 +267,7 @@ class SnapshotServiceTest
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
           withLocalS3Bucket { bucket =>
-            val elasticConfig = DisplayElasticConfig(
-              documentType = itemType,
+            val elasticConfig = createDisplayElasticConfigWith(
               indexV1name = "wrong-index",
               indexV2name = "wrong-index"
             )
@@ -323,8 +318,7 @@ class SnapshotServiceTest
             secretKey = secretKey
           )
 
-          val elasticConfig = DisplayElasticConfig(
-            documentType = itemType,
+          val elasticConfig = createDisplayElasticConfigWith(
             indexV1name = "indexv1",
             indexV2name = "indexv2"
           )

@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.receive
 
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.json.JsonUtil._
@@ -14,9 +13,9 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class HybridRecordReceiver[T] @Inject()(
+class HybridRecordReceiver[T](
   messageWriter: MessageWriter[TransformedBaseWork],
-  objectsStore: ObjectStore[T])(implicit ec: ExecutionContext)
+  objectStore: ObjectStore[T])(implicit ec: ExecutionContext)
     extends Logging {
 
   def receiveMessage(
@@ -25,7 +24,7 @@ class HybridRecordReceiver[T] @Inject()(
     debug(s"Starting to process message $message")
 
     val futurePublishAttempt = for {
-      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
+      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
       transformableRecord <- getTransformable(hybridRecord)
       work <- Future.fromTry(
         transformToWork(transformableRecord, hybridRecord.version))
@@ -45,7 +44,7 @@ class HybridRecordReceiver[T] @Inject()(
   }
 
   private def getTransformable(hybridRecord: HybridRecord): Future[T] =
-    objectsStore.get(hybridRecord.location)
+    objectStore.get(hybridRecord.location)
 
   private def publishMessage(
     work: TransformedBaseWork): Future[PublishAttempt] =

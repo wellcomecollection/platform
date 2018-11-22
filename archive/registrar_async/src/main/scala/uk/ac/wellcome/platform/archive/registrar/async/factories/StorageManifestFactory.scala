@@ -16,6 +16,10 @@ import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   BagLocation
 }
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  StorageLocation,
+  StorageProvider
+}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -33,23 +37,26 @@ object StorageManifestFactory extends Logging {
         archiveComplete,
         s"manifest-$algorithm.txt",
         " +")
-      fileManifest = FileManifest(
-        ChecksumAlgorithm(algorithm),
-        manifestTuples
-      )
-    } yield
+      tagManifestTuples <- getBagItems(
+        archiveComplete,
+        s"tagmanifest-$algorithm.txt",
+        " +")
+    } yield {
+      val checksumAlgorithm = ChecksumAlgorithm(algorithm)
       StorageManifest(
         space = archiveComplete.space,
         info = bagInfo,
-        manifest = fileManifest,
-        accessLocation = Location(
-          Provider("aws-s3-ia", "AWS S3 - Infrequent Access"),
+        manifest = FileManifest(checksumAlgorithm, manifestTuples),
+        tagManifest = FileManifest(checksumAlgorithm, tagManifestTuples),
+        accessLocation = StorageLocation(
+          StorageProvider("aws-s3-ia"),
           ObjectLocation(
             archiveComplete.bagLocation.storageNamespace,
             s"${archiveComplete.bagLocation.storagePath}/${archiveComplete.bagLocation.bagPath.value}")
         ),
         createdDate = Instant.now()
       )
+    }
   }
 
   private def getBagItems(archiveComplete: ArchiveComplete,

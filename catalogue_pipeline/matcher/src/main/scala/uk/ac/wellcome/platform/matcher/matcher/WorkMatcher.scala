@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.matcher.matcher
 
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
@@ -25,7 +24,7 @@ import uk.ac.wellcome.platform.matcher.workgraph.WorkGraphUpdater
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WorkMatcher @Inject()(
+class WorkMatcher(
   workGraphStore: WorkGraphStore,
   lockingService: DynamoLockingService)(implicit ec: ExecutionContext)
     extends Logging {

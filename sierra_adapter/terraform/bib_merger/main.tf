@@ -21,8 +21,8 @@ module "sierra_merger_service" {
   ecs_cluster_id   = "${data.aws_ecs_cluster.cluster.id}"
   ecs_cluster_name = "${var.cluster_name}"
 
-  cpu    = 512
-  memory = 2048
+  cpu    = 256
+  memory = 512
 
   env_vars = {
     windows_queue_url = "${module.updates_queue.id}"

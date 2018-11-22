@@ -1,3 +1,0 @@
---sqs-queue-url=${notifier_queue_url}
---sns-topic-arn=${progress_topic_arn}
---metrics-namespace=notifier

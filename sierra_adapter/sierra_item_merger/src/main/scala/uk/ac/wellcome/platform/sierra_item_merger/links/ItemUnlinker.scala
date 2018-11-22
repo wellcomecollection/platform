@@ -15,7 +15,7 @@ object ItemUnlinker {
     val itemRecords =
       sierraTransformable.itemRecords
         .filterNot {
-          case (id, currentItemRecord) => {
+          case (id, currentItemRecord) =>
             val matchesCurrentItemRecord = id == itemRecord.id
 
             val modifiedAfter = itemRecord.modifiedDate.isAfter(
@@ -23,7 +23,6 @@ object ItemUnlinker {
             )
 
             matchesCurrentItemRecord && modifiedAfter
-          }
         }
 
     sierraTransformable.copy(itemRecords = itemRecords)

@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.merger.services
 
-import akka.actor.{ActorSystem, Terminated}
-import com.google.inject.Inject
+import akka.Done
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -12,8 +11,7 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MergerWorkerService @Inject()(
-  system: ActorSystem,
+class MergerWorkerService(
   sqsStream: SQSStream[NotificationMessage],
   playbackService: RecorderPlaybackService,
   mergerManager: MergerManager,
@@ -21,11 +19,12 @@ class MergerWorkerService @Inject()(
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  sqsStream.foreach(this.getClass.getSimpleName, processMessage)
+  def run(): Future[Done] =
+    sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
+      matcherResult <- Future.fromTry(fromJson[MatcherResult](message.body))
       _ <- Future.sequence(matcherResult.works.map { applyMerge })
     } yield ()
 
@@ -44,6 +43,4 @@ class MergerWorkerService @Inject()(
           messageWriter.write(_, "merged-work")
         ))
   }
-
-  def stop(): Future[Terminated] = system.terminate()
 }

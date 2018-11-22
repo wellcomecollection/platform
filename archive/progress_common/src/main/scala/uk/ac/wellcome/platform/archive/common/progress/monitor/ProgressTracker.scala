@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
 class ProgressTracker @Inject()(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
-)(implicit ex: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext) extends Logging {
   import Progress._
 
   def get(id: UUID): Future[Option[Progress]] = Future {
@@ -67,11 +67,13 @@ class ProgressTracker @Inject()(
 
     val eventsUpdate = appendAll('events -> update.events.toList)
     val mergedUpdate = update match {
-      case eventUpdate: ProgressEventUpdate =>
+      case _: ProgressEventUpdate =>
         eventsUpdate
       case statusUpdate: ProgressStatusUpdate =>
-        eventsUpdate and set('status -> statusUpdate.status) and appendAll(
-          'resources -> statusUpdate.affectedResources.toList)
+        val bagUpdate = statusUpdate.affectedBag.map(bag => set(
+          'bag -> bag)).toList
+
+        (List(eventsUpdate, set('status -> statusUpdate.status)) ++ bagUpdate).reduce(_ and _)
       case callbackStatusUpdate: ProgressCallbackStatusUpdate =>
         eventsUpdate and set(
           'callback \ 'status -> callbackStatusUpdate.callbackStatus)

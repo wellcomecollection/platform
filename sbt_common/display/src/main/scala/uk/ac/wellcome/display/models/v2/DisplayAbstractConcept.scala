@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal._
 
@@ -95,10 +96,9 @@ case class DisplayConcept(
   ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     dataType = "String"
-  ) label: String
-) extends DisplayAbstractConcept {
-  @JsonProperty("type") val ontologyType: String = "Concept"
-}
+  ) label: String,
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Concept"
+) extends DisplayAbstractConcept
 
 @ApiModel(
   value = "Period",
@@ -116,10 +116,10 @@ case class DisplayPeriod(
   ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     dataType = "String"
-  ) label: String
-) extends DisplayAbstractConcept {
-  @JsonProperty("type") val ontologyType: String = "Period"
-}
+  ) label: String,
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Period"
+) extends DisplayAbstractConcept
+
 case object DisplayPeriod {
   def apply(period: Period): DisplayPeriod = DisplayPeriod(
     label = period.label
@@ -142,10 +142,10 @@ case class DisplayPlace(
   ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     dataType = "String"
-  ) label: String
-) extends DisplayAbstractConcept {
-  @JsonProperty("type") val ontologyType: String = "Place"
-}
+  ) label: String,
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Place"
+) extends DisplayAbstractConcept
+
 case object DisplayPlace {
   def apply(place: Place): DisplayPlace = DisplayPlace(
     label = place.label

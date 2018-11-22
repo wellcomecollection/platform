@@ -4,9 +4,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
@@ -19,7 +17,7 @@ class ArchivistFeatureTest
     with ScalaFutures
     with RandomThings
     with MetricsSenderFixture
-    with ArchivistFixture
+    with ArchivistFixtures
     with IntegrationPatience
     with ProgressUpdateAssertions {
 
@@ -38,7 +36,16 @@ class ArchivistFeatureTest
           case (request, bagIdentifier) =>
             archivist.run()
             eventually {
-              listKeysInBucket(storageBucket) should have size 15
+
+              val archivedObjects = listKeysInBucket(storageBucket)
+              archivedObjects should have size 16
+              val archivedObjectNames = archivedObjects.map(_.split("/").last)
+
+              archivedObjectNames should contain allElementsOf List(
+                "bag-info.txt",
+                "bagit.txt",
+                "manifest-sha256.txt",
+                "tagmanifest-sha256.txt")
 
               assertQueuePairSizes(queuePair, 0, 0)
 
@@ -103,7 +110,7 @@ class ArchivistFeatureTest
                 request.archiveRequestId,
                 progressTopic,
                 Progress.Failed,
-                Nil)({ events =>
+                None)({ events =>
                 all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
               })
             }
@@ -111,7 +118,35 @@ class ArchivistFeatureTest
     }
   }
 
-  it("continues after bag with bad checksum") {
+  it("fails when ingesting a bag with no tag manifest") {
+    withArchivist {
+      case (
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          registrarTopic,
+          progressTopic,
+          archivist) =>
+        createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
+          case (request, bagIdentifier) =>
+            archivist.run()
+            eventually {
+              assertQueuePairSizes(queuePair, 0, 0)
+              assertSnsReceivesNothing(registrarTopic)
+
+              assertTopicReceivesProgressStatusUpdate(
+                request.archiveRequestId,
+                progressTopic,
+                Progress.Failed,
+                None)({ events =>
+                all(events.map(_.description)) should include regex "Failed reading file tagmanifest-sha256.txt from zip file"
+              })
+            }
+        }
+    }
+  }
+
+  it("continues after bag with bad digest") {
     withArchivist {
       case (
           ingestBucket,
@@ -171,7 +206,7 @@ class ArchivistFeatureTest
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
@@ -179,7 +214,7 @@ class ArchivistFeatureTest
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
@@ -260,7 +295,7 @@ class ArchivistFeatureTest
                     invalidRequestId1,
                     progressTopic,
                     Progress.Failed,
-                    Nil) { events =>
+                    None) { events =>
                     events should have size 1
                     events.head.description should startWith(
                       s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip")
@@ -270,7 +305,7 @@ class ArchivistFeatureTest
                     invalidRequestId2,
                     progressTopic,
                     Progress.Failed,
-                    Nil) { events =>
+                    None) { events =>
                     events should have size 1
                     events.head.description should startWith(
                       s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip")
@@ -342,7 +377,7 @@ class ArchivistFeatureTest
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
                           }
@@ -351,7 +386,7 @@ class ArchivistFeatureTest
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
                           }
@@ -423,7 +458,7 @@ class ArchivistFeatureTest
                             invalidRequest1.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }
@@ -432,7 +467,7 @@ class ArchivistFeatureTest
                             invalidRequest2.archiveRequestId,
                             progressTopic,
                             Progress.Failed,
-                            Nil) { events =>
+                            None) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }

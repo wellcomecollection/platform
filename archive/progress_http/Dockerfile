@@ -1,11 +1,5 @@
-FROM wellcome/finatra_service_base
+FROM wellcome/typesafe_config_base:2
 
 ADD target/universal/stage /opt/docker
 
-USER root
-RUN chown -R daemon:daemon /opt/docker
-
-ENV project=progress_http
-
-USER daemon
-CMD ["/run.sh"]
+ENV PROJECT=progress_http

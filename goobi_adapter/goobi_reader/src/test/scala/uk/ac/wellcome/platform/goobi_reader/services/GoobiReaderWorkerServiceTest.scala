@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client}
 import com.gu.scanamo.Scanamo
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.{FunSpec, Inside}
+import org.scalatest.{Assertion, FunSpec, Inside}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -16,10 +16,14 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.goobi_reader.GoobiRecordMetadata
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
+import uk.ac.wellcome.platform.goobi_reader.models.GoobiRecordMetadata
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.fixtures.{
+  LocalDynamoDb,
+  LocalVersionedHybridStore
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
@@ -37,7 +41,9 @@ class GoobiReaderWorkerServiceTest
     with GoobiReaderFixtures
     with Messaging
     with SQS
-    with Inside {
+    with Inside
+    with LocalDynamoDb
+    with LocalVersionedHybridStore {
 
   private val id = "mets-0001"
   private val goobiS3Prefix = "goobi"
@@ -237,8 +243,7 @@ class GoobiReaderWorkerServiceTest
                                  expectedMetadata: GoobiRecordMetadata,
                                  expectedContents: String,
                                  table: Table,
-                                 bucket: Bucket) = {
-
+                                 bucket: Bucket): Assertion =
     inside(getHybridRecord(table, id)) {
       case HybridRecord(actualId, actualVersion, location) =>
         actualId shouldBe id
@@ -246,7 +251,6 @@ class GoobiReaderWorkerServiceTest
         getRecordMetadata[GoobiRecordMetadata](table, id) shouldBe expectedMetadata
         getContentFromS3(location) shouldBe expectedContents
     }
-  }
 
   private def assertMessageSentToDlq(queue: Queue, dlq: Queue) = {
     assertQueueEmpty(queue)
@@ -301,13 +305,22 @@ class GoobiReaderWorkerServiceTest
               queue,
               mockMetricsSender) { sqsStream =>
               withS3StreamStoreFixtures {
-                case (bucket, table, vhs) =>
-                  new GoobiReaderWorkerService(
-                    s3Client,
-                    actorSystem,
-                    sqsStream,
-                    vhs)
-                  testWith((bucket, queuePair, mockMetricsSender, table, vhs))
+                case (bucket, table, versionedHybridStore) =>
+                  val service = new GoobiReaderWorkerService(
+                    s3Client = s3Client,
+                    sqsStream = sqsStream,
+                    versionedHybridStore = versionedHybridStore
+                  )(actorSystem = actorSystem)
+
+                  service.run()
+
+                  testWith(
+                    (
+                      bucket,
+                      queuePair,
+                      mockMetricsSender,
+                      table,
+                      versionedHybridStore))
               }
             }
           }

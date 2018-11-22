@@ -1,8 +1,0 @@
--aws.message.reader.sqs.queue.url=${queue_url}
--aws.message.reader.s3.bucketName=${vhs_bucket_name}
--aws.metrics.namespace=${metrics_namespace}
--aws.sns.topic.arn=${topic_arn}
--aws.dynamo.tableName=${dynamo_table}
--aws.dynamo.tableIndex=${dynamo_index}
--aws.dynamo.locking.service.lockTableName=${dynamo_lock_table}
--aws.dynamo.locking.service.lockTableIndexName=${dynamo_lock_table_index}

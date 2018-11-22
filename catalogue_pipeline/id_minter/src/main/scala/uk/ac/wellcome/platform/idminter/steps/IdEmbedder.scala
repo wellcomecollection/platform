@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.idminter.steps
 
-import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
 import io.circe._
@@ -12,7 +11,7 @@ import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class IdEmbedder @Inject()(identifierGenerator: IdentifierGenerator)(
+class IdEmbedder(identifierGenerator: IdentifierGenerator)(
   implicit ec: ExecutionContext)
     extends Logging {
 

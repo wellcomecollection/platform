@@ -3,13 +3,10 @@ package uk.ac.wellcome.elasticsearch.test.fixtures
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
-import org.scalatest.concurrent.{
-  Eventually,
-  PatienceConfiguration,
-  ScalaFutures
-}
+import org.scalactic.source.Position
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{Matchers, Suite}
+import org.scalatest.{Assertion, Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.{
   DisplayElasticConfig,
   ElasticClientBuilder,
@@ -26,36 +23,23 @@ import scala.util.Random
 
 trait ElasticsearchFixtures
     extends Eventually
-    with PatienceConfiguration
     with ScalaFutures
     with Matchers
-    with JsonAssertions { this: Suite =>
-
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
-    timeout = scaled(Span(40, Seconds)),
-    interval = scaled(Span(150, Millis))
-  )
+    with JsonAssertions
+    with IntegrationPatience { this: Suite =>
 
   private val esHost = "localhost"
   private val esPort = 9200
 
-  def displayEsLocalFlags(indexNameV1: String,
-                          indexNameV2: String,
-                          itemType: String) =
+  val documentType = "work"
+
+  def displayEsLocalFlags(indexNameV1: String, indexNameV2: String) =
     Map(
       "es.host" -> esHost,
       "es.port" -> esPort.toString,
       "es.index.v1" -> indexNameV1,
       "es.index.v2" -> indexNameV2,
-      "es.type" -> itemType
-    )
-
-  def ingestEsLocalFlags(indexName: String, itemType: String) =
-    Map(
-      "es.host" -> esHost,
-      "es.port" -> esPort.toString,
-      "es.index" -> indexName,
-      "es.type" -> itemType
+      "es.type" -> documentType
     )
 
   val elasticClient: HttpClient = ElasticClientBuilder.create(
@@ -66,17 +50,21 @@ trait ElasticsearchFixtures
     password = "changeme"
   )
 
-  // Elasticsearch takes a while to start up so check that it actually started before running tests
+  // Elasticsearch takes a while to start up so check that it actually started
+  // before running tests.
   eventually {
     elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
-  }
+  }(
+    PatienceConfig(
+      timeout = scaled(Span(40, Seconds)),
+      interval = scaled(Span(150, Millis))
+    ),
+    implicitly[Position])
 
-  def withLocalElasticsearchIndex[R](
-    indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,
-    itemType: String)(testWith: TestWith[String, R]): R = {
+  def withLocalElasticsearchIndex[R](testWith: TestWith[String, R]): R = {
+    val indexName = createIndexName
 
-    val elasticConfig = DisplayElasticConfig(
-      documentType = itemType,
+    val elasticConfig = createDisplayElasticConfigWith(
       indexV1name = indexName,
       indexV2name = s"$indexName-v2"
     )
@@ -86,12 +74,14 @@ trait ElasticsearchFixtures
       rootIndexType = elasticConfig.documentType
     )
 
-    withLocalElasticsearchIndex(index, indexName)(testWith)
+    withLocalElasticsearchIndex(index, indexName) { indexName =>
+      testWith(indexName)
+    }
   }
 
   def withLocalElasticsearchIndex[R](
     index: ElasticsearchIndex,
-    indexName: String)(testWith: TestWith[String, R]): R = {
+    indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
 
     index.create(indexName).await
 
@@ -111,15 +101,15 @@ trait ElasticsearchFixtures
     }
   }
 
-  def assertElasticsearchEventuallyHasWork(indexName: String,
-                                           itemType: String,
-                                           works: IdentifiedBaseWork*) = {
+  def assertElasticsearchEventuallyHasWork(
+    indexName: String,
+    works: IdentifiedBaseWork*): Seq[Assertion] =
     works.map { work =>
       val workJson = toJson(work).get
 
       eventually {
         val getResponse = elasticClient
-          .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
+          .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
           .await
 
         getResponse.exists shouldBe true
@@ -127,10 +117,8 @@ trait ElasticsearchFixtures
         assertJsonStringsAreEqual(getResponse.sourceAsString, workJson)
       }
     }
-  }
 
   def assertElasticsearchNeverHasWork(indexName: String,
-                                      itemType: String,
                                       works: IdentifiedBaseWork*) = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
@@ -138,7 +126,7 @@ trait ElasticsearchFixtures
 
     works.foreach { work =>
       val hit = elasticClient
-        .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
+        .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
         .await
 
       hit.found shouldBe false
@@ -146,14 +134,13 @@ trait ElasticsearchFixtures
   }
 
   def insertIntoElasticsearch(indexName: String,
-                              itemType: String,
-                              works: IdentifiedBaseWork*) = {
+                              works: IdentifiedBaseWork*): Assertion = {
     val result = elasticClient.execute(
       bulk(
         works.map { work =>
           val jsonDoc = toJson(work).get
 
-          indexInto(indexName / itemType)
+          indexInto(indexName / documentType)
             .version(work.version)
             .versionType(VersionType.EXTERNAL_GTE)
             .id(work.canonicalId)
@@ -174,4 +161,16 @@ trait ElasticsearchFixtures
       }
     }
   }
+
+  def createDisplayElasticConfigWith(
+    indexV1name: String,
+    indexV2name: String): DisplayElasticConfig =
+    DisplayElasticConfig(
+      documentType = documentType,
+      indexV1name = indexV1name,
+      indexV2name = indexV2name
+    )
+
+  private def createIndexName: String =
+    (Random.alphanumeric take 10 mkString) toLowerCase
 }

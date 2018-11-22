@@ -5,7 +5,7 @@ object WellcomeDependencies {
   private lazy val versions = new {
     val json = "1.0.0"
     val monitoring = "1.1.0"
-    val storage = "2.4.1"
+    val storage = "2.6.0"
   }
 
   val jsonLibrary: Seq[ModuleID] = Seq(
@@ -46,6 +46,7 @@ object Dependencies {
     val sierraStreamsSourceVersion = "0.4"
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
+    val typesafe = "1.3.2"
     val wiremockVersion = "2.18.0"
     val apacheCommons = "2.6"
   }
@@ -58,7 +59,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
-  
+
   val circeDependencies = Seq(
     "io.circe" %% "circe-core" % versions.circeVersion,
     "io.circe" %% "circe-generic"% versions.circeVersion,
@@ -155,7 +156,13 @@ object Dependencies {
 
   val finatraMonitoringDependencies = finatraDependencies ++ WellcomeDependencies.monitoringLibrary
 
-  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
+  val typesafeDependencies: Seq[ModuleID] = Seq(
+    "com.typesafe" % "config" % versions.typesafe
+  )
+
+  val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
+
+  val typesafeStorageDependencies: Seq[ModuleID] = akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary
 
   val internalModelDependencies = Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
@@ -169,6 +176,10 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
   )
 
+  val miroTransformerDependencies: Seq[ModuleID] = Seq(
+    "org.apache.commons" % "commons-lang3" % "3.1"
+  )
+
   val snapshotGeneratorDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka
   )
@@ -177,11 +188,11 @@ object Dependencies {
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   )
 
-  val archiveCommonDependencies = Seq(
+  val archiveCommonDependencies: Seq[ModuleID] = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
     "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
     "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
     "org.rogach" %% "scallop" % "3.1.3",
     "de.heikoseeberger" %% "akka-http-circe" % "1.21.1"
-  ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
+  ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 }

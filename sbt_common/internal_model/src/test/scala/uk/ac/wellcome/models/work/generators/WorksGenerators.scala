@@ -74,6 +74,7 @@ trait WorksGenerators extends ItemsGenerators {
     description: Option[String] = None,
     lettering: Option[String] = None,
     workType: Option[WorkType] = None,
+    thumbnail: Option[Location] = None,
     contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = List(),
     production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = List(),
     items: List[MaybeDisplayable[Item]] = List(),
@@ -93,7 +94,7 @@ trait WorksGenerators extends ItemsGenerators {
       subjects = List(),
       genres = List(),
       contributors = contributors,
-      thumbnail = None,
+      thumbnail = thumbnail,
       production = production,
       language = None,
       dimensions = None,
@@ -191,6 +192,12 @@ trait WorksGenerators extends ItemsGenerators {
     createUnidentifiedWorkWith(
       sourceIdentifier = createMiroSourceIdentifier,
       otherIdentifiers = otherIdentifiers,
+      thumbnail = Some(
+        DigitalLocation(
+          url = "https://iiif.wellcomecollection.org/V01234.jpg",
+          locationType = LocationType("thumbnail-image"),
+          license = Some(License_CCBY)
+        )),
       items = List(
         createUnidentifiableItemWith(locations = List(
           createDigitalLocationWith(locationType = createImageLocationType))))

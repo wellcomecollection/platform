@@ -1,21 +1,37 @@
 package uk.ac.wellcome.platform.idminter.services
 
-import akka.actor.{ActorSystem, Terminated}
-import com.google.inject.Inject
+import akka.Done
 import io.circe.Json
 import uk.ac.wellcome.messaging.message.{MessageStream, MessageWriter}
+import uk.ac.wellcome.platform.idminter.config.models.{
+  IdentifiersTableConfig,
+  RDSClientConfig
+}
+import uk.ac.wellcome.platform.idminter.database.TableProvisioner
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IdMinterWorkerService @Inject()(
+class IdMinterWorkerService(
   idEmbedder: IdEmbedder,
   writer: MessageWriter[Json],
   messageStream: MessageStream[Json],
-  system: ActorSystem
+  rdsClientConfig: RDSClientConfig,
+  identifiersTableConfig: IdentifiersTableConfig
 )(implicit ec: ExecutionContext) {
 
-  messageStream.foreach(this.getClass.getSimpleName, processMessage)
+  def run(): Future[Done] = {
+    val tableProvisioner = new TableProvisioner(
+      rdsClientConfig = rdsClientConfig
+    )
+
+    tableProvisioner.provision(
+      database = identifiersTableConfig.database,
+      tableName = identifiersTableConfig.tableName
+    )
+
+    messageStream.foreach(this.getClass.getSimpleName, processMessage)
+  }
 
   def processMessage(json: Json): Future[Unit] =
     for {
@@ -25,8 +41,4 @@ class IdMinterWorkerService @Inject()(
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
-
-  def stop(): Future[Terminated] = {
-    system.terminate()
-  }
 }

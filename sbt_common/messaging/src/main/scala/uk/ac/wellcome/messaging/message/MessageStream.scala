@@ -3,33 +3,29 @@ package uk.ac.wellcome.messaging.message
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
 import akka.{Done, NotUsed}
-import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
-import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSStream
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MessageStream[T] @Inject()(actorSystem: ActorSystem,
-                                 sqsClient: AmazonSQSAsync,
-                                 s3Client: AmazonS3,
-                                 messageReaderConfig: MessageReaderConfig,
-                                 metricsSender: MetricsSender)(
+class MessageStream[T](actorSystem: ActorSystem,
+                       sqsClient: AmazonSQSAsync,
+                       sqsConfig: SQSConfig,
+                       metricsSender: MetricsSender)(
   implicit objectStore: ObjectStore[T],
   ec: ExecutionContext) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
-    actorSystem = actorSystem,
     sqsClient = sqsClient,
-    sqsConfig = messageReaderConfig.sqsConfig,
+    sqsConfig = sqsConfig,
     metricsSender = metricsSender
-  )
+  )(actorSystem = actorSystem)
 
   def runStream(
     streamName: String,
@@ -45,7 +41,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
       streamName = streamName,
       process = (notification: NotificationMessage) =>
         for {
-          body <- getBody(notification.Message)
+          body <- getBody(notification.body)
           result <- process(body)
         } yield result
     )
@@ -53,10 +49,10 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
   private def messageFromS3Source(
     source: Source[(Message, NotificationMessage), NotUsed])(
     implicit decoder: Decoder[T]) = {
-    source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
+    source.mapAsyncUnordered(sqsConfig.parallelism) {
       case (message, notification) =>
         for {
-          deserialisedObject <- getBody(notification.Message)
+          deserialisedObject <- getBody(notification.body)
         } yield (message, deserialisedObject)
     }
   }

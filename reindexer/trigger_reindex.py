@@ -142,7 +142,6 @@ def main():
     source_name = args["--source"]
     reason = args["--reason"]
     skip_pipeline_checks = args["--skip-pipeline-checks"] or args["partial"]
-
     username = iam_client.get_user()["User"]["UserName"]
 
     if not skip_pipeline_checks:

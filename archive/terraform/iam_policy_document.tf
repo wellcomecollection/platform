@@ -42,6 +42,19 @@ data "aws_iam_policy_document" "ingest_get" {
   }
 }
 
+data "aws_iam_policy_document" "ingest_get_bagger" {
+  statement {
+    actions = [
+      "s3:GetObject*",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.bagger_drop_bucket_name}/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "ingest_workflow_get" {
   statement {
     actions = [
@@ -50,6 +63,31 @@ data "aws_iam_policy_document" "ingest_workflow_get" {
 
     resources = [
       "arn:aws:s3:::wellcomecollection-workflow-export-bagit/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "archive_dlcs_get" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type = "AWS"
+
+      identifiers = [
+        "arn:aws:iam::653428163053:user/echo-fs",
+        "arn:aws:iam::653428163053:user/api",
+      ]
+    }
+
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.archive_bucket_name}",
+      "arn:aws:s3:::${local.archive_bucket_name}/*",
     ]
   }
 }

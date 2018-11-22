@@ -23,9 +23,9 @@ object NotifyFailureFlow {
           ProgressStatusUpdate(
             toRequestId(error.t),
             Progress.Failed,
-            Nil,
+            None,
             List(ProgressEvent(error.toString))
         )
       )
-      .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig, Some(subject)))
+      .via(SnsPublishFlow[ProgressUpdate](snsClient, snsConfig, subject))
 }

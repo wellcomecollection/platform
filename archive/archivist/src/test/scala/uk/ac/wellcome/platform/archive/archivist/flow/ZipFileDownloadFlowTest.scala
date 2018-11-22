@@ -7,11 +7,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadingError
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
@@ -27,7 +24,7 @@ class ZipFileDownloadFlowTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with ArchivistFixture
+    with ArchivistFixtures
     with IngestRequestContextGenerators
     with Inside
     with SNS
@@ -43,8 +40,10 @@ class ZipFileDownloadFlowTest
       withLocalSnsTopic { progressTopic =>
         withBagItZip() {
           case (bagName, zipFile) =>
-            val downloadZipFlow =
-              ZipFileDownloadFlow(10, SNSConfig(progressTopic.arn))
+            val downloadZipFlow = ZipFileDownloadFlow(
+              parallelism = 10,
+              snsConfig = createSNSConfigWith(progressTopic)
+            )
 
             val uploadKey = bagName.toString
 
@@ -82,8 +81,10 @@ class ZipFileDownloadFlowTest
       withLocalSnsTopic { progressTopic =>
         val bagIdentifier = randomAlphanumeric()
 
-        val downloadZipFlow =
-          ZipFileDownloadFlow(10, SNSConfig(progressTopic.arn))
+        val downloadZipFlow = ZipFileDownloadFlow(
+          parallelism = 10,
+          snsConfig = createSNSConfigWith(progressTopic)
+        )
 
         val objectLocation =
           ObjectLocation(storageBucket.name, bagIdentifier.toString)
@@ -105,7 +106,7 @@ class ZipFileDownloadFlowTest
             ingestBagRequest.archiveRequestId,
             progressTopic,
             Progress.Failed,
-            Nil) { events =>
+            None) { events =>
             events should have size 1
             events.head.description should startWith(
               s"Failed downloading zipFile ${objectLocation.namespace}/${objectLocation.key}")

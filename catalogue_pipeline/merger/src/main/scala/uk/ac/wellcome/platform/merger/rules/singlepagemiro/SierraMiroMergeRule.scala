@@ -12,10 +12,9 @@ import uk.ac.wellcome.platform.merger.logging.MergerLogging
   *
   *   - We copy across all the identifiers from the Miro work (except
   *     those which contain Sierra identifiers)
-  *   - We copy across the Miro location to the Sierra work *if* the
-  *     Sierra work doesn't already have a digital location.
-  *     In this case, the Sierra digital location supersedes the one
-  *     from Miro.
+  *
+  *   - We combine the locations on the items, and use the Miro iiif-image
+  *     location for the thumbnail.
   *
   */
 object SierraMiroMergeRule extends SierraMiroMerger with SierraMiroPartitioner {
@@ -49,7 +48,12 @@ trait SierraMiroMerger extends Logging with MergerLogging {
 
         val mergedWork = sierraWork.copy(
           otherIdentifiers = mergeIdentifiers(sierraWork, miroWork),
-          items = mergeItems(sierraItem, miroItem)
+          items = mergeItems(sierraItem, miroItem),
+          // We always copy across the thumbnail from the Miro work, at least
+          // for now -- it's never populated on Sierra, always populated in Miro.
+          // Later we may use the iiif-presentation item location to populate
+          // this field, but right now it's empty on all Sierra works.
+          thumbnail = miroWork.thumbnail
         )
 
         Some(
@@ -62,24 +66,27 @@ trait SierraMiroMerger extends Logging with MergerLogging {
     }
   }
 
-  private def mergeItems(sierraItem: MaybeDisplayable[Item],
-                         miroItem: Unidentifiable[Item]) = {
-    val sierraDigitalLocations = sierraItem.agent.locations.collect {
-      case location: DigitalLocation => location
-    }
+  private def mergeItems(
+    sierraItem: MaybeDisplayable[Item],
+    miroItem: Unidentifiable[Item]): List[MaybeDisplayable[Item]] = {
 
-    val items = sierraDigitalLocations match {
-      case Nil =>
-        val agent: Item = sierraItem.agent.copy(
-          locations = sierraItem.agent.locations ++ miroItem.agent.locations
-        )
-        List(copyItem(sierraItem, agent))
-      case _ =>
-        debug(
-          s"Sierra work already has digital location $sierraDigitalLocations takes precedence over Miro location.")
-        List(sierraItem)
-    }
-    items
+    // We always use the locations from the Sierra and the Miro records.
+    //
+    // We may sometimes have digital locations from both records:
+    //
+    //   * a iiif-image location from Miro
+    //   * a iiif-presentation location from Sierra
+    //
+    // This is when an image has been through the digitisation workflow
+    // after it came from Sierra.  We may remove the iiif-image later
+    // (strictly speaking the -presentation replaces it), but we leave
+    // it for now, so the website can still use it.
+    val locations = sierraItem.agent.locations ++ miroItem.agent.locations
+
+    val agent: Item = sierraItem.agent.copy(
+      locations = locations
+    )
+    List(copyItem(sierraItem, agent))
   }
 
   /**

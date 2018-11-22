@@ -1,13 +1,14 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import akka.stream.scaladsl.{Sink, Source}
+import java.io.File
+
+import akka.NotUsed
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ArchiveJobError,
@@ -19,7 +20,10 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   IngestRequestContextGenerators
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  InvalidBagManifestError
+}
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   BagLocation,
@@ -27,7 +31,8 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.test.fixtures.Akka
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.collection.JavaConverters._
 
@@ -35,7 +40,7 @@ class ArchiveZipFileFlowTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with ArchivistFixture
+    with ArchivistFixtures
     with IngestRequestContextGenerators
     with BagUploaderConfigGenerator
     with Akka
@@ -51,39 +56,40 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
-            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
             withBagItZip() {
               case (bagName, zipFile) =>
-                val uploader = ArchiveZipFileFlow(
-                  bagUploaderConfig,
-                  SNSConfig(reportingTopic.arn))
-                val ingestContext = createIngestBagRequestWith()
-                val (_, verification) =
-                  uploader.runWith(
-                    Source.single(
-                      ZipFileDownloadComplete(zipFile, ingestContext)),
-                    Sink.seq
-                  )
+                withArchiveZipFileFlow(storageBucket, reportingTopic) {
+                  uploader =>
+                    val ingestContext = createIngestBagRequestWith()
+                    val (_, verification) =
+                      uploader.runWith(
+                        Source.single(
+                          ZipFileDownloadComplete(zipFile, ingestContext)),
+                        Sink.seq
+                      )
 
-                whenReady(verification) { result =>
-                  listKeysInBucket(storageBucket) should have size 4
-                  result shouldBe List(Right(ArchiveComplete(
-                    ingestContext.archiveRequestId,
-                    ingestContext.storageSpace,
-                    BagLocation(
-                      storageBucket.name,
-                      "archive",
-                      BagPath(s"${ingestContext.storageSpace}/$bagName"))
-                  )))
+                    whenReady(verification) { result =>
+                      listKeysInBucket(storageBucket) should have size 5
+                      result shouldBe List(Right(ArchiveComplete(
+                        ingestContext.archiveRequestId,
+                        ingestContext.storageSpace,
+                        BagLocation(
+                          storageBucket.name,
+                          "archive",
+                          BagPath(s"${ingestContext.storageSpace}/$bagName"))
+                      )))
 
-                  assertTopicReceivesProgressEventUpdate(
-                    ingestContext.archiveRequestId,
-                    reportingTopic) { events =>
-                    inside(events) {
-                      case List(event) =>
-                        event.description shouldBe "Bag uploaded and verified successfully"
+                      assertTopicReceivesProgressEventUpdate(
+                        ingestContext.archiveRequestId,
+                        reportingTopic) { events =>
+                        inside(events) {
+                          case List(event) =>
+                            event.description shouldBe "Bag uploaded and verified successfully"
+                        }
+                      }
+
+                      new File(zipFile.getName).exists() shouldBe false
                     }
-                  }
                 }
             }
           }
@@ -98,34 +104,37 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
-            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
             withBagItZip(createDigest = _ => "bad_digest") {
               case (_, zipFile) =>
-                val uploader = ArchiveZipFileFlow(
-                  bagUploaderConfig,
-                  SNSConfig(reportingTopic.arn))
-                val ingestContext = createIngestBagRequest
+                withArchiveZipFileFlow(storageBucket, reportingTopic) {
+                  uploader =>
+                    val ingestContext = createIngestBagRequest
 
-                val (_, verification) =
-                  uploader.runWith(
-                    Source.single(
-                      ZipFileDownloadComplete(zipFile, ingestContext)),
-                    Sink.seq)
+                    val (_, verification) =
+                      uploader.runWith(
+                        Source.single(
+                          ZipFileDownloadComplete(zipFile, ingestContext)),
+                        Sink.seq)
 
-                whenReady(verification) { result =>
-                  inside(result.toList) {
-                    case List(Left(ArchiveJobError(_, errors))) =>
-                      all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
-                  }
+                    whenReady(verification) { result =>
+                      inside(result.toList) {
+                        case List(Left(ArchiveJobError(_, errors))) =>
+                          all(errors) shouldBe a[
+                            ChecksumNotMatchedOnUploadError]
+                      }
 
-                  assertTopicReceivesProgressStatusUpdate(
-                    ingestContext.archiveRequestId,
-                    reportingTopic,
-                    Progress.Failed,
-                    Nil) { events =>
-                    events should have size (zipFile.entries().asScala.size - 1)
-                    all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
-                  }
+                      assertTopicReceivesProgressStatusUpdate(
+                        ingestContext.archiveRequestId,
+                        reportingTopic,
+                        Progress.Failed,
+                        None) { events =>
+                        events should have size (zipFile
+                          .entries()
+                          .asScala
+                          .size - 1)
+                        all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+                      }
+                    }
                 }
             }
           }
@@ -141,34 +150,33 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
-            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
             withBagItZip(createBagInfoFile = _ => None) {
               case (_, zipFile) =>
-                val uploader = ArchiveZipFileFlow(
-                  bagUploaderConfig,
-                  SNSConfig(reportingTopic.arn))
-                val ingestContext = createIngestBagRequest
+                withArchiveZipFileFlow(storageBucket, reportingTopic) {
+                  uploader =>
+                    val ingestContext = createIngestBagRequest
 
-                val (_, verification) =
-                  uploader.runWith(
-                    Source.single(
-                      ZipFileDownloadComplete(zipFile, ingestContext)),
-                    Sink.seq)
+                    val (_, verification) =
+                      uploader.runWith(
+                        Source.single(
+                          ZipFileDownloadComplete(zipFile, ingestContext)),
+                        Sink.seq)
 
-                whenReady(verification) { result =>
-                  result shouldBe List(
-                    Left(FileNotFoundError("bag-info.txt", ingestContext)))
+                    whenReady(verification) { result =>
+                      result shouldBe List(
+                        Left(FileNotFoundError("bag-info.txt", ingestContext)))
 
-                  assertTopicReceivesProgressStatusUpdate(
-                    ingestContext.archiveRequestId,
-                    reportingTopic,
-                    Progress.Failed,
-                    Nil) { events =>
-                    inside(events) {
-                      case List(event) =>
-                        event.description shouldBe result.head.left.get.toString
+                      assertTopicReceivesProgressStatusUpdate(
+                        ingestContext.archiveRequestId,
+                        reportingTopic,
+                        Progress.Failed,
+                        None) { events =>
+                        inside(events) {
+                          case List(event) =>
+                            event.description shouldBe result.head.left.get.toString
+                        }
+                      }
                     }
-                  }
                 }
             }
           }
@@ -184,46 +192,45 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
-            val bagUploaderConfig = createBagUploaderConfig(storageBucket)
             withBagItZip(createDataManifest = _ =>
               Some(FileEntry("manifest-sha256.txt", "dgfssjhdfg"))) {
               case (bagName, zipFile) =>
-                val uploader = ArchiveZipFileFlow(
-                  bagUploaderConfig,
-                  SNSConfig(reportingTopic.arn))
-                val ingestContext = createIngestBagRequest
+                withArchiveZipFileFlow(storageBucket, reportingTopic) {
+                  uploader =>
+                    val ingestContext = createIngestBagRequest
 
-                val (_, verification) =
-                  uploader.runWith(
-                    Source.single(
-                      ZipFileDownloadComplete(zipFile, ingestContext)),
-                    Sink.seq)
+                    val (_, verification) =
+                      uploader.runWith(
+                        Source.single(
+                          ZipFileDownloadComplete(zipFile, ingestContext)),
+                        Sink.seq)
 
-                whenReady(verification) { result =>
-                  inside(result.toList) {
-                    case List(
-                        Left(InvalidBagManifestError(
-                          archiveJob,
-                          "manifest-sha256.txt"))) =>
-                      archiveJob shouldBe a[ArchiveJob]
-                      archiveJob
-                        .asInstanceOf[ArchiveJob]
-                        .bagLocation shouldBe BagLocation(
-                        storageBucket.name,
-                        "archive",
-                        BagPath(s"${ingestContext.storageSpace}/$bagName"))
-                  }
+                    whenReady(verification) { result =>
+                      inside(result.toList) {
+                        case List(
+                            Left(InvalidBagManifestError(
+                              archiveJob,
+                              "manifest-sha256.txt"))) =>
+                          archiveJob shouldBe a[ArchiveJob]
+                          archiveJob
+                            .asInstanceOf[ArchiveJob]
+                            .bagLocation shouldBe BagLocation(
+                            storageBucket.name,
+                            "archive",
+                            BagPath(s"${ingestContext.storageSpace}/$bagName"))
+                      }
 
-                  assertTopicReceivesProgressStatusUpdate(
-                    ingestContext.archiveRequestId,
-                    reportingTopic,
-                    Progress.Failed,
-                    Nil) { events =>
-                    inside(events) {
-                      case List(event) =>
-                        event.description shouldBe result.head.left.get.toString
+                      assertTopicReceivesProgressStatusUpdate(
+                        ingestContext.archiveRequestId,
+                        reportingTopic,
+                        Progress.Failed,
+                        None) { events =>
+                        inside(events) {
+                          case List(event) =>
+                            event.description shouldBe result.head.left.get.toString
+                        }
+                      }
                     }
-                  }
                 }
             }
           }
@@ -237,26 +244,40 @@ class ArchiveZipFileFlowTest
     withLocalS3Bucket { storageBucket =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
-          val bagUploaderConfig = createBagUploaderConfig(storageBucket)
           withBagItZip(createDigest = _ => "bad_digest") {
             case (_, zipFile) =>
-              val uploader =
-                ArchiveZipFileFlow(bagUploaderConfig, SNSConfig("bad-topic"))
-              val ingestContext = createIngestBagRequest
+              withArchiveZipFileFlow(storageBucket, Topic("bad-topic")) {
+                uploader =>
+                  val ingestContext = createIngestBagRequest
 
-              val (_, verification) =
-                uploader.runWith(
-                  Source.single(
-                    ZipFileDownloadComplete(zipFile, ingestContext)),
-                  Sink.seq)
+                  val (_, verification) =
+                    uploader.runWith(
+                      Source.single(
+                        ZipFileDownloadComplete(zipFile, ingestContext)),
+                      Sink.seq)
 
-              whenReady(verification) { result =>
-                result shouldBe empty
+                  whenReady(verification) { result =>
+                    result shouldBe empty
+                  }
               }
           }
         }
       }
     }
 
+  }
+
+  private def withArchiveZipFileFlow[R](bucket: Bucket, topic: Topic)(
+    testWith: TestWith[Flow[ZipFileDownloadComplete,
+                            Either[ArchiveError[_], ArchiveComplete],
+                            NotUsed],
+                       R]): R = {
+    val bagUploaderConfig = createBagUploaderConfig(bucket)
+    val flow = ArchiveZipFileFlow(
+      config = bagUploaderConfig,
+      snsConfig = createSNSConfigWith(topic)
+    )
+
+    testWith(flow)
   }
 }

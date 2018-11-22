@@ -1,0 +1,7 @@
+aws.message.reader.sqs.queue.url="${queue_url}"
+aws.metrics.namespace="${metrics_namespace}"
+aws.sns.topic.arn="${topic_arn}"
+aws.dynamo.tableName="${dynamo_table}"
+aws.dynamo.tableIndex="${dynamo_index}"
+aws.locking.service.dynamo.tableName="${dynamo_lock_table}"
+aws.locking.service.dynamo.tableIndex="${dynamo_lock_table_index}"

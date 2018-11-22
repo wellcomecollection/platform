@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.notifier.flows
 
+import java.net.URL
+
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Flow
@@ -21,13 +23,17 @@ import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
   *
   */
 object NotificationFlow {
-  def apply(snsClient: AmazonSNS, snsConfig: SNSConfig)(
+  def apply(contextUrl: URL, snsClient: AmazonSNS, snsConfig: SNSConfig)(
     implicit actorSystem: ActorSystem)
     : Flow[CallbackNotification, PublishResult, NotUsed] = {
 
-    val callbackUrlFlow = CallbackUrlFlow()
+    val callbackUrlFlow = CallbackUrlFlow(contextUrl: URL)
     val prepareNotificationFlow = PrepareNotificationFlow()
-    val snsPublishFlow = SnsPublishFlow[ProgressUpdate](snsClient, snsConfig)
+    val snsPublishFlow = SnsPublishFlow[ProgressUpdate](
+      snsClient,
+      snsConfig,
+      subject = s"Sent by ${this.getClass.getName}"
+    )
 
     callbackUrlFlow
       .via(prepareNotificationFlow)

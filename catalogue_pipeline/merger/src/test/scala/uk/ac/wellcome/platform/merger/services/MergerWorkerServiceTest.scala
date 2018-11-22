@@ -1,15 +1,11 @@
 package uk.ac.wellcome.platform.merger.services
 
-import akka.actor.ActorSystem
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{atLeastOnce, times, verify}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.message.MessageWriter
-import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -20,31 +16,25 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.fixtures.{
   LocalWorksVhs,
-  MatcherResultFixture
+  MatcherResultFixture,
+  WorkerServiceFixture
 }
-import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.test.fixtures.TestWith
 
 class MergerWorkerServiceTest
     extends FunSpec
     with ScalaFutures
     with SQS
-    with Akka
     with IntegrationPatience
     with MetricsSenderFixture
-    with LocalVersionedHybridStore
     with SNS
     with Messaging
     with WorksGenerators
     with LocalWorksVhs
     with MatcherResultFixture
     with Matchers
-    with MockitoSugar {
-  case class TestObject(something: String)
+    with MockitoSugar
+    with WorkerServiceFixture {
 
   it(
     "reads matcher result messages, retrieves the works from vhs and sends them to sns") {
@@ -57,7 +47,7 @@ class MergerWorkerServiceTest
         val matcherResult =
           matcherResultWith(Set(Set(work3), Set(work1, work2)))
 
-        givenStoredInVhs(vhs, entries = List(work1, work2, work3))
+        givenStoredInVhs(vhs, work1, work2, work3)
 
         sendNotificationToSQS(
           queue = queue,
@@ -136,9 +126,7 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(work, olderWork)))
 
-        givenStoredInVhs(
-          vhs,
-          entries = List[TransformedBaseWork](work, newerWork))
+        givenStoredInVhs(vhs, work, newerWork)
 
         sendNotificationToSQS(
           queue = queue,
@@ -190,8 +178,8 @@ class MergerWorkerServiceTest
     val works = List(physicalWork, digitalWork)
 
     withMergerWorkerServiceFixtures {
-      case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        givenStoredInVhs(vhs, works)
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
+        givenStoredInVhs(vhs, works: _*)
 
         val matcherResult = MatcherResult(
           Set(
@@ -229,10 +217,11 @@ class MergerWorkerServiceTest
   it("splits the received works into multiple merged works if required") {
     val workPair1 = List(createSierraPhysicalWork, createSierraDigitalWork)
     val workPair2 = List(createSierraPhysicalWork, createSierraDigitalWork)
+    val works = workPair1 ++ workPair2
 
     withMergerWorkerServiceFixtures {
-      case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        givenStoredInVhs(vhs, entries = workPair1 ++ workPair2)
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
+        givenStoredInVhs(vhs, works: _*)
 
         val matcherResult = MatcherResult(
           Set(
@@ -265,10 +254,7 @@ class MergerWorkerServiceTest
   it("fails if the message sent is not a matcher result") {
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), _, metricsSender) =>
-        sendNotificationToSQS(
-          queue = queue,
-          message = TestObject("not-a-matcher-result")
-        )
+        sendInvalidJSONto(queue)
 
         eventually {
           assertQueueEmpty(queue)
@@ -280,63 +266,23 @@ class MergerWorkerServiceTest
   }
 
   def withMergerWorkerServiceFixtures[R](
-    testWith: TestWith[(VersionedHybridStore[TransformedBaseWork,
-                                             EmptyMetadata,
-                                             ObjectStore[TransformedBaseWork]],
-                        QueuePair,
-                        Topic,
-                        MetricsSender),
-                       R]): R = {
-    withLocalS3Bucket { storageBucket =>
-      withLocalS3Bucket { messageBucket =>
-        withLocalDynamoDbTable { table =>
-          withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
-            storageBucket,
-            table) { vhs =>
-            withActorSystem { actorSystem =>
-              withLocalSqsQueueAndDlq {
-                case queuePair @ QueuePair(queue, dlq) =>
-                  withLocalSnsTopic { topic =>
-                    withMockMetricSender { metricsSender =>
-                      withSQSStream[NotificationMessage, R](
-                        actorSystem,
-                        queue,
-                        metricsSender) { sqsStream =>
-                        withMessageWriter[BaseWork, R](messageBucket, topic) {
-                          snsWriter =>
-                            withMergerWorkerService(
-                              actorSystem,
-                              sqsStream,
-                              vhs,
-                              snsWriter) { _ =>
-                              testWith((vhs, queuePair, topic, metricsSender))
-                            }
-                        }
-                      }
-                    }
-                  }
+    testWith: TestWith[
+      (TransformedBaseWorkVHS, QueuePair, Topic, MetricsSender),
+      R]): R =
+    withTransformedBaseWorkVHS { vhs =>
+      withLocalSqsQueueAndDlq {
+        case queuePair @ QueuePair(queue, _) =>
+          withLocalSnsTopic { topic =>
+            withMockMetricSender { mockMetricsSender =>
+              withWorkerService(
+                vhs = vhs,
+                topic = topic,
+                queue = queue,
+                metricsSender = mockMetricsSender) { _ =>
+                testWith((vhs, queuePair, topic, mockMetricsSender))
               }
             }
           }
-        }
       }
     }
-  }
-
-  private def withMergerWorkerService[R](
-    actorSystem: ActorSystem,
-    sqsStream: SQSStream[NotificationMessage],
-    vhs: VersionedHybridStore[TransformedBaseWork,
-                              EmptyMetadata,
-                              ObjectStore[TransformedBaseWork]],
-    messageWriter: MessageWriter[BaseWork])(
-    testWith: TestWith[MergerWorkerService, R]) = {
-    testWith(
-      new MergerWorkerService(
-        actorSystem,
-        sqsStream,
-        playbackService = new RecorderPlaybackService(vhs),
-        mergerManager = new MergerManager(new Merger()),
-        messageWriter))
-  }
 }

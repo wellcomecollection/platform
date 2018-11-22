@@ -1,5 +1,5 @@
 module "service" {
-  source       = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
+  source       = "../scaling_service"
   service_name = "reindex_worker-${var.namespace}"
 
   task_desired_count = "0"
@@ -9,8 +9,8 @@ module "service" {
   container_image    = "${var.reindex_worker_container_image}"
   security_group_ids = ["${var.service_egress_security_group_id}"]
 
-  cpu    = 512
-  memory = 2048
+  cpu    = 256
+  memory = 1024
 
   env_vars = {
     reindex_jobs_queue_id     = "${module.reindex_worker_queue.id}"

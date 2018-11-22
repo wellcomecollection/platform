@@ -10,7 +10,7 @@ case class ZipLocation(
 )
 
 object ZipLocation {
-  def apply(archiveItemJob: ArchiveItemJob): ZipLocation = {
+  def apply(archiveItemJob: ArchiveDigestItemJob): ZipLocation = {
     ZipLocation(
       archiveItemJob.archiveJob.zipFile,
       archiveItemJob.bagDigestItem.location

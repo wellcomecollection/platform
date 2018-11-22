@@ -1,0 +1,6 @@
+aws.message.reader.sqs.queue.url="${recorder_queue_url}"
+aws.vhs.dynamo.tableName="${vhs_recorder_dynamo_table_name}"
+aws.vhs.s3.bucketName="${vhs_recorder_bucket_name}"
+aws.vhs.s3.globalPrefix="recorder"
+aws.metrics.namespace="${metrics_namespace}"
+aws.sns.topic.arn="${sns_topic}"

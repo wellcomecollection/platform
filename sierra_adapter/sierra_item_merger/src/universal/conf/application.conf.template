@@ -1,0 +1,7 @@
+aws.sns.topic.arn="${topic_arn}"
+aws.sqs.parallelism="${sqs_parallelism}"
+aws.sqs.queue.url="${windows_queue_url}"
+aws.s3.bucketName="${sierra_items_bucket}"
+aws.metrics.namespace="${metrics_namespace}"
+aws.vhs.s3.bucketName="${bucket_name}"
+aws.vhs.dynamo.tableName="${dynamo_table_name}"

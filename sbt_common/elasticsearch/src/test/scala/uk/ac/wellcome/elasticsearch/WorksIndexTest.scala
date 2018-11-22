@@ -5,7 +5,7 @@ import org.elasticsearch.client.ResponseException
 import org.scalacheck.Shrink
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Person, Subject, Unidentifiable}
@@ -22,7 +22,6 @@ class WorksIndexTest
     with Eventually
     with Matchers
     with JsonAssertions
-    with BeforeAndAfterEach
     with PropertyChecks with WorksGenerators {
 
   // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
@@ -31,7 +30,7 @@ class WorksIndexTest
 
   it("puts a valid work") {
     forAll { sampleWork: IdentifiedBaseWork =>
-      withLocalElasticsearchIndex(itemType = "work") { indexName =>
+      withLocalElasticsearchIndex { indexName =>
         val sampleWorkJson = toJson(sampleWork).get
 
         val futureIndexResponse = elasticClient.execute(
@@ -48,7 +47,7 @@ class WorksIndexTest
   // a bug in the mapping related to person subjects wasn't causght by the above test.
   // So let's add a specific one
   it("puts a work with a person subject") {
-    withLocalElasticsearchIndex(itemType = "work") { indexName =>
+    withLocalElasticsearchIndex { indexName =>
       val sampleWorkJson = toJson(createIdentifiedWorkWith(subjects = List(Subject("Daredevil", List(Unidentifiable(Person(label = "Daredevil", prefix = Some("Superhero"), numeration = Some("I")))))))).get
       val futureIndexResponse = elasticClient.execute(
         indexInto(indexName / "work").doc(sampleWorkJson))
@@ -60,7 +59,7 @@ class WorksIndexTest
   }
 
   it("does not put an invalid work") {
-    withLocalElasticsearchIndex(itemType = "work") { indexName =>
+    withLocalElasticsearchIndex { indexName =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 

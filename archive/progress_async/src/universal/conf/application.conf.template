@@ -1,0 +1,4 @@
+aws.sqs.queue.url="${queue_url}"
+aws.sns.topic.arn="${topic_arn}"
+aws.dynamo.tableName="${archive_progress_table_name}"
+metrics.namespace=progress_async

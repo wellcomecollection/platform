@@ -175,11 +175,13 @@ class SierraItemsToDynamoWorkerServiceTest
         val dynamoInserter = new DynamoInserter(versionedHybridStore)
         withSNSWriter(topic) { snsWriter =>
           val service = new SierraItemsToDynamoWorkerService(
-            system = actorSystem,
+            actorSystem = actorSystem,
             sqsStream = sqsStream,
             dynamoInserter = dynamoInserter,
             snsWriter = snsWriter
           )
+
+          service.run()
 
           testWith(service)
         }

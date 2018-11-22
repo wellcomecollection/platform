@@ -1,32 +1,31 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
-import akka.actor.ActorSystem
-import com.google.inject.Inject
+import akka.Done
+import akka.actor.{ActorSystem, Terminated}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord, VHSIndexEntry}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SierraItemMergerWorkerService @Inject()(
-  system: ActorSystem,
+class SierraItemMergerWorkerService(
+  actorSystem: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService,
   objectStore: ObjectStore[SierraItemRecord],
   snsWriter: SNSWriter
 )(implicit ec: ExecutionContext) {
 
-  sqsStream.foreach(this.getClass.getSimpleName, process)
-
   private def process(message: NotificationMessage): Future[Unit] =
     for {
-      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
+      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
       itemRecord <- objectStore.get(hybridRecord.location)
-      hybridRecords: Seq[HybridRecord] <- sierraItemMergerUpdaterService.update(
-        itemRecord)
+      vhsIndexEntries: Seq[VHSIndexEntry[EmptyMetadata]] <- sierraItemMergerUpdaterService
+        .update(itemRecord)
+      hybridRecords: Seq[HybridRecord] = vhsIndexEntries.map { _.hybridRecord }
       _ <- Future.sequence(
         hybridRecords.map { hybridRecord =>
           snsWriter.writeMessage(
@@ -37,5 +36,8 @@ class SierraItemMergerWorkerService @Inject()(
       )
     } yield ()
 
-  def stop() = system.terminate()
+  def run(): Future[Done] =
+    sqsStream.foreach(this.getClass.getSimpleName, process)
+
+  def stop(): Future[Terminated] = actorSystem.terminate()
 }

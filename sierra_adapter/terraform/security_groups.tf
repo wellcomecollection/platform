@@ -1,5 +1,5 @@
 resource "aws_security_group" "service_egress_security_group" {
-  name        = "service_egress_security_group"
+  name        = "${var.namespace}_service_egress_security_group"
   description = "Allow traffic between services"
   vpc_id      = "${local.vpc_id}"
 
@@ -16,7 +16,7 @@ resource "aws_security_group" "service_egress_security_group" {
 }
 
 resource "aws_security_group" "interservice_security_group" {
-  name        = "interservice_security_group"
+  name        = "${var.namespace}_interservice_security_group"
   description = "Allow traffic between services"
   vpc_id      = "${local.vpc_id}"
 

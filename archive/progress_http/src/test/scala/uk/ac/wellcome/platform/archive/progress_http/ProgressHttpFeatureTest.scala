@@ -14,11 +14,8 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Callback,
-  Namespace,
-  Progress
-}
+import uk.ac.wellcome.platform.archive.common.progress.models._
+import uk.ac.wellcome.platform.archive.display._
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -39,6 +36,7 @@ class ProgressHttpFeatureTest
   import uk.ac.wellcome.storage.dynamo._
   import Progress._
 
+  val contextUrl = "http://api.wellcomecollection.org/storage/v1/context.json"
   describe("GET /progress/:id") {
     it("returns a progress tracker when available") {
       withConfiguredApp {
@@ -55,13 +53,17 @@ class ProgressHttpFeatureTest
                   whenRequestReady(request) { result =>
                     result.status shouldBe StatusCodes.OK
                     getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
+                      contextUrl,
                       progress.id,
-                      progress.uploadUri.toString,
+                      DisplayLocation(
+                        DisplayProvider(progress.sourceLocation.provider.id),
+                        progress.sourceLocation.location.namespace,
+                        progress.sourceLocation.location.key),
                       progress.callback.map(DisplayCallback(_)),
                       DisplayIngestType("create"),
                       DisplayStorageSpace(progress.space.underlying),
-                      DisplayIngestStatus(progress.status.toString),
-                      Nil,
+                      DisplayStatus(progress.status.toString),
+                      None,
                       Nil,
                       progress.createdDate.toString,
                       progress.lastModifiedDate.toString
@@ -138,11 +140,14 @@ class ProgressHttpFeatureTest
               val url = s"$baseUrl/progress"
 
               val someCallback = Some(
-                DisplayCallback(uri = testCallbackUri.toString, status = None))
+                DisplayCallback(url = testCallbackUri.toString, status = None))
               val storageSpace = DisplayStorageSpace(id = "somespace")
               val displayIngestType = DisplayIngestType(id = "create")
+              val displayProvider = DisplayProvider("s3")
+              val displayLocation =
+                DisplayLocation(displayProvider, "bucket", "key.txt")
               val createProgressRequest = RequestDisplayIngest(
-                uploadUrl = testUploadUri.toString,
+                sourceLocation = displayLocation,
                 callback = someCallback,
                 space = storageSpace,
                 ingestType = displayIngestType
@@ -180,35 +185,39 @@ class ProgressHttpFeatureTest
                 whenReady(progressFuture) { actualProgress =>
                   inside(actualProgress) {
                     case ResponseDisplayIngest(
+                        actualContextUrl,
                         actualId,
-                        actualUploadUrl,
+                        actualSourceLocation,
                         Some(
                           DisplayCallback(
                             actualCallbackUrl,
-                            Some(actualCallbackStatus),
+                            Some(DisplayStatus(actualCallbackStatus, "Status")),
                             "Callback")),
                         DisplayIngestType("create", "IngestType"),
                         DisplayStorageSpace(actualSpaceId, "Space"),
-                        DisplayIngestStatus("initialised", "IngestStatus"),
-                        Nil,
+                        DisplayStatus("initialised", "Status"),
+                        None,
                         Nil,
                         actualCreatedDate,
                         actualLastModifiedDate,
                         "Ingest") =>
+                      actualContextUrl shouldBe contextUrl
                       actualId shouldBe id
-                      actualUploadUrl shouldBe testUploadUri.toString
+                      actualSourceLocation shouldBe displayLocation
                       actualCallbackUrl shouldBe testCallbackUri.toString
-                      actualCallbackStatus shouldBe "pending"
+                      actualCallbackStatus shouldBe "processing"
                       actualSpaceId shouldBe storageSpace.id
 
                       assertTableOnlyHasItem(
                         Progress(
                           id,
-                          testUploadUri,
+                          StorageLocation(
+                            StorageProvider("s3"),
+                            ObjectLocation("bucket", "key.txt")),
                           Namespace(storageSpace.id),
                           Some(Callback(testCallbackUri, Callback.Pending)),
                           Progress.Initialised,
-                          Nil,
+                          None,
                           Instant.parse(actualCreatedDate),
                           Instant.parse(actualLastModifiedDate),
                           Nil
@@ -221,13 +230,13 @@ class ProgressHttpFeatureTest
                     listMessagesReceivedFromSNS(topic).map(messageInfo =>
                       fromJson[IngestBagRequest](messageInfo.message).get)
 
-                  requests shouldBe List(IngestBagRequest(
-                    id,
-                    storageSpace = StorageSpace(storageSpace.id),
-                    archiveCompleteCallbackUrl = Some(testCallbackUri),
-                    zippedBagLocation =
-                      ObjectLocation("ingest-bucket", "bag.zip")
-                  ))
+                  requests shouldBe List(
+                    IngestBagRequest(
+                      id,
+                      storageSpace = StorageSpace(storageSpace.id),
+                      archiveCompleteCallbackUrl = Some(testCallbackUri),
+                      zippedBagLocation = ObjectLocation("bucket", "key.txt")
+                    ))
                 }
               }
             }

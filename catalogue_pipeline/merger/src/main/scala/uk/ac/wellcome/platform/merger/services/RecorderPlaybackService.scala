@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.merger.services
 
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.matcher.WorkIdentifier
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
@@ -17,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * so the merger has everything it needs to work with.
   *
   */
-class RecorderPlaybackService @Inject()(
+class RecorderPlaybackService(
   versionedHybridStore: VersionedHybridStore[TransformedBaseWork,
                                              EmptyMetadata,
                                              ObjectStore[TransformedBaseWork]],
@@ -27,8 +26,8 @@ class RecorderPlaybackService @Inject()(
   /** Given a collection of matched identifiers, return all the
     * corresponding works from VHS.
     */
-  def fetchAllWorks(workIdentifiers: List[WorkIdentifier])
-    : Future[List[Option[TransformedBaseWork]]] = {
+  def fetchAllWorks(workIdentifiers: Seq[WorkIdentifier])
+    : Future[Seq[Option[TransformedBaseWork]]] = {
     Future.sequence(
       workIdentifiers
         .map { getWorkForIdentifier }

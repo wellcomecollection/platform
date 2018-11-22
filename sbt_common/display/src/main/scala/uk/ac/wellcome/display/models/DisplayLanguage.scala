@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal.Language
 
@@ -15,11 +16,10 @@ case class DisplayLanguage(
   ) id: String,
   @ApiModelProperty(
     value = "The name of a language"
-  ) label: String
-) {
+  ) label: String,
   @ApiModelProperty(readOnly = true, value = "A type of thing")
-  @JsonProperty("type") val ontologyType: String = "Language"
-}
+  @JsonProperty("type") @JsonKey("type") ontologyType: String = "Language"
+)
 
 case object DisplayLanguage {
   def apply(language: Language): DisplayLanguage = DisplayLanguage(

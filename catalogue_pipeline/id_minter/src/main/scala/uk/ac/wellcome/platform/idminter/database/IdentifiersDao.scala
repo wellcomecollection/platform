@@ -2,19 +2,16 @@ package uk.ac.wellcome.platform.idminter.database
 
 import java.sql.SQLIntegrityConstraintViolationException
 
-import com.google.inject.{Inject, Singleton}
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import scalikejdbc._
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
-import uk.ac.wellcome.platform.idminter.database.exceptions.IdMinterException
+import uk.ac.wellcome.platform.idminter.exceptions.IdMinterException
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 
 import scala.concurrent.blocking
 import scala.util.Try
 
-@Singleton
-class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
-    extends Logging {
+class IdentifiersDao(db: DB, identifiers: IdentifiersTable) extends Logging {
 
   implicit val session = AutoSession(db.settingsProvider)
 

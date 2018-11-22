@@ -1,11 +1,11 @@
 package uk.ac.wellcome.platform.archive.progress_async
 
+import akka.Done
 import akka.actor.ActorSystem
-import akka.event.Logging
+import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.sns.AmazonSNS
-import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
@@ -21,39 +21,27 @@ import uk.ac.wellcome.platform.archive.progress_async.flows.{
   ProgressUpdateFlow
 }
 
-trait ProgressAsync extends Logging {
-  val injector: Injector
+import scala.concurrent.Future
 
-  def run() = {
+class ProgressAsync(
+  messageStream: MessageStream[NotificationMessage, Unit],
+  progressTracker: ProgressTracker,
+  snsClient: AmazonSNS,
+  snsConfig: SNSConfig
+)(implicit val actorSystem: ActorSystem, materializer: ActorMaterializer)
+    extends Logging {
+  def run(): Future[Done] = {
+    implicit val adapter: LoggingAdapter =
+      Logging(actorSystem.eventStream, "customLogger")
 
-    type StreamNotice = MessageStream[NotificationMessage, Unit]
+    val parseNotificationFlow = NotificationParsingFlow[ProgressUpdate]()
 
-    implicit val snsClient: AmazonSNS =
-      injector.getInstance(classOf[AmazonSNS])
-    val snsConfig = injector.getInstance(classOf[SNSConfig])
+    val progressUpdateFlow = ProgressUpdateFlow(progressTracker)
 
-    implicit val system =
-      injector.getInstance(classOf[ActorSystem])
-
-    implicit val materializer = ActorMaterializer()
-
-    implicit val adapter =
-      Logging(system.eventStream, "customLogger")
-
-    val messageStream =
-      injector.getInstance(classOf[StreamNotice])
-
-    val progressTracker = injector
-      .getInstance(classOf[ProgressTracker])
-
-    val progressUpdateFlow =
-      ProgressUpdateFlow(progressTracker)
-
-    val parseNotificationFlow =
-      NotificationParsingFlow[ProgressUpdate]()
-
-    val callbackNotificationFlow =
-      CallbackNotificationFlow(snsClient, snsConfig)
+    val callbackNotificationFlow = CallbackNotificationFlow(
+      snsClient = snsClient,
+      snsConfig = snsConfig
+    )
 
     val workFlow = Flow[NotificationMessage]
       .log("notification message")

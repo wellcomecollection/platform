@@ -11,15 +11,21 @@ trait ArchiveJobGenerators {
 
   def createArchiveItemJob(zipFile: ZipFile,
                            bucket: S3.Bucket,
-                           digest: String,
                            bagIdentifier: ExternalIdentifier,
                            s3Key: String) = {
-    val archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket)
-    val bagDigestItem =
-      BagItem(digest, EntryPath(s3Key))
-    val archiveItemJob =
-      ArchiveItemJob(archiveJob = archiveJob, bagDigestItem = bagDigestItem)
-    archiveItemJob
+    ArchiveItemJob(
+      archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
+      itemLocation = EntryPath(s3Key))
+  }
+
+  def createArchiveDigestItemJob(zipFile: ZipFile,
+                                 bucket: S3.Bucket,
+                                 digest: String,
+                                 bagIdentifier: ExternalIdentifier,
+                                 s3Key: String) = {
+    ArchiveDigestItemJob(
+      archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
+      bagDigestItem = BagItem(digest, EntryPath(s3Key)))
   }
 
   def createArchiveJob(

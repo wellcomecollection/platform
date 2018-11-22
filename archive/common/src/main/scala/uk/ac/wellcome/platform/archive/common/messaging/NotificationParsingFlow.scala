@@ -11,8 +11,8 @@ import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
   */
 object NotificationParsingFlow {
   def apply[T]()(implicit dec: Decoder[T]) = {
-    def parse(msg: NotificationMessage) =
-      fromJson[T](msg.Message)
+    def parse(notificationMessage: NotificationMessage) =
+      fromJson[T](notificationMessage.body)
 
     ProcessLogDiscardFlow[NotificationMessage, T]("parse_notification")(parse)
   }

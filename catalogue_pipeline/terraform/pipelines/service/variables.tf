@@ -27,7 +27,7 @@ variable "source_queue_name" {}
 variable "source_queue_arn" {}
 
 variable "max_capacity" {
-  default = 15
+  default = 5
 }
 
 variable "security_group_ids" {

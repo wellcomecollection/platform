@@ -12,7 +12,15 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.DisplayStorageSpace
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  StorageLocation,
+  StorageProvider
+}
+import uk.ac.wellcome.platform.archive.display.{
+  DisplayLocation,
+  DisplayProvider,
+  DisplayStorageSpace
+}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
@@ -48,14 +56,17 @@ class RegistrarHttpFeatureTest
               val path = "path"
               val bucket = "bucket"
               val providerId = "provider-id"
-              val providerLabel = "provider label"
               val storageManifest = StorageManifest(
                 space = space,
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                Location(
-                  Provider(providerId, providerLabel),
+                tagManifest = FileManifest(
+                  ChecksumAlgorithm(checksumAlgorithm),
+                  List(
+                    BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
+                StorageLocation(
+                  StorageProvider(providerId),
                   ObjectLocation(bucket, path)),
                 Instant.now
               )
@@ -74,6 +85,7 @@ class RegistrarHttpFeatureTest
 
                   inside(displayBag) {
                     case DisplayBag(
+                        actualContextUrl,
                         actualBagId,
                         DisplayStorageSpace(storageSpaceName, "Space"),
                         DisplayBagInfo(
@@ -86,19 +98,21 @@ class RegistrarHttpFeatureTest
                           _,
                           "BagInfo"),
                         DisplayBagManifest(
-                          actualChecksumAlgorithm,
+                          actualDataManifestChecksumAlgorithm,
                           Nil,
                           "BagManifest"),
+                        DisplayBagManifest(
+                          actualTagManifestChecksumAlgorithm,
+                          List(DisplayFileDigest("a", "bag-info.txt", "File")),
+                          "BagManifest"),
                         DisplayLocation(
-                          DisplayProvider(
-                            actualProviderId,
-                            actualProviderLabel,
-                            "Provider"),
+                          DisplayProvider(actualProviderId, "Provider"),
                           actualBucket,
                           actualPath,
                           "Location"),
                         createdDateString,
                         "Bag") =>
+                      actualContextUrl shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
                       actualBagId shouldBe s"${space.underlying}/${bagInfo.externalIdentifier.underlying}"
                       storageSpaceName shouldBe space.underlying
                       externalIdentifierString shouldBe bagInfo.externalIdentifier.underlying
@@ -107,9 +121,9 @@ class RegistrarHttpFeatureTest
                       baggingDate shouldBe bagInfo.baggingDate.format(
                         DateTimeFormatter.ISO_LOCAL_DATE)
 
-                      actualChecksumAlgorithm shouldBe checksumAlgorithm
+                      actualDataManifestChecksumAlgorithm shouldBe checksumAlgorithm
+                      actualTagManifestChecksumAlgorithm shouldBe checksumAlgorithm
                       actualProviderId shouldBe providerId
-                      actualProviderLabel shouldBe providerLabel
                       actualBucket shouldBe bucket
                       actualPath shouldBe path
 
@@ -136,14 +150,17 @@ class RegistrarHttpFeatureTest
               val path = "path"
               val bucket = "bucket"
               val providerId = "provider-id"
-              val providerLabel = "provider label"
               val storageManifest = StorageManifest(
                 space = space,
                 info = bagInfo,
                 manifest =
                   FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                Location(
-                  Provider(providerId, providerLabel),
+                tagManifest = FileManifest(
+                  ChecksumAlgorithm(checksumAlgorithm),
+                  List(
+                    BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
+                StorageLocation(
+                  StorageProvider(providerId),
                   ObjectLocation(bucket, path)),
                 Instant.now
               )

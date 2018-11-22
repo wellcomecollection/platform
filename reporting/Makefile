@@ -7,7 +7,8 @@ SBT_NO_DOCKER_LIBRARIES =
 
 SBT_APPS 	=
 ECS_TASKS 	=
-LAMBDAS 	= transformer_example
+LAMBDAS 	= miro_transformer \
+			  miro_inventory_transformer
 
 TF_NAME 	= reporting
 TF_PATH 	= $(STACK_ROOT)/terraform

@@ -2,6 +2,7 @@ package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
@@ -44,7 +45,7 @@ class ElasticsearchIndexTest
 
   object TestIndex extends ElasticsearchIndex {
     val httpClient: HttpClient = elasticClient
-    val mappingDefinition = mapping(testType)
+    val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
         keywordField("id"),
@@ -56,8 +57,8 @@ class ElasticsearchIndexTest
   }
 
   object CompatibleTestIndex extends ElasticsearchIndex {
-    val httpClient = elasticClient
-    val mappingDefinition = mapping(testType)
+    val httpClient: HttpClient = elasticClient
+    val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
         keywordField("id"),
@@ -70,8 +71,7 @@ class ElasticsearchIndexTest
   }
 
   it("creates an index into which doc of the expected type can be put") {
-    val indexName = "working-index"
-    withLocalElasticsearchIndex(TestIndex, indexName = indexName) { indexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       val testObject = TestObject("id", "description", true)
       val testObjectJson = toJson(testObject).get
 
@@ -92,8 +92,7 @@ class ElasticsearchIndexTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    val indexName = "unexpected-type-index"
-    withLocalElasticsearchIndex(TestIndex, indexName = indexName) { indexName =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
@@ -110,8 +109,7 @@ class ElasticsearchIndexTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    val indexName = "existing-index"
-    withLocalElasticsearchIndex(TestIndex, indexName = indexName) { _ =>
+    withLocalElasticsearchIndex(TestIndex) { indexName =>
       withLocalElasticsearchIndex(CompatibleTestIndex, indexName = indexName) {
         testIndexName =>
           val compatibleTestObject =

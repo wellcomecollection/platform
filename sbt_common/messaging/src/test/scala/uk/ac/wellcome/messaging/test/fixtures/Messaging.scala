@@ -11,20 +11,16 @@ import com.amazonaws.services.sqs.model.SendMessageResult
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
-import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
-import uk.ac.wellcome.storage.s3.S3Config
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 
-import scala.concurrent.duration._
-import scala.util.{Random, Success}
+import scala.util.Success
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -54,16 +50,9 @@ trait Messaging
       }
     )
 
-  def messagingLocalFlags(bucket: Bucket, topic: Topic, queue: Queue) =
-    messageReaderLocalFlags(bucket, queue) ++ messageWriterLocalFlags(
-      bucket,
-      topic)
-
-  def messageReaderLocalFlags(bucket: Bucket, queue: Queue) =
+  def messageReaderLocalFlags(queue: Queue): Map[String, String] =
     Map(
-      "aws.message.reader.s3.bucketName" -> bucket.name,
       "aws.message.reader.sqs.queue.url" -> queue.url,
-      "aws.message.reader.sqs.waitTime" -> "1",
     ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
 
   def messageWriterLocalFlags(bucket: Bucket, topic: Topic) =
@@ -85,11 +74,9 @@ trait Messaging
                               writerSnsClient: AmazonSNS = snsClient)(
     testWith: TestWith[MessageWriter[T], R])(
     implicit store: ObjectStore[T]): R = {
-    val s3Config = S3Config(bucketName = bucket.name)
-    val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageWriterConfig(
-      s3Config = s3Config,
-      snsConfig = snsConfig
+      s3Config = createS3ConfigWith(bucket),
+      snsConfig = createSNSConfigWith(topic)
     )
 
     val messageWriter = new MessageWriter[T](
@@ -103,47 +90,31 @@ trait Messaging
 
   def withMessageStream[T, R](
     actorSystem: ActorSystem,
-    bucket: Bucket,
     queue: SQS.Queue,
     metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
-    implicit objectStore: ObjectStore[T]) = {
-    val s3Config = S3Config(bucketName = bucket.name)
-    val sqsConfig =
-      SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
-
-    val messageConfig = MessageReaderConfig(
-      sqsConfig = sqsConfig,
-      s3Config = s3Config
-    )
-
+    implicit objectStore: ObjectStore[T]): R = {
     val stream = new MessageStream[T](
       actorSystem,
       asyncSqsClient,
-      s3Client,
-      messageConfig,
+      sqsConfig = createSQSConfigWith(queue),
       metricsSender)
     testWith(stream)
   }
 
   def withMessageStreamFixtures[T, R](
-    testWith: TestWith[(Bucket, MessageStream[T], QueuePair, MetricsSender), R]
-  )(implicit objectStore: ObjectStore[T]) = {
-
+    testWith: TestWith[(MessageStream[T], QueuePair, MetricsSender), R]
+  )(implicit objectStore: ObjectStore[T]): R =
     withActorSystem { actorSystem =>
-      withLocalS3Bucket { bucket =>
-        withLocalSqsQueueAndDlq {
-          case queuePair @ QueuePair(queue, _) =>
-            withMockMetricSender { metricsSender =>
-              withMessageStream[T, R](actorSystem, bucket, queue, metricsSender) {
-                stream =>
-                  testWith((bucket, stream, queuePair, metricsSender))
-              }
-
+      withLocalSqsQueueAndDlq {
+        case queuePair @ QueuePair(queue, _) =>
+          withMockMetricSender { metricsSender =>
+            withMessageStream[T, R](actorSystem, queue, metricsSender) {
+              stream =>
+                testWith((stream, queuePair, metricsSender))
             }
-        }
+          }
       }
     }
-  }
 
   /** Given a topic ARN which has received notifications containing pointers
     * to objects in S3, return the unpacked objects.
@@ -152,10 +123,7 @@ trait Messaging
     listMessagesReceivedFromSNS(topic).map { messageInfo =>
       fromJson[MessageNotification](messageInfo.message) match {
         case Success(RemoteNotification(location)) =>
-          getObjectFromS3[T](
-            bucket = Bucket(location.namespace),
-            key = location.key
-          )
+          getObjectFromS3[T](location)
         case Success(InlineNotification(jsonString)) =>
           fromJson[T](jsonString).get
         case _ =>
@@ -165,32 +133,20 @@ trait Messaging
       }
     }.toList
 
-  /** Store an object in S3 and send the notification to SQS.
+  /** Send a MessageNotification to SQS.
     *
     * As if another application had used a MessageWriter to send the message
     * to an SNS topic, which was forwarded to the queue.  We don't use a
     * MessageWriter instance because that sends to SNS, not SQS.
     *
-    * Also, MessageWriter contains some extra logic for sending some messages
-    * over S3, some over SNS, which is tested separately -- and which we don't
-    * need to replicate here.
+    * We always send an InlineNotification regardless of size, which makes for
+    * slightly easier debugging if queue messages ever fail.
     *
     */
-  def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(
-    implicit encoder: Encoder[T]): SendMessageResult = {
-    val s3key = Random.alphanumeric take 10 mkString
-
-    val location = ObjectLocation(namespace = bucket.name, key = s3key)
-
-    s3Client.putObject(
-      location.namespace,
-      location.key,
-      toJson(obj).get
-    )
-
+  def sendMessage[T](queue: Queue, obj: T)(
+    implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS[MessageNotification](
       queue = queue,
-      message = RemoteNotification(location)
+      message = InlineNotification(jsonString = toJson(obj).get)
     )
-  }
 }

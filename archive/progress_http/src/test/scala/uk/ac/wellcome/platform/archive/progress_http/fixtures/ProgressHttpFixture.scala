@@ -1,19 +1,18 @@
 package uk.ac.wellcome.platform.archive.progress_http.fixtures
 
+import java.net.URL
 import java.util.UUID
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import akka.stream.Materializer
-import com.google.inject.Guice
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
@@ -24,9 +23,8 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   ProgressStatusUpdate,
   ProgressUpdate
 }
-import uk.ac.wellcome.platform.archive.common.progress.modules.ProgressTrackerModule
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.progress_http.modules._
+import uk.ac.wellcome.platform.archive.progress_http.ProgressHTTP
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -44,10 +42,8 @@ trait ProgressHttpFixture
     with SNS
     with Messaging {
 
-//  import Progress._
-
   def withProgress[R](monitor: ProgressTracker)(
-    testWith: TestWith[Progress, R]) = {
+    testWith: TestWith[Progress, R]): R = {
     val createdProgress = createProgress
 
     whenReady(monitor.initialise(createdProgress)) { storedProgress =>
@@ -56,7 +52,7 @@ trait ProgressHttpFixture
   }
 
   def withProgressUpdate[R](id: UUID, status: Progress.Status)(
-    testWith: TestWith[ProgressUpdate, R]) = {
+    testWith: TestWith[ProgressUpdate, R]): R = {
 
     val events = List(
       ProgressEvent(
@@ -66,49 +62,62 @@ trait ProgressHttpFixture
     val progress = ProgressStatusUpdate(
       id = id,
       status = status,
-      affectedResources = List(createResource),
+      affectedBag = Some(randomBagId),
       events = events
     )
 
     testWith(progress)
   }
 
-  def withApp[R](table: Table, topic: Topic, serverConfig: HttpServerConfig)(
-    testWith: TestWith[AkkaHttpApp, R]) = {
+  def withApp[R](table: Table,
+                 topic: Topic,
+                 httpServerConfig: HTTPServerConfig,
+                 contextURL: URL)(testWith: TestWith[ProgressHTTP, R]): R =
+    withSNSWriter(topic) { snsWriter =>
+      withActorSystem { actorSystem =>
+        withMaterializer(actorSystem) { materializer =>
+          val progressHTTP = new ProgressHTTP(
+            dynamoClient = dynamoDbClient,
+            dynamoConfig = createDynamoConfigWith(table),
+            snsWriter = snsWriter,
+            httpServerConfig = httpServerConfig,
+            contextURL = contextURL
+          )(
+            actorSystem = actorSystem,
+            materializer = materializer,
+            executionContext = actorSystem.dispatcher
+          )
 
-    val progress = new AkkaHttpApp {
-      val injector = Guice.createInjector(
-        new TestAppConfigModule(table, topic, serverConfig),
-        ConfigModule,
-        AkkaModule,
-        CloudWatchClientModule,
-        ProgressTrackerModule,
-        SNSClientModule
-      )
+          testWith(progressHTTP)
+        }
+      }
     }
-    testWith(progress)
-  }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(Table, Topic, String, AkkaHttpApp), R]) = {
-
+    testWith: TestWith[(Table, Topic, String, ProgressHTTP), R]): R = {
     val host = "localhost"
     val port = randomPort
-    val baseUrl = s"http://$host:$port"
+    val externalBaseURL = s"http://$host:$port"
+    val contextURL = new URL(
+      "http://api.wellcomecollection.org/storage/v1/context.json")
 
-    val serverConfig = HttpServerConfig(host, port, baseUrl)
+    val httpServerConfig = HTTPServerConfig(
+      host = host,
+      port = port,
+      externalBaseURL = externalBaseURL
+    )
 
     withLocalSnsTopic { topic =>
       withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
-        withApp(table, topic, serverConfig) { progressHttp =>
-          testWith((table, topic, baseUrl, progressHttp))
+        withApp(table, topic, httpServerConfig, contextURL) { progressHttp =>
+          testWith((table, topic, externalBaseURL, progressHttp))
         }
       }
     }
   }
 
   def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T],
-                                  materializer: Materializer) = {
+                                  materializer: Materializer): T = {
     val timeout = 300.millis
 
     val stringBody = entity

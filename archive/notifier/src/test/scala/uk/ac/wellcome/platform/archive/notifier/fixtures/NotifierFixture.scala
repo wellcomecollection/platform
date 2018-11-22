@@ -1,18 +1,15 @@
 package uk.ac.wellcome.platform.archive.notifier.fixtures
 
-import java.net.URI
+import java.net.{URI, URL}
 
-import com.google.inject.{Guice, Injector}
+import com.amazonaws.services.sns.model.PublishResult
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
-import uk.ac.wellcome.platform.archive.notifier.modules.{
-  ConfigModule,
-  TestAppConfigModule
-}
 import uk.ac.wellcome.platform.archive.notifier.Notifier
 import uk.ac.wellcome.platform.archive.common.fixtures.BagIt
-import uk.ac.wellcome.platform.archive.common.modules._
+import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
+import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Namespace
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -26,26 +23,32 @@ trait NotifierFixture extends S3 with Messaging with BagIt {
   val uploadUri = new URI(s"http://www.example.com/asset")
 
   def withApp[R](queue: Queue, topic: Topic)(
-    testWith: TestWith[Notifier, R]): R = {
-    val appConfigModule = new TestAppConfigModule(
-      queue = queue,
-      topic = topic
-    )
+    testWith: TestWith[Notifier, R]): R =
+    withActorSystem { actorSystem =>
+      withMaterializer(actorSystem) { materializer =>
+        withMetricsSender(actorSystem) { metricsSender =>
+          val messageStream =
+            new MessageStream[NotificationMessage, PublishResult](
+              actorSystem = actorSystem,
+              sqsClient = asyncSqsClient,
+              sqsConfig = createSQSConfigWith(queue),
+              metricsSender = metricsSender
+            )
 
-    val injector: Injector = Guice.createInjector(
-      appConfigModule,
-      ConfigModule,
-      AkkaModule,
-      CloudWatchClientModule,
-      SQSClientModule,
-      SNSClientModule,
-      MessageStreamModule
-    )
+          val notifier = new Notifier(
+            messageStream = messageStream,
+            snsClient = snsClient,
+            snsConfig = createSNSConfigWith(topic),
+            contextUrl = new URL("http://localhost/context.json")
+          )(
+            actorSystem = actorSystem,
+            materializer = materializer
+          )
 
-    val app = injector.getInstance(classOf[Notifier])
-
-    testWith(app)
-  }
+          testWith(notifier)
+        }
+      }
+    }
 
   def withNotifier[R](
     testWith: TestWith[(QueuePair, Topic, Notifier), R]): R = {

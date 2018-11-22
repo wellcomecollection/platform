@@ -12,10 +12,10 @@ import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.test.fixtures._
 
-import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 import scala.util.Random
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -30,7 +30,7 @@ object SQS {
 
 }
 
-trait SQS extends Matchers with Logging {
+trait SQS extends Matchers with Logging with MetricsSenderFixture {
 
   import SQS._
 
@@ -50,7 +50,6 @@ trait SQS extends Matchers with Logging {
 
   def sqsLocalFlags(queue: Queue) = sqsLocalClientFlags ++ Map(
     "aws.sqs.queue.url" -> queue.url,
-    "aws.sqs.waitTime" -> "1"
   )
 
   def sqsLocalClientFlags = Map(
@@ -94,7 +93,7 @@ trait SQS extends Matchers with Logging {
   )
 
   def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]): R =
-    withLocalSqsQueueAndDlqAndTimeout(1)(testWith)
+    withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 1)(testWith)
 
   def withLocalSqsQueueAndDlqAndTimeout[R](visibilityTimeout: Int)(
     testWith: TestWith[QueuePair, R]): R =
@@ -146,29 +145,27 @@ trait SQS extends Matchers with Logging {
   def withSQSStream[T, R](
     actorSystem: ActorSystem,
     queue: Queue,
-    metricsSender: MetricsSender)(testwith: TestWith[SQSStream[T], R]) = {
-    val sqsConfig = SQSConfig(
-      queueUrl = queue.url,
-      waitTime = 1 millisecond,
-      maxMessages = 1
-    )
+    metricsSender: MetricsSender)(testWith: TestWith[SQSStream[T], R]): R = {
+    val sqsConfig = createSQSConfigWith(queue)
 
     val stream = new SQSStream[T](
-      actorSystem = actorSystem,
       sqsClient = asyncSqsClient,
       sqsConfig = sqsConfig,
-      metricsSender = metricsSender)
+      metricsSender = metricsSender)(actorSystem = actorSystem)
 
-    testwith(stream)
+    testWith(stream)
   }
 
+  def withSQSStream[T, R](actorSystem: ActorSystem, queue: Queue)(
+    testWith: TestWith[SQSStream[T], R]): R =
+    withMetricsSender(actorSystem) { metricsSender =>
+      withSQSStream[T, R](actorSystem, queue, metricsSender) { sqsStream =>
+        testWith(sqsStream)
+      }
+    }
+
   def createNotificationMessageWith(body: String): NotificationMessage =
-    NotificationMessage(
-      MessageId = Random.alphanumeric take 10 mkString,
-      TopicArn = Random.alphanumeric take 10 mkString,
-      Subject = Random.alphanumeric take 10 mkString,
-      Message = body
-    )
+    NotificationMessage(body = body)
 
   def createNotificationMessageWith[T](message: T)(
     implicit encoder: Encoder[T]): NotificationMessage =
@@ -306,4 +303,7 @@ trait SQS extends Matchers with Logging {
       .asScala
     messages
   }
+
+  def createSQSConfigWith(queue: Queue): SQSConfig =
+    SQSConfig(queueUrl = queue.url)
 }

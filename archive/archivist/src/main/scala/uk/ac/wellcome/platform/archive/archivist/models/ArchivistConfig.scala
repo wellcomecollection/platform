@@ -1,22 +1,5 @@
 package uk.ac.wellcome.platform.archive.archivist.models
 
-import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.messaging.sqs.SQSConfig
-import uk.ac.wellcome.monitoring.MetricsConfig
-import uk.ac.wellcome.platform.archive.common.modules._
-
-case class ArchivistConfig(
-  s3ClientConfig: S3ClientConfig,
-  bagUploaderConfig: BagUploaderConfig,
-  cloudwatchClientConfig: CloudwatchClientConfig,
-  sqsClientConfig: SQSClientConfig,
-  sqsConfig: SQSConfig,
-  snsClientConfig: SnsClientConfig,
-  registrarSnsConfig: SNSConfig,
-  progressSnsConfig: SNSConfig,
-  metricsConfig: MetricsConfig
-)
-
 case class UploadConfig(uploadNamespace: String,
                         uploadPrefix: String = "archive")
 

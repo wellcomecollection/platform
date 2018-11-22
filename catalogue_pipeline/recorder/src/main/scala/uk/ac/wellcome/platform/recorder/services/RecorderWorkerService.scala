@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.recorder.services
 
-import akka.actor.{ActorSystem, Terminated}
+import akka.Done
 import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.{
@@ -12,31 +12,34 @@ import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  EmptyMetadata,
+  VHSIndexEntry,
+  VersionedHybridStore
+}
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 class RecorderWorkerService @Inject()(
   versionedHybridStore: VersionedHybridStore[TransformedBaseWork,
                                              EmptyMetadata,
                                              ObjectStore[TransformedBaseWork]],
   messageStream: MessageStream[TransformedBaseWork],
-  snsWriter: SNSWriter,
-  system: ActorSystem) {
+  snsWriter: SNSWriter)(implicit executionContext: ExecutionContext) {
 
-  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-
-  messageStream.foreach(this.getClass.getSimpleName, processMessage)
+  def run(): Future[Done] =
+    messageStream.foreach(this.getClass.getSimpleName, processMessage)
 
   private def processMessage(work: TransformedBaseWork): Future[Unit] =
     for {
-      (hybridRecord, _) <- storeInVhs(work)
+      vhsEntry <- storeInVhs(work)
       _ <- snsWriter.writeMessage[MessageNotification](
-        message = RemoteNotification(hybridRecord.location),
+        message = RemoteNotification(vhsEntry.hybridRecord.location),
         subject = s"Sent from ${this.getClass.getSimpleName}")
     } yield ()
 
-  private def storeInVhs(work: TransformedBaseWork) = {
+  private def storeInVhs(
+    work: TransformedBaseWork): Future[VHSIndexEntry[EmptyMetadata]] = {
     versionedHybridStore.updateRecord(work.sourceIdentifier.toString)(
       (work, EmptyMetadata()))(
       (existingWork, existingMetadata) =>
@@ -46,9 +49,5 @@ class RecorderWorkerService @Inject()(
           (work, EmptyMetadata())
       }
     )
-  }
-
-  def stop(): Future[Terminated] = {
-    system.terminate()
   }
 }

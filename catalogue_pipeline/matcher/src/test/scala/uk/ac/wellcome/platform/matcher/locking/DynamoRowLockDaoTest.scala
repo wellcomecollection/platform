@@ -215,7 +215,7 @@ class DynamoRowLockDaoTest
     }
   }
 
-  private def aRowLockQueryResult = {
+  private def aRowLockQueryResult: QueryResult = {
     val rowLockAsMap: util.Map[String, AttributeValue] =
       new util.HashMap[String, AttributeValue]() {
         put("id", new AttributeValue("id"))

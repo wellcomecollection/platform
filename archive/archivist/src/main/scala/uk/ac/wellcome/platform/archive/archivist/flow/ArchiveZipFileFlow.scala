@@ -1,5 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import java.io.File
+import java.util.zip.ZipFile
+
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.s3.AmazonS3
@@ -26,6 +29,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object ArchiveZipFileFlow extends Logging {
+
   def apply(config: BagUploaderConfig, snsConfig: SNSConfig)(
     implicit s3Client: AmazonS3,
     snsClient: AmazonSNS
@@ -49,6 +53,7 @@ object ArchiveZipFileFlow extends Logging {
                   delimiter = config.bagItConfig.digestDelimiterRegexp,
                   parallelism = config.parallelism,
                   ingestBagRequest = ingestRequest)))
+            .map(deleteZipFile(_, zipFile))
             .flatMapMerge(
               config.parallelism,
               (result: Either[ArchiveError[_], ArchiveComplete]) =>
@@ -59,11 +64,19 @@ object ArchiveZipFileFlow extends Logging {
                     SnsPublishFlow[ProgressUpdate](
                       snsClient,
                       snsConfig,
-                      Some("archivist_progress")))
+                      subject = "archivist_progress"))
                   .map(_ => result)
             )
       }
     )
+
+  private def deleteZipFile(
+    passContext: Either[ArchiveError[_], ArchiveComplete],
+    zipFile: ZipFile) = {
+    debug(s"Deleting zipfile ${zipFile.getName}")
+    new File(zipFile.getName).delete()
+    passContext
+  }
 
   private def toProgressUpdate(
     result: Either[ArchiveError[_], ArchiveComplete],
@@ -77,13 +90,13 @@ object ArchiveZipFileFlow extends Logging {
         ProgressStatusUpdate(
           ingestBagRequest.archiveRequestId,
           Progress.Failed,
-          Nil,
+          None,
           errors.map(error => ProgressEvent(error.toString)))
       case Left(archiveError) =>
         ProgressStatusUpdate(
           ingestBagRequest.archiveRequestId,
           Progress.Failed,
-          Nil,
+          None,
           List(ProgressEvent(archiveError.toString)))
     }
 }

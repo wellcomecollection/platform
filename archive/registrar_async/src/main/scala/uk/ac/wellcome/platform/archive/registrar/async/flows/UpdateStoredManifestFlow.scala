@@ -28,7 +28,7 @@ object UpdateStoredManifestFlow {
           ProgressStatusUpdate(
             requestId,
             Progress.Completed,
-            List(Resource(ResourceIdentifier(bagId.toString))),
+            Some(bagId),
             List(ProgressEvent("Bag registered successfully"))
           )
       }
@@ -36,7 +36,7 @@ object UpdateStoredManifestFlow {
         SnsPublishFlow[ProgressUpdate](
           snsClient,
           progressSnsConfig,
-          Some("registration_complete")))
+          subject = "registration_complete"))
       .map(_ => ())
 
   private def updateStoredManifest(

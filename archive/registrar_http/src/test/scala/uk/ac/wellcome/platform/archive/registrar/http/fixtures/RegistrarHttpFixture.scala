@@ -1,22 +1,17 @@
 package uk.ac.wellcome.platform.archive.registrar.http.fixtures
 
+import java.net.URL
+
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import akka.stream.Materializer
-import com.google.inject.Guice
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.config.models.HttpServerConfig
+import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
-import uk.ac.wellcome.platform.archive.registrar.common.modules.VHSModule
-import uk.ac.wellcome.platform.archive.registrar.http.modules.{
-  AkkaHttpApp,
-  ConfigModule,
-  TestAppConfigModule
-}
+import uk.ac.wellcome.platform.archive.registrar.http.RegistrarHTTP
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -33,49 +28,56 @@ trait RegistrarHttpFixture
     with ScalaFutures
     with Akka {
 
-  def withApp[R](
-    table: Table,
-    bucket: Bucket,
-    s3Prefix: String,
-    serverConfig: HttpServerConfig)(testWith: TestWith[AkkaHttpApp, R]) = {
+  def withApp[R](table: Table,
+                 bucket: Bucket,
+                 s3Prefix: String,
+                 httpServerConfig: HTTPServerConfig,
+                 contextURL: URL)(testWith: TestWith[RegistrarHTTP, R]): R =
+    withActorSystem { actorSystem =>
+      withMaterializer(actorSystem) { materializer =>
+        withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table) { vhs =>
+          val registrarHTTP = new RegistrarHTTP(
+            vhs = vhs,
+            httpServerConfig = httpServerConfig,
+            contextURL = contextURL
+          )(
+            actorSystem = actorSystem,
+            materializer = materializer,
+            executionContext = actorSystem.dispatcher
+          )
 
-    val progress = new AkkaHttpApp {
-      val injector = Guice.createInjector(
-        new TestAppConfigModule(
-          serverConfig,
-          table.name,
-          bucket.name,
-          s3Prefix),
-        ConfigModule,
-        AkkaModule,
-        VHSModule,
-        DynamoClientModule
-      )
+          testWith(registrarHTTP)
+        }
+      }
     }
-    testWith(progress)
-  }
 
   def withConfiguredApp[R](
     testWith: TestWith[(VersionedHybridStore[StorageManifest,
                                              EmptyMetadata,
                                              ObjectStore[StorageManifest]],
                         String,
-                        AkkaHttpApp),
-                       R]) = {
-
+                        RegistrarHTTP),
+                       R]): R = {
     val host = "localhost"
     val port = randomPort
-    val baseUrl = s"http://$host:$port"
+    val externalBaseURL = s"http://$host:$port"
+    val contextURL = new URL(
+      "http://api.wellcomecollection.org/storage/v1/context.json")
 
-    val serverConfig = HttpServerConfig(host, port, baseUrl)
+    val httpServerConfig = HTTPServerConfig(
+      host = host,
+      port = port,
+      externalBaseURL = externalBaseURL
+    )
 
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
         val s3Prefix = "archive"
         withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table, s3Prefix) {
           vhs =>
-            withApp(table, bucket, s3Prefix, serverConfig) { progressHttp =>
-              testWith((vhs, baseUrl, progressHttp))
+            withApp(table, bucket, s3Prefix, httpServerConfig, contextURL) {
+              progressHttp =>
+                testWith((vhs, externalBaseURL, progressHttp))
             }
         }
       }

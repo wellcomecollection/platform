@@ -1,10 +1,10 @@
 {
   "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
   "id": "watu9tbc",
-  "type": "Article",
-  "workType": {
+  "type": "Story",
+  "storyType": {
     "id": "article",
-    "type": "ArticleType",
+    "type": "StoryType",
     "label": "Article"
   },
   "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
@@ -44,9 +44,9 @@
   "about": {
     "id": "e32y8y",
     "type": "Exhibition",
-    "label": "Teeth"
+    "title": "Teeth"
   },
-  "articleFormat": [
+  "storyFormat": [
     {
       "id": "a24s7qf3",
       "label": "Interview",

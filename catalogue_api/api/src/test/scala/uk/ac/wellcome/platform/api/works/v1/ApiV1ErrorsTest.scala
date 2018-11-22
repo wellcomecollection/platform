@@ -7,7 +7,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a BadRequest error when malformed query parameters are presented") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=penguin",
           andExpect = Status.BadRequest,
@@ -20,7 +20,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a NotFound error when requesting a work with a non-existent id") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         val badId = "non-existing-id"
         server.httpGet(
           path = s"/$apiPrefix/works/$badId",
@@ -34,7 +34,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
   it(
     "returns a BadRequest error if the user asks for a page size just over the maximum") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         val pageSize = 101
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -50,7 +50,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
   it(
     "returns a BadRequest error if the user asks for an overly large page size") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         val pageSize = 100000
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -65,7 +65,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a BadRequest error if the user asks for zero-length pages") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         val pageSize = 0
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -80,7 +80,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a BadRequest error if the user asks for a negative page size") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         val pageSize = -50
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -94,7 +94,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a BadRequest error if the user asks for page 0") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?page=0",
           andExpect = Status.BadRequest,
@@ -107,7 +107,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a BadRequest error if the user asks for a page before 0") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?page=-50",
           andExpect = Status.BadRequest,
@@ -121,7 +121,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns multiple errors if there's more than one invalid parameter") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=-60&page=-50",
           andExpect = Status.BadRequest,
@@ -134,7 +134,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a Bad Request error if asked for an invalid include") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?includes=foo",
           andExpect = Status.BadRequest,
@@ -147,7 +147,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a Bad Request error if asked for more than one invalid include") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?includes=foo,bar",
           andExpect = Status.BadRequest,
@@ -162,7 +162,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
   it(
     "returns a Bad Request error if asked for a mixture of valid and invalid includes") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
           andExpect = Status.BadRequest,
@@ -177,7 +177,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
   it(
     "returns a Bad Request error if asked for an invalid include on an individual work") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
           andExpect = Status.BadRequest,
@@ -190,7 +190,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns Not Found if you look up a non-existent index") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?_index=foobarbaz",
           andExpect = Status.NotFound,
@@ -202,7 +202,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns Not Found if you ask for a non-existent work") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works/xhu96f9j",
           andExpect = Status.NotFound,
@@ -214,7 +214,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns Bad Request if you ask for a malformed identifier") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works/zd224ncv]",
           andExpect = Status.NotFound,
@@ -232,7 +232,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
     // a canonicalId field to sort on.  Trying to query one of these will
     // trigger one such exception!
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?_index=.watches",
           andExpect = Status.InternalServerError,
@@ -249,7 +249,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
 
   it("returns a Bad Request error if you try to access the 10000th page") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?page=10000",
           andExpect = Status.BadRequest,
@@ -264,7 +264,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
   it(
     "returns a Bad Request error if you try to get the 101th page with 100 results per page") {
     withV1Api {
-      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=100&page=101",
           andExpect = Status.BadRequest,

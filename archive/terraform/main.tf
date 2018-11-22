@@ -1,22 +1,3 @@
-# API
-
-module "api_ecs" {
-  source = "api_ecs"
-
-  namespace = "${local.namespace}"
-  api_path  = "/storage/v1"
-
-  archive_api_container_image = "${local.api_ecs_container_image}"
-  archive_api_container_port  = "9000"
-
-  vpc_id                         = "${local.vpc_id}"
-  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
-  private_subnets                = "${local.private_subnets}"
-  public_subnets                 = "${local.public_subnets}"
-  certificate_domain             = "api.wellcomecollection.org"
-  api_alb_cdir_blocks            = "${var.api_alb_cdir_blocks}"
-}
-
 # Archivist
 
 module "archivist" {
@@ -78,30 +59,6 @@ module "registrar_async" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
-module "registrar_http" {
-  source       = "internal_rest_service"
-  service_name = "registrar_http"
-
-  container_port  = "9001"
-  container_image = "${local.registrar_http_container_image}"
-
-  env_vars = {
-    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
-    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
-    app_base_url    = "https://api.wellcomecollection.org"
-  }
-
-  env_vars_length = 3
-
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
-  private_subnets    = "${local.private_subnets}"
-
-  cluster_id = "${aws_ecs_cluster.cluster.id}"
-  vpc_id     = "${local.vpc_id}"
-
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-}
-
 # Notifier
 
 module "notifier" {
@@ -120,11 +77,12 @@ module "notifier" {
   max_capacity = 1
 
   env_vars = {
+    context_url        = "https://api.wellcomecollection.org/storage/v1/context.json"
     notifier_queue_url = "${module.notifier_queue.id}"
     progress_topic_arn = "${module.progress_async_topic.arn}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 3
 
   container_image   = "${local.notifier_container_image}"
   source_queue_name = "${module.notifier_queue.name}"
@@ -160,30 +118,7 @@ module "progress_async" {
   source_queue_arn  = "${module.progress_async_queue.arn}"
 }
 
-module "progress_http" {
-  source = "internal_rest_service"
-
-  service_name = "progress_http"
-
-  container_port  = "9001"
-  container_image = "${local.progress_http_container_image}"
-
-  env_vars = {
-    app_base_url                = "https://${module.api_ecs.alb_dns_name}/storage/v1/ingests"
-    topic_arn                   = "${module.ingest_requests_topic.arn}"
-    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
-  }
-
-  env_vars_length = 3
-
-  security_group_ids = ["${aws_security_group.service_egress_security_group.id}", "${aws_security_group.interservice_security_group.id}", "${aws_security_group.tcp_access_security_group.id}"]
-  private_subnets    = "${local.private_subnets}"
-
-  cluster_id = "${aws_ecs_cluster.cluster.id}"
-  vpc_id     = "${local.vpc_id}"
-
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-}
+# Migration services
 
 module "bagger" {
   source = "internal_queue_service"
@@ -233,10 +168,46 @@ module "bagger" {
   source_queue_arn  = "${module.bagger_queue.arn}"
 }
 
+module "migrator" {
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v16.1.2"
+
+  name        = "migrator"
+  description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
+
+  timeout = 25
+
+  environment_variables = {
+    # Private DNS
+    INGEST_API_URL = "http://progress_http.archive-storage:9001/progress"
+    ARCHIVE_SPACE  = "digitised"
+  }
+
+  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+
+  s3_bucket = "${local.infra_bucket}"
+  s3_key    = "lambdas/archive/migrator.zip"
+
+  security_group_ids = [
+    "${aws_security_group.interservice_security_group.id}",
+    "${aws_security_group.service_egress_security_group.id}",
+  ]
+
+  subnet_ids = "${local.private_subnets}"
+
+  log_retention_in_days = 30
+}
+
+module "trigger_migrator" {
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/modules/triggers/sns?ref=v16.1.2"
+
+  lambda_function_name = "${module.migrator.function_name}"
+  sns_trigger_arn      = "${module.bagging_complete_topic.arn}"
+}
+
 # Integration testing - callback_client
 
 module "callback_stub_server" {
-  source = "internal_rest_service"
+  source = "callback_service"
 
   service_name = "callback_stub_server"
 
@@ -254,4 +225,55 @@ module "callback_stub_server" {
   vpc_id     = "${local.vpc_id}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+}
+
+# Storage API
+
+module "storage_api" {
+  source = "storage_api"
+
+  vpc_id       = "${local.vpc_id}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  subnets      = "${local.private_subnets}"
+
+  namespace     = "storage-api"
+  namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+
+  # Auth
+
+  auth_scopes = [
+    "${local.cognito_storage_api_identifier}/ingests",
+    "${local.cognito_storage_api_identifier}/bags",
+  ]
+  cognito_user_pool_arn = "${local.cognito_user_pool_arn}"
+
+  # Bags endpoint
+
+  bags_container_image = "${local.registrar_http_container_image}"
+  bags_container_port  = "9001"
+  bags_env_vars = {
+    context_url     = "https://api.wellcomecollection.org/storage/v1/context.json"
+    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
+    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
+    app_base_url    = "https://api.wellcomecollection.org/storage/v1/bags"
+  }
+  bags_env_vars_length       = 4
+  bags_nginx_container_image = "${local.nginx_image_uri}"
+  bags_nginx_container_port  = "9000"
+
+  # Ingests endpoint
+
+  ingests_container_image = "${local.progress_http_container_image}"
+  ingests_container_port  = "9001"
+  ingests_env_vars = {
+    context_url                 = "https://api.wellcomecollection.org/storage/v1/context.json"
+    app_base_url                = "https://api.wellcomecollection.org/storage/v1/ingests"
+    topic_arn                   = "${module.ingest_requests_topic.arn}"
+    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+  }
+  ingests_env_vars_length            = 4
+  ingests_nginx_container_image      = "${local.nginx_image_uri}"
+  ingests_nginx_container_port       = "9000"
+  storage_static_content_bucket_name = "${local.storage_static_content_bucket_name}"
 }
