@@ -1,9 +1,5 @@
-FROM anapsix/alpine-java
+FROM wellcome/typesafe_config_base:19
 
 ADD target/universal/stage /opt/docker
 
-RUN mkdir -p /opt/docker
-
-EXPOSE 8888
-
-ENTRYPOINT ["/opt/docker/bin/reindex_worker"]
+ENV PROJECT reindex_worker
