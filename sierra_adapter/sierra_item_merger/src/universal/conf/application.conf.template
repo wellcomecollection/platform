@@ -1,3 +1,13 @@
+akka {
+  actor {
+    default-dispatcher {
+      executor = "thread-pool-executor"
+      thread-pool-executor {
+        fixed-pool-size = 50
+      }
+    }
+  }
+}
 aws.sns.topic.arn="${topic_arn}"
 aws.sqs.parallelism="${sqs_parallelism}"
 aws.sqs.queue.url="${windows_queue_url}"
