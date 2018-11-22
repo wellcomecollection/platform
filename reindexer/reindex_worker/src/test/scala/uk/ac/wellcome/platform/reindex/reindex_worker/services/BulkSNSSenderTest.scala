@@ -1,12 +1,12 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
+import com.amazonaws.SdkClientException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
-import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,11 +40,11 @@ class BulkSNSSenderTest
     }
   }
 
-  it("returns a failed Future[ReindexerException] if there's an SNS error") {
+  it("returns a failed Future[SdkClientException] if there's an SNS error") {
     withBulkSNSSender(Topic("no-such-topic")) { bulkSNSSender =>
       val future = bulkSNSSender.sendToSNS(messages = messages)
       whenReady(future.failed) {
-        _ shouldBe a[ReindexerException]
+        _ shouldBe a[SdkClientException]
       }
     }
   }

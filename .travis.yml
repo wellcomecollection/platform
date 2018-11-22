@@ -122,20 +122,14 @@ jobs:
     #
     - stage: test
       env:
-        - TRAVIS_LAMBDAS="\
-          # Shared
+        - TRAVIS_LAMBDAS="snapshot_scheduler \
+          sierra_window_generator \
+          s3_demultiplexer \
           lambdas/drain_ecs_container_instance \
           lambdas/dynamo_write_heartbeat \
           lambdas/ecs_ec2_instance_tagger \
-
-          # Monitoring
           post_to_slack \
-          update_service_list \
-
-          # Others
-          snapshot_scheduler \
-          sierra_window_generator \
-          s3_demultiplexer"
+          update_service_list"
         - TASK=travis-lambda-test
 
     # Catalogue API stack
