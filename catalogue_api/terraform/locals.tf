@@ -1,19 +1,15 @@
 locals {
   # API pins
 
-  production_api       = "romulus"
-  pinned_nginx         = "bad0dbfa548874938d16496e313b05adb71268b7"
-  pinned_remus_api     = ""
-  pinned_remus_nginx   = ""
-  pinned_romulus_api   = "5d753c10ca58846ca67df73dd9998771b700757b"
-  pinned_romulus_nginx = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
+  production_api     = "remus"
+  pinned_nginx       = "bad0dbfa548874938d16496e313b05adb71268b7"
+  pinned_remus_api   = "30514388354026d642e6887e211af11ecebe4d59"
+  pinned_romulus_api = "5d753c10ca58846ca67df73dd9998771b700757b"
 
   # Blue / Green config
 
   romulus_api_release_id   = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : var.release_ids["api"]}"
-  romulus_nginx_release_id = "${local.pinned_romulus_nginx != "" ? local.pinned_romulus_nginx : var.release_ids["nginx_api-delta"]}"
   remus_api_release_id     = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
-  remus_nginx_release_id   = "${local.pinned_remus_nginx != "" ? local.pinned_remus_nginx : var.release_ids["nginx_api-delta"]}"
   romulus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
   remus_app_uri            = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
   romulus_is_prod          = "${local.production_api == "romulus" ? "true" : "false"}"
@@ -25,13 +21,13 @@ locals {
   remus_enable_alb_alarm   = "${local.remus_is_prod == "true" ? 1 : 0}"
   romulus_enable_alb_alarm = "${local.romulus_is_prod == "true" ? 1 : 0}"
   es_config_romulus = {
-    index_v1 = "v1-2018-09-27-marc-610-subjects"
-    index_v2 = "v2-2018-09-27-marc-610-subjects"
+    index_v1 = "v1-2018-11-22-thumbnails"
+    index_v2 = "v2-2018-11-22-thumbnails"
     doc_type = "work"
   }
   es_config_remus = {
-    index_v1 = "v1-2018-09-27-marc-610-subjects"
-    index_v2 = "v2-2018-09-27-marc-610-subjects"
+    index_v1 = "v1-2018-11-22-thumbnails"
+    index_v2 = "v2-2018-11-22-thumbnails"
     doc_type = "work"
   }
 
