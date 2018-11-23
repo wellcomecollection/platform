@@ -7,13 +7,14 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.scaladsl.Flow
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.display.ResponseDisplayIngest
 import uk.ac.wellcome.platform.archive.notifier.models.CallbackFlowResult
 
-object CallbackUrlFlow {
+object CallbackUrlFlow extends Logging {
 
   // This flow handles the case where there is a callback URL on
   // the progress object.
@@ -48,6 +49,7 @@ object CallbackUrlFlow {
       toJson(ResponseDisplayIngest(progress, contextUrl)).get
     )
 
+    info(s"POST to $callbackUri request:$entity")
     HttpRequest(
       method = HttpMethods.POST,
       uri = callbackUri.toString,
