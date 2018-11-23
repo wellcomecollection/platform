@@ -31,3 +31,9 @@ variable "namespace" {
 variable "snapshot_generator_release_id" {}
 
 variable "critical_slack_webhook" {}
+
+variable "vpc_id" {}
+
+variable "private_subnets" {
+  type = "list"
+}

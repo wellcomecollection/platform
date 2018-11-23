@@ -6,7 +6,4 @@ locals {
   lambda_error_alarm_arn     = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
   dlq_alarm_arn              = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   terminal_failure_alarm_arn = "${data.terraform_remote_state.shared_infra.terminal_failure_alarm_arn}"
-
-  vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
-  private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 }

@@ -34,7 +34,7 @@ module "snapshot_generator" {
   memory = 4096
   cpu    = 2048
 
-  vpc_id = "${local.vpc_id}"
+  vpc_id = "${var.vpc_id}"
 
   max_capacity = 2
 
@@ -46,8 +46,8 @@ module "snapshot_generator" {
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
 
   aws_region = "${var.aws_region}"
-  vpc_id     = "${local.vpc_id}"
-  subnets    = "${local.private_subnets}"
+  vpc_id     = "${var.vpc_id}"
+  subnets    = "${var.private_subnets}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
