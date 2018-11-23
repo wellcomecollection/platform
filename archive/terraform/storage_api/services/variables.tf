@@ -49,3 +49,5 @@ variable "bags_env_vars" {
 }
 
 variable "bags_env_vars_length" {}
+
+variable "interservice_security_group_id" {}
