@@ -31,4 +31,3 @@ resource "aws_security_group" "service_lb_ingress_security_group" {
     Name = "${var.namespace}-lb-ingress"
   }
 }
-

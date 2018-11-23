@@ -276,6 +276,5 @@ module "storage_api" {
   ingests_nginx_container_image      = "${local.nginx_image_uri}"
   ingests_nginx_container_port       = "9000"
   storage_static_content_bucket_name = "${local.storage_static_content_bucket_name}"
-
   interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
 }
