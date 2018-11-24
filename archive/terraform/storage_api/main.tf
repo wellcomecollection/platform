@@ -23,11 +23,12 @@ module "services" {
 
   # Ingests endpoint
 
-  ingests_container_image       = "${var.ingests_container_image}"
-  ingests_container_port        = "${var.ingests_container_port}"
-  ingests_env_vars              = "${var.ingests_env_vars}"
-  ingests_env_vars_length       = "${var.ingests_env_vars_length}"
-  ingests_nginx_container_port  = "${var.ingests_nginx_container_port}"
-  ingests_nginx_container_image = "${var.ingests_nginx_container_image}"
-  ingests_listener_port         = "${local.ingests_listener_port}"
+  ingests_container_image        = "${var.ingests_container_image}"
+  ingests_container_port         = "${var.ingests_container_port}"
+  ingests_env_vars               = "${var.ingests_env_vars}"
+  ingests_env_vars_length        = "${var.ingests_env_vars_length}"
+  ingests_nginx_container_port   = "${var.ingests_nginx_container_port}"
+  ingests_nginx_container_image  = "${var.ingests_nginx_container_image}"
+  ingests_listener_port          = "${local.ingests_listener_port}"
+  interservice_security_group_id = "${var.interservice_security_group_id}"
 }

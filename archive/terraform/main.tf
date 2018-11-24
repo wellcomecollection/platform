@@ -178,7 +178,7 @@ module "migrator" {
 
   environment_variables = {
     # Private DNS
-    INGEST_API_URL = "http://progress_http.archive-storage:9001/progress"
+    INGEST_API_URL = "http://storage-api-ingests.archive-storage:9000/progress"
     ARCHIVE_SPACE  = "digitised"
   }
 
@@ -276,4 +276,5 @@ module "storage_api" {
   ingests_nginx_container_image      = "${local.nginx_image_uri}"
   ingests_nginx_container_port       = "9000"
   storage_static_content_bucket_name = "${local.storage_static_content_bucket_name}"
+  interservice_security_group_id     = "${aws_security_group.interservice_security_group.id}"
 }
