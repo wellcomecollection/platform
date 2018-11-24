@@ -15,10 +15,10 @@ resource "aws_s3_bucket" "public_data" {
 
 # This file is served from the root of data.wellcomecollection.org.
 resource "aws_s3_bucket_object" "index_page" {
-  bucket = "${aws_s3_bucket.public_data.id}"
-  key    = "index.html"
-  source = "${path.module}/data_wc_index.html"
-  etag   = "${md5(file("${path.module}/data_wc_index.html"))}"
+  bucket  = "${aws_s3_bucket.public_data.id}"
+  key     = "index.html"
+  content = "${file("${path.module}/data_wc_index.html")}"
+  etag    = "${md5(file("${path.module}/data_wc_index.html"))}"
 
   content_type = "text/html"
 }
