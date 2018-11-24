@@ -5,6 +5,7 @@ variable "security_group_ids" {
 }
 
 variable "cluster_id" {}
+
 variable "vpc_id" {}
 
 variable "private_subnets" {

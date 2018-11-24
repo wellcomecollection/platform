@@ -1,3 +1,12 @@
+# Provider
+
+provider "aws" {
+  region  = "${var.aws_region}"
+  version = "1.42.0"
+}
+
+# Terraform
+
 terraform {
   required_version = ">= 0.9"
 
@@ -8,6 +17,8 @@ terraform {
     region         = "eu-west-1"
   }
 }
+
+# Data
 
 data "terraform_remote_state" "shared_infra" {
   backend = "s3"
@@ -28,3 +39,5 @@ data "terraform_remote_state" "infra_critical" {
     region = "eu-west-1"
   }
 }
+
+data "aws_caller_identity" "current" {}
