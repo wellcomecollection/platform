@@ -57,8 +57,7 @@ trait ProgressGenerators extends RandomThings {
     ProgressStatusUpdate(id, status, maybeBag, events)
   }
 
-  def createSpace =
-    Namespace(randomAlphanumeric())
+  def createSpace = Namespace(randomAlphanumeric())
 
   def createCallback(): Callback = createCallbackWith()
 
@@ -66,4 +65,5 @@ trait ProgressGenerators extends RandomThings {
     uri: URI = testCallbackUri,
     status: Callback.CallbackStatus = Callback.Pending): Callback =
     Callback(uri = uri, status = status)
+
 }

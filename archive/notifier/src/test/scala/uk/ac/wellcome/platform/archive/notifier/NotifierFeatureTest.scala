@@ -10,6 +10,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{
   urlPathEqualTo,
   _
 }
+import org.apache.http.HttpStatus
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
@@ -103,73 +104,85 @@ class NotifierFeatureTest
     }
   }
 
+  import org.scalatest.prop.TableDrivenPropertyChecks._
+
+  val successfulStatuscodes =
+    Table(
+      "status code",
+      HttpStatus.SC_OK,
+      HttpStatus.SC_CREATED,
+      HttpStatus.SC_ACCEPTED,
+      HttpStatus.SC_NO_CONTENT
+    )
   describe("Updating status") {
-    it("sends a ProgressUpdate when it receives Progress with a callback") {
-      withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
-        withNotifier {
-          case (queuePair, topic, notifier) =>
-            val requestId = randomUUID
+    it("sends a ProgressUpdate when it receives a successful callback") {
+      forAll(successfulStatuscodes) { statusResponse: Int =>
+        withLocalWireMockClient(callbackHost, callbackPort) { wireMock =>
+          withNotifier {
+            case (queuePair, topic, notifier) =>
+              val requestId = randomUUID
 
-            val callbackPath = s"/callback/$requestId"
-            val callbackUri = new URI(
-              s"http://$callbackHost:$callbackPort" + callbackPath
-            )
-
-            stubFor(
-              post(urlEqualTo(callbackPath))
-                .willReturn(aResponse().withStatus(200))
-            )
-
-            val progress = createProgressWith(
-              id = requestId,
-              callback = Some(createCallbackWith(uri = callbackUri))
-            )
-
-            sendNotificationToSQS[CallbackNotification](
-              queuePair.queue,
-              CallbackNotification(requestId, callbackUri, progress)
-            )
-
-            notifier.run()
-
-            eventually {
-              wireMock.verifyThat(
-                1,
-                postRequestedFor(urlPathEqualTo(callbackUri.getPath))
-                  .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
-                    "http://localhost/context.json",
-                    progress.id,
-                    DisplayLocation(
-                      DisplayProvider(progress.sourceLocation.provider.id),
-                      progress.sourceLocation.location.namespace,
-                      progress.sourceLocation.location.key),
-                    progress.callback.map(DisplayCallback(_)),
-                    DisplayIngestType("create"),
-                    DisplayStorageSpace(progress.space.underlying),
-                    DisplayStatus(progress.status.toString),
-                    progress.bag.map(bagId =>
-                      IngestDisplayBag(
-                        s"${bagId.space}/${bagId.externalIdentifier}")),
-                    progress.events.map(event =>
-                      DisplayProgressEvent(
-                        event.description,
-                        event.createdDate.toString)),
-                    progress.createdDate.toString,
-                    progress.lastModifiedDate.toString
-                  )).get))
+              val callbackPath = s"/callback/$requestId"
+              val callbackUri = new URI(
+                s"http://$callbackHost:$callbackPort" + callbackPath
               )
 
-              inside(notificationMessage[ProgressUpdate](topic)) {
-                case ProgressCallbackStatusUpdate(
-                    id,
-                    callbackStatus,
-                    List(progressEvent)) =>
-                  id shouldBe progress.id
-                  progressEvent.description shouldBe "Callback fulfilled."
-                  callbackStatus shouldBe Callback.Succeeded
-                  assertRecent(progressEvent.createdDate)
+              stubFor(
+                post(urlEqualTo(callbackPath))
+                  .willReturn(aResponse().withStatus(statusResponse))
+              )
+
+              val progress = createProgressWith(
+                id = requestId,
+                callback = Some(createCallbackWith(uri = callbackUri))
+              )
+
+              sendNotificationToSQS[CallbackNotification](
+                queuePair.queue,
+                CallbackNotification(requestId, callbackUri, progress)
+              )
+
+              notifier.run()
+
+              eventually {
+                wireMock.verifyThat(
+                  1,
+                  postRequestedFor(urlPathEqualTo(callbackUri.getPath))
+                    .withRequestBody(equalToJson(toJson(ResponseDisplayIngest(
+                      "http://localhost/context.json",
+                      progress.id,
+                      DisplayLocation(
+                        DisplayProvider(progress.sourceLocation.provider.id),
+                        progress.sourceLocation.location.namespace,
+                        progress.sourceLocation.location.key),
+                      progress.callback.map(DisplayCallback(_)),
+                      DisplayIngestType("create"),
+                      DisplayStorageSpace(progress.space.underlying),
+                      DisplayStatus(progress.status.toString),
+                      progress.bag.map(bagId =>
+                        IngestDisplayBag(
+                          s"${bagId.space}/${bagId.externalIdentifier}")),
+                      progress.events.map(event =>
+                        DisplayProgressEvent(
+                          event.description,
+                          event.createdDate.toString)),
+                      progress.createdDate.toString,
+                      progress.lastModifiedDate.toString
+                    )).get))
+                )
+
+                inside(notificationMessage[ProgressUpdate](topic)) {
+                  case ProgressCallbackStatusUpdate(
+                      id,
+                      callbackStatus,
+                      List(progressEvent)) =>
+                    id shouldBe progress.id
+                    progressEvent.description shouldBe "Callback fulfilled."
+                    callbackStatus shouldBe Callback.Succeeded
+                    assertRecent(progressEvent.createdDate)
+                }
               }
-            }
+          }
         }
       }
     }
