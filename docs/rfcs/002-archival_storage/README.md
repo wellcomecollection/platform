@@ -44,7 +44,11 @@ These services will need to provide accessions in the BagIt bag format, gzip-com
 
 ### Storage
 
-Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to Azure Blob Storage with the Archive storage class. All AWS storage will have versioning enabled, but we will only keep the most recent version in Azure as it is intended only for worst case disaster recovery following a complete failure of AWS.
+Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to Azure Blob Storage with the Archive storage class.
+
+Archival AWS storage will have versioning enabled, but we will only keep the most recent version in Azure as it is intended only for worst case disaster recovery following a complete failure of AWS.
+
+The underlying storage provider version should be stored for every file. The underlying storage provider version of the tagmanifest should be used as the overall version of the bag.
 
 #### Locations
 
@@ -128,10 +132,12 @@ Pragma: no-cache
 This token must be provided on all subsequent requests in the Authorization header:
 
 ```http
-Authentication: Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
+Authorization: Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
 ```
 
 ### Ingests
+
+#### Storing a new bag
 
 Request:
 
@@ -198,7 +204,7 @@ Response:
     "type": "Bag"
   },
   "status": {
-    "id": "processing|failure|success",
+    "id": "accepted|processing|failed|succeeded",
     "type": "Status"
   },
   "sourceLocation": {
@@ -214,7 +220,7 @@ Response:
     "type": "Callback",
     "url": "https://workflow.wellcomecollection.org/callback?id=b1234567",
     "status": {
-      "id": "processing|failure|success",
+      "id": "accepted|processing|failed|succeeded",
       "type": "Status"
     }
   },
@@ -227,6 +233,49 @@ Response:
   ]
 }
 ```
+
+#### Updating an existing bag
+
+As above, but use an `ingestType` of `update`:
+
+```http
+POST /ingests
+Content-Type: application/json
+
+{
+  "type": "Ingest",
+  "ingestType": {
+    "id": "update",
+    "type": "IngestType"
+  },
+  "space": {
+    "id": "space-id",
+    "type": "Space"
+  },
+  "sourceLocation": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-standard"
+    },
+    "bucket": "source-bucket",
+    "path": "/source-path/source-bag.zip"
+  },
+  "callback": {
+    "type": "Callback",
+    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567"
+  }
+}
+```
+
+Updates should be processed as follows:
+
+- Compare existing file checksums to those in the new bag
+- Do nothing for files that have not changed
+- Update existing files that have changed
+- Remove existing files not present in the new bag
+- File versions should be updated to reflect their new underlying storage provider version
+- Bag version should be updated to reflect the new underlying storage version of the tagmanifest
 
 ### Bags
 
@@ -397,18 +446,21 @@ Response:
     "files": [
       {
         "type": "File",
+        "path": "data/b24923333.xml",
         "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "path": "data/b24923333.xml"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       },
       {
         "type": "File",
+        "path": "data/objects/b24923333_001.jp2",
         "checksum": "e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e",
-        "path": "data/objects/b24923333_001.jp2"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       },
       {
         "type": "File",
+        "path": "data/alto/b24923333_001.xml",
         "checksum": "17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502",
-        "path": "data/alto/b24923333_001.xml"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       }
     ]
   },
@@ -418,18 +470,21 @@ Response:
     "files": [
       {
         "type": "File",
+        "path": "manifest-256.txt",
         "checksum": "791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e",
-        "path": "manifest-256.txt"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       },
       {
         "type": "File",
+        "path": "bag-info.txt",
         "checksum": "13f83db60db65c72bf5077662bca91ed7f69405b86e5be4824bb94ca439d56e7",
-        "path": "bag-info.txt"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       },
       {
         "type": "File",
+        "path": "bagit.txt",
         "checksum": "a39e0c061a400a5488b57a81d877c3aff36d9edd8d811d66060f45f39bf76d37",
-        "path": "bagit.txt"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       }
     ]
   },
@@ -469,7 +524,8 @@ Response:
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
-  "lastModifiedDate": "2016-08-07T00:00:00Z"
+  "lastModifiedDate": "2016-08-07T00:00:00Z",
+  "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
 }
 ```
 
@@ -542,13 +598,15 @@ Response:
     "files": [
       {
         "type": "File",
+        "path": "data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml",
         "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "path": "data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       },
       {
         "type": "File",
+        "path": "data/objects/Disc_1/HEART.WRI",
         "checksum": "4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4",
-        "path": "data/objects/Disc_1/HEART.WRI"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       }
     ]
   },
@@ -558,18 +616,21 @@ Response:
     "files": [
       {
         "type": "File",
+        "path": "bagit.txt",
         "checksum": "452ad4b7d28249102dcac5d5bafe834e",
-        "path": "bagit.txt"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       },
       {
         "type": "File",
+        "path": "bag-info.txt",
         "checksum": "9e5ad981e0d29adc278f6a294b8c2aca",
-        "path": "bag-info.txt"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       },
       {
         "type": "File",
+        "path": "manifest-256.txt",
         "checksum": "3148319ddaf49214944ec357405a8189",
-        "path": "manifest-256.txt"
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
       }
     ]
   },
@@ -609,6 +670,7 @@ Response:
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
-  "lastModifiedDate": "2016-08-07T00:00:00Z"
+  "lastModifiedDate": "2016-08-07T00:00:00Z",
+  "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
 }
 ```
