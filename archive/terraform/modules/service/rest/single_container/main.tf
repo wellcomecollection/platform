@@ -1,5 +1,5 @@
 module "rest_service_single_container" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=c0e6476a6502ed1bc8876e273ed4ab09be281958"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/default?ref=v16.1.8"
 
   service_name       = "${var.service_name}"
   task_desired_count = "1"

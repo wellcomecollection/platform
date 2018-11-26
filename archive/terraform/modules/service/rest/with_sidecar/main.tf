@@ -1,5 +1,5 @@
 module "rest_service_with_sidecar" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest/container_with_sidecar?ref=c0e6476a6502ed1bc8876e273ed4ab09be281958"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/rest/container_with_sidecar?ref=v16.1.8"
 
   vpc_id  = "${var.vpc_id}"
   subnets = ["${var.subnets}"]
