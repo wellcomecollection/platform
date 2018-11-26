@@ -1,11 +1,8 @@
 locals {
   namespace = "archive-storage"
 
-  vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
-  private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
-
-  vpc_id_new          = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_id}"
-  private_subnets_new = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_private_subnets}"
+  vpc_id          = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_id}"
+  private_subnets = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_private_subnets}"
 
   archive_bucket_name                = "wellcomecollection-assets-archive-storage"
   ingest_bucket_name                 = "wellcomecollection-assets-archive-ingest"
