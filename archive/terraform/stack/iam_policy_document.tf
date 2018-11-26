@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "read_from_registrar_queue" {
     ]
 
     resources = [
-      "${module.registrar_queue.arn}",
+      "${module.bags_queue.arn}",
     ]
   }
 }
@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "read_from_progress_async_queue" {
     ]
 
     resources = [
-      "${module.progress_async_queue.arn}",
+      "${module.ingests_async_queue.arn}",
     ]
   }
 }

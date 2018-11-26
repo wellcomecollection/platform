@@ -18,8 +18,8 @@ module "archivist" {
   env_vars = {
     queue_url           = "${module.archivist_queue.id}"
     archive_bucket      = "${var.archive_bucket_name}"
-    registrar_topic_arn = "${module.registrar_topic.arn}"
-    progress_topic_arn  = "${module.progress_async_topic.arn}"
+    registrar_topic_arn = "${module.bags_topic.arn}"
+    progress_topic_arn  = "${module.ingests_async_topic.arn}"
   }
 
   env_vars_length = 4
@@ -47,9 +47,9 @@ module "bags_async" {
   max_capacity = 1
 
   env_vars = {
-    queue_url          = "${module.registrar_queue.id}"
+    queue_url          = "${module.bags_queue.id}"
     archive_bucket     = "${var.archive_bucket_name}"
-    progress_topic_arn = "${module.progress_async_topic.arn}"
+    progress_topic_arn = "${module.ingests_async_topic.arn}"
     vhs_bucket_name    = "${var.vhs_archive_manifest_bucket_name}"
     vhs_table_name     = "${var.vhs_archive_manifest_table_name}"
   }
@@ -57,8 +57,8 @@ module "bags_async" {
   env_vars_length = 5
 
   container_image   = "${var.registrar_async_container_image}"
-  source_queue_name = "${module.registrar_queue.name}"
-  source_queue_arn  = "${module.registrar_queue.arn}"
+  source_queue_name = "${module.bags_queue.name}"
+  source_queue_arn  = "${module.bags_queue.arn}"
 }
 
 # Notifier
@@ -82,7 +82,7 @@ module "notifier" {
   env_vars = {
     context_url        = "https://api.wellcomecollection.org/storage/v1/context.json"
     notifier_queue_url = "${module.notifier_queue.id}"
-    progress_topic_arn = "${module.progress_async_topic.arn}"
+    progress_topic_arn = "${module.ingests_async_topic.arn}"
   }
 
   env_vars_length = 3
@@ -111,7 +111,7 @@ module "ingests_async" {
   max_capacity = 1
 
   env_vars = {
-    queue_url                   = "${module.progress_async_queue.id}"
+    queue_url                   = "${module.ingests_async_queue.id}"
     topic_arn                   = "${module.notifier_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
@@ -119,8 +119,8 @@ module "ingests_async" {
   env_vars_length = 3
 
   container_image   = "${var.progress_async_container_image}"
-  source_queue_name = "${module.progress_async_queue.name}"
-  source_queue_arn  = "${module.progress_async_queue.arn}"
+  source_queue_name = "${module.ingests_async_queue.name}"
+  source_queue_arn  = "${module.ingests_async_queue.arn}"
 }
 
 # Storage API

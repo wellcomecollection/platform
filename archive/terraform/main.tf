@@ -16,13 +16,13 @@ module "stack-241118" {
   vpc_id          = "${local.vpc_id_new}"
   private_subnets = "${local.private_subnets_new}"
 
-  current_account_id     = "${data.aws_caller_identity.current.id}"
+  current_account_id     = "${data.aws_caller_identity.current.account_id}"
   infra_bucket           = "${local.infra_bucket}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
   dlq_alarm_arn          = "${local.dlq_alarm_arn}"
 
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
+  service_egress_security_group_id = "${aws_security_group.service_egress.id}"
+  interservice_security_group_id   = "${aws_security_group.interservice.id}"
 
   cognito_user_pool_arn          = "${local.cognito_user_pool_arn}"
   cognito_storage_api_identifier = "${local.cognito_storage_api_identifier}"
@@ -321,6 +321,7 @@ module "storage_api" {
     topic_arn                   = "${module.ingest_requests_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
+
   ingests_env_vars_length            = 4
   ingests_nginx_container_image      = "${local.nginx_container_image}"
   ingests_nginx_container_port       = "9000"

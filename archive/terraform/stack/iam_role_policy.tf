@@ -22,12 +22,12 @@ resource "aws_iam_role_policy" "archivist_task_get_s3_workflow" {
 
 resource "aws_iam_role_policy" "archivist_task_registrar_sns" {
   role   = "${module.archivist.task_role_name}"
-  policy = "${module.registrar_topic.publish_policy}"
+  policy = "${module.bags_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "archivist_task_progress_async_sns" {
   role   = "${module.archivist.task_role_name}"
-  policy = "${module.progress_async_topic.publish_policy}"
+  policy = "${module.ingests_async_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "archivist_task_sqs" {
@@ -49,7 +49,7 @@ resource "aws_iam_role_policy" "registrar_async_task_vhs" {
 
 resource "aws_iam_role_policy" "registrar_async_task_progress_async_sns" {
   role   = "${module.bags_async.task_role_name}"
-  policy = "${module.progress_async_topic.publish_policy}"
+  policy = "${module.ingests_async_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "registrar_async_task_sqs" {
@@ -102,7 +102,7 @@ resource "aws_iam_role_policy" "notifier_task_sqs" {
 
 resource "aws_iam_role_policy" "notifier_task_publish_progress_sns" {
   role   = "${module.notifier.task_role_name}"
-  policy = "${module.progress_async_topic.publish_policy}"
+  policy = "${module.ingests_async_topic.publish_policy}"
 }
 
 # Bagger

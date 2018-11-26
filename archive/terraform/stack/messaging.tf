@@ -1,18 +1,18 @@
 # Messaging - archivist
 
 module "ingest_requests_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v16.1.2"
-  name   = "${var.namespace}-ingest-requests"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${replace(var.namespace,"-","")}_ingest_requests"
 }
 
 module "archivist_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v16.1.2"
-  name   = "${var.namespace}-archivist"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${replace(var.namespace,"-","")}_archivist"
 }
 
 module "archivist_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${var.namespace}-archivist"
+  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
+  queue_name  = "${replace(var.namespace,"-","")}_archivist"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.current_account_id}"
   topic_names = ["${module.ingest_requests_topic.name}"]
@@ -25,17 +25,17 @@ module "archivist_queue" {
 
 # Messaging - registrar
 
-module "registrar_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v16.1.2"
-  name   = "${var.namespace}-registrar"
+module "bags_topic" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${replace(var.namespace,"-","")}_bags"
 }
 
-module "registrar_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${var.namespace}-registrar"
+module "bags_queue" {
+  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
+  queue_name  = "${replace(var.namespace,"-","")}_bags"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.current_account_id}"
-  topic_names = ["${module.registrar_topic.name}"]
+  topic_names = ["${module.bags_topic.name}"]
 
   visibility_timeout_seconds = 300
   max_receive_count          = 3
@@ -45,17 +45,17 @@ module "registrar_queue" {
 
 # Messaging - progress
 
-module "progress_async_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v16.1.2"
-  name   = "${var.namespace}-progress"
+module "ingests_async_topic" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${replace(var.namespace,"-","")}_ingests"
 }
 
-module "progress_async_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${var.namespace}-progress"
+module "ingests_async_queue" {
+  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
+  queue_name  = "${replace(var.namespace,"-","")}_ingests"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.current_account_id}"
-  topic_names = ["${module.progress_async_topic.name}"]
+  topic_names = ["${module.ingests_async_topic.name}"]
 
   visibility_timeout_seconds = 180
   max_receive_count          = 3
@@ -66,13 +66,13 @@ module "progress_async_queue" {
 # Messaging - notifier
 
 module "notifier_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v16.1.2"
-  name   = "${var.namespace}_notifier_topic"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${replace(var.namespace,"-","")}_notifier"
 }
 
 module "notifier_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${var.namespace}-notifier"
+  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
+  queue_name  = "${replace(var.namespace,"-","")}_notifier"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.current_account_id}"
   topic_names = ["${module.notifier_topic.name}"]
@@ -86,14 +86,14 @@ module "notifier_queue" {
 # Messaging - bag creattion
 
 module "bagger_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v16.1.2"
-  name   = "${var.namespace}-bagger"
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "${replace(var.namespace,"-","")}_bagger"
 }
 
 module "bagger_queue" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v9.1.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v11.6.0"
 
-  queue_name  = "${var.namespace}-bagger"
+  queue_name  = "${replace(var.namespace,"-","")}_bagger"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.current_account_id}"
   topic_names = ["${module.bagger_topic.name}"]
@@ -106,6 +106,6 @@ module "bagger_queue" {
 }
 
 module "bagging_complete_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v16.1.2"
-  name   = "${var.namespace}-bagger-complete"
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "${replace(var.namespace,"-","")}_bagging_complete"
 }
