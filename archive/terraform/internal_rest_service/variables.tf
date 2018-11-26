@@ -4,7 +4,8 @@ variable "security_group_ids" {
   type = "list"
 }
 
-variable "cluster_id" {}
+variable "cluster_name" {}
+
 variable "vpc_id" {}
 
 variable "private_subnets" {
