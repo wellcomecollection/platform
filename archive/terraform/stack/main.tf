@@ -9,7 +9,7 @@ module "archivist" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
-  service_name                     = "archivist"
+  service_name                     = "${var.namespace}-archivist"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1
@@ -31,7 +31,7 @@ module "archivist" {
 
 # Registrar
 
-module "registrar_async" {
+module "bags_async" {
   source = "../modules/service/queue"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
@@ -40,7 +40,7 @@ module "registrar_async" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
-  service_name                     = "registrar_async"
+  service_name                     = "${var.namespace}-bags_async"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1
@@ -73,7 +73,7 @@ module "notifier" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
-  service_name                     = "notifier"
+  service_name                     = "${var.namespace}-notifier"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1
@@ -94,7 +94,7 @@ module "notifier" {
 
 # Progress
 
-module "progress_async" {
+module "ingests_async" {
   source = "../modules/service/queue"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
@@ -104,7 +104,7 @@ module "progress_async" {
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets      = "${var.private_subnets}"
   vpc_id       = "${var.vpc_id}"
-  service_name = "progress_async"
+  service_name = "${var.namespace}-ingests_async"
   aws_region   = "${var.aws_region}"
 
   min_capacity = 1
@@ -135,7 +135,7 @@ module "api" {
 
   domain_name = "${var.domain_name}"
 
-  namespace     = "storage-api"
+  namespace     = "${var.namespace}-api"
   namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
 
@@ -183,7 +183,7 @@ module "api" {
 module "callback_stub_server" {
   source = "../modules/service/rest/single_container"
 
-  service_name = "callback_stub_server"
+  service_name = "${var.namespace}-callback_stub_server"
 
   container_port  = "8080"
   container_image = "${var.callback_stub_server_container_image}"
@@ -213,7 +213,7 @@ module "bagger" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
-  service_name                     = "bagger"
+  service_name                     = "${var.namespace}-bagger"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1
@@ -256,7 +256,7 @@ module "bagger" {
 module "migrator" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v16.1.2"
 
-  name        = "migrator"
+  name        = "${var.namespace}-migrator"
   description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
 
   timeout = 25

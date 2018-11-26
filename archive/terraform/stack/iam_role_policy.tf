@@ -38,22 +38,22 @@ resource "aws_iam_role_policy" "archivist_task_sqs" {
 # Registrar async
 
 resource "aws_iam_role_policy" "registrar_async_task_get_s3" {
-  role   = "${module.registrar_async.task_role_name}"
+  role   = "${module.bags_async.task_role_name}"
   policy = "${var.archive_get_policy_json}"
 }
 
 resource "aws_iam_role_policy" "registrar_async_task_vhs" {
-  role   = "${module.registrar_async.task_role_name}"
+  role   = "${module.bags_async.task_role_name}"
   policy = "${var.vhs_archive_manifest_full_access_policy_json}"
 }
 
 resource "aws_iam_role_policy" "registrar_async_task_progress_async_sns" {
-  role   = "${module.registrar_async.task_role_name}"
+  role   = "${module.bags_async.task_role_name}"
   policy = "${module.progress_async_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "registrar_async_task_sqs" {
-  role   = "${module.registrar_async.task_role_name}"
+  role   = "${module.bags_async.task_role_name}"
   policy = "${data.aws_iam_policy_document.read_from_registrar_queue.json}"
 }
 
@@ -67,17 +67,17 @@ resource "aws_iam_role_policy" "bags_vhs" {
 # Progress Async
 
 resource "aws_iam_role_policy" "progress_async_task_sns" {
-  role   = "${module.progress_async.task_role_name}"
+  role   = "${module.ingests_async.task_role_name}"
   policy = "${module.notifier_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "progress_async_task_sqs" {
-  role   = "${module.progress_async.task_role_name}"
+  role   = "${module.ingests_async.task_role_name}"
   policy = "${data.aws_iam_policy_document.read_from_progress_async_queue.json}"
 }
 
 resource "aws_iam_role_policy" "progress_async_task_archive_progress_table" {
-  role   = "${module.progress_async.task_role_name}"
+  role   = "${module.ingests_async.task_role_name}"
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
 
