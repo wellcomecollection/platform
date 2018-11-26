@@ -28,3 +28,8 @@ data "terraform_remote_state" "shared_infra" {
     region = "eu-west-1"
   }
 }
+
+provider "aws" {
+  region = "us-east-1"
+  alias  = "us_east_1"
+}

@@ -16,5 +16,10 @@ locals {
   cloudfront_errors_topic_arn = "${data.terraform_remote_state.loris.cloudfront_errors_topic_arn}"
 
   namespace      = "monitoring"
-  vpc_cidr_block = "22.0.0.0/16"
+  account_id     = "${data.aws_caller_identity.current.account_id}"
+
+  vpc_id          = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_id}"
+  private_subnets = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_private_subnets}"
+  public_subnets = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_public_subnets}"
+
 }
