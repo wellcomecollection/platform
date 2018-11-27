@@ -9,9 +9,8 @@ import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
-import uk.ac.wellcome.platform.transformer.miro.services.MiroTransformerWorkerService
-import uk.ac.wellcome.platform.transformer.receive.HybridRecordReceiver
+import uk.ac.wellcome.platform.transformer.miro.services.{MiroTransformerWorkerService, MiroVHSRecordReceiver}
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
@@ -24,14 +23,14 @@ object Main extends App with Logging {
   implicit val executionContext: ExecutionContext =
     AkkaBuilder.buildExecutionContext()
 
-  val messageReceiver = new HybridRecordReceiver[MiroTransformable](
+  val vhsRecordReceiver = new MiroVHSRecordReceiver(
     messageWriter =
       MessagingBuilder.buildMessageWriter[TransformedBaseWork](config),
-    objectStore = S3Builder.buildObjectStore[MiroTransformable](config)
+    objectStore = S3Builder.buildObjectStore[MiroRecord](config)
   )
 
   val workerService = new MiroTransformerWorkerService(
-    messageReceiver = messageReceiver,
+    vhsRecordReceiver = vhsRecordReceiver,
     miroTransformer = new MiroTransformableTransformer,
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
   )
