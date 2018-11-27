@@ -13,11 +13,9 @@ object License {
   implicit val licenseEncoder = Encoder.instance[License](
     license =>
       Json.obj(
-        ("id", Json.fromString(license.id)),
-        ("label", Json.fromString(license.label)),
-        ("url", Json.fromString(license.url)),
-        ("ontologyType", Json.fromString(license.ontologyType))
-    ))
+        ("id", Json.fromString(license.id))
+      )
+  )
 
   implicit val licenseDecoder = Decoder.instance[License](cursor =>
     for {
