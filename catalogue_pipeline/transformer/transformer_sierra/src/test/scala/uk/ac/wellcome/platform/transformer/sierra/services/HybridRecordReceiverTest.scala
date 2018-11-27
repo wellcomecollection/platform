@@ -12,7 +12,7 @@ import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
 import uk.ac.wellcome.platform.transformer.sierra.fixtures.HybridRecordReceiverFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
@@ -126,7 +126,7 @@ class HybridRecordReceiverTest
                 transformToWork)
 
             whenReady(future.failed) { x =>
-              x shouldBe a[TransformerException]
+              x shouldBe a[SierraTransformerException]
             }
         }
       }
