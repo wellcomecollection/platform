@@ -12,13 +12,6 @@ import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.util.Try
 
-/** MiroTransformable looks for several fields in the source JSON -- if they're
-  *  missing or have the wrong values, it rejects the record.
-  *
-  *  This trait provides a single method `transform()` which adds the necessary
-  *  fields before transformation, allowing tests to focus on only the fields
-  *  that are interesting for that test.
-  */
 trait MiroTransformableWrapper
     extends Matchers
     with MiroTransformableGenerators { this: Suite =>
