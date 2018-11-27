@@ -33,7 +33,7 @@ class MiroTransformableTransformer
         throw e
     }
 
-  def doTransform(miroTransformable: MiroTransformable, version: Int) = {
+  private def doTransform(miroTransformable: MiroTransformable, version: Int): Try[TransformedBaseWork] = {
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
