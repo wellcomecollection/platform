@@ -8,8 +8,10 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
-import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.{
+  ShouldNotTransformException,
+  SierraTransformerException
+}
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
   SierraItemData
