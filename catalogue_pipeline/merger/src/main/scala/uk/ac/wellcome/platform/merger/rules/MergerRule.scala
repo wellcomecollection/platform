@@ -20,8 +20,8 @@ trait MergerRule { this: Partitioner with WorkPairMerger =>
       .getOrElse(works)
 
   private def updateVersion(mergedWork: MergedWork): Seq[BaseWork] = List(
-    mergedWork.work.copy(version = mergedWork.work.version +1),
-    mergedWork.redirectedWork.copy(version = mergedWork.redirectedWork.version + 1)
+    mergedWork.work.copy(merged = true),
+    mergedWork.redirectedWork
   )
 }
 

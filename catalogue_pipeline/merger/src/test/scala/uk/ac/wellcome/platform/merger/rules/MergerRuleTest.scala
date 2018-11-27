@@ -39,7 +39,7 @@ class MergerRuleTest extends FunSpec with WorksGenerators with Matchers {
     mergerRule.mergeAndRedirectWorks(works) shouldBe works
   }
 
-  it("increments the version of merged/redirected works") {
+  it("sets the merged flag of merged works") {
     val mergerRule = new MergerRule with Partitioner with WorkPairMerger {
       override protected def partitionWorks(
                                              works: Seq[BaseWork])
@@ -54,8 +54,8 @@ class MergerRuleTest extends FunSpec with WorksGenerators with Matchers {
 
     val works = createUnidentifiedWorks(5)
 
-    val expectedMergedWork = works.head.copy(version = 2)
-    val expectedRedirectedWork = UnidentifiedRedirectedWork(version = 2, sourceIdentifier = works.tail.head.sourceIdentifier, redirect = IdentifiableRedirect(works.head.sourceIdentifier))
+    val expectedMergedWork = works.head.copy(merged = true)
+    val expectedRedirectedWork = UnidentifiedRedirectedWork(version = 1, sourceIdentifier = works.tail.head.sourceIdentifier, redirect = IdentifiableRedirect(works.head.sourceIdentifier))
     val expectedWorks = expectedMergedWork +: expectedRedirectedWork +: works.tail.tail
     mergerRule.mergeAndRedirectWorks(works) shouldBe expectedWorks
   }

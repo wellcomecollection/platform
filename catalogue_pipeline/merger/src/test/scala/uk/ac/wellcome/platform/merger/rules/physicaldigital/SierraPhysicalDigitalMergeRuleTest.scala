@@ -20,7 +20,7 @@ class SierraPhysicalDigitalMergeRuleTest
         expectedMergedWork(physicalWork, digitalWork),
         UnidentifiedRedirectedWork(
           sourceIdentifier = digitalWork.sourceIdentifier,
-          version = digitalWork.version + 1,
+          version = digitalWork.version,
           redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)))
     }
 
@@ -35,7 +35,7 @@ class SierraPhysicalDigitalMergeRuleTest
         expectedMergedWork(physicalWork, digitalWork),
         UnidentifiedRedirectedWork(
           sourceIdentifier = digitalWork.sourceIdentifier,
-          version = digitalWork.version + 1,
+          version = digitalWork.version,
           redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)))
     }
 
@@ -165,7 +165,7 @@ class SierraPhysicalDigitalMergeRuleTest
     val expectedMergedWork = physicalWork.copy(
       otherIdentifiers = expectedOtherIdentifiers,
       items = List(expectedItem),
-      version = physicalWork.version +1
+      merged = true
     )
     expectedMergedWork
   }
