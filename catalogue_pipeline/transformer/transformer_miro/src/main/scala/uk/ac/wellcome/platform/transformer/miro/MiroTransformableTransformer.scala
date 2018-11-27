@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.miro
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.miro.exceptions.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
