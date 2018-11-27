@@ -26,12 +26,13 @@ object License {
 
   def createLicense(id: String): License = {
     id match {
-      case s: String if s == License_CCBY.id     => License_CCBY
-      case s: String if s == License_CCBYNC.id   => License_CCBYNC
-      case s: String if s == License_CCBYNCND.id => License_CCBYNCND
-      case s: String if s == License_CC0.id      => License_CC0
-      case s: String if s == License_PDM.id      => License_PDM
-      case id =>
+      case s: String if s == License_CCBY.id                => License_CCBY
+      case s: String if s == License_CCBYNC.id              => License_CCBYNC
+      case s: String if s == License_CCBYNCND.id            => License_CCBYNCND
+      case s: String if s == License_CC0.id                 => License_CC0
+      case s: String if s == License_PDM.id                 => License_PDM
+      case s: String if s == License_CopyrightNotCleared.id => License_CopyrightNotCleared
+      case _ =>
         val errorMessage = s"$id is not a valid id"
         throw new Exception(errorMessage)
     }
@@ -67,4 +68,10 @@ case object License_PDM extends License {
   val id = "pdm"
   val label = "Public Domain Mark"
   val url = Some("https://creativecommons.org/share-your-work/public-domain/pdm/")
+}
+
+case object License_CopyrightNotCleared extends License {
+  val id = "copyright-not-cleared"
+  val label = "Copyright not cleared"
+  val url: Option[String] = None
 }
