@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro
 
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
@@ -39,7 +40,11 @@ class MiroTransformableTransformer
         throw e
     }
 
-  private def doTransform(miroRecord: MiroRecord, version: Int): Try[TransformedBaseWork] = {
+  private def doTransform(originalMiroRecord: MiroRecord, version: Int): Try[TransformedBaseWork] = {
+    // This is an utterly awful hack we have to live with until we get
+    // these corrected in the source data.
+    val miroRecord = MiroRecord.create(toJson(originalMiroRecord).get)
+
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
