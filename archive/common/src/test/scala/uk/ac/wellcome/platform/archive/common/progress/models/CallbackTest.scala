@@ -18,7 +18,7 @@ class CallbackTest extends FunSpec with Matchers {
     ("string-status", "parsed-status"),
     ("processing", Callback.Pending),
     ("succeeded", Callback.Succeeded),
-    ("failure", Callback.Failed),
+    ("failed", Callback.Failed),
   )
 
   it("converts all callback status values to strings") {

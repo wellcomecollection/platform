@@ -29,7 +29,7 @@ class ProgressTest
     ("accepted", Progress.Accepted),
     ("processing", Progress.Processing),
     ("succeeded", Progress.Completed),
-    ("failure", Progress.Failed),
+    ("failed", Progress.Failed),
   )
 
   it("converts all callback status values to strings") {
