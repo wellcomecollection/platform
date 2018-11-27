@@ -32,11 +32,12 @@ trait MiroLicenses {
         useRestrictions match {
 
           // Certain strings map directly onto license types
-          case "CC-0"        => License_CC0
-          case "CC-BY"       => License_CCBY
-          case "CC-BY-NC"    => License_CCBYNC
-          case "CC-BY-NC-ND" => License_CCBYNCND
-          case "PDM"         => License_PDM
+          case "CC-0"         => License_CC0
+          case "CC-BY"        => License_CCBY
+          case "CC-BY-NC"     => License_CCBYNC
+          case "CC-BY-NC-ND"  => License_CCBYNCND
+          case "PDM"          => License_PDM
+          case "In copyright" => License_CopyrightNotCleared
 
           // These mappings are defined in Christy's document
           case "Academics" => License_CCBYNC
