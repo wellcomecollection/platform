@@ -1,14 +1,17 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 class MiroTransformableTransformerTest
     extends FunSpec
     with Matchers
     with IdentifiersGenerators
+    with MiroRecordGenerators
     with MiroTransformableWrapper {
 
   it("passes through the Miro identifier") {
@@ -223,35 +226,31 @@ class MiroTransformableTransformerTest
     )
   }
 
-  it(
-    "returns an InvisibleWork if usage restrictions mean we suppress the image") {
-    assertTransformReturnsInvisibleWork(
-      data =
-        buildJSONForWork("""
-        "image_title": "Private pictures of perilous penguins",
-        "image_use_restrictions": "Do not use"
-      """)
-    )
-  }
+  describe("returns an InvisibleWork") {
+    it("if usage restrictions mean we suppress the image") {
+      assertTransformReturnsInvisibleWork(
+        createMiroRecordWith(
+          useRestrictions = Some("Do not use")
+        )
+      )
+    }
 
-  it("returns an InvisibleWork for images from contributor GUS") {
-    assertTransformReturnsInvisibleWork(
-      miroId = "B0009891",
-      data = buildJSONForWork("""
-        "image_source_code": "GUS"
-      """)
-    )
-  }
+    it("if the contributor code is GUS") {
+      assertTransformReturnsInvisibleWork(
+        createMiroRecordWith(
+          sourceCode = Some("GUS"),
+          imageNumber = "B0009891"
+        )
+      )
+    }
 
-  it("returns an InvisibleWork for images without copyright clearance") {
-    assertTransformReturnsInvisibleWork(
-      data = """{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "N",
-        "image_tech_file_size": ["1000000"],
-        "image_use_restrictions": "CC-BY"
-      }"""
-    )
+    it("if the image doesn't have copyright clearance") {
+      assertTransformReturnsInvisibleWork(
+        createMiroRecordWith(
+          copyrightCleared = Some("N")
+        )
+      )
+    }
   }
 
   it(
@@ -320,19 +319,13 @@ class MiroTransformableTransformerTest
     )
   }
 
-  private def assertTransformReturnsInvisibleWork(miroId: String = "G0000001",
-                                                  data: String) = {
-    val miroTransformable = createMiroTransformableWith(
-      miroId = miroId,
-      data = data
-    )
-
-    val triedMaybeWork = transformer.transform(miroTransformable, version = 1)
+  private def assertTransformReturnsInvisibleWork(miroRecord: MiroRecord): Assertion = {
+    val triedMaybeWork = transformer.transform(miroRecord, version = 1)
     triedMaybeWork.isSuccess shouldBe true
 
     triedMaybeWork.get shouldBe UnidentifiedInvisibleWork(
       sourceIdentifier = createMiroSourceIdentifierWith(
-        value = miroId
+        value = miroRecord.imageNumber
       ),
       version = 1
     )
