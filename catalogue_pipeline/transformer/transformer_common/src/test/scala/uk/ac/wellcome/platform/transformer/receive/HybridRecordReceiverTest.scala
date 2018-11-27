@@ -39,9 +39,9 @@ class HybridRecordReceiverTest
 
   case class TestException(message: String) extends Exception(message)
   case class TestTransformable()
-  def transformToWork(transforrmable: TestTransformable, version: Int) =
+  def transformToWork(transformable: TestTransformable, version: Int) =
     Try(createUnidentifiedWorkWith(version = version))
-  def failingTransformToWork(transforrmable: TestTransformable, version: Int) =
+  def failingTransformToWork(transformable: TestTransformable, version: Int) =
     Try(throw TestException("BOOOM!"))
 
   it("receives a message and sends it to SNS client") {
