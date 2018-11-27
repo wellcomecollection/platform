@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{Assertion, Matchers, Suite}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
@@ -39,12 +38,6 @@ trait MiroTransformableWrapper
         $baseData,
         $extraData
       }"""
-  }
-
-  def transformWork(data: String = ""): UnidentifiedWork = {
-    val miroRecord = fromJson[MiroRecord](buildJSONForWork(data)).get
-
-    transformToWork(miroRecord).asInstanceOf[UnidentifiedWork]
   }
 
   def transformWork(miroRecord: MiroRecord): UnidentifiedWork =
