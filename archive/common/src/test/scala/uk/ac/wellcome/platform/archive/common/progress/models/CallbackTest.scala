@@ -17,7 +17,7 @@ class CallbackTest extends FunSpec with Matchers {
   private val callbackStatus = Table(
     ("string-status", "parsed-status"),
     ("processing", Callback.Pending),
-    ("success", Callback.Succeeded),
+    ("succeeded", Callback.Succeeded),
     ("failure", Callback.Failed),
   )
 

@@ -21,7 +21,7 @@ case object Progress extends URIConverters {
 
   private val acceptedString = "accepted"
   private val processingString = "processing"
-  private val successString = "success"
+  private val succeededString = "succeeded"
   private val failureString = "failure"
 
   case object Accepted extends Status {
@@ -33,7 +33,7 @@ case object Progress extends URIConverters {
   }
 
   case object Completed extends Status {
-    override def toString: String = successString
+    override def toString: String = succeededString
   }
 
   case object Failed extends Status {

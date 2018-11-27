@@ -19,7 +19,7 @@ case object Callback extends URIConverters {
   }
 
   val processingString = "processing"
-  val successString = "success"
+  private val succeededString = "succeeded"
   val failureString = "failure"
 
   case object Pending extends CallbackStatus {
@@ -27,7 +27,7 @@ case object Callback extends URIConverters {
   }
 
   case object Succeeded extends CallbackStatus {
-    override def toString: String = successString
+    override def toString: String = succeededString
   }
 
   case object Failed extends CallbackStatus {

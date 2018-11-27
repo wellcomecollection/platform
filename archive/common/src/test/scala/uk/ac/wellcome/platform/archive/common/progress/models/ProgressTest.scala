@@ -28,7 +28,7 @@ class ProgressTest
     ("string-status", "parsed-status"),
     ("accepted", Progress.Accepted),
     ("processing", Progress.Processing),
-    ("success", Progress.Completed),
+    ("succeeded", Progress.Completed),
     ("failure", Progress.Failed),
   )
 
