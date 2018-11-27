@@ -4,7 +4,7 @@ import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroRecordGenerators {
   def createMiroRecordWith(
-    title: Option[String] = None,
+    title: Option[String] = Some("Auto-created title in MiroRecordGenerators"),
     useRestrictions: Option[String] = Some("CC-BY"),
     innopacID: Option[String] = None,
     creditLine: Option[String] = None,
@@ -20,4 +20,7 @@ trait MiroRecordGenerators {
       sourceCode = sourceCode,
       imageNumber = imageNumber
     )
+
+  def createMiroRecord: MiroRecord =
+    createMiroRecordWith()
 }

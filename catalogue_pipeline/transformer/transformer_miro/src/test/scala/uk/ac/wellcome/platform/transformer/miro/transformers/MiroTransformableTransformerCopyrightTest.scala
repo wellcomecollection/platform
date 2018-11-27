@@ -13,9 +13,7 @@ class MiroTransformableTransformerCopyrightTest
 
   it("has no credit line if there's not enough information") {
     transformRecordAndCheckCredit(
-      miroRecord = createMiroRecordWith(
-        title = Some("An image without any copyright?")
-      ),
+      miroRecord = createMiroRecord,
       expectedCredit = None
     )
   }
@@ -23,7 +21,6 @@ class MiroTransformableTransformerCopyrightTest
   it("uses the image_credit_line field if present") {
     transformRecordAndCheckCredit(
       miroRecord = createMiroRecordWith(
-        title = Some("A tumultuous transformation of trees"),
         creditLine = Some("Wellcome Collection")
       ),
       expectedCredit = Some("Wellcome Collection")
@@ -33,7 +30,6 @@ class MiroTransformableTransformerCopyrightTest
   it("uses the image_credit_line in preference to image_source_code") {
     transformRecordAndCheckCredit(
       miroRecord = createMiroRecordWith(
-        title = Some("A tumultuous transformation of trees"),
         creditLine = Some("Wellcome Collection"),
         sourceCode = Some("CAM")
       ),
@@ -44,7 +40,6 @@ class MiroTransformableTransformerCopyrightTest
   it("uses image_source_code if image_credit_line is empty") {
     transformRecordAndCheckCredit(
       miroRecord = createMiroRecordWith(
-        title = Some("A tumultuous transformation of trees"),
         creditLine = None,
         sourceCode = Some("CAM")
       ),
@@ -55,7 +50,6 @@ class MiroTransformableTransformerCopyrightTest
   it("uses the uppercased version of the source_code if necessary") {
     transformRecordAndCheckCredit(
       miroRecord = createMiroRecordWith(
-        title = Some("A loud and leafy lime"),
         sourceCode = Some("wel")
       ),
       expectedCredit = Some("Wellcome Collection")
@@ -65,7 +59,6 @@ class MiroTransformableTransformerCopyrightTest
   it("tidies up the credit line if necessary") {
     transformRecordAndCheckCredit(
       miroRecord = createMiroRecordWith(
-        title = Some("Outside an odorous oak"),
         creditLine = Some("The Wellcome Library, London")
       ),
       expectedCredit = Some("Wellcome Collection")
@@ -75,7 +68,6 @@ class MiroTransformableTransformerCopyrightTest
   it("handles special characters in the contributor map") {
     transformRecordAndCheckCredit(
       miroRecord = createMiroRecordWith(
-        title = Some("A fanciful flurry of firs"),
         sourceCode = Some("FEI")
       ),
       expectedCredit = Some("Fernán Federici")
