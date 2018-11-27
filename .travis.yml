@@ -42,6 +42,11 @@ cache:
     - reindexer/reindex_request_creator/target
 
     - sbt_common/common/target
+    - sbt_common/config/core/target
+    - sbt_common/config/elasticsearch/target
+    - sbt_common/config/messaging/target
+    - sbt_common/config/monitoring/target
+    - sbt_common/config/storage/target
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
     - sbt_common/finatra_akka/target
@@ -49,7 +54,6 @@ cache:
     - sbt_common/finatra_elasticsearch/target
     - sbt_common/finatra_messaging/target
     - sbt_common/finatra_monitoring/target
-    - sbt_common/finatra_storage/target
     - sbt_common/internal_model/target
     - sbt_common/messaging/target
 
@@ -59,16 +63,16 @@ cache:
     - sierra_adapter/sierra_bib_merger/target
     - sierra_adapter/sierra_item_merger/target
 
+    - archive/archivist/target
     - archive/commmon/target
     - archive/display/target
-    - archive/archivist/target
     - archive/notifier/target
-    - archive/progress_common/target
     - archive/progress_async/target
+    - archive/progress_common/target
     - archive/progress_http/target
+    - archive/registrar_async/target
     - archive/registrar_common/target
     - archive/registrar_http/target
-    - archive/registrar_async/target
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
