@@ -17,8 +17,7 @@ class MiroTransformableTransformerTest
   it("passes through the Miro identifier") {
     val miroId = "M0000005_test"
     val work = transformWork(
-      data = """"image_title": "A picture of a passing porpoise"""",
-      miroId = miroId
+      createMiroRecordWith(imageNumber = miroId)
     )
     work.identifiers shouldBe List(
       createMiroSourceIdentifierWith(value = miroId)
@@ -28,11 +27,11 @@ class MiroTransformableTransformerTest
   it("passes through the INNOPAC ID as the Sierra system number") {
     forAll(Table("", "b", "B", ".b", ".B")) { prefix =>
       forAll(Table("8", "x")) { checkDigit =>
-        val innopacId = s"${prefix}1234567${checkDigit}"
-        val expectedSierraNumber = s"b1234567${checkDigit}"
+        val innopacID = s"${prefix}1234567$checkDigit"
+        val expectedSierraNumber = s"b1234567$checkDigit"
 
         transformRecordAndCheckSierraSystemNumber(
-          innopacId = innopacId,
+          innopacID = innopacID,
           expectedSierraNumber = expectedSierraNumber
         )
       }
@@ -42,32 +41,30 @@ class MiroTransformableTransformerTest
   describe("non-MPL references are passed through as identifiers") {
     it("no references") {
       transformRecordAndCheckMiroLibraryReferences(
-        data = """
-          "image_library_ref_department": null,
-          "image_library_ref_id": null
-        """,
+        createMiroRecordWith(
+          libraryRefDepartment = Nil,
+          libraryRefId = Nil
+        ),
         expectedValues = List()
       )
     }
 
     it("one reference") {
       transformRecordAndCheckMiroLibraryReferences(
-        data = """
-          "image_library_ref_department": ["External Reference"],
-          "image_library_ref_id": ["Sanskrit ID 1924"]
-        """,
-        expectedValues = List(
-          "External Reference Sanskrit ID 1924"
-        )
+        createMiroRecordWith(
+          libraryRefDepartment = List(Some("External Reference")),
+          libraryRefId = List(Some("Sanskrit ID 1924"))
+        ),
+        expectedValues = List("External Reference Sanskrit ID 1924")
       )
     }
 
     it("two references") {
       transformRecordAndCheckMiroLibraryReferences(
-        data = """
-          "image_library_ref_department": ["External Reference", "ICV No"],
-          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
-        """,
+        createMiroRecordWith(
+          libraryRefDepartment = List(Some("External Reference"), Some("ICV No")),
+          libraryRefId = List(Some("Sanskrit ID 1924"), Some("1234"))
+        ),
         expectedValues = List(
           "External Reference Sanskrit ID 1924",
           "ICV No 1234"
@@ -179,24 +176,20 @@ class MiroTransformableTransformerTest
   it("passes through the value of the creation date on V records") {
     val date = "1820-1848"
     val work = transformWork(
-      miroId = "V1234567",
-      data = s"""
-        "image_title": "A description of a dalmation",
-        "image_image_desc": "A description of a dalmation with dots",
-        "image_artwork_date": "$date"
-      """
+      createMiroRecordWith(
+        artworkDate = Some(date),
+        imageNumber = "V1234567"
+      )
     )
     work.createdDate shouldBe Some(Period(date))
   }
 
   it("does not pass through the value of the creation date on non-V records") {
-    val date = "1820-1848"
     val work = transformWork(
-      miroId = "A1234567",
-      data = s"""
-        "image_title": "A diary about a dodo",
-        "image_artwork_date": "$date"
-      """
+      createMiroRecordWith(
+        artworkDate = Some("1820-1848"),
+        imageNumber = "A1234567"
+      )
     )
     work.createdDate shouldBe None
   }
@@ -204,20 +197,19 @@ class MiroTransformableTransformerTest
   it("passes through the lettering field if available") {
     val lettering = "A lifelong lament for lemurs"
     val work = transformWork(
-      data = s"""
-        "image_title": "Lemurs and lemons",
-        "image_supp_lettering": "$lettering"
-      """
+      createMiroRecordWith(
+        suppLettering = Some(lettering)
+      )
     )
     work.lettering shouldBe Some(lettering)
   }
 
   it("corrects HTML-encoded entities in the input JSON") {
     val work = transformWork(
-      data = s"""
-        "image_title": "A caf&#233; for cats",
-        "image_creator": ["Gyokush&#333;, a c&#228;t &#212;wn&#234;r"]
-      """
+      createMiroRecordWith(
+        title = Some("A caf&#233; for cats"),
+        creator = Some(List(Some("Gyokush&#333;, a c&#228;t &#212;wn&#234;r")))
+      )
     )
 
     work.title shouldBe "A café for cats"
@@ -256,11 +248,11 @@ class MiroTransformableTransformerTest
   it(
     "transforms an image with no credit line and an image-specific contributor code") {
     val work = transformWork(
-      data = s"""
-        "image_credit_line": null,
-        "image_source_code": "FDN"
-      """,
-      miroId = "B0011308"
+      createMiroRecordWith(
+        creditLine = None,
+        sourceCode = Some("FDN"),
+        imageNumber = "B0011308"
+      )
     )
 
     val expectedDigitalLocation = DigitalLocation(
@@ -274,7 +266,7 @@ class MiroTransformableTransformerTest
 
   it("extracts both identifiable and unidentifiable items") {
     val work = transformWork(
-      miroId = "B0011308"
+      createMiroRecordWith(imageNumber = "B0011308")
     )
 
     val expectedLocation = DigitalLocation(
@@ -303,10 +295,7 @@ class MiroTransformableTransformerTest
   it("sets the thumbnail with the IIIF Image URL") {
     val miroId = "A0001234"
     val work = transformWork(
-      miroId = miroId,
-      data = """
-           "image_use_restrictions": "CC-BY"
-        """
+      createMiroRecordWith(imageNumber = miroId)
     )
 
     work.thumbnail shouldBe Some(
@@ -332,35 +321,23 @@ class MiroTransformableTransformerTest
   }
 
   private def transformRecordAndCheckSierraSystemNumber(
-    innopacId: String,
-    expectedSierraNumber: String,
-    miroID: String = "V0000832"
-  ) = {
+    innopacID: String,
+    expectedSierraNumber: String
+  ): Assertion = {
     val work = transformWork(
-      data = s"""
-        "image_title": "A bouncing bundle of bison",
-        "image_innopac_id": "$innopacId"
-      """,
-      miroId = miroID
+      createMiroRecordWith(innopacID = Some(innopacID))
     )
-    work.identifiers shouldBe List(
-      createMiroSourceIdentifierWith(value = miroID),
+    work.identifiers should contain(
       createSierraSystemSourceIdentifierWith(value = expectedSierraNumber)
     )
   }
 
   private def transformRecordAndCheckMiroLibraryReferences(
-    data: String,
+    record: MiroRecord,
     expectedValues: List[String]
-  ) = {
+  ): Assertion = {
     val miroId = "V0175278"
-    val work = transformWork(
-      data = s"""
-        "image_title": "A fanciful frolicking of fish",
-        $data
-      """,
-      miroId = miroId
-    )
+    val work = transformWork(record.copy(imageNumber = miroId))
     val miroIDList = List(
       createMiroSourceIdentifierWith(value = miroId)
     )

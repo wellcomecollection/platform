@@ -41,10 +41,7 @@ trait MiroTransformableWrapper
       }"""
   }
 
-  def transformWork(
-    miroId: String = "M0000001",
-    data: String = ""
-  ): UnidentifiedWork = {
+  def transformWork(data: String = ""): UnidentifiedWork = {
     val miroRecord = fromJson[MiroRecord](buildJSONForWork(data)).get
 
     transformToWork(miroRecord).asInstanceOf[UnidentifiedWork]
