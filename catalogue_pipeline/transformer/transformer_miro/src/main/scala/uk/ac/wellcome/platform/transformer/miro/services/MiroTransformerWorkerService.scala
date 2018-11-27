@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 import scala.concurrent.Future
 
 class MiroTransformerWorkerService(
-  messageReceiver: MiroVHSRecordReceiver,
+  vhsRecordReceiver: MiroVHSRecordReceiver,
   miroTransformer: MiroTransformableTransformer,
   sqsStream: SQSStream[NotificationMessage]
 ) {
@@ -18,5 +18,5 @@ class MiroTransformerWorkerService(
     sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
-    messageReceiver.receiveMessage(message, miroTransformer.transform)
+    vhsRecordReceiver.receiveMessage(message, miroTransformer.transform)
 }

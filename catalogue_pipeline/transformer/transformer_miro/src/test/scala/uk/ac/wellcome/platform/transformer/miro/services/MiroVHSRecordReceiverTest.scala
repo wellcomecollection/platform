@@ -44,7 +44,7 @@ class MiroVHSRecordReceiverTest
   it("receives a message and sends it to SNS client") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
-        val message = createMiroVHSRecordWith(bucket = bucket)
+        val message = createMiroVHSRecordNotificationMessageWith(bucket = bucket)
 
         withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
           val future = recordReceiver.receiveMessage(message, transformToWork)
@@ -67,7 +67,7 @@ class MiroVHSRecordReceiverTest
 
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
-        val message = createMiroVHSRecordWith(
+        val message = createMiroVHSRecordNotificationMessageWith(
           version = version,
           bucket = bucket
         )
@@ -133,7 +133,7 @@ class MiroVHSRecordReceiverTest
   it("fails if it's unable to perform a transformation") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
-        val message = createMiroVHSRecordWith(bucket = bucket)
+        val message = createMiroVHSRecordNotificationMessageWith(bucket = bucket)
 
         withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
           val future =
@@ -149,7 +149,7 @@ class MiroVHSRecordReceiverTest
 
   it("fails if it's unable to publish the work") {
     withLocalS3Bucket { bucket =>
-      val message = createMiroVHSRecordWith(bucket = bucket)
+      val message = createMiroVHSRecordNotificationMessageWith(bucket = bucket)
 
       withMiroVHSRecordReceiver(Topic("no-such-topic"), bucket) { recordReceiver =>
         val future = recordReceiver.receiveMessage(message, transformToWork)

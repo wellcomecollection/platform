@@ -30,9 +30,13 @@ trait MiroVHSRecordReceiverFixture extends Messaging with SNS with MiroRecordGen
       testWith(recordReceiver)
     }
 
-  def createMiroVHSRecordWith(bucket: Bucket, version: Int = 1): NotificationMessage = {
+  def createMiroVHSRecordNotificationMessageWith(
+    miroRecord: MiroRecord = createMiroRecord,
+    bucket: Bucket,
+    version: Int = 1
+  ): NotificationMessage = {
     val hybridRecord = createHybridRecordWith(
-      createMiroRecord,
+      miroRecord,
       version = version,
       s3Client = s3Client,
       bucket = bucket
