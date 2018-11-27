@@ -1,14 +1,13 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{Assertion, Matchers, Suite}
-import uk.ac.wellcome.models.work.internal.{
-  TransformedBaseWork,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
-import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
+import uk.ac.wellcome.platform.transformer.miro.models.{MiroMetadata, MiroTransformable}
+import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 
 import scala.util.Try
 
@@ -29,12 +28,10 @@ trait MiroTransformableWrapper
     miroId: String = "M0000001",
     data: String = ""
   ): UnidentifiedWork = {
-    val miroTransformable = createMiroTransformableWith(
-      miroId = miroId,
-      data = buildJSONForWork(miroId = miroId, data)
-    )
+    val data = buildJSONForWork(miroId = miroId, data)
+    val transformable = fromJson[MiroTransformableData](data).get
 
-    transformToWork(miroTransformable).asInstanceOf[UnidentifiedWork]
+    transformToWork(transformable = transformable).asInstanceOf[UnidentifiedWork]
   }
 
   def assertTransformWorkFails(data: String): Assertion = {
@@ -45,9 +42,12 @@ trait MiroTransformableWrapper
     assertTransformToWorkFails(miroTransformable)
   }
 
-  def transformToWork(transformable: MiroTransformable): TransformedBaseWork = {
-    val triedWork: Try[TransformedBaseWork] =
-      transformer.transform(transformable, version = 1)
+  private def transformToWork(transformable: MiroTransformableData): TransformedBaseWork = {
+    val triedWork: Try[TransformedBaseWork] = transformer.transform(
+      transformable,
+      metadata = MiroMetadata(isClearedForCatalogueAPI = true),
+      version = 1
+    )
 
     if (triedWork.isFailure) {
       triedWork.failed.get.printStackTrace()
