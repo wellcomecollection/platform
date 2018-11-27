@@ -11,7 +11,8 @@ class MiroRecordTest extends FunSpec with Matchers {
     val jsonString =
       """
         |{
-        |    "image_keywords_unauth": [null, null]
+        |  "image_no_calc": "L0068740",
+        |  "image_keywords_unauth": [null, null]
         |}
         |
       """.stripMargin
@@ -24,6 +25,7 @@ class MiroRecordTest extends FunSpec with Matchers {
     val jsonString =
       """
         |{
+        |  "image_no_calc": "A0000001",
         |  "image_creator": ["Ad\u00c3\u00aale Mongr\u00c3\u00a9dien"]
         |}
       """.stripMargin
