@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{Assertion, Matchers, Suite}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
@@ -8,7 +9,7 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
-import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.util.Try
 
@@ -44,13 +45,13 @@ trait MiroTransformableWrapper
     miroId: String = "M0000001",
     data: String = ""
   ): UnidentifiedWork = {
-    val miroTransformable = createMiroTransformableWith(
-      miroId = miroId,
-      data = buildJSONForWork(data)
-    )
+    val miroRecord = fromJson[MiroRecord](buildJSONForWork(data)).get
 
-    transformToWork(miroTransformable).asInstanceOf[UnidentifiedWork]
+    transformToWork(miroRecord).asInstanceOf[UnidentifiedWork]
   }
+
+  def transformWork(miroRecord: MiroRecord): UnidentifiedWork =
+    transformToWork(miroRecord).asInstanceOf[UnidentifiedWork]
 
   def assertTransformWorkFails(data: String): Assertion = {
     val miroTransformable = createMiroTransformableWith(
@@ -62,9 +63,9 @@ trait MiroTransformableWrapper
       .isSuccess shouldBe false
   }
 
-  private def transformToWork(transformable: MiroTransformable): TransformedBaseWork = {
+  private def transformToWork(miroRecord: MiroRecord): TransformedBaseWork = {
     val triedWork: Try[TransformedBaseWork] =
-      transformer.transform(transformable, version = 1)
+      transformer.transform(miroRecord, version = 1)
 
     if (triedWork.isFailure) {
       triedWork.failed.get.printStackTrace()
