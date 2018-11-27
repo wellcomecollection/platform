@@ -14,14 +14,20 @@ trait MiroTransformableGenerators {
     )
 
   def createMiroTransformableDataWith(
+    title: Option[String] = None,
+    physFormat: Option[String] = None,
+    lcGenre: Option[String] = None,
+    useRestrictions: Option[String] = Some("CC-BY"),
     innopacID: Option[String] = None,
-    useRestrictions: Option[String] = None,
     sourceCode: Option[String] = None,
     libraryRefDepartment: List[Option[String]] = Nil,
     libraryRefId: List[Option[String]] = Nil): MiroTransformableData =
     MiroTransformableData(
+      title = title,
       copyrightCleared = Some("Y"),
       miroId = "M0000001",
+      physFormat = physFormat,
+      lcGenre = lcGenre,
       innopacID = innopacID,
       useRestrictions = useRestrictions,
       sourceCode = sourceCode,

@@ -31,8 +31,11 @@ trait MiroTransformableWrapper
     val jsonString = buildJSONForWork(miroId = miroId, data)
     val transformable = fromJson[MiroTransformableData](jsonString).get
 
-    transformToWork(transformable = transformable).asInstanceOf[UnidentifiedWork]
+    transformWork(transformable)
   }
+
+  def transformWork(transformable: MiroTransformableData): UnidentifiedWork =
+    transformToWork(transformable).asInstanceOf[UnidentifiedWork]
 
   def assertTransformWorkFails(transformable: MiroTransformableData): Assertion =
     transformer
