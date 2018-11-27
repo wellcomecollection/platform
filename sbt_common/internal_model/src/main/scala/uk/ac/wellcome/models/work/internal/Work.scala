@@ -122,7 +122,7 @@ case object UnidentifiedRedirectedWork {
             target: UnidentifiedWork): UnidentifiedRedirectedWork =
     UnidentifiedRedirectedWork(
       sourceIdentifier = source.sourceIdentifier,
-      version = source.version + 1 ,
+      version = source.version,
       redirect = IdentifiableRedirect(target.sourceIdentifier))
 }
 

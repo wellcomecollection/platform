@@ -44,7 +44,7 @@ trait SierraPhysicalDigitalMerger extends Logging with MergerLogging with WorkPa
         Some(
           MergedWork(
             mergedWork,
-            List(UnidentifiedRedirectedWork(digitalWork, physicalWork))
+            UnidentifiedRedirectedWork(digitalWork, physicalWork)
           ))
       case _ =>
         debug(

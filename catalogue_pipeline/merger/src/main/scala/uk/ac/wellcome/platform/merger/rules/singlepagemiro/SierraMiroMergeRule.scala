@@ -44,7 +44,7 @@ trait SierraMiroMerger extends Logging with MergerLogging with WorkPairMerger {
         Some(
           MergedWork(
             mergedWork,
-            List(UnidentifiedRedirectedWork(miroWork, sierraWork))
+            UnidentifiedRedirectedWork(miroWork, sierraWork)
           )
         )
       case _ =>
