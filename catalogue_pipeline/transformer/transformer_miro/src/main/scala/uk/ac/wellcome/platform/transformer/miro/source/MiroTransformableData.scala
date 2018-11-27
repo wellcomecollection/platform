@@ -23,6 +23,7 @@ case class MiroTransformableData(
   @JsonKey("image_keywords") keywords: Option[List[String]] = None,
   @JsonKey("image_keywords_unauth") keywordsUnauth: Option[
     List[Option[String]]] = None,
+  @JsonKey("image_no_calc") miroId: String,
   @JsonKey("image_phys_format") physFormat: Option[String] = None,
   @JsonKey("image_lc_genre") lcGenre: Option[String] = None,
   @JsonKey("image_tech_file_size") techFileSize: Option[List[String]] = None,

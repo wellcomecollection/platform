@@ -92,7 +92,7 @@ class MiroVHSRecordReceiverTest
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         val incompleteMessage = createHybridRecordNotificationWith(
-          MiroTransformableData(),
+          createMiroTransformableData,
           s3Client = s3Client,
           bucket = bucket
         )

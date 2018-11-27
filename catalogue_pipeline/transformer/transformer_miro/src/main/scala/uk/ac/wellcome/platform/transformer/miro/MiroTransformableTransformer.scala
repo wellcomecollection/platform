@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro
 
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.miro.models.{MiroMetadata, MiroTransformable}
@@ -25,17 +26,17 @@ class MiroTransformableTransformer
     version: Int
   ): Try[TransformedBaseWork] =
     transform(
-      transformable = transformable,
+      data = fromJson[MiroTransformableData](transformable.data).get,
       metadata = MiroMetadata(isClearedForCatalogueAPI = true),
       version = version
     )
 
   def transform(
-    transformable: MiroTransformable,
+    data: MiroTransformableData,
     metadata: MiroMetadata,
     version: Int
   ): Try[TransformedBaseWork] =
-    doTransform(transformable, metadata, version) map { transformed =>
+    doTransform(data, metadata, version) map { transformed =>
       debug(s"Transformed record to $transformed")
       transformed
     } recover {
@@ -45,17 +46,20 @@ class MiroTransformableTransformer
     }
 
   private def doTransform(
-    miroTransformable: MiroTransformable,
+    data: MiroTransformableData,
     metadata: MiroMetadata,
     version: Int): Try[TransformedBaseWork] = {
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
-      value = miroTransformable.sourceId
+      value = data.miroId
     )
 
     Try {
-      val miroData = MiroTransformableData.create(miroTransformable.data)
+      // This is super hacky and we should really remove it (probably fix the
+      // source data properly now we have the reporting pipeline), but for
+      // now it'll do.
+      val miroData = MiroTransformableData.create(toJson(data).get)
 
       // These images should really have been removed from the pipeline
       // already, but we have at least one instance (B0010525).  It was
@@ -63,7 +67,7 @@ class MiroTransformableTransformer
       // it properly here.
       if (!miroData.copyrightCleared.contains("Y")) {
         throw new ShouldNotTransformException(
-          s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
+          s"Image ${data.miroId} does not have copyright clearance!"
         )
       }
 
@@ -72,7 +76,7 @@ class MiroTransformableTransformer
       UnidentifiedWork(
         sourceIdentifier = sourceIdentifier,
         otherIdentifiers =
-          getOtherIdentifiers(miroData, miroTransformable.sourceId),
+          getOtherIdentifiers(miroData, data.miroId),
         mergeCandidates = List(),
         title = title,
         workType = getWorkType,
@@ -81,19 +85,19 @@ class MiroTransformableTransformer
         extent = None,
         lettering = miroData.suppLettering,
         createdDate =
-          getCreatedDate(miroData, miroId = miroTransformable.sourceId),
+          getCreatedDate(miroData, miroId = data.miroId),
         subjects = getSubjects(miroData),
         genres = getGenres(miroData),
         contributors = getContributors(
-          miroId = miroTransformable.sourceId,
+          miroId = data.miroId,
           miroData = miroData
         ),
-        thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+        thumbnail = Some(getThumbnail(miroData, data.miroId)),
         production = List(),
         language = None,
         dimensions = None,
-        items = getItems(miroData, miroTransformable.sourceId),
-        itemsV1 = getItemsV1(miroData, miroTransformable.sourceId),
+        items = getItems(miroData, data.miroId),
+        itemsV1 = getItemsV1(miroData, data.miroId),
         version = version
       )
     }.recover {

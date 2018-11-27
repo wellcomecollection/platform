@@ -5,6 +5,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
 import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
 import uk.ac.wellcome.platform.transformer.miro.services.MiroVHSRecordReceiver
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
@@ -14,7 +15,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait MiroVHSRecordReceiverFixture extends Messaging with SNS {
+trait MiroVHSRecordReceiverFixture extends Messaging with SNS with MiroTransformableGenerators {
   def withMiroVHSRecordReceiver[R](topic: Topic, bucket: Bucket)(testWith: TestWith[MiroVHSRecordReceiver, R])(
     implicit objectStore: ObjectStore[MiroTransformableData]): R =
     withMessageWriter[TransformedBaseWork, R](
@@ -31,7 +32,7 @@ trait MiroVHSRecordReceiverFixture extends Messaging with SNS {
 
   def createMiroVHSRecordWith(bucket: Bucket, version: Int = 1): NotificationMessage = {
     val hybridRecord = createHybridRecordWith(
-      MiroTransformableData(),
+      createMiroTransformableData,
       version = version,
       s3Client = s3Client,
       bucket = bucket

@@ -3,19 +3,18 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
 
-class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators {
+class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators with MiroTransformableGenerators {
   val transformer = new MiroItems {}
 
   describe("getItemsV1") {
     it("extracts an identifiable item") {
       transformer.getItemsV1(
         miroId = "B0011308",
-        miroData = MiroTransformableData(
-          creditLine = None,
-          sourceCode = Some("FDN"),
-          useRestrictions = Some("CC-0")
+        miroData = createMiroTransformableDataWith(
+          useRestrictions = Some("CC-0"),
+          sourceCode = Some("FDN")
         )) shouldBe List(
         Identifiable(
           agent = Item(locations = List(DigitalLocation(
@@ -34,10 +33,9 @@ class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators {
     it("extracts an unidentifiable item") {
       transformer.getItems(
         miroId = "B0011308",
-        miroData = MiroTransformableData(
-          creditLine = None,
-          sourceCode = Some("FDN"),
-          useRestrictions = Some("CC-0")
+        miroData = createMiroTransformableDataWith(
+          useRestrictions = Some("CC-0"),
+          sourceCode = Some("FDN")
         )) shouldBe List(
         Unidentifiable(
           agent = Item(locations = List(DigitalLocation(
