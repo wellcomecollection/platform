@@ -10,7 +10,6 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.transformer.fixtures.HybridRecordReceiverFixture
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
 import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
 import uk.ac.wellcome.platform.transformer.miro.services.MiroTransformerWorkerService
 import uk.ac.wellcome.storage.fixtures.S3
@@ -29,8 +28,7 @@ class MiroTransformerFeatureTest
     with Eventually
     with HybridRecordReceiverFixture
     with IntegrationPatience
-    with MiroTransformableWrapper
-    with MiroTransformableGenerators {
+    with MiroTransformableWrapper {
 
   it("transforms miro records and publishes the result to the given topic") {
     val miroID = "M0000001"
@@ -162,4 +160,13 @@ class MiroTransformerFeatureTest
           }
         }
     }
+
+  private def createMiroTransformableWith(
+    miroId: String = "M0000001",
+    data: String
+  ): MiroTransformable =
+    MiroTransformable(
+      sourceId = miroId,
+      data = data
+    )
 }

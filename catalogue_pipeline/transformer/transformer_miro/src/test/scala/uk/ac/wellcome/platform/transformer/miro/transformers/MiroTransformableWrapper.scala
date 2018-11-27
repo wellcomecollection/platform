@@ -7,14 +7,11 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
-import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.util.Try
 
-trait MiroTransformableWrapper
-    extends Matchers
-    with MiroTransformableGenerators { this: Suite =>
+trait MiroTransformableWrapper extends Matchers { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String = {
