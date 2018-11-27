@@ -18,7 +18,7 @@ case object Callback extends URIConverters {
     callbackUri.map(Callback(_))
   }
 
-  val processingString = "processing"
+  private val processingString = "processing"
   private val succeededString = "succeeded"
   val failureString = "failure"
 
