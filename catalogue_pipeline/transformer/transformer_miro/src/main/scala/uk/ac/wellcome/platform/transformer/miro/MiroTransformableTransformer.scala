@@ -23,8 +23,9 @@ class MiroTransformableTransformer
   def transform(
     transformable: MiroTransformable,
     version: Int
-  ): Try[TransformedBaseWork] =
-    doTransform(transformable, version) map { transformed =>
+  ): Try[TransformedBaseWork] = {
+    val miroRecord = MiroRecord.create(transformable.data)
+    doTransform(miroRecord, version) map { transformed =>
       debug(s"Transformed record to $transformed")
       transformed
     } recover {
@@ -32,24 +33,23 @@ class MiroTransformableTransformer
         error("Failed to perform transform to unified item", e)
         throw e
     }
+  }
 
-  private def doTransform(miroTransformable: MiroTransformable, version: Int): Try[TransformedBaseWork] = {
+  private def doTransform(miroRecord: MiroRecord, version: Int): Try[TransformedBaseWork] = {
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
-      value = miroTransformable.sourceId
+      value = miroRecord.imageNumber
     )
 
     Try {
-      val miroRecord = MiroRecord.create(miroTransformable.data)
-
       // These images should really have been removed from the pipeline
       // already, but we have at least one instance (B0010525).  It was
       // throwing a MatchError when we tried to pick a license, so handle
       // it properly here.
       if (!miroRecord.copyrightCleared.contains("Y")) {
         throw new ShouldNotTransformException(
-          s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
+          s"Image ${miroRecord.imageNumber} does not have copyright clearance!"
         )
       }
 
@@ -58,7 +58,7 @@ class MiroTransformableTransformer
       UnidentifiedWork(
         sourceIdentifier = sourceIdentifier,
         otherIdentifiers =
-          getOtherIdentifiers(miroRecord, miroTransformable.sourceId),
+          getOtherIdentifiers(miroRecord, miroRecord.imageNumber),
         mergeCandidates = List(),
         title = title,
         workType = getWorkType,
@@ -67,19 +67,19 @@ class MiroTransformableTransformer
         extent = None,
         lettering = miroRecord.suppLettering,
         createdDate =
-          getCreatedDate(miroRecord, miroId = miroTransformable.sourceId),
+          getCreatedDate(miroRecord, miroId = miroRecord.imageNumber),
         subjects = getSubjects(miroRecord),
         genres = getGenres(miroRecord),
         contributors = getContributors(
-          miroId = miroTransformable.sourceId,
+          miroId = miroRecord.imageNumber,
           miroRecord = miroRecord
         ),
-        thumbnail = Some(getThumbnail(miroRecord, miroTransformable.sourceId)),
+        thumbnail = Some(getThumbnail(miroRecord, miroRecord.imageNumber)),
         production = List(),
         language = None,
         dimensions = None,
-        items = getItems(miroRecord, miroTransformable.sourceId),
-        itemsV1 = getItemsV1(miroRecord, miroTransformable.sourceId),
+        items = getItems(miroRecord, miroRecord.imageNumber),
+        itemsV1 = getItemsV1(miroRecord, miroRecord.imageNumber),
         version = version
       )
     }.recover {

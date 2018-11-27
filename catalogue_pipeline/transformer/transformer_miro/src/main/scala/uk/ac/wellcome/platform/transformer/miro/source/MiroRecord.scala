@@ -35,7 +35,8 @@ case class MiroRecord(
     Option[String]] = Nil,
   @JsonKey("image_library_ref_id") libraryRefId: List[Option[String]] = Nil,
   @JsonKey("image_award") award: List[Option[String]] = Nil,
-  @JsonKey("image_award_date") awardDate: List[Option[String]] = Nil
+  @JsonKey("image_award_date") awardDate: List[Option[String]] = Nil,
+  @JsonKey("image_no_calc") imageNumber: String
 )
 
 case object MiroRecord {

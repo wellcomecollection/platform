@@ -11,6 +11,7 @@ trait MiroRecordGenerators {
     MiroRecord(
       useRestrictions = useRestrictions,
       innopacID = innopacID,
-      sourceCode = sourceCode
+      sourceCode = sourceCode,
+      imageNumber = "M0000001"
     )
 }
