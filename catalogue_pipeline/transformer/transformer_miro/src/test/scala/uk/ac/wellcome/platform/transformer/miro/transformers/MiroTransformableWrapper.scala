@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWor
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
-import uk.ac.wellcome.platform.transformer.miro.models.{MiroMetadata, MiroTransformable}
+import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 
 import scala.util.Try
@@ -14,9 +14,9 @@ import scala.util.Try
 /** MiroTransformable looks for several fields in the source JSON -- if they're
   *  missing or have the wrong values, it rejects the record.
   *
-  *  This trait provides a single method `transform()` which adds the necessary
-  *  fields before transformation, allowing tests to focus on only the fields
-  *  that are interesting for that test.
+  *  This trait provides a single method `transformToWork()` which adds the
+  *  necessary fields before transformation, allowing tests to focus on only
+  *  the fields that are interesting for that test.
   */
 trait MiroTransformableWrapper
     extends Matchers
@@ -28,8 +28,8 @@ trait MiroTransformableWrapper
     miroId: String = "M0000001",
     data: String = ""
   ): UnidentifiedWork = {
-    val data = buildJSONForWork(miroId = miroId, data)
-    val transformable = fromJson[MiroTransformableData](data).get
+    val jsonString = buildJSONForWork(miroId = miroId, data)
+    val transformable = fromJson[MiroTransformableData](jsonString).get
 
     transformToWork(transformable = transformable).asInstanceOf[UnidentifiedWork]
   }
