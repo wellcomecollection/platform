@@ -8,10 +8,15 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroThumbnail extends MiroImageApiURL with MiroLicenses {
-  def getThumbnail(miroRecord: MiroRecord, miroId: String): Location =
+  def getThumbnail(miroRecord: MiroRecord): Location =
     DigitalLocation(
       locationType = LocationType("thumbnail-image"),
-      url = buildImageApiURL(miroId, templateName = "thumbnail"),
-      license = Some(chooseLicense(miroId, miroRecord.useRestrictions))
+      url = buildImageApiURL(miroId = miroRecord.imageNumber, templateName = "thumbnail"),
+      license = Some(
+        chooseLicense(
+          miroId = miroRecord.imageNumber,
+          maybeUseRestrictions = miroRecord.useRestrictions
+        )
+      )
     )
 }

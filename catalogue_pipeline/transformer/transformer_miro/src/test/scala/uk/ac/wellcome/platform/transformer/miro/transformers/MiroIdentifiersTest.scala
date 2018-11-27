@@ -12,11 +12,11 @@ class MiroIdentifiersTest
 
   it("fixes the malformed INNOPAC ID on L0035411") {
     val miroRecord = createMiroRecordWith(
-      innopacID = Some("L 35411 \n\n15551040")
+      innopacID = Some("L 35411 \n\n15551040"),
+      imageNumber = "L0035411"
     )
 
-    val otherIdentifiers =
-      transformer.getOtherIdentifiers(miroRecord = miroRecord, miroId = "L0035411")
+    val otherIdentifiers = transformer.getOtherIdentifiers(miroRecord = miroRecord)
 
     otherIdentifiers shouldBe List(
       createSierraSystemSourceIdentifierWith(

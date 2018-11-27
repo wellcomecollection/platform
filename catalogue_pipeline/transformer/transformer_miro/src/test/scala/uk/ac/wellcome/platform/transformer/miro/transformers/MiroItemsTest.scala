@@ -11,10 +11,10 @@ class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators wit
   describe("getItemsV1") {
     it("extracts an identifiable item") {
       transformer.getItemsV1(
-        miroId = "B0011308",
-        miroRecord = createMiroRecordWith(
+        createMiroRecordWith(
           sourceCode = Some("FDN"),
-          useRestrictions = Some("CC-0")
+          useRestrictions = Some("CC-0"),
+          imageNumber = "B0011308"
         )) shouldBe List(
         Identifiable(
           agent = Item(locations = List(DigitalLocation(
@@ -32,10 +32,10 @@ class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators wit
   describe("getItems") {
     it("extracts an unidentifiable item") {
       transformer.getItems(
-        miroId = "B0011308",
-        miroRecord = createMiroRecordWith(
+        createMiroRecordWith(
           sourceCode = Some("FDN"),
-          useRestrictions = Some("CC-0")
+          useRestrictions = Some("CC-0"),
+          imageNumber = "B0011308"
         )) shouldBe List(
         Unidentifiable(
           agent = Item(locations = List(DigitalLocation(

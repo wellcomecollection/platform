@@ -57,8 +57,7 @@ class MiroTransformableTransformer
 
       UnidentifiedWork(
         sourceIdentifier = sourceIdentifier,
-        otherIdentifiers =
-          getOtherIdentifiers(miroRecord, miroRecord.imageNumber),
+        otherIdentifiers = getOtherIdentifiers(miroRecord),
         mergeCandidates = List(),
         title = title,
         workType = getWorkType,
@@ -66,20 +65,16 @@ class MiroTransformableTransformer
         physicalDescription = None,
         extent = None,
         lettering = miroRecord.suppLettering,
-        createdDate =
-          getCreatedDate(miroRecord, miroId = miroRecord.imageNumber),
+        createdDate = getCreatedDate(miroRecord),
         subjects = getSubjects(miroRecord),
         genres = getGenres(miroRecord),
-        contributors = getContributors(
-          miroId = miroRecord.imageNumber,
-          miroRecord = miroRecord
-        ),
-        thumbnail = Some(getThumbnail(miroRecord, miroRecord.imageNumber)),
+        contributors = getContributors(miroRecord),
+        thumbnail = Some(getThumbnail(miroRecord)),
         production = List(),
         language = None,
         dimensions = None,
-        items = getItems(miroRecord, miroRecord.imageNumber),
-        itemsV1 = getItemsV1(miroRecord, miroRecord.imageNumber),
+        items = getItems(miroRecord),
+        itemsV1 = getItemsV1(miroRecord),
         version = version
       )
     }.recover {

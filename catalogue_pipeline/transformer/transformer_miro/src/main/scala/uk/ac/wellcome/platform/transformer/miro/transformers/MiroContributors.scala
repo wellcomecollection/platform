@@ -7,7 +7,7 @@ import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroContributors extends MiroContributorCodes {
   /* Populate wwork:contributors.  We use the <image_creator> tag from the Miro XML. */
-  def getContributors(miroId: String, miroRecord: MiroRecord)
+  def getContributors(miroRecord: MiroRecord)
     : List[Contributor[Unidentifiable[Agent]]] = {
     val primaryCreators = miroRecord.creator match {
       case Some(maybeCreators) =>
@@ -31,12 +31,12 @@ trait MiroContributors extends MiroContributorCodes {
     // only if the contributor *isn't* Wellcome Collection.v
     val maybeContributorCreator = miroRecord.sourceCode match {
       case Some(code) =>
-        lookupContributorCode(miroId = miroId, code = code) match {
+        lookupContributorCode(miroId = miroRecord.imageNumber, code = code) match {
           case Some("Wellcome Collection") => None
           case Some(s)                     => Some(s)
           case None =>
             throw TransformerException(
-              s"Unable to look up contributor credit line for ${miroRecord.sourceCode} on ${miroId}"
+              s"Unable to look up contributor credit line for ${miroRecord.sourceCode} on ${miroRecord.imageNumber}"
             )
         }
       case None => None

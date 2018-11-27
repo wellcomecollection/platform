@@ -13,10 +13,10 @@ class MiroLocationsTest extends FunSpec with Matchers with MiroRecordGenerators 
   it(
     "extracts the digital location and finds the credit line for an image-specific contributor code") {
     transformer.getLocations(
-      miroId = "B0011308",
-      miroRecord = createMiroRecordWith(
+      createMiroRecordWith(
         sourceCode = Some("FDN"),
-        useRestrictions = Some("CC-0")
+        useRestrictions = Some("CC-0"),
+        imageNumber = "B0011308"
       )
     ) shouldBe List(
       DigitalLocation(

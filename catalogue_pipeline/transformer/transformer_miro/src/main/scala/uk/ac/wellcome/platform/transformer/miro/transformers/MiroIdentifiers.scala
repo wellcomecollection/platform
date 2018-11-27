@@ -4,8 +4,7 @@ import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroIdentifiers extends MiroTransformableUtils {
-  def getOtherIdentifiers(miroRecord: MiroRecord,
-                          miroId: String): List[SourceIdentifier] = {
+  def getOtherIdentifiers(miroRecord: MiroRecord): List[SourceIdentifier] = {
 
     // Add the Sierra system number from the INNOPAC ID, if it's present.
     //
@@ -20,7 +19,7 @@ trait MiroIdentifiers extends MiroTransformableUtils {
     //
     // We fix that here, for this record only, so the change is documented.
     //
-    val innopacIdField = if (miroId == "L0035411") {
+    val innopacIdField = if (miroRecord.imageNumber == "L0035411") {
       miroRecord.innopacID.map { _.replaceAll("L 35411 \n\n", "") }
     } else {
       miroRecord.innopacID

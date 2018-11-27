@@ -8,13 +8,21 @@ trait MiroLocations
     with MiroLicenses
     with MiroContributorCodes {
 
-  def getLocations(miroRecord: MiroRecord, miroId: String): List[DigitalLocation] =
+  def getLocations(miroRecord: MiroRecord): List[DigitalLocation] =
     List(
       DigitalLocation(
         locationType = LocationType("iiif-image"),
-        url = buildImageApiURL(miroId, "info"),
-        credit = getCredit(miroId = miroId, miroRecord = miroRecord),
-        license = Some(chooseLicense(miroId, miroRecord.useRestrictions))
+        url = buildImageApiURL(
+          miroId = miroRecord.imageNumber,
+          templateName = "info"
+        ),
+        credit = getCredit(miroRecord),
+        license = Some(
+          chooseLicense(
+            miroId = miroRecord.imageNumber,
+            maybeUseRestrictions = miroRecord.useRestrictions
+          )
+        )
       )
     )
 
@@ -27,8 +35,7 @@ trait MiroLocations
     * We prefer the per-image credit line, but use the contributor-level credit
     * if unavailable.
     */
-  private def getCredit(miroId: String,
-                        miroRecord: MiroRecord): Option[String] = {
+  private def getCredit(miroRecord: MiroRecord): Option[String] = {
     miroRecord.creditLine match {
 
       // Some of the credit lines are inconsistent or use old names for
@@ -77,7 +84,7 @@ trait MiroLocations
       case None =>
         miroRecord.sourceCode match {
           case Some(code) =>
-            lookupContributorCode(miroId = miroId, code = code)
+            lookupContributorCode(miroId = miroRecord.imageNumber, code = code)
           case None => None
         }
     }

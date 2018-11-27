@@ -6,12 +6,13 @@ trait MiroRecordGenerators {
   def createMiroRecordWith(
     useRestrictions: Option[String] = None,
     innopacID: Option[String] = None,
-    sourceCode: Option[String] = None
+    sourceCode: Option[String] = None,
+    imageNumber: String = "M0000001"
   ): MiroRecord =
     MiroRecord(
       useRestrictions = useRestrictions,
       innopacID = innopacID,
       sourceCode = sourceCode,
-      imageNumber = "M0000001"
+      imageNumber = imageNumber
     )
 }
