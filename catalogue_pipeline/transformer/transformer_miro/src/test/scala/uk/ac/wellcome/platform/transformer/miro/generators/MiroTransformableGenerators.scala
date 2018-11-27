@@ -38,7 +38,8 @@ trait MiroTransformableGenerators {
   def createMiroTransformableData: MiroTransformableData =
     createMiroTransformableDataWith()
 
-  def buildJSONForWork(miroId: String = "M0000001", extraData: String): String = {
+  def buildJSONForWork(miroId: String = "M0000001",
+                       extraData: String): String = {
     val baseData =
       s"""
          |  "image_no_calc": "$miroId",

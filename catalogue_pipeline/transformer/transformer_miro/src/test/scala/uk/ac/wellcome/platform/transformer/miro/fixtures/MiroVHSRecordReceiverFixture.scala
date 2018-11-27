@@ -15,8 +15,12 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait MiroVHSRecordReceiverFixture extends Messaging with SNS with MiroTransformableGenerators {
-  def withMiroVHSRecordReceiver[R](topic: Topic, bucket: Bucket)(testWith: TestWith[MiroVHSRecordReceiver, R])(
+trait MiroVHSRecordReceiverFixture
+    extends Messaging
+    with SNS
+    with MiroTransformableGenerators {
+  def withMiroVHSRecordReceiver[R](topic: Topic, bucket: Bucket)(
+    testWith: TestWith[MiroVHSRecordReceiver, R])(
     implicit objectStore: ObjectStore[MiroTransformableData]): R =
     withMessageWriter[TransformedBaseWork, R](
       bucket,
@@ -30,7 +34,8 @@ trait MiroVHSRecordReceiverFixture extends Messaging with SNS with MiroTransform
       testWith(recordReceiver)
     }
 
-  def createMiroVHSRecordWith(bucket: Bucket, version: Int = 1): NotificationMessage = {
+  def createMiroVHSRecordWith(bucket: Bucket,
+                              version: Int = 1): NotificationMessage = {
     val hybridRecord = createHybridRecordWith(
       createMiroTransformableData,
       version = version,
@@ -48,7 +53,8 @@ trait MiroVHSRecordReceiverFixture extends Messaging with SNS with MiroTransform
          |  "id": "${hybridRecord.id}",
          |  "location": ${toJson(hybridRecord.location).get},
          |  "version": ${hybridRecord.version},
-         |  "isClearedForCatalogueAPI": ${toJson(miroMetadata.isClearedForCatalogueAPI).get}
+         |  "isClearedForCatalogueAPI": ${toJson(
+           miroMetadata.isClearedForCatalogueAPI).get}
          |}
        """.stripMargin
     )

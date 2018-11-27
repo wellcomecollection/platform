@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{Assertion, Matchers, Suite}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
@@ -37,12 +40,17 @@ trait MiroTransformableWrapper
   def transformWork(transformable: MiroTransformableData): UnidentifiedWork =
     transformToWork(transformable).asInstanceOf[UnidentifiedWork]
 
-  def assertTransformWorkFails(transformable: MiroTransformableData): Assertion =
+  def assertTransformWorkFails(
+    transformable: MiroTransformableData): Assertion =
     transformer
-      .transform(transformable, metadata = MiroMetadata(isClearedForCatalogueAPI = true), version = 1)
+      .transform(
+        transformable,
+        metadata = MiroMetadata(isClearedForCatalogueAPI = true),
+        version = 1)
       .isSuccess shouldBe false
 
-  private def transformToWork(transformable: MiroTransformableData): TransformedBaseWork = {
+  private def transformToWork(
+    transformable: MiroTransformableData): TransformedBaseWork = {
     val triedWork: Try[TransformedBaseWork] = transformer.transform(
       transformable,
       metadata = MiroMetadata(isClearedForCatalogueAPI = true),

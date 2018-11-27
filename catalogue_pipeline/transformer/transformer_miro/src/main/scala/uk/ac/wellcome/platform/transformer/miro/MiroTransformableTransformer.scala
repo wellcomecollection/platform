@@ -4,7 +4,10 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
-import uk.ac.wellcome.platform.transformer.miro.models.{MiroMetadata, MiroTransformable}
+import uk.ac.wellcome.platform.transformer.miro.models.{
+  MiroMetadata,
+  MiroTransformable
+}
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 
 import scala.util.Try
@@ -45,10 +48,9 @@ class MiroTransformableTransformer
         throw e
     }
 
-  private def doTransform(
-    data: MiroTransformableData,
-    metadata: MiroMetadata,
-    version: Int): Try[TransformedBaseWork] = {
+  private def doTransform(data: MiroTransformableData,
+                          metadata: MiroMetadata,
+                          version: Int): Try[TransformedBaseWork] = {
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
@@ -75,8 +77,7 @@ class MiroTransformableTransformer
 
       UnidentifiedWork(
         sourceIdentifier = sourceIdentifier,
-        otherIdentifiers =
-          getOtherIdentifiers(miroData, data.miroId),
+        otherIdentifiers = getOtherIdentifiers(miroData, data.miroId),
         mergeCandidates = List(),
         title = title,
         workType = getWorkType,
@@ -84,8 +85,7 @@ class MiroTransformableTransformer
         physicalDescription = None,
         extent = None,
         lettering = miroData.suppLettering,
-        createdDate =
-          getCreatedDate(miroData, miroId = data.miroId),
+        createdDate = getCreatedDate(miroData, miroId = data.miroId),
         subjects = getSubjects(miroData),
         genres = getGenres(miroData),
         contributors = getContributors(

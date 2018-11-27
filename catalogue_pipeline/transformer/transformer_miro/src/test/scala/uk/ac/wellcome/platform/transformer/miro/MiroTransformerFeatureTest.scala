@@ -43,7 +43,9 @@ class MiroTransformerFeatureTest
             val miroHybridRecordMessage = createHybridRecordNotificationWith(
               createMiroTransformableWith(
                 miroId = miroId,
-                data = buildJSONForWork(miroId = miroId, s""""image_title": "$title"""")
+                data = buildJSONForWork(
+                  miroId = miroId,
+                  s""""image_title": "$title"""")
               ),
               s3Client = s3Client,
               bucket = storageBucket

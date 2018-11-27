@@ -228,13 +228,13 @@ class MiroTransformableTransformerTest
     it("if usage restrictions mean we suppress the image") {
       assertTransformReturnsInvisibleWork(
         miroId = "M0000001",
-        data =
-          buildJSONForWork(
-            miroId = "M0000001",
-            extraData = """
+        data = buildJSONForWork(
+          miroId = "M0000001",
+          extraData = """
         "image_title": "Private pictures of perilous penguins",
         "image_use_restrictions": "Do not use"
-      """)
+      """
+        )
       )
     }
 
@@ -252,8 +252,7 @@ class MiroTransformableTransformerTest
     it("if the image isn't copyright cleared") {
       assertTransformReturnsInvisibleWork(
         miroId = "M0000001",
-        data =
-          """{
+        data = """{
         "image_cleared": "Y",
         "image_copyright_cleared": "N",
         "image_no_calc": "M0000001",
@@ -330,7 +329,8 @@ class MiroTransformableTransformerTest
     )
   }
 
-  private def assertTransformReturnsInvisibleWork(miroId: String, data: String): Assertion = {
+  private def assertTransformReturnsInvisibleWork(miroId: String,
+                                                  data: String): Assertion = {
     val miroTransformable = createMiroTransformableWith(
       miroId = miroId,
       data = data

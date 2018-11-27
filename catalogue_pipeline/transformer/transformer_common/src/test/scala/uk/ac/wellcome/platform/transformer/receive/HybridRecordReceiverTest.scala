@@ -124,9 +124,7 @@ class HybridRecordReceiverTest
         withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) {
           recordReceiver =>
             val future =
-              recordReceiver.receiveMessage(
-                invalidSqsMessage,
-                transformToWork)
+              recordReceiver.receiveMessage(invalidSqsMessage, transformToWork)
 
             whenReady(future.failed) { x =>
               x shouldBe a[TransformerException]
@@ -146,9 +144,7 @@ class HybridRecordReceiverTest
         withHybridRecordReceiver[TestTransformable, Assertion](topic, bucket) {
           recordReceiver =>
             val future =
-              recordReceiver.receiveMessage(
-                invalidSqsMessage,
-                transformToWork)
+              recordReceiver.receiveMessage(invalidSqsMessage, transformToWork)
 
             whenReady(future.failed) {
               _ shouldBe a[JsonDecodingError]

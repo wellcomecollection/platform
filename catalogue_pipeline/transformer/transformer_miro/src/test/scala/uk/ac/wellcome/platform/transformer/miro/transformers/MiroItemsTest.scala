@@ -5,7 +5,11 @@ import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroTransformableGenerators
 
-class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators with MiroTransformableGenerators {
+class MiroItemsTest
+    extends FunSpec
+    with Matchers
+    with IdentifiersGenerators
+    with MiroTransformableGenerators {
   val transformer = new MiroItems {}
 
   describe("getItemsV1") {

@@ -62,7 +62,9 @@ class MiroGenresTest
     )
 
     val expectedGenreObjects = expectedGenres
-      .map { g: String => Genre(g, List(Unidentifiable(Concept(g)))) }
+      .map { g: String =>
+        Genre(g, List(Unidentifiable(Concept(g))))
+      }
 
     transformWork(transformable).genres shouldBe expectedGenreObjects
   }
