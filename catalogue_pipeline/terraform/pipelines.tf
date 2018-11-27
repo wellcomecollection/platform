@@ -17,7 +17,7 @@ module "catalogue_pipelines" {
 
   sierra_adapter_topic_count = 3
 
-  index_v1 = "v1-2018-11-27-correct merge"
+  index_v1 = "v1-2018-11-27-correct-merge"
   index_v2 = "v2-2018-11-27-correct-merge"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
