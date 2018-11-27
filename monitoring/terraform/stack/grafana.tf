@@ -4,7 +4,7 @@ module "grafana" {
   namespace = "${var.namespace}-grafana"
 
   domain     = "${var.domain}"
-  aws_region = ""
+  aws_region = "${var.aws_region}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
