@@ -22,14 +22,6 @@ class MiroTransformableTransformer
     with Logging {
 
   def transform(miroRecord: MiroRecord,
-                version: Int): Try[TransformedBaseWork] =
-    transform(
-      miroRecord = miroRecord,
-      miroMetadata = MiroMetadata(isClearedForCatalogueAPI = true),
-      version = version
-    )
-
-  def transform(miroRecord: MiroRecord,
                 miroMetadata: MiroMetadata,
                 version: Int): Try[TransformedBaseWork] =
     doTransform(miroRecord, miroMetadata, version) map { transformed =>
