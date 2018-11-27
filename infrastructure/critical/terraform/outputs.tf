@@ -16,6 +16,24 @@ output "vhs_miro_bucket_name" {
   value = "${module.vhs_miro.bucket_name}"
 }
 
+# Miro Complete Hybrid Store
+
+output "vhs_miro_complete_dynamodb_update_policy" {
+  value = "${module.vhs_miro2.dynamodb_update_policy}"
+}
+
+output "vhs_miro_complete_read_policy" {
+  value = "${module.vhs_miro2.read_policy}"
+}
+
+output "vhs_miro_complete_table_name" {
+  value = "${module.vhs_miro2.table_name}"
+}
+
+output "vhs_miro_complete_bucket_name" {
+  value = "${module.vhs_miro2.bucket_name}"
+}
+
 # Miro Inventory Hybrid Store
 
 output "vhs_miro_inventory_dynamodb_update_policy" {

@@ -53,7 +53,7 @@ module "reporting_miro_reindexer" {
   source = "./reindex_worker"
 
   namespace                           = "reporting_pipeline_miro"
-  vhs_table_name                      = "${local.vhs_miro_table_name}"
+  vhs_table_name                      = "${local.vhs_miro_complete_table_name}"
   hybrid_records_topic_arn            = "${local.reporting_miro_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.reporting_miro_hybrid_records_topic_publish_policy}"
 
