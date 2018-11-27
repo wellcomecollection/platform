@@ -8,10 +8,9 @@ import uk.ac.wellcome.models.work.internal._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 
-  def optionalString(
-    fieldName: String,
-    maybeStringValue: Option[String],
-    trailingComma: Boolean = true): Option[String] =
+  def optionalString(fieldName: String,
+                     maybeStringValue: Option[String],
+                     trailingComma: Boolean = true): Option[String] =
     maybeStringValue.map { p =>
       s"""
         "$fieldName": "$p"

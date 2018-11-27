@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{License, License_CC0, License_CopyrightNotCleared}
+import uk.ac.wellcome.models.work.internal.{
+  License,
+  License_CC0,
+  License_CopyrightNotCleared
+}
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
 
 class MiroLicensesTest extends FunSpec with Matchers {
@@ -32,7 +36,9 @@ class MiroLicensesTest extends FunSpec with Matchers {
   }
 
   private def chooseLicense(maybeUseRestrictions: Option[String]): License =
-    transformer.chooseLicense(miroId = "A1234567", maybeUseRestrictions = maybeUseRestrictions)
+    transformer.chooseLicense(
+      miroId = "A1234567",
+      maybeUseRestrictions = maybeUseRestrictions)
 
   val transformer = new MiroLicenses {}
 }

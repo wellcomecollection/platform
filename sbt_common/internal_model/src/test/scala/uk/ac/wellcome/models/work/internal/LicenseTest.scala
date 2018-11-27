@@ -9,7 +9,8 @@ class LicenseTest extends FunSpec with Matchers {
     assertRoundTripsLicenseCorrectly(License_CCBY)
   }
 
-  it("can serialise and then deserialise a copyright-not-cleared license as JSON") {
+  it(
+    "can serialise and then deserialise a copyright-not-cleared license as JSON") {
     assertRoundTripsLicenseCorrectly(License_CopyrightNotCleared)
   }
 
