@@ -30,5 +30,3 @@ module "scheduled_slack_budget" {
   cluster_arn                = "${aws_ecs_cluster.monitoring.arn}"
   task_definition_arn        = "${module.slack_budget_bot.task_definition_arn}"
 }
-
-

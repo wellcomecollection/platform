@@ -30,7 +30,7 @@ module "trigger_update_service_list" {
   lambda_function_name    = "${module.lambda_update_service_list.function_name}"
   lambda_function_arn     = "${module.lambda_update_service_list.arn}"
   cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_minute.arn}"
+  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_minute.name}"
 }
 
 # post_to_slack

@@ -1,3 +1,5 @@
+# Terraform config
+
 terraform {
   required_version = ">= 0.10"
 
@@ -8,6 +10,8 @@ terraform {
     region         = "eu-west-1"
   }
 }
+
+# Data
 
 data "terraform_remote_state" "loris" {
   backend = "s3"
@@ -27,6 +31,15 @@ data "terraform_remote_state" "shared_infra" {
     key    = "terraform/shared_infra.tfstate"
     region = "eu-west-1"
   }
+}
+
+data "aws_caller_identity" "current" {}
+
+#Providers
+
+provider "aws" {
+  region  = "${var.aws_region}"
+  version = "1.22.0"
 }
 
 provider "aws" {
