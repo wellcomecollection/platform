@@ -35,11 +35,11 @@ trait MiroTransformableWrapper
   }
 
   def assertTransformWorkFails(data: String): Assertion = {
-    val miroTransformable = createMiroTransformableWith(
-      data = buildJSONForWork(extraData = data)
-    )
 
-    assertTransformToWorkFails(miroTransformable)
+    val transformable = fromJson[MiroTransformableData](data).get
+    transformer
+      .transform(transformable, metadata = MiroMetadata(isClearedForCatalogueAPI = true), version = 1)
+      .isSuccess shouldBe false
   }
 
   private def transformToWork(transformable: MiroTransformableData): TransformedBaseWork = {
@@ -58,12 +58,4 @@ trait MiroTransformableWrapper
     triedWork.isSuccess shouldBe true
     triedWork.get
   }
-
-  def assertTransformToWorkFails(
-    transformable: MiroTransformable): Assertion = {
-    transformer
-      .transform(transformable, version = 1)
-      .isSuccess shouldBe false
-  }
-
 }
