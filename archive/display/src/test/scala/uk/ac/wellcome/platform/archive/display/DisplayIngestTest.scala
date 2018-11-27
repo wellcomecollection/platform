@@ -83,7 +83,7 @@ class DisplayIngestTest
       ObjectLocation(bucket, path))
     progress.callback shouldBe Some(
       Callback(URI.create(progressCreateRequest.callback.get.url)))
-    progress.status shouldBe Progress.Initialised
+    progress.status shouldBe Progress.Accepted
     assertRecent(progress.createdDate)
     assertRecent(progress.lastModifiedDate)
     progress.events shouldBe List.empty

@@ -26,7 +26,7 @@ trait ProgressGenerators extends RandomThings {
                          sourceLocation: StorageLocation = storageLocation,
                          callback: Option[Callback] = Some(createCallback()),
                          space: Namespace = createSpace,
-                         status: Status = Progress.Initialised,
+                         status: Status = Progress.Accepted,
                          maybeBag: Option[BagId] = None,
                          events: List[ProgressEvent] = List.empty): Progress = {
     Progress(
@@ -51,7 +51,7 @@ trait ProgressGenerators extends RandomThings {
 
   def createProgressStatusUpdateWith(
     id: UUID,
-    status: Status = Progress.Initialised,
+    status: Status = Progress.Accepted,
     maybeBag: Option[BagId] = Some(randomBagId),
     events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
     ProgressStatusUpdate(id, status, maybeBag, events)

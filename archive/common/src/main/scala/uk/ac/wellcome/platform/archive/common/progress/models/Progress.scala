@@ -10,7 +10,7 @@ case class Progress(id: UUID,
                     sourceLocation: StorageLocation,
                     space: Namespace,
                     callback: Option[Callback] = None,
-                    status: Progress.Status = Progress.Initialised,
+                    status: Progress.Status = Progress.Accepted,
                     bag: Option[BagId] = None,
                     createdDate: Instant = Instant.now,
                     lastModifiedDate: Instant = Instant.now,
@@ -19,13 +19,13 @@ case class Progress(id: UUID,
 case object Progress extends URIConverters {
   sealed trait Status
 
-  private val initialisedString = "initialised"
+  private val acceptedString = "accepted"
   private val processingString = "processing"
   private val successString = "success"
   private val failureString = "failure"
 
-  case object Initialised extends Status {
-    override def toString: String = initialisedString
+  case object Accepted extends Status {
+    override def toString: String = acceptedString
   }
 
   case object Processing extends Status {
