@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.work.internal.{
   License_CC0,
   LocationType
 }
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 class MiroLocationsTest extends FunSpec with Matchers {
   val transformer = new MiroLocations {}
@@ -14,7 +14,7 @@ class MiroLocationsTest extends FunSpec with Matchers {
     "extracts the digital location and finds the credit line for an image-specific contributor code") {
     transformer.getLocations(
       miroId = "B0011308",
-      miroData = MiroTransformableData(
+      miroRecord = MiroRecord(
         creditLine = None,
         sourceCode = Some("FDN"),
         useRestrictions = Some("CC-0")

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroSubjects {
 
@@ -16,11 +16,11 @@ trait MiroSubjects {
    *  have enough information in Miro to determine which ones those are.
    */
   def getSubjects(
-    miroData: MiroTransformableData): List[Subject[Unidentifiable[Concept]]] = {
-    val keywords: List[String] = miroData.keywords.getOrElse(List())
+    miroRecord: MiroRecord): List[Subject[Unidentifiable[Concept]]] = {
+    val keywords: List[String] = miroRecord.keywords.getOrElse(List())
 
     val keywordsUnauth: List[String] =
-      miroData.keywordsUnauth match {
+      miroRecord.keywordsUnauth match {
         case Some(maybeKeywords) => maybeKeywords.flatten
         case None                => List()
       }

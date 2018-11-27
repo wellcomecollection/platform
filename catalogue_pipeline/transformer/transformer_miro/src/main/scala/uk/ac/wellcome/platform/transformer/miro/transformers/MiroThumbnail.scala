@@ -5,13 +5,13 @@ import uk.ac.wellcome.models.work.internal.{
   Location,
   LocationType
 }
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroThumbnail extends MiroImageApiURL with MiroLicenses {
-  def getThumbnail(miroData: MiroTransformableData, miroId: String): Location =
+  def getThumbnail(miroRecord: MiroRecord, miroId: String): Location =
     DigitalLocation(
       locationType = LocationType("thumbnail-image"),
       url = buildImageApiURL(miroId, templateName = "thumbnail"),
-      license = Some(chooseLicense(miroId, miroData.useRestrictions))
+      license = Some(chooseLicense(miroId, miroRecord.useRestrictions))
     )
 }

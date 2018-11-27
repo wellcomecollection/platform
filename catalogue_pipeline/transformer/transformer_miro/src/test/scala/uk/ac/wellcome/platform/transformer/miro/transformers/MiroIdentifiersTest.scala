@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 class MiroIdentifiersTest
     extends FunSpec
@@ -10,12 +10,12 @@ class MiroIdentifiersTest
     with IdentifiersGenerators {
 
   it("fixes the malformed INNOPAC ID on L0035411") {
-    val miroData = MiroTransformableData(
+    val miroRecord = MiroRecord(
       innopacID = Some("L 35411 \n\n15551040")
     )
 
     val otherIdentifiers =
-      transformer.getOtherIdentifiers(miroData = miroData, miroId = "L0035411")
+      transformer.getOtherIdentifiers(miroRecord = miroRecord, miroId = "L0035411")
 
     otherIdentifiers shouldBe List(
       createSierraSystemSourceIdentifierWith(

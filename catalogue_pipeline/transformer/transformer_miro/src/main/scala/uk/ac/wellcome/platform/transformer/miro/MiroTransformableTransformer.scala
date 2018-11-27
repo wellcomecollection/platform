@@ -4,7 +4,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.util.Try
 
@@ -41,45 +41,45 @@ class MiroTransformableTransformer
     )
 
     Try {
-      val miroData = MiroTransformableData.create(miroTransformable.data)
+      val miroRecord = MiroRecord.create(miroTransformable.data)
 
       // These images should really have been removed from the pipeline
       // already, but we have at least one instance (B0010525).  It was
       // throwing a MatchError when we tried to pick a license, so handle
       // it properly here.
-      if (!miroData.copyrightCleared.contains("Y")) {
+      if (!miroRecord.copyrightCleared.contains("Y")) {
         throw new ShouldNotTransformException(
           s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
         )
       }
 
-      val (title, description) = getTitleAndDescription(miroData)
+      val (title, description) = getTitleAndDescription(miroRecord)
 
       UnidentifiedWork(
         sourceIdentifier = sourceIdentifier,
         otherIdentifiers =
-          getOtherIdentifiers(miroData, miroTransformable.sourceId),
+          getOtherIdentifiers(miroRecord, miroTransformable.sourceId),
         mergeCandidates = List(),
         title = title,
         workType = getWorkType,
         description = description,
         physicalDescription = None,
         extent = None,
-        lettering = miroData.suppLettering,
+        lettering = miroRecord.suppLettering,
         createdDate =
-          getCreatedDate(miroData, miroId = miroTransformable.sourceId),
-        subjects = getSubjects(miroData),
-        genres = getGenres(miroData),
+          getCreatedDate(miroRecord, miroId = miroTransformable.sourceId),
+        subjects = getSubjects(miroRecord),
+        genres = getGenres(miroRecord),
         contributors = getContributors(
           miroId = miroTransformable.sourceId,
-          miroData = miroData
+          miroRecord = miroRecord
         ),
-        thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+        thumbnail = Some(getThumbnail(miroRecord, miroTransformable.sourceId)),
         production = List(),
         language = None,
         dimensions = None,
-        items = getItems(miroData, miroTransformable.sourceId),
-        itemsV1 = getItemsV1(miroData, miroTransformable.sourceId),
+        items = getItems(miroRecord, miroTransformable.sourceId),
+        itemsV1 = getItemsV1(miroRecord, miroTransformable.sourceId),
         version = version
       )
     }.recover {

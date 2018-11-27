@@ -1,11 +1,11 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroItems extends MiroLocations {
 
-  def getItemsV1(miroData: MiroTransformableData,
+  def getItemsV1(miroRecord: MiroRecord,
                  miroId: String): List[Identifiable[Item]] =
     List(
       Identifiable(
@@ -14,12 +14,12 @@ trait MiroItems extends MiroLocations {
           "Item",
           miroId),
         agent = Item(
-          locations = getLocations(miroData, miroId)
+          locations = getLocations(miroRecord, miroId)
         )
       ))
 
-  def getItems(miroData: MiroTransformableData,
+  def getItems(miroRecord: MiroRecord,
                miroId: String): List[Unidentifiable[Item]] =
-    List(Unidentifiable(Item(locations = getLocations(miroData, miroId))))
+    List(Unidentifiable(Item(locations = getLocations(miroRecord, miroId))))
 
 }

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators {
   val transformer = new MiroItems {}
@@ -12,7 +12,7 @@ class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators {
     it("extracts an identifiable item") {
       transformer.getItemsV1(
         miroId = "B0011308",
-        miroData = MiroTransformableData(
+        miroRecord = MiroRecord(
           creditLine = None,
           sourceCode = Some("FDN"),
           useRestrictions = Some("CC-0")
@@ -34,7 +34,7 @@ class MiroItemsTest extends FunSpec with Matchers with IdentifiersGenerators {
     it("extracts an unidentifiable item") {
       transformer.getItems(
         miroId = "B0011308",
-        miroData = MiroTransformableData(
+        miroRecord = MiroRecord(
           creditLine = None,
           sourceCode = Some("FDN"),
           useRestrictions = Some("CC-0")

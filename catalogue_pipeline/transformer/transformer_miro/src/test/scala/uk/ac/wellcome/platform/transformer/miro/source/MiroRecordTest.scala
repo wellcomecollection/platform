@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.miro.source
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 
-class MiroTransformableDataTest extends FunSpec with Matchers {
+class MiroRecordTest extends FunSpec with Matchers {
 
   // This is based on failures we've seen in the pipeline.
   // Examples: L0068740, V0014729.
@@ -16,7 +16,7 @@ class MiroTransformableDataTest extends FunSpec with Matchers {
         |
       """.stripMargin
 
-    fromJson[MiroTransformableData](jsonString).isSuccess shouldBe true
+    fromJson[MiroRecord](jsonString).isSuccess shouldBe true
   }
 
   // This is based on bugs from data in the pipeline.
@@ -28,7 +28,7 @@ class MiroTransformableDataTest extends FunSpec with Matchers {
         |}
       """.stripMargin
 
-    MiroTransformableData.create(jsonString).creator shouldBe Some(
+    MiroRecord.create(jsonString).creator shouldBe Some(
       List(Some("Adêle Mongrédien")))
   }
 }
