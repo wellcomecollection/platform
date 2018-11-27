@@ -153,7 +153,7 @@ class MiroVHSRecordReceiverTest
         val future = recordReceiver.receiveMessage(message, transformToWork)
 
         whenReady(future.failed) {
-          _.getMessage should be("Failed publishing message")
+          _.getMessage should include("Unknown topic: no-such-topic")
         }
       }
     }
