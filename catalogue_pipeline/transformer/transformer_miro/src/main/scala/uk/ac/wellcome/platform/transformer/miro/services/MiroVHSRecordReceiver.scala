@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.transformer.miro.services
 
 import grizzled.slf4j.Logging
 import io.circe.ParsingFailure
-import uk.ac.wellcome.json.JsonUtil.fromJson
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
