@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
 }
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.miro.exceptions.MiroTransformerException
 import uk.ac.wellcome.platform.transformer.miro.fixtures.MiroVHSRecordReceiverFixture
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
 import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
@@ -112,7 +112,7 @@ class MiroVHSRecordReceiverTest
             recordReceiver.receiveMessage(incompleteMessage, transformToWork)
 
           whenReady(future.failed) {
-            _ shouldBe a[TransformerException]
+            _ shouldBe a[MiroTransformerException]
           }
         }
       }
@@ -131,7 +131,7 @@ class MiroVHSRecordReceiverTest
             recordReceiver.receiveMessage(incompleteMessage, transformToWork)
 
           whenReady(future.failed) {
-            _ shouldBe a[TransformerException]
+            _ shouldBe a[MiroTransformerException]
           }
         }
       }
