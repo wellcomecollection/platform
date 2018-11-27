@@ -21,7 +21,8 @@ class SierraPhysicalDigitalMergeRuleTest
         UnidentifiedRedirectedWork(
           sourceIdentifier = digitalWork.sourceIdentifier,
           version = digitalWork.version,
-          redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)))
+          redirect = IdentifiableRedirect(physicalWork.sourceIdentifier))
+      )
     }
 
     it(
@@ -36,7 +37,8 @@ class SierraPhysicalDigitalMergeRuleTest
         UnidentifiedRedirectedWork(
           sourceIdentifier = digitalWork.sourceIdentifier,
           version = digitalWork.version,
-          redirect = IdentifiableRedirect(physicalWork.sourceIdentifier)))
+          redirect = IdentifiableRedirect(physicalWork.sourceIdentifier))
+      )
     }
 
     it("merges a Sierra physical and Sierra digital work, keeping extra works") {

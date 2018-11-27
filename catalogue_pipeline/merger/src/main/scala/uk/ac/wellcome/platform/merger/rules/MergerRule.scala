@@ -35,6 +35,6 @@ trait Partitioner {
 
 trait WorkPairMerger {
   protected def mergeAndRedirectWorkPair(
-                                firstWork: UnidentifiedWork,
-                                secondWork: UnidentifiedWork): Option[MergedWork]
+    firstWork: UnidentifiedWork,
+    secondWork: UnidentifiedWork): Option[MergedWork]
 }

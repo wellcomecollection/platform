@@ -1,9 +1,13 @@
 package uk.ac.wellcome.platform.merger.rules.singlepagemiro
 
-import uk.ac.wellcome.models.work.internal.{BaseWork, IdentifierType, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  BaseWork,
+  IdentifierType,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.merger.rules.{Partition, Partitioner}
 
-trait SierraMiroPartitioner extends Partitioner{
+trait SierraMiroPartitioner extends Partitioner {
 
   private object workType extends Enumeration {
     val SierraWork, MiroWork, OtherWork = Value

@@ -30,8 +30,7 @@ class SierraPhysicalDigitalPartitionerTest
     val result =
       partitioner.partitionWorks(Seq(physicalWork, digitalWork) ++ otherWorks)
 
-    result shouldBe Some(
-      Partition(physicalWork, digitalWork, otherWorks))
+    result shouldBe Some(Partition(physicalWork, digitalWork, otherWorks))
   }
 
   it("does not partition a single physical work") {

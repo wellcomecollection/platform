@@ -30,8 +30,7 @@ class SierraMiroPartitionerTest
     val result =
       partitioner.partitionWorks(Seq(sierraWork, miroWork) ++ otherWorks)
 
-    result shouldBe Some(
-      Partition(sierraWork, miroWork, otherWorks))
+    result shouldBe Some(Partition(sierraWork, miroWork, otherWorks))
   }
 
   it("does not partition a single Sierra work") {

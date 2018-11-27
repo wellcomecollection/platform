@@ -19,7 +19,10 @@ import uk.ac.wellcome.platform.merger.rules.{MergerRule, WorkPairMerger}
   *     location for the thumbnail.
   *
   */
-object SierraMiroMergeRule extends MergerRule with SierraMiroMerger with SierraMiroPartitioner
+object SierraMiroMergeRule
+    extends MergerRule
+    with SierraMiroMerger
+    with SierraMiroPartitioner
 
 trait SierraMiroMerger extends Logging with MergerLogging with WorkPairMerger {
   override protected def mergeAndRedirectWorkPair(
