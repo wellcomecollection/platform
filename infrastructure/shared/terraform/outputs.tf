@@ -163,3 +163,17 @@ output "storage_vpc_delta_public_subnets" {
 output "storage_vpc_delta_id" {
   value = "${module.storage_vpc_delta.vpc_id}"
 }
+
+# Monitoring VPC
+
+output "monitoring_vpc_delta_private_subnets" {
+  value = ["${module.monitoring_vpc_delta.private_subnets}"]
+}
+
+output "monitoring_vpc_delta_public_subnets" {
+  value = ["${module.monitoring_vpc_delta.public_subnets}"]
+}
+
+output "monitoring_vpc_delta_id" {
+  value = "${module.monitoring_vpc_delta.vpc_id}"
+}
