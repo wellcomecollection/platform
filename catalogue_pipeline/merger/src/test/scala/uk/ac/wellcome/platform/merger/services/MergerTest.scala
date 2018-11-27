@@ -9,7 +9,7 @@ class MergerTest extends FunSpec with WorksGenerators with Matchers {
   private val sierraDigitalWork = createSierraDigitalWork
   private val miroWork = createMiroWork
 
-  private val merger = new Merger()
+  private val merger = PlatformMerger
 
   it("merges a Sierra physical and Sierra digital work") {
     val result = merger.merge(

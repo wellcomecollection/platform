@@ -1,21 +1,15 @@
 package uk.ac.wellcome.platform.merger.rules.physicaldigital
 
-import uk.ac.wellcome.models.work.internal.{
-  BaseWork,
-  IdentifierType,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{BaseWork, IdentifierType, UnidentifiedWork}
+import uk.ac.wellcome.platform.merger.rules.{Partition, Partitioner}
 
-trait SierraPhysicalDigitalPartitioner {
-  case class Partition(physicalWork: UnidentifiedWork,
-                       digitalWork: UnidentifiedWork,
-                       otherWorks: Seq[BaseWork])
+trait SierraPhysicalDigitalPartitioner extends Partitioner{
 
   private object workType extends Enumeration {
     val SierraDigitalWork, SierraPhysicalWork, OtherWork = Value
   }
 
-  def partitionWorks(works: Seq[BaseWork]): Option[Partition] = {
+  override def partitionWorks(works: Seq[BaseWork]): Option[Partition] = {
     val groupedWorks = works.groupBy {
       case work: UnidentifiedWork if isSierraPhysicalWork(work) =>
         workType.SierraPhysicalWork
