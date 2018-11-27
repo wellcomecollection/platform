@@ -5,6 +5,8 @@ import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 trait MiroRecordGenerators {
   def createMiroRecordWith(
     title: Option[String] = Some("Auto-created title in MiroRecordGenerators"),
+    creator: Option[List[Option[String]]] = None,
+    secondaryCreator: Option[List[String]] = None,
     useRestrictions: Option[String] = Some("CC-BY"),
     innopacID: Option[String] = None,
     creditLine: Option[String] = None,
@@ -13,6 +15,8 @@ trait MiroRecordGenerators {
   ): MiroRecord =
     MiroRecord(
       title = title,
+      creator = creator,
+      secondaryCreator = secondaryCreator,
       copyrightCleared = Some("Y"),
       useRestrictions = useRestrictions,
       innopacID = innopacID,
