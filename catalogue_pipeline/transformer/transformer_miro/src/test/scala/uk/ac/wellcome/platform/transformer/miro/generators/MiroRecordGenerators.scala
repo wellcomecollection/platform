@@ -16,6 +16,8 @@ trait MiroRecordGenerators {
     innopacID: Option[String] = None,
     creditLine: Option[String] = None,
     sourceCode: Option[String] = None,
+    libraryRefDepartment: List[Option[String]] = Nil,
+    libraryRefId: List[Option[String]] = Nil,
     imageNumber: String = "M0000001"
   ): MiroRecord =
     MiroRecord(
@@ -31,6 +33,8 @@ trait MiroRecordGenerators {
       innopacID = innopacID,
       creditLine = creditLine,
       sourceCode = sourceCode,
+      libraryRefDepartment = libraryRefDepartment,
+      libraryRefId = libraryRefId,
       imageNumber = imageNumber
     )
 

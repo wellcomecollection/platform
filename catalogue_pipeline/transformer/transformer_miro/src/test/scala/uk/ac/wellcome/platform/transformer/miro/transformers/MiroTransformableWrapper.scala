@@ -53,15 +53,10 @@ trait MiroTransformableWrapper
   def transformWork(miroRecord: MiroRecord): UnidentifiedWork =
     transformToWork(miroRecord).asInstanceOf[UnidentifiedWork]
 
-  def assertTransformWorkFails(data: String): Assertion = {
-    val miroTransformable = createMiroTransformableWith(
-      data = buildJSONForWork(data)
-    )
-
+  def assertTransformWorkFails(miroRecord: MiroRecord): Assertion =
     transformer
-      .transform(miroTransformable, version = 1)
+      .transform(miroRecord, version = 1)
       .isSuccess shouldBe false
-  }
 
   private def transformToWork(miroRecord: MiroRecord): TransformedBaseWork = {
     val triedWork: Try[TransformedBaseWork] =

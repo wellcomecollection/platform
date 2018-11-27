@@ -77,28 +77,28 @@ class MiroTransformableTransformerTest
 
     it("with mismatched ref IDs/department") {
       assertTransformWorkFails(
-        data = """
-          "image_library_ref_department": ["External Reference"],
-          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
-        """
+        createMiroRecordWith(
+          libraryRefDepartment = List(Some("External Reference")),
+          libraryRefId = List(Some("Sanskrit ID 1924"), Some("1234"))
+        )
       )
     }
 
     it("with ref IDs null but department non-null") {
       assertTransformWorkFails(
-        data = """
-          "image_library_ref_department": ["External Reference"],
-          "image_library_ref_id": null
-        """
+        createMiroRecordWith(
+          libraryRefDepartment = List(Some("External Reference")),
+          libraryRefId = Nil
+        )
       )
     }
 
     it("with ref IDs non-null but department null") {
       assertTransformWorkFails(
-        data = """
-          "image_library_ref_department": null,
-          "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
-        """
+        createMiroRecordWith(
+          libraryRefDepartment = Nil,
+          libraryRefId = List(Some("Sanskrit ID 1924"), Some("1234"))
+        )
       )
     }
   }
