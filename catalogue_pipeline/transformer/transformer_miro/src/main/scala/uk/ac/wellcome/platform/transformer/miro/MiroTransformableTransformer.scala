@@ -51,6 +51,14 @@ class MiroTransformableTransformer
     )
 
     Try {
+      // Any records that aren't cleared for the Catalogue API should be
+      // discarded immediately.
+      if (!miroMetadata.isClearedForCatalogueAPI) {
+        throw new ShouldNotTransformException(
+          s"Image ${originalMiroRecord.imageNumber} is not cleared for the API!"
+        )
+      }
+
       // This is an utterly awful hack we have to live with until we get
       // these corrected in the source data.
       val miroRecord = MiroRecord.create(toJson(originalMiroRecord).get)
