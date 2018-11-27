@@ -15,8 +15,8 @@ trait DisplayV2SerialisationTestBase extends DisplaySerialisationTestBase {
     s"""{
       "id": "${license.id}",
       "label": "${license.label}",
-      "type": "${license.ontologyType}",
-      "url": "${license.url}"
+      ${optionalString("url", license.url)}
+      "type": "${license.ontologyType}"
     }"""
 
   def identifier(identifier: SourceIdentifier) =

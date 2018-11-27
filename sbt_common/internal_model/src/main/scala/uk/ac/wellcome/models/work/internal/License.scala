@@ -5,7 +5,7 @@ import io.circe.{Decoder, Encoder, Json}
 sealed trait License {
   val id: String
   val label: String
-  val url: String
+  val url: Option[String]
   val ontologyType: String = "License"
 }
 
@@ -41,30 +41,30 @@ object License {
 case object License_CCBY extends License {
   val id = "cc-by"
   val label = "Attribution 4.0 International (CC BY 4.0)"
-  val url = "http://creativecommons.org/licenses/by/4.0/"
+  val url = Some("http://creativecommons.org/licenses/by/4.0/")
 }
 
 case object License_CCBYNC extends License {
   val id = "cc-by-nc"
   val label = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
-  val url = "https://creativecommons.org/licenses/by-nc/4.0/"
+  val url = Some("https://creativecommons.org/licenses/by-nc/4.0/")
 }
 
 case object License_CCBYNCND extends License {
   val id = "cc-by-nc-nd"
   val label =
     "Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"
-  val url = "https://creativecommons.org/licenses/by-nc-nd/4.0/"
+  val url = Some("https://creativecommons.org/licenses/by-nc-nd/4.0/")
 }
 
 case object License_CC0 extends License {
   val id = "cc-0"
   val label = "CC0 1.0 Universal"
-  val url = "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+  val url = Some("https://creativecommons.org/publicdomain/zero/1.0/legalcode")
 }
 
 case object License_PDM extends License {
   val id = "pdm"
   val label = "Public Domain Mark"
-  val url = "https://creativecommons.org/share-your-work/public-domain/pdm/"
+  val url = Some("https://creativecommons.org/share-your-work/public-domain/pdm/")
 }
