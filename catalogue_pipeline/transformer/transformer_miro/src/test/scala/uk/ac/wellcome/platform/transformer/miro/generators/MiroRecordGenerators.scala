@@ -6,6 +6,7 @@ trait MiroRecordGenerators {
   def createMiroRecordWith(
     title: Option[String] = Some("Auto-created title in MiroRecordGenerators"),
     creator: Option[List[Option[String]]] = None,
+    description: Option[String] = None,
     secondaryCreator: Option[List[String]] = None,
     artworkDate: Option[String] = None,
     copyrightCleared: Option[String] = Some("Y"),
@@ -20,11 +21,14 @@ trait MiroRecordGenerators {
     sourceCode: Option[String] = None,
     libraryRefDepartment: List[Option[String]] = Nil,
     libraryRefId: List[Option[String]] = Nil,
+    award: List[Option[String]] = Nil,
+    awardDate: List[Option[String]] = Nil,
     imageNumber: String = "M0000001"
   ): MiroRecord =
     MiroRecord(
       title = title,
       creator = creator,
+      description = description,
       secondaryCreator = secondaryCreator,
       artworkDate = artworkDate,
       copyrightCleared = copyrightCleared,
@@ -39,6 +43,8 @@ trait MiroRecordGenerators {
       sourceCode = sourceCode,
       libraryRefDepartment = libraryRefDepartment,
       libraryRefId = libraryRefId,
+      award = award,
+      awardDate = awardDate,
       imageNumber = imageNumber
     )
 

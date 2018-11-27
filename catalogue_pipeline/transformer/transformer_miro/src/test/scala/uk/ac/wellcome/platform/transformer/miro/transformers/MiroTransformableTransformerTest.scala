@@ -101,17 +101,14 @@ class MiroTransformableTransformerTest
   }
 
   it("has no description if no image_image_desc field is present") {
-    val work = transformWork(data = s""""image_title": "A line of lions"""")
+    val work = transformWork(createMiroRecord)
     work.description shouldBe None
   }
 
   it("passes through the value of the description field") {
     val description = "A new novel about northern narwhals in November"
     val work = transformWork(
-      data = s"""
-        "image_title": "A note on narwhals",
-        "image_image_desc": "$description"
-      """
+      createMiroRecordWith(description = Some(description))
     )
     work.description shouldBe Some(description)
   }
@@ -120,12 +117,11 @@ class MiroTransformableTransformerTest
     it("does nothing for non-WIA metadata") {
       val description = "Spotting sea snakes on sandbanks."
       val work = transformWork(
-        data = s"""
-          "image_title": "Snakes!",
-          "image_image_desc": "$description",
-          "image_award": ["Award of Excellence"],
-          "image_award_date": [null]
-        """
+        createMiroRecordWith(
+          description = Some(description),
+          award = List(Some("Award of Excellence")),
+          awardDate = List(None)
+        )
       )
       work.description shouldBe Some(description)
     }
@@ -133,12 +129,11 @@ class MiroTransformableTransformerTest
     it("adds WIA metadata if present") {
       val description = "Purple penguins play with paint."
       val work = transformWork(
-        data = s"""
-          "image_title": "Penguin feeding time",
-          "image_image_desc": "$description",
-          "image_award": ["Biomedical Image Awards"],
-          "image_award_date": ["2001"]
-        """
+        createMiroRecordWith(
+          description = Some(description),
+          award = List(Some("Biomedical Image Awards")),
+          awardDate = List(Some("2001"))
+        )
       )
       work.description shouldBe Some(
         description + " Biomedical Image Awards 2001.")
@@ -147,12 +142,11 @@ class MiroTransformableTransformerTest
     it("only includes WIA metadata") {
       val description = "Giraffes can be grazing, galloping or graceful."
       val work = transformWork(
-        data = s"""
-          "image_title": "A giraffe trifecta",
-          "image_image_desc": "$description",
-          "image_award": ["Dirt, Wellcome Collection", "Biomedical Image Awards"],
-          "image_award_date": [null, "2002"]
-        """
+        createMiroRecordWith(
+          description = Some(description),
+          award = List(Some("Dirt, Wellcome Collection"), Some("Biomedical Image Awards")),
+          awardDate = List(None, Some("2002"))
+        )
       )
       work.description shouldBe Some(
         description + " Biomedical Image Awards 2002.")
@@ -161,12 +155,11 @@ class MiroTransformableTransformerTest
     it("combines multiple WIA metadata fields if necessary") {
       val description = "Amazed and awe-inspired by an adversarial aardvark."
       val work = transformWork(
-        data = s"""
-          "image_title": "Award-winning!",
-          "image_image_desc": "$description",
-          "image_award": ["WIA Overall Winner", "Wellcome Image Awards"],
-          "image_award_date": ["2015", "2015"]
-        """
+        createMiroRecordWith(
+          description = Some(description),
+          award = List(Some("WIA Overall Winner"), Some("Wellcome Image Awards")),
+          awardDate = List(Some("2015"), Some("2015"))
+        )
       )
       work.description shouldBe Some(
         description + " Wellcome Image Awards Overall Winner 2015.")
@@ -287,7 +280,7 @@ class MiroTransformableTransformerTest
   }
 
   it("sets the WorkType as 'Digital images'") {
-    val work = transformWork()
+    val work = transformWork(createMiroRecord)
     work.workType.isDefined shouldBe true
     work.workType.get.label shouldBe "Digital images"
   }
