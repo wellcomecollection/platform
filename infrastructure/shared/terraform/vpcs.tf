@@ -29,7 +29,7 @@ module "storage_vpc_delta" {
 
   name = "storage-172-30-0-0-16"
 
-  cidr_block_vpc            = "172.30.0.0/16"
+  cidr_block_vpc = "172.30.0.0/16"
 
   public_az_count           = "3"
   cidr_block_public         = "172.30.0.0/17"
@@ -49,7 +49,7 @@ module "monitoring_vpc_delta" {
 
   name = "monitoring-172-28-0-0-16"
 
-  cidr_block_vpc            = "172.28.0.0/16"
+  cidr_block_vpc = "172.28.0.0/16"
 
   public_az_count           = "3"
   cidr_block_public         = "172.28.0.0/17"
@@ -69,7 +69,7 @@ module "datascience_vpc_delta" {
 
   name = "datascience-172-27-0-0-16"
 
-  cidr_block_vpc            = "172.27.0.0/16"
+  cidr_block_vpc = "172.27.0.0/16"
 
   public_az_count           = "3"
   cidr_block_public         = "172.27.0.0/17"
