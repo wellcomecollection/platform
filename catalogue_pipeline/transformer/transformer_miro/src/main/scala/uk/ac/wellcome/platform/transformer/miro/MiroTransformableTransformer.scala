@@ -4,7 +4,6 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
-import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.util.Try
@@ -20,15 +19,6 @@ class MiroTransformableTransformer
     with transformers.MiroTitleAndDescription
     with transformers.MiroWorkType
     with Logging {
-
-  def transform(
-    transformable: MiroTransformable,
-    version: Int
-  ): Try[TransformedBaseWork] =
-    transform(
-      miroRecord = MiroRecord.create(transformable.data),
-      version = version
-    )
 
   def transform(miroRecord: MiroRecord, version: Int): Try[TransformedBaseWork] =
     doTransform(miroRecord, version) map { transformed =>
