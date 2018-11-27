@@ -20,6 +20,7 @@ trait MiroTransformableGenerators {
     libraryRefDepartment: List[Option[String]] = Nil,
     libraryRefId: List[Option[String]] = Nil): MiroTransformableData =
     MiroTransformableData(
+      copyrightCleared = Some("Y"),
       miroId = "M0000001",
       innopacID = innopacID,
       useRestrictions = useRestrictions,
