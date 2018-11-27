@@ -1,129 +1,65 @@
-# update_service_list
+module "monitoring-271118" {
+  source = "stack"
 
-module "lambda_update_service_list" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
+  namespace = "monitoring-271118"
 
-  s3_bucket = "${var.infra_bucket}"
-  s3_key    = "lambdas/monitoring/update_service_list.zip"
+  monitoring_bucket          = "${aws_s3_bucket.monitoring.bucket}"
+  account_id                 = "${data.aws_caller_identity.current.account_id}"
+  non_critical_slack_webhook = "${var.non_critical_slack_webhook}"
 
-  name        = "update_service_list"
-  description = "Publish ECS service status summary to S3"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  vpc_id       = "${local.vpc_id}"
 
-  # We've seen timeouts at 60 seconds on these Lambdas, so set the max
-  # timeout to make a timeout as unlikely as possible.
-  timeout = 300
+  efs_id                = "${module.grafana_efs.efs_id}"
+  efs_security_group_id = "${aws_security_group.efs_security_group.id}"
 
-  environment_variables = {
-    BUCKET_NAME     = "${aws_s3_bucket.dashboard.bucket}"
-    OBJECT_KEY      = "data/ecs_status.json"
-    ASSUMABLE_ROLES = "${join(",", var.dashboard_assumable_roles)}"
-  }
+  domain = "monitoring.wellcomecollection.org"
 
-  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+  public_subnets  = "${local.public_subnets}"
+  private_subnets = "${local.private_subnets}"
 
-  log_retention_in_days = 14
-}
+  infra_bucket       = "${var.infra_bucket}"
+  key_name           = "${var.key_name}"
+  aws_region         = "${var.aws_region}"
+  admin_cidr_ingress = "${var.admin_cidr_ingress}"
 
-module "trigger_update_service_list" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_cloudwatch?ref=v1.0.0"
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
-  lambda_function_name    = "${module.lambda_update_service_list.function_name}"
-  lambda_function_arn     = "${module.lambda_update_service_list.arn}"
-  cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.every_minute.arn}"
-  cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.every_minute.name}"
-}
+  every_day_at_8am_rule_name = "${aws_cloudwatch_event_rule.every_day_at_8am.name}"
+  every_minute_rule_arn      = "${aws_cloudwatch_event_rule.every_minute.arn}"
+  every_minute_rule_name     = "${aws_cloudwatch_event_rule.every_minute.name}"
 
-# post_to_slack
+  # slack_budget_bot
 
-module "lambda_post_to_slack" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
+  slack_budget_bot_container_uri = "${local.slack_budget_bot_container_uri}"
 
-  s3_bucket = "${var.infra_bucket}"
-  s3_key    = "lambdas/monitoring/post_to_slack.zip"
+  # grafana
 
-  name        = "post_to_slack"
-  description = "Post notification to Slack when an alarm is triggered"
-  timeout     = 10
+  grafana_admin_user        = "${var.grafana_admin_user}"
+  grafana_anonymous_role    = "${var.grafana_anonymous_role}"
+  grafana_admin_password    = "${var.grafana_admin_password}"
+  grafana_anonymous_enabled = "${var.grafana_anonymous_enabled}"
 
-  environment_variables = {
-    CRITICAL_SLACK_WEBHOOK    = "${var.critical_slack_webhook}"
-    NONCRITICAL_SLACK_WEBHOOK = "${var.non_critical_slack_webhook}"
-    BITLY_ACCESS_TOKEN        = "${var.bitly_access_token}"
-  }
+  # update_service_list
 
-  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+  dashboard_bucket          = "${aws_s3_bucket.dashboard.bucket}"
+  dashboard_assumable_roles = "${var.dashboard_assumable_roles}"
 
-  log_retention_in_days = 30
-}
+  # post_to_slack
 
-module "trigger_post_to_slack_dlqs_not_empty" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+  dlq_alarm_arn               = "${local.dlq_alarm_arn}"
+  alb_server_error_alarm_arn  = "${local.alb_server_error_alarm_arn}"
+  cloudfront_errors_topic_arn = "${local.cloudfront_errors_topic_arn}"
+  critical_slack_webhook      = "${var.critical_slack_webhook}"
+  bitly_access_token          = "${var.bitly_access_token}"
 
-  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
-  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${local.dlq_alarm_arn}"
-}
+  # IAM
 
-module "trigger_post_to_slack_server_error_alb" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
-
-  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
-  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${local.alb_server_error_alarm_arn}"
-}
-
-module "trigger_post_to_slack_lambda_error" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
-
-  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
-  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${local.lambda_error_alarm_arn}"
-}
-
-resource "random_id" "statement_id" {
-  keepers = {
-    aws_sns_topic_subscription = "${aws_sns_topic_subscription.subscribe_lambda_to_cloudfront_errors.id}"
-  }
-
-  byte_length = 8
-}
-
-resource "aws_lambda_permission" "allow_sns_cloudfront_trigger" {
-  statement_id  = "${random_id.statement_id.hex}"
-  action        = "lambda:InvokeFunction"
-  function_name = "${module.lambda_post_to_slack.arn}"
-  principal     = "sns.amazonaws.com"
-  source_arn    = "${local.cloudfront_errors_topic_arn}"
-  depends_on    = ["aws_sns_topic_subscription.subscribe_lambda_to_cloudfront_errors"]
-}
-
-resource "aws_sns_topic_subscription" "subscribe_lambda_to_cloudfront_errors" {
-  provider = "aws.us_east_1"
-
-  topic_arn = "${local.cloudfront_errors_topic_arn}"
-  protocol  = "lambda"
-  endpoint  = "${module.lambda_post_to_slack.arn}"
-}
-
-# Terraform tracker
-
-module "lambda_terraform_tracker" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
-
-  s3_bucket = "${var.infra_bucket}"
-  s3_key    = "lambdas/monitoring/terraform_tracker.zip"
-
-  name        = "terraform_tracker"
-  description = "Post notifications of 'terraform apply' to Slack"
-  timeout     = 10
-
-  environment_variables = {
-    INFRA_BUCKET       = "${aws_s3_bucket.monitoring.bucket}"
-    SLACK_WEBHOOK      = "${var.non_critical_slack_webhook}"
-    BITLY_ACCESS_TOKEN = "${var.bitly_access_token}"
-  }
-
-  alarm_topic_arn = "${local.lambda_error_alarm_arn}"
-
-  log_retention_in_days = 30
+  allow_cloudwatch_read_metrics_policy_json = "${data.aws_iam_policy_document.allow_cloudwatch_read_metrics.json}"
+  describe_services_policy_json             = "${data.aws_iam_policy_document.describe_services.json}"
+  assume_roles_policy_json                  = "${data.aws_iam_policy_document.assume_roles.json}"
+  cloudwatch_allow_filterlogs_policy_json   = "${data.aws_iam_policy_document.cloudwatch_allow_filterlogs.json}"
+  allow_s3_write_policy_json                = "${data.aws_iam_policy_document.allow_s3_write.json}"
+  allow_describe_budgets_policy_json        = "${data.aws_iam_policy_document.allow_describe_budgets.json}"
+  s3_put_dashboard_status_policy_json       = "${data.aws_iam_policy_document.s3_put_dashboard_status.json}"
 }

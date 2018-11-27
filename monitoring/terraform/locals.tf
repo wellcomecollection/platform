@@ -20,4 +20,6 @@ locals {
   vpc_id          = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_id}"
   private_subnets = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_private_subnets}"
   public_subnets  = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_public_subnets}"
+
+  slack_budget_bot_container_uri = "${module.ecr_repository_slack_budget_bot.repository_url}:${var.release_ids["slack_budget_bot"]}"
 }

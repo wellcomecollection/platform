@@ -1,3 +1,5 @@
+# Grafana
+
 data "aws_iam_policy_document" "allow_cloudwatch_read_metrics" {
   statement {
     actions = [
