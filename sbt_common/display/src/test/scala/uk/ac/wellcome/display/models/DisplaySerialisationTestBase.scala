@@ -8,11 +8,15 @@ import uk.ac.wellcome.models.work.internal._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 
-  def optionalString(fieldName: String, maybeStringValue: Option[String]) =
-    maybeStringValue map { p =>
+  def optionalString(
+    fieldName: String,
+    maybeStringValue: Option[String],
+    trailingComma: Boolean = true): Option[String] =
+    maybeStringValue.map { p =>
       s"""
-           "$fieldName": "$p"
-         """
+        "$fieldName": "$p"
+        ${if (trailingComma) "," else ""}
+      """
     }
 
   def optionalObject[T](fieldName: String,
@@ -124,12 +128,8 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def person(p: Person) = {
     s"""{
         "type": "Person",
-        ${optionalString("prefix", p.prefix)
-      .map(str => s"$str, ")
-      .getOrElse("")}
-        ${optionalString("numeration", p.numeration)
-      .map(str => s"$str, ")
-      .getOrElse("")}
+        ${optionalString("prefix", p.prefix)}
+        ${optionalString("numeration", p.numeration)}
         "label": "${p.label}"
       }"""
   }
