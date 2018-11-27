@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.miro
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
-import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
+import uk.ac.wellcome.platform.transformer.miro.models.{MiroMetadata, MiroTransformable}
 import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
 
 import scala.util.Try
@@ -24,7 +24,18 @@ class MiroTransformableTransformer
     transformable: MiroTransformable,
     version: Int
   ): Try[TransformedBaseWork] =
-    doTransform(transformable, version) map { transformed =>
+    transform(
+      transformable = transformable,
+      metadata = MiroMetadata(isClearedForCatalogueAPI = true),
+      version = version
+    )
+
+  def transform(
+    transformable: MiroTransformable,
+    metadata: MiroMetadata,
+    version: Int
+  ): Try[TransformedBaseWork] =
+    doTransform(transformable, metadata, version) map { transformed =>
       debug(s"Transformed record to $transformed")
       transformed
     } recover {
@@ -33,7 +44,10 @@ class MiroTransformableTransformer
         throw e
     }
 
-  def doTransform(miroTransformable: MiroTransformable, version: Int) = {
+  private def doTransform(
+    miroTransformable: MiroTransformable,
+    metadata: MiroMetadata,
+    version: Int): Try[TransformedBaseWork] = {
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",

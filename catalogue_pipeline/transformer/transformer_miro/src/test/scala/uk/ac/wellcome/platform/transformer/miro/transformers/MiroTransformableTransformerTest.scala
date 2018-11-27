@@ -223,35 +223,40 @@ class MiroTransformableTransformerTest
     )
   }
 
-  it(
-    "returns an InvisibleWork if usage restrictions mean we suppress the image") {
-    assertTransformReturnsInvisibleWork(
-      data =
-        buildJSONForWork("""
+  describe("returns an InvisibleWork when appropriate") {
+
+    it("if usage restrictions mean we suppress the image") {
+      assertTransformReturnsInvisibleWork(
+        data =
+          buildJSONForWork(
+            """
         "image_title": "Private pictures of perilous penguins",
         "image_use_restrictions": "Do not use"
       """)
-    )
-  }
+      )
+    }
 
-  it("returns an InvisibleWork for images from contributor GUS") {
-    assertTransformReturnsInvisibleWork(
-      miroId = "B0009891",
-      data = buildJSONForWork("""
+    it("if the image is from from contributor GUS") {
+      assertTransformReturnsInvisibleWork(
+        miroId = "B0009891",
+        data = buildJSONForWork(
+          """
         "image_source_code": "GUS"
       """)
-    )
-  }
+      )
+    }
 
-  it("returns an InvisibleWork for images without copyright clearance") {
-    assertTransformReturnsInvisibleWork(
-      data = """{
+    it("if the image isn't copyright cleared") {
+      assertTransformReturnsInvisibleWork(
+        data =
+          """{
         "image_cleared": "Y",
         "image_copyright_cleared": "N",
         "image_tech_file_size": ["1000000"],
         "image_use_restrictions": "CC-BY"
       }"""
-    )
+      )
+    }
   }
 
   it(
