@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.{Assertion, Matchers, Suite}
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.MiroTransformableTransformer
+import uk.ac.wellcome.platform.transformer.miro.exceptions.MiroTransformerException
 import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
@@ -23,7 +23,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     if (triedWork.isFailure) {
       triedWork.failed.get.printStackTrace()
       println(
-        triedWork.failed.get.asInstanceOf[TransformerException].e.getMessage)
+        triedWork.failed.get.asInstanceOf[MiroTransformerException].e.getMessage)
     }
 
     triedWork.isSuccess shouldBe true
