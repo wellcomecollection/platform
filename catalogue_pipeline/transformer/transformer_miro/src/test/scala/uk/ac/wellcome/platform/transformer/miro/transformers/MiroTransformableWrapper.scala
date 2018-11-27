@@ -12,23 +12,7 @@ import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 import scala.util.Try
 
 trait MiroTransformableWrapper extends Matchers { this: Suite =>
-
   val transformer = new MiroTransformableTransformer
-  def buildJSONForWork(extraData: String): String = {
-    val baseData =
-      """
-        |"image_cleared": "Y",
-        |        "image_copyright_cleared": "Y",
-        |        "image_tech_file_size": ["1000000"],
-        |        "image_use_restrictions": "CC-BY"
-      """.stripMargin
-
-    if (extraData.isEmpty) s"""{$baseData}"""
-    else s"""{
-        $baseData,
-        $extraData
-      }"""
-  }
 
   def transformWork(miroRecord: MiroRecord): UnidentifiedWork =
     transformToWork(miroRecord).asInstanceOf[UnidentifiedWork]
