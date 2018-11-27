@@ -24,21 +24,6 @@ trait MiroTransformableWrapper
     with MiroTransformableGenerators { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
-  def buildJSONForWork(extraData: String): String = {
-    val baseData =
-      """
-        |"image_cleared": "Y",
-        |        "image_copyright_cleared": "Y",
-        |        "image_tech_file_size": ["1000000"],
-        |        "image_use_restrictions": "CC-BY"
-      """.stripMargin
-
-    if (extraData.isEmpty) s"""{$baseData}"""
-    else s"""{
-        $baseData,
-        $extraData
-      }"""
-  }
 
   def transformWork(
     miroId: String = "M0000001",
@@ -46,7 +31,7 @@ trait MiroTransformableWrapper
   ): UnidentifiedWork = {
     val miroTransformable = createMiroTransformableWith(
       miroId = miroId,
-      data = buildJSONForWork(data)
+      data = buildJSONForWork(miroId = miroId, data)
     )
 
     transformToWork(miroTransformable).asInstanceOf[UnidentifiedWork]
@@ -54,7 +39,7 @@ trait MiroTransformableWrapper
 
   def assertTransformWorkFails(data: String): Assertion = {
     val miroTransformable = createMiroTransformableWith(
-      data = buildJSONForWork(data)
+      data = buildJSONForWork(extraData = data)
     )
 
     assertTransformToWorkFails(miroTransformable)

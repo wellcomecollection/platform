@@ -33,7 +33,7 @@ class MiroTransformerFeatureTest
     with MiroTransformableGenerators {
 
   it("transforms miro records and publishes the result to the given topic") {
-    val miroID = "M0000001"
+    val miroId = "M0000001"
     val title = "A guide for a giraffe"
 
     withLocalSnsTopic { topic =>
@@ -42,8 +42,8 @@ class MiroTransformerFeatureTest
           withLocalS3Bucket { messageBucket =>
             val miroHybridRecordMessage = createHybridRecordNotificationWith(
               createMiroTransformableWith(
-                miroId = miroID,
-                data = buildJSONForWork(s""""image_title": "$title"""")
+                miroId = miroId,
+                data = buildJSONForWork(miroId = miroId, s""""image_title": "$title"""")
               ),
               s3Client = s3Client,
               bucket = storageBucket
@@ -60,7 +60,7 @@ class MiroTransformerFeatureTest
                 works.length shouldBe >=(1)
 
                 works.map { actualWork =>
-                  actualWork.identifiers.head.value shouldBe miroID
+                  actualWork.identifiers.head.value shouldBe miroId
                   actualWork.title shouldBe title
                 }
               }

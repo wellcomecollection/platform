@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
 
@@ -227,9 +227,11 @@ class MiroTransformableTransformerTest
 
     it("if usage restrictions mean we suppress the image") {
       assertTransformReturnsInvisibleWork(
+        miroId = "M0000001",
         data =
           buildJSONForWork(
-            """
+            miroId = "M0000001",
+            extraData = """
         "image_title": "Private pictures of perilous penguins",
         "image_use_restrictions": "Do not use"
       """)
@@ -240,7 +242,8 @@ class MiroTransformableTransformerTest
       assertTransformReturnsInvisibleWork(
         miroId = "B0009891",
         data = buildJSONForWork(
-          """
+          miroId = "B0009891",
+          extraData = """
         "image_source_code": "GUS"
       """)
       )
@@ -248,10 +251,12 @@ class MiroTransformableTransformerTest
 
     it("if the image isn't copyright cleared") {
       assertTransformReturnsInvisibleWork(
+        miroId = "M0000001",
         data =
           """{
         "image_cleared": "Y",
         "image_copyright_cleared": "N",
+        "image_no_calc": "M0000001",
         "image_tech_file_size": ["1000000"],
         "image_use_restrictions": "CC-BY"
       }"""
@@ -325,8 +330,7 @@ class MiroTransformableTransformerTest
     )
   }
 
-  private def assertTransformReturnsInvisibleWork(miroId: String = "G0000001",
-                                                  data: String) = {
+  private def assertTransformReturnsInvisibleWork(miroId: String, data: String): Assertion = {
     val miroTransformable = createMiroTransformableWith(
       miroId = miroId,
       data = data
