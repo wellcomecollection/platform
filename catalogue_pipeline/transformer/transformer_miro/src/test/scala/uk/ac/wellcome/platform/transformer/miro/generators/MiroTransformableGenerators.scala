@@ -13,13 +13,19 @@ trait MiroTransformableGenerators {
       data = data
     )
 
-  def createMiroTransformableDataWith(innopacID: Option[String] = None, useRestrictions: Option[String] = None, sourceCode: Option[String] = None): MiroTransformableData =
+  def createMiroTransformableDataWith(
+    innopacID: Option[String] = None,
+    useRestrictions: Option[String] = None,
+    sourceCode: Option[String] = None,
+    libraryRefDepartment: List[Option[String]] = Nil,
+    libraryRefId: List[Option[String]] = Nil): MiroTransformableData =
     MiroTransformableData(
-
       miroId = "M0000001",
       innopacID = innopacID,
       useRestrictions = useRestrictions,
-      sourceCode = sourceCode
+      sourceCode = sourceCode,
+      libraryRefDepartment = libraryRefDepartment,
+      libraryRefId = libraryRefId
     )
 
   def createMiroTransformableData: MiroTransformableData =
