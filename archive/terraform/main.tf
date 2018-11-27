@@ -2,7 +2,7 @@
 
 resource "aws_api_gateway_base_path_mapping" "api-gw-mapping-241118" {
   api_id      = "${module.stack-241118.api_gateway_id}"
-  domain_name = "stage.wellcomecollection.org"
+  domain_name = "api.wellcomecollection.org"
   base_path   = "storage"
 }
 
@@ -11,7 +11,7 @@ module "stack-241118" {
 
   namespace = "storage-241118"
 
-  domain_name = "api-stage.wellcomecollection.org"
+  domain_name = "api.wellcomecollection.org"
 
   vpc_id          = "${local.vpc_id}"
   private_subnets = "${local.private_subnets}"
