@@ -11,7 +11,9 @@ trait MiroThumbnail extends MiroImageApiURL with MiroLicenses {
   def getThumbnail(miroRecord: MiroRecord): Location =
     DigitalLocation(
       locationType = LocationType("thumbnail-image"),
-      url = buildImageApiURL(miroId = miroRecord.imageNumber, templateName = "thumbnail"),
+      url = buildImageApiURL(
+        miroId = miroRecord.imageNumber,
+        templateName = "thumbnail"),
       license = Some(
         chooseLicense(
           miroId = miroRecord.imageNumber,

@@ -8,7 +8,10 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
 
-class MiroLocationsTest extends FunSpec with Matchers with MiroRecordGenerators {
+class MiroLocationsTest
+    extends FunSpec
+    with Matchers
+    with MiroRecordGenerators {
   val transformer = new MiroLocations {}
   it(
     "extracts the digital location and finds the credit line for an image-specific contributor code") {

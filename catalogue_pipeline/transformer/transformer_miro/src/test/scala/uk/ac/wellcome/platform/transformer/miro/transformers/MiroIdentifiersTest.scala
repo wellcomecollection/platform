@@ -16,7 +16,8 @@ class MiroIdentifiersTest
       imageNumber = "L0035411"
     )
 
-    val otherIdentifiers = transformer.getOtherIdentifiers(miroRecord = miroRecord)
+    val otherIdentifiers =
+      transformer.getOtherIdentifiers(miroRecord = miroRecord)
 
     otherIdentifiers shouldBe List(
       createSierraSystemSourceIdentifierWith(

@@ -61,8 +61,8 @@ class MiroGenresTest
     expectedGenreLabels: List[String]
   ): Assertion = {
     val transformedWork = transformWork(miroRecord)
-    val expectedGenres = expectedGenreLabels.map {
-      label => Genre(label, concepts = List(Unidentifiable(Concept(label))))
+    val expectedGenres = expectedGenreLabels.map { label =>
+      Genre(label, concepts = List(Unidentifiable(Concept(label))))
     }
     transformedWork.genres shouldBe expectedGenres
   }

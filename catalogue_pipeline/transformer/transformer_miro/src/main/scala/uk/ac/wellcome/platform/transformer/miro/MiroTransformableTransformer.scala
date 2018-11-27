@@ -20,7 +20,8 @@ class MiroTransformableTransformer
     with transformers.MiroWorkType
     with Logging {
 
-  def transform(miroRecord: MiroRecord, version: Int): Try[TransformedBaseWork] =
+  def transform(miroRecord: MiroRecord,
+                version: Int): Try[TransformedBaseWork] =
     doTransform(miroRecord, version) map { transformed =>
       debug(s"Transformed record to $transformed")
       transformed
@@ -30,7 +31,8 @@ class MiroTransformableTransformer
         throw e
     }
 
-  private def doTransform(originalMiroRecord: MiroRecord, version: Int): Try[TransformedBaseWork] = {
+  private def doTransform(originalMiroRecord: MiroRecord,
+                          version: Int): Try[TransformedBaseWork] = {
     // This is an utterly awful hack we have to live with until we get
     // these corrected in the source data.
     val miroRecord = MiroRecord.create(toJson(originalMiroRecord).get)

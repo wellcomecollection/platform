@@ -62,7 +62,8 @@ class MiroTransformableTransformerTest
     it("two references") {
       transformRecordAndCheckMiroLibraryReferences(
         createMiroRecordWith(
-          libraryRefDepartment = List(Some("External Reference"), Some("ICV No")),
+          libraryRefDepartment =
+            List(Some("External Reference"), Some("ICV No")),
           libraryRefId = List(Some("Sanskrit ID 1924"), Some("1234"))
         ),
         expectedValues = List(
@@ -144,7 +145,9 @@ class MiroTransformableTransformerTest
       val work = transformWork(
         createMiroRecordWith(
           description = Some(description),
-          award = List(Some("Dirt, Wellcome Collection"), Some("Biomedical Image Awards")),
+          award = List(
+            Some("Dirt, Wellcome Collection"),
+            Some("Biomedical Image Awards")),
           awardDate = List(None, Some("2002"))
         )
       )
@@ -157,7 +160,8 @@ class MiroTransformableTransformerTest
       val work = transformWork(
         createMiroRecordWith(
           description = Some(description),
-          award = List(Some("WIA Overall Winner"), Some("Wellcome Image Awards")),
+          award =
+            List(Some("WIA Overall Winner"), Some("Wellcome Image Awards")),
           awardDate = List(Some("2015"), Some("2015"))
         )
       )
@@ -301,7 +305,8 @@ class MiroTransformableTransformerTest
     )
   }
 
-  private def assertTransformReturnsInvisibleWork(miroRecord: MiroRecord): Assertion = {
+  private def assertTransformReturnsInvisibleWork(
+    miroRecord: MiroRecord): Assertion = {
     val triedMaybeWork = transformer.transform(miroRecord, version = 1)
     triedMaybeWork.isSuccess shouldBe true
 
