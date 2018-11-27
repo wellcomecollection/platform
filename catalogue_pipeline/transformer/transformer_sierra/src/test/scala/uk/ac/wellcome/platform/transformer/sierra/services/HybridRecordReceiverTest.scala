@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.receive
+package uk.ac.wellcome.platform.transformer.sierra.services
 
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
@@ -11,12 +11,9 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.models.work.internal.{
-  TransformedBaseWork,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.fixtures.HybridRecordReceiverFixture
+import uk.ac.wellcome.platform.transformer.sierra.fixtures.HybridRecordReceiverFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.vhs.HybridRecord

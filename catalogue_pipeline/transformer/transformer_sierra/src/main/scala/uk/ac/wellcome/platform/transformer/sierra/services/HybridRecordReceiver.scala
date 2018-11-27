@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.receive
+package uk.ac.wellcome.platform.transformer.sierra.services
 
 import grizzled.slf4j.Logging
 import io.circe.ParsingFailure
