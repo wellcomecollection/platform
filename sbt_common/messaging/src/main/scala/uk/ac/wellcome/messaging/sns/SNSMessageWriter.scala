@@ -18,15 +18,16 @@ class SNSMessageWriter @Inject()(snsClient: AmazonSNS)(
     extends Logging {
   def writeMessage(message: String,
                    subject: String,
-                   topicArn: String): Future[PublishAttempt] =
+                   snsConfig: SNSConfig): Future[PublishAttempt] =
     Future {
       blocking {
-        debug(s"Publishing message $message to $topicArn")
-        snsClient.publish(new PublishRequest(topicArn, message, subject))
+        debug(s"Publishing message $message to ${snsConfig.topicArn}")
+        snsClient.publish(
+          new PublishRequest(snsConfig.topicArn, message, subject))
       }
     }.map { publishResult =>
         debug(
-          s"Published message $message to $topicArn (${publishResult.getMessageId})")
+          s"Published message $message to ${snsConfig.topicArn} (${publishResult.getMessageId})")
         PublishAttempt(Right(message))
       }
       .recover {
@@ -35,11 +36,11 @@ class SNSMessageWriter @Inject()(snsClient: AmazonSNS)(
           throw e
       }
 
-  def writeMessage[T](message: T, subject: String, topicArn: String)(
+  def writeMessage[T](message: T, subject: String, snsConfig: SNSConfig)(
     implicit encoder: Encoder[T]): Future[PublishAttempt] =
     writeMessage(
       message = toJson[T](message).get,
-      topicArn = topicArn,
-      subject = subject
+      subject = subject,
+      snsConfig = snsConfig
     )
 }

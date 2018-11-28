@@ -35,23 +35,23 @@ object Main extends App with Logging {
 
   val recordReader = new RecordReader(
     maxRecordsScanner = new MaxRecordsScanner(
-      scanSpecScanner = scanSpecScanner,
-      dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
+      scanSpecScanner = scanSpecScanner
     ),
     parallelScanner = new ParallelScanner(
-      scanSpecScanner = scanSpecScanner,
-      dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
+      scanSpecScanner = scanSpecScanner
     )
   )
 
   val hybridRecordSender = new BulkSNSSender(
-    snsWriter = SNSBuilder.buildSNSWriter(config)
+    snsMessageWriter = SNSBuilder.buildSNSMessageWriter(config)
   )
 
   val workerService = new ReindexWorkerService(
     recordReader = recordReader,
     bulkSNSSender = hybridRecordSender,
-    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
+    dynamoConfig = DynamoBuilder.buildDynamoConfig(config),
+    snsConfig = SNSBuilder.buildSNSConfig(config)
   )
 
   try {

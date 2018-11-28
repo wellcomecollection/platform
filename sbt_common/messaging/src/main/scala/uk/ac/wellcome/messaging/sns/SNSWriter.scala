@@ -18,7 +18,7 @@ class SNSWriter @Inject()(snsMessageWriter: SNSMessageWriter,
     snsMessageWriter.writeMessage(
       message = message,
       subject = subject,
-      topicArn = snsConfig.topicArn
+      snsConfig = snsConfig
     )
 
   def writeMessage[T](message: T, subject: String)(
@@ -26,6 +26,6 @@ class SNSWriter @Inject()(snsMessageWriter: SNSMessageWriter,
     snsMessageWriter.writeMessage[T](
       message = message,
       subject = subject,
-      topicArn = snsConfig.topicArn
+      snsConfig = snsConfig
     )
 }
