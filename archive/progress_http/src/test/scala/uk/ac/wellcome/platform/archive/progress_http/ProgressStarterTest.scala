@@ -3,10 +3,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  StorageSpace
-}
+import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
@@ -43,7 +40,7 @@ class ProgressStarterTest
 
               requests shouldBe List(IngestBagRequest(
                 p.id,
-                storageSpace = StorageSpace(p.space.underlying),
+                storageSpace = p.space,
                 archiveCompleteCallbackUrl = p.callback.map(_.uri),
                 zippedBagLocation = ObjectLocation(
                   progress.sourceLocation.location.namespace,

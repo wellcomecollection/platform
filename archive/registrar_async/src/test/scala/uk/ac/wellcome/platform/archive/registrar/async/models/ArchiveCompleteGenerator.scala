@@ -5,18 +5,18 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   BagLocation,
-  StorageSpace
+  Namespace
 }
 
 object ArchiveCompleteGenerator extends RandomThings {
   def createWith(
     bagLocation: BagLocation,
     archiveRequestId: UUID = randomUUID,
-    storageSpace: StorageSpace = randomStorageSpace,
-  ) =
+    space: Namespace = createNamespace,
+  ): ArchiveComplete =
     ArchiveComplete(
-      archiveRequestId,
-      storageSpace,
-      bagLocation
+      archiveRequestId = archiveRequestId,
+      space = space,
+      bagLocation = bagLocation
     )
 }

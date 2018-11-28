@@ -56,12 +56,10 @@ trait RandomThings {
     LocalDate.ofEpochDay(startRange + Random.nextInt(maxValue))
   }
 
-  def randomStorageSpace = StorageSpace(
-    randomAlphanumeric()
-  )
+  def createNamespace: Namespace = Namespace(randomAlphanumeric())
 
   def randomBagId = BagId(
-    randomStorageSpace,
+    space = createNamespace,
     randomExternalIdentifier
   )
 }

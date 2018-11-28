@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.model._
+import com.amazonaws.services.sqs.model.SendMessageResult
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
@@ -32,12 +33,16 @@ trait RegistrarFixtures
     with LocalDynamoDb {
 
   def sendNotification(requestId: UUID,
-                       storageSpace: StorageSpace,
+                       space: Namespace,
                        bagLocation: BagLocation,
-                       queuePair: QueuePair) =
+                       queuePair: QueuePair): SendMessageResult =
     sendNotificationToSQS(
       queuePair.queue,
-      ArchiveComplete(requestId, storageSpace, bagLocation)
+      ArchiveComplete(
+        archiveRequestId = requestId,
+        space = space,
+        bagLocation = bagLocation
+      )
     )
 
   def withBagNotification[R](requestId: UUID,

@@ -1,10 +1,7 @@
 package uk.ac.wellcome.platform.archive.progress_http
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.SNSWriter
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  StorageSpace
-}
+import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
@@ -23,12 +20,12 @@ class ProgressStarter @Inject()(
         "progress-http-request-created")
     } yield progress
 
-  private def toIngestRequest(progress: Progress) = {
+  private def toIngestRequest(progress: Progress): IngestBagRequest = {
     IngestBagRequest(
-      progress.id,
-      progress.sourceLocation.location,
-      progress.callback.map(_.uri),
-      StorageSpace(progress.space.underlying)
+      archiveRequestId = progress.id,
+      zippedBagLocation = progress.sourceLocation.location,
+      archiveCompleteCallbackUrl = progress.callback.map(_.uri),
+      storageSpace = progress.space
     )
   }
 }

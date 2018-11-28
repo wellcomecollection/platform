@@ -233,7 +233,7 @@ class ProgressHttpFeatureTest
                   requests shouldBe List(
                     IngestBagRequest(
                       id,
-                      storageSpace = StorageSpace(storageSpace.id),
+                      storageSpace = Namespace(storageSpace.id),
                       archiveCompleteCallbackUrl = Some(testCallbackUri),
                       zippedBagLocation = ObjectLocation("bucket", "key.txt")
                     ))

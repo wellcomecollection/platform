@@ -1,11 +1,12 @@
 package uk.ac.wellcome.platform.archive.common.models
+
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.json.JsonUtil._
 
 case class BagId(
-  space: StorageSpace,
+  space: Namespace,
   externalIdentifier: ExternalIdentifier
 ) {
   override def toString: String =

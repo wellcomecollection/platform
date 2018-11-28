@@ -5,8 +5,10 @@ import uk.ac.wellcome.json.utils.JsonAssertions
 
 class BagIdTest extends FunSpec with JsonAssertions {
   it("serialises space and external identifier as strings") {
-    val bagId =
-      BagId(StorageSpace("digitised"), ExternalIdentifier("b1234567x"))
+    val bagId = BagId(
+      space = Namespace("digitised"),
+      externalIdentifier = ExternalIdentifier("b1234567x")
+    )
     val expectedJson =
       s"""
          |{
