@@ -1,16 +1,10 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{Period, _}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.source.{
-  MarcSubfield,
-  VarField
-}
-import uk.ac.wellcome.platform.transformer.sierra.generators.{
-  MarcGenerators,
-  SierraDataGenerators
-}
+import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
 
 class SierraProductionTest
     extends FunSpec
@@ -55,15 +49,15 @@ class SierraProductionTest
     it("populates dates from subfield c") {
       val production = transform260ToProduction(
         subfields = List(
-          MarcSubfield(tag = "c", content = "1955."),
-          MarcSubfield(tag = "c", content = "1984."),
-          MarcSubfield(tag = "c", content = "1999.")
+          MarcSubfield(tag = "c", content = "1955"),
+          MarcSubfield(tag = "c", content = "1984"),
+          MarcSubfield(tag = "c", content = "1999")
         ))
 
       production.dates shouldBe List(
-        Period(label = "1955."),
-        Period(label = "1984."),
-        Period(label = "1999.")
+        Period(label = "1955"),
+        Period(label = "1984"),
+        Period(label = "1999")
       )
     }
 
@@ -117,7 +111,7 @@ class SierraProductionTest
         subfields = List(
           MarcSubfield(tag = "c", content = "1981"),
           MarcSubfield(tag = "g", content = "April 15, 1977"),
-          MarcSubfield(tag = "g", content = "1973 printing"),
+          MarcSubfield(tag = "g", content = "1973 printing")
         ))
 
       production.dates shouldBe List(
@@ -182,6 +176,26 @@ class SierraProductionTest
       )
 
       transformToProduction(varFields) shouldBe expectedProductions
+    }
+
+    it("normalises Place and Period labels") {
+      val production = transform260ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Paris  : "),
+          MarcSubfield(tag = "a", content = "London :"),
+          MarcSubfield(tag = "c", content = "1984 . "),
+          MarcSubfield(tag = "c", content = "1999.")
+        ))
+
+      production.places shouldBe List(
+        Place(label = "Paris"),
+        Place(label = "London")
+      )
+
+      production.dates shouldBe List(
+        Period(label = "1984"),
+        Period(label = "1999")
+      )
     }
   }
 
@@ -373,6 +387,33 @@ class SierraProductionTest
       )
 
       transformToProduction(varFields) shouldBe expectedProductions
+    }
+
+    it("normalises Place and Period labels") {
+      val production = transform264ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Boston:"),
+          MarcSubfield(tag = "a", content = "Cambridge : "),
+          MarcSubfield(tag = "b", content = "ABC Publishers,"),
+          MarcSubfield(tag = "b", content = "Iverson Ltd. , "),
+          MarcSubfield(tag = "c", content = "2002."),
+          MarcSubfield(tag = "c", content = "1983 ."),
+          MarcSubfield(tag = "c", content = "copyright 2005.")
+        ))
+
+      production.places shouldBe List(
+        Place(label = "Boston"),
+        Place(label = "Cambridge")
+      )
+      production.agents shouldBe List(
+        Unidentifiable(Agent(label = "ABC Publishers")),
+        Unidentifiable(Agent(label = "Iverson Ltd."))
+      )
+      production.dates shouldBe List(
+        Period(label = "2002"),
+        Period(label = "1983"),
+        Period(label = "copyright 2005")
+      )
     }
   }
 

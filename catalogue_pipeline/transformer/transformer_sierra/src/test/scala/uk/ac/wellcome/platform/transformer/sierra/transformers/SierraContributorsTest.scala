@@ -390,6 +390,30 @@ class SierraContributorsTest
         varFields = varFields,
         expectedContributors = expectedContributors)
     }
+
+    it("normalises Person contributor labels") {
+      val varFields = List(
+        createVarFieldWith(
+          marcTag = "100",
+          subfields = List(MarcSubfield(tag = "a", content = "George,"))
+        ),
+        createVarFieldWith(
+          marcTag = "700",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Sebastian,")
+          )
+        )
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Unidentifiable(Person(label = "George"))),
+        Contributor(agent = Unidentifiable(Person(label = "Sebastian")))
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
   }
 
   describe("Organisation") {
@@ -583,6 +607,28 @@ class SierraContributorsTest
         Contributor(
           agent = Unidentifiable(Organisation(label = name))
         )
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
+
+    it("normalises Organisation contributor labels") {
+      val varFields = List(
+        createVarFieldWith(
+          marcTag = "110",
+          subfields = List(MarcSubfield(tag = "a", content = "The organisation,"))
+        ),
+        createVarFieldWith(
+          marcTag = "710",
+          subfields = List(MarcSubfield(tag = "a", content = "Another organisation,"))
+        )
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Unidentifiable(Organisation(label = "The organisation"))),
+        Contributor(agent = Unidentifiable(Organisation(label = "Another organisation")))
       )
 
       transformAndCheckContributors(

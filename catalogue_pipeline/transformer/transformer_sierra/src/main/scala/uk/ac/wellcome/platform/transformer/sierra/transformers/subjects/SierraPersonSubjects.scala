@@ -16,7 +16,9 @@ import uk.ac.wellcome.platform.transformer.sierra.transformers.{
   SierraAgents
 }
 
-trait SierraPersonSubjects extends MarcUtils with SierraAgents {
+trait SierraPersonSubjects
+  extends MarcUtils
+    with SierraAgents {
 
   // Populate wwork:subject
   //
@@ -44,7 +46,7 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
       .filterNot { _.indicator2.contains("7") }
       .flatMap { varField: VarField =>
         val subfields = varField.subfields
-        val maybePerson = getPerson(subfields)
+        val maybePerson = getPerson("600", subfields)
         maybePerson.map { person =>
           val label = getPersonSubjectLabel(
             person = person,

@@ -201,7 +201,7 @@ class SierraTransformableTransformerTest
         marcTag = "260",
         subfields = List(
           MarcSubfield(tag = "b", content = "Peaceful Poetry"),
-          MarcSubfield(tag = "c", content = "1923.")
+          MarcSubfield(tag = "c", content = "1923")
         )
       )
     )
@@ -213,7 +213,7 @@ class SierraTransformableTransformerTest
           MarcSubfield(
             tag = "a",
             content = "A delightful description of a dead daisy."),
-          MarcSubfield(tag = "c", content = "1923.")
+          MarcSubfield(tag = "c", content = "1923")
         )
       )
     )
@@ -257,7 +257,7 @@ class SierraTransformableTransformerTest
         ProductionEvent(
           places = List(),
           agents = List(Unidentifiable(Agent(label = "Peaceful Poetry"))),
-          dates = List(Period("1923.")),
+          dates = List(Period("1923")),
           function = None
         )
       ),
