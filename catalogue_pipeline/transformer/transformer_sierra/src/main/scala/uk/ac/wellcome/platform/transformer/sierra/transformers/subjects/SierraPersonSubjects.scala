@@ -16,9 +16,7 @@ import uk.ac.wellcome.platform.transformer.sierra.transformers.{
   SierraAgents
 }
 
-trait SierraPersonSubjects
-  extends MarcUtils
-    with SierraAgents {
+trait SierraPersonSubjects extends MarcUtils with SierraAgents {
 
   // Populate wwork:subject
   //

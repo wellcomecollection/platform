@@ -60,7 +60,6 @@ object Person {
     Person(
       label = trimTrailing(label, ','),
       prefix = prefix,
-      numeration= numeration)
+      numeration = numeration)
   }
 }
-

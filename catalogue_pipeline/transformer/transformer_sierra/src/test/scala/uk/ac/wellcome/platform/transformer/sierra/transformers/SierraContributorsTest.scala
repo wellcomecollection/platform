@@ -618,17 +618,21 @@ class SierraContributorsTest
       val varFields = List(
         createVarFieldWith(
           marcTag = "110",
-          subfields = List(MarcSubfield(tag = "a", content = "The organisation,"))
+          subfields =
+            List(MarcSubfield(tag = "a", content = "The organisation,"))
         ),
         createVarFieldWith(
           marcTag = "710",
-          subfields = List(MarcSubfield(tag = "a", content = "Another organisation,"))
+          subfields =
+            List(MarcSubfield(tag = "a", content = "Another organisation,"))
         )
       )
 
       val expectedContributors = List(
-        Contributor(agent = Unidentifiable(Organisation(label = "The organisation"))),
-        Contributor(agent = Unidentifiable(Organisation(label = "Another organisation")))
+        Contributor(
+          agent = Unidentifiable(Organisation(label = "The organisation"))),
+        Contributor(
+          agent = Unidentifiable(Organisation(label = "Another organisation")))
       )
 
       transformAndCheckContributors(

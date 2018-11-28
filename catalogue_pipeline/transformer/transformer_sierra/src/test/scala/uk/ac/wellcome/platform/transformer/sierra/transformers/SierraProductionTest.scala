@@ -3,8 +3,14 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{Period, _}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.sierra.source.{MarcSubfield, VarField}
-import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
+import uk.ac.wellcome.platform.transformer.sierra.source.{
+  MarcSubfield,
+  VarField
+}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 
 class SierraProductionTest
     extends FunSpec

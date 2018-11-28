@@ -209,7 +209,7 @@ trait SierraProduction {
       }
 
   private def datesFromSubfields(vf: VarField,
-                               subfieldTag: String): List[Period] =
+                                 subfieldTag: String): List[Period] =
     vf.subfields
       .filter { _.tag == subfieldTag }
       .map { sf: MarcSubfield =>
