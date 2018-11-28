@@ -33,14 +33,16 @@ object Main extends App with Logging {
     dynamoDBClient = DynamoBuilder.buildDynamoClient(config)
   )
 
+  val dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
+
   val recordReader = new RecordReader(
     maxRecordsScanner = new MaxRecordsScanner(
       scanSpecScanner = scanSpecScanner,
-      dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
+      dynamoConfig = dynamoConfig
     ),
     parallelScanner = new ParallelScanner(
       scanSpecScanner = scanSpecScanner,
-      dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
+      dynamoConfig = dynamoConfig
     )
   )
 
@@ -51,7 +53,9 @@ object Main extends App with Logging {
   val workerService = new ReindexWorkerService(
     recordReader = recordReader,
     bulkSNSSender = hybridRecordSender,
-    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
+    sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
+    dynamoConfig = dynamoConfig,
+    snsConfig = SNSBuilder.buildSNSConfig(config)
   )
 
   try {

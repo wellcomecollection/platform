@@ -34,7 +34,9 @@ trait WorkerServiceFixture extends Akka with DynamoFixtures with SNS with SQS {
               val workerService = new ReindexWorkerService(
                 recordReader = recordReader,
                 bulkSNSSender = hybridRecordSender,
-                sqsStream = sqsStream
+                sqsStream = sqsStream,
+                dynamoConfig = createDynamoConfigWith(table),
+                snsConfig = createSNSConfigWith(topic)
               )(actorSystem = actorSystem, ec = global)
 
               workerService.run()
