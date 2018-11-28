@@ -28,7 +28,7 @@ class ReindexWorkerService(
         snsConfig = snsConfig
       )
       recordsToSend: List[String] <- recordReader
-        .findRecordsForReindexing(reindexJob)
+        .findRecordsForReindexing(reindexJob.parameters)
       _ <- bulkSNSSender.sendToSNS(messages = recordsToSend)
     } yield ()
 

@@ -19,10 +19,10 @@ class RecordReader(
   parallelScanner: ParallelScanner
 ) extends Logging {
 
-  def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[String]] = {
-    debug(s"Finding records that need reindexing for $reindexJob")
+  def findRecordsForReindexing(reindexParameters: ReindexParameters): Future[List[String]] = {
+    debug(s"Finding records that need reindexing for $reindexParameters")
 
-    reindexJob.parameters match {
+    reindexParameters match {
       case CompleteReindexParameters(segment, totalSegments) =>
         parallelScanner
           .scan(

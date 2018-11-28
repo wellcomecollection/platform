@@ -10,8 +10,8 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
   ReindexableTable
 }
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  PartialReindexJob
+  CompleteReindexParameters,
+  PartialReindexParameters
 }
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -46,9 +46,12 @@ class RecordReaderTest
         records.foreach(record =>
           Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
+        val reindexParameters = CompleteReindexParameters(
+          segment = 0,
+          totalSegments = 1
+        )
 
-        whenReady(reader.findRecordsForReindexing(reindexJob)) {
+        whenReady(reader.findRecordsForReindexing(reindexParameters)) {
           actualRecords =>
             actualRecords.map { fromJson[HybridRecord](_).get } should contain theSameElementsAs records
         }
@@ -64,9 +67,9 @@ class RecordReaderTest
           Scanamo.put(dynamoDbClient)(table.name)(record)
         }
 
-        val reindexJob = PartialReindexJob(maxRecords = 5)
+        val reindexParameters = PartialReindexParameters(maxRecords = 5)
 
-        whenReady(reader.findRecordsForReindexing(reindexJob)) {
+        whenReady(reader.findRecordsForReindexing(reindexParameters)) {
           actualRecords =>
             actualRecords should have size 5
         }
@@ -76,9 +79,14 @@ class RecordReaderTest
 
   it("returns a failed Future if there's a DynamoDB error") {
     val table = Table("does-not-exist", "no-such-index")
+
+    val reindexParameters = CompleteReindexParameters(
+      segment = 5,
+      totalSegments = 10
+    )
+
     withRecordReader(table) { reader =>
-      val future = reader.findRecordsForReindexing(
-        CompleteReindexJob(segment = 5, totalSegments = 10))
+      val future = reader.findRecordsForReindexing(reindexParameters)
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }
