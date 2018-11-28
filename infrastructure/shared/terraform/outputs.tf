@@ -62,10 +62,6 @@ output "reporting_miro_reindex_topic_name" {
   value = "${module.reporting_miro_reindex_topic.name}"
 }
 
-output "reporting_miro_reindex_topic_publish_policy" {
-  value = "${module.reporting_miro_reindex_topic.publish_policy}"
-}
-
 ## Reporting - miro inventory
 
 output "reporting_miro_inventory_reindex_topic_arn" {
@@ -74,10 +70,6 @@ output "reporting_miro_inventory_reindex_topic_arn" {
 
 output "reporting_miro_inventory_reindex_topic_name" {
   value = "${module.reporting_miro_inventory_reindex_topic.name}"
-}
-
-output "reporting_miro_inventory_reindex_topic_publish_policy" {
-  value = "${module.reporting_miro_inventory_reindex_topic.publish_policy}"
 }
 
 ## Reporting - sierra
@@ -90,10 +82,6 @@ output "reporting_sierra_reindex_topic_name" {
   value = "${module.reporting_sierra_reindex_topic.name}"
 }
 
-output "reporting_sierra_reindex_topic_publish_policy" {
-  value = "${module.reporting_sierra_reindex_topic.publish_policy}"
-}
-
 ## Catalogue - miro
 
 output "catalogue_miro_reindex_topic_arn" {
@@ -102,10 +90,6 @@ output "catalogue_miro_reindex_topic_arn" {
 
 output "catalogue_miro_reindex_topic_name" {
   value = "${module.catalogue_miro_reindex_topic.name}"
-}
-
-output "catalogue_miro_reindex_topic_publish_policy" {
-  value = "${module.catalogue_miro_reindex_topic.publish_policy}"
 }
 
 ## Catalogue - sierra
@@ -118,10 +102,6 @@ output "catalogue_sierra_reindex_topic_name" {
   value = "${module.catalogue_sierra_reindex_topic.name}"
 }
 
-output "catalogue_sierra_reindex_topic_publish_policy" {
-  value = "${module.catalogue_sierra_reindex_topic.publish_policy}"
-}
-
 ## Catalogue - sierra items
 
 output "catalogue_sierra_items_reindex_topic_arn" {
@@ -130,10 +110,6 @@ output "catalogue_sierra_items_reindex_topic_arn" {
 
 output "catalogue_sierra_items_reindex_topic_name" {
   value = "${module.catalogue_sierra_items_reindex_topic.name}"
-}
-
-output "catalogue_sierra_items_reindex_topic_publish_policy" {
-  value = "${module.catalogue_sierra_items_reindex_topic.publish_policy}"
 }
 
 # Catalogue VPC
