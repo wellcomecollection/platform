@@ -32,7 +32,10 @@ class ReindexWorkerService(
           reindexParameters = reindexJob.parameters,
           dynamoConfig = reindexJob.dynamoConfig
         )
-      _ <- bulkSNSSender.sendToSNS(messages = recordsToSend)
+      _ <- bulkSNSSender.sendToSNS(
+        messages = recordsToSend,
+        snsConfig = reindexJob.snsConfig
+      )
     } yield ()
 
   def run(): Future[Done] =
