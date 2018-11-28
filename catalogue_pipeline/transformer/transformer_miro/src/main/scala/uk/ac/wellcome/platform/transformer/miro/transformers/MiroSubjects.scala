@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
+import uk.ac.wellcome.models.work.text.TextNormalisation.sentenceCase
 
 trait MiroSubjects {
 
@@ -26,9 +27,10 @@ trait MiroSubjects {
       }
 
     (keywords ++ keywordsUnauth).map { keyword =>
+      val normalisedLabel = sentenceCase(keyword)
       Subject[Unidentifiable[Concept]](
-        label = keyword,
-        concepts = List(Unidentifiable(Concept(keyword)))
+        label = normalisedLabel,
+        concepts = List(Unidentifiable(Concept(normalisedLabel)))
       )
     }
   }

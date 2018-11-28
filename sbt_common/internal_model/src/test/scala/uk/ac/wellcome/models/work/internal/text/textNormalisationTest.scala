@@ -30,4 +30,17 @@ class textNormalisationTest extends FunSpec with Matchers {
       trimTrailing(i, '.') shouldBe o
     }
   }
+
+  it("converts to sentence case") {
+    val examples = Table(
+      ("in",        "out"),
+      ("text",      "Text"),
+      ("TEXT",      "TEXT"),
+      ("teXT",      "TeXT"),
+      ("text text", "Text text")
+    )
+    forAll(examples) { (i: String, o: String) =>
+      sentenceCase(i) shouldBe o
+    }
+  }
 }

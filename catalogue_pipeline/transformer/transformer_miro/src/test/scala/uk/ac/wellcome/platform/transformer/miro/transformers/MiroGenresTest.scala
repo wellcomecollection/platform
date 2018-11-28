@@ -21,38 +21,48 @@ class MiroGenresTest
   it("uses the image_phys_format field if present") {
     transformRecordAndCheckGenres(
       miroRecord = createMiroRecordWith(
-        physFormat = Some("painting")
+        physFormat = Some("Painting")
       ),
-      expectedGenreLabels = List("painting")
+      expectedGenreLabels = List("Painting")
     )
   }
 
   it("uses the image_lc_genre field if present") {
     transformRecordAndCheckGenres(
       miroRecord = createMiroRecordWith(
-        lcGenre = Some("sculpture")
+        lcGenre = Some("Sculpture")
       ),
-      expectedGenreLabels = List("sculpture")
+      expectedGenreLabels = List("Sculpture")
     )
   }
 
   it("uses the image_phys_format and image_lc_genre fields if both present") {
     transformRecordAndCheckGenres(
       miroRecord = createMiroRecordWith(
-        physFormat = Some("etching"),
-        lcGenre = Some("woodwork")
+        physFormat = Some("Etching"),
+        lcGenre = Some("Woodwork")
       ),
-      expectedGenreLabels = List("etching", "woodwork")
+      expectedGenreLabels = List("Etching", "Woodwork")
     )
   }
 
   it("deduplicates entries in the genre field") {
     transformRecordAndCheckGenres(
       miroRecord = createMiroRecordWith(
-        physFormat = Some("oil painting"),
-        lcGenre = Some("oil painting")
+        physFormat = Some("Oil painting"),
+        lcGenre = Some("Oil painting")
       ),
-      expectedGenreLabels = List("oil painting")
+      expectedGenreLabels = List("Oil painting")
+    )
+  }
+
+  it("normalises genre labels and concepts to sentence case") {
+    transformRecordAndCheckGenres(
+      miroRecord = createMiroRecordWith(
+        physFormat = Some("etching"),
+        lcGenre = Some("wood work")
+      ),
+      expectedGenreLabels = List("Etching", "Wood work")
     )
   }
 
