@@ -15,6 +15,7 @@ variable "admin_cidr_ingress" {}
 variable "public_subnets" {
   type = "list"
 }
+
 variable "private_subnets" {
   type = "list"
 }

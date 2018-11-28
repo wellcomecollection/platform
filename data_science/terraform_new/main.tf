@@ -6,7 +6,7 @@ module "stack-281118" {
   vpc_id         = "${local.vpc_id}"
   vpc_cidr_block = "${data.aws_vpc.datascience.cidr_block}"
 
-  key_name = "${var.key_name}"
+  key_name   = "${var.key_name}"
   aws_region = "${var.aws_region}"
 
   public_subnets  = "${local.public_subnets}"
