@@ -1,7 +1,9 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 /** Tests that the Miro transformer extracts the "subjects" field correctly.
   *
@@ -12,51 +14,49 @@ import uk.ac.wellcome.models.work.internal._
 class MiroSubjectsTest
     extends FunSpec
     with Matchers
+    with MiroRecordGenerators
     with MiroTransformableWrapper {
 
   it("puts an empty subject list on records without keywords") {
     transformRecordAndCheckSubjects(
-      data = s""""image_title": "A snail without a subject"""",
+      miroRecord = createMiroRecord,
       expectedSubjectLabels = List()
     )
   }
 
   it("uses the image_keywords field if present") {
     transformRecordAndCheckSubjects(
-      data = s"""
-        "image_title": "A scorpion with a strawberry",
-        "image_keywords": ["animals", "arachnids", "fruit"]
-      """,
+      miroRecord = createMiroRecordWith(
+        keywords = Some(List("animals", "arachnids", "fruit"))
+      ),
       expectedSubjectLabels = List("animals", "arachnids", "fruit")
     )
   }
 
   it("uses the image_keywords_unauth field if present") {
     transformRecordAndCheckSubjects(
-      data = s"""
-        "image_title": "A sweet seal gives you a sycamore",
-        "image_keywords_unauth": ["altruism", "mammals"]
-      """,
+      miroRecord = createMiroRecordWith(
+        keywordsUnauth = Some(List(Some("altruism"), Some("mammals")))
+      ),
       expectedSubjectLabels = List("altruism", "mammals")
     )
   }
 
   it("uses the image_keywords and image_keywords_unauth fields if both present") {
     transformRecordAndCheckSubjects(
-      data = s"""
-        "image_title": "A squid, a sponge and a stingray walk into a bar",
-        "image_keywords": ["humour"],
-        "image_keywords_unauth": ["marine creatures"]
-      """,
+      miroRecord = createMiroRecordWith(
+        keywords = Some(List("humour")),
+        keywordsUnauth = Some(List(Some("marine creatures")))
+      ),
       expectedSubjectLabels = List("humour", "marine creatures")
     )
   }
 
   private def transformRecordAndCheckSubjects(
-    data: String,
+    miroRecord: MiroRecord,
     expectedSubjectLabels: List[String]
-  ) = {
-    val transformedWork = transformWork(data = data)
+  ): Assertion = {
+    val transformedWork = transformWork(miroRecord)
     val expectedSubjects = expectedSubjectLabels.map { label =>
       Subject(label = label, concepts = List(Unidentifiable(Concept(label))))
     }

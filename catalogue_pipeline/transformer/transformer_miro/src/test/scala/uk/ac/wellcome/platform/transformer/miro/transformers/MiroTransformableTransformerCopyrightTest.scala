@@ -1,87 +1,84 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.DigitalLocation
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 class MiroTransformableTransformerCopyrightTest
     extends FunSpec
     with Matchers
+    with MiroRecordGenerators
     with MiroTransformableWrapper {
 
   it("has no credit line if there's not enough information") {
     transformRecordAndCheckCredit(
-      data = s""""image_title": "An image without any copyright?""""
+      miroRecord = createMiroRecord,
+      expectedCredit = None
     )
   }
 
   it("uses the image_credit_line field if present") {
     transformRecordAndCheckCredit(
-      data = s"""
-        "image_title": "A tumultuous transformation of trees",
-        "image_credit_line": "Wellcome Collection"
-      """,
+      miroRecord = createMiroRecordWith(
+        creditLine = Some("Wellcome Collection")
+      ),
       expectedCredit = Some("Wellcome Collection")
     )
   }
 
   it("uses the image_credit_line in preference to image_source_code") {
     transformRecordAndCheckCredit(
-      data = s"""
-        "image_title": "A tumultuous transformation of trees",
-        "image_credit_line": "Wellcome Collection",
-        "image_source_code": "CAM"
-      """,
+      miroRecord = createMiroRecordWith(
+        creditLine = Some("Wellcome Collection"),
+        sourceCode = Some("CAM")
+      ),
       expectedCredit = Some("Wellcome Collection")
     )
   }
 
   it("uses image_source_code if image_credit_line is empty") {
     transformRecordAndCheckCredit(
-      data = s"""
-        "image_title": "A tumultuous transformation of trees",
-        "image_credit_line": null,
-        "image_source_code": "CAM"
-      """,
+      miroRecord = createMiroRecordWith(
+        creditLine = None,
+        sourceCode = Some("CAM")
+      ),
       expectedCredit = Some("Benedict Campbell")
     )
   }
 
   it("uses the uppercased version of the source_code if necessary") {
     transformRecordAndCheckCredit(
-      data = s"""
-        "image_title": "A loud and leafy lime",
-        "image_source_code": "wel"
-      """,
+      miroRecord = createMiroRecordWith(
+        sourceCode = Some("wel")
+      ),
       expectedCredit = Some("Wellcome Collection")
     )
   }
 
   it("tidies up the credit line if necessary") {
     transformRecordAndCheckCredit(
-      data = s"""
-        "image_title": "Outside an odorous oak",
-        "image_credit_line": "The Wellcome Library, London"
-      """,
+      miroRecord = createMiroRecordWith(
+        creditLine = Some("The Wellcome Library, London")
+      ),
       expectedCredit = Some("Wellcome Collection")
     )
   }
 
   it("handles special characters in the contributor map") {
     transformRecordAndCheckCredit(
-      data = s"""
-        "image_title": "A fanciful flurry of firs",
-        "image_credit_line": null,
-        "image_source_code": "FEI"
-      """,
+      miroRecord = createMiroRecordWith(
+        sourceCode = Some("FEI")
+      ),
       expectedCredit = Some("Fernán Federici")
     )
   }
 
   private def transformRecordAndCheckCredit(
-    data: String,
-    expectedCredit: Option[String] = None
-  ) = {
-    val transformedWork = transformWork(data = data)
+    miroRecord: MiroRecord,
+    expectedCredit: Option[String]
+  ): Assertion = {
+    val transformedWork = transformWork(miroRecord)
     val location = transformedWork.itemsV1.head.agent.locations.head
     location shouldBe a[DigitalLocation]
     location.asInstanceOf[DigitalLocation].credit shouldBe expectedCredit

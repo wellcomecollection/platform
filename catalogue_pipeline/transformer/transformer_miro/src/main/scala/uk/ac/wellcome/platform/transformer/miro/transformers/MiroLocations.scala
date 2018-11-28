@@ -1,23 +1,30 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import uk.ac.wellcome.models.work.internal.{DigitalLocation, LocationType}
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroLocations
     extends MiroImageApiURL
     with MiroLicenses
     with MiroContributorCodes {
 
-  def getLocations(miroData: MiroTransformableData, miroId: String) = {
+  def getLocations(miroRecord: MiroRecord): List[DigitalLocation] =
     List(
       DigitalLocation(
         locationType = LocationType("iiif-image"),
-        url = buildImageApiURL(miroId, "info"),
-        credit = getCredit(miroId = miroId, miroData = miroData),
-        license = Some(chooseLicense(miroId, miroData.useRestrictions))
+        url = buildImageApiURL(
+          miroId = miroRecord.imageNumber,
+          templateName = "info"
+        ),
+        credit = getCredit(miroRecord),
+        license = Some(
+          chooseLicense(
+            miroId = miroRecord.imageNumber,
+            maybeUseRestrictions = miroRecord.useRestrictions
+          )
+        )
       )
     )
-  }
 
   /** Image credits in MIRO could be set in two ways:
     *
@@ -28,9 +35,8 @@ trait MiroLocations
     * We prefer the per-image credit line, but use the contributor-level credit
     * if unavailable.
     */
-  private def getCredit(miroId: String,
-                        miroData: MiroTransformableData): Option[String] = {
-    miroData.creditLine match {
+  private def getCredit(miroRecord: MiroRecord): Option[String] = {
+    miroRecord.creditLine match {
 
       // Some of the credit lines are inconsistent or use old names for
       // Wellcome, so we do a bunch of replacements and trimming to tidy
@@ -76,9 +82,9 @@ trait MiroLocations
       // Otherwise we carry through the contributor codes, which have
       // already been edited for consistency.
       case None =>
-        miroData.sourceCode match {
+        miroRecord.sourceCode match {
           case Some(code) =>
-            lookupContributorCode(miroId = miroId, code = code)
+            lookupContributorCode(miroId = miroRecord.imageNumber, code = code)
           case None => None
         }
     }

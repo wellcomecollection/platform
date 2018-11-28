@@ -4,9 +4,9 @@ import io.circe.generic.extras.JsonKey
 import org.apache.commons.lang3.StringEscapeUtils
 import uk.ac.wellcome.json.JsonUtil._
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
-case class MiroTransformableData(
+case class MiroRecord(
   @JsonKey("image_title") title: Option[String] = None,
   // Miro data has null json values scattered a bit everywhere.
   // If the type is not Option, circe decoding fails when it
@@ -35,10 +35,11 @@ case class MiroTransformableData(
     Option[String]] = Nil,
   @JsonKey("image_library_ref_id") libraryRefId: List[Option[String]] = Nil,
   @JsonKey("image_award") award: List[Option[String]] = Nil,
-  @JsonKey("image_award_date") awardDate: List[Option[String]] = Nil
+  @JsonKey("image_award_date") awardDate: List[Option[String]] = Nil,
+  @JsonKey("image_no_calc") imageNumber: String
 )
 
-case object MiroTransformableData {
+case object MiroRecord {
 
   /* Some of the Miro fields were imported from Sierra, and had special
    * characters replaced by HTML-encoded entities when copied across.
@@ -48,11 +49,6 @@ case object MiroTransformableData {
   private def unescapeHtml(s: String): String =
     StringEscapeUtils.unescapeHtml3(s)
 
-  /* Create MiroTransformableData from string */
-  private def createMiroTransformableData(
-    s: String): Try[MiroTransformableData] =
-    fromJson[MiroTransformableData](s)
-
   /* Adêle Mongrédien's name has been mangled as Unicode nonsense in the
    * Miro exports.  This presents as ugly nonsense in the API, and it affects
    * a fair number of works, to replace it properly.
@@ -61,18 +57,12 @@ case object MiroTransformableData {
     s.replaceAll("Ad\\u00c3\\u00aale", "Adêle")
       .replaceAll("Mongr\\u00c3\\u00a9dien", "Mongrédien")
 
-  def create(jsonString: String): MiroTransformableData = {
+  def create(jsonString: String): MiroRecord = {
     val unescapedData = fixAdeleUnicode(unescapeHtml(jsonString))
 
-    val tryMiroTransformableData =
-      createMiroTransformableData(unescapedData)
-
-    val miroTransformableData: MiroTransformableData =
-      tryMiroTransformableData match {
-        case Success(miroData) => miroData
-        case Failure(e)        => throw e
-      }
-
-    miroTransformableData
+    fromJson[MiroRecord](unescapedData) match {
+      case Success(miroRecord) => miroRecord
+      case Failure(e)          => throw e
+    }
   }
 }

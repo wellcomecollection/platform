@@ -1,79 +1,69 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
-import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Concept,
-  Genre,
-  MaybeDisplayable,
-  Unidentifiable
-}
+import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.models.work.internal.{Concept, Genre, Unidentifiable}
+import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 class MiroGenresTest
     extends FunSpec
     with Matchers
+    with MiroRecordGenerators
     with MiroTransformableWrapper {
 
   it("has an empty genre list on records without keywords") {
     transformRecordAndCheckGenres(
-      data = s""""image_title": "The giraffe's genre is gone'"""",
-      expectedGenres = List()
+      miroRecord = createMiroRecord,
+      expectedGenreLabels = List()
     )
   }
 
   it("uses the image_phys_format field if present") {
     transformRecordAndCheckGenres(
-      data = s"""
-        "image_title": "A goat grazes on some grass",
-        "image_phys_format": "painting"
-      """,
-      expectedGenres =
-        List(Genre("painting", List(Unidentifiable(Concept("painting")))))
+      miroRecord = createMiroRecordWith(
+        physFormat = Some("painting")
+      ),
+      expectedGenreLabels = List("painting")
     )
   }
 
   it("uses the image_lc_genre field if present") {
     transformRecordAndCheckGenres(
-      data = s"""
-        "image_title": "Grouchy geese are good as guards",
-        "image_lc_genre": "sculpture"
-      """,
-      expectedGenres =
-        List(Genre("sculpture", List(Unidentifiable(Concept("sculpture")))))
+      miroRecord = createMiroRecordWith(
+        lcGenre = Some("sculpture")
+      ),
+      expectedGenreLabels = List("sculpture")
     )
   }
 
   it("uses the image_phys_format and image_lc_genre fields if both present") {
     transformRecordAndCheckGenres(
-      data = s"""
-        "image_title": "A gorilla and a gibbon in a garden",
-        "image_phys_format": "etching",
-        "image_lc_genre": "woodwork"
-      """,
-      expectedGenres = List(
-        Genre("etching", List(Unidentifiable(Concept("etching")))),
-        Genre("woodwork", List(Unidentifiable(Concept("woodwork"))))
-      )
+      miroRecord = createMiroRecordWith(
+        physFormat = Some("etching"),
+        lcGenre = Some("woodwork")
+      ),
+      expectedGenreLabels = List("etching", "woodwork")
     )
   }
 
   it("deduplicates entries in the genre field") {
     transformRecordAndCheckGenres(
-      data = s"""
-        "image_title": "A duality of dancing dodos",
-        "image_phys_format": "oil painting",
-        "image_lc_genre": "oil painting"
-      """,
-      expectedGenres = List(
-        Genre("oil painting", List(Unidentifiable(Concept("oil painting")))))
+      miroRecord = createMiroRecordWith(
+        physFormat = Some("oil painting"),
+        lcGenre = Some("oil painting")
+      ),
+      expectedGenreLabels = List("oil painting")
     )
   }
 
   private def transformRecordAndCheckGenres(
-    data: String,
-    expectedGenres: List[Genre[MaybeDisplayable[AbstractConcept]]]
-  ) = {
-    val transformedWork = transformWork(data = data)
+    miroRecord: MiroRecord,
+    expectedGenreLabels: List[String]
+  ): Assertion = {
+    val transformedWork = transformWork(miroRecord)
+    val expectedGenres = expectedGenreLabels.map { label =>
+      Genre(label, concepts = List(Unidentifiable(Concept(label))))
+    }
     transformedWork.genres shouldBe expectedGenres
   }
 }
