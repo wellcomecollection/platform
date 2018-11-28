@@ -6,6 +6,9 @@ module "catalogue_miro_reindexer" {
   hybrid_records_topic_arn            = "${local.catalogue_miro_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.catalogue_miro_hybrid_records_topic_publish_policy}"
 
+  reindexer_job_config      = "${local.reindexer_job_config}"
+  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
@@ -22,6 +25,9 @@ module "catalogue_sierra_reindexer" {
   vhs_table_name                      = "${local.vhs_sierra_table_name}"
   hybrid_records_topic_arn            = "${local.catalogue_sierra_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.catalogue_sierra_hybrid_records_topic_publish_policy}"
+
+  reindexer_job_config      = "${local.reindexer_job_config}"
+  reindexer_job_config_json = "${local.reindexer_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
@@ -40,6 +46,9 @@ module "catalogue_sierra_items_reindexer" {
   hybrid_records_topic_arn            = "${local.catalogue_sierra_items_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.catalogue_sierra_items_hybrid_records_topic_publish_policy}"
 
+  reindexer_job_config      = "${local.reindexer_job_config}"
+  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
@@ -56,6 +65,9 @@ module "reporting_miro_reindexer" {
   vhs_table_name                      = "${local.vhs_miro_table_name}"
   hybrid_records_topic_arn            = "${local.reporting_miro_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.reporting_miro_hybrid_records_topic_publish_policy}"
+
+  reindexer_job_config      = "${local.reindexer_job_config}"
+  reindexer_job_config_json = "${local.reindexer_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
@@ -74,6 +86,9 @@ module "reporting_miro_inventory_reindexer" {
   hybrid_records_topic_arn            = "${local.reporting_miro_inventory_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.reporting_miro_inventory_hybrid_records_topic_publish_policy}"
 
+  reindexer_job_config      = "${local.reindexer_job_config}"
+  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
@@ -90,6 +105,9 @@ module "reporting_sierra_reindexer" {
   vhs_table_name                      = "${local.vhs_sierra_table_name}"
   hybrid_records_topic_arn            = "${local.reporting_sierra_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.reporting_sierra_hybrid_records_topic_publish_policy}"
+
+  reindexer_job_config      = "${local.reindexer_job_config}"
+  reindexer_job_config_json = "${local.reindexer_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
