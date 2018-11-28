@@ -8,13 +8,12 @@ locals {
 
   # Blue / Green config
 
-  romulus_api_release_id   = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : var.release_ids["api"]}"
-  remus_api_release_id     = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
-  romulus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
-  remus_app_uri            = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
-  romulus_is_prod          = "${local.production_api == "romulus" ? "true" : "false"}"
-  remus_is_prod            = "${local.production_api == "remus" ? "true" : "false"}"
-
+  romulus_api_release_id = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : var.release_ids["api"]}"
+  remus_api_release_id   = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
+  romulus_app_uri        = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
+  remus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
+  romulus_is_prod        = "${local.production_api == "romulus" ? "true" : "false"}"
+  remus_is_prod          = "${local.production_api == "remus" ? "true" : "false"}"
   es_config_romulus = {
     index_v1 = "v1-2018-11-27-correct-merge"
     index_v2 = "v2-2018-11-27-correct-merge"
