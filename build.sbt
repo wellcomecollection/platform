@@ -22,7 +22,7 @@ def doSharedLibrarySetup(project: Project, folder: String) =
 
 def doSharedSierraSetup(project: Project, folder: String) =
   doServiceSetup(project = project, folder = folder)
-    .dependsOn(sierra_adapter_common % "compile->compile;test->test")
+    .dependsOn(catalogue/adapters/sierra/common % "compile->compile;test->test")
 
 lazy val common = doSharedLibrarySetup(project, "sbt_common/common")
   .settings(libraryDependencies ++= Dependencies.commonDependencies)
@@ -85,7 +85,7 @@ lazy val config_elasticsearch = doSharedLibrarySetup(project, "sbt_common/config
   .dependsOn(config_core % "compile->compile;test->test")
   .dependsOn(elasticsearch % "compile->compile;test->test")
 
-lazy val api = doServiceSetup(project, "catalogue_api/api")
+lazy val api = doServiceSetup(project, "catalogue/api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(display % "compile->compile;test->test")
@@ -95,44 +95,44 @@ lazy val api = doServiceSetup(project, "catalogue_api/api")
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
 
-lazy val ingestor = doServiceSetup(project, "catalogue_pipeline/ingestor")
+lazy val ingestor = doServiceSetup(project, "catalogue/pipeline/ingestor")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_elasticsearch % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
   .settings(Search.settings: _*)
 
-lazy val transformer_common = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_common")
+lazy val transformer_common = doServiceSetup(project, "catalogue/pipeline/transformer/transformer_common")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
 
-lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
+lazy val transformer_miro = doServiceSetup(project, "catalogue/pipeline/transformer/transformer_miro")
   .dependsOn(transformer_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.miroTransformerDependencies)
 
-lazy val transformer_sierra = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_sierra")
+lazy val transformer_sierra = doServiceSetup(project, "catalogue/pipeline/transformer/transformer_sierra")
   .dependsOn(transformer_common % "compile->compile;test->test")
 
-lazy val merger = doServiceSetup(project, "catalogue_pipeline/merger")
+lazy val merger = doServiceSetup(project, "catalogue/pipeline/merger")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
 
-lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
+lazy val id_minter = doServiceSetup(project, "catalogue/pipeline/id_minter")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
-lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
+lazy val recorder = doServiceSetup(project, "catalogue/pipeline/recorder")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
 
-lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
+lazy val matcher = doServiceSetup(project, "catalogue/pipeline/matcher")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
@@ -145,26 +145,26 @@ lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
 
-lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
+lazy val goobi_reader = doServiceSetup(project, "catalogue/adapters/goobi/goobi_reader")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
 
-lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")
+lazy val catalogue/adapters/sierra_common = doServiceSetup(project, "catalogue/adapters/sierra/common")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
 
-lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_reader")
+lazy val sierra_reader = doSharedSierraSetup(project, "catalogue/adapters/sierra/sierra_reader")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraReaderDependencies)
 
-lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_items_to_dynamo")
+lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "catalogue/adapters/sierra/sierra_items_to_dynamo")
   .dependsOn(common % "compile->compile;test->test")
 
-lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_bib_merger")
+lazy val sierra_bib_merger = doSharedSierraSetup(project, "catalogue/adapters/sierra/sierra_bib_merger")
   .dependsOn(common % "compile->compile;test->test")
 
-lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
+lazy val sierra_item_merger = doSharedSierraSetup(project, "catalogue/adapters/sierra/sierra_item_merger")
   .dependsOn(common % "compile->compile;test->test")
 
 lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generator")
@@ -247,7 +247,7 @@ lazy val root = (project in file("."))
     reindex_worker,
 
     goobi_reader,
-    sierra_adapter_common,
+    catalogue/adapters/sierra_common,
     sierra_reader,
     sierra_items_to_dynamo,
     sierra_bib_merger,

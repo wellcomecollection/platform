@@ -5,19 +5,21 @@ include formatting.Makefile
 include infrastructure/critical/Makefile
 include infrastructure/shared/Makefile
 
+include catalogue/api/Makefile
+include catalogue/pipeline/Makefile
+include catalogue/adapters/goobi/Makefile
+include catalogue/adapters/sierra/Makefile
+
 include assets/Makefile
 include builds/Makefile
 include loris/Makefile
 include data_api/Makefile
 include data_science/Makefile
-include catalogue_api/Makefile
-include catalogue_pipeline/Makefile
-include goobi_adapter/Makefile
+
 include monitoring/Makefile
 include ontologies/Makefile
 include reindexer/Makefile
 include sbt_common/Makefile
-include sierra_adapter/Makefile
 include nginx/Makefile
 include archive/Makefile
 include reporting/Makefile
