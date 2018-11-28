@@ -72,9 +72,9 @@ class CallbackNotificationFlowTest
   it("doesn't send callbackNotifications") {
     val doesNotSendCallbackStatus = Table(
       ("progress-status", "callback-status"),
-      (Progress.Initialised, Callback.Pending),
-      (Progress.Initialised, Callback.Succeeded),
-      (Progress.Initialised, Callback.Failed),
+      (Progress.Accepted, Callback.Pending),
+      (Progress.Accepted, Callback.Succeeded),
+      (Progress.Accepted, Callback.Failed),
       (Progress.Processing, Callback.Pending),
       (Progress.Processing, Callback.Succeeded),
       (Progress.Processing, Callback.Failed),
