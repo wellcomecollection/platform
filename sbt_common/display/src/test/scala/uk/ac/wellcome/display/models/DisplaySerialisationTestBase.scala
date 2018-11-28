@@ -8,10 +8,9 @@ import uk.ac.wellcome.models.work.internal._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 
-  def optionalString(
-    fieldName: String,
-    maybeStringValue: Option[String],
-    trailingComma: Boolean = true): String =
+  def optionalString(fieldName: String,
+                     maybeStringValue: Option[String],
+                     trailingComma: Boolean = true): String =
     maybeStringValue match {
       case None => ""
       case Some(value) =>
