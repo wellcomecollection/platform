@@ -57,10 +57,6 @@ case class DisplayIngestType(id: String = "create",
                              @JsonKey("type")
                              ontologyType: String = "IngestType")
 
-case class DisplayStorageSpace(id: String,
-                               @JsonKey("type")
-                               ontologyType: String = "Space")
-
 case class DisplayStatus(id: String,
                          @JsonKey("type")
                          ontologyType: String = "Status")
