@@ -46,9 +46,13 @@ trait ProgressTrackerFixture
     space: Namespace,
     maybeCallbackUri: Option[URI],
     table: Table): Option[Either[DynamoReadError, Progress]] = {
-    givenTableHasItem(
-      Progress(id, storageLocation, space, Callback(maybeCallbackUri)),
-      table)
+    val progress = Progress(
+      id = id,
+      sourceLocation = storageLocation,
+      space = space,
+      callback = Callback(maybeCallbackUri)
+    )
+    givenTableHasItem(progress, table = table)
   }
 
   def assertProgressCreated(id: UUID,

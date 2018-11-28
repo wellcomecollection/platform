@@ -31,17 +31,18 @@ class DisplayIngestTest
   it("creates a DisplayIngest from Progress") {
     val bagId = randomBagId
     val progress: Progress = Progress(
-      id,
-      StorageLocation(
+      id = id,
+      sourceLocation = StorageLocation(
         StorageProvider("s3"),
-        ObjectLocation("bukkit", "key.txt")),
-      Namespace(spaceId),
-      Some(Callback(new URI(callbackUrl))),
-      Progress.Processing,
-      Some(bagId),
-      Instant.parse(createdDate),
-      Instant.parse(modifiedDate),
-      List(ProgressEvent(eventDescription, Instant.parse(eventDate)))
+        ObjectLocation("bukkit", "key.txt")
+      ),
+      space = Namespace(spaceId),
+      callback = Some(Callback(new URI(callbackUrl))),
+      status = Progress.Processing,
+      bag = Some(bagId),
+      createdDate = Instant.parse(createdDate),
+      lastModifiedDate = Instant.parse(modifiedDate),
+      events = List(ProgressEvent(eventDescription, Instant.parse(eventDate)))
     )
 
     val ingest = ResponseDisplayIngest(progress, contextUrl)

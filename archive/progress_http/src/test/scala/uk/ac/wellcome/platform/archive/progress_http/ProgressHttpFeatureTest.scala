@@ -208,22 +208,22 @@ class ProgressHttpFeatureTest
                       actualCallbackStatus shouldBe "processing"
                       actualSpaceId shouldBe storageSpace.id
 
-                      assertTableOnlyHasItem(
-                        Progress(
-                          id,
-                          StorageLocation(
-                            StorageProvider("s3"),
-                            ObjectLocation("bucket", "key.txt")),
-                          Namespace(storageSpace.id),
-                          Some(Callback(testCallbackUri, Callback.Pending)),
-                          Progress.Accepted,
-                          None,
-                          Instant.parse(actualCreatedDate),
-                          Instant.parse(actualLastModifiedDate),
-                          Nil
+                      val expectedProgress = Progress(
+                        id = id,
+                        sourceLocation = StorageLocation(
+                          StorageProvider("s3"),
+                          ObjectLocation("bucket", "key.txt")
                         ),
-                        table
+                        space = Namespace(storageSpace.id),
+                        callback = Some(Callback(testCallbackUri, Callback.Pending)),
+                        status = Progress.Accepted,
+                        bag = None,
+                        createdDate = Instant.parse(actualCreatedDate),
+                        lastModifiedDate = Instant.parse(actualLastModifiedDate),
+                        events = Nil
                       )
+
+                      assertTableOnlyHasItem(expectedProgress, table = table)
                   }
 
                   val requests =
