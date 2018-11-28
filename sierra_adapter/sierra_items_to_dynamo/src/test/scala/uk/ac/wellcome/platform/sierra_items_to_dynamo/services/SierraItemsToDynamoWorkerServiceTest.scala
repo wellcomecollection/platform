@@ -14,13 +14,12 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.SierraItemRecordVHSFixture
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -35,7 +34,8 @@ class SierraItemsToDynamoWorkerServiceTest
     with Akka
     with MetricsSenderFixture
     with ScalaFutures
-    with SierraGenerators {
+    with SierraGenerators
+    with SierraItemRecordVHSFixture {
 
   it("reads a sierra record from SQS and inserts it into DynamoDB") {
     val bibIds = createSierraBibNumbers(count = 5)
@@ -185,17 +185,5 @@ class SierraItemsToDynamoWorkerServiceTest
 
           testWith(service)
         }
-    }
-
-  def withItemRecordVHS[R](table: Table, bucket: Bucket)(
-    testWith: TestWith[VersionedHybridStore[SierraItemRecord,
-                                            EmptyMetadata,
-                                            ObjectStore[SierraItemRecord]],
-                       R]): R =
-    withTypeVHS[SierraItemRecord, EmptyMetadata, R](
-      bucket,
-      table,
-      globalS3Prefix = "") { vhs =>
-      testWith(vhs)
     }
 }
