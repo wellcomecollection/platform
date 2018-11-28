@@ -6,8 +6,8 @@ module "catalogue_miro_reindexer" {
   hybrid_records_topic_arn            = "${local.catalogue_miro_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.catalogue_miro_hybrid_records_topic_publish_policy}"
 
-  reindexer_job_config      = "${local.reindexer_job_config}"
-  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+  reindexer_jobs            = "${local.reindexer_jobs}"
+  reindexer_job_config_json = "${local.reindex_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
@@ -16,6 +16,8 @@ module "catalogue_miro_reindexer" {
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "catalogue_sierra_reindexer" {
@@ -26,8 +28,8 @@ module "catalogue_sierra_reindexer" {
   hybrid_records_topic_arn            = "${local.catalogue_sierra_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.catalogue_sierra_hybrid_records_topic_publish_policy}"
 
-  reindexer_job_config      = "${local.reindexer_job_config}"
-  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+  reindexer_jobs            = "${local.reindexer_jobs}"
+  reindexer_job_config_json = "${local.reindex_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
@@ -36,6 +38,8 @@ module "catalogue_sierra_reindexer" {
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "catalogue_sierra_items_reindexer" {
@@ -46,8 +50,8 @@ module "catalogue_sierra_items_reindexer" {
   hybrid_records_topic_arn            = "${local.catalogue_sierra_items_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.catalogue_sierra_items_hybrid_records_topic_publish_policy}"
 
-  reindexer_job_config      = "${local.reindexer_job_config}"
-  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+  reindexer_jobs            = "${local.reindexer_jobs}"
+  reindexer_job_config_json = "${local.reindex_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
@@ -56,6 +60,8 @@ module "catalogue_sierra_items_reindexer" {
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "reporting_miro_reindexer" {
@@ -66,8 +72,8 @@ module "reporting_miro_reindexer" {
   hybrid_records_topic_arn            = "${local.reporting_miro_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.reporting_miro_hybrid_records_topic_publish_policy}"
 
-  reindexer_job_config      = "${local.reindexer_job_config}"
-  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+  reindexer_jobs            = "${local.reindexer_jobs}"
+  reindexer_job_config_json = "${local.reindex_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
@@ -76,6 +82,8 @@ module "reporting_miro_reindexer" {
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "reporting_miro_inventory_reindexer" {
@@ -86,8 +94,8 @@ module "reporting_miro_inventory_reindexer" {
   hybrid_records_topic_arn            = "${local.reporting_miro_inventory_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.reporting_miro_inventory_hybrid_records_topic_publish_policy}"
 
-  reindexer_job_config      = "${local.reindexer_job_config}"
-  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+  reindexer_jobs            = "${local.reindexer_jobs}"
+  reindexer_job_config_json = "${local.reindex_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
@@ -96,6 +104,8 @@ module "reporting_miro_inventory_reindexer" {
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }
 
 module "reporting_sierra_reindexer" {
@@ -106,8 +116,8 @@ module "reporting_sierra_reindexer" {
   hybrid_records_topic_arn            = "${local.reporting_sierra_hybrid_records_topic_arn}"
   hybrid_records_topic_publish_policy = "${local.reporting_sierra_hybrid_records_topic_publish_policy}"
 
-  reindexer_job_config      = "${local.reindexer_job_config}"
-  reindexer_job_config_json = "${local.reindexer_job_config_json}"
+  reindexer_jobs            = "${local.reindexer_jobs}"
+  reindexer_job_config_json = "${local.reindex_job_config_json}"
 
   reindex_worker_container_image = "${local.reindex_worker_container_image}"
 
@@ -116,4 +126,6 @@ module "reporting_sierra_reindexer" {
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.reindexer.id}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
 }

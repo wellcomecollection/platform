@@ -38,12 +38,12 @@ locals {
   reindexer_jobs = [
     {
       id    = "sierra--reporting"
-      table = "${local.vhs_sierra_items_table_name}"
+      table = "${local.vhs_sierra_table_name}"
       topic = "${local.reporting_sierra_hybrid_records_topic_arn}"
     },
     {
       id    = "sierra--catalogue"
-      table = "${local.vhs_sierra_items_table_name}"
+      table = "${local.vhs_sierra_table_name}"
       topic = "${local.catalogue_sierra_hybrid_records_topic_arn}"
     },
     {

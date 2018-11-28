@@ -8,6 +8,8 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
+variable "account_id" {}
+
 variable "reindex_worker_container_image" {}
 
 variable "service_egress_security_group_id" {}
@@ -20,7 +22,7 @@ variable "namespace_id" {}
 variable "hybrid_records_topic_arn" {}
 variable "hybrid_records_topic_publish_policy" {}
 
-variable "reindexer_job_config" {
+variable "reindexer_jobs" {
   type = "list"
 }
 
