@@ -1,10 +1,9 @@
 module "catalogue_miro_reindexer" {
   source = "./reindex_worker"
 
-  namespace                           = "catalogue_pipeline_miro"
-  vhs_table_name                      = "${local.vhs_miro_table_name}"
-  hybrid_records_topic_arn            = "${local.catalogue_miro_hybrid_records_topic_arn}"
-  hybrid_records_topic_publish_policy = "${local.catalogue_miro_hybrid_records_topic_publish_policy}"
+  namespace                = "catalogue_pipeline_miro"
+  vhs_table_name           = "${local.vhs_miro_table_name}"
+  hybrid_records_topic_arn = "${local.catalogue_miro_hybrid_records_topic_arn}"
 
   reindexer_jobs            = "${local.reindexer_jobs}"
   reindexer_job_config_json = "${local.reindex_job_config_json}"
@@ -23,10 +22,9 @@ module "catalogue_miro_reindexer" {
 module "catalogue_sierra_reindexer" {
   source = "./reindex_worker"
 
-  namespace                           = "catalogue_pipeline_sierra"
-  vhs_table_name                      = "${local.vhs_sierra_table_name}"
-  hybrid_records_topic_arn            = "${local.catalogue_sierra_hybrid_records_topic_arn}"
-  hybrid_records_topic_publish_policy = "${local.catalogue_sierra_hybrid_records_topic_publish_policy}"
+  namespace                = "catalogue_pipeline_sierra"
+  vhs_table_name           = "${local.vhs_sierra_table_name}"
+  hybrid_records_topic_arn = "${local.catalogue_sierra_hybrid_records_topic_arn}"
 
   reindexer_jobs            = "${local.reindexer_jobs}"
   reindexer_job_config_json = "${local.reindex_job_config_json}"
@@ -45,10 +43,9 @@ module "catalogue_sierra_reindexer" {
 module "catalogue_sierra_items_reindexer" {
   source = "./reindex_worker"
 
-  namespace                           = "catalogue_pipeline_sierra_items"
-  vhs_table_name                      = "${local.vhs_sierra_items_table_name}"
-  hybrid_records_topic_arn            = "${local.catalogue_sierra_items_hybrid_records_topic_arn}"
-  hybrid_records_topic_publish_policy = "${local.catalogue_sierra_items_hybrid_records_topic_publish_policy}"
+  namespace                = "catalogue_pipeline_sierra_items"
+  vhs_table_name           = "${local.vhs_sierra_items_table_name}"
+  hybrid_records_topic_arn = "${local.catalogue_sierra_items_hybrid_records_topic_arn}"
 
   reindexer_jobs            = "${local.reindexer_jobs}"
   reindexer_job_config_json = "${local.reindex_job_config_json}"
@@ -67,10 +64,9 @@ module "catalogue_sierra_items_reindexer" {
 module "reporting_miro_reindexer" {
   source = "./reindex_worker"
 
-  namespace                           = "reporting_pipeline_miro"
-  vhs_table_name                      = "${local.vhs_miro_table_name}"
-  hybrid_records_topic_arn            = "${local.reporting_miro_hybrid_records_topic_arn}"
-  hybrid_records_topic_publish_policy = "${local.reporting_miro_hybrid_records_topic_publish_policy}"
+  namespace                = "reporting_pipeline_miro"
+  vhs_table_name           = "${local.vhs_miro_table_name}"
+  hybrid_records_topic_arn = "${local.reporting_miro_hybrid_records_topic_arn}"
 
   reindexer_jobs            = "${local.reindexer_jobs}"
   reindexer_job_config_json = "${local.reindex_job_config_json}"
@@ -89,10 +85,9 @@ module "reporting_miro_reindexer" {
 module "reporting_miro_inventory_reindexer" {
   source = "./reindex_worker"
 
-  namespace                           = "reporting_pipeline_miro_inventory"
-  vhs_table_name                      = "${local.vhs_miro_inventory_table_name}"
-  hybrid_records_topic_arn            = "${local.reporting_miro_inventory_hybrid_records_topic_arn}"
-  hybrid_records_topic_publish_policy = "${local.reporting_miro_inventory_hybrid_records_topic_publish_policy}"
+  namespace                = "reporting_pipeline_miro_inventory"
+  vhs_table_name           = "${local.vhs_miro_inventory_table_name}"
+  hybrid_records_topic_arn = "${local.reporting_miro_inventory_hybrid_records_topic_arn}"
 
   reindexer_jobs            = "${local.reindexer_jobs}"
   reindexer_job_config_json = "${local.reindex_job_config_json}"
@@ -111,10 +106,9 @@ module "reporting_miro_inventory_reindexer" {
 module "reporting_sierra_reindexer" {
   source = "./reindex_worker"
 
-  namespace                           = "reporting_pipeline_sierra"
-  vhs_table_name                      = "${local.vhs_sierra_table_name}"
-  hybrid_records_topic_arn            = "${local.reporting_sierra_hybrid_records_topic_arn}"
-  hybrid_records_topic_publish_policy = "${local.reporting_sierra_hybrid_records_topic_publish_policy}"
+  namespace                = "reporting_pipeline_sierra"
+  vhs_table_name           = "${local.vhs_sierra_table_name}"
+  hybrid_records_topic_arn = "${local.reporting_sierra_hybrid_records_topic_arn}"
 
   reindexer_jobs            = "${local.reindexer_jobs}"
   reindexer_job_config_json = "${local.reindex_job_config_json}"
