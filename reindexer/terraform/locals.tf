@@ -35,35 +35,36 @@ locals {
   # are the DynamoDB table that will be reindexed, and the topic ARN to send
   # new records to, respectively.
   #
-  reindexer_jobs = {
-    "sierra--reporting" = {
+  reindexer_jobs = [
+    {
+      id    = "sierra--reporting"
       table = "${local.vhs_sierra_items_table_name}"
       topic = "${local.reporting_sierra_hybrid_records_topic_arn}"
-    }
-
-    "sierra--catalogue" = {
+    },
+    {
+      id    = "sierra--catalogue"
       table = "${local.vhs_sierra_items_table_name}"
       topic = "${local.catalogue_sierra_hybrid_records_topic_arn}"
-    }
-
-    "miro--reporting" = {
+    },
+    {
+      id    = "miro--reporting"
       table = "${local.vhs_miro_table_name}"
       topic = "${local.reporting_miro_hybrid_records_topic_arn}"
-    }
-
-    "miro--catalogue" = {
+    },
+    {
+      id    = "miro--catalogue"
       table = "${local.vhs_miro_table_name}"
       topic = "${local.catalogue_miro_hybrid_records_topic_arn}"
-    }
-
-    "miro_inventory--reporting" = {
+    },
+    {
+      id    = "miro_inventory--reporting"
       table = "${local.vhs_miro_inventory_table_name}"
       topic = "${local.reporting_miro_inventory_hybrid_records_topic_arn}"
-    }
-
-    "sierra_items--catalogue" = {
+    },
+    {
+      id    = "sierra_items--catalogue"
       table = "${local.vhs_sierra_items_table_name}"
       topic = "${local.catalogue_sierra_items_hybrid_records_topic_arn}"
-    }
-  }
+    },
+  ]
 }
