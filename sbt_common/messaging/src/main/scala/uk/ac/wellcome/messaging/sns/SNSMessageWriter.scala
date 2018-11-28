@@ -22,7 +22,8 @@ class SNSMessageWriter @Inject()(snsClient: AmazonSNS)(
     Future {
       blocking {
         debug(s"Publishing message $message to ${snsConfig.topicArn}")
-        snsClient.publish(new PublishRequest(snsConfig.topicArn, message, subject))
+        snsClient.publish(
+          new PublishRequest(snsConfig.topicArn, message, subject))
       }
     }.map { publishResult =>
         debug(

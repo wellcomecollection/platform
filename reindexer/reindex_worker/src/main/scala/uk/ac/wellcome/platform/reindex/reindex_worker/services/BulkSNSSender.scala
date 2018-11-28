@@ -8,8 +8,10 @@ import uk.ac.wellcome.messaging.sns.{
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BulkSNSSender(snsMessageWriter: SNSMessageWriter)(implicit ec: ExecutionContext) {
-  def sendToSNS(messages: List[String], snsConfig: SNSConfig): Future[List[PublishAttempt]] = {
+class BulkSNSSender(snsMessageWriter: SNSMessageWriter)(
+  implicit ec: ExecutionContext) {
+  def sendToSNS(messages: List[String],
+                snsConfig: SNSConfig): Future[List[PublishAttempt]] = {
     Future.sequence {
       messages
         .map { message: String =>

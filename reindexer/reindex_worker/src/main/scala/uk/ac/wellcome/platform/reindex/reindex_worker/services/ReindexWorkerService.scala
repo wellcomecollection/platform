@@ -4,7 +4,10 @@ import akka.Done
 import akka.actor.ActorSystem
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{ReindexJob, ReindexParameters}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  ReindexJob,
+  ReindexParameters
+}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 

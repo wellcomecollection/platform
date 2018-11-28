@@ -21,4 +21,3 @@ case class CompleteReindexParameters(
 case class PartialReindexParameters(
   maxRecords: Int
 ) extends ReindexParameters
-

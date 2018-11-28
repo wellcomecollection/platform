@@ -10,7 +10,11 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends Akka with BulkSNSSenderFixture with RecordReaderFixture with SQS {
+trait WorkerServiceFixture
+    extends Akka
+    with BulkSNSSenderFixture
+    with RecordReaderFixture
+    with SQS {
   def withWorkerService[R](queue: Queue, table: Table, topic: Topic)(
     testWith: TestWith[ReindexWorkerService, R]): R =
     withActorSystem { actorSystem =>

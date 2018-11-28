@@ -160,7 +160,10 @@ def main():
         )
     else:
         messages = [
-            {"maxRecords": int(args["--max_records"]), "type": "PartialReindexParameters"}
+            {
+                "maxRecords": int(args["--max_records"]),
+                "type": "PartialReindexParameters",
+            }
         ]
         slack_message = (
             f"*{username}* started a partial reindex in *{source_name}*\n"

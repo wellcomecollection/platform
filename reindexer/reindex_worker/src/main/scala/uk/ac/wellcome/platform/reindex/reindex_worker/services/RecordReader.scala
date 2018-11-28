@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{MaxRecordsScanner, ParallelScanner}
+import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
+  MaxRecordsScanner,
+  ParallelScanner
+}
 import uk.ac.wellcome.platform.reindex.reindex_worker.models._
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
@@ -25,7 +28,8 @@ class RecordReader(
             totalSegments = totalSegments
           )(tableName = dynamoConfig.table)
       case PartialReindexParameters(maxRecords) =>
-        maxRecordsScanner.scan(maxRecords = maxRecords)(tableName = dynamoConfig.table)
+        maxRecordsScanner.scan(maxRecords = maxRecords)(
+          tableName = dynamoConfig.table)
     }
   }
 }

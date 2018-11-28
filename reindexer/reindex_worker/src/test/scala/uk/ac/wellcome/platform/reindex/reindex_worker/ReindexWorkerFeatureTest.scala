@@ -57,7 +57,8 @@ class ReindexWorkerFeatureTest
           withWorkerService(queue, table, topic) { _ =>
             val testRecords = createReindexableData(table)
 
-            val reindexParameters = CompleteReindexParameters(segment = 0, totalSegments = 1)
+            val reindexParameters =
+              CompleteReindexParameters(segment = 0, totalSegments = 1)
 
             sendNotificationToSQS[ReindexParameters](
               queue = queue,
@@ -143,7 +144,8 @@ class ReindexWorkerFeatureTest
         }
         withLocalSnsTopic { topic =>
           withWorkerService(queue, table, topic) { _ =>
-            val reindexParameters = CompleteReindexParameters(segment = 0, totalSegments = 1)
+            val reindexParameters =
+              CompleteReindexParameters(segment = 0, totalSegments = 1)
 
             sendNotificationToSQS[ReindexParameters](
               queue = queue,
