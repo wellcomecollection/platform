@@ -17,10 +17,7 @@ class WorksIndex(client: HttpClient, rootIndexType: String)(
   val httpClient: HttpClient = client
 
   val license = objectField("license").fields(
-    keywordField("ontologyType"),
-    keywordField("id"),
-    textField("label"),
-    textField("url")
+    keywordField("id")
   )
 
   def sourceIdentifierFields = Seq(
