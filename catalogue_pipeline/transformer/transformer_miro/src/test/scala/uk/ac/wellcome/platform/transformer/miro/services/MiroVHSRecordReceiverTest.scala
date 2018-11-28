@@ -7,7 +7,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.miro.fixtures.MiroVHSRecordReceiverFixture
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
@@ -35,16 +38,21 @@ class MiroVHSRecordReceiverTest
 
   case class TestException(message: String) extends Exception(message)
 
-  def transformToWork(miroRecord: MiroRecord, metadata: MiroMetadata, version: Int) =
+  def transformToWork(miroRecord: MiroRecord,
+                      metadata: MiroMetadata,
+                      version: Int) =
     Try(createUnidentifiedWorkWith(version = version))
 
-  def failingTransformToWork(miroRecord: MiroRecord, metadata: MiroMetadata, version: Int) =
+  def failingTransformToWork(miroRecord: MiroRecord,
+                             metadata: MiroMetadata,
+                             version: Int) =
     Try(throw TestException("BOOOM!"))
 
   it("receives a message and sends it to SNS client") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
-        val message = createMiroVHSRecordNotificationMessageWith(bucket = bucket)
+        val message =
+          createMiroVHSRecordNotificationMessageWith(bucket = bucket)
 
         withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
           val future = recordReceiver.receiveMessage(message, transformToWork)
@@ -100,8 +108,8 @@ class MiroVHSRecordReceiverTest
         )
 
         withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
-          val future = recordReceiver.receiveMessage(
-            incompleteMessage, transformToWork)
+          val future =
+            recordReceiver.receiveMessage(incompleteMessage, transformToWork)
 
           whenReady(future.failed) {
             _ shouldBe a[TransformerException]
@@ -119,8 +127,8 @@ class MiroVHSRecordReceiverTest
         )
 
         withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
-          val future = recordReceiver.receiveMessage(
-            incompleteMessage, transformToWork)
+          val future =
+            recordReceiver.receiveMessage(incompleteMessage, transformToWork)
 
           whenReady(future.failed) {
             _ shouldBe a[TransformerException]
@@ -133,7 +141,8 @@ class MiroVHSRecordReceiverTest
   it("fails if it's unable to perform a transformation") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
-        val message = createMiroVHSRecordNotificationMessageWith(bucket = bucket)
+        val message =
+          createMiroVHSRecordNotificationMessageWith(bucket = bucket)
 
         withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
           val future =
@@ -151,12 +160,13 @@ class MiroVHSRecordReceiverTest
     withLocalS3Bucket { bucket =>
       val message = createMiroVHSRecordNotificationMessageWith(bucket = bucket)
 
-      withMiroVHSRecordReceiver(Topic("no-such-topic"), bucket) { recordReceiver =>
-        val future = recordReceiver.receiveMessage(message, transformToWork)
+      withMiroVHSRecordReceiver(Topic("no-such-topic"), bucket) {
+        recordReceiver =>
+          val future = recordReceiver.receiveMessage(message, transformToWork)
 
-        whenReady(future.failed) {
-          _.getMessage should include("Unknown topic: no-such-topic")
-        }
+          whenReady(future.failed) {
+            _.getMessage should include("Unknown topic: no-such-topic")
+          }
       }
     }
   }

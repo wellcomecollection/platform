@@ -9,7 +9,10 @@ import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.miro.services.{MiroTransformerWorkerService, MiroVHSRecordReceiver}
+import uk.ac.wellcome.platform.transformer.miro.services.{
+  MiroTransformerWorkerService,
+  MiroVHSRecordReceiver
+}
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.concurrent.{Await, ExecutionContext}

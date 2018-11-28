@@ -15,8 +15,12 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait MiroVHSRecordReceiverFixture extends Messaging with SNS with MiroRecordGenerators {
-  def withMiroVHSRecordReceiver[R](topic: Topic, bucket: Bucket)(testWith: TestWith[MiroVHSRecordReceiver, R])(
+trait MiroVHSRecordReceiverFixture
+    extends Messaging
+    with SNS
+    with MiroRecordGenerators {
+  def withMiroVHSRecordReceiver[R](topic: Topic, bucket: Bucket)(
+    testWith: TestWith[MiroVHSRecordReceiver, R])(
     implicit objectStore: ObjectStore[MiroRecord]): R =
     withMessageWriter[TransformedBaseWork, R](
       bucket,
@@ -52,7 +56,8 @@ trait MiroVHSRecordReceiverFixture extends Messaging with SNS with MiroRecordGen
          |  "id": "${hybridRecord.id}",
          |  "location": ${toJson(hybridRecord.location).get},
          |  "version": ${hybridRecord.version},
-         |  "isClearedForCatalogueAPI": ${toJson(miroMetadata.isClearedForCatalogueAPI).get}
+         |  "isClearedForCatalogueAPI": ${toJson(
+           miroMetadata.isClearedForCatalogueAPI).get}
          |}
        """.stripMargin
     )

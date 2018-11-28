@@ -39,13 +39,14 @@ class MiroTransformerFeatureTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
-            val miroHybridRecordMessage = createMiroVHSRecordNotificationMessageWith(
-              miroRecord = createMiroRecordWith(
-                title = Some(title),
-                imageNumber = miroID
-              ),
-              bucket = storageBucket
-            )
+            val miroHybridRecordMessage =
+              createMiroVHSRecordNotificationMessageWith(
+                miroRecord = createMiroRecordWith(
+                  title = Some(title),
+                  imageNumber = miroID
+                ),
+                bucket = storageBucket
+              )
 
             sendSqsMessage(
               queue = queue,
@@ -75,32 +76,34 @@ class MiroTransformerFeatureTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          val miroHybridRecordMessage1 = createMiroVHSRecordNotificationMessageWith(
-            miroRecord = createMiroRecordWith(
-              title = Some("Antonio Dionisi"),
-              description = Some("Antonio Dionisi"),
-              physFormat = Some("Book"),
-              copyrightCleared = Some("Y"),
-              imageNumber = "L0011975",
-              useRestrictions = Some("CC-BY"),
-              innopacID = Some("12917175"),
-              creditLine = Some("Wellcome Library, London")
-            ),
-            bucket = storageBucket
-          )
-          val miroHybridRecordMessage2 = createMiroVHSRecordNotificationMessageWith(
-            miroRecord = createMiroRecordWith(
-              title =
-                Some("Greenfield Sluder, Tonsillectomy..., use of guillotine"),
-              description = Some("Use of the guillotine"),
-              copyrightCleared = Some("Y"),
-              imageNumber = "L0023034",
-              useRestrictions = Some("CC-BY"),
-              innopacID = Some("12074536"),
-              creditLine = Some("Wellcome Library, London")
-            ),
-            bucket = storageBucket
-          )
+          val miroHybridRecordMessage1 =
+            createMiroVHSRecordNotificationMessageWith(
+              miroRecord = createMiroRecordWith(
+                title = Some("Antonio Dionisi"),
+                description = Some("Antonio Dionisi"),
+                physFormat = Some("Book"),
+                copyrightCleared = Some("Y"),
+                imageNumber = "L0011975",
+                useRestrictions = Some("CC-BY"),
+                innopacID = Some("12917175"),
+                creditLine = Some("Wellcome Library, London")
+              ),
+              bucket = storageBucket
+            )
+          val miroHybridRecordMessage2 =
+            createMiroVHSRecordNotificationMessageWith(
+              miroRecord = createMiroRecordWith(
+                title = Some(
+                  "Greenfield Sluder, Tonsillectomy..., use of guillotine"),
+                description = Some("Use of the guillotine"),
+                copyrightCleared = Some("Y"),
+                imageNumber = "L0023034",
+                useRestrictions = Some("CC-BY"),
+                innopacID = Some("12074536"),
+                creditLine = Some("Wellcome Library, London")
+              ),
+              bucket = storageBucket
+            )
 
           withLocalS3Bucket { messageBucket =>
             withWorkerService(topic, messageBucket, queue) { _ =>
@@ -121,19 +124,18 @@ class MiroTransformerFeatureTest
   def withWorkerService[R](topic: Topic, bucket: Bucket, queue: Queue)(
     testWith: TestWith[MiroTransformerWorkerService, R]): R =
     withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
-        withActorSystem { actorSystem =>
-          withSQSStream[NotificationMessage, R](actorSystem, queue) {
-            sqsStream =>
-              val workerService = new MiroTransformerWorkerService(
-                vhsRecordReceiver = recordReceiver,
-                miroTransformer = new MiroTransformableTransformer,
-                sqsStream = sqsStream
-              )
+      withActorSystem { actorSystem =>
+        withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+          val workerService = new MiroTransformerWorkerService(
+            vhsRecordReceiver = recordReceiver,
+            miroTransformer = new MiroTransformableTransformer,
+            sqsStream = sqsStream
+          )
 
-              workerService.run()
+          workerService.run()
 
-              testWith(workerService)
-          }
+          testWith(workerService)
         }
+      }
     }
 }

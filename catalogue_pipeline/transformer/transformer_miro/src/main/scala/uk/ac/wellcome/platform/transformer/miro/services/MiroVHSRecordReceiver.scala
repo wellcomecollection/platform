@@ -15,14 +15,16 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class MiroVHSRecordReceiver(
-  objectStore: ObjectStore[MiroRecord],
-  messageWriter: MessageWriter[TransformedBaseWork])(implicit ec: ExecutionContext)
-  extends Logging {
+class MiroVHSRecordReceiver(objectStore: ObjectStore[MiroRecord],
+                            messageWriter: MessageWriter[TransformedBaseWork])(
+  implicit ec: ExecutionContext)
+    extends Logging {
 
-  def receiveMessage(
-    message: NotificationMessage,
-    transformToWork: (MiroRecord, MiroMetadata, Int) => Try[TransformedBaseWork]): Future[Unit] = {
+  def receiveMessage(message: NotificationMessage,
+                     transformToWork: (
+                       MiroRecord,
+                       MiroMetadata,
+                       Int) => Try[TransformedBaseWork]): Future[Unit] = {
     debug(s"Starting to process message $message")
 
     val futurePublishAttempt = for {
@@ -40,7 +42,9 @@ class MiroVHSRecordReceiver(
     futurePublishAttempt
       .recover {
         case e: JsonDecodingError =>
-          info("Recoverable failure parsing HybridRecord/MiroMetadata from JSON", e)
+          info(
+            "Recoverable failure parsing HybridRecord/MiroMetadata from JSON",
+            e)
           throw TransformerException(e)
       }
       .map(_ => ())
@@ -50,7 +54,8 @@ class MiroVHSRecordReceiver(
   private def getTransformable(hybridRecord: HybridRecord): Future[MiroRecord] =
     objectStore.get(hybridRecord.location)
 
-  private def publishMessage(work: TransformedBaseWork): Future[PublishAttempt] =
+  private def publishMessage(
+    work: TransformedBaseWork): Future[PublishAttempt] =
     messageWriter.write(
       message = work,
       subject = s"source: ${this.getClass.getSimpleName}.publishMessage"
