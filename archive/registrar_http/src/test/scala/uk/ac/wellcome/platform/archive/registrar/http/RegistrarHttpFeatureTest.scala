@@ -19,7 +19,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 import uk.ac.wellcome.platform.archive.display.{
   DisplayLocation,
   DisplayProvider,
-  DisplayStorageSpace
+  DisplaySpace
 }
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
@@ -87,7 +87,7 @@ class RegistrarHttpFeatureTest
                     case DisplayBag(
                         actualContextUrl,
                         actualBagId,
-                        DisplayStorageSpace(storageSpaceName, "Space"),
+                        DisplaySpace(storageSpaceName, "Space"),
                         DisplayBagInfo(
                           externalIdentifierString,
                           payloadOxum,

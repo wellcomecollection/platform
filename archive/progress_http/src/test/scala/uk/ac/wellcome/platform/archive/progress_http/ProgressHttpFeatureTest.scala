@@ -61,7 +61,7 @@ class ProgressHttpFeatureTest
                         progress.sourceLocation.location.key),
                       progress.callback.map(DisplayCallback(_)),
                       DisplayIngestType("create"),
-                      DisplayStorageSpace(progress.space.underlying),
+                      DisplaySpace(progress.space.underlying),
                       DisplayStatus(progress.status.toString),
                       None,
                       Nil,
@@ -141,7 +141,7 @@ class ProgressHttpFeatureTest
 
               val someCallback = Some(
                 DisplayCallback(url = testCallbackUri.toString, status = None))
-              val storageSpace = DisplayStorageSpace(id = "somespace")
+              val storageSpace = DisplaySpace(id = "somespace")
               val displayIngestType = DisplayIngestType(id = "create")
               val displayProvider = DisplayProvider("s3")
               val displayLocation =
@@ -194,7 +194,7 @@ class ProgressHttpFeatureTest
                             Some(DisplayStatus(actualCallbackStatus, "Status")),
                             "Callback")),
                         DisplayIngestType("create", "IngestType"),
-                        DisplayStorageSpace(actualSpaceId, "Space"),
+                        DisplaySpace(actualSpaceId, "Space"),
                         DisplayStatus("accepted", "Status"),
                         None,
                         Nil,

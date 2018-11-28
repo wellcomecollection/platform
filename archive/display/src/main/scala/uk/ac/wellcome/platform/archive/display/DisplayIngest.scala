@@ -12,7 +12,7 @@ sealed trait DisplayIngest
 case class RequestDisplayIngest(sourceLocation: DisplayLocation,
                                 callback: Option[DisplayCallback],
                                 ingestType: DisplayIngestType,
-                                space: DisplayStorageSpace,
+                                space: DisplaySpace,
                                 @JsonKey("type")
                                 ontologyType: String = "Ingest")
     extends DisplayIngest {
@@ -34,7 +34,7 @@ case class ResponseDisplayIngest(@JsonKey("@context")
                                  sourceLocation: DisplayLocation,
                                  callback: Option[DisplayCallback],
                                  ingestType: DisplayIngestType,
-                                 space: DisplayStorageSpace,
+                                 space: DisplaySpace,
                                  status: DisplayStatus,
                                  bag: Option[IngestDisplayBag] = None,
                                  events: Seq[DisplayProgressEvent] = Seq.empty,
@@ -73,7 +73,7 @@ case object ResponseDisplayIngest {
       id = progress.id,
       sourceLocation = DisplayLocation(progress.sourceLocation),
       callback = progress.callback.map(DisplayCallback(_)),
-      space = DisplayStorageSpace(progress.space.toString),
+      space = DisplaySpace(progress.space.toString),
       ingestType = DisplayIngestType(),
       bag = progress.bag.map(IngestDisplayBag(_)),
       status = DisplayStatus(progress.status),

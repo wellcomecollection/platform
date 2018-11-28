@@ -54,7 +54,7 @@ class DisplayIngestTest
       path = "key.txt")
     ingest.callback shouldBe Some(
       DisplayCallback(callbackUrl, Some(ingest.callback.get.status.get)))
-    ingest.space shouldBe DisplayStorageSpace(spaceId)
+    ingest.space shouldBe DisplaySpace(spaceId)
     ingest.status shouldBe DisplayStatus("processing")
     ingest.bag shouldBe Some(
       IngestDisplayBag(s"${bagId.space}/${bagId.externalIdentifier}"))
@@ -73,7 +73,7 @@ class DisplayIngestTest
       Some(
         DisplayCallback("http://www.wellcomecollection.org/callback/ok", None)),
       DisplayIngestType("create"),
-      DisplayStorageSpace("space-id")
+      DisplaySpace("space-id")
     )
 
     val progress = progressCreateRequest.toProgress
