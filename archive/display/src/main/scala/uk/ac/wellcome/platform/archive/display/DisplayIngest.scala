@@ -73,7 +73,7 @@ case object ResponseDisplayIngest {
       id = progress.id,
       sourceLocation = DisplayLocation(progress.sourceLocation),
       callback = progress.callback.map(DisplayCallback(_)),
-      space = DisplaySpace(progress.space.toString),
+      space = DisplaySpace(progress.space),
       ingestType = DisplayIngestType(),
       bag = progress.bag.map(IngestDisplayBag(_)),
       status = DisplayStatus(progress.status),

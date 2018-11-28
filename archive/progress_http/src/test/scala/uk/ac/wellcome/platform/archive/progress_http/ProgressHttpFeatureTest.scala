@@ -61,7 +61,7 @@ class ProgressHttpFeatureTest
                         progress.sourceLocation.location.key),
                       progress.callback.map(DisplayCallback(_)),
                       DisplayIngestType("create"),
-                      DisplaySpace(progress.space.underlying),
+                      DisplaySpace(progress.space),
                       DisplayStatus(progress.status.toString),
                       None,
                       Nil,

@@ -27,7 +27,7 @@ object DisplayBag {
     DisplayBag(
       contextUrl.toString,
       storageManifest.id.toString,
-      DisplaySpace(storageManifest.space.underlying),
+      DisplaySpace(storageManifest.space),
       DisplayBagInfo(storageManifest.info),
       DisplayBagManifest(storageManifest.manifest),
       DisplayBagManifest(storageManifest.tagManifest),

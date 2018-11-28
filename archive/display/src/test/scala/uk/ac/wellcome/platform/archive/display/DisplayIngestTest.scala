@@ -54,7 +54,7 @@ class DisplayIngestTest
       path = "key.txt")
     ingest.callback shouldBe Some(
       DisplayCallback(callbackUrl, Some(ingest.callback.get.status.get)))
-    ingest.space shouldBe DisplaySpace(spaceId)
+    ingest.space shouldBe DisplaySpace(progress.space)
     ingest.status shouldBe DisplayStatus("processing")
     ingest.bag shouldBe Some(
       IngestDisplayBag(s"${bagId.space}/${bagId.externalIdentifier}"))
