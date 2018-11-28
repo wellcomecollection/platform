@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.progress.models
+package uk.ac.wellcome.platform.archive.common.models
 
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
@@ -10,17 +10,19 @@ case class Namespace(underlying: String) extends AnyVal {
 }
 
 object Namespace {
-  implicit val namespaceEnc =
+  implicit val namespaceEncoder: Encoder[Namespace] =
     Encoder.instance[Namespace] { space: Namespace =>
       Json.fromString(space.toString)
     }
 
-  implicit val namespaceDec = Decoder.instance[Namespace](cursor =>
-    cursor.value.as[String].map(Namespace(_)))
+  implicit val namespaceDecoder: Decoder[Namespace] =
+    Decoder.instance[Namespace](cursor =>
+      cursor.value.as[String].map { Namespace(_) }
+    )
 
-  implicit def fmtNamespace =
+  implicit def fmtNamespace: AnyRef with DynamoFormat[Namespace] =
     DynamoFormat.xmap[Namespace, String](
-      fromJson[Namespace](_)(namespaceDec).toEither.left
+      fromJson[Namespace](_)(namespaceDecoder).toEither.left
         .map(TypeCoercionError)
     )(
       toJson[Namespace](_).get

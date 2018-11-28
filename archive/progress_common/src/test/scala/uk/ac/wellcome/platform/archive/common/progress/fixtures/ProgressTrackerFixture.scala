@@ -7,7 +7,8 @@ import com.gu.scanamo.error.DynamoReadError
 import org.scalatest.Assertion
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress, StorageLocation}
+import uk.ac.wellcome.platform.archive.common.models.Namespace
+import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Progress, StorageLocation}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
