@@ -20,7 +20,6 @@
 # constructs or anything useful, so we have to construct the string by hand.
 # This file does that.
 
-
 # This template contains the JSON string for a *single* entry in the job config.
 
 data "template_file" "single_reindex_job_config" {
@@ -44,7 +43,6 @@ EOF
   }
 }
 
-
 # This template takes all of those JSON strings, and combines them into a single
 # JSON object.
 
@@ -62,7 +60,6 @@ EOF
 
 # For an idea of what's going on, uncomment this line and run a 'terraform apply':
 # output "all_reindex_job_config" { value = "${data.template_file.all_reindex_job_config.rendered }"}
-
 
 # This renders the template, and removes all the whitespace so it can be passed
 # as a single line.

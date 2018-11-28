@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "vhs_read_policy" {
     ]
 
     resources = [
-      "${local.reindexer_tables}"
+      "${local.reindexer_tables}",
     ]
   }
 }
@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "sns_publish_policy" {
 #
 
 data "template_file" "table_name" {
-  count   = "${length(var.reindexer_jobs)}"
+  count    = "${length(var.reindexer_jobs)}"
   template = "arn:aws:dynamodb:${var.aws_region}:${var.account_id}:table/$${table}"
 
   vars = {
