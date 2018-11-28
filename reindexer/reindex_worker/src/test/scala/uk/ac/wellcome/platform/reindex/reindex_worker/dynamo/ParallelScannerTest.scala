@@ -21,7 +21,7 @@ class ParallelScannerTest
 
   it("reads a table with a single record") {
     withLocalDynamoDbTable { table =>
-      withParallelScanner(table) { parallelScanner =>
+      withParallelScanner { parallelScanner =>
         val record =
           TestVersioned(id = "123", data = "hello world", version = 1)
         Scanamo.put(dynamoDbClient)(table.name)(record)
@@ -29,7 +29,7 @@ class ParallelScannerTest
         val futureResult = parallelScanner.scan(
           segment = 0,
           totalSegments = 1
-        )
+        )(table.name)
 
         whenReady(futureResult) { result =>
           result.map { fromJson[TestVersioned](_).get } shouldBe List(record)
@@ -49,11 +49,11 @@ class ParallelScannerTest
   it(
     "returns a failed future if asked for a segment that's greater than totalSegments") {
     withLocalDynamoDbTable { table =>
-      withParallelScanner(table) { parallelScanner =>
+      withParallelScanner { parallelScanner =>
         val future = parallelScanner.scan(
           segment = 10,
           totalSegments = 5
-        )
+        )(table.name)
 
         whenReady(future.failed) { r =>
           r shouldBe a[AmazonDynamoDBException]
@@ -67,7 +67,7 @@ class ParallelScannerTest
 
   private def runTest(totalRecords: Int, segmentCount: Int): Assertion = {
     withLocalDynamoDbTable { table =>
-      withParallelScanner(table) { parallelScanner =>
+      withParallelScanner { parallelScanner =>
         val records = (1 to totalRecords).map { id =>
           TestVersioned(id = id.toString, data = "Hello world", version = 1)
         }
@@ -81,7 +81,7 @@ class ParallelScannerTest
           parallelScanner.scan(
             segment = segment,
             totalSegments = segmentCount
-          )
+          )(table.name)
         }
 
         whenReady(Future.sequence(futureResults)) {

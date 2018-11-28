@@ -33,16 +33,12 @@ object Main extends App with Logging {
     dynamoDBClient = DynamoBuilder.buildDynamoClient(config)
   )
 
-  val dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
-
   val recordReader = new RecordReader(
     maxRecordsScanner = new MaxRecordsScanner(
-      scanSpecScanner = scanSpecScanner,
-      dynamoConfig = dynamoConfig
+      scanSpecScanner = scanSpecScanner
     ),
     parallelScanner = new ParallelScanner(
-      scanSpecScanner = scanSpecScanner,
-      dynamoConfig = dynamoConfig
+      scanSpecScanner = scanSpecScanner
     )
   )
 
@@ -54,7 +50,7 @@ object Main extends App with Logging {
     recordReader = recordReader,
     bulkSNSSender = hybridRecordSender,
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
-    dynamoConfig = dynamoConfig,
+    dynamoConfig = DynamoBuilder.buildDynamoConfig(config),
     snsConfig = SNSBuilder.buildSNSConfig(config)
   )
 

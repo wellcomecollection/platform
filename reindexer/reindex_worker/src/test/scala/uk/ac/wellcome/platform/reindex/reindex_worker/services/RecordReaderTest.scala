@@ -6,7 +6,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
-  DynamoFixtures,
+  RecordReaderFixture,
   ReindexableTable
 }
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
@@ -16,13 +16,12 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.test.fixtures.TestWith
 
 class RecordReaderTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with DynamoFixtures
+    with RecordReaderFixture
     with ReindexableTable
     with IntegrationPatience {
 
@@ -37,7 +36,7 @@ class RecordReaderTest
 
   it("finds records in the table with a complete reindex") {
     withLocalDynamoDbTable { table =>
-      withRecordReader(table) { reader =>
+      withRecordReader { reader =>
         val records = List(
           exampleRecord.copy(id = "id1"),
           exampleRecord.copy(id = "id2")
@@ -51,9 +50,13 @@ class RecordReaderTest
           totalSegments = 1
         )
 
-        whenReady(reader.findRecordsForReindexing(reindexParameters)) {
-          actualRecords =>
-            actualRecords.map { fromJson[HybridRecord](_).get } should contain theSameElementsAs records
+        val future = reader.findRecordsForReindexing(
+          reindexParameters = reindexParameters,
+          dynamoConfig = createDynamoConfigWith(table)
+        )
+
+        whenReady(future) { actualRecords =>
+          actualRecords.map { fromJson[HybridRecord](_).get } should contain theSameElementsAs records
         }
       }
     }
@@ -61,7 +64,7 @@ class RecordReaderTest
 
   it("finds records in the table with a maxResults reindex") {
     withLocalDynamoDbTable { table =>
-      withRecordReader(table) { reader =>
+      withRecordReader { reader =>
         (1 to 15).foreach { id =>
           val record = exampleRecord.copy(id = id.toString)
           Scanamo.put(dynamoDbClient)(table.name)(record)
@@ -69,9 +72,13 @@ class RecordReaderTest
 
         val reindexParameters = PartialReindexParameters(maxRecords = 5)
 
-        whenReady(reader.findRecordsForReindexing(reindexParameters)) {
-          actualRecords =>
-            actualRecords should have size 5
+        val future = reader.findRecordsForReindexing(
+          reindexParameters = reindexParameters,
+          dynamoConfig = createDynamoConfigWith(table)
+        )
+
+        whenReady(future) { actualRecords =>
+          actualRecords should have size 5
         }
       }
     }
@@ -85,24 +92,14 @@ class RecordReaderTest
       totalSegments = 10
     )
 
-    withRecordReader(table) { reader =>
-      val future = reader.findRecordsForReindexing(reindexParameters)
+    withRecordReader { reader =>
+      val future = reader.findRecordsForReindexing(
+        reindexParameters = reindexParameters,
+        dynamoConfig = createDynamoConfigWith(table)
+      )
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }
     }
   }
-
-  private def withRecordReader[R](table: Table)(
-    testWith: TestWith[RecordReader, R]): R =
-    withMaxRecordsScanner(table) { maxRecordsScanner =>
-      withParallelScanner(table) { parallelScanner =>
-        val reader = new RecordReader(
-          maxRecordsScanner = maxRecordsScanner,
-          parallelScanner = parallelScanner
-        )
-
-        testWith(reader)
-      }
-    }
 }

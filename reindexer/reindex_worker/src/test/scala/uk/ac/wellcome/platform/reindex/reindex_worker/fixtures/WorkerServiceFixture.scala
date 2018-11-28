@@ -6,7 +6,6 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.reindex.reindex_worker.services.{
   BulkSNSSender,
-  RecordReader,
   ReindexWorkerService
 }
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -14,35 +13,28 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends Akka with DynamoFixtures with SNS with SQS {
+trait WorkerServiceFixture extends Akka with RecordReaderFixture with SNS with SQS {
   def withWorkerService[R](queue: Queue, table: Table, topic: Topic)(
     testWith: TestWith[ReindexWorkerService, R]): R =
     withActorSystem { actorSystem =>
       withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
-        withMaxRecordsScanner(table) { maxRecordsScanner =>
-          withParallelScanner(table) { parallelScanner =>
-            val recordReader = new RecordReader(
-              maxRecordsScanner = maxRecordsScanner,
-              parallelScanner = parallelScanner
+        withRecordReader { recordReader =>
+          withSNSWriter(topic) { snsWriter =>
+            val hybridRecordSender = new BulkSNSSender(
+              snsWriter = snsWriter
             )
 
-            withSNSWriter(topic) { snsWriter =>
-              val hybridRecordSender = new BulkSNSSender(
-                snsWriter = snsWriter
-              )
+            val workerService = new ReindexWorkerService(
+              recordReader = recordReader,
+              bulkSNSSender = hybridRecordSender,
+              sqsStream = sqsStream,
+              dynamoConfig = createDynamoConfigWith(table),
+              snsConfig = createSNSConfigWith(topic)
+            )(actorSystem = actorSystem, ec = global)
 
-              val workerService = new ReindexWorkerService(
-                recordReader = recordReader,
-                bulkSNSSender = hybridRecordSender,
-                sqsStream = sqsStream,
-                dynamoConfig = createDynamoConfigWith(table),
-                snsConfig = createSNSConfigWith(topic)
-              )(actorSystem = actorSystem, ec = global)
+            workerService.run()
 
-              workerService.run()
-
-              testWith(workerService)
-            }
+            testWith(workerService)
           }
         }
       }
