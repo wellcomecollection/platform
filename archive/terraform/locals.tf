@@ -7,7 +7,7 @@ locals {
   archive_bucket_name                = "wellcomecollection-assets-archive-storage"
   ingest_bucket_name                 = "wellcomecollection-assets-archive-ingest"
   storage_static_content_bucket_name = "wellcomecollection-public-archive-static"
-  workflow_bucket_name               = "Wellcomecollection-workflow-export-bagit"
+  workflow_bucket_name               = "wellcomecollection-workflow-export-bagit"
 
   cognito_user_pool_arn          = "${data.terraform_remote_state.infra_critical.cognito_user_pool_arn}"
   cognito_storage_api_identifier = "${data.terraform_remote_state.infra_critical.cognito_storage_api_identifier}"
