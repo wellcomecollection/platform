@@ -9,7 +9,10 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.{SierraItemRecordVHSFixture, WorkerServiceFixture}
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.{
+  SierraItemRecordVHSFixture,
+  WorkerServiceFixture
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
@@ -81,28 +84,34 @@ class SierraItemsToDynamoWorkerServiceTest
   it("returns a GracefulFailureException if it receives an invalid message") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-          withMockMetricSender { mockMetricsSender =>
-            withLocalSnsTopic { topic =>
-              withWorkerService(queue, table, bucket, topic, mockMetricsSender) { _ =>
-                val body =
-                  """
+        withLocalSqsQueueAndDlq {
+          case QueuePair(queue, dlq) =>
+            withMockMetricSender { mockMetricsSender =>
+              withLocalSnsTopic { topic =>
+                withWorkerService(
+                  queue,
+                  table,
+                  bucket,
+                  topic,
+                  mockMetricsSender) { _ =>
+                  val body =
+                    """
                     |{
                     | "something": "something"
                     |}
                   """.stripMargin
 
-                sendNotificationToSQS(queue = queue, body = body)
+                  sendNotificationToSQS(queue = queue, body = body)
 
-                eventually {
-                  assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, size = 1)
-                  verify(mockMetricsSender, never()).incrementCount(
-                    "SierraItemsToDynamoWorkerService_ProcessMessage_failure")
+                  eventually {
+                    assertQueueEmpty(queue)
+                    assertQueueHasSize(dlq, size = 1)
+                    verify(mockMetricsSender, never()).incrementCount(
+                      "SierraItemsToDynamoWorkerService_ProcessMessage_failure")
+                  }
                 }
               }
             }
-          }
         }
       }
     }

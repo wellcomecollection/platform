@@ -9,9 +9,9 @@ trait DynamoInserterFixture extends SierraItemRecordVHSFixture {
   def withDynamoInserter[R](table: Table, bucket: Bucket)(
     testWith: TestWith[DynamoInserter, R]): R =
     withItemRecordVHS(table = table, bucket = bucket) { versionedHybridStore =>
-        val dynamoInserter = new DynamoInserter(
-          versionedHybridStore = versionedHybridStore
-        )
-        testWith(dynamoInserter)
+      val dynamoInserter = new DynamoInserter(
+        versionedHybridStore = versionedHybridStore
+      )
+      testWith(dynamoInserter)
     }
 }

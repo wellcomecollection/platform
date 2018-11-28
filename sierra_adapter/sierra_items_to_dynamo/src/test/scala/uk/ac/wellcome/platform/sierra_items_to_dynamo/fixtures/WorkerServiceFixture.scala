@@ -12,7 +12,11 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends Akka with SNS with SQS with DynamoInserterFixture {
+trait WorkerServiceFixture
+    extends Akka
+    with SNS
+    with SQS
+    with DynamoInserterFixture {
   def withWorkerService[R](
     queue: Queue,
     table: Table,
@@ -20,34 +24,36 @@ trait WorkerServiceFixture extends Akka with SNS with SQS with DynamoInserterFix
     topic: Topic)(testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withWorkerService(queue, table, bucket, topic, metricsSender) { workerService =>
-          testWith(workerService)
+        withWorkerService(queue, table, bucket, topic, metricsSender) {
+          workerService =>
+            testWith(workerService)
         }
       }
     }
 
-  def withWorkerService[R](
-    queue: Queue,
-    table: Table,
-    bucket: Bucket,
-    topic: Topic,
-    metricsSender: MetricsSender)(testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
+  def withWorkerService[R](queue: Queue,
+                           table: Table,
+                           bucket: Bucket,
+                           topic: Topic,
+                           metricsSender: MetricsSender)(
+    testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
     withActorSystem { actorSystem =>
-      withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
-        withDynamoInserter(table, bucket) { dynamoInserter =>
-          withSNSWriter(topic) { snsWriter =>
-            val workerService = new SierraItemsToDynamoWorkerService(
-              actorSystem = actorSystem,
-              sqsStream = sqsStream,
-              dynamoInserter = dynamoInserter,
-              snsWriter = snsWriter
-            )
+      withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) {
+        sqsStream =>
+          withDynamoInserter(table, bucket) { dynamoInserter =>
+            withSNSWriter(topic) { snsWriter =>
+              val workerService = new SierraItemsToDynamoWorkerService(
+                actorSystem = actorSystem,
+                sqsStream = sqsStream,
+                dynamoInserter = dynamoInserter,
+                snsWriter = snsWriter
+              )
 
-            workerService.run()
+              workerService.run()
 
-            testWith(workerService)
+              testWith(workerService)
+            }
           }
-        }
       }
     }
 }

@@ -13,8 +13,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SierraItemRecordVHSFixture extends LocalVersionedHybridStore {
   type SierraItemsVHS = VersionedHybridStore[SierraItemRecord,
-    EmptyMetadata,
-    ObjectStore[SierraItemRecord]]
+                                             EmptyMetadata,
+                                             ObjectStore[SierraItemRecord]]
 
   def withItemRecordVHS[R](table: Table, bucket: Bucket)(
     testWith: TestWith[SierraItemsVHS, R]): R =
