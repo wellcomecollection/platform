@@ -86,7 +86,7 @@ class NotifierFeatureTest
                     progress.callback.map(DisplayCallback(_)),
                     DisplayIngestType("create"),
                     DisplaySpace(progress.space),
-                    DisplayStatus(progress.status.toString),
+                    DisplayStatus(progress.status),
                     progress.bag.map(bagId =>
                       IngestDisplayBag(
                         s"${bagId.space}/${bagId.externalIdentifier}")),
@@ -158,7 +158,7 @@ class NotifierFeatureTest
                       progress.callback.map(DisplayCallback(_)),
                       DisplayIngestType("create"),
                       DisplaySpace(progress.space),
-                      DisplayStatus(progress.status.toString),
+                      DisplayStatus(progress.status),
                       progress.bag.map(bagId =>
                         IngestDisplayBag(
                           s"${bagId.space}/${bagId.externalIdentifier}")),

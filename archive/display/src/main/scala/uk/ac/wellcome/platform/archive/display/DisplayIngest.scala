@@ -57,10 +57,6 @@ case class DisplayIngestType(id: String = "create",
                              @JsonKey("type")
                              ontologyType: String = "IngestType")
 
-case class DisplayStatus(id: String,
-                         @JsonKey("type")
-                         ontologyType: String = "Status")
-
 case class DisplayProgressEvent(description: String,
                                 createdDate: String,
                                 @JsonKey("type")
@@ -88,14 +84,6 @@ case object DisplayProgressEvent {
     DisplayProgressEvent(
       progressEvent.description,
       progressEvent.createdDate.toString)
-}
-
-case object DisplayStatus {
-  def apply(progressStatus: Progress.Status): DisplayStatus =
-    DisplayStatus(progressStatus.toString)
-
-  def apply(callbackStatus: Callback.CallbackStatus): DisplayStatus =
-    DisplayStatus(callbackStatus.toString)
 }
 
 case object DisplayCallback {
