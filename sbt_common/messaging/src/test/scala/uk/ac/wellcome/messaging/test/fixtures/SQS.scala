@@ -171,20 +171,33 @@ trait SQS extends Matchers with Logging with MetricsSenderFixture {
     implicit encoder: Encoder[T]): NotificationMessage =
     createNotificationMessageWith(body = toJson(message).get)
 
+  def createHybridRecordWith[T](
+    t: T,
+    version: Int = 1,
+    s3Client: AmazonS3,
+    bucket: Bucket)(implicit encoder: Encoder[T]): HybridRecord = {
+    val s3key = Random.alphanumeric take 10 mkString
+    val content = toJson(t).get
+    s3Client.putObject(bucket.name, s3key, content)
+
+    HybridRecord(
+      id = Random.alphanumeric take 10 mkString,
+      version = version,
+      location = ObjectLocation(namespace = bucket.name, key = s3key)
+    )
+  }
+
   /** Store an object in S3 and create the HybridRecordNotification that should be sent to SNS. */
   def createHybridRecordNotificationWith[T](
     t: T,
     version: Int = 1,
     s3Client: AmazonS3,
     bucket: Bucket)(implicit encoder: Encoder[T]): NotificationMessage = {
-    val s3key = Random.alphanumeric take 10 mkString
-    val content = toJson(t).get
-    s3Client.putObject(bucket.name, s3key, content)
-
-    val hybridRecord = HybridRecord(
-      id = Random.alphanumeric take 10 mkString,
+    val hybridRecord = createHybridRecordWith[T](
+      t,
       version = version,
-      location = ObjectLocation(namespace = bucket.name, key = s3key)
+      s3Client = s3Client,
+      bucket = bucket
     )
 
     createNotificationMessageWith(

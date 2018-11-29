@@ -23,7 +23,7 @@ case class RequestDisplayIngest(sourceLocation: DisplayLocation,
       callback = Callback(
         callback.map(displayCallback => URI.create(displayCallback.url))),
       space = Namespace(space.id),
-      status = Progress.Initialised
+      status = Progress.Accepted
     )
   }
 }

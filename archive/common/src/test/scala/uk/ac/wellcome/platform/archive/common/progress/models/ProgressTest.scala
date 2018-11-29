@@ -14,9 +14,9 @@ class ProgressTest
     with ProgressGenerators
     with RandomThings {
 
-  it("can be initialised") {
+  it("can be created") {
     val progress = createProgress
-    progress.status shouldBe Progress.Initialised
+    progress.status shouldBe Progress.Accepted
     assertRecent(progress.createdDate)
     progress.lastModifiedDate shouldBe progress.createdDate
     progress.events shouldBe List.empty
@@ -26,10 +26,10 @@ class ProgressTest
 
   private val progressStatus = Table(
     ("string-status", "parsed-status"),
-    ("initialised", Progress.Initialised),
+    ("accepted", Progress.Accepted),
     ("processing", Progress.Processing),
-    ("success", Progress.Completed),
-    ("failure", Progress.Failed),
+    ("succeeded", Progress.Completed),
+    ("failed", Progress.Failed),
   )
 
   it("converts all callback status values to strings") {

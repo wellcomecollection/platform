@@ -102,18 +102,18 @@ lazy val ingestor = doServiceSetup(project, "catalogue_pipeline/ingestor")
   .dependsOn(config_storage % "compile->compile;test->test")
   .settings(Search.settings: _*)
 
-lazy val transformer_common = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_common")
+lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
-
-lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
-  .dependsOn(transformer_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.miroTransformerDependencies)
 
 lazy val transformer_sierra = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_sierra")
-  .dependsOn(transformer_common % "compile->compile;test->test")
+  .dependsOn(common % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile;test->test")
+  .dependsOn(config_storage % "compile->compile;test->test")
 
 lazy val merger = doServiceSetup(project, "catalogue_pipeline/merger")
   .dependsOn(common % "compile->compile;test->test")
@@ -236,7 +236,6 @@ lazy val root = (project in file("."))
 
     api,
     ingestor,
-    transformer_common,
     transformer_miro,
     transformer_sierra,
     id_minter,

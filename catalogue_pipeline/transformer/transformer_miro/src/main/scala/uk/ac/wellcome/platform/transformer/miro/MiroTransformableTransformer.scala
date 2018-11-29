@@ -1,10 +1,11 @@
 package uk.ac.wellcome.platform.transformer.miro
 
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
-import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.util.Try
 
@@ -20,11 +21,10 @@ class MiroTransformableTransformer
     with transformers.MiroWorkType
     with Logging {
 
-  def transform(
-    transformable: MiroTransformable,
-    version: Int
-  ): Try[TransformedBaseWork] =
-    doTransform(transformable, version) map { transformed =>
+  def transform(miroRecord: MiroRecord,
+                miroMetadata: MiroMetadata,
+                version: Int): Try[TransformedBaseWork] =
+    doTransform(miroRecord, miroMetadata, version) map { transformed =>
       debug(s"Transformed record to $transformed")
       transformed
     } recover {
@@ -33,58 +33,65 @@ class MiroTransformableTransformer
         throw e
     }
 
-  def doTransform(miroTransformable: MiroTransformable, version: Int) = {
+  private def doTransform(originalMiroRecord: MiroRecord,
+                          miroMetadata: MiroMetadata,
+                          version: Int): Try[TransformedBaseWork] = {
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
-      value = miroTransformable.sourceId
+      value = originalMiroRecord.imageNumber
     )
 
     Try {
-      val miroData = MiroTransformableData.create(miroTransformable.data)
+      // Any records that aren't cleared for the Catalogue API should be
+      // discarded immediately.
+      if (!miroMetadata.isClearedForCatalogueAPI) {
+        throw new ShouldNotTransformException(
+          s"Image ${originalMiroRecord.imageNumber} is not cleared for the API!"
+        )
+      }
+
+      // This is an utterly awful hack we have to live with until we get
+      // these corrected in the source data.
+      val miroRecord = MiroRecord.create(toJson(originalMiroRecord).get)
 
       // These images should really have been removed from the pipeline
       // already, but we have at least one instance (B0010525).  It was
       // throwing a MatchError when we tried to pick a license, so handle
       // it properly here.
-      if (!miroData.copyrightCleared.contains("Y")) {
+      if (!miroRecord.copyrightCleared.contains("Y")) {
         throw new ShouldNotTransformException(
-          s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
+          s"Image ${miroRecord.imageNumber} does not have copyright clearance!"
         )
       }
 
-      val (title, description) = getTitleAndDescription(miroData)
+      val (title, description) = getTitleAndDescription(miroRecord)
 
       UnidentifiedWork(
         sourceIdentifier = sourceIdentifier,
-        otherIdentifiers =
-          getOtherIdentifiers(miroData, miroTransformable.sourceId),
+        otherIdentifiers = getOtherIdentifiers(miroRecord),
         mergeCandidates = List(),
         title = title,
         workType = getWorkType,
         description = description,
         physicalDescription = None,
         extent = None,
-        lettering = miroData.suppLettering,
-        createdDate =
-          getCreatedDate(miroData, miroId = miroTransformable.sourceId),
-        subjects = getSubjects(miroData),
-        genres = getGenres(miroData),
-        contributors = getContributors(
-          miroId = miroTransformable.sourceId,
-          miroData = miroData
-        ),
-        thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+        lettering = miroRecord.suppLettering,
+        createdDate = getCreatedDate(miroRecord),
+        subjects = getSubjects(miroRecord),
+        genres = getGenres(miroRecord),
+        contributors = getContributors(miroRecord),
+        thumbnail = Some(getThumbnail(miroRecord)),
         production = List(),
         language = None,
         dimensions = None,
-        items = getItems(miroData, miroTransformable.sourceId),
-        itemsV1 = getItemsV1(miroData, miroTransformable.sourceId),
+        items = getItems(miroRecord),
+        itemsV1 = getItemsV1(miroRecord),
         version = version
       )
     }.recover {
       case e: ShouldNotTransformException =>
-        info(s"Should not transform: ${e.getMessage}")
+        debug(s"Should not transform: ${e.getMessage}")
         UnidentifiedInvisibleWork(
           sourceIdentifier = sourceIdentifier,
           version = version

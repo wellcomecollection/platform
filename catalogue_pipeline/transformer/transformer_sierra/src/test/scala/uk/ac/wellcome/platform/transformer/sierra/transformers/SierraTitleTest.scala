@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 
 class SierraTitleTest extends FunSpec with Matchers with SierraDataGenerators {
