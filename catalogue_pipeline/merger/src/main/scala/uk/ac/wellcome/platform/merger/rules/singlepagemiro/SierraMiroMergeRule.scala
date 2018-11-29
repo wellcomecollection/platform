@@ -21,10 +21,9 @@ import uk.ac.wellcome.platform.merger.rules.{MergerRule, WorkPairMerger}
   */
 object SierraMiroMergeRule
     extends MergerRule
-    with SierraMiroMerger
-    with SierraMiroPartitioner
+    with Logging with MergerLogging with WorkPairMerger
+    with SierraMiroPartitioner {
 
-trait SierraMiroMerger extends Logging with MergerLogging with WorkPairMerger {
   override protected def mergeAndRedirectWorkPair(
     sierraWork: UnidentifiedWork,
     miroWork: UnidentifiedWork): Option[MergedWork] = {

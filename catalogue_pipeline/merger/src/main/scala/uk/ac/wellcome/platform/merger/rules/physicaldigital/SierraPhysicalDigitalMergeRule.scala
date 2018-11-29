@@ -19,13 +19,9 @@ import uk.ac.wellcome.platform.merger.rules.{MergerRule, WorkPairMerger}
 object SierraPhysicalDigitalMergeRule
     extends MergerRule
     with Logging
-    with SierraPhysicalDigitalMerger
-    with SierraPhysicalDigitalPartitioner
-
-trait SierraPhysicalDigitalMerger
-    extends Logging
-    with MergerLogging
-    with WorkPairMerger {
+      with MergerLogging
+      with WorkPairMerger
+    with SierraPhysicalDigitalPartitioner{
   override protected def mergeAndRedirectWorkPair(
     physicalWork: UnidentifiedWork,
     digitalWork: UnidentifiedWork): Option[MergedWork] =
