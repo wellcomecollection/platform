@@ -33,10 +33,8 @@ class WorkIndexer(
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
     val inserts = works.map { work =>
-      val l = calculateEsVersion(work)
-      debug(s"es version is $l")
       indexInto(indexName / documentType)
-        .version(l)
+        .version(calculateEsVersion(work))
         .versionType(VersionType.EXTERNAL_GTE)
         .id(work.canonicalId)
         .doc(work)
