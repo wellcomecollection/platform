@@ -173,7 +173,8 @@ class WorksIndex(client: HttpClient, rootIndexType: String)(
       textField("dimensions"),
       objectField("redirect")
         .fields(sourceIdentifier, keywordField("canonicalId")),
-      keywordField("type")
+      keywordField("type"),
+      booleanField("merged")
     )
 
   val mappingDefinition: MappingDefinition = mapping(rootIndexType)

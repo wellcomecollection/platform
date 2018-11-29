@@ -1,7 +1,3 @@
-data "aws_ecs_cluster" "cluster" {
-  cluster_name = "${var.cluster_name}"
-}
-
 module "service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
 
@@ -15,7 +11,7 @@ module "service" {
   source_queue_name = "${var.source_queue_name}"
   source_queue_arn  = "${var.source_queue_arn}"
 
-  ecs_cluster_id   = "${data.aws_ecs_cluster.cluster.id}"
+  ecs_cluster_id   = "${var.cluster_id}"
   ecs_cluster_name = "${var.cluster_name}"
 
   cpu    = 256

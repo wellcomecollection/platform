@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork
 }
 
-class MergerManager(mergerRules: MergerRules) {
+class MergerManager(mergerRules: Merger) {
 
   /** Given a list of recorder work entries retrieved from VHS, and a
     * merging function, apply the function to these works.

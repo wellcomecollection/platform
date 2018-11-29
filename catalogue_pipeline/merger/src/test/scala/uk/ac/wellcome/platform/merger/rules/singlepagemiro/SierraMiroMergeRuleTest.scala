@@ -32,9 +32,9 @@ class SierraMiroMergeRuleTest
 
       it("creates a redirect from the Miro work to the Sierra work") {
         redirectedWork shouldBe UnidentifiedRedirectedWork(
-          source = miroWork,
-          target = sierraPhysicalWork
-        )
+          sourceIdentifier = miroWork.sourceIdentifier,
+          version = miroWork.version,
+          redirect = IdentifiableRedirect(sierraPhysicalWork.sourceIdentifier))
       }
 
       it("copies identifiers from the Miro work to the Sierra work") {
@@ -96,9 +96,9 @@ class SierraMiroMergeRuleTest
 
       it("creates a redirect from the Miro work to the Sierra work") {
         redirectedWork shouldBe UnidentifiedRedirectedWork(
-          source = miroWork,
-          target = sierraPhysicalWork
-        )
+          sourceIdentifier = miroWork.sourceIdentifier,
+          version = miroWork.version,
+          redirect = IdentifiableRedirect(sierraPhysicalWork.sourceIdentifier))
       }
 
       it("copies identifiers from the Miro work to the Sierra work") {
