@@ -38,7 +38,7 @@ trait RegistrarFixtures
     storageSpace: StorageSpace = randomStorageSpace
   )(testWith: TestWith[(BagLocation, BagInfo), R]): R =
     withBag(storageBucket) {
-      case (bagLocation, bagInfo, _) =>
+      case (bagLocation, bagInfo) =>
         val archiveComplete = ArchiveComplete(
           archiveRequestId = archiveRequestId,
           space = storageSpace,
@@ -98,6 +98,8 @@ trait RegistrarFixtures
             actorSystem = actorSystem
           )
 
+          registrar.run()
+
           testWith(registrar)
         }
       }
@@ -108,8 +110,7 @@ trait RegistrarFixtures
                                           ObjectStore[StorageManifest]]
 
   def withRegistrar[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, ManifestVHS), R])
-    : R = {
+    testWith: TestWith[(Bucket, QueuePair, Topic, ManifestVHS), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
         progressTopic =>
@@ -123,7 +124,7 @@ trait RegistrarFixtures
                         hybridStoreBucket,
                         hybridDynamoTable,
                         queuePair,
-                        progressTopic) { registrar =>
+                        progressTopic) { _ =>
                         implicit val storageBackend =
                           new S3StorageBackend(s3Client)
 
@@ -131,12 +132,7 @@ trait RegistrarFixtures
                           hybridStoreBucket,
                           hybridDynamoTable) { vhs =>
                           testWith(
-                            (
-                              storageBucket,
-                              queuePair,
-                              progressTopic,
-                              registrar,
-                              vhs)
+                            (storageBucket, queuePair, progressTopic, vhs)
                           )
                         }
                       }
@@ -150,28 +146,22 @@ trait RegistrarFixtures
   }
 
   def withRegistrarAndBrokenVHS[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, Bucket), R]) = {
+    testWith: TestWith[(Bucket, QueuePair, Topic, Bucket), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
-      withLocalSnsTopic {
-        progressTopic =>
-          withLocalS3Bucket { storageBucket =>
-            withLocalS3Bucket { hybridStoreBucket =>
-              withApp(
-                hybridStoreBucket,
-                Table("does-not-exist", ""),
-                queuePair,
-                progressTopic) { registrar =>
-                testWith(
-                  (
-                    storageBucket,
-                    queuePair,
-                    progressTopic,
-                    registrar,
-                    hybridStoreBucket)
-                )
-              }
+      withLocalSnsTopic { progressTopic =>
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { hybridStoreBucket =>
+            withApp(
+              hybridStoreBucket,
+              Table("does-not-exist", ""),
+              queuePair,
+              progressTopic) { _ =>
+              testWith(
+                (storageBucket, queuePair, progressTopic, hybridStoreBucket)
+              )
             }
           }
+        }
 
       }
     })
