@@ -3,6 +3,7 @@ module "recorder" {
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${var.cluster_name}"
+  cluster_id                     = "${var.cluster_id}"
   namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
@@ -31,6 +32,7 @@ module "matcher" {
   source                           = "../service"
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${var.cluster_name}"
+  cluster_id                     = "${var.cluster_id}"
   namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
@@ -59,6 +61,7 @@ module "merger" {
   source                           = "../service"
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${var.cluster_name}"
+  cluster_id                     = "${var.cluster_id}"
   namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
@@ -87,6 +90,7 @@ module "id_minter" {
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${var.cluster_name}"
+  cluster_id                     = "${var.cluster_id}"
   namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
@@ -133,6 +137,7 @@ module "ingestor" {
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${var.cluster_name}"
+  cluster_id                     = "${var.cluster_id}"
   namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"

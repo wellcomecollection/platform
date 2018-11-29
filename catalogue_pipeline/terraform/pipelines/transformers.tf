@@ -17,6 +17,7 @@ module "miro_transformer" {
   subnets                          = "${var.private_subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
+  cluster_id = "${aws_ecs_cluster.cluster.id}"
   namespace    = "${var.namespace}"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
@@ -53,6 +54,7 @@ module "sierra_transformer" {
   subnets                          = "${var.private_subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
+  cluster_id = "${aws_ecs_cluster.cluster.id}"
   namespace    = "${var.namespace}"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
