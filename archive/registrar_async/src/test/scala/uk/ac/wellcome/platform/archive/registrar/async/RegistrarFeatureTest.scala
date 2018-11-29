@@ -81,7 +81,7 @@ class RegistrarFeatureTest
                   requestId,
                   progressTopic,
                   Progress.Completed,
-                  Some(bagId)) { events =>
+                  expectedBag = Some(bagId)) { events =>
                   events should have size 1
                   events.head.description shouldBe "Bag registered successfully"
                 }
@@ -117,8 +117,7 @@ class RegistrarFeatureTest
           assertTopicReceivesProgressStatusUpdate(
             requestId,
             progressTopic,
-            Progress.Failed,
-            None) { events =>
+            Progress.Failed) { events =>
             events should have size 1
             events.head.description should startWith(
               "There was an exception while downloading object")

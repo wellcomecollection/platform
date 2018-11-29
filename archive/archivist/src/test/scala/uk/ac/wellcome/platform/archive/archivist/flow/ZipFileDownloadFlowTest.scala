@@ -105,8 +105,7 @@ class ZipFileDownloadFlowTest
           assertTopicReceivesProgressStatusUpdate(
             ingestBagRequest.archiveRequestId,
             progressTopic,
-            Progress.Failed,
-            None) { events =>
+            Progress.Failed) { events =>
             events should have size 1
             events.head.description should startWith(
               s"Failed downloading zipFile ${objectLocation.namespace}/${objectLocation.key}")

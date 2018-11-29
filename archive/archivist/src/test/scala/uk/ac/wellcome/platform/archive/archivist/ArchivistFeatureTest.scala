@@ -109,8 +109,7 @@ class ArchivistFeatureTest
               assertTopicReceivesProgressStatusUpdate(
                 request.archiveRequestId,
                 progressTopic,
-                Progress.Failed,
-                None)({ events =>
+                Progress.Failed)({ events =>
                 all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
               })
             }
@@ -137,8 +136,7 @@ class ArchivistFeatureTest
               assertTopicReceivesProgressStatusUpdate(
                 request.archiveRequestId,
                 progressTopic,
-                Progress.Failed,
-                None)({ events =>
+                Progress.Failed)({ events =>
                 all(events.map(_.description)) should include regex "Failed reading file tagmanifest-sha256.txt from zip file"
               })
             }
@@ -205,16 +203,14 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressStatusUpdate(
                             invalidRequest1.archiveRequestId,
                             progressTopic,
-                            Progress.Failed,
-                            None) { events =>
+                            Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
                           assertTopicReceivesProgressStatusUpdate(
                             invalidRequest2.archiveRequestId,
                             progressTopic,
-                            Progress.Failed,
-                            None) { events =>
+                            Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
@@ -304,8 +300,7 @@ class ArchivistFeatureTest
                   assertTopicReceivesProgressStatusUpdate(
                     invalidRequestId2,
                     progressTopic,
-                    Progress.Failed,
-                    None) { events =>
+                    Progress.Failed) { events =>
                     events should have size 1
                     events.head.description should startWith(
                       s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip")
@@ -376,8 +371,7 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressStatusUpdate(
                             invalidRequest1.archiveRequestId,
                             progressTopic,
-                            Progress.Failed,
-                            None) { events =>
+                            Progress.Failed) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
                           }
@@ -385,8 +379,7 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressStatusUpdate(
                             invalidRequest2.archiveRequestId,
                             progressTopic,
-                            Progress.Failed,
-                            None) { events =>
+                            Progress.Failed) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
                           }
@@ -457,17 +450,17 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressStatusUpdate(
                             invalidRequest1.archiveRequestId,
                             progressTopic,
-                            Progress.Failed,
-                            None) { events =>
+                            Progress.Failed) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }
 
+
+
                           assertTopicReceivesProgressStatusUpdate(
                             invalidRequest2.archiveRequestId,
                             progressTopic,
-                            Progress.Failed,
-                            None) { events =>
+                            Progress.Failed) { events =>
                             events should have size 1
                             events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
                           }

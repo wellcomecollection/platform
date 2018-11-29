@@ -126,8 +126,7 @@ class ArchiveZipFileFlowTest
                       assertTopicReceivesProgressStatusUpdate(
                         ingestContext.archiveRequestId,
                         reportingTopic,
-                        Progress.Failed,
-                        None) { events =>
+                        Progress.Failed) { events =>
                         events should have size (zipFile
                           .entries()
                           .asScala
@@ -169,8 +168,7 @@ class ArchiveZipFileFlowTest
                       assertTopicReceivesProgressStatusUpdate(
                         ingestContext.archiveRequestId,
                         reportingTopic,
-                        Progress.Failed,
-                        None) { events =>
+                        Progress.Failed) { events =>
                         inside(events) {
                           case List(event) =>
                             event.description shouldBe result.head.left.get.toString
@@ -223,8 +221,7 @@ class ArchiveZipFileFlowTest
                       assertTopicReceivesProgressStatusUpdate(
                         ingestContext.archiveRequestId,
                         reportingTopic,
-                        Progress.Failed,
-                        None) { events =>
+                        Progress.Failed) { events =>
                         inside(events) {
                           case List(event) =>
                             event.description shouldBe result.head.left.get.toString
