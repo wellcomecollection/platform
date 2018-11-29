@@ -98,6 +98,8 @@ trait RegistrarFixtures
             actorSystem = actorSystem
           )
 
+          registrar.run()
+
           testWith(registrar)
         }
       }
@@ -108,7 +110,7 @@ trait RegistrarFixtures
                                           ObjectStore[StorageManifest]]
 
   def withRegistrar[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, ManifestVHS), R])
+    testWith: TestWith[(Bucket, QueuePair, Topic, ManifestVHS), R])
     : R = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
@@ -123,7 +125,7 @@ trait RegistrarFixtures
                         hybridStoreBucket,
                         hybridDynamoTable,
                         queuePair,
-                        progressTopic) { registrar =>
+                        progressTopic) { _ =>
                         implicit val storageBackend =
                           new S3StorageBackend(s3Client)
 
@@ -135,7 +137,6 @@ trait RegistrarFixtures
                               storageBucket,
                               queuePair,
                               progressTopic,
-                              registrar,
                               vhs)
                           )
                         }
@@ -150,7 +151,7 @@ trait RegistrarFixtures
   }
 
   def withRegistrarAndBrokenVHS[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, Bucket), R]) = {
+    testWith: TestWith[(Bucket, QueuePair, Topic, Bucket), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
       withLocalSnsTopic {
         progressTopic =>
@@ -160,13 +161,12 @@ trait RegistrarFixtures
                 hybridStoreBucket,
                 Table("does-not-exist", ""),
                 queuePair,
-                progressTopic) { registrar =>
+                progressTopic) { _ =>
                 testWith(
                   (
                     storageBucket,
                     queuePair,
                     progressTopic,
-                    registrar,
                     hybridStoreBucket)
                 )
               }
