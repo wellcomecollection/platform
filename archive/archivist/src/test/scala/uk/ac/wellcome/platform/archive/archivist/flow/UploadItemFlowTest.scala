@@ -37,11 +37,11 @@ class UploadItemFlowTest
           val fileContent = "bah buh bih beh"
           val fileName = "key.txt"
           withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
-
-            val archiveItemJob =
-              createArchiveItemJob(zipFile, bucket, bagIdentifier, fileName)
+            val archiveItemJob = createArchiveItemJobWith(
+              zipFile = zipFile,
+              bucket = bucket,
+              s3Key = fileName
+            )
 
             val source = Source.single(archiveItemJob)
             val flow = UploadItemFlow(10)(s3Client)
@@ -73,8 +73,12 @@ class UploadItemFlowTest
             val bagIdentifier =
               ExternalIdentifier(randomAlphanumeric())
 
-            val archiveItemJob =
-              createArchiveItemJob(zipFile, bucket, bagIdentifier, fileName)
+            val archiveItemJob = createArchiveItemJobWith(
+              zipFile = zipFile,
+              bucket = bucket,
+              bagIdentifier = bagIdentifier,
+              s3Key = fileName
+            )
 
             val source = Source.single(archiveItemJob)
             val flow = UploadItemFlow(10)(s3Client)
@@ -103,14 +107,11 @@ class UploadItemFlowTest
         val fileContent = "bah buh bih beh"
         val fileName = "key.txt"
         withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-          val bagIdentifier =
-            ExternalIdentifier(randomAlphanumeric())
-
-          val failingArchiveItemJob = createArchiveItemJob(
-            zipFile,
-            Bucket("does-not-exist"),
-            bagIdentifier,
-            fileName)
+          val failingArchiveItemJob = createArchiveItemJobWith(
+            zipFile = zipFile,
+            bucket = Bucket("does-not-exist"),
+            s3Key = fileName
+          )
 
           val source = Source.single(failingArchiveItemJob)
           val decider: Supervision.Decider = { e =>

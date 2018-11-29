@@ -3,20 +3,23 @@ package uk.ac.wellcome.platform.archive.archivist.generators
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
+import uk.ac.wellcome.platform.archive.common.generators.ExternalIdentifierGenerators
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
-trait ArchiveJobGenerators {
+trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
 
-  def createArchiveItemJob(zipFile: ZipFile,
-                           bucket: S3.Bucket,
-                           bagIdentifier: ExternalIdentifier,
-                           s3Key: String) = {
+  def createArchiveItemJobWith(
+    zipFile: ZipFile,
+    bucket: S3.Bucket,
+    bagIdentifier: ExternalIdentifier = createExternalIdentifier,
+    s3Key: String
+  ): ArchiveItemJob =
     ArchiveItemJob(
       archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
-      itemLocation = EntryPath(s3Key))
-  }
+      itemLocation = EntryPath(s3Key)
+    )
 
   def createArchiveDigestItemJob(zipFile: ZipFile,
                                  bucket: S3.Bucket,
