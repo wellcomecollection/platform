@@ -56,11 +56,7 @@ class RegistrarFeatureTest
         val requestId = randomUUID
         val createdAfterDate = Instant.now()
 
-        withBagNotification(
-          requestId,
-          queuePair,
-          storageBucket
-        ) {
+        withBagNotification(queuePair, storageBucket, requestId) {
           case (bagLocation, bagInfo, bagId) =>
             registrar.run()
 
@@ -142,11 +138,8 @@ class RegistrarFeatureTest
           progressTopic,
           registrar,
           _) =>
-        val requestId1 = randomUUID
-        val requestId2 = randomUUID
-
-        withBagNotification(requestId1, queuePair, storageBucket) { _ =>
-          withBagNotification(requestId2, queuePair, storageBucket) { _ =>
+        withBagNotification(queuePair, storageBucket) { _ =>
+          withBagNotification(queuePair, storageBucket) { _ =>
             registrar.run()
 
             eventually {

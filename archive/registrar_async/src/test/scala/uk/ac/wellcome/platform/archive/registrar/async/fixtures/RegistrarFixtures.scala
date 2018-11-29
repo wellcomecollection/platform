@@ -40,9 +40,11 @@ trait RegistrarFixtures
       ArchiveComplete(requestId, storageSpace, bagLocation)
     )
 
-  def withBagNotification[R](requestId: UUID,
-                             queuePair: QueuePair,
-                             storageBucket: Bucket)(
+  def withBagNotification[R](
+    queuePair: QueuePair,
+    storageBucket: Bucket,
+    requestId: UUID = randomUUID
+  )(
     testWith: TestWith[(BagLocation, BagInfo, BagId), R]): R =
     withBag(storageBucket) { case (bagLocation, bagInfo, bagId) =>
       sendNotification(requestId, bagId.space, bagLocation, queuePair)
