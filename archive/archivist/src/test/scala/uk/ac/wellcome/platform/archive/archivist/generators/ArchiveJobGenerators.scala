@@ -28,9 +28,9 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
   def createArchiveDigestItemJobWith(
     zipFile: ZipFile,
     bucket: S3.Bucket,
-    digest: String,
+    digest: String = randomAlphanumeric(),
     bagIdentifier: ExternalIdentifier = createExternalIdentifier,
-    s3Key: String
+    s3Key: String = randomAlphanumeric()
   ): ArchiveDigestItemJob =
     ArchiveDigestItemJob(
       archiveJob = createArchiveJobWith(

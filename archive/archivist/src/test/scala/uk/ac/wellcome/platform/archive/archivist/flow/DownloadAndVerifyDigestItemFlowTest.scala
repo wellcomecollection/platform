@@ -30,14 +30,11 @@ class DownloadAndVerifyDigestItemFlowTest
         withMaterializer(actorSystem) { implicit materializer =>
           withZipFile(List()) { zipFile =>
             val fileContent = "bah buh bih beh"
-            val digest =
-              "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
             val fileName = "key.txt"
 
             val archiveItemJob = createArchiveDigestItemJobWith(
               zipFile = zipFile,
               bucket = bucket,
-              digest = digest,
               s3Key = fileName
             )
 
@@ -101,14 +98,9 @@ class DownloadAndVerifyDigestItemFlowTest
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
           withZipFile(List()) { zipFile =>
-            val digest = "digest"
-            val fileName = "this/does/not/exist.txt"
-
             val archiveItemJob = createArchiveDigestItemJobWith(
               zipFile = zipFile,
-              bucket = bucket,
-              digest = digest,
-              s3Key = fileName
+              bucket = bucket
             )
             val source = Source.single(archiveItemJob)
             val futureResult = source via flow runWith Sink.head

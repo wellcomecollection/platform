@@ -82,8 +82,7 @@ class UploadDigestItemFlowTest
 
           val fileName = "key.txt"
           withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-            val digest =
-              "wrong!"
+            val digest = "wrong!"
 
             val archiveItemJob = createArchiveDigestItemJobWith(
               zipFile = zipFile,
@@ -119,15 +118,11 @@ class UploadDigestItemFlowTest
         withMaterializer(actorSystem) { implicit materializer =>
           withZipFile(List()) { zipFile =>
             val fileName = "key.txt"
-            val digest =
-              "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
-
             val bagIdentifier = createExternalIdentifier
 
             val archiveItemJob = createArchiveDigestItemJobWith(
               zipFile = zipFile,
               bucket = bucket,
-              digest = digest,
               bagIdentifier = bagIdentifier,
               s3Key = fileName
             )
@@ -161,13 +156,9 @@ class UploadDigestItemFlowTest
 
         val fileName = "key.txt"
         withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-          val digest =
-            "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
-
           val failingArchiveItemJob = createArchiveDigestItemJobWith(
             zipFile = zipFile,
             bucket = Bucket("does-not-exist"),
-            digest = digest,
             s3Key = fileName
           )
 
