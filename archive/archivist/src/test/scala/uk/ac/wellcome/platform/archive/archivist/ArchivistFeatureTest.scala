@@ -243,10 +243,9 @@ class ArchivistFeatureTest
             sendNotificationToSQS(
               queuePair.queue,
               IngestBagRequest(
-                invalidRequestId1,
-                ObjectLocation(ingestBucket.name, "non-existing1.zip"),
-                None,
-                StorageSpace("not_a_real_one")
+                archiveRequestId = invalidRequestId1,
+                zippedBagLocation = ObjectLocation(ingestBucket.name, "non-existing1.zip"),
+                storageSpace = StorageSpace("not_a_real_one")
               )
             )
 
@@ -257,10 +256,9 @@ class ArchivistFeatureTest
                 sendNotificationToSQS(
                   queuePair.queue,
                   IngestBagRequest(
-                    invalidRequestId2,
-                    ObjectLocation(ingestBucket.name, "non-existing2.zip"),
-                    None,
-                    StorageSpace("not_a_real_one")
+                    archiveRequestId = invalidRequestId2,
+                    zippedBagLocation = ObjectLocation(ingestBucket.name, "non-existing2.zip"),
+                    storageSpace = StorageSpace("not_a_real_one")
                   )
                 )
 
