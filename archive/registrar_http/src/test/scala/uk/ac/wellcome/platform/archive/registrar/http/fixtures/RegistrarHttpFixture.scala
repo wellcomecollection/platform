@@ -46,6 +46,8 @@ trait RegistrarHttpFixture
             executionContext = actorSystem.dispatcher
           )
 
+          registrarHTTP.run()
+
           testWith(registrarHTTP)
         }
       }
@@ -55,8 +57,7 @@ trait RegistrarHttpFixture
     testWith: TestWith[(VersionedHybridStore[StorageManifest,
                                              EmptyMetadata,
                                              ObjectStore[StorageManifest]],
-                        String,
-                        RegistrarHTTP),
+                        String),
                        R]): R = {
     val host = "localhost"
     val port = randomPort
@@ -76,8 +77,8 @@ trait RegistrarHttpFixture
         withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table, s3Prefix) {
           vhs =>
             withApp(table, bucket, s3Prefix, httpServerConfig, contextURL) {
-              progressHttp =>
-                testWith((vhs, externalBaseURL, progressHttp))
+              _ =>
+                testWith((vhs, externalBaseURL))
             }
         }
       }
