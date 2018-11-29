@@ -21,37 +21,37 @@ class StorageManifestFactoryTest
   implicit val _ = s3Client
 
   it("returns a right of storage manifest if reading a bag location succeeds") {
+    val storageSpace = randomStorageSpace
     withLocalS3Bucket { bucket =>
-      withBag(bucket) {
-        case (bagLocation, bagInfo, bagId) =>
-          val archiveComplete = createArchiveCompleteWith(
-            space = bagId.space,
-            bagLocation = bagLocation
-          )
+      withBag(bucket) { case (bagLocation, bagInfo, _) =>
+        val archiveComplete = createArchiveCompleteWith(
+          space = storageSpace,
+          bagLocation = bagLocation
+        )
 
-          val storageManifest =
-            StorageManifestFactory.create(archiveComplete)
+        val storageManifest =
+          StorageManifestFactory.create(archiveComplete)
 
-          inside(storageManifest) {
-            case Right(
-                StorageManifest(
-                  actualStorageSpace,
-                  actualBagInfo,
-                  FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-                  FileManifest(
-                    ChecksumAlgorithm("sha256"),
-                    tagManifestDigestFiles),
-                  _,
-                  _)) =>
-              actualStorageSpace shouldBe bagId.space
-              actualBagInfo shouldBe bagInfo
-              bagDigestFiles should have size 1
-              tagManifestDigestFiles should have size 3
-              tagManifestDigestFiles.map(_.path.value) should contain theSameElementsAs List(
-                "manifest-sha256.txt",
-                "bag-info.txt",
-                "bagit.txt")
-          }
+        inside(storageManifest) {
+          case Right(
+          StorageManifest(
+          actualStorageSpace,
+          actualBagInfo,
+          FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+          FileManifest(
+          ChecksumAlgorithm("sha256"),
+          tagManifestDigestFiles),
+          _,
+          _)) =>
+            actualStorageSpace shouldBe storageSpace
+            actualBagInfo shouldBe bagInfo
+            bagDigestFiles should have size 1
+            tagManifestDigestFiles should have size 3
+            tagManifestDigestFiles.map(_.path.value) should contain theSameElementsAs List(
+              "manifest-sha256.txt",
+              "bag-info.txt",
+              "bagit.txt")
+        }
       }
     }
   }
