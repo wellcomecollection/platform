@@ -43,13 +43,11 @@ trait RegistrarFixtures
   def withBagNotification[R](requestId: UUID,
                              queuePair: QueuePair,
                              storageBucket: Bucket)(
-    testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
-    withBag(storageBucket) {
-      case (bagLocation, bagInfo, bagId) =>
-        sendNotification(requestId, bagId.space, bagLocation, queuePair)
-        testWith((bagLocation, bagInfo, bagId))
+    testWith: TestWith[(BagLocation, BagInfo, BagId), R]) =
+    withBag(storageBucket) { case (bagLocation, bagInfo, bagId) =>
+      sendNotification(requestId, bagId.space, bagLocation, queuePair)
+      testWith((bagLocation, bagInfo, bagId))
     }
-  }
 
   override def createTable(table: Table) = {
     dynamoDbClient.createTable(
