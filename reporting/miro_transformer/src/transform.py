@@ -2,8 +2,7 @@ from dateutil.parser import parse
 
 
 def transform(miro_transformable):
-    original_data = miro_transformable["data"]
-    transformed = drop_redundant_fields(original_data, keys_to_drop)
+    transformed = drop_redundant_fields(miro_transformable, keys_to_drop)
     transformed = clean_dates(transformed, keys_to_parse)
     return transformed
 

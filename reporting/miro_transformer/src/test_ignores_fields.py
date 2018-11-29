@@ -33,5 +33,4 @@ def transformed_data():
 
 
 def test_ignores_bad_fields():
-    test_dict = {"data": raw_data()}
-    assert transform(test_dict) == transformed_data()
+    assert transform(raw_data()) == transformed_data()
