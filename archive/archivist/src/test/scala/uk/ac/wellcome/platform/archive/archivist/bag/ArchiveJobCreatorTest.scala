@@ -1,13 +1,14 @@
 package uk.ac.wellcome.platform.archive.archivist.bag
+
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveJob,
   BagItConfig,
-  BagManifestLocation,
-  IngestRequestContextGenerators
+  BagManifestLocation
 }
+import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
@@ -17,10 +18,10 @@ class ArchiveJobCreatorTest
     with BagUploaderConfigGenerator
     with Matchers
     with Inside
-    with IngestRequestContextGenerators {
+    with IngestBagRequestGenerators {
   it("creates an archive job") {
     withBagItZip() {
-      case (bagIdentifier, zipFile) =>
+      case (_, zipFile) =>
         val bucketName = "bucket"
         val ingestRequest = createIngestBagRequest
         inside(

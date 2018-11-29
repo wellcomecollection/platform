@@ -15,11 +15,9 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ChecksumNotMatchedOnUploadError,
   FileNotFoundError
 }
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  IngestRequestContextGenerators
-}
+import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models.error.{
   ArchiveError,
   InvalidBagManifestError
@@ -41,7 +39,7 @@ class ArchiveZipFileFlowTest
     with Matchers
     with ScalaFutures
     with ArchivistFixtures
-    with IngestRequestContextGenerators
+    with IngestBagRequestGenerators
     with BagUploaderConfigGenerator
     with Akka
     with SNS

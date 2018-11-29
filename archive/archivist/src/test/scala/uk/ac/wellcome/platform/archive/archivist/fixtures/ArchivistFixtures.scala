@@ -10,11 +10,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.models.{
   BagItConfig,
   BagUploaderConfig,
-  IngestRequestContextGenerators,
   UploadConfig
 }
 import uk.ac.wellcome.platform.archive.archivist.Archivist
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{
   BagInfo,
@@ -29,7 +29,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait ArchivistFixtures
     extends Messaging
     with ZipBagItFixture
-    with IngestRequestContextGenerators {
+    with IngestBagRequestGenerators {
 
   import IngestBagRequest._
 

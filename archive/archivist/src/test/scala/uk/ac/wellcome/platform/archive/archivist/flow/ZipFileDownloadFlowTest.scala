@@ -11,8 +11,8 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
-import uk.ac.wellcome.platform.archive.archivist.models.IngestRequestContextGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadingError
+import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
@@ -28,7 +28,7 @@ class ZipFileDownloadFlowTest
     with Matchers
     with ScalaFutures
     with ArchivistFixtures
-    with IngestRequestContextGenerators
+    with IngestBagRequestGenerators
     with Inside
     with SNS
     with ProgressUpdateAssertions {

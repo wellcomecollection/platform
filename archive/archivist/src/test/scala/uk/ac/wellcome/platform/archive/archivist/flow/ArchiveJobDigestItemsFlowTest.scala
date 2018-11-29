@@ -7,11 +7,9 @@ import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors._
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagItConfig,
-  IngestRequestContextGenerators
-}
+import uk.ac.wellcome.platform.archive.archivist.models.BagItConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.storage.fixtures.S3
@@ -27,7 +25,7 @@ class ArchiveJobDigestItemsFlowTest
     with ScalaFutures
     with ZipBagItFixture
     with Inside
-    with IngestRequestContextGenerators {
+    with IngestBagRequestGenerators {
   implicit val s = s3Client
 
   it("outputs a right of archive complete if all of the items succeed") {
