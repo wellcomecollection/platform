@@ -61,10 +61,7 @@ def generate_partial_reindex_parameters(max_records):
    Generate instances of the Scala case class ``PartialReindexParameters``
    to send to the reindexer.
     """
-    yield {
-        "maxRecords": max_records,
-        "type": "PartialReindexParameters"
-    }
+    yield {"maxRecords": max_records, "type": "PartialReindexParameters"}
 
 
 def generate_reindex_requests(job_config_id, parameters):
@@ -72,10 +69,7 @@ def generate_reindex_requests(job_config_id, parameters):
     Generate instances of the Scala case class ``ReindexRequest`` to send.
     """
     for params in parameters:
-        yield {
-            "jobConfigId": job_config_id,
-            "parameters": params
-        }
+        yield {"jobConfigId": job_config_id, "parameters": params}
 
 
 def publish_messages(topic_arn, messages):
