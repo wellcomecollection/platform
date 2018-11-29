@@ -78,7 +78,7 @@ class WorkIndexer(
     * it shouldn't be merged (or redirected) anymore, the new unmerged version is ingested
     * and never replaced by the previous merged version still running through the pipeline.
     *
-    * We can do that by ingesting works into elastic search with a version derived by a
+    * We can do that by ingesting works into Elasticsearch with a version derived by a
     * combination of work version, merged flag and work type. More specifically, by
     * multiplying the work version by 10, we make sure that a new version of a work
     * always wins over previous versions (merged or unmerged).
