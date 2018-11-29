@@ -17,7 +17,11 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
     s3Key: String
   ): ArchiveItemJob =
     ArchiveItemJob(
-      archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
+      archiveJob = createArchiveJobWith(
+        zipFile = zipFile,
+        bagIdentifier = bagIdentifier,
+        bucket = bucket
+      ),
       itemLocation = EntryPath(s3Key)
     )
 
@@ -29,24 +33,29 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
     s3Key: String
   ): ArchiveDigestItemJob =
     ArchiveDigestItemJob(
-      archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
+      archiveJob = createArchiveJobWith(
+        zipFile = zipFile,
+        bagIdentifier = bagIdentifier,
+        bucket = bucket
+      ),
       bagDigestItem = BagItem(digest, EntryPath(s3Key))
     )
 
-  def createArchiveJob(
+  def createArchiveJobWith(
     zipFile: ZipFile,
-    bagIdentifier: ExternalIdentifier,
+    bagIdentifier: ExternalIdentifier = createExternalIdentifier,
     bucket: Bucket,
-    manifestFiles: List[String] =
-      List("manifest-sha256.txt", "tagmanifest-sha256.txt")) = {
+    manifestFiles: List[String] = List("manifest-sha256.txt", "tagmanifest-sha256.txt")
+  ): ArchiveJob = {
     val bagPath = BagPath(s"space/$bagIdentifier")
 
     val bagLocation = BagLocation(bucket.name, "archive", bagPath)
     ArchiveJob(
-      bagIdentifier,
-      zipFile,
-      bagLocation,
-      BagItConfig(),
-      manifestFiles.map(BagManifestLocation(_)))
+      externalIdentifier = bagIdentifier,
+      zipFile = zipFile,
+      bagLocation = bagLocation,
+      config = BagItConfig(),
+      bagManifestLocations = manifestFiles.map { BagManifestLocation(_) }
+    )
   }
 }

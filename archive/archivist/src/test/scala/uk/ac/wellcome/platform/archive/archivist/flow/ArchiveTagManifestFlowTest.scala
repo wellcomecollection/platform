@@ -12,7 +12,6 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ArchiveItemJobError,
   UploadError
 }
-import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -34,11 +33,11 @@ class ArchiveTagManifestFlowTest
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withBagItZip(dataFileCount = 2) {
-            case (bagName, zipFile) =>
-              val bagIdentifier =
-                ExternalIdentifier(randomAlphanumeric())
-
-              val archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket)
+            case (_, zipFile) =>
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
 
               val source = Source.single(archiveJob)
               val flow = ArchiveTagManifestFlow(10)(s3Client)
@@ -65,14 +64,14 @@ class ArchiveTagManifestFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withBagItZip(dataFileCount = 2) {
-          case (bagName, zipFile) =>
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
+          case (_, zipFile) =>
+            val bagIdentifier = createExternalIdentifier
 
-            val archiveJob = createArchiveJob(
-              zipFile,
-              bagIdentifier,
-              Bucket("not-a-valid-bucket"))
+            val archiveJob = createArchiveJobWith(
+              zipFile = zipFile,
+              bagIdentifier = bagIdentifier,
+              bucket = Bucket("not-a-valid-bucket")
+            )
 
             val source = Source.single(archiveJob)
             val flow = ArchiveTagManifestFlow(10)(s3Client)
@@ -91,7 +90,7 @@ class ArchiveTagManifestFlowTest
                         .getErrorCode shouldBe "NoSuchBucket"
                       location shouldBe ObjectLocation(
                         "not-a-valid-bucket",
-                        s"archive/space/${bagIdentifier}/tagmanifest-sha256.txt")
+                        s"archive/space/$bagIdentifier/tagmanifest-sha256.txt")
                   }
               }
             }
