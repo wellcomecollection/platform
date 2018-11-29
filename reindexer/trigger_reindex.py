@@ -43,15 +43,38 @@ def get_topic_name(source_name):
     return f"reindex_jobs-{source_name}"
 
 
-def all_complete_messages(total_segments):
+def generate_complete_reindex_parameters(total_segments):
     """
-    Generates all the messages to be sent to SNS.
+    Generate instances of the Scala case class ``CompleteReindexParameters``
+    to send to the reindexer.
     """
     for i in range(total_segments):
         yield {
             "segment": i,
             "totalSegments": total_segments,
             "type": "CompleteReindexParameters",
+        }
+
+
+def generate_partial_reindex_parameters(max_records):
+    """
+   Generate instances of the Scala case class ``PartialReindexParameters``
+   to send to the reindexer.
+    """
+    yield {
+        "maxRecords": max_records,
+        "type": "PartialReindexParameters"
+    }
+
+
+def generate_reindex_requests(job_id, parameters):
+    """
+    Generate instances of the Scala case class ``ReindexRequest`` to send.
+    """
+    for params in parameters:
+        yield {
+            "id": job_id,
+            "parameters": params
         }
 
 
@@ -152,24 +175,22 @@ def main():
 
     if args["complete"]:
         total_segments = int(args["--total_segments"])
-        messages = all_complete_messages(total_segments=total_segments)
+        parameters = generate_complete_reindex_parameters(total_segments=total_segments)
         slack_message = (
             f"*{username}* started a complete reindex in *{source_name}*\n"
             f"Reason: *{reason}* "
             f'({total_segments} segment{"s" if total_segments != 1 else ""})'
         )
     else:
-        messages = [
-            {
-                "maxRecords": int(args["--max_records"]),
-                "type": "PartialReindexParameters",
-            }
-        ]
+        max_records = int(args["--max_records"])
+        parameters = generate_partial_reindex_parameters(max_records=max_records)
         slack_message = (
             f"*{username}* started a partial reindex in *{source_name}*\n"
             f"Reason: *{reason}* "
             f'({int(args["--max_records"])})'
         )
+
+    messages = generate_reindex_requests(job_id="TBC", parameters=parameters)
 
     post_to_slack(source_name=source_name, slack_message=slack_message)
 
