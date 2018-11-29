@@ -40,10 +40,7 @@ class ArchiveJobDigestItemsFlowTest
                 bucket = bucket
               )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 archiveJobs shouldBe List(
@@ -77,10 +74,7 @@ class ArchiveJobDigestItemsFlowTest
                 bucket = bucket
               )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 inside(archiveJobs.toList) {
@@ -127,10 +121,7 @@ class ArchiveJobDigestItemsFlowTest
                 .toList
 
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 inside(archiveJobs.toList) {
@@ -171,10 +162,7 @@ class ArchiveJobDigestItemsFlowTest
                 bucket = bucket
               )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 inside(archiveJobs.toList) {
@@ -206,10 +194,7 @@ class ArchiveJobDigestItemsFlowTest
                 bucket = bucket
               )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -238,10 +223,7 @@ class ArchiveJobDigestItemsFlowTest
                 bucket = bucket
               )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -267,10 +249,7 @@ class ArchiveJobDigestItemsFlowTest
                 bucket = bucket
               )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -299,10 +278,7 @@ class ArchiveJobDigestItemsFlowTest
                 bucket = bucket
               )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -318,4 +294,10 @@ class ArchiveJobDigestItemsFlowTest
     }
   }
 
+  private def createFlow(ingestRequest: IngestBagRequest) =
+    ArchiveJobDigestItemsFlow(
+      delimiter = BagItConfig().digestDelimiterRegexp,
+      parallelism = 10,
+      ingestBagRequest = ingestRequest
+    )
 }
