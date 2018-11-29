@@ -5,6 +5,7 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
+import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 class MiroTransformableTransformerTest
@@ -240,6 +241,13 @@ class MiroTransformableTransformerTest
         )
       )
     }
+
+    it("if the image isn't cleared for the catalogue API") {
+      assertTransformReturnsInvisibleWork(
+        createMiroRecord,
+        miroMetadata = MiroMetadata(isClearedForCatalogueAPI = false)
+      )
+    }
   }
 
   it(
@@ -306,8 +314,15 @@ class MiroTransformableTransformerTest
   }
 
   private def assertTransformReturnsInvisibleWork(
-    miroRecord: MiroRecord): Assertion = {
-    val triedMaybeWork = transformer.transform(miroRecord, version = 1)
+    miroRecord: MiroRecord,
+    miroMetadata: MiroMetadata = MiroMetadata(isClearedForCatalogueAPI = true)
+  ): Assertion = {
+    val triedMaybeWork = transformer.transform(
+      miroRecord = miroRecord,
+      miroMetadata = miroMetadata,
+      version = 1
+    )
+
     triedMaybeWork.isSuccess shouldBe true
 
     triedMaybeWork.get shouldBe UnidentifiedInvisibleWork(
