@@ -5,14 +5,16 @@ import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SQSBuilder}
-import uk.ac.wellcome.config.storage.builders.{S3Builder}
+import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.receive.HybridRecordReceiver
-import uk.ac.wellcome.platform.transformer.sierra.services.SierraTransformerWorkerService
+import uk.ac.wellcome.platform.transformer.sierra.services.{
+  HybridRecordReceiver,
+  SierraTransformerWorkerService
+}
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration

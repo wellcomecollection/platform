@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.work.internal.{
   License_CC0,
   License_CopyrightNotCleared
 }
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.miro.exceptions.ShouldNotTransformException
 
 class MiroLicensesTest extends FunSpec with Matchers {
   it("finds a recognised license") {

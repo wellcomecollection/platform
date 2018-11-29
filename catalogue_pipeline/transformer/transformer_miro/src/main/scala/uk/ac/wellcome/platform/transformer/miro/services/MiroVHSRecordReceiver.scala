@@ -6,7 +6,7 @@ import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.miro.exceptions.MiroTransformerException
 import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 import uk.ac.wellcome.storage.ObjectStore
@@ -45,7 +45,7 @@ class MiroVHSRecordReceiver(objectStore: ObjectStore[MiroRecord],
           info(
             "Recoverable failure parsing HybridRecord/MiroMetadata from JSON",
             e)
-          throw TransformerException(e)
+          throw MiroTransformerException(e)
       }
       .map(_ => ())
 

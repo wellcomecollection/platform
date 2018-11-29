@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.transformer.receive
+package uk.ac.wellcome.platform.transformer.sierra.services
 
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
@@ -15,8 +15,8 @@ import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
 }
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.fixtures.HybridRecordReceiverFixture
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
+import uk.ac.wellcome.platform.transformer.sierra.fixtures.HybridRecordReceiverFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -127,7 +127,7 @@ class HybridRecordReceiverTest
               recordReceiver.receiveMessage(invalidSqsMessage, transformToWork)
 
             whenReady(future.failed) { x =>
-              x shouldBe a[TransformerException]
+              x shouldBe a[SierraTransformerException]
             }
         }
       }
