@@ -21,15 +21,17 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
       itemLocation = EntryPath(s3Key)
     )
 
-  def createArchiveDigestItemJob(zipFile: ZipFile,
-                                 bucket: S3.Bucket,
-                                 digest: String,
-                                 bagIdentifier: ExternalIdentifier,
-                                 s3Key: String) = {
+  def createArchiveDigestItemJobWith(
+    zipFile: ZipFile,
+    bucket: S3.Bucket,
+    digest: String,
+    bagIdentifier: ExternalIdentifier = createExternalIdentifier,
+    s3Key: String
+  ): ArchiveDigestItemJob =
     ArchiveDigestItemJob(
       archiveJob = createArchiveJob(zipFile, bagIdentifier, bucket),
-      bagDigestItem = BagItem(digest, EntryPath(s3Key)))
-  }
+      bagDigestItem = BagItem(digest, EntryPath(s3Key))
+    )
 
   def createArchiveJob(
     zipFile: ZipFile,

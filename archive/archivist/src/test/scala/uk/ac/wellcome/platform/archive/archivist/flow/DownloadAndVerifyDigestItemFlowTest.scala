@@ -8,7 +8,6 @@ import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ChecksumNotMatchedOnDownloadError
-import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.platform.archive.common.models.error.DownloadError
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
@@ -33,15 +32,12 @@ class DownloadAndVerifyDigestItemFlowTest
               "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
             val fileName = "key.txt"
 
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
-
-            val archiveItemJob = createArchiveDigestItemJob(
-              zipFile,
-              bucket,
-              digest,
-              bagIdentifier,
-              fileName)
+            val archiveItemJob = createArchiveDigestItemJobWith(
+              zipFile = zipFile,
+              bucket = bucket,
+              digest = digest,
+              s3Key = fileName
+            )
 
             s3Client.putObject(
               bucket.name,
@@ -71,15 +67,12 @@ class DownloadAndVerifyDigestItemFlowTest
             val digest = "bad-digest"
             val fileName = "key.txt"
 
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
-
-            val archiveItemJob = createArchiveDigestItemJob(
-              zipFile,
-              bucket,
-              digest,
-              bagIdentifier,
-              fileName)
+            val archiveItemJob = createArchiveDigestItemJobWith(
+              zipFile = zipFile,
+              bucket = bucket,
+              digest = digest,
+              s3Key = fileName
+            )
 
             s3Client.putObject(
               bucket.name,
@@ -111,15 +104,12 @@ class DownloadAndVerifyDigestItemFlowTest
             val digest = "digest"
             val fileName = "this/does/not/exist.txt"
 
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
-
-            val archiveItemJob = createArchiveDigestItemJob(
-              zipFile,
-              bucket,
-              digest,
-              bagIdentifier,
-              fileName)
+            val archiveItemJob = createArchiveDigestItemJobWith(
+              zipFile = zipFile,
+              bucket = bucket,
+              digest = digest,
+              s3Key = fileName
+            )
             val source = Source.single(archiveItemJob)
             val flow = DownloadAndVerifyDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
