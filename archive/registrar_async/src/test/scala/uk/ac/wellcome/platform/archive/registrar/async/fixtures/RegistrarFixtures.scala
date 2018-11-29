@@ -76,19 +76,20 @@ trait RegistrarFixtures
           sqsConfig = createSQSConfigWith(queuePair.queue),
           metricsSender = metricsSender
         )
-        withStorageManifestVHS(hybridStoreTable, hybridStoreBucket) { dataStore =>
-          val registrar = new Registrar(
-            snsClient = snsClient,
-            progressSnsConfig = createSNSConfigWith(progressTopic),
-            s3Client = s3Client,
-            messageStream = messageStream,
-            dataStore = dataStore,
-            actorSystem = actorSystem
-          )
+        withStorageManifestVHS(hybridStoreTable, hybridStoreBucket) {
+          dataStore =>
+            val registrar = new Registrar(
+              snsClient = snsClient,
+              progressSnsConfig = createSNSConfigWith(progressTopic),
+              s3Client = s3Client,
+              messageStream = messageStream,
+              dataStore = dataStore,
+              actorSystem = actorSystem
+            )
 
-          registrar.run()
+            registrar.run()
 
-          testWith(registrar)
+            testWith(registrar)
         }
       }
     }
@@ -106,16 +107,11 @@ trait RegistrarFixtures
                 hybridDynamoTable,
                 queuePair,
                 progressTopic) { _ =>
-                withStorageManifestVHS(
-                  hybridDynamoTable,
-                  hybridStoreBucket) { vhs =>
-                  testWith(
-                    (
-                      storageBucket,
-                      queuePair,
-                      progressTopic,
-                      vhs)
-                  )
+                withStorageManifestVHS(hybridDynamoTable, hybridStoreBucket) {
+                  vhs =>
+                    testWith(
+                      (storageBucket, queuePair, progressTopic, vhs)
+                    )
                 }
               }
             }

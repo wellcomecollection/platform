@@ -68,9 +68,8 @@ trait RegistrarHttpFixture
       withLocalDynamoDbTable { table =>
         val s3Prefix = "archive"
         withStorageManifestVHS(table, bucket, s3Prefix) { vhs =>
-          withApp(table, bucket, s3Prefix, httpServerConfig, contextURL) {
-            _ =>
-              testWith((vhs, externalBaseURL))
+          withApp(table, bucket, s3Prefix, httpServerConfig, contextURL) { _ =>
+            testWith((vhs, externalBaseURL))
           }
         }
       }
