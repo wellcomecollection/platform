@@ -7,7 +7,12 @@ import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
 import grizzled.slf4j.Logging
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
-import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedInvisibleWork, IdentifiedRedirectedWork, IdentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
+  IdentifiedInvisibleWork,
+  IdentifiedRedirectedWork,
+  IdentifiedWork
+}
 import uk.ac.wellcome.json.JsonUtil._
 import scala.language.implicitConversions
 
@@ -61,9 +66,9 @@ class WorkIndexer(
   }
 
   private def calculateEsVersion(work: IdentifiedBaseWork): Int = work match {
-    case w: IdentifiedWork => (w.version * 10) + w.merged
+    case w: IdentifiedWork           => (w.version * 10) + w.merged
     case w: IdentifiedRedirectedWork => (w.version * 10) + 1
-    case w: IdentifiedInvisibleWork => w.version * 10
+    case w: IdentifiedInvisibleWork  => w.version * 10
   }
 
   /** Did we try to PUT a document with a lower version than the existing version?
@@ -85,5 +90,5 @@ class WorkIndexer(
     alreadyIndexedWorkHasHigherVersion
   }
 
-  implicit private def toInteger(bool: Boolean): Int = if(bool) 1 else 0
+  implicit private def toInteger(bool: Boolean): Int = if (bool) 1 else 0
 }

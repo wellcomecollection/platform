@@ -26,8 +26,8 @@ trait WorksGenerators extends ItemsGenerators {
     createIdentifiedRedirectedWorkWith()
 
   def createIdentifiedRedirectedWorkWith(
-                                          canonicalId: String = createCanonicalId,
-                                          sourceIdentifier: SourceIdentifier = createSourceIdentifier,
+    canonicalId: String = createCanonicalId,
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     version: Int = 1,
   ): IdentifiedRedirectedWork =
     IdentifiedRedirectedWork(
@@ -51,10 +51,9 @@ trait WorksGenerators extends ItemsGenerators {
     createUnidentifiedInvisibleWorkWith()
 
   def createIdentifiedInvisibleWorkWith(
-                                       canonicalId: String = createCanonicalId,
+    canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     version: Int = 1
-
   ): IdentifiedInvisibleWork =
     IdentifiedInvisibleWork(
       sourceIdentifier = sourceIdentifier,
