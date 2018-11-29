@@ -31,26 +31,26 @@ trait RegistrarFixtures
     with BagLocationFixtures
     with LocalDynamoDb {
 
-  def sendNotification(requestId: UUID,
-                       storageSpace: StorageSpace,
-                       bagLocation: BagLocation,
-                       queuePair: QueuePair) =
-    sendNotificationToSQS(
-      queuePair.queue,
-      ArchiveComplete(requestId, storageSpace, bagLocation)
-    )
+  def withBagNotification[R](
+    queuePair: QueuePair,
+    storageBucket: Bucket,
+    archiveRequestId: UUID = randomUUID,
+    storageSpace: StorageSpace = randomStorageSpace
+  )(testWith: TestWith[(BagLocation, BagInfo), R]): R =
+    withBag(storageBucket) {
+      case (bagLocation, bagInfo, _) =>
+        val archiveComplete = ArchiveComplete(
+          archiveRequestId = archiveRequestId,
+          space = storageSpace,
+          bagLocation = bagLocation
+        )
 
-  def withBagNotification[R](requestId: UUID,
-                             queuePair: QueuePair,
-                             storageBucket: Bucket,
-                             dataFileCount: Int = 1)(
-    testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
-    withBag(storageBucket, dataFileCount) {
-      case (bagLocation, bagInfo, bagId) =>
-        sendNotification(requestId, bagId.space, bagLocation, queuePair)
-        testWith((bagLocation, bagInfo, bagId))
+        sendNotificationToSQS(
+          queuePair.queue,
+          archiveComplete
+        )
+        testWith((bagLocation, bagInfo))
     }
-  }
 
   override def createTable(table: Table) = {
     dynamoDbClient.createTable(

@@ -14,6 +14,7 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
+  BagId,
   BagLocation,
   BagPath
 }
@@ -54,15 +55,17 @@ class RegistrarFeatureTest
           vhs
           ) =>
         val requestId = randomUUID
+        val storageSpace = randomStorageSpace
         val createdAfterDate = Instant.now()
 
-        withBagNotification(
-          requestId,
-          queuePair,
-          storageBucket
-        ) {
-          case (bagLocation, bagInfo, bagId) =>
+        withBagNotification(queuePair, storageBucket, requestId, storageSpace) {
+          case (bagLocation, bagInfo) =>
             registrar.run()
+
+            val bagId = BagId(
+              space = storageSpace,
+              externalIdentifier = bagInfo.externalIdentifier
+            )
 
             eventually {
               val futureMaybeManifest = vhs.getRecord(bagId.toString)
@@ -142,11 +145,8 @@ class RegistrarFeatureTest
           progressTopic,
           registrar,
           _) =>
-        val requestId1 = randomUUID
-        val requestId2 = randomUUID
-
-        withBagNotification(requestId1, queuePair, storageBucket) { _ =>
-          withBagNotification(requestId2, queuePair, storageBucket) { _ =>
+        withBagNotification(queuePair, storageBucket) { _ =>
+          withBagNotification(queuePair, storageBucket) { _ =>
             registrar.run()
 
             eventually {
