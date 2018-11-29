@@ -1,8 +1,11 @@
 package uk.ac.wellcome.platform.archive.archivist
 
+import java.util.UUID
+
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.common.models._
@@ -287,24 +290,17 @@ class ArchivistFeatureTest
                     registrarTopic
                   )
 
-                  assertTopicReceivesProgressStatusUpdate(
-                    invalidRequestId1,
-                    progressTopic,
-                    Progress.Failed,
-                    None) { events =>
-                    events should have size 1
-                    events.head.description should startWith(
-                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip")
-                  }
+                  assertTopicReceivesFailedProgress(
+                    requestId = invalidRequestId1,
+                    expectedDescriptionPrefix = s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip",
+                    progressTopic = progressTopic
+                  )
 
-                  assertTopicReceivesProgressStatusUpdate(
-                    invalidRequestId2,
-                    progressTopic,
-                    Progress.Failed) { events =>
-                    events should have size 1
-                    events.head.description should startWith(
-                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip")
-                  }
+                  assertTopicReceivesFailedProgress(
+                    requestId = invalidRequestId2,
+                    expectedDescriptionPrefix = s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip",
+                    progressTopic = progressTopic
+                  )
                 }
             }
         }
@@ -368,21 +364,17 @@ class ArchivistFeatureTest
                             registrarTopic
                           )
 
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest1.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed) { events =>
-                            events should have size 1
-                            events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
-                          }
+                          assertTopicReceivesFailedProgress(
+                            requestId = invalidRequest1.archiveRequestId,
+                            expectedDescription = "Failed reading file this/does/not/exists.jpg from zip file",
+                            progressTopic = progressTopic
+                          )
 
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest2.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed) { events =>
-                            events should have size 1
-                            events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
-                          }
+                          assertTopicReceivesFailedProgress(
+                            requestId = invalidRequest2.archiveRequestId,
+                            expectedDescription = "Failed reading file this/does/not/exists.jpg from zip file",
+                            progressTopic = progressTopic
+                          )
                         }
                     }
                 }
@@ -447,23 +439,17 @@ class ArchivistFeatureTest
                             registrarTopic
                           )
 
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest1.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed) { events =>
-                            events should have size 1
-                            events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
-                          }
+                          assertTopicReceivesFailedProgress(
+                            requestId = invalidRequest1.archiveRequestId,
+                            expectedDescription = "Failed reading file bag-info.txt from zip file",
+                            progressTopic = progressTopic
+                          )
 
-
-
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest2.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed) { events =>
-                            events should have size 1
-                            events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
-                          }
+                          assertTopicReceivesFailedProgress(
+                            requestId = invalidRequest2.archiveRequestId,
+                            expectedDescription = "Failed reading file bag-info.txt from zip file",
+                            progressTopic = progressTopic
+                          )
                         }
                     }
                 }
@@ -471,4 +457,26 @@ class ArchivistFeatureTest
         }
     }
   }
+
+  private def assertTopicReceivesFailedProgress(
+    requestId: UUID,
+    expectedDescription: String = "",
+    expectedDescriptionPrefix: String = "",
+    progressTopic: Topic
+  ) =
+    assertTopicReceivesProgressStatusUpdate(
+      requestId = requestId,
+      progressTopic = progressTopic,
+      status = Progress.Failed,
+      expectedBag = None) { events =>
+      events should have size 1
+
+      if (!expectedDescription.isEmpty) {
+        events.head.description shouldBe expectedDescription
+      }
+
+      if (!expectedDescriptionPrefix.isEmpty) {
+        events.head.description should startWith(expectedDescriptionPrefix)
+      }
+    }
 }
