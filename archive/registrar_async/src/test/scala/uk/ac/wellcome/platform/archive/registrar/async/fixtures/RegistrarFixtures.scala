@@ -37,18 +37,19 @@ trait RegistrarFixtures
     archiveRequestId: UUID = randomUUID,
     storageSpace: StorageSpace = randomStorageSpace
   )(testWith: TestWith[(BagLocation, BagInfo), R]): R =
-    withBag(storageBucket) { case (bagLocation, bagInfo, _) =>
-      val archiveComplete = ArchiveComplete(
-        archiveRequestId = archiveRequestId,
-        space = storageSpace,
-        bagLocation = bagLocation
-      )
+    withBag(storageBucket) {
+      case (bagLocation, bagInfo, _) =>
+        val archiveComplete = ArchiveComplete(
+          archiveRequestId = archiveRequestId,
+          space = storageSpace,
+          bagLocation = bagLocation
+        )
 
-      sendNotificationToSQS(
-        queuePair.queue,
-        archiveComplete
-      )
-      testWith((bagLocation, bagInfo))
+        sendNotificationToSQS(
+          queuePair.queue,
+          archiveComplete
+        )
+        testWith((bagLocation, bagInfo))
     }
 
   override def createTable(table: Table) = {
