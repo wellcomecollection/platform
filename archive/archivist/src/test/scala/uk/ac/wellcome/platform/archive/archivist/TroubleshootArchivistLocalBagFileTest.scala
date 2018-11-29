@@ -14,25 +14,22 @@ class TroubleshootArchivistLocalBagFileTest
     with MetricsSenderFixture {
 
   ignore("downloads, uploads and verifies a known BagIt bag") {
-    withArchivist {
-      case (ingestBucket, storageBucket, queuePair, _, _, archivist) =>
-        sendBag(
-          new ZipFile(
-            List(
-              System.getProperty("user.home"),
-              "git/platform",
-              "b22454408.zip"
-            ).mkString("/")),
-          ingestBucket,
-          queuePair
-        ) { invalidBag =>
-          archivist.run()
-
-          while (true) {
-            Thread.sleep(10000)
-            println(s"Uploaded: ${listKeysInBucket(storageBucket).size}")
-          }
+    withArchivist { case (ingestBucket, storageBucket, queuePair, _, _) =>
+      sendBag(
+        new ZipFile(
+          List(
+            System.getProperty("user.home"),
+            "git/platform",
+            "b22454408.zip"
+          ).mkString("/")),
+        ingestBucket,
+        queuePair
+      ) { _ =>
+        while (true) {
+          Thread.sleep(10000)
+          println(s"Uploaded: ${listKeysInBucket(storageBucket).size}")
         }
+      }
     }
   }
 }

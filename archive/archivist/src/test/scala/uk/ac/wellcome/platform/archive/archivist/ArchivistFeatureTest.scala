@@ -33,11 +33,9 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) =>
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair) {
           case (request, bagIdentifier) =>
-            archivist.run()
             eventually {
 
               val archivedObjects = listKeysInBucket(storageBucket)
@@ -94,17 +92,15 @@ class ArchivistFeatureTest
     withArchivist {
       case (
           ingestBucket,
-          storageBucket,
+          _,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) =>
+          progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
           createDigest = _ => "bad_digest") {
-          case (request, bagIdentifier) =>
-            archivist.run()
+          case (request, _ =>
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
@@ -124,14 +120,12 @@ class ArchivistFeatureTest
     withArchivist {
       case (
           ingestBucket,
-          storageBucket,
+          _,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) =>
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
-          case (request, bagIdentifier) =>
-            archivist.run()
+          case (request, _) =>
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
@@ -154,11 +148,7 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) => {
-
-        archivist.run()
-
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
@@ -222,7 +212,6 @@ class ArchivistFeatureTest
                 }
             }
         }
-      }
     }
   }
 
@@ -233,10 +222,7 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) =>
-        archivist.run()
-
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             val invalidRequestId1 = randomUUID
@@ -313,11 +299,7 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) => {
-
-        archivist.run()
-
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
@@ -378,7 +360,6 @@ class ArchivistFeatureTest
                 }
             }
         }
-      }
     }
   }
 
@@ -389,10 +370,7 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) =>
-        archivist.run()
-
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(

@@ -104,12 +104,14 @@ trait ArchivistFixtures
           actorSystem = actorSystem
         )
 
+        archivist.run()
+
         testWith(archivist)
       }
     }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, Archivist), R])
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic), R])
     : R = {
     withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
       withLocalSnsTopic {
@@ -122,15 +124,14 @@ trait ArchivistFixtures
                     storageBucket,
                     queuePair,
                     registrarTopic,
-                    progressTopic) { archivist =>
+                    progressTopic) { _ =>
                     testWith(
                       (
                         ingestBucket,
                         storageBucket,
                         queuePair,
                         registrarTopic,
-                        progressTopic,
-                        archivist))
+                        progressTopic))
                   }
                 }
               }
