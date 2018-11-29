@@ -64,14 +64,21 @@ class WorkIndexerTest
     val olderWork = work.copy(version = 1)
 
     withLocalElasticsearchIndex { indexName =>
-      insertIntoElasticsearch(indexName = indexName, work)
 
       withWorkIndexer { workIndexer =>
-        val future = workIndexer.indexWorks(
-          works = List(olderWork),
+
+        val future = for {_ <- workIndexer.indexWorks(
+          works = List(work),
           indexName = indexName,
           documentType = documentType
         )
+
+             result <- workIndexer.indexWorks(
+               works = List(olderWork),
+               indexName = indexName,
+               documentType = documentType
+             )
+        } yield result
 
         whenReady(future) { result =>
           // Give Elasticsearch enough time to ingest the work
@@ -83,20 +90,174 @@ class WorkIndexerTest
       }
     }
   }
+describe("updating merged / redirected works") {
+  it("doesn't override a merged Work with same version but merged flag = false") {
+    val mergedWork = createIdentifiedWorkWith(version = 3, merged = true)
+    val unmergedWork = mergedWork.copy(merged = false)
+
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
+
+        val unmergedWorkInsertFuture = for {
+          _ <-workIndexer.indexWorks(
+        works = List(mergedWork),
+          indexName = indexName,
+          documentType = documentType
+          )
+          result <- workIndexer.indexWorks(
+            works = List(unmergedWork),
+            indexName = indexName,
+            documentType = documentType
+          )
+        } yield result
+
+        whenReady(unmergedWorkInsertFuture) { result =>
+          // Give Elasticsearch enough time to ingest the work
+          Thread.sleep(700)
+          result.right.get should contain(unmergedWork)
+
+          assertElasticsearchEventuallyHasWork(indexName = indexName, mergedWork)
+        }
+      }
+    }
+  }
+  it("doesn't overwrite a Work with lower version and merged = true") {
+    val unmergedNewWork = createIdentifiedWorkWith(version = 4)
+    val mergedOldWork = unmergedNewWork.copy(version = 3, merged = true)
+
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
+        val mergedWorkInsertFuture = for{
+          _ <- workIndexer.indexWorks(
+            works = List(unmergedNewWork),
+            indexName = indexName,
+            documentType = documentType
+          )
+          result <- workIndexer.indexWorks(
+              works = List(mergedOldWork),
+              indexName = indexName,
+              documentType = documentType
+            )
+          } yield result
+          whenReady(mergedWorkInsertFuture) { result =>
+            // Give Elasticsearch enough time to ingest the work
+            Thread.sleep(700)
+            result.right.get should contain(mergedOldWork)
+
+            assertElasticsearchEventuallyHasWork(indexName = indexName, unmergedNewWork)
+          }
+        }
+      }
+    }
+
+  it("doesn't override a identified Work with redirected work with lower version") {
+    val identifiedNewWork = createIdentifiedWorkWith(version = 4)
+    val redirectedOldWork = createIdentifiedRedirectedWorkWith(canonicalId = identifiedNewWork.canonicalId,version = 3)
+
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
+        val redirectedWorkInsertFuture = for {_ <-workIndexer.indexWorks(
+          works = List(identifiedNewWork),
+          indexName = indexName,
+          documentType = documentType
+        )
+        result <-
+          workIndexer.indexWorks(
+            works = List(redirectedOldWork),
+            indexName = indexName,
+            documentType = documentType
+          )
+        } yield result
+        whenReady(redirectedWorkInsertFuture) { result =>
+          // Give Elasticsearch enough time to ingest the work
+          Thread.sleep(700)
+          result.right.get should contain(redirectedOldWork)
+
+          assertElasticsearchEventuallyHasWork(indexName = indexName, identifiedNewWork)
+        }
+      }
+    }
+  }
+  it("doesn't override a redirected Work with identified work same version") {
+    val redirectedWork = createIdentifiedRedirectedWorkWith(version = 3)
+    val identifiedWork = createIdentifiedWorkWith(canonicalId = redirectedWork.canonicalId, version = 3)
+
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
+        val identifiedWorkInsertFuture = for {_ <-workIndexer.indexWorks(
+          works = List(redirectedWork),
+          indexName = indexName,
+          documentType = documentType
+        )
+             result <-
+          workIndexer.indexWorks(
+            works = List(identifiedWork),
+            indexName = indexName,
+            documentType = documentType
+          )
+        } yield result
+        whenReady(identifiedWorkInsertFuture) { result =>
+          // Give Elasticsearch enough time to ingest the work
+          Thread.sleep(700)
+          result.right.get should contain(identifiedWork)
+
+          assertElasticsearchEventuallyHasWork(indexName = indexName, redirectedWork)
+        }
+      }
+    }
+  }
+  it("override a identified Work with invisible work with higher version") {
+    val work = createIdentifiedWorkWith(version = 3)
+    val invisibleWork = createIdentifiedInvisibleWorkWith(canonicalId = work.canonicalId, version = 4)
+
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
+        val invisibleWorkInsertFuture = for {_ <-workIndexer.indexWorks(
+          works = List(work),
+          indexName = indexName,
+          documentType = documentType
+        )
+        result <-
+          workIndexer.indexWorks(
+            works = List(invisibleWork),
+            indexName = indexName,
+            documentType = documentType
+          )
+        } yield result
+        whenReady(invisibleWorkInsertFuture) { result =>
+          // Give Elasticsearch enough time to ingest the work
+          Thread.sleep(700)
+          result.right.get should contain(invisibleWork)
+
+          assertElasticsearchEventuallyHasWork(indexName = indexName, invisibleWork)
+        }
+      }
+    }
+  }
+
+}
 
   it("replaces a Work with the same version") {
     val work = createIdentifiedWorkWith(version = 3)
     val updatedWork = work.copy(title = "a different title")
 
     withLocalElasticsearchIndex { indexName =>
-      insertIntoElasticsearch(indexName = indexName, work)
 
       withWorkIndexer { workIndexer =>
-        val future = workIndexer.indexWorks(
-          works = List(updatedWork),
-          indexName = indexName,
-          documentType = documentType
-        )
+
+        val future = for {
+          _ <- workIndexer.indexWorks(
+            works = List(work),
+            indexName = indexName,
+            documentType = documentType
+          )
+          result <-workIndexer.indexWorks(
+            works = List(updatedWork),
+            indexName = indexName,
+            documentType = documentType
+          )
+        } yield result
+
 
         whenReady(future) { result =>
           result.right.get should contain(updatedWork)
