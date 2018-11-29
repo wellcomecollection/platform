@@ -42,10 +42,9 @@ trait RegistrarFixtures
 
   def withBagNotification[R](requestId: UUID,
                              queuePair: QueuePair,
-                             storageBucket: Bucket,
-                             dataFileCount: Int = 1)(
+                             storageBucket: Bucket)(
     testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
-    withBag(storageBucket, dataFileCount) {
+    withBag(storageBucket) {
       case (bagLocation, bagInfo, bagId) =>
         sendNotification(requestId, bagId.space, bagLocation, queuePair)
         testWith((bagLocation, bagInfo, bagId))
