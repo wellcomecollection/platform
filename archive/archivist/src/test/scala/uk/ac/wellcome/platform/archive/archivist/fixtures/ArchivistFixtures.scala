@@ -111,25 +111,21 @@ trait ArchivistFixtures
     }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic), R])
-    : R = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(5) { queuePair =>
       withLocalSnsTopic { registrarTopic =>
         withLocalSnsTopic { progressTopic =>
           withLocalS3Bucket { ingestBucket =>
             withLocalS3Bucket { storageBucket =>
-              withApp(
-                storageBucket,
-                queuePair,
-                registrarTopic,
-                progressTopic) { _ =>
-                testWith(
-                  (
-                    ingestBucket,
-                    storageBucket,
-                    queuePair,
-                    registrarTopic,
-                    progressTopic))
+              withApp(storageBucket, queuePair, registrarTopic, progressTopic) {
+                _ =>
+                  testWith(
+                    (
+                      ingestBucket,
+                      storageBucket,
+                      queuePair,
+                      registrarTopic,
+                      progressTopic))
               }
             }
           }

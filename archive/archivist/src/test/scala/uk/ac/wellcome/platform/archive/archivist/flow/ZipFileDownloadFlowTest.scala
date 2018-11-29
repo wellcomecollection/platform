@@ -56,7 +56,7 @@ class ZipFileDownloadFlowTest
                 createIngestBagRequestWith(ingestBagLocation = objectLocation)
 
               val download: Future[Either[ArchiveError[IngestBagRequest],
-                ZipFileDownloadComplete]] =
+                                          ZipFileDownloadComplete]] =
                 downloadZipFlow
                   .runWith(Source.single(ingestBagRequest), Sink.head)
                   ._2
@@ -111,12 +111,13 @@ class ZipFileDownloadFlowTest
     }
   }
 
-  type ZipFileDLFlow = Flow[
-    IngestBagRequest,
-    Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete],
-    NotUsed]
+  type ZipFileDLFlow =
+    Flow[IngestBagRequest,
+         Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete],
+         NotUsed]
 
-  private def withZipFileDownloadFlow[R](topic: Topic)(testWith: TestWith[ZipFileDLFlow, R]): R = {
+  private def withZipFileDownloadFlow[R](topic: Topic)(
+    testWith: TestWith[ZipFileDLFlow, R]): R = {
     val downloadZipFlow: ZipFileDLFlow = ZipFileDownloadFlow(
       parallelism = 10,
       snsConfig = createSNSConfigWith(topic)
