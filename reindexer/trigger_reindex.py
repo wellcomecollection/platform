@@ -67,13 +67,13 @@ def generate_partial_reindex_parameters(max_records):
     }
 
 
-def generate_reindex_requests(job_id, parameters):
+def generate_reindex_requests(job_config_id, parameters):
     """
     Generate instances of the Scala case class ``ReindexRequest`` to send.
     """
     for params in parameters:
         yield {
-            "id": job_id,
+            "jobConfigId": job_config_id,
             "parameters": params
         }
 
@@ -190,7 +190,7 @@ def main():
             f'({int(args["--max_records"])})'
         )
 
-    messages = generate_reindex_requests(job_id="TBC", parameters=parameters)
+    messages = generate_reindex_requests(job_config_id="TBC", parameters=parameters)
 
     post_to_slack(source_name=source_name, slack_message=slack_message)
 
