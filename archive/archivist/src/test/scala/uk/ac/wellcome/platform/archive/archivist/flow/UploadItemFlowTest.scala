@@ -29,6 +29,8 @@ class UploadItemFlowTest
     with ArchiveJobGenerators
     with Inside {
 
+  val flow = UploadItemFlow(parallelism = 10)(s3Client)
+
   it(
     "sends a right of archive item job when uploading a file from an archive item job succeeds") {
     withLocalS3Bucket { bucket =>
@@ -44,7 +46,6 @@ class UploadItemFlowTest
             )
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -81,7 +82,6 @@ class UploadItemFlowTest
             )
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.seq
 
             whenReady(futureResult) { result =>
@@ -118,9 +118,9 @@ class UploadItemFlowTest
             error("Stream failure", e)
             Supervision.Resume
           }
-          val flow = UploadItemFlow(10)(s3Client)
+          val modifiedFlow = flow
             .withAttributes(ActorAttributes.supervisionStrategy(decider))
-          val futureResult = source via flow runWith Sink.seq
+          val futureResult = source via modifiedFlow runWith Sink.seq
 
           whenReady(futureResult) { result =>
             inside(result.toList) {

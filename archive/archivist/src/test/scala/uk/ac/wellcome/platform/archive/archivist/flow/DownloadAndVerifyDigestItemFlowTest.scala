@@ -22,6 +22,8 @@ class DownloadAndVerifyDigestItemFlowTest
     with ArchiveJobGenerators
     with Inside {
 
+  val flow = DownloadAndVerifyDigestItemFlow(parallelism = 10)(s3Client)
+
   it("passes through a correct right archive item job") {
     withLocalS3Bucket { bucket =>
       withActorSystem { implicit actorSystem =>
@@ -45,7 +47,6 @@ class DownloadAndVerifyDigestItemFlowTest
               fileContent)
 
             val source = Source.single(archiveItemJob)
-            val flow = DownloadAndVerifyDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -80,7 +81,6 @@ class DownloadAndVerifyDigestItemFlowTest
               fileContent)
 
             val source = Source.single(archiveItemJob)
-            val flow = DownloadAndVerifyDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -111,7 +111,6 @@ class DownloadAndVerifyDigestItemFlowTest
               s3Key = fileName
             )
             val source = Source.single(archiveItemJob)
-            val flow = DownloadAndVerifyDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>

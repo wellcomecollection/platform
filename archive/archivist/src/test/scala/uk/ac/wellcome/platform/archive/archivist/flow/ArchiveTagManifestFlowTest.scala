@@ -28,6 +28,8 @@ class ArchiveTagManifestFlowTest
     with ArchiveJobGenerators
     with Inside {
 
+  val flow = ArchiveTagManifestFlow(parallelism = 10)(s3Client)
+
   it("archives the tag manifest") {
     withLocalS3Bucket { bucket =>
       withActorSystem { implicit actorSystem =>
@@ -40,7 +42,6 @@ class ArchiveTagManifestFlowTest
               )
 
               val source = Source.single(archiveJob)
-              val flow = ArchiveTagManifestFlow(10)(s3Client)
               val futureResult = source via flow runWith Sink.head
 
               whenReady(futureResult) { result =>
@@ -74,7 +75,6 @@ class ArchiveTagManifestFlowTest
             )
 
             val source = Source.single(archiveJob)
-            val flow = ArchiveTagManifestFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>

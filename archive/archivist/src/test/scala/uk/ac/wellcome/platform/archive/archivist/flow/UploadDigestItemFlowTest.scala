@@ -31,6 +31,8 @@ class UploadDigestItemFlowTest
     with ArchiveJobGenerators
     with Inside {
 
+  val flow = UploadDigestItemFlow(parallelism = 10)(s3Client)
+
   it(
     "sends a right of archive item job when uploading a file from an archive item job succeeds") {
     withLocalS3Bucket { bucket =>
@@ -51,7 +53,6 @@ class UploadDigestItemFlowTest
             )
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -92,7 +93,6 @@ class UploadDigestItemFlowTest
             )
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -133,7 +133,6 @@ class UploadDigestItemFlowTest
             )
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.seq
 
             whenReady(futureResult) { result =>
@@ -177,9 +176,9 @@ class UploadDigestItemFlowTest
             error("Stream failure", e)
             Supervision.Resume
           }
-          val flow = UploadDigestItemFlow(10)(s3Client)
+          val modifiedFlow = flow
             .withAttributes(ActorAttributes.supervisionStrategy(decider))
-          val futureResult = source via flow runWith Sink.seq
+          val futureResult = source via modifiedFlow runWith Sink.seq
 
           whenReady(futureResult) { result =>
             inside(result.toList) {
