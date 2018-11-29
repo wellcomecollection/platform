@@ -3,7 +3,7 @@ module "transformer" {
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${var.cluster_name}"
-  cluster_id                     = "${var.cluster_id}"
+  cluster_id                       = "${var.cluster_id}"
   namespace_id                     = "${var.namespace_id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"

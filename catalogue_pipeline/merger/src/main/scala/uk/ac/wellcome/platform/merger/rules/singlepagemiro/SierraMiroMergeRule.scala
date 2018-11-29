@@ -21,7 +21,9 @@ import uk.ac.wellcome.platform.merger.rules.{MergerRule, WorkPairMerger}
   */
 object SierraMiroMergeRule
     extends MergerRule
-    with Logging with MergerLogging with WorkPairMerger
+    with Logging
+    with MergerLogging
+    with WorkPairMerger
     with SierraMiroPartitioner {
 
   override protected def mergeAndRedirectWorkPair(

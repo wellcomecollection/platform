@@ -31,7 +31,7 @@ module "v1_pipeline" {
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
 
   cluster_name                       = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
+  cluster_id                         = "${aws_ecs_cluster.cluster.id}"
   namespace_id                       = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   allow_s3_messages_put_json         = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
   allow_s3_messages_get_json         = "${data.aws_iam_policy_document.allow_s3_messages_get.json}"
@@ -76,7 +76,7 @@ module "v2_pipeline" {
   lambda_error_alarm_arn             = "${var.lambda_error_alarm_arn}"
   service_egress_security_group_id   = "${var.service_egress_security_group_id}"
   cluster_name                       = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
+  cluster_id                         = "${aws_ecs_cluster.cluster.id}"
   namespace_id                       = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   allow_s3_messages_put_json         = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
   allow_s3_messages_get_json         = "${data.aws_iam_policy_document.allow_s3_messages_get.json}"
