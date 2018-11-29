@@ -9,7 +9,7 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
-import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
+import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ArchiveJobError,
   ChecksumNotMatchedOnUploadError,
@@ -40,7 +40,7 @@ class ArchiveZipFileFlowTest
     with ScalaFutures
     with ArchivistFixtures
     with IngestBagRequestGenerators
-    with BagUploaderConfigGenerator
+    with BagUploaderConfigGenerators
     with Akka
     with SNS
     with Inside
@@ -267,7 +267,7 @@ class ArchiveZipFileFlowTest
                             Either[ArchiveError[_], ArchiveComplete],
                             NotUsed],
                        R]): R = {
-    val bagUploaderConfig = createBagUploaderConfig(bucket)
+    val bagUploaderConfig = createBagUploaderConfigWith(bucket)
     val flow = ArchiveZipFileFlow(
       config = bagUploaderConfig,
       snsConfig = createSNSConfigWith(topic)

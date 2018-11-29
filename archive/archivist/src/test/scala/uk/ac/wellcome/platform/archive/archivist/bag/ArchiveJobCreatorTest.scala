@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
-import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerator
+import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveJob,
   BagItConfig,
@@ -10,12 +10,11 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 }
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest
     extends FunSpec
     with ZipBagItFixture
-    with BagUploaderConfigGenerator
+    with BagUploaderConfigGenerators
     with Matchers
     with Inside
     with IngestBagRequestGenerators {
@@ -28,7 +27,7 @@ class ArchiveJobCreatorTest
           ArchiveJobCreator
             .create(
               zipFile,
-              createBagUploaderConfig(Bucket(bucketName)),
+              createBagUploaderConfigWith(bucketName),
               ingestRequest
             )) {
           case Right(

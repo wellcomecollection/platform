@@ -9,10 +9,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.models.{
   BagItConfig,
-  BagUploaderConfig,
   UploadConfig
 }
 import uk.ac.wellcome.platform.archive.archivist.Archivist
+import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
@@ -29,6 +29,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait ArchivistFixtures
     extends Messaging
     with ZipBagItFixture
+    with BagUploaderConfigGenerators
     with IngestBagRequestGenerators {
 
   import IngestBagRequest._
@@ -96,11 +97,7 @@ trait ArchivistFixtures
             sqsConfig = createSQSConfigWith(queuePair.queue),
             metricsSender = metricsSender
           ),
-          bagUploaderConfig = BagUploaderConfig(
-            uploadConfig = UploadConfig(uploadNamespace = storageBucket.name),
-            parallelism = 10,
-            bagItConfig = BagItConfig()
-          ),
+          bagUploaderConfig = createBagUploaderConfigWith(storageBucket),
           snsRegistrarConfig = createSNSConfigWith(registrarTopic),
           snsProgressConfig = createSNSConfigWith(progressTopic)
         )(
