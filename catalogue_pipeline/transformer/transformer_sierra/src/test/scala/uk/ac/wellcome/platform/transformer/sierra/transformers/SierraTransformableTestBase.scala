@@ -20,7 +20,10 @@ trait SierraTransformableTestBase extends Matchers {
     if (triedWork.isFailure) {
       triedWork.failed.get.printStackTrace()
       println(
-        triedWork.failed.get.asInstanceOf[SierraTransformerException].e.getMessage)
+        triedWork.failed.get
+          .asInstanceOf[SierraTransformerException]
+          .e
+          .getMessage)
     }
 
     triedWork.isSuccess shouldBe true

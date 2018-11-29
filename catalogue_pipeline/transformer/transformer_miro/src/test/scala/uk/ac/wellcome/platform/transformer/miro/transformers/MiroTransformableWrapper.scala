@@ -26,7 +26,10 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
     if (triedWork.isFailure) {
       triedWork.failed.get.printStackTrace()
       println(
-        triedWork.failed.get.asInstanceOf[MiroTransformerException].e.getMessage)
+        triedWork.failed.get
+          .asInstanceOf[MiroTransformerException]
+          .e
+          .getMessage)
     }
 
     triedWork.isSuccess shouldBe true

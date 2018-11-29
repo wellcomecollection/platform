@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.sierra.exceptions
 import uk.ac.wellcome.exceptions.GracefulFailureException
 
 case class SierraTransformerException(e: Throwable)
-  extends Exception(e.getMessage)
+    extends Exception(e.getMessage)
     with GracefulFailureException
 
 case object SierraTransformerException {

@@ -11,7 +11,10 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.sierra.services.{HybridRecordReceiver, SierraTransformerWorkerService}
+import uk.ac.wellcome.platform.transformer.sierra.services.{
+  HybridRecordReceiver,
+  SierraTransformerWorkerService
+}
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
