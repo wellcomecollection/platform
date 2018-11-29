@@ -44,8 +44,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
   def createArchiveJobWith(
     zipFile: ZipFile,
     bagIdentifier: ExternalIdentifier = createExternalIdentifier,
-    bucket: Bucket,
-    manifestFiles: List[String] = List("manifest-sha256.txt", "tagmanifest-sha256.txt")
+    bucket: Bucket
   ): ArchiveJob = {
     val bagPath = BagPath(s"space/$bagIdentifier")
 
@@ -55,7 +54,10 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
       zipFile = zipFile,
       bagLocation = bagLocation,
       config = BagItConfig(),
-      bagManifestLocations = manifestFiles.map { BagManifestLocation(_) }
+      bagManifestLocations = List(
+        BagManifestLocation("manifest-sha256.txt"),
+        BagManifestLocation("tagmanifest-sha256.txt")
+      )
     )
   }
 }
