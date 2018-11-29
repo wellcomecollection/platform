@@ -4,7 +4,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.models.work.internal.Subject
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -23,11 +23,7 @@ class WorkIndexerTest
 
     withLocalElasticsearchIndex { indexName =>
       withWorkIndexer { workIndexer =>
-        val future = workIndexer.indexWorks(
-          works = List(work),
-          indexName = indexName,
-          documentType = documentType
-        )
+        val future = indexWork(work, indexName, workIndexer)
 
         whenReady(future) { result =>
           result.right.get should contain(work)
@@ -45,11 +41,7 @@ class WorkIndexerTest
         val future = Future.sequence(
           (1 to 2).map(
             _ =>
-              workIndexer.indexWorks(
-                works = List(work),
-                indexName = indexName,
-                documentType = documentType
-            ))
+              indexWork(work, indexName, workIndexer))
         )
 
         whenReady(future) { _ =>
@@ -66,29 +58,38 @@ class WorkIndexerTest
     withLocalElasticsearchIndex { indexName =>
       withWorkIndexer { workIndexer =>
         val future = for {
-          _ <- workIndexer.indexWorks(
-            works = List(work),
-            indexName = indexName,
-            documentType = documentType
-          )
-
-          result <- workIndexer.indexWorks(
-            works = List(olderWork),
-            indexName = indexName,
-            documentType = documentType
-          )
+          _ <- indexWork(work, indexName, workIndexer)
+          result <- indexWork(olderWork, indexName, workIndexer)
         } yield result
 
         whenReady(future) { result =>
-          // Give Elasticsearch enough time to ingest the work
-          Thread.sleep(700)
-          result.right.get should contain(olderWork)
-
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+          assertIngestedWorkIs(result = result, ingestedWork = work, indexName = indexName)
         }
       }
     }
   }
+
+  it("replaces a Work with the same version") {
+    val work = createIdentifiedWorkWith(version = 3)
+    val updatedWork = work.copy(title = "a different title")
+
+    withLocalElasticsearchIndex { indexName =>
+      withWorkIndexer { workIndexer =>
+        val future = for {
+          _ <- indexWork(work, indexName, workIndexer)
+          result <- indexWork(updatedWork, indexName, workIndexer)
+        } yield result
+
+        whenReady(future) { result =>
+          result.right.get should contain(updatedWork)
+          assertElasticsearchEventuallyHasWork(
+            indexName = indexName,
+            updatedWork)
+        }
+      }
+    }
+  }
+
   describe("updating merged / redirected works") {
     it(
       "doesn't override a merged Work with same version but merged flag = false") {
@@ -98,26 +99,12 @@ class WorkIndexerTest
       withLocalElasticsearchIndex { indexName =>
         withWorkIndexer { workIndexer =>
           val unmergedWorkInsertFuture = for {
-            _ <- workIndexer.indexWorks(
-              works = List(mergedWork),
-              indexName = indexName,
-              documentType = documentType
-            )
-            result <- workIndexer.indexWorks(
-              works = List(unmergedWork),
-              indexName = indexName,
-              documentType = documentType
-            )
+            _ <- indexWork(mergedWork, indexName, workIndexer)
+            result <- indexWork(unmergedWork, indexName, workIndexer)
           } yield result
 
           whenReady(unmergedWorkInsertFuture) { result =>
-            // Give Elasticsearch enough time to ingest the work
-            Thread.sleep(700)
-            result.right.get should contain(unmergedWork)
-
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              mergedWork)
+            assertIngestedWorkIs(result = result, ingestedWork = mergedWork, indexName = indexName)
           }
         }
       }
@@ -129,25 +116,11 @@ class WorkIndexerTest
       withLocalElasticsearchIndex { indexName =>
         withWorkIndexer { workIndexer =>
           val mergedWorkInsertFuture = for {
-            _ <- workIndexer.indexWorks(
-              works = List(unmergedNewWork),
-              indexName = indexName,
-              documentType = documentType
-            )
-            result <- workIndexer.indexWorks(
-              works = List(mergedOldWork),
-              indexName = indexName,
-              documentType = documentType
-            )
+            _ <- indexWork(unmergedNewWork, indexName, workIndexer)
+            result <- indexWork(mergedOldWork, indexName, workIndexer)
           } yield result
           whenReady(mergedWorkInsertFuture) { result =>
-            // Give Elasticsearch enough time to ingest the work
-            Thread.sleep(700)
-            result.right.get should contain(mergedOldWork)
-
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              unmergedNewWork)
+            assertIngestedWorkIs(result = result, ingestedWork = unmergedNewWork, indexName = indexName)
           }
         }
       }
@@ -163,25 +136,11 @@ class WorkIndexerTest
       withLocalElasticsearchIndex { indexName =>
         withWorkIndexer { workIndexer =>
           val redirectedWorkInsertFuture = for {
-            _ <- workIndexer.indexWorks(
-              works = List(identifiedNewWork),
-              indexName = indexName,
-              documentType = documentType
-            )
-            result <- workIndexer.indexWorks(
-              works = List(redirectedOldWork),
-              indexName = indexName,
-              documentType = documentType
-            )
+            _ <- indexWork(identifiedNewWork, indexName, workIndexer)
+            result <- indexWork(redirectedOldWork, indexName, workIndexer)
           } yield result
           whenReady(redirectedWorkInsertFuture) { result =>
-            // Give Elasticsearch enough time to ingest the work
-            Thread.sleep(700)
-            result.right.get should contain(redirectedOldWork)
-
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              identifiedNewWork)
+            assertIngestedWorkIs(result = result, ingestedWork = identifiedNewWork, indexName = indexName)
           }
         }
       }
@@ -195,30 +154,16 @@ class WorkIndexerTest
       withLocalElasticsearchIndex { indexName =>
         withWorkIndexer { workIndexer =>
           val identifiedWorkInsertFuture = for {
-            _ <- workIndexer.indexWorks(
-              works = List(redirectedWork),
-              indexName = indexName,
-              documentType = documentType
-            )
-            result <- workIndexer.indexWorks(
-              works = List(identifiedWork),
-              indexName = indexName,
-              documentType = documentType
-            )
+            _ <- indexWork(redirectedWork, indexName, workIndexer)
+            result <- indexWork(identifiedWork, indexName, workIndexer)
           } yield result
           whenReady(identifiedWorkInsertFuture) { result =>
-            // Give Elasticsearch enough time to ingest the work
-            Thread.sleep(700)
-            result.right.get should contain(identifiedWork)
-
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              redirectedWork)
+            assertIngestedWorkIs(result = result, ingestedWork = redirectedWork, indexName = indexName)
           }
         }
       }
     }
-    it("override a identified Work with invisible work with higher version") {
+    it("overrides a identified Work with invisible work with higher version") {
       val work = createIdentifiedWorkWith(version = 3)
       val invisibleWork = createIdentifiedInvisibleWorkWith(
         canonicalId = work.canonicalId,
@@ -227,59 +172,16 @@ class WorkIndexerTest
       withLocalElasticsearchIndex { indexName =>
         withWorkIndexer { workIndexer =>
           val invisibleWorkInsertFuture = for {
-            _ <- workIndexer.indexWorks(
-              works = List(work),
-              indexName = indexName,
-              documentType = documentType
-            )
-            result <- workIndexer.indexWorks(
-              works = List(invisibleWork),
-              indexName = indexName,
-              documentType = documentType
-            )
+            _ <- indexWork(work, indexName, workIndexer)
+            result <- indexWork(invisibleWork, indexName, workIndexer)
           } yield result
           whenReady(invisibleWorkInsertFuture) { result =>
-            // Give Elasticsearch enough time to ingest the work
-            Thread.sleep(700)
-            result.right.get should contain(invisibleWork)
-
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              invisibleWork)
+            assertIngestedWorkIs(result = result, ingestedWork = invisibleWork, indexName = indexName)
           }
         }
       }
     }
 
-  }
-
-  it("replaces a Work with the same version") {
-    val work = createIdentifiedWorkWith(version = 3)
-    val updatedWork = work.copy(title = "a different title")
-
-    withLocalElasticsearchIndex { indexName =>
-      withWorkIndexer { workIndexer =>
-        val future = for {
-          _ <- workIndexer.indexWorks(
-            works = List(work),
-            indexName = indexName,
-            documentType = documentType
-          )
-          result <- workIndexer.indexWorks(
-            works = List(updatedWork),
-            indexName = indexName,
-            documentType = documentType
-          )
-        } yield result
-
-        whenReady(future) { result =>
-          result.right.get should contain(updatedWork)
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            updatedWork)
-        }
-      }
-    }
   }
 
   it("inserts a list of works into elasticsearch and returns them") {
@@ -338,5 +240,18 @@ class WorkIndexerTest
   private def withWorkIndexer[R](testWith: TestWith[WorkIndexer, R]): R = {
     val workIndexer = new WorkIndexer(elasticClient = elasticClient)
     testWith(workIndexer)
+  }
+
+  private def indexWork(work: IdentifiedBaseWork, indexName: String, workIndexer: WorkIndexer) = {
+    workIndexer.indexWorks(
+      works = List(work),
+      indexName = indexName,
+      documentType = documentType
+    )
+  }
+
+  private def assertIngestedWorkIs(result: Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]], ingestedWork: IdentifiedBaseWork, indexName: String) = {
+    result.isRight shouldBe true
+    assertElasticsearchEventuallyHasWork(indexName = indexName, ingestedWork)
   }
 }
