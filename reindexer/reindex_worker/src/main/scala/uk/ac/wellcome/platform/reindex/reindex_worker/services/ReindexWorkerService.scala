@@ -6,7 +6,7 @@ import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
   ReindexJob,
-  ReindexParameters
+  ReindexRequest
 }
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -23,10 +23,10 @@ class ReindexWorkerService(
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexParameters: ReindexParameters <- Future.fromTry(
-        fromJson[ReindexParameters](message.body))
+      reindexRequest: ReindexRequest <- Future.fromTry(
+        fromJson[ReindexRequest](message.body))
       reindexJob = ReindexJob(
-        parameters = reindexParameters,
+        parameters = reindexRequest.parameters,
         dynamoConfig = dynamoConfig,
         snsConfig = snsConfig
       )

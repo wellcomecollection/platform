@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.models
 
-/** This is the request received from a caller who wants to trigger a reindexer.
+/** The main interface to the reindexer.
+  *
+  * It receives JSON-encoded instances of this case class from SNS, and uses
+  * them to decide what sort of reindex to run.
   *
   * @param id The name of the reindex to run, e.g. "miro--reporting" or "sierra--catalogue".
   * @param parameters Parameters for the reindex.

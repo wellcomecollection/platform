@@ -7,10 +7,10 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.WorkerServiceFixture
+import uk.ac.wellcome.platform.reindex.reindex_worker.generators.ReindexRequestGenerators
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
   CompleteReindexParameters,
-  PartialReindexParameters,
-  ReindexParameters
+  PartialReindexParameters
 }
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
@@ -24,6 +24,7 @@ class ReindexWorkerFeatureTest
     with Eventually
     with IntegrationPatience
     with LocalDynamoDbVersioned
+    with ReindexRequestGenerators
     with SNS
     with SQS
     with ScalaFutures
@@ -60,9 +61,9 @@ class ReindexWorkerFeatureTest
             val reindexParameters =
               CompleteReindexParameters(segment = 0, totalSegments = 1)
 
-            sendNotificationToSQS[ReindexParameters](
+            sendNotificationToSQS(
               queue = queue,
-              message = reindexParameters
+              message = createReindexRequest(reindexParameters)
             )
 
             eventually {
@@ -89,9 +90,9 @@ class ReindexWorkerFeatureTest
 
             val reindexParameters = PartialReindexParameters(maxRecords = 1)
 
-            sendNotificationToSQS[ReindexParameters](
+            sendNotificationToSQS(
               queue = queue,
-              message = reindexParameters
+              message = createReindexRequest(reindexParameters)
             )
 
             eventually {
@@ -144,12 +145,14 @@ class ReindexWorkerFeatureTest
         }
         withLocalSnsTopic { topic =>
           withWorkerService(queue, table, topic) { _ =>
-            val reindexParameters =
-              CompleteReindexParameters(segment = 0, totalSegments = 1)
+            val reindexParameters = CompleteReindexParameters(
+              segment = 0,
+              totalSegments = 1
+            )
 
-            sendNotificationToSQS[ReindexParameters](
+            sendNotificationToSQS(
               queue = queue,
-              message = reindexParameters
+              message = createReindexRequest(reindexParameters)
             )
 
             eventually {
