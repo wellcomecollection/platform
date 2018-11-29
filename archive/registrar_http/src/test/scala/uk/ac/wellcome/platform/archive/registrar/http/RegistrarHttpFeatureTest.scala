@@ -16,8 +16,6 @@ import uk.ac.wellcome.platform.archive.display.{DisplayLocation, DisplayProvider
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
-import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
 class RegistrarHttpFeatureTest
     extends FunSpec
@@ -54,11 +52,8 @@ class RegistrarHttpFeatureTest
               path = path
             )
 
-            val putResult = vhs.updateRecord(
-              s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
-              ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
-              (_, _) => fail("vhs should have been empty!"))
-            whenReady(putResult) { _ =>
+            val future = storeSingleManifest(vhs, storageManifest)
+            whenReady(future) { _ =>
               val request = HttpRequest(
                 GET,
                 s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
@@ -127,11 +122,8 @@ class RegistrarHttpFeatureTest
           withMaterializer(actorSystem) { implicit actorMaterializer =>
             val storageManifest = createStorageManifest
 
-            val putResult = vhs.updateRecord(
-              s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
-              ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
-              (_, _) => fail("vhs should have been empty!"))
-            whenReady(putResult) { _ =>
+            val future = storeSingleManifest(vhs, storageManifest)
+            whenReady(future) { _ =>
               val request = HttpRequest(
                 GET,
                 s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
