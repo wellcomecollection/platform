@@ -23,7 +23,7 @@ class StorageManifestFactoryTest
   it("returns a right of storage manifest if reading a bag location succeeds") {
     val storageSpace = randomStorageSpace
     withLocalS3Bucket { bucket =>
-      withBag(bucket) { case (bagLocation, bagInfo, _) =>
+      withBag(bucket) { case (bagLocation, bagInfo) =>
         val archiveComplete = createArchiveCompleteWith(
           space = storageSpace,
           bagLocation = bagLocation
@@ -83,7 +83,7 @@ class StorageManifestFactoryTest
           bucket,
           createDataManifest =
             _ => Some(FileEntry("manifest-sha256.txt", "bleeergh!"))) {
-          case (bagLocation, _, _) =>
+          case (bagLocation, _) =>
             val archiveComplete = createArchiveCompleteWith(
               bagLocation = bagLocation
             )
@@ -100,7 +100,7 @@ class StorageManifestFactoryTest
           bucket,
           createTagManifest =
             _ => Some(FileEntry("tagmanifest-sha256.txt", "blaaargh!"))) {
-          case (bagLocation, _, _) =>
+          case (bagLocation, _) =>
             val archiveComplete = createArchiveCompleteWith(
               bagLocation = bagLocation
             )
