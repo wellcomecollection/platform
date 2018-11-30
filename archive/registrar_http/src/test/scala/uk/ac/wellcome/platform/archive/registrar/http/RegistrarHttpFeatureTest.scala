@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archive.registrar.http
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
-import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.scaladsl.Sink
 import io.circe.optics.JsonPath._
@@ -162,14 +161,12 @@ class RegistrarHttpFeatureTest
         case (_, baseUrl) =>
           withActorSystem { implicit actorSystem =>
             val bagId = randomBagId
-            val request = Http().singleRequest(
-              HttpRequest(
-                GET,
-                s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}")
-            )
+            val request = HttpRequest(
+              GET,
+              s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}")
 
-            whenReady(request) { result: HttpResponse =>
-              result.status shouldBe StatusCodes.NotFound
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.NotFound
             }
           }
       }

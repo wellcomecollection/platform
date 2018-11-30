@@ -97,11 +97,11 @@ trait ProgressHttpFixture
     fromJson[T](stringBody).get
   }
 
-  def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]) =
+  def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]): R =
     withActorSystem { implicit actorSystem =>
       val request = Http().singleRequest(r)
-      whenReady(request) { result =>
-        testWith(result)
+      whenReady(request) { (response: HttpResponse) =>
+        testWith(response)
       }
     }
 }

@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archive.progress_http
 import java.time.Instant
 import java.util.UUID
 
-import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.scaladsl.Sink
@@ -108,13 +107,10 @@ class ProgressHttpFeatureTest
       withConfiguredApp { case (_, _, baseUrl) =>
         withActorSystem { implicit actorSystem =>
           val uuid = randomUUID
+          val request = HttpRequest(GET, s"$baseUrl/progress/$uuid")
 
-          val request = Http().singleRequest(
-            HttpRequest(GET, s"$baseUrl/progress/$uuid")
-          )
-
-          whenReady(request) { result: HttpResponse =>
-            result.status shouldBe StatusCodes.NotFound
+          whenRequestReady(request) { response: HttpResponse =>
+            response shouldBe StatusCodes.NotFound
           }
         }
       }
@@ -147,21 +143,19 @@ class ProgressHttpFeatureTest
               toJson(createProgressRequest).get
             )
 
-            val httpRequest = HttpRequest(
+            val request = HttpRequest(
               method = POST,
               uri = url,
               headers = Nil,
               entity = entity
             )
 
-            val request = Http().singleRequest(httpRequest)
-
             val expectedLocationR = s"$baseUrl/(.+)".r
 
-            whenReady(request) { result: HttpResponse =>
-              result.status shouldBe StatusCodes.Created
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.Created
 
-              val maybeId = result.headers.collectFirst {
+              val maybeId = response.headers.collectFirst {
                 case HttpHeader("location", expectedLocationR(id)) => id
               }
 
@@ -169,7 +163,7 @@ class ProgressHttpFeatureTest
               val id = UUID.fromString(maybeId.get)
 
               val progressFuture =
-                Unmarshal(result.entity).to[ResponseDisplayIngest]
+                Unmarshal(response.entity).to[ResponseDisplayIngest]
 
               whenReady(progressFuture) { actualProgress =>
                 inside(actualProgress) {
