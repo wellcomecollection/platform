@@ -32,15 +32,13 @@ trait ProgressTrackerFixture
     testWith(progressTracker)
   }
 
-  def assertProgressCreated(id: UUID,
-                            expectedStorageLocation: StorageLocation,
-                            table: Table): Progress = {
-    val progress = getExistingTableItem[Progress](id.toString, table)
-    progress.sourceLocation shouldBe expectedStorageLocation
+  def assertProgressCreated(progress: Progress, table: Table): Progress = {
+    val storedProgress = getExistingTableItem[Progress](progress.id.toString, table)
+    storedProgress.sourceLocation shouldBe progress.sourceLocation
 
-    assertRecent(progress.createdDate, recentSeconds = 45)
-    assertRecent(progress.lastModifiedDate, recentSeconds = 45)
-    progress
+    assertRecent(storedProgress.createdDate, recentSeconds = 45)
+    assertRecent(storedProgress.lastModifiedDate, recentSeconds = 45)
+    storedProgress
   }
 
   def assertProgressRecordedRecentEvents(id: UUID,

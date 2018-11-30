@@ -46,21 +46,18 @@ class ProgressTrackerTest
     it("only allows the creation of one progress monitor for a given id") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
-          val id = randomUUID
+          val progress = createProgress
 
-          val monitors = List(
-            createProgressWith(id = id, sourceLocation = storageLocation),
-            createProgressWith(id = id, sourceLocation = storageLocation)
-          )
+          val monitors = List(progress, progress)
 
           val result = Future.sequence(monitors.map(progressTracker.initialise))
           whenReady(result.failed) { failedException =>
 
             failedException shouldBe a[IdConstraintError]
             failedException.getMessage should include(
-              s"There is already a progress tracker with id:$id")
+              s"There is already a progress tracker with id:${progress.id}")
 
-            assertProgressCreated(id, storageLocation, table)
+            assertProgressCreated(progress, table)
           }
         }
 
@@ -142,7 +139,7 @@ class ProgressTrackerTest
 
             progressTracker.update(progressUpdate)
 
-            assertProgressCreated(progress.id, progress.sourceLocation, table)
+            assertProgressCreated(progress, table)
 
             assertProgressRecordedRecentEvents(
               progressUpdate.id,
@@ -167,8 +164,7 @@ class ProgressTrackerTest
 
             progressTracker.update(progressUpdate)
 
-            val actualProgress =
-              assertProgressCreated(progress.id, progress.sourceLocation, table)
+            val actualProgress = assertProgressCreated(progress, table)
 
             actualProgress.status shouldBe Progress.Completed
             actualProgress.bag shouldBe someBagId
@@ -194,8 +190,7 @@ class ProgressTrackerTest
 
             progressTracker.update(progressUpdate)
 
-            val actualProgress =
-              assertProgressCreated(progress.id, progress.sourceLocation, table)
+            val actualProgress = assertProgressCreated(progress, table)
 
             actualProgress.callback shouldBe defined
             actualProgress.callback.get.status shouldBe Callback.Succeeded
@@ -220,7 +215,7 @@ class ProgressTrackerTest
 
             progressTracker.update(progressUpdate)
 
-            assertProgressCreated(progress.id, progress.sourceLocation, table)
+            assertProgressCreated(progress, table)
 
             assertProgressRecordedRecentEvents(
               progressUpdate.id,
@@ -242,7 +237,7 @@ class ProgressTrackerTest
 
             updates.foreach(progressTracker.update(_))
 
-            assertProgressCreated(progress.id, progress.sourceLocation, table)
+            assertProgressCreated(progress, table)
 
             assertProgressRecordedRecentEvents(
               progress.id,
