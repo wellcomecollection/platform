@@ -28,7 +28,7 @@ class ProgressTrackerTest
     it("creates a progress monitor") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
-          val futureProgress = progressTracker.initialise(createProgress())
+          val futureProgress = progressTracker.initialise(createProgress)
 
           whenReady(futureProgress) { progress =>
             assertTableOnlyHasItem(progress, table)
@@ -69,7 +69,7 @@ class ProgressTrackerTest
           .thenThrow(expectedException)
 
         withProgressTracker(table, dynamoDbClient = mockDynamoDbClient) { progressTracker =>
-          val progress = createProgress()
+          val progress = createProgress
 
           val result = progressTracker.initialise(progress)
           whenReady(result.failed) { failedException =>
@@ -85,7 +85,7 @@ class ProgressTrackerTest
     it("retrieves progress by id") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
-          whenReady(progressTracker.initialise(createProgress())) { progress=>
+          whenReady(progressTracker.initialise(createProgress)) { progress =>
             assertTableOnlyHasItem[Progress](progress, table)
 
             whenReady(progressTracker.get(progress.id)) { result =>
@@ -127,7 +127,7 @@ class ProgressTrackerTest
     it("adds a single event to a monitor with no events") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
-          whenReady(progressTracker.initialise(createProgress())) { progress =>
+          whenReady(progressTracker.initialise(createProgress)) { progress =>
 
             val progressUpdate = ProgressEventUpdate(
               progress.id,
@@ -150,7 +150,7 @@ class ProgressTrackerTest
     it("adds a status update to a monitor with no events") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
-          whenReady(progressTracker.initialise(createProgress())) { progress =>
+          whenReady(progressTracker.initialise(createProgress)) { progress =>
             val someBagId = Some(randomBagId)
             val progressUpdate = ProgressStatusUpdate(
               progress.id,
@@ -179,7 +179,7 @@ class ProgressTrackerTest
     it("adds a callback status update to a monitor with no events") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
-          whenReady(progressTracker.initialise(createProgress())) { progress =>
+          whenReady(progressTracker.initialise(createProgress)) { progress =>
             val progressUpdate = ProgressCallbackStatusUpdate(
               progress.id,
               Callback.Succeeded,
@@ -206,7 +206,7 @@ class ProgressTrackerTest
     it("adds an update with multiple events") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
-          whenReady(progressTracker.initialise(createProgress())) { progress =>
+          whenReady(progressTracker.initialise(createProgress)) { progress =>
             val progressUpdate = ProgressEventUpdate(
               progress.id,
               List(createProgressEvent, createProgressEvent)
@@ -228,7 +228,7 @@ class ProgressTrackerTest
     it("adds multiple events to a monitor") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
-          whenReady(progressTracker.initialise(createProgress())) { progress =>
+          whenReady(progressTracker.initialise(createProgress)) { progress =>
             val updates = List(
               createProgressEventUpdateWith(progress.id),
               createProgressEventUpdateWith(progress.id)

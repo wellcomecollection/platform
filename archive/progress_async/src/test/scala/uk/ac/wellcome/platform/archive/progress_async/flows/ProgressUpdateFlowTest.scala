@@ -34,7 +34,7 @@ class ProgressUpdateFlowTest
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
-              val progress = createProgress()
+              val progress = createProgress
               whenReady(monitor.initialise(progress)) {
                 _ =>
                   val update =

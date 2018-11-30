@@ -31,7 +31,7 @@ class ProgressStarterTest
           withProgressTracker(table) { progressTracker =>
             val progressStarter =
               new ProgressStarter(progressTracker, writer)
-            val progress = createProgress()
+            val progress = createProgress
 
             whenReady(progressStarter.initialise(progress)) { p =>
               p shouldBe progress

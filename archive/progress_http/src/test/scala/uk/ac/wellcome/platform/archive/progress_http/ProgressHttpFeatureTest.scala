@@ -45,7 +45,7 @@ class ProgressHttpFeatureTest
           withActorSystem { actorSystem =>
             withMaterializer(actorSystem) { implicit materialiser =>
               withProgressTracker(table) { progressTracker =>
-                val progress = createProgress()
+                val progress = createProgress
                 whenReady(progressTracker.initialise(progress)) { _ =>
                   val request =
                     HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
