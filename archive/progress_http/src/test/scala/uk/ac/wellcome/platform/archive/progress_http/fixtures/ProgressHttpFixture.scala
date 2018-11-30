@@ -16,8 +16,6 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.ProgressHTTP
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
@@ -35,15 +33,6 @@ trait ProgressHttpFixture
     with ProgressGenerators
     with SNS
     with Messaging {
-
-  def withProgress[R](monitor: ProgressTracker)(
-    testWith: TestWith[Progress, R]): R = {
-    val createdProgress = createProgress
-
-    whenReady(monitor.initialise(createdProgress)) { storedProgress =>
-      testWith(storedProgress)
-    }
-  }
 
   def withApp[R](table: Table,
                  topic: Topic,
