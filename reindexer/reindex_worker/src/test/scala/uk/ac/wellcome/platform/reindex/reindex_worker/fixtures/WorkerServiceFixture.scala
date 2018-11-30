@@ -4,7 +4,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{ReindexJobConfig, ReindexParameters, ReindexRequest}
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{CompleteReindexParameters, ReindexJobConfig, ReindexParameters, ReindexRequest}
 import uk.ac.wellcome.platform.reindex.reindex_worker.services.ReindexWorkerService
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -50,11 +50,19 @@ trait WorkerServiceFixture
       testWith(service)
     }
 
+  private val defaultParameters = CompleteReindexParameters(
+    segment = 0,
+    totalSegments = 1
+  )
+
   def createReindexRequestWith(
     jobConfigId: String = defaultJobConfigId,
-    parameters: ReindexParameters): ReindexRequest =
+    parameters: ReindexParameters = defaultParameters): ReindexRequest =
     ReindexRequest(
       jobConfigId = jobConfigId,
+
       parameters = parameters
     )
+
+  def createReindexRequest: ReindexRequest = createReindexRequestWith()
 }

@@ -43,33 +43,36 @@ class ReindexWorkerServiceTest
   it("completes a reindex") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withLocalSqsQueueAndDlq {
-          case QueuePair(queue, dlq) =>
-            withWorkerService(queue, table, topic) { _ =>
-              val reindexParameters = CompleteReindexParameters(
-                segment = 0,
-                totalSegments = 1
-              )
+        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+          withWorkerService(queue, table, topic) { _ =>
+            val reindexParameters = CompleteReindexParameters(
+              segment = 0,
+              totalSegments = 1
+            )
 
-              Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
+            Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
 
-              sendNotificationToSQS(
-                queue = queue,
-                message = createReindexRequestWith(parameters = reindexParameters)
-              )
+            sendNotificationToSQS(
+              queue = queue,
+              message = createReindexRequestWith(parameters = reindexParameters)
+            )
 
-              eventually {
-                val actualRecords: Seq[HybridRecord] =
-                  listMessagesReceivedFromSNS(topic)
-                    .map { _.message }
-                    .map { fromJson[HybridRecord](_).get }
-                    .distinct
+            eventually {
+              val actualRecords: Seq[HybridRecord] =
+                listMessagesReceivedFromSNS(topic)
+                  .map {
+                    _.message
+                  }
+                  .map {
+                    fromJson[HybridRecord](_).get
+                  }
+                  .distinct
 
-                actualRecords shouldBe List(exampleRecord)
-                assertQueueEmpty(queue)
-                assertQueueEmpty(dlq)
-              }
+              actualRecords shouldBe List(exampleRecord)
+              assertQueueEmpty(queue)
+              assertQueueEmpty(dlq)
             }
+          }
         }
       }
     }
@@ -100,24 +103,15 @@ class ReindexWorkerServiceTest
     val badTable = Table(name = "doesnotexist", index = "whatindex")
     val badTopic = Topic("does-not-exist")
 
-    withLocalSqsQueueAndDlq {
-      case QueuePair(queue, dlq) =>
-        withWorkerService(queue, badTable, badTopic) { _ =>
-          val reindexParameters = CompleteReindexParameters(
-            segment = 5,
-            totalSegments = 10
-          )
+    withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+      withWorkerService(queue, badTable, badTopic) { _ =>
+        sendNotificationToSQS(queue = queue, message = createReindexRequest)
 
-          sendNotificationToSQS(
-            queue = queue,
-            message = createReindexRequestWith(parameters = reindexParameters)
-          )
-
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
-          }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
         }
+      }
     }
   }
 }
