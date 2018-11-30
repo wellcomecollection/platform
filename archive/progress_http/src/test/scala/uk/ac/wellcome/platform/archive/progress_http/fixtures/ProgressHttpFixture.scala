@@ -108,7 +108,7 @@ trait ProgressHttpFixture
     )
 
     withLocalSnsTopic { topic =>
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withApp(table, topic, httpServerConfig, contextURL) { progressHttp =>
           testWith((table, topic, externalBaseURL, progressHttp))
         }

@@ -16,6 +16,7 @@ trait ProgressTrackerFixture
     with RandomThings
     with ProgressGenerators
     with TimeTestFixture {
+  def createTable(table: LocalDynamoDb.Table): Table = Table("table", "index")
 
   def withProgressTracker[R](table: Table)(
     testWith: TestWith[ProgressTracker, R]): R = {

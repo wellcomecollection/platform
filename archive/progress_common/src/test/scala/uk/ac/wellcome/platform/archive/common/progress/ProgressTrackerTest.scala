@@ -29,7 +29,7 @@ class ProgressTrackerTest
 
   describe("create") {
     it("creates a progress monitor") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           val futureProgress = progressTracker.initialise(createProgress())
 
@@ -41,7 +41,7 @@ class ProgressTrackerTest
     }
 
     it("only allows the creation of one progress monitor for a given id") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           val id = randomUUID
 
@@ -65,7 +65,7 @@ class ProgressTrackerTest
     }
 
     it("throws if put to dynamo fails during creation") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         val mockDynamoDbClient = mock[AmazonDynamoDB]
         val expectedException = new RuntimeException("root cause")
         when(mockDynamoDbClient.putItem(any[PutItemRequest]))
@@ -89,7 +89,7 @@ class ProgressTrackerTest
 
   describe("read") {
     it("retrieves progress by id") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress())) { progress=>
             assertTableOnlyHasItem[Progress](progress, table)
@@ -104,7 +104,7 @@ class ProgressTrackerTest
     }
 
     it("returns None when no progress monitor matches id") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.get(randomUUID)) { result =>
             result shouldBe None
@@ -114,7 +114,7 @@ class ProgressTrackerTest
     }
 
     it("throws when it encounters an error") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         val mockDynamoDbClient = mock[AmazonDynamoDB]
         val expectedException = new RuntimeException("root cause")
         when(mockDynamoDbClient.getItem(any[GetItemRequest]))
@@ -134,7 +134,7 @@ class ProgressTrackerTest
 
   describe("update") {
     it("adds a single event to a monitor with no events") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress())) { progress =>
 
@@ -157,7 +157,7 @@ class ProgressTrackerTest
     }
 
     it("adds a status update to a monitor with no events") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress())) { progress =>
             val someBagId = Some(randomBagId)
@@ -186,7 +186,7 @@ class ProgressTrackerTest
     }
 
     it("adds a callback status update to a monitor with no events") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress())) { progress =>
             val progressUpdate = ProgressCallbackStatusUpdate(
@@ -213,7 +213,7 @@ class ProgressTrackerTest
     }
 
     it("adds an update with multiple events") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress())) { progress =>
             val progressUpdate = ProgressEventUpdate(
@@ -235,7 +235,7 @@ class ProgressTrackerTest
     }
 
     it("adds multiple events to a monitor") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress())) { progress =>
             val updates = List(
@@ -257,7 +257,7 @@ class ProgressTrackerTest
     }
 
     it("throws if put to dynamo fails when adding an event") {
-      withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      withProgressTrackerTable { table =>
         val mockDynamoDbClient = mock[AmazonDynamoDB]
 
         val expectedException = new RuntimeException("root cause")

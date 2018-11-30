@@ -27,7 +27,7 @@ class ProgressStarterTest
   it("saves a progress to the database and sends a ingest bag request to sns") {
     withLocalSnsTopic { topic =>
       withSNSWriter(topic) { writer =>
-        withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+        withProgressTrackerTable { table =>
           withProgressTracker(table) { progressTracker =>
             val progressStarter =
               new ProgressStarter(progressTracker, writer)
