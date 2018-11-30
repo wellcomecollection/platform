@@ -2,14 +2,13 @@ package uk.ac.wellcome.platform.archive.registrar.http.fixtures
 
 import java.net.URL
 
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.HttpEntity
 import akka.stream.Materializer
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 import uk.ac.wellcome.platform.archive.registrar.http.RegistrarHTTP
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -23,6 +22,7 @@ trait RegistrarHttpFixture
     extends RandomThings
     with ScalaFutures
     with StorageManifestVHSFixture
+    with HttpFixtures
     with Akka {
 
   def withApp[R](table: Table,
@@ -77,7 +77,7 @@ trait RegistrarHttpFixture
   }
 
   def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T],
-                                  materializer: Materializer) = {
+                                  materializer: Materializer): T = {
     val timeout = 300.millis
 
     val stringBody = entity
@@ -89,12 +89,4 @@ trait RegistrarHttpFixture
       .get
     fromJson[T](stringBody).get
   }
-
-  def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]) =
-    withActorSystem { implicit actorSystem =>
-      val request = Http().singleRequest(r)
-      whenReady(request) { result =>
-        testWith(result)
-      }
-    }
 }
