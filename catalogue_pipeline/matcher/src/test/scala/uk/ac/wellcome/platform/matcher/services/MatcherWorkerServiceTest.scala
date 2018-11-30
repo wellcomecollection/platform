@@ -1,16 +1,12 @@
 package uk.ac.wellcome.platform.matcher.services
 
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -346,14 +342,10 @@ class MatcherWorkerServiceTest
 
   private def assertLastMatchedResultIs(
     topic: Topic,
-    expectedMatcherResult: MatcherResult) = {
+    expectedMatcherResult: MatcherResult): Assertion = {
+    val matcherResults = listObjectsReceivedFromSNS[MatcherResult](topic)
+    matcherResults.size should be >= 1
 
-    val snsMessages = listMessagesReceivedFromSNS(topic)
-    snsMessages.size should be >= 1
-
-    val actualMatcherResults = snsMessages.map { snsMessage =>
-      fromJson[MatcherResult](snsMessage.message).get
-    }
-    actualMatcherResults.last shouldBe expectedMatcherResult
+    matcherResults.last shouldBe expectedMatcherResult
   }
 }

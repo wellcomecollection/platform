@@ -68,10 +68,7 @@ class ReindexWorkerFeatureTest
 
             eventually {
               val actualRecords: Seq[HybridRecord] =
-                listMessagesReceivedFromSNS(topic)
-                  .map { _.message }
-                  .map { fromJson[HybridRecord](_).get }
-                  .distinct
+                listObjectsReceivedFromSNS[HybridRecord](topic).distinct
 
               actualRecords should contain theSameElementsAs testRecords
             }
@@ -97,10 +94,7 @@ class ReindexWorkerFeatureTest
 
             eventually {
               val actualRecords: Seq[HybridRecord] =
-                listMessagesReceivedFromSNS(topic)
-                  .map { _.message }
-                  .map { fromJson[HybridRecord](_).get }
-                  .distinct
+                listObjectsReceivedFromSNS[HybridRecord](topic).distinct
 
               actualRecords should have length 1
               actualRecords should contain theSameElementsAs List(

@@ -68,9 +68,6 @@ class SierraTransformerFeatureTest
 
             withWorkerService(topic, messagingBucket, queue) { _ =>
               eventually {
-                val snsMessages = listMessagesReceivedFromSNS(topic)
-                snsMessages.size should be >= 1
-
                 val sourceIdentifier = createSierraSystemSourceIdentifierWith(
                   value = id.withCheckDigit
                 )
@@ -81,7 +78,7 @@ class SierraTransformerFeatureTest
                   )
 
                 val works = getMessages[UnidentifiedWork](topic)
-                works.length shouldBe >=(1)
+                works.length should be >= 1
 
                 works.map { actualWork =>
                   actualWork.sourceIdentifier shouldBe sourceIdentifier

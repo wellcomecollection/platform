@@ -33,18 +33,16 @@ class MatcherFeatureTest
           sendMessage[TransformedBaseWork](queue = queue, work)
 
           eventually {
-            val snsMessages = listMessagesReceivedFromSNS(topic)
-            snsMessages.size should be >= 1
+            val matcherResults = listObjectsReceivedFromSNS[MatcherResult](topic)
+            matcherResults.size should be >= 1
 
-            snsMessages.map { snsMessage =>
-              val identifiersList =
-                fromJson[MatcherResult](snsMessage.message).get
-
+            matcherResults.map { identifiersList =>
               identifiersList shouldBe
                 MatcherResult(
                   Set(MatchedIdentifiers(
                     Set(WorkIdentifier(work))
-                  )))
+                  ))
+                )
             }
           }
         }

@@ -1,4 +1,5 @@
 package uk.ac.wellcome.platform.archive.common.progress
+
 import java.util.UUID
 
 import grizzled.slf4j.Logging
@@ -11,16 +12,14 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
 import scala.util.Try
 
 trait ProgressUpdateAssertions extends SNS with Inside with Logging {
-  def assertTopicReceivesProgressStatusUpdate[R](requestId: UUID,
-                                                 progressTopic: SNS.Topic,
-                                                 status: Progress.Status,
-                                                 expectedBag: Option[BagId] =
-                                                   None)(
-    assert: Seq[ProgressEvent] => R): Assertion = {
-    val messages = listMessagesReceivedFromSNS(progressTopic)
-    val progressUpdates = messages.map { messageinfo =>
-      fromJson[ProgressUpdate](messageinfo.message).get
-    }.distinct
+  def assertTopicReceivesProgressStatusUpdate(
+    requestId: UUID,
+    progressTopic: SNS.Topic,
+    status: Progress.Status,
+    expectedBag: Option[BagId] = None)(
+    assert: Seq[ProgressEvent] => Assertion): Assertion = {
+    val progressUpdates =
+      listObjectsReceivedFromSNS[ProgressUpdate](progressTopic).distinct
     progressUpdates.size should be > 0
 
     val (success, failure) = progressUpdates
@@ -41,10 +40,8 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
   def assertTopicReceivesProgressEventUpdate(requestId: UUID,
                                              progressTopic: SNS.Topic)(
     assert: Seq[ProgressEvent] => Assertion): Assertion = {
-    val messages = listMessagesReceivedFromSNS(progressTopic)
-    val progressUpdates = messages.map { messageinfo =>
-      fromJson[ProgressUpdate](messageinfo.message).get
-    }
+    val progressUpdates =
+      listObjectsReceivedFromSNS[ProgressUpdate](progressTopic).distinct
     progressUpdates.size should be > 0
 
     val (success, failure) = progressUpdates

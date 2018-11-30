@@ -40,8 +40,7 @@ class ProgressStarterTest
             assertTableOnlyHasItem(progress, table)
 
             val requests =
-              listMessagesReceivedFromSNS(topic).map(messageInfo =>
-                fromJson[IngestBagRequest](messageInfo.message).get)
+              listObjectsReceivedFromSNS[IngestBagRequest](topic)
 
             requests shouldBe List(IngestBagRequest(
               p.id,

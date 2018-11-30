@@ -206,8 +206,7 @@ class ProgressHttpFeatureTest
                   }
 
                   val requests =
-                    listMessagesReceivedFromSNS(topic).map(messageInfo =>
-                      fromJson[IngestBagRequest](messageInfo.message).get)
+                    listObjectsReceivedFromSNS[IngestBagRequest](topic)
 
                   requests shouldBe List(
                     IngestBagRequest(

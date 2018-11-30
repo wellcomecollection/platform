@@ -3,7 +3,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import io.circe.generic.extras.JsonKey
-import io.circe.{yaml, Decoder, Json, ParsingFailure}
+import io.circe.{Decoder, Json, ParsingFailure, yaml}
 import org.scalatest.Matchers
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{
@@ -140,6 +140,10 @@ trait SNS extends Matchers with Logging {
         _.topicArn == topic.arn
       }
   }
+
+  def listObjectsReceivedFromSNS[T](topic: Topic)(implicit decoder: Decoder[T]): Seq[T] =
+    listMessagesReceivedFromSNS(topic)
+      .map { messageInfo: MessageInfo => fromJson[T](messageInfo.message).get }
 
   def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic)(
     implicit decoderT: Decoder[T]) = {

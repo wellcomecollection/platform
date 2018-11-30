@@ -2,7 +2,7 @@ package uk.ac.wellcome.sierra_adapter.utils
 
 import io.circe.Decoder
 import org.scalatest.Assertion
-import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging}
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
@@ -76,9 +76,7 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       hybridRecord.location.key)
     storedTransformable shouldBe t
 
-    listMessagesReceivedFromSNS(topic).map { info: MessageInfo =>
-      fromJson[HybridRecord](info.message).get
-    } should contain(hybridRecord)
+    listObjectsReceivedFromSNS[HybridRecord](topic) should contain(hybridRecord)
   }
 
   def assertStoredAndSent(transformable: SierraTransformable,

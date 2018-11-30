@@ -91,17 +91,15 @@ class SnapshotGeneratorFeatureTest
               assertJsonStringsAreEqual(actualLine, expectedLine)
           }
 
-          val receivedMessages = listMessagesReceivedFromSNS(topic)
-          receivedMessages.size should be >= 1
+          val receivedJobs = listObjectsReceivedFromSNS[CompletedSnapshotJob](topic)
+          receivedJobs.size should be >= 1
 
           val expectedJob = CompletedSnapshotJob(
             snapshotJob = snapshotJob,
             targetLocation =
               s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
           )
-          val actualJob =
-            fromJson[CompletedSnapshotJob](receivedMessages.head.message).get
-          actualJob shouldBe expectedJob
+          receivedJobs.head shouldBe expectedJob
         }
     }
 

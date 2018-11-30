@@ -186,13 +186,10 @@ class MessageWriterTest
 
             whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) {
               _ =>
-                val messages = listMessagesReceivedFromSNS(topic)
-                messages should have size (2)
+                val notifications = listObjectsReceivedFromSNS[MessageNotification](topic)
+                notifications should have size 2
 
-                val locations = messages
-                  .map { msg =>
-                    fromJson[MessageNotification](msg.message).get
-                  }
+                val locations = notifications
                   .map { _.asInstanceOf[RemoteNotification] }
                   .map { _.location }
 
