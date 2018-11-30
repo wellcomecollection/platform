@@ -1,12 +1,10 @@
 package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
-import java.net.URI
 import java.util.UUID
 
-import com.gu.scanamo.error.DynamoReadError
 import org.scalatest.Assertion
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress, StorageLocation}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, StorageLocation}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -29,17 +27,6 @@ trait ProgressTrackerFixture
       dynamoConfig = createDynamoConfigWith(table)
     )
     testWith(progressTracker)
-  }
-
-  def givenProgressRecord(
-    id: UUID,
-    storageLocation: StorageLocation,
-    space: Namespace,
-    maybeCallbackUri: Option[URI],
-    table: Table): Option[Either[DynamoReadError, Progress]] = {
-    givenTableHasItem(
-      Progress(id, storageLocation, space, Callback(maybeCallbackUri)),
-      table)
   }
 
   def assertProgressCreated(id: UUID,
