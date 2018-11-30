@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
 import java.util.UUID
 
-import org.scalatest.Assertion
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, StorageLocation}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
@@ -17,8 +16,6 @@ trait ProgressTrackerFixture
     with RandomThings
     with ProgressGenerators
     with TimeTestFixture {
-
-  import Progress._
 
   def withProgressTracker[R](table: Table)(
     testWith: TestWith[ProgressTracker, R]): R = {
@@ -50,13 +47,5 @@ trait ProgressTrackerFixture
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
     progress.events.foreach(event =>
       assertRecent(event.createdDate, recentSeconds))
-  }
-
-  def assertProgressStatus(id: UUID,
-                           expectedStatus: Status,
-                           table: LocalDynamoDb.Table): Assertion = {
-    val progress = getExistingTableItem[Progress](id.toString, table)
-
-    progress.status shouldBe expectedStatus
   }
 }
