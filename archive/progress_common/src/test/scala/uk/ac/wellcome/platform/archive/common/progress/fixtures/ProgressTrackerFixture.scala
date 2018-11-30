@@ -21,14 +21,14 @@ trait ProgressTrackerFixture
     with RandomThings
     with ProgressGenerators
     with TimeTestFixture {
-  import uk.ac.wellcome.storage.dynamo._
+
   import Progress._
 
   def withProgressTracker[R](table: Table)(
     testWith: TestWith[ProgressTracker, R]): R = {
     val progressTracker = new ProgressTracker(
-      dynamoDbClient,
-      DynamoConfig(table = table.name, index = table.index)
+      dynamoClient = dynamoDbClient,
+      dynamoConfig = createDynamoConfigWith(table)
     )
     testWith(progressTracker)
   }
