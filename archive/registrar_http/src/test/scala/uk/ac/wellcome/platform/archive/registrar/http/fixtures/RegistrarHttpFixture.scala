@@ -14,8 +14,6 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 trait RegistrarHttpFixture
     extends RandomThings
     with ScalaFutures
