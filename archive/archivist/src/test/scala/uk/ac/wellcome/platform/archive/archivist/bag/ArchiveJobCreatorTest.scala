@@ -10,6 +10,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 }
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest
     extends FunSpec
@@ -27,7 +28,7 @@ class ArchiveJobCreatorTest
           ArchiveJobCreator
             .create(
               zipFile,
-              createBagUploaderConfigWith(bucketName),
+              createBagUploaderConfigWith(Bucket(bucketName)),
               ingestRequest
             )) {
           case Right(
