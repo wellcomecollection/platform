@@ -134,4 +134,74 @@ class ReindexWorkerServiceTest
       }
     }
   }
+
+  it("selects the correct job config") {
+    withLocalDynamoDbTable { table1 =>
+      withLocalSnsTopic { topic1 =>
+        withLocalDynamoDbTable { table2 =>
+          withLocalSnsTopic { topic2 =>
+            withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+              val exampleRecord1 = exampleRecord.copy(id = "exampleRecord1")
+              val exampleRecord2 = exampleRecord.copy(id = "exampleRecord2")
+
+              Scanamo.put(dynamoDbClient)(table1.name)(exampleRecord1)
+              Scanamo.put(dynamoDbClient)(table2.name)(exampleRecord2)
+
+              val configMap = Map(
+                "1" -> ((table1, topic1)),
+                "2" -> ((table2, topic2))
+              )
+              withWorkerService(queue, configMap = configMap) { _ =>
+                sendNotificationToSQS(
+                  queue = queue,
+                  message = createReindexRequestWith(jobConfigId = "1")
+                )
+
+                eventually {
+                  val actualRecords: Seq[HybridRecord] =
+                    listMessagesReceivedFromSNS(topic1)
+                      .map {
+                        _.message
+                      }
+                      .map {
+                        fromJson[HybridRecord](_).get
+                      }
+                      .distinct
+
+                  actualRecords shouldBe List(exampleRecord1)
+
+                  assertSnsReceivesNothing(topic2)
+
+                  assertQueueEmpty(queue)
+                  assertQueueEmpty(dlq)
+                }
+
+                sendNotificationToSQS(
+                  queue = queue,
+                  message = createReindexRequestWith(jobConfigId = "2")
+                )
+
+                eventually {
+                  val actualRecords: Seq[HybridRecord] =
+                    listMessagesReceivedFromSNS(topic2)
+                      .map {
+                        _.message
+                      }
+                      .map {
+                        fromJson[HybridRecord](_).get
+                      }
+                      .distinct
+
+                  actualRecords shouldBe List(exampleRecord2)
+
+                  assertQueueEmpty(queue)
+                  assertQueueEmpty(dlq)
+                }
+              }
+              }
+            }
+          }
+        }
+      }
+    }
 }
