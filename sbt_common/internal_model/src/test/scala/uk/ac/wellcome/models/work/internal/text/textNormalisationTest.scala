@@ -8,19 +8,28 @@ class textNormalisationTest extends FunSpec with Matchers {
 
   it("removes trailing character") {
     val examples = Table(
-      ("in", "out"),
-      ("text", "text"),
-      ("text.", "text"),
-      (" text", " text"),
-      (" text.", " text"),
-      ("te xt.", "te xt"),
-      ("text . ", "text"),
-      ("text ,. ", "text ,"),
-      ("text.  ", "text"),
-      ("text..  ", "text."),
-      (".text", ".text"),
-      (".text.", ".text"),
-      (".text..", ".text."),
+      ("-in-",      "-out-"),
+      ("text",      "text"),
+      ("text.",     "text"),
+      (" text. ",   " text"),
+      ("text. ",    "text"),
+      ("text.  ",   "text"),
+      ("text . ",   "text"),
+      ("text.\t",   "text"),
+      ("text.\n",   "text"),
+      ("text.\r",   "text"),
+      ("text.\f",   "text"),
+      ("text .",    "text"),
+      (" text",     " text"),
+      (" \ttext.",  " \ttext"),
+      ("te xt.",    "te xt"),
+      ("text . ",   "text"),
+      ("text ,. ",  "text ,"),
+      ("text.  ",   "text"),
+      ("text..  ",  "text."),
+      (".text",     ".text"),
+      (".text.",    ".text"),
+      (".text..",   ".text."),
       (".text. . ", ".text."),
       (".", ""),
       ("..", "."),
@@ -31,13 +40,26 @@ class textNormalisationTest extends FunSpec with Matchers {
     }
   }
 
+  it("removes trailing literal regexp character") {
+    val examples = Table(
+      ("in", "char"),
+      ("text\\", '\\'),
+      ("text^", '^')
+    )
+    forAll(examples) { (i: String, c: Char) =>
+      trimTrailing(i, c) shouldBe "text"
+    }
+  }
+
   it("converts to sentence case") {
     val examples = Table(
-      ("in", "out"),
-      ("text", "Text"),
-      ("TEXT", "TEXT"),
-      ("teXT", "TeXT"),
-      ("text text", "Text text")
+      ("-in-",        "-out-"),
+      ("text",      "Text"),
+      ("TEXT",      "TEXT"),
+      ("teXT",      "TeXT"),
+      ("text text", "Text text"),
+      ("Text Text", "Text Text"),
+      ("Text teXT", "Text teXT")
     )
     forAll(examples) { (i: String, o: String) =>
       sentenceCase(i) shouldBe o
