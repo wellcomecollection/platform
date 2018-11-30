@@ -196,7 +196,7 @@ trait SierraProduction {
     vf.subfields
       .filter { _.tag == subfieldTag }
       .map { sf: MarcSubfield =>
-        Place(label = sf.content)
+        Place.normalised(label = sf.content)
       }
 
   private def agentsFromSubfields(
@@ -205,7 +205,7 @@ trait SierraProduction {
     vf.subfields
       .filter { _.tag == subfieldTag }
       .map { sf: MarcSubfield =>
-        Unidentifiable(Agent(label = sf.content))
+        Unidentifiable(Agent.normalised(label = sf.content))
       }
 
   private def datesFromSubfields(vf: VarField,
@@ -213,6 +213,6 @@ trait SierraProduction {
     vf.subfields
       .filter { _.tag == subfieldTag }
       .map { sf: MarcSubfield =>
-        Period(label = sf.content)
+        Period.normalised(label = sf.content)
       }
 }

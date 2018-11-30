@@ -4,14 +4,14 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 
 trait SierraAgents {
-
   // This is used to construct a Person from MARc tags 100, 700 and 600.
   // For all these cases:
   //  - subfield $a populates the person label
   //  - subfield $b populates the person numeration
   //  - subfield $c populates the person prefixes
   //
-  def getPerson(subfields: List[MarcSubfield]): Option[Person] =
+  def getPerson(subfields: List[MarcSubfield],
+                normalisePerson: Boolean = false): Option[Person] =
     getLabel(subfields).map { label =>
       // Extract the numeration from subfield $b.  This is also non-repeatable
       // in the MARC spec.
@@ -27,11 +27,24 @@ trait SierraAgents {
       val prefixString =
         if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-      Person(
-        label = label,
-        prefix = prefixString,
-        numeration = numeration
-      )
+      // The rule is to only normalise the 'Person' label when a contributor.  Strictly a 'Person' within
+      // 'Subjects' (sourced from Marc 600) should not be normalised -- however, as these labels
+      // are not expected to have punctuation normalisation should not change the 'Person' label for 'Subjects'
+      // In which case normalisation is effectively a no-op and the test can be removed and Person.normalised
+      // always returned when confident in the data.
+      if (normalisePerson) {
+        Person.normalised(
+          label = label,
+          prefix = prefixString,
+          numeration = numeration
+        )
+      } else {
+        Person(
+          label = label,
+          prefix = prefixString,
+          numeration = numeration
+        )
+      }
     }
 
   // This is used to construct an Organisation from MARC tags 110 and 710.
@@ -41,7 +54,7 @@ trait SierraAgents {
   //
   def getOrganisation(subfields: List[MarcSubfield]): Option[Organisation] =
     getLabel(subfields).map { label =>
-      Organisation(label = label)
+      Organisation.normalised(label = label)
     }
 
   /* Given an agent and the associated MARC subfields, look for instances of subfield $0,

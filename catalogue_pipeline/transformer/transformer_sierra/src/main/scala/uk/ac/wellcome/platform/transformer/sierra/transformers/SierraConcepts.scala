@@ -102,7 +102,6 @@ trait SierraConcepts extends MarcUtils {
         case "z"       => Place(label = subfield.content)
       }
     }
-
     concepts.map { Unidentifiable(_) }
   }
 }

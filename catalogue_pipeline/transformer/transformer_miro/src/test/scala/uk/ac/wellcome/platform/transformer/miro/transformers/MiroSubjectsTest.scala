@@ -27,28 +27,39 @@ class MiroSubjectsTest
   it("uses the image_keywords field if present") {
     transformRecordAndCheckSubjects(
       miroRecord = createMiroRecordWith(
-        keywords = Some(List("animals", "arachnids", "fruit"))
+        keywords = Some(List("Animals", "Arachnids", "Fruit"))
       ),
-      expectedSubjectLabels = List("animals", "arachnids", "fruit")
+      expectedSubjectLabels = List("Animals", "Arachnids", "Fruit")
     )
   }
 
   it("uses the image_keywords_unauth field if present") {
     transformRecordAndCheckSubjects(
       miroRecord = createMiroRecordWith(
-        keywordsUnauth = Some(List(Some("altruism"), Some("mammals")))
+        keywordsUnauth = Some(List(Some("Altruism"), Some("Mammals")))
       ),
-      expectedSubjectLabels = List("altruism", "mammals")
+      expectedSubjectLabels = List("Altruism", "Mammals")
     )
   }
 
   it("uses the image_keywords and image_keywords_unauth fields if both present") {
     transformRecordAndCheckSubjects(
       miroRecord = createMiroRecordWith(
-        keywords = Some(List("humour")),
+        keywords = Some(List("Humour")),
+        keywordsUnauth = Some(List(Some("Marine creatures")))
+      ),
+      expectedSubjectLabels = List("Humour", "Marine creatures")
+    )
+  }
+
+  it("normalises subject labels and concepts to sentence case") {
+    transformRecordAndCheckSubjects(
+      miroRecord = createMiroRecordWith(
+        keywords = Some(List("humour", "comedic aspect")),
         keywordsUnauth = Some(List(Some("marine creatures")))
       ),
-      expectedSubjectLabels = List("humour", "marine creatures")
+      expectedSubjectLabels =
+        List("Humour", "Comedic aspect", "Marine creatures")
     )
   }
 
