@@ -39,6 +39,6 @@ trait StorageManifestVHSFixture extends LocalVersionedHybridStore {
     )(
       ifNotExisting = (storageManifest, EmptyMetadata())
     )(
-      ifExisting => (_, _) => throw new RuntimeException("VHS should be empty!")
+      ifExisting = (_, _) => throw new RuntimeException("VHS should be empty!")
     )
 }
