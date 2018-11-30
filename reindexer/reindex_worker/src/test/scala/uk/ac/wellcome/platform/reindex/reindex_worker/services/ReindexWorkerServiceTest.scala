@@ -114,4 +114,24 @@ class ReindexWorkerServiceTest
       }
     }
   }
+
+  it("fails if passed an invalid job ID") {
+    withLocalDynamoDbTable { table =>
+      withLocalSnsTopic { topic =>
+        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+          withWorkerService(queue, configMap = Map("foo" -> ((table, topic)))) { _ =>
+            sendNotificationToSQS(
+              queue = queue,
+              message = createReindexRequestWith(jobConfigId = "bar")
+            )
+
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+            }
+          }
+        }
+      }
+    }
+  }
 }
