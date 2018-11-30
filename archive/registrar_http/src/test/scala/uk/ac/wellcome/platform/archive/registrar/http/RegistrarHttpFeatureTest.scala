@@ -12,6 +12,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
 import uk.ac.wellcome.platform.archive.display.{
   DisplayLocation,
   DisplayProvider,
@@ -26,6 +27,7 @@ class RegistrarHttpFeatureTest
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
+    with BagInfoGenerators
     with RegistrarHttpFixture
     with RandomThings
     with IntegrationPatience
@@ -126,7 +128,9 @@ class RegistrarHttpFeatureTest
         case (vhs, baseUrl) =>
           withActorSystem { implicit actorSystem =>
             withMaterializer(actorSystem) { implicit actorMaterializer =>
-              val storageManifest = createStorageManifest
+              val storageManifest = createStorageManifestWith(
+                bagInfo = createBagInfoWith(externalDescription = None)
+              )
 
               val future = storeSingleManifest(vhs, storageManifest)
               whenReady(future) { _ =>
