@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.miro.transformers
 import java.io.InputStream
 
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.miro.exceptions.ShouldNotTransformException
 
 import scala.io.Source
 

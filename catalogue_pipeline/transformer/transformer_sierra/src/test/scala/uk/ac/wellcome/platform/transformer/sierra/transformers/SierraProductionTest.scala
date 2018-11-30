@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{Period, _}
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   VarField
@@ -284,7 +284,7 @@ class SierraProductionTest
           )
         )
 
-        val caught = intercept[TransformerException] {
+        val caught = intercept[SierraTransformerException] {
           transformToProduction(varFields)
         }
 
@@ -551,7 +551,7 @@ class SierraProductionTest
   private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {
     val bibData = createSierraBibDataWith(varFields = varFields)
 
-    intercept[TransformerException] {
+    intercept[SierraTransformerException] {
       transformer.getProduction(bibData)
     }
   }

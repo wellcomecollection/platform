@@ -8,12 +8,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.platform.transformer.fixtures.HybridRecordReceiverFixture
+import uk.ac.wellcome.platform.transformer.miro.fixtures.MiroVHSRecordReceiverFixture
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
 import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWrapper
-import uk.ac.wellcome.platform.transformer.miro.models.MiroTransformable
 import uk.ac.wellcome.platform.transformer.miro.services.MiroTransformerWorkerService
-import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -28,10 +26,10 @@ class MiroTransformerFeatureTest
     with S3
     with Messaging
     with Eventually
-    with HybridRecordReceiverFixture
     with IntegrationPatience
     with MiroRecordGenerators
-    with MiroTransformableWrapper {
+    with MiroTransformableWrapper
+    with MiroVHSRecordReceiverFixture {
 
   it("transforms miro records and publishes the result to the given topic") {
     val miroID = "M0000001"
@@ -41,13 +39,14 @@ class MiroTransformerFeatureTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
-            val miroHybridRecordMessage = createHybridRecordNotificationWith(
-              miroRecord = createMiroRecordWith(
-                title = Some(title),
-                imageNumber = miroID
-              ),
-              bucket = storageBucket
-            )
+            val miroHybridRecordMessage =
+              createMiroVHSRecordNotificationMessageWith(
+                miroRecord = createMiroRecordWith(
+                  title = Some(title),
+                  imageNumber = miroID
+                ),
+                bucket = storageBucket
+              )
 
             sendSqsMessage(
               queue = queue,
@@ -77,32 +76,34 @@ class MiroTransformerFeatureTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          val miroHybridRecordMessage1 = createHybridRecordNotificationWith(
-            miroRecord = createMiroRecordWith(
-              title = Some("Antonio Dionisi"),
-              description = Some("Antonio Dionisi"),
-              physFormat = Some("Book"),
-              copyrightCleared = Some("Y"),
-              imageNumber = "L0011975",
-              useRestrictions = Some("CC-BY"),
-              innopacID = Some("12917175"),
-              creditLine = Some("Wellcome Library, London")
-            ),
-            bucket = storageBucket
-          )
-          val miroHybridRecordMessage2 = createHybridRecordNotificationWith(
-            miroRecord = createMiroRecordWith(
-              title =
-                Some("Greenfield Sluder, Tonsillectomy..., use of guillotine"),
-              description = Some("Use of the guillotine"),
-              copyrightCleared = Some("Y"),
-              imageNumber = "L0023034",
-              useRestrictions = Some("CC-BY"),
-              innopacID = Some("12074536"),
-              creditLine = Some("Wellcome Library, London")
-            ),
-            bucket = storageBucket
-          )
+          val miroHybridRecordMessage1 =
+            createMiroVHSRecordNotificationMessageWith(
+              miroRecord = createMiroRecordWith(
+                title = Some("Antonio Dionisi"),
+                description = Some("Antonio Dionisi"),
+                physFormat = Some("Book"),
+                copyrightCleared = Some("Y"),
+                imageNumber = "L0011975",
+                useRestrictions = Some("CC-BY"),
+                innopacID = Some("12917175"),
+                creditLine = Some("Wellcome Library, London")
+              ),
+              bucket = storageBucket
+            )
+          val miroHybridRecordMessage2 =
+            createMiroVHSRecordNotificationMessageWith(
+              miroRecord = createMiroRecordWith(
+                title = Some(
+                  "Greenfield Sluder, Tonsillectomy..., use of guillotine"),
+                description = Some("Use of the guillotine"),
+                copyrightCleared = Some("Y"),
+                imageNumber = "L0023034",
+                useRestrictions = Some("CC-BY"),
+                innopacID = Some("12074536"),
+                creditLine = Some("Wellcome Library, London")
+              ),
+              bucket = storageBucket
+            )
 
           withLocalS3Bucket { messageBucket =>
             withWorkerService(topic, messageBucket, queue) { _ =>
@@ -122,37 +123,19 @@ class MiroTransformerFeatureTest
 
   def withWorkerService[R](topic: Topic, bucket: Bucket, queue: Queue)(
     testWith: TestWith[MiroTransformerWorkerService, R]): R =
-    withHybridRecordReceiver[MiroTransformable, R](topic, bucket) {
-      messageReceiver =>
-        withActorSystem { actorSystem =>
-          withSQSStream[NotificationMessage, R](actorSystem, queue) {
-            sqsStream =>
-              val workerService = new MiroTransformerWorkerService(
-                messageReceiver = messageReceiver,
-                miroTransformer = new MiroTransformableTransformer,
-                sqsStream = sqsStream
-              )
+    withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
+      withActorSystem { actorSystem =>
+        withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+          val workerService = new MiroTransformerWorkerService(
+            vhsRecordReceiver = recordReceiver,
+            miroTransformer = new MiroTransformableTransformer,
+            sqsStream = sqsStream
+          )
 
-              workerService.run()
+          workerService.run()
 
-              testWith(workerService)
-          }
+          testWith(workerService)
         }
+      }
     }
-
-  private def createHybridRecordNotificationWith(
-    miroRecord: MiroRecord,
-    bucket: Bucket
-  ): NotificationMessage = {
-    val miroTransformable = MiroTransformable(
-      sourceId = miroRecord.imageNumber,
-      data = toJson(miroRecord).get
-    )
-
-    createHybridRecordNotificationWith(
-      miroTransformable,
-      s3Client = s3Client,
-      bucket = bucket
-    )
-  }
 }

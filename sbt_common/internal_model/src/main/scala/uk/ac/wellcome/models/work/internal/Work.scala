@@ -60,6 +60,7 @@ case class UnidentifiedWork(
   items: List[MaybeDisplayable[Item]],
   itemsV1: List[Identifiable[Item]],
   version: Int,
+  merged: Boolean = false,
   ontologyType: String = "Work",
   identifiedType: String = classOf[IdentifiedWork].getSimpleName)
     extends Work
@@ -87,6 +88,7 @@ case class IdentifiedWork(
   items: List[Displayable[Item]],
   itemsV1: List[Identified[Item]],
   version: Int,
+  merged: Boolean = false,
   ontologyType: String = "Work")
     extends Work
     with IdentifiedBaseWork

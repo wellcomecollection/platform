@@ -1,4 +1,5 @@
 package uk.ac.wellcome.platform.archive.registrar.async.fixtures
+
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.fixtures.S3
@@ -13,7 +14,7 @@ trait BagLocationFixtures extends S3 with BagIt {
       createValidDataManifest,
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest)(
-    testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
+    testWith: TestWith[(BagLocation, BagInfo), R]): R = {
     val bagIdentifier = ExternalIdentifier(randomAlphanumeric())
 
     info(s"Creating bag $bagIdentifier")
@@ -40,10 +41,6 @@ trait BagLocationFixtures extends S3 with BagIt {
         )
     })
 
-    testWith(
-      (
-        bagLocation,
-        bagInfo,
-        BagId(randomStorageSpace, bagInfo.externalIdentifier)))
+    testWith((bagLocation, bagInfo))
   }
 }

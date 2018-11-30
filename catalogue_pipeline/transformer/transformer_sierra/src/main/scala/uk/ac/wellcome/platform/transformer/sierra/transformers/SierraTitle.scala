@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers
 
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.sierra.source.SierraBibData
 
 trait SierraTitle {

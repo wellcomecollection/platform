@@ -26,12 +26,14 @@ trait WorksGenerators extends ItemsGenerators {
     createIdentifiedRedirectedWorkWith()
 
   def createIdentifiedRedirectedWorkWith(
-    sourceIdentifier: SourceIdentifier = createSourceIdentifier
+    canonicalId: String = createCanonicalId,
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier,
+    version: Int = 1,
   ): IdentifiedRedirectedWork =
     IdentifiedRedirectedWork(
-      canonicalId = createCanonicalId,
+      canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
-      version = 1,
+      version = version,
       redirect = IdentifiedRedirect(
         canonicalId = createCanonicalId
       )
@@ -49,12 +51,14 @@ trait WorksGenerators extends ItemsGenerators {
     createUnidentifiedInvisibleWorkWith()
 
   def createIdentifiedInvisibleWorkWith(
-    sourceIdentifier: SourceIdentifier = createSourceIdentifier
+    canonicalId: String = createCanonicalId,
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier,
+    version: Int = 1
   ): IdentifiedInvisibleWork =
     IdentifiedInvisibleWork(
       sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = createCanonicalId
+      version = version,
+      canonicalId = canonicalId
     )
 
   def createIdentifiedInvisibleWork: IdentifiedInvisibleWork =
@@ -129,7 +133,8 @@ trait WorksGenerators extends ItemsGenerators {
     language: Option[Language] = None,
     items: List[Displayable[Item]] = List(),
     itemsV1: List[Identified[Item]] = List(),
-    version: Int = 1
+    version: Int = 1,
+    merged: Boolean = false
   ): IdentifiedWork =
     IdentifiedWork(
       canonicalId = canonicalId,
@@ -152,7 +157,8 @@ trait WorksGenerators extends ItemsGenerators {
       dimensions = None,
       items = items,
       itemsV1 = itemsV1,
-      version = version
+      version = version,
+      merged = merged
     )
 
   def createIdentifiedWork: IdentifiedWork = createIdentifiedWorkWith()

@@ -17,11 +17,12 @@ module "service" {
     reindex_publish_topic_arn = "${var.hybrid_records_topic_arn}"
     metrics_namespace         = "reindex_worker-${var.namespace}"
     dynamo_table_name         = "${var.vhs_table_name}"
+    reindexer_job_config_json = "${var.reindexer_job_config_json}"
 
     sqs_parallelism = 10
   }
 
-  env_vars_length = 5
+  env_vars_length = 6
 
   ecs_cluster_name = "${var.ecs_cluster_name}"
   ecs_cluster_id   = "${var.ecs_cluster_id}"

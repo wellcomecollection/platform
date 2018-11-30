@@ -7,12 +7,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal.BaseWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.merger.services.{
-  Merger,
-  MergerManager,
-  MergerWorkerService,
-  RecorderPlaybackService
-}
+import uk.ac.wellcome.platform.merger.services._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 
@@ -34,7 +29,7 @@ trait WorkerServiceFixture extends LocalWorksVhs with Messaging with S3 {
             val workerService = new MergerWorkerService(
               sqsStream = sqsStream,
               playbackService = new RecorderPlaybackService(vhs),
-              mergerManager = new MergerManager(new Merger()),
+              mergerManager = new MergerManager(PlatformMerger),
               messageWriter = messageWriter
             )
 

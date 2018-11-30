@@ -14,6 +14,7 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
+  BagId,
   BagLocation,
   BagPath
 }
@@ -46,23 +47,17 @@ class RegistrarFeatureTest
   it(
     "registers an archived BagIt bag from S3 and notifies the progress tracker") {
     withRegistrar {
-      case (
-          storageBucket,
-          queuePair,
-          progressTopic,
-          registrar,
-          vhs
-          ) =>
+      case (storageBucket, queuePair, progressTopic, vhs) =>
         val requestId = randomUUID
+        val storageSpace = randomStorageSpace
         val createdAfterDate = Instant.now()
 
-        withBagNotification(
-          requestId,
-          queuePair,
-          storageBucket
-        ) {
-          case (bagLocation, bagInfo, bagId) =>
-            registrar.run()
+        withBagNotification(queuePair, storageBucket, requestId, storageSpace) {
+          case (bagLocation, bagInfo) =>
+            val bagId = BagId(
+              space = storageSpace,
+              externalIdentifier = bagInfo.externalIdentifier
+            )
 
             eventually {
               val futureMaybeManifest = vhs.getRecord(bagId.toString)
@@ -98,7 +93,7 @@ class RegistrarFeatureTest
 
   it("notifies the progress tracker if registering a bag fails") {
     withRegistrar {
-      case (storageBucket, queuePair, progressTopic, registrar, vhs) =>
+      case (storageBucket, queuePair, progressTopic, vhs) =>
         val requestId = randomUUID
         val bagId = randomBagId
 
@@ -111,8 +106,6 @@ class RegistrarFeatureTest
           queuePair.queue,
           ArchiveComplete(requestId, bagId.space, bagLocation)
         )
-
-        registrar.run()
 
         eventually {
           val futureMaybeManifest = vhs.getRecord(bagId.toString)
@@ -140,15 +133,9 @@ class RegistrarFeatureTest
           storageBucket,
           queuePair @ QueuePair(queue, dlq),
           progressTopic,
-          registrar,
           _) =>
-        val requestId1 = randomUUID
-        val requestId2 = randomUUID
-
-        withBagNotification(requestId1, queuePair, storageBucket) { _ =>
-          withBagNotification(requestId2, queuePair, storageBucket) { _ =>
-            registrar.run()
-
+        withBagNotification(queuePair, storageBucket) { _ =>
+          withBagNotification(queuePair, storageBucket) { _ =>
             eventually {
               listMessagesReceivedFromSNS(progressTopic) shouldBe empty
 

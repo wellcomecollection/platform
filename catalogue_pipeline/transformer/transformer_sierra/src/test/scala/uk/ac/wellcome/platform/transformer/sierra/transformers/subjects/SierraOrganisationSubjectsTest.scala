@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers.subjects
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
 import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
@@ -183,7 +183,7 @@ class SierraOrganisationSubjectsTest
       val varField = createMarc610VarField(subfields = List())
       val bibData = createSierraBibDataWith(varFields = List(varField))
 
-      val err = intercept[TransformerException] {
+      val err = intercept[SierraTransformerException] {
         transformer.getSubjectsWithOrganisation(bibData)
       }
       err.e.getMessage shouldBe s"Not enough information to build a label on $varField"

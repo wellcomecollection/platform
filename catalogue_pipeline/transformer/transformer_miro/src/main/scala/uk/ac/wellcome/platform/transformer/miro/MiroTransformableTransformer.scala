@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.transformer.miro
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.miro.exceptions.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.util.Try
@@ -21,8 +22,9 @@ class MiroTransformableTransformer
     with Logging {
 
   def transform(miroRecord: MiroRecord,
+                miroMetadata: MiroMetadata,
                 version: Int): Try[TransformedBaseWork] =
-    doTransform(miroRecord, version) map { transformed =>
+    doTransform(miroRecord, miroMetadata, version) map { transformed =>
       debug(s"Transformed record to $transformed")
       transformed
     } recover {
@@ -32,18 +34,27 @@ class MiroTransformableTransformer
     }
 
   private def doTransform(originalMiroRecord: MiroRecord,
+                          miroMetadata: MiroMetadata,
                           version: Int): Try[TransformedBaseWork] = {
-    // This is an utterly awful hack we have to live with until we get
-    // these corrected in the source data.
-    val miroRecord = MiroRecord.create(toJson(originalMiroRecord).get)
-
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
-      value = miroRecord.imageNumber
+      value = originalMiroRecord.imageNumber
     )
 
     Try {
+      // Any records that aren't cleared for the Catalogue API should be
+      // discarded immediately.
+      if (!miroMetadata.isClearedForCatalogueAPI) {
+        throw new ShouldNotTransformException(
+          s"Image ${originalMiroRecord.imageNumber} is not cleared for the API!"
+        )
+      }
+
+      // This is an utterly awful hack we have to live with until we get
+      // these corrected in the source data.
+      val miroRecord = MiroRecord.create(toJson(originalMiroRecord).get)
+
       // These images should really have been removed from the pipeline
       // already, but we have at least one instance (B0010525).  It was
       // throwing a MatchError when we tried to pick a license, so handle
@@ -80,7 +91,7 @@ class MiroTransformableTransformer
       )
     }.recover {
       case e: ShouldNotTransformException =>
-        info(s"Should not transform: ${e.getMessage}")
+        debug(s"Should not transform: ${e.getMessage}")
         UnidentifiedInvisibleWork(
           sourceIdentifier = sourceIdentifier,
           version = version
