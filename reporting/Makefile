@@ -9,7 +9,8 @@ SBT_APPS 	=
 ECS_TASKS 	=
 LAMBDAS 	= reporting_miro_transformer \
 			  reporting_miro_inventory_transformer \
-			  reporting_sierra_transformer
+			  reporting_sierra_transformer \
+			  reporting_calm_transformer
 
 TF_NAME 	= reporting
 TF_PATH 	= $(STACK_ROOT)/terraform

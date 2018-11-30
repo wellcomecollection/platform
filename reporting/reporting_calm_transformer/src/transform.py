@@ -14,20 +14,20 @@ def transform(record):
     transformed_record = deepcopy(record)
     for key, value in record.items():
         new_value = deepcopy(value)
-        
+
         if isinstance(new_value, (int, float, complex)):
             if math.isnan(value):
                 new_value = None
-        
+
         if isinstance(new_value, list) and len(value) == 1:
             new_value = record[key][0]
-        
+
         if isinstance(new_value, str):
             if new_value.startswith("'"):
                 new_value = new_value[1:]
             if new_value.endswith("'"):
                 new_value = new_value[:-1]
-    
+
         if key in keys_to_parse:
             new_value = convert_date_to_iso(new_value)
 
@@ -41,5 +41,5 @@ keys_to_parse = {
     "UserDate1",
     "UserDate2",
     "UserDate3",
-    "UserDate4", 
+    "UserDate4",
 }

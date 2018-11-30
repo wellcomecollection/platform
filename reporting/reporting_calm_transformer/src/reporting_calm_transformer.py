@@ -1,3 +1,14 @@
+'''
+Basic transformer, which cleans up the static calm data before sending it off
+to an elasticsearch indesx. The raw data can be downloaded by running:
+
+    python monitoring/scripts/download_oai_harvest.py
+
+from the root of this repo. The `path_to_calm_json` parameter below should be
+set to the relative path to that file from this directory. The `es_username`,
+`es_password`, and `es_url` variables should describe the relevant
+elasticsearch host and auth.
+'''
 import pandas as pd
 from transform import transform
 from tqdm import tqdm_notebook as tqdm
