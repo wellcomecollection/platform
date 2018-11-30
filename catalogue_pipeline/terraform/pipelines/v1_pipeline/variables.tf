@@ -6,6 +6,7 @@ variable "subnets" {
 }
 
 variable "cluster_name" {}
+variable "cluster_id" {}
 
 variable "namespace_id" {}
 

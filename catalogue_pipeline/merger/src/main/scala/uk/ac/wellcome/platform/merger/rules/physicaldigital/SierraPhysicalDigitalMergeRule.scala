@@ -3,6 +3,8 @@ package uk.ac.wellcome.platform.merger.rules.physicaldigital
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.logging.MergerLogging
+import uk.ac.wellcome.platform.merger.model.MergedWork
+import uk.ac.wellcome.platform.merger.rules.{MergerRule, WorkPairMerger}
 
 /** If we have a pair of Sierra records:
   *
@@ -15,32 +17,14 @@ import uk.ac.wellcome.platform.merger.logging.MergerLogging
   *
   */
 object SierraPhysicalDigitalMergeRule
-    extends Logging
-    with SierraPhysicalDigitalMerger
+    extends MergerRule
+    with Logging
+    with MergerLogging
+    with WorkPairMerger
     with SierraPhysicalDigitalPartitioner {
-
-  def mergeAndRedirectWorks(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
-    partitionWorks(works)
-      .map {
-        case Partition(physicalWork, digitalWork, otherWorks) =>
-          val maybeResult = mergeAndRedirectWorkPair(
-            physicalWork = physicalWork,
-            digitalWork = digitalWork
-          )
-          maybeResult match {
-            case Some(result) =>
-              result ++ otherWorks
-            case _ => works
-          }
-      }
-      .getOrElse(works)
-  }
-}
-
-trait SierraPhysicalDigitalMerger extends Logging with MergerLogging {
-  def mergeAndRedirectWorkPair(
+  override protected def mergeAndRedirectWorkPair(
     physicalWork: UnidentifiedWork,
-    digitalWork: UnidentifiedWork): Option[List[BaseWork]] =
+    digitalWork: UnidentifiedWork): Option[MergedWork] =
     (physicalWork.items, digitalWork.items) match {
       case (
           List(physicalItem: Identifiable[Item]),
@@ -57,7 +41,7 @@ trait SierraPhysicalDigitalMerger extends Logging with MergerLogging {
         )
 
         Some(
-          List(
+          MergedWork(
             mergedWork,
             UnidentifiedRedirectedWork(digitalWork, physicalWork)
           ))

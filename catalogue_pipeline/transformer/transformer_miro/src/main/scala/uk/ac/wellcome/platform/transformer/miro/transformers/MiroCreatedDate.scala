@@ -6,7 +6,9 @@ import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 trait MiroCreatedDate {
   def getCreatedDate(miroRecord: MiroRecord): Option[Period] =
     if (collectionIsV(miroRecord.imageNumber)) {
-      miroRecord.artworkDate.map { Period }
+      miroRecord.artworkDate.map { date =>
+        Period(label = date)
+      }
     } else {
       None
     }

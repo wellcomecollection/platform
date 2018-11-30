@@ -7,8 +7,14 @@ import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
 import grizzled.slf4j.Logging
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
-import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
+  IdentifiedInvisibleWork,
+  IdentifiedRedirectedWork,
+  IdentifiedWork
+}
 import uk.ac.wellcome.json.JsonUtil._
+import scala.language.implicitConversions
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +39,7 @@ class WorkIndexer(
 
     val inserts = works.map { work =>
       indexInto(indexName / documentType)
-        .version(work.version)
+        .version(calculateEsVersion(work))
         .versionType(VersionType.EXTERNAL_GTE)
         .id(work.canonicalId)
         .doc(work)
@@ -59,6 +65,32 @@ class WorkIndexer(
       }
   }
 
+  /**
+    * When the merger makes the decision to merge some works, it modifies the content of
+    * the affected works. Despite the content of these works being modified, their version
+    * remains the same. Instead, the merger sets the merged flag to true for the target work
+    * and changes the type of the other works to redirected.
+    *
+    * When we ingest those works, we need to make sure that the merger modified works
+    * are never overridden by unmerged works for the same version still running through
+    * the pipeline.
+    * We also need to make sure that, if a work is modified by a source in such a way that
+    * it shouldn't be merged (or redirected) anymore, the new unmerged version is ingested
+    * and never replaced by the previous merged version still running through the pipeline.
+    *
+    * We can do that by ingesting works into Elasticsearch with a version derived by a
+    * combination of work version, merged flag and work type. More specifically, by
+    * multiplying the work version by 10, we make sure that a new version of a work
+    * always wins over previous versions (merged or unmerged).
+    * We make sure that a merger modified work always wins over other works with the same
+    * version, by adding one to work.version * 10.
+    */
+  private def calculateEsVersion(work: IdentifiedBaseWork): Int = work match {
+    case w: IdentifiedWork           => (w.version * 10) + w.merged
+    case w: IdentifiedRedirectedWork => (w.version * 10) + 1
+    case w: IdentifiedInvisibleWork  => w.version * 10
+  }
+
   /** Did we try to PUT a document with a lower version than the existing version?
     *
     */
@@ -77,4 +109,6 @@ class WorkIndexer(
 
     alreadyIndexedWorkHasHigherVersion
   }
+
+  implicit private def toInteger(bool: Boolean): Int = if (bool) 1 else 0
 }

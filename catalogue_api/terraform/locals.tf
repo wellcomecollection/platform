@@ -1,10 +1,10 @@
 locals {
   # API pins
 
-  production_api     = "romulus"
+  production_api     = "remus"
   pinned_nginx       = "bad0dbfa548874938d16496e313b05adb71268b7"
-  pinned_remus_api   = ""
-  pinned_romulus_api = "692e6e5b5e6f574cba8bb0a78d849e0350fff2c0"
+  pinned_remus_api   = "a16e89c26252f085edbe5c09bad3240b231c9d0e"
+  pinned_romulus_api = ""
 
   # Blue / Green config
 
@@ -15,13 +15,13 @@ locals {
   romulus_is_prod        = "${local.production_api == "romulus" ? "true" : "false"}"
   remus_is_prod          = "${local.production_api == "remus" ? "true" : "false"}"
   es_config_romulus = {
-    index_v1 = "v1-2018-11-27-correct-merge"
-    index_v2 = "v2-2018-11-27-correct-merge"
+    index_v1 = "v1-2018-11-29-merge-versioning"
+    index_v2 = "v2-2018-11-29-merge-versioning"
     doc_type = "work"
   }
   es_config_remus = {
-    index_v1 = "v1-2018-11-27-correct-merge"
-    index_v2 = "v2-2018-11-27-correct-merge"
+    index_v1 = "v1-2018-11-29-merge-versioning"
+    index_v2 = "v2-2018-11-29-merge-versioning"
     doc_type = "work"
   }
 

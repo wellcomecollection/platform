@@ -7,29 +7,20 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
-import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
-import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.fixtures.{
-  LocalDynamoDb,
-  LocalVersionedHybridStore,
-  S3
-}
-import uk.ac.wellcome.storage.s3.S3StorageBackend
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
+import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 
 trait RegistrarFixtures
     extends S3
     with Messaging
-    with LocalVersionedHybridStore
     with BagLocationFixtures
-    with LocalDynamoDb {
+    with LocalDynamoDb
+    with StorageManifestVHSFixture {
 
   def withBagNotification[R](
     queuePair: QueuePair,
@@ -85,64 +76,49 @@ trait RegistrarFixtures
           sqsConfig = createSQSConfigWith(queuePair.queue),
           metricsSender = metricsSender
         )
-        withTypeVHS[StorageManifest, EmptyMetadata, R](
-          bucket = hybridStoreBucket,
-          table = hybridStoreTable
-        ) { dataStore =>
-          val registrar = new Registrar(
-            snsClient = snsClient,
-            progressSnsConfig = createSNSConfigWith(progressTopic),
-            s3Client = s3Client,
-            messageStream = messageStream,
-            dataStore = dataStore,
-            actorSystem = actorSystem
-          )
+        withStorageManifestVHS(hybridStoreTable, hybridStoreBucket) {
+          dataStore =>
+            val registrar = new Registrar(
+              snsClient = snsClient,
+              progressSnsConfig = createSNSConfigWith(progressTopic),
+              s3Client = s3Client,
+              messageStream = messageStream,
+              dataStore = dataStore,
+              actorSystem = actorSystem
+            )
 
-          registrar.run()
+            registrar.run()
 
-          testWith(registrar)
+            testWith(registrar)
         }
       }
     }
 
-  type ManifestVHS = VersionedHybridStore[StorageManifest,
-                                          EmptyMetadata,
-                                          ObjectStore[StorageManifest]]
-
   def withRegistrar[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, ManifestVHS), R]): R = {
-    withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalSnsTopic {
-        progressTopic =>
-          withLocalS3Bucket {
-            storageBucket =>
-              withLocalS3Bucket {
-                hybridStoreBucket =>
-                  withLocalDynamoDbTable {
-                    hybridDynamoTable =>
-                      withApp(
-                        hybridStoreBucket,
-                        hybridDynamoTable,
-                        queuePair,
-                        progressTopic) { _ =>
-                        implicit val storageBackend =
-                          new S3StorageBackend(s3Client)
-
-                        withTypeVHS[StorageManifest, EmptyMetadata, R](
-                          hybridStoreBucket,
-                          hybridDynamoTable) { vhs =>
-                          testWith(
-                            (storageBucket, queuePair, progressTopic, vhs)
-                          )
-                        }
-                      }
-                  }
+    testWith: TestWith[(Bucket, QueuePair, Topic, StorageManifestVHS), R])
+    : R = {
+    withLocalSqsQueueAndDlqAndTimeout(15) { queuePair =>
+      withLocalSnsTopic { progressTopic =>
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { hybridStoreBucket =>
+            withLocalDynamoDbTable { hybridDynamoTable =>
+              withApp(
+                hybridStoreBucket,
+                hybridDynamoTable,
+                queuePair,
+                progressTopic) { _ =>
+                withStorageManifestVHS(hybridDynamoTable, hybridStoreBucket) {
+                  vhs =>
+                    testWith(
+                      (storageBucket, queuePair, progressTopic, vhs)
+                    )
+                }
               }
-
+            }
           }
-
+        }
       }
-    })
+    }
   }
 
   def withRegistrarAndBrokenVHS[R](
