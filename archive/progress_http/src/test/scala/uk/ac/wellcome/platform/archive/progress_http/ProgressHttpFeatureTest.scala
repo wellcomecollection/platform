@@ -104,9 +104,8 @@ class ProgressHttpFeatureTest
 
     it("returns a 404 NotFound if no progress tracker matches id") {
       withConfiguredApp { case (_, _, baseUrl) =>
-        whenGetRequestReady(s"$baseUrl/progress/$randomUUID") {
-          response: HttpResponse =>
-            response shouldBe StatusCodes.NotFound
+        whenGetRequestReady(s"$baseUrl/progress/$randomUUID") { response =>
+          response.status shouldBe StatusCodes.NotFound
         }
       }
     }
