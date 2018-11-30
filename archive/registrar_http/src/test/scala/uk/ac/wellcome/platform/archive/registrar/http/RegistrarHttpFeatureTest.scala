@@ -12,31 +12,27 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  StorageLocation,
-  StorageProvider
-}
+import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
 import uk.ac.wellcome.platform.archive.display.{
   DisplayLocation,
   DisplayProvider,
   DisplayStorageSpace
 }
-import uk.ac.wellcome.platform.archive.registrar.common.models._
+import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
-import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
 class RegistrarHttpFeatureTest
     extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
+    with BagInfoGenerators
     with RegistrarHttpFixture
     with RandomThings
     with IntegrationPatience
-    with Inside {
+    with Inside
+    with StorageManifestGenerators {
 
   import HttpMethods._
   import uk.ac.wellcome.json.JsonUtil._
@@ -44,9 +40,7 @@ class RegistrarHttpFeatureTest
   describe("GET /registrar/:space/:id") {
     it("returns a bag when available") {
       withConfiguredApp {
-        case (vhs, baseUrl, app) =>
-          app.run()
-
+        case (vhs, baseUrl) =>
           withActorSystem { implicit actorSystem =>
             withMaterializer(actorSystem) { implicit actorMaterializer =>
               val space = randomStorageSpace
@@ -56,25 +50,17 @@ class RegistrarHttpFeatureTest
               val path = "path"
               val bucket = "bucket"
               val providerId = "provider-id"
-              val storageManifest = StorageManifest(
+              val storageManifest = createStorageManifestWith(
                 space = space,
-                info = bagInfo,
-                manifest =
-                  FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                tagManifest = FileManifest(
-                  ChecksumAlgorithm(checksumAlgorithm),
-                  List(
-                    BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
-                StorageLocation(
-                  StorageProvider(providerId),
-                  ObjectLocation(bucket, path)),
-                Instant.now
+                bagInfo = bagInfo,
+                checksumAlgorithm = checksumAlgorithm,
+                providerId = providerId,
+                bucket = bucket,
+                path = path
               )
-              val putResult = vhs.updateRecord(
-                s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
-                ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
-                (_, _) => fail("vhs should have been empty!"))
-              whenReady(putResult) { _ =>
+
+              val future = storeSingleManifest(vhs, storageManifest)
+              whenReady(future) { _ =>
                 val request = HttpRequest(
                   GET,
                   s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
@@ -136,39 +122,18 @@ class RegistrarHttpFeatureTest
           }
       }
     }
+
     it("does not output null values") {
       withConfiguredApp {
-        case (vhs, baseUrl, app) =>
-          app.run()
-
+        case (vhs, baseUrl) =>
           withActorSystem { implicit actorSystem =>
             withMaterializer(actorSystem) { implicit actorMaterializer =>
-              val space = randomStorageSpace
-              val bagInfo = randomBagInfo.copy(externalDescription = None)
-
-              val checksumAlgorithm = "sha256"
-              val path = "path"
-              val bucket = "bucket"
-              val providerId = "provider-id"
-              val storageManifest = StorageManifest(
-                space = space,
-                info = bagInfo,
-                manifest =
-                  FileManifest(ChecksumAlgorithm(checksumAlgorithm), Nil),
-                tagManifest = FileManifest(
-                  ChecksumAlgorithm(checksumAlgorithm),
-                  List(
-                    BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))),
-                StorageLocation(
-                  StorageProvider(providerId),
-                  ObjectLocation(bucket, path)),
-                Instant.now
+              val storageManifest = createStorageManifestWith(
+                bagInfo = createBagInfoWith(externalDescription = None)
               )
-              val putResult = vhs.updateRecord(
-                s"${storageManifest.id.space}/${storageManifest.id.externalIdentifier}")(
-                ifNotExisting = (storageManifest, EmptyMetadata()))(ifExisting =
-                (_, _) => fail("vhs should have been empty!"))
-              whenReady(putResult) { _ =>
+
+              val future = storeSingleManifest(vhs, storageManifest)
+              whenReady(future) { _ =>
                 val request = HttpRequest(
                   GET,
                   s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
@@ -194,9 +159,7 @@ class RegistrarHttpFeatureTest
 
     it("returns a 404 NotFound if no progress monitor matches id") {
       withConfiguredApp {
-        case (_, baseUrl, app) =>
-          app.run()
-
+        case (_, baseUrl) =>
           withActorSystem { implicit actorSystem =>
             val bagId = randomBagId
             val request = Http().singleRequest(
