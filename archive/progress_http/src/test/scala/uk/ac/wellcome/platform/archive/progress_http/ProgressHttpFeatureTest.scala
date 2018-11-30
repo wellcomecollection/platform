@@ -44,10 +44,7 @@ class ProgressHttpFeatureTest
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
               whenReady(progressTracker.initialise(progress)) { _ =>
-                val request =
-                  HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
-
-                whenRequestReady(request) { result =>
+                whenGetRequestReady(s"$baseUrl/progress/${progress.id}") { result =>
                   result.status shouldBe StatusCodes.OK
                   getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
                     contextUrl,
@@ -81,10 +78,7 @@ class ProgressHttpFeatureTest
             withProgressTracker(table) { progressTracker =>
               val progress = createProgressWith(callback = None)
               whenReady(progressTracker.initialise(progress)) { _ =>
-                val request =
-                  HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
-
-                whenRequestReady(request) { result =>
+                whenGetRequestReady(s"$baseUrl/progress/${progress.id}") { result =>
                   result.status shouldBe StatusCodes.OK
                   val value = result.entity.dataBytes.runWith(Sink.fold("") {
                     case (acc, byteString) =>
@@ -106,10 +100,7 @@ class ProgressHttpFeatureTest
     it("returns a 404 NotFound if no progress tracker matches id") {
       withConfiguredApp { case (_, _, baseUrl) =>
         withActorSystem { implicit actorSystem =>
-          val uuid = randomUUID
-          val request = HttpRequest(GET, s"$baseUrl/progress/$uuid")
-
-          whenRequestReady(request) { response: HttpResponse =>
+          whenGetRequestReady(s"$baseUrl/progress/$randomUUID") { response: HttpResponse =>
             response shouldBe StatusCodes.NotFound
           }
         }

@@ -33,7 +33,6 @@ class RegistrarHttpFeatureTest
     with Inside
     with StorageManifestGenerators {
 
-  import HttpMethods._
   import uk.ac.wellcome.json.JsonUtil._
 
   describe("GET /registrar/:space/:id") {
@@ -57,16 +56,11 @@ class RegistrarHttpFeatureTest
                 bucket = bucket,
                 path = path
               )
-
               val future = storeSingleManifest(vhs, storageManifest)
               whenReady(future) { _ =>
-                val request = HttpRequest(
-                  GET,
-                  s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
-
-                whenRequestReady(request) { result =>
-                  result.status shouldBe StatusCodes.OK
-                  val displayBag = getT[DisplayBag](result.entity)
+                whenGetRequestReady(s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") { response =>
+                  response.status shouldBe StatusCodes.OK
+                  val displayBag = getT[DisplayBag](response.entity)
 
                   inside(displayBag) {
                     case DisplayBag(
@@ -130,16 +124,11 @@ class RegistrarHttpFeatureTest
               val storageManifest = createStorageManifestWith(
                 bagInfo = createBagInfoWith(externalDescription = None)
               )
-
               val future = storeSingleManifest(vhs, storageManifest)
               whenReady(future) { _ =>
-                val request = HttpRequest(
-                  GET,
-                  s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}")
-
-                whenRequestReady(request) { result =>
-                  result.status shouldBe StatusCodes.OK
-                  val value = result.entity.dataBytes.runWith(Sink.fold("") {
+                whenGetRequestReady(s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") { response =>
+                  response.status shouldBe StatusCodes.OK
+                  val value = response.entity.dataBytes.runWith(Sink.fold("") {
                     case (acc, byteString) =>
                       acc + byteString.utf8String
                   })
@@ -161,11 +150,7 @@ class RegistrarHttpFeatureTest
         case (_, baseUrl) =>
           withActorSystem { implicit actorSystem =>
             val bagId = randomBagId
-            val request = HttpRequest(
-              GET,
-              s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}")
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenGetRequestReady(s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") { response =>
               response.status shouldBe StatusCodes.NotFound
             }
           }

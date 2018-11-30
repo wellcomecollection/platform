@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.fixtures
 
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.HttpMethods.GET
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
 import akka.stream.Materializer
 import io.circe.Decoder
@@ -18,6 +19,11 @@ trait HttpFixtures extends Akka with ScalaFutures {
       whenReady(request) { (response: HttpResponse) =>
         testWith(response)
       }
+    }
+
+  def whenGetRequestReady[R](path: String)(testWith: TestWith[HttpResponse, R]): R =
+    whenRequestReady(HttpRequest(GET, path)) { response =>
+      testWith(response)
     }
 
   def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T],
