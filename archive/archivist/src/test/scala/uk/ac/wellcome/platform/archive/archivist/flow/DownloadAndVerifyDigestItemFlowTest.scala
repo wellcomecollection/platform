@@ -125,7 +125,8 @@ class DownloadAndVerifyDigestItemFlowTest
 
   def sha256(s: String)(implicit materializer: ActorMaterializer): String = {
     val future: Future[String] =
-      Source.single(ByteString(s.getBytes))
+      Source
+        .single(ByteString(s.getBytes))
         .via(SHA256Flow())
         .runWith(Sink.head)
 
