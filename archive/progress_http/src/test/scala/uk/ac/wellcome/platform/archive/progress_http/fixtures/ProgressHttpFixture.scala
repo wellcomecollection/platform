@@ -30,10 +30,11 @@ trait ProgressHttpFixture
     with HttpFixtures
     with Messaging {
 
-  def withApp[R](table: Table,
-                 topic: Topic,
-                 httpServerConfig: HTTPServerConfig,
-                 contextURL: URL)(testWith: TestWith[ProgressHTTP, R]): R =
+  private def withApp[R](
+    table: Table,
+    topic: Topic,
+    httpServerConfig: HTTPServerConfig,
+    contextURL: URL)(testWith: TestWith[ProgressHTTP, R]): R =
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { materializer =>
