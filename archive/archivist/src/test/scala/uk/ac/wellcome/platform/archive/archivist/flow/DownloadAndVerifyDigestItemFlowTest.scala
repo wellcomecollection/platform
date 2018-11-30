@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
+import akka.util.ByteString
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -11,6 +13,8 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.ChecksumNotMatche
 import uk.ac.wellcome.platform.archive.common.models.error.DownloadError
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
+
+import scala.concurrent.Future
 
 class DownloadAndVerifyDigestItemFlowTest
     extends FunSpec
@@ -35,6 +39,7 @@ class DownloadAndVerifyDigestItemFlowTest
             val archiveItemJob = createArchiveDigestItemJobWith(
               zipFile = zipFile,
               bucket = bucket,
+              digest = sha256(fileContent),
               s3Key = fileName
             )
 
@@ -49,7 +54,6 @@ class DownloadAndVerifyDigestItemFlowTest
             whenReady(futureResult) { result =>
               result shouldBe Right(archiveItemJob)
             }
-
           }
         }
       }
@@ -119,4 +123,14 @@ class DownloadAndVerifyDigestItemFlowTest
     }
   }
 
+  def sha256(s: String)(implicit materializer: ActorMaterializer): String = {
+    val future: Future[String] =
+      Source.single(ByteString(s.getBytes))
+        .via(SHA256Flow())
+        .runWith(Sink.head)
+
+    whenReady(future) { result =>
+      result
+    }
+  }
 }
