@@ -34,24 +34,22 @@ trait ProgressTrackerFixture
 
   def assertProgressCreated(id: UUID,
                             expectedStorageLocation: StorageLocation,
-                            table: Table,
-                            recentSeconds: Int = 45): Progress = {
+                            table: Table): Progress = {
     val progress = getExistingTableItem[Progress](id.toString, table)
     progress.sourceLocation shouldBe expectedStorageLocation
 
-    assertRecent(progress.createdDate, recentSeconds)
-    assertRecent(progress.lastModifiedDate, recentSeconds)
+    assertRecent(progress.createdDate, recentSeconds = 45)
+    assertRecent(progress.lastModifiedDate, recentSeconds = 45)
     progress
   }
 
   def assertProgressRecordedRecentEvents(id: UUID,
                                          expectedEventDescriptions: Seq[String],
-                                         table: LocalDynamoDb.Table,
-                                         recentSeconds: Int = 45) = {
+                                         table: LocalDynamoDb.Table): Unit = {
     val progress = getExistingTableItem[Progress](id.toString, table)
 
     progress.events.map(_.description) should contain theSameElementsAs expectedEventDescriptions
     progress.events.foreach(event =>
-      assertRecent(event.createdDate, recentSeconds))
+      assertRecent(event.createdDate, recentSeconds = 45))
   }
 }
