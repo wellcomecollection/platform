@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
 import java.util.UUID
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, StorageLocation}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
@@ -18,7 +19,7 @@ trait ProgressTrackerFixture
     with TimeTestFixture {
   def createTable(table: LocalDynamoDb.Table): Table = Table("table", "index")
 
-  def withProgressTracker[R](table: Table)(
+  def withProgressTracker[R](table: Table, dynamoDbClient: AmazonDynamoDB = dynamoDbClient)(
     testWith: TestWith[ProgressTracker, R]): R = {
     val progressTracker = new ProgressTracker(
       dynamoClient = dynamoDbClient,

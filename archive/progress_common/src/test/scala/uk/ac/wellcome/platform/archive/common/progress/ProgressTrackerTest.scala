@@ -9,7 +9,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
 import uk.ac.wellcome.platform.archive.common.progress.models._
-import uk.ac.wellcome.platform.archive.common.progress.monitor.{IdConstraintError, ProgressTracker}
+import uk.ac.wellcome.platform.archive.common.progress.monitor.IdConstraintError
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -23,9 +23,6 @@ class ProgressTrackerTest
     with ProgressTrackerFixture
     with ProgressGenerators
     with ScalaFutures {
-
-  import uk.ac.wellcome.storage.dynamo._
-  import Progress._
 
   describe("create") {
     it("creates a progress monitor") {
@@ -71,17 +68,14 @@ class ProgressTrackerTest
         when(mockDynamoDbClient.putItem(any[PutItemRequest]))
           .thenThrow(expectedException)
 
-        val progressTracker = new ProgressTracker(
-          mockDynamoDbClient,
-          DynamoConfig(table = table.name, index = table.index)
-        )
+        withProgressTracker(table, dynamoDbClient = mockDynamoDbClient) { progressTracker =>
+          val progress = createProgress()
 
-        val progress = createProgress()
-
-        val result = progressTracker.initialise(progress)
-        whenReady(result.failed) { failedException=>
-          failedException shouldBe a[RuntimeException]
-          failedException shouldBe expectedException
+          val result = progressTracker.initialise(progress)
+          whenReady(result.failed) { failedException =>
+            failedException shouldBe a[RuntimeException]
+            failedException shouldBe expectedException
+          }
         }
       }
     }
@@ -120,13 +114,10 @@ class ProgressTrackerTest
         when(mockDynamoDbClient.getItem(any[GetItemRequest]))
           .thenThrow(expectedException)
 
-        val progressTracker = new ProgressTracker(
-          mockDynamoDbClient,
-          DynamoConfig(table.name, table.index)
-        )
-
-        whenReady(progressTracker.get(randomUUID).failed) { failedException =>
-          failedException shouldBe expectedException
+        withProgressTracker(table, dynamoDbClient = mockDynamoDbClient) { progressTracker =>
+          whenReady(progressTracker.get(randomUUID).failed) { failedException =>
+            failedException shouldBe expectedException
+          }
         }
       }
     }
@@ -263,18 +254,16 @@ class ProgressTrackerTest
         val expectedException = new RuntimeException("root cause")
         when(mockDynamoDbClient.updateItem(any[UpdateItemRequest]))
           .thenThrow(expectedException)
-        val progressTracker = new ProgressTracker(
-          mockDynamoDbClient,
-          DynamoConfig(table = table.name, index = table.index)
-        )
 
-        val update = createProgressEventUpdateWith(randomUUID)
+        withProgressTracker(table, dynamoDbClient = mockDynamoDbClient) { progressTracker =>
+          val update = createProgressEventUpdateWith(randomUUID)
 
-        val result = Try(progressTracker.update(update))
+          val result = Try(progressTracker.update(update))
 
-        val failedException = result.failed.get
-        failedException shouldBe a[RuntimeException]
-        failedException shouldBe expectedException
+          val failedException = result.failed.get
+          failedException shouldBe a[RuntimeException]
+          failedException shouldBe expectedException
+        }
       }
     }
   }
