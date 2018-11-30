@@ -2,11 +2,7 @@ package uk.ac.wellcome.platform.archive.progress_http.fixtures
 
 import java.net.URL
 
-import akka.http.scaladsl.model.HttpEntity
-import akka.stream.Materializer
-import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
@@ -19,9 +15,6 @@ import uk.ac.wellcome.platform.archive.progress_http.ProgressHTTP
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 
 trait ProgressHttpFixture
     extends S3
@@ -81,19 +74,5 @@ trait ProgressHttpFixture
         }
       }
     }
-  }
-
-  def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T],
-                                  materializer: Materializer): T = {
-    val timeout = 300.millis
-
-    val stringBody = entity
-      .toStrict(timeout)
-      .map(_.data)
-      .map(_.utf8String)
-      .value
-      .get
-      .get
-    fromJson[T](stringBody).get
   }
 }

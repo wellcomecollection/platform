@@ -1,9 +1,15 @@
 package uk.ac.wellcome.platform.archive.common.fixtures
 
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
+import akka.stream.Materializer
+import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
+import uk.ac.wellcome.json.JsonUtil.fromJson
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 trait HttpFixtures extends Akka with ScalaFutures {
   def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]): R =
@@ -13,4 +19,18 @@ trait HttpFixtures extends Akka with ScalaFutures {
         testWith(response)
       }
     }
+
+  def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T],
+                                  materializer: Materializer): T = {
+    val timeout = 300.millis
+
+    val stringBody = entity
+      .toStrict(timeout)
+      .map(_.data)
+      .map(_.utf8String)
+      .value
+      .get
+      .get
+    fromJson[T](stringBody).get
+  }
 }

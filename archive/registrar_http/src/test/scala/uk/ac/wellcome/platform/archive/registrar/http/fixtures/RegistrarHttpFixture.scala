@@ -2,11 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.http.fixtures
 
 import java.net.URL
 
-import akka.http.scaladsl.model.HttpEntity
-import akka.stream.Materializer
-import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
@@ -16,7 +12,6 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 
 trait RegistrarHttpFixture
     extends RandomThings
@@ -74,19 +69,5 @@ trait RegistrarHttpFixture
         }
       }
     }
-  }
-
-  def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T],
-                                  materializer: Materializer): T = {
-    val timeout = 300.millis
-
-    val stringBody = entity
-      .toStrict(timeout)
-      .map(_.data)
-      .map(_.utf8String)
-      .value
-      .get
-      .get
-    fromJson[T](stringBody).get
   }
 }
