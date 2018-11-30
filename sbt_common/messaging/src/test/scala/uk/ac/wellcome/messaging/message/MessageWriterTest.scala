@@ -168,7 +168,7 @@ class MessageWriterTest
           val eventualAttempt = messageWriter.write(largeMessage, subject)
 
           whenReady(eventualAttempt.failed) { _ =>
-            listMessagesReceivedFromSNS(topic) should be('empty)
+            assertSnsReceivesNothing(topic)
           }
         }
       }

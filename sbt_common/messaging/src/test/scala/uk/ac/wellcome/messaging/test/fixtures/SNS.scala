@@ -4,7 +4,7 @@ import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import io.circe.generic.extras.JsonKey
 import io.circe.{Decoder, Json, ParsingFailure, yaml}
-import org.scalatest.Matchers
+import org.scalatest.{Assertion, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{
   SNSClientFactory,
@@ -146,13 +146,11 @@ trait SNS extends Matchers with Logging {
       .map { messageInfo: MessageInfo => fromJson[T](messageInfo.message).get }
 
   def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic)(
-    implicit decoderT: Decoder[T]) = {
+    implicit decoderT: Decoder[T]): Assertion =
     assertSnsReceives(Set(expectedMessage), topic)
-  }
 
-  def assertSnsReceivesNothing(topic: SNS.Topic) = {
+  def assertSnsReceivesNothing(topic: SNS.Topic): Assertion =
     notificationCount(topic) shouldBe 0
-  }
 
   def assertSnsReceives[T, I[T] <: Iterable[T]](
     expectedMessages: I[T],

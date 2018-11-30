@@ -136,7 +136,7 @@ class RegistrarFeatureTest
         withBagNotification(queuePair, storageBucket) { _ =>
           withBagNotification(queuePair, storageBucket) { _ =>
             eventually {
-              listMessagesReceivedFromSNS(progressTopic) shouldBe empty
+              assertSnsReceivesNothing(topic)
 
               assertQueueEmpty(queue)
               assertQueueHasSize(dlq, 2)

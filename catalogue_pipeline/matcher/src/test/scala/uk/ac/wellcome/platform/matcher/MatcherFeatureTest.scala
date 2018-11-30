@@ -76,7 +76,7 @@ class MatcherFeatureTest
             eventually {
               noMessagesAreWaitingIn(queuePair.queue)
               noMessagesAreWaitingIn(queuePair.dlq)
-              listMessagesReceivedFromSNS(topic).size shouldBe 0
+              assertSnsReceivesNothing(topic)
             }
           }
         }

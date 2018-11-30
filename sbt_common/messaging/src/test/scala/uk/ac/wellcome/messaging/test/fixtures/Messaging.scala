@@ -120,17 +120,13 @@ trait Messaging
     * to objects in S3, return the unpacked objects.
     */
   def getMessages[T](topic: Topic)(implicit decoder: Decoder[T]): List[T] =
-    listMessagesReceivedFromSNS(topic).map { messageInfo =>
-      fromJson[MessageNotification](messageInfo.message) match {
-        case Success(RemoteNotification(location)) =>
-          getObjectFromS3[T](location)
-        case Success(InlineNotification(jsonString)) =>
-          fromJson[T](jsonString).get
-        case _ =>
-          throw new RuntimeException(
-            s"Unrecognised message: ${messageInfo.message}"
-          )
-      }
+    listObjectsReceivedFromSNS[MessageNotification](topic).map {
+      case RemoteNotification(location) =>
+        getObjectFromS3[T](location)
+      case InlineNotification(jsonString) =>
+        fromJson[T](jsonString).get
+      case _ =>
+        throw new RuntimeException(s"Unrecognised message!")
     }.toList
 
   /** Send a MessageNotification to SQS.

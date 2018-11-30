@@ -109,7 +109,7 @@ class MergerWorkerServiceTest
         eventually {
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, 1)
-          listMessagesReceivedFromSNS(topic) shouldBe empty
+          assertSnsReceivesNothing(topic)
 
           verify(metricsSender, times(3))
             .countFailure(any[String])
