@@ -50,24 +50,17 @@ trait RegistrarHttpFixture
 
   def withConfiguredApp[R](
     testWith: TestWith[(StorageManifestVHS, String), R]): R = {
-    val host = "localhost"
-    val port = randomPort
-    val externalBaseURL = s"http://$host:$port"
     val contextURL = new URL(
       "http://api.wellcomecollection.org/storage/v1/context.json")
 
-    val httpServerConfig = HTTPServerConfig(
-      host = host,
-      port = port,
-      externalBaseURL = externalBaseURL
-    )
+    val httpServerConfig = createHTTPServerConfig
 
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
         val s3Prefix = "archive"
         withStorageManifestVHS(table, bucket, s3Prefix) { vhs =>
           withApp(table, bucket, s3Prefix, httpServerConfig, contextURL) { _ =>
-            testWith((vhs, externalBaseURL))
+            testWith((vhs, httpServerConfig.externalBaseURL))
           }
         }
       }

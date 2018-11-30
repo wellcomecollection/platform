@@ -58,22 +58,15 @@ trait ProgressHttpFixture
     }
 
   def withConfiguredApp[R](testWith: TestWith[(Table, Topic, String), R]): R = {
-    val host = "localhost"
-    val port = randomPort
-    val externalBaseURL = s"http://$host:$port"
     val contextURL = new URL(
       "http://api.wellcomecollection.org/storage/v1/context.json")
 
-    val httpServerConfig = HTTPServerConfig(
-      host = host,
-      port = port,
-      externalBaseURL = externalBaseURL
-    )
+    val httpServerConfig = createHTTPServerConfig
 
     withLocalSnsTopic { topic =>
       withProgressTrackerTable { table =>
         withApp(table, topic, httpServerConfig, contextURL) { _ =>
-          testWith((table, topic, externalBaseURL))
+          testWith((table, topic, httpServerConfig.externalBaseURL))
         }
       }
     }

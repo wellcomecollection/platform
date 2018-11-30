@@ -7,6 +7,7 @@ import akka.stream.Materializer
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil.fromJson
+import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,4 +42,11 @@ trait HttpFixtures extends Akka with ScalaFutures {
       .get
     fromJson[T](stringBody).get
   }
+
+  def createHTTPServerConfig: HTTPServerConfig =
+    HTTPServerConfig(
+      host = "localhost",
+      port = 1234,
+      externalBaseURL = "http://localhost:1234"
+    )
 }
