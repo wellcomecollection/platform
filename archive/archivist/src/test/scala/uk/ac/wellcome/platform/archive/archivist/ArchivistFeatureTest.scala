@@ -90,12 +90,7 @@ class ArchivistFeatureTest
 
   it("fails when ingesting an invalid bag") {
     withArchivist {
-      case (
-          ingestBucket,
-          _,
-          queuePair,
-          registrarTopic,
-          progressTopic) =>
+      case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
@@ -118,12 +113,7 @@ class ArchivistFeatureTest
 
   it("fails when ingesting a bag with no tag manifest") {
     withArchivist {
-      case (
-          ingestBucket,
-          _,
-          queuePair,
-          registrarTopic,
-          progressTopic) =>
+      case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
           case (request, _) =>
             eventually {
@@ -230,7 +220,8 @@ class ArchivistFeatureTest
               queuePair.queue,
               IngestBagRequest(
                 archiveRequestId = invalidRequestId1,
-                zippedBagLocation = ObjectLocation(ingestBucket.name, "non-existing1.zip"),
+                zippedBagLocation =
+                  ObjectLocation(ingestBucket.name, "non-existing1.zip"),
                 storageSpace = StorageSpace("not_a_real_one")
               )
             )
@@ -243,7 +234,8 @@ class ArchivistFeatureTest
                   queuePair.queue,
                   IngestBagRequest(
                     archiveRequestId = invalidRequestId2,
-                    zippedBagLocation = ObjectLocation(ingestBucket.name, "non-existing2.zip"),
+                    zippedBagLocation =
+                      ObjectLocation(ingestBucket.name, "non-existing2.zip"),
                     storageSpace = StorageSpace("not_a_real_one")
                   )
                 )
@@ -276,13 +268,15 @@ class ArchivistFeatureTest
 
                   assertTopicReceivesFailedProgress(
                     requestId = invalidRequestId1,
-                    expectedDescriptionPrefix = s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip",
+                    expectedDescriptionPrefix =
+                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip",
                     progressTopic = progressTopic
                   )
 
                   assertTopicReceivesFailedProgress(
                     requestId = invalidRequestId2,
-                    expectedDescriptionPrefix = s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip",
+                    expectedDescriptionPrefix =
+                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip",
                     progressTopic = progressTopic
                   )
                 }
@@ -346,13 +340,15 @@ class ArchivistFeatureTest
 
                           assertTopicReceivesFailedProgress(
                             requestId = invalidRequest1.archiveRequestId,
-                            expectedDescription = "Failed reading file this/does/not/exists.jpg from zip file",
+                            expectedDescription =
+                              "Failed reading file this/does/not/exists.jpg from zip file",
                             progressTopic = progressTopic
                           )
 
                           assertTopicReceivesFailedProgress(
                             requestId = invalidRequest2.archiveRequestId,
-                            expectedDescription = "Failed reading file this/does/not/exists.jpg from zip file",
+                            expectedDescription =
+                              "Failed reading file this/does/not/exists.jpg from zip file",
                             progressTopic = progressTopic
                           )
                         }
@@ -417,13 +413,15 @@ class ArchivistFeatureTest
 
                           assertTopicReceivesFailedProgress(
                             requestId = invalidRequest1.archiveRequestId,
-                            expectedDescription = "Failed reading file bag-info.txt from zip file",
+                            expectedDescription =
+                              "Failed reading file bag-info.txt from zip file",
                             progressTopic = progressTopic
                           )
 
                           assertTopicReceivesFailedProgress(
                             requestId = invalidRequest2.archiveRequestId,
-                            expectedDescription = "Failed reading file bag-info.txt from zip file",
+                            expectedDescription =
+                              "Failed reading file bag-info.txt from zip file",
                             progressTopic = progressTopic
                           )
                         }
