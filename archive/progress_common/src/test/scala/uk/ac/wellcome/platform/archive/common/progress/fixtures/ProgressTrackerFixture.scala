@@ -5,7 +5,6 @@ import java.util.UUID
 
 import com.gu.scanamo.error.DynamoReadError
 import org.scalatest.Assertion
-import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.models.{Callback, Namespace, Progress, StorageLocation}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
@@ -17,7 +16,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait ProgressTrackerFixture
     extends LocalProgressTrackerDynamoDb
-    with MockitoSugar
     with RandomThings
     with ProgressGenerators
     with TimeTestFixture {
@@ -30,12 +28,6 @@ trait ProgressTrackerFixture
       dynamoClient = dynamoDbClient,
       dynamoConfig = createDynamoConfigWith(table)
     )
-    testWith(progressTracker)
-  }
-
-  def withMockProgressTracker[R]()(
-    testWith: TestWith[ProgressTracker, R]): R = {
-    val progressTracker = mock[ProgressTracker]
     testWith(progressTracker)
   }
 
