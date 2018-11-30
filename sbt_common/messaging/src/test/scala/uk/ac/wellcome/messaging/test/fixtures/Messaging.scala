@@ -50,24 +50,13 @@ trait Messaging
       }
     )
 
-  def messageReaderLocalFlags(queue: Queue): Map[String, String] =
-    Map(
-      "aws.message.reader.sqs.queue.url" -> queue.url,
-    ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
-
-  def messageWriterLocalFlags(bucket: Bucket, topic: Topic) =
-    Map(
-      "aws.message.writer.sns.topic.arn" -> topic.arn,
-      "aws.message.writer.s3.bucketName" -> bucket.name
-    ) ++ s3ClientLocalFlags ++ snsLocalClientFlags
-
   def withExampleObjectMessageWriter[R](bucket: Bucket,
                                         topic: Topic,
                                         writerSnsClient: AmazonSNS = snsClient)(
-    testWith: TestWith[MessageWriter[ExampleObject], R]) = {
-    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient)(
-      testWith)
-  }
+    testWith: TestWith[MessageWriter[ExampleObject], R]): R =
+    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient) { writer =>
+      testWith(writer)
+    }
 
   def withMessageWriter[T, R](bucket: Bucket,
                               topic: Topic,

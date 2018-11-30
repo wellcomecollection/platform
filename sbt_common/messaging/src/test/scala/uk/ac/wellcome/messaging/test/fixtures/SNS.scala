@@ -154,7 +154,7 @@ trait SNS extends Matchers with Logging {
 
   def assertSnsReceives[T, I[T] <: Iterable[T]](
     expectedMessages: I[T],
-    topic: SNS.Topic)(implicit decoderT: Decoder[T]) = {
+    topic: SNS.Topic)(implicit decoderT: Decoder[T]): Assertion = {
     val triedReceiptsT = listObjectsReceivedFromSNS[T](topic).toSet
 
     debug(s"SNS $topic received $triedReceiptsT")
