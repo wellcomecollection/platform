@@ -33,7 +33,8 @@ class textNormalisationTest extends FunSpec with Matchers {
       (".text. . ", ".text."),
       (".", ""),
       ("..", "."),
-      ("a title ... with ... . ", "a title ... with ...")
+      ("a title ... with ... . ", "a title ... with ..."),
+      ("a title ... with .... ", "a title ... with ...")
     )
     forAll(examples) { (i: String, o: String) =>
       trimTrailing(i, '.') shouldBe o
@@ -42,9 +43,9 @@ class textNormalisationTest extends FunSpec with Matchers {
 
   it("removes trailing literal regexp character") {
     val examples = Table(
-      ("in", "char"),
+      ("-in-",   "-char-"),
       ("text\\", '\\'),
-      ("text^", '^')
+      ("text^",  '^')
     )
     forAll(examples) { (i: String, c: Char) =>
       trimTrailing(i, c) shouldBe "text"
