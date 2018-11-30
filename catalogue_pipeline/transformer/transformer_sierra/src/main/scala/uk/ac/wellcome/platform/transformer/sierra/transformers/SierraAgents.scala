@@ -27,11 +27,11 @@ trait SierraAgents {
       val prefixString =
         if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-      // Only normalise the Person label when a contributor. Strictly a Person within
-      // Subjects is not normalised however, as this should not change the Person
-      // label for subjects (sourced from Marc 600) those could also be normalised.
-      // As this is effectively a no-op and the test can be removed and Person.normalised
-      // can be returned when confident this is the case.
+      // The rule is to only normalise the 'Person' label when a contributor.  Strictly a 'Person' within
+      // 'Subjects' (sourced from Marc 600) should not be normalised -- however, as these labels
+      // are not expected to have punctuation normalisation should not change the 'Person' label for 'Subjects'
+      // In which case normalisation is effectively a no-op and the test can be removed and Person.normalised
+      // always returned when confident in the data.
       if (Set("100", "700").contains(marcTag))
         Person.normalised(
           label = label,
