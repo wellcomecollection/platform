@@ -7,11 +7,9 @@ import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors._
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagItConfig,
-  IngestRequestContextGenerators
-}
+import uk.ac.wellcome.platform.archive.archivist.models.BagItConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.storage.fixtures.S3
@@ -27,7 +25,7 @@ class ArchiveJobDigestItemsFlowTest
     with ScalaFutures
     with ZipBagItFixture
     with Inside
-    with IngestRequestContextGenerators {
+    with IngestBagRequestGenerators {
   implicit val s = s3Client
 
   it("outputs a right of archive complete if all of the items succeed") {
@@ -35,14 +33,14 @@ class ArchiveJobDigestItemsFlowTest
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
           withBagItZip(dataFileCount = 2) {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val ingestRequest = createIngestBagRequest
-              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 archiveJobs shouldBe List(
@@ -69,14 +67,14 @@ class ArchiveJobDigestItemsFlowTest
           withBagItZip(
             dataFileCount = 2,
             createDataManifest = dataManifestWithNonExistingFile) {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val ingestRequest = createIngestBagRequest
-              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 inside(archiveJobs.toList) {
@@ -106,9 +104,12 @@ class ArchiveJobDigestItemsFlowTest
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
           withBagItZip(dataFileCount = 2, createDigest = _ => "bad-digest") {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val ingestRequest = createIngestBagRequest
-              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
 
               val failedFiles: List[String] = zipFile
                 .entries()
@@ -120,10 +121,7 @@ class ArchiveJobDigestItemsFlowTest
                 .toList
 
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 inside(archiveJobs.toList) {
@@ -149,7 +147,7 @@ class ArchiveJobDigestItemsFlowTest
           withBagItZip(
             dataFileCount = 2,
             createDataManifest = dataManifestWithWrongChecksum) {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val ingestRequest = createIngestBagRequest
               val manifestZipEntry = zipFile.getEntry("manifest-sha256.txt")
               val badChecksumLine = IOUtils
@@ -159,12 +157,12 @@ class ArchiveJobDigestItemsFlowTest
                 .head
               val filepath = badChecksumLine.replace("badDigest", "").trim
 
-              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
               val eventualArchiveJobs = source via flow runWith Sink.seq
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 inside(archiveJobs.toList) {
@@ -189,14 +187,14 @@ class ArchiveJobDigestItemsFlowTest
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
           withBagItZip(dataFileCount = 2, createDataManifest = _ => None) {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val ingestRequest = createIngestBagRequest
-              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -218,14 +216,14 @@ class ArchiveJobDigestItemsFlowTest
             dataFileCount = 2,
             createDataManifest = _ =>
               Some(FileEntry("manifest-sha256.txt", randomAlphanumeric()))) {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val ingestRequest = createIngestBagRequest
-              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -244,14 +242,14 @@ class ArchiveJobDigestItemsFlowTest
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
           withBagItZip(dataFileCount = 2, createTagManifest = _ => None) {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val ingestRequest = createIngestBagRequest
-              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -273,14 +271,14 @@ class ArchiveJobDigestItemsFlowTest
             dataFileCount = 2,
             createTagManifest = _ =>
               Some(FileEntry("tagmanifest-sha256.txt", randomAlphanumeric()))) {
-            case (bagName, zipFile) =>
+            case (_, zipFile) =>
               val ingestRequest = createIngestBagRequest
-              val archiveJob = createArchiveJob(zipFile, bagName, bucket)
+              val archiveJob = createArchiveJobWith(
+                zipFile = zipFile,
+                bucket = bucket
+              )
               val source = Source.single(archiveJob)
-              val flow = ArchiveJobDigestItemsFlow(
-                BagItConfig().digestDelimiterRegexp,
-                10,
-                ingestRequest)
+              val flow = createFlow(ingestRequest)
 
               val eventualArchiveJobs = source via flow runWith Sink.seq
 
@@ -296,4 +294,10 @@ class ArchiveJobDigestItemsFlowTest
     }
   }
 
+  private def createFlow(ingestRequest: IngestBagRequest) =
+    ArchiveJobDigestItemsFlow(
+      delimiter = BagItConfig().digestDelimiterRegexp,
+      parallelism = 10,
+      ingestBagRequest = ingestRequest
+    )
 }

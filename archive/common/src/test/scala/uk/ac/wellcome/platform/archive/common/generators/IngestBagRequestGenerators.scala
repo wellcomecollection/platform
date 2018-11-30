@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist.models
+package uk.ac.wellcome.platform.archive.common.generators
 
 import java.net.URI
 import java.util.UUID
@@ -10,9 +10,8 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 import uk.ac.wellcome.storage.ObjectLocation
 
-trait IngestRequestContextGenerators extends RandomThings {
-
-  def createIngestBagRequest = createIngestBagRequestWith()
+trait IngestBagRequestGenerators extends RandomThings {
+  def createIngestBagRequest: IngestBagRequest = createIngestBagRequestWith()
 
   def createIngestBagRequestWith(requestId: UUID = randomUUID,
                                  ingestBagLocation: ObjectLocation =

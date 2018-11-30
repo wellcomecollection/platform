@@ -9,7 +9,7 @@ import akka.util.ByteString
   * the input string.
   *
   */
-object VerifiedDownloadFlow {
+object SHA256Flow {
   def apply(): Flow[ByteString, String, NotUsed] =
     Flow.fromGraph(GraphDSL.create() { implicit b =>
       {

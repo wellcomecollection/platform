@@ -1,8 +1,11 @@
 package uk.ac.wellcome.platform.archive.archivist
 
+import java.util.UUID
+
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.common.models._
@@ -30,11 +33,9 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) =>
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair) {
           case (request, bagIdentifier) =>
-            archivist.run()
             eventually {
 
               val archivedObjects = listKeysInBucket(storageBucket)
@@ -89,19 +90,12 @@ class ArchivistFeatureTest
 
   it("fails when ingesting an invalid bag") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          registrarTopic,
-          progressTopic,
-          archivist) =>
+      case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
           createDigest = _ => "bad_digest") {
-          case (request, bagIdentifier) =>
-            archivist.run()
+          case (request, _) =>
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
@@ -109,8 +103,7 @@ class ArchivistFeatureTest
               assertTopicReceivesProgressStatusUpdate(
                 request.archiveRequestId,
                 progressTopic,
-                Progress.Failed,
-                None)({ events =>
+                Progress.Failed)({ events =>
                 all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
               })
             }
@@ -120,16 +113,9 @@ class ArchivistFeatureTest
 
   it("fails when ingesting a bag with no tag manifest") {
     withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          registrarTopic,
-          progressTopic,
-          archivist) =>
+      case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
-          case (request, bagIdentifier) =>
-            archivist.run()
+          case (request, _) =>
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
@@ -137,8 +123,7 @@ class ArchivistFeatureTest
               assertTopicReceivesProgressStatusUpdate(
                 request.archiveRequestId,
                 progressTopic,
-                Progress.Failed,
-                None)({ events =>
+                Progress.Failed)({ events =>
                 all(events.map(_.description)) should include regex "Failed reading file tagmanifest-sha256.txt from zip file"
               })
             }
@@ -153,11 +138,7 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) => {
-
-        archivist.run()
-
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
@@ -205,16 +186,14 @@ class ArchivistFeatureTest
                           assertTopicReceivesProgressStatusUpdate(
                             invalidRequest1.archiveRequestId,
                             progressTopic,
-                            Progress.Failed,
-                            None) { events =>
+                            Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
                           assertTopicReceivesProgressStatusUpdate(
                             invalidRequest2.archiveRequestId,
                             progressTopic,
-                            Progress.Failed,
-                            None) { events =>
+                            Progress.Failed) { events =>
                             all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                           }
 
@@ -223,7 +202,6 @@ class ArchivistFeatureTest
                 }
             }
         }
-      }
     }
   }
 
@@ -234,20 +212,17 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) =>
-        archivist.run()
-
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             val invalidRequestId1 = randomUUID
             sendNotificationToSQS(
               queuePair.queue,
               IngestBagRequest(
-                invalidRequestId1,
-                ObjectLocation(ingestBucket.name, "non-existing1.zip"),
-                None,
-                StorageSpace("not_a_real_one")
+                archiveRequestId = invalidRequestId1,
+                zippedBagLocation =
+                  ObjectLocation(ingestBucket.name, "non-existing1.zip"),
+                storageSpace = StorageSpace("not_a_real_one")
               )
             )
 
@@ -258,10 +233,10 @@ class ArchivistFeatureTest
                 sendNotificationToSQS(
                   queuePair.queue,
                   IngestBagRequest(
-                    invalidRequestId2,
-                    ObjectLocation(ingestBucket.name, "non-existing2.zip"),
-                    None,
-                    StorageSpace("not_a_real_one")
+                    archiveRequestId = invalidRequestId2,
+                    zippedBagLocation =
+                      ObjectLocation(ingestBucket.name, "non-existing2.zip"),
+                    storageSpace = StorageSpace("not_a_real_one")
                   )
                 )
 
@@ -291,25 +266,19 @@ class ArchivistFeatureTest
                     registrarTopic
                   )
 
-                  assertTopicReceivesProgressStatusUpdate(
-                    invalidRequestId1,
-                    progressTopic,
-                    Progress.Failed,
-                    None) { events =>
-                    events should have size 1
-                    events.head.description should startWith(
-                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip")
-                  }
+                  assertTopicReceivesFailedProgress(
+                    requestId = invalidRequestId1,
+                    expectedDescriptionPrefix =
+                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip",
+                    progressTopic = progressTopic
+                  )
 
-                  assertTopicReceivesProgressStatusUpdate(
-                    invalidRequestId2,
-                    progressTopic,
-                    Progress.Failed,
-                    None) { events =>
-                    events should have size 1
-                    events.head.description should startWith(
-                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip")
-                  }
+                  assertTopicReceivesFailedProgress(
+                    requestId = invalidRequestId2,
+                    expectedDescriptionPrefix =
+                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip",
+                    progressTopic = progressTopic
+                  )
                 }
             }
         }
@@ -324,11 +293,7 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) => {
-
-        archivist.run()
-
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
@@ -373,29 +338,24 @@ class ArchivistFeatureTest
                             registrarTopic
                           )
 
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest1.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed,
-                            None) { events =>
-                            events should have size 1
-                            events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
-                          }
+                          assertTopicReceivesFailedProgress(
+                            requestId = invalidRequest1.archiveRequestId,
+                            expectedDescription =
+                              "Failed reading file this/does/not/exists.jpg from zip file",
+                            progressTopic = progressTopic
+                          )
 
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest2.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed,
-                            None) { events =>
-                            events should have size 1
-                            events.head.description shouldBe "Failed reading file this/does/not/exists.jpg from zip file"
-                          }
+                          assertTopicReceivesFailedProgress(
+                            requestId = invalidRequest2.archiveRequestId,
+                            expectedDescription =
+                              "Failed reading file this/does/not/exists.jpg from zip file",
+                            progressTopic = progressTopic
+                          )
                         }
                     }
                 }
             }
         }
-      }
     }
   }
 
@@ -406,10 +366,7 @@ class ArchivistFeatureTest
           storageBucket,
           queuePair,
           registrarTopic,
-          progressTopic,
-          archivist) =>
-        archivist.run()
-
+          progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
           case (validRequest1, validBag1) =>
             createAndSendBag(
@@ -454,23 +411,19 @@ class ArchivistFeatureTest
                             registrarTopic
                           )
 
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest1.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed,
-                            None) { events =>
-                            events should have size 1
-                            events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
-                          }
+                          assertTopicReceivesFailedProgress(
+                            requestId = invalidRequest1.archiveRequestId,
+                            expectedDescription =
+                              "Failed reading file bag-info.txt from zip file",
+                            progressTopic = progressTopic
+                          )
 
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest2.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed,
-                            None) { events =>
-                            events should have size 1
-                            events.head.description shouldBe "Failed reading file bag-info.txt from zip file"
-                          }
+                          assertTopicReceivesFailedProgress(
+                            requestId = invalidRequest2.archiveRequestId,
+                            expectedDescription =
+                              "Failed reading file bag-info.txt from zip file",
+                            progressTopic = progressTopic
+                          )
                         }
                     }
                 }
@@ -478,4 +431,26 @@ class ArchivistFeatureTest
         }
     }
   }
+
+  private def assertTopicReceivesFailedProgress(
+    requestId: UUID,
+    expectedDescription: String = "",
+    expectedDescriptionPrefix: String = "",
+    progressTopic: Topic
+  ) =
+    assertTopicReceivesProgressStatusUpdate(
+      requestId = requestId,
+      progressTopic = progressTopic,
+      status = Progress.Failed,
+      expectedBag = None) { events =>
+      events should have size 1
+
+      if (!expectedDescription.isEmpty) {
+        events.head.description shouldBe expectedDescription
+      }
+
+      if (!expectedDescriptionPrefix.isEmpty) {
+        events.head.description should startWith(expectedDescriptionPrefix)
+      }
+    }
 }

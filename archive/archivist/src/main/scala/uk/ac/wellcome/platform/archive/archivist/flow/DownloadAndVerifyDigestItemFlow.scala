@@ -40,7 +40,7 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
             case Success(inputStream) =>
               StreamConverters
                 .fromInputStream(() => inputStream)
-                .via(VerifiedDownloadFlow())
+                .via(SHA256Flow())
                 .map {
                   case calculatedChecksum
                       if job.bagDigestItem.checksum == calculatedChecksum =>
@@ -50,7 +50,7 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
                     Left(
                       ChecksumNotMatchedOnDownloadError(
                         expectedChecksum = job.bagDigestItem.checksum,
-                        actualCheckSum = calculatedChecksum,
+                        actualChecksum = calculatedChecksum,
                         t = job
                       )
                     )

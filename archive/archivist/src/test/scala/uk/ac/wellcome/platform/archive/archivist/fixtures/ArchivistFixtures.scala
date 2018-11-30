@@ -7,14 +7,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagItConfig,
-  BagUploaderConfig,
-  IngestRequestContextGenerators,
-  UploadConfig
-}
 import uk.ac.wellcome.platform.archive.archivist.Archivist
+import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{
   BagInfo,
@@ -29,7 +25,8 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait ArchivistFixtures
     extends Messaging
     with ZipBagItFixture
-    with IngestRequestContextGenerators {
+    with BagUploaderConfigGenerators
+    with IngestBagRequestGenerators {
 
   import IngestBagRequest._
 
@@ -96,50 +93,40 @@ trait ArchivistFixtures
             sqsConfig = createSQSConfigWith(queuePair.queue),
             metricsSender = metricsSender
           ),
-          bagUploaderConfig = BagUploaderConfig(
-            uploadConfig = UploadConfig(uploadNamespace = storageBucket.name),
-            parallelism = 10,
-            bagItConfig = BagItConfig()
-          ),
+          bagUploaderConfig = createBagUploaderConfigWith(storageBucket),
           snsRegistrarConfig = createSNSConfigWith(registrarTopic),
           snsProgressConfig = createSNSConfigWith(progressTopic)
         )(
           actorSystem = actorSystem
         )
 
+        archivist.run()
+
         testWith(archivist)
       }
     }
 
   def withArchivist[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic, Archivist), R])
-    : R = {
-    withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
-      withLocalSnsTopic {
-        registrarTopic =>
-          withLocalSnsTopic {
-            progressTopic =>
-              withLocalS3Bucket { ingestBucket =>
-                withLocalS3Bucket { storageBucket =>
-                  withApp(
-                    storageBucket,
-                    queuePair,
-                    registrarTopic,
-                    progressTopic) { archivist =>
-                    testWith(
-                      (
-                        ingestBucket,
-                        storageBucket,
-                        queuePair,
-                        registrarTopic,
-                        progressTopic,
-                        archivist))
-                  }
-                }
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic), R]): R = {
+    withLocalSqsQueueAndDlqAndTimeout(5) { queuePair =>
+      withLocalSnsTopic { registrarTopic =>
+        withLocalSnsTopic { progressTopic =>
+          withLocalS3Bucket { ingestBucket =>
+            withLocalS3Bucket { storageBucket =>
+              withApp(storageBucket, queuePair, registrarTopic, progressTopic) {
+                _ =>
+                  testWith(
+                    (
+                      ingestBucket,
+                      storageBucket,
+                      queuePair,
+                      registrarTopic,
+                      progressTopic))
               }
+            }
           }
+        }
       }
-    })
+    }
   }
-
 }
