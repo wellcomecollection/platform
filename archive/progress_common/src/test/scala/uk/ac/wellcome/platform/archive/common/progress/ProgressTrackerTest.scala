@@ -7,7 +7,10 @@ import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.common.progress.monitor.IdConstraintError
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -23,6 +26,9 @@ class ProgressTrackerTest
     with ProgressTrackerFixture
     with ProgressGenerators
     with ScalaFutures {
+
+  import uk.ac.wellcome.storage.dynamo._
+  import Progress._
 
   describe("create") {
     it("creates a progress monitor") {

@@ -17,6 +17,10 @@ trait ProgressTrackerFixture
     with RandomThings
     with ProgressGenerators
     with TimeTestFixture {
+
+  import uk.ac.wellcome.storage.dynamo._
+  import Progress._
+
   def createTable(table: LocalDynamoDb.Table): Table = Table("table", "index")
 
   def withProgressTracker[R](table: Table, dynamoDbClient: AmazonDynamoDB = dynamoDbClient)(
