@@ -14,10 +14,8 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
 }
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexParameters,
-  ReindexParameters
-}
+import uk.ac.wellcome.platform.reindex.reindex_worker.generators.ReindexRequestGenerators
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.CompleteReindexParameters
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -29,6 +27,7 @@ class ReindexWorkerServiceTest
     with Akka
     with DynamoFixtures
     with ReindexableTable
+    with ReindexRequestGenerators
     with SNS
     with SQS
     with ScalaFutures
@@ -56,9 +55,9 @@ class ReindexWorkerServiceTest
 
               Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
 
-              sendNotificationToSQS[ReindexParameters](
+              sendNotificationToSQS(
                 queue = queue,
-                message = reindexParameters
+                message = createReindexRequest(reindexParameters)
               )
 
               eventually {
@@ -111,9 +110,9 @@ class ReindexWorkerServiceTest
             totalSegments = 10
           )
 
-          sendNotificationToSQS[ReindexParameters](
+          sendNotificationToSQS(
             queue = queue,
-            message = reindexParameters
+            message = createReindexRequest(reindexParameters)
           )
 
           eventually {
