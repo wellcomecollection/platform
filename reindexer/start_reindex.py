@@ -6,6 +6,8 @@ import sys
 
 import boto3
 import click
+import hcl
+import requests
 
 
 SOURCES = [
@@ -60,6 +62,36 @@ def partial_reindex_parameters(max_records):
     }
 
 
+def post_to_slack(slack_message):
+    """
+    Posts a message about the reindex in Slack, so we can track them.
+    """
+    # Get the non-critical Slack token.
+    s3 = boto3.client("s3")
+    tfvars_obj = s3.get_object(
+        Bucket="wellcomecollection-platform-infra", Key="terraform.tfvars"
+    )
+    tfvars_body = tfvars_obj["Body"].read()
+    tfvars = hcl.loads(tfvars_body)
+
+    webhook_url = tfvars["non_critical_slack_webhook"]
+
+    slack_data = {
+        "username": "reindex-tracker",
+        "icon_emoji": ":dynamodb:",
+        "color": "#2E72B8",
+        "title": "reindexer",
+        "fields": [{"value": slack_message}],
+    }
+
+    resp = requests.post(
+        webhook_url,
+        json=slack_data,
+        headers={"Content-Type": "application/json"},
+    )
+    resp.raise_for_status()
+
+
 @click.command()
 @click.option(
     "--src", type=click.Choice(SOURCES), required=True,
@@ -88,7 +120,17 @@ def start_reindex(src, dst, mode, reason):
         parameters = complete_reindex_parameters(total_segments)
     elif mode == "partial":
         max_records = click.prompt("How many records do you want to send?", default=10)
-        parameters = partial_reindex_parameters(total_segments)
+        parameters = partial_reindex_parameters(max_records)
+
+    username = boto3.client("iam").get_user()["User"]["UserName"]
+    slack_message = (
+        f"*{username}* started a {mode} reindex *{src!r}* ~> *{dst!r}*\n"
+        f"Reason: *{reason}*"
+    )
+
+    post_to_slack(slack_message)
+
+    print(slack_message)
 
     print(src)
     print(dst)
