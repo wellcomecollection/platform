@@ -13,7 +13,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 trait HttpFixtures extends Akka with ScalaFutures {
-  def whenRequestReady[R](r: HttpRequest)(testWith: TestWith[HttpResponse, R]): R =
+  def whenRequestReady[R](r: HttpRequest)(
+    testWith: TestWith[HttpResponse, R]): R =
     withActorSystem { implicit actorSystem =>
       val request = Http().singleRequest(r)
       whenReady(request) { (response: HttpResponse) =>
@@ -21,7 +22,8 @@ trait HttpFixtures extends Akka with ScalaFutures {
       }
     }
 
-  def whenGetRequestReady[R](path: String)(testWith: TestWith[HttpResponse, R]): R =
+  def whenGetRequestReady[R](path: String)(
+    testWith: TestWith[HttpResponse, R]): R =
     whenRequestReady(HttpRequest(GET, path)) { response =>
       testWith(response)
     }

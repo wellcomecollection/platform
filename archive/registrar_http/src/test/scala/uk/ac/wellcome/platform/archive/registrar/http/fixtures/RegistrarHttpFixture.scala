@@ -4,7 +4,10 @@ import java.net.URL
 
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  HttpFixtures,
+  RandomThings
+}
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 import uk.ac.wellcome.platform.archive.registrar.http.RegistrarHTTP
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table

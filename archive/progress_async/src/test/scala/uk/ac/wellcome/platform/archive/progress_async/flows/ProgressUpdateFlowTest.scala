@@ -110,27 +110,28 @@ class ProgressUpdateFlowTest
 
   it("continues on failure") {
     withProgressTrackerTable { table =>
-      withProgressUpdateFlow(table) { case (flow, _) =>
-        withActorSystem(actorSystem => {
-          withMaterializer(actorSystem)(materializer => {
-            val id = randomUUID
+      withProgressUpdateFlow(table) {
+        case (flow, _) =>
+          withActorSystem(actorSystem => {
+            withMaterializer(actorSystem)(materializer => {
+              val id = randomUUID
 
-            val update =
-              ProgressEventUpdate(
-                id,
-                List(ProgressEvent("Such progress, much wow.")))
+              val update =
+                ProgressEventUpdate(
+                  id,
+                  List(ProgressEvent("Such progress, much wow.")))
 
-            val updates = Source
-              .single(update)
-              .via(flow)
-              .async
-              .runWith(Sink.seq)(materializer)
+              val updates = Source
+                .single(update)
+                .via(flow)
+                .async
+                .runWith(Sink.seq)(materializer)
 
-            whenReady(updates) { result =>
-              result shouldBe empty
-            }
+              whenReady(updates) { result =>
+                result shouldBe empty
+              }
+            })
           })
-        })
       }
     }
   }

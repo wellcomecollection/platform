@@ -6,7 +6,10 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  HttpFixtures,
+  RandomThings
+}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
@@ -53,8 +56,7 @@ trait ProgressHttpFixture
       }
     }
 
-  def withConfiguredApp[R](
-    testWith: TestWith[(Table, Topic, String), R]): R = {
+  def withConfiguredApp[R](testWith: TestWith[(Table, Topic, String), R]): R = {
     val host = "localhost"
     val port = randomPort
     val externalBaseURL = s"http://$host:$port"
