@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archive.progress_http.fixtures
 
 import java.net.URL
-import java.util.UUID
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
@@ -17,12 +16,7 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressEvent,
-  ProgressStatusUpdate,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_http.ProgressHTTP
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -49,24 +43,6 @@ trait ProgressHttpFixture
     whenReady(monitor.initialise(createdProgress)) { storedProgress =>
       testWith(storedProgress)
     }
-  }
-
-  def withProgressUpdate[R](id: UUID, status: Progress.Status)(
-    testWith: TestWith[ProgressUpdate, R]): R = {
-
-    val events = List(
-      ProgressEvent(
-        description = randomAlphanumeric()
-      ))
-
-    val progress = ProgressStatusUpdate(
-      id = id,
-      status = status,
-      affectedBag = Some(randomBagId),
-      events = events
-    )
-
-    testWith(progress)
   }
 
   def withApp[R](table: Table,
