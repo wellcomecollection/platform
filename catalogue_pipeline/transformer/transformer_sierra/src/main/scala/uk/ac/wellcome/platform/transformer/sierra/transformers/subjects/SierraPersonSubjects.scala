@@ -44,7 +44,7 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
       .filterNot { _.indicator2.contains("7") }
       .flatMap { varField: VarField =>
         val subfields = varField.subfields
-        val maybePerson = getPerson("600", subfields)
+        val maybePerson = getPerson(subfields)
         maybePerson.map { person =>
           val label = getPersonSubjectLabel(
             person = person,

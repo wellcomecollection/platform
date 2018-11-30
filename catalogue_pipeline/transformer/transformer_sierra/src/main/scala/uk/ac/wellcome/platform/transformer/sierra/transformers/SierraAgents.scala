@@ -10,8 +10,7 @@ trait SierraAgents {
   //  - subfield $b populates the person numeration
   //  - subfield $c populates the person prefixes
   //
-  def getPerson(marcTag: String,
-                subfields: List[MarcSubfield]): Option[Person] =
+  def getPerson(subfields: List[MarcSubfield], normalisePerson: Boolean = false): Option[Person] =
     getLabel(subfields).map { label =>
       // Extract the numeration from subfield $b.  This is also non-repeatable
       // in the MARC spec.
@@ -32,18 +31,19 @@ trait SierraAgents {
       // are not expected to have punctuation normalisation should not change the 'Person' label for 'Subjects'
       // In which case normalisation is effectively a no-op and the test can be removed and Person.normalised
       // always returned when confident in the data.
-      if (Set("100", "700").contains(marcTag))
+      if (normalisePerson) {
         Person.normalised(
           label = label,
           prefix = prefixString,
           numeration = numeration
         )
-      else
+      } else {
         Person(
           label = label,
           prefix = prefixString,
           numeration = numeration
         )
+      }
     }
 
   // This is used to construct an Organisation from MARC tags 110 and 710.
