@@ -53,13 +53,15 @@ trait ProgressHttpFixture
             executionContext = actorSystem.dispatcher
           )
 
+          progressHTTP.run()
+
           testWith(progressHTTP)
         }
       }
     }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(Table, Topic, String, ProgressHTTP), R]): R = {
+    testWith: TestWith[(Table, Topic, String), R]): R = {
     val host = "localhost"
     val port = randomPort
     val externalBaseURL = s"http://$host:$port"
@@ -74,8 +76,8 @@ trait ProgressHttpFixture
 
     withLocalSnsTopic { topic =>
       withProgressTrackerTable { table =>
-        withApp(table, topic, httpServerConfig, contextURL) { progressHttp =>
-          testWith((table, topic, externalBaseURL, progressHttp))
+        withApp(table, topic, httpServerConfig, contextURL) { _ =>
+          testWith((table, topic, externalBaseURL))
         }
       }
     }
