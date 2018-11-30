@@ -38,7 +38,7 @@ def convert_date_to_iso(date_string):
     try:
         return parse(date_string).date().isoformat()
     except (ValueError, TypeError):
-        return date_string
+        return None
 
 
 keys_to_parse = {
