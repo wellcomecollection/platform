@@ -257,7 +257,7 @@ class ProgressTrackerTest
           .thenThrow(expectedException)
 
         withProgressTracker(table, dynamoDbClient = mockDynamoDbClient) { progressTracker =>
-          val update = createProgressEventUpdateWith(randomUUID)
+          val update = createProgressEventUpdate
 
           val result = Try(progressTracker.update(update))
 
