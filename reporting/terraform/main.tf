@@ -1,7 +1,7 @@
 module "lambda_miro_transformer" {
   source = "./reporting_lambda"
 
-  name        = "miro_transformer"
+  name        = "reporting_miro_transformer"
   description = "Transform miro source data and send to ES."
 
   environment_variables = {
@@ -20,7 +20,7 @@ module "lambda_miro_transformer" {
 module "lambda_miro_inventory_transformer" {
   source = "./reporting_lambda"
 
-  name        = "miro_inventory_transformer"
+  name        = "reporting_miro_inventory_transformer"
   description = "Transform miro inventory source data and send to ES."
 
   environment_variables = {
@@ -39,7 +39,7 @@ module "lambda_miro_inventory_transformer" {
 module "lambda_sierra_transformer" {
   source = "./reporting_lambda"
 
-  name        = "sierra_transformer"
+  name        = "reporting_sierra_transformer"
   description = "Transform sierra source data and send to ES."
 
   environment_variables = {
