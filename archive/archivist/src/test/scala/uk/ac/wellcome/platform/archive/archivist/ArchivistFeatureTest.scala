@@ -100,7 +100,7 @@ class ArchivistFeatureTest
           ingestBucket,
           queuePair,
           createDigest = _ => "bad_digest") {
-          case (request, _ =>
+          case (request, _) =>
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
