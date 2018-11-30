@@ -3,7 +3,8 @@ from transform import transform
 
 
 def raw_data():
-    return json.loads("""{
+    return json.loads(
+        """{
                 \"an_array\": [
                     \"a value\",
                     \"another value\"
@@ -18,7 +19,8 @@ def raw_data():
                       \"a\": \"a_value\"
                   },
                 \"image_source\": \"ignored field\"
-            }""")
+            }"""
+    )
 
 
 def transformed_data():
