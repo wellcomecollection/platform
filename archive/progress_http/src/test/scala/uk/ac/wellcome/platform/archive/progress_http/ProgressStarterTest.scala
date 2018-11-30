@@ -57,7 +57,8 @@ class ProgressStarterTest
     }
   }
 
-  private def withProgressStarter[R](table: Table, topic: Topic)(testWith: TestWith[ProgressStarter, R]): R =
+  private def withProgressStarter[R](table: Table, topic: Topic)(
+    testWith: TestWith[ProgressStarter, R]): R =
     withSNSWriter(topic) { snsWriter =>
       withProgressTracker(table) { progressTracker =>
         val progressStarter = new ProgressStarter(
