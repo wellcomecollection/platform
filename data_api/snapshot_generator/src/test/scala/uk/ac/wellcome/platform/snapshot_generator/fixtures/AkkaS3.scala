@@ -9,9 +9,9 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 trait AkkaS3 extends S3 {
 
-  def withS3AkkaClient[R](
-    actorSystem: ActorSystem,
-    materializer: ActorMaterializer)(testWith: TestWith[S3Client, R]): R = {
+  def withS3AkkaClient[R](testWith: TestWith[S3Client, R])(
+    implicit actorSystem: ActorSystem,
+    materializer: ActorMaterializer): R = {
 
     val s3AkkaClient = AkkaS3ClientModule.buildAkkaS3Client(
       region = "localhost",

@@ -70,10 +70,10 @@ class SnapshotServiceTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[(SnapshotService, String, String, Bucket), R]) =
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        withS3AkkaClient(actorSystem, materializer) { s3Client =>
+    testWith: TestWith[(SnapshotService, String, String, Bucket), R]): R =
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withS3AkkaClient { s3Client =>
           withLocalElasticsearchIndex { indexNameV1 =>
             withLocalElasticsearchIndex { indexNameV2 =>
               withLocalS3Bucket { bucket =>
@@ -263,9 +263,9 @@ class SnapshotServiceTest
   }
 
   it("returns a failed future if it fails reading from elasticsearch") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        withS3AkkaClient(actorSystem, materializer) { s3Client =>
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withS3AkkaClient { s3Client =>
           withLocalS3Bucket { bucket =>
             val elasticConfig = createDisplayElasticConfigWith(
               indexV1name = "wrong-index",
