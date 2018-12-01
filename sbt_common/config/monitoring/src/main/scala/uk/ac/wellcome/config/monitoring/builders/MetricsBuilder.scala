@@ -24,19 +24,17 @@ object MetricsBuilder {
 
   private def buildMetricsSender(
     cloudWatchClient: AmazonCloudWatch,
-    actorSystem: ActorSystem,
     metricsConfig: MetricsConfig
-  ): MetricsSender =
+  )(implicit actorSystem: ActorSystem): MetricsSender =
     new MetricsSender(
       amazonCloudWatch = cloudWatchClient,
       actorSystem = actorSystem,
       metricsConfig = metricsConfig
     )
 
-  def buildMetricsSender(config: Config): MetricsSender =
+  def buildMetricsSender(config: Config)(implicit actorSystem: ActorSystem): MetricsSender =
     buildMetricsSender(
       cloudWatchClient = CloudWatchBuilder.buildCloudWatchClient(config),
-      actorSystem = AkkaBuilder.buildActorSystem(),
       metricsConfig = buildMetricsConfig(config)
     )
 }
