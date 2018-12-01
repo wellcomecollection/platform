@@ -44,7 +44,6 @@ trait ZipBagItFixture extends BagIt with Logging {
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
     createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile
   )(testWith: TestWith[(ExternalIdentifier, ZipFile), R]) = {
-
     info(s"Creating bag ${bagInfo.externalIdentifier}")
 
     val allFiles = createBag(

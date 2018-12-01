@@ -64,8 +64,10 @@ trait ArchivistFixtures
       createValidDataManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
     createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile)(
-    testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]): Boolean =
+    testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]): Boolean = {
+    val bagInfo = randomBagInfo
     withBagItZip(
+      bagInfo = bagInfo,
       dataFileCount = dataFileCount,
       createTagManifest = createTagManifest,
       createDigest = createDigest,
@@ -73,10 +75,11 @@ trait ArchivistFixtures
       createBagItFile = createBagItFile,
       createBagInfoFile = createBagInfoFile
     ) {
-      case (bagIdentifier, zipFile) =>
+      case (_, zipFile) =>
         sendBag(zipFile, ingestBucket, queuePair)(ingestBagRequest =>
-          testWith((ingestBagRequest, bagIdentifier)))
+          testWith((ingestBagRequest, bagInfo.externalIdentifier)))
     }
+  }
 
   def withApp[R](storageBucket: Bucket,
                  queuePair: QueuePair,

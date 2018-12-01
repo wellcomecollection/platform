@@ -54,8 +54,9 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
-            withBagItZip() {
-              case (bagName, zipFile) =>
+            val bagInfo = randomBagInfo
+            withBagItZip(bagInfo) {
+              case (_, zipFile) =>
                 withArchiveZipFileFlow(storageBucket, reportingTopic) {
                   uploader =>
                     val ingestContext = createIngestBagRequestWith()
@@ -74,7 +75,7 @@ class ArchiveZipFileFlowTest
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"${ingestContext.storageSpace}/$bagName"))
+                          BagPath(s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
                       )))
 
                       assertTopicReceivesProgressEventUpdate(
@@ -188,9 +189,10 @@ class ArchiveZipFileFlowTest
       withActorSystem { actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
-            withBagItZip(createDataManifest = _ =>
+            val bagInfo = randomBagInfo
+            withBagItZip(bagInfo, createDataManifest = _ =>
               Some(FileEntry("manifest-sha256.txt", "dgfssjhdfg"))) {
-              case (bagName, zipFile) =>
+              case (_, zipFile) =>
                 withArchiveZipFileFlow(storageBucket, reportingTopic) {
                   uploader =>
                     val ingestContext = createIngestBagRequest
@@ -213,7 +215,7 @@ class ArchiveZipFileFlowTest
                             .bagLocation shouldBe BagLocation(
                             storageBucket.name,
                             "archive",
-                            BagPath(s"${ingestContext.storageSpace}/$bagName"))
+                            BagPath(s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
                       }
 
                       assertTopicReceivesProgressStatusUpdate(

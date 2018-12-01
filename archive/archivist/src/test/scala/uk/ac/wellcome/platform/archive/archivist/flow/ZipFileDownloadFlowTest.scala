@@ -42,9 +42,10 @@ class ZipFileDownloadFlowTest
     withLocalS3Bucket { storageBucket =>
       withLocalSnsTopic { progressTopic =>
         withZipFileDownloadFlow(progressTopic) { downloadZipFlow =>
-          withBagItZip() {
-            case (bagName, zipFile) =>
-              val uploadKey = bagName.toString
+          val bagInfo = randomBagInfo
+          withBagItZip(bagInfo) {
+            case (_, zipFile) =>
+              val uploadKey = bagInfo.externalIdentifier.toString
 
               s3Client.putObject(
                 storageBucket.name,
