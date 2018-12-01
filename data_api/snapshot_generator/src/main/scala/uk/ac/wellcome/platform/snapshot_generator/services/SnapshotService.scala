@@ -28,14 +28,12 @@ import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSourc
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SnapshotService @Inject()(actorSystem: ActorSystem,
-                                akkaS3Client: S3Client,
+class SnapshotService @Inject()(akkaS3Client: S3Client,
                                 elasticClient: HttpClient,
                                 elasticConfig: DisplayElasticConfig,
                                 objectMapper: ObjectMapper)(
-  implicit ec: ExecutionContext
+  implicit actorSystem: ActorSystem, ec: ExecutionContext
 ) extends Logging {
-  implicit val system: ActorSystem = actorSystem
   implicit val materializer = ActorMaterializer()
 
   val s3Endpoint = akkaS3Client.s3Settings.endpointUrl.getOrElse("s3:/")
