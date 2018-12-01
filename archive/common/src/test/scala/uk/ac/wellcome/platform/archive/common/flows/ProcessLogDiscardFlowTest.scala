@@ -14,33 +14,31 @@ class ProcessLogDiscardFlowTest
     with ScalaFutures {
 
   it("process, logs & discards failed events") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        val e = new RuntimeException("EitherFlowTest")
-        val func: String => Try[Int] = (in: String) =>
-          Try {
-            if (in.startsWith("f")) {
-              throw e
-            }
+    withMaterializer { implicit materializer =>
+      val e = new RuntimeException("EitherFlowTest")
+      val func: String => Try[Int] = (in: String) =>
+        Try {
+          if (in.startsWith("f")) {
+            throw e
+          }
 
-            in.length
+          in.length
         }
 
-        val failList = List("fail", "flumps")
-        val succeedList = List("boomer", "bust", "banana")
+      val failList = List("fail", "flumps")
+      val succeedList = List("boomer", "bust", "banana")
 
-        val listIn = succeedList.patch(2, failList, 0)
-        val source = Source(listIn)
-        val pldFlow = ProcessLogDiscardFlow("ProcessLogDiscardFlowTest")(func)
+      val listIn = succeedList.patch(2, failList, 0)
+      val source = Source(listIn)
+      val pldFlow = ProcessLogDiscardFlow("ProcessLogDiscardFlowTest")(func)
 
-        val eventualResult = source
-          .via(pldFlow)
-          .async
-          .runWith(Sink.seq)(materializer)
+      val eventualResult = source
+        .via(pldFlow)
+        .async
+        .runWith(Sink.seq)
 
-        whenReady(eventualResult) { result =>
-          result shouldBe succeedList.map(func).map(_.get)
-        }
+      whenReady(eventualResult) { result =>
+        result shouldBe succeedList.map(func).map(_.get)
       }
     }
   }

@@ -23,45 +23,70 @@ class SNSPublishFlowTest
 
   it("publishes a notification and returns Right(T)") {
     withLocalSnsTopic { topic =>
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          val bob = Person("Bobbert", 42)
+      withMaterializer { implicit materializer =>
+        val bob = Person("Bobbert", 42)
 
-          val snsConfig = createSNSConfigWith(topic)
-          val publishFlow =
-            SnsPublishFlow[Person](
-              snsClient,
-              snsConfig,
-              subject = "SNSPublishFlowTest")
+        val snsConfig = createSNSConfigWith(topic)
+        val publishFlow =
+          SnsPublishFlow[Person](
+            snsClient,
+            snsConfig,
+            subject = "SNSPublishFlowTest")
 
-          val publication = Source
-            .single(bob)
-            .via(publishFlow)
-            .async
-            .runWith(Sink.head)(materializer)
+        val publication = Source
+          .single(bob)
+          .via(publishFlow)
+          .async
+          .runWith(Sink.head)
 
-          whenReady(publication) { result =>
-            result shouldBe a[PublishResult]
+        whenReady(publication) { result =>
+          result shouldBe a[PublishResult]
 
-            assertSnsReceivesOnly(bob, topic)
-          }
-
+          assertSnsReceivesOnly(bob, topic)
         }
       }
     }
   }
 
   it("handles multiple errors") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+    withMaterializer { implicit materializer =>
+      val bobs = () =>
+        Iterator(
+          Person("Bobbert", 42),
+          Person("Bobbrit", 41),
+          Person("Borbbit", 40)
+        )
+
+      val snsConfig = createSNSConfigWith(Topic("bad_topic"))
+      val publishFlow =
+        SnsPublishFlow[Person](
+          snsClient,
+          snsConfig,
+          subject = "SNSPublishFlowTest")
+
+      val publication = Source
+        .fromIterator(bobs)
+        .via(publishFlow)
+        .async
+        .runWith(Sink.seq)
+
+      whenReady(publication) { result =>
+        result shouldBe empty
+      }
+    }
+  }
+
+  it("publishes multiple notifications") {
+    withLocalSnsTopic { topic =>
+      withMaterializer { implicit materializer =>
         val bobs = () =>
           Iterator(
             Person("Bobbert", 42),
             Person("Bobbrit", 41),
             Person("Borbbit", 40)
-        )
+          )
 
-        val snsConfig = createSNSConfigWith(Topic("bad_topic"))
+        val snsConfig = createSNSConfigWith(topic)
         val publishFlow =
           SnsPublishFlow[Person](
             snsClient,
@@ -72,48 +97,16 @@ class SNSPublishFlowTest
           .fromIterator(bobs)
           .via(publishFlow)
           .async
-          .runWith(Sink.seq)(materializer)
+          .runWith(Sink.seq)
+
+        val resultantBobs = bobs().toList
 
         whenReady(publication) { result =>
-          result shouldBe empty
+          result should have length resultantBobs.length
+
+          assertSnsReceives(resultantBobs, topic)
         }
-      }
-    }
-  }
 
-  it("publishes multiple notifications") {
-    withLocalSnsTopic { topic =>
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          val bobs = () =>
-            Iterator(
-              Person("Bobbert", 42),
-              Person("Bobbrit", 41),
-              Person("Borbbit", 40)
-          )
-
-          val snsConfig = createSNSConfigWith(topic)
-          val publishFlow =
-            SnsPublishFlow[Person](
-              snsClient,
-              snsConfig,
-              subject = "SNSPublishFlowTest")
-
-          val publication = Source
-            .fromIterator(bobs)
-            .via(publishFlow)
-            .async
-            .runWith(Sink.seq)(materializer)
-
-          val resultantBobs = bobs().toList
-
-          whenReady(publication) { result =>
-            result should have length resultantBobs.length
-
-            assertSnsReceives(resultantBobs, topic)
-          }
-
-        }
       }
     }
   }

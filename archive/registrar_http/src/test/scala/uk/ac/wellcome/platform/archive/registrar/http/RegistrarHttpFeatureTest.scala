@@ -39,79 +39,77 @@ class RegistrarHttpFeatureTest
     it("returns a bag when available") {
       withConfiguredApp {
         case (vhs, baseUrl) =>
-          withActorSystem { implicit actorSystem =>
-            withMaterializer(actorSystem) { implicit actorMaterializer =>
-              val space = randomStorageSpace
-              val bagInfo = randomBagInfo
+          withMaterializer { implicit materializer =>
+            val space = randomStorageSpace
+            val bagInfo = randomBagInfo
 
-              val checksumAlgorithm = "sha256"
-              val path = "path"
-              val bucket = "bucket"
-              val providerId = "provider-id"
-              val storageManifest = createStorageManifestWith(
-                space = space,
-                bagInfo = bagInfo,
-                checksumAlgorithm = checksumAlgorithm,
-                providerId = providerId,
-                bucket = bucket,
-                path = path
-              )
-              val future = storeSingleManifest(vhs, storageManifest)
-              whenReady(future) { _ =>
-                whenGetRequestReady(
-                  s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") {
-                  response =>
-                    response.status shouldBe StatusCodes.OK
-                    val displayBag = getT[DisplayBag](response.entity)
+            val checksumAlgorithm = "sha256"
+            val path = "path"
+            val bucket = "bucket"
+            val providerId = "provider-id"
+            val storageManifest = createStorageManifestWith(
+              space = space,
+              bagInfo = bagInfo,
+              checksumAlgorithm = checksumAlgorithm,
+              providerId = providerId,
+              bucket = bucket,
+              path = path
+            )
+            val future = storeSingleManifest(vhs, storageManifest)
+            val requestPath = s
+            whenReady(future) { _ =>
+              whenGetRequestReady(
+                "$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") {
+                response =>
+                  response.status shouldBe StatusCodes.OK
+                  val displayBag = getT[DisplayBag](response.entity)
 
-                    inside(displayBag) {
-                      case DisplayBag(
-                          actualContextUrl,
-                          actualBagId,
-                          DisplayStorageSpace(storageSpaceName, "Space"),
-                          DisplayBagInfo(
-                            externalIdentifierString,
-                            payloadOxum,
-                            sourceOrganization,
-                            baggingDate,
-                            _,
-                            _,
-                            _,
-                            "BagInfo"),
-                          DisplayBagManifest(
-                            actualDataManifestChecksumAlgorithm,
-                            Nil,
-                            "BagManifest"),
-                          DisplayBagManifest(
-                            actualTagManifestChecksumAlgorithm,
-                            List(
-                              DisplayFileDigest("a", "bag-info.txt", "File")),
-                            "BagManifest"),
-                          DisplayLocation(
-                            DisplayProvider(actualProviderId, "Provider"),
-                            actualBucket,
-                            actualPath,
-                            "Location"),
-                          createdDateString,
-                          "Bag") =>
-                        actualContextUrl shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
-                        actualBagId shouldBe s"${space.underlying}/${bagInfo.externalIdentifier.underlying}"
-                        storageSpaceName shouldBe space.underlying
-                        externalIdentifierString shouldBe bagInfo.externalIdentifier.underlying
-                        payloadOxum shouldBe s"${bagInfo.payloadOxum.payloadBytes}.${bagInfo.payloadOxum.numberOfPayloadFiles}"
-                        sourceOrganization shouldBe bagInfo.sourceOrganisation.underlying
-                        baggingDate shouldBe bagInfo.baggingDate.format(
-                          DateTimeFormatter.ISO_LOCAL_DATE)
+                  inside(displayBag) {
+                    case DisplayBag(
+                        actualContextUrl,
+                        actualBagId,
+                        DisplayStorageSpace(storageSpaceName, "Space"),
+                        DisplayBagInfo(
+                          externalIdentifierString,
+                          payloadOxum,
+                          sourceOrganization,
+                          baggingDate,
+                          _,
+                          _,
+                          _,
+                          "BagInfo"),
+                        DisplayBagManifest(
+                          actualDataManifestChecksumAlgorithm,
+                          Nil,
+                          "BagManifest"),
+                        DisplayBagManifest(
+                          actualTagManifestChecksumAlgorithm,
+                          List(
+                            DisplayFileDigest("a", "bag-info.txt", "File")),
+                          "BagManifest"),
+                        DisplayLocation(
+                          DisplayProvider(actualProviderId, "Provider"),
+                          actualBucket,
+                          actualPath,
+                          "Location"),
+                        createdDateString,
+                        "Bag") =>
+                      actualContextUrl shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
+                      actualBagId shouldBe s"${space.underlying}/${bagInfo.externalIdentifier.underlying}"
+                      storageSpaceName shouldBe space.underlying
+                      externalIdentifierString shouldBe bagInfo.externalIdentifier.underlying
+                      payloadOxum shouldBe s"${bagInfo.payloadOxum.payloadBytes}.${bagInfo.payloadOxum.numberOfPayloadFiles}"
+                      sourceOrganization shouldBe bagInfo.sourceOrganisation.underlying
+                      baggingDate shouldBe bagInfo.baggingDate.format(
+                        DateTimeFormatter.ISO_LOCAL_DATE)
 
-                        actualDataManifestChecksumAlgorithm shouldBe checksumAlgorithm
-                        actualTagManifestChecksumAlgorithm shouldBe checksumAlgorithm
-                        actualProviderId shouldBe providerId
-                        actualBucket shouldBe bucket
-                        actualPath shouldBe path
+                      actualDataManifestChecksumAlgorithm shouldBe checksumAlgorithm
+                      actualTagManifestChecksumAlgorithm shouldBe checksumAlgorithm
+                      actualProviderId shouldBe providerId
+                      actualBucket shouldBe bucket
+                      actualPath shouldBe path
 
-                        Instant.parse(createdDateString) shouldBe storageManifest.createdDate
-                    }
-
+                      Instant.parse(createdDateString) shouldBe storageManifest.createdDate
                 }
               }
             }
@@ -122,34 +120,30 @@ class RegistrarHttpFeatureTest
     it("does not output null values") {
       withConfiguredApp {
         case (vhs, baseUrl) =>
-          withActorSystem { implicit actorSystem =>
-            withMaterializer(actorSystem) { implicit actorMaterializer =>
-              val storageManifest = createStorageManifestWith(
-                bagInfo = createBagInfoWith(externalDescription = None)
-              )
-              val future = storeSingleManifest(vhs, storageManifest)
-              whenReady(future) { _ =>
-                whenGetRequestReady(
-                  s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") {
-                  response =>
-                    response.status shouldBe StatusCodes.OK
-                    val value =
-                      response.entity.dataBytes.runWith(Sink.fold("") {
-                        case (acc, byteString) =>
-                          acc + byteString.utf8String
-                      })
-                    whenReady(value) { jsonString =>
-                      val infoJson =
-                        root.info.json
-                          .getOption(parse(jsonString).right.get)
-                          .get
-                      infoJson.findAllByKey("externalDescription") shouldBe empty
-                    }
-
-                }
+          withMaterializer { implicit materializer =>
+            val storageManifest = createStorageManifestWith(
+              bagInfo = createBagInfoWith(externalDescription = None)
+            )
+            val future = storeSingleManifest(vhs, storageManifest)
+            whenReady(future) { _ =>
+              whenGetRequestReady(
+                s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") {
+                response =>
+                  response.status shouldBe StatusCodes.OK
+                  val value =
+                    response.entity.dataBytes.runWith(Sink.fold("") {
+                      case (acc, byteString) => acc + byteString.utf8String
+                    })
+                  whenReady(value) { jsonString =>
+                    val infoJson =
+                      root.info.json
+                        .getOption(parse(jsonString).right.get)
+                        .get
+                    infoJson.findAllByKey("externalDescription") shouldBe empty
+                  }
               }
-            }
           }
+        }
       }
     }
 
