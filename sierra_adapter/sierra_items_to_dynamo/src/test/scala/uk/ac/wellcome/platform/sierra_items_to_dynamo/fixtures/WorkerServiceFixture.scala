@@ -43,7 +43,6 @@ trait WorkerServiceFixture
           withDynamoInserter(table, bucket) { dynamoInserter =>
             withSNSWriter(topic) { snsWriter =>
               val workerService = new SierraItemsToDynamoWorkerService(
-                actorSystem = actorSystem,
                 sqsStream = sqsStream,
                 dynamoInserter = dynamoInserter,
                 snsWriter = snsWriter
