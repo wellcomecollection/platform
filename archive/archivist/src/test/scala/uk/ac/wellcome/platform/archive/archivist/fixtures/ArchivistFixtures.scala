@@ -14,7 +14,6 @@ import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerat
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{
   BagInfo,
-  ExternalIdentifier,
   IngestBagRequest,
   NotificationMessage
 }
@@ -65,7 +64,7 @@ trait ArchivistFixtures
       createValidDataManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
     createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile)(
-    testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]): R =
+    testWith: TestWith[IngestBagRequest, R]): R =
     withBagItZip(
       bagInfo = bagInfo,
       dataFileCount = dataFileCount,
@@ -76,7 +75,7 @@ trait ArchivistFixtures
       createBagInfoFile = createBagInfoFile
     ) { zipFile =>
       sendBag(zipFile, ingestBucket, queuePair) { ingestBagRequest =>
-        testWith((ingestBagRequest, bagInfo.externalIdentifier))
+        testWith(ingestBagRequest)
       }
     }
 
