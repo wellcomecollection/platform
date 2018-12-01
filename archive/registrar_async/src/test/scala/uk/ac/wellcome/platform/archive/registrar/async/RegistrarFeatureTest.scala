@@ -47,12 +47,12 @@ class RegistrarFeatureTest
   it(
     "registers an archived BagIt bag from S3 and notifies the progress tracker") {
     withRegistrar {
-      case (storageBucket, queuePair, progressTopic, vhs) =>
+      case (storageBucket, QueuePair(queue, _), progressTopic, vhs) =>
         val requestId = randomUUID
         val storageSpace = randomStorageSpace
         val createdAfterDate = Instant.now()
 
-        withBagNotification(queuePair, storageBucket, requestId, storageSpace) {
+        withBagNotification(queue, storageBucket, requestId, storageSpace) {
           case (bagLocation, bagInfo) =>
             val bagId = BagId(
               space = storageSpace,
@@ -128,13 +128,9 @@ class RegistrarFeatureTest
 
   it("discards messages if it fails writing to the VHS") {
     withRegistrarAndBrokenVHS {
-      case (
-          storageBucket,
-          queuePair @ QueuePair(queue, dlq),
-          progressTopic,
-          _) =>
-        withBagNotification(queuePair, storageBucket) { _ =>
-          withBagNotification(queuePair, storageBucket) { _ =>
+      case (storageBucket, QueuePair(queue, dlq), progressTopic, _) =>
+        withBagNotification(queue, storageBucket) { _ =>
+          withBagNotification(queue, storageBucket) { _ =>
             eventually {
               assertSnsReceivesNothing(progressTopic)
 

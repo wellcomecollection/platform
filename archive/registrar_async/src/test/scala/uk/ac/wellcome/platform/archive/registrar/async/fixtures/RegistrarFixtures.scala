@@ -4,14 +4,13 @@ import java.util.UUID
 import com.amazonaws.services.dynamodbv2.model._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
-
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 
@@ -23,7 +22,7 @@ trait RegistrarFixtures
     with StorageManifestVHSFixture {
 
   def withBagNotification[R](
-    queuePair: QueuePair,
+    queue: Queue,
     storageBucket: Bucket,
     archiveRequestId: UUID = randomUUID,
     storageSpace: StorageSpace = randomStorageSpace
@@ -36,10 +35,7 @@ trait RegistrarFixtures
           bagLocation = bagLocation
         )
 
-        sendNotificationToSQS(
-          queuePair.queue,
-          archiveComplete
-        )
+        sendNotificationToSQS(queue, archiveComplete)
         testWith((bagLocation, bagInfo))
     }
 
