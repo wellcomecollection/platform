@@ -122,7 +122,7 @@ class SierraRecordWrapperFlowTest
   }
 
   it("is able to handle deleted bibs") {
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withRecordWrapperFlow(SierraBibRecord.apply) { wrapperFlow =>
           val id = createSierraBibNumber
@@ -158,7 +158,7 @@ class SierraRecordWrapperFlowTest
   }
 
   it("fails the stream if the record contains invalid JSON") {
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withRecordWrapperFlow(SierraBibRecord.apply) { wrapperFlow =>
           val invalidSierraJson = parse(
