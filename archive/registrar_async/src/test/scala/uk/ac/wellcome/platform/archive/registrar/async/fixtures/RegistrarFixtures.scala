@@ -68,7 +68,7 @@ trait RegistrarFixtures
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
                  progressTopic: Topic)(testWith: TestWith[Registrar, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         val messageStream = new MessageStream[NotificationMessage, Unit](
           actorSystem = actorSystem,
@@ -83,8 +83,7 @@ trait RegistrarFixtures
               progressSnsConfig = createSNSConfigWith(progressTopic),
               s3Client = s3Client,
               messageStream = messageStream,
-              dataStore = dataStore,
-              actorSystem = actorSystem
+              dataStore = dataStore
             )
 
             registrar.run()

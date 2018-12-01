@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar.async
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.scaladsl.Flow
@@ -33,7 +34,7 @@ import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class Registrar(
   snsClient: AmazonSNS,
@@ -42,13 +43,10 @@ class Registrar(
   messageStream: MessageStream[NotificationMessage, Unit],
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
-                                  ObjectStore[StorageManifest]],
-  actorSystem: ActorSystem
-) extends Logging {
-  def run() = {
-
+                                  ObjectStore[StorageManifest]]
+)(implicit val actorSystem: ActorSystem) extends Logging {
+  def run(): Future[Done] = {
     implicit val snsclient = snsClient
-    implicit val system = actorSystem
     implicit val s3client = s3Client
 
     implicit val adapter: LoggingAdapter =
