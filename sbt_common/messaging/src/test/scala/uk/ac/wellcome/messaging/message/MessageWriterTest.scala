@@ -186,7 +186,8 @@ class MessageWriterTest
 
             whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) {
               _ =>
-                val notifications = listObjectsReceivedFromSNS[MessageNotification](topic)
+                val notifications =
+                  listObjectsReceivedFromSNS[MessageNotification](topic)
                 notifications should have size 2
 
                 val locations = notifications

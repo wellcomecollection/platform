@@ -54,8 +54,9 @@ trait Messaging
                                         topic: Topic,
                                         writerSnsClient: AmazonSNS = snsClient)(
     testWith: TestWith[MessageWriter[ExampleObject], R]): R =
-    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient) { writer =>
-      testWith(writer)
+    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient) {
+      writer =>
+        testWith(writer)
     }
 
   def withMessageWriter[T, R](bucket: Bucket,

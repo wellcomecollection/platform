@@ -91,7 +91,8 @@ class SnapshotGeneratorFeatureTest
               assertJsonStringsAreEqual(actualLine, expectedLine)
           }
 
-          val receivedJobs = listObjectsReceivedFromSNS[CompletedSnapshotJob](topic)
+          val receivedJobs =
+            listObjectsReceivedFromSNS[CompletedSnapshotJob](topic)
           receivedJobs.size should be >= 1
 
           val expectedJob = CompletedSnapshotJob(
