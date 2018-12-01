@@ -6,29 +6,33 @@ import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.BagInfo
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures._
 
 trait ZipBagItFixture extends BagIt with Logging {
 
-  def withZipFile[R](files: Seq[FileEntry])(testWith: TestWith[ZipFile, R]) = {
-    val file = File.createTempFile(randomAlphanumeric(), ".zip")
-    val zipFileOutputStream = new FileOutputStream(file)
-    val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
-    files.foreach {
-      case FileEntry(name, contents) =>
-        info(s"Adding $name to zip contents")
-        val zipEntry = new ZipEntry(name)
-        zipOutputStream.putNextEntry(zipEntry)
-        zipOutputStream.write(contents.getBytes)
-        zipOutputStream.closeEntry()
-    }
-    zipOutputStream.close()
-    val zipFile = new ZipFile(file)
+  def withZipFile[R](files: Seq[FileEntry]): Fixture[ZipFile, R] = fixture[ZipFile, R](
+    create = {
+      val file = File.createTempFile(randomAlphanumeric(), ".zip")
+      val zipFileOutputStream = new FileOutputStream(file)
+      val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
+      files.foreach {
+        case FileEntry(name, contents) =>
+          info(s"Adding $name to zip contents")
+          val zipEntry = new ZipEntry(name)
+          zipOutputStream.putNextEntry(zipEntry)
+          zipOutputStream.write(contents.getBytes)
+          zipOutputStream.closeEntry()
+      }
+      zipOutputStream.close()
+      val zipFile = new ZipFile(file)
 
-    info(s"zipfile full path: ${file.getAbsolutePath}")
-    testWith(zipFile)
-    file.delete()
-  }
+      info(s"zipfile full path: ${file.getAbsolutePath}")
+      zipFile
+    },
+    destroy = { zf: ZipFile =>
+      new File(zf.getName).delete()
+    }
+  )
 
   def withBagItZip[R](
     bagInfo: BagInfo = randomBagInfo,
