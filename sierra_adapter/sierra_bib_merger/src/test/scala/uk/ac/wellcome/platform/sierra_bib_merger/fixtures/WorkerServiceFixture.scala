@@ -26,14 +26,14 @@ trait WorkerServiceFixture
     with SQS {
   def withApp[R](bucket: Bucket, table: Table, queue: Queue, topic: Topic)(
     testWith: TestWith[SierraBibMergerWorkerService, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withTypeVHS[SierraTransformable, EmptyMetadata, R](bucket, table) {
         versionedHybridStore =>
           val updaterService = new SierraBibMergerUpdaterService(
             versionedHybridStore = versionedHybridStore
           )
 
-          withSQSStream[NotificationMessage, R](actorSystem, queue) {
+          withSQSStream[NotificationMessage, R](queue) {
             sqsStream =>
               withSNSWriter(topic) { snsWriter =>
                 val workerService = new SierraBibMergerWorkerService(

@@ -37,8 +37,8 @@ trait WorkerServiceFixture
                            topic: Topic,
                            metricsSender: MetricsSender)(
     testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
-    withActorSystem { actorSystem =>
-      withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) {
+    withActorSystem { implicit actorSystem =>
+      withSQSStream[NotificationMessage, R](queue, metricsSender) {
         sqsStream =>
           withDynamoInserter(table, bucket) { dynamoInserter =>
             withSNSWriter(topic) { snsWriter =>

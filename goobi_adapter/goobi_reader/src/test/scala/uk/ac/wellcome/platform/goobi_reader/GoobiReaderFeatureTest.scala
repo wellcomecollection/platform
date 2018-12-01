@@ -71,8 +71,8 @@ class GoobiReaderFeatureTest
 
   private def withWorkerService[R](queue: Queue, bucket: Bucket, table: Table)(
     testWith: TestWith[GoobiReaderWorkerService, R]): R =
-    withActorSystem { actorSystem =>
-      withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+    withActorSystem { implicit actorSystem =>
+      withSQSStream[NotificationMessage, R](queue) { sqsStream =>
         withTypeVHS[InputStream, GoobiRecordMetadata, R](bucket, table) { vhs =>
           val workerService = new GoobiReaderWorkerService(
             s3Client = s3Client,

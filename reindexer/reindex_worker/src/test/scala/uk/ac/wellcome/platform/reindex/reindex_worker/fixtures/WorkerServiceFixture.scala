@@ -17,8 +17,8 @@ trait WorkerServiceFixture
     with SQS {
   def withWorkerService[R](queue: Queue, table: Table, topic: Topic)(
     testWith: TestWith[ReindexWorkerService, R]): R =
-    withActorSystem { actorSystem =>
-      withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+    withActorSystem { implicit actorSystem =>
+      withSQSStream[NotificationMessage, R](queue) { sqsStream =>
         withRecordReader { recordReader =>
           withBulkSNSSender { bulkSNSSender =>
             val workerService = new ReindexWorkerService(

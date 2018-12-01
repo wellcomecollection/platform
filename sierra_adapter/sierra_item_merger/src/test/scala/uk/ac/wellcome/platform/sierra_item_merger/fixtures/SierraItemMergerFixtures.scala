@@ -45,20 +45,19 @@ trait SierraItemMergerFixtures
     table: Table)(testWith: TestWith[SierraItemMergerWorkerService, R]): R =
     withSierraVHS(sierraDataBucket, table) { vhs =>
       withSierraUpdaterService(vhs) { updaterService =>
-        withActorSystem { actorSystem =>
-          withSQSStream[NotificationMessage, R](actorSystem, queue) {
-            sqsStream =>
-              withSNSWriter(topic) { snsWriter =>
-                val workerService = new SierraItemMergerWorkerService(
-                  actorSystem = actorSystem,
-                  sqsStream = sqsStream,
-                  sierraItemMergerUpdaterService = updaterService,
-                  objectStore = ObjectStore[SierraItemRecord],
-                  snsWriter = snsWriter
-                )
+        withActorSystem { implicit actorSystem =>
+          withSQSStream[NotificationMessage, R](queue) { sqsStream =>
+            withSNSWriter(topic) { snsWriter =>
+              val workerService = new SierraItemMergerWorkerService(
+                actorSystem = actorSystem,
+                sqsStream = sqsStream,
+                sierraItemMergerUpdaterService = updaterService,
+                objectStore = ObjectStore[SierraItemRecord],
+                snsWriter = snsWriter
+              )
 
-                testWith(workerService)
-              }
+              testWith(workerService)
+            }
           }
         }
       }

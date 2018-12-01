@@ -296,14 +296,13 @@ class GoobiReaderWorkerServiceTest
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]),
                        R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, dlq) =>
           withMockMetricSender { mockMetricsSender =>
             withSQSStream[NotificationMessage, R](
-              actorSystem,
-              queue,
-              mockMetricsSender) { sqsStream =>
+              queue = queue,
+              metricsSender = mockMetricsSender) { sqsStream =>
               withS3StreamStoreFixtures {
                 case (bucket, table, versionedHybridStore) =>
                   val service = new GoobiReaderWorkerService(
