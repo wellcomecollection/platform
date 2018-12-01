@@ -12,12 +12,12 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
 import scala.util.Try
 
 trait ProgressUpdateAssertions extends SNS with Inside with Logging {
-  def assertTopicReceivesProgressStatusUpdate(
+  def assertTopicReceivesProgressStatusUpdate[R](
     requestId: UUID,
     progressTopic: SNS.Topic,
     status: Progress.Status,
     expectedBag: Option[BagId] = None)(
-    assert: Seq[ProgressEvent] => Assertion): Assertion = {
+    assert: Seq[ProgressEvent] => R): Assertion = {
     val progressUpdates =
       listObjectsReceivedFromSNS[ProgressUpdate](progressTopic).distinct
     progressUpdates.size should be > 0
