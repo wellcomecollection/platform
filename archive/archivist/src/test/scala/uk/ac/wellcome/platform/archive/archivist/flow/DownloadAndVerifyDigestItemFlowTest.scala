@@ -84,9 +84,11 @@ class DownloadAndVerifyDigestItemFlowTest
           whenReady(futureResult) { result =>
             result shouldBe Left(
               ChecksumNotMatchedOnDownloadError(
-                digest,
-                "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73",
-                archiveItemJob))
+                expectedChecksum = digest,
+                actualChecksum = sha256(fileContent),
+                t = archiveItemJob
+              )
+            )
           }
         }
       }
