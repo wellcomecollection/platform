@@ -33,7 +33,6 @@ object Main extends App with Logging {
   )
 
   val workerService = new SierraItemMergerWorkerService(
-    actorSystem = actorSystem,
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
     sierraItemMergerUpdaterService = updaterService,
     objectStore = S3Builder.buildObjectStore[SierraItemRecord](config),

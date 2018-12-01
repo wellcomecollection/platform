@@ -49,7 +49,6 @@ trait SierraItemMergerFixtures
           withSQSStream[NotificationMessage, R](queue) { sqsStream =>
             withSNSWriter(topic) { snsWriter =>
               val workerService = new SierraItemMergerWorkerService(
-                actorSystem = actorSystem,
                 sqsStream = sqsStream,
                 sierraItemMergerUpdaterService = updaterService,
                 objectStore = ObjectStore[SierraItemRecord],
