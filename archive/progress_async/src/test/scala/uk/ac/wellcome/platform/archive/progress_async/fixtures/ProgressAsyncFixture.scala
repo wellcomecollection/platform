@@ -57,8 +57,8 @@ trait ProgressAsyncFixture
 
   def withApp[R](queuePair: QueuePair, topic: Topic, table: Table)(
     testWith: TestWith[ProgressAsync, R]): R =
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withMetricsSender(actorSystem) { metricsSender =>
           val progressAsync = new ProgressAsync(
             messageStream = new MessageStream[NotificationMessage, Unit](
@@ -73,7 +73,7 @@ trait ProgressAsyncFixture
             ),
             snsClient = snsClient,
             snsConfig = createSNSConfigWith(topic)
-          )(actorSystem, materializer)
+          )
 
           testWith(progressAsync)
         }

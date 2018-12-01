@@ -24,8 +24,8 @@ trait NotifierFixture extends S3 with Messaging with BagIt {
 
   def withApp[R](queue: Queue, topic: Topic)(
     testWith: TestWith[Notifier, R]): R =
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withMetricsSender(actorSystem) { metricsSender =>
           val messageStream =
             new MessageStream[NotificationMessage, PublishResult](
@@ -40,9 +40,6 @@ trait NotifierFixture extends S3 with Messaging with BagIt {
             snsClient = snsClient,
             snsConfig = createSNSConfigWith(topic),
             contextUrl = new URL("http://localhost/context.json")
-          )(
-            actorSystem = actorSystem,
-            materializer = materializer
           )
 
           testWith(notifier)

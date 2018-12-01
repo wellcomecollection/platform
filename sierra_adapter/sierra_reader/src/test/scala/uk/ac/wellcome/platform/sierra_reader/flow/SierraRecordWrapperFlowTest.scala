@@ -42,7 +42,7 @@ class SierraRecordWrapperFlowTest
 
   it("creates a SierraRecord from a bib") {
     withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
           wrapperFlow =>
             val id = createSierraBibNumber
@@ -65,7 +65,7 @@ class SierraRecordWrapperFlowTest
             val futureRecord = Source
               .single(json)
               .via(wrapperFlow)
-              .runWith(Sink.head)(materializer)
+              .runWith(Sink.head)
 
             whenReady(futureRecord) { sierraRecord =>
               assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
@@ -77,7 +77,7 @@ class SierraRecordWrapperFlowTest
 
   it("creates a SierraRecord from an item") {
     withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withRecordWrapperFlow(actorSystem, SierraItemRecord.apply) {
           wrapperFlow =>
             val id = createSierraItemNumber
@@ -109,7 +109,7 @@ class SierraRecordWrapperFlowTest
             val futureRecord = Source
               .single(json)
               .via(wrapperFlow)
-              .runWith(Sink.head)(materializer)
+              .runWith(Sink.head)
 
             whenReady(futureRecord) { sierraRecord =>
               assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
@@ -121,7 +121,7 @@ class SierraRecordWrapperFlowTest
 
   it("is able to handle deleted bibs") {
     withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
           wrapperFlow =>
             val id = createSierraBibNumber
@@ -143,7 +143,7 @@ class SierraRecordWrapperFlowTest
             val futureRecord = Source
               .single(json)
               .via(wrapperFlow)
-              .runWith(Sink.head)(materializer)
+              .runWith(Sink.head)
 
             whenReady(futureRecord) { sierraRecord =>
               assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
@@ -155,7 +155,7 @@ class SierraRecordWrapperFlowTest
 
   it("fails the stream if the record contains invalid JSON") {
     withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
           wrapperFlow =>
             val invalidSierraJson = parse(s"""{
@@ -167,7 +167,7 @@ class SierraRecordWrapperFlowTest
             val futureUnit = Source
               .single(invalidSierraJson)
               .via(wrapperFlow)
-              .runWith(Sink.head)(materializer)
+              .runWith(Sink.head)
 
             whenReady(futureUnit.failed) { _ =>
               true shouldBe true

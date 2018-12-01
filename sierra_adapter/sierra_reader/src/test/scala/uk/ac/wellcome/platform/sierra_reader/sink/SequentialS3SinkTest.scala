@@ -47,11 +47,11 @@ class SequentialS3SinkTest
           actorSystem = actorSystem,
           bucket = bucket,
           keyPrefix = "testA_") { sink =>
-          withMaterializer(actorSystem) { materializer =>
+          withMaterializer(actorSystem) { implicit materializer =>
             val futureDone = Source
               .single(json)
               .zipWithIndex
-              .runWith(sink)(materializer)
+              .runWith(sink)
 
             whenReady(futureDone) { _ =>
               val keys = listKeysInBucket(bucket = bucket)
@@ -77,9 +77,9 @@ class SequentialS3SinkTest
           actorSystem = actorSystem,
           bucket = bucket,
           keyPrefix = "testB_") { sink =>
-          withMaterializer(actorSystem) { materializer =>
+          withMaterializer(actorSystem) { implicit materializer =>
             val futureDone = Source(List(json0, json1, json2)).zipWithIndex
-              .runWith(sink)(materializer)
+              .runWith(sink)
 
             whenReady(futureDone) { _ =>
               val keys = listKeysInBucket(bucket = bucket)
@@ -111,9 +111,9 @@ class SequentialS3SinkTest
           bucket = bucket,
           keyPrefix = "testC_",
           offset = 3) { sink =>
-          withMaterializer(actorSystem) { materializer =>
+          withMaterializer(actorSystem) { implicit materializer =>
             val futureDone = Source(List(json0, json1, json2)).zipWithIndex
-              .runWith(sink)(materializer)
+              .runWith(sink)
 
             whenReady(futureDone) { _ =>
               val keys = listKeysInBucket(bucket = bucket)
