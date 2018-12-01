@@ -34,8 +34,9 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair) {
-          case (request, bagIdentifier) =>
+        val bagInfo = randomBagInfo
+        createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo) {
+          case (request, _) =>
             eventually {
 
               val archivedObjects = listKeysInBucket(storageBucket)
@@ -57,7 +58,7 @@ class ArchivistFeatureTest
                   BagLocation(
                     storageBucket.name,
                     "archive",
-                    BagPath(s"${request.storageSpace}/$bagIdentifier"))
+                    BagPath(s"${request.storageSpace}/${bagInfo.externalIdentifier}"))
                 ),
                 registrarTopic
               )
@@ -132,6 +133,9 @@ class ArchivistFeatureTest
   }
 
   it("continues after bag with bad digest") {
+    val bagInfo1 = randomBagInfo
+    val bagInfo2 = randomBagInfo
+
     withArchivist {
       case (
           ingestBucket,
@@ -139,16 +143,16 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-          case (validRequest1, validBag1) =>
+        createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo1, dataFileCount = 1) {
+          case (validRequest1, _) =>
             createAndSendBag(
               ingestBucket,
               queuePair,
               dataFileCount = 1,
               createDigest = _ => "bad_digest") {
               case (invalidRequest1, _) =>
-                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-                  case (validRequest2, validBag2) =>
+                createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo2, dataFileCount = 1) {
+                  case (validRequest2, _) =>
                     createAndSendBag(
                       ingestBucket,
                       queuePair,
@@ -168,7 +172,7 @@ class ArchivistFeatureTest
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
+                                    s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                               ),
                               ArchiveComplete(
                                 validRequest2.archiveRequestId,
@@ -177,7 +181,7 @@ class ArchivistFeatureTest
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
+                                    s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                               )
                             ),
                             registrarTopic
@@ -206,6 +210,9 @@ class ArchivistFeatureTest
   }
 
   it("continues after non existing zip file") {
+    val bagInfo1 = randomBagInfo
+    val bagInfo2 = randomBagInfo
+
     withArchivist {
       case (
           ingestBucket,
@@ -213,8 +220,8 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-          case (validRequest1, validBag1) =>
+        createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo1, dataFileCount = 1) {
+          case (validRequest1, _) =>
             val invalidRequestId1 = randomUUID
             sendNotificationToSQS(
               queuePair.queue,
@@ -226,8 +233,8 @@ class ArchivistFeatureTest
               )
             )
 
-            createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-              case (validRequest2, validBag2) =>
+            createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo2, dataFileCount = 1) {
+              case (validRequest2, _) =>
                 val invalidRequestId2 = randomUUID
 
                 sendNotificationToSQS(
@@ -252,7 +259,7 @@ class ArchivistFeatureTest
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"${validRequest1.storageSpace}/$validBag1"))
+                          BagPath(s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                       ),
                       ArchiveComplete(
                         validRequest2.archiveRequestId,
@@ -260,7 +267,7 @@ class ArchivistFeatureTest
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"${validRequest2.storageSpace}/$validBag2"))
+                          BagPath(s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                       )
                     ),
                     registrarTopic
@@ -287,6 +294,9 @@ class ArchivistFeatureTest
   }
 
   it("continues after non existing file referenced in manifest") {
+    val bagInfo1 = randomBagInfo
+    val bagInfo2 = randomBagInfo
+
     withArchivist {
       case (
           ingestBucket,
@@ -294,16 +304,16 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-          case (validRequest1, validBag1) =>
+        createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo1, dataFileCount = 1) {
+          case (validRequest1, _) =>
             createAndSendBag(
               ingestBucket,
               queuePair,
               dataFileCount = 1,
               createDataManifest = dataManifestWithNonExistingFile) {
               case (invalidRequest1, _) =>
-                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-                  case (validRequest2, validBag2) =>
+                createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo2, dataFileCount = 1) {
+                  case (validRequest2, _) =>
                     createAndSendBag(
                       ingestBucket,
                       queuePair,
@@ -323,7 +333,7 @@ class ArchivistFeatureTest
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
+                                    s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                               ),
                               ArchiveComplete(
                                 validRequest2.archiveRequestId,
@@ -332,7 +342,7 @@ class ArchivistFeatureTest
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
+                                    s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                               )
                             ),
                             registrarTopic
@@ -360,6 +370,9 @@ class ArchivistFeatureTest
   }
 
   it("continues after zip file with no bag-info.txt") {
+    val bagInfo1 = randomBagInfo
+    val bagInfo2 = randomBagInfo
+
     withArchivist {
       case (
           ingestBucket,
@@ -367,16 +380,16 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-          case (validRequest1, validBag1) =>
+        createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo1, dataFileCount = 1) {
+          case (validRequest1, _) =>
             createAndSendBag(
               ingestBucket,
               queuePair,
               dataFileCount = 1,
               createBagInfoFile = _ => None) {
               case (invalidRequest1, _) =>
-                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-                  case (validRequest2, validBag2) =>
+                createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo2, dataFileCount = 1) {
+                  case (validRequest2, _) =>
                     createAndSendBag(
                       ingestBucket,
                       queuePair,
@@ -396,7 +409,7 @@ class ArchivistFeatureTest
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
+                                    s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                               ),
                               ArchiveComplete(
                                 validRequest2.archiveRequestId,
@@ -405,7 +418,7 @@ class ArchivistFeatureTest
                                   storageBucket.name,
                                   "archive",
                                   BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
+                                    s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                               )
                             ),
                             registrarTopic

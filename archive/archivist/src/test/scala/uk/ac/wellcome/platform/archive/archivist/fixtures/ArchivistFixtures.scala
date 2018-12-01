@@ -56,6 +56,7 @@ trait ArchivistFixtures
   def createAndSendBag[R](
     ingestBucket: Bucket,
     queuePair: QueuePair,
+    bagInfo: BagInfo = randomBagInfo,
     dataFileCount: Int = 12,
     createDigest: String => String = createValidDigest,
     createTagManifest: List[(String, String)] => Option[FileEntry] =
@@ -64,8 +65,7 @@ trait ArchivistFixtures
       createValidDataManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
     createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile)(
-    testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]): Boolean = {
-    val bagInfo = randomBagInfo
+    testWith: TestWith[(IngestBagRequest, ExternalIdentifier), R]): R =
     withBagItZip(
       bagInfo = bagInfo,
       dataFileCount = dataFileCount,
@@ -75,10 +75,10 @@ trait ArchivistFixtures
       createBagItFile = createBagItFile,
       createBagInfoFile = createBagInfoFile
     ) { zipFile =>
-      sendBag(zipFile, ingestBucket, queuePair)(ingestBagRequest =>
-         testWith((ingestBagRequest, bagInfo.externalIdentifier)))
+      sendBag(zipFile, ingestBucket, queuePair) { ingestBagRequest =>
+        testWith((ingestBagRequest, bagInfo.externalIdentifier))
+      }
     }
-  }
 
   def withApp[R](storageBucket: Bucket,
                  queuePair: QueuePair,
