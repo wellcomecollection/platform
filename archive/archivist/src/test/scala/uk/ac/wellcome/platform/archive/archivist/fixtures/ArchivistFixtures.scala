@@ -74,10 +74,9 @@ trait ArchivistFixtures
       createDataManifest = createDataManifest,
       createBagItFile = createBagItFile,
       createBagInfoFile = createBagInfoFile
-    ) {
-      case (_, zipFile) =>
-        sendBag(zipFile, ingestBucket, queuePair)(ingestBagRequest =>
-          testWith((ingestBagRequest, bagInfo.externalIdentifier)))
+    ) { zipFile =>
+      sendBag(zipFile, ingestBucket, queuePair)(ingestBagRequest =>
+         testWith((ingestBagRequest, bagInfo.externalIdentifier)))
     }
   }
 

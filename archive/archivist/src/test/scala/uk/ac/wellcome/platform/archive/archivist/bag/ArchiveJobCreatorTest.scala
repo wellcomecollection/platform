@@ -20,35 +20,33 @@ class ArchiveJobCreatorTest
     with Inside
     with IngestBagRequestGenerators {
   it("creates an archive job") {
-    withBagItZip() {
-      case (_, zipFile) =>
-        val bucketName = "bucket"
-        val ingestRequest = createIngestBagRequest
-        inside(
-          ArchiveJobCreator
-            .create(
-              zipFile,
-              createBagUploaderConfigWith(Bucket(bucketName)),
-              ingestRequest
-            )) {
-          case Right(
-              ArchiveJob(
-                bagIdentifier,
-                actualZipFile,
-                bagLocation,
-                bagItConfig,
-                bagManifestLocations)) =>
-            actualZipFile shouldBe zipFile
-            bagLocation shouldBe BagLocation(
-              bucketName,
-              "archive",
-              BagPath(s"${ingestRequest.storageSpace}/$bagIdentifier"))
-            bagItConfig shouldBe BagItConfig()
-            bagManifestLocations should contain only (BagManifestLocation(
-              "tagmanifest-sha256.txt"), BagManifestLocation(
-              "manifest-sha256.txt"))
-        }
+    withBagItZip() { zipFile =>
+      val bucketName = "bucket"
+      val ingestRequest = createIngestBagRequest
+      inside(
+        ArchiveJobCreator
+          .create(
+            zipFile,
+            createBagUploaderConfigWith(Bucket(bucketName)),
+            ingestRequest
+          )) {
+        case Right(
+        ArchiveJob(
+        bagIdentifier,
+        actualZipFile,
+        bagLocation,
+        bagItConfig,
+        bagManifestLocations)) =>
+          actualZipFile shouldBe zipFile
+          bagLocation shouldBe BagLocation(
+            bucketName,
+            "archive",
+            BagPath(s"${ingestRequest.storageSpace}/$bagIdentifier"))
+          bagItConfig shouldBe BagItConfig()
+          bagManifestLocations should contain only(BagManifestLocation(
+            "tagmanifest-sha256.txt"), BagManifestLocation(
+            "manifest-sha256.txt"))
+      }
     }
   }
-
 }
