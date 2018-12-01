@@ -83,13 +83,12 @@ trait ArchivistFixtures
                  queuePair: QueuePair,
                  registrarTopic: Topic,
                  progressTopic: Topic)(testWith: TestWith[Archivist, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         val archivist = new Archivist(
           s3Client = s3Client,
           snsClient = snsClient,
           messageStream = new MessageStream[NotificationMessage, Unit](
-            actorSystem = actorSystem,
             sqsClient = asyncSqsClient,
             sqsConfig = createSQSConfigWith(queuePair.queue),
             metricsSender = metricsSender
@@ -97,8 +96,6 @@ trait ArchivistFixtures
           bagUploaderConfig = createBagUploaderConfigWith(storageBucket),
           snsRegistrarConfig = createSNSConfigWith(registrarTopic),
           snsProgressConfig = createSNSConfigWith(progressTopic)
-        )(
-          actorSystem = actorSystem
         )
 
         archivist.run()

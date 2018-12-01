@@ -71,7 +71,6 @@ trait RegistrarFixtures
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         val messageStream = new MessageStream[NotificationMessage, Unit](
-          actorSystem = actorSystem,
           sqsClient = asyncSqsClient,
           sqsConfig = createSQSConfigWith(queuePair.queue),
           metricsSender = metricsSender

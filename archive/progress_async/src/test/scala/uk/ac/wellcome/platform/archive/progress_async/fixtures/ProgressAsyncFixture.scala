@@ -62,7 +62,6 @@ trait ProgressAsyncFixture
         withMetricsSender(actorSystem) { metricsSender =>
           val progressAsync = new ProgressAsync(
             messageStream = new MessageStream[NotificationMessage, Unit](
-              actorSystem = actorSystem,
               sqsClient = asyncSqsClient,
               sqsConfig = createSQSConfigWith(queuePair.queue),
               metricsSender = metricsSender

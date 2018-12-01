@@ -145,14 +145,13 @@ class MessageStreamTest
                         MetricsSender),
                        R]
   ) = {
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
             val sqsConfig = createSQSConfigWith(queue)
 
             val stream = new MessageStream[ExampleObject, Unit](
-              actorSystem = actorSystem,
               sqsClient = asyncSqsClient,
               sqsConfig = sqsConfig,
               metricsSender = metricsSender
