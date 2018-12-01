@@ -10,29 +10,30 @@ import uk.ac.wellcome.test.fixtures._
 
 trait ZipBagItFixture extends BagIt with Logging {
 
-  def withZipFile[R](files: Seq[FileEntry]): Fixture[ZipFile, R] = fixture[ZipFile, R](
-    create = {
-      val file = File.createTempFile(randomAlphanumeric(), ".zip")
-      val zipFileOutputStream = new FileOutputStream(file)
-      val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
-      files.foreach {
-        case FileEntry(name, contents) =>
-          info(s"Adding $name to zip contents")
-          val zipEntry = new ZipEntry(name)
-          zipOutputStream.putNextEntry(zipEntry)
-          zipOutputStream.write(contents.getBytes)
-          zipOutputStream.closeEntry()
-      }
-      zipOutputStream.close()
-      val zipFile = new ZipFile(file)
+  def withZipFile[R](files: Seq[FileEntry]): Fixture[ZipFile, R] =
+    fixture[ZipFile, R](
+      create = {
+        val file = File.createTempFile(randomAlphanumeric(), ".zip")
+        val zipFileOutputStream = new FileOutputStream(file)
+        val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
+        files.foreach {
+          case FileEntry(name, contents) =>
+            info(s"Adding $name to zip contents")
+            val zipEntry = new ZipEntry(name)
+            zipOutputStream.putNextEntry(zipEntry)
+            zipOutputStream.write(contents.getBytes)
+            zipOutputStream.closeEntry()
+        }
+        zipOutputStream.close()
+        val zipFile = new ZipFile(file)
 
-      info(s"zipfile full path: ${file.getAbsolutePath}")
-      zipFile
-    },
-    destroy = { zf: ZipFile =>
-      new File(zf.getName).delete()
-    }
-  )
+        info(s"zipfile full path: ${file.getAbsolutePath}")
+        zipFile
+      },
+      destroy = { zf: ZipFile =>
+        new File(zf.getName).delete()
+      }
+    )
 
   def withBagItZip[R](
     bagInfo: BagInfo = randomBagInfo,

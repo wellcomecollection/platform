@@ -77,12 +77,12 @@ class ArchiveJobDigestItemsFlowTest
             whenReady(eventualArchiveJobs) { archiveJobs =>
               inside(archiveJobs.toList) {
                 case List(
-                Left(
-                ArchiveJobError(
-                actualArchiveJob,
-                List(FileNotFoundError(
-                "this/does/not/exists.jpg",
-                archiveItemJob))))) =>
+                    Left(
+                      ArchiveJobError(
+                        actualArchiveJob,
+                        List(FileNotFoundError(
+                          "this/does/not/exists.jpg",
+                          archiveItemJob))))) =>
                   actualArchiveJob shouldBe archiveJob
                   archiveItemJob.bagDigestItem.location shouldBe EntryPath(
                     "this/does/not/exists.jpg")

@@ -56,7 +56,7 @@ class ZipFileDownloadFlowTest
               createIngestBagRequestWith(ingestBagLocation = objectLocation)
 
             val download: Future[Either[ArchiveError[IngestBagRequest],
-              ZipFileDownloadComplete]] =
+                                        ZipFileDownloadComplete]] =
               downloadZipFlow
                 .runWith(Source.single(ingestBagRequest), Sink.head)
                 ._2

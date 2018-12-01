@@ -74,7 +74,8 @@ class ArchiveZipFileFlowTest
                       BagLocation(
                         storageBucket.name,
                         "archive",
-                        BagPath(s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
+                        BagPath(
+                          s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
                     )))
 
                     assertTopicReceivesProgressEventUpdate(
@@ -116,8 +117,7 @@ class ArchiveZipFileFlowTest
                   whenReady(verification) { result =>
                     inside(result.toList) {
                       case List(Left(ArchiveJobError(_, errors))) =>
-                        all(errors) shouldBe a[
-                          ChecksumNotMatchedOnUploadError]
+                        all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
                     }
 
                     assertTopicReceivesProgressStatusUpdate(
@@ -186,8 +186,10 @@ class ArchiveZipFileFlowTest
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
             val bagInfo = randomBagInfo
-            withBagItZip(bagInfo, createDataManifest = _ =>
-              Some(FileEntry("manifest-sha256.txt", "dgfssjhdfg"))) {
+            withBagItZip(
+              bagInfo,
+              createDataManifest =
+                _ => Some(FileEntry("manifest-sha256.txt", "dgfssjhdfg"))) {
               zipFile =>
                 withArchiveZipFileFlow(storageBucket, reportingTopic) {
                   uploader =>
@@ -211,7 +213,8 @@ class ArchiveZipFileFlowTest
                             .bagLocation shouldBe BagLocation(
                             storageBucket.name,
                             "archive",
-                            BagPath(s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
+                            BagPath(
+                              s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
                       }
 
                       assertTopicReceivesProgressStatusUpdate(

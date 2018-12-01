@@ -31,19 +31,19 @@ class ArchiveJobCreatorTest
             ingestRequest
           )) {
         case Right(
-        ArchiveJob(
-        bagIdentifier,
-        actualZipFile,
-        bagLocation,
-        bagItConfig,
-        bagManifestLocations)) =>
+            ArchiveJob(
+              bagIdentifier,
+              actualZipFile,
+              bagLocation,
+              bagItConfig,
+              bagManifestLocations)) =>
           actualZipFile shouldBe zipFile
           bagLocation shouldBe BagLocation(
             bucketName,
             "archive",
             BagPath(s"${ingestRequest.storageSpace}/$bagIdentifier"))
           bagItConfig shouldBe BagItConfig()
-          bagManifestLocations should contain only(BagManifestLocation(
+          bagManifestLocations should contain only (BagManifestLocation(
             "tagmanifest-sha256.txt"), BagManifestLocation(
             "manifest-sha256.txt"))
       }

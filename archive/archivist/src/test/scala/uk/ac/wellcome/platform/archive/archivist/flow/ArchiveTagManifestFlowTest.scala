@@ -46,8 +46,8 @@ class ArchiveTagManifestFlowTest
             whenReady(futureResult) { result =>
               result shouldBe Right(archiveJob)
 
-              val expectedTagManifestStream = fromInputStream(
-                zipFile.getInputStream(
+              val expectedTagManifestStream =
+                fromInputStream(zipFile.getInputStream(
                   new ZipEntry("tagmanifest-sha256.txt"))).mkString
 
               getContentFromS3(
