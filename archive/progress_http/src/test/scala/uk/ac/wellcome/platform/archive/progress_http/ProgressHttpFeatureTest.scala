@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archive.progress_http
 import java.time.Instant
 import java.util.UUID
 
-import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.scaladsl.Sink
@@ -40,34 +39,31 @@ class ProgressHttpFeatureTest
   describe("GET /progress/:id") {
     it("returns a progress tracker when available") {
       withConfiguredApp {
-        case (table, _, baseUrl, app) =>
-          app.run()
+        case (table, _, baseUrl) =>
           withActorSystem { actorSystem =>
             withMaterializer(actorSystem) { implicit materialiser =>
               withProgressTracker(table) { progressTracker =>
-                val progress = createProgress()
+                val progress = createProgress
                 whenReady(progressTracker.initialise(progress)) { _ =>
-                  val request =
-                    HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
-
-                  whenRequestReady(request) { result =>
-                    result.status shouldBe StatusCodes.OK
-                    getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
-                      contextUrl,
-                      progress.id,
-                      DisplayLocation(
-                        DisplayProvider(progress.sourceLocation.provider.id),
-                        progress.sourceLocation.location.namespace,
-                        progress.sourceLocation.location.key),
-                      progress.callback.map(DisplayCallback(_)),
-                      DisplayIngestType("create"),
-                      DisplayStorageSpace(progress.space.underlying),
-                      DisplayStatus(progress.status.toString),
-                      None,
-                      Nil,
-                      progress.createdDate.toString,
-                      progress.lastModifiedDate.toString
-                    )
+                  whenGetRequestReady(s"$baseUrl/progress/${progress.id}") {
+                    result =>
+                      result.status shouldBe StatusCodes.OK
+                      getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
+                        contextUrl,
+                        progress.id,
+                        DisplayLocation(
+                          DisplayProvider(progress.sourceLocation.provider.id),
+                          progress.sourceLocation.location.namespace,
+                          progress.sourceLocation.location.key),
+                        progress.callback.map(DisplayCallback(_)),
+                        DisplayIngestType("create"),
+                        DisplayStorageSpace(progress.space.underlying),
+                        DisplayStatus(progress.status.toString),
+                        None,
+                        Nil,
+                        progress.createdDate.toString,
+                        progress.lastModifiedDate.toString
+                      )
 
                   }
                 }
@@ -76,28 +72,27 @@ class ProgressHttpFeatureTest
           }
       }
     }
+
     it("does not output empty values") {
       withConfiguredApp {
-        case (table, _, baseUrl, app) =>
-          app.run()
+        case (table, _, baseUrl) =>
           withActorSystem { actorSystem =>
             withMaterializer(actorSystem) { implicit materialiser =>
               withProgressTracker(table) { progressTracker =>
                 val progress = createProgressWith(callback = None)
                 whenReady(progressTracker.initialise(progress)) { _ =>
-                  val request =
-                    HttpRequest(GET, s"$baseUrl/progress/${progress.id}")
-
-                  whenRequestReady(request) { result =>
-                    result.status shouldBe StatusCodes.OK
-                    val value = result.entity.dataBytes.runWith(Sink.fold("") {
-                      case (acc, byteString) =>
-                        acc + byteString.utf8String
-                    })
-                    whenReady(value) { jsonString =>
-                      val infoJson = parse(jsonString).right.get
-                      infoJson.findAllByKey("callback") shouldBe empty
-                    }
+                  whenGetRequestReady(s"$baseUrl/progress/${progress.id}") {
+                    result =>
+                      result.status shouldBe StatusCodes.OK
+                      val value =
+                        result.entity.dataBytes.runWith(Sink.fold("") {
+                          case (acc, byteString) =>
+                            acc + byteString.utf8String
+                        })
+                      whenReady(value) { jsonString =>
+                        val infoJson = parse(jsonString).right.get
+                        infoJson.findAllByKey("callback") shouldBe empty
+                      }
 
                   }
                 }
@@ -109,21 +104,9 @@ class ProgressHttpFeatureTest
 
     it("returns a 404 NotFound if no progress tracker matches id") {
       withConfiguredApp {
-        case (_, _, baseUrl, app) =>
-          app.run()
-
-          withActorSystem { actorSystem =>
-            implicit val system = actorSystem
-
-            val uuid = randomUUID
-
-            val request = Http().singleRequest(
-              HttpRequest(GET, s"$baseUrl/progress/$uuid")
-            )
-
-            whenReady(request) { result: HttpResponse =>
-              result.status shouldBe StatusCodes.NotFound
-            }
+        case (_, _, baseUrl) =>
+          whenGetRequestReady(s"$baseUrl/progress/$randomUUID") { response =>
+            response.status shouldBe StatusCodes.NotFound
           }
       }
     }
@@ -132,9 +115,7 @@ class ProgressHttpFeatureTest
   describe("POST /progress") {
     it("creates a progress tracker") {
       withConfiguredApp {
-        case (table, topic, baseUrl, app) =>
-          app.run()
-
+        case (table, topic, baseUrl) =>
           withActorSystem { implicit actorSystem =>
             withMaterializer(actorSystem) { implicit materializer =>
               val url = s"$baseUrl/progress"
@@ -158,21 +139,19 @@ class ProgressHttpFeatureTest
                 toJson(createProgressRequest).get
               )
 
-              val httpRequest = HttpRequest(
+              val request = HttpRequest(
                 method = POST,
                 uri = url,
                 headers = Nil,
                 entity = entity
               )
 
-              val request = Http().singleRequest(httpRequest)
-
               val expectedLocationR = s"$baseUrl/(.+)".r
 
-              whenReady(request) { result: HttpResponse =>
-                result.status shouldBe StatusCodes.Created
+              whenRequestReady(request) { response: HttpResponse =>
+                response.status shouldBe StatusCodes.Created
 
-                val maybeId = result.headers.collectFirst {
+                val maybeId = response.headers.collectFirst {
                   case HttpHeader("location", expectedLocationR(id)) => id
                 }
 
@@ -180,7 +159,7 @@ class ProgressHttpFeatureTest
                 val id = UUID.fromString(maybeId.get)
 
                 val progressFuture =
-                  Unmarshal(result.entity).to[ResponseDisplayIngest]
+                  Unmarshal(response.entity).to[ResponseDisplayIngest]
 
                 whenReady(progressFuture) { actualProgress =>
                   inside(actualProgress) {

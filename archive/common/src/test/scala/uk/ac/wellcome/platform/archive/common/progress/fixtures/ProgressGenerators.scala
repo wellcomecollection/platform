@@ -18,7 +18,8 @@ trait ProgressGenerators extends RandomThings {
     StorageProvider(randomAlphanumeric()),
     ObjectLocation(randomAlphanumeric(), randomAlphanumeric()))
 
-  def createProgress(): Progress = createProgressWith()
+  def createProgress: Progress = createProgressWith()
+
   val testCallbackUri =
     new URI("http://www.wellcomecollection.org/callback/ok")
 
@@ -43,11 +44,14 @@ trait ProgressGenerators extends RandomThings {
     ProgressEvent(randomAlphanumeric(15))
   }
 
-  def createProgressEventUpdateWith(id: UUID,
+  def createProgressEventUpdateWith(id: UUID = randomUUID,
                                     events: List[ProgressEvent] = List(
-                                      createProgressEvent)) = {
+                                      createProgressEvent))
+    : ProgressEventUpdate =
     ProgressEventUpdate(id, events)
-  }
+
+  def createProgressEventUpdate: ProgressEventUpdate =
+    createProgressEventUpdateWith()
 
   def createProgressStatusUpdateWith(
     id: UUID,
