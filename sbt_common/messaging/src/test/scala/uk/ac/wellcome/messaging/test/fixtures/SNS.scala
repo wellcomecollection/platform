@@ -16,8 +16,9 @@ import uk.ac.wellcome.test.fixtures._
 
 import scala.language.higherKinds
 import scala.collection.immutable.Seq
+import scala.util.{Random, Success}
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Random, Success, Try}
 
 object SNS {
 
