@@ -56,10 +56,9 @@ class RegistrarHttpFeatureTest
               path = path
             )
             val future = storeSingleManifest(vhs, storageManifest)
-            val requestPath = s
             whenReady(future) { _ =>
               whenGetRequestReady(
-                "$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") {
+                s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") {
                 response =>
                   response.status shouldBe StatusCodes.OK
                   val displayBag = getT[DisplayBag](response.entity)
