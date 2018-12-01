@@ -7,14 +7,12 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.platform.archive.notifier.Notifier
-import uk.ac.wellcome.platform.archive.common.fixtures.BagIt
-import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
+import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagIt}
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Namespace
-import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 
-trait NotifierFixture extends S3 with Messaging with BagIt {
+trait NotifierFixture extends ArchiveMessaging with Messaging with BagIt {
 
   protected val callbackHost = "localhost"
   protected val callbackPort = 8080
@@ -27,21 +25,16 @@ trait NotifierFixture extends S3 with Messaging with BagIt {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withMetricsSender(actorSystem) { metricsSender =>
-          val messageStream =
-            new MessageStream[NotificationMessage, PublishResult](
-              sqsClient = asyncSqsClient,
-              sqsConfig = createSQSConfigWith(queue),
-              metricsSender = metricsSender
+          withArchiveMessageStream[NotificationMessage, PublishResult, R](queue, metricsSender) { messageStream =>
+            val notifier = new Notifier(
+              messageStream = messageStream,
+              snsClient = snsClient,
+              snsConfig = createSNSConfigWith(topic),
+              contextUrl = new URL("http://localhost/context.json")
             )
 
-          val notifier = new Notifier(
-            messageStream = messageStream,
-            snsClient = snsClient,
-            snsConfig = createSNSConfigWith(topic),
-            contextUrl = new URL("http://localhost/context.json")
-          )
-
-          testWith(notifier)
+            testWith(notifier)
+          }
         }
       }
     }

@@ -13,12 +13,14 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.platform.archive.common.fixtures.ArchiveMessaging
 import uk.ac.wellcome.test.fixtures.TestWith
 
 class MessageStreamTest
     extends FunSpec
     with Matchers
     with ScalaFutures
+    with ArchiveMessaging
     with Messaging
     with MockitoSugar
     with IntegrationPatience {
@@ -144,20 +146,14 @@ class MessageStreamTest
                         ActorSystem,
                         MetricsSender),
                        R]
-  ) = {
+  ): R = {
     withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
-          withMockMetricSender { metricsSender =>
-            val sqsConfig = createSQSConfigWith(queue)
-
-            val stream = new MessageStream[ExampleObject, Unit](
-              sqsClient = asyncSqsClient,
-              sqsConfig = sqsConfig,
-              metricsSender = metricsSender
-            )
-
-            testWith((stream, queuePair, actorSystem, metricsSender))
+          withMockMetricSender { mockMetricsSender =>
+            withArchiveMessageStream[ExampleObject, Unit, R](queue, mockMetricsSender) { stream =>
+              testWith((stream, queuePair, actorSystem, mockMetricsSender))
+            }
           }
       }
     }

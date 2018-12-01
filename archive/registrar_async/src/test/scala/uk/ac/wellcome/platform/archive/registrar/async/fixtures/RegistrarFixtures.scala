@@ -5,19 +5,19 @@ import com.amazonaws.services.dynamodbv2.model._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.platform.archive.common.fixtures.ArchiveMessaging
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
-
-import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 
 trait RegistrarFixtures
     extends S3
     with Messaging
+    with ArchiveMessaging
     with BagLocationFixtures
     with LocalDynamoDb
     with StorageManifestVHSFixture {
@@ -70,24 +70,21 @@ trait RegistrarFixtures
                  progressTopic: Topic)(testWith: TestWith[Registrar, R]): R =
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        val messageStream = new MessageStream[NotificationMessage, Unit](
-          sqsClient = asyncSqsClient,
-          sqsConfig = createSQSConfigWith(queuePair.queue),
-          metricsSender = metricsSender
-        )
-        withStorageManifestVHS(hybridStoreTable, hybridStoreBucket) {
-          dataStore =>
-            val registrar = new Registrar(
-              snsClient = snsClient,
-              progressSnsConfig = createSNSConfigWith(progressTopic),
-              s3Client = s3Client,
-              messageStream = messageStream,
-              dataStore = dataStore
-            )
+        withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue, metricsSender) { messageStream =>
+          withStorageManifestVHS(hybridStoreTable, hybridStoreBucket) {
+            dataStore =>
+              val registrar = new Registrar(
+                snsClient = snsClient,
+                progressSnsConfig = createSNSConfigWith(progressTopic),
+                s3Client = s3Client,
+                messageStream = messageStream,
+                dataStore = dataStore
+              )
 
-            registrar.run()
+              registrar.run()
 
-            testWith(registrar)
+              testWith(registrar)
+          }
         }
       }
     }
