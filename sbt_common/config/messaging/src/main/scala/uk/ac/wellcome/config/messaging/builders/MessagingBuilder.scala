@@ -1,5 +1,6 @@
 package uk.ac.wellcome.config.messaging.builders
 
+import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
@@ -16,7 +17,7 @@ import scala.concurrent.ExecutionContext
 
 object MessagingBuilder {
   def buildMessageStream[T](config: Config)(
-    implicit serialisationStrategy: SerialisationStrategy[T])
+    implicit actorSystem: ActorSystem, serialisationStrategy: SerialisationStrategy[T])
     : MessageStream[T] = {
     implicit val executionContext: ExecutionContext =
       AkkaBuilder.buildExecutionContext()
@@ -26,7 +27,6 @@ object MessagingBuilder {
     )
 
     new MessageStream[T](
-      actorSystem = AkkaBuilder.buildActorSystem(),
       sqsClient = SQSBuilder.buildSQSAsyncClient(config),
       sqsConfig =
         SQSBuilder.buildSQSConfig(config, namespace = "message.reader"),

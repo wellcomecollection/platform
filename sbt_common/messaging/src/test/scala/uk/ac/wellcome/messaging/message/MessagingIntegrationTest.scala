@@ -80,10 +80,10 @@ class MessagingIntegrationTest
 
   def withLocalStackMessageStreamFixtures[R](
     testWith: TestWith[(Queue, MessageStream[ExampleObject]), R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalStackSqsQueue { queue =>
-          withMessageStream[ExampleObject, R](actorSystem, queue, metricsSender) {
+          withMessageStream[ExampleObject, R](queue, metricsSender) {
             messageStream =>
               testWith((queue, messageStream))
           }

@@ -23,12 +23,11 @@ trait WorkerServiceFixture extends ElasticsearchFixtures with Messaging {
                            indexName: String,
                            elasticClient: HttpClient = elasticClient)(
     testWith: TestWith[IngestorWorkerService, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withMessageStream[IdentifiedBaseWork, R](
-          actorSystem,
-          queue,
-          metricsSender) { messageStream =>
+          queue = queue,
+          metricsSender = metricsSender) { messageStream =>
           val ingestorConfig = IngestorConfig(
             batchSize = 100,
             flushInterval = 5 seconds,
