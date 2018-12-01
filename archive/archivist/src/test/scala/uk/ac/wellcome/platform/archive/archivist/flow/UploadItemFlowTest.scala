@@ -13,7 +13,6 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   UploadError
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.Akka
@@ -37,7 +36,7 @@ class UploadItemFlowTest
       withMaterializer { implicit materializer =>
         val fileContent = "bah buh bih beh"
         val fileName = "key.txt"
-        withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+        withZipFile(List(FileEntry(fileName, fileContent))) { zipFile =>
           val archiveItemJob = createArchiveItemJobWith(
             zipFile = zipFile,
             bucket = bucket,
@@ -67,9 +66,7 @@ class UploadItemFlowTest
       withMaterializer { implicit materializer =>
         withZipFile(List()) { zipFile =>
           val fileName = "key.txt"
-
-          val bagIdentifier =
-            ExternalIdentifier(randomAlphanumeric())
+          val bagIdentifier = createExternalIdentifier
 
           val archiveItemJob = createArchiveItemJobWith(
             zipFile = zipFile,
