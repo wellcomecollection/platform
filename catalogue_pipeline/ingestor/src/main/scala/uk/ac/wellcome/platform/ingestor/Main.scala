@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor
 
-akka.actor.ActorSystem
+import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
