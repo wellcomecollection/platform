@@ -12,12 +12,7 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagId,
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.registrar.async.fixtures.StorageManifestAssertions
@@ -107,7 +102,7 @@ class RegistrarFeatureTest
           queuePair.queue,
           createArchiveCompleteWith(
             archiveRequestId = archiveRequestId,
-            space = bagId.space,
+            space = Namespace(bagId.space.underlying),
             bagLocation = bagLocation
           )
         )

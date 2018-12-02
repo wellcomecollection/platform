@@ -51,7 +51,7 @@ class ArchiveJobDigestItemsFlowTest
                   Right(
                     createArchiveCompleteWith(
                       archiveRequestId = ingestRequest.archiveRequestId,
-                      space = ingestRequest.storageSpace,
+                      space = Namespace(ingestRequest.storageSpace.underlying),
                       bagLocation = archiveJob.bagLocation
                     )
                   )

@@ -8,12 +8,12 @@ import uk.ac.wellcome.platform.archive.common.models._
 trait ArchiveCompleteGenerators extends RandomThings {
   def createArchiveCompleteWith(
     archiveRequestId: UUID = randomUUID,
-    space: StorageSpace = randomStorageSpace,
+    space: Namespace = Namespace(randomAlphanumeric()),
     bagLocation: BagLocation
   ): ArchiveComplete =
     ArchiveComplete(
       archiveRequestId = archiveRequestId,
-      space = Namespace(space.underlying),
+      space = space,
       bagLocation = bagLocation
     )
 
@@ -23,7 +23,7 @@ trait ArchiveCompleteGenerators extends RandomThings {
   ): ArchiveComplete =
     createArchiveCompleteWith(
       archiveRequestId = request.archiveRequestId,
-      space = request.storageSpace,
+      space = Namespace(request.storageSpace.underlying),
       bagLocation = BagLocation(
         storageNamespace = request.zippedBagLocation.namespace,
         storagePath = "archive",

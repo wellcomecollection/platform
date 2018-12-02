@@ -34,7 +34,7 @@ trait RegistrarFixtures
       case (bagLocation, bagInfo) =>
         val archiveComplete = createArchiveCompleteWith(
           archiveRequestId = archiveRequestId,
-          space = storageSpace,
+          space = Namespace(storageSpace.underlying),
           bagLocation = bagLocation
         )
 
