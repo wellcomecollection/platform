@@ -51,9 +51,10 @@ class RegistrarFeatureTest
         val requestId = randomUUID
         val storageSpace = randomStorageSpace
         val createdAfterDate = Instant.now()
+        val bagInfo = randomBagInfo
 
-        withBagNotification(queuePair, storageBucket, requestId, storageSpace) {
-          case (bagLocation, bagInfo) =>
+        withBagNotification(queuePair, storageBucket, requestId, storageSpace, bagInfo = bagInfo) {
+          case (bagLocation, _) =>
             val bagId = BagId(
               space = storageSpace,
               externalIdentifier = bagInfo.externalIdentifier
