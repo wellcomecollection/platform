@@ -11,6 +11,7 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.generators.ArchiveCompleteGenerators
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
@@ -20,6 +21,7 @@ class ArchivistFeatureTest
     with ScalaFutures
     with RandomThings
     with MetricsSenderFixture
+    with ArchiveCompleteGenerators
     with ArchivistFixtures
     with IntegrationPatience
     with ProgressUpdateAssertions {
@@ -51,13 +53,9 @@ class ArchivistFeatureTest
               assertQueuePairSizes(queuePair, 0, 0)
 
               assertSnsReceivesOnly(
-                ArchiveComplete(
-                  request.archiveRequestId,
-                  request.storageSpace,
-                  BagLocation(
-                    storageBucket.name,
-                    "archive",
-                    BagPath(s"${request.storageSpace}/$bagIdentifier"))
+                createArchiveCompleteWith(
+                  request = request,
+                  bagIdentifier = bagIdentifier
                 ),
                 registrarTopic
               )
@@ -161,23 +159,13 @@ class ArchivistFeatureTest
 
                           assertSnsReceives(
                             Set(
-                              ArchiveComplete(
-                                validRequest1.archiveRequestId,
-                                validRequest1.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
+                              createArchiveCompleteWith(
+                                request = validRequest1,
+                                bagIdentifier = validBag1
                               ),
-                              ArchiveComplete(
-                                validRequest2.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
+                              createArchiveCompleteWith(
+                                request = validRequest2,
+                                bagIdentifier = validBag2
                               )
                             ),
                             registrarTopic
@@ -246,21 +234,13 @@ class ArchivistFeatureTest
 
                   assertSnsReceives(
                     Set(
-                      ArchiveComplete(
-                        validRequest1.archiveRequestId,
-                        validRequest1.storageSpace,
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(s"${validRequest1.storageSpace}/$validBag1"))
+                      createArchiveCompleteWith(
+                        request = validRequest1,
+                        bagIdentifier = validBag1
                       ),
-                      ArchiveComplete(
-                        validRequest2.archiveRequestId,
-                        validRequest2.storageSpace,
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(s"${validRequest2.storageSpace}/$validBag2"))
+                      createArchiveCompleteWith(
+                        request = validRequest2,
+                        bagIdentifier = validBag2
                       )
                     ),
                     registrarTopic
@@ -316,23 +296,13 @@ class ArchivistFeatureTest
 
                           assertSnsReceives(
                             Set(
-                              ArchiveComplete(
-                                validRequest1.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
+                              createArchiveCompleteWith(
+                                request = validRequest1,
+                                bagIdentifier = validBag1
                               ),
-                              ArchiveComplete(
-                                validRequest2.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
+                              createArchiveCompleteWith(
+                                request = validRequest2,
+                                bagIdentifier = validBag2
                               )
                             ),
                             registrarTopic
@@ -389,23 +359,13 @@ class ArchivistFeatureTest
 
                           assertSnsReceives(
                             Set(
-                              ArchiveComplete(
-                                validRequest1.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
+                              createArchiveCompleteWith(
+                                request = validRequest1,
+                                bagIdentifier = validBag1
                               ),
-                              ArchiveComplete(
-                                validRequest2.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
+                              createArchiveCompleteWith(
+                                request = validRequest2,
+                                bagIdentifier = validBag2
                               )
                             ),
                             registrarTopic
