@@ -54,7 +54,7 @@ class RegistrarFeatureTest
         val bagInfo = randomBagInfo
 
         withBagNotification(queuePair, storageBucket, requestId, storageSpace, bagInfo = bagInfo) {
-          case (bagLocation, _) =>
+          bagLocation =>
             val bagId = BagId(
               space = storageSpace,
               externalIdentifier = bagInfo.externalIdentifier
