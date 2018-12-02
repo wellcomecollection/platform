@@ -30,7 +30,7 @@ trait RegistrarFixtures
   )(testWith: TestWith[(BagLocation, BagInfo), R]): R = {
     val bagInfo = randomBagInfo
     withBag(storageBucket, bagInfo = bagInfo) {
-      case (bagLocation, _) =>
+      bagLocation =>
         val archiveComplete = ArchiveComplete(
           archiveRequestId = archiveRequestId,
           space = storageSpace,
