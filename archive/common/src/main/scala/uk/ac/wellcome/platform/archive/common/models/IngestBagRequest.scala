@@ -9,9 +9,11 @@ import uk.ac.wellcome.platform.archive.common.json.{
 }
 import uk.ac.wellcome.storage.ObjectLocation
 
-case class IngestBagRequest(archiveRequestId: UUID,
-                            zippedBagLocation: ObjectLocation,
-                            archiveCompleteCallbackUrl: Option[URI] = None,
-                            storageSpace: StorageSpace)
+case class IngestBagRequest(
+  archiveRequestId: UUID,
+  zippedBagLocation: ObjectLocation,
+  archiveCompleteCallbackUrl: Option[URI] = None,
+  storageSpace: Namespace
+)
 
 object IngestBagRequest extends URIConverters with UUIDConverters {}

@@ -3,14 +3,10 @@ package uk.ac.wellcome.platform.archive.common.generators
 import java.net.URI
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  StorageSpace
-}
+import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.storage.ObjectLocation
 
-trait IngestBagRequestGenerators extends RandomThings {
+trait IngestBagRequestGenerators extends NamespaceGenerators {
   def createIngestBagRequest: IngestBagRequest = createIngestBagRequestWith()
 
   def createIngestBagRequestWith(requestId: UUID = randomUUID,
@@ -21,6 +17,6 @@ trait IngestBagRequestGenerators extends RandomThings {
       archiveRequestId = requestId,
       zippedBagLocation = ingestBagLocation,
       archiveCompleteCallbackUrl = callbackUri,
-      storageSpace = StorageSpace("fake")
+      storageSpace = createNamespace
     )
 }

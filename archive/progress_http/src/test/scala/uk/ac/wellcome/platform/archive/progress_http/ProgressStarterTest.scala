@@ -44,12 +44,12 @@ class ProgressStarterTest
                 fromJson[IngestBagRequest](messageInfo.message).get)
 
             requests shouldBe List(IngestBagRequest(
-              p.id,
-              storageSpace = StorageSpace(p.space.underlying),
-              archiveCompleteCallbackUrl = p.callback.map(_.uri),
+              archiveRequestId = p.id,
               zippedBagLocation = ObjectLocation(
                 progress.sourceLocation.location.namespace,
-                progress.sourceLocation.location.key)
+                progress.sourceLocation.location.key),
+              archiveCompleteCallbackUrl = p.callback.map(_.uri),
+              storageSpace = p.space
             ))
           }
         }

@@ -210,7 +210,7 @@ class ArchivistFeatureTest
                 archiveRequestId = invalidRequestId1,
                 zippedBagLocation =
                   ObjectLocation(ingestBucket.name, "non-existing1.zip"),
-                storageSpace = StorageSpace("not_a_real_one")
+                storageSpace = createNamespace
               )
             )
 
@@ -224,7 +224,7 @@ class ArchivistFeatureTest
                     archiveRequestId = invalidRequestId2,
                     zippedBagLocation =
                       ObjectLocation(ingestBucket.name, "non-existing2.zip"),
-                    storageSpace = StorageSpace("not_a_real_one")
+                    storageSpace = createNamespace
                   )
                 )
 
