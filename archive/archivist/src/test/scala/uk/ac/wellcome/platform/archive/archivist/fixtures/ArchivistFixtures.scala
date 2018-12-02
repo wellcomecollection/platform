@@ -33,15 +33,15 @@ trait ArchivistFixtures
   def sendBag[R](zipFile: ZipFile, ingestBucket: Bucket, queuePair: QueuePair)(
     testWith: TestWith[IngestBagRequest, R]): R = {
 
+    val bucket = ingestBucket.name
+    val key = s"${randomAlphanumeric()}.zip"
+
     val ingestBagRequest = createIngestBagRequestWith(
       ingestBagLocation = ObjectLocation(
-        ingestBucket.name,
-        s"${randomAlphanumeric()}.zip"
+        namespace = bucket,
+        key = key
       )
     )
-
-    val bucket = ingestBagRequest.zippedBagLocation.namespace
-    val key = ingestBagRequest.zippedBagLocation.key
 
     s3Client.putObject(bucket, key, new File(zipFile.getName))
 

@@ -18,8 +18,9 @@ trait IngestBagRequestGenerators extends RandomThings {
                                    ObjectLocation("testNamespace", "testKey"),
                                  callbackUri: Option[URI] = None) =
     IngestBagRequest(
-      requestId,
-      ingestBagLocation,
-      callbackUri,
-      StorageSpace("fake"))
+      archiveRequestId = requestId,
+      zippedBagLocation = ingestBagLocation,
+      archiveCompleteCallbackUrl = callbackUri,
+      storageSpace = StorageSpace("fake")
+    )
 }
