@@ -14,7 +14,11 @@ import uk.ac.wellcome.platform.archive.common.generators.{
   BagInfoGenerators,
   NamespaceGenerators
 }
-import uk.ac.wellcome.platform.archive.display.{DisplayLocation, DisplayProvider, DisplayStorageSpace}
+import uk.ac.wellcome.platform.archive.display.{
+  DisplayLocation,
+  DisplayProvider,
+  DisplayStorageSpace
+}
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
