@@ -39,7 +39,6 @@ class SierraItemsToDynamoFeatureTest
                 assertStoredAndSent(
                   itemRecord = itemRecord,
                   topic = topic,
-                  bucket = bucket,
                   table = table
                 )
               }
@@ -50,10 +49,8 @@ class SierraItemsToDynamoFeatureTest
     }
   }
 
-  // TODO: Remove the bucket parameter from this method.
   private def assertStoredAndSent(itemRecord: SierraItemRecord,
                                   topic: Topic,
-                                  bucket: Bucket,
                                   table: Table): Assertion =
     assertStoredAndSent[SierraItemRecord](
       itemRecord,
