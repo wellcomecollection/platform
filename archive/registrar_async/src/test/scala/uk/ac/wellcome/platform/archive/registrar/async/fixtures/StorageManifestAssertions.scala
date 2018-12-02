@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import java.time.Instant
 
 import org.scalatest.{Inside, Matchers}
-import uk.ac.wellcome.platform.archive.common.models.{BagInfo, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.{BagInfo, Namespace}
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   StorageLocation,
   StorageProvider
@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 trait StorageManifestAssertions extends Inside with Matchers {
   def assertStorageManifest(storageManifest: StorageManifest)(
-    expectedStorageSpace: StorageSpace,
+    expectedStorageSpace: Namespace,
     expectedBagInfo: BagInfo,
     expectedNamespace: String,
     expectedPath: String,

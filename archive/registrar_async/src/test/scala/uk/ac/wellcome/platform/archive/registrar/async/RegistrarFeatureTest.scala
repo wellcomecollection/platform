@@ -50,7 +50,7 @@ class RegistrarFeatureTest
         withBagNotification(queuePair, storageBucket, requestId, space) {
           case (bagLocation, bagInfo) =>
             val bagId = BagId(
-              space = StorageSpace(space.underlying),
+              space = space,
               externalIdentifier = bagInfo.externalIdentifier
             )
 
@@ -63,7 +63,7 @@ class RegistrarFeatureTest
                 val storageManifest = maybeStorageManifest.get
 
                 assertStorageManifest(storageManifest)(
-                  expectedStorageSpace = bagId.space,
+                  expectedStorageSpace = space,
                   expectedBagInfo = bagInfo,
                   expectedNamespace = storageBucket.name,
                   expectedPath =

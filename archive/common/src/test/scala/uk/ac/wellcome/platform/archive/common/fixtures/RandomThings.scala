@@ -61,7 +61,7 @@ trait RandomThings {
   )
 
   def randomBagId = BagId(
-    randomStorageSpace,
-    randomExternalIdentifier
+    space = Namespace(randomAlphanumeric()),
+    externalIdentifier = randomExternalIdentifier
   )
 }

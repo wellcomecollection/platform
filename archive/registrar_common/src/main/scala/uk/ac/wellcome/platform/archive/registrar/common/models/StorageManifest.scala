@@ -5,6 +5,7 @@ import java.time.Instant
 import uk.ac.wellcome.platform.archive.common.models.{
   BagId,
   BagInfo,
+  Namespace,
   StorageSpace
 }
 import uk.ac.wellcome.platform.archive.common.progress.models.StorageLocation
@@ -25,7 +26,10 @@ case class StorageManifest(
   accessLocation: StorageLocation,
   createdDate: Instant
 ) {
-  val id = BagId(space, info.externalIdentifier)
+  val id = BagId(
+    space = Namespace(space.underlying),
+    externalIdentifier = info.externalIdentifier
+  )
 }
 
 case class FileManifest(checksumAlgorithm: ChecksumAlgorithm,
