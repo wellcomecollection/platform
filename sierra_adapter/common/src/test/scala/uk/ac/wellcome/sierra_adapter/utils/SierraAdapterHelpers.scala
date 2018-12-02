@@ -54,9 +54,7 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       }
     )
 
-  // TODO: We can drop the 'bucket' parameter from this method
   def assertStored(transformable: SierraTransformable,
-                   bucket: Bucket,
                    table: Table): Assertion =
     assertStored[SierraTransformable](
       table = table,
