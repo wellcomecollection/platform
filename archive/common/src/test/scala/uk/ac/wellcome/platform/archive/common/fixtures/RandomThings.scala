@@ -55,8 +55,4 @@ trait RandomThings {
     val maxValue = 1999999998
     LocalDate.ofEpochDay(startRange + Random.nextInt(maxValue))
   }
-
-  def randomStorageSpace = StorageSpace(
-    randomAlphanumeric()
-  )
 }

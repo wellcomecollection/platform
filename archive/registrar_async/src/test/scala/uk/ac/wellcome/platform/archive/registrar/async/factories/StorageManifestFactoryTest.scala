@@ -21,7 +21,7 @@ class StorageManifestFactoryTest
   implicit val _ = s3Client
 
   it("returns a right of storage manifest if reading a bag location succeeds") {
-    val storageSpace = randomStorageSpace
+    val storageSpace = createNamespace
     withLocalS3Bucket { bucket =>
       withBag(bucket) {
         case (bagLocation, bagInfo) =>
