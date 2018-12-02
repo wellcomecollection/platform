@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar.generators
 import java.time.Instant
 
 import uk.ac.wellcome.platform.archive.common.generators.NamespaceGenerators
-import uk.ac.wellcome.platform.archive.common.models.{BagInfo, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.{BagInfo, Namespace}
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   StorageLocation,
   StorageProvider
