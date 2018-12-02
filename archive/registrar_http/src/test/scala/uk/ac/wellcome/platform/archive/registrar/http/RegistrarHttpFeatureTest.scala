@@ -10,13 +10,11 @@ import io.circe.parser._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
-import uk.ac.wellcome.platform.archive.display.{
-  DisplayLocation,
-  DisplayProvider,
-  DisplayStorageSpace
+import uk.ac.wellcome.platform.archive.common.generators.{
+  BagInfoGenerators,
+  NamespaceGenerators
 }
+import uk.ac.wellcome.platform.archive.display.{DisplayLocation, DisplayProvider, DisplayStorageSpace}
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
@@ -28,9 +26,9 @@ class RegistrarHttpFeatureTest
     with MetricsSenderFixture
     with BagInfoGenerators
     with RegistrarHttpFixture
-    with RandomThings
     with IntegrationPatience
     with Inside
+    with NamespaceGenerators
     with StorageManifestGenerators {
 
   import uk.ac.wellcome.json.JsonUtil._
@@ -157,9 +155,8 @@ class RegistrarHttpFeatureTest
       withConfiguredApp {
         case (_, baseUrl) =>
           withActorSystem { implicit actorSystem =>
-            val bagId = randomBagId
             whenGetRequestReady(
-              s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
+              s"$baseUrl/registrar/$createNamespace/$randomExternalIdentifier") {
               response =>
                 response.status shouldBe StatusCodes.NotFound
             }

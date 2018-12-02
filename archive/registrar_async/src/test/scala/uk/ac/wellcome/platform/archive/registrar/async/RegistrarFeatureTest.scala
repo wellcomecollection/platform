@@ -11,7 +11,7 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.generators.BagIdGenerators
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -26,8 +26,8 @@ class RegistrarFeatureTest
     with MetricsSenderFixture
     with IntegrationPatience
     with RegistrarFixtures
+    with BagIdGenerators
     with Inside
-    with RandomThings
     with ProgressUpdateAssertions
     with StorageManifestAssertions
     with PatienceConfiguration {
@@ -90,7 +90,7 @@ class RegistrarFeatureTest
     withRegistrar {
       case (storageBucket, queuePair, progressTopic, vhs) =>
         val archiveRequestId = randomUUID
-        val bagId = randomBagId
+        val bagId = createBagId
 
         val bagLocation = BagLocation(
           storageNamespace = storageBucket.name,
@@ -102,7 +102,7 @@ class RegistrarFeatureTest
           queuePair.queue,
           createArchiveCompleteWith(
             archiveRequestId = archiveRequestId,
-            space = Namespace(bagId.space.underlying),
+            space = bagId.space,
             bagLocation = bagLocation
           )
         )

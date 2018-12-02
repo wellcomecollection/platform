@@ -3,13 +3,13 @@ package uk.ac.wellcome.platform.archive.common.progress.fixtures
 import java.net.URI
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.generators.BagIdGenerators
 import uk.ac.wellcome.platform.archive.common.models.{BagId, Namespace}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-trait ProgressGenerators extends RandomThings {
+trait ProgressGenerators extends BagIdGenerators {
 
   val storageLocation = StorageLocation(
     StorageProvider(randomAlphanumeric()),
@@ -53,7 +53,7 @@ trait ProgressGenerators extends RandomThings {
   def createProgressStatusUpdateWith(
     id: UUID,
     status: Status = Progress.Accepted,
-    maybeBag: Option[BagId] = Some(randomBagId),
+    maybeBag: Option[BagId] = Some(createBagId),
     events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
     ProgressStatusUpdate(id, status, maybeBag, events)
   }

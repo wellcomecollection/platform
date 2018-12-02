@@ -7,6 +7,7 @@ import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.platform.archive.common.generators.BagIdGenerators
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
@@ -21,6 +22,7 @@ import scala.util.Try
 
 class ProgressTrackerTest
     extends FunSpec
+    with BagIdGenerators
     with LocalDynamoDb
     with MockitoSugar
     with ProgressTrackerFixture
@@ -154,7 +156,7 @@ class ProgressTrackerTest
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
-            val someBagId = Some(randomBagId)
+            val someBagId = Some(createBagId)
             val progressUpdate = ProgressStatusUpdate(
               progress.id,
               Progress.Completed,
