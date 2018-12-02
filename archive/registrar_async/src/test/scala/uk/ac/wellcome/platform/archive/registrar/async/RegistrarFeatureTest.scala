@@ -44,13 +44,13 @@ class RegistrarFeatureTest
     withRegistrar {
       case (storageBucket, queuePair, progressTopic, vhs) =>
         val requestId = randomUUID
-        val storageSpace = randomStorageSpace
+        val space = createNamespace
         val createdAfterDate = Instant.now()
 
-        withBagNotification(queuePair, storageBucket, requestId, storageSpace) {
+        withBagNotification(queuePair, storageBucket, requestId, space) {
           case (bagLocation, bagInfo) =>
             val bagId = BagId(
-              space = storageSpace,
+              space = StorageSpace(space.underlying),
               externalIdentifier = bagInfo.externalIdentifier
             )
 

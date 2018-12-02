@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.generators.ArchiveCompleteGenerators
+import uk.ac.wellcome.platform.archive.common.generators.{ArchiveCompleteGenerators, NamespaceGenerators}
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -28,21 +28,20 @@ trait RegistrarFixtures
     queuePair: QueuePair,
     storageBucket: Bucket,
     archiveRequestId: UUID = randomUUID,
-    storageSpace: StorageSpace = randomStorageSpace
+    space: Namespace = createNamespace
   )(testWith: TestWith[(BagLocation, BagInfo), R]): R =
-    withBag(storageBucket) {
-      case (bagLocation, bagInfo) =>
-        val archiveComplete = createArchiveCompleteWith(
-          archiveRequestId = archiveRequestId,
-          space = Namespace(storageSpace.underlying),
-          bagLocation = bagLocation
-        )
+    withBag(storageBucket) { case (bagLocation, bagInfo) =>
+      val archiveComplete = createArchiveCompleteWith(
+        archiveRequestId = archiveRequestId,
+        space = space,
+        bagLocation = bagLocation
+      )
 
-        sendNotificationToSQS(
-          queuePair.queue,
-          archiveComplete
-        )
-        testWith((bagLocation, bagInfo))
+      sendNotificationToSQS(
+        queuePair.queue,
+        archiveComplete
+      )
+      testWith((bagLocation, bagInfo))
     }
 
   override def createTable(table: Table) = {

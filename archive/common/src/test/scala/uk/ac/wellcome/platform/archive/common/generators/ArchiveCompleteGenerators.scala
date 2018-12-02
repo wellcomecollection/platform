@@ -2,13 +2,12 @@ package uk.ac.wellcome.platform.archive.common.generators
 
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
 
-trait ArchiveCompleteGenerators extends RandomThings {
+trait ArchiveCompleteGenerators extends NamespaceGenerators {
   def createArchiveCompleteWith(
     archiveRequestId: UUID = randomUUID,
-    space: Namespace = Namespace(randomAlphanumeric()),
+    space: Namespace = createNamespace,
     bagLocation: BagLocation
   ): ArchiveComplete =
     ArchiveComplete(
