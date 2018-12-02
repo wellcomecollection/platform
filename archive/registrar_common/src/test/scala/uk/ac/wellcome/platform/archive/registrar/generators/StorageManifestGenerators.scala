@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.registrar.generators
 
 import java.time.Instant
 
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.generators.NamespaceGenerators
 import uk.ac.wellcome.platform.archive.common.models.{BagInfo, StorageSpace}
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   StorageLocation,
@@ -11,9 +11,9 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-trait StorageManifestGenerators extends RandomThings {
+trait StorageManifestGenerators extends NamespaceGenerators {
   def createStorageManifestWith(
-    space: StorageSpace = randomStorageSpace,
+    space: Namespace = createNamespace,
     bagInfo: BagInfo = randomBagInfo,
     checksumAlgorithm: String = "sha256",
     providerId: String = "providerId",

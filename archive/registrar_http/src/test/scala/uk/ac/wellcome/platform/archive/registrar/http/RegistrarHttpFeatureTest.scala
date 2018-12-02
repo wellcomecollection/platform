@@ -39,7 +39,7 @@ class RegistrarHttpFeatureTest
         case (vhs, baseUrl) =>
           withActorSystem { implicit actorSystem =>
             withMaterializer(actorSystem) { implicit actorMaterializer =>
-              val space = randomStorageSpace
+              val space = createNamespace
               val bagInfo = randomBagInfo
 
               val checksumAlgorithm = "sha256"
