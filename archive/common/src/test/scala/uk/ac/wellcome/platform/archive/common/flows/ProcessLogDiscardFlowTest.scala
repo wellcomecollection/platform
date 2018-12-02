@@ -23,7 +23,7 @@ class ProcessLogDiscardFlowTest
           }
 
           in.length
-        }
+      }
 
       val failList = List("fail", "flumps")
       val succeedList = List("boomer", "bust", "banana")

@@ -92,11 +92,10 @@ class UploadDigestItemFlowTest
           val futureResult = source via flow runWith Sink.head
 
           whenReady(futureResult) { result =>
-            result shouldBe Left(
-              ChecksumNotMatchedOnUploadError(
-                digest,
-                "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73",
-                archiveItemJob))
+            result shouldBe Left(ChecksumNotMatchedOnUploadError(
+              digest,
+              "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73",
+              archiveItemJob))
             getContentFromS3(
               bucket,
               s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent

@@ -75,14 +75,12 @@ class SnapshotServiceTest
           withLocalElasticsearchIndex { indexNameV1 =>
             withLocalElasticsearchIndex { indexNameV2 =>
               withLocalS3Bucket { bucket =>
-                withSnapshotService(
-                  s3Client,
-                  indexNameV1,
-                  indexNameV2) { snapshotService =>
-                  {
-                    testWith(
-                      (snapshotService, indexNameV1, indexNameV2, bucket))
-                  }
+                withSnapshotService(s3Client, indexNameV1, indexNameV2) {
+                  snapshotService =>
+                    {
+                      testWith(
+                        (snapshotService, indexNameV1, indexNameV2, bucket))
+                    }
                 }
               }
             }
@@ -261,7 +259,10 @@ class SnapshotServiceTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withS3AkkaClient { s3Client =>
-          withSnapshotService(s3Client, indexNameV1 = "wrong-index", indexNameV2 = "wrong-index") { brokenSnapshotService =>
+          withSnapshotService(
+            s3Client,
+            indexNameV1 = "wrong-index",
+            indexNameV2 = "wrong-index") { brokenSnapshotService =>
             val snapshotJob = SnapshotJob(
               publicBucketName = "bukkit",
               publicObjectKey = "target.json.gz",
@@ -294,12 +295,14 @@ class SnapshotServiceTest
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withS3AkkaClient(endpoint = "") { s3Client =>
-            withSnapshotService(s3Client, indexNameV1 = "indexv1", indexNameV2 = "indexv2") {
-              snapshotService =>
-                snapshotService.buildLocation(
-                  bucketName = "bukkit",
-                  objectKey = "snapshot.json.gz"
-                ) shouldBe Uri("s3://bukkit/snapshot.json.gz")
+            withSnapshotService(
+              s3Client,
+              indexNameV1 = "indexv1",
+              indexNameV2 = "indexv2") { snapshotService =>
+              snapshotService.buildLocation(
+                bucketName = "bukkit",
+                objectKey = "snapshot.json.gz"
+              ) shouldBe Uri("s3://bukkit/snapshot.json.gz")
             }
           }
         }

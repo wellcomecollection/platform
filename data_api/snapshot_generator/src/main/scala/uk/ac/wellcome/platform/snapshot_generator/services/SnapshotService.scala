@@ -32,7 +32,8 @@ class SnapshotService @Inject()(akkaS3Client: S3Client,
                                 elasticClient: HttpClient,
                                 elasticConfig: DisplayElasticConfig,
                                 objectMapper: ObjectMapper)(
-  implicit actorSystem: ActorSystem, ec: ExecutionContext
+  implicit actorSystem: ActorSystem,
+  ec: ExecutionContext
 ) extends Logging {
   implicit val materializer = ActorMaterializer()
 

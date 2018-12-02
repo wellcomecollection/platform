@@ -69,7 +69,6 @@ class SierraRecordWrapperFlowTest
     }
   }
 
-
   it("creates a SierraRecord from an item") {
     withMaterializer { implicit materializer =>
       withRecordWrapperFlow(SierraItemRecord.apply) { wrapperFlow =>
@@ -148,8 +147,7 @@ class SierraRecordWrapperFlowTest
   it("fails the stream if the record contains invalid JSON") {
     withMaterializer { implicit materializer =>
       withRecordWrapperFlow(SierraBibRecord.apply) { wrapperFlow =>
-        val invalidSierraJson = parse(
-          s"""
+        val invalidSierraJson = parse(s"""
           |{
           |  "missing": ["id", "updatedDate"],
           |  "reason": "This JSON will not pass!",

@@ -55,7 +55,7 @@ class SNSPublishFlowTest
           Person("Bobbert", 42),
           Person("Bobbrit", 41),
           Person("Borbbit", 40)
-        )
+      )
 
       val snsConfig = createSNSConfigWith(Topic("bad_topic"))
       val publishFlow =
@@ -84,7 +84,7 @@ class SNSPublishFlowTest
             Person("Bobbert", 42),
             Person("Bobbrit", 41),
             Person("Borbbit", 40)
-          )
+        )
 
         val snsConfig = createSNSConfigWith(topic)
         val publishFlow =

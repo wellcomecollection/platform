@@ -6,10 +6,16 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, RandomThings}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  ArchiveMessaging,
+  RandomThings
+}
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  Progress,
+  ProgressUpdate
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_async.ProgressAsync
 import uk.ac.wellcome.platform.archive.progress_async.flows.ProgressUpdateFlow
@@ -50,7 +56,9 @@ trait ProgressAsyncFixture
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withMetricsSender(actorSystem) { metricsSender =>
-          withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue, metricsSender) { messageStream =>
+          withArchiveMessageStream[NotificationMessage, Unit, R](
+            queuePair.queue,
+            metricsSender) { messageStream =>
             withProgressTracker(table) { progressTracker =>
               val progressAsync = new ProgressAsync(
                 messageStream = messageStream,

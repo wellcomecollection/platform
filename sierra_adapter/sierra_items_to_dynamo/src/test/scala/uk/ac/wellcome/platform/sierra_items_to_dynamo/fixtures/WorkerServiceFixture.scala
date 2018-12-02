@@ -38,21 +38,20 @@ trait WorkerServiceFixture
                            metricsSender: MetricsSender)(
     testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
     withActorSystem { implicit actorSystem =>
-      withSQSStream[NotificationMessage, R](queue, metricsSender) {
-        sqsStream =>
-          withDynamoInserter(table, bucket) { dynamoInserter =>
-            withSNSWriter(topic) { snsWriter =>
-              val workerService = new SierraItemsToDynamoWorkerService(
-                sqsStream = sqsStream,
-                dynamoInserter = dynamoInserter,
-                snsWriter = snsWriter
-              )
+      withSQSStream[NotificationMessage, R](queue, metricsSender) { sqsStream =>
+        withDynamoInserter(table, bucket) { dynamoInserter =>
+          withSNSWriter(topic) { snsWriter =>
+            val workerService = new SierraItemsToDynamoWorkerService(
+              sqsStream = sqsStream,
+              dynamoInserter = dynamoInserter,
+              snsWriter = snsWriter
+            )
 
-              workerService.run()
+            workerService.run()
 
-              testWith(workerService)
-            }
+            testWith(workerService)
           }
+        }
       }
     }
 }

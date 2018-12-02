@@ -106,7 +106,7 @@ class S3UploadFlowTest
         val res = createBytesWith(length = 23 * 1024 * 1024)
         val s3Key = "key.txt"
         val futureResult = Source
-          // one bytestring of 23MB
+        // one bytestring of 23MB
           .single(ByteString(res))
           .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key))(s3Client))
           .runWith(Sink.seq)
@@ -240,9 +240,8 @@ class S3UploadFlowTest
           ObjectMetadata(userMetadata = Map("metadata" -> "1234"))
         val futureResult = StreamConverters
           .fromInputStream(() => new ByteArrayInputStream(content.getBytes()))
-          .via(
-            S3UploadFlow(ObjectLocation(bucket.name, s3Key), Some(metadata))(
-              s3Client))
+          .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key), Some(metadata))(
+            s3Client))
           .runWith(Sink.head)
 
         whenReady(futureResult) {

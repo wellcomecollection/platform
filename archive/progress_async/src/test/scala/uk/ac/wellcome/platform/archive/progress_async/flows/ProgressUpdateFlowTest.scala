@@ -34,27 +34,24 @@ class ProgressUpdateFlowTest
         case (flow, monitor) =>
           withMaterializer { implicit materializer =>
             val progress = createProgress
-            whenReady(monitor.initialise(progress)) {
-              _ =>
-                val update =
-                  ProgressEventUpdate(
-                    progress.id,
-                    List(ProgressEvent("Wow.")))
+            whenReady(monitor.initialise(progress)) { _ =>
+              val update =
+                ProgressEventUpdate(progress.id, List(ProgressEvent("Wow.")))
 
-                val updates = Source
-                  .single(update)
-                  .via(flow)
-                  .async
-                  .runWith(Sink.ignore)
+              val updates = Source
+                .single(update)
+                .via(flow)
+                .async
+                .runWith(Sink.ignore)
 
-                whenReady(updates) { _ =>
-                  assertProgressCreated(progress, table)
+              whenReady(updates) { _ =>
+                assertProgressCreated(progress, table)
 
-                  assertProgressRecordedRecentEvents(
-                    update.id,
-                    update.events.map(_.description),
-                    table)
-                }
+                assertProgressRecordedRecentEvents(
+                  update.id,
+                  update.events.map(_.description),
+                  table)
+              }
             }
           }
       }

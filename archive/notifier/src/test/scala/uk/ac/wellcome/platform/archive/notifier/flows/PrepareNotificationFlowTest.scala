@@ -62,9 +62,9 @@ class PrepareNotificationFlowTest
           whenReady(eventualResult) { result =>
             inside(result.head) {
               case ProgressCallbackStatusUpdate(
-              actualId,
-              callbackStatus,
-              List(progressEvent)) =>
+                  actualId,
+                  callbackStatus,
+                  List(progressEvent)) =>
                 actualId shouldBe id
                 progressEvent.description shouldBe "Callback fulfilled."
                 callbackStatus shouldBe Callback.Succeeded
@@ -104,9 +104,9 @@ class PrepareNotificationFlowTest
             whenReady(eventualResult) { result =>
               inside(result.head) {
                 case ProgressCallbackStatusUpdate(
-                actualId,
-                callbackStatus,
-                List(progressEvent)) =>
+                    actualId,
+                    callbackStatus,
+                    List(progressEvent)) =>
                   actualId shouldBe id
                   progressEvent.description shouldBe expectedMsg
                   callbackStatus shouldBe Callback.Failed
@@ -133,9 +133,9 @@ class PrepareNotificationFlowTest
         whenReady(eventualResult) { result =>
           inside(result.head) {
             case ProgressCallbackStatusUpdate(
-            actualId,
-            callbackStatus,
-            List(progressEvent)) =>
+                actualId,
+                callbackStatus,
+                List(progressEvent)) =>
               actualId shouldBe id
               progressEvent.description shouldBe "Callback failed for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe (Callback exception)"
               callbackStatus shouldBe Callback.Failed
@@ -159,9 +159,9 @@ class PrepareNotificationFlowTest
         whenReady(eventualResult) { result =>
           inside(result.head) {
             case ProgressCallbackStatusUpdate(
-            actualId,
-            callbackStatus,
-            List(progressEvent)) =>
+                actualId,
+                callbackStatus,
+                List(progressEvent)) =>
               actualId shouldBe id
               progressEvent.description shouldBe "Unexpected callback failure for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe"
               callbackStatus shouldBe Callback.Failed

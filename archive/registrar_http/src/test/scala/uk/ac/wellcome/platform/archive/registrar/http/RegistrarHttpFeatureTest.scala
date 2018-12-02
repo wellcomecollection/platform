@@ -83,8 +83,7 @@ class RegistrarHttpFeatureTest
                           "BagManifest"),
                         DisplayBagManifest(
                           actualTagManifestChecksumAlgorithm,
-                          List(
-                            DisplayFileDigest("a", "bag-info.txt", "File")),
+                          List(DisplayFileDigest("a", "bag-info.txt", "File")),
                           "BagManifest"),
                         DisplayLocation(
                           DisplayProvider(actualProviderId, "Provider"),
@@ -109,7 +108,7 @@ class RegistrarHttpFeatureTest
                       actualPath shouldBe path
 
                       Instant.parse(createdDateString) shouldBe storageManifest.createdDate
-                }
+                  }
               }
             }
           }
@@ -141,8 +140,8 @@ class RegistrarHttpFeatureTest
                     infoJson.findAllByKey("externalDescription") shouldBe empty
                   }
               }
+            }
           }
-        }
       }
     }
 

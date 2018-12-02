@@ -22,9 +22,7 @@ class SequentialS3SinkTest
     with ScalaFutures
     with IntegrationPatience {
 
-  private def withSink(bucket: Bucket,
-                       keyPrefix: String,
-                       offset: Int = 0)(
+  private def withSink(bucket: Bucket, keyPrefix: String, offset: Int = 0)(
     testWith: TestWith[Sink[(Json, Long), Future[Done]], Assertion]) = {
     val sink = SequentialS3Sink(
       s3Client,
@@ -41,9 +39,7 @@ class SequentialS3SinkTest
 
     withLocalS3Bucket { bucket =>
       withMaterializer { implicit materializer =>
-        withSink(
-          bucket = bucket,
-          keyPrefix = "testA_") { sink =>
+        withSink(bucket = bucket, keyPrefix = "testA_") { sink =>
           val futureDone = Source
             .single(json)
             .zipWithIndex
@@ -68,9 +64,7 @@ class SequentialS3SinkTest
 
     withLocalS3Bucket { bucket =>
       withMaterializer { implicit materializer =>
-        withSink(
-          bucket = bucket,
-          keyPrefix = "testB_") { sink =>
+        withSink(bucket = bucket, keyPrefix = "testB_") { sink =>
           val futureDone = Source(List(json0, json1, json2)).zipWithIndex
             .runWith(sink)
 
@@ -98,10 +92,7 @@ class SequentialS3SinkTest
 
     withLocalS3Bucket { bucket =>
       withMaterializer { implicit materializer =>
-        withSink(
-          bucket = bucket,
-          keyPrefix = "testC_",
-          offset = 3) { sink =>
+        withSink(bucket = bucket, keyPrefix = "testC_", offset = 3) { sink =>
           val futureDone = Source(List(json0, json1, json2)).zipWithIndex
             .runWith(sink)
 

@@ -20,8 +20,7 @@ import scala.concurrent.ExecutionContextExecutor
 class MessageStream[T, R](
   sqsClient: AmazonSQSAsync,
   sqsConfig: SQSConfig,
-  metricsSender: MetricsSender)(
-  implicit val actorSystem: ActorSystem)
+  metricsSender: MetricsSender)(implicit val actorSystem: ActorSystem)
     extends Logging {
 
   implicit val dispatcher: ExecutionContextExecutor = actorSystem.dispatcher

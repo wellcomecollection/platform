@@ -31,7 +31,8 @@ object MetricsBuilder {
       metricsConfig = metricsConfig
     )
 
-  def buildMetricsSender(config: Config)(implicit actorSystem: ActorSystem): MetricsSender =
+  def buildMetricsSender(config: Config)(
+    implicit actorSystem: ActorSystem): MetricsSender =
     buildMetricsSender(
       cloudWatchClient = CloudWatchBuilder.buildCloudWatchClient(config),
       metricsConfig = buildMetricsConfig(config)

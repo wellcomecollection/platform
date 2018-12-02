@@ -20,7 +20,7 @@ class EitherFlowTest extends FunSpec with Akka with Matchers with ScalaFutures {
           }
 
           in.length
-        }
+      }
 
       val failList = List("fail", "flumps")
       val succeedList = List("boomer", "bust", "banana")

@@ -17,8 +17,8 @@ import scala.concurrent.ExecutionContext
 
 object MessagingBuilder {
   def buildMessageStream[T](config: Config)(
-    implicit actorSystem: ActorSystem, serialisationStrategy: SerialisationStrategy[T])
-    : MessageStream[T] = {
+    implicit actorSystem: ActorSystem,
+    serialisationStrategy: SerialisationStrategy[T]): MessageStream[T] = {
     implicit val executionContext: ExecutionContext =
       AkkaBuilder.buildExecutionContext()
 

@@ -9,7 +9,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.Archivist
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, FileEntry}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  ArchiveMessaging,
+  FileEntry
+}
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models.{
   BagInfo,
@@ -85,7 +88,9 @@ trait ArchivistFixtures
                  progressTopic: Topic)(testWith: TestWith[Archivist, R]): R =
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue, metricsSender) { messageStream =>
+        withArchiveMessageStream[NotificationMessage, Unit, R](
+          queuePair.queue,
+          metricsSender) { messageStream =>
           val archivist = new Archivist(
             s3Client = s3Client,
             snsClient = snsClient,

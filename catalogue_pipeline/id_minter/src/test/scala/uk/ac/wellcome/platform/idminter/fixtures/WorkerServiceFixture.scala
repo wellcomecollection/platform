@@ -31,23 +31,22 @@ trait WorkerServiceFixture
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withMessageWriter[Json, R](bucket, topic, snsClient) { messageWriter =>
-          withMessageStream[Json, R](queue, metricsSender) {
-            messageStream =>
-              val workerService = new IdMinterWorkerService(
-                idEmbedder = new IdEmbedder(
-                  identifierGenerator = new IdentifierGenerator(
-                    identifiersDao = identifiersDao
-                  )
-                ),
-                writer = messageWriter,
-                messageStream = messageStream,
-                rdsClientConfig = rdsClientConfig,
-                identifiersTableConfig = identifiersTableConfig
-              )
+          withMessageStream[Json, R](queue, metricsSender) { messageStream =>
+            val workerService = new IdMinterWorkerService(
+              idEmbedder = new IdEmbedder(
+                identifierGenerator = new IdentifierGenerator(
+                  identifiersDao = identifiersDao
+                )
+              ),
+              writer = messageWriter,
+              messageStream = messageStream,
+              rdsClientConfig = rdsClientConfig,
+              identifiersTableConfig = identifiersTableConfig
+            )
 
-              workerService.run()
+            workerService.run()
 
-              testWith(workerService)
+            testWith(workerService)
           }
         }
       }

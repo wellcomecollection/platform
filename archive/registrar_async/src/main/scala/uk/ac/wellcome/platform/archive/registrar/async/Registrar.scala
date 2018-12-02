@@ -44,7 +44,8 @@ class Registrar(
   dataStore: VersionedHybridStore[StorageManifest,
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]]
-)(implicit val actorSystem: ActorSystem) extends Logging {
+)(implicit val actorSystem: ActorSystem)
+    extends Logging {
   def run(): Future[Done] = {
     implicit val snsclient = snsClient
     implicit val s3client = s3Client

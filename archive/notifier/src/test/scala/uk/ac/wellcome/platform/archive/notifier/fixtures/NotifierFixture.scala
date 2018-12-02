@@ -25,7 +25,9 @@ trait NotifierFixture extends ArchiveMessaging with Messaging with BagIt {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withMetricsSender(actorSystem) { metricsSender =>
-          withArchiveMessageStream[NotificationMessage, PublishResult, R](queue, metricsSender) { messageStream =>
+          withArchiveMessageStream[NotificationMessage, PublishResult, R](
+            queue,
+            metricsSender) { messageStream =>
             val notifier = new Notifier(
               messageStream = messageStream,
               snsClient = snsClient,

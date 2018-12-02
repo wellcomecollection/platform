@@ -13,7 +13,8 @@ trait Akka {
     destroy = system => Await.ready(system.terminate(), 10 seconds)
   )
 
-  def withMaterializer[R](actorSystem: ActorSystem): Fixture[ActorMaterializer, R] =
+  def withMaterializer[R](
+    actorSystem: ActorSystem): Fixture[ActorMaterializer, R] =
     fixture[ActorMaterializer, R](
       create = ActorMaterializer()(actorSystem),
       destroy = _.shutdown()

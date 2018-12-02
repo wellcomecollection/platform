@@ -121,8 +121,7 @@ class ArchiveJobDigestItemsFlowTest
                   actualArchiveJob shouldBe archiveJob
                   all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
                   errors.map(_.t.bagDigestItem.location.path) should contain theSameElementsAs failedFiles
-                  errors.map(_.t.archiveJob).distinct shouldBe List(
-                    archiveJob)
+                  errors.map(_.t.archiveJob).distinct shouldBe List(archiveJob)
               }
             }
         }
@@ -264,10 +263,8 @@ class ArchiveJobDigestItemsFlowTest
             val eventualArchiveJobs = source via flow runWith Sink.seq
 
             whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(
-                Left(InvalidBagManifestError(
-                  archiveJob,
-                  "tagmanifest-sha256.txt")))
+              archiveJobs shouldBe List(Left(
+                InvalidBagManifestError(archiveJob, "tagmanifest-sha256.txt")))
             }
         }
       }

@@ -20,7 +20,7 @@ class LogLeftFlowTest
       val rightList = List("boomer", "bust", "banana").map(Right(_))
 
       val list
-      : List[Either[FailedEvent[String], String]] = leftList ++ rightList
+        : List[Either[FailedEvent[String], String]] = leftList ++ rightList
 
       val source = Source(list)
       val logLeftFlow = LogLeftFlow[String, String]("LogLeftFlowTest")
