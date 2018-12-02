@@ -66,13 +66,13 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
     t: T,
     id: String,
     topic: Topic,
-    bucket: Bucket,
     table: Table)(implicit decoder: Decoder[T]): Assertion = {
     val hybridRecord = getHybridRecord(table, id = id)
 
     val storedTransformable = getObjectFromS3[T](
-      Bucket(hybridRecord.location.namespace),
-      hybridRecord.location.key)
+      bucket = Bucket(hybridRecord.location.namespace),
+      key = hybridRecord.location.key
+    )
     storedTransformable shouldBe t
 
     listMessagesReceivedFromSNS(topic).map { info: MessageInfo =>
@@ -80,6 +80,7 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
     } should contain(hybridRecord)
   }
 
+  // TODO: Remove the bucket parameter from this method
   def assertStoredAndSent(transformable: SierraTransformable,
                           topic: Topic,
                           bucket: Bucket,
@@ -88,7 +89,6 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
       transformable,
       id = transformable.sierraId.withoutCheckDigit,
       topic = topic,
-      bucket = bucket,
       table = table
     )
 }
