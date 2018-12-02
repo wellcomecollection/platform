@@ -17,9 +17,9 @@ import uk.ac.wellcome.platform.archive.common.flows.{
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
-  IngestBagRequest
+  IngestBagRequest,
+  Namespace
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.Namespace
 
 object ArchiveJobDigestItemsFlow extends Logging {
   def apply(delimiter: String,

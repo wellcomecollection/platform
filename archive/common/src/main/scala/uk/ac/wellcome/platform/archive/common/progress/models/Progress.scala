@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.json.URIConverters
-import uk.ac.wellcome.platform.archive.common.models.BagId
+import uk.ac.wellcome.platform.archive.common.models.{BagId, Namespace}
 
 case class Progress(id: UUID,
                     sourceLocation: StorageLocation,

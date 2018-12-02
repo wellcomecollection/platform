@@ -4,7 +4,6 @@ import java.net.{URI, URISyntaxException}
 import java.util.UUID
 
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.progress.models.Namespace
 
 case class ArchiveComplete(
   archiveRequestId: UUID,
