@@ -28,10 +28,10 @@ trait WorkerServiceFixture
                            identifiersDao: IdentifiersDao,
                            identifiersTableConfig: IdentifiersTableConfig)(
     testWith: TestWith[IdMinterWorkerService, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withMessageWriter[Json, R](bucket, topic, snsClient) { messageWriter =>
-          withMessageStream[Json, R](actorSystem, queue, metricsSender) {
+          withMessageStream[Json, R](queue, metricsSender) {
             messageStream =>
               val workerService = new IdMinterWorkerService(
                 idEmbedder = new IdEmbedder(
