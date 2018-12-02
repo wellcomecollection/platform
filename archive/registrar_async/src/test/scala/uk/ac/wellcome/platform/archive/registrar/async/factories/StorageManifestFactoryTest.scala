@@ -23,8 +23,9 @@ class StorageManifestFactoryTest
   it("returns a right of storage manifest if reading a bag location succeeds") {
     val storageSpace = randomStorageSpace
     withLocalS3Bucket { bucket =>
-      withBag(bucket) {
-        case (bagLocation, bagInfo) =>
+      val bagInfo = randomBagInfo
+      withBag(bucket, bagInfo = bagInfo) {
+        case (bagLocation, _) =>
           val archiveComplete = createArchiveCompleteWith(
             space = storageSpace,
             bagLocation = bagLocation

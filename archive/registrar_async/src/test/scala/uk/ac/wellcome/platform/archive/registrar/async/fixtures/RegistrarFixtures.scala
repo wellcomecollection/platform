@@ -27,9 +27,10 @@ trait RegistrarFixtures
     storageBucket: Bucket,
     archiveRequestId: UUID = randomUUID,
     storageSpace: StorageSpace = randomStorageSpace
-  )(testWith: TestWith[(BagLocation, BagInfo), R]): R =
-    withBag(storageBucket) {
-      case (bagLocation, bagInfo) =>
+  )(testWith: TestWith[(BagLocation, BagInfo), R]): R = {
+    val bagInfo = randomBagInfo
+    withBag(storageBucket, bagInfo = bagInfo) {
+      case (bagLocation, _) =>
         val archiveComplete = ArchiveComplete(
           archiveRequestId = archiveRequestId,
           space = storageSpace,
@@ -42,6 +43,7 @@ trait RegistrarFixtures
         )
         testWith((bagLocation, bagInfo))
     }
+  }
 
   override def createTable(table: Table) = {
     dynamoDbClient.createTable(
