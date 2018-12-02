@@ -80,10 +80,8 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
     } should contain(hybridRecord)
   }
 
-  // TODO: Remove the bucket parameter from this method
   def assertStoredAndSent(transformable: SierraTransformable,
                           topic: Topic,
-                          bucket: Bucket,
                           table: Table): Assertion =
     assertStoredAndSent[SierraTransformable](
       transformable,
