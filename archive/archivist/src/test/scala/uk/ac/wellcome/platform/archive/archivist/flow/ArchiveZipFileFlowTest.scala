@@ -17,7 +17,10 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
 }
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
+import uk.ac.wellcome.platform.archive.common.generators.{
+  ArchiveCompleteGenerators,
+  IngestBagRequestGenerators
+}
 import uk.ac.wellcome.platform.archive.common.models.error.{
   ArchiveError,
   InvalidBagManifestError
@@ -40,6 +43,7 @@ class ArchiveZipFileFlowTest
     with ScalaFutures
     with ArchivistFixtures
     with IngestBagRequestGenerators
+    with ArchiveCompleteGenerators
     with BagUploaderConfigGenerators
     with Akka
     with SNS
@@ -55,30 +59,29 @@ class ArchiveZipFileFlowTest
         withMaterializer(actorSystem) { implicit materializer =>
           withLocalSnsTopic { reportingTopic =>
             withBagItZip() {
-              case (bagName, zipFile) =>
+              case (bagIdentifier, zipFile) =>
                 withArchiveZipFileFlow(storageBucket, reportingTopic) {
                   uploader =>
-                    val ingestContext = createIngestBagRequestWith()
+                    val ingestRequest = createIngestBagRequestWith()
                     val (_, verification) =
                       uploader.runWith(
                         Source.single(
-                          ZipFileDownloadComplete(zipFile, ingestContext)),
+                          ZipFileDownloadComplete(zipFile, ingestRequest)),
                         Sink.seq
                       )
 
                     whenReady(verification) { result =>
                       listKeysInBucket(storageBucket) should have size 5
-                      result shouldBe List(Right(ArchiveComplete(
-                        ingestContext.archiveRequestId,
-                        ingestContext.storageSpace,
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(s"${ingestContext.storageSpace}/$bagName"))
-                      )))
+
+                      val expectedArchiveComplete = createArchiveCompleteWith(
+                        request = ingestRequest,
+                        bagIdentifier = bagIdentifier
+                      )
+
+                      result shouldBe List(Right(expectedArchiveComplete))
 
                       assertTopicReceivesProgressEventUpdate(
-                        ingestContext.archiveRequestId,
+                        ingestRequest.archiveRequestId,
                         reportingTopic) { events =>
                         inside(events) {
                           case List(event) =>

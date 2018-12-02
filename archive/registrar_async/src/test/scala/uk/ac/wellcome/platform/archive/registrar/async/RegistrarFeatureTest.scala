@@ -94,17 +94,22 @@ class RegistrarFeatureTest
   it("notifies the progress tracker if registering a bag fails") {
     withRegistrar {
       case (storageBucket, queuePair, progressTopic, vhs) =>
-        val requestId = randomUUID
+        val archiveRequestId = randomUUID
         val bagId = randomBagId
 
         val bagLocation = BagLocation(
-          storageBucket.name,
-          "archive",
-          BagPath(s"space/does-not-exist"))
+          storageNamespace = storageBucket.name,
+          storagePath = "archive",
+          bagPath = BagPath(s"space/does-not-exist")
+        )
 
         sendNotificationToSQS(
           queuePair.queue,
-          ArchiveComplete(requestId, bagId.space, bagLocation)
+          createArchiveCompleteWith(
+            archiveRequestId = archiveRequestId,
+            space = bagId.space,
+            bagLocation = bagLocation
+          )
         )
 
         eventually {
@@ -115,7 +120,7 @@ class RegistrarFeatureTest
           }
 
           assertTopicReceivesProgressStatusUpdate(
-            requestId,
+            archiveRequestId,
             progressTopic,
             Progress.Failed) { events =>
             events should have size 1

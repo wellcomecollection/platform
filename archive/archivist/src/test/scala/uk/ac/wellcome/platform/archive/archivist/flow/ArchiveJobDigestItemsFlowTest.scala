@@ -9,7 +9,10 @@ import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.errors._
 import uk.ac.wellcome.platform.archive.archivist.models.BagItConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
+import uk.ac.wellcome.platform.archive.common.generators.{
+  ArchiveCompleteGenerators,
+  IngestBagRequestGenerators
+}
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.storage.fixtures.S3
@@ -19,6 +22,7 @@ import scala.collection.JavaConverters._
 
 class ArchiveJobDigestItemsFlowTest
     extends FunSpec
+    with ArchiveCompleteGenerators
     with ArchiveJobGenerators
     with S3
     with Akka
@@ -45,10 +49,10 @@ class ArchiveJobDigestItemsFlowTest
               whenReady(eventualArchiveJobs) { archiveJobs =>
                 archiveJobs shouldBe List(
                   Right(
-                    ArchiveComplete(
-                      ingestRequest.archiveRequestId,
-                      ingestRequest.storageSpace,
-                      archiveJob.bagLocation
+                    createArchiveCompleteWith(
+                      archiveRequestId = ingestRequest.archiveRequestId,
+                      space = ingestRequest.storageSpace,
+                      bagLocation = archiveJob.bagLocation
                     )
                   )
                 )
