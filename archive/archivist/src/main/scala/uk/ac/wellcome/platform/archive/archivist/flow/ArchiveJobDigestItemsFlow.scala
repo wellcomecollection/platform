@@ -19,6 +19,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
   IngestBagRequest
 }
+import uk.ac.wellcome.platform.archive.common.progress.models.Namespace
 
 object ArchiveJobDigestItemsFlow extends Logging {
   def apply(delimiter: String,
@@ -71,7 +72,7 @@ object ArchiveJobDigestItemsFlow extends Logging {
           Right(
             ArchiveComplete(
               archiveRequestId = ingestBagRequest.archiveRequestId,
-              space = ingestBagRequest.storageSpace,
+              space = Namespace(ingestBagRequest.storageSpace.underlying),
               bagLocation = archiveJob.bagLocation
             ))
         case (errors, archiveJob) => Left(ArchiveJobError(archiveJob, errors))
