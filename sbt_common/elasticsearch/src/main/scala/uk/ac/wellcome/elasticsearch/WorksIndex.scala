@@ -1,12 +1,9 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.analyzers._
-import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
-
-import scala.concurrent.{ExecutionContext, Future}
+import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition, ObjectField}
 
 object WorksIndex extends MappingDefinitionBuilder {
   def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
