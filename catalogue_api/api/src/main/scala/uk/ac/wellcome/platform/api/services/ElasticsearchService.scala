@@ -6,18 +6,12 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.searches.SearchDefinition
-import com.sksamuel.elastic4s.searches.queries.{
-  BoolQueryDefinition,
-  QueryDefinition
-}
 import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
+import com.sksamuel.elastic4s.searches.queries.{BoolQueryDefinition, QueryDefinition}
 import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
 import org.elasticsearch.action.search.SearchType
-import uk.ac.wellcome.platform.api.models.{
-  ItemLocationTypeFilter,
-  WorkFilter,
-  WorkTypeFilter
-}
+import org.elasticsearch.search.sort.SortOrder
+import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkFilter, WorkTypeFilter}
 
 import scala.concurrent.Future
 
@@ -47,7 +41,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
                     ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = None,
-      sortByFields = List("canonicalId")
+      sortDefinitions = List(fieldSort("canonicalId").order(SortOrder.ASC))
     )
 
   def simpleStringQueryResults(queryString: String)
@@ -55,7 +49,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
        ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = Some(queryString),
-      sortByFields = List("_score", "canonicalId")
+      sortDefinitions = List(fieldSort("_score").order(SortOrder.DESC),fieldSort("canonicalId").order(SortOrder.ASC))
     )
 
   /** Given a set of query options, build a SearchDefinition for Elasticsearch
@@ -63,16 +57,13 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
     */
   private def executeSearch(
     maybeQueryString: Option[String],
-    sortByFields: List[String]
+    sortDefinitions: List[FieldSortDefinition]
   )(documentOptions: ElasticsearchDocumentOptions,
     queryOptions: ElasticsearchQueryOptions): Future[SearchResponse] = {
     val queryDefinition = buildQuery(
       maybeQueryString = maybeQueryString,
       filters = queryOptions.filters
     )
-
-    val sortDefinitions: List[FieldSortDefinition] =
-      sortByFields.map(fieldName => fieldSort(fieldName))
 
     val searchDefinition: SearchDefinition =
       search(s"${documentOptions.indexName}/${documentOptions.documentType}")
