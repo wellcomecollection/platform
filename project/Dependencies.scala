@@ -132,8 +132,12 @@ object Dependencies {
   )
 
   // Internal Library dependency groups
-  val commonDependencies: Seq[ModuleID] =
-    testDependencies ++ loggingDependencies ++ circeDependencies ++ akkaDependencies
+  val commonDependencies =
+    testDependencies ++
+      loggingDependencies ++ Seq(
+      "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
+      "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
+    ) ++ apacheCommons
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 

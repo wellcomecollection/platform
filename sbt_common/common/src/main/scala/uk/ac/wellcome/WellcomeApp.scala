@@ -6,7 +6,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 trait WellcomeApp extends App with Logging {
-  def run(workerService: WorkerService) =
+  def run(workerService: Runnable) =
     try {
       info(s"Starting worker.")
 

@@ -8,7 +8,7 @@ import akka.stream.{ActorAttributes, ActorMaterializer, ActorMaterializerSetting
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.WorkerService
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
@@ -32,7 +32,7 @@ class Registrar(
                                   EmptyMetadata,
                                   ObjectStore[StorageManifest]]
 )(implicit val actorSystem: ActorSystem)
-    extends Logging with WorkerService {
+    extends Logging with Runnable {
   def run(): Future[Done] = {
     implicit val snsclient = snsClient
     implicit val s3client = s3Client

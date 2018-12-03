@@ -5,7 +5,7 @@ import java.io.InputStream
 import akka.Done
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.WorkerService
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.goobi_reader.models.{
@@ -28,7 +28,7 @@ class GoobiReaderWorkerService(
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]
 )(implicit ex: ExecutionContext)
-    extends Logging with WorkerService {
+    extends Logging with Runnable {
 
   def run(): Future[Done] =
     sqsStream.foreach(
