@@ -41,7 +41,7 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
                 worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
       .listResults(
-        documentOptions,
+        documentOptions.index,
         toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
@@ -50,7 +50,7 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
     worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
       .simpleStringQueryResults(query)(
-        documentOptions,
+        documentOptions.index,
         toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 

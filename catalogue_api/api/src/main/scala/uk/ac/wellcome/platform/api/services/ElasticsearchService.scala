@@ -41,7 +41,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
       }
       .map { _.result }
 
-  def listResults: (ElasticsearchDocumentOptions,
+  def listResults: (Index,
                     ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = None,
@@ -49,7 +49,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
     )
 
   def simpleStringQueryResults(queryString: String)
-    : (ElasticsearchDocumentOptions,
+    : (Index,
        ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = Some(queryString),
@@ -64,7 +64,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
   private def executeSearch(
     maybeQueryString: Option[String],
     sortDefinitions: List[FieldSort]
-  )(documentOptions: ElasticsearchDocumentOptions,
+  )(index: Index,
     queryOptions: ElasticsearchQueryOptions): Future[SearchResponse] = {
     val queryDefinition: BoolQuery = buildQuery(
       maybeQueryString = maybeQueryString,
@@ -72,7 +72,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
     )
 
     val searchRequest: SearchRequest =
-      search(documentOptions.index.name / documentOptions.documentType)
+      search(index)
         .searchType(SearchType.DFS_QUERY_THEN_FETCH)
         .query(queryDefinition)
         .sortBy(sortDefinitions)

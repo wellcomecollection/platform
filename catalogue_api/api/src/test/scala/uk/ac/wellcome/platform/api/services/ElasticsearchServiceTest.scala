@@ -196,7 +196,7 @@ class ElasticsearchServiceTest
           (1 to 10).foreach { _ =>
             val searchResponseFuture = searchService
               .simpleStringQueryResults("A")(
-                createElasticsearchDocumentOptionsWith(index),
+                index,
                 createElasticsearchQueryOptions)
 
             whenReady(searchResponseFuture) { response =>
@@ -438,10 +438,8 @@ class ElasticsearchServiceTest
     expectedWorks: List[IdentifiedWork]
   ): Assertion =
     withElasticsearchService { searchService =>
-      val documentOptions = createElasticsearchDocumentOptionsWith(index)
-
       val searchResponseFuture = searchService
-        .simpleStringQueryResults(queryString)(documentOptions, queryOptions)
+        .simpleStringQueryResults(queryString)(index, queryOptions)
 
       whenReady(searchResponseFuture) { response =>
         searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
@@ -454,10 +452,8 @@ class ElasticsearchServiceTest
     expectedWorks: Seq[IdentifiedWork]
   ): Assertion =
     withElasticsearchService { searchService =>
-      val documentOptions = createElasticsearchDocumentOptionsWith(index)
-
       val listResponseFuture = searchService
-        .listResults(documentOptions, queryOptions)
+        .listResults(index, queryOptions)
 
       whenReady(listResponseFuture) { response =>
         searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
