@@ -34,11 +34,17 @@ trait ElasticsearchFixtures
   val documentType = "work"
 
   def displayEsLocalFlags(indexNameV1: String, indexNameV2: String) =
+    displayEsLocalFlags(
+      indexV1 = Index(indexNameV1),
+      indexV2 = Index(indexNameV2)
+    )
+
+  def displayEsLocalFlags(indexV1: Index, indexV2: Index): Map[String, String] =
     Map(
       "es.host" -> esHost,
       "es.port" -> esPort.toString,
-      "es.index.v1" -> indexNameV1,
-      "es.index.v2" -> indexNameV2,
+      "es.index.v1" -> indexV1.name,
+      "es.index.v2" -> indexV2.name,
       "es.type" -> documentType
     )
 
@@ -174,13 +180,17 @@ trait ElasticsearchFixtures
   }
 
   def insertIntoElasticsearch(indexName: String,
+                              works: IdentifiedBaseWork*): Assertion =
+    insertIntoElasticsearch(Index(name), works: _*)
+
+  def insertIntoElasticsearch(index: Index,
                               works: IdentifiedBaseWork*): Assertion = {
     val result = elasticClient.execute(
       bulk(
         works.map { work =>
           val jsonDoc = toJson(work).get
 
-          indexInto(indexName / documentType)
+          indexInto(index.name / documentType)
             .version(work.version)
             .versionType(ExternalGte)
             .id(work.canonicalId)
@@ -192,7 +202,7 @@ trait ElasticsearchFixtures
     whenReady(result) { _ =>
       eventually {
         val response: Response[SearchResponse] = elasticClient.execute {
-          search(indexName).matchAllQuery()
+          search(index).matchAllQuery()
         }.await
 
         response.result.hits.total shouldBe works.size

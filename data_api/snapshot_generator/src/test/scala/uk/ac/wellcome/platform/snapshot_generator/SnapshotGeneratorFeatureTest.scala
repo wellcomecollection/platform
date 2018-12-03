@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.snapshot_generator
 import java.io.File
 
 import com.amazonaws.services.s3.model.GetObjectRequest
+import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
@@ -108,17 +109,17 @@ class SnapshotGeneratorFeatureTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
+    testWith: TestWith[(Queue, Topic, Index, Index, Bucket), R]): R =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalWorksIndex { indexNameV1 =>
-          withLocalWorksIndex { indexNameV2 =>
+        withLocalWorksIndex2 { indexV1 =>
+          withLocalWorksIndex2 { indexV2 =>
             withLocalS3Bucket { bucket =>
               val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
-                indexNameV1,
-                indexNameV2) ++ s3ClientLocalFlags
+                indexV1,
+                indexV2) ++ s3ClientLocalFlags
               withServer(flags) { _ =>
-                testWith((queue, topic, indexNameV1, indexNameV2, bucket))
+                testWith((queue, topic, indexV1, indexV2, bucket))
               }
             }
           }

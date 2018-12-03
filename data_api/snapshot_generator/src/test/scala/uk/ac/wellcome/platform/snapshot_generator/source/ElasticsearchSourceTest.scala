@@ -23,11 +23,11 @@ class ElasticsearchSourceTest
   it("outputs the entire content of the index") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withLocalWorksIndex { indexName =>
+        withLocalWorksIndex2 { index: Index =>
           val works = createIdentifiedWorks(count = 10)
-          insertIntoElasticsearch(indexName, works: _*)
+          insertIntoElasticsearch(index, works: _*)
 
-          withSource(indexName) { source =>
+          withSource(index) { source =>
             val future = source.runWith(Sink.seq)
 
             whenReady(future) { result =>
@@ -42,14 +42,14 @@ class ElasticsearchSourceTest
   it("filters non visible works") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withLocalWorksIndex { indexName =>
+        withLocalWorksIndex2 { index: Index =>
           val visibleWorks = createIdentifiedWorks(count = 10)
           val invisibleWorks = createIdentifiedInvisibleWorks(count = 3)
 
           val works = visibleWorks ++ invisibleWorks
-          insertIntoElasticsearch(indexName, works: _*)
+          insertIntoElasticsearch(index, works: _*)
 
-          withSource(indexName) { source =>
+          withSource(index) { source =>
             val future = source.runWith(Sink.seq)
 
             whenReady(future) { result =>
@@ -61,12 +61,12 @@ class ElasticsearchSourceTest
     }
   }
 
-  private def withSource[R](indexName: String)(
+  private def withSource[R](index: Index)(
     testWith: TestWith[Source[IdentifiedWork, NotUsed], R])(
     implicit actorSystem: ActorSystem): R = {
     val source = ElasticsearchWorksSource(
       elasticClient = elasticClient,
-      index = Index(indexName)
+      index = index
     )
     testWith(source)
   }
