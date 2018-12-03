@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter.services
 
 import akka.Done
 import io.circe.Json
-import uk.ac.wellcome.WorkerService
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.message.{MessageStream, MessageWriter}
 import uk.ac.wellcome.platform.idminter.config.models.{
   IdentifiersTableConfig,
@@ -19,7 +19,7 @@ class IdMinterWorkerService(
   messageStream: MessageStream[Json],
   rdsClientConfig: RDSClientConfig,
   identifiersTableConfig: IdentifiersTableConfig
-)(implicit ec: ExecutionContext) extends WorkerService {
+)(implicit ec: ExecutionContext) extends Runnable {
 
   def run(): Future[Done] = {
     val tableProvisioner = new TableProvisioner(

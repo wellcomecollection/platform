@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.ingestor.services
 import akka.Done
 import com.amazonaws.services.sqs.model.Message
 import com.sksamuel.elastic4s.http.ElasticClient
-import uk.ac.wellcome.WorkerService
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.elasticsearch.{ElasticsearchIndexCreator, WorksIndex}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class IngestorWorkerService(elasticClient: ElasticClient,
                             ingestorConfig: IngestorConfig,
                             messageStream: MessageStream[IdentifiedBaseWork])(
-  implicit ec: ExecutionContext) extends WorkerService {
+  implicit ec: ExecutionContext) extends Runnable {
 
   case class MessageBundle(message: Message, work: IdentifiedBaseWork)
 

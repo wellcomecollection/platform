@@ -16,7 +16,7 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
-import uk.ac.wellcome.WorkerService
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.sierra.{
   AbstractSierraRecord,
@@ -40,7 +40,7 @@ class SierraReaderWorkerService(
   readerConfig: ReaderConfig,
   sierraAPIConfig: SierraAPIConfig
 )(implicit ec: ExecutionContext)
-    extends Logging with WorkerService {
+    extends Logging with Runnable {
 
   val windowManager = new WindowManager(
     s3client = s3client,
