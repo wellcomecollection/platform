@@ -44,7 +44,7 @@ class ElasticsearchIndexTest
   val testType = "thing"
 
   object TestIndex extends ElasticsearchIndex {
-    val httpClient: HttpClient = elasticClient
+    val elasticClient: HttpClient = elasticClient
     val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
@@ -57,7 +57,7 @@ class ElasticsearchIndexTest
   }
 
   object CompatibleTestIndex extends ElasticsearchIndex {
-    val httpClient: HttpClient = elasticClient
+    val elasticClient: HttpClient = elasticClient
     val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(

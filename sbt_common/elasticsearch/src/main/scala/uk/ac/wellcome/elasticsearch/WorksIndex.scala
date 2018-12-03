@@ -14,7 +14,7 @@ class WorksIndex(client: ElasticClient, indexName: String)(
     extends ElasticsearchIndex
     with Logging {
 
-  val httpClient: ElasticClient = client
+  val elasticClient: ElasticClient = client
 
   val license = objectField("license").fields(
     keywordField("id")

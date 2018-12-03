@@ -11,12 +11,12 @@ import org.elasticsearch.client.ResponseException
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ElasticsearchIndex extends Logging {
-  val httpClient: ElasticClient
+  val elasticClient: ElasticClient
   val mappingDefinition: MappingDefinition
   implicit val ec: ExecutionContext
 
   def create(indexName: String): Future[Unit] =
-    httpClient
+    elasticClient
       .execute(createIndex(indexName).mappings {
         mappingDefinition
       })
@@ -34,7 +34,7 @@ trait ElasticsearchIndex extends Logging {
       }
 
   private def update(indexName: String): Future[Response[PutMappingResponse]] =
-    httpClient
+    elasticClient
       .execute {
         putMapping(indexName / mappingDefinition.`type`)
           .dynamic(mappingDefinition.dynamic.getOrElse(DynamicMapping.Strict))

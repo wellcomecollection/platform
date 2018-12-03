@@ -1,12 +1,7 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.http.ElasticDsl.{
-  intField,
-  keywordField,
-  mapping,
-  objectField
-}
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticDsl.{intField, keywordField, mapping, objectField}
+import com.sksamuel.elastic4s.http.{ElasticClient, HttpClient}
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import uk.ac.wellcome.elasticsearch.ElasticsearchIndex
@@ -15,11 +10,9 @@ import scala.concurrent.ExecutionContext
 
 trait CustomElasticsearchMapping {
 
-  class OnlyInvisibleWorksIndex(elasticClient: HttpClient, documentType: String)(
+  class OnlyInvisibleWorksIndex(val elasticClient: ElasticClient, documentType: String)(
     implicit val ec: ExecutionContext)
       extends ElasticsearchIndex {
-    val httpClient: HttpClient = elasticClient
-
     def sourceIdentifierFields = Seq(
       keywordField("ontologyType"),
       objectField("identifierType").fields(
