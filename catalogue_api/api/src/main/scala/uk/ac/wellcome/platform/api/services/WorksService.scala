@@ -34,7 +34,7 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
   def listWorks(documentOptions: ElasticsearchDocumentOptions,
                 worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
-      .listResults(sortByField = "canonicalId")(
+      .listResults(
         documentOptions,
         toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
@@ -59,7 +59,7 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
   private def createResultList(searchResponse: SearchResponse): ResultList =
     ResultList(
       results = searchResponseToWorks(searchResponse),
-      totalResults = searchResponse.totalHits
+      totalResults = searchResponse.totalHits.toInt
     )
 
   private def searchResponseToWorks(
