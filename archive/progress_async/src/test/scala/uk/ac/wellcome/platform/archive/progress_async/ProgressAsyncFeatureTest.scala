@@ -20,8 +20,6 @@ class ProgressAsyncFeatureTest
     with ProgressFixture
     with IntegrationPatience {
 
-  import CallbackNotification._
-
   it("updates an existing progress status to Completed") {
     withConfiguredApp {
       case (qPair, topic, table, app) => {

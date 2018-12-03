@@ -24,8 +24,6 @@ class ArchivistFeatureTest
     with IntegrationPatience
     with ProgressUpdateAssertions {
 
-  import IngestBagRequest._
-
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist {
       case (

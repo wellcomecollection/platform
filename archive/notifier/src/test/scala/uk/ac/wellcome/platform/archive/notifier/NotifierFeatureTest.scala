@@ -45,8 +45,6 @@ class NotifierFeatureTest
     with ProgressGenerators
     with TimeTestFixture {
 
-  import uk.ac.wellcome.platform.archive.common.progress.models.Progress._
-
   implicit val system: ActorSystem = ActorSystem("test")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 

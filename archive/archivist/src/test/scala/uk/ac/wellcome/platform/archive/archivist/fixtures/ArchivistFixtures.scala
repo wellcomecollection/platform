@@ -28,8 +28,6 @@ trait ArchivistFixtures
     with BagUploaderConfigGenerators
     with IngestBagRequestGenerators {
 
-  import IngestBagRequest._
-
   def sendBag[R](zipFile: ZipFile, ingestBucket: Bucket, queuePair: QueuePair)(
     testWith: TestWith[IngestBagRequest, R]): R = {
 
