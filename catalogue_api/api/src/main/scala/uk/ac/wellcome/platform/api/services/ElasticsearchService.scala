@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.get.GetResponse
@@ -17,8 +18,9 @@ import uk.ac.wellcome.platform.api.models.{
 
 import scala.concurrent.Future
 
+// TODO: This is just IndexAndType
 case class ElasticsearchDocumentOptions(
-  indexName: String,
+  index: Index,
   documentType: String
 )
 
@@ -36,7 +38,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
     elasticClient
       .execute {
         get(canonicalId).from(
-          s"${documentOptions.indexName}/${documentOptions.documentType}")
+          documentOptions.index.name / documentOptions.documentType)
       }
       .map { _.result }
 
@@ -71,7 +73,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
     )
 
     val searchRequest: SearchRequest =
-      search(s"${documentOptions.indexName}/${documentOptions.documentType}")
+      search(documentOptions.index.name / documentOptions.documentType)
         .searchType(SearchType.DFS_QUERY_THEN_FETCH)
         .query(queryDefinition)
         .sortBy(sortDefinitions)

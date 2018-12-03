@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.controllers
 
 import com.jakehschwartz.finatra.swagger.SwaggerController
+import com.sksamuel.elastic4s.Index
 import com.twitter.finatra.http.Controller
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
@@ -86,7 +87,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
       val documentOptions = ElasticsearchDocumentOptions(
-        indexName = request._index.getOrElse(indexName),
+        index = Index(request._index.getOrElse(indexName)),
         documentType = documentType
       )
 
@@ -112,7 +113,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
 
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
     val documentOptions = ElasticsearchDocumentOptions(
-      indexName = request._index.getOrElse(indexName),
+      index = Index(request._index.getOrElse(indexName)),
       documentType = documentType
     )
 
