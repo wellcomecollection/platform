@@ -1,8 +1,8 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
+import com.sksamuel.elastic4s.http.Response
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
@@ -12,7 +12,6 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestObject(
@@ -44,30 +43,29 @@ class ElasticsearchIndexTest
 
   val testType = "thing"
 
-  object TestIndex extends ElasticsearchIndex {
-    val mappingDefinition: MappingDefinition = mapping(testType)
-      .dynamic(DynamicMapping.Strict)
-      .as(
-        keywordField("id"),
-        textField("description"),
-        booleanField("visible")
-      )
-
-    implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
+  object TestIndex extends MappingDefinitionBuilder {
+    def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
+      mapping(testType)
+        .dynamic(DynamicMapping.Strict)
+        .as(
+          keywordField("id"),
+          textField("description"),
+          booleanField("visible")
+        )
+    }
   }
 
-  object CompatibleTestIndex extends ElasticsearchIndex {
-    val elasticClient: ElasticClient = elasticClient
-    val mappingDefinition: MappingDefinition = mapping(testType)
-      .dynamic(DynamicMapping.Strict)
-      .as(
-        keywordField("id"),
-        textField("description"),
-        intField("count"),
-        booleanField("visible")
-      )
-
-    implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
+  object CompatibleTestIndex extends MappingDefinitionBuilder {
+    def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
+      mapping(testType)
+        .dynamic(DynamicMapping.Strict)
+        .as(
+          keywordField("id"),
+          textField("description"),
+          intField("count"),
+          booleanField("visible")
+        )
+    }
   }
 
   it("creates an index into which doc of the expected type can be put") {
