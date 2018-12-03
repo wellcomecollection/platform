@@ -34,7 +34,6 @@ class SnapshotGeneratorFeatureTest
     with S3
     with SNS
     with SQS
-    with fixtures.Server
     with CloudWatch
     with GzipUtils
     with JsonAssertions
