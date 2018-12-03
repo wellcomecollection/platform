@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.api.services
 
+import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
@@ -98,15 +99,15 @@ class WorksServiceTest
 
   describe("findWorkById") {
     it("gets a DisplayWork by id") {
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex2 { index: Index =>
         withElasticsearchService { searchService =>
           withWorksService(searchService) { worksService =>
             val work = createIdentifiedWork
 
-            insertIntoElasticsearch(indexName, work)
+            insertIntoElasticsearch(index, work)
 
             val documentOptions =
-              createElasticsearchDocumentOptionsWith(indexName = indexName)
+              createElasticsearchDocumentOptionsWith(index = index)
 
             val recordsFuture = worksService.findWorkById(
               canonicalId = work.canonicalId)(documentOptions)
@@ -121,11 +122,11 @@ class WorksServiceTest
     }
 
     it("returns a future of None if it cannot get a record by id") {
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex2 { index: Index =>
         withElasticsearchService { searchService =>
           withWorksService(searchService) { worksService =>
             val documentOptions =
-              createElasticsearchDocumentOptionsWith(indexName = indexName)
+              createElasticsearchDocumentOptionsWith(index = index)
 
             val recordsFuture =
               worksService.findWorkById(canonicalId = "1234")(documentOptions)
@@ -267,15 +268,15 @@ class WorksServiceTest
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions
   ): Assertion =
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex2 { index: Index =>
       withElasticsearchService { searchService =>
         withWorksService(searchService) { worksService =>
-          if (!allWorks.isEmpty) {
-            insertIntoElasticsearch(indexName, allWorks: _*)
+          if (allWorks.nonEmpty) {
+            insertIntoElasticsearch(index, allWorks: _*)
           }
 
           val documentOptions = createElasticsearchDocumentOptionsWith(
-            indexName = indexName
+            index: Index
           )
 
           val future = partialSearchFunction(worksService)(
