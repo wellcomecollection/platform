@@ -69,7 +69,7 @@ class SnapshotServiceTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[(SnapshotService, String, String, Bucket), R]): R =
+    testWith: TestWith[(SnapshotService, Index, Index, Bucket), R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withS3AkkaClient { s3Client =>
@@ -80,7 +80,7 @@ class SnapshotServiceTest
                   snapshotService =>
                     {
                       testWith(
-                        (snapshotService, indexV1.name, indexV2.name, bucket))
+                        (snapshotService, indexV1, indexV2, bucket))
                     }
                 }
               }
@@ -92,13 +92,13 @@ class SnapshotServiceTest
 
   it("completes a V1 snapshot generation") {
     withFixtures {
-      case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
+      case (snapshotService: SnapshotService, indexV1, _, publicBucket) =>
         val visibleWorks = createIdentifiedWorks(count = 3)
         val notVisibleWorks = createIdentifiedInvisibleWorks(count = 1)
 
         val works = visibleWorks ++ notVisibleWorks
 
-        insertIntoElasticsearch(indexNameV1, works: _*)
+        insertIntoElasticsearch(indexV1, works: _*)
 
         val publicObjectKey = "target.txt.gz"
 
@@ -140,13 +140,13 @@ class SnapshotServiceTest
 
   it("completes a V2 snapshot generation") {
     withFixtures {
-      case (snapshotService: SnapshotService, _, indexNameV2, publicBucket) =>
+      case (snapshotService: SnapshotService, _, indexV2, publicBucket) =>
         val visibleWorks = createIdentifiedWorks(count = 4)
         val notVisibleWorks = createIdentifiedInvisibleWorks(count = 2)
 
         val works = visibleWorks ++ notVisibleWorks
 
-        insertIntoElasticsearch(indexNameV2, works: _*)
+        insertIntoElasticsearch(indexV2, works: _*)
 
         val publicObjectKey = "target.txt.gz"
 
@@ -189,14 +189,14 @@ class SnapshotServiceTest
 
   it("completes a snapshot generation of an index with more than 10000 items") {
     withFixtures {
-      case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
+      case (snapshotService: SnapshotService, indexV1, _, publicBucket) =>
         val works = (1 to 11000).map { id =>
           createIdentifiedWorkWith(
             title = randomAlphanumeric(length = 1500)
           )
         }
 
-        insertIntoElasticsearch(indexNameV1, works: _*)
+        insertIntoElasticsearch(indexV1, works: _*)
 
         val publicObjectKey = "target.txt.gz"
         val snapshotJob = SnapshotJob(
@@ -237,10 +237,10 @@ class SnapshotServiceTest
 
   it("returns a failed future if the S3 upload fails") {
     withFixtures {
-      case (snapshotService: SnapshotService, indexNameV1, _, _) =>
+      case (snapshotService: SnapshotService, indexV1, _, _) =>
         val works = createIdentifiedWorks(count = 3)
 
-        insertIntoElasticsearch(indexNameV1, works: _*)
+        insertIntoElasticsearch(indexV1, works: _*)
 
         val snapshotJob = SnapshotJob(
           publicBucketName = "wrongBukkit",
@@ -262,8 +262,8 @@ class SnapshotServiceTest
         withS3AkkaClient { s3Client =>
           withSnapshotService(
             s3Client,
-            indexV1 = "wrong-index",
-            indexV2 = "wrong-index") { brokenSnapshotService =>
+            indexV1 = Index("wrong-index"),
+            indexV2 = Index("wrong-index")) { brokenSnapshotService =>
             val snapshotJob = SnapshotJob(
               publicBucketName = "bukkit",
               publicObjectKey = "target.json.gz",
@@ -298,8 +298,8 @@ class SnapshotServiceTest
           withS3AkkaClient(endpoint = "") { s3Client =>
             withSnapshotService(
               s3Client,
-              indexV1 = "indexv1",
-              indexV2 = "indexv2") { snapshotService =>
+              indexV1 = Index("indexv1"),
+              indexV2 = Index("indexv2")) { snapshotService =>
               snapshotService.buildLocation(
                 bucketName = "bukkit",
                 objectKey = "snapshot.json.gz"
