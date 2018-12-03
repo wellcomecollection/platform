@@ -152,10 +152,6 @@ trait ElasticsearchFixtures
     }
   }
 
-  def insertIntoElasticsearch(indexName: String,
-                              works: IdentifiedBaseWork*): Assertion =
-    insertIntoElasticsearch(Index(name), works: _*)
-
   def insertIntoElasticsearch(index: Index,
                               works: IdentifiedBaseWork*): Assertion = {
     val result = elasticClient.execute(
