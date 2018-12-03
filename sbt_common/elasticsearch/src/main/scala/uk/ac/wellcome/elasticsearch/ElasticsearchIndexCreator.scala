@@ -2,28 +2,37 @@ package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.http.ElasticDsl.{createIndex, _}
+import com.sksamuel.elastic4s.http.index.CreateIndexResponse
 import com.sksamuel.elastic4s.http.index.mappings.PutMappingResponse
 import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import grizzled.slf4j.Logging
-import org.elasticsearch.client.ResponseException
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ElasticsearchIndexCreator(elasticClient: ElasticClient)(implicit ec: ExecutionContext) extends Logging {
   def create(indexName: String, mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
-      .execute(createIndex(indexName).mappings {
-        mappingDefinition
-      })
-      .recoverWith {
-        case e: ResponseException
-          if e.getMessage.contains("index_already_exists_exception") =>
-          info(s"Index $indexName already exists")
-          update(indexName, mappingDefinition = mappingDefinition)
-        case e: Throwable =>
-          error(s"Failed creating index $indexName", e)
-          Future.failed(e)
+      .execute {
+        createIndex(indexName).mappings {
+          mappingDefinition
+        }
+      }
+      .map { response: Response[CreateIndexResponse] =>
+        if (response.isError) {
+          if (response.error.`type` == "index_already_exists_exception") {
+            info(s"Index $indexName already exists")
+            update(indexName, mappingDefinition = mappingDefinition)
+          } else {
+            Future.failed(
+              throw new RuntimeException(
+                s"Failed creating index $indexName: ${response.error}"
+              )
+            )
+          }
+        } else {
+          response
+        }
       }
       .map { _ =>
         info("Index updated successfully")
@@ -40,5 +49,11 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(implicit ec: Execu
         case e: Throwable =>
           error(s"Failed updating index $indexName", e)
           throw e
+      }
+      .map { response: Response[PutMappingResponse] =>
+        if (response.isError) {
+          throw new RuntimeException(s"Failed updating index: $response")
+        }
+        response
       }
 }
