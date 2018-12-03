@@ -19,7 +19,6 @@ import uk.ac.wellcome.platform.archive.common.models.{
   NotificationMessage
 }
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
-import uk.ac.wellcome.platform.archive.common.models.CallbackNotification._
 
 import scala.concurrent.Future
 
