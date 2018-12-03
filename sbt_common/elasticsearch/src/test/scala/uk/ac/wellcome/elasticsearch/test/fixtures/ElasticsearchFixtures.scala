@@ -1,8 +1,10 @@
 package uk.ac.wellcome.elasticsearch.test.fixtures
 
+import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.ElasticClient
-import org.elasticsearch.index.VersionType
+import com.sksamuel.elastic4s.http.get.GetResponse
+import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import org.scalactic.source.Position
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -48,7 +50,7 @@ trait ElasticsearchFixtures
   // Elasticsearch takes a while to start up so check that it actually started
   // before running tests.
   eventually {
-    elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
+    elasticClient.execute(clusterHealth()).await.result.numberOfNodes shouldBe 1
   }(
     PatienceConfig(
       timeout = scaled(Span(40, Seconds)),
@@ -86,6 +88,7 @@ trait ElasticsearchFixtures
       elasticClient
         .execute(indexExists(indexName))
         .await
+        .result
         .isExists should be(true)
     }
 
@@ -103,28 +106,28 @@ trait ElasticsearchFixtures
       val workJson = toJson(work).get
 
       eventually {
-        val getResponse = elasticClient
+        val response: Response[GetResponse] = elasticClient
           .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
           .await
 
-        getResponse.exists shouldBe true
+        response.result.exists shouldBe true
 
-        assertJsonStringsAreEqual(getResponse.sourceAsString, workJson)
+        assertJsonStringsAreEqual(response.result.sourceAsString, workJson)
       }
     }
 
   def assertElasticsearchNeverHasWork(indexName: String,
-                                      works: IdentifiedBaseWork*) = {
+                                      works: IdentifiedBaseWork*): Unit = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
     Thread.sleep(500)
 
     works.foreach { work =>
-      val hit = elasticClient
+      val response: Response[GetResponse] = elasticClient
         .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
         .await
 
-      hit.found shouldBe false
+      response.result.found shouldBe false
     }
   }
 
@@ -137,7 +140,7 @@ trait ElasticsearchFixtures
 
           indexInto(indexName / documentType)
             .version(work.version)
-            .versionType(VersionType.EXTERNAL_GTE)
+            .versionType(ExternalGte)
             .id(work.canonicalId)
             .doc(jsonDoc)
         }
@@ -146,13 +149,12 @@ trait ElasticsearchFixtures
 
     whenReady(result) { _ =>
       eventually {
-        val hits = elasticClient
+        val response: Response[SearchResponse] = elasticClient
           .execute {
             search(indexName).matchAllQuery()
           }
           .await
-          .hits
-        hits.total shouldBe works.size
+        response.result.hits.total shouldBe works.size
       }
     }
   }
