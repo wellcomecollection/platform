@@ -8,6 +8,7 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishResult
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.{
@@ -27,7 +28,7 @@ class Notifier(
   snsClient: AmazonSNS,
   snsConfig: SNSConfig,
   contextUrl: URL
-)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) {
+)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) extends WorkerService {
   def run(): Future[Done] = {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
