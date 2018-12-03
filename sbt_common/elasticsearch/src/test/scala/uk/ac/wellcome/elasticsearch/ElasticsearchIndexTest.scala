@@ -1,7 +1,7 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
@@ -44,7 +44,7 @@ class ElasticsearchIndexTest
   val testType = "thing"
 
   object TestIndex extends ElasticsearchIndex {
-    val elasticClient: HttpClient = elasticClient
+    val elasticClient: ElasticClient = elasticClient
     val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
@@ -57,7 +57,7 @@ class ElasticsearchIndexTest
   }
 
   object CompatibleTestIndex extends ElasticsearchIndex {
-    val elasticClient: HttpClient = elasticClient
+    val elasticClient: ElasticClient = elasticClient
     val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
@@ -81,7 +81,7 @@ class ElasticsearchIndexTest
             indexInto(indexName / testType).doc(testObjectJson))
           hits <- elasticClient
             .execute(search(s"$indexName/$testType").matchAllQuery())
-            .map { _.hits.hits }
+            .map { _.result.hits.hits }
         } yield {
           hits should have size 1
 
@@ -123,7 +123,7 @@ class ElasticsearchIndexTest
             eventually {
               val hits = elasticClient
                 .execute(search(s"$testIndexName/$testType").matchAllQuery())
-                .map { _.hits.hits }
+                .map { _.result.hits.hits }
                 .await
 
               hits should have size 1

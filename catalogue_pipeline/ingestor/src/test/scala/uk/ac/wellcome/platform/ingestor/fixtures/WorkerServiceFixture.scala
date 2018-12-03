@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.fixtures
 
-import com.sksamuel.elastic4s.http.{ElasticClient, HttpClient}
+import com.sksamuel.elastic4s.http.ElasticClient
 import org.scalatest.Suite
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
