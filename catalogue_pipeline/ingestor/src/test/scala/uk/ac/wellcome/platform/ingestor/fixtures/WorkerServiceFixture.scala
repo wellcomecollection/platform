@@ -21,7 +21,7 @@ import scala.concurrent.duration._
 trait WorkerServiceFixture extends ElasticsearchFixtures with Messaging {
   this: Suite =>
   def withWorkerService[R](queue: Queue,
-                           index: Index,
+                           index: Index = createIndex,
                            elasticClient: ElasticClient = elasticClient)(
     testWith: TestWith[IngestorWorkerService, R]): R =
     withActorSystem { implicit actorSystem =>

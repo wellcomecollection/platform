@@ -160,10 +160,7 @@ class IngestorWorkerServiceTest
         val brokenElasticClient: ElasticClient =
           ElasticClient.fromRestClient(brokenRestClient)
 
-        withWorkerService(
-          queue,
-          index = Index("works-v1"),
-          elasticClient = brokenElasticClient) { _ =>
+        withWorkerService(queue, elasticClient = brokenElasticClient) { _ =>
           val work = createIdentifiedWork
 
           sendMessage[IdentifiedBaseWork](queue = queue, obj = work)

@@ -50,8 +50,8 @@ class SnapshotServiceTest
 
   private def withSnapshotService[R](
     s3AkkaClient: S3Client,
-    indexV1: Index,
-    indexV2: Index)(testWith: TestWith[SnapshotService, R])(
+    indexV1: Index = createIndex,
+    indexV2: Index = createIndex)(testWith: TestWith[SnapshotService, R])(
     implicit actorSystem: ActorSystem): R = {
     val elasticConfig = createDisplayElasticConfigWith(
       indexV1 = indexV1,
@@ -262,8 +262,8 @@ class SnapshotServiceTest
         withS3AkkaClient { s3Client =>
           withSnapshotService(
             s3Client,
-            indexV1 = Index("wrong-index"),
-            indexV2 = Index("wrong-index")) { brokenSnapshotService =>
+            indexV1 = createIndex,
+            indexV2 = createIndex) { brokenSnapshotService =>
             val snapshotJob = SnapshotJob(
               publicBucketName = "bukkit",
               publicObjectKey = "target.json.gz",
@@ -296,10 +296,7 @@ class SnapshotServiceTest
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           withS3AkkaClient(endpoint = "") { s3Client =>
-            withSnapshotService(
-              s3Client,
-              indexV1 = Index("indexv1"),
-              indexV2 = Index("indexv2")) { snapshotService =>
+            withSnapshotService(s3Client) { snapshotService =>
               snapshotService.buildLocation(
                 bucketName = "bukkit",
                 objectKey = "snapshot.json.gz"

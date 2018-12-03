@@ -279,7 +279,7 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
   // TODO figure out what the correct behaviour should be in this case
   ignore(
     "returns a Not Found error if you try to get a version that doesn't exist") {
-    withServer(indexV1 = Index("index-v1"), indexV2 = Index("index-v2")) {
+    withServer() {
       server =>
         server.httpGet(
           path = "/catalogue/v567/works?pageSize=100&page=101",

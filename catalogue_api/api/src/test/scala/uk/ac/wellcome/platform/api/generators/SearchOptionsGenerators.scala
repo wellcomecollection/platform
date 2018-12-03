@@ -12,10 +12,6 @@ trait SearchOptionsGenerators {
   val documentType: String
 
   def createElasticsearchDocumentOptionsWith(
-    indexName: String): ElasticsearchDocumentOptions =
-    createElasticsearchDocumentOptionsWith(index = Index(indexName))
-
-  def createElasticsearchDocumentOptionsWith(
     index: Index): ElasticsearchDocumentOptions =
     ElasticsearchDocumentOptions(
       index = index,

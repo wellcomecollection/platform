@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.ingestor
 
-import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -17,7 +16,7 @@ class IngestorIndexTest
     with WorkerServiceFixture {
 
   it("creates the index at startup if it doesn't already exist") {
-    val index = Index("works")
+    val index = createIndex
 
     eventuallyDeleteIndex(index)
 

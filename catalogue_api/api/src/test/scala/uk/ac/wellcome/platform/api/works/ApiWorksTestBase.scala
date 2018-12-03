@@ -21,7 +21,7 @@ trait ApiWorksTestBase
       toJson(t).get
   }
 
-  def withServer[R](indexV1: Index, indexV2: Index)(
+  def withServer[R](indexV1: Index = createIndex, indexV2: Index = createIndex)(
     testWith: TestWith[EmbeddedHttpServer, R]): R = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
