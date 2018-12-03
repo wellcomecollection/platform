@@ -19,8 +19,6 @@ variable "ecs_cluster_id" {}
 
 variable "namespace_id" {}
 
-variable "hybrid_records_topic_arn" {}
-
 variable "reindexer_jobs" {
   type = "list"
 }
