@@ -23,7 +23,7 @@ class ElasticsearchSourceTest
   it("outputs the entire content of the index") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withLocalWorksIndex2 { index: Index =>
+        withLocalWorksIndex { index: Index =>
           val works = createIdentifiedWorks(count = 10)
           insertIntoElasticsearch(index, works: _*)
 
@@ -42,7 +42,7 @@ class ElasticsearchSourceTest
   it("filters non visible works") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withLocalWorksIndex2 { index: Index =>
+        withLocalWorksIndex { index: Index =>
           val visibleWorks = createIdentifiedWorks(count = 10)
           val invisibleWorks = createIdentifiedInvisibleWorks(count = 3)
 

@@ -39,7 +39,7 @@ class WorksIndexTest
 
   it("puts a valid work") {
     forAll { sampleWork: IdentifiedBaseWork =>
-      withLocalWorksIndex2 { index: Index =>
+      withLocalWorksIndex { index: Index =>
         val sampleWorkJson = toJson(sampleWork).get
 
         val futureIndexResponse = elasticClient.execute(
@@ -56,7 +56,7 @@ class WorksIndexTest
   // a bug in the mapping related to person subjects wasn't caught by the above test.
   // So let's add a specific one
   it("puts a work with a person subject") {
-    withLocalWorksIndex2 { index: Index =>
+    withLocalWorksIndex { index: Index =>
       val sampleWorkJson = toJson(
         createIdentifiedWorkWith(
           subjects = List(
@@ -83,7 +83,7 @@ class WorksIndexTest
   }
 
   it("does not put an invalid work") {
-    withLocalWorksIndex2 { index: Index =>
+    withLocalWorksIndex { index: Index =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 

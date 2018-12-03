@@ -112,8 +112,8 @@ class SnapshotGeneratorFeatureTest
     testWith: TestWith[(Queue, Topic, Index, Index, Bucket), R]): R =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalWorksIndex2 { indexV1 =>
-          withLocalWorksIndex2 { indexV2 =>
+        withLocalWorksIndex { indexV1 =>
+          withLocalWorksIndex { indexV2 =>
             withLocalS3Bucket { bucket =>
               val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
                 indexV1,

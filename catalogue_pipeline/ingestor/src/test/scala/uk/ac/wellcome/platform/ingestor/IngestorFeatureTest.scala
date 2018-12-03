@@ -26,7 +26,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
-      withLocalWorksIndex2 { index: Index =>
+      withLocalWorksIndex { index: Index =>
         withWorkerService(queue, index) { _ =>
           assertElasticsearchEventuallyHasWork2(index, work)
         }
@@ -41,7 +41,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
-      withLocalWorksIndex2 { index: Index =>
+      withLocalWorksIndex { index: Index =>
         withWorkerService(queue, index) { _ =>
           assertElasticsearchEventuallyHasWork2(index, work)
         }
@@ -51,7 +51,7 @@ class IngestorFeatureTest
 
   it("does not delete a message from the queue if it fails processing") {
     withLocalSqsQueue { queue =>
-      withLocalWorksIndex2 { index =>
+      withLocalWorksIndex { index =>
         withWorkerService(queue, index) { _ =>
           sendNotificationToSQS(
             queue = queue,

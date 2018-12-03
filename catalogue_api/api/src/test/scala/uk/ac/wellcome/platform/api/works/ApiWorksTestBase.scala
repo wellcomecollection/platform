@@ -44,8 +44,8 @@ trait ApiWorksTestBase
   def withApiFixtures[R](apiVersion: ApiVersions.Value,
                          apiName: String = "catalogue/")(
     testWith: TestWith[(String, String, String, EmbeddedHttpServer), R]): R =
-    withLocalWorksIndex2 { indexV1 =>
-      withLocalWorksIndex2 { indexV2 =>
+    withLocalWorksIndex { indexV1 =>
+      withLocalWorksIndex { indexV2 =>
         withServer(indexV1, indexV2) { server =>
           testWith((apiName + apiVersion, indexV1.name, indexV2.name, server))
         }

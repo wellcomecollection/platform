@@ -65,12 +65,7 @@ trait ElasticsearchFixtures
     ),
     implicitly[Position])
 
-  def withLocalWorksIndex[R](testWith: TestWith[String, R]): R =
-    withLocalElasticsearchIndex[R](WorksIndex) { indexName =>
-      testWith(indexName)
-    }
-
-  def withLocalWorksIndex2[R](testWith: TestWith[Index, R]): R =
+  def withLocalWorksIndex[R](testWith: TestWith[Index, R]): R =
     withLocalElasticsearchIndex[R](WorksIndex) { indexName =>
       testWith(Index(name = indexName))
     }

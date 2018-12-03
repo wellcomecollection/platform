@@ -23,7 +23,7 @@ class WorkIndexerTest
   it("inserts an identified Work into Elasticsearch") {
     val work = createIdentifiedWork
 
-    withLocalWorksIndex2 { index: Index =>
+    withLocalWorksIndex { index: Index =>
       val future = indexWork(work, index, workIndexer)
 
       whenReady(future) { result =>
@@ -36,7 +36,7 @@ class WorkIndexerTest
   it("only adds one record when the same ID is ingested multiple times") {
     val work = createIdentifiedWork
 
-    withLocalWorksIndex2 { index: Index =>
+    withLocalWorksIndex { index: Index =>
       val future = Future.sequence(
         (1 to 2).map(_ => indexWork(work, index, workIndexer))
       )
@@ -51,7 +51,7 @@ class WorkIndexerTest
     val work = createIdentifiedWorkWith(version = 3)
     val olderWork = work.copy(version = 1)
 
-    withLocalWorksIndex2 { index: Index =>
+    withLocalWorksIndex { index: Index =>
       val future = ingestWorkPairInOrder(
         firstWork = work,
         secondWork = olderWork,
@@ -70,7 +70,7 @@ class WorkIndexerTest
     val work = createIdentifiedWorkWith(version = 3)
     val updatedWork = work.copy(title = "a different title")
 
-    withLocalWorksIndex2 { index: Index =>
+    withLocalWorksIndex { index: Index =>
       val future = ingestWorkPairInOrder(
         firstWork = work,
         secondWork = updatedWork,
@@ -91,7 +91,7 @@ class WorkIndexerTest
       val mergedWork = createIdentifiedWorkWith(version = 3, merged = true)
       val unmergedWork = mergedWork.copy(merged = false)
 
-      withLocalWorksIndex2 { index: Index =>
+      withLocalWorksIndex { index: Index =>
         val unmergedWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = mergedWork,
           secondWork = unmergedWork,
@@ -110,7 +110,7 @@ class WorkIndexerTest
       val unmergedNewWork = createIdentifiedWorkWith(version = 4)
       val mergedOldWork = unmergedNewWork.copy(version = 3, merged = true)
 
-      withLocalWorksIndex2 { index: Index =>
+      withLocalWorksIndex { index: Index =>
         val mergedWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = unmergedNewWork,
           secondWork = mergedOldWork,
@@ -131,7 +131,7 @@ class WorkIndexerTest
         canonicalId = identifiedNewWork.canonicalId,
         version = 3)
 
-      withLocalWorksIndex2 { index: Index =>
+      withLocalWorksIndex { index: Index =>
         val redirectedWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = identifiedNewWork,
           secondWork = redirectedOldWork,
@@ -151,7 +151,7 @@ class WorkIndexerTest
         canonicalId = redirectedWork.canonicalId,
         version = 3)
 
-      withLocalWorksIndex2 { index: Index =>
+      withLocalWorksIndex { index: Index =>
         val identifiedWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = redirectedWork,
           secondWork = identifiedWork,
@@ -171,7 +171,7 @@ class WorkIndexerTest
         canonicalId = work.canonicalId,
         version = 4)
 
-      withLocalWorksIndex2 { index: Index =>
+      withLocalWorksIndex { index: Index =>
         val invisibleWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = work,
           secondWork = invisibleWork,
@@ -189,7 +189,7 @@ class WorkIndexerTest
   it("inserts a list of works into elasticsearch and returns them") {
     val works = createIdentifiedWorks(count = 5)
 
-    withLocalWorksIndex2 { index: Index =>
+    withLocalWorksIndex { index: Index =>
       val future = workIndexer.indexWorks(
         works = works,
         index = index,

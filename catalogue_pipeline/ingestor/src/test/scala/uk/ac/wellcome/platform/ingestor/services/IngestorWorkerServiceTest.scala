@@ -132,14 +132,14 @@ class IngestorWorkerServiceTest
 
     val work = createIdentifiedWork
 
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex { index: Index =>
       withLocalSqsQueueAndDlq {
         case QueuePair(queue, dlq) =>
-          withWorkerService(queue, indexName) { _ =>
+          withWorkerService(queue, index) { _ =>
             sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
             sendMessage(queue = queue, obj = square)
 
-            assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+            assertElasticsearchEventuallyHasWork2(index = index, work)
 
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, 1)
@@ -178,7 +178,7 @@ class IngestorWorkerServiceTest
 
   private def assertWorksIndexedCorrectly(
     works: IdentifiedBaseWork*): Assertion =
-    withLocalWorksIndex2 { index: Index =>
+    withLocalWorksIndex { index: Index =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>
           withWorkerService(queue, index) { _ =>
