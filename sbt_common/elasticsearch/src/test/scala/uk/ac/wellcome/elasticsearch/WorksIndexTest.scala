@@ -1,9 +1,9 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search, _}
-import com.sksamuel.elastic4s.http.Response
+import com.sksamuel.elastic4s.http.{RequestFailure, Response}
+import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import org.elasticsearch.client.ResponseException
 import org.scalacheck.Shrink
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
@@ -16,6 +16,7 @@ import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class WorksIndexTest
     extends FunSpec
@@ -46,7 +47,7 @@ class WorksIndexTest
   }
 
   // Possibly because the number of variations in the work model is too big,
-  // a bug in the mapping related to person subjects wasn't causght by the above test.
+  // a bug in the mapping related to person subjects wasn't caught by the above test.
   // So let's add a specific one
   it("puts a work with a person subject") {
     withLocalWorksIndex { indexName =>
@@ -65,14 +66,15 @@ class WorksIndexTest
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
-      val eventualResponse =
-        for {
-          response <- elasticClient.execute(
-            indexInto(indexName / "work").doc(badTestObjectJson))
-        } yield response
+      val future: Future[Response[IndexResponse]] =
+        elasticClient
+          .execute {
+            indexInto(indexName / "work").doc(badTestObjectJson)
+          }
 
-      whenReady(eventualResponse.failed) { exception =>
-        exception shouldBe a[ResponseException]
+      whenReady(future) { response =>
+        response.isError shouldBe true
+        response.error shouldBe a[RequestFailure]
       }
     }
   }
