@@ -7,7 +7,12 @@ import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
 import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedInvisibleWork, IdentifiedRedirectedWork, IdentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
+  IdentifiedInvisibleWork,
+  IdentifiedRedirectedWork,
+  IdentifiedWork
+}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions

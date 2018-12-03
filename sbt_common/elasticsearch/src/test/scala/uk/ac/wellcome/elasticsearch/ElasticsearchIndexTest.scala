@@ -140,11 +140,9 @@ class ElasticsearchIndexTest
 
             eventually {
               val response: Response[SearchResponse] =
-                elasticClient
-                  .execute {
-                    search(s"$indexName/$testType").matchAllQuery()
-                  }
-                  .await
+                elasticClient.execute {
+                  search(s"$indexName/$testType").matchAllQuery()
+                }.await
 
               val hits = response.result.hits.hits
 

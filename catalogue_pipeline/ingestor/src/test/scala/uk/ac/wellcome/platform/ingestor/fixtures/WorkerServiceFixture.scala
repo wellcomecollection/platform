@@ -7,7 +7,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.platform.ingestor.config.models.{IngestElasticConfig, IngestorConfig}
+import uk.ac.wellcome.platform.ingestor.config.models.{
+  IngestElasticConfig,
+  IngestorConfig
+}
 import uk.ac.wellcome.platform.ingestor.services.IngestorWorkerService
 import uk.ac.wellcome.test.fixtures.TestWith
 

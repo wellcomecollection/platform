@@ -1,6 +1,11 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.http.ElasticDsl.{intField, keywordField, mapping, objectField}
+import com.sksamuel.elastic4s.http.ElasticDsl.{
+  intField,
+  keywordField,
+  mapping,
+  objectField
+}
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import uk.ac.wellcome.elasticsearch.MappingDefinitionBuilder
