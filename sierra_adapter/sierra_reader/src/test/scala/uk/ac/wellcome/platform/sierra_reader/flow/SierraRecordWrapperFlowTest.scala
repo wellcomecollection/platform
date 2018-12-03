@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.sierra_reader.flow
 import java.time.Instant
 
 import akka.NotUsed
-import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import io.circe.Json
 import io.circe.parser._
@@ -30,7 +29,6 @@ class SierraRecordWrapperFlowTest
     with SierraGenerators {
 
   private def withRecordWrapperFlow[T <: AbstractSierraRecord](
-    actorSystem: ActorSystem,
     createRecord: (String, String, Instant) => T)(
     testWith: TestWith[Flow[Json, T, NotUsed], Assertion]) = {
     val wrapperFlow = SierraRecordWrapperFlow(
@@ -41,137 +39,129 @@ class SierraRecordWrapperFlowTest
   }
 
   it("creates a SierraRecord from a bib") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
-          wrapperFlow =>
-            val id = createSierraBibNumber
-            val updatedDate = "2013-12-13T12:43:16Z"
-            val jsonString = s"""
-               |{
-               | "id": "$id",
-               | "updatedDate": "$updatedDate"
-               |}
-            """.stripMargin
+    withMaterializer { implicit materializer =>
+      withRecordWrapperFlow(SierraBibRecord.apply) { wrapperFlow =>
+        val id = createSierraBibNumber
+        val updatedDate = "2013-12-13T12:43:16Z"
+        val jsonString =
+          s"""
+          |{
+          |  "id": "$id",
+          |  "updatedDate": "$updatedDate"
+          |}
+          """.stripMargin
+        val expectedRecord = createSierraBibRecordWith(
+          id = id,
+          data = jsonString,
+          modifiedDate = Instant.parse(updatedDate)
+        )
 
-            val expectedRecord = createSierraBibRecordWith(
-              id = id,
-              data = jsonString,
-              modifiedDate = Instant.parse(updatedDate)
-            )
+        val json = parse(jsonString).right.get
 
-            val json = parse(jsonString).right.get
-
-            val futureRecord = Source
-              .single(json)
-              .via(wrapperFlow)
-              .runWith(Sink.head)(materializer)
-
-            whenReady(futureRecord) { sierraRecord =>
-              assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
-            }
+        val futureRecord = Source
+          .single(json)
+          .via(wrapperFlow)
+          .runWith(Sink.head)
+        whenReady(futureRecord) { sierraRecord =>
+          assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
         }
       }
     }
   }
 
   it("creates a SierraRecord from an item") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        withRecordWrapperFlow(actorSystem, SierraItemRecord.apply) {
-          wrapperFlow =>
-            val id = createSierraItemNumber
-            val updatedDate = "2014-04-14T14:14:14Z"
+    withMaterializer { implicit materializer =>
+      withRecordWrapperFlow(SierraItemRecord.apply) { wrapperFlow =>
+        val id = createSierraItemNumber
+        val updatedDate = "2014-04-14T14:14:14Z"
 
-            // We need to encode the bib IDs as strings, _not_ as typed
-            // objects -- the format needs to map what we get from the
-            // Sierra API.
-            //
-            val bibIds = (1 to 4).map { _ =>
-              createSierraRecordNumberString
-            }
-            val jsonString = s"""
+        // We need to encode the bib IDs as strings, _not_ as typed
+        // objects -- the format needs to map what we get from the
+        // Sierra API.
+        //
+        val bibIds = (1 to 4).map { _ =>
+          createSierraRecordNumberString
+        }
+        val jsonString =
+          s"""
           |{
           | "id": "$id",
           | "updatedDate": "$updatedDate",
           | "bibIds": ${toJson(bibIds).get}
           |}
-        """.stripMargin
+          """.stripMargin
 
-            val expectedRecord = createSierraItemRecordWith(
-              id = id,
-              data = jsonString,
-              modifiedDate = Instant.parse(updatedDate)
-            )
+        val expectedRecord = createSierraItemRecordWith(
+          id = id,
+          data = jsonString,
+          modifiedDate = Instant.parse(updatedDate)
+        )
 
-            val json = parse(jsonString).right.get
+        val json = parse(jsonString).right.get
 
-            val futureRecord = Source
-              .single(json)
-              .via(wrapperFlow)
-              .runWith(Sink.head)(materializer)
+        val futureRecord = Source
+          .single(json)
+          .via(wrapperFlow)
+          .runWith(Sink.head)
 
-            whenReady(futureRecord) { sierraRecord =>
-              assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
-            }
+        whenReady(futureRecord) { sierraRecord =>
+          assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
         }
       }
     }
   }
 
   it("is able to handle deleted bibs") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
-          wrapperFlow =>
-            val id = createSierraBibNumber
-            val deletedDate = "2014-01-31"
-            val jsonString = s"""{
-            |  "id" : "$id",
-            |  "deletedDate" : "$deletedDate",
-            |  "deleted" : true
-            |}""".stripMargin
+    withMaterializer { implicit materializer =>
+      withRecordWrapperFlow(SierraBibRecord.apply) { wrapperFlow =>
+        val id = createSierraBibNumber
+        val deletedDate = "2014-01-31"
+        val jsonString =
+          s"""
+          |{
+          |  "id" : "$id",
+          |  "deletedDate" : "$deletedDate",
+          |  "deleted" : true
+          |}
+          |""".stripMargin
 
-            val expectedRecord = createSierraBibRecordWith(
-              id = id,
-              data = jsonString,
-              modifiedDate = Instant.parse(s"${deletedDate}T00:00:00Z")
-            )
+        val expectedRecord = createSierraBibRecordWith(
+          id = id,
+          data = jsonString,
+          modifiedDate = Instant.parse(s"${deletedDate}T00:00:00Z")
+        )
 
-            val json = parse(jsonString).right.get
+        val json = parse(jsonString).right.get
 
-            val futureRecord = Source
-              .single(json)
-              .via(wrapperFlow)
-              .runWith(Sink.head)(materializer)
-
-            whenReady(futureRecord) { sierraRecord =>
-              assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
-            }
+        val futureRecord = Source
+          .single(json)
+          .via(wrapperFlow)
+          .runWith(Sink.head)
+        whenReady(futureRecord) { sierraRecord =>
+          assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
         }
       }
     }
   }
 
   it("fails the stream if the record contains invalid JSON") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
-          wrapperFlow =>
-            val invalidSierraJson = parse(s"""{
-          | "missing": ["id", "updatedDate"],
-          | "reason": "This JSON will not pass!",
+    withMaterializer { implicit materializer =>
+      withRecordWrapperFlow(SierraBibRecord.apply) { wrapperFlow =>
+        val invalidSierraJson = parse(s"""
+          |{
+          |  "missing": ["id", "updatedDate"],
+          |  "reason": "This JSON will not pass!",
           |  "comment": "XML is coming!"
-          |}""".stripMargin).right.get
+          |}
+          |""".stripMargin).right.get
 
-            val futureUnit = Source
-              .single(invalidSierraJson)
-              .via(wrapperFlow)
-              .runWith(Sink.head)(materializer)
+        val futureUnit = Source
+          .single(invalidSierraJson)
+          .via(wrapperFlow)
+          .runWith(Sink.head)
 
-            whenReady(futureUnit.failed) { _ =>
-              true shouldBe true
-            }
+        whenReady(futureUnit.failed) { _ =>
+          true shouldBe true
         }
       }
     }

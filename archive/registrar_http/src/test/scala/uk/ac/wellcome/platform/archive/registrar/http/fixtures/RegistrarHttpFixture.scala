@@ -14,6 +14,8 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait RegistrarHttpFixture
     extends RandomThings
     with ScalaFutures
@@ -26,17 +28,13 @@ trait RegistrarHttpFixture
                  s3Prefix: String,
                  httpServerConfig: HTTPServerConfig,
                  contextURL: URL)(testWith: TestWith[RegistrarHTTP, R]): R =
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withStorageManifestVHS(table, bucket) { vhs =>
           val registrarHTTP = new RegistrarHTTP(
             vhs = vhs,
             httpServerConfig = httpServerConfig,
             contextURL = contextURL
-          )(
-            actorSystem = actorSystem,
-            materializer = materializer,
-            executionContext = actorSystem.dispatcher
           )
 
           registrarHTTP.run()

@@ -233,19 +233,16 @@ class SQSStreamTest
     }
 
   def withSQSStreamFixtures[R](
-    testWith: TestWith[(SQSStream[ExampleObject], QueuePair, MetricsSender),
-                       R]) = {
-
-    withActorSystem { actorSystem =>
+    testWith: TestWith[(SQSStream[ExampleObject], QueuePair, MetricsSender), R])
+    : R =
+    withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
-            withSQSStream[ExampleObject, R](actorSystem, queue, metricsSender) {
-              stream =>
-                testWith((stream, queuePair, metricsSender))
+            withSQSStream[ExampleObject, R](queue, metricsSender) { stream =>
+              testWith((stream, queuePair, metricsSender))
             }
           }
       }
     }
-  }
 }

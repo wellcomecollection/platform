@@ -46,31 +46,29 @@ class PrepareNotificationFlowTest
         226
       )
     it("returns a successful ProgressUpdate when a callback succeeds") {
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          forAll(successfulStatuscodes) { responseStatus: Int =>
-            val id = randomUUID
-            val callbackResult = createCallbackResultWith(
-              id = id,
-              response = HttpResponse(responseStatus))
+      withMaterializer { implicit materializer =>
+        forAll(successfulStatuscodes) { responseStatus: Int =>
+          val id = randomUUID
+          val callbackResult = createCallbackResultWith(
+            id = id,
+            response = HttpResponse(responseStatus))
 
-            val eventualResult =
-              Source
-                .single(callbackResult)
-                .via(PrepareNotificationFlow())
-                .runWith(Sink.seq)(materializer)
+          val eventualResult =
+            Source
+              .single(callbackResult)
+              .via(PrepareNotificationFlow())
+              .runWith(Sink.seq)
 
-            whenReady(eventualResult) { result =>
-              inside(result.head) {
-                case ProgressCallbackStatusUpdate(
-                    actualId,
-                    callbackStatus,
-                    List(progressEvent)) =>
-                  actualId shouldBe id
-                  progressEvent.description shouldBe "Callback fulfilled."
-                  callbackStatus shouldBe Callback.Succeeded
-                  assertRecent(progressEvent.createdDate)
-              }
+          whenReady(eventualResult) { result =>
+            inside(result.head) {
+              case ProgressCallbackStatusUpdate(
+                  actualId,
+                  callbackStatus,
+                  List(progressEvent)) =>
+                actualId shouldBe id
+                progressEvent.description shouldBe "Callback fulfilled."
+                callbackStatus shouldBe Callback.Succeeded
+                assertRecent(progressEvent.createdDate)
             }
           }
         }
@@ -89,91 +87,85 @@ class PrepareNotificationFlowTest
       )
     it(
       "returns a failed ProgressUpdate when a callback returns with a failed status code") {
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          forAll(failedStatusCodes) {
-            (responseStatus: Int, expectedMsg: String) =>
-              val id = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
-              val callbackResult = createCallbackResultWith(
-                id = id,
-                response = HttpResponse(responseStatus))
+      withMaterializer { implicit materializer =>
+        forAll(failedStatusCodes) {
+          (responseStatus: Int, expectedMsg: String) =>
+            val id = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
+            val callbackResult = createCallbackResultWith(
+              id = id,
+              response = HttpResponse(responseStatus))
 
-              val eventualResult =
-                Source
-                  .single(callbackResult)
-                  .via(PrepareNotificationFlow())
-                  .runWith(Sink.seq)(materializer)
+            val eventualResult =
+              Source
+                .single(callbackResult)
+                .via(PrepareNotificationFlow())
+                .runWith(Sink.seq)
 
-              whenReady(eventualResult) { result =>
-                inside(result.head) {
-                  case ProgressCallbackStatusUpdate(
-                      actualId,
-                      callbackStatus,
-                      List(progressEvent)) =>
-                    actualId shouldBe id
-                    progressEvent.description shouldBe expectedMsg
-                    callbackStatus shouldBe Callback.Failed
-                    assertRecent(progressEvent.createdDate)
-                }
+            whenReady(eventualResult) { result =>
+              inside(result.head) {
+                case ProgressCallbackStatusUpdate(
+                    actualId,
+                    callbackStatus,
+                    List(progressEvent)) =>
+                  actualId shouldBe id
+                  progressEvent.description shouldBe expectedMsg
+                  callbackStatus shouldBe Callback.Failed
+                  assertRecent(progressEvent.createdDate)
               }
-          }
+            }
         }
       }
     }
 
     it("returns a failed ProgressUpdate when a callback fails") {
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          val id = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
-          val callbackResult = createFailedCallbackResultWith(
-            id = id,
-            exception = new RuntimeException("Callback exception"))
+      withMaterializer { implicit materializer =>
+        val id = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
+        val callbackResult = createFailedCallbackResultWith(
+          id = id,
+          exception = new RuntimeException("Callback exception"))
 
-          val eventualResult =
-            Source
-              .single(callbackResult)
-              .via(PrepareNotificationFlow())
-              .runWith(Sink.seq)(materializer)
+        val eventualResult =
+          Source
+            .single(callbackResult)
+            .via(PrepareNotificationFlow())
+            .runWith(Sink.seq)
 
-          whenReady(eventualResult) { result =>
-            inside(result.head) {
-              case ProgressCallbackStatusUpdate(
-                  actualId,
-                  callbackStatus,
-                  List(progressEvent)) =>
-                actualId shouldBe id
-                progressEvent.description shouldBe "Callback failed for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe (Callback exception)"
-                callbackStatus shouldBe Callback.Failed
-                assertRecent(progressEvent.createdDate)
-            }
+        whenReady(eventualResult) { result =>
+          inside(result.head) {
+            case ProgressCallbackStatusUpdate(
+                actualId,
+                callbackStatus,
+                List(progressEvent)) =>
+              actualId shouldBe id
+              progressEvent.description shouldBe "Callback failed for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe (Callback exception)"
+              callbackStatus shouldBe Callback.Failed
+              assertRecent(progressEvent.createdDate)
           }
         }
       }
     }
 
     it("returns a failed ProgressUpdate when a callback returns nothing") {
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          val id = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
-          val callbackResult = createEmptyCallbackResultWith(id = id)
+      withMaterializer { implicit materializer =>
+        val id = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
+        val callbackResult = createEmptyCallbackResultWith(id = id)
 
-          val eventualResult =
-            Source
-              .single(callbackResult)
-              .via(PrepareNotificationFlow())
-              .runWith(Sink.seq)(materializer)
+        val eventualResult =
+          Source
+            .single(callbackResult)
+            .via(PrepareNotificationFlow())
+            .runWith(Sink.seq)
 
-          whenReady(eventualResult) { result =>
-            inside(result.head) {
-              case ProgressCallbackStatusUpdate(
-                  actualId,
-                  callbackStatus,
-                  List(progressEvent)) =>
-                actualId shouldBe id
-                progressEvent.description shouldBe "Unexpected callback failure for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe"
-                callbackStatus shouldBe Callback.Failed
-                assertRecent(progressEvent.createdDate)
-            }
+        whenReady(eventualResult) { result =>
+          inside(result.head) {
+            case ProgressCallbackStatusUpdate(
+                actualId,
+                callbackStatus,
+                List(progressEvent)) =>
+              actualId shouldBe id
+              progressEvent.description shouldBe "Unexpected callback failure for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe"
+              callbackStatus shouldBe Callback.Failed
+              assertRecent(progressEvent.createdDate)
           }
         }
       }

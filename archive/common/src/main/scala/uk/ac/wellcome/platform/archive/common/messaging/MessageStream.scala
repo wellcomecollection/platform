@@ -9,21 +9,21 @@ import akka.stream.alpakka.sqs.scaladsl.{AckResult, SqsAckFlow, SqsSource}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
 
-class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
-                                    sqsClient: AmazonSQSAsync,
-                                    sqsConfig: SQSConfig,
-                                    metricsSender: MetricsSender)
+import scala.concurrent.ExecutionContextExecutor
+
+class MessageStream[T, R](
+  sqsClient: AmazonSQSAsync,
+  sqsConfig: SQSConfig,
+  metricsSender: MetricsSender)(implicit val actorSystem: ActorSystem)
     extends Logging {
 
-  implicit val system = actorSystem
-  implicit val dispatcher = system.dispatcher
+  implicit val dispatcher: ExecutionContextExecutor = actorSystem.dispatcher
 
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val ackFlow: Flow[(Message, MessageAction), AckResult, NotUsed] =

@@ -9,9 +9,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.Archivist
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  ArchiveMessaging,
+  FileEntry
+}
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{
   BagInfo,
   IngestBagRequest,
@@ -24,6 +26,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait ArchivistFixtures
     extends Messaging
     with ZipBagItFixture
+    with ArchiveMessaging
     with BagUploaderConfigGenerators
     with IngestBagRequestGenerators {
 
@@ -83,27 +86,24 @@ trait ArchivistFixtures
                  queuePair: QueuePair,
                  registrarTopic: Topic,
                  progressTopic: Topic)(testWith: TestWith[Archivist, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        val archivist = new Archivist(
-          s3Client = s3Client,
-          snsClient = snsClient,
-          messageStream = new MessageStream[NotificationMessage, Unit](
-            actorSystem = actorSystem,
-            sqsClient = asyncSqsClient,
-            sqsConfig = createSQSConfigWith(queuePair.queue),
-            metricsSender = metricsSender
-          ),
-          bagUploaderConfig = createBagUploaderConfigWith(storageBucket),
-          snsRegistrarConfig = createSNSConfigWith(registrarTopic),
-          snsProgressConfig = createSNSConfigWith(progressTopic)
-        )(
-          actorSystem = actorSystem
-        )
+        withArchiveMessageStream[NotificationMessage, Unit, R](
+          queuePair.queue,
+          metricsSender) { messageStream =>
+          val archivist = new Archivist(
+            s3Client = s3Client,
+            snsClient = snsClient,
+            messageStream = messageStream,
+            bagUploaderConfig = createBagUploaderConfigWith(storageBucket),
+            snsRegistrarConfig = createSNSConfigWith(registrarTopic),
+            snsProgressConfig = createSNSConfigWith(progressTopic)
+          )
 
-        archivist.run()
+          archivist.run()
 
-        testWith(archivist)
+          testWith(archivist)
+        }
       }
     }
 

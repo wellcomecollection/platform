@@ -124,8 +124,8 @@ class MiroTransformerFeatureTest
   def withWorkerService[R](topic: Topic, bucket: Bucket, queue: Queue)(
     testWith: TestWith[MiroTransformerWorkerService, R]): R =
     withMiroVHSRecordReceiver(topic, bucket) { recordReceiver =>
-      withActorSystem { actorSystem =>
-        withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+      withActorSystem { implicit actorSystem =>
+        withSQSStream[NotificationMessage, R](queue) { sqsStream =>
           val workerService = new MiroTransformerWorkerService(
             vhsRecordReceiver = recordReceiver,
             miroTransformer = new MiroTransformableTransformer,

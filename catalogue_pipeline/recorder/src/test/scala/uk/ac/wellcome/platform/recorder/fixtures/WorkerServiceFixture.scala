@@ -26,16 +26,15 @@ trait WorkerServiceFixture
     storageBucket: Bucket,
     topic: Topic,
     queue: Queue)(testWith: TestWith[RecorderWorkerService, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withSNSWriter(topic) { snsWriter =>
           withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
             bucket = storageBucket,
             table = table) { versionedHybridStore =>
             withMessageStream[TransformedBaseWork, R](
-              actorSystem,
-              queue,
-              metricsSender) { messageStream =>
+              queue = queue,
+              metricsSender = metricsSender) { messageStream =>
               val workerService = new RecorderWorkerService(
                 versionedHybridStore = versionedHybridStore,
                 messageStream = messageStream,

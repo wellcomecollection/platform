@@ -14,18 +14,18 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MessageStream[T](actorSystem: ActorSystem,
-                       sqsClient: AmazonSQSAsync,
+class MessageStream[T](sqsClient: AmazonSQSAsync,
                        sqsConfig: SQSConfig,
                        metricsSender: MetricsSender)(
-  implicit objectStore: ObjectStore[T],
+  implicit actorSystem: ActorSystem,
+  objectStore: ObjectStore[T],
   ec: ExecutionContext) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
     sqsClient = sqsClient,
     sqsConfig = sqsConfig,
     metricsSender = metricsSender
-  )(actorSystem = actorSystem)
+  )
 
   def runStream(
     streamName: String,

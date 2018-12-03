@@ -20,14 +20,13 @@ class ElasticsearchSourceTest
     with WorksGenerators {
 
   it("outputs the entire content of the index") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { actorMaterialiser =>
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withLocalElasticsearchIndex { indexName =>
-          implicit val materialiser = actorMaterialiser
           val works = createIdentifiedWorks(count = 10)
           insertIntoElasticsearch(indexName, works: _*)
 
-          withSource(actorSystem, indexName) { source =>
+          withSource(indexName) { source =>
             val future = source.runWith(Sink.seq)
 
             whenReady(future) { result =>
@@ -40,17 +39,16 @@ class ElasticsearchSourceTest
   }
 
   it("filters non visible works") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { actorMaterialiser =>
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
         withLocalElasticsearchIndex { indexName =>
-          implicit val materialiser = actorMaterialiser
           val visibleWorks = createIdentifiedWorks(count = 10)
           val invisibleWorks = createIdentifiedInvisibleWorks(count = 3)
 
           val works = visibleWorks ++ invisibleWorks
           insertIntoElasticsearch(indexName, works: _*)
 
-          withSource(actorSystem, indexName) { source =>
+          withSource(indexName) { source =>
             val future = source.runWith(Sink.seq)
 
             whenReady(future) { result =>
@@ -62,13 +60,13 @@ class ElasticsearchSourceTest
     }
   }
 
-  private def withSource[R](actorSystem: ActorSystem, indexName: String)(
-    testWith: TestWith[Source[IdentifiedWork, NotUsed], R]): R = {
+  private def withSource[R](indexName: String)(
+    testWith: TestWith[Source[IdentifiedWork, NotUsed], R])(
+    implicit actorSystem: ActorSystem): R = {
     val source = ElasticsearchWorksSource(
       elasticClient = elasticClient,
       indexName = indexName,
-      documentType = documentType)(actorSystem)
+      documentType = documentType)
     testWith(source)
   }
-
 }
