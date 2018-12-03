@@ -131,7 +131,7 @@ class IngestorWorkerServiceTest
 
     val work = createIdentifiedWork
 
-    withLocalElasticsearchIndex { indexName =>
+    withLocalWorksIndex { indexName =>
       withLocalSqsQueueAndDlq {
         case QueuePair(queue, dlq) =>
           withWorkerService(queue, indexName) { _ =>
@@ -177,7 +177,7 @@ class IngestorWorkerServiceTest
 
   private def assertWorksIndexedCorrectly(
     works: IdentifiedBaseWork*): Assertion =
-    withLocalElasticsearchIndex { indexName =>
+    withLocalWorksIndex { indexName =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>
           withWorkerService(queue, indexName) { _ =>

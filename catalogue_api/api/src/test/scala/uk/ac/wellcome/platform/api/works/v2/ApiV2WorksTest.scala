@@ -202,7 +202,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("searches different indices with the ?_index query parameter") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
-        withLocalElasticsearchIndex { otherIndex =>
+        withLocalWorksIndex { otherIndex =>
           val work = createIdentifiedWork
           insertIntoElasticsearch(indexNameV2, work)
 
@@ -246,7 +246,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("looks up works in different indices with the ?_index query parameter") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
-        withLocalElasticsearchIndex { otherIndex =>
+        withLocalWorksIndex { otherIndex =>
           val work = createIdentifiedWorkWith(
             title = "Playing with pangolins"
           )
