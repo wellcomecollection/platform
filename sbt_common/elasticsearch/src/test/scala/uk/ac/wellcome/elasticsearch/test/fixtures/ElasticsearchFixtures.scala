@@ -84,7 +84,7 @@ trait ElasticsearchFixtures
     indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
     elasticsearchIndexCreator
       .create(
-        indexName = indexName,
+        index = Index(name = indexName),
         mappingDefinition = index.buildMappingDefinition(documentType)
       )
       .await

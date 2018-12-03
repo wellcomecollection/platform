@@ -1,5 +1,6 @@
 package uk.ac.wellcome.elasticsearch
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.http.ElasticDsl.{createIndex, _}
 import com.sksamuel.elastic4s.http.index.CreateIndexResponse
@@ -13,11 +14,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
   implicit ec: ExecutionContext)
     extends Logging {
-  def create(indexName: String,
+  def create(index: Index,
              mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
       .execute {
-        createIndex(indexName).mappings {
+        createIndex(index.name).mappings {
           mappingDefinition
         }
       }
@@ -25,11 +26,11 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
         if (response.isError) {
           if (response.error.`type` == "resource_already_exists_exception") {
             info(s"Index $indexName already exists")
-            update(indexName, mappingDefinition = mappingDefinition)
+            update(index, mappingDefinition = mappingDefinition)
           } else {
             Future.failed(
               throw new RuntimeException(
-                s"Failed creating index $indexName: ${response.error}"
+                s"Failed creating index $index: ${response.error}"
               )
             )
           }
@@ -41,22 +42,22 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
         info("Index updated successfully")
       }
 
-  private def update(indexName: String, mappingDefinition: MappingDefinition)
+  private def update(index: Index, mappingDefinition: MappingDefinition)
     : Future[Response[PutMappingResponse]] =
     elasticClient
       .execute {
-        putMapping(indexName / mappingDefinition.`type`)
+        putMapping(index.name / mappingDefinition.`type`)
           .dynamic(mappingDefinition.dynamic.getOrElse(DynamicMapping.Strict))
           .as(mappingDefinition.fields)
       }
       .recover {
         case e: Throwable =>
-          error(s"Failed updating index $indexName", e)
+          error(s"Failed updating index $index", e)
           throw e
       }
       .map { response: Response[PutMappingResponse] =>
         if (response.isError) {
-          throw new RuntimeException(s"Failed updating index: $response")
+          throw new RuntimeException(s"Failed updating index $index: $response")
         }
         response
       }
