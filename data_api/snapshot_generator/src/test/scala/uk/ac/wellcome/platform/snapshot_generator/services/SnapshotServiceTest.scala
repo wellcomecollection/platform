@@ -72,8 +72,8 @@ class SnapshotServiceTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withS3AkkaClient { s3Client =>
-          withLocalElasticsearchIndex { indexNameV1 =>
-            withLocalElasticsearchIndex { indexNameV2 =>
+          withLocalWorksIndex { indexNameV1 =>
+            withLocalWorksIndex { indexNameV2 =>
               withLocalS3Bucket { bucket =>
                 withSnapshotService(s3Client, indexNameV1, indexNameV2) {
                   snapshotService =>

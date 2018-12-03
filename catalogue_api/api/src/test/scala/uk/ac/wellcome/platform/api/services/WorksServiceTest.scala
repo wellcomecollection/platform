@@ -98,7 +98,7 @@ class WorksServiceTest
 
   describe("findWorkById") {
     it("gets a DisplayWork by id") {
-      withLocalElasticsearchIndex { indexName =>
+      withLocalWorksIndex { indexName =>
         withElasticsearchService { searchService =>
           withWorksService(searchService) { worksService =>
             val work = createIdentifiedWork
@@ -121,7 +121,7 @@ class WorksServiceTest
     }
 
     it("returns a future of None if it cannot get a record by id") {
-      withLocalElasticsearchIndex { indexName =>
+      withLocalWorksIndex { indexName =>
         withElasticsearchService { searchService =>
           withWorksService(searchService) { worksService =>
             val documentOptions =
@@ -267,7 +267,7 @@ class WorksServiceTest
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions
   ): Assertion =
-    withLocalElasticsearchIndex { indexName =>
+    withLocalWorksIndex { indexName =>
       withElasticsearchService { searchService =>
         withWorksService(searchService) { worksService =>
           if (!allWorks.isEmpty) {

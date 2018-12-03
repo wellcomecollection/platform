@@ -64,8 +64,8 @@ trait ElasticsearchFixtures
     ),
     implicitly[Position])
 
-  def withLocalElasticsearchIndex[R](testWith: TestWith[String, R]): R =
-    withLocalElasticsearchIndex(WorksIndex) { indexName =>
+  def withLocalWorksIndex[R](testWith: TestWith[String, R]): R =
+    withLocalElasticsearchIndex[R](WorksIndex) { indexName =>
       testWith(indexName)
     }
 
@@ -74,9 +74,8 @@ trait ElasticsearchFixtures
   )
 
   def withLocalElasticsearchIndex[R](
-                                      index: MappingDefinitionBuilder,
-                                      indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
-
+    index: MappingDefinitionBuilder,
+    indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
     elasticsearchIndexCreator
       .create(
         indexName = indexName,
