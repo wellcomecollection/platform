@@ -23,7 +23,7 @@ object Main extends App with Logging {
     AkkaBuilder.buildExecutionContext()
 
   val workerService = new IngestorWorkerService(
-    elasticClient = ElasticBuilder.buildHttpClient(config),
+    elasticClient = ElasticBuilder.buildElasticClient(config),
     ingestorConfig = IngestorConfigBuilder.buildIngestorConfig(config),
     messageStream =
       MessagingBuilder.buildMessageStream[IdentifiedBaseWork](config)
