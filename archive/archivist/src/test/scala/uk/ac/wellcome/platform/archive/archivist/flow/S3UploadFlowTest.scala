@@ -18,7 +18,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
 
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Random, Try}
 
 class S3UploadFlowTest
     extends FunSpec
@@ -80,8 +80,7 @@ class S3UploadFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          val res = Array.fill(23 * 1024 * 1024)(
-            (scala.util.Random.nextInt(256) - 128).toByte)
+          val res = createBytesWith(length = 23 * 1024 * 1024)
 
           val s3Key = "key.txt"
 
@@ -111,8 +110,7 @@ class S3UploadFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          val res = Array.fill(23 * 1024 * 1024)(
-            (scala.util.Random.nextInt(256) - 128).toByte)
+          val res = createBytesWith(length = 23 * 1024 * 1024)
           val s3Key = "key.txt"
           val futureResult = Source
           // one bytestring of 23MB
@@ -141,14 +139,9 @@ class S3UploadFlowTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withLocalS3Bucket { bucket =>
-          val smallArray1 =
-            Array.fill(1024)((scala.util.Random.nextInt(256) - 128).toByte)
-
-          val bigArray = Array.fill(23 * 1024 * 1024)(
-            (scala.util.Random.nextInt(256) - 128).toByte)
-
-          val smallArray2 =
-            Array.fill(1024)((scala.util.Random.nextInt(256) - 128).toByte)
+          val smallArray1 = createBytesWith(length = 1024)
+          val bigArray = createBytesWith(length = 23 * 1024 * 1024)
+          val smallArray2 = createBytesWith(length = 1024)
 
           val s3Key = "key.txt"
           val futureResult = Source(
@@ -282,4 +275,6 @@ class S3UploadFlowTest
     }
   }
 
+  private def createBytesWith(length: Int): Array[Byte] =
+    Array.fill(length)((Random.nextInt(256) - 128).toByte)
 }

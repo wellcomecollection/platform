@@ -84,7 +84,7 @@ trait ProgressAsyncFixture
     testWith: TestWith[(QueuePair, Topic, Table, ProgressAsync), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15) { qPair =>
       withLocalSnsTopic { topic =>
-        withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+        withProgressTrackerTable { table =>
           withApp(qPair, topic, table) { progressAsync =>
             testWith((qPair, topic, table, progressAsync))
           }

@@ -5,14 +5,13 @@ import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.util.Random
 
 trait LocalProgressTrackerDynamoDb extends LocalDynamoDb {
-  def createTable(table: LocalDynamoDb.Table): Table = Table("table", "index")
-
-  def createProgressTrackerTable(
-    dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
+  private def createProgressTrackerTable(
+    dynamoDbClient: AmazonDynamoDB): Table = {
     val tableName = Random.alphanumeric.take(10).mkString
     val tableIndex = Random.alphanumeric.take(10).mkString
     val table = Table(tableName, tableIndex)
@@ -38,4 +37,9 @@ trait LocalProgressTrackerDynamoDb extends LocalDynamoDb {
     }
     table
   }
+
+  def withProgressTrackerTable[R](testWith: TestWith[Table, R]): R =
+    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+      testWith(table)
+    }
 }

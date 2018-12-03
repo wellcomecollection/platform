@@ -16,7 +16,6 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   UploadDigestItemError
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.Akka
@@ -32,6 +31,8 @@ class UploadDigestItemFlowTest
     with ArchiveJobGenerators
     with Inside {
 
+  val flow = UploadDigestItemFlow(parallelism = 10)(s3Client)
+
   it(
     "sends a right of archive item job when uploading a file from an archive item job succeeds") {
     withLocalS3Bucket { bucket =>
@@ -44,18 +45,14 @@ class UploadDigestItemFlowTest
             val digest =
               "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
 
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
-
-            val archiveItemJob = createArchiveDigestItemJob(
-              zipFile,
-              bucket,
-              digest,
-              bagIdentifier,
-              fileName)
+            val archiveItemJob = createArchiveDigestItemJobWith(
+              zipFile = zipFile,
+              bucket = bucket,
+              digest = digest,
+              s3Key = fileName
+            )
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -85,21 +82,16 @@ class UploadDigestItemFlowTest
 
           val fileName = "key.txt"
           withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-            val digest =
-              "wrong!"
+            val digest = "wrong!"
 
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
-
-            val archiveItemJob = createArchiveDigestItemJob(
-              zipFile,
-              bucket,
-              digest,
-              bagIdentifier,
-              fileName)
+            val archiveItemJob = createArchiveDigestItemJobWith(
+              zipFile = zipFile,
+              bucket = bucket,
+              digest = digest,
+              s3Key = fileName
+            )
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.head
 
             whenReady(futureResult) { result =>
@@ -126,21 +118,16 @@ class UploadDigestItemFlowTest
         withMaterializer(actorSystem) { implicit materializer =>
           withZipFile(List()) { zipFile =>
             val fileName = "key.txt"
-            val digest =
-              "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
+            val bagIdentifier = createExternalIdentifier
 
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
-
-            val archiveItemJob = createArchiveDigestItemJob(
-              zipFile,
-              bucket,
-              digest,
-              bagIdentifier,
-              fileName)
+            val archiveItemJob = createArchiveDigestItemJobWith(
+              zipFile = zipFile,
+              bucket = bucket,
+              bagIdentifier = bagIdentifier,
+              s3Key = fileName
+            )
 
             val source = Source.single(archiveItemJob)
-            val flow = UploadDigestItemFlow(10)(s3Client)
             val futureResult = source via flow runWith Sink.seq
 
             whenReady(futureResult) { result =>
@@ -169,27 +156,20 @@ class UploadDigestItemFlowTest
 
         val fileName = "key.txt"
         withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-          val digest =
-            "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
-
-          val bagIdentifier =
-            ExternalIdentifier(randomAlphanumeric())
-
-          val failingArchiveItemJob = createArchiveDigestItemJob(
-            zipFile,
-            Bucket("does-not-exist"),
-            digest,
-            bagIdentifier,
-            fileName)
+          val failingArchiveItemJob = createArchiveDigestItemJobWith(
+            zipFile = zipFile,
+            bucket = Bucket("does-not-exist"),
+            s3Key = fileName
+          )
 
           val source = Source.single(failingArchiveItemJob)
           val decider: Supervision.Decider = { e =>
             error("Stream failure", e)
             Supervision.Resume
           }
-          val flow = UploadDigestItemFlow(10)(s3Client)
+          val modifiedFlow = flow
             .withAttributes(ActorAttributes.supervisionStrategy(decider))
-          val futureResult = source via flow runWith Sink.seq
+          val futureResult = source via modifiedFlow runWith Sink.seq
 
           whenReady(futureResult) { result =>
             inside(result.toList) {

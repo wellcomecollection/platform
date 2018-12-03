@@ -26,21 +26,21 @@ trait RegistrarFixtures
     queuePair: QueuePair,
     storageBucket: Bucket,
     archiveRequestId: UUID = randomUUID,
-    storageSpace: StorageSpace = randomStorageSpace
-  )(testWith: TestWith[(BagLocation, BagInfo), R]): R =
-    withBag(storageBucket) {
-      case (bagLocation, bagInfo) =>
-        val archiveComplete = ArchiveComplete(
-          archiveRequestId = archiveRequestId,
-          space = storageSpace,
-          bagLocation = bagLocation
-        )
+    storageSpace: StorageSpace = randomStorageSpace,
+    bagInfo: BagInfo = randomBagInfo
+  )(testWith: TestWith[BagLocation, R]): R =
+    withBag(storageBucket, bagInfo = bagInfo) { bagLocation =>
+      val archiveComplete = ArchiveComplete(
+        archiveRequestId = archiveRequestId,
+        space = storageSpace,
+        bagLocation = bagLocation
+      )
 
-        sendNotificationToSQS(
-          queuePair.queue,
-          archiveComplete
-        )
-        testWith((bagLocation, bagInfo))
+      sendNotificationToSQS(
+        queuePair.queue,
+        archiveComplete
+      )
+      testWith(bagLocation)
     }
 
   override def createTable(table: Table) = {

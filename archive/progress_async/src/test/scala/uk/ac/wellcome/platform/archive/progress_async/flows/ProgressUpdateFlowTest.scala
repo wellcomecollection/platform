@@ -29,12 +29,12 @@ class ProgressUpdateFlowTest
     with ScalaFutures {
 
   it("adds an event to a monitor with none") {
-    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+    withProgressTrackerTable { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
-              val progress = createProgress()
+              val progress = createProgress
               whenReady(monitor.initialise(progress)) {
                 _ =>
                   val update =
@@ -49,10 +49,7 @@ class ProgressUpdateFlowTest
                     .runWith(Sink.ignore)(materializer)
 
                   whenReady(updates) { _ =>
-                    assertProgressCreated(
-                      progress.id,
-                      progress.sourceLocation,
-                      table)
+                    assertProgressCreated(progress, table)
 
                     assertProgressRecordedRecentEvents(
                       update.id,
@@ -67,7 +64,7 @@ class ProgressUpdateFlowTest
   }
 
   it("adds multiple events to a monitor") {
-    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+    withProgressTrackerTable { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
           withActorSystem(actorSystem => {
@@ -92,10 +89,7 @@ class ProgressUpdateFlowTest
                 .runWith(Sink.ignore)(materializer)
 
               whenReady(futureUpdates) { _ =>
-                assertProgressCreated(
-                  progress.id,
-                  progress.sourceLocation,
-                  table)
+                assertProgressCreated(progress, table)
 
                 assertProgressRecordedRecentEvents(
                   progress.id,
@@ -109,9 +103,9 @@ class ProgressUpdateFlowTest
   }
 
   it("continues on failure") {
-    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+    withProgressTrackerTable { table =>
       withProgressUpdateFlow(table) {
-        case (flow, monitor) =>
+        case (flow, _) =>
           withActorSystem(actorSystem => {
             withMaterializer(actorSystem)(materializer => {
               val id = randomUUID

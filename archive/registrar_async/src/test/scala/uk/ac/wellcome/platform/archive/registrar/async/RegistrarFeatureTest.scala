@@ -51,42 +51,47 @@ class RegistrarFeatureTest
         val requestId = randomUUID
         val storageSpace = randomStorageSpace
         val createdAfterDate = Instant.now()
+        val bagInfo = randomBagInfo
 
-        withBagNotification(queuePair, storageBucket, requestId, storageSpace) {
-          case (bagLocation, bagInfo) =>
-            val bagId = BagId(
-              space = storageSpace,
-              externalIdentifier = bagInfo.externalIdentifier
-            )
+        withBagNotification(
+          queuePair,
+          storageBucket,
+          requestId,
+          storageSpace,
+          bagInfo = bagInfo) { bagLocation =>
+          val bagId = BagId(
+            space = storageSpace,
+            externalIdentifier = bagInfo.externalIdentifier
+          )
 
-            eventually {
-              val futureMaybeManifest = vhs.getRecord(bagId.toString)
+          eventually {
+            val futureMaybeManifest = vhs.getRecord(bagId.toString)
 
-              whenReady(futureMaybeManifest) { maybeStorageManifest =>
-                maybeStorageManifest shouldBe defined
+            whenReady(futureMaybeManifest) { maybeStorageManifest =>
+              maybeStorageManifest shouldBe defined
 
-                val storageManifest = maybeStorageManifest.get
+              val storageManifest = maybeStorageManifest.get
 
-                assertStorageManifest(storageManifest)(
-                  expectedStorageSpace = bagId.space,
-                  expectedBagInfo = bagInfo,
-                  expectedNamespace = storageBucket.name,
-                  expectedPath =
-                    s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
-                  filesNumber = 1,
-                  createdDateAfter = createdAfterDate
-                )
+              assertStorageManifest(storageManifest)(
+                expectedStorageSpace = bagId.space,
+                expectedBagInfo = bagInfo,
+                expectedNamespace = storageBucket.name,
+                expectedPath =
+                  s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
+                filesNumber = 1,
+                createdDateAfter = createdAfterDate
+              )
 
-                assertTopicReceivesProgressStatusUpdate(
-                  requestId,
-                  progressTopic,
-                  Progress.Completed,
-                  Some(bagId)) { events =>
-                  events should have size 1
-                  events.head.description shouldBe "Bag registered successfully"
-                }
+              assertTopicReceivesProgressStatusUpdate(
+                requestId,
+                progressTopic,
+                Progress.Completed,
+                expectedBag = Some(bagId)) { events =>
+                events should have size 1
+                events.head.description shouldBe "Bag registered successfully"
               }
             }
+          }
         }
     }
   }
@@ -117,8 +122,7 @@ class RegistrarFeatureTest
           assertTopicReceivesProgressStatusUpdate(
             requestId,
             progressTopic,
-            Progress.Failed,
-            None) { events =>
+            Progress.Failed) { events =>
             events should have size 1
             events.head.description should startWith(
               "There was an exception while downloading object")
