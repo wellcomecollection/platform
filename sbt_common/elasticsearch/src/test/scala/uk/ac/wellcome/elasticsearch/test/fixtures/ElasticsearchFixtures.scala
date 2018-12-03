@@ -58,11 +58,6 @@ trait ElasticsearchFixtures
   def withLocalElasticsearchIndex[R](testWith: TestWith[String, R]): R = {
     val indexName = createIndexName
 
-    val elasticConfig = createDisplayElasticConfigWith(
-      indexV1name = indexName,
-      indexV2name = s"$indexName-v2"
-    )
-
     val index = new WorksIndex(
       client = elasticClient,
       indexName = indexName
