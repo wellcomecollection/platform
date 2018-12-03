@@ -9,7 +9,7 @@ module "service" {
   container_image    = "${var.reindex_worker_container_image}"
   security_group_ids = ["${var.service_egress_security_group_id}"]
 
-  cpu    = 256
+  cpu    = 512
   memory = 1024
 
   env_vars = {
@@ -31,5 +31,5 @@ module "service" {
 
   launch_type = "FARGATE"
 
-  max_capacity = 5
+  max_capacity = 7
 }
