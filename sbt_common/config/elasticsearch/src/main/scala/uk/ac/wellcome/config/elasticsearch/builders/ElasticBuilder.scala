@@ -25,7 +25,7 @@ object ElasticBuilder {
   def buildElasticConfig(config: Config): DisplayElasticConfig =
     DisplayElasticConfig(
       documentType = config.getOrElse[String]("es.type")(default = "item"),
-      indexV1name = config.required[String]("es.index.v1"),
-      indexV2name = config.required[String]("es.index.v2")
+      indexNameV1 = config.required[String]("es.index.v1"),
+      indexNameV2 = config.required[String]("es.index.v2")
     )
 }

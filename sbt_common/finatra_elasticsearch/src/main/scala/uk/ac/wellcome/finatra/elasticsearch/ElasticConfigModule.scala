@@ -8,15 +8,15 @@ object ElasticConfigModule extends TwitterModule {
   private val documentType =
     flag[String]("es.type", "item", "document type in Elasticsearch")
 
-  private val indexV1name = flag[String]("es.index.v1", "V1 ES index name")
-  private val indexV2name = flag[String]("es.index.v2", "V2 ES index name")
+  private val indexNameV1 = flag[String]("es.index.v1", "V1 ES index name")
+  private val indexNameV2 = flag[String]("es.index.v2", "V2 ES index name")
 
   @Singleton
   @Provides
   def providesElasticConfig(): DisplayElasticConfig =
     DisplayElasticConfig(
       documentType = documentType(),
-      indexV1name = indexV1name(),
-      indexV2name = indexV2name()
+      indexNameV1 = indexNameV1(),
+      indexNameV2 = indexNameV2()
     )
 }

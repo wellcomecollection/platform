@@ -179,12 +179,12 @@ trait ElasticsearchFixtures
   }
 
   def createDisplayElasticConfigWith(
-    indexV1name: String,
-    indexV2name: String): DisplayElasticConfig =
+    indexNameV1: String,
+    indexNameV2: String): DisplayElasticConfig =
     DisplayElasticConfig(
       documentType = documentType,
-      indexV1name = indexV1name,
-      indexV2name = indexV2name
+      indexNameV1 = indexNameV1,
+      indexNameV2 = indexNameV2
     )
 
   private def createIndexName: String =

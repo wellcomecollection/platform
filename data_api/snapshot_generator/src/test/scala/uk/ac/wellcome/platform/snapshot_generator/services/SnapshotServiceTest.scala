@@ -53,8 +53,8 @@ class SnapshotServiceTest
     indexNameV2: String)(testWith: TestWith[SnapshotService, R])(
     implicit actorSystem: ActorSystem): R = {
     val elasticConfig = createDisplayElasticConfigWith(
-      indexV1name = indexNameV1,
-      indexV2name = indexNameV2
+      indexNameV1 = indexNameV1,
+      indexNameV2 = indexNameV2
     )
 
     val snapshotService = new SnapshotService(
