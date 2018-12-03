@@ -18,7 +18,7 @@ trait CustomElasticsearchMapping {
   class OnlyInvisibleWorksIndex(elasticClient: HttpClient, documentType: String)(
     implicit val ec: ExecutionContext)
       extends ElasticsearchIndex {
-    val httpClient: HttpClient = elasticClient
+    val elasticClient: HttpClient = elasticClient
 
     def sourceIdentifierFields = Seq(
       keywordField("ontologyType"),

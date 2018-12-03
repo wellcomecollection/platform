@@ -24,5 +24,4 @@ class ElasticsearchExceptionManagerTest
         "index_not_found_exception")
     }
   }
-
 }

@@ -1,20 +1,18 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.analyzers._
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import grizzled.slf4j.Logging
 
 import scala.concurrent.ExecutionContext
 
-class WorksIndex(client: HttpClient, rootIndexType: String)(
+class WorksIndex(val elasticClient: ElasticClient, rootIndexType: String)(
   implicit val ec: ExecutionContext)
     extends ElasticsearchIndex
     with Logging {
-
-  val httpClient: HttpClient = client
 
   val license = objectField("license").fields(
     keywordField("id")

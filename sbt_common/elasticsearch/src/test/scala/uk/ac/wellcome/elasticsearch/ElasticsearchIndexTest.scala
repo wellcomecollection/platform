@@ -1,14 +1,15 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.concurrent.ExecutionContext
@@ -44,7 +45,6 @@ class ElasticsearchIndexTest
   val testType = "thing"
 
   object TestIndex extends ElasticsearchIndex {
-    val httpClient: HttpClient = elasticClient
     val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
@@ -57,7 +57,7 @@ class ElasticsearchIndexTest
   }
 
   object CompatibleTestIndex extends ElasticsearchIndex {
-    val httpClient: HttpClient = elasticClient
+    val elasticClient: ElasticClient = elasticClient
     val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
@@ -79,13 +79,18 @@ class ElasticsearchIndexTest
         for {
           _ <- elasticClient.execute(
             indexInto(indexName / testType).doc(testObjectJson))
-          hits <- elasticClient
-            .execute(search(s"$indexName/$testType").matchAllQuery())
-            .map { _.hits.hits }
+          response: Response[SearchResponse] <- elasticClient
+            .execute {
+              search(s"$indexName/$testType").matchAllQuery()
+            }
         } yield {
+          val hits = response.result.hits.hits
           hits should have size 1
 
-          assertJsonStringsAreEqual(hits.head.sourceAsString, testObjectJson)
+          assertJsonStringsAreEqual(
+            hits.head.sourceAsString,
+            testObjectJson
+          )
         }
       }
     }
@@ -121,10 +126,13 @@ class ElasticsearchIndexTest
 
           whenReady(futureInsert) { _ =>
             eventually {
-              val hits = elasticClient
-                .execute(search(s"$testIndexName/$testType").matchAllQuery())
-                .map { _.hits.hits }
+              val response: Response[SearchResponse] = elasticClient
+                .execute {
+                  search(s"$testIndexName/$testType").matchAllQuery()
+                }
                 .await
+
+              val hits = response.result.hits.hits
 
               hits should have size 1
 

@@ -23,7 +23,7 @@ class IngestorWorkerService(elasticClient: HttpClient,
   )
 
   val worksIndex = new WorksIndex(
-    client = elasticClient,
+    elasticClient = elasticClient,
     rootIndexType = ingestorConfig.elasticConfig.documentType
   )
 
