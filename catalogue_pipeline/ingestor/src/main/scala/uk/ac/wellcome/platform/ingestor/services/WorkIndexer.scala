@@ -1,25 +1,20 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import com.sksamuel.elastic4s.Indexable
+import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
 import grizzled.slf4j.Logging
-import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedBaseWork,
-  IdentifiedInvisibleWork,
-  IdentifiedRedirectedWork,
-  IdentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedInvisibleWork, IdentifiedRedirectedWork, IdentifiedWork}
 import uk.ac.wellcome.json.JsonUtil._
-import scala.language.implicitConversions
 
+import scala.language.implicitConversions
 import scala.concurrent.{ExecutionContext, Future}
 
 class WorkIndexer(
-  elasticClient: HttpClient
+  elasticClient: ElasticClient
 )(implicit ec: ExecutionContext)
     extends Logging
     with ElasticsearchExceptionManager {
@@ -40,7 +35,7 @@ class WorkIndexer(
     val inserts = works.map { work =>
       indexInto(indexName / documentType)
         .version(calculateEsVersion(work))
-        .versionType(VersionType.EXTERNAL_GTE)
+        .versionType(ExternalGte)
         .id(work.canonicalId)
         .doc(work)
     }
@@ -49,7 +44,8 @@ class WorkIndexer(
       .execute {
         bulk(inserts)
       }
-      .map { bulkResponse: BulkResponse =>
+      .map { response: Response[BulkResponse] =>
+        val bulkResponse = response.result
         val actualFailures = bulkResponse.failures.filterNot {
           isVersionConflictException
         }
