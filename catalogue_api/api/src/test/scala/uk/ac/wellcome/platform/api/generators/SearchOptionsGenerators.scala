@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.api.generators
 import com.sksamuel.elastic4s.{Index, IndexAndType}
 import uk.ac.wellcome.platform.api.models.WorkFilter
 import uk.ac.wellcome.platform.api.services.{
-  ElasticsearchDocumentOptions,
   ElasticsearchQueryOptions,
   WorksSearchOptions
 }
@@ -15,13 +14,6 @@ trait SearchOptionsGenerators {
     IndexAndType(
       index = index.name,
       `type` = documentType
-    )
-
-  def createElasticsearchDocumentOptionsWith(
-    index: Index): ElasticsearchDocumentOptions =
-    ElasticsearchDocumentOptions(
-      index = index,
-      documentType = documentType
     )
 
   def createElasticsearchQueryOptionsWith(
