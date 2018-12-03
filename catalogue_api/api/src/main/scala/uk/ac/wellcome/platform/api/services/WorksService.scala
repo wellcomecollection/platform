@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
+import com.sksamuel.elastic4s.http.Response
+import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
@@ -25,7 +27,8 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
     : Future[Option[IdentifiedBaseWork]] =
     searchService
       .findResultById(canonicalId)(documentOptions)
-      .map { result =>
+      .map { response: Response[GetResponse] => response.result }
+      .map { result: GetResponse =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
         else None
@@ -56,10 +59,10 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
       from = (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize
     )
 
-  private def createResultList(searchResponse: SearchResponse): ResultList =
+  private def createResultList(searchResponse: Response[SearchResponse]): ResultList =
     ResultList(
-      results = searchResponseToWorks(searchResponse),
-      totalResults = searchResponse.totalHits
+      results = searchResponseToWorks(searchResponse.result),
+      totalResults = searchResponse.result.totalHits.toInt
     )
 
   private def searchResponseToWorks(

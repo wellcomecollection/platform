@@ -1,18 +1,13 @@
 package uk.ac.wellcome.elasticsearch.test.fixtures
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import org.elasticsearch.index.VersionType
 import org.scalactic.source.Position
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.{
-  DisplayElasticConfig,
-  ElasticClientBuilder,
-  ElasticsearchIndex,
-  WorksIndex
-}
+import uk.ac.wellcome.elasticsearch.{DisplayElasticConfig, ElasticClientBuilder, ElasticsearchIndex, WorksIndex}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -42,7 +37,7 @@ trait ElasticsearchFixtures
       "es.type" -> documentType
     )
 
-  val elasticClient: HttpClient = ElasticClientBuilder.create(
+  val elasticClient: ElasticClient = ElasticClientBuilder.create(
     hostname = esHost,
     port = esPort,
     protocol = "http",

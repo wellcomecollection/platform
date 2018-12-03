@@ -2,21 +2,13 @@ package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.searches.SearchDefinition
-import com.sksamuel.elastic4s.searches.queries.{
-  BoolQueryDefinition,
-  QueryDefinition
-}
-import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
-import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
-import uk.ac.wellcome.platform.api.models.{
-  ItemLocationTypeFilter,
-  WorkFilter,
-  WorkTypeFilter
-}
+import com.sksamuel.elastic4s.searches.queries.{BoolQuery, Query}
+import com.sksamuel.elastic4s.searches.queries.term.TermsQuery
+import com.sksamuel.elastic4s.searches.sort.FieldSort
+import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkFilter, WorkTypeFilter}
 
 import scala.concurrent.Future
 
@@ -32,10 +24,10 @@ case class ElasticsearchQueryOptions(
 )
 
 @Singleton
-class ElasticsearchService @Inject()(elasticClient: HttpClient) {
+class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
 
   def findResultById(canonicalId: String)(
-    documentOptions: ElasticsearchDocumentOptions): Future[GetResponse] =
+    documentOptions: ElasticsearchDocumentOptions): Future[Response[GetResponse]] =
     elasticClient
       .execute {
         get(canonicalId).from(
@@ -44,7 +36,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
 
   def listResults(sortByField: String)
     : (ElasticsearchDocumentOptions,
-       ElasticsearchQueryOptions) => Future[SearchResponse] =
+       ElasticsearchQueryOptions) => Future[Response[SearchResponse]] =
     executeSearch(
       maybeQueryString = None,
       sortByField = Some(sortByField)
@@ -52,7 +44,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
 
   def simpleStringQueryResults(queryString: String)
     : (ElasticsearchDocumentOptions,
-       ElasticsearchQueryOptions) => Future[SearchResponse] =
+       ElasticsearchQueryOptions) => Future[Response[SearchResponse]] =
     executeSearch(
       maybeQueryString = Some(queryString),
       sortByField = None
@@ -65,19 +57,19 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
     maybeQueryString: Option[String],
     sortByField: Option[String]
   )(documentOptions: ElasticsearchDocumentOptions,
-    queryOptions: ElasticsearchQueryOptions): Future[SearchResponse] = {
+    queryOptions: ElasticsearchQueryOptions): Future[Response[SearchResponse]] = {
     val queryDefinition = buildQuery(
       maybeQueryString = maybeQueryString,
       filters = queryOptions.filters
     )
 
-    val sortDefinitions: List[FieldSortDefinition] =
+    val sortDefinitions: List[FieldSort] =
       sortByField match {
         case Some(fieldName) => List(fieldSort(fieldName))
         case None            => List()
       }
 
-    val searchDefinition: SearchDefinition =
+    val searchDefinition =
       search(s"${documentOptions.indexName}/${documentOptions.documentType}")
         .query(queryDefinition)
         .sortBy(sortDefinitions)
@@ -89,7 +81,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
   }
 
   private def toTermQuery(
-    workFilter: WorkFilter): TermsQueryDefinition[String] =
+    workFilter: WorkFilter): TermsQuery[String] =
     workFilter match {
       case ItemLocationTypeFilter(itemLocationTypeIds) =>
         termsQuery(
@@ -100,13 +92,12 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
     }
 
   private def buildQuery(maybeQueryString: Option[String],
-                         filters: List[WorkFilter]): BoolQueryDefinition = {
+                         filters: List[WorkFilter]): BoolQuery = {
     val queries = List(
       maybeQueryString.map { simpleStringQuery }
     ).flatten
 
-    val filterDefinitions
-      : List[QueryDefinition] = filters.map { toTermQuery } :+ termQuery(
+    val filterDefinitions: List[Query] = filters.map { toTermQuery } :+ termQuery(
       "type",
       "IdentifiedWork")
 
