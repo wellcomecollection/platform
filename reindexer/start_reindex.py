@@ -132,12 +132,13 @@ def get_reindexer_topic_arn():
 
 def publish_messages(job_config_id, topic_arn, parameters):
     """Publish a sequence of messages to an SNS topic."""
+    sns = boto3.client("sns")
     for params in tqdm.tqdm(list(parameters)):
         to_publish = {
             "jobConfigId": job_config_id,
             "parameters": params
         }
-        resp = sns_client.publish(
+        resp = sns.publish(
             TopicArn=topic_arn,
             MessageStructure="json",
             Message=json.dumps({"default": json.dumps(to_publish)}),
