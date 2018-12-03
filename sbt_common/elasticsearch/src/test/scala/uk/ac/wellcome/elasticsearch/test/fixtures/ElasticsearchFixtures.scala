@@ -70,6 +70,11 @@ trait ElasticsearchFixtures
       testWith(indexName)
     }
 
+  def withLocalWorksIndex2[R](testWith: TestWith[Index, R]): R =
+    withLocalElasticsearchIndex[R](WorksIndex) { indexName =>
+      testWith(Index(name = indexName))
+    }
+
   private val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
     elasticClient = elasticClient
   )
@@ -179,14 +184,13 @@ trait ElasticsearchFixtures
     }
   }
 
-  // TODO: This method can use Index as a parameter
   def createDisplayElasticConfigWith(
-    indexNameV1: String,
-    indexNameV2: String): DisplayElasticConfig =
+    indexV1: Index,
+    indexV2: Index): DisplayElasticConfig =
     DisplayElasticConfig(
       documentType = documentType,
-      indexV1 = Index(name = indexNameV1),
-      indexV2 = Index(name = indexNameV2)
+      indexV1 = indexV1,
+      indexV2 = indexV2
     )
 
   private def createIndexName: String =

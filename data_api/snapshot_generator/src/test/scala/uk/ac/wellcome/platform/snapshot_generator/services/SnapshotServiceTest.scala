@@ -9,6 +9,7 @@ import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.sksamuel.elastic4s.Index
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
@@ -49,12 +50,12 @@ class SnapshotServiceTest
 
   private def withSnapshotService[R](
     s3AkkaClient: S3Client,
-    indexNameV1: String,
-    indexNameV2: String)(testWith: TestWith[SnapshotService, R])(
+    indexV1: Index,
+    indexV2: Index)(testWith: TestWith[SnapshotService, R])(
     implicit actorSystem: ActorSystem): R = {
     val elasticConfig = createDisplayElasticConfigWith(
-      indexNameV1 = indexNameV1,
-      indexNameV2 = indexNameV2
+      indexV1 = indexV1,
+      indexV2 = indexV2
     )
 
     val snapshotService = new SnapshotService(
@@ -72,14 +73,14 @@ class SnapshotServiceTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withS3AkkaClient { s3Client =>
-          withLocalWorksIndex { indexNameV1 =>
-            withLocalWorksIndex { indexNameV2 =>
+          withLocalWorksIndex2 { indexV1 =>
+            withLocalWorksIndex2 { indexV2 =>
               withLocalS3Bucket { bucket =>
-                withSnapshotService(s3Client, indexNameV1, indexNameV2) {
+                withSnapshotService(s3Client, indexV1, indexV2) {
                   snapshotService =>
                     {
                       testWith(
-                        (snapshotService, indexNameV1, indexNameV2, bucket))
+                        (snapshotService, indexV1.name, indexV2.name, bucket))
                     }
                 }
               }
@@ -261,8 +262,8 @@ class SnapshotServiceTest
         withS3AkkaClient { s3Client =>
           withSnapshotService(
             s3Client,
-            indexNameV1 = "wrong-index",
-            indexNameV2 = "wrong-index") { brokenSnapshotService =>
+            indexV1 = "wrong-index",
+            indexV2 = "wrong-index") { brokenSnapshotService =>
             val snapshotJob = SnapshotJob(
               publicBucketName = "bukkit",
               publicObjectKey = "target.json.gz",
@@ -297,8 +298,8 @@ class SnapshotServiceTest
           withS3AkkaClient(endpoint = "") { s3Client =>
             withSnapshotService(
               s3Client,
-              indexNameV1 = "indexv1",
-              indexNameV2 = "indexv2") { snapshotService =>
+              indexV1 = "indexv1",
+              indexV2 = "indexv2") { snapshotService =>
               snapshotService.buildLocation(
                 bucketName = "bukkit",
                 objectKey = "snapshot.json.gz"
