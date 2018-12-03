@@ -16,11 +16,9 @@ module "service" {
     reindex_jobs_queue_id     = "${module.reindex_worker_queue.id}"
     metrics_namespace         = "reindex_worker-${var.namespace}"
     reindexer_job_config_json = "${var.reindexer_job_config_json}"
-
-    sqs_parallelism = 10
   }
 
-  env_vars_length = 6
+  env_vars_length = 3
 
   ecs_cluster_name = "${var.ecs_cluster_name}"
   ecs_cluster_id   = "${var.ecs_cluster_id}"
