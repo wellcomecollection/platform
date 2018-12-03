@@ -1,5 +1,6 @@
 package uk.ac.wellcome.elasticsearch
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search, _}
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
@@ -38,14 +39,14 @@ class WorksIndexTest
 
   it("puts a valid work") {
     forAll { sampleWork: IdentifiedBaseWork =>
-      withLocalWorksIndex { indexName: String =>
+      withLocalWorksIndex2 { index: Index =>
         val sampleWorkJson = toJson(sampleWork).get
 
         val futureIndexResponse = elasticClient.execute(
-          indexInto(indexName / "work").doc(sampleWorkJson))
+          indexInto(index, "work").doc(sampleWorkJson))
 
         whenReady(futureIndexResponse) { _ =>
-          assertWorkIndexed(indexName, sampleWorkJson)
+          assertWorkIndexed(index, sampleWorkJson)
         }
       }
     }
@@ -55,26 +56,41 @@ class WorksIndexTest
   // a bug in the mapping related to person subjects wasn't caught by the above test.
   // So let's add a specific one
   it("puts a work with a person subject") {
-    withLocalWorksIndex { indexName =>
-      val sampleWorkJson = toJson(createIdentifiedWorkWith(subjects = List(Subject("Daredevil", List(Unidentifiable(Person(label = "Daredevil", prefix = Some("Superhero"), numeration = Some("I")))))))).get
+    withLocalWorksIndex2 { index: Index =>
+      val sampleWorkJson = toJson(
+        createIdentifiedWorkWith(
+          subjects = List(
+            Subject(
+              label = "Daredevil",
+              concepts = List(
+                Unidentifiable(Person(
+                  label = "Daredevil",
+                  prefix = Some("Superhero"),
+                  numeration = Some("I")
+                ))
+              )
+            )
+          )
+        )
+      ).get
       val futureIndexResponse = elasticClient.execute(
-        indexInto(indexName / "work").doc(sampleWorkJson))
+        indexInto(index, "work").doc(sampleWorkJson))
 
       whenReady(futureIndexResponse) { _ =>
-        assertWorkIndexed(indexName, sampleWorkJson)
+        assertWorkIndexed(index, sampleWorkJson)
       }
     }
   }
 
   it("does not put an invalid work") {
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex2 { index: Index =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
       val future: Future[Response[IndexResponse]] =
         elasticClient
           .execute {
-            indexInto(indexName / "work").doc(badTestObjectJson)
+            indexInto(index, "work").doc(badTestObjectJson)
           }
 
       whenReady(future) { response =>
@@ -84,13 +100,13 @@ class WorksIndexTest
     }
   }
 
-  private def assertWorkIndexed(indexName: String, sampleWorkJson: String): Assertion = {
+  private def assertWorkIndexed(index: Index, sampleWorkJson: String): Assertion = {
     // Elasticsearch is eventually consistent so, when the future completes,
     // the documents might not immediately appear in search
     eventually {
       val response: Response[SearchResponse] = elasticClient
         .execute {
-          search(s"$indexName/work").matchAllQuery()
+          search(index).matchAllQuery()
         }
         .await
 
