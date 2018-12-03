@@ -12,7 +12,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestObject(
@@ -44,7 +44,7 @@ class ElasticsearchIndexTest
 
   val testType = "thing"
 
-  object TestIndex extends ElasticsearchIndex {
+  class TestIndex(implicit ec: ExecutionContext) {
     val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
@@ -53,11 +53,15 @@ class ElasticsearchIndexTest
         booleanField("visible")
       )
 
-    implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
+    val index = new ElasticsearchIndex(
+      elasticClient = elasticClient,
+      mappingDefinition = mappingDefinition
+    )
+
+    def create(indexName: String): Future[Unit] = index.create(indexName)
   }
 
-  object CompatibleTestIndex extends ElasticsearchIndex {
-    val elasticClient: ElasticClient = elasticClient
+  class CompatibleTestIndex(implicit ec: ExecutionContext) {
     val mappingDefinition: MappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
@@ -67,7 +71,12 @@ class ElasticsearchIndexTest
         booleanField("visible")
       )
 
-    implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
+    val index = new ElasticsearchIndex(
+      elasticClient = elasticClient,
+      mappingDefinition = mappingDefinition
+    )
+
+    def create(indexName: String): Future[Unit] = index.create(indexName)
   }
 
   it("creates an index into which doc of the expected type can be put") {

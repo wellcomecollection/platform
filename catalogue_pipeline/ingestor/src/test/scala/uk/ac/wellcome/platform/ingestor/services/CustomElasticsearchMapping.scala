@@ -1,25 +1,18 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.http.ElasticDsl.{
-  intField,
-  keywordField,
-  mapping,
-  objectField
-}
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticDsl.{intField, keywordField, mapping, objectField}
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import uk.ac.wellcome.elasticsearch.ElasticsearchIndex
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 trait CustomElasticsearchMapping {
 
-  class OnlyInvisibleWorksIndex(elasticClient: HttpClient, documentType: String)(
-    implicit val ec: ExecutionContext)
-      extends ElasticsearchIndex {
-    val elasticClient: HttpClient = elasticClient
-
+  class OnlyInvisibleWorksIndex(
+    elasticClient: ElasticClient,
+    documentType: String)(implicit ec: ExecutionContext) {
     def sourceIdentifierFields = Seq(
       keywordField("ontologyType"),
       objectField("identifierType").fields(
@@ -39,9 +32,15 @@ trait CustomElasticsearchMapping {
         keywordField("type")
       )
 
-    override val mappingDefinition: MappingDefinition = mapping(documentType)
+    val mappingDefinition: MappingDefinition = mapping(documentType)
       .dynamic(DynamicMapping.Strict)
       .as(rootIndexFields)
-  }
 
+    val index = new ElasticsearchIndex(
+      elasticClient = elasticClient,
+      mappingDefinition = mappingDefinition
+    )
+
+    def create(indexName: String): Future[Unit] = index.create(indexName)
+  }
 }

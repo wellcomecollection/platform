@@ -10,11 +10,10 @@ import org.elasticsearch.client.ResponseException
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait ElasticsearchIndex extends Logging {
-  val elasticClient: ElasticClient
-  val mappingDefinition: MappingDefinition
-  implicit val ec: ExecutionContext
-
+class ElasticsearchIndex(
+  elasticClient: ElasticClient,
+  mappingDefinition: MappingDefinition
+)(implicit ec: ExecutionContext) extends Logging {
   def create(indexName: String): Future[Unit] =
     elasticClient
       .execute(createIndex(indexName).mappings {
@@ -22,7 +21,7 @@ trait ElasticsearchIndex extends Logging {
       })
       .recoverWith {
         case e: ResponseException
-            if e.getMessage.contains("index_already_exists_exception") =>
+          if e.getMessage.contains("index_already_exists_exception") =>
           info(s"Index $indexName already exists")
           update(indexName)
         case e: Throwable =>

@@ -5,14 +5,11 @@ import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
-import grizzled.slf4j.Logging
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class WorksIndex(val elasticClient: ElasticClient, rootIndexType: String)(
-  implicit val ec: ExecutionContext)
-    extends ElasticsearchIndex
-    with Logging {
+  implicit val ec: ExecutionContext) {
 
   val license = objectField("license").fields(
     keywordField("id")
@@ -178,4 +175,11 @@ class WorksIndex(val elasticClient: ElasticClient, rootIndexType: String)(
   val mappingDefinition: MappingDefinition = mapping(rootIndexType)
     .dynamic(DynamicMapping.Strict)
     .as(rootIndexFields)
+
+  val index = new ElasticsearchIndex(
+    elasticClient = elasticClient,
+    mappingDefinition = mappingDefinition
+  )
+
+  def create(indexName: String): Future[Unit] = index.create(indexName)
 }
