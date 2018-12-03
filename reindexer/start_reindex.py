@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8
 
+import json
 import math
 import sys
 
@@ -8,6 +9,7 @@ import boto3
 import click
 import hcl
 import requests
+import tqdm
 
 
 SOURCES = [
@@ -62,18 +64,22 @@ def partial_reindex_parameters(max_records):
     }
 
 
+def read_from_s3(bucket, key):
+    s3 = boto3.client("s3")
+    obj = s3.get_object(Bucket=bucket, Key=key)
+    return obj["Body"].read()
+
+
 def post_to_slack(slack_message):
     """
     Posts a message about the reindex in Slack, so we can track them.
     """
     # Get the non-critical Slack token.
-    s3 = boto3.client("s3")
-    tfvars_obj = s3.get_object(
-        Bucket="wellcomecollection-platform-infra", Key="terraform.tfvars"
+    tfvars_body = read_from_s3(
+        bucket="wellcomecollection-platform-infra",
+        key="terraform.tfvars"
     )
-    tfvars_body = tfvars_obj["Body"].read()
     tfvars = hcl.loads(tfvars_body)
-
     webhook_url = tfvars["non_critical_slack_webhook"]
 
     slack_data = {
@@ -90,6 +96,54 @@ def post_to_slack(slack_message):
         headers={"Content-Type": "application/json"},
     )
     resp.raise_for_status()
+
+
+def get_reindexer_topic_arn():
+    statefile_body = read_from_s3(
+        bucket="wellcomecollection-platform-infra",
+        key="terraform/shared_infra.tfstate"
+    )
+
+    # The structure of the interesting bits of the statefile is:
+    #
+    #   {
+    #       ...
+    #       "modules": [
+    #           {
+    #               "path": ["root"],
+    #               "outputs": {
+    #                   "name_of_output": {
+    #                       "value": "1234567890x",
+    #                       ...
+    #                   },
+    #                   ...
+    #               }
+    #           },
+    #           ...
+    #       ]
+    #   }
+    #
+    statefile_data = json.loads(statefile_body)
+    modules = statefile_data["modules"]
+    root_module = [m for m in modules if m["path"] == ["root"]][0]
+    root_outputs = root_module["outputs"]
+    return root_outputs["alb_client_error_alarm_arn"]["value"]
+
+
+def publish_messages(job_config_id, topic_arn, parameters):
+    """Publish a sequence of messages to an SNS topic."""
+    for params in tqdm.tqdm(list(parameters)):
+        to_publish = {
+            "jobConfigId": job_config_id,
+            "parameters": params
+        }
+        resp = sns_client.publish(
+            TopicArn=topic_arn,
+            MessageStructure="json",
+            Message=json.dumps({"default": json.dumps(to_publish)}),
+            Subject=f"Source: {__file__}",
+        )
+        assert resp["ResponseMetadata"]["HTTPStatusCode"] == 200, resp
 
 
 @click.command()
@@ -130,12 +184,13 @@ def start_reindex(src, dst, mode, reason):
 
     post_to_slack(slack_message)
 
-    print(slack_message)
+    topic_arn = get_reindexer_topic_arn()
 
-    print(src)
-    print(dst)
-    print(mode)
-    print(reason)
+    publish_messages(
+        job_config_id=f"{src}--{dst}",
+        topic_arn=topic_arn,
+        parameters=parameters
+    )
 
 
 if __name__ == '__main__':
