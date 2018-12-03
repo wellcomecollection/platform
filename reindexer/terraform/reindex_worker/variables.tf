@@ -2,8 +2,6 @@ variable "namespace" {
   description = "miro, sierra, goobi, ..."
 }
 
-variable "vhs_table_name" {}
-
 variable "aws_region" {
   default = "eu-west-1"
 }
