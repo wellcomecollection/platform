@@ -12,11 +12,8 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.fixtures.CloudWatch
-import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.fixtures.{AkkaS3, WorkerServiceFixture}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -40,7 +37,8 @@ class SnapshotGeneratorFeatureTest
     with IntegrationPatience
     with ElasticsearchFixtures
     with DisplayV1SerialisationTestBase
-    with WorksGenerators {
+    with WorksGenerators
+    with WorkerServiceFixture {
 
   it("completes a snapshot generation") {
     withFixtures {
@@ -108,15 +106,12 @@ class SnapshotGeneratorFeatureTest
 
   def withFixtures[R](
     testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
-    withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalElasticsearchIndex { indexNameV1 =>
-          withLocalElasticsearchIndex { indexNameV2 =>
-            withLocalS3Bucket { bucket =>
-              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
-                indexNameV1,
-                indexNameV2) ++ s3ClientLocalFlags
-              withServer(flags) { _ =>
+    withLocalS3Bucket { bucket =>
+      withLocalSqsQueue { queue =>
+        withLocalSnsTopic { topic =>
+          withLocalElasticsearchIndex { indexNameV1 =>
+            withLocalElasticsearchIndex { indexNameV2 =>
+              withWorkerService(queue, topic, indexNameV1, indexNameV2) { _ =>
                 testWith((queue, topic, indexNameV1, indexNameV2, bucket))
               }
             }
@@ -124,5 +119,4 @@ class SnapshotGeneratorFeatureTest
         }
       }
     }
-
 }

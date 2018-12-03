@@ -115,7 +115,7 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-http" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-http-streams" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
-  )
+  ) ++ circeDependencies
 
   val scalaGraphDependencies = Seq(
     "org.scala-graph" %% "graph-core" % versions.scalaGraphVersion

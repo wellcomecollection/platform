@@ -11,25 +11,20 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes, V2WorksIncludes}
-import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.platform.snapshot_generator.fixtures.{AkkaS3, SnapshotServiceFixture}
+import uk.ac.wellcome.platform.snapshot_generator.fixtures.SnapshotServiceFixture
 import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.test.fixtures.TestWith
 
 class SnapshotServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with Akka
-    with AkkaS3
-    with S3
     with GzipUtils
     with IntegrationPatience
-    with ElasticsearchFixtures
     with WorksGenerators
     with SnapshotServiceFixture {
 
