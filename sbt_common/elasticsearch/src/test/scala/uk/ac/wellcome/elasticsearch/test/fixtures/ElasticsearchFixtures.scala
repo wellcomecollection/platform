@@ -33,12 +33,6 @@ trait ElasticsearchFixtures
 
   val documentType = "work"
 
-  def displayEsLocalFlags(indexNameV1: String, indexNameV2: String) =
-    displayEsLocalFlags(
-      indexV1 = Index(indexNameV1),
-      indexV2 = Index(indexNameV2)
-    )
-
   def displayEsLocalFlags(indexV1: Index, indexV2: Index): Map[String, String] =
     Map(
       "es.host" -> esHost,

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.api.works
 
-import com.sksamuel.elastic4s.Indexable
+import com.sksamuel.elastic4s.{Index, Indexable}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.ApiVersions
@@ -21,14 +21,14 @@ trait ApiWorksTestBase
       toJson(t).get
   }
 
-  def withServer[R](indexNameV1: String, indexNameV2: String)(
+  def withServer[R](indexV1: Index, indexV2: Index)(
     testWith: TestWith[EmbeddedHttpServer, R]): R = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
       flags = displayEsLocalFlags(
-        indexNameV1 = indexNameV1,
-        indexNameV2 = indexNameV2
+        indexV1 = indexV1,
+        indexV2 = indexV2
       )
     )
 
@@ -44,10 +44,10 @@ trait ApiWorksTestBase
   def withApiFixtures[R](apiVersion: ApiVersions.Value,
                          apiName: String = "catalogue/")(
     testWith: TestWith[(String, String, String, EmbeddedHttpServer), R]): R =
-    withLocalWorksIndex { indexV1 =>
-      withLocalWorksIndex { indexV2 =>
+    withLocalWorksIndex2 { indexV1 =>
+      withLocalWorksIndex2 { indexV2 =>
         withServer(indexV1, indexV2) { server =>
-          testWith((apiName + apiVersion, indexV1, indexV2, server))
+          testWith((apiName + apiVersion, indexV1.name, indexV2.name, server))
         }
       }
     }

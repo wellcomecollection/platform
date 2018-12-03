@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.api.works.v2
 
+import com.sksamuel.elastic4s.Index
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
@@ -278,7 +279,7 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
   // TODO figure out what the correct behaviour should be in this case
   ignore(
     "returns a Not Found error if you try to get a version that doesn't exist") {
-    withServer(indexNameV1 = "not-important", indexNameV2 = "not-important") {
+    withServer(indexV1 = Index("index-v1"), indexV2 = Index("index-v2")) {
       server =>
         server.httpGet(
           path = "/catalogue/v567/works?pageSize=100&page=101",
