@@ -1,4 +1,4 @@
-module "catalogue_miro_reindexer" {
+module "reindex_worker" {
   source = "./reindex_worker"
 
   reindexer_jobs            = "${local.reindexer_jobs}"
