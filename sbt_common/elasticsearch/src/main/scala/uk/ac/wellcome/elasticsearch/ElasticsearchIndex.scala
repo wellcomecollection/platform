@@ -1,7 +1,7 @@
 package uk.ac.wellcome.elasticsearch
 
+import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.http.ElasticDsl.{createIndex, _}
-import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.index.mappings.PutMappingResponse
 import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
@@ -11,12 +11,12 @@ import org.elasticsearch.client.ResponseException
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ElasticsearchIndex extends Logging {
-  val httpClient: HttpClient
+  val elasticClient: ElasticClient
   val mappingDefinition: MappingDefinition
   implicit val ec: ExecutionContext
 
   def create(indexName: String): Future[Unit] =
-    httpClient
+    elasticClient
       .execute(createIndex(indexName).mappings {
         mappingDefinition
       })
@@ -33,8 +33,8 @@ trait ElasticsearchIndex extends Logging {
         info("Index updated successfully")
       }
 
-  private def update(indexName: String): Future[PutMappingResponse] =
-    httpClient
+  private def update(indexName: String): Future[Response[PutMappingResponse]] =
+    elasticClient
       .execute {
         putMapping(indexName / mappingDefinition.`type`)
           .dynamic(mappingDefinition.dynamic.getOrElse(DynamicMapping.Strict))
