@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
+import com.sksamuel.elastic4s.IndexAndType
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
@@ -24,7 +25,12 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
     documentOptions: ElasticsearchDocumentOptions)
     : Future[Option[IdentifiedBaseWork]] =
     searchService
-      .findResultById(canonicalId)(documentOptions)
+      .findResultById(canonicalId)(
+        IndexAndType(
+          index = documentOptions.index.name,
+          `type` = documentOptions.documentType
+        )
+      )
       .map { result =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
