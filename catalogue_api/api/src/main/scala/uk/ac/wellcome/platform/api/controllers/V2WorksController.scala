@@ -25,7 +25,7 @@ class V2WorksController @Inject()(
       V2SingleWorkRequest,
       V2WorksIncludes](
       apiConfig = apiConfig,
-      indexName = elasticConfig.indexV2,
+      index = elasticConfig.indexV2,
       documentType = elasticConfig.documentType,
       worksService = worksService
     ) {

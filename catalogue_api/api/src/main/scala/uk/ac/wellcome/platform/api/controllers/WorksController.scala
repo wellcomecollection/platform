@@ -30,7 +30,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
                                W <: WorksIncludes](
   apiConfig: ApiConfig,
   documentType: String,
-  indexName: String,
+  index: Index,
   worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
     with SwaggerController {
@@ -86,10 +86,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     } { request: S =>
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
-      val documentOptions = ElasticsearchDocumentOptions(
-        index = Index(request._index.getOrElse(indexName)),
-        documentType = documentType
-      )
+      val documentOptions = getDocumentOptions(request)
 
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
@@ -112,10 +109,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
   def buildFilters(request: M): List[WorkFilter]
 
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
-    val documentOptions = ElasticsearchDocumentOptions(
-      index = Index(request._index.getOrElse(indexName)),
-      documentType = documentType
-    )
+    val documentOptions = getDocumentOptions(request)
 
     val worksSearchOptions = WorksSearchOptions(
       filters = buildFilters(request),
@@ -132,6 +126,15 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
 
     searchFunction(documentOptions, worksSearchOptions)
   }
+
+  private def getDocumentOptions(request: S): ElasticsearchDocumentOptions =
+    ElasticsearchDocumentOptions(
+      index = request._index match {
+        case Some(name) => Index(name)
+        case _ => index
+      },
+      documentType = documentType
+    )
 
   private def generateSingleWorkResponse[T <: DisplayWork](
     maybeWork: Option[IdentifiedBaseWork],
