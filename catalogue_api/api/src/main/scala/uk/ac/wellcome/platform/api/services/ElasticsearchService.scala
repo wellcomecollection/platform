@@ -1,24 +1,15 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.searches.SearchDefinition
-import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
-import com.sksamuel.elastic4s.searches.queries.{
-  BoolQueryDefinition,
-  QueryDefinition
-}
-import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
-import org.elasticsearch.action.search.SearchType
-import org.elasticsearch.search.sort.SortOrder
-import uk.ac.wellcome.platform.api.models.{
-  ItemLocationTypeFilter,
-  WorkFilter,
-  WorkTypeFilter
-}
+import com.sksamuel.elastic4s.searches.{SearchRequest, SearchType}
+import com.sksamuel.elastic4s.searches.queries.term.TermsQuery
+import com.sksamuel.elastic4s.searches.queries.{BoolQuery, Query}
+import com.sksamuel.elastic4s.searches.sort.{FieldSort, SortOrder}
+import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkFilter, WorkTypeFilter}
 
 import scala.concurrent.Future
 
@@ -34,7 +25,7 @@ case class ElasticsearchQueryOptions(
 )
 
 @Singleton
-class ElasticsearchService @Inject()(elasticClient: HttpClient) {
+class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
 
   def findResultById(canonicalId: String)(
     documentOptions: ElasticsearchDocumentOptions): Future[GetResponse] =
@@ -43,6 +34,7 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
         get(canonicalId).from(
           s"${documentOptions.indexName}/${documentOptions.documentType}")
       }
+      .map { _.result }
 
   def listResults: (ElasticsearchDocumentOptions,
                     ElasticsearchQueryOptions) => Future[SearchResponse] =
@@ -66,15 +58,15 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
     */
   private def executeSearch(
     maybeQueryString: Option[String],
-    sortDefinitions: List[FieldSortDefinition]
+    sortDefinitions: List[FieldSort]
   )(documentOptions: ElasticsearchDocumentOptions,
     queryOptions: ElasticsearchQueryOptions): Future[SearchResponse] = {
-    val queryDefinition = buildQuery(
+    val queryDefinition: BoolQuery = buildQuery(
       maybeQueryString = maybeQueryString,
       filters = queryOptions.filters
     )
 
-    val searchDefinition: SearchDefinition =
+    val searchRequest: SearchRequest =
       search(s"${documentOptions.indexName}/${documentOptions.documentType}")
         .searchType(SearchType.DFS_QUERY_THEN_FETCH)
         .query(queryDefinition)
@@ -83,11 +75,12 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
         .from(queryOptions.from)
 
     elasticClient
-      .execute { searchDefinition }
+      .execute { searchRequest }
+      .map { _.result }
   }
 
   private def toTermQuery(
-    workFilter: WorkFilter): TermsQueryDefinition[String] =
+    workFilter: WorkFilter): TermsQuery[String] =
     workFilter match {
       case ItemLocationTypeFilter(itemLocationTypeIds) =>
         termsQuery(
@@ -98,15 +91,15 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
     }
 
   private def buildQuery(maybeQueryString: Option[String],
-                         filters: List[WorkFilter]): BoolQueryDefinition = {
+                         filters: List[WorkFilter]): BoolQuery = {
     val queries = List(
       maybeQueryString.map { simpleStringQuery }
     ).flatten
 
-    val filterDefinitions
-      : List[QueryDefinition] = filters.map { toTermQuery } :+ termQuery(
-      "type",
-      "IdentifiedWork")
+    val filterDefinitions: List[Query] =
+      filters.map { toTermQuery } :+ termQuery(
+        field = "type",
+        value = "IdentifiedWork")
 
     must(queries).filter(filterDefinitions)
   }
