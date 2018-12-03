@@ -1,8 +1,6 @@
 package uk.ac.wellcome.platform.snapshot_generator.services
 
 import akka.Done
-import akka.actor.{ActorSystem, Terminated}
-import com.google.inject.Inject
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -11,7 +9,7 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SnapshotGeneratorWorkerService @Inject()(
+class SnapshotGeneratorWorkerService(
   snapshotService: SnapshotService,
   sqsStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter

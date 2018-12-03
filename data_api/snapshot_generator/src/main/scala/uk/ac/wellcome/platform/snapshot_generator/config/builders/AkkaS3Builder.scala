@@ -2,14 +2,15 @@ package uk.ac.wellcome.platform.snapshot_generator.config.builders
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.stream.alpakka.s3.impl.ListBucketVersion2
+import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions.AwsRegionProvider
 import com.typesafe.config.Config
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
 import uk.ac.wellcome.config.core.models.AWSClientConfig
-import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule.{akkaS3Settings, logger}
 
 object AkkaS3Builder extends AWSClientConfigBuilder with Logging {
   def buildAkkaS3Client(awsClientConfig: AWSClientConfig)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer): S3Client = {
@@ -45,4 +46,19 @@ object AkkaS3Builder extends AWSClientConfigBuilder with Logging {
     buildAkkaS3Client(
       awsClientConfig = buildAWSClientConfig(config, namespace = "s3")
     )
+
+  private def akkaS3Settings(
+    credentialsProvider: AWSCredentialsProvider,
+    regionProvider: AwsRegionProvider,
+    endpointUrl: Option[String]): S3Settings =
+    new S3Settings(
+      bufferType = MemoryBufferType,
+      proxy = None,
+      credentialsProvider = credentialsProvider,
+      s3RegionProvider = regionProvider,
+      pathStyleAccess = true,
+      endpointUrl = endpointUrl,
+      listBucketApiVersion = ListBucketVersion2
+    )
+
 }
