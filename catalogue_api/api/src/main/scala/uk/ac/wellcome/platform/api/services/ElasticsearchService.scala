@@ -13,8 +13,7 @@ import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkFilter, W
 import scala.concurrent.Future
 
 case class ElasticsearchDocumentOptions(
-  indexName: String,
-  documentType: String
+  indexName: String
 )
 
 case class ElasticsearchQueryOptions(
@@ -30,8 +29,8 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
     documentOptions: ElasticsearchDocumentOptions): Future[Response[GetResponse]] =
     elasticClient
       .execute {
-        get(canonicalId).from(
-          s"${documentOptions.indexName}/${documentOptions.documentType}")
+        get(canonicalId)
+          .from(documentOptions.indexName)
       }
 
   def listResults(sortByField: String)
@@ -70,7 +69,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
       }
 
     val searchDefinition =
-      search(s"${documentOptions.indexName}/${documentOptions.documentType}")
+      search(documentOptions.indexName)
         .query(queryDefinition)
         .sortBy(sortDefinitions)
         .limit(queryOptions.limit)

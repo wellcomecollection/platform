@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.json.JsonUtil._
 
 object ElasticsearchWorksSource extends Logging {
-  def apply(elasticClient: HttpClient, indexName: String, documentType: String)(
+  def apply(elasticClient: HttpClient, indexName: String)(
     implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] = {
     val loggingSink = Flow[IdentifiedWork]
       .grouped(10000)
@@ -24,7 +24,7 @@ object ElasticsearchWorksSource extends Logging {
     Source
       .fromPublisher(
         elasticClient.publisher(
-          search(s"$indexName/$documentType")
+          search(indexName)
             .query(termQuery("type", "IdentifiedWork"))
             .scroll(keepAlive = "2m")
             // Increasing the size of each request from the

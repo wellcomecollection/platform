@@ -28,7 +28,6 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
                                S <: SingleWorkRequest[W],
                                W <: WorksIncludes](
   apiConfig: ApiConfig,
-  documentType: String,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
@@ -86,8 +85,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
       val documentOptions = ElasticsearchDocumentOptions(
-        indexName = request._index.getOrElse(indexName),
-        documentType = documentType
+        indexName = request._index.getOrElse(indexName)
       )
 
       val contextUri =
@@ -112,8 +110,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
 
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
     val documentOptions = ElasticsearchDocumentOptions(
-      indexName = request._index.getOrElse(indexName),
-      documentType = documentType
+      indexName = request._index.getOrElse(indexName)
     )
 
     val worksSearchOptions = WorksSearchOptions(

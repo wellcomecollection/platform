@@ -8,13 +8,10 @@ import uk.ac.wellcome.platform.api.services.{
 }
 
 trait SearchOptionsGenerators {
-  val documentType: String
-
   def createElasticsearchDocumentOptionsWith(
     indexName: String): ElasticsearchDocumentOptions =
     ElasticsearchDocumentOptions(
-      indexName = indexName,
-      documentType = documentType
+      indexName = indexName
     )
 
   def createElasticsearchQueryOptionsWith(
