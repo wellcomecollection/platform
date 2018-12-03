@@ -1,11 +1,13 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search, _}
+import com.sksamuel.elastic4s.http.Response
+import com.sksamuel.elastic4s.http.search.SearchResponse
 import org.elasticsearch.client.ResponseException
 import org.scalacheck.Shrink
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Person, Subject, Unidentifiable}
@@ -75,20 +77,17 @@ class WorksIndexTest
     }
   }
 
-  private def assertWorkIndexed(indexName: String, sampleWorkJson: String) = {
-    // Elasticsearch is eventually consistent so, when the future completes,
-    // the documents might not immediately appear in search
+  private def assertWorkIndexed(indexName: String, sampleWorkJson: String): Assertion =
+    // Elasticsearch is eventually consistent so, when the indexing completes,
+    // the documents might not immediately appear in search.
     eventually {
-      val hits = elasticClient
+      val response: Response[SearchResponse] = elasticClient
         .execute(search(s"$indexName/work").matchAllQuery())
-        .map {
-          _.hits.hits
-        }
         .await
+
+      val hits = response.result.hits.hits
 
       hits should have size 1
       assertJsonStringsAreEqual(hits.head.sourceAsString, sampleWorkJson)
     }
-  }
-
 }
