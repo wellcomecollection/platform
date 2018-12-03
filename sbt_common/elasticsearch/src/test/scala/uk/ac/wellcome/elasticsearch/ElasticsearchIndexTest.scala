@@ -1,5 +1,6 @@
 package uk.ac.wellcome.elasticsearch
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.{RequestFailure, Response}
 import com.sksamuel.elastic4s.http.index.IndexResponse
@@ -70,17 +71,21 @@ class ElasticsearchIndexTest
   }
 
   it("creates an index into which doc of the expected type can be put") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
-      val testObject = TestObject("id", "description", true)
+    withLocalElasticsearchIndex2(TestIndex) { index: Index =>
+      val testObject = TestObject(
+        id = "id",
+        description = "description",
+        visible = true
+      )
       val testObjectJson = toJson(testObject).get
 
       eventually {
         for {
           _ <- elasticClient.execute(
-            indexInto(indexName / testType).doc(testObjectJson))
+            indexInto(index.name / testType).doc(testObjectJson))
           response: Response[SearchResponse] <- elasticClient
             .execute {
-              search(s"$indexName/$testType").matchAllQuery()
+              search(index).matchAllQuery()
             }
         } yield {
           val hits = response.result.hits.hits
@@ -96,14 +101,14 @@ class ElasticsearchIndexTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
-      val badTestObject = BadTestObject("id", 5)
+    withLocalElasticsearchIndex2(TestIndex) { index: Index =>
+      val badTestObject = BadTestObject(id = "id", weight = 5)
       val badTestObjectJson = toJson(badTestObject).get
 
       val future: Future[Response[IndexResponse]] =
         elasticClient
           .execute {
-            indexInto(indexName / testType)
+            indexInto(index.name / testType)
               .doc(badTestObjectJson)
           }
 
@@ -115,9 +120,9 @@ class ElasticsearchIndexTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
-      withLocalElasticsearchIndex(CompatibleTestIndex, indexName = indexName) {
-        testIndexName =>
+    withLocalElasticsearchIndex2(TestIndex) { index: Index =>
+      withLocalElasticsearchIndex2(CompatibleTestIndex, index = index) {
+        _ =>
           val compatibleTestObject = CompatibleTestObject(
             id = "id",
             description = "description",
@@ -130,7 +135,7 @@ class ElasticsearchIndexTest
           val futureInsert: Future[Response[IndexResponse]] =
             elasticClient
               .execute {
-                indexInto(indexName / testType)
+                indexInto(index.name / testType)
                   .doc(compatibleTestObjectJson)
               }
 
@@ -141,7 +146,7 @@ class ElasticsearchIndexTest
             eventually {
               val response: Response[SearchResponse] =
                 elasticClient.execute {
-                  search(s"$indexName/$testType").matchAllQuery()
+                  search(index).matchAllQuery()
                 }.await
 
               val hits = response.result.hits.hits

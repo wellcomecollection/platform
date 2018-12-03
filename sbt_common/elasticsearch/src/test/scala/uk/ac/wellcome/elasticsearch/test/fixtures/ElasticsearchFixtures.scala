@@ -81,30 +81,40 @@ trait ElasticsearchFixtures
 
   def withLocalElasticsearchIndex[R](
     index: MappingDefinitionBuilder,
-    indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
+    indexName: String = createIndexName)(testWith: TestWith[String, R]): R =
+    withLocalElasticsearchIndex2(index, Index(indexName)) { idx =>
+      testWith(idx.name)
+    }
+
+  def withLocalElasticsearchIndex2[R](
+    mappingDefinition: MappingDefinitionBuilder,
+    index: Index = createIndexName)(testWith: TestWith[Index, R]): R = {
     elasticsearchIndexCreator
       .create(
-        index = Index(name = indexName),
-        mappingDefinition = index.buildMappingDefinition(documentType)
+        index = index,
+        mappingDefinition = mappingDefinition.buildMappingDefinition(documentType)
       )
       .await
 
     // Elasticsearch is eventually consistent, so the future
     // completing doesn't actually mean that the index exists yet
-    eventuallyIndexExists(indexName)
+    eventuallyIndexExists2(index)
 
     try {
-      testWith(indexName)
+      testWith(index)
     } finally {
-      elasticClient.execute(deleteIndex(indexName))
+      elasticClient.execute(deleteIndex(index.name))
     }
   }
 
   def eventuallyIndexExists(indexName: String): Assertion =
+    eventuallyIndexExists2(Index(indexName))
+
+  def eventuallyIndexExists2(index: Index): Assertion =
     eventually {
       val response: Response[IndexExistsResponse] =
         elasticClient
-          .execute(indexExists(indexName))
+          .execute(indexExists(index.name))
           .await
 
       response.result.isExists shouldBe true
