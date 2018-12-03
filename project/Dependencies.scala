@@ -38,7 +38,7 @@ object Dependencies {
     val mockito = "1.9.5"
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
-    val elastic4s = "5.6.5"
+    val elastic4s = "6.4.0"
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
