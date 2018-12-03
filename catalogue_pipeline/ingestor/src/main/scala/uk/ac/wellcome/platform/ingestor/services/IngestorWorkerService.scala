@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.ingestor.services
 import akka.Done
 import com.amazonaws.services.sqs.model.Message
 import com.sksamuel.elastic4s.http.HttpClient
-import uk.ac.wellcome.elasticsearch.WorksIndex
+import uk.ac.wellcome.elasticsearch.{ElasticsearchIndexCreator, WorksIndex}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -22,13 +22,15 @@ class IngestorWorkerService(elasticClient: HttpClient,
     elasticClient = elasticClient
   )
 
-  val worksIndex = new WorksIndex(
-    elasticClient = elasticClient,
-    rootIndexType = ingestorConfig.elasticConfig.documentType
+  val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
+    elasticClient = elasticClient
   )
 
-  worksIndex.create(
-    indexName = ingestorConfig.elasticConfig.indexName
+  elasticsearchIndexCreator.create(
+    indexName = ingestorConfig.elasticConfig.indexName,
+    mappingDefinition = WorksIndex.buildMappingDefinition(
+      rootIndexType = ingestorConfig.elasticConfig.documentType
+    )
   )
 
   def run(): Future[Done] =

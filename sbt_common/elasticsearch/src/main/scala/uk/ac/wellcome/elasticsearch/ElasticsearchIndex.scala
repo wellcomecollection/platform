@@ -10,6 +10,10 @@ import org.elasticsearch.client.ResponseException
 
 import scala.concurrent.{ExecutionContext, Future}
 
+trait ElasticsearchIndexBuilder {
+  def buildMappingDefinition(rootIndexType: String): MappingDefinition
+}
+
 class ElasticsearchIndexCreator(elasticClient: ElasticClient)(implicit ec: ExecutionContext) extends Logging {
   def create(indexName: String, mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
