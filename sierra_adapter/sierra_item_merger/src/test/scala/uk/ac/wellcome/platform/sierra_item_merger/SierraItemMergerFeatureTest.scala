@@ -56,7 +56,6 @@ class SierraItemMergerFeatureTest
                     assertStoredAndSent(
                       transformable = expectedSierraTransformable,
                       topic = topic,
-                      bucket = sierraDataBucket,
                       table = table
                     )
                   }
@@ -122,13 +121,11 @@ class SierraItemMergerFeatureTest
                     assertStoredAndSent(
                       transformable = expectedSierraTransformable1,
                       topic = topic,
-                      bucket = sierraDataBucket,
                       table = table
                     )
                     assertStoredAndSent(
                       transformable = expectedSierraTransformable2,
                       topic = topic,
-                      bucket = sierraDataBucket,
                       table = table
                     )
                   }
@@ -176,7 +173,6 @@ class SierraItemMergerFeatureTest
                       assertStoredAndSent(
                         transformable = tranformable,
                         topic = topic,
-                        bucket = sierraDataBucket,
                         table = table
                       )
                     }

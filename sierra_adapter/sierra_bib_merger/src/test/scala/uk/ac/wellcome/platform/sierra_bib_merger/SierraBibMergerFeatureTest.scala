@@ -45,7 +45,6 @@ class SierraBibMergerFeatureTest
                 assertStoredAndSent(
                   transformable = expectedSierraTransformable,
                   topic = topic,
-                  bucket = bucket,
                   table = table
                 )
               }
@@ -81,13 +80,11 @@ class SierraBibMergerFeatureTest
                   assertStoredAndSent(
                     transformable = expectedTransformable1,
                     topic = topic,
-                    bucket = bucket,
                     table = table
                   )
                   assertStoredAndSent(
                     transformable = expectedTransformable2,
                     topic = topic,
-                    bucket = bucket,
                     table = table
                   )
                 }
@@ -133,7 +130,6 @@ class SierraBibMergerFeatureTest
                   assertStoredAndSent(
                     transformable = expectedTransformable,
                     topic = topic,
-                    bucket = bucket,
                     table = table
                   )
                 }
@@ -179,7 +175,6 @@ class SierraBibMergerFeatureTest
                 assertStoredAndSent(
                   transformable = expectedTransformable,
                   topic = topic,
-                  bucket = bucket,
                   table = table
                 )
               }
@@ -219,7 +214,6 @@ class SierraBibMergerFeatureTest
                   assertStoredAndSent(
                     transformable = expectedTransformable,
                     topic = topic,
-                    bucket = bucket,
                     table = table
                   )
                 }

@@ -5,7 +5,7 @@ object WellcomeDependencies {
   private lazy val versions = new {
     val json = "1.0.0"
     val monitoring = "1.1.0"
-    val storage = "2.6.0"
+    val storage = "2.7.0"
   }
 
   val jsonLibrary: Seq[ModuleID] = Seq(
