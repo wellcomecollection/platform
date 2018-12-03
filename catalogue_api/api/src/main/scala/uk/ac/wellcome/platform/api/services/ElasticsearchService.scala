@@ -7,11 +7,18 @@ import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.searches.SearchDefinition
 import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
-import com.sksamuel.elastic4s.searches.queries.{BoolQueryDefinition, QueryDefinition}
+import com.sksamuel.elastic4s.searches.queries.{
+  BoolQueryDefinition,
+  QueryDefinition
+}
 import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
 import org.elasticsearch.action.search.SearchType
 import org.elasticsearch.search.sort.SortOrder
-import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.models.{
+  ItemLocationTypeFilter,
+  WorkFilter,
+  WorkTypeFilter
+}
 
 import scala.concurrent.Future
 
@@ -49,7 +56,9 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
        ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = Some(queryString),
-      sortDefinitions = List(fieldSort("_score").order(SortOrder.DESC),fieldSort("canonicalId").order(SortOrder.ASC))
+      sortDefinitions = List(
+        fieldSort("_score").order(SortOrder.DESC),
+        fieldSort("canonicalId").order(SortOrder.ASC))
     )
 
   /** Given a set of query options, build a SearchDefinition for Elasticsearch
