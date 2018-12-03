@@ -76,7 +76,7 @@ trait ElasticsearchFixtures
 
   def withLocalElasticsearchIndex[R](
     mappingDefinition: MappingDefinitionBuilder,
-    index: Index = createIndexName)(testWith: TestWith[Index, R]): R = {
+    index: Index = createIndex)(testWith: TestWith[Index, R]): R = {
     elasticsearchIndexCreator
       .create(
         index = index,
@@ -188,6 +188,6 @@ trait ElasticsearchFixtures
       indexV2 = indexV2
     )
 
-  private def createIndexName: String =
-    (Random.alphanumeric take 10 mkString) toLowerCase
+  private def createIndex: Index =
+    Index(name = (Random.alphanumeric take 10 mkString) toLowerCase)
 }
