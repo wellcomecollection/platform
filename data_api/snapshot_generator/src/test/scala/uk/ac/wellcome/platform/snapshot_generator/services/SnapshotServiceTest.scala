@@ -2,36 +2,23 @@ package uk.ac.wellcome.platform.snapshot_generator.services
 
 import java.io.File
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
 import akka.stream.alpakka.s3.S3Exception
-import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{
-  ApiVersions,
-  V1WorksIncludes,
-  V2WorksIncludes
-}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
+import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes, V2WorksIncludes}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.fixtures.{AkkaS3, WorkerServiceFixture}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SnapshotServiceTest
     extends FunSpec
@@ -43,51 +30,8 @@ class SnapshotServiceTest
     with GzipUtils
     with IntegrationPatience
     with ElasticsearchFixtures
-    with WorksGenerators {
-
-  val mapper = new ObjectMapper with ScalaObjectMapper
-
-  private def withSnapshotService[R](
-    s3AkkaClient: S3Client,
-    indexNameV1: String,
-    indexNameV2: String)(testWith: TestWith[SnapshotService, R])(
-    implicit actorSystem: ActorSystem): R = {
-    val elasticConfig = createDisplayElasticConfigWith(
-      indexV1name = indexNameV1,
-      indexV2name = indexNameV2
-    )
-
-    val snapshotService = new SnapshotService(
-      elasticClient = elasticClient,
-      elasticConfig = elasticConfig,
-      akkaS3Client = s3AkkaClient,
-      objectMapper = mapper
-    )
-
-    testWith(snapshotService)
-  }
-
-  def withFixtures[R](
-    testWith: TestWith[(SnapshotService, String, String, Bucket), R]): R =
-    withActorSystem { implicit actorSystem =>
-      withMaterializer(actorSystem) { implicit materializer =>
-        withS3AkkaClient { s3Client =>
-          withLocalElasticsearchIndex { indexNameV1 =>
-            withLocalElasticsearchIndex { indexNameV2 =>
-              withLocalS3Bucket { bucket =>
-                withSnapshotService(s3Client, indexNameV1, indexNameV2) {
-                  snapshotService =>
-                    {
-                      testWith(
-                        (snapshotService, indexNameV1, indexNameV2, bucket))
-                    }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    with WorksGenerators
+    with WorkerServiceFixture {
 
   it("completes a V1 snapshot generation") {
     withFixtures {
@@ -309,4 +253,26 @@ class SnapshotServiceTest
       }
     }
   }
+
+  private def withFixtures[R](
+    testWith: TestWith[(SnapshotService, String, String, Bucket), R]): R =
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withS3AkkaClient { s3Client =>
+          withLocalElasticsearchIndex { indexNameV1 =>
+            withLocalElasticsearchIndex { indexNameV2 =>
+              withLocalS3Bucket { bucket =>
+                withSnapshotService(s3Client, indexNameV1, indexNameV2) {
+                  snapshotService =>
+                  {
+                    testWith(
+                      (snapshotService, indexNameV1, indexNameV2, bucket))
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 }
