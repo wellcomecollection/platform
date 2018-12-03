@@ -23,7 +23,7 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
       }
       .map { response: Response[CreateIndexResponse] =>
         if (response.isError) {
-          if (response.error.`type` == "index_already_exists_exception") {
+          if (response.error.`type` == "resource_already_exists_exception") {
             info(s"Index $indexName already exists")
             update(indexName, mappingDefinition = mappingDefinition)
           } else {
