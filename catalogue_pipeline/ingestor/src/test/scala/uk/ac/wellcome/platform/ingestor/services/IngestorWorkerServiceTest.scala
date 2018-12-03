@@ -22,8 +22,7 @@ class IngestorWorkerServiceTest
     with ElasticsearchFixtures
     with SQS
     with WorkerServiceFixture
-    with WorksGenerators
-    with CustomElasticsearchMapping {
+    with WorksGenerators {
 
   it("indexes a Miro identified Work") {
     val miroSourceIdentifier = createSourceIdentifier
