@@ -54,6 +54,31 @@ object WorksIndex extends MappingDefinitionBuilder {
       keywordField("ontologyType")
     )
 
+    val concept = Seq(
+      textField("label"),
+      keywordField("ontologyType"),
+      keywordField("type")
+    )
+
+    val agent = Seq(
+      textField("label"),
+      keywordField("type"),
+      keywordField("prefix"),
+      keywordField("numeration"),
+      keywordField("ontologyType")
+    )
+
+    val rootConcept = concept ++ agent
+
+    def identified(fieldName: String, fields: Seq[FieldDefinition]): ObjectField =
+      objectField(fieldName).fields(
+        textField("type"),
+        objectField("agent").fields(fields),
+        keywordField("canonicalId"),
+        objectField("sourceIdentifier").fields(sourceIdentifierFields),
+        objectField("otherIdentifiers").fields(sourceIdentifierFields)
+      )
+
     def subject(fieldName: String) = objectField(fieldName).fields(
       textField("label"),
       keywordField("ontologyType"),
@@ -66,37 +91,12 @@ object WorksIndex extends MappingDefinitionBuilder {
       identified("concepts", concept)
     )
 
-    val agent = Seq(
-      textField("label"),
-      keywordField("type"),
-      keywordField("prefix"),
-      keywordField("numeration"),
-      keywordField("ontologyType")
-    )
-
-    val concept = Seq(
-      textField("label"),
-      keywordField("ontologyType"),
-      keywordField("type")
-    )
-
-    val rootConcept = concept ++ agent
-
     def labelledTextField(fieldName: String) = objectField(fieldName).fields(
       textField("label"),
       keywordField("ontologyType")
     )
 
     def period(fieldName: String) = labelledTextField(fieldName)
-
-    def identified(fieldName: String, fields: Seq[FieldDefinition]) =
-      objectField(fieldName).fields(
-        textField("type"),
-        objectField("agent").fields(fields),
-        keywordField("canonicalId"),
-        objectField("sourceIdentifier").fields(sourceIdentifierFields),
-        objectField("otherIdentifiers").fields(sourceIdentifierFields)
-      )
 
     def items(fieldName: String) = objectField(fieldName).fields(
       keywordField("canonicalId"),
