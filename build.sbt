@@ -54,15 +54,6 @@ lazy val finatra_elasticsearch = doSharedLibrarySetup(project, "sbt_common/finat
   .dependsOn(elasticsearch % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraAkkaDependencies)
 
-lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra_messaging")
-  .dependsOn(messaging % "compile->compile;test->test")
-  .dependsOn(finatra_monitoring % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
-
-lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_monitoring")
-  .dependsOn(finatra_akka % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.finatraMonitoringDependencies)
-
 lazy val config_core = doSharedLibrarySetup(project, "sbt_common/config/core")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
@@ -172,9 +163,8 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(display % "compile->compile;test->test")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_elasticsearch % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
+  .dependsOn(config_elasticsearch % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotGeneratorDependencies)
 
 lazy val archive_common = doServiceSetup(project, "archive/common")
@@ -227,8 +217,6 @@ lazy val root = (project in file("."))
     finatra_akka,
     finatra_controllers,
     finatra_elasticsearch,
-    finatra_messaging,
-    finatra_monitoring,
 
     config_core,
     config_messaging,
