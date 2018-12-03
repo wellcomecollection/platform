@@ -101,7 +101,7 @@ def post_to_slack(slack_message):
 def get_reindexer_topic_arn():
     statefile_body = read_from_s3(
         bucket="wellcomecollection-platform-infra",
-        key="terraform/shared_infra.tfstate"
+        key="terraform/reindexer.tfstate"
     )
 
     # The structure of the interesting bits of the statefile is:
@@ -127,7 +127,7 @@ def get_reindexer_topic_arn():
     modules = statefile_data["modules"]
     root_module = [m for m in modules if m["path"] == ["root"]][0]
     root_outputs = root_module["outputs"]
-    return root_outputs["alb_client_error_alarm_arn"]["value"]
+    return root_outputs["topic_arn"]["value"]
 
 
 def publish_messages(job_config_id, topic_arn, parameters):
