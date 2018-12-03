@@ -6,11 +6,18 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.searches.SearchDefinition
-import com.sksamuel.elastic4s.searches.queries.{BoolQueryDefinition, QueryDefinition}
+import com.sksamuel.elastic4s.searches.queries.{
+  BoolQueryDefinition,
+  QueryDefinition
+}
 import com.sksamuel.elastic4s.searches.queries.term.TermsQueryDefinition
 import com.sksamuel.elastic4s.searches.sort.FieldSortDefinition
 import org.elasticsearch.action.search.SearchType
-import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.models.{
+  ItemLocationTypeFilter,
+  WorkFilter,
+  WorkTypeFilter
+}
 
 import scala.concurrent.Future
 
@@ -36,9 +43,8 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
           s"${documentOptions.indexName}/${documentOptions.documentType}")
       }
 
-  def listResults
-    : (ElasticsearchDocumentOptions,
-       ElasticsearchQueryOptions) => Future[SearchResponse] =
+  def listResults: (ElasticsearchDocumentOptions,
+                    ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = None,
       sortByFields = List("canonicalId")
@@ -65,10 +71,12 @@ class ElasticsearchService @Inject()(elasticClient: HttpClient) {
       filters = queryOptions.filters
     )
 
-    val sortDefinitions: List[FieldSortDefinition] = sortByFields.map(fieldName => fieldSort(fieldName))
+    val sortDefinitions: List[FieldSortDefinition] =
+      sortByFields.map(fieldName => fieldSort(fieldName))
 
     val searchDefinition: SearchDefinition =
-      search(s"${documentOptions.indexName}/${documentOptions.documentType}").searchType(SearchType.DFS_QUERY_THEN_FETCH)
+      search(s"${documentOptions.indexName}/${documentOptions.documentType}")
+        .searchType(SearchType.DFS_QUERY_THEN_FETCH)
         .query(queryDefinition)
         .sortBy(sortDefinitions)
         .limit(queryOptions.limit)
