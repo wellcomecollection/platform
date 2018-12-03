@@ -74,12 +74,12 @@ class ArchiveJobDigestItemsFlowTest
           whenReady(eventualArchiveJobs) { archiveJobs =>
             inside(archiveJobs.toList) {
               case List(
-              Left(
-              ArchiveJobError(
-              actualArchiveJob,
-              List(FileNotFoundError(
-              "this/does/not/exists.jpg",
-              archiveItemJob))))) =>
+                  Left(
+                    ArchiveJobError(
+                      actualArchiveJob,
+                      List(FileNotFoundError(
+                        "this/does/not/exists.jpg",
+                        archiveItemJob))))) =>
                 actualArchiveJob shouldBe archiveJob
                 archiveItemJob.bagDigestItem.location shouldBe EntryPath(
                   "this/does/not/exists.jpg")
@@ -198,8 +198,8 @@ class ArchiveJobDigestItemsFlowTest
       withLocalS3Bucket { bucket =>
         withBagItZip(
           dataFileCount = 2,
-          createDataManifest = _ =>
-            Some(FileEntry("manifest-sha256.txt", randomAlphanumeric()))) {
+          createDataManifest =
+            _ => Some(FileEntry("manifest-sha256.txt", randomAlphanumeric()))) {
           zipFile =>
             val ingestRequest = createIngestBagRequest
             val archiveJob = createArchiveJobWith(
