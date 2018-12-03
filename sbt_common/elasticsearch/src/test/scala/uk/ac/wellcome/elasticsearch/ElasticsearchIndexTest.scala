@@ -44,39 +44,29 @@ class ElasticsearchIndexTest
 
   val testType = "thing"
 
-  class TestIndex(implicit ec: ExecutionContext) {
-    val mappingDefinition: MappingDefinition = mapping(testType)
-      .dynamic(DynamicMapping.Strict)
-      .as(
-        keywordField("id"),
-        textField("description"),
-        booleanField("visible")
-      )
-
-    val index = new ElasticsearchIndex(
-      elasticClient = elasticClient,
-      mappingDefinition = mappingDefinition
-    )
-
-    def create(indexName: String): Future[Unit] = index.create(indexName)
+  object TestIndex extends ElasticsearchIndexBuilder {
+    def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
+      mapping(testType)
+        .dynamic(DynamicMapping.Strict)
+        .as(
+          keywordField("id"),
+          textField("description"),
+          booleanField("visible")
+        )
+    }
   }
 
-  class CompatibleTestIndex(implicit ec: ExecutionContext) {
-    val mappingDefinition: MappingDefinition = mapping(testType)
-      .dynamic(DynamicMapping.Strict)
-      .as(
-        keywordField("id"),
-        textField("description"),
-        intField("count"),
-        booleanField("visible")
-      )
-
-    val index = new ElasticsearchIndex(
-      elasticClient = elasticClient,
-      mappingDefinition = mappingDefinition
-    )
-
-    def create(indexName: String): Future[Unit] = index.create(indexName)
+  object CompatibleTestIndex extends ElasticsearchIndexBuilder {
+    def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
+      mapping(testType)
+        .dynamic(DynamicMapping.Strict)
+        .as(
+          keywordField("id"),
+          textField("description"),
+          intField("count"),
+          booleanField("visible")
+        )
+    }
   }
 
   it("creates an index into which doc of the expected type can be put") {
