@@ -8,7 +8,7 @@ import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object WorksIndex extends ElasticsearchIndexBuilder {
+object WorksIndex extends MappingDefinitionBuilder {
   def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
     val license = objectField("license").fields(
       keywordField("id")

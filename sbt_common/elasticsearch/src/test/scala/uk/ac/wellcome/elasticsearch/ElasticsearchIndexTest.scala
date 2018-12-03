@@ -44,7 +44,7 @@ class ElasticsearchIndexTest
 
   val testType = "thing"
 
-  object TestIndex extends ElasticsearchIndexBuilder {
+  object TestIndex extends MappingDefinitionBuilder {
     def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
       mapping(testType)
         .dynamic(DynamicMapping.Strict)
@@ -56,7 +56,7 @@ class ElasticsearchIndexTest
     }
   }
 
-  object CompatibleTestIndex extends ElasticsearchIndexBuilder {
+  object CompatibleTestIndex extends MappingDefinitionBuilder {
     def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
       mapping(testType)
         .dynamic(DynamicMapping.Strict)

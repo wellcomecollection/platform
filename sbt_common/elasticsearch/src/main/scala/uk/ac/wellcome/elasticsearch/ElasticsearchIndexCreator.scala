@@ -10,10 +10,6 @@ import org.elasticsearch.client.ResponseException
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait ElasticsearchIndexBuilder {
-  def buildMappingDefinition(rootIndexType: String): MappingDefinition
-}
-
 class ElasticsearchIndexCreator(elasticClient: ElasticClient)(implicit ec: ExecutionContext) extends Logging {
   def create(indexName: String, mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
@@ -45,14 +41,4 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(implicit ec: Execu
           error(s"Failed updating index $indexName", e)
           throw e
       }
-}
-
-class ElasticsearchIndex(
-  elasticClient: ElasticClient,
-  mappingDefinition: MappingDefinition
-)(implicit ec: ExecutionContext) extends Logging {
-  def create(indexName: String): Future[Unit] =
-    new ElasticsearchIndexCreator(
-      elasticClient = elasticClient
-    ).create(indexName, mappingDefinition = mappingDefinition)
 }

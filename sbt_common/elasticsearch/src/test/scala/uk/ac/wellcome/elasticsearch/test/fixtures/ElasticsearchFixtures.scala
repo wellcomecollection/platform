@@ -11,7 +11,7 @@ import org.scalactic.source.Position
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.{DisplayElasticConfig, ElasticClientBuilder, ElasticsearchIndex, WorksIndex}
+import uk.ac.wellcome.elasticsearch._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -64,29 +64,25 @@ trait ElasticsearchFixtures
     ),
     implicitly[Position])
 
-  def withLocalElasticsearchIndex[R](testWith: TestWith[String, R]): R = {
-    val indexName = createIndexName
-
-    val elasticConfig = createDisplayElasticConfigWith(
-      indexV1name = indexName,
-      indexV2name = s"$indexName-v2"
-    )
-
-    val index = new WorksIndex(
-      elasticClient = elasticClient,
-      rootIndexType = elasticConfig.documentType
-    )
-
-    withLocalElasticsearchIndex(index, indexName) { indexName =>
+  def withLocalElasticsearchIndex[R](testWith: TestWith[String, R]): R =
+    withLocalElasticsearchIndex(WorksIndex) { indexName =>
       testWith(indexName)
     }
-  }
+
+  private val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
+    elasticClient = elasticClient
+  )
 
   def withLocalElasticsearchIndex[R](
-    index: ElasticsearchIndex,
-    indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
+                                      index: MappingDefinitionBuilder,
+                                      indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
 
-    index.create(indexName).await
+    elasticsearchIndexCreator
+      .create(
+        indexName = indexName,
+        mappingDefinition = index.buildMappingDefinition(documentType)
+      )
+      .await
 
     // Elasticsearch is eventually consistent, so the future
     // completing doesn't actually mean that the index exists yet
