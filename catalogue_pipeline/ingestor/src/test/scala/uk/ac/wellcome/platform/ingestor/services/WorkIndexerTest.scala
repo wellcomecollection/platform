@@ -214,8 +214,7 @@ class WorkIndexerTest
       withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(
           works = works,
-          indexName = indexName,
-          documentType = documentType
+          indexName = indexName
         )
 
         whenReady(future) { successfullyInserted =>
@@ -243,8 +242,7 @@ class WorkIndexerTest
       withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(
           works = works,
-          indexName = indexName,
-          documentType = documentType
+          indexName = indexName
         )
 
         whenReady(future) { result =>
@@ -277,11 +275,11 @@ class WorkIndexerTest
 
   private def indexWork(work: IdentifiedBaseWork,
                         indexName: String,
-                        workIndexer: WorkIndexer) = workIndexer.indexWorks(
-    works = List(work),
-    indexName = indexName,
-    documentType = documentType
-  )
+                        workIndexer: WorkIndexer) =
+    workIndexer.indexWorks(
+      works = List(work),
+      indexName = indexName
+    )
 
   private def assertIngestedWorkIs(
     result: Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]],

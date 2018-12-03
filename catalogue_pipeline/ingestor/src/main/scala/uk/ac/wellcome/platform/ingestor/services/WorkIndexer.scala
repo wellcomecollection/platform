@@ -26,14 +26,12 @@ class WorkIndexer(
   }
 
   def indexWorks(works: Seq[IdentifiedBaseWork],
-                 indexName: String,
-                 documentType: String)
+                 indexName: String)
     : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
-
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
     val inserts = works.map { work =>
-      indexInto(indexName / documentType)
+      indexInto(indexName)
         .version(calculateEsVersion(work))
         .versionType(ExternalGte)
         .id(work.canonicalId)
