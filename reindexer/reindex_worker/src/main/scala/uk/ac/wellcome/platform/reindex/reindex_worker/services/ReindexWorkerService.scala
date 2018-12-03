@@ -25,7 +25,8 @@ class ReindexWorkerService(
         fromJson[ReindexRequest](message.body))
       reindexJobConfig = reindexJobConfigMap.getOrElse(
         reindexRequest.jobConfigId,
-        throw new RuntimeException(s"No such job config: ${reindexRequest.jobConfigId}")
+        throw new RuntimeException(
+          s"No such job config: ${reindexRequest.jobConfigId}")
       )
       recordsToSend: List[String] <- recordReader
         .findRecordsForReindexing(

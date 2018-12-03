@@ -12,16 +12,9 @@ import requests
 import tqdm
 
 
-SOURCES = [
-    "miro",
-    "sierra",
-    "sierra_items"
-]
+SOURCES = ["miro", "sierra", "sierra_items"]
 
-DESTINATIONS = [
-    "catalogue",
-    "reporting"
-]
+DESTINATIONS = ["catalogue", "reporting"]
 
 
 def how_many_segments(table_name):
@@ -58,10 +51,7 @@ def complete_reindex_parameters(total_segments):
 
 
 def partial_reindex_parameters(max_records):
-    yield {
-        "maxRecords": max_records,
-        "type": "PartialReindexParameters"
-    }
+    yield {"maxRecords": max_records, "type": "PartialReindexParameters"}
 
 
 def read_from_s3(bucket, key):
@@ -76,8 +66,7 @@ def post_to_slack(slack_message):
     """
     # Get the non-critical Slack token.
     tfvars_body = read_from_s3(
-        bucket="wellcomecollection-platform-infra",
-        key="terraform.tfvars"
+        bucket="wellcomecollection-platform-infra", key="terraform.tfvars"
     )
     tfvars = hcl.loads(tfvars_body)
     webhook_url = tfvars["non_critical_slack_webhook"]
@@ -91,17 +80,14 @@ def post_to_slack(slack_message):
     }
 
     resp = requests.post(
-        webhook_url,
-        json=slack_data,
-        headers={"Content-Type": "application/json"},
+        webhook_url, json=slack_data, headers={"Content-Type": "application/json"}
     )
     resp.raise_for_status()
 
 
 def get_reindexer_topic_arn():
     statefile_body = read_from_s3(
-        bucket="wellcomecollection-platform-infra",
-        key="terraform/reindexer.tfstate"
+        bucket="wellcomecollection-platform-infra", key="terraform/reindexer.tfstate"
     )
 
     # The structure of the interesting bits of the statefile is:
@@ -134,10 +120,7 @@ def publish_messages(job_config_id, topic_arn, parameters):
     """Publish a sequence of messages to an SNS topic."""
     sns = boto3.client("sns")
     for params in tqdm.tqdm(list(parameters)):
-        to_publish = {
-            "jobConfigId": job_config_id,
-            "parameters": params
-        }
+        to_publish = {"jobConfigId": job_config_id, "parameters": params}
         resp = sns.publish(
             TopicArn=topic_arn,
             MessageStructure="json",
@@ -149,23 +132,30 @@ def publish_messages(job_config_id, topic_arn, parameters):
 
 @click.command()
 @click.option(
-    "--src", type=click.Choice(SOURCES), required=True,
+    "--src",
+    type=click.Choice(SOURCES),
+    required=True,
     prompt="Which source do you want to reindex? (%s)" % ", ".join(SOURCES),
-    help="Name of the source to reindex"
+    help="Name of the source to reindex",
 )
 @click.option(
-    "--dst", type=click.Choice(DESTINATIONS), required=True,
+    "--dst",
+    type=click.Choice(DESTINATIONS),
+    required=True,
     prompt="Which pipeline are you sending this to? (%s)" % ", ".join(DESTINATIONS),
-    help="Name of the pipeline to receive the reindexed records"
+    help="Name of the pipeline to receive the reindexed records",
 )
 @click.option(
-    "--mode", type=click.Choice(["complete", "partial"]), required=True,
+    "--mode",
+    type=click.Choice(["complete", "partial"]),
+    required=True,
     prompt="Every record (complete) or just a few (partial)?",
-    help="Should this reindex send every record (complete) or just a few (partial)?"
+    help="Should this reindex send every record (complete) or just a few (partial)?",
 )
 @click.option(
-    "--reason", prompt="Why are you running this reindex?",
-    help="The reason to run this reindex"
+    "--reason",
+    prompt="Why are you running this reindex?",
+    help="The reason to run this reindex",
 )
 def start_reindex(src, dst, mode, reason):
     print(f"Starting a reindex {src!r} ~> {dst!r}")
@@ -188,11 +178,9 @@ def start_reindex(src, dst, mode, reason):
     topic_arn = get_reindexer_topic_arn()
 
     publish_messages(
-        job_config_id=f"{src}--{dst}",
-        topic_arn=topic_arn,
-        parameters=parameters
+        job_config_id=f"{src}--{dst}", topic_arn=topic_arn, parameters=parameters
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     start_reindex()

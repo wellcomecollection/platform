@@ -51,7 +51,8 @@ object Main extends App with Logging {
     recordReader = recordReader,
     bulkSNSSender = hybridRecordSender,
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
-    reindexJobConfigMap = ReindexJobConfigBuilder.buildReindexJobConfigMap(config)
+    reindexJobConfigMap =
+      ReindexJobConfigBuilder.buildReindexJobConfigMap(config)
   )
 
   try {
