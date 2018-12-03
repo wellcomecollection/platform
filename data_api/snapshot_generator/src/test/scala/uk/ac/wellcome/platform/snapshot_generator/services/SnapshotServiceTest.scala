@@ -13,7 +13,7 @@ import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes, V2WorksIncludes}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.platform.snapshot_generator.fixtures.{AkkaS3, WorkerServiceFixture}
+import uk.ac.wellcome.platform.snapshot_generator.fixtures.{AkkaS3, SnapshotServiceFixture}
 import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
@@ -31,7 +31,7 @@ class SnapshotServiceTest
     with IntegrationPatience
     with ElasticsearchFixtures
     with WorksGenerators
-    with WorkerServiceFixture {
+    with SnapshotServiceFixture {
 
   it("completes a V1 snapshot generation") {
     withFixtures {
@@ -202,22 +202,19 @@ class SnapshotServiceTest
   it("returns a failed future if it fails reading from elasticsearch") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withS3AkkaClient { s3Client =>
-          withSnapshotService(
-            s3Client,
-            indexNameV1 = "wrong-index",
-            indexNameV2 = "wrong-index") { brokenSnapshotService =>
-            val snapshotJob = SnapshotJob(
-              publicBucketName = "bukkit",
-              publicObjectKey = "target.json.gz",
-              apiVersion = ApiVersions.v1
-            )
+        withSnapshotService(
+          indexV1name = "wrong-index",
+          indexV2name = "wrong-index") { brokenSnapshotService =>
+          val snapshotJob = SnapshotJob(
+            publicBucketName = "bukkit",
+            publicObjectKey = "target.json.gz",
+            apiVersion = ApiVersions.v1
+          )
 
-            val future = brokenSnapshotService.generateSnapshot(snapshotJob)
+          val future = brokenSnapshotService.generateSnapshot(snapshotJob)
 
-            whenReady(future.failed) { result =>
-              result shouldBe a[ResponseException]
-            }
+          whenReady(future.failed) { result =>
+            result shouldBe a[ResponseException]
           }
         }
       }
@@ -241,8 +238,8 @@ class SnapshotServiceTest
           withS3AkkaClient(endpoint = "") { s3Client =>
             withSnapshotService(
               s3Client,
-              indexNameV1 = "indexv1",
-              indexNameV2 = "indexv2") { snapshotService =>
+              indexV1name = "indexv1",
+              indexV2name = "indexv2") { snapshotService =>
               snapshotService.buildLocation(
                 bucketName = "bukkit",
                 objectKey = "snapshot.json.gz"
@@ -258,16 +255,13 @@ class SnapshotServiceTest
     testWith: TestWith[(SnapshotService, String, String, Bucket), R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withS3AkkaClient { s3Client =>
-          withLocalElasticsearchIndex { indexNameV1 =>
-            withLocalElasticsearchIndex { indexNameV2 =>
-              withLocalS3Bucket { bucket =>
-                withSnapshotService(s3Client, indexNameV1, indexNameV2) {
-                  snapshotService =>
-                  {
-                    testWith(
-                      (snapshotService, indexNameV1, indexNameV2, bucket))
-                  }
+        withLocalElasticsearchIndex { indexV1name =>
+          withLocalElasticsearchIndex { indexV2name =>
+            withLocalS3Bucket { bucket =>
+              withSnapshotService(indexV1name, indexV2name) {
+                snapshotService => {
+                  testWith(
+                    (snapshotService, indexV1name, indexV2name, bucket))
                 }
               }
             }
