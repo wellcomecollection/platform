@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import akka.Done
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -15,7 +16,7 @@ class SierraItemMergerWorkerService(
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService,
   objectStore: ObjectStore[SierraItemRecord],
   snsWriter: SNSWriter
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext) extends WorkerService {
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {

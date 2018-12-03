@@ -8,6 +8,7 @@ import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.WorkerService
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
@@ -30,7 +31,8 @@ class Archivist(
   snsRegistrarConfig: SNSConfig,
   snsProgressConfig: SNSConfig
 )(implicit val actorSystem: ActorSystem)
-    extends Logging {
+    extends Logging with WorkerService {
+
   def run(): Future[Done] = {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
