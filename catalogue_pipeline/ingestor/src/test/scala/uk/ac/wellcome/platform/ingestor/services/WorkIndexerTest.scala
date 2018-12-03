@@ -228,7 +228,7 @@ class WorkIndexerTest
   it("returns a list of Works that weren't indexed correctly") {
     val subsetOfFieldsIndex = new OnlyInvisibleWorksIndex(
       elasticClient = elasticClient,
-      indexName = randomAlphanumeric()
+      indexName = randomAlphanumeric(length = 10)
     )
 
     val validWorks = createIdentifiedInvisibleWorks(count = 5)

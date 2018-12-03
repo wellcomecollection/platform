@@ -79,6 +79,16 @@ trait ElasticsearchFixtures
 
     index.create(indexName).await
 
+    eventuallyIndexExists(indexName)
+
+    try {
+      testWith(indexName)
+    } finally {
+      deleteIndexIfExists(indexName)
+    }
+  }
+
+  def eventuallyIndexExists(indexName: String): Assertion =
     // Elasticsearch is eventually consistent, so the future
     // completing doesn't actually mean that the index exists yet
     eventually {
@@ -86,13 +96,18 @@ trait ElasticsearchFixtures
         .execute(indexExists(indexName))
         .await
         .result
-        .isExists should be(true)
+        .isExists shouldBe true
     }
 
-    try {
-      testWith(indexName)
-    } finally {
-      elasticClient.execute(deleteIndex(indexName))
+  def deleteIndexIfExists(indexName: String): Assertion = {
+    elasticClient.execute(deleteIndex(indexName))
+
+    eventually {
+      elasticClient
+        .execute(indexExists(indexName))
+        .await
+        .result
+        .isExists shouldBe false
     }
   }
 
