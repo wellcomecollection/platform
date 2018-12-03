@@ -6,10 +6,7 @@ import com.amazonaws.services.dynamodbv2.model._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.generators.{
-  ArchiveCompleteGenerators,
-  NamespaceGenerators
-}
+import uk.ac.wellcome.platform.archive.common.generators.ArchiveCompleteGenerators
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
