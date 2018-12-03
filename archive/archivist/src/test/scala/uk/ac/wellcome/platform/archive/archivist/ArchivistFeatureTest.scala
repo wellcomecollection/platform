@@ -55,6 +55,7 @@ class ArchivistFeatureTest
               assertSnsReceivesOnly(
                 createArchiveCompleteWith(
                   request = request,
+                  bucket = storageBucket,
                   bagIdentifier = bagIdentifier
                 ),
                 registrarTopic
@@ -161,10 +162,12 @@ class ArchivistFeatureTest
                             Set(
                               createArchiveCompleteWith(
                                 request = validRequest1,
+                                bucket = storageBucket,
                                 bagIdentifier = validBag1
                               ),
                               createArchiveCompleteWith(
                                 request = validRequest2,
+                                bucket = storageBucket,
                                 bagIdentifier = validBag2
                               )
                             ),
@@ -236,10 +239,12 @@ class ArchivistFeatureTest
                     Set(
                       createArchiveCompleteWith(
                         request = validRequest1,
+                        bucket = storageBucket,
                         bagIdentifier = validBag1
                       ),
                       createArchiveCompleteWith(
                         request = validRequest2,
+                        bucket = storageBucket,
                         bagIdentifier = validBag2
                       )
                     ),
@@ -298,10 +303,12 @@ class ArchivistFeatureTest
                             Set(
                               createArchiveCompleteWith(
                                 request = validRequest1,
+                                bucket = storageBucket,
                                 bagIdentifier = validBag1
                               ),
                               createArchiveCompleteWith(
                                 request = validRequest2,
+                                bucket = storageBucket,
                                 bagIdentifier = validBag2
                               )
                             ),
@@ -361,10 +368,12 @@ class ArchivistFeatureTest
                             Set(
                               createArchiveCompleteWith(
                                 request = validRequest1,
+                                bucket = storageBucket,
                                 bagIdentifier = validBag1
                               ),
                               createArchiveCompleteWith(
                                 request = validRequest2,
+                                bucket = storageBucket,
                                 bagIdentifier = validBag2
                               )
                             ),

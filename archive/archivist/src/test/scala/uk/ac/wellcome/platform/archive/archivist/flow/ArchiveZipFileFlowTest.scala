@@ -75,6 +75,7 @@ class ArchiveZipFileFlowTest
 
                       val expectedArchiveComplete = createArchiveCompleteWith(
                         request = ingestRequest,
+                        bucket = storageBucket,
                         bagIdentifier = bagIdentifier
                       )
 
