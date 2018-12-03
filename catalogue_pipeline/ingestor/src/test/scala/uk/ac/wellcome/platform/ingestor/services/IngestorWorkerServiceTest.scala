@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
@@ -161,7 +162,7 @@ class IngestorWorkerServiceTest
 
         withWorkerService(
           queue,
-          indexName = "works-v1",
+          index = Index("works-v1"),
           elasticClient = brokenElasticClient) { _ =>
           val work = createIdentifiedWork
 
@@ -177,17 +178,15 @@ class IngestorWorkerServiceTest
 
   private def assertWorksIndexedCorrectly(
     works: IdentifiedBaseWork*): Assertion =
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex2 { index: Index =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>
-          withWorkerService(queue, indexName) { _ =>
+          withWorkerService(queue, index) { _ =>
             works.map { work =>
               sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
             }
 
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              works: _*)
+            assertElasticsearchEventuallyHasWork2(index = index, works: _*)
 
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)

@@ -136,12 +136,17 @@ trait ElasticsearchFixtures
   def assertElasticsearchEventuallyHasWork(
     indexName: String,
     works: IdentifiedBaseWork*): Seq[Assertion] =
+    assertElasticsearchEventuallyHasWork2(Index(indexName), works: _*)
+
+  def assertElasticsearchEventuallyHasWork2(
+    index: Index,
+    works: IdentifiedBaseWork*): Seq[Assertion] =
     works.map { work =>
       val workJson = toJson(work).get
 
       eventually {
         val response: Response[GetResponse] = elasticClient
-          .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
+          .execute(get(work.canonicalId).from(index.name / documentType))
           .await
 
         val getResponse = response.result
@@ -153,14 +158,18 @@ trait ElasticsearchFixtures
     }
 
   def assertElasticsearchNeverHasWork(indexName: String,
-                                      works: IdentifiedBaseWork*): Unit = {
+                                      works: IdentifiedBaseWork*): Unit =
+    assertElasticsearchNeverHasWork2(Index(indexName), works: _*)
+
+  def assertElasticsearchNeverHasWork2(index: Index,
+                                       works: IdentifiedBaseWork*): Unit = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
     Thread.sleep(500)
 
     works.foreach { work =>
       val response: Response[GetResponse] = elasticClient
-        .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
+        .execute(get(work.canonicalId).from(index.name / documentType))
         .await
 
       response.result.found shouldBe false
