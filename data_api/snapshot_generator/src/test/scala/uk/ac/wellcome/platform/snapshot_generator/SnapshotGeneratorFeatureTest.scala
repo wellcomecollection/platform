@@ -2,6 +2,8 @@ package uk.ac.wellcome.platform.snapshot_generator
 
 import java.io.File
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.model.GetObjectRequest
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
@@ -105,7 +107,7 @@ class SnapshotGeneratorFeatureTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
+    testWith: TestWith[(Queue, Topic, String, String, Bucket), R])(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) =
     withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queue =>
         withLocalSnsTopic { topic =>

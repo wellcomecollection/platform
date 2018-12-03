@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.snapshot_generator.fixtures
 
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
@@ -8,6 +9,8 @@ import org.scalatest.Suite
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.platform.snapshot_generator.services.SnapshotService
 import uk.ac.wellcome.test.fixtures.TestWith
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SnapshotServiceFixture extends ElasticsearchFixtures with AkkaS3 { this: Suite =>
   val mapper = new ObjectMapper with ScalaObjectMapper
@@ -35,7 +38,7 @@ trait SnapshotServiceFixture extends ElasticsearchFixtures with AkkaS3 { this: S
   def withSnapshotService[R](
     indexV1name: String,
     indexV2name: String)(testWith: TestWith[SnapshotService, R])(
-    implicit actorSystem: ActorSystem): R =
+    implicit actorSystem: ActorSystem, materializer: ActorMaterializer): R =
     withS3AkkaClient { s3AkkaClient =>
       withSnapshotService(s3AkkaClient, indexV1name, indexV2name) {
         service =>
