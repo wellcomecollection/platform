@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.ingestor
 
+import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -25,9 +26,9 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
-      withLocalWorksIndex { indexName =>
-        withWorkerService(queue, indexName) { _ =>
-          assertElasticsearchEventuallyHasWork(indexName, work)
+      withLocalWorksIndex2 { index: Index =>
+        withWorkerService(queue, index) { _ =>
+          assertElasticsearchEventuallyHasWork2(index, work)
         }
       }
     }
@@ -40,9 +41,9 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
-      withLocalWorksIndex { indexName =>
-        withWorkerService(queue, indexName) { _ =>
-          assertElasticsearchEventuallyHasWork(indexName, work)
+      withLocalWorksIndex2 { index: Index =>
+        withWorkerService(queue, index) { _ =>
+          assertElasticsearchEventuallyHasWork2(index, work)
         }
       }
     }
@@ -50,8 +51,8 @@ class IngestorFeatureTest
 
   it("does not delete a message from the queue if it fails processing") {
     withLocalSqsQueue { queue =>
-      withLocalWorksIndex { indexName =>
-        withWorkerService(queue, indexName) { _ =>
+      withLocalWorksIndex2 { index =>
+        withWorkerService(queue, index) { _ =>
           sendNotificationToSQS(
             queue = queue,
             body = "not a json string -- this will fail parsing"

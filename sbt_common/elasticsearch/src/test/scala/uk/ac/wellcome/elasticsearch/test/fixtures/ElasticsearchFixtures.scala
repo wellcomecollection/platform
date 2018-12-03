@@ -120,13 +120,13 @@ trait ElasticsearchFixtures
       response.result.isExists shouldBe true
     }
 
-  def eventuallyDeleteIndex(indexName: String): Assertion = {
-    elasticClient.execute(deleteIndex(indexName))
+  def eventuallyDeleteIndex(index: Index): Assertion = {
+    elasticClient.execute(deleteIndex(index.name))
 
     eventually {
       val response: Response[IndexExistsResponse] =
         elasticClient
-          .execute(indexExists(indexName))
+          .execute(indexExists(index.name))
           .await
 
       response.result.isExists shouldBe false
