@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
-import com.sksamuel.elastic4s.IndexAndType
+import com.sksamuel.elastic4s.{Index, IndexAndType}
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
@@ -21,36 +21,30 @@ case class WorksSearchOptions(
 class WorksService @Inject()(searchService: ElasticsearchService)(
   implicit ec: ExecutionContext) {
 
-  def findWorkById(canonicalId: String)(
-    documentOptions: ElasticsearchDocumentOptions)
-    : Future[Option[IdentifiedBaseWork]] =
+  def findWorkById(canonicalId: String)(indexAndType: IndexAndType): Future[Option[IdentifiedBaseWork]] =
     searchService
-      .findResultById(canonicalId)(
-        IndexAndType(
-          index = documentOptions.index.name,
-          `type` = documentOptions.documentType
-        )
-      )
+      .findResultById(canonicalId)(indexAndType)
       .map { result =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
         else None
       }
 
-  def listWorks(documentOptions: ElasticsearchDocumentOptions,
-                worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def listWorks(
+    index: Index,
+    worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
       .listResults(
-        documentOptions.index,
+        index,
         toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 
   def searchWorks(query: String)(
-    documentOptions: ElasticsearchDocumentOptions,
+    index: Index,
     worksSearchOptions: WorksSearchOptions): Future[ResultList] =
     searchService
       .simpleStringQueryResults(query)(
-        documentOptions.index,
+        index,
         toElasticsearchQueryOptions(worksSearchOptions))
       .map { createResultList }
 

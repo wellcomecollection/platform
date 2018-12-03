@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.controllers
 
 import com.jakehschwartz.finatra.swagger.SwaggerController
-import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.{Index, IndexAndType}
 import com.twitter.finatra.http.Controller
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
@@ -86,13 +86,13 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     } { request: S =>
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
-      val documentOptions = getDocumentOptions(request)
+      val indexAndType = getIndexAndType(request)
 
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
       for {
         maybeWork <- worksService.findWorkById(canonicalId = request.id)(
-          documentOptions)
+          indexAndType)
       } yield
         generateSingleWorkResponse(
           maybeWork,
@@ -109,7 +109,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
   def buildFilters(request: M): List[WorkFilter]
 
   private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
-    val documentOptions = getDocumentOptions(request)
+    val index = getIndex(request)
 
     val worksSearchOptions = WorksSearchOptions(
       filters = buildFilters(request),
@@ -117,23 +117,26 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       pageNumber = request.page
     )
 
-    def searchFunction: (ElasticsearchDocumentOptions,
+    def searchFunction: (Index,
                          WorksSearchOptions) => Future[ResultList] =
       request.query match {
         case Some(queryString) => worksService.searchWorks(queryString)
         case None              => worksService.listWorks
       }
 
-    searchFunction(documentOptions, worksSearchOptions)
+    searchFunction(index, worksSearchOptions)
   }
 
-  private def getDocumentOptions(request: S): ElasticsearchDocumentOptions =
-    ElasticsearchDocumentOptions(
-      index = request._index match {
-        case Some(name) => Index(name)
-        case _ => index
-      },
-      documentType = documentType
+  private def getIndex(request: ApiRequest): Index =
+    request._index match {
+      case Some(name) => Index(name)
+      case _ => index
+    }
+
+  private def getIndexAndType(request: ApiRequest): IndexAndType =
+    IndexAndType(
+      index = getIndex(request).name,
+      `type` = documentType
     )
 
   private def generateSingleWorkResponse[T <: DisplayWork](

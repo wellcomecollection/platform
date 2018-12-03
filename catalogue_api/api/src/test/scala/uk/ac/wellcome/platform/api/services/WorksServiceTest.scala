@@ -106,11 +106,10 @@ class WorksServiceTest
 
             insertIntoElasticsearch(index, work)
 
-            val documentOptions =
-              createElasticsearchDocumentOptionsWith(index = index)
+            val indexAndType = createIndexAndType(index = index)
 
             val recordsFuture = worksService.findWorkById(
-              canonicalId = work.canonicalId)(documentOptions)
+              canonicalId = work.canonicalId)(indexAndType)
 
             whenReady(recordsFuture) { records =>
               records.isDefined shouldBe true
@@ -125,11 +124,10 @@ class WorksServiceTest
       withLocalWorksIndex { index: Index =>
         withElasticsearchService { searchService =>
           withWorksService(searchService) { worksService =>
-            val documentOptions =
-              createElasticsearchDocumentOptionsWith(index = index)
+            val indexAndType = createIndexAndType(index = index)
 
             val recordsFuture =
-              worksService.findWorkById(canonicalId = "1234")(documentOptions)
+              worksService.findWorkById(canonicalId = "1234")(indexAndType)
 
             whenReady(recordsFuture) { record =>
               record shouldBe None
@@ -260,7 +258,7 @@ class WorksServiceTest
 
   private def assertResultIsCorrect(
     partialSearchFunction: WorksService => (
-      ElasticsearchDocumentOptions,
+      Index,
       WorksSearchOptions) => Future[ResultList]
   )(
     allWorks: Seq[IdentifiedBaseWork],
@@ -275,12 +273,8 @@ class WorksServiceTest
             insertIntoElasticsearch(index, allWorks: _*)
           }
 
-          val documentOptions = createElasticsearchDocumentOptionsWith(
-            index: Index
-          )
-
           val future = partialSearchFunction(worksService)(
-            documentOptions,
+            index,
             worksSearchOptions)
 
           whenReady(future) { works =>

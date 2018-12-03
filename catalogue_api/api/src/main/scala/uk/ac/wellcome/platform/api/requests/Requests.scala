@@ -11,6 +11,7 @@ import uk.ac.wellcome.display.models.{
 
 sealed trait ApiRequest {
   val request: Request
+  val _index: Option[String]
 }
 
 trait MultipleResultsRequest[W <: WorksIncludes] extends ApiRequest {
@@ -18,7 +19,6 @@ trait MultipleResultsRequest[W <: WorksIncludes] extends ApiRequest {
   val pageSize: Option[Int]
   val include: Option[W]
   val query: Option[String]
-  val _index: Option[String]
   val request: Request
 }
 
@@ -44,7 +44,7 @@ case class V2MultipleResultsRequest(
   request: Request
 ) extends MultipleResultsRequest[V2WorksIncludes]
 
-trait SingleWorkRequest[W <: WorksIncludes] {
+trait SingleWorkRequest[W <: WorksIncludes] extends ApiRequest {
   val id: String
   val include: Option[W]
   val _index: Option[String]
