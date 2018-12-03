@@ -27,7 +27,9 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
     : Future[Option[IdentifiedBaseWork]] =
     searchService
       .findResultById(canonicalId)(documentOptions)
-      .map { response: Response[GetResponse] => response.result }
+      .map { response: Response[GetResponse] =>
+        response.result
+      }
       .map { result: GetResponse =>
         if (result.exists)
           Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
@@ -59,7 +61,8 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
       from = (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize
     )
 
-  private def createResultList(searchResponse: Response[SearchResponse]): ResultList =
+  private def createResultList(
+    searchResponse: Response[SearchResponse]): ResultList =
     ResultList(
       results = searchResponseToWorks(searchResponse.result),
       totalResults = searchResponse.result.totalHits.toInt

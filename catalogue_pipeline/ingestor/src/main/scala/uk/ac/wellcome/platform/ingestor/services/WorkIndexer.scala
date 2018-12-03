@@ -7,7 +7,12 @@ import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
-import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedInvisibleWork, IdentifiedRedirectedWork, IdentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
+  IdentifiedInvisibleWork,
+  IdentifiedRedirectedWork,
+  IdentifiedWork
+}
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.language.implicitConversions
@@ -25,8 +30,7 @@ class WorkIndexer(
       toJson(t).get
   }
 
-  def indexWorks(works: Seq[IdentifiedBaseWork],
-                 indexName: String)
+  def indexWorks(works: Seq[IdentifiedBaseWork], indexName: String)
     : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 

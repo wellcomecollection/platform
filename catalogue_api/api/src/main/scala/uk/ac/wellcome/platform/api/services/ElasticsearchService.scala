@@ -8,7 +8,11 @@ import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.searches.queries.{BoolQuery, Query}
 import com.sksamuel.elastic4s.searches.queries.term.TermsQuery
 import com.sksamuel.elastic4s.searches.sort.FieldSort
-import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.models.{
+  ItemLocationTypeFilter,
+  WorkFilter,
+  WorkTypeFilter
+}
 
 import scala.concurrent.Future
 
@@ -25,7 +29,8 @@ case class ElasticsearchQueryOptions(
 @Singleton
 class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
   def findResultById(canonicalId: String)(
-    documentOptions: ElasticsearchDocumentOptions): Future[Response[GetResponse]] =
+    documentOptions: ElasticsearchDocumentOptions)
+    : Future[Response[GetResponse]] =
     elasticClient
       .execute {
         get(canonicalId)
@@ -55,7 +60,8 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
     maybeQueryString: Option[String],
     sortByField: Option[String]
   )(documentOptions: ElasticsearchDocumentOptions,
-    queryOptions: ElasticsearchQueryOptions): Future[Response[SearchResponse]] = {
+    queryOptions: ElasticsearchQueryOptions)
+    : Future[Response[SearchResponse]] = {
     val queryDefinition = buildQuery(
       maybeQueryString = maybeQueryString,
       filters = queryOptions.filters
@@ -78,8 +84,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
       .execute { searchDefinition }
   }
 
-  private def toTermQuery(
-    workFilter: WorkFilter): TermsQuery[String] =
+  private def toTermQuery(workFilter: WorkFilter): TermsQuery[String] =
     workFilter match {
       case ItemLocationTypeFilter(itemLocationTypeIds) =>
         termsQuery(
@@ -95,7 +100,8 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
       maybeQueryString.map { simpleStringQuery }
     ).flatten
 
-    val filterDefinitions: List[Query] = filters.map { toTermQuery } :+ termQuery(
+    val filterDefinitions
+      : List[Query] = filters.map { toTermQuery } :+ termQuery(
       "type",
       "IdentifiedWork")
 
