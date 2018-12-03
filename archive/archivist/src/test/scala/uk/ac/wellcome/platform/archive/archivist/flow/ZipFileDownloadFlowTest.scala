@@ -42,34 +42,34 @@ class ZipFileDownloadFlowTest
     withLocalS3Bucket { storageBucket =>
       withLocalSnsTopic { progressTopic =>
         withZipFileDownloadFlow(progressTopic) { downloadZipFlow =>
-          withBagItZip() {
-            case (bagName, zipFile) =>
-              val uploadKey = bagName.toString
+          val bagInfo = randomBagInfo
+          withBagItZip(bagInfo) { zipFile =>
+            val uploadKey = bagInfo.externalIdentifier.toString
 
-              s3Client.putObject(
-                storageBucket.name,
-                uploadKey,
-                new File(zipFile.getName))
+            s3Client.putObject(
+              storageBucket.name,
+              uploadKey,
+              new File(zipFile.getName))
 
-              val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
-              val ingestBagRequest =
-                createIngestBagRequestWith(ingestBagLocation = objectLocation)
+            val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
+            val ingestBagRequest =
+              createIngestBagRequestWith(ingestBagLocation = objectLocation)
 
-              val download: Future[Either[ArchiveError[IngestBagRequest],
-                                          ZipFileDownloadComplete]] =
-                downloadZipFlow
-                  .runWith(Source.single(ingestBagRequest), Sink.head)
-                  ._2
+            val download: Future[Either[ArchiveError[IngestBagRequest],
+                                        ZipFileDownloadComplete]] =
+              downloadZipFlow
+                .runWith(Source.single(ingestBagRequest), Sink.head)
+                ._2
 
-              whenReady(download) { result =>
-                inside(result) {
-                  case Right(ZipFileDownloadComplete(downloadedZipFile, _)) =>
-                    downloadedZipFile.entries.asScala.toList
-                      .map(_.toString) should contain theSameElementsAs zipFile.entries.asScala.toList
-                      .map(_.toString)
-                    downloadedZipFile.size shouldEqual zipFile.size
-                }
+            whenReady(download) { result =>
+              inside(result) {
+                case Right(ZipFileDownloadComplete(downloadedZipFile, _)) =>
+                  downloadedZipFile.entries.asScala.toList
+                    .map(_.toString) should contain theSameElementsAs zipFile.entries.asScala.toList
+                    .map(_.toString)
+                  downloadedZipFile.size shouldEqual zipFile.size
               }
+            }
           }
         }
       }

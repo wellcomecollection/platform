@@ -34,8 +34,9 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair) {
-          case (request, bagIdentifier) =>
+        val bagInfo = randomBagInfo
+        createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo) {
+          request =>
             eventually {
 
               val archivedObjects = listKeysInBucket(storageBucket)
@@ -57,7 +58,8 @@ class ArchivistFeatureTest
                   BagLocation(
                     storageBucket.name,
                     "archive",
-                    BagPath(s"${request.storageSpace}/$bagIdentifier"))
+                    BagPath(
+                      s"${request.storageSpace}/${bagInfo.externalIdentifier}"))
                 ),
                 registrarTopic
               )
@@ -94,19 +96,18 @@ class ArchivistFeatureTest
         createAndSendBag(
           ingestBucket,
           queuePair,
-          createDigest = _ => "bad_digest") {
-          case (request, _) =>
-            eventually {
-              assertQueuePairSizes(queuePair, 0, 0)
-              assertSnsReceivesNothing(registrarTopic)
+          createDigest = _ => "bad_digest") { request =>
+          eventually {
+            assertQueuePairSizes(queuePair, 0, 0)
+            assertSnsReceivesNothing(registrarTopic)
 
-              assertTopicReceivesProgressStatusUpdate(
-                request.archiveRequestId,
-                progressTopic,
-                Progress.Failed)({ events =>
-                all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
-              })
-            }
+            assertTopicReceivesProgressStatusUpdate(
+              request.archiveRequestId,
+              progressTopic,
+              Progress.Failed)({ events =>
+              all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+            })
+          }
         }
     }
   }
@@ -115,7 +116,7 @@ class ArchivistFeatureTest
     withArchivist {
       case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
-          case (request, _) =>
+          request =>
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
               assertSnsReceivesNothing(registrarTopic)
@@ -132,6 +133,9 @@ class ArchivistFeatureTest
   }
 
   it("continues after bag with bad digest") {
+    val bagInfo1 = randomBagInfo
+    val bagInfo2 = randomBagInfo
+
     withArchivist {
       case (
           ingestBucket,
@@ -139,107 +143,26 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-          case (validRequest1, validBag1) =>
+        createAndSendBag(
+          ingestBucket,
+          queuePair,
+          bagInfo = bagInfo1,
+          dataFileCount = 1) { validRequest1 =>
+          createAndSendBag(
+            ingestBucket,
+            queuePair,
+            dataFileCount = 1,
+            createDigest = _ => "bad_digest") { invalidRequest1 =>
             createAndSendBag(
               ingestBucket,
               queuePair,
-              dataFileCount = 1,
-              createDigest = _ => "bad_digest") {
-              case (invalidRequest1, _) =>
-                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-                  case (validRequest2, validBag2) =>
-                    createAndSendBag(
-                      ingestBucket,
-                      queuePair,
-                      dataFileCount = 1,
-                      createDigest = _ => "bad_digest") {
-                      case (invalidRequest2, _) =>
-                        eventually {
-
-                          assertQueuePairSizes(queuePair, 0, 0)
-
-                          assertSnsReceives(
-                            Set(
-                              ArchiveComplete(
-                                validRequest1.archiveRequestId,
-                                validRequest1.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
-                              ),
-                              ArchiveComplete(
-                                validRequest2.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
-                              )
-                            ),
-                            registrarTopic
-                          )
-
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest1.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed) { events =>
-                            all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
-                          }
-
-                          assertTopicReceivesProgressStatusUpdate(
-                            invalidRequest2.archiveRequestId,
-                            progressTopic,
-                            Progress.Failed) { events =>
-                            all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
-                          }
-
-                        }
-                    }
-                }
-            }
-        }
-    }
-  }
-
-  it("continues after non existing zip file") {
-    withArchivist {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          registrarTopic,
-          progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-          case (validRequest1, validBag1) =>
-            val invalidRequestId1 = randomUUID
-            sendNotificationToSQS(
-              queuePair.queue,
-              IngestBagRequest(
-                archiveRequestId = invalidRequestId1,
-                zippedBagLocation =
-                  ObjectLocation(ingestBucket.name, "non-existing1.zip"),
-                storageSpace = StorageSpace("not_a_real_one")
-              )
-            )
-
-            createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-              case (validRequest2, validBag2) =>
-                val invalidRequestId2 = randomUUID
-
-                sendNotificationToSQS(
-                  queuePair.queue,
-                  IngestBagRequest(
-                    archiveRequestId = invalidRequestId2,
-                    zippedBagLocation =
-                      ObjectLocation(ingestBucket.name, "non-existing2.zip"),
-                    storageSpace = StorageSpace("not_a_real_one")
-                  )
-                )
-
+              bagInfo = bagInfo2,
+              dataFileCount = 1) { validRequest2 =>
+              createAndSendBag(
+                ingestBucket,
+                queuePair,
+                dataFileCount = 1,
+                createDigest = _ => "bad_digest") { invalidRequest2 =>
                 eventually {
 
                   assertQueuePairSizes(queuePair, 0, 0)
@@ -252,7 +175,8 @@ class ArchivistFeatureTest
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"${validRequest1.storageSpace}/$validBag1"))
+                          BagPath(
+                            s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                       ),
                       ArchiveComplete(
                         validRequest2.archiveRequestId,
@@ -260,33 +184,131 @@ class ArchivistFeatureTest
                         BagLocation(
                           storageBucket.name,
                           "archive",
-                          BagPath(s"${validRequest2.storageSpace}/$validBag2"))
+                          BagPath(
+                            s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                       )
                     ),
                     registrarTopic
                   )
 
-                  assertTopicReceivesFailedProgress(
-                    requestId = invalidRequestId1,
-                    expectedDescriptionPrefix =
-                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip",
-                    progressTopic = progressTopic
-                  )
+                  assertTopicReceivesProgressStatusUpdate(
+                    invalidRequest1.archiveRequestId,
+                    progressTopic,
+                    Progress.Failed) { events =>
+                    all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+                  }
 
-                  assertTopicReceivesFailedProgress(
-                    requestId = invalidRequestId2,
-                    expectedDescriptionPrefix =
-                      s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip",
-                    progressTopic = progressTopic
-                  )
+                  assertTopicReceivesProgressStatusUpdate(
+                    invalidRequest2.archiveRequestId,
+                    progressTopic,
+                    Progress.Failed) { events =>
+                    all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+                  }
+
                 }
+              }
             }
+          }
+        }
+    }
+  }
+
+  it("continues after non existing zip file") {
+    val bagInfo1 = randomBagInfo
+    val bagInfo2 = randomBagInfo
+
+    withArchivist {
+      case (
+          ingestBucket,
+          storageBucket,
+          queuePair,
+          registrarTopic,
+          progressTopic) =>
+        createAndSendBag(
+          ingestBucket,
+          queuePair,
+          bagInfo = bagInfo1,
+          dataFileCount = 1) { validRequest1 =>
+          val invalidRequestId1 = randomUUID
+          sendNotificationToSQS(
+            queuePair.queue,
+            IngestBagRequest(
+              archiveRequestId = invalidRequestId1,
+              zippedBagLocation =
+                ObjectLocation(ingestBucket.name, "non-existing1.zip"),
+              storageSpace = StorageSpace("not_a_real_one")
+            )
+          )
+
+          createAndSendBag(
+            ingestBucket,
+            queuePair,
+            bagInfo = bagInfo2,
+            dataFileCount = 1) { validRequest2 =>
+            val invalidRequestId2 = randomUUID
+
+            sendNotificationToSQS(
+              queuePair.queue,
+              IngestBagRequest(
+                archiveRequestId = invalidRequestId2,
+                zippedBagLocation =
+                  ObjectLocation(ingestBucket.name, "non-existing2.zip"),
+                storageSpace = StorageSpace("not_a_real_one")
+              )
+            )
+
+            eventually {
+
+              assertQueuePairSizes(queuePair, 0, 0)
+
+              assertSnsReceives(
+                Set(
+                  ArchiveComplete(
+                    validRequest1.archiveRequestId,
+                    validRequest1.storageSpace,
+                    BagLocation(
+                      storageBucket.name,
+                      "archive",
+                      BagPath(
+                        s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
+                  ),
+                  ArchiveComplete(
+                    validRequest2.archiveRequestId,
+                    validRequest2.storageSpace,
+                    BagLocation(
+                      storageBucket.name,
+                      "archive",
+                      BagPath(
+                        s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
+                  )
+                ),
+                registrarTopic
+              )
+
+              assertTopicReceivesFailedProgress(
+                requestId = invalidRequestId1,
+                expectedDescriptionPrefix =
+                  s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip",
+                progressTopic = progressTopic
+              )
+
+              assertTopicReceivesFailedProgress(
+                requestId = invalidRequestId2,
+                expectedDescriptionPrefix =
+                  s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip",
+                progressTopic = progressTopic
+              )
+            }
+          }
         }
 
     }
   }
 
   it("continues after non existing file referenced in manifest") {
+    val bagInfo1 = randomBagInfo
+    val bagInfo2 = randomBagInfo
+
     withArchivist {
       case (
           ingestBucket,
@@ -294,72 +316,81 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-          case (validRequest1, validBag1) =>
-            createAndSendBag(
-              ingestBucket,
-              queuePair,
-              dataFileCount = 1,
-              createDataManifest = dataManifestWithNonExistingFile) {
-              case (invalidRequest1, _) =>
-                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-                  case (validRequest2, validBag2) =>
-                    createAndSendBag(
-                      ingestBucket,
-                      queuePair,
-                      dataFileCount = 1,
-                      createDataManifest = dataManifestWithNonExistingFile) {
-                      case (invalidRequest2, _) =>
-                        eventually {
+        createAndSendBag(
+          ingestBucket,
+          queuePair,
+          bagInfo = bagInfo1,
+          dataFileCount = 1) { validRequest1 =>
+          createAndSendBag(
+            ingestBucket,
+            queuePair,
+            dataFileCount = 1,
+            createDataManifest = dataManifestWithNonExistingFile) {
+            invalidRequest1 =>
+              createAndSendBag(
+                ingestBucket,
+                queuePair,
+                bagInfo = bagInfo2,
+                dataFileCount = 1) { validRequest2 =>
+                createAndSendBag(
+                  ingestBucket,
+                  queuePair,
+                  dataFileCount = 1,
+                  createDataManifest = dataManifestWithNonExistingFile) {
+                  invalidRequest2 =>
+                    eventually {
 
-                          assertQueuePairSizes(queuePair, 0, 0)
+                      assertQueuePairSizes(queuePair, 0, 0)
 
-                          assertSnsReceives(
-                            Set(
-                              ArchiveComplete(
-                                validRequest1.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
-                              ),
-                              ArchiveComplete(
-                                validRequest2.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
-                              )
-                            ),
-                            registrarTopic
+                      assertSnsReceives(
+                        Set(
+                          ArchiveComplete(
+                            validRequest1.archiveRequestId,
+                            validRequest2.storageSpace,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              BagPath(
+                                s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
+                          ),
+                          ArchiveComplete(
+                            validRequest2.archiveRequestId,
+                            validRequest2.storageSpace,
+                            BagLocation(
+                              storageBucket.name,
+                              "archive",
+                              BagPath(
+                                s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                           )
+                        ),
+                        registrarTopic
+                      )
 
-                          assertTopicReceivesFailedProgress(
-                            requestId = invalidRequest1.archiveRequestId,
-                            expectedDescription =
-                              "Failed reading file this/does/not/exists.jpg from zip file",
-                            progressTopic = progressTopic
-                          )
+                      assertTopicReceivesFailedProgress(
+                        requestId = invalidRequest1.archiveRequestId,
+                        expectedDescription =
+                          "Failed reading file this/does/not/exists.jpg from zip file",
+                        progressTopic = progressTopic
+                      )
 
-                          assertTopicReceivesFailedProgress(
-                            requestId = invalidRequest2.archiveRequestId,
-                            expectedDescription =
-                              "Failed reading file this/does/not/exists.jpg from zip file",
-                            progressTopic = progressTopic
-                          )
-                        }
+                      assertTopicReceivesFailedProgress(
+                        requestId = invalidRequest2.archiveRequestId,
+                        expectedDescription =
+                          "Failed reading file this/does/not/exists.jpg from zip file",
+                        progressTopic = progressTopic
+                      )
                     }
                 }
-            }
+              }
+          }
         }
     }
   }
 
   it("continues after zip file with no bag-info.txt") {
+    val bagInfo1 = randomBagInfo
+    val bagInfo2 = randomBagInfo
+
     withArchivist {
       case (
           ingestBucket,
@@ -367,67 +398,71 @@ class ArchivistFeatureTest
           queuePair,
           registrarTopic,
           progressTopic) =>
-        createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-          case (validRequest1, validBag1) =>
+        createAndSendBag(
+          ingestBucket,
+          queuePair,
+          bagInfo = bagInfo1,
+          dataFileCount = 1) { validRequest1 =>
+          createAndSendBag(
+            ingestBucket,
+            queuePair,
+            dataFileCount = 1,
+            createBagInfoFile = _ => None) { invalidRequest1 =>
             createAndSendBag(
               ingestBucket,
               queuePair,
-              dataFileCount = 1,
-              createBagInfoFile = _ => None) {
-              case (invalidRequest1, _) =>
-                createAndSendBag(ingestBucket, queuePair, dataFileCount = 1) {
-                  case (validRequest2, validBag2) =>
-                    createAndSendBag(
-                      ingestBucket,
-                      queuePair,
-                      dataFileCount = 1,
-                      createBagInfoFile = _ => None) {
-                      case (invalidRequest2, _) =>
-                        eventually {
+              bagInfo = bagInfo2,
+              dataFileCount = 1) { validRequest2 =>
+              createAndSendBag(
+                ingestBucket,
+                queuePair,
+                dataFileCount = 1,
+                createBagInfoFile = _ => None) { invalidRequest2 =>
+                eventually {
 
-                          assertQueuePairSizes(queuePair, 0, 0)
+                  assertQueuePairSizes(queuePair, 0, 0)
 
-                          assertSnsReceives(
-                            Set(
-                              ArchiveComplete(
-                                validRequest1.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest1.storageSpace}/$validBag1"))
-                              ),
-                              ArchiveComplete(
-                                validRequest2.archiveRequestId,
-                                validRequest2.storageSpace,
-                                BagLocation(
-                                  storageBucket.name,
-                                  "archive",
-                                  BagPath(
-                                    s"${validRequest2.storageSpace}/$validBag2"))
-                              )
-                            ),
-                            registrarTopic
-                          )
+                  assertSnsReceives(
+                    Set(
+                      ArchiveComplete(
+                        validRequest1.archiveRequestId,
+                        validRequest2.storageSpace,
+                        BagLocation(
+                          storageBucket.name,
+                          "archive",
+                          BagPath(
+                            s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
+                      ),
+                      ArchiveComplete(
+                        validRequest2.archiveRequestId,
+                        validRequest2.storageSpace,
+                        BagLocation(
+                          storageBucket.name,
+                          "archive",
+                          BagPath(
+                            s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
+                      )
+                    ),
+                    registrarTopic
+                  )
 
-                          assertTopicReceivesFailedProgress(
-                            requestId = invalidRequest1.archiveRequestId,
-                            expectedDescription =
-                              "Failed reading file bag-info.txt from zip file",
-                            progressTopic = progressTopic
-                          )
+                  assertTopicReceivesFailedProgress(
+                    requestId = invalidRequest1.archiveRequestId,
+                    expectedDescription =
+                      "Failed reading file bag-info.txt from zip file",
+                    progressTopic = progressTopic
+                  )
 
-                          assertTopicReceivesFailedProgress(
-                            requestId = invalidRequest2.archiveRequestId,
-                            expectedDescription =
-                              "Failed reading file bag-info.txt from zip file",
-                            progressTopic = progressTopic
-                          )
-                        }
-                    }
+                  assertTopicReceivesFailedProgress(
+                    requestId = invalidRequest2.archiveRequestId,
+                    expectedDescription =
+                      "Failed reading file bag-info.txt from zip file",
+                    progressTopic = progressTopic
+                  )
                 }
+              }
             }
+          }
         }
     }
   }
