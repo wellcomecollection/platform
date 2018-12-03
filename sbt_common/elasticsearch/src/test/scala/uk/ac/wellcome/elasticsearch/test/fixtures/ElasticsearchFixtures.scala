@@ -1,5 +1,6 @@
 package uk.ac.wellcome.elasticsearch.test.fixtures
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.cluster.ClusterHealthResponse
@@ -178,13 +179,14 @@ trait ElasticsearchFixtures
     }
   }
 
+  // TODO: This method can use Index as a parameter
   def createDisplayElasticConfigWith(
     indexNameV1: String,
     indexNameV2: String): DisplayElasticConfig =
     DisplayElasticConfig(
       documentType = documentType,
-      indexNameV1 = indexNameV1,
-      indexNameV2 = indexNameV2
+      indexV1 = Index(name = indexNameV1),
+      indexV2 = Index(name = indexNameV2)
     )
 
   private def createIndexName: String =

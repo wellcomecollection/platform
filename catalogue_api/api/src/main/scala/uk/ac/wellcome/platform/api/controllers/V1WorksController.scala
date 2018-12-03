@@ -23,7 +23,7 @@ class V1WorksController @Inject()(
       V1SingleWorkRequest,
       V1WorksIncludes](
       apiConfig = apiConfig,
-      indexName = elasticConfig.indexNameV1,
+      indexName = elasticConfig.indexV1,
       documentType = elasticConfig.documentType,
       worksService = worksService
     ) {

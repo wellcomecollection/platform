@@ -54,14 +54,14 @@ class SnapshotService @Inject()(akkaS3Client: S3Client,
         runStream(
           publicBucketName = publicBucketName,
           publicObjectKey = publicObjectKey,
-          indexName = elasticConfig.indexNameV1,
+          indexName = elasticConfig.indexV1,
           toDisplayWork = DisplayWorkV1.apply(_, V1WorksIncludes.includeAll())
         )
       case ApiVersions.v2 =>
         runStream(
           publicBucketName = publicBucketName,
           publicObjectKey = publicObjectKey,
-          indexName = elasticConfig.indexNameV2,
+          indexName = elasticConfig.indexV2,
           toDisplayWork = DisplayWorkV2.apply(_, V2WorksIncludes.includeAll())
         )
     }
