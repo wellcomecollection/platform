@@ -1,19 +1,24 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search, _}
-import com.sksamuel.elastic4s.http.{RequestFailure, Response}
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.sksamuel.elastic4s.http.{ElasticError, Response}
 import org.scalacheck.Shrink
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Person, Subject, Unidentifiable}
 import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
+  Person,
+  Subject,
+  Unidentifiable
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -74,7 +79,7 @@ class WorksIndexTest
 
       whenReady(future) { response =>
         response.isError shouldBe true
-        response.error shouldBe a[RequestFailure]
+        response.error shouldBe a[ElasticError]
       }
     }
   }

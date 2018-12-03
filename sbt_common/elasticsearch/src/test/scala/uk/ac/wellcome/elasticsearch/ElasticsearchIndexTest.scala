@@ -1,11 +1,11 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.Response
+import com.sksamuel.elastic4s.http.{RequestFailure, Response}
+import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -13,6 +13,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 case class TestObject(
   id: String,
@@ -23,8 +24,8 @@ case class TestObject(
 case class CompatibleTestObject(
   id: String,
   description: String,
-  count: Int,
-  visible: Boolean
+  visible: Boolean,
+  count: Int
 )
 
 case class BadTestObject(
@@ -62,8 +63,8 @@ class ElasticsearchIndexTest
         .as(
           keywordField("id"),
           textField("description"),
-          intField("count"),
-          booleanField("visible")
+          booleanField("visible"),
+          intField("count")
         )
     }
   }
@@ -99,14 +100,16 @@ class ElasticsearchIndexTest
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
-      val eventuallyResponse =
-        for {
-          response <- elasticClient.execute(
-            indexInto(indexName / testType).doc(badTestObjectJson))
-        } yield response
+      val future: Future[Response[IndexResponse]] =
+        elasticClient
+          .execute {
+            indexInto(indexName / testType)
+              .doc(badTestObjectJson)
+          }
 
-      whenReady(eventuallyResponse.failed) { exception =>
-        exception shouldBe a[ResponseException]
+      whenReady(future) { response =>
+        response.isError shouldBe true
+        response shouldBe a[RequestFailure]
       }
     }
   }
@@ -115,20 +118,33 @@ class ElasticsearchIndexTest
     withLocalElasticsearchIndex(TestIndex) { indexName =>
       withLocalElasticsearchIndex(CompatibleTestIndex, indexName = indexName) {
         testIndexName =>
-          val compatibleTestObject =
-            CompatibleTestObject("id", "description", 5, visible = true)
+          val compatibleTestObject = CompatibleTestObject(
+            id = "id",
+            description = "description",
+            count = 5,
+            visible = true
+          )
+
           val compatibleTestObjectJson = toJson(compatibleTestObject).get
 
-          val futureInsert = elasticClient.execute(
-            indexInto(testIndexName / testType) doc compatibleTestObjectJson)
+          val futureInsert: Future[Response[IndexResponse]] =
+            elasticClient
+              .execute {
+                indexInto(indexName / testType)
+                  .doc(compatibleTestObjectJson)
+              }
 
-          whenReady(futureInsert) { _ =>
+          whenReady(futureInsert) { response =>
+            if (response.isError) { println(response) }
+            response.isError shouldBe false
+
             eventually {
-              val response: Response[SearchResponse] = elasticClient
-                .execute {
-                  search(s"$testIndexName/$testType").matchAllQuery()
-                }
-                .await
+              val response: Response[SearchResponse] =
+                elasticClient
+                  .execute {
+                    search(s"$indexName/$testType").matchAllQuery()
+                  }
+                  .await
 
               val hits = response.result.hits.hits
 
