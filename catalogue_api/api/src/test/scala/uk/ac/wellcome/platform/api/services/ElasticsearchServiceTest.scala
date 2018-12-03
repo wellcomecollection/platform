@@ -23,7 +23,7 @@ class ElasticsearchServiceTest
     with Matchers
     with ScalaFutures
     with SearchOptionsGenerators
-    with WorksGenerators {
+    with WorksGenerators  {
 
   describe("simpleStringQueryResults") {
     it("finds results for a simpleStringQuery search") {
@@ -180,7 +180,27 @@ class ElasticsearchServiceTest
         )
       }
     }
-  }
+
+    it("returns results in consistent order") {
+      withLocalElasticsearchIndex { indexName =>
+        val works = (1 to 5).map { _ => createIdentifiedWorkWith(title = s"A ${Random.alphanumeric.filterNot(_.equals('A')) take 10 mkString}") }.sortBy(_.canonicalId)
+
+        insertIntoElasticsearch(indexName, works: _*)
+        withElasticsearchService { searchService =>
+          (1 to 10).foreach { _ =>
+
+            val searchResponseFuture = searchService
+              .simpleStringQueryResults("A")(createElasticsearchDocumentOptionsWith(indexName), createElasticsearchQueryOptions)
+
+            whenReady(searchResponseFuture) { response =>
+              searchResponseToWorks(response) shouldBe works
+            }
+          }
+        }
+        }
+      }
+    }
+
 
   describe("findResultById") {
     it("finds a result by ID") {
@@ -432,7 +452,7 @@ class ElasticsearchServiceTest
       val documentOptions = createElasticsearchDocumentOptionsWith(indexName)
 
       val listResponseFuture = searchService
-        .listResults(sortByField = "canonicalId")(documentOptions, queryOptions)
+        .listResults(documentOptions, queryOptions)
 
       whenReady(listResponseFuture) { response =>
         searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
