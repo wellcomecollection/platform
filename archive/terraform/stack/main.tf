@@ -154,7 +154,7 @@ module "api" {
   bags_env_vars = {
     context_url     = "https://api.wellcomecollection.org/storage/v1/context.json"
     vhs_bucket_name = "${var.vhs_archive_manifest_bucket_name}"
-    vhs_table_name  = "${var.vhs_archive_manifest_bucket_name}"
+    vhs_table_name  = "${var.vhs_archive_manifest_table_name}"
     app_base_url    = "https://api.wellcomecollection.org/storage/v1/bags"
   }
   bags_env_vars_length       = 4
