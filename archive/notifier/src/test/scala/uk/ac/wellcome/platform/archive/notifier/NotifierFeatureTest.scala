@@ -85,7 +85,7 @@ class NotifierFeatureTest
                       progress.sourceLocation.location.key),
                     progress.callback.map(DisplayCallback(_)),
                     DisplayIngestType("create"),
-                    DisplayStorageSpace(progress.space.underlying),
+                    DisplaySpace(progress.space),
                     DisplayStatus(progress.status.toString),
                     progress.bag.map(bagId =>
                       IngestDisplayBag(
@@ -157,7 +157,7 @@ class NotifierFeatureTest
                         progress.sourceLocation.location.key),
                       progress.callback.map(DisplayCallback(_)),
                       DisplayIngestType("create"),
-                      DisplayStorageSpace(progress.space.underlying),
+                      DisplaySpace(progress.space),
                       DisplayStatus(progress.status.toString),
                       progress.bag.map(bagId =>
                         IngestDisplayBag(

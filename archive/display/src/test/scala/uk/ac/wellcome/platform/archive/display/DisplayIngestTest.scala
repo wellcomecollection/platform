@@ -7,7 +7,6 @@ import java.util.UUID
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.generators.BagIdGenerators
-import uk.ac.wellcome.platform.archive.common.models.Namespace
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.storage.ObjectLocation
@@ -30,12 +29,13 @@ class DisplayIngestTest
 
   it("creates a DisplayIngest from Progress") {
     val bagId = createBagId
+    val namespace = createNamespace
     val progress: Progress = Progress(
       id,
       StorageLocation(
         StorageProvider("s3"),
         ObjectLocation("bukkit", "key.txt")),
-      Namespace(spaceId),
+      space = namespace,
       Some(Callback(new URI(callbackUrl))),
       Progress.Processing,
       Some(bagId),
@@ -54,7 +54,7 @@ class DisplayIngestTest
       path = "key.txt")
     ingest.callback shouldBe Some(
       DisplayCallback(callbackUrl, Some(ingest.callback.get.status.get)))
-    ingest.space shouldBe DisplayStorageSpace(spaceId)
+    ingest.space shouldBe DisplaySpace(namespace)
     ingest.status shouldBe DisplayStatus("processing")
     ingest.bag shouldBe Some(
       IngestDisplayBag(s"${bagId.space}/${bagId.externalIdentifier}"))
@@ -73,7 +73,7 @@ class DisplayIngestTest
       Some(
         DisplayCallback("http://www.wellcomecollection.org/callback/ok", None)),
       DisplayIngestType("create"),
-      DisplayStorageSpace("space-id")
+      space = DisplaySpace(createNamespace)
     )
 
     val progress = progressCreateRequest.toProgress
