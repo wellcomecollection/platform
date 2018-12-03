@@ -1,6 +1,6 @@
 module "service" {
   source       = "../scaling_service"
-  service_name = "reindex_worker-${var.namespace}"
+  service_name = "reindex_worker"
 
   task_desired_count = "0"
   source_queue_name  = "${module.reindex_worker_queue.name}"
@@ -14,7 +14,7 @@ module "service" {
 
   env_vars = {
     reindex_jobs_queue_id     = "${module.reindex_worker_queue.id}"
-    metrics_namespace         = "reindex_worker-${var.namespace}"
+    metrics_namespace         = "reindex_worker"
     reindexer_job_config_json = "${var.reindexer_job_config_json}"
   }
 

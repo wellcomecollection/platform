@@ -1,7 +1,3 @@
-variable "namespace" {
-  description = "miro, sierra, goobi, ..."
-}
-
 variable "aws_region" {
   default = "eu-west-1"
 }
