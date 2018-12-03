@@ -9,6 +9,5 @@ case class IngestorConfig(
 )
 
 case class IngestElasticConfig(
-  documentType: String,
   indexName: String
 )

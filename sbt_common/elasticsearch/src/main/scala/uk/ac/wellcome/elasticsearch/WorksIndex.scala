@@ -9,7 +9,7 @@ import grizzled.slf4j.Logging
 
 import scala.concurrent.ExecutionContext
 
-class WorksIndex(client: ElasticClient, rootIndexType: String)(
+class WorksIndex(client: ElasticClient, indexName: String)(
   implicit val ec: ExecutionContext)
     extends ElasticsearchIndex
     with Logging {
@@ -177,7 +177,7 @@ class WorksIndex(client: ElasticClient, rootIndexType: String)(
       booleanField("merged")
     )
 
-  val mappingDefinition: MappingDefinition = mapping(rootIndexType)
+  val mappingDefinition: MappingDefinition = mapping(indexName)
     .dynamic(DynamicMapping.Strict)
     .as(rootIndexFields)
 }

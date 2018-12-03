@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.fixtures
 
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.{ElasticClient, HttpClient}
 import org.scalatest.Suite
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
@@ -21,7 +21,7 @@ trait WorkerServiceFixture extends ElasticsearchFixtures with Messaging {
   this: Suite =>
   def withWorkerService[R](queue: Queue,
                            indexName: String,
-                           elasticClient: HttpClient = elasticClient)(
+                           elasticClient: ElasticClient = elasticClient)(
     testWith: TestWith[IngestorWorkerService, R]): R =
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
@@ -32,7 +32,6 @@ trait WorkerServiceFixture extends ElasticsearchFixtures with Messaging {
             batchSize = 100,
             flushInterval = 5 seconds,
             elasticConfig = IngestElasticConfig(
-              documentType = documentType,
               indexName = indexName
             )
           )

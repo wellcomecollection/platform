@@ -27,11 +27,9 @@ object IngestorConfigBuilder {
   }
 
   def buildElasticConfig(config: Config): IngestElasticConfig = {
-    val documentType = config.getOrElse[String]("es.type")(default = "item")
     val indexName = config.required[String]("es.index")
 
     IngestElasticConfig(
-      documentType = documentType,
       indexName = indexName
     )
   }

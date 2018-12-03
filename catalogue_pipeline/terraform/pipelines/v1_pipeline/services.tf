@@ -66,11 +66,10 @@ module "ingestor" {
     es_password         = "${var.es_cluster_credentials["password"]}"
     es_protocol         = "${var.es_cluster_credentials["protocol"]}"
     es_index            = "${var.index}"
-    es_doc_type         = "work"
     ingest_queue_id     = "${module.es_ingest_queue.id}"
   }
 
-  env_vars_length   = 10
+  env_vars_length   = 9
   container_image   = "${var.ingestor_container_image}"
   source_queue_name = "${module.es_ingest_queue.name}"
   source_queue_arn  = "${module.es_ingest_queue.arn}"
