@@ -44,7 +44,7 @@ class ElasticsearchServiceTest
     }
 
     it("filters search results by workType") {
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex2 { index: Index =>
         val workWithCorrectWorkType = createIdentifiedWorkWith(
           title = "Animated artichokes",
           workType = Some(WorkType(id = "b", label = "Books"))
@@ -59,13 +59,13 @@ class ElasticsearchServiceTest
         )
 
         insertIntoElasticsearch(
-          indexName,
+          index,
           workWithCorrectWorkType,
           workWithWrongTitle,
           workWithWrongWorkType)
 
         assertSearchResultsAreCorrect(
-          index = indexName,
+          index = index,
           queryString = "artichokes",
           queryOptions = createElasticsearchQueryOptionsWith(
             filters = List(WorkTypeFilter(workTypeId = "b"))
@@ -76,7 +76,7 @@ class ElasticsearchServiceTest
     }
 
     it("filters search results with multiple workTypes") {
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex2 { index: Index =>
         val work1 = createIdentifiedWorkWith(
           title = "Animated artichokes",
           workType = Some(WorkType(id = "b", label = "Books"))
@@ -95,14 +95,14 @@ class ElasticsearchServiceTest
         )
 
         insertIntoElasticsearch(
-          indexName,
+          index,
           work1,
           workWithWrongTitle,
           work2,
           workWithWrongType)
 
         assertSearchResultsAreCorrect(
-          index = indexName,
+          index = index,
           queryString = "artichokes",
           queryOptions = createElasticsearchQueryOptionsWith(
             filters = List(WorkTypeFilter(List("b", "m")))

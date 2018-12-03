@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.api.works.v1
 
+import com.sksamuel.elastic4s.Index
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.models.work.internal._
@@ -363,12 +364,12 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it("searches different indices with the ?_index query parameter") {
     withV1Api {
       case (apiPrefix, indexNameV1, _, server: EmbeddedHttpServer) =>
-        withLocalWorksIndex { otherIndex =>
+        withLocalWorksIndex2 { altIndex: Index =>
           val work = createIdentifiedWork
           insertIntoElasticsearch(indexNameV1, work)
 
-          val work_alt = createIdentifiedWork
-          insertIntoElasticsearch(indexName = otherIndex, work_alt)
+          val altWork = createIdentifiedWork
+          insertIntoElasticsearch(index = altIndex, altWork)
 
           eventually {
             server.httpGet(
@@ -393,14 +394,14 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           eventually {
             server.httpGet(
               path =
-                s"/$apiPrefix/works/${work_alt.canonicalId}?_index=$otherIndex",
+                s"/$apiPrefix/works/${altWork.canonicalId}?_index=${altIndex.name}",
               andExpect = Status.Ok,
               withJsonBody = s"""
                    |{
                    | "@context": "https://localhost:8888/$apiPrefix/context.json",
                    | "type": "Work",
-                   | "id": "${work_alt.canonicalId}",
-                   | "title": "${work_alt.title}",
+                   | "id": "${altWork.canonicalId}",
+                   | "title": "${altWork.title}",
                    | "creators": [ ],
                    | "subjects": [ ],
                    | "genres": [ ],
@@ -417,16 +418,16 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it("looks up works in different indices with the ?_index query parameter") {
     withV1Api {
       case (apiPrefix, indexNameV1, _, server: EmbeddedHttpServer) =>
-        withLocalWorksIndex { otherIndex =>
+        withLocalWorksIndex2 { altIndex: Index =>
           val work = createIdentifiedWorkWith(
             title = "Wombles of Wimbledon"
           )
           insertIntoElasticsearch(indexNameV1, work)
 
-          val work_alt = createIdentifiedWorkWith(
+          val altWork = createIdentifiedWorkWith(
             title = work.title
           )
-          insertIntoElasticsearch(indexName = otherIndex, work_alt)
+          insertIntoElasticsearch(index = altIndex, altWork)
 
           eventually {
             server.httpGet(
@@ -454,7 +455,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
           eventually {
             server.httpGet(
-              path = s"/$apiPrefix/works?query=wombles&_index=$otherIndex",
+              path = s"/$apiPrefix/works?query=wombles&_index=${altIndex.name}",
               andExpect = Status.Ok,
               withJsonBody = s"""
                    |{
@@ -462,8 +463,8 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                    |  "results": [
                    |   {
                    |     "type": "Work",
-                   |     "id": "${work_alt.canonicalId}",
-                   |     "title": "${work_alt.title}",
+                   |     "id": "${altWork.canonicalId}",
+                   |     "title": "${altWork.title}",
                    |     "creators": [ ],
                    |     "subjects": [ ],
                    |     "genres": [ ],
