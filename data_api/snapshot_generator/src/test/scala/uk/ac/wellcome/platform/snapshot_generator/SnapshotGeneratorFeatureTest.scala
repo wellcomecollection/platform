@@ -46,10 +46,10 @@ class SnapshotGeneratorFeatureTest
 
   it("completes a snapshot generation") {
     withFixtures {
-      case (queue, topic, indexNameV1, _, publicBucket: Bucket) =>
+      case (queue, topic, indexV1, _, publicBucket: Bucket) =>
         val works = createIdentifiedWorks(count = 3)
 
-        insertIntoElasticsearch(indexNameV1, works: _*)
+        insertIntoElasticsearch(indexV1, works: _*)
 
         val publicObjectKey = "target.txt.gz"
 
