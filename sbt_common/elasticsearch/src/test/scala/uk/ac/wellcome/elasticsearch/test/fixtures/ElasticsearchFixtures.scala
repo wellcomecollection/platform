@@ -85,6 +85,16 @@ trait ElasticsearchFixtures
 
     // Elasticsearch is eventually consistent, so the future
     // completing doesn't actually mean that the index exists yet
+    eventuallyIndexExists(indexName)
+
+    try {
+      testWith(indexName)
+    } finally {
+      elasticClient.execute(deleteIndex(indexName))
+    }
+  }
+
+  def eventuallyIndexExists(indexName: String): Assertion =
     eventually {
       val response: Response[IndexExistsResponse] =
         elasticClient
@@ -94,10 +104,16 @@ trait ElasticsearchFixtures
       response.result.isExists shouldBe true
     }
 
-    try {
-      testWith(indexName)
-    } finally {
-      elasticClient.execute(deleteIndex(indexName))
+  def eventuallyDeleteIndex(indexName: String): Assertion = {
+    elasticClient.execute(deleteIndex(indexName))
+
+    eventually {
+      val response: Response[IndexExistsResponse] =
+        elasticClient
+          .execute(indexExists(indexName))
+          .await
+
+      response.result.isExists shouldBe false
     }
   }
 

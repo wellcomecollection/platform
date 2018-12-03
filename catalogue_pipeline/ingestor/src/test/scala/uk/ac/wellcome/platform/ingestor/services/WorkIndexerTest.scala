@@ -227,11 +227,6 @@ class WorkIndexerTest
   }
 
   it("returns a list of Works that weren't indexed correctly") {
-    val subsetOfFieldsIndex = new OnlyInvisibleWorksIndex(
-      elasticClient = elasticClient,
-      documentType = documentType
-    )
-
     val validWorks = createIdentifiedInvisibleWorks(count = 5)
     val notMatchingMappingWork = createIdentifiedWorkWith(
       subjects = List(Subject(label = "crystallography", concepts = Nil))
@@ -239,7 +234,7 @@ class WorkIndexerTest
 
     val works = validWorks :+ notMatchingMappingWork
 
-    withLocalWorksIndex(subsetOfFieldsIndex) { indexName =>
+    withLocalElasticsearchIndex(OnlyInvisibleWorksIndex) { indexName =>
       withWorkIndexer { workIndexer =>
         val future = workIndexer.indexWorks(
           works = works,

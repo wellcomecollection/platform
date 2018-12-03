@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
@@ -156,8 +156,8 @@ class IngestorWorkerServiceTest
             new ElasticCredentials("elastic", "changeme"))
           .build()
 
-        val brokenElasticClient: HttpClient =
-          HttpClient.fromRestClient(brokenRestClient)
+        val brokenElasticClient: ElasticClient =
+          ElasticClient.fromRestClient(brokenRestClient)
 
         withWorkerService(
           queue,
