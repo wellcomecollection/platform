@@ -10,8 +10,11 @@ import grizzled.slf4j.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ElasticsearchIndexCreator(elasticClient: ElasticClient)(implicit ec: ExecutionContext) extends Logging {
-  def create(indexName: String, mappingDefinition: MappingDefinition): Future[Unit] =
+class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
+  implicit ec: ExecutionContext)
+    extends Logging {
+  def create(indexName: String,
+             mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
       .execute {
         createIndex(indexName).mappings {
@@ -38,7 +41,8 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(implicit ec: Execu
         info("Index updated successfully")
       }
 
-  private def update(indexName: String, mappingDefinition: MappingDefinition): Future[Response[PutMappingResponse]] =
+  private def update(indexName: String, mappingDefinition: MappingDefinition)
+    : Future[Response[PutMappingResponse]] =
     elasticClient
       .execute {
         putMapping(indexName / mappingDefinition.`type`)

@@ -15,8 +15,15 @@ import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.platform.snapshot_generator.flow.{DisplayWorkToJsonStringFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
-import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
+import uk.ac.wellcome.platform.snapshot_generator.flow.{
+  DisplayWorkToJsonStringFlow,
+  IdentifiedWorkToVisibleDisplayWork,
+  StringToGzipFlow
+}
+import uk.ac.wellcome.platform.snapshot_generator.models.{
+  CompletedSnapshotJob,
+  SnapshotJob
+}
 import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSource
 
 import scala.concurrent.{ExecutionContext, Future}

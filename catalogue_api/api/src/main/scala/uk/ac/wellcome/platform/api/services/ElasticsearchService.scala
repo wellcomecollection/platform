@@ -9,7 +9,11 @@ import com.sksamuel.elastic4s.searches.{SearchRequest, SearchType}
 import com.sksamuel.elastic4s.searches.queries.term.TermsQuery
 import com.sksamuel.elastic4s.searches.queries.{BoolQuery, Query}
 import com.sksamuel.elastic4s.searches.sort.{FieldSort, SortOrder}
-import uk.ac.wellcome.platform.api.models.{ItemLocationTypeFilter, WorkFilter, WorkTypeFilter}
+import uk.ac.wellcome.platform.api.models.{
+  ItemLocationTypeFilter,
+  WorkFilter,
+  WorkTypeFilter
+}
 
 import scala.concurrent.Future
 
@@ -79,8 +83,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
       .map { _.result }
   }
 
-  private def toTermQuery(
-    workFilter: WorkFilter): TermsQuery[String] =
+  private def toTermQuery(workFilter: WorkFilter): TermsQuery[String] =
     workFilter match {
       case ItemLocationTypeFilter(itemLocationTypeIds) =>
         termsQuery(

@@ -21,7 +21,9 @@ variable "es_cluster_credentials" {
   type        = "map"
 }
 
-variable "es_cluster_credentials_v6" { type = "map" }
+variable "es_cluster_credentials_v6" {
+  type = "map"
+}
 
 variable "matcher_graph_table_index" {
   description = "Name of the GSI in the matcher graph table"

@@ -3,7 +3,11 @@ package uk.ac.wellcome.elasticsearch
 import com.sksamuel.elastic4s.analyzers._
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition, ObjectField}
+import com.sksamuel.elastic4s.mappings.{
+  FieldDefinition,
+  MappingDefinition,
+  ObjectField
+}
 
 object WorksIndex extends MappingDefinitionBuilder {
   def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
@@ -70,7 +74,8 @@ object WorksIndex extends MappingDefinitionBuilder {
 
     val rootConcept = concept ++ agent
 
-    def identified(fieldName: String, fields: Seq[FieldDefinition]): ObjectField =
+    def identified(fieldName: String,
+                   fields: Seq[FieldDefinition]): ObjectField =
       objectField(fieldName).fields(
         textField("type"),
         objectField("agent").fields(fields),

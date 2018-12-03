@@ -12,7 +12,9 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 object ElasticsearchWorksSource extends Logging {
-  def apply(elasticClient: ElasticClient, indexName: String, documentType: String)(
+  def apply(elasticClient: ElasticClient,
+            indexName: String,
+            documentType: String)(
     implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] = {
     val loggingSink = Flow[IdentifiedWork]
       .grouped(10000)
