@@ -66,8 +66,8 @@ trait ElasticsearchFixtures
     implicitly[Position])
 
   def withLocalWorksIndex[R](testWith: TestWith[Index, R]): R =
-    withLocalElasticsearchIndex[R](WorksIndex) { indexName =>
-      testWith(Index(name = indexName))
+    withLocalElasticsearchIndex[R](WorksIndex) { index: Index =>
+      testWith(index)
     }
 
   private val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
@@ -75,13 +75,6 @@ trait ElasticsearchFixtures
   )
 
   def withLocalElasticsearchIndex[R](
-    index: MappingDefinitionBuilder,
-    indexName: String = createIndexName)(testWith: TestWith[String, R]): R =
-    withLocalElasticsearchIndex2(index, Index(indexName)) { idx =>
-      testWith(idx.name)
-    }
-
-  def withLocalElasticsearchIndex2[R](
     mappingDefinition: MappingDefinitionBuilder,
     index: Index = createIndexName)(testWith: TestWith[Index, R]): R = {
     elasticsearchIndexCreator
@@ -126,11 +119,6 @@ trait ElasticsearchFixtures
   }
 
   def assertElasticsearchEventuallyHasWork(
-    indexName: String,
-    works: IdentifiedBaseWork*): Seq[Assertion] =
-    assertElasticsearchEventuallyHasWork2(Index(indexName), works: _*)
-
-  def assertElasticsearchEventuallyHasWork2(
     index: Index,
     works: IdentifiedBaseWork*): Seq[Assertion] =
     works.map { work =>
@@ -149,12 +137,8 @@ trait ElasticsearchFixtures
       }
     }
 
-  def assertElasticsearchNeverHasWork(indexName: String,
-                                      works: IdentifiedBaseWork*): Unit =
-    assertElasticsearchNeverHasWork2(Index(indexName), works: _*)
-
-  def assertElasticsearchNeverHasWork2(index: Index,
-                                       works: IdentifiedBaseWork*): Unit = {
+  def assertElasticsearchNeverHasWork(index: Index,
+                                      works: IdentifiedBaseWork*): Unit = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
     Thread.sleep(500)

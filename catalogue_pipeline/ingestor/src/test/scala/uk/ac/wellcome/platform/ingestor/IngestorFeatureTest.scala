@@ -28,7 +28,7 @@ class IngestorFeatureTest
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
       withLocalWorksIndex { index: Index =>
         withWorkerService(queue, index) { _ =>
-          assertElasticsearchEventuallyHasWork2(index, work)
+          assertElasticsearchEventuallyHasWork(index, work)
         }
       }
     }
@@ -43,7 +43,7 @@ class IngestorFeatureTest
       sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
       withLocalWorksIndex { index: Index =>
         withWorkerService(queue, index) { _ =>
-          assertElasticsearchEventuallyHasWork2(index, work)
+          assertElasticsearchEventuallyHasWork(index, work)
         }
       }
     }

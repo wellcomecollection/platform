@@ -139,7 +139,7 @@ class IngestorWorkerServiceTest
             sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
             sendMessage(queue = queue, obj = square)
 
-            assertElasticsearchEventuallyHasWork2(index = index, work)
+            assertElasticsearchEventuallyHasWork(index = index, work)
 
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, 1)
@@ -186,7 +186,7 @@ class IngestorWorkerServiceTest
               sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
             }
 
-            assertElasticsearchEventuallyHasWork2(index = index, works: _*)
+            assertElasticsearchEventuallyHasWork(index = index, works: _*)
 
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)

@@ -28,7 +28,7 @@ class WorkIndexerTest
 
       whenReady(future) { result =>
         result.right.get should contain(work)
-        assertElasticsearchEventuallyHasWork2(index = index, work)
+        assertElasticsearchEventuallyHasWork(index = index, work)
       }
     }
   }
@@ -42,7 +42,7 @@ class WorkIndexerTest
       )
 
       whenReady(future) { _ =>
-        assertElasticsearchEventuallyHasWork2(index = index, work)
+        assertElasticsearchEventuallyHasWork(index = index, work)
       }
     }
   }
@@ -78,7 +78,7 @@ class WorkIndexerTest
 
       whenReady(future) { result =>
         result.right.get should contain(updatedWork)
-        assertElasticsearchEventuallyHasWork2(
+        assertElasticsearchEventuallyHasWork(
           index = index,
           updatedWork)
       }
@@ -197,7 +197,7 @@ class WorkIndexerTest
       )
 
       whenReady(future) { successfullyInserted =>
-        assertElasticsearchEventuallyHasWork2(index = index, works: _*)
+        assertElasticsearchEventuallyHasWork(index = index, works: _*)
         successfullyInserted.right.get should contain theSameElementsAs works
       }
     }
@@ -211,7 +211,7 @@ class WorkIndexerTest
 
     val works = validWorks :+ notMatchingMappingWork
 
-    withLocalElasticsearchIndex2(OnlyInvisibleWorksIndex) { index: Index =>
+    withLocalElasticsearchIndex(OnlyInvisibleWorksIndex) { index: Index =>
       val future = workIndexer.indexWorks(
         works = works,
         index = index,
@@ -219,10 +219,10 @@ class WorkIndexerTest
       )
 
       whenReady(future) { result =>
-        assertElasticsearchEventuallyHasWork2(
+        assertElasticsearchEventuallyHasWork(
           index = index,
           validWorks: _*)
-        assertElasticsearchNeverHasWork2(
+        assertElasticsearchNeverHasWork(
           index = index,
           notMatchingMappingWork)
         result.left.get should contain(notMatchingMappingWork)
@@ -252,6 +252,6 @@ class WorkIndexerTest
     ingestedWork: IdentifiedBaseWork,
     index: Index) = {
     result.isRight shouldBe true
-    assertElasticsearchEventuallyHasWork2(index = index, ingestedWork)
+    assertElasticsearchEventuallyHasWork(index = index, ingestedWork)
   }
 }
