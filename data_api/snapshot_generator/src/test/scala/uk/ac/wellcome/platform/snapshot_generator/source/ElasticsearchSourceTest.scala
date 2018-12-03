@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.snapshot_generator.source
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Sink, Source}
+import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -65,8 +66,8 @@ class ElasticsearchSourceTest
     implicit actorSystem: ActorSystem): R = {
     val source = ElasticsearchWorksSource(
       elasticClient = elasticClient,
-      indexName = indexName,
-      documentType = documentType)
+      index = Index(indexName)
+    )
     testWith(source)
   }
 }

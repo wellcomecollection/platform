@@ -23,7 +23,7 @@ class IngestorIndexTest
 
     withLocalSqsQueue { queue =>
       withWorkerService(queue, index) { _ =>
-        eventuallyIndexExists2(index)
+        eventuallyIndexExists(index)
       }
     }
   }

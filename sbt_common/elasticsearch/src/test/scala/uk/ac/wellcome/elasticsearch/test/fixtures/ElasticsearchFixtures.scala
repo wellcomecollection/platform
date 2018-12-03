@@ -98,7 +98,7 @@ trait ElasticsearchFixtures
 
     // Elasticsearch is eventually consistent, so the future
     // completing doesn't actually mean that the index exists yet
-    eventuallyIndexExists2(index)
+    eventuallyIndexExists(index)
 
     try {
       testWith(index)
@@ -107,10 +107,7 @@ trait ElasticsearchFixtures
     }
   }
 
-  def eventuallyIndexExists(indexName: String): Assertion =
-    eventuallyIndexExists2(Index(indexName))
-
-  def eventuallyIndexExists2(index: Index): Assertion =
+  def eventuallyIndexExists(index: Index): Assertion =
     eventually {
       val response: Response[IndexExistsResponse] =
         elasticClient
