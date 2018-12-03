@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.config.builders
 
+import com.sksamuel.elastic4s.Index
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.platform.ingestor.config.models.{
@@ -32,7 +33,7 @@ object IngestorConfigBuilder {
 
     IngestElasticConfig(
       documentType = documentType,
-      indexName = indexName
+      index = Index(indexName)
     )
   }
 }

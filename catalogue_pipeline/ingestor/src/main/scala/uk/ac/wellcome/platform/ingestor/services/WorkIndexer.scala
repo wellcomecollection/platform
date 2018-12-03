@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.Indexable
+import com.sksamuel.elastic4s.{Index, Indexable}
 import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
@@ -29,14 +29,14 @@ class WorkIndexer(
   }
 
   def indexWorks(works: Seq[IdentifiedBaseWork],
-                 indexName: String,
+                 index: Index,
                  documentType: String)
     : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
     val inserts = works.map { work =>
-      indexInto(indexName / documentType)
+      indexInto(index.name / documentType)
         .version(calculateEsVersion(work))
         .versionType(ExternalGte)
         .id(work.canonicalId)

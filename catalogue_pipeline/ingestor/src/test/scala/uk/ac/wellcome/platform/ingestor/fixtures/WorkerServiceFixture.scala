@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.fixtures
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import org.scalatest.Suite
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -20,7 +21,7 @@ import scala.concurrent.duration._
 trait WorkerServiceFixture extends ElasticsearchFixtures with Messaging {
   this: Suite =>
   def withWorkerService[R](queue: Queue,
-                           indexName: String,
+                           index: Index,
                            elasticClient: ElasticClient = elasticClient)(
     testWith: TestWith[IngestorWorkerService, R]): R =
     withActorSystem { implicit actorSystem =>
@@ -33,7 +34,7 @@ trait WorkerServiceFixture extends ElasticsearchFixtures with Messaging {
             flushInterval = 5 seconds,
             elasticConfig = IngestElasticConfig(
               documentType = documentType,
-              indexName = indexName
+              index = index
             )
           )
 
