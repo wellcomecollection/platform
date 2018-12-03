@@ -28,15 +28,12 @@ trait ElasticsearchFixtures
   private val esHost = "localhost"
   private val esPort = 9200
 
-  val documentType = "work"
-
   def displayEsLocalFlags(indexNameV1: String, indexNameV2: String) =
     Map(
       "es.host" -> esHost,
       "es.port" -> esPort.toString,
       "es.index.v1" -> indexNameV1,
-      "es.index.v2" -> indexNameV2,
-      "es.type" -> documentType
+      "es.index.v2" -> indexNameV2
     )
 
   val elasticClient: ElasticClient = ElasticClientBuilder.create(
@@ -107,7 +104,7 @@ trait ElasticsearchFixtures
 
       eventually {
         val response: Response[GetResponse] = elasticClient
-          .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
+          .execute(get(work.canonicalId).from(indexName))
           .await
 
         response.result.exists shouldBe true
@@ -124,7 +121,7 @@ trait ElasticsearchFixtures
 
     works.foreach { work =>
       val response: Response[GetResponse] = elasticClient
-        .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
+        .execute(get(work.canonicalId).from(indexName))
         .await
 
       response.result.found shouldBe false
@@ -138,7 +135,7 @@ trait ElasticsearchFixtures
         works.map { work =>
           val jsonDoc = toJson(work).get
 
-          indexInto(indexName / documentType)
+          indexInto(indexName)
             .version(work.version)
             .versionType(ExternalGte)
             .id(work.canonicalId)

@@ -65,8 +65,7 @@ class ElasticsearchSourceTest
     implicit actorSystem: ActorSystem): R = {
     val source = ElasticsearchWorksSource(
       elasticClient = elasticClient,
-      indexName = indexName,
-      documentType = documentType)
+      indexName = indexName)
     testWith(source)
   }
 }

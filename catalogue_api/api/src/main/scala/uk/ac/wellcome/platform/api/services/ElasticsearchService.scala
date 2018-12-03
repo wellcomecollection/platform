@@ -24,7 +24,6 @@ case class ElasticsearchQueryOptions(
 
 @Singleton
 class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
-
   def findResultById(canonicalId: String)(
     documentOptions: ElasticsearchDocumentOptions): Future[Response[GetResponse]] =
     elasticClient
