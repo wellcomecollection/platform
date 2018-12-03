@@ -6,7 +6,6 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
 import grizzled.slf4j.Logging
 import org.elasticsearch.index.VersionType
-import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedBaseWork,
   IdentifiedInvisibleWork,
@@ -21,8 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class WorkIndexer(
   elasticClient: HttpClient
 )(implicit ec: ExecutionContext)
-    extends Logging
-    with ElasticsearchExceptionManager {
+    extends Logging {
 
   implicit object IdentifiedWorkIndexable
       extends Indexable[IdentifiedBaseWork] {
