@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJobConfig
 
 object ReindexJobConfigBuilder extends Logging {
   def buildReindexJobConfigMap(config: Config): Map[String, ReindexJobConfig] = {
-    val jsonString = config.required("reindexer.jobConfig")
+    val jsonString = config.required[String]("reindexer.jobConfig")
     val configMap = fromJson[Map[String, ReindexJobConfig]](jsonString).getOrElse(
       throw new RuntimeException(s"Unable to parse reindexer.jobConfig: <<$jsonString>>")
     )
