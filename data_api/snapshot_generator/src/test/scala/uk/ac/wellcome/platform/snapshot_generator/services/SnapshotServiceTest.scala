@@ -9,23 +9,17 @@ import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import org.elasticsearch.client.ResponseException
+import com.sksamuel.elastic4s.http.{ElasticClient, JavaClientExceptionWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{
-  ApiVersions,
-  V1WorksIncludes,
-  V2WorksIncludes
-}
+import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes, V2WorksIncludes}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
+import uk.ac.wellcome.elasticsearch.ElasticClientBuilder
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -50,7 +44,8 @@ class SnapshotServiceTest
   private def withSnapshotService[R](
     s3AkkaClient: S3Client,
     indexNameV1: String,
-    indexNameV2: String)(testWith: TestWith[SnapshotService, R])(
+    indexNameV2: String,
+    elasticClient: ElasticClient = elasticClient)(testWith: TestWith[SnapshotService, R])(
     implicit actorSystem: ActorSystem): R = {
     val elasticConfig = createDisplayElasticConfigWith(
       indexV1name = indexNameV1,
@@ -259,10 +254,19 @@ class SnapshotServiceTest
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withS3AkkaClient { s3Client =>
+          val brokenElasticClient: ElasticClient = ElasticClientBuilder.create(
+            hostname = "localhost",
+            port = 8888,
+            protocol = "http",
+            username = "elastic",
+            password = "changeme"
+          )
+
           withSnapshotService(
             s3Client,
             indexNameV1 = "wrong-index",
-            indexNameV2 = "wrong-index") { brokenSnapshotService =>
+            indexNameV2 = "wrong-index",
+            elasticClient = brokenElasticClient) { brokenSnapshotService =>
             val snapshotJob = SnapshotJob(
               publicBucketName = "bukkit",
               publicObjectKey = "target.json.gz",
@@ -272,7 +276,7 @@ class SnapshotServiceTest
             val future = brokenSnapshotService.generateSnapshot(snapshotJob)
 
             whenReady(future.failed) { result =>
-              result shouldBe a[ResponseException]
+              result shouldBe a[JavaClientExceptionWrapper]
             }
           }
         }

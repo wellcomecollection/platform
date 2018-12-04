@@ -89,8 +89,7 @@ class SnapshotService @Inject()(akkaS3Client: S3Client,
     val displayWorks: Source[DisplayWork, Any] =
       ElasticsearchWorksSource(
         elasticClient = elasticClient,
-        indexName = indexName,
-        documentType = elasticConfig.documentType)
+        indexName = indexName)
         .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
 
     // This source generates JSON strings of DisplayWork instances, which
