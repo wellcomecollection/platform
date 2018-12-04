@@ -182,7 +182,7 @@ class ElasticsearchServiceTest
     }
 
     it("returns results in consistent order") {
-      withLocalElasticsearchIndex { indexName =>
+      withLocalWorksIndex { indexName =>
         val works = (1 to 5)
           .map { _ =>
             createIdentifiedWorkWith(title =

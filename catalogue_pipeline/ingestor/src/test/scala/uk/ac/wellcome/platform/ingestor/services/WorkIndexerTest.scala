@@ -18,17 +18,17 @@ class WorkIndexerTest
     with WorksGenerators
     with CustomElasticsearchMapping {
 
+  val workIndexer = new WorkIndexer(elasticClient = elasticClient)
+
   it("inserts an identified Work into Elasticsearch") {
     val work = createIdentifiedWork
 
     withLocalWorksIndex { indexName =>
-      withWorkIndexer { workIndexer =>
-        val future = indexWork(work, indexName, workIndexer)
+      val future = indexWork(work, indexName)
 
-        whenReady(future) { result =>
-          result.right.get should contain(work)
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-        }
+      whenReady(future) { result =>
+        result.right.get should contain(work)
+        assertElasticsearchEventuallyHasWork(indexName = indexName, work)
       }
     }
   }
@@ -37,14 +37,12 @@ class WorkIndexerTest
     val work = createIdentifiedWork
 
     withLocalWorksIndex { indexName =>
-      withWorkIndexer { workIndexer =>
-        val future = Future.sequence(
-          (1 to 2).map(_ => indexWork(work, indexName, workIndexer))
-        )
+      val future = Future.sequence(
+        (1 to 2).map(_ => indexWork(work, indexName))
+      )
 
-        whenReady(future) { _ =>
-          assertElasticsearchEventuallyHasWork(indexName = indexName, work)
-        }
+      whenReady(future) { _ =>
+        assertElasticsearchEventuallyHasWork(indexName = indexName, work)
       }
     }
   }
@@ -54,19 +52,17 @@ class WorkIndexerTest
     val olderWork = work.copy(version = 1)
 
     withLocalWorksIndex { indexName =>
-      withWorkIndexer { workIndexer =>
-        val future = ingestWorkPairInOrder(
-          firstWork = work,
-          secondWork = olderWork,
-          indexName = indexName,
-          workIndexer = workIndexer)
+      val future = ingestWorkPairInOrder(
+        firstWork = work,
+        secondWork = olderWork,
+        indexName = indexName
+      )
 
-        whenReady(future) { result =>
-          assertIngestedWorkIs(
-            result = result,
-            ingestedWork = work,
-            indexName = indexName)
-        }
+      whenReady(future) { result =>
+        assertIngestedWorkIs(
+          result = result,
+          ingestedWork = work,
+          indexName = indexName)
       }
     }
   }
@@ -76,19 +72,17 @@ class WorkIndexerTest
     val updatedWork = work.copy(title = "a different title")
 
     withLocalWorksIndex { indexName =>
-      withWorkIndexer { workIndexer =>
-        val future = ingestWorkPairInOrder(
-          firstWork = work,
-          secondWork = updatedWork,
-          indexName = indexName,
-          workIndexer = workIndexer)
+      val future = ingestWorkPairInOrder(
+        firstWork = work,
+        secondWork = updatedWork,
+        indexName = indexName
+      )
 
-        whenReady(future) { result =>
-          result.right.get should contain(updatedWork)
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            updatedWork)
-        }
+      whenReady(future) { result =>
+        result.right.get should contain(updatedWork)
+        assertElasticsearchEventuallyHasWork(
+          indexName = indexName,
+          updatedWork)
       }
     }
   }
@@ -100,39 +94,36 @@ class WorkIndexerTest
       val unmergedWork = mergedWork.copy(merged = false)
 
       withLocalWorksIndex { indexName =>
-        withWorkIndexer { workIndexer =>
-          val unmergedWorkInsertFuture = ingestWorkPairInOrder(
-            firstWork = mergedWork,
-            secondWork = unmergedWork,
-            indexName = indexName,
-            workIndexer = workIndexer)
+        val unmergedWorkInsertFuture = ingestWorkPairInOrder(
+          firstWork = mergedWork,
+          secondWork = unmergedWork,
+          indexName = indexName
+        )
 
-          whenReady(unmergedWorkInsertFuture) { result =>
-            assertIngestedWorkIs(
-              result = result,
-              ingestedWork = mergedWork,
-              indexName = indexName)
-          }
+        whenReady(unmergedWorkInsertFuture) { result =>
+          assertIngestedWorkIs(
+            result = result,
+            ingestedWork = mergedWork,
+            indexName = indexName)
         }
       }
     }
+
     it("doesn't overwrite a Work with lower version and merged = true") {
       val unmergedNewWork = createIdentifiedWorkWith(version = 4)
       val mergedOldWork = unmergedNewWork.copy(version = 3, merged = true)
 
       withLocalWorksIndex { indexName =>
-        withWorkIndexer { workIndexer =>
-          val mergedWorkInsertFuture = ingestWorkPairInOrder(
-            firstWork = unmergedNewWork,
-            secondWork = mergedOldWork,
-            indexName = indexName,
-            workIndexer = workIndexer)
-          whenReady(mergedWorkInsertFuture) { result =>
-            assertIngestedWorkIs(
-              result = result,
-              ingestedWork = unmergedNewWork,
-              indexName = indexName)
-          }
+        val mergedWorkInsertFuture = ingestWorkPairInOrder(
+          firstWork = unmergedNewWork,
+          secondWork = mergedOldWork,
+          indexName = indexName
+        )
+        whenReady(mergedWorkInsertFuture) { result =>
+          assertIngestedWorkIs(
+            result = result,
+            ingestedWork = unmergedNewWork,
+            indexName = indexName)
         }
       }
     }
@@ -145,21 +136,20 @@ class WorkIndexerTest
         version = 3)
 
       withLocalWorksIndex { indexName =>
-        withWorkIndexer { workIndexer =>
-          val redirectedWorkInsertFuture = ingestWorkPairInOrder(
-            firstWork = identifiedNewWork,
-            secondWork = redirectedOldWork,
-            indexName = indexName,
-            workIndexer = workIndexer)
-          whenReady(redirectedWorkInsertFuture) { result =>
-            assertIngestedWorkIs(
-              result = result,
-              ingestedWork = identifiedNewWork,
-              indexName = indexName)
-          }
+        val redirectedWorkInsertFuture = ingestWorkPairInOrder(
+          firstWork = identifiedNewWork,
+          secondWork = redirectedOldWork,
+          indexName = indexName
+        )
+        whenReady(redirectedWorkInsertFuture) { result =>
+          assertIngestedWorkIs(
+            result = result,
+            ingestedWork = identifiedNewWork,
+            indexName = indexName)
         }
       }
     }
+
     it("doesn't override a redirected Work with identified work same version") {
       val redirectedWork = createIdentifiedRedirectedWorkWith(version = 3)
       val identifiedWork = createIdentifiedWorkWith(
@@ -167,21 +157,20 @@ class WorkIndexerTest
         version = 3)
 
       withLocalWorksIndex { indexName =>
-        withWorkIndexer { workIndexer =>
-          val identifiedWorkInsertFuture = ingestWorkPairInOrder(
-            firstWork = redirectedWork,
-            secondWork = identifiedWork,
-            indexName = indexName,
-            workIndexer = workIndexer)
-          whenReady(identifiedWorkInsertFuture) { result =>
-            assertIngestedWorkIs(
-              result = result,
-              ingestedWork = redirectedWork,
-              indexName = indexName)
-          }
+        val identifiedWorkInsertFuture = ingestWorkPairInOrder(
+          firstWork = redirectedWork,
+          secondWork = identifiedWork,
+          indexName = indexName
+        )
+        whenReady(identifiedWorkInsertFuture) { result =>
+          assertIngestedWorkIs(
+            result = result,
+            ingestedWork = redirectedWork,
+            indexName = indexName)
         }
       }
     }
+
     it("overrides a identified Work with invisible work with higher version") {
       val work = createIdentifiedWorkWith(version = 3)
       val invisibleWork = createIdentifiedInvisibleWorkWith(
@@ -189,38 +178,33 @@ class WorkIndexerTest
         version = 4)
 
       withLocalWorksIndex { indexName =>
-        withWorkIndexer { workIndexer =>
-          val invisibleWorkInsertFuture = ingestWorkPairInOrder(
-            firstWork = work,
-            secondWork = invisibleWork,
-            indexName = indexName,
-            workIndexer = workIndexer)
-          whenReady(invisibleWorkInsertFuture) { result =>
-            assertIngestedWorkIs(
-              result = result,
-              ingestedWork = invisibleWork,
-              indexName = indexName)
-          }
+        val invisibleWorkInsertFuture = ingestWorkPairInOrder(
+          firstWork = work,
+          secondWork = invisibleWork,
+          indexName = indexName
+        )
+        whenReady(invisibleWorkInsertFuture) { result =>
+          assertIngestedWorkIs(
+            result = result,
+            ingestedWork = invisibleWork,
+            indexName = indexName)
         }
       }
     }
-
   }
 
   it("inserts a list of works into elasticsearch and returns them") {
     val works = createIdentifiedWorks(count = 5)
 
     withLocalWorksIndex { indexName =>
-      withWorkIndexer { workIndexer =>
-        val future = workIndexer.indexWorks(
-          works = works,
-          indexName = indexName
-        )
+      val future = workIndexer.indexWorks(
+        works = works,
+        indexName = indexName
+      )
 
-        whenReady(future) { successfullyInserted =>
-          assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
-          successfullyInserted.right.get should contain theSameElementsAs works
-        }
+      whenReady(future) { successfullyInserted =>
+        assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
+        successfullyInserted.right.get should contain theSameElementsAs works
       }
     }
   }
@@ -234,46 +218,38 @@ class WorkIndexerTest
     val works = validWorks :+ notMatchingMappingWork
 
     withLocalElasticsearchIndex(OnlyInvisibleWorksIndex) { indexName =>
-      withWorkIndexer { workIndexer =>
-        val future = workIndexer.indexWorks(
-          works = works,
-          indexName = indexName
-        )
+      val future = workIndexer.indexWorks(
+        works = works,
+        indexName = indexName
+      )
 
-        whenReady(future) { result =>
-          assertElasticsearchEventuallyHasWork(
-            indexName = indexName,
-            validWorks: _*)
-          assertElasticsearchNeverHasWork(
-            indexName = indexName,
-            notMatchingMappingWork)
-          result.left.get should contain(notMatchingMappingWork)
-        }
+      whenReady(future) { result =>
+        assertElasticsearchEventuallyHasWork(
+          indexName = indexName,
+          validWorks: _*)
+        assertElasticsearchNeverHasWork(
+          indexName = indexName,
+          notMatchingMappingWork)
+        result.left.get should contain(notMatchingMappingWork)
       }
     }
   }
 
-  private def withWorkIndexer[R](testWith: TestWith[WorkIndexer, R]): R = {
-    val workIndexer = new WorkIndexer(elasticClient = elasticClient)
-    testWith(workIndexer)
-  }
-
   private def ingestWorkPairInOrder(firstWork: IdentifiedBaseWork,
                                     secondWork: IdentifiedBaseWork,
-                                    indexName: String,
-                                    workIndexer: WorkIndexer) = {
+                                    indexName: String) = {
     for {
-      _ <- indexWork(firstWork, indexName, workIndexer)
-      result <- indexWork(secondWork, indexName, workIndexer)
+      _ <- indexWork(firstWork, indexName)
+      result <- indexWork(secondWork, indexName)
     } yield result
   }
 
   private def indexWork(work: IdentifiedBaseWork,
-                        indexName: String,
-                        workIndexer: WorkIndexer) = workIndexer.indexWorks(
-    works = List(work),
-    indexName = indexName
-  )
+                        indexName: String) =
+    workIndexer.indexWorks(
+      works = List(work),
+      indexName = indexName
+    )
 
   private def assertIngestedWorkIs(
     result: Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]],
