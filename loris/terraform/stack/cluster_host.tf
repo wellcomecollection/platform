@@ -1,5 +1,5 @@
 module "cluster_host" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/ebs?ref=v16.1.8"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/ebs?ref=v17.0.0"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id       = "${var.vpc_id}"
