@@ -1,31 +1,49 @@
 """
 Basic transformer, which cleans up the static calm data before sending it off
-to an elasticsearch indesx. The raw data can be downloaded by running:
+to an elasticsearch index.
+
+The raw data can be obtained by running:
 
     python monitoring/scripts/download_oai_harvest.py
 
-from the root of this repo. The `path_to_calm_json` parameter below should be
-set to the relative path to that file from this directory. The `es_username`,
-`es_password`, and `es_url` variables should describe the relevant
-elasticsearch host and auth.
+from the root of this repo. This will create a file called `calm_records.json`.
+
+The elasticsearch credentials (url, username, and password) should be specified
+by a `es_credentials.json` file in this directory.
 """
-import pandas as pd
+import os
+import json
+import subprocess
+from tqdm import tqdm
 from transform import transform
-from tqdm import tqdm_notebook as tqdm
 from elasticsearch import Elasticsearch
 
-es_username = ""
-es_password = ""
-es_url = ""
-path_to_calm_json = ""
 
-df = pd.read_json(path_to_calm_json)
-es = Elasticsearch(es_url, http_auth=(es_username, es_password))
+path_to_es_credentials = (
+    os.path.dirname(os.path.realpath(__file__))
+    + '/es_credentials.json'
+)
 
-for idx in tqdm(range(len(df))):
+es_credentials = json.load(open(path_to_es_credentials))
+
+es = Elasticsearch(
+    es_credentials["url"],
+    http_auth=(es_credentials["username"], es_credentials["password"])
+)
+
+path_to_raw_records = (
+    subprocess
+    .check_output(["git", "rev-parse", "--show-toplevel"])
+    .strip()
+    .decode("utf8")
+    + "/calm_records.json"
+)
+
+raw_records = json.load(open(path_to_raw_records))
+
+for raw_record in tqdm(raw_records):
     try:
-        record = df.iloc[idx].to_dict()
-        record = transform(record)
+        record = transform(raw_record)
         res = es.index(
             index="calm", id=record["RecordID"], doc_type="calm_record", body=record
         )

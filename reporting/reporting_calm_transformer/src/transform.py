@@ -23,12 +23,11 @@ def transform(record):
             new_value = record[key][0]
 
         if isinstance(new_value, str):
-            if new_value.startswith("'"):
-                new_value = new_value[1:]
-            if new_value.endswith("'"):
-                new_value = new_value[:-1]
+            if new_value.startswith("'") and new_value.endswith("'"):
+                new_value = new_value[1:-1]
 
         if key in keys_to_parse:
+            transformed_record[key + "_raw"] = value
             new_value = convert_date_to_iso(new_value)
 
         transformed_record[key] = new_value
