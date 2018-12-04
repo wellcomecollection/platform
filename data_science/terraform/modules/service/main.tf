@@ -8,7 +8,7 @@ resource "aws_alb_listener_rule" "path_rule" {
 
   condition {
     field  = "path-pattern"
-    values = ["/${var.namespace}/*"]
+    values = ["${var.application_path}/*"]
   }
 }
 
