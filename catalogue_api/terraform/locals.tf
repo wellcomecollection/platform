@@ -1,10 +1,10 @@
 locals {
   # API pins
 
-  production_api     = "remus"
+  production_api     = "romulus"
   pinned_nginx       = "bad0dbfa548874938d16496e313b05adb71268b7"
-  pinned_remus_api   = "a16e89c26252f085edbe5c09bad3240b231c9d0e"
-  pinned_romulus_api = ""
+  pinned_remus_api   = ""
+  pinned_romulus_api = "0441419ebc483bceaafe9f6340a866184f725b39"
 
   # Blue / Green config
 
