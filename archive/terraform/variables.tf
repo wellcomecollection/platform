@@ -2,6 +2,9 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
+variable "key_name" {}
+variable "admin_cidr_ingress" {}
+
 variable "release_ids" {
   description = "Release tags for platform apps"
   type        = "map"

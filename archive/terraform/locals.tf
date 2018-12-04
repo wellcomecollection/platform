@@ -3,6 +3,7 @@ locals {
 
   vpc_id          = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_id}"
   private_subnets = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_private_subnets}"
+  public_subnets = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_public_subnets}"
 
   archive_bucket_name                = "wellcomecollection-assets-archive-storage"
   ingest_bucket_name                 = "wellcomecollection-assets-archive-ingest"
