@@ -28,9 +28,7 @@ class IngestorWorkerService(elasticClient: ElasticClient,
 
   elasticsearchIndexCreator.create(
     indexName = ingestorConfig.elasticConfig.indexName,
-    mappingDefinition = WorksIndex.buildMappingDefinition(
-      rootIndexType = ingestorConfig.elasticConfig.documentType
-    )
+    mappingDefinitionBuilder = WorksIndex
   )
 
   def run(): Future[Done] =

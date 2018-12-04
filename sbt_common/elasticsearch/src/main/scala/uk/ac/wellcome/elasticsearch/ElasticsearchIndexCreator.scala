@@ -14,7 +14,14 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
   implicit ec: ExecutionContext)
     extends Logging {
   def create(indexName: String,
-             mappingDefinition: MappingDefinition): Future[Unit] =
+             mappingDefinitionBuilder: MappingDefinitionBuilder): Future[Unit] =
+    create(
+      indexName = indexName,
+      mappingDefinition = mappingDefinitionBuilder.buildMappingDefinition(indexName)
+    )
+
+  private def create(indexName: String,
+                     mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
       .execute {
         createIndex(indexName).mappings {

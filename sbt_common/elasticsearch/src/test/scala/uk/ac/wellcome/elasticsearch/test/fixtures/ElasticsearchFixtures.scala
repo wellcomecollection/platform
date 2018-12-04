@@ -74,12 +74,12 @@ trait ElasticsearchFixtures
   )
 
   def withLocalElasticsearchIndex[R](
-    index: MappingDefinitionBuilder,
+    mappingDefinitionBuilder: MappingDefinitionBuilder,
     indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
     elasticsearchIndexCreator
       .create(
         indexName = indexName,
-        mappingDefinition = index.buildMappingDefinition(documentType)
+        mappingDefinitionBuilder = mappingDefinitionBuilder
       )
       .await
 
@@ -125,7 +125,7 @@ trait ElasticsearchFixtures
 
       eventually {
         val response: Response[GetResponse] = elasticClient
-          .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
+          .execute(get(work.canonicalId).from(indexName))
           .await
 
         val getResponse = response.result
@@ -144,7 +144,7 @@ trait ElasticsearchFixtures
 
     works.foreach { work =>
       val response: Response[GetResponse] = elasticClient
-        .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
+        .execute(get(work.canonicalId).from(indexName))
         .await
 
       response.result.found shouldBe false
@@ -158,7 +158,7 @@ trait ElasticsearchFixtures
         works.map { work =>
           val jsonDoc = toJson(work).get
 
-          indexInto(indexName / documentType)
+          indexInto(indexName / indexName)
             .version(work.version)
             .versionType(ExternalGte)
             .id(work.canonicalId)
