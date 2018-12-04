@@ -6,7 +6,7 @@ def test_strips_quoted_strings():
     raw_data = {
         "quote_before": "some text",
         "quote_after": "some text",
-        "quote_both": "some text"
+        "quote_both": "some text",
     }
     transformed = transform(raw_data)
     assert transformed["quote_before"] == "some text"
