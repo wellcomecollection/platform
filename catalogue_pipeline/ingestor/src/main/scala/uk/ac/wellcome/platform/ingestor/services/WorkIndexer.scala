@@ -53,7 +53,7 @@ class WorkIndexer(
       .map { response: Response[BulkResponse] =>
         if (response.isError) {
           warn(s"Error from Elasticsearch: $response")
-          Right(works)
+          Left(works)
         } else {
           debug(s"Bulk response = $response")
           val bulkResponse = response.result
