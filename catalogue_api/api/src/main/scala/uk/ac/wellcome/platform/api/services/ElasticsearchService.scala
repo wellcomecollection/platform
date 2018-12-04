@@ -15,7 +15,7 @@ import uk.ac.wellcome.platform.api.models.{
   WorkTypeFilter
 }
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class ElasticsearchDocumentOptions(
   indexName: String,
@@ -29,7 +29,9 @@ case class ElasticsearchQueryOptions(
 )
 
 @Singleton
-class ElasticsearchService @Inject()(elasticClient: ElasticClient) {
+class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
+  implicit ec: ExecutionContext
+) {
 
   def findResultById(canonicalId: String)(
     documentOptions: ElasticsearchDocumentOptions): Future[GetResponse] =
