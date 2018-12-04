@@ -38,7 +38,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
     elasticClient
       .execute {
         get(canonicalId).from(
-          s"${documentOptions.indexName}/${documentOptions.documentType}")
+          documentOptions.indexName, documentOptions.indexName)
       }
       .map { _.result }
 
@@ -73,7 +73,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
     )
 
     val searchRequest: SearchRequest =
-      search(s"${documentOptions.indexName}/${documentOptions.documentType}")
+      search(documentOptions.indexName)
         .searchType(SearchType.DFS_QUERY_THEN_FETCH)
         .query(queryDefinition)
         .sortBy(sortDefinitions)
