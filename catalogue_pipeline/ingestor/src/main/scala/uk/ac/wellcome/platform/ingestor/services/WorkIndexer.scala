@@ -48,19 +48,25 @@ class WorkIndexer(
         bulk(inserts)
       }
       .map { response: Response[BulkResponse] =>
-        val bulkResponse = response.result
-        val actualFailures = bulkResponse.failures.filterNot {
-          isVersionConflictException
+        if (response.isError) {
+          warn(s"Error from Elasticsearch: $response")
+          Right(works)
+        } else {
+          debug(s"Bulk response = $response")
+          val bulkResponse = response.result
+          val actualFailures = bulkResponse.failures.filterNot {
+            isVersionConflictException
+          }
+
+          if (actualFailures.nonEmpty) {
+            val failedIds = actualFailures.map(_.id)
+            debug(s"Failed indexing works $failedIds")
+
+            Left(works.filter(w => {
+              failedIds.contains(w.canonicalId)
+            }))
+          } else Right(works)
         }
-
-        if (actualFailures.nonEmpty) {
-          val failedIds = actualFailures.map(_.id)
-          debug(s"Failed indexing works $failedIds")
-
-          Left(works.filter(w => {
-            failedIds.contains(w.canonicalId)
-          }))
-        } else Right(works)
       }
   }
 
