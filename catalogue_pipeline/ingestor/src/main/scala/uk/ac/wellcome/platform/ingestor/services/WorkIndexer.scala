@@ -29,14 +29,19 @@ class WorkIndexer(
   }
 
   def indexWorks(works: Seq[IdentifiedBaseWork],
-                 indexName: String,
-                 documentType: String)
+                 indexName: String)
     : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
     val inserts = works.map { work =>
-      indexInto(indexName / documentType)
+
+      // Elasticsearch are removing types entirely in ES 7, and creating an index
+      // with more than one type in ES 6 is a 400 Error.
+      //
+      // Our prod cluster is already creating a single "type" with the same name
+      // as the index, so do the same here.
+      indexInto(indexName / indexName)
         .version(calculateEsVersion(work))
         .versionType(ExternalGte)
         .id(work.canonicalId)

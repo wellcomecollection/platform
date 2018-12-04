@@ -57,8 +57,7 @@ class IngestorWorkerService(elasticClient: ElasticClient,
       works <- Future.successful(messageBundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
         works = works,
-        indexName = ingestorConfig.elasticConfig.indexName,
-        documentType = ingestorConfig.elasticConfig.documentType
+        indexName = ingestorConfig.elasticConfig.indexName
       )
     } yield {
       val failedWorks = either.left.getOrElse(Nil)
