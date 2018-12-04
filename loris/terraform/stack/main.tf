@@ -52,7 +52,7 @@ module "service" {
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
 
-  ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  ecs_cluster_id = "${aws_ecs_cluster.cluster.id}"
 
   vpc_id = "${var.vpc_id}"
 
@@ -69,8 +69,8 @@ module "service" {
 
   healthcheck_path = "${var.healthcheck_path}"
 
-  listener_port         = "80"
-  lb_arn                = "${aws_alb.loris.arn}"
+  listener_port = "80"
+  lb_arn        = "${aws_alb.loris.arn}"
 
   launch_type = "EC2"
 }
