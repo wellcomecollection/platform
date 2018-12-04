@@ -2,25 +2,30 @@ package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, WorkType}
-import uk.ac.wellcome.platform.api.fixtures.{
-  ElasticsearchServiceFixture,
-  WorksServiceFixture
-}
 import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
 import uk.ac.wellcome.platform.api.models.{ResultList, WorkTypeFilter}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class WorksServiceTest
     extends FunSpec
-    with ElasticsearchServiceFixture
-    with WorksServiceFixture
+    with ElasticsearchFixtures
     with Matchers
     with ScalaFutures
     with SearchOptionsGenerators
     with WorksGenerators {
+
+  val elasticsearchService = new ElasticsearchService(
+    elasticClient = elasticClient
+  )
+
+  val worksService = new WorksService(
+    searchService = elasticsearchService
+  )
 
   describe("listWorks") {
     it("gets records in Elasticsearch") {
@@ -99,41 +104,34 @@ class WorksServiceTest
   describe("findWorkById") {
     it("gets a DisplayWork by id") {
       withLocalWorksIndex { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val work = createIdentifiedWork
+        val work = createIdentifiedWork
 
-            insertIntoElasticsearch(indexName, work)
+        insertIntoElasticsearch(indexName, work)
 
-            val documentOptions =
-              createElasticsearchDocumentOptionsWith(indexName = indexName)
+        val documentOptions =
+          createElasticsearchDocumentOptionsWith(indexName = indexName)
 
-            val recordsFuture = worksService.findWorkById(
-              canonicalId = work.canonicalId)(documentOptions)
+        val recordsFuture = worksService.findWorkById(
+          canonicalId = work.canonicalId)(documentOptions)
 
-            whenReady(recordsFuture) { records =>
-              records.isDefined shouldBe true
-              records.get shouldBe work
-            }
-          }
+        whenReady(recordsFuture) { records =>
+          records.isDefined shouldBe true
+          records.get shouldBe work
         }
       }
+
     }
 
     it("returns a future of None if it cannot get a record by id") {
       withLocalWorksIndex { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val documentOptions =
-              createElasticsearchDocumentOptionsWith(indexName = indexName)
+        val documentOptions =
+          createElasticsearchDocumentOptionsWith(indexName = indexName)
 
-            val recordsFuture =
-              worksService.findWorkById(canonicalId = "1234")(documentOptions)
+        val recordsFuture =
+          worksService.findWorkById(canonicalId = "1234")(documentOptions)
 
-            whenReady(recordsFuture) { record =>
-              record shouldBe None
-            }
-          }
+        whenReady(recordsFuture) { record =>
+          record shouldBe None
         }
       }
     }
@@ -242,9 +240,9 @@ class WorksServiceTest
     expectedWorks: Seq[IdentifiedBaseWork],
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
-  ) =
+  ): Assertion =
     assertResultIsCorrect(
-      (worksService: WorksService) => worksService.listWorks
+      worksService.listWorks
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertSearchResultIsCorrect(query: String)(
@@ -252,13 +250,13 @@ class WorksServiceTest
     expectedWorks: Seq[IdentifiedBaseWork],
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
-  ) =
+  ): Assertion =
     assertResultIsCorrect(
-      (worksService: WorksService) => worksService.searchWorks(query = query)
+      worksService.searchWorks(query = query)
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertResultIsCorrect(
-    partialSearchFunction: WorksService => (
+    partialSearchFunction: (
       ElasticsearchDocumentOptions,
       WorksSearchOptions) => Future[ResultList]
   )(
@@ -268,25 +266,21 @@ class WorksServiceTest
     worksSearchOptions: WorksSearchOptions
   ): Assertion =
     withLocalWorksIndex { indexName =>
-      withElasticsearchService { searchService =>
-        withWorksService(searchService) { worksService =>
-          if (!allWorks.isEmpty) {
-            insertIntoElasticsearch(indexName, allWorks: _*)
-          }
+      if (allWorks.nonEmpty) {
+        insertIntoElasticsearch(indexName, allWorks: _*)
+      }
 
-          val documentOptions = createElasticsearchDocumentOptionsWith(
-            indexName = indexName
-          )
+      val documentOptions = createElasticsearchDocumentOptionsWith(
+        indexName = indexName
+      )
 
-          val future = partialSearchFunction(worksService)(
-            documentOptions,
-            worksSearchOptions)
+      val future = partialSearchFunction(
+        documentOptions,
+        worksSearchOptions)
 
-          whenReady(future) { works =>
-            works.results should contain theSameElementsAs expectedWorks
-            works.totalResults shouldBe expectedTotalResults
-          }
-        }
+      whenReady(future) { works =>
+        works.results should contain theSameElementsAs expectedWorks
+        works.totalResults shouldBe expectedTotalResults
       }
     }
 }
