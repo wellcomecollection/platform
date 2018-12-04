@@ -31,7 +31,7 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
       }
       .map { response: Response[CreateIndexResponse] =>
         if (response.isError) {
-          if (response.error.`type` == "resource_already_exists_exception") {
+          if (response.error.`type` == "resource_already_exists_exception" || response.error.`type` == "index_already_exists_exception") {
             info(s"Index $indexName already exists")
             update(indexName, mappingDefinition = mappingDefinition)
           } else {
@@ -49,8 +49,7 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
         info("Index updated successfully")
       }
 
-  private def update(indexName: String, mappingDefinition: MappingDefinition)
-    : Future[Response[PutMappingResponse]] =
+  private def update(indexName: String, mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
       .execute {
         putMapping(indexName / mappingDefinition.`type`)
@@ -67,5 +66,8 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
           throw new RuntimeException(s"Failed updating index: $response")
         }
         response
+      }
+      .map { _ =>
+        info("Successfully applied new mapping")
       }
 }

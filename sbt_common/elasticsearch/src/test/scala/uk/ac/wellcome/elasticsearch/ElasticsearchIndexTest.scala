@@ -117,7 +117,7 @@ class ElasticsearchIndexTest
   it("updates an already existing index with a compatible mapping") {
     withLocalElasticsearchIndex(TestIndex) { indexName =>
       withLocalElasticsearchIndex(CompatibleTestIndex, indexName = indexName) {
-        testIndexName =>
+        _ =>
           val compatibleTestObject = CompatibleTestObject(
             id = "id",
             description = "description",
