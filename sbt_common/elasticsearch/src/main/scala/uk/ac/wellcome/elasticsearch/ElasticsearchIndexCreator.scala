@@ -17,7 +17,8 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
              mappingDefinitionBuilder: MappingDefinitionBuilder): Future[Unit] =
     create(
       indexName = indexName,
-      mappingDefinition = mappingDefinitionBuilder.buildMappingDefinition(indexName)
+      mappingDefinition =
+        mappingDefinitionBuilder.buildMappingDefinition(indexName)
     )
 
   private def create(indexName: String,

@@ -12,14 +12,21 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.sksamuel.elastic4s.http.{ElasticClient, JavaClientExceptionWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes, V2WorksIncludes}
+import uk.ac.wellcome.display.models.{
+  ApiVersions,
+  V1WorksIncludes,
+  V2WorksIncludes
+}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.elasticsearch.ElasticClientBuilder
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
+import uk.ac.wellcome.platform.snapshot_generator.models.{
+  CompletedSnapshotJob,
+  SnapshotJob
+}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -41,11 +48,12 @@ class SnapshotServiceTest
 
   val mapper = new ObjectMapper with ScalaObjectMapper
 
-  private def withSnapshotService[R](
-    s3AkkaClient: S3Client,
-    indexNameV1: String,
-    indexNameV2: String,
-    elasticClient: ElasticClient = elasticClient)(testWith: TestWith[SnapshotService, R])(
+  private def withSnapshotService[R](s3AkkaClient: S3Client,
+                                     indexNameV1: String,
+                                     indexNameV2: String,
+                                     elasticClient: ElasticClient =
+                                       elasticClient)(
+    testWith: TestWith[SnapshotService, R])(
     implicit actorSystem: ActorSystem): R = {
     val elasticConfig = createDisplayElasticConfigWith(
       indexV1name = indexNameV1,

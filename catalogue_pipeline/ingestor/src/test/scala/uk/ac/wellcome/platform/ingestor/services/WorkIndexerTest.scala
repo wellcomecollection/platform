@@ -80,9 +80,7 @@ class WorkIndexerTest
 
       whenReady(future) { result =>
         result.right.get should contain(updatedWork)
-        assertElasticsearchEventuallyHasWork(
-          indexName = indexName,
-          updatedWork)
+        assertElasticsearchEventuallyHasWork(indexName = indexName, updatedWork)
       }
     }
   }
@@ -244,8 +242,7 @@ class WorkIndexerTest
     } yield result
   }
 
-  private def indexWork(work: IdentifiedBaseWork,
-                        indexName: String) =
+  private def indexWork(work: IdentifiedBaseWork, indexName: String) =
     workIndexer.indexWorks(
       works = List(work),
       indexName = indexName

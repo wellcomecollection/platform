@@ -28,14 +28,12 @@ class WorkIndexer(
       toJson(t).get
   }
 
-  def indexWorks(works: Seq[IdentifiedBaseWork],
-                 indexName: String)
+  def indexWorks(works: Seq[IdentifiedBaseWork], indexName: String)
     : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
     val inserts = works.map { work =>
-
       // Elasticsearch are removing types entirely in ES 7, and creating an index
       // with more than one type in ES 6 is a 400 Error.
       //
