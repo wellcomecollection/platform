@@ -45,14 +45,13 @@ trait MatcherFixtures
     testWith: TestWith[MatcherWorkerService, R])(
     implicit objectStore: ObjectStore[TransformedBaseWork]): R =
     withSNSWriter(topic) { snsWriter =>
-      withActorSystem { actorSystem =>
+      withActorSystem { implicit actorSystem =>
         withMockMetricSender { metricsSender =>
           withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
             withWorkGraphStore(graphTable) { workGraphStore =>
               withWorkMatcher(workGraphStore, lockTable, metricsSender) {
                 workMatcher =>
                   withMessageStream[TransformedBaseWork, R](
-                    actorSystem = actorSystem,
                     queue = queue,
                     metricsSender = metricsSender
                   ) { messageStream =>
@@ -60,7 +59,7 @@ trait MatcherFixtures
                       messageStream = messageStream,
                       snsWriter = snsWriter,
                       workMatcher = workMatcher
-                    )(actorSystem = actorSystem, ec = actorSystem.dispatcher)
+                    )
 
                     workerService.run()
 

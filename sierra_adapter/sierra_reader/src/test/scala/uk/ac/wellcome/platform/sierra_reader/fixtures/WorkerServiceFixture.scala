@@ -19,8 +19,8 @@ trait WorkerServiceFixture extends Akka with SQS with S3 {
                            readerConfig: ReaderConfig = bibsReaderConfig,
                            sierraAPIConfig: SierraAPIConfig = sierraAPIConfig)(
     testWith: TestWith[SierraReaderWorkerService, R]): R =
-    withActorSystem { actorSystem =>
-      withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+    withActorSystem { implicit actorSystem =>
+      withSQSStream[NotificationMessage, R](queue) { sqsStream =>
         val workerService = new SierraReaderWorkerService(
           sqsStream = sqsStream,
           s3client = s3Client,

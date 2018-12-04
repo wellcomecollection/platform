@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.snapshot_generator.services
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -12,9 +12,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class SnapshotGeneratorWorkerService @Inject()(
   snapshotService: SnapshotService,
   sqsStream: SQSStream[NotificationMessage],
-  snsWriter: SNSWriter,
-  system: ActorSystem
-)(implicit ec: ExecutionContext) {
+  snsWriter: SNSWriter
+)(implicit actorSystem: ActorSystem, ec: ExecutionContext) {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
@@ -29,5 +28,5 @@ class SnapshotGeneratorWorkerService @Inject()(
       )
     } yield ()
 
-  def stop() = system.terminate()
+  def stop(): Future[Terminated] = actorSystem.terminate()
 }

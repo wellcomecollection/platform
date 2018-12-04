@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.ingestor
 
+import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
@@ -16,6 +17,8 @@ import scala.concurrent.{Await, ExecutionContext}
 object Main extends App with Logging {
   val config: Config = ConfigFactory.load()
 
+  implicit val actorSystem: ActorSystem =
+    AkkaBuilder.buildActorSystem()
   implicit val executionContext: ExecutionContext =
     AkkaBuilder.buildExecutionContext()
 

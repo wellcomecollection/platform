@@ -30,30 +30,28 @@ class DownloadAndVerifyDigestItemFlowTest
 
   it("passes through a correct right archive item job") {
     withLocalS3Bucket { bucket =>
-      withActorSystem { implicit actorSystem =>
-        withMaterializer(actorSystem) { implicit materializer =>
-          withZipFile(List()) { zipFile =>
-            val fileContent = "bah buh bih beh"
-            val fileName = "key.txt"
+      withMaterializer { implicit materializer =>
+        withZipFile(List()) { zipFile =>
+          val fileContent = "bah buh bih beh"
+          val fileName = "key.txt"
 
-            val archiveItemJob = createArchiveDigestItemJobWith(
-              zipFile = zipFile,
-              bucket = bucket,
-              digest = sha256(fileContent),
-              s3Key = fileName
-            )
+          val archiveItemJob = createArchiveDigestItemJobWith(
+            zipFile = zipFile,
+            bucket = bucket,
+            digest = sha256(fileContent),
+            s3Key = fileName
+          )
 
-            s3Client.putObject(
-              bucket.name,
-              s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName",
-              fileContent)
+          s3Client.putObject(
+            bucket.name,
+            s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName",
+            fileContent)
 
-            val source = Source.single(archiveItemJob)
-            val futureResult = source via flow runWith Sink.head
+          val source = Source.single(archiveItemJob)
+          val futureResult = source via flow runWith Sink.head
 
-            whenReady(futureResult) { result =>
-              result shouldBe Right(archiveItemJob)
-            }
+          whenReady(futureResult) { result =>
+            result shouldBe Right(archiveItemJob)
           }
         }
       }
@@ -62,35 +60,35 @@ class DownloadAndVerifyDigestItemFlowTest
 
   it("outputs a left of archive item job if the checksum doesn't match") {
     withLocalS3Bucket { bucket =>
-      withActorSystem { implicit actorSystem =>
-        withMaterializer(actorSystem) { implicit materializer =>
-          withZipFile(List()) { zipFile =>
-            val fileContent = "bah buh bih beh"
-            val digest = "bad-digest"
-            val fileName = "key.txt"
+      withMaterializer { implicit materializer =>
+        withZipFile(List()) { zipFile =>
+          val fileContent = "bah buh bih beh"
+          val digest = "bad-digest"
+          val fileName = "key.txt"
 
-            val archiveItemJob = createArchiveDigestItemJobWith(
-              zipFile = zipFile,
-              bucket = bucket,
-              digest = digest,
-              s3Key = fileName
+          val archiveItemJob = createArchiveDigestItemJobWith(
+            zipFile = zipFile,
+            bucket = bucket,
+            digest = digest,
+            s3Key = fileName
+          )
+
+          s3Client.putObject(
+            bucket.name,
+            s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName",
+            fileContent)
+
+          val source = Source.single(archiveItemJob)
+          val futureResult = source via flow runWith Sink.head
+
+          whenReady(futureResult) { result =>
+            result shouldBe Left(
+              ChecksumNotMatchedOnDownloadError(
+                expectedChecksum = digest,
+                actualChecksum = sha256(fileContent),
+                t = archiveItemJob
+              )
             )
-
-            s3Client.putObject(
-              bucket.name,
-              s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName",
-              fileContent)
-
-            val source = Source.single(archiveItemJob)
-            val futureResult = source via flow runWith Sink.head
-
-            whenReady(futureResult) { result =>
-              result shouldBe Left(
-                ChecksumNotMatchedOnDownloadError(
-                  digest,
-                  "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73",
-                  archiveItemJob))
-            }
           }
         }
       }
@@ -98,24 +96,22 @@ class DownloadAndVerifyDigestItemFlowTest
   }
 
   it("returns a left of archive item job if the file does not exist") {
-    withActorSystem { implicit actorSystem =>
-      withMaterializer(actorSystem) { implicit materializer =>
-        withLocalS3Bucket { bucket =>
-          withZipFile(List()) { zipFile =>
-            val archiveItemJob = createArchiveDigestItemJobWith(
-              zipFile = zipFile,
-              bucket = bucket
-            )
-            val source = Source.single(archiveItemJob)
-            val futureResult = source via flow runWith Sink.head
+    withMaterializer { implicit materializer =>
+      withLocalS3Bucket { bucket =>
+        withZipFile(List()) { zipFile =>
+          val archiveItemJob = createArchiveDigestItemJobWith(
+            zipFile = zipFile,
+            bucket = bucket
+          )
+          val source = Source.single(archiveItemJob)
+          val futureResult = source via flow runWith Sink.head
 
-            whenReady(futureResult) { result =>
-              inside(result) {
-                case Left(DownloadError(exception, uploadLocation, job)) =>
-                  job shouldBe archiveItemJob
-                  uploadLocation shouldBe archiveItemJob.uploadLocation
-                  exception shouldBe a[AmazonS3Exception]
-              }
+          whenReady(futureResult) { result =>
+            inside(result) {
+              case Left(DownloadError(exception, uploadLocation, job)) =>
+                job shouldBe archiveItemJob
+                uploadLocation shouldBe archiveItemJob.uploadLocation
+                exception shouldBe a[AmazonS3Exception]
             }
           }
         }

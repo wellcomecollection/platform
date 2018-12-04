@@ -39,30 +39,28 @@ class CallbackNotificationFlowTest
       (Progress.Completed, Callback.Pending)
     )
     forAll(sendsCallbackStatus) { (progressStatus, callbackStatus) =>
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          withLocalSnsTopic { topic =>
-            val callbackNotificationFlow = CallbackNotificationFlow(
-              snsClient,
-              snsConfig = createSNSConfigWith(topic)
-            )
+      withMaterializer { implicit materializer =>
+        withLocalSnsTopic { topic =>
+          val callbackNotificationFlow = CallbackNotificationFlow(
+            snsClient,
+            snsConfig = createSNSConfigWith(topic)
+          )
 
-            val progress = createProgressWith(
-              status = progressStatus,
-              callback = Some(createCallbackWith(status = callbackStatus)))
+          val progress = createProgressWith(
+            status = progressStatus,
+            callback = Some(createCallbackWith(status = callbackStatus)))
 
-            val eventuallyResult = Source
-              .single(progress)
-              .via(callbackNotificationFlow)
-              .runWith(Sink.seq)(materializer)
+          val eventuallyResult = Source
+            .single(progress)
+            .via(callbackNotificationFlow)
+            .runWith(Sink.seq)
 
-            whenReady(eventuallyResult) { result =>
-              result should have size 1
-              val msg = notificationMessage[CallbackNotification](topic)
-              msg.id shouldBe progress.id
-              msg.callbackUri shouldBe progress.callback.get.uri
-              msg.payload shouldBe progress
-            }
+          whenReady(eventuallyResult) { result =>
+            result should have size 1
+            val msg = notificationMessage[CallbackNotification](topic)
+            msg.id shouldBe progress.id
+            msg.callbackUri shouldBe progress.callback.get.uri
+            msg.payload shouldBe progress
           }
         }
       }
@@ -83,33 +81,29 @@ class CallbackNotificationFlowTest
       (Progress.Completed, Callback.Succeeded),
       (Progress.Completed, Callback.Failed)
     )
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        withLocalSnsTopic { topic =>
-          forAll(doesNotSendCallbackStatus) {
-            (progressStatus, callbackStatus) =>
-              val callbackNotificationFlow = CallbackNotificationFlow(
-                snsClient,
-                snsConfig = createSNSConfigWith(topic)
-              )
+    withMaterializer { implicit materializer =>
+      withLocalSnsTopic { topic =>
+        forAll(doesNotSendCallbackStatus) { (progressStatus, callbackStatus) =>
+          val callbackNotificationFlow = CallbackNotificationFlow(
+            snsClient,
+            snsConfig = createSNSConfigWith(topic)
+          )
 
-              val progress = createProgressWith(
-                status = progressStatus,
-                callback = Some(createCallbackWith(status = callbackStatus)))
+          val progress = createProgressWith(
+            status = progressStatus,
+            callback = Some(createCallbackWith(status = callbackStatus)))
 
-              val eventuallyResult = Source
-                .single(progress)
-                .via(callbackNotificationFlow)
-                .runWith(Sink.seq)(materializer)
+          val eventuallyResult = Source
+            .single(progress)
+            .via(callbackNotificationFlow)
+            .runWith(Sink.seq)
 
-              whenReady(eventuallyResult) { result =>
-                result should have size 1
-                assertSnsReceivesNothing(topic)
-              }
+          whenReady(eventuallyResult) { result =>
+            result should have size 1
+            assertSnsReceivesNothing(topic)
           }
         }
       }
     }
   }
-
 }

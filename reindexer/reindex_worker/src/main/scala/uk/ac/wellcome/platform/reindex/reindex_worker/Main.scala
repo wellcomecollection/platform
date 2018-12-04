@@ -7,6 +7,7 @@ import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.platform.reindex.reindex_worker.config.ReindexJobConfigBuilder
 import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
   MaxRecordsScanner,
   ParallelScanner,
@@ -50,8 +51,8 @@ object Main extends App with Logging {
     recordReader = recordReader,
     bulkSNSSender = hybridRecordSender,
     sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config),
-    dynamoConfig = DynamoBuilder.buildDynamoConfig(config),
-    snsConfig = SNSBuilder.buildSNSConfig(config)
+    reindexJobConfigMap =
+      ReindexJobConfigBuilder.buildReindexJobConfigMap(config)
   )
 
   try {

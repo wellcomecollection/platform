@@ -32,7 +32,6 @@ class DynamoInserterTest
 
           whenReady(futureUnit) { _ =>
             assertStored[SierraItemRecord](
-              bucket = bucket,
               table = table,
               id = record.id.withoutCheckDigit,
               record = record
@@ -66,7 +65,6 @@ class DynamoInserterTest
           val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
           whenReady(futureUnit) { _ =>
             assertStored[SierraItemRecord](
-              bucket = bucket,
               table = table,
               id = oldRecord.id.withoutCheckDigit,
               record = newRecord
@@ -101,7 +99,6 @@ class DynamoInserterTest
 
           whenReady(futureUnit) { _ =>
             assertStored[SierraItemRecord](
-              bucket = bucket,
               table = table,
               id = oldRecord.id.withoutCheckDigit,
               record = newRecord
@@ -137,7 +134,6 @@ class DynamoInserterTest
 
           whenReady(futureUnit) { _ =>
             assertStored[SierraItemRecord](
-              bucket = bucket,
               table = table,
               id = oldRecord.id.withoutCheckDigit,
               record = newRecord.copy(unlinkedBibIds = List(bibIds(2)))
@@ -173,7 +169,6 @@ class DynamoInserterTest
 
           whenReady(futureUnit) { _ =>
             assertStored[SierraItemRecord](
-              bucket = bucket,
               table = table,
               id = oldRecord.id.withoutCheckDigit,
               record = newRecord.copy(unlinkedBibIds = List(bibIds(0)))

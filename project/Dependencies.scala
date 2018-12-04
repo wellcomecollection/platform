@@ -3,9 +3,9 @@ import sbt._
 
 object WellcomeDependencies {
   private lazy val versions = new {
-    val json = "1.0.0"
+    val json = "1.1.1"
     val monitoring = "1.1.0"
-    val storage = "2.6.0"
+    val storage = "2.7.0"
   }
 
   val jsonLibrary: Seq[ModuleID] = Seq(
@@ -38,7 +38,7 @@ object Dependencies {
     val mockito = "1.9.5"
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
-    val elastic4s = "5.6.5"
+    val elastic4s = "5.6.9"
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"

@@ -13,7 +13,6 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   UploadError
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
-import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.Akka
@@ -34,30 +33,28 @@ class UploadItemFlowTest
   it(
     "sends a right of archive item job when uploading a file from an archive item job succeeds") {
     withLocalS3Bucket { bucket =>
-      withActorSystem { implicit actorSystem =>
-        withMaterializer(actorSystem) { implicit materializer =>
-          val fileContent = "bah buh bih beh"
-          val fileName = "key.txt"
-          withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-            val archiveItemJob = createArchiveItemJobWith(
-              zipFile = zipFile,
-              bucket = bucket,
-              s3Key = fileName
-            )
+      withMaterializer { implicit materializer =>
+        val fileContent = "bah buh bih beh"
+        val fileName = "key.txt"
+        withZipFile(List(FileEntry(fileName, fileContent))) { zipFile =>
+          val archiveItemJob = createArchiveItemJobWith(
+            zipFile = zipFile,
+            bucket = bucket,
+            s3Key = fileName
+          )
 
-            val source = Source.single(archiveItemJob)
-            val futureResult = source via flow runWith Sink.head
+          val source = Source.single(archiveItemJob)
+          val futureResult = source via flow runWith Sink.head
 
-            whenReady(futureResult) { result =>
-              result shouldBe 'right
-              result.right.get._1 shouldBe archiveItemJob
+          whenReady(futureResult) { result =>
+            result shouldBe 'right
+            result.right.get._1 shouldBe archiveItemJob
 
-              getContentFromS3(
-                bucket,
-                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent
-            }
-
+            getContentFromS3(
+              bucket,
+              s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$fileName") shouldBe fileContent
           }
+
         }
       }
     }
@@ -66,34 +63,30 @@ class UploadItemFlowTest
   it(
     "sends a left of archive item job when uploading a file fails because the file does not exist") {
     withLocalS3Bucket { bucket =>
-      withActorSystem { implicit actorSystem =>
-        withMaterializer(actorSystem) { implicit materializer =>
-          withZipFile(List()) { zipFile =>
-            val fileName = "key.txt"
+      withMaterializer { implicit materializer =>
+        withZipFile(List()) { zipFile =>
+          val fileName = "key.txt"
+          val bagIdentifier = createExternalIdentifier
 
-            val bagIdentifier =
-              ExternalIdentifier(randomAlphanumeric())
+          val archiveItemJob = createArchiveItemJobWith(
+            zipFile = zipFile,
+            bucket = bucket,
+            bagIdentifier = bagIdentifier,
+            s3Key = fileName
+          )
 
-            val archiveItemJob = createArchiveItemJobWith(
-              zipFile = zipFile,
-              bucket = bucket,
-              bagIdentifier = bagIdentifier,
-              s3Key = fileName
-            )
+          val source = Source.single(archiveItemJob)
+          val futureResult = source via flow runWith Sink.seq
 
-            val source = Source.single(archiveItemJob)
-            val futureResult = source via flow runWith Sink.seq
-
-            whenReady(futureResult) { result =>
-              result shouldBe List(
-                Left(FileNotFoundError(fileName, archiveItemJob)))
-              val exception = intercept[AmazonS3Exception] {
-                getContentFromS3(
-                  bucket,
-                  s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$bagIdentifier/$fileName")
-              }
-              exception.getErrorCode shouldBe "NoSuchKey"
+          whenReady(futureResult) { result =>
+            result shouldBe List(
+              Left(FileNotFoundError(fileName, archiveItemJob)))
+            val exception = intercept[AmazonS3Exception] {
+              getContentFromS3(
+                bucket,
+                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$bagIdentifier/$fileName")
             }
+            exception.getErrorCode shouldBe "NoSuchKey"
           }
         }
       }
@@ -102,36 +95,34 @@ class UploadItemFlowTest
 
   it(
     "sends a left of archive item job when uploading a big file fails because the bucket does not exist (Resume supervision strategy)") {
-    withActorSystem { implicit actorSystem =>
-      withMaterializer(actorSystem) { implicit materializer =>
-        val fileContent = "bah buh bih beh"
-        val fileName = "key.txt"
-        withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
-          val failingArchiveItemJob = createArchiveItemJobWith(
-            zipFile = zipFile,
-            bucket = Bucket("does-not-exist"),
-            s3Key = fileName
-          )
+    withMaterializer { implicit materializer =>
+      val fileContent = "bah buh bih beh"
+      val fileName = "key.txt"
+      withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+        val failingArchiveItemJob = createArchiveItemJobWith(
+          zipFile = zipFile,
+          bucket = Bucket("does-not-exist"),
+          s3Key = fileName
+        )
 
-          val source = Source.single(failingArchiveItemJob)
-          val decider: Supervision.Decider = { e =>
-            error("Stream failure", e)
-            Supervision.Resume
-          }
-          val modifiedFlow = flow
-            .withAttributes(ActorAttributes.supervisionStrategy(decider))
-          val futureResult = source via modifiedFlow runWith Sink.seq
+        val source = Source.single(failingArchiveItemJob)
+        val decider: Supervision.Decider = { e =>
+          error("Stream failure", e)
+          Supervision.Resume
+        }
+        val modifiedFlow = flow
+          .withAttributes(ActorAttributes.supervisionStrategy(decider))
+        val futureResult = source via modifiedFlow runWith Sink.seq
 
-          whenReady(futureResult) { result =>
-            inside(result.toList) {
-              case List(Left(UploadError(location, exception, t))) =>
-                location shouldBe failingArchiveItemJob.uploadLocation
-                t shouldBe failingArchiveItemJob
-                exception shouldBe a[AmazonS3Exception]
-                exception
-                  .asInstanceOf[AmazonS3Exception]
-                  .getErrorCode shouldBe "NoSuchBucket"
-            }
+        whenReady(futureResult) { result =>
+          inside(result.toList) {
+            case List(Left(UploadError(location, exception, t))) =>
+              location shouldBe failingArchiveItemJob.uploadLocation
+              t shouldBe failingArchiveItemJob
+              exception shouldBe a[AmazonS3Exception]
+              exception
+                .asInstanceOf[AmazonS3Exception]
+                .getErrorCode shouldBe "NoSuchBucket"
           }
         }
       }

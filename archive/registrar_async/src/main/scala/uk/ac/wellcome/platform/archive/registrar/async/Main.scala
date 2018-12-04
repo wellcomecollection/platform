@@ -31,8 +31,7 @@ object Main extends App with Logging {
     progressSnsConfig = SNSBuilder.buildSNSConfig(config),
     s3Client = S3Builder.buildS3Client(config),
     messageStream = messageStream,
-    dataStore = dataStore,
-    actorSystem = actorSystem
+    dataStore = dataStore
   )
 
   try {

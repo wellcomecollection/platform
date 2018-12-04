@@ -64,7 +64,7 @@ module "palette_service" {
 
 module "image_similarity_service" {
   source    = "../../modules/service"
-  namespace = "${var.namespace}_image_similarity"
+  namespace = "${var.namespace}_iss"
 
   lb_listener_arn = "${aws_alb_listener.http_80.arn}"
   vpc_id          = "${var.vpc_id}"

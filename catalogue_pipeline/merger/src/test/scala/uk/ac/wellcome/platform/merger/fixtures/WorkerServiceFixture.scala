@@ -21,11 +21,10 @@ trait WorkerServiceFixture extends LocalWorksVhs with Messaging with S3 {
     testWith: TestWith[MergerWorkerService, R]): R =
     withLocalS3Bucket { messageBucket =>
       withMessageWriter[BaseWork, R](messageBucket, topic) { messageWriter =>
-        withActorSystem { actorSystem =>
+        withActorSystem { implicit actorSystem =>
           withSQSStream[NotificationMessage, R](
-            actorSystem,
-            queue,
-            metricsSender) { sqsStream =>
+            queue = queue,
+            metricsSender = metricsSender) { sqsStream =>
             val workerService = new MergerWorkerService(
               sqsStream = sqsStream,
               playbackService = new RecorderPlaybackService(vhs),

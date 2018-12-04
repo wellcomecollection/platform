@@ -32,33 +32,28 @@ class ProgressUpdateFlowTest
     withProgressTrackerTable { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
-          withActorSystem(actorSystem => {
-            withMaterializer(actorSystem)(materializer => {
-              val progress = createProgress
-              whenReady(monitor.initialise(progress)) {
-                _ =>
-                  val update =
-                    ProgressEventUpdate(
-                      progress.id,
-                      List(ProgressEvent("Wow.")))
+          withMaterializer { implicit materializer =>
+            val progress = createProgress
+            whenReady(monitor.initialise(progress)) { _ =>
+              val update =
+                ProgressEventUpdate(progress.id, List(ProgressEvent("Wow.")))
 
-                  val updates = Source
-                    .single(update)
-                    .via(flow)
-                    .async
-                    .runWith(Sink.ignore)(materializer)
+              val updates = Source
+                .single(update)
+                .via(flow)
+                .async
+                .runWith(Sink.ignore)
 
-                  whenReady(updates) { _ =>
-                    assertProgressCreated(progress, table)
+              whenReady(updates) { _ =>
+                assertProgressCreated(progress, table)
 
-                    assertProgressRecordedRecentEvents(
-                      update.id,
-                      update.events.map(_.description),
-                      table)
-                  }
+                assertProgressRecordedRecentEvents(
+                  update.id,
+                  update.events.map(_.description),
+                  table)
               }
-            })
-          })
+            }
+          }
       }
     }
   }
@@ -67,37 +62,35 @@ class ProgressUpdateFlowTest
     withProgressTrackerTable { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
-          withActorSystem(actorSystem => {
-            withMaterializer(actorSystem)(materializer => {
+          withMaterializer { implicit materializer =>
+            val progress = createProgress
+            monitor.initialise(progress)
 
-              val progress = createProgress
-              monitor.initialise(progress)
+            val progressUpdates = List(
+              ProgressEventUpdate(
+                progress.id,
+                List(ProgressEvent("It happened again."))),
+              ProgressEventUpdate(
+                progress.id,
+                List(ProgressEvent("Dammit Bobby.")))
+            )
 
-              val progressUpdates = List(
-                ProgressEventUpdate(
-                  progress.id,
-                  List(ProgressEvent("It happened again."))),
-                ProgressEventUpdate(
-                  progress.id,
-                  List(ProgressEvent("Dammit Bobby.")))
-              )
+            val futureUpdates = Source
+              .fromIterator(() => progressUpdates.toIterator)
+              .via(flow)
+              .async
+              .runWith(Sink.ignore)
 
-              val futureUpdates = Source
-                .fromIterator(() => progressUpdates.toIterator)
-                .via(flow)
-                .async
-                .runWith(Sink.ignore)(materializer)
+            whenReady(futureUpdates) { _ =>
+              assertProgressCreated(progress, table)
 
-              whenReady(futureUpdates) { _ =>
-                assertProgressCreated(progress, table)
+              assertProgressRecordedRecentEvents(
+                progress.id,
+                progressUpdates.flatMap(_.events.map(_.description)),
+                table)
+            }
 
-                assertProgressRecordedRecentEvents(
-                  progress.id,
-                  progressUpdates.flatMap(_.events.map(_.description)),
-                  table)
-              }
-            })
-          })
+          }
       }
     }
   }
@@ -106,26 +99,24 @@ class ProgressUpdateFlowTest
     withProgressTrackerTable { table =>
       withProgressUpdateFlow(table) {
         case (flow, _) =>
-          withActorSystem(actorSystem => {
-            withMaterializer(actorSystem)(materializer => {
-              val id = randomUUID
+          withMaterializer { implicit materializer =>
+            val id = randomUUID
 
-              val update =
-                ProgressEventUpdate(
-                  id,
-                  List(ProgressEvent("Such progress, much wow.")))
+            val update =
+              ProgressEventUpdate(
+                id,
+                List(ProgressEvent("Such progress, much wow.")))
 
-              val updates = Source
-                .single(update)
-                .via(flow)
-                .async
-                .runWith(Sink.seq)(materializer)
+            val updates = Source
+              .single(update)
+              .via(flow)
+              .async
+              .runWith(Sink.seq)
 
-              whenReady(updates) { result =>
-                result shouldBe empty
-              }
-            })
-          })
+            whenReady(updates) { result =>
+              result shouldBe empty
+            }
+          }
       }
     }
   }

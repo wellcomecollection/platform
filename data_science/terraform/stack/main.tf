@@ -23,7 +23,7 @@ module "harrison_pim_notebook" {
 module "labs" {
   source = "labs"
 
-  namespace = "${var.namespace}-datalabs"
+  namespace = "${var.namespace}-labs"
 
   vpc_cidr_block = "${var.vpc_cidr_block}"
 

@@ -1,31 +1,22 @@
-module "harrison_pim_notebook" {
-  source = "notebooks"
+module "stack-281118" {
+  source = "stack"
 
-  namespace = "notebook"
+  namespace = "datascience-281118"
 
-  s3_bucket_name = "${aws_s3_bucket.jupyter.id}"
-  s3_bucket_arn  = "${aws_s3_bucket.jupyter.arn}"
+  vpc_id         = "${local.vpc_id}"
+  vpc_cidr_block = "${data.aws_vpc.datascience.cidr_block}"
 
-  key_name = "${var.key_name}"
-
+  key_name   = "${var.key_name}"
   aws_region = "${var.aws_region}"
 
-  vpc_cidr_block = "${var.vpc_cidr_block}"
-  subnets        = "${module.network.public_subnets}"
-  vpc_id         = "${module.network.vpc_id}"
+  public_subnets  = "${local.public_subnets}"
+  private_subnets = "${local.private_subnets}"
 
-  controlled_access_cidr_ingress = ["${var.admin_cidr_ingress}"]
-}
+  notebook_bucket_name = "${aws_s3_bucket.jupyter.bucket}"
+  notebook_bucket_arn  = "${aws_s3_bucket.jupyter.arn}"
 
-module "labs" {
-  source = "labs"
+  efs_id                = "${module.efs.efs_id}"
+  efs_security_group_id = "${aws_security_group.efs_security_group.id}"
 
-  namespace = "datalabs"
-
-  vpc_cidr_block = "${var.vpc_cidr_block}"
-
-  vpc_id = "${module.network.vpc_id}"
-
-  private_subnets = "${module.network.private_subnets}"
-  public_subnets  = "${module.network.public_subnets}"
+  admin_cidr_ingress = "${var.admin_cidr_ingress}"
 }

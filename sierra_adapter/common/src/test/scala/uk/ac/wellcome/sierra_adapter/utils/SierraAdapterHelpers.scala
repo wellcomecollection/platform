@@ -55,25 +55,21 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
     )
 
   def assertStored(transformable: SierraTransformable,
-                   bucket: Bucket,
                    table: Table): Assertion =
     assertStored[SierraTransformable](
-      bucket,
-      table,
+      table = table,
       id = transformable.sierraId.withoutCheckDigit,
-      record = transformable)
+      record = transformable
+    )
 
-  def assertStoredAndSent[T](
-    t: T,
-    id: String,
-    topic: Topic,
-    bucket: Bucket,
-    table: Table)(implicit decoder: Decoder[T]): Assertion = {
+  def assertStoredAndSent[T](t: T, id: String, topic: Topic, table: Table)(
+    implicit decoder: Decoder[T]): Assertion = {
     val hybridRecord = getHybridRecord(table, id = id)
 
     val storedTransformable = getObjectFromS3[T](
-      Bucket(hybridRecord.location.namespace),
-      hybridRecord.location.key)
+      bucket = Bucket(hybridRecord.location.namespace),
+      key = hybridRecord.location.key
+    )
     storedTransformable shouldBe t
 
     listMessagesReceivedFromSNS(topic).map { info: MessageInfo =>
@@ -83,13 +79,11 @@ trait SierraAdapterHelpers extends LocalVersionedHybridStore with Messaging {
 
   def assertStoredAndSent(transformable: SierraTransformable,
                           topic: Topic,
-                          bucket: Bucket,
                           table: Table): Assertion =
     assertStoredAndSent[SierraTransformable](
       transformable,
       id = transformable.sierraId.withoutCheckDigit,
       topic = topic,
-      bucket = bucket,
       table = table
     )
 }

@@ -19,6 +19,8 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait ProgressHttpFixture
     extends S3
     with RandomThings
@@ -36,18 +38,14 @@ trait ProgressHttpFixture
     httpServerConfig: HTTPServerConfig,
     contextURL: URL)(testWith: TestWith[ProgressHTTP, R]): R =
     withSNSWriter(topic) { snsWriter =>
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
+      withActorSystem { implicit actorSystem =>
+        withMaterializer(actorSystem) { implicit materializer =>
           val progressHTTP = new ProgressHTTP(
             dynamoClient = dynamoDbClient,
             dynamoConfig = createDynamoConfigWith(table),
             snsWriter = snsWriter,
             httpServerConfig = httpServerConfig,
             contextURL = contextURL
-          )(
-            actorSystem = actorSystem,
-            materializer = materializer,
-            executionContext = actorSystem.dispatcher
           )
 
           progressHTTP.run()

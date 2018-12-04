@@ -4,7 +4,7 @@ module "cloudformation_stack" {
   asg_name = "${var.name}"
 
   asg_min     = "0"
-  asg_desired = "${var.enabled ? 1 : 0}"
+  asg_desired = "${var.enabled == true ? 1 : 0}"
   asg_max     = "1"
 
   subnet_list        = "${var.subnet_list}"

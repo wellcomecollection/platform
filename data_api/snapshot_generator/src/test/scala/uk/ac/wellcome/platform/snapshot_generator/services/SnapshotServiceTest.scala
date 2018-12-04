@@ -21,7 +21,6 @@ import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedSnapshotJob,
@@ -49,17 +48,16 @@ class SnapshotServiceTest
   val mapper = new ObjectMapper with ScalaObjectMapper
 
   private def withSnapshotService[R](
-    actorSystem: ActorSystem,
     s3AkkaClient: S3Client,
     indexNameV1: String,
-    indexNameV2: String)(testWith: TestWith[SnapshotService, R]): R = {
+    indexNameV2: String)(testWith: TestWith[SnapshotService, R])(
+    implicit actorSystem: ActorSystem): R = {
     val elasticConfig = createDisplayElasticConfigWith(
       indexV1name = indexNameV1,
       indexV2name = indexNameV2
     )
 
     val snapshotService = new SnapshotService(
-      actorSystem = actorSystem,
       elasticClient = elasticClient,
       elasticConfig = elasticConfig,
       akkaS3Client = s3AkkaClient,
@@ -70,22 +68,19 @@ class SnapshotServiceTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[(SnapshotService, String, String, Bucket), R]) =
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { actorMaterialiser =>
-        withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
+    testWith: TestWith[(SnapshotService, String, String, Bucket), R]): R =
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withS3AkkaClient { s3Client =>
           withLocalElasticsearchIndex { indexNameV1 =>
             withLocalElasticsearchIndex { indexNameV2 =>
               withLocalS3Bucket { bucket =>
-                withSnapshotService(
-                  actorSystem,
-                  s3Client,
-                  indexNameV1,
-                  indexNameV2) { snapshotService =>
-                  {
-                    testWith(
-                      (snapshotService, indexNameV1, indexNameV2, bucket))
-                  }
+                withSnapshotService(s3Client, indexNameV1, indexNameV2) {
+                  snapshotService =>
+                    {
+                      testWith(
+                        (snapshotService, indexNameV1, indexNameV2, bucket))
+                    }
                 }
               }
             }
@@ -257,30 +252,19 @@ class SnapshotServiceTest
         whenReady(future.failed) { result =>
           result shouldBe a[S3Exception]
         }
-
     }
-
   }
 
   it("returns a failed future if it fails reading from elasticsearch") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { actorMaterialiser =>
-        withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
-          withLocalS3Bucket { bucket =>
-            val elasticConfig = createDisplayElasticConfigWith(
-              indexV1name = "wrong-index",
-              indexV2name = "wrong-index"
-            )
-
-            val brokenSnapshotService = new SnapshotService(
-              actorSystem = actorSystem,
-              elasticClient = elasticClient,
-              elasticConfig = elasticConfig,
-              akkaS3Client = s3Client,
-              objectMapper = mapper
-            )
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withS3AkkaClient { s3Client =>
+          withSnapshotService(
+            s3Client,
+            indexNameV1 = "wrong-index",
+            indexNameV2 = "wrong-index") { brokenSnapshotService =>
             val snapshotJob = SnapshotJob(
-              publicBucketName = bucket.name,
+              publicBucketName = "bukkit",
               publicObjectKey = "target.json.gz",
               apiVersion = ApiVersions.v1
             )
@@ -308,36 +292,21 @@ class SnapshotServiceTest
     }
 
     it("creates the correct object location with the default S3 endpoint") {
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          val s3Client = AkkaS3ClientModule.buildAkkaS3Client(
-            region = "eu-west-1",
-            actorSystem = actorSystem,
-            endpoint = "",
-            accessKey = accessKey,
-            secretKey = secretKey
-          )
-
-          val elasticConfig = createDisplayElasticConfigWith(
-            indexV1name = "indexv1",
-            indexV2name = "indexv2"
-          )
-
-          val snapshotService = new SnapshotService(
-            actorSystem = actorSystem,
-            elasticClient = elasticClient,
-            elasticConfig = elasticConfig,
-            akkaS3Client = s3Client,
-            objectMapper = mapper
-          )
-
-          snapshotService.buildLocation(
-            bucketName = "bukkit",
-            objectKey = "snapshot.json.gz"
-          ) shouldBe Uri("s3://bukkit/snapshot.json.gz")
+      withActorSystem { implicit actorSystem =>
+        withMaterializer(actorSystem) { implicit materializer =>
+          withS3AkkaClient(endpoint = "") { s3Client =>
+            withSnapshotService(
+              s3Client,
+              indexNameV1 = "indexv1",
+              indexNameV2 = "indexv2") { snapshotService =>
+              snapshotService.buildLocation(
+                bucketName = "bukkit",
+                objectKey = "snapshot.json.gz"
+              ) shouldBe Uri("s3://bukkit/snapshot.json.gz")
+            }
+          }
         }
       }
     }
   }
-
 }

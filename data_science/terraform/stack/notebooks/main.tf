@@ -23,7 +23,7 @@ module "p2_compute" {
 }
 
 module "t2_compute" {
-  source = "dlami"
+  source = "../../modules/dlami"
   name   = "jupyter-t2-${var.namespace}"
 
   key_name    = "${var.key_name}"

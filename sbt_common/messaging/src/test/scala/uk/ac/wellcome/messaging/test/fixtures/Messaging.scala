@@ -88,29 +88,25 @@ trait Messaging
     testWith(messageWriter)
   }
 
-  def withMessageStream[T, R](
-    actorSystem: ActorSystem,
-    queue: SQS.Queue,
-    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
-    implicit objectStore: ObjectStore[T]): R = {
+  def withMessageStream[T, R](queue: SQS.Queue, metricsSender: MetricsSender)(
+    testWith: TestWith[MessageStream[T], R])(implicit actorSystem: ActorSystem,
+                                             objectStore: ObjectStore[T]): R = {
     val stream = new MessageStream[T](
-      actorSystem,
-      asyncSqsClient,
+      sqsClient = asyncSqsClient,
       sqsConfig = createSQSConfigWith(queue),
-      metricsSender)
+      metricsSender = metricsSender)
     testWith(stream)
   }
 
   def withMessageStreamFixtures[T, R](
     testWith: TestWith[(MessageStream[T], QueuePair, MetricsSender), R]
   )(implicit objectStore: ObjectStore[T]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
-            withMessageStream[T, R](actorSystem, queue, metricsSender) {
-              stream =>
-                testWith((stream, queuePair, metricsSender))
+            withMessageStream[T, R](queue, metricsSender) { stream =>
+              testWith((stream, queuePair, metricsSender))
             }
           }
       }

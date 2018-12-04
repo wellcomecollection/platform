@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import akka.Done
-import akka.actor.{ActorSystem, Terminated}
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
@@ -10,7 +9,6 @@ import uk.ac.wellcome.json.JsonUtil._
 import scala.concurrent.{ExecutionContext, Future}
 
 class SierraItemsToDynamoWorkerService(
-  actorSystem: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   dynamoInserter: DynamoInserter,
   snsWriter: SNSWriter
@@ -28,6 +26,4 @@ class SierraItemsToDynamoWorkerService(
 
   def run(): Future[Done] =
     sqsStream.foreach(this.getClass.getSimpleName, process)
-
-  def stop(): Future[Terminated] = actorSystem.terminate()
 }

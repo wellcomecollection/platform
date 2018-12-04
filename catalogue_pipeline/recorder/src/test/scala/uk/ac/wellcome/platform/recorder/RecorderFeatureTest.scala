@@ -30,10 +30,10 @@ class RecorderFeatureTest
 
               eventually {
                 assertStored[TransformedBaseWork](
-                  bucket,
-                  table,
+                  table = table,
                   id = work.sourceIdentifier.toString,
-                  record = work)
+                  record = work
+                )
               }
             }
           }

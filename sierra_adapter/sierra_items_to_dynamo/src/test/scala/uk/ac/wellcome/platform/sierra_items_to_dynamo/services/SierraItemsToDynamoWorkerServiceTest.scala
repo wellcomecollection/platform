@@ -67,7 +67,6 @@ class SierraItemsToDynamoWorkerServiceTest
 
                 eventually {
                   assertStored[SierraItemRecord](
-                    bucket = bucket,
                     table = table,
                     id = record1.id.withoutCheckDigit,
                     record = expectedRecord
