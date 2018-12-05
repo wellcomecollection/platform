@@ -65,8 +65,11 @@ object Dependencies {
     "io.circe" %% "circe-generic"% versions.circeVersion,
     "io.circe" %% "circe-generic-extras"% versions.circeVersion,
     "io.circe" %% "circe-parser"% versions.circeVersion,
-    "io.circe" %% "circe-optics" % versions.circeVersion,
     "io.circe" %% "circe-java8" % versions.circeVersion
+  )
+
+  val circeOpticsDependencies = Seq(
+    "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
   val swaggerDependencies = Seq(
@@ -141,7 +144,11 @@ object Dependencies {
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
-  val commonElasticsearchDependencies = elasticsearchDependencies ++ guiceDependencies ++ scalacheckDependencies
+  val commonElasticsearchDependencies: Seq[ModuleID] =
+    elasticsearchDependencies ++
+      circeOpticsDependencies ++
+      guiceDependencies ++
+      scalacheckDependencies
 
   val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
@@ -168,12 +175,12 @@ object Dependencies {
   ) ++ WellcomeDependencies.jsonLibrary
 
   // Application specific dependency groups
-  val idminterDependencies = Seq(
+  val idminterDependencies: Seq[ModuleID] = Seq(
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
     "mysql" % "mysql-connector-java" % "6.0.6",
     "org.flywaydb" % "flyway-core" % "4.2.0",
     "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
-  )
+  ) ++ circeOpticsDependencies
 
   val miroTransformerDependencies: Seq[ModuleID] = Seq(
     "org.apache.commons" % "commons-lang3" % "3.1"
@@ -185,7 +192,7 @@ object Dependencies {
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
-  )
+  ) ++ circeOpticsDependencies
 
   val archiveCommonDependencies: Seq[ModuleID] = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
@@ -194,4 +201,6 @@ object Dependencies {
     "org.rogach" %% "scallop" % "3.1.3",
     "de.heikoseeberger" %% "akka-http-circe" % "1.21.1"
   ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
+
+  val registrarHttpDependencies: Seq[ModuleID] = circeOpticsDependencies
 }
