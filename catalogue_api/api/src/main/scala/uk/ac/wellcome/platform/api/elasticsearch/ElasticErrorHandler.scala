@@ -51,19 +51,19 @@ object ElasticErrorHandler extends Logging {
 
   private def userError(message: String, elasticError: ElasticError): DisplayError = {
     warn(
-      s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message; $elasticError)")
+      s"Sending HTTP 400 from ${this.getClass.getSimpleName} ($message; $elasticError)")
     DisplayError(Error(variant = "http-400", description = Some(message)))
   }
 
   private def notFound(message: String, elasticError: ElasticError): DisplayError = {
     warn(
-      s"Sending HTTP 404 from ElasticsearchResponseExceptionMapper ($message; $elasticError)")
+      s"Sending HTTP 404 from ${this.getClass.getSimpleName} ($message; $elasticError)")
     DisplayError(Error(variant = "http-404", description = Some(message)))
   }
 
   private def serverError(message: String, elasticError: ElasticError): DisplayError = {
     error(
-      s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message; $elasticError)")
+      s"Sending HTTP 500 from ${this.getClass.getSimpleName} ($message; $elasticError)")
     DisplayError(Error(variant = "http-500", description = None))
   }
 }
