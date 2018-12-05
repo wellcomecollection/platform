@@ -1,15 +1,15 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
-import com.sksamuel.elastic4s.{Hit, Index}
-import com.sksamuel.elastic4s.http.{ElasticClient, ElasticError, Response}
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.searches.{SearchRequest, SearchType}
+import com.sksamuel.elastic4s.http.{ElasticClient, ElasticError, Response}
 import com.sksamuel.elastic4s.searches.queries.term.TermsQuery
 import com.sksamuel.elastic4s.searches.queries.{BoolQuery, Query}
 import com.sksamuel.elastic4s.searches.sort.{FieldSort, SortOrder}
+import com.sksamuel.elastic4s.searches.{SearchRequest, SearchType}
 import uk.ac.wellcome.platform.api.models.{
   ItemLocationTypeFilter,
   WorkFilter,

@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticError
-import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
@@ -17,7 +16,6 @@ import uk.ac.wellcome.platform.api.models.{
 }
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.util.Random
 
 class ElasticsearchServiceTest
