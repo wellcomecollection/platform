@@ -27,7 +27,7 @@ class GoobiReaderWorkerService(
   versionedHybridStore: VersionedHybridStore[InputStream,
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]
-)(implicit ex: ExecutionContext)
+)(implicit ec: ExecutionContext)
     extends Logging
     with Runnable {
 

@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.sierra_reader.services
 import java.time.Instant
 
 import akka.Done
+import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import grizzled.slf4j.Logging
@@ -39,7 +40,7 @@ class SierraReaderWorkerService(
   s3Config: S3Config,
   readerConfig: ReaderConfig,
   sierraAPIConfig: SierraAPIConfig
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, materializer: ActorMaterializer)
     extends Logging
     with Runnable {
 
