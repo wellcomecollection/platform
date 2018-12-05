@@ -20,6 +20,8 @@ module "catalogue_api" {
   remus_es_config   = "${local.es_config_remus}"
 
   production_api = "${local.production_api}"
+
+  alarm_topic_arn = "${local.gateway_server_error_alarm_arn}"
 }
 
 module "data_api" {

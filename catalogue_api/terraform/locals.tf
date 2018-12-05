@@ -31,6 +31,7 @@ locals {
   private_subnets     = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
   namespace           = "catalogue-api"
   nginx_container_uri = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
+  gateway_server_error_alarm_arn = "${data.terraform_remote_state.shared_infra.gateway_server_error_alarm_arn}"
 
   # Data API
 
