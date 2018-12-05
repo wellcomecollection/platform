@@ -33,7 +33,7 @@ case class BadTestObject(
   weight: Int
 )
 
-class ElasticsearchIndexTest
+class ElasticsearchIndexCreatorTest
     extends FunSpec
     with ElasticsearchFixtures
     with ScalaFutures
