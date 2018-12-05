@@ -196,14 +196,26 @@ class ElasticsearchServiceTest
           .sortBy(_.canonicalId)
 
         insertIntoElasticsearch(indexName, works: _*)
-        (1 to 10).foreach { _ =>
-          val searchResponseFuture = searchService
-            .simpleStringQueryResults("A")(
-              createElasticsearchDocumentOptionsWith(indexName),
-              createElasticsearchQueryOptions)
 
-          whenReady(searchResponseFuture) { response =>
-            searchResponseToWorks(response) shouldBe works
+        val documentOptions = createElasticsearchDocumentOptionsWith(indexName)
+        val queryOptions = createElasticsearchQueryOptions
+
+        // Get the initial ordering from Elasticsearch
+        val initialResponse: Future[SearchResponse] = searchService
+          .simpleStringQueryResults("A")(documentOptions, queryOptions)
+
+        whenReady(initialResponse) { response =>
+          val initialWorks = searchResponseToWorks(response)
+
+          // Now we make the query 10 more times, and assert that we always get
+          // results back in the same order.
+          (1 to 10).foreach { _ =>
+            val searchResponseFuture = searchService
+              .simpleStringQueryResults("A")(documentOptions, queryOptions)
+
+            whenReady(searchResponseFuture) { response =>
+              searchResponseToWorks(response) shouldBe initialWorks
+            }
           }
         }
       }
