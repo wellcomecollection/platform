@@ -40,7 +40,8 @@ class SierraReaderWorkerService(
   readerConfig: ReaderConfig,
   sierraAPIConfig: SierraAPIConfig
 )(implicit ec: ExecutionContext)
-    extends Logging with Runnable {
+    extends Logging
+    with Runnable {
 
   val windowManager = new WindowManager(
     s3client = s3client,

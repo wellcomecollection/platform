@@ -18,7 +18,8 @@ class MatcherWorkerService(messageStream: MessageStream[TransformedBaseWork],
                            workMatcher: WorkMatcher)(
   implicit val actorSystem: ActorSystem,
   ec: ExecutionContext)
-    extends Logging with Runnable {
+    extends Logging
+    with Runnable {
 
   def run(): Future[Done] =
     messageStream.foreach(this.getClass.getSimpleName, processMessage)

@@ -13,7 +13,8 @@ class SierraItemsToDynamoWorkerService(
   sqsStream: SQSStream[NotificationMessage],
   dynamoInserter: DynamoInserter,
   snsWriter: SNSWriter
-)(implicit ec: ExecutionContext) extends Runnable {
+)(implicit ec: ExecutionContext)
+    extends Runnable {
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {

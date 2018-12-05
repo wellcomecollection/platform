@@ -28,7 +28,8 @@ class GoobiReaderWorkerService(
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]
 )(implicit ex: ExecutionContext)
-    extends Logging with Runnable {
+    extends Logging
+    with Runnable {
 
   def run(): Future[Done] =
     sqsStream.foreach(

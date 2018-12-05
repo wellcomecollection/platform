@@ -23,7 +23,8 @@ class RegistrarHTTP(
 )(implicit val actorSystem: ActorSystem,
   materializer: ActorMaterializer,
   executionContext: ExecutionContext)
-    extends Logging with Runnable {
+    extends Logging
+    with Runnable {
   val router = new Router(
     vhs = vhs,
     contextURL = contextURL

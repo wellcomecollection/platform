@@ -28,7 +28,8 @@ class Notifier(
   snsClient: AmazonSNS,
   snsConfig: SNSConfig,
   contextUrl: URL
-)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer) extends Runnable {
+)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer)
+    extends Runnable {
   def run(): Future[Done] = {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")

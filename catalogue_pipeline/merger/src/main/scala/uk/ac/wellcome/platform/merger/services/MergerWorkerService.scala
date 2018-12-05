@@ -18,7 +18,8 @@ class MergerWorkerService(
   mergerManager: MergerManager,
   messageWriter: MessageWriter[BaseWork]
 )(implicit ec: ExecutionContext)
-    extends Logging with Runnable {
+    extends Logging
+    with Runnable {
 
   def run(): Future[Done] =
     sqsStream.foreach(this.getClass.getSimpleName, processMessage)

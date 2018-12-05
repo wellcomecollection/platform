@@ -13,7 +13,8 @@ import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 object Main extends WellcomeTypesafeApp {
   runWithConfig { config: Config =>
     implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val materializer: ActorMaterializer = AkkaBuilder.buildActorMaterializer()
+    implicit val materializer: ActorMaterializer =
+      AkkaBuilder.buildActorMaterializer()
 
     val messageStream =
       MessagingBuilder.buildMessageStream[NotificationMessage, PublishResult](

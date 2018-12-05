@@ -1,7 +1,7 @@
 package uk.ac.wellcome.config.core
 
 import com.typesafe.config.{Config, ConfigFactory}
-import uk.ac.wellcome.{WellcomeApp, Runnable}
+import uk.ac.wellcome.{Runnable, WellcomeApp}
 
 trait WellcomeTypesafeApp extends WellcomeApp {
   def runWithConfig(builder: Config => Runnable) = {

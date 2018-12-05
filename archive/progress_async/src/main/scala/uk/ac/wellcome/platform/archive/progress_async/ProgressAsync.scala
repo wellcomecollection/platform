@@ -30,7 +30,8 @@ class ProgressAsync(
   snsClient: AmazonSNS,
   snsConfig: SNSConfig
 )(implicit val actorSystem: ActorSystem, materializer: ActorMaterializer)
-    extends Logging with Runnable {
+    extends Logging
+    with Runnable {
   def run(): Future[Done] = {
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")

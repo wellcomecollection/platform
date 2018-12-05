@@ -26,7 +26,8 @@ class RecorderWorkerService @Inject()(
                                              EmptyMetadata,
                                              ObjectStore[TransformedBaseWork]],
   messageStream: MessageStream[TransformedBaseWork],
-  snsWriter: SNSWriter)(implicit ec: ExecutionContext) extends Runnable {
+  snsWriter: SNSWriter)(implicit ec: ExecutionContext)
+    extends Runnable {
 
   def run(): Future[Done] =
     messageStream.foreach(this.getClass.getSimpleName, processMessage)

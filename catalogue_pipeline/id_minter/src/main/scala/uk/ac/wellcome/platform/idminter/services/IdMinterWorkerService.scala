@@ -19,7 +19,8 @@ class IdMinterWorkerService(
   messageStream: MessageStream[Json],
   rdsClientConfig: RDSClientConfig,
   identifiersTableConfig: IdentifiersTableConfig
-)(implicit ec: ExecutionContext) extends Runnable {
+)(implicit ec: ExecutionContext)
+    extends Runnable {
 
   def run(): Future[Done] = {
     val tableProvisioner = new TableProvisioner(

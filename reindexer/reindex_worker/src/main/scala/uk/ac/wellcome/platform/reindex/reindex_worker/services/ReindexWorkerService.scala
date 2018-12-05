@@ -17,7 +17,8 @@ class ReindexWorkerService(
   bulkSNSSender: BulkSNSSender,
   sqsStream: SQSStream[NotificationMessage],
   reindexJobConfigMap: Map[String, ReindexJobConfig]
-)(implicit ec: ExecutionContext) extends Runnable {
+)(implicit ec: ExecutionContext)
+    extends Runnable {
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
