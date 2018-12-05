@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.works
 
 import com.sksamuel.elastic4s.Indexable
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.ApiVersions
@@ -9,7 +10,9 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.Server
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait ApiWorksTestBase
     extends FunSpec
@@ -99,4 +102,18 @@ trait ApiWorksTestBase
       "label": "Gone",
       "description": "This work has been deleted"
     }"""
+
+  def withEmptyIndex[R]: Fixture[String, R] =
+    fixture[String, R](
+      create = {
+        val indexName = createIndexName
+        elasticClient
+          .execute {
+            createIndex(indexName)
+          }
+        eventuallyIndexExists(indexName)
+        indexName
+      },
+      destroy = eventuallyDeleteIndex
+    )
 }

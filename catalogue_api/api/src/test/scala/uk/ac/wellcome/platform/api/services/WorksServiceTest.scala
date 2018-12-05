@@ -147,8 +147,9 @@ class WorksServiceTest
         val recordsFuture =
           worksService.findWorkById(canonicalId = "1234")(index)
 
-        whenReady(recordsFuture) { record =>
-          record shouldBe None
+        whenReady(recordsFuture) { result =>
+          result.isRight shouldBe true
+          result.right.get shouldBe None
         }
       }
     }

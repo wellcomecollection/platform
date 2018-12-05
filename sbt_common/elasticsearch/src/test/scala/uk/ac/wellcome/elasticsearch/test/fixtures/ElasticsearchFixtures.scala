@@ -187,6 +187,6 @@ trait ElasticsearchFixtures
       indexV2name = indexV2name
     )
 
-  private def createIndexName: String =
+  def createIndexName: String =
     (Random.alphanumeric take 10 mkString) toLowerCase
 }

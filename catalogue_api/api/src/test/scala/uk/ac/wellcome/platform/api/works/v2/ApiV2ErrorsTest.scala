@@ -249,22 +249,26 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
     // We need to do something that reliably triggers an internal exception
     // in the Elasticsearch handler.
     //
-    // Elasticsearch has a number of "private" indexes, which don't have
-    // a canonicalId field to sort on.  Trying to query one of these will
-    // trigger one such exception!
+    // By creating an index without a mapping, we don't have a canonicalId field
+    // to sort on.  Trying to query this index of these will trigger one such exception!
     withV2Api {
       case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-        server.httpGet(
-          path = s"/$apiPrefix/works?_index=.watches",
-          andExpect = Status.InternalServerError,
-          withJsonBody = s"""{
-          "@context": "https://localhost:8888/$apiPrefix/context.json",
-          "type": "Error",
-          "errorType": "http",
-          "httpStatus": 500,
-          "label": "Internal Server Error"
-        }"""
-        )
+        withEmptyIndex { indexName =>
+          server.httpGet(
+            path = s"/$apiPrefix/works?_index=$indexName",
+            andExpect = Status.InternalServerError,
+            withJsonBody =
+              s"""
+                 |{
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Error",
+                 |  "errorType": "http",
+                 |  "httpStatus": 500,
+                 |  "label": "Internal Server Error"
+                 |}
+               """.stripMargin
+          )
+        }
     }
   }
 
