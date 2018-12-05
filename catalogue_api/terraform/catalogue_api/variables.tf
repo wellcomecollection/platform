@@ -35,3 +35,6 @@ variable "cluster_name" {}
 variable "namespace" {}
 
 variable "production_api" {}
+
+variable "alarm_topic_arn" {
+}

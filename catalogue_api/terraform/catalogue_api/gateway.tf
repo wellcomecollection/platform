@@ -30,22 +30,29 @@ module "prod" {
 }
 
 module "stage" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v14.2.0"
-  domain_name = "api-stage.wellcomecollection.org"
+  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=307d3fa2576360a7c41765bbd95e61281afd6ea8"
 
   stage_name = "stage"
   api_id     = "${aws_api_gateway_rest_api.api.id}"
+  api_name = "${aws_api_gateway_rest_api.api.name}"
 
   variables = {
     port = "${local.stage_listener_port}"
   }
 
-  base_path = "catalogue"
-
   depends_on = [
     "${module.root_resource_integration.uri}",
     "${module.simple_integration.uri}",
   ]
+  enable_alarm = true
+  alarm_topic_arn = "${var.alarm_topic_arn}"
+}
+
+resource "aws_api_gateway_base_path_mapping" "stage" {
+  api_id      = "${aws_api_gateway_rest_api.api.id}"
+  stage_name  = "stage"
+  domain_name = "api-stage.wellcomecollection.org"
+  base_path = "catalogue"
 }
 
 # Resources
