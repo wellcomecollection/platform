@@ -188,7 +188,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
     }
   }
 
-  it("returns Not Found if you look up a non-existent index") {
+  it("returns Not Found if you list in a non-existent index") {
     withV1Api {
       case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
@@ -196,7 +196,28 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
           andExpect = Status.NotFound,
           withJsonBody = notFound(apiPrefix, "There is no index foobarbaz")
         )
+    }
+  }
 
+  it("returns Not Found if you look up in a non-existent index") {
+    withV1Api {
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works/1234?_index=foobarbaz",
+          andExpect = Status.NotFound,
+          withJsonBody = notFound(apiPrefix, "There is no index foobarbaz")
+        )
+    }
+  }
+
+  it("returns Not Found if you search in a non-existent index") {
+    withV1Api {
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?_index=foobarbaz&query=foobar",
+          andExpect = Status.NotFound,
+          withJsonBody = notFound(apiPrefix, "There is no index foobarbaz")
+        )
     }
   }
 
