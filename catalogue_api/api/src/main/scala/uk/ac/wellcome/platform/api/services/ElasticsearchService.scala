@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
-import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.http.ElasticClient
+import com.sksamuel.elastic4s.{Hit, Index}
+import com.sksamuel.elastic4s.http.{ElasticClient, ElasticError, Response}
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
@@ -29,21 +29,21 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
   implicit ec: ExecutionContext
 ) {
 
-  def findResultById(canonicalId: String)(index: Index): Future[GetResponse] =
+  def findResultById(canonicalId: String)(index: Index): Future[Either[ElasticError, GetResponse]] =
     elasticClient
       .execute {
         get(canonicalId).from(index.name, index.name)
       }
-      .map { _.result }
+      .map { toEither }
 
-  def listResults: (Index, ElasticsearchQueryOptions) => Future[SearchResponse] =
+  def listResults: (Index, ElasticsearchQueryOptions) => Future[Either[ElasticError, SearchResponse]] =
     executeSearch(
       maybeQueryString = None,
       sortDefinitions = List(fieldSort("canonicalId").order(SortOrder.ASC))
     )
 
   def simpleStringQueryResults(queryString: String)
-    : (Index, ElasticsearchQueryOptions) => Future[SearchResponse] =
+    : (Index, ElasticsearchQueryOptions) => Future[Either[ElasticError, SearchResponse]] =
     executeSearch(
       maybeQueryString = Some(queryString),
       sortDefinitions = List(
@@ -58,7 +58,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
     maybeQueryString: Option[String],
     sortDefinitions: List[FieldSort]
   )(index: Index,
-    queryOptions: ElasticsearchQueryOptions): Future[SearchResponse] = {
+    queryOptions: ElasticsearchQueryOptions): Future[Either[ElasticError, SearchResponse]] = {
     val queryDefinition: BoolQuery = buildQuery(
       maybeQueryString = maybeQueryString,
       filters = queryOptions.filters
@@ -74,7 +74,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
 
     elasticClient
       .execute { searchRequest }
-      .map { _.result }
+      .map { toEither }
   }
 
   private def toTermQuery(workFilter: WorkFilter): TermsQuery[String] =
@@ -100,4 +100,11 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
 
     must(queries).filter(filterDefinitions)
   }
+
+  private def toEither[T](response: Response[T]): Either[ElasticError, T] =
+    if (response.isError) {
+      Left(response.error)
+    } else {
+      Right(response.result)
+    }
 }

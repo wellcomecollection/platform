@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticError
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import org.scalatest.concurrent.ScalaFutures
@@ -30,6 +31,8 @@ class ElasticsearchServiceTest
   val searchService = new ElasticsearchService(
     elasticClient = elasticClient
   )
+
+  val defaultQueryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptions
 
   describe("simpleStringQueryResults") {
     it("finds results for a simpleStringQuery search") {
@@ -199,11 +202,10 @@ class ElasticsearchServiceTest
         insertIntoElasticsearch(indexName, works: _*)
 
         val index = Index(indexName)
-        val queryOptions = createElasticsearchQueryOptions
 
         // Get the initial ordering from Elasticsearch
-        val initialResponse: Future[SearchResponse] = searchService
-          .simpleStringQueryResults("A")(index, queryOptions)
+        val initialResponse = searchService
+          .simpleStringQueryResults("A")(index, defaultQueryOptions)
 
         whenReady(initialResponse) { response =>
           val initialWorks = searchResponseToWorks(response)
@@ -212,13 +214,23 @@ class ElasticsearchServiceTest
           // results back in the same order.
           (1 to 10).foreach { _ =>
             val searchResponseFuture = searchService
-              .simpleStringQueryResults("A")(index, queryOptions)
+              .simpleStringQueryResults("A")(index, defaultQueryOptions)
 
             whenReady(searchResponseFuture) { response =>
               searchResponseToWorks(response) shouldBe initialWorks
             }
           }
         }
+      }
+    }
+
+    it("returns a Left[ElasticError] if Elasticsearch returns an error") {
+      val future = searchService
+        .simpleStringQueryResults("cat")(Index("doesnotexist"), defaultQueryOptions)
+
+      whenReady(future) { response =>
+        response.isLeft shouldBe true
+        response.left.get shouldBe a[ElasticError]
       }
     }
   }
@@ -232,13 +244,23 @@ class ElasticsearchServiceTest
 
         val index = Index(indexName)
 
-        val searchResultFuture: Future[GetResponse] =
+        val searchResultFuture =
           searchService.findResultById(canonicalId = work.canonicalId)(index)
 
         whenReady(searchResultFuture) { result =>
-          val returnedWork = jsonToIdentifiedBaseWork(result.sourceAsString)
+          val returnedWork = jsonToIdentifiedBaseWork(result.right.get.sourceAsString)
           returnedWork shouldBe work
         }
+      }
+    }
+
+    it("returns a Left[ElasticError] if Elasticsearch returns an error") {
+      val future = searchService
+        .findResultById("1234")(Index("doesnotexist"))
+
+      whenReady(future) { response =>
+        response.isLeft shouldBe true
+        response.left.get shouldBe a[ElasticError]
       }
     }
   }
@@ -417,6 +439,16 @@ class ElasticsearchServiceTest
         )
       }
     }
+
+    it("returns a Left[ElasticError] if Elasticsearch returns an error") {
+      val future = searchService
+        .listResults(Index("doesnotexist"), defaultQueryOptions)
+
+      whenReady(future) { response =>
+        response.isLeft shouldBe true
+        response.left.get shouldBe a[ElasticError]
+      }
+    }
   }
 
   private def createItemWithLocationType(
@@ -475,8 +507,8 @@ class ElasticsearchServiceTest
   }
 
   private def searchResponseToWorks(
-    response: SearchResponse): List[IdentifiedBaseWork] =
-    response.hits.hits.map { h: SearchHit =>
+    response: Either[ElasticError, SearchResponse]): List[IdentifiedBaseWork] =
+    response.right.get.hits.hits.map { h: SearchHit =>
       jsonToIdentifiedBaseWork(h.sourceAsString)
     }.toList
 
