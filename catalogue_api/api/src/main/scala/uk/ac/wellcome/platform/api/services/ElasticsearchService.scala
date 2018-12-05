@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.get.GetResponse
@@ -17,11 +18,6 @@ import uk.ac.wellcome.platform.api.models.{
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ElasticsearchDocumentOptions(
-  indexName: String,
-  documentType: String
-)
-
 case class ElasticsearchQueryOptions(
   filters: List[WorkFilter],
   limit: Int,
@@ -33,25 +29,21 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
   implicit ec: ExecutionContext
 ) {
 
-  def findResultById(canonicalId: String)(
-    documentOptions: ElasticsearchDocumentOptions): Future[GetResponse] =
+  def findResultById(canonicalId: String)(index: Index): Future[GetResponse] =
     elasticClient
       .execute {
-        get(canonicalId).from(
-          documentOptions.indexName, documentOptions.indexName)
+        get(canonicalId).from(index.name, index.name)
       }
       .map { _.result }
 
-  def listResults: (ElasticsearchDocumentOptions,
-                    ElasticsearchQueryOptions) => Future[SearchResponse] =
+  def listResults: (Index, ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = None,
       sortDefinitions = List(fieldSort("canonicalId").order(SortOrder.ASC))
     )
 
   def simpleStringQueryResults(queryString: String)
-    : (ElasticsearchDocumentOptions,
-       ElasticsearchQueryOptions) => Future[SearchResponse] =
+    : (Index, ElasticsearchQueryOptions) => Future[SearchResponse] =
     executeSearch(
       maybeQueryString = Some(queryString),
       sortDefinitions = List(
@@ -65,7 +57,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
   private def executeSearch(
     maybeQueryString: Option[String],
     sortDefinitions: List[FieldSort]
-  )(documentOptions: ElasticsearchDocumentOptions,
+  )(index: Index,
     queryOptions: ElasticsearchQueryOptions): Future[SearchResponse] = {
     val queryDefinition: BoolQuery = buildQuery(
       maybeQueryString = maybeQueryString,
@@ -73,7 +65,7 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
     )
 
     val searchRequest: SearchRequest =
-      search(documentOptions.indexName)
+      search(index)
         .searchType(SearchType.DFS_QUERY_THEN_FETCH)
         .query(queryDefinition)
         .sortBy(sortDefinitions)

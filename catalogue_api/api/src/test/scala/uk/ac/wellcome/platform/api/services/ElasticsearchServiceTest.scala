@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.api.services
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import org.scalatest.concurrent.ScalaFutures
@@ -197,12 +198,12 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, works: _*)
 
-        val documentOptions = createElasticsearchDocumentOptionsWith(indexName)
+        val index = Index(indexName)
         val queryOptions = createElasticsearchQueryOptions
 
         // Get the initial ordering from Elasticsearch
         val initialResponse: Future[SearchResponse] = searchService
-          .simpleStringQueryResults("A")(documentOptions, queryOptions)
+          .simpleStringQueryResults("A")(index, queryOptions)
 
         whenReady(initialResponse) { response =>
           val initialWorks = searchResponseToWorks(response)
@@ -211,7 +212,7 @@ class ElasticsearchServiceTest
           // results back in the same order.
           (1 to 10).foreach { _ =>
             val searchResponseFuture = searchService
-              .simpleStringQueryResults("A")(documentOptions, queryOptions)
+              .simpleStringQueryResults("A")(index, queryOptions)
 
             whenReady(searchResponseFuture) { response =>
               searchResponseToWorks(response) shouldBe initialWorks
@@ -229,12 +230,10 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, work)
 
-        val documentOptions =
-          createElasticsearchDocumentOptionsWith(indexName)
+        val index = Index(indexName)
 
         val searchResultFuture: Future[GetResponse] =
-          searchService.findResultById(canonicalId = work.canonicalId)(
-            documentOptions)
+          searchService.findResultById(canonicalId = work.canonicalId)(index)
 
         whenReady(searchResultFuture) { result =>
           val returnedWork = jsonToIdentifiedBaseWork(result.sourceAsString)
@@ -450,10 +449,10 @@ class ElasticsearchServiceTest
     queryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptions,
     expectedWorks: List[IdentifiedWork]
   ): Assertion = {
-    val documentOptions = createElasticsearchDocumentOptionsWith(indexName)
+    val index = Index(indexName)
 
     val searchResponseFuture = searchService
-      .simpleStringQueryResults(queryString)(documentOptions, queryOptions)
+      .simpleStringQueryResults(queryString)(index, queryOptions)
 
     whenReady(searchResponseFuture) { response =>
       searchResponseToWorks(response) should contain theSameElementsAs expectedWorks
@@ -465,10 +464,10 @@ class ElasticsearchServiceTest
     queryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptions,
     expectedWorks: Seq[IdentifiedWork]
   ): Assertion = {
-    val documentOptions = createElasticsearchDocumentOptionsWith(indexName)
+    val index = Index(indexName)
 
     val listResponseFuture = searchService
-      .listResults(documentOptions, queryOptions)
+      .listResults(index, queryOptions)
 
     whenReady(listResponseFuture) { response =>
       searchResponseToWorks(response) should contain theSameElementsAs expectedWorks

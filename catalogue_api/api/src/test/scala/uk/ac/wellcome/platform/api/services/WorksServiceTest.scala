@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.api.services
 
+import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -108,11 +109,10 @@ class WorksServiceTest
 
         insertIntoElasticsearch(indexName, work)
 
-        val documentOptions =
-          createElasticsearchDocumentOptionsWith(indexName = indexName)
+        val index = Index(indexName)
 
         val recordsFuture = worksService.findWorkById(
-          canonicalId = work.canonicalId)(documentOptions)
+          canonicalId = work.canonicalId)(index)
 
         whenReady(recordsFuture) { records =>
           records.isDefined shouldBe true
@@ -124,11 +124,10 @@ class WorksServiceTest
 
     it("returns a future of None if it cannot get a record by id") {
       withLocalWorksIndex { indexName =>
-        val documentOptions =
-          createElasticsearchDocumentOptionsWith(indexName = indexName)
+        val index = Index(indexName)
 
         val recordsFuture =
-          worksService.findWorkById(canonicalId = "1234")(documentOptions)
+          worksService.findWorkById(canonicalId = "1234")(index)
 
         whenReady(recordsFuture) { record =>
           record shouldBe None
@@ -256,9 +255,7 @@ class WorksServiceTest
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertResultIsCorrect(
-    partialSearchFunction: (
-      ElasticsearchDocumentOptions,
-      WorksSearchOptions) => Future[ResultList]
+    partialSearchFunction: (Index, WorksSearchOptions) => Future[ResultList]
   )(
     allWorks: Seq[IdentifiedBaseWork],
     expectedWorks: Seq[IdentifiedBaseWork],
@@ -270,12 +267,8 @@ class WorksServiceTest
         insertIntoElasticsearch(indexName, allWorks: _*)
       }
 
-      val documentOptions = createElasticsearchDocumentOptionsWith(
-        indexName = indexName
-      )
-
       val future = partialSearchFunction(
-        documentOptions,
+        Index(indexName),
         worksSearchOptions)
 
       whenReady(future) { works =>
