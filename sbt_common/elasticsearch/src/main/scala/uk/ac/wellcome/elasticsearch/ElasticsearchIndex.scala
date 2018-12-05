@@ -17,9 +17,12 @@ trait ElasticsearchIndex extends Logging {
 
   def create(indexName: String): Future[Unit] =
     httpClient
-      .execute(createIndex(indexName).mappings {
-        mappingDefinition
-      }.shards(1))
+      .execute(
+        createIndex(indexName)
+          .mappings {
+            mappingDefinition
+          }
+          .shards(1))
       .recoverWith {
         case e: ResponseException
             if e.getMessage.contains("index_already_exists_exception") =>
