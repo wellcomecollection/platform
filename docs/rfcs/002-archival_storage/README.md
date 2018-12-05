@@ -355,12 +355,10 @@ Note that all files must be present the manifest and only files that are not sup
 ```
 b24923333/
 |-- data
-|   |-- b24923333.xml      // mets "anchor" file for multiple manifestation
-|  [|-- b24923333_001.xml  // mets file for vol 1]
-|  [|-- b24923333_002.xml  // mets file for vol 2]
-|   ...
+|   |-- b24923333.xml
 |-- fetch.txt
 |     s3://wellcomecollection-storage-archive/digitised/b24923333/data/objects/b24923333_001.jp2 - data/objects/b24923333_001.jp2
+|     s3://wellcomecollection-storage-archive/digitised/b24923333/data/alto/b24923333_001.xml - data/alto/b24923333_001.xml
 |     ...
 |-- manifest-sha256.txt
 |     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b24923333.xml
