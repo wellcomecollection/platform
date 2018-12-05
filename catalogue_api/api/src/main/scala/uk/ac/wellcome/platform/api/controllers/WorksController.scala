@@ -14,7 +14,10 @@ import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.elasticsearch.ElasticErrorHandler
 import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.{WorksSearchOptions, WorksService}
 
 import scala.collection.JavaConverters._
@@ -57,16 +60,17 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
 
       for {
         result <- getWorkList(request, pageSize)
-      } yield handleWorksServiceResult(result, version) { resultList: ResultList =>
-        generateResultListResponse(
-          resultList = resultList,
-          toDisplayWork = toDisplayWork,
-          pageSize = pageSize,
-          includes = includes,
-          request = request,
-          apiVersion = version
-        )
-      }
+      } yield
+        handleWorksServiceResult(result, version) { resultList: ResultList =>
+          generateResultListResponse(
+            resultList = resultList,
+            toDisplayWork = toDisplayWork,
+            pageSize = pageSize,
+            includes = includes,
+            request = request,
+            apiVersion = version
+          )
+        }
     }
   }
 
@@ -88,14 +92,15 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
         maybeResult <- worksService.findWorkById(canonicalId = request.id)(
           index)
       } yield
-        handleWorksServiceResult(maybeResult, version) { maybeWork: Option[IdentifiedBaseWork] =>
-          generateSingleWorkResponse(
-            maybeWork = maybeWork,
-            toDisplayWork = toDisplayWork,
-            includes = includes,
-            request = request,
-            contextUri = contextUri
-          )
+        handleWorksServiceResult(maybeResult, version) {
+          maybeWork: Option[IdentifiedBaseWork] =>
+            generateSingleWorkResponse(
+              maybeWork = maybeWork,
+              toDisplayWork = toDisplayWork,
+              includes = includes,
+              request = request,
+              contextUri = contextUri
+            )
         }
     }
   }
@@ -105,7 +110,9 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     */
   def buildFilters(request: M): List[WorkFilter]
 
-  private def getWorkList(request: M, pageSize: Int): Future[Either[ElasticError, ResultList]] = {
+  private def getWorkList(
+    request: M,
+    pageSize: Int): Future[Either[ElasticError, ResultList]] = {
     val index = Index(request._index.getOrElse(indexName))
 
     val worksSearchOptions = WorksSearchOptions(
@@ -114,7 +121,8 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       pageNumber = request.page
     )
 
-    def searchFunction: (Index, WorksSearchOptions) => Future[Either[ElasticError, ResultList]] =
+    def searchFunction: (Index, WorksSearchOptions) => Future[
+      Either[ElasticError, ResultList]] =
       request.query match {
         case Some(queryString) => worksService.searchWorks(queryString)
         case None              => worksService.listWorks
@@ -123,9 +131,8 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     searchFunction(index, worksSearchOptions)
   }
 
-  private def handleWorksServiceResult[T](
-    maybeResult: Either[ElasticError, T],
-    apiVersion: ApiVersions.Value)(
+  private def handleWorksServiceResult[T](maybeResult: Either[ElasticError, T],
+                                          apiVersion: ApiVersions.Value)(
     responseBuilder: T => ResponseBuilder#EnrichedResponse
   ): ResponseBuilder#EnrichedResponse =
     maybeResult match {
@@ -193,8 +200,9 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     )
   }
 
-  private def respondWithWork[T <: DisplayWork](result: T,
-                                                contextUri: String): ResponseBuilder#EnrichedResponse =
+  private def respondWithWork[T <: DisplayWork](
+    result: T,
+    contextUri: String): ResponseBuilder#EnrichedResponse =
     response.ok.json(ResultResponse(context = contextUri, result = result))
 
   /** Create a 302 Redirect to a new Work.

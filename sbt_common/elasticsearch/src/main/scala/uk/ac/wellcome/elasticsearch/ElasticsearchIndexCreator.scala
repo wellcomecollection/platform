@@ -49,7 +49,8 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
         info("Index updated successfully")
       }
 
-  private def update(indexName: String, mappingDefinition: MappingDefinition): Future[Unit] =
+  private def update(indexName: String,
+                     mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
       .execute {
         putMapping(indexName / mappingDefinition.`type`)

@@ -23,7 +23,8 @@ case class WorksSearchOptions(
 class WorksService @Inject()(searchService: ElasticsearchService)(
   implicit ec: ExecutionContext) {
 
-  def findWorkById(canonicalId: String)(index: Index): Future[Either[ElasticError, Option[IdentifiedBaseWork]]] =
+  def findWorkById(canonicalId: String)(
+    index: Index): Future[Either[ElasticError, Option[IdentifiedBaseWork]]] =
     searchService
       .findResultById(canonicalId)(index)
       .map { result =>
@@ -34,17 +35,15 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
         }
       }
 
-  def listWorks(index: Index,
-                worksSearchOptions: WorksSearchOptions): Future[Either[ElasticError, ResultList]] =
+  def listWorks(index: Index, worksSearchOptions: WorksSearchOptions)
+    : Future[Either[ElasticError, ResultList]] =
     searchService
-      .listResults(
-        index,
-        toElasticsearchQueryOptions(worksSearchOptions))
+      .listResults(index, toElasticsearchQueryOptions(worksSearchOptions))
       .map { _.right.map { createResultList } }
 
-  def searchWorks(query: String)(
-    index: Index,
-    worksSearchOptions: WorksSearchOptions): Future[Either[ElasticError, ResultList]] =
+  def searchWorks(query: String)(index: Index,
+                                 worksSearchOptions: WorksSearchOptions)
+    : Future[Either[ElasticError, ResultList]] =
     searchService
       .simpleStringQueryResults(query)(
         index,

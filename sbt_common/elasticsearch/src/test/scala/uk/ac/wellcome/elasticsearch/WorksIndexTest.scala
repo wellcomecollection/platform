@@ -31,7 +31,8 @@ class WorksIndexTest
     with Eventually
     with Matchers
     with JsonAssertions
-    with PropertyChecks with WorksGenerators {
+    with PropertyChecks
+    with WorksGenerators {
 
   // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
   // With IdentifiedWork, that means that it never actually completes.
@@ -57,11 +58,12 @@ class WorksIndexTest
           Subject(
             label = "Daredevil",
             concepts = List(
-              Unidentifiable(Person(
-                label = "Daredevil",
-                prefix = Some("Superhero"),
-                numeration = Some("I")
-              ))
+              Unidentifiable(
+                Person(
+                  label = "Daredevil",
+                  prefix = Some("Superhero"),
+                  numeration = Some("I")
+                ))
             )
           )
         )
@@ -86,21 +88,21 @@ class WorksIndexTest
     }
   }
 
-  private def indexObject[T](indexName: String, t: T)(implicit encoder: Encoder[T]): Future[Response[IndexResponse]] =
+  private def indexObject[T](indexName: String, t: T)(
+    implicit encoder: Encoder[T]): Future[Response[IndexResponse]] =
     elasticClient
       .execute {
         indexInto(indexName / indexName).doc(toJson(t).get)
       }
 
-  private def assertObjectIndexed[T](indexName: String, t: T)(implicit encoder: Encoder[T]): Assertion =
+  private def assertObjectIndexed[T](indexName: String, t: T)(
+    implicit encoder: Encoder[T]): Assertion =
     // Elasticsearch is eventually consistent so, when the future completes,
     // the documents might not immediately appear in search
     eventually {
-      val response: Response[SearchResponse] = elasticClient
-        .execute {
-          search(indexName).matchAllQuery()
-        }
-        .await
+      val response: Response[SearchResponse] = elasticClient.execute {
+        search(indexName).matchAllQuery()
+      }.await
 
       val hits = response.result.hits.hits
 

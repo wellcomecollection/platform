@@ -16,7 +16,7 @@ object ElasticErrorHandler extends Logging {
   // When returning a 400 to the user, we wrap this error to avoid talking
   // about internal Elasticsearch concepts.
   private val resultSizePattern =
-  """Result window is too large, from \+ size must be less than or equal to: \[([0-9]+)\]""".r.unanchored
+    """Result window is too large, from \+ size must be less than or equal to: \[([0-9]+)\]""".r.unanchored
 
   def buildDisplayError(elasticError: ElasticError): DisplayError =
     elasticError.`type` match {
@@ -49,19 +49,22 @@ object ElasticErrorHandler extends Logging {
         serverError("Unknown error", elasticError)
     }
 
-  private def userError(message: String, elasticError: ElasticError): DisplayError = {
+  private def userError(message: String,
+                        elasticError: ElasticError): DisplayError = {
     warn(
       s"Sending HTTP 400 from ${this.getClass.getSimpleName} ($message; $elasticError)")
     DisplayError(Error(variant = "http-400", description = Some(message)))
   }
 
-  private def notFound(message: String, elasticError: ElasticError): DisplayError = {
+  private def notFound(message: String,
+                       elasticError: ElasticError): DisplayError = {
     warn(
       s"Sending HTTP 404 from ${this.getClass.getSimpleName} ($message; $elasticError)")
     DisplayError(Error(variant = "http-404", description = Some(message)))
   }
 
-  private def serverError(message: String, elasticError: ElasticError): DisplayError = {
+  private def serverError(message: String,
+                          elasticError: ElasticError): DisplayError = {
     error(
       s"Sending HTTP 500 from ${this.getClass.getSimpleName} ($message; $elasticError)")
     DisplayError(Error(variant = "http-500", description = None))

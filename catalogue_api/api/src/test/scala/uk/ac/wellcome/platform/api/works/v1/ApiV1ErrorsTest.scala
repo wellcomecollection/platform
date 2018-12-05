@@ -257,8 +257,7 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?_index=$indexName",
             andExpect = Status.InternalServerError,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  |  "@context": "https://localhost:8888/$apiPrefix/context.json",
                  |  "type": "Error",

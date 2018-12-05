@@ -29,21 +29,24 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
   implicit ec: ExecutionContext
 ) {
 
-  def findResultById(canonicalId: String)(index: Index): Future[Either[ElasticError, GetResponse]] =
+  def findResultById(canonicalId: String)(
+    index: Index): Future[Either[ElasticError, GetResponse]] =
     elasticClient
       .execute {
         get(canonicalId).from(index.name, index.name)
       }
       .map { toEither }
 
-  def listResults: (Index, ElasticsearchQueryOptions) => Future[Either[ElasticError, SearchResponse]] =
+  def listResults: (Index, ElasticsearchQueryOptions) => Future[
+    Either[ElasticError, SearchResponse]] =
     executeSearch(
       maybeQueryString = None,
       sortDefinitions = List(fieldSort("canonicalId").order(SortOrder.ASC))
     )
 
-  def simpleStringQueryResults(queryString: String)
-    : (Index, ElasticsearchQueryOptions) => Future[Either[ElasticError, SearchResponse]] =
+  def simpleStringQueryResults(
+    queryString: String): (Index, ElasticsearchQueryOptions) => Future[
+    Either[ElasticError, SearchResponse]] =
     executeSearch(
       maybeQueryString = Some(queryString),
       sortDefinitions = List(
@@ -57,8 +60,8 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
   private def executeSearch(
     maybeQueryString: Option[String],
     sortDefinitions: List[FieldSort]
-  )(index: Index,
-    queryOptions: ElasticsearchQueryOptions): Future[Either[ElasticError, SearchResponse]] = {
+  )(index: Index, queryOptions: ElasticsearchQueryOptions)
+    : Future[Either[ElasticError, SearchResponse]] = {
     val queryDefinition: BoolQuery = buildQuery(
       maybeQueryString = maybeQueryString,
       filters = queryOptions.filters

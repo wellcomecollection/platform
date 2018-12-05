@@ -126,8 +126,8 @@ class WorksServiceTest
 
         val index = Index(indexName)
 
-        val future = worksService.findWorkById(
-          canonicalId = work.canonicalId)(index)
+        val future =
+          worksService.findWorkById(canonicalId = work.canonicalId)(index)
 
         whenReady(future) { response =>
           response.isRight shouldBe true
@@ -301,7 +301,9 @@ class WorksServiceTest
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertResultIsCorrect(
-    partialSearchFunction: (Index, WorksSearchOptions) => Future[Either[ElasticError, ResultList]]
+    partialSearchFunction: (
+      Index,
+      WorksSearchOptions) => Future[Either[ElasticError, ResultList]]
   )(
     allWorks: Seq[IdentifiedBaseWork],
     expectedWorks: Seq[IdentifiedBaseWork],
@@ -313,9 +315,7 @@ class WorksServiceTest
         insertIntoElasticsearch(indexName, allWorks: _*)
       }
 
-      val future = partialSearchFunction(
-        Index(indexName),
-        worksSearchOptions)
+      val future = partialSearchFunction(Index(indexName), worksSearchOptions)
 
       whenReady(future) { result =>
         result.isRight shouldBe true

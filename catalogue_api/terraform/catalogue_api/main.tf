@@ -13,7 +13,7 @@ module "services" {
 
   container_port = "${var.container_port}"
 
-  es_cluster_credentials = "${var.es_cluster_credentials}"
+  es_cluster_credentials    = "${var.es_cluster_credentials}"
   es_cluster_credentials_v6 = "${var.es_cluster_credentials_v6}"
 
   remus_container_image = "${var.remus_container_image}"

@@ -30,7 +30,8 @@ class ElasticsearchServiceTest
     elasticClient = elasticClient
   )
 
-  val defaultQueryOptions: ElasticsearchQueryOptions = createElasticsearchQueryOptions
+  val defaultQueryOptions: ElasticsearchQueryOptions =
+    createElasticsearchQueryOptions
 
   describe("simpleStringQueryResults") {
     it("finds results for a simpleStringQuery search") {
@@ -224,7 +225,9 @@ class ElasticsearchServiceTest
 
     it("returns a Left[ElasticError] if Elasticsearch returns an error") {
       val future = searchService
-        .simpleStringQueryResults("cat")(Index("doesnotexist"), defaultQueryOptions)
+        .simpleStringQueryResults("cat")(
+          Index("doesnotexist"),
+          defaultQueryOptions)
 
       whenReady(future) { response =>
         response.isLeft shouldBe true
@@ -246,7 +249,8 @@ class ElasticsearchServiceTest
           searchService.findResultById(canonicalId = work.canonicalId)(index)
 
         whenReady(searchResultFuture) { result =>
-          val returnedWork = jsonToIdentifiedBaseWork(result.right.get.sourceAsString)
+          val returnedWork =
+            jsonToIdentifiedBaseWork(result.right.get.sourceAsString)
           returnedWork shouldBe work
         }
       }
