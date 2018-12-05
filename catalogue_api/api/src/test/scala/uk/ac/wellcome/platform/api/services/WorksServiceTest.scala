@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -27,6 +28,8 @@ class WorksServiceTest
   val worksService = new WorksService(
     searchService = elasticsearchService
   )
+
+  val defaultWorksSearchOptions = createWorksSearchOptions
 
   describe("listWorks") {
     it("gets records in Elasticsearch") {
@@ -100,6 +103,18 @@ class WorksServiceTest
         )
       )
     }
+
+    it("returns a Left[ElasticError] if there's an Elasticsearch error") {
+      val future = worksService.listWorks(
+        index = Index("doesnotexist"),
+        worksSearchOptions = defaultWorksSearchOptions
+      )
+
+      whenReady(future) { result =>
+        result.isLeft shouldBe true
+        result.left.get shouldBe a[ElasticError]
+      }
+    }
   }
 
   describe("findWorkById") {
@@ -111,10 +126,13 @@ class WorksServiceTest
 
         val index = Index(indexName)
 
-        val recordsFuture = worksService.findWorkById(
+        val future = worksService.findWorkById(
           canonicalId = work.canonicalId)(index)
 
-        whenReady(recordsFuture) { records =>
+        whenReady(future) { response =>
+          response.isRight shouldBe true
+
+          val records = response.right.get
           records.isDefined shouldBe true
           records.get shouldBe work
         }
@@ -132,6 +150,19 @@ class WorksServiceTest
         whenReady(recordsFuture) { record =>
           record shouldBe None
         }
+      }
+    }
+
+    it("returns a Left[ElasticError] if there's an Elasticsearch error") {
+      val future = worksService.findWorkById(
+        canonicalId = "1234"
+      )(
+        index = Index("doesnotexist")
+      )
+
+      whenReady(future) { result =>
+        result.isLeft shouldBe true
+        result.left.get shouldBe a[ElasticError]
       }
     }
   }
@@ -232,6 +263,20 @@ class WorksServiceTest
         )
       )
     }
+
+    it("returns a Left[ElasticError] if there's an Elasticsearch error") {
+      val future = worksService.searchWorks(
+        query = "cat"
+      )(
+        index = Index("doesnotexist"),
+        worksSearchOptions = defaultWorksSearchOptions
+      )
+
+      whenReady(future) { result =>
+        result.isLeft shouldBe true
+        result.left.get shouldBe a[ElasticError]
+      }
+    }
   }
 
   private def assertListResultIsCorrect(
@@ -255,7 +300,7 @@ class WorksServiceTest
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertResultIsCorrect(
-    partialSearchFunction: (Index, WorksSearchOptions) => Future[ResultList]
+    partialSearchFunction: (Index, WorksSearchOptions) => Future[Either[ElasticError, ResultList]]
   )(
     allWorks: Seq[IdentifiedBaseWork],
     expectedWorks: Seq[IdentifiedBaseWork],
@@ -271,7 +316,10 @@ class WorksServiceTest
         Index(indexName),
         worksSearchOptions)
 
-      whenReady(future) { works =>
+      whenReady(future) { result =>
+        result.isRight shouldBe true
+
+        val works = result.right.get
         works.results should contain theSameElementsAs expectedWorks
         works.totalResults shouldBe expectedTotalResults
       }

@@ -2,6 +2,8 @@ package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticError
+import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
@@ -21,32 +23,33 @@ case class WorksSearchOptions(
 class WorksService @Inject()(searchService: ElasticsearchService)(
   implicit ec: ExecutionContext) {
 
-  def findWorkById(canonicalId: String)(index: Index)
-    : Future[Option[IdentifiedBaseWork]] =
+  def findWorkById(canonicalId: String)(index: Index): Future[Either[ElasticError, Option[IdentifiedBaseWork]]] =
     searchService
       .findResultById(canonicalId)(index)
       .map { result =>
-        if (result.exists)
-          Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
-        else None
+        result.right.map { response: GetResponse =>
+          if (response.exists)
+            Some(jsonTo[IdentifiedBaseWork](response.sourceAsString))
+          else None
+        }
       }
 
   def listWorks(index: Index,
-                worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+                worksSearchOptions: WorksSearchOptions): Future[Either[ElasticError, ResultList]] =
     searchService
       .listResults(
         index,
         toElasticsearchQueryOptions(worksSearchOptions))
-      .map { createResultList }
+      .map { _.right.map { createResultList } }
 
   def searchWorks(query: String)(
     index: Index,
-    worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+    worksSearchOptions: WorksSearchOptions): Future[Either[ElasticError, ResultList]] =
     searchService
       .simpleStringQueryResults(query)(
         index,
         toElasticsearchQueryOptions(worksSearchOptions))
-      .map { createResultList }
+      .map { _.right.map { createResultList } }
 
   private def toElasticsearchQueryOptions(
     worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
