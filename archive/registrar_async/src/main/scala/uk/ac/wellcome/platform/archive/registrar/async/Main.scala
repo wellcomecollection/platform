@@ -12,12 +12,9 @@ import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
-import scala.concurrent.ExecutionContext
-
 object Main extends WellcomeTypesafeApp {
   runWithConfig { config: Config =>
     implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
     val messageStream =
       MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config)
