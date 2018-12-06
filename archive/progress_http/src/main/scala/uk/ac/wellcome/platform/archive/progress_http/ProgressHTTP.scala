@@ -7,6 +7,7 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
@@ -23,7 +24,8 @@ class ProgressHTTP(
 )(implicit val actorSystem: ActorSystem,
   materializer: ActorMaterializer,
   executionContext: ExecutionContext)
-    extends Logging {
+    extends Logging
+    with Runnable {
   val progressTracker = new ProgressTracker(
     dynamoClient = dynamoClient,
     dynamoConfig = dynamoConfig

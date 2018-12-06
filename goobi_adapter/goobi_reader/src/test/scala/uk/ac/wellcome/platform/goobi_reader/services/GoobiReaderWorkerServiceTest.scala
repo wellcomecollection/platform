@@ -309,7 +309,7 @@ class GoobiReaderWorkerServiceTest
                     s3Client = s3Client,
                     sqsStream = sqsStream,
                     versionedHybridStore = versionedHybridStore
-                  )(actorSystem = actorSystem)
+                  )
 
                   service.run()
 

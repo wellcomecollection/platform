@@ -41,7 +41,7 @@ trait WorkerServiceFixture
                     snsConfig = createSNSConfigWith(topic)
                   )
               }
-            )(actorSystem = actorSystem, ec = global)
+            )
 
             workerService.run()
 

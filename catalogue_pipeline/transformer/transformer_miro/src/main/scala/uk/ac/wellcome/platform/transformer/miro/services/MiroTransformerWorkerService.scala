@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro.services
 
 import akka.Done
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -12,7 +13,7 @@ class MiroTransformerWorkerService(
   vhsRecordReceiver: MiroVHSRecordReceiver,
   miroTransformer: MiroTransformableTransformer,
   sqsStream: SQSStream[NotificationMessage]
-) {
+) extends Runnable {
 
   def run(): Future[Done] =
     sqsStream.foreach(this.getClass.getSimpleName, processMessage)

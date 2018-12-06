@@ -3,10 +3,9 @@ package uk.ac.wellcome.platform.goobi_reader.services
 import java.io.InputStream
 
 import akka.Done
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.goobi_reader.models.{
@@ -19,7 +18,7 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{VHSIndexEntry, VersionedHybridStore}
 import uk.ac.wellcome.json.JsonUtil._
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class GoobiReaderWorkerService(
@@ -28,12 +27,9 @@ class GoobiReaderWorkerService(
   versionedHybridStore: VersionedHybridStore[InputStream,
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]
-)(implicit val actorSystem: ActorSystem)
-    extends Logging {
-
-  implicit val materialiser: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContextExecutor =
-    actorSystem.dispatcher
+)(implicit ec: ExecutionContext)
+    extends Logging
+    with Runnable {
 
   def run(): Future[Done] =
     sqsStream.foreach(
