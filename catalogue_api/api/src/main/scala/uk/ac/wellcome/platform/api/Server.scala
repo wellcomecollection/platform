@@ -17,7 +17,6 @@ import uk.ac.wellcome.finatra.elasticsearch.{
 import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.{
   CaseClassMappingExceptionWrapper,
-  ElasticsearchResponseExceptionMapper,
   GeneralExceptionMapper
 }
 import uk.ac.wellcome.platform.api.modules.ApiConfigModule
@@ -48,6 +47,5 @@ class Server extends HttpServer {
       .add[MissingPathController]
       .exceptionMapper[GeneralExceptionMapper]
       .exceptionMapper[CaseClassMappingExceptionWrapper]
-      .exceptionMapper[ElasticsearchResponseExceptionMapper]
   }
 }

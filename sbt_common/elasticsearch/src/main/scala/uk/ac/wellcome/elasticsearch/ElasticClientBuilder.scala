@@ -1,6 +1,6 @@
 package uk.ac.wellcome.elasticsearch
 
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import org.apache.http.HttpHost
 import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.impl.client.BasicCredentialsProvider
@@ -25,7 +25,7 @@ object ElasticClientBuilder {
              port: Int,
              protocol: String,
              username: String,
-             password: String): HttpClient = {
+             password: String): ElasticClient = {
     val restClient = RestClient
       .builder(new HttpHost(hostname, port, protocol))
       .setHttpClientConfigCallback(new ElasticCredentials(username, password))
@@ -34,6 +34,6 @@ object ElasticClientBuilder {
       .setMaxRetryTimeoutMillis(2000)
       .build()
 
-    HttpClient.fromRestClient(restClient)
+    ElasticClient.fromRestClient(restClient)
   }
 }

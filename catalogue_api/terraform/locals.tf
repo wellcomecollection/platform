@@ -20,8 +20,8 @@ locals {
     doc_type = "work"
   }
   es_config_remus = {
-    index_v1 = "v1-2018-11-29-merge-versioning"
-    index_v2 = "v2-2018-11-29-merge-versioning"
+    index_v1 = "v1-2018-12-03-elasticsearch6"
+    index_v2 = "v2-2018-12-03-elasticsearch6"
     doc_type = "work"
   }
 

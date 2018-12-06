@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
@@ -22,8 +22,7 @@ class IngestorWorkerServiceTest
     with ElasticsearchFixtures
     with SQS
     with WorkerServiceFixture
-    with WorksGenerators
-    with CustomElasticsearchMapping {
+    with WorksGenerators {
 
   it("indexes a Miro identified Work") {
     val miroSourceIdentifier = createSourceIdentifier
@@ -132,7 +131,7 @@ class IngestorWorkerServiceTest
 
     val work = createIdentifiedWork
 
-    withLocalElasticsearchIndex { indexName =>
+    withLocalWorksIndex { indexName =>
       withLocalSqsQueueAndDlq {
         case QueuePair(queue, dlq) =>
           withWorkerService(queue, indexName) { _ =>
@@ -157,8 +156,8 @@ class IngestorWorkerServiceTest
             new ElasticCredentials("elastic", "changeme"))
           .build()
 
-        val brokenElasticClient: HttpClient =
-          HttpClient.fromRestClient(brokenRestClient)
+        val brokenElasticClient: ElasticClient =
+          ElasticClient.fromRestClient(brokenRestClient)
 
         withWorkerService(
           queue,
@@ -178,7 +177,7 @@ class IngestorWorkerServiceTest
 
   private def assertWorksIndexedCorrectly(
     works: IdentifiedBaseWork*): Assertion =
-    withLocalElasticsearchIndex { indexName =>
+    withLocalWorksIndex { indexName =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>
           withWorkerService(queue, indexName) { _ =>

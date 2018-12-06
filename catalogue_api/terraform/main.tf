@@ -9,7 +9,8 @@ module "catalogue_api" {
   container_port = "8888"
   cluster_name   = "${aws_ecs_cluster.cluster.name}"
 
-  es_cluster_credentials = "${var.es_cluster_credentials}"
+  es_cluster_credentials    = "${var.es_cluster_credentials}"
+  es_cluster_credentials_v6 = "${var.es_cluster_credentials_v6}"
 
   romulus_container_image = "${local.romulus_app_uri}"
   remus_container_image   = "${local.remus_app_uri}"
