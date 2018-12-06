@@ -12,11 +12,12 @@ module "ingest_requests_topic" {
 module "ingests_topic" {
   source = "../modules/topic"
 
-  namespace  = "${var.namespace}_ingests"
+  namespace = "${var.namespace}_ingests"
+
   role_names = [
     "${module.ingests.name}",
     "${module.archivist.name}",
-    "${module.notifier.name}"
+    "${module.notifier.name}",
   ]
 }
 
@@ -27,11 +28,11 @@ module "ingests_queue" {
 
   topic_names = ["${module.ingests_topic.name}"]
 
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.current_account_id}"
+  aws_region = "${var.aws_region}"
+  account_id = "${var.current_account_id}"
 
   role_names = [
-    "${module.ingests.name}"
+    "${module.ingests.name}",
   ]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
@@ -53,8 +54,8 @@ module "archivist_queue" {
 
   topic_names = ["${module.archivist_topic.name}"]
 
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.current_account_id}"
+  aws_region = "${var.aws_region}"
+  account_id = "${var.current_account_id}"
   role_names = ["${module.archivist.name}"]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
@@ -76,8 +77,8 @@ module "bags_queue" {
 
   topic_names = ["${module.bags_topic.name}"]
 
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.current_account_id}"
+  aws_region = "${var.aws_region}"
+  account_id = "${var.current_account_id}"
   role_names = ["${module.bags.name}"]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
@@ -99,8 +100,8 @@ module "notifier_queue" {
 
   topic_names = ["${module.notifier_topic.name}"]
 
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.current_account_id}"
+  aws_region = "${var.aws_region}"
+  account_id = "${var.current_account_id}"
   role_names = ["${module.notifier.name}"]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
@@ -122,8 +123,8 @@ module "bagger_queue" {
 
   topic_names = ["${module.bagger_topic.name}"]
 
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.current_account_id}"
+  aws_region = "${var.aws_region}"
+  account_id = "${var.current_account_id}"
   role_names = ["${module.bagger.name}"]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"

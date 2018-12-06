@@ -88,7 +88,7 @@ module "stack-041218" {
 
   private_subnets = "${local.private_subnets}"
   public_subnets  = "${local.public_subnets}"
-  
+
   ssh_key_name = "${var.key_name}"
 
   instance_type = "i3.2xlarge"

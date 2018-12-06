@@ -42,18 +42,23 @@ variable "memory" {
 variable "sidecar_cpu" {
   default = "512"
 }
+
 variable "sidecar_memory" {
   default = "1024"
 }
+
 variable "app_cpu" {
   default = "512"
 }
+
 variable "app_memory" {
   default = "1024"
 }
+
 variable "aws_region" {
   default = "eu-west-1"
 }
+
 variable "launch_type" {
   default = "FARGATE"
 }

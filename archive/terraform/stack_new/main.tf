@@ -21,7 +21,7 @@ module "archivist" {
 
   env_vars_length = 4
 
-  container_image   = "${var.archivist_container_image}"
+  container_image = "${var.archivist_container_image}"
 }
 
 # bags aka registrar-async
@@ -48,7 +48,7 @@ module "bags" {
 
   env_vars_length = 5
 
-  container_image   = "${var.registrar_async_container_image}"
+  container_image = "${var.registrar_async_container_image}"
 }
 
 # notifier
@@ -74,7 +74,7 @@ module "notifier" {
 
   env_vars_length = 3
 
-  container_image   = "${var.notifier_container_image}"
+  container_image = "${var.notifier_container_image}"
 }
 
 # ingests aka progress-async
@@ -100,7 +100,7 @@ module "ingests" {
 
   env_vars_length = 3
 
-  container_image   = "${var.progress_async_container_image}"
+  container_image = "${var.progress_async_container_image}"
 }
 
 # Storage API
@@ -201,7 +201,7 @@ module "bagger" {
 
   env_vars_length = 19
 
-  container_image   = "${var.bagger_container_image}"
+  container_image = "${var.bagger_container_image}"
 }
 
 module "migrator" {

@@ -28,6 +28,7 @@ variable "service_egress_security_group_id" {}
 variable "metric_namespace" {
   default = "storage"
 }
+
 variable "high_metric_name" {
   default = "empty"
 }
@@ -35,6 +36,7 @@ variable "high_metric_name" {
 variable "min_capacity" {
   default = "1"
 }
+
 variable "max_capacity" {
   default = "1"
 }

@@ -3,6 +3,7 @@ variable "aws_region" {
 }
 
 variable "key_name" {}
+
 variable "admin_cidr_ingress" {
   type = "list"
 }
