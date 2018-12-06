@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.api.works
 
-import com.sksamuel.elastic4s.Indexable
+import com.sksamuel.elastic4s.{Index, Indexable}
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
@@ -30,8 +30,8 @@ trait ApiWorksTestBase
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
       flags = displayEsLocalFlags(
-        indexNameV1 = indexNameV1,
-        indexNameV2 = indexNameV2
+        indexV1 = Index(indexNameV1),
+        indexV2 = Index(indexNameV2)
       )
     )
 
