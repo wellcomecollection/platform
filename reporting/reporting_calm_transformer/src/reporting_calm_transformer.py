@@ -19,9 +19,9 @@ from transform import transform
 from elasticsearch import Elasticsearch
 
 
-path_to_es_credentials = (
-    os.path.dirname(os.path.realpath(__file__))
-    + '/es_credentials.json'
+path_to_es_credentials = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), 
+    'es_credentials.json'
 )
 
 es_credentials = json.load(open(path_to_es_credentials))
