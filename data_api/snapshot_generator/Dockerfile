@@ -1,11 +1,6 @@
-FROM wellcome/finatra_service_base
+FROM wellcome/typesafe_config_base:21
 
 ADD target/universal/stage /opt/docker
 
-USER root
-RUN chown -R daemon:daemon /opt/docker
+ENV PROJECT snapshot_generator
 
-ENV project=snapshot_generator
-
-USER daemon
-CMD ["/run.sh"]
