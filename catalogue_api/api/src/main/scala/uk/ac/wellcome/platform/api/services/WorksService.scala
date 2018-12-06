@@ -27,17 +27,21 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
     index: Index): Future[Either[ElasticError, Option[IdentifiedBaseWork]]] =
     searchService
       .findResultById(canonicalId)(index)
-      .map { response: GetResponse =>
-        if (response.exists)
-          Some(jsonTo[IdentifiedBaseWork](response.sourceAsString))
-        else None
+      .map { result: Either[ElasticError, GetResponse] =>
+        result.map { response: GetResponse =>
+          if (response.exists)
+            Some(jsonTo[IdentifiedBaseWork](response.sourceAsString))
+          else None
+        }
       }
 
   def listWorks(index: Index, worksSearchOptions: WorksSearchOptions)
     : Future[Either[ElasticError, ResultList]] =
     searchService
       .listResults(index, toElasticsearchQueryOptions(worksSearchOptions))
-      .map { createResultList }
+      .map { result: Either[ElasticError, SearchResponse] =>
+        result.map { createResultList }
+      }
 
   def searchWorks(query: String)(index: Index,
                                  worksSearchOptions: WorksSearchOptions)
@@ -46,7 +50,9 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
       .simpleStringQueryResults(query)(
         index,
         toElasticsearchQueryOptions(worksSearchOptions))
-      .map { createResultList }
+      .map { result: Either[ElasticError, SearchResponse] =>
+        result.map { createResultList }
+      }
 
   private def toElasticsearchQueryOptions(
     worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =
