@@ -24,15 +24,15 @@ locals {
 
   # Blue / Green config
 
-  romulus_is_prod = "${local.production_api == "romulus" ? "true" : "false"}"
-  remus_is_prod   = "${local.production_api == "remus" ? "true" : "false"}"
+  romulus_is_prod        = "${local.production_api == "romulus" ? "true" : "false"}"
+  remus_is_prod          = "${local.production_api == "remus" ? "true" : "false"}"
   romulus_api_release_id = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : var.release_ids["api"]}"
   remus_api_release_id   = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
   romulus_app_uri        = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
   remus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
-  stage_api           = "${local.remus_is_prod == "false" ? "remus" : "romulus"}"
-  remus_task_number   = "${local.remus_is_prod == "true" ? 3 : 1}"
-  romulus_task_number = "${local.romulus_is_prod == "true" ? 3 : 1}"
+  stage_api              = "${local.remus_is_prod == "false" ? "remus" : "romulus"}"
+  remus_task_number      = "${local.remus_is_prod == "true" ? 3 : 1}"
+  romulus_task_number    = "${local.romulus_is_prod == "true" ? 3 : 1}"
 
   # Catalogue API
 
