@@ -1,6 +1,7 @@
 package uk.ac.wellcome.finatra.elasticsearch
 
 import com.google.inject.{Provides, Singleton}
+import com.sksamuel.elastic4s.Index
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 
@@ -16,7 +17,7 @@ object ElasticConfigModule extends TwitterModule {
   def providesElasticConfig(): DisplayElasticConfig =
     DisplayElasticConfig(
       documentType = documentType(),
-      indexNameV1 = indexV1name(),
-      indexNameV2 = indexV2name()
+      indexV1 = Index(indexV1name()),
+      indexV2 = Index(indexV2name())
     )
 }
