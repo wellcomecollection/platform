@@ -28,12 +28,11 @@ es_credentials = json.load(open(path_to_es_credentials))
 
 es = Elasticsearch(
     es_credentials["url"],
-    http_auth=(es_credentials["username"], es_credentials["password"])
+    http_auth=(es_credentials["username"], es_credentials["password"]),
 )
 
 path_to_raw_records = (
-    subprocess
-    .check_output(["git", "rev-parse", "--show-toplevel"])
+    subprocess.check_output(["git", "rev-parse", "--show-toplevel"])
     .strip()
     .decode("utf8")
     + "/calm_records.json"
