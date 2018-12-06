@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.api.works
 
+import com.sksamuel.elastic4s.Index
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
@@ -32,7 +33,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   }
 
   private def withServer[R](testWith: TestWith[EmbeddedHttpServer, R]): R =
-    withServer(indexNameV1 = "index-v1", indexNameV2 = "index-v2") { server =>
+    withServer(indexV1 = Index("index-v1"), indexV2 = Index("index-v2")) { server =>
       testWith(server)
     }
 }

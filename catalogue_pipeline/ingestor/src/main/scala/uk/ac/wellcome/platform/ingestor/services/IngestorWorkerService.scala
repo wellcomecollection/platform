@@ -28,7 +28,7 @@ class IngestorWorkerService(elasticClient: ElasticClient,
   )
 
   elasticsearchIndexCreator.create(
-    index = Index(ingestorConfig.elasticConfig.indexName),
+    index = ingestorConfig.index,
     mappingDefinitionBuilder = WorksIndex
   )
 

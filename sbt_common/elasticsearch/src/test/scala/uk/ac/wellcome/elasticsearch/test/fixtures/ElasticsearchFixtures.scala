@@ -31,8 +31,6 @@ trait ElasticsearchFixtures
   private val esHost = "localhost"
   private val esPort = 9200
 
-  val documentType = "work"
-
   def displayEsLocalFlags(indexV1: Index, indexV2: Index) =
     Map(
       "es.host" -> esHost,
@@ -93,9 +91,6 @@ trait ElasticsearchFixtures
       elasticClient.execute(deleteIndex(index.name))
     }
   }
-
-  def eventuallyIndexExists(indexName: String): Assertion =
-    eventuallyIndexExists(Index(indexName))
 
   def eventuallyIndexExists(index: Index): Assertion =
     eventually {
@@ -175,16 +170,13 @@ trait ElasticsearchFixtures
     whenReady(result) { _ =>
       eventually {
         val response: Response[SearchResponse] = elasticClient.execute {
-          search(indexName).matchAllQuery()
+          search(index.name).matchAllQuery()
         }.await
 
         response.result.hits.total shouldBe works.size
       }
     }
   }
-
-  def createIndexName: String =
-    createIndex.name
 
   private def createIndex: Index =
     Index(name = (Random.alphanumeric take 10 mkString) toLowerCase)

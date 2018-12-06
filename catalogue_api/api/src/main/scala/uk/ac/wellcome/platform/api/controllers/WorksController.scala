@@ -28,7 +28,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
                                S <: SingleWorkRequest[W],
                                W <: WorksIncludes](
   apiConfig: ApiConfig,
-  indexName: String,
+  defaultIndex: Index,
   worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
     with SwaggerController {
@@ -83,7 +83,10 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     } { request: S =>
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
-      val index = Index(request._index.getOrElse(indexName))
+      val index: Index = request._index match {
+        case Some(indexName) => Index(name = indexName)
+        case None => defaultIndex
+      }
 
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
@@ -112,7 +115,10 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
   private def getWorkList(
     request: M,
     pageSize: Int): Future[Either[ElasticError, ResultList]] = {
-    val index = Index(request._index.getOrElse(indexName))
+    val index: Index = request._index match {
+      case Some(indexName) => Index(name = indexName)
+      case None => defaultIndex
+    }
 
     val worksSearchOptions = WorksSearchOptions(
       filters = buildFilters(request),

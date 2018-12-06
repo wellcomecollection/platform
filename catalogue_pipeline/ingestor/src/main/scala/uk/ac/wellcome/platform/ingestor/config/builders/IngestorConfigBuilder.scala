@@ -1,11 +1,9 @@
 package uk.ac.wellcome.platform.ingestor.config.builders
 
+import com.sksamuel.elastic4s.Index
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
-import uk.ac.wellcome.platform.ingestor.config.models.{
-  IngestElasticConfig,
-  IngestorConfig
-}
+import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 
 import scala.concurrent.duration._
 
@@ -17,22 +15,12 @@ object IngestorConfigBuilder {
 
     val batchSize = config.getOrElse[Int]("es.ingest.batchSize")(default = 100)
 
-    val elasticConfig = buildElasticConfig(config)
+    val indexName = config.required[String]("es.index")
 
     IngestorConfig(
       batchSize = batchSize,
       flushInterval = flushInterval,
-      elasticConfig = elasticConfig
-    )
-  }
-
-  def buildElasticConfig(config: Config): IngestElasticConfig = {
-    val documentType = config.getOrElse[String]("es.type")(default = "item")
-    val indexName = config.required[String]("es.index")
-
-    IngestElasticConfig(
-      documentType = documentType,
-      indexName = indexName
+      index = Index(indexName)
     )
   }
 }

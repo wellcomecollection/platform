@@ -8,10 +8,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.platform.ingestor.config.models.{
-  IngestElasticConfig,
-  IngestorConfig
-}
+import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.services.IngestorWorkerService
 import uk.ac.wellcome.test.fixtures.TestWith
 
@@ -32,10 +29,7 @@ trait WorkerServiceFixture extends ElasticsearchFixtures with Messaging {
           val ingestorConfig = IngestorConfig(
             batchSize = 100,
             flushInterval = 5 seconds,
-            elasticConfig = IngestElasticConfig(
-              documentType = documentType,
-              indexName = index.name
-            )
+            index = index
           )
 
           val workerService = new IngestorWorkerService(

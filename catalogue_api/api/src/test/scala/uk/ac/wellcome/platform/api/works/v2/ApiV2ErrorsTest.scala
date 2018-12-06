@@ -253,9 +253,9 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
     // to sort on.  Trying to query this index of these will trigger one such exception!
     withV2Api {
       case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-        withEmptyIndex { indexName =>
+        withEmptyIndex { index =>
           server.httpGet(
-            path = s"/$apiPrefix/works?_index=$indexName",
+            path = s"/$apiPrefix/works?_index=${index.name}",
             andExpect = Status.InternalServerError,
             withJsonBody = s"""
                  |{
@@ -303,7 +303,7 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
   // TODO figure out what the correct behaviour should be in this case
   ignore(
     "returns a Not Found error if you try to get a version that doesn't exist") {
-    withServer(indexNameV1 = "not-important", indexNameV2 = "not-important") {
+    withServer(indexV1 = "not-important", indexV2 = "not-important") {
       server =>
         server.httpGet(
           path = "/catalogue/v567/works?pageSize=100&page=101",
