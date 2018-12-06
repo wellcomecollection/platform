@@ -1,43 +1,53 @@
 locals {
   # API pins
 
-  production_api     = "romulus"
+  production_api = "romulus"
+
   pinned_nginx       = "bad0dbfa548874938d16496e313b05adb71268b7"
   pinned_remus_api   = ""
   pinned_romulus_api = "0441419ebc483bceaafe9f6340a866184f725b39"
 
-  # Blue / Green config
+  romulus_es_cluster_credentials = "${var.es_cluster_credentials}"
+  remus_es_cluster_credentials   = "${var.es_cluster_credentials_v6}"
 
-  romulus_api_release_id = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : var.release_ids["api"]}"
-  remus_api_release_id   = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
-  romulus_app_uri        = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
-  remus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
-  romulus_is_prod        = "${local.production_api == "romulus" ? "true" : "false"}"
-  remus_is_prod          = "${local.production_api == "remus" ? "true" : "false"}"
-  es_config_romulus = {
+  romulus_es_config = {
     index_v1 = "v1-2018-11-29-merge-versioning"
     index_v2 = "v2-2018-11-29-merge-versioning"
     doc_type = "work"
   }
-  es_config_remus = {
-    index_v1 = "v1-2018-12-03-elasticsearch6"
-    index_v2 = "v2-2018-12-03-elasticsearch6"
+
+  remus_es_config = {
+    index_v1 = "v1-2018-12-6-single-shard"
+    index_v2 = "v2-2018-12-6-single-shard"
     doc_type = "work"
   }
 
+  # Blue / Green config
+
+  romulus_is_prod        = "${local.production_api == "romulus" ? "true" : "false"}"
+  remus_is_prod          = "${local.production_api == "remus" ? "true" : "false"}"
+  romulus_api_release_id = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : var.release_ids["api"]}"
+  remus_api_release_id   = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
+  romulus_app_uri        = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
+  remus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
+  stage_api              = "${local.remus_is_prod == "false" ? "remus" : "romulus"}"
+  remus_task_number      = "${local.remus_is_prod == "true" ? 3 : 1}"
+  romulus_task_number    = "${local.romulus_is_prod == "true" ? 3 : 1}"
+
   # Catalogue API
 
-  vpc_id              = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
-  private_subnets     = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
-  namespace           = "catalogue-api"
-  nginx_container_uri = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
+  vpc_id                         = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  private_subnets                = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
+  namespace                      = "catalogue-api"
+  nginx_container_uri            = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
+  gateway_server_error_alarm_arn = "${data.terraform_remote_state.shared_infra.gateway_server_error_alarm_arn}"
 
   # Data API
 
   prod_es_config = {
-    index_v1 = "${local.romulus_is_prod == "true" ? local.es_config_romulus["index_v1"] : local.es_config_remus["index_v1"]}"
-    index_v2 = "${local.romulus_is_prod == "true" ? local.es_config_romulus["index_v2"] : local.es_config_remus["index_v2"]}"
-    doc_type = "${local.romulus_is_prod == "true" ? local.es_config_romulus["doc_type"] : local.es_config_remus["doc_type"]}"
+    index_v1 = "${local.romulus_is_prod == "true" ? local.romulus_es_config["index_v1"] : local.remus_es_config["index_v1"]}"
+    index_v2 = "${local.romulus_is_prod == "true" ? local.romulus_es_config["index_v2"] : local.remus_es_config["index_v2"]}"
+    doc_type = "${local.romulus_is_prod == "true" ? local.romulus_es_config["doc_type"] : local.remus_es_config["doc_type"]}"
   }
   release_id = "${local.romulus_is_prod == "true" ? local.pinned_romulus_api : local.pinned_remus_api}"
 

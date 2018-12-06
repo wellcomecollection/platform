@@ -53,7 +53,7 @@ variable "dashboard_assumable_roles" {
 # post_to_slack
 
 variable "dlq_alarm_arn" {}
-variable "alb_server_error_alarm_arn" {}
+variable "gateway_server_error_alarm_arn" {}
 variable "cloudfront_errors_topic_arn" {}
 variable "critical_slack_webhook" {}
 variable "bitly_access_token" {}

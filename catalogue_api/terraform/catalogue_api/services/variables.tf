@@ -6,11 +6,11 @@ variable "romulus_es_config" {
   type = "map"
 }
 
-variable "es_cluster_credentials" {
+variable "romulus_es_cluster_credentials" {
   type = "map"
 }
 
-variable "es_cluster_credentials_v6" {
+variable "remus_es_cluster_credentials" {
   type = "map"
 }
 
