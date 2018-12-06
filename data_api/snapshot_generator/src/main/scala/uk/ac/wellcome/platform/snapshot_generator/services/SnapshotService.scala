@@ -34,10 +34,9 @@ class SnapshotService(
   elasticConfig: DisplayElasticConfig,
   objectMapper: ObjectMapper)(
   implicit actorSystem: ActorSystem,
+  materializer: ActorMaterializer,
   ec: ExecutionContext
 ) extends Logging {
-  implicit val materializer = ActorMaterializer()
-
   val s3Endpoint = akkaS3Client.s3Settings.endpointUrl.getOrElse("s3:/")
 
   def buildLocation(bucketName: String, objectKey: String): Uri =

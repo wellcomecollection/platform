@@ -12,9 +12,12 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.snapshot_generator.config.builders.AkkaS3Builder
 import uk.ac.wellcome.platform.snapshot_generator.services.{SnapshotGeneratorWorkerService, SnapshotService}
 
+import scala.concurrent.ExecutionContext
+
 object Main extends WellcomeTypesafeApp {
   runWithConfig { config: Config =>
     implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
+    implicit val executionContext: ExecutionContext = AkkaBuilder.buildExecutionContext()
     implicit val materializer: ActorMaterializer = AkkaBuilder.buildActorMaterializer()
 
     val snapshotService = new SnapshotService(

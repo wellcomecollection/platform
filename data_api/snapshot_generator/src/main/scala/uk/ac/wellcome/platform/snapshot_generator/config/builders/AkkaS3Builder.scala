@@ -14,7 +14,7 @@ import uk.ac.wellcome.config.core.models.AWSClientConfig
 
 object AkkaS3Builder extends AWSClientConfigBuilder with Logging {
 
-  def buildAkkaS3Client(config: Config)(implicit actorSystem: ActorSystem): S3Client =
+  def buildAkkaS3Client(config: Config)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer): S3Client =
     buildAkkaS3Client(
       buildAWSClientConfig(config, namespace = "s3")
     )
