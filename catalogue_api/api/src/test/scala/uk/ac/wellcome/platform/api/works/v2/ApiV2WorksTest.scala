@@ -278,7 +278,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
           eventually {
             server.httpGet(
-              path = s"/$apiPrefix/works?query=pangolins&_index=${altIndex.name}",
+              path =
+                s"/$apiPrefix/works?query=pangolins&_index=${altIndex.name}",
               andExpect = Status.Ok,
               withJsonBody = s"""
                    |{
