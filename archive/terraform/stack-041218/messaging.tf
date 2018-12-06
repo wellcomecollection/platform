@@ -1,12 +1,3 @@
-# Messaging - api
-
-module "ingest_requests_topic" {
-  source = "../modules/topic"
-
-  namespace  = "${var.namespace}_ingest_requests"
-  role_names = ["${module.api.ingests_name}"]
-}
-
 # Messaging - ingests aka progress-async
 
 module "ingests_topic" {
@@ -40,11 +31,11 @@ module "ingests_queue" {
 
 # Messaging - archivist
 
-module "archivist_topic" {
+module "ingest_requests_topic" {
   source = "../modules/topic"
 
-  namespace  = "${var.namespace}_archivist"
-  role_names = ["${module.archivist.task_role_name}"]
+  namespace  = "${var.namespace}_ingest_requests"
+  role_names = ["${module.api.ingests_role_name}"]
 }
 
 module "archivist_queue" {
@@ -52,7 +43,9 @@ module "archivist_queue" {
 
   namespace = "${replace(var.namespace,"-","")}_archivist"
 
-  topic_names = ["${module.archivist_topic.name}"]
+  topic_names = [
+    "${module.ingest_requests_topic.name}"
+  ]
 
   aws_region = "${var.aws_region}"
   account_id = "${var.current_account_id}"
