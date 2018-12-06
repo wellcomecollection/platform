@@ -10,6 +10,10 @@ variable "subnets" {
   type = "list"
 }
 
+variable "aws_region" {
+  default = "eu-west-1"
+}
+
 variable "container_image" {}
 
 variable "namespace_id" {}
@@ -28,5 +32,9 @@ variable "high_metric_name" {
   default = "empty"
 }
 
-variable "min_capacity" {}
-variable "max_capacity" {}
+variable "min_capacity" {
+  default = "1"
+}
+variable "max_capacity" {
+  default = "1"
+}

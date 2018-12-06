@@ -19,12 +19,13 @@ module "cluster_hosts" {
   cluster_name = "${aws_ecs_cluster.cluster.name}"
 
   instance_type = "${var.instance_type}"
+  image_id      = "ami-0627e141ce928067c"
 
   asg_min = "1"
   asg_desired = "1"
   asg_max = "2"
 
-  controlled_access_cidr_ingress = "${var.controlled_access_cidr_ingress}"
+  controlled_access_cidr_ingress = ["${var.vpc_cidr}"]
 }
 
 module "bastion" {

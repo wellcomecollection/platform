@@ -24,12 +24,16 @@ module "catalogue_vpc_delta" {
 # Used by:
 # - Storage service
 
+locals {
+  storage_cidr_block_vpc = "172.30.0.0/16"
+}
+
 module "storage_vpc_delta" {
   source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.8"
 
   name = "storage-172-30-0-0-16"
 
-  cidr_block_vpc = "172.30.0.0/16"
+  cidr_block_vpc = "${local.storage_cidr_block_vpc}"
 
   public_az_count           = "3"
   cidr_block_public         = "172.30.0.0/17"

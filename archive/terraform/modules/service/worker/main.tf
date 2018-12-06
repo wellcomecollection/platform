@@ -22,4 +22,6 @@ module "service" {
 
   min_capacity = "${var.min_capacity}"
   max_capacity = "${var.max_capacity}"
+
+  launch_type = "EC2"
 }

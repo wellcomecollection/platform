@@ -1,111 +1,137 @@
-# Messaging - archivist
+# Messaging - api
 
 module "ingest_requests_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "${replace(var.namespace,"-","")}_ingest_requests"
+  source = "../modules/topic"
+
+  namespace  = "${var.namespace}_ingest_requests"
+  role_names = ["${module.api.ingests_name}"]
 }
 
+# Messaging - ingests aka progress-async
+
+module "ingests_topic" {
+  source = "../modules/topic"
+
+  namespace  = "${var.namespace}_ingests"
+  role_names = [
+    "${module.ingests.name}",
+    "${module.archivist.name}",
+    "${module.notifier.name}"
+  ]
+}
+
+module "ingests_queue" {
+  source = "../modules/queue"
+
+  namespace = "${replace(var.namespace,"-","")}_ingests"
+
+  topic_names = ["${module.ingests_topic.name}"]
+
+  aws_region  = "${var.aws_region}"
+  account_id  = "${var.current_account_id}"
+
+  role_names = [
+    "${module.ingests.name}"
+  ]
+
+  dlq_alarm_arn = "${var.dlq_alarm_arn}"
+}
+
+# Messaging - archivist
+
 module "archivist_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "${replace(var.namespace,"-","")}_archivist"
+  source = "../modules/topic"
+
+  namespace  = "${var.namespace}_archivist"
+  role_names = ["${module.archivist.name}"]
 }
 
 module "archivist_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
-  queue_name  = "${replace(var.namespace,"-","")}_archivist"
+  source = "../modules/queue"
+
+  namespace = "${replace(var.namespace,"-","")}_archivist"
+
+  topic_names = ["${module.archivist_topic.name}"]
+
   aws_region  = "${var.aws_region}"
   account_id  = "${var.current_account_id}"
-  topic_names = ["${module.ingest_requests_topic.name}"]
+  role_names = ["${module.archivist.name}"]
 
-  visibility_timeout_seconds = 43200
-  max_receive_count          = 3
-
-  alarm_topic_arn = "${var.dlq_alarm_arn}"
+  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
 
-# Messaging - registrar
+# Messaging - bags aka registrar-async
 
 module "bags_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "${replace(var.namespace,"-","")}_bags"
+  source = "../modules/topic"
+
+  namespace  = "${var.namespace}_bags"
+  role_names = ["${module.archivist.name}"]
 }
 
 module "bags_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
-  queue_name  = "${replace(var.namespace,"-","")}_bags"
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.current_account_id}"
+  source = "../modules/queue"
+
+  namespace = "${replace(var.namespace,"-","")}_bags"
+
   topic_names = ["${module.bags_topic.name}"]
 
-  visibility_timeout_seconds = 300
-  max_receive_count          = 3
-
-  alarm_topic_arn = "${var.dlq_alarm_arn}"
-}
-
-# Messaging - progress
-
-module "ingests_async_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "${replace(var.namespace,"-","")}_ingests"
-}
-
-module "ingests_async_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
-  queue_name  = "${replace(var.namespace,"-","")}_ingests"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.current_account_id}"
-  topic_names = ["${module.ingests_async_topic.name}"]
+  role_names = ["${module.bags.name}"]
 
-  visibility_timeout_seconds = 180
-  max_receive_count          = 3
-
-  alarm_topic_arn = "${var.dlq_alarm_arn}"
+  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
 
 # Messaging - notifier
 
 module "notifier_topic" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "${replace(var.namespace,"-","")}_notifier"
+  source = "../modules/topic"
+
+  namespace  = "${var.namespace}_notifier"
+  role_names = ["${module.ingests.name}"]
 }
 
 module "notifier_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
-  queue_name  = "${replace(var.namespace,"-","")}_notifier"
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.current_account_id}"
+  source = "../modules/queue"
+
+  namespace = "${replace(var.namespace,"-","")}_notifier"
+
   topic_names = ["${module.notifier_topic.name}"]
 
-  visibility_timeout_seconds = 300
-  max_receive_count          = 3
+  aws_region  = "${var.aws_region}"
+  account_id  = "${var.current_account_id}"
+  role_names = ["${module.notifier.name}"]
 
-  alarm_topic_arn = "${var.dlq_alarm_arn}"
+  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
 
-# Messaging - bag creattion
+# Messaging - bagger
 
 module "bagger_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "${replace(var.namespace,"-","")}_bagger"
+  source = "../modules/topic"
+
+  namespace  = "${var.namespace}_notifier"
+  role_names = []
 }
 
 module "bagger_queue" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v11.6.0"
+  source = "../modules/queue"
 
-  queue_name  = "${replace(var.namespace,"-","")}_bagger"
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.current_account_id}"
+  namespace = "${replace(var.namespace,"-","")}_bagger"
+
   topic_names = ["${module.bagger_topic.name}"]
 
-  # Ensure that messages are spread around -- if the merger has an error
-  # (for example, hitting DynamoDB write limits), we don't retry too quickly.
-  visibility_timeout_seconds = 3600
+  aws_region  = "${var.aws_region}"
+  account_id  = "${var.current_account_id}"
+  role_names = ["${module.bagger.name}"]
 
-  alarm_topic_arn = "${var.dlq_alarm_arn}"
+  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
 
 module "bagging_complete_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "${replace(var.namespace,"-","")}_bagging_complete"
+  source = "../modules/topic"
+
+  namespace  = "${var.namespace}_bagging_complete"
+  role_names = ["${module.bagger.name}"]
 }

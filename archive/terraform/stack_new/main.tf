@@ -1,4 +1,4 @@
-# Archivist
+# archivist
 
 module "archivist" {
   source = "../modules/service/worker"
@@ -10,15 +10,13 @@ module "archivist" {
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}-archivist"
-
-  min_capacity = 1
-  max_capacity = 1
+  aws_region                       = "${var.aws_region}"
 
   env_vars = {
-    queue_url           = "${module.archivist_queue.id}"
+    queue_url           = "${module.archivist_queue.url}"
     archive_bucket      = "${var.archive_bucket_name}"
     registrar_topic_arn = "${module.bags_topic.arn}"
-    progress_topic_arn  = "${module.ingests_async_topic.arn}"
+    progress_topic_arn  = "${module.ingests_topic.arn}"
   }
 
   env_vars_length = 4
@@ -26,9 +24,9 @@ module "archivist" {
   container_image   = "${var.archivist_container_image}"
 }
 
-# Registrar
+# bags aka registrar-async
 
-module "bags_async" {
+module "bags" {
   source = "../modules/service/worker"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
@@ -38,14 +36,12 @@ module "bags_async" {
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}-bags_async"
-
-  min_capacity = 1
-  max_capacity = 1
+  aws_region                       = "${var.aws_region}"
 
   env_vars = {
-    queue_url          = "${module.bags_queue.id}"
+    queue_url          = "${module.bags_queue.url}"
     archive_bucket     = "${var.archive_bucket_name}"
-    progress_topic_arn = "${module.ingests_async_topic.arn}"
+    progress_topic_arn = "${module.ingests_topic.arn}"
     vhs_bucket_name    = "${var.vhs_archive_manifest_bucket_name}"
     vhs_table_name     = "${var.vhs_archive_manifest_table_name}"
   }
@@ -55,26 +51,25 @@ module "bags_async" {
   container_image   = "${var.registrar_async_container_image}"
 }
 
-# Notifier
+# notifier
 
 module "notifier" {
   source = "../modules/service/worker"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
+  security_group_ids               = ["${var.interservice_security_group_id}"]
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   cluster_id                       = "${aws_ecs_cluster.cluster.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}-notifier"
-
-  min_capacity = 1
-  max_capacity = 1
+  aws_region                       = "${var.aws_region}"
 
   env_vars = {
     context_url        = "https://api.wellcomecollection.org/storage/v1/context.json"
-    notifier_queue_url = "${module.notifier_queue.id}"
-    progress_topic_arn = "${module.ingests_async_topic.arn}"
+    notifier_queue_url = "${module.notifier_queue.url}"
+    progress_topic_arn = "${module.ingests_topic.arn}"
   }
 
   env_vars_length = 3
@@ -82,9 +77,9 @@ module "notifier" {
   container_image   = "${var.notifier_container_image}"
 }
 
-# Progress
+# ingests aka progress-async
 
-module "ingests_async" {
+module "ingests" {
   source = "../modules/service/worker"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
@@ -95,12 +90,10 @@ module "ingests_async" {
   subnets      = "${var.private_subnets}"
   vpc_id       = "${var.vpc_id}"
   service_name = "${var.namespace}-ingests_async"
-
-  min_capacity = 1
-  max_capacity = 1
+  aws_region   = "${var.aws_region}"
 
   env_vars = {
-    queue_url                   = "${module.ingests_async_queue.id}"
+    queue_url                   = "${module.ingests_queue.url}"
     topic_arn                   = "${module.notifier_topic.arn}"
     archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
   }
@@ -165,30 +158,6 @@ module "api" {
   interservice_security_group_id     = "${var.interservice_security_group_id}"
 }
 
-# Integration testing - callback_client
-
-module "callback_stub_server" {
-  source = "../modules/service/rest/single_container"
-
-  service_name = "${var.namespace}-callback_stub_server"
-
-  container_port  = "8080"
-  container_image = "${var.callback_stub_server_container_image}"
-
-  env_vars        = {}
-  env_vars_length = 0
-  command         = ["--verbose", "--disable-banner"]
-
-  security_group_ids = ["${var.service_egress_security_group_id}", "${var.interservice_security_group_id}"]
-  private_subnets    = "${var.private_subnets}"
-
-  cluster_id = "${aws_ecs_cluster.cluster.id}"
-
-  vpc_id = "${var.vpc_id}"
-
-  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-}
-
 # Migration services
 
 module "bagger" {
@@ -201,9 +170,7 @@ module "bagger" {
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}-bagger"
-
-  min_capacity = 1
-  max_capacity = 1
+  aws_region                       = "${var.aws_region}"
 
   env_vars = {
     METS_BUCKET_NAME            = "${var.bagger_mets_bucket_name}"
