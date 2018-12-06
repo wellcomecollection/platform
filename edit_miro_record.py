@@ -48,29 +48,28 @@ def edit_miro_vhs_record(miro_id, reason):
 
     if record == existing_record:
         print("No changes; not uploading a new version")
-        return
+    else:
+        username = boto3.client("iam").get_user()["User"]["UserName"]
 
-    username = boto3.client("iam").get_user()["User"]["UserName"]
+        record["all_amendment_by"].append(f"aws:{username}")
+        record["all_amendment_date"].append(dt.datetime.now().strftime("%d/%m/%Y"))
+        record["all_amendment_note"].append(reason)
 
-    record["all_amendment_by"].append(f"aws:{username}")
-    record["all_amendment_date"].append(dt.datetime.now().strftime("%d/%m/%Y"))
-    record["all_amendment_note"].append(reason)
+        json_string = json.dumps(record, separators=(",", ":")).encode("utf8")
+        new_key = f"{miro_id}/{sha256(json_string)}.json"
+        print(f"Uploading new object as {new_key}")
 
-    json_string = json.dumps(record, separators=(",", ":")).encode("utf8")
-    new_key = f"{miro_id}/{sha256(json_string)}.json"
-    print(f"Uploading new object as {new_key}")
+        item["location"]["M"]["key"]["S"] = new_key
+        item["version"]["N"] = str(int(item["version"]["N"]) + 1)
 
-    item["location"]["M"]["key"]["S"] = new_key
-    item["version"]["N"] = str(int(item["version"]["N"]) + 1)
+        s3.put_object(
+            Bucket=item["location"]["M"]["namespace"]["S"],
+            Key=item["location"]["M"]["key"]["S"],
+            Body=json_string,
+        )
 
-    s3.put_object(
-        Bucket=item["location"]["M"]["namespace"]["S"],
-        Key=item["location"]["M"]["key"]["S"],
-        Body=json_string,
-    )
-
-    print(f"Updating DynamoDB item {miro_id}")
-    dynamodb.put_item(TableName="vhs-sourcedata-miro", Item=item)
+        print(f"Updating DynamoDB item {miro_id}")
+        dynamodb.put_item(TableName="vhs-sourcedata-miro", Item=item)
 
     print(f"Sending message to SNS topic")
     sns = boto3.client("sns")
