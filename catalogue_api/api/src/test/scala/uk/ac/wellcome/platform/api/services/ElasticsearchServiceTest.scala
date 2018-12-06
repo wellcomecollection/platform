@@ -191,10 +191,14 @@ class ElasticsearchServiceTest
 
     it("returns results in consistent order") {
       withLocalWorksIndex { indexName =>
+        val title = s"A ${Random.alphanumeric.filterNot(_.equals('A')) take 10 mkString}"
+
+        // We have a secondary sort on canonicalId in ElasticsearchService.
+        // Since every work has the same title, we expect them to be returned in
+        // ID order when we search for "A".
         val works = (1 to 5)
           .map { _ =>
-            createIdentifiedWorkWith(title =
-              s"A ${Random.alphanumeric.filterNot(_.equals('A')) take 10 mkString}")
+            createIdentifiedWorkWith(title = title)
           }
           .sortBy(_.canonicalId)
 
@@ -202,22 +206,12 @@ class ElasticsearchServiceTest
 
         val index = Index(indexName)
 
-        // Get the initial ordering from Elasticsearch
-        val initialResponse = searchService
-          .simpleStringQueryResults("A")(index, defaultQueryOptions)
+        (1 to 10).foreach { _ =>
+          val searchResponseFuture = searchService
+            .simpleStringQueryResults("A")(index, defaultQueryOptions)
 
-        whenReady(initialResponse) { response =>
-          val initialWorks = searchResponseToWorks(response)
-
-          // Now we make the query 10 more times, and assert that we always get
-          // results back in the same order.
-          (1 to 10).foreach { _ =>
-            val searchResponseFuture = searchService
-              .simpleStringQueryResults("A")(index, defaultQueryOptions)
-
-            whenReady(searchResponseFuture) { response =>
-              searchResponseToWorks(response) shouldBe initialWorks
-            }
+          whenReady(searchResponseFuture) { response =>
+            searchResponseToWorks(response) shouldBe works
           }
         }
       }
