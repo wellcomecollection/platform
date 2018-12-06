@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import akka.Done
 import com.amazonaws.services.sqs.model.Message
-import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import uk.ac.wellcome.elasticsearch.{ElasticsearchIndexCreator, WorksIndex}
 import uk.ac.wellcome.json.JsonUtil._
@@ -56,7 +55,7 @@ class IngestorWorkerService(elasticClient: ElasticClient,
       works <- Future.successful(messageBundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
         works = works,
-        indexName = ingestorConfig.elasticConfig.indexName
+        index = ingestorConfig.index
       )
     } yield {
       val failedWorks = either.left.getOrElse(Nil)
