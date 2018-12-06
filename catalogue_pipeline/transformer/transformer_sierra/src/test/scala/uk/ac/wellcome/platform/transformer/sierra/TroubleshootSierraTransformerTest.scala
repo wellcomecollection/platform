@@ -9,7 +9,10 @@ import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.platform.transformer.sierra.transformers.SierraTransformableTestBase
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
-class TroubleshootSierraTransformerTest extends FunSpec with Matchers with SierraTransformableTestBase {
+class TroubleshootSierraTransformerTest
+    extends FunSpec
+    with Matchers
+    with SierraTransformableTestBase {
 
   ignore("transforms this message received from SQS") {
     val queueJsonString =
@@ -28,15 +31,21 @@ class TroubleshootSierraTransformerTest extends FunSpec with Matchers with Sierr
         |}
       """.stripMargin
 
-    val notification: NotificationMessage = fromJson[NotificationMessage](queueJsonString).get
+    val notification: NotificationMessage =
+      fromJson[NotificationMessage](queueJsonString).get
     val hybridRecord = fromJson[HybridRecord](notification.body).get
 
-    val s3client = AmazonS3ClientBuilder.standard.withRegion("eu-west-1").build()
+    val s3client =
+      AmazonS3ClientBuilder.standard.withRegion("eu-west-1").build()
 
     val jsonString =
       scala.io.Source
         .fromInputStream(
-          s3client.getObject(hybridRecord.location.namespace, hybridRecord.location.key).getObjectContent
+          s3client
+            .getObject(
+              hybridRecord.location.namespace,
+              hybridRecord.location.key)
+            .getObjectContent
         )
         .mkString
 

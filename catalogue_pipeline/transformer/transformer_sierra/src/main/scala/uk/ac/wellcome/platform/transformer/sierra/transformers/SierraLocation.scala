@@ -16,12 +16,13 @@ trait SierraLocation extends Logging {
       case Some(SierraSourceLocation("", ""))         => None
       case Some(SierraSourceLocation("none", "none")) => None
 
-      case Some(loc: SierraSourceLocation) => Some(
-        PhysicalLocation(
-          locationType = getLocationType(loc),
-          label = loc.name
+      case Some(loc: SierraSourceLocation) =>
+        Some(
+          PhysicalLocation(
+            locationType = getLocationType(loc),
+            label = loc.name
+          )
         )
-      )
       case None => None
     }
 
@@ -35,7 +36,8 @@ trait SierraLocation extends Logging {
       // Rather than playing whack-a-mole, just drop a warning and guess the label we
       // would have put in the spreadsheet anyway.
       case _: IllegalArgumentException =>
-        warn(s"No lookup provided for LocationType ${loc.code}, so using Sierra data")
+        warn(
+          s"No lookup provided for LocationType ${loc.code}, so using Sierra data")
         LocationType(
           id = loc.code,
           label = loc.name
