@@ -42,11 +42,9 @@ class ElasticsearchIndexCreatorTest
     with JsonAssertions
     with BeforeAndAfterEach {
 
-  val testType = "thing"
-
   object TestIndex extends MappingDefinitionBuilder {
     def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
-      mapping(testType)
+      mapping(rootIndexType)
         .dynamic(DynamicMapping.Strict)
         .as(
           keywordField("id"),
@@ -58,7 +56,7 @@ class ElasticsearchIndexCreatorTest
 
   object CompatibleTestIndex extends MappingDefinitionBuilder {
     def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
-      mapping(testType)
+      mapping(rootIndexType)
         .dynamic(DynamicMapping.Strict)
         .as(
           keywordField("id"),
