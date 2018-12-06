@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8
 
+# TODO: Conditional updates in DynamoDB; right now it's not safe for concurrent edits
+# TODO: Support toggling the 'isClearedForCatalogueAPI' parameter
+
 import contextlib
 import copy
 import datetime as dt
