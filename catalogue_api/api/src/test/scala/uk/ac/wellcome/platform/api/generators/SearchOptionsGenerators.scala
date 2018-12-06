@@ -7,8 +7,6 @@ import uk.ac.wellcome.platform.api.services.{
 }
 
 trait SearchOptionsGenerators {
-  val documentType: String
-
   def createElasticsearchQueryOptionsWith(
     filters: List[WorkFilter] = List(),
     limit: Int = 10,
