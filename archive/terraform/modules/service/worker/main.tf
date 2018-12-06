@@ -28,5 +28,7 @@ module "service" {
   min_capacity = "${var.min_capacity}"
   max_capacity = "${var.max_capacity}"
 
+  desired_task_count = "${var.desired_task_count}"
+
   launch_type = "${var.launch_type}"
 }

@@ -41,6 +41,10 @@ variable "max_capacity" {
   default = "1"
 }
 
+variable "desired_task_count" {
+  default = "1"
+}
+
 variable "launch_type" {
   default = "FARGATE"
 }
