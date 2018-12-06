@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import akka.Done
 import com.amazonaws.services.sqs.model.Message
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import uk.ac.wellcome.elasticsearch.{ElasticsearchIndexCreator, WorksIndex}
 import uk.ac.wellcome.json.JsonUtil._
@@ -27,7 +28,7 @@ class IngestorWorkerService(elasticClient: ElasticClient,
   )
 
   elasticsearchIndexCreator.create(
-    indexName = ingestorConfig.elasticConfig.indexName,
+    index = Index(ingestorConfig.elasticConfig.indexName),
     mappingDefinitionBuilder = WorksIndex
   )
 

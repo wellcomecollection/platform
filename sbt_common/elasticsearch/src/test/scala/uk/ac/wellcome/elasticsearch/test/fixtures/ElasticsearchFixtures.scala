@@ -1,5 +1,6 @@
 package uk.ac.wellcome.elasticsearch.test.fixtures
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.cluster.ClusterHealthResponse
@@ -78,7 +79,7 @@ trait ElasticsearchFixtures
     indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
     elasticsearchIndexCreator
       .create(
-        indexName = indexName,
+        index = Index(indexName),
         mappingDefinitionBuilder = mappingDefinitionBuilder
       )
       .await
