@@ -172,9 +172,8 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(display % "compile->compile;test->test")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_elasticsearch % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
+  .dependsOn(config_elasticsearch % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotGeneratorDependencies)
 
 lazy val archive_common = doServiceSetup(project, "archive/common")
