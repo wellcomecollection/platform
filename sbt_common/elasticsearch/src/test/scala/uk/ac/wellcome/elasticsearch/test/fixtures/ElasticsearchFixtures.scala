@@ -1,6 +1,5 @@
 package uk.ac.wellcome.elasticsearch.test.fixtures
 
-import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.cluster.ClusterHealthResponse
@@ -178,14 +177,6 @@ trait ElasticsearchFixtures
       }
     }
   }
-
-  def createDisplayElasticConfigWith(
-    indexV1name: String,
-    indexV2name: String): DisplayElasticConfig =
-    DisplayElasticConfig(
-      indexV1 = Index(indexV1name),
-      indexV2 = Index(indexV2name)
-    )
 
   def createIndexName: String =
     (Random.alphanumeric take 10 mkString) toLowerCase

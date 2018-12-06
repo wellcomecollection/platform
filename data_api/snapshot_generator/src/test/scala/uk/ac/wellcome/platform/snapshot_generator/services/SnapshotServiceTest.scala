@@ -9,6 +9,7 @@ import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.{ElasticClient, JavaClientExceptionWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
@@ -19,7 +20,7 @@ import uk.ac.wellcome.display.models.{
 }
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.elasticsearch.ElasticClientBuilder
+import uk.ac.wellcome.elasticsearch.{DisplayElasticConfig, ElasticClientBuilder}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
@@ -55,9 +56,9 @@ class SnapshotServiceTest
                                        elasticClient)(
     testWith: TestWith[SnapshotService, R])(
     implicit actorSystem: ActorSystem): R = {
-    val elasticConfig = createDisplayElasticConfigWith(
-      indexV1name = indexNameV1,
-      indexV2name = indexNameV2
+    val elasticConfig = DisplayElasticConfig(
+      indexV1 = Index(indexNameV1),
+      indexV2 = Index(indexNameV2)
     )
 
     val snapshotService = new SnapshotService(
