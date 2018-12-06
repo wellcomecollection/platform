@@ -1,7 +1,7 @@
 package uk.ac.wellcome.finatra.elasticsearch
 
 import com.google.inject.{Provides, Singleton}
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.elasticsearch.ElasticClientBuilder
 
@@ -16,7 +16,7 @@ object ElasticClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesElasticClient(): HttpClient =
+  def providesElasticClient(): ElasticClient =
     ElasticClientBuilder.create(
       hostname = hostname(),
       port = hostPort(),

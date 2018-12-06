@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
+import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticError
+import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.{SearchHit, SearchResponse}
 import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
@@ -21,32 +24,35 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
   implicit ec: ExecutionContext) {
 
   def findWorkById(canonicalId: String)(
-    documentOptions: ElasticsearchDocumentOptions)
-    : Future[Option[IdentifiedBaseWork]] =
+    index: Index): Future[Either[ElasticError, Option[IdentifiedBaseWork]]] =
     searchService
-      .findResultById(canonicalId)(documentOptions)
-      .map { result =>
-        if (result.exists)
-          Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
-        else None
+      .findResultById(canonicalId)(index)
+      .map { result: Either[ElasticError, GetResponse] =>
+        result.map { response: GetResponse =>
+          if (response.exists)
+            Some(jsonTo[IdentifiedBaseWork](response.sourceAsString))
+          else None
+        }
       }
 
-  def listWorks(documentOptions: ElasticsearchDocumentOptions,
-                worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def listWorks(index: Index, worksSearchOptions: WorksSearchOptions)
+    : Future[Either[ElasticError, ResultList]] =
     searchService
-      .listResults(
-        documentOptions,
-        toElasticsearchQueryOptions(worksSearchOptions))
-      .map { createResultList }
+      .listResults(index, toElasticsearchQueryOptions(worksSearchOptions))
+      .map { result: Either[ElasticError, SearchResponse] =>
+        result.map { createResultList }
+      }
 
-  def searchWorks(query: String)(
-    documentOptions: ElasticsearchDocumentOptions,
-    worksSearchOptions: WorksSearchOptions): Future[ResultList] =
+  def searchWorks(query: String)(index: Index,
+                                 worksSearchOptions: WorksSearchOptions)
+    : Future[Either[ElasticError, ResultList]] =
     searchService
       .simpleStringQueryResults(query)(
-        documentOptions,
+        index,
         toElasticsearchQueryOptions(worksSearchOptions))
-      .map { createResultList }
+      .map { result: Either[ElasticError, SearchResponse] =>
+        result.map { createResultList }
+      }
 
   private def toElasticsearchQueryOptions(
     worksSearchOptions: WorksSearchOptions): ElasticsearchQueryOptions =

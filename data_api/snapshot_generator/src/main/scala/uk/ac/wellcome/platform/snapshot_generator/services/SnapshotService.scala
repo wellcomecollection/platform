@@ -8,11 +8,11 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Inject
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.twitter.inject.Logging
+import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.snapshot_generator.flow.{
@@ -29,7 +29,7 @@ import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSourc
 import scala.concurrent.{ExecutionContext, Future}
 
 class SnapshotService @Inject()(akkaS3Client: S3Client,
-                                elasticClient: HttpClient,
+                                elasticClient: ElasticClient,
                                 elasticConfig: DisplayElasticConfig,
                                 objectMapper: ObjectMapper)(
   implicit actorSystem: ActorSystem,
@@ -88,9 +88,8 @@ class SnapshotService @Inject()(akkaS3Client: S3Client,
     // This source outputs DisplayWorks in the elasticsearch index.
     val displayWorks: Source[DisplayWork, Any] =
       ElasticsearchWorksSource(
-        elasticClient,
-        indexName,
-        elasticConfig.documentType)
+        elasticClient = elasticClient,
+        indexName = indexName)
         .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
 
     // This source generates JSON strings of DisplayWork instances, which

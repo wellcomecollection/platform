@@ -5,6 +5,8 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.platform.api.services.ElasticsearchService
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait ElasticsearchServiceFixture extends ElasticsearchFixtures {
   this: Suite =>
   def withElasticsearchService[R](

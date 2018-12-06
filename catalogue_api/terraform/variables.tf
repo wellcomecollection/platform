@@ -32,6 +32,10 @@ variable "es_cluster_credentials" {
   type        = "map"
 }
 
+variable "es_cluster_credentials_v6" {
+  type = "map"
+}
+
 variable "infra_bucket" {}
 
 variable "critical_slack_webhook" {}

@@ -1,24 +1,24 @@
 package uk.ac.wellcome.platform.api.controllers
 
 import com.jakehschwartz.finatra.swagger.SwaggerController
+import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticError
 import com.twitter.finatra.http.Controller
+import com.twitter.finatra.http.response.ResponseBuilder
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
+import uk.ac.wellcome.platform.api.elasticsearch.ElasticErrorHandler
 import uk.ac.wellcome.platform.api.models._
 import uk.ac.wellcome.platform.api.requests._
 import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
   ResultResponse
 }
-import uk.ac.wellcome.platform.api.services.{
-  ElasticsearchDocumentOptions,
-  WorksSearchOptions,
-  WorksService
-}
+import uk.ac.wellcome.platform.api.services.{WorksSearchOptions, WorksService}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,19 +59,18 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
       for {
-        resultList <- getWorkList(request, pageSize)
-        displayResultList = DisplayResultList(
-          resultList = resultList,
-          toDisplayWork,
-          pageSize = pageSize,
-          includes = includes)
+        result <- getWorkList(request, pageSize)
       } yield
-        ResultListResponse.create[T, M, W](
-          buildContextUri(apiConfig = apiConfig, version = version),
-          displayResultList,
-          request,
-          s"${apiConfig.scheme}://${apiConfig.host}"
-        )
+        handleWorksServiceResult(result, version) { resultList: ResultList =>
+          generateResultListResponse(
+            resultList = resultList,
+            toDisplayWork = toDisplayWork,
+            pageSize = pageSize,
+            includes = includes,
+            request = request,
+            apiVersion = version
+          )
+        }
     }
   }
 
@@ -85,23 +84,24 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     } { request: S =>
       val includes = request.include.getOrElse(emptyWorksIncludes)
 
-      val documentOptions = ElasticsearchDocumentOptions(
-        indexName = request._index.getOrElse(indexName),
-        documentType = documentType
-      )
+      val index = Index(request._index.getOrElse(indexName))
 
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
       for {
-        maybeWork <- worksService.findWorkById(canonicalId = request.id)(
-          documentOptions)
+        maybeResult <- worksService.findWorkById(canonicalId = request.id)(
+          index)
       } yield
-        generateSingleWorkResponse(
-          maybeWork,
-          toDisplayWork,
-          includes,
-          request,
-          contextUri)
+        handleWorksServiceResult(maybeResult, version) {
+          maybeWork: Option[IdentifiedBaseWork] =>
+            generateSingleWorkResponse(
+              maybeWork = maybeWork,
+              toDisplayWork = toDisplayWork,
+              includes = includes,
+              request = request,
+              contextUri = contextUri
+            )
+        }
     }
   }
 
@@ -110,11 +110,10 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     */
   def buildFilters(request: M): List[WorkFilter]
 
-  private def getWorkList(request: M, pageSize: Int): Future[ResultList] = {
-    val documentOptions = ElasticsearchDocumentOptions(
-      indexName = request._index.getOrElse(indexName),
-      documentType = documentType
-    )
+  private def getWorkList(
+    request: M,
+    pageSize: Int): Future[Either[ElasticError, ResultList]] = {
+    val index = Index(request._index.getOrElse(indexName))
 
     val worksSearchOptions = WorksSearchOptions(
       filters = buildFilters(request),
@@ -122,15 +121,36 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
       pageNumber = request.page
     )
 
-    def searchFunction: (ElasticsearchDocumentOptions,
-                         WorksSearchOptions) => Future[ResultList] =
+    def searchFunction: (Index, WorksSearchOptions) => Future[
+      Either[ElasticError, ResultList]] =
       request.query match {
         case Some(queryString) => worksService.searchWorks(queryString)
         case None              => worksService.listWorks
       }
 
-    searchFunction(documentOptions, worksSearchOptions)
+    searchFunction(index, worksSearchOptions)
   }
+
+  private def handleWorksServiceResult[T](maybeResult: Either[ElasticError, T],
+                                          apiVersion: ApiVersions.Value)(
+    responseBuilder: T => ResponseBuilder#EnrichedResponse
+  ): ResponseBuilder#EnrichedResponse =
+    maybeResult match {
+      case Right(t) => responseBuilder(t)
+      case Left(elasticError) => {
+        val displayError = ElasticErrorHandler.buildDisplayError(elasticError)
+
+        val errorResponse = ResultResponse(
+          context = buildContextUri(apiConfig = apiConfig, version = apiVersion),
+          result = displayError
+        )
+        displayError.httpStatus.get match {
+          case 500 => response.internalServerError.json(errorResponse)
+          case 404 => response.notFound.json(errorResponse)
+          case 400 => response.badRequest.json(errorResponse)
+        }
+      }
+    }
 
   private def generateSingleWorkResponse[T <: DisplayWork](
     maybeWork: Option[IdentifiedBaseWork],
@@ -151,10 +171,39 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
         respondWithNotFoundError(request, contextUri: String)
     }
 
-  private def respondWithWork[T <: DisplayWork](result: T,
-                                                contextUri: String) = {
-    response.ok.json(ResultResponse(context = contextUri, result = result))
+  private def generateResultListResponse[T <: DisplayWork](
+    resultList: ResultList,
+    toDisplayWork: (IdentifiedWork, W) => T,
+    pageSize: Int,
+    includes: W,
+    request: M,
+    apiVersion: ApiVersions.Value): ResponseBuilder#EnrichedResponse = {
+    val displayResultList = DisplayResultList(
+      resultList = resultList,
+      toDisplayWork,
+      pageSize = pageSize,
+      includes = includes
+    )
+
+    val contextUri = buildContextUri(
+      apiConfig = apiConfig,
+      version = apiVersion
+    )
+
+    response.ok.json(
+      ResultListResponse.create[T, M, W](
+        contextUri = contextUri,
+        displayResultList,
+        request,
+        s"${apiConfig.scheme}://${apiConfig.host}"
+      )
+    )
   }
+
+  private def respondWithWork[T <: DisplayWork](
+    result: T,
+    contextUri: String): ResponseBuilder#EnrichedResponse =
+    response.ok.json(ResultResponse(context = contextUri, result = result))
 
   /** Create a 302 Redirect to a new Work.
     *

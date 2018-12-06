@@ -1,28 +1,26 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import com.sksamuel.elastic4s.Indexable
+import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
+import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import grizzled.slf4j.Logging
-import org.elasticsearch.index.VersionType
-import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedBaseWork,
   IdentifiedInvisibleWork,
   IdentifiedRedirectedWork,
   IdentifiedWork
 }
-import uk.ac.wellcome.json.JsonUtil._
-import scala.language.implicitConversions
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.implicitConversions
 
 class WorkIndexer(
-  elasticClient: HttpClient
+  elasticClient: ElasticClient
 )(implicit ec: ExecutionContext)
-    extends Logging
-    with ElasticsearchExceptionManager {
+    extends Logging {
 
   implicit object IdentifiedWorkIndexable
       extends Indexable[IdentifiedBaseWork] {
@@ -30,17 +28,20 @@ class WorkIndexer(
       toJson(t).get
   }
 
-  def indexWorks(works: Seq[IdentifiedBaseWork],
-                 indexName: String,
-                 documentType: String)
+  def indexWorks(works: Seq[IdentifiedBaseWork], indexName: String)
     : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
     val inserts = works.map { work =>
-      indexInto(indexName / documentType)
+      // Elasticsearch are removing types entirely in ES 7, and creating an index
+      // with more than one type in ES 6 is a 400 Error.
+      //
+      // Our prod cluster is already creating a single "type" with the same name
+      // as the index, so do the same here.
+      indexInto(indexName / indexName)
         .version(calculateEsVersion(work))
-        .versionType(VersionType.EXTERNAL_GTE)
+        .versionType(ExternalGte)
         .id(work.canonicalId)
         .doc(work)
     }
@@ -49,19 +50,26 @@ class WorkIndexer(
       .execute {
         bulk(inserts)
       }
-      .map { bulkResponse: BulkResponse =>
-        val actualFailures = bulkResponse.failures.filterNot {
-          isVersionConflictException
+      .map { response: Response[BulkResponse] =>
+        if (response.isError) {
+          warn(s"Error from Elasticsearch: $response")
+          Left(works)
+        } else {
+          debug(s"Bulk response = $response")
+          val bulkResponse = response.result
+          val actualFailures = bulkResponse.failures.filterNot {
+            isVersionConflictException
+          }
+
+          if (actualFailures.nonEmpty) {
+            val failedIds = actualFailures.map(_.id)
+            debug(s"Failed indexing works $failedIds")
+
+            Left(works.filter(w => {
+              failedIds.contains(w.canonicalId)
+            }))
+          } else Right(works)
         }
-
-        if (actualFailures.nonEmpty) {
-          val failedIds = actualFailures.map(_.id)
-          debug(s"Failed indexing works $failedIds")
-
-          Left(works.filter(w => {
-            failedIds.contains(w.canonicalId)
-          }))
-        } else Right(works)
       }
   }
 

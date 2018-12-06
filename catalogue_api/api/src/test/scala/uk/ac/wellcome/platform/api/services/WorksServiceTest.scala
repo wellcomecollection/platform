@@ -1,26 +1,35 @@
 package uk.ac.wellcome.platform.api.services
 
+import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticError
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, WorkType}
-import uk.ac.wellcome.platform.api.fixtures.{
-  ElasticsearchServiceFixture,
-  WorksServiceFixture
-}
 import uk.ac.wellcome.platform.api.generators.SearchOptionsGenerators
 import uk.ac.wellcome.platform.api.models.{ResultList, WorkTypeFilter}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class WorksServiceTest
     extends FunSpec
-    with ElasticsearchServiceFixture
-    with WorksServiceFixture
+    with ElasticsearchFixtures
     with Matchers
     with ScalaFutures
     with SearchOptionsGenerators
     with WorksGenerators {
+
+  val elasticsearchService = new ElasticsearchService(
+    elasticClient = elasticClient
+  )
+
+  val worksService = new WorksService(
+    searchService = elasticsearchService
+  )
+
+  val defaultWorksSearchOptions = createWorksSearchOptions
 
   describe("listWorks") {
     it("gets records in Elasticsearch") {
@@ -94,47 +103,67 @@ class WorksServiceTest
         )
       )
     }
+
+    it("returns a Left[ElasticError] if there's an Elasticsearch error") {
+      val future = worksService.listWorks(
+        index = Index("doesnotexist"),
+        worksSearchOptions = defaultWorksSearchOptions
+      )
+
+      whenReady(future) { result =>
+        result.isLeft shouldBe true
+        result.left.get shouldBe a[ElasticError]
+      }
+    }
   }
 
   describe("findWorkById") {
     it("gets a DisplayWork by id") {
-      withLocalElasticsearchIndex { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val work = createIdentifiedWork
+      withLocalWorksIndex { indexName =>
+        val work = createIdentifiedWork
 
-            insertIntoElasticsearch(indexName, work)
+        insertIntoElasticsearch(indexName, work)
 
-            val documentOptions =
-              createElasticsearchDocumentOptionsWith(indexName = indexName)
+        val index = Index(indexName)
 
-            val recordsFuture = worksService.findWorkById(
-              canonicalId = work.canonicalId)(documentOptions)
+        val future =
+          worksService.findWorkById(canonicalId = work.canonicalId)(index)
 
-            whenReady(recordsFuture) { records =>
-              records.isDefined shouldBe true
-              records.get shouldBe work
-            }
-          }
+        whenReady(future) { response =>
+          response.isRight shouldBe true
+
+          val records = response.right.get
+          records.isDefined shouldBe true
+          records.get shouldBe work
+        }
+      }
+
+    }
+
+    it("returns a future of None if it cannot get a record by id") {
+      withLocalWorksIndex { indexName =>
+        val index = Index(indexName)
+
+        val recordsFuture =
+          worksService.findWorkById(canonicalId = "1234")(index)
+
+        whenReady(recordsFuture) { result =>
+          result.isRight shouldBe true
+          result.right.get shouldBe None
         }
       }
     }
 
-    it("returns a future of None if it cannot get a record by id") {
-      withLocalElasticsearchIndex { indexName =>
-        withElasticsearchService { searchService =>
-          withWorksService(searchService) { worksService =>
-            val documentOptions =
-              createElasticsearchDocumentOptionsWith(indexName = indexName)
+    it("returns a Left[ElasticError] if there's an Elasticsearch error") {
+      val future = worksService.findWorkById(
+        canonicalId = "1234"
+      )(
+        index = Index("doesnotexist")
+      )
 
-            val recordsFuture =
-              worksService.findWorkById(canonicalId = "1234")(documentOptions)
-
-            whenReady(recordsFuture) { record =>
-              record shouldBe None
-            }
-          }
-        }
+      whenReady(future) { result =>
+        result.isLeft shouldBe true
+        result.left.get shouldBe a[ElasticError]
       }
     }
   }
@@ -235,6 +264,20 @@ class WorksServiceTest
         )
       )
     }
+
+    it("returns a Left[ElasticError] if there's an Elasticsearch error") {
+      val future = worksService.searchWorks(
+        query = "cat"
+      )(
+        index = Index("doesnotexist"),
+        worksSearchOptions = defaultWorksSearchOptions
+      )
+
+      whenReady(future) { result =>
+        result.isLeft shouldBe true
+        result.left.get shouldBe a[ElasticError]
+      }
+    }
   }
 
   private def assertListResultIsCorrect(
@@ -242,9 +285,9 @@ class WorksServiceTest
     expectedWorks: Seq[IdentifiedBaseWork],
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
-  ) =
+  ): Assertion =
     assertResultIsCorrect(
-      (worksService: WorksService) => worksService.listWorks
+      worksService.listWorks
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertSearchResultIsCorrect(query: String)(
@@ -252,41 +295,34 @@ class WorksServiceTest
     expectedWorks: Seq[IdentifiedBaseWork],
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions = createWorksSearchOptions
-  ) =
+  ): Assertion =
     assertResultIsCorrect(
-      (worksService: WorksService) => worksService.searchWorks(query = query)
+      worksService.searchWorks(query = query)
     )(allWorks, expectedWorks, expectedTotalResults, worksSearchOptions)
 
   private def assertResultIsCorrect(
-    partialSearchFunction: WorksService => (
-      ElasticsearchDocumentOptions,
-      WorksSearchOptions) => Future[ResultList]
+    partialSearchFunction: (
+      Index,
+      WorksSearchOptions) => Future[Either[ElasticError, ResultList]]
   )(
     allWorks: Seq[IdentifiedBaseWork],
     expectedWorks: Seq[IdentifiedBaseWork],
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions
   ): Assertion =
-    withLocalElasticsearchIndex { indexName =>
-      withElasticsearchService { searchService =>
-        withWorksService(searchService) { worksService =>
-          if (!allWorks.isEmpty) {
-            insertIntoElasticsearch(indexName, allWorks: _*)
-          }
+    withLocalWorksIndex { indexName =>
+      if (allWorks.nonEmpty) {
+        insertIntoElasticsearch(indexName, allWorks: _*)
+      }
 
-          val documentOptions = createElasticsearchDocumentOptionsWith(
-            indexName = indexName
-          )
+      val future = partialSearchFunction(Index(indexName), worksSearchOptions)
 
-          val future = partialSearchFunction(worksService)(
-            documentOptions,
-            worksSearchOptions)
+      whenReady(future) { result =>
+        result.isRight shouldBe true
 
-          whenReady(future) { works =>
-            works.results should contain theSameElementsAs expectedWorks
-            works.totalResults shouldBe expectedTotalResults
-          }
-        }
+        val works = result.right.get
+        works.results should contain theSameElementsAs expectedWorks
+        works.totalResults shouldBe expectedTotalResults
       }
     }
 }
