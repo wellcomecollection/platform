@@ -49,7 +49,11 @@ module "archivist_queue" {
 
   aws_region = "${var.aws_region}"
   account_id = "${var.current_account_id}"
-  role_names = ["${module.archivist.task_role_name}"]
+
+  role_names = [
+    "${module.archivist.task_role_name}",
+    "${module.archivist-nvm.task_role_name}",
+  ]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
@@ -59,8 +63,12 @@ module "archivist_queue" {
 module "bags_topic" {
   source = "../modules/topic"
 
-  namespace  = "${var.namespace}_bags"
-  role_names = ["${module.archivist.task_role_name}"]
+  namespace = "${var.namespace}_bags"
+
+  role_names = [
+    "${module.archivist.task_role_name}",
+    "${module.archivist-nvm.task_role_name}",
+  ]
 }
 
 module "bags_queue" {
