@@ -47,7 +47,7 @@ def guess_cloudwatch_search_terms(alarm_name):
 def is_critical_error(alarm_name):
     """Is this a critical error (True) or just a warning (False)?"""
     # Alarms for the API or Loris are always critical.
-    if any(p in alarm_name for p in ["Catalogue API_prod_5xx_alarm", "loris"]):
+    if any(p in alarm_name for p in ["catalogue-api", "loris"]):
         return True
 
     # Any alarms to do with healthy/unhealthy hosts are critical.

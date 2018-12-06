@@ -10,18 +10,15 @@ resource "aws_api_gateway_rest_api" "api" {
 
 # Stages
 
-module "prod" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v14.2.0"
-  domain_name = "api.wellcomecollection.org"
+module "romulus" {
+  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v17.0.0"
 
-  stage_name = "prod"
+  stage_name = "romulus"
   api_id     = "${aws_api_gateway_rest_api.api.id}"
 
   variables = {
-    port = "${local.prod_listener_port}"
+    port = "${local.romulus_listener_port}"
   }
-
-  base_path = "catalogue"
 
   depends_on = [
     "${module.root_resource_integration.uri}",
@@ -29,29 +26,33 @@ module "prod" {
   ]
 }
 
-module "stage" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=307d3fa2576360a7c41765bbd95e61281afd6ea8"
+module "remus" {
+  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v17.0.0"
 
-  stage_name = "stage"
+  stage_name = "remus"
   api_id     = "${aws_api_gateway_rest_api.api.id}"
-  api_name = "${aws_api_gateway_rest_api.api.name}"
 
   variables = {
-    port = "${local.stage_listener_port}"
+    port = "${local.remus_listener_port}"
   }
 
   depends_on = [
     "${module.root_resource_integration.uri}",
     "${module.simple_integration.uri}",
   ]
-  enable_alarm = true
-  alarm_topic_arn = "${var.alarm_topic_arn}"
 }
 
 resource "aws_api_gateway_base_path_mapping" "stage" {
   api_id      = "${aws_api_gateway_rest_api.api.id}"
-  stage_name  = "stage"
+  stage_name  = "${var.stage_api}"
   domain_name = "api-stage.wellcomecollection.org"
+  base_path = "catalogue"
+}
+
+resource "aws_api_gateway_base_path_mapping" "prod" {
+  api_id      = "${aws_api_gateway_rest_api.api.id}"
+  stage_name  = "${var.production_api}"
+  domain_name = "api.wellcomecollection.org"
   base_path = "catalogue"
 }
 
