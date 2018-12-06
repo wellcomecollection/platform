@@ -37,7 +37,7 @@ object NotificationMessageFlow extends Logging {
             id = bagRequest.archiveRequestId,
             events = List(
               ProgressEvent(
-                s"Started working on ingestRequest: ${bagRequest.archiveRequestId}")
+                s"Started work on ingest: ${bagRequest.archiveRequestId}")
             )
           )
 

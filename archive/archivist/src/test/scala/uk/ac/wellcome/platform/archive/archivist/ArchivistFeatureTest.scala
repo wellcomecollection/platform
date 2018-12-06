@@ -66,14 +66,14 @@ class ArchivistFeatureTest
                 request.archiveRequestId,
                 progressTopic) { events =>
                 events should have size 1
-                events.head.description shouldBe s"Started working on ingestRequest: ${request.archiveRequestId}"
+                events.head.description shouldBe s"Started work on ingest: ${request.archiveRequestId}"
               }
 
               assertTopicReceivesProgressEventUpdate(
                 request.archiveRequestId,
                 progressTopic) { events =>
                 events should have size 1
-                events.head.description shouldBe "zipFile downloaded successfully"
+                events.head.description shouldBe "Source bag downloaded successfully"
               }
 
               assertTopicReceivesProgressEventUpdate(
