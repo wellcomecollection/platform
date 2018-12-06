@@ -156,7 +156,7 @@ trait ElasticsearchFixtures
         works.map { work =>
           val jsonDoc = toJson(work).get
 
-          indexInto(index.name)
+          indexInto(index.name / index.name)
             .version(work.version)
             .versionType(ExternalGte)
             .id(work.canonicalId)
