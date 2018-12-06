@@ -140,8 +140,6 @@ class WorksServiceTest
 
     it("returns a future of None if it cannot get a record by id") {
       withLocalWorksIndex { index =>
-        val index = Index(index)
-
         val recordsFuture =
           worksService.findWorkById(canonicalId = "1234")(index)
 
