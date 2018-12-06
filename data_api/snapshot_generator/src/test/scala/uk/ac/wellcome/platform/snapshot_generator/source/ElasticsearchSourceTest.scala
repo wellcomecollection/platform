@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.snapshot_generator.source
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Sink, Source}
+import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -22,11 +23,11 @@ class ElasticsearchSourceTest
   it("outputs the entire content of the index") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withLocalWorksIndex { indexName =>
+        withLocalWorksIndex { index =>
           val works = createIdentifiedWorks(count = 10)
-          insertIntoElasticsearch(indexName, works: _*)
+          insertIntoElasticsearch(index, works: _*)
 
-          withSource(indexName) { source =>
+          withSource(index) { source =>
             val future = source.runWith(Sink.seq)
 
             whenReady(future) { result =>
@@ -41,14 +42,14 @@ class ElasticsearchSourceTest
   it("filters non visible works") {
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withLocalWorksIndex { indexName =>
+        withLocalWorksIndex { index =>
           val visibleWorks = createIdentifiedWorks(count = 10)
           val invisibleWorks = createIdentifiedInvisibleWorks(count = 3)
 
           val works = visibleWorks ++ invisibleWorks
-          insertIntoElasticsearch(indexName, works: _*)
+          insertIntoElasticsearch(index, works: _*)
 
-          withSource(indexName) { source =>
+          withSource(index) { source =>
             val future = source.runWith(Sink.seq)
 
             whenReady(future) { result =>
@@ -60,12 +61,12 @@ class ElasticsearchSourceTest
     }
   }
 
-  private def withSource[R](indexName: String)(
+  private def withSource[R](index: Index)(
     testWith: TestWith[Source[IdentifiedWork, NotUsed], R])(
     implicit actorSystem: ActorSystem): R = {
     val source = ElasticsearchWorksSource(
       elasticClient = elasticClient,
-      indexName = indexName
+      index = index
     )
     testWith(source)
   }

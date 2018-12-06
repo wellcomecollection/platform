@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.snapshot_generator
 
-import com.sksamuel.elastic4s.Index
 import com.twitter.finagle.http.Status.Ok
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.ScalaFutures
@@ -31,11 +30,10 @@ class ServerTest
   private def withFixtures[R](testWith: TestWith[EmbeddedHttpServer, R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalWorksIndex { indexNameV1 =>
-          withLocalWorksIndex { indexNameV2 =>
+        withLocalWorksIndex { indexV1 =>
+          withLocalWorksIndex { indexV2 =>
             val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
-              indexV1 = Index(indexNameV1),
-              indexV2 = Index(indexNameV2))
+              indexV1, indexV2)
             withServer(flags) { server =>
               testWith(server)
             }

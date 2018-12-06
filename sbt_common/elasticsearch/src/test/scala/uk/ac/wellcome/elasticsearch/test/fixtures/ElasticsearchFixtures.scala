@@ -64,9 +64,9 @@ trait ElasticsearchFixtures
     ),
     implicitly[Position])
 
-  def withLocalWorksIndex[R](testWith: TestWith[String, R]): R =
+  def withLocalWorksIndex[R](testWith: TestWith[Index, R]): R =
     withLocalElasticsearchIndex[R](WorksIndex) { index =>
-      testWith(index.name)
+      testWith(index)
     }
 
   private val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
@@ -107,13 +107,13 @@ trait ElasticsearchFixtures
       response.result.isExists shouldBe true
     }
 
-  def eventuallyDeleteIndex(indexName: String): Assertion = {
-    elasticClient.execute(deleteIndex(indexName))
+  def eventuallyDeleteIndex(index: Index): Assertion = {
+    elasticClient.execute(deleteIndex(index.name))
 
     eventually {
       val response: Response[IndexExistsResponse] =
         elasticClient
-          .execute(indexExists(indexName))
+          .execute(indexExists(index.name))
           .await
 
       response.result.isExists shouldBe false
@@ -121,14 +121,16 @@ trait ElasticsearchFixtures
   }
 
   def assertElasticsearchEventuallyHasWork(
-    indexName: String,
+    index: Index,
     works: IdentifiedBaseWork*): Seq[Assertion] =
     works.map { work =>
       val workJson = toJson(work).get
 
       eventually {
         val response: Response[GetResponse] = elasticClient
-          .execute(get(work.canonicalId).from(indexName))
+          .execute {
+            get(work.canonicalId).from(index.name)
+          }
           .await
 
         val getResponse = response.result
@@ -139,7 +141,7 @@ trait ElasticsearchFixtures
       }
     }
 
-  def assertElasticsearchNeverHasWork(indexName: String,
+  def assertElasticsearchNeverHasWork(index: Index,
                                       works: IdentifiedBaseWork*): Unit = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
@@ -147,21 +149,21 @@ trait ElasticsearchFixtures
 
     works.foreach { work =>
       val response: Response[GetResponse] = elasticClient
-        .execute(get(work.canonicalId).from(indexName))
+        .execute(get(work.canonicalId).from(index.name))
         .await
 
       response.result.found shouldBe false
     }
   }
 
-  def insertIntoElasticsearch(indexName: String,
+  def insertIntoElasticsearch(index: Index,
                               works: IdentifiedBaseWork*): Assertion = {
     val result = elasticClient.execute(
       bulk(
         works.map { work =>
           val jsonDoc = toJson(work).get
 
-          indexInto(indexName / indexName)
+          indexInto(index.name)
             .version(work.version)
             .versionType(ExternalGte)
             .id(work.canonicalId)
@@ -184,6 +186,6 @@ trait ElasticsearchFixtures
   def createIndexName: String =
     createIndex.name
 
-  def createIndex: Index =
+  private def createIndex: Index =
     Index(name = (Random.alphanumeric take 10 mkString) toLowerCase)
 }

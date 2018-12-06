@@ -1,5 +1,6 @@
 package uk.ac.wellcome.elasticsearch
 
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticDsl.{indexInto, search, _}
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
@@ -40,9 +41,9 @@ class WorksIndexTest
 
   it("puts a valid work") {
     forAll { sampleWork: IdentifiedBaseWork =>
-      withLocalWorksIndex { indexName: String =>
-        whenReady(indexObject(indexName, sampleWork)) { _ =>
-          assertObjectIndexed(indexName, sampleWork)
+      withLocalWorksIndex { index =>
+        whenReady(indexObject(index, sampleWork)) { _ =>
+          assertObjectIndexed(index, sampleWork)
         }
       }
     }
@@ -52,7 +53,7 @@ class WorksIndexTest
   // a bug in the mapping related to person subjects wasn't caught by the above test.
   // So let's add a specific one
   it("puts a work with a person subject") {
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex { index =>
       val sampleWork = createIdentifiedWorkWith(
         subjects = List(
           Subject(
@@ -68,40 +69,40 @@ class WorksIndexTest
           )
         )
       )
-      whenReady(indexObject(indexName, sampleWork)) { _ =>
-        assertObjectIndexed(indexName, sampleWork)
+      whenReady(indexObject(index, sampleWork)) { _ =>
+        assertObjectIndexed(index, sampleWork)
       }
     }
   }
 
   it("does not put an invalid work") {
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex { index =>
       val badTestObject = BadTestObject(
         id = "id",
         weight = 5
       )
 
-      whenReady(indexObject(indexName, badTestObject)) { response =>
+      whenReady(indexObject(index, badTestObject)) { response =>
         response.isError shouldBe true
         response.error shouldBe a[ElasticError]
       }
     }
   }
 
-  private def indexObject[T](indexName: String, t: T)(
+  private def indexObject[T](index: Index, t: T)(
     implicit encoder: Encoder[T]): Future[Response[IndexResponse]] =
     elasticClient
       .execute {
-        indexInto(indexName / indexName).doc(toJson(t).get)
+        indexInto(index.name / index.name).doc(toJson(t).get)
       }
 
-  private def assertObjectIndexed[T](indexName: String, t: T)(
+  private def assertObjectIndexed[T](index: Index, t: T)(
     implicit encoder: Encoder[T]): Assertion =
     // Elasticsearch is eventually consistent so, when the future completes,
     // the documents might not immediately appear in search
     eventually {
       val response: Response[SearchResponse] = elasticClient.execute {
-        search(indexName).matchAllQuery()
+        search(index).matchAllQuery()
       }.await
 
       val hits = response.result.hits.hits

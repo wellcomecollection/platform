@@ -1,7 +1,8 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
@@ -22,12 +23,12 @@ class WorkIndexerTest
   it("inserts an identified Work into Elasticsearch") {
     val work = createIdentifiedWork
 
-    withLocalWorksIndex { indexName =>
-      val future = indexWork(work, indexName)
+    withLocalWorksIndex { index =>
+      val future = indexWork(work, index)
 
       whenReady(future) { result =>
         result.right.get should contain(work)
-        assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+        assertElasticsearchEventuallyHasWork(index = index, work)
       }
     }
   }
@@ -35,13 +36,13 @@ class WorkIndexerTest
   it("only adds one record when the same ID is ingested multiple times") {
     val work = createIdentifiedWork
 
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex { index =>
       val future = Future.sequence(
-        (1 to 2).map(_ => indexWork(work, indexName))
+        (1 to 2).map(_ => indexWork(work, index))
       )
 
       whenReady(future) { _ =>
-        assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+        assertElasticsearchEventuallyHasWork(index = index, work)
       }
     }
   }
@@ -50,18 +51,18 @@ class WorkIndexerTest
     val work = createIdentifiedWorkWith(version = 3)
     val olderWork = work.copy(version = 1)
 
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex { index =>
       val future = ingestWorkPairInOrder(
         firstWork = work,
         secondWork = olderWork,
-        indexName = indexName
+        index = index
       )
 
       whenReady(future) { result =>
         assertIngestedWorkIs(
           result = result,
           ingestedWork = work,
-          indexName = indexName)
+          index = index)
       }
     }
   }
@@ -70,16 +71,16 @@ class WorkIndexerTest
     val work = createIdentifiedWorkWith(version = 3)
     val updatedWork = work.copy(title = "a different title")
 
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex { index =>
       val future = ingestWorkPairInOrder(
         firstWork = work,
         secondWork = updatedWork,
-        indexName = indexName
+        index = index
       )
 
       whenReady(future) { result =>
         result.right.get should contain(updatedWork)
-        assertElasticsearchEventuallyHasWork(indexName = indexName, updatedWork)
+        assertElasticsearchEventuallyHasWork(index = index, updatedWork)
       }
     }
   }
@@ -90,18 +91,18 @@ class WorkIndexerTest
       val mergedWork = createIdentifiedWorkWith(version = 3, merged = true)
       val unmergedWork = mergedWork.copy(merged = false)
 
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex { index =>
         val unmergedWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = mergedWork,
           secondWork = unmergedWork,
-          indexName = indexName
+          index = index
         )
 
         whenReady(unmergedWorkInsertFuture) { result =>
           assertIngestedWorkIs(
             result = result,
             ingestedWork = mergedWork,
-            indexName = indexName)
+            index = index)
         }
       }
     }
@@ -110,17 +111,17 @@ class WorkIndexerTest
       val unmergedNewWork = createIdentifiedWorkWith(version = 4)
       val mergedOldWork = unmergedNewWork.copy(version = 3, merged = true)
 
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex { index =>
         val mergedWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = unmergedNewWork,
           secondWork = mergedOldWork,
-          indexName = indexName
+          index = index
         )
         whenReady(mergedWorkInsertFuture) { result =>
           assertIngestedWorkIs(
             result = result,
             ingestedWork = unmergedNewWork,
-            indexName = indexName)
+            index = index)
         }
       }
     }
@@ -132,17 +133,17 @@ class WorkIndexerTest
         canonicalId = identifiedNewWork.canonicalId,
         version = 3)
 
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex { index =>
         val redirectedWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = identifiedNewWork,
           secondWork = redirectedOldWork,
-          indexName = indexName
+          index = index
         )
         whenReady(redirectedWorkInsertFuture) { result =>
           assertIngestedWorkIs(
             result = result,
             ingestedWork = identifiedNewWork,
-            indexName = indexName)
+            index = index)
         }
       }
     }
@@ -153,17 +154,17 @@ class WorkIndexerTest
         canonicalId = redirectedWork.canonicalId,
         version = 3)
 
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex { index =>
         val identifiedWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = redirectedWork,
           secondWork = identifiedWork,
-          indexName = indexName
+          index = index
         )
         whenReady(identifiedWorkInsertFuture) { result =>
           assertIngestedWorkIs(
             result = result,
             ingestedWork = redirectedWork,
-            indexName = indexName)
+            index = index)
         }
       }
     }
@@ -174,17 +175,17 @@ class WorkIndexerTest
         canonicalId = work.canonicalId,
         version = 4)
 
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex { index =>
         val invisibleWorkInsertFuture = ingestWorkPairInOrder(
           firstWork = work,
           secondWork = invisibleWork,
-          indexName = indexName
+          index = index
         )
         whenReady(invisibleWorkInsertFuture) { result =>
           assertIngestedWorkIs(
             result = result,
             ingestedWork = invisibleWork,
-            indexName = indexName)
+            index = index)
         }
       }
     }
@@ -193,14 +194,14 @@ class WorkIndexerTest
   it("inserts a list of works into elasticsearch and returns them") {
     val works = createIdentifiedWorks(count = 5)
 
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex { index =>
       val future = workIndexer.indexWorks(
         works = works,
-        indexName = indexName
+        index = index
       )
 
       whenReady(future) { successfullyInserted =>
-        assertElasticsearchEventuallyHasWork(indexName = indexName, works: _*)
+        assertElasticsearchEventuallyHasWork(index = index, works: _*)
         successfullyInserted.right.get should contain theSameElementsAs works
       }
     }
@@ -217,15 +218,15 @@ class WorkIndexerTest
     withLocalElasticsearchIndex(OnlyInvisibleWorksIndex) { index =>
       val future = workIndexer.indexWorks(
         works = works,
-        indexName = index.name
+        index = index
       )
 
       whenReady(future) { result =>
         assertElasticsearchEventuallyHasWork(
-          indexName = index.name,
+          index = index,
           validWorks: _*)
         assertElasticsearchNeverHasWork(
-          indexName = index.name,
+          index = index,
           notMatchingMappingWork)
         result.left.get should contain(notMatchingMappingWork)
       }
@@ -234,24 +235,23 @@ class WorkIndexerTest
 
   private def ingestWorkPairInOrder(firstWork: IdentifiedBaseWork,
                                     secondWork: IdentifiedBaseWork,
-                                    indexName: String) = {
+                                    index: Index) =
     for {
-      _ <- indexWork(firstWork, indexName)
-      result <- indexWork(secondWork, indexName)
+      _ <- indexWork(firstWork, index)
+      result <- indexWork(secondWork, index)
     } yield result
-  }
 
-  private def indexWork(work: IdentifiedBaseWork, indexName: String) =
+  private def indexWork(work: IdentifiedBaseWork, index: Index) =
     workIndexer.indexWorks(
       works = List(work),
-      indexName = indexName
+      index = index
     )
 
   private def assertIngestedWorkIs(
     result: Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]],
     ingestedWork: IdentifiedBaseWork,
-    indexName: String) = {
+    index: Index): Seq[Assertion] = {
     result.isRight shouldBe true
-    assertElasticsearchEventuallyHasWork(indexName = indexName, ingestedWork)
+    assertElasticsearchEventuallyHasWork(index = index, ingestedWork)
   }
 }

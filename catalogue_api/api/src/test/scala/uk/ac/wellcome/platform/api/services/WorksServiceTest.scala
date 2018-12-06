@@ -119,12 +119,10 @@ class WorksServiceTest
 
   describe("findWorkById") {
     it("gets a DisplayWork by id") {
-      withLocalWorksIndex { indexName =>
+      withLocalWorksIndex { index =>
         val work = createIdentifiedWork
 
-        insertIntoElasticsearch(indexName, work)
-
-        val index = Index(indexName)
+        insertIntoElasticsearch(index, work)
 
         val future =
           worksService.findWorkById(canonicalId = work.canonicalId)(index)
@@ -141,8 +139,8 @@ class WorksServiceTest
     }
 
     it("returns a future of None if it cannot get a record by id") {
-      withLocalWorksIndex { indexName =>
-        val index = Index(indexName)
+      withLocalWorksIndex { index =>
+        val index = Index(index)
 
         val recordsFuture =
           worksService.findWorkById(canonicalId = "1234")(index)
@@ -310,12 +308,12 @@ class WorksServiceTest
     expectedTotalResults: Int,
     worksSearchOptions: WorksSearchOptions
   ): Assertion =
-    withLocalWorksIndex { indexName =>
+    withLocalWorksIndex { index =>
       if (allWorks.nonEmpty) {
-        insertIntoElasticsearch(indexName, allWorks: _*)
+        insertIntoElasticsearch(index, allWorks: _*)
       }
 
-      val future = partialSearchFunction(Index(indexName), worksSearchOptions)
+      val future = partialSearchFunction(index, worksSearchOptions)
 
       whenReady(future) { result =>
         result.isRight shouldBe true
