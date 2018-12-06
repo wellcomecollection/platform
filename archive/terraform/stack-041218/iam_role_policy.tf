@@ -29,7 +29,7 @@ resource "aws_iam_role_policy" "bags_vhs" {
 
 # api.ingests aka progress-http
 
-resource "aws_iam_role_policy" "ingests_archive_progress_table" {
+resource "aws_iam_role_policy" "api-ingests_archive_progress_table" {
   role   = "${module.api.ingests_role_name}"
   policy = "${data.aws_iam_policy_document.archive_progress_table_read_write_policy.json}"
 }
