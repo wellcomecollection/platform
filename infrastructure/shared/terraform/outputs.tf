@@ -128,6 +128,10 @@ output "storage_vpc_delta_id" {
   value = "${module.storage_vpc_delta.vpc_id}"
 }
 
+output "storage_cidr_block_vpc" {
+  value = "${local.storage_cidr_block_vpc}"
+}
+
 # Monitoring VPC
 
 output "monitoring_vpc_delta_private_subnets" {
