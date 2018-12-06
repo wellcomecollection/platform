@@ -53,6 +53,19 @@ class SierraLocationTest
 
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
     }
+
+    it("tries to extract a LocationType if it can't find one") {
+      val itemData = createSierraItemDataWith(
+        location = Some(SierraSourceLocation("foo", "bar"))
+      )
+
+      transformer.getPhysicalLocation(itemData = itemData) shouldBe Some(
+        PhysicalLocation(
+          locationType = LocationType(id = "foo", label = "bar"),
+          label = "bar"
+        )
+      )
+    }
   }
 
   describe("Digital locations") {
