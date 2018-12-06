@@ -64,6 +64,7 @@ lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_
   .settings(libraryDependencies ++= Dependencies.finatraMonitoringDependencies)
 
 lazy val config_core = doSharedLibrarySetup(project, "sbt_common/config/core")
+  .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
 
 lazy val config_storage = doSharedLibrarySetup(project, "sbt_common/config/storage")
@@ -202,6 +203,7 @@ lazy val registrar_async = doServiceSetup(project, "archive/registrar_async")
 lazy val registrar_http = doServiceSetup(project, "archive/registrar_http")
   .dependsOn(registrar_common % "compile->compile;test->test")
   .dependsOn(archive_display % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.registrarHttpDependencies)
 
 lazy val progress_common = doServiceSetup(project, "archive/progress_common")
   .dependsOn(archive_common % "compile->compile;test->test")

@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.matcher.services
 import akka.Done
 import akka.actor.ActorSystem
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.sns.SNSWriter
@@ -17,7 +18,8 @@ class MatcherWorkerService(messageStream: MessageStream[TransformedBaseWork],
                            workMatcher: WorkMatcher)(
   implicit val actorSystem: ActorSystem,
   ec: ExecutionContext)
-    extends Logging {
+    extends Logging
+    with Runnable {
 
   def run(): Future[Done] =
     messageStream.foreach(this.getClass.getSimpleName, processMessage)

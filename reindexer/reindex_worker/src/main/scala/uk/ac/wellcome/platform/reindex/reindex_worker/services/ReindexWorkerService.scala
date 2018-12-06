@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import akka.Done
-import akka.actor.ActorSystem
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
@@ -17,7 +17,8 @@ class ReindexWorkerService(
   bulkSNSSender: BulkSNSSender,
   sqsStream: SQSStream[NotificationMessage],
   reindexJobConfigMap: Map[String, ReindexJobConfig]
-)(implicit val actorSystem: ActorSystem, ec: ExecutionContext) {
+)(implicit ec: ExecutionContext)
+    extends Runnable {
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {

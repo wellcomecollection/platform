@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.recorder.services
 
 import akka.Done
 import com.google.inject.Inject
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.{
   MessageNotification,
@@ -25,7 +26,8 @@ class RecorderWorkerService @Inject()(
                                              EmptyMetadata,
                                              ObjectStore[TransformedBaseWork]],
   messageStream: MessageStream[TransformedBaseWork],
-  snsWriter: SNSWriter)(implicit executionContext: ExecutionContext) {
+  snsWriter: SNSWriter)(implicit ec: ExecutionContext)
+    extends Runnable {
 
   def run(): Future[Done] =
     messageStream.foreach(this.getClass.getSimpleName, processMessage)
