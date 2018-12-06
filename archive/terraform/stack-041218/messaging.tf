@@ -7,6 +7,7 @@ module "ingests_topic" {
 
   role_names = [
     "${module.ingests.task_role_name}",
+    "${module.archivist-nvm.task_role_name}",
     "${module.archivist.task_role_name}",
     "${module.notifier.task_role_name}",
   ]

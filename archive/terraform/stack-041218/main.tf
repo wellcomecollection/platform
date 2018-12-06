@@ -19,6 +19,11 @@ module "archivist" {
     progress_topic_arn  = "${module.ingests_topic.arn}"
   }
 
+  min_capacity = "0"
+  max_capacity = "1"
+
+  desired_task_count = "0"
+
   env_vars_length = 4
 
   container_image = "${var.archivist_container_image}"
