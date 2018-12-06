@@ -2,24 +2,12 @@ output "lambda_error_alarm_arn" {
   value = "${module.lambda_error_alarm.arn}"
 }
 
-output "ec2_instance_terminating_for_too_long_alarm_arn" {
-  value = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"
-}
-
 output "dlq_alarm_arn" {
   value = "${module.dlq_alarm.arn}"
 }
 
-output "alb_server_error_alarm_arn" {
-  value = "${module.alb_server_error_alarm.arn}"
-}
-
-output "alb_client_error_alarm_arn" {
-  value = "${module.alb_client_error_alarm.arn}"
-}
-
-output "terminal_failure_alarm_arn" {
-  value = "${module.terminal_failure_alarm.arn}"
+output "gateway_server_error_alarm_arn" {
+  value = "${module.gateway_server_error_alarm.arn}"
 }
 
 output "ec2_terminating_topic_arn" {

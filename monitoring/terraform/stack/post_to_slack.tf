@@ -27,12 +27,12 @@ module "trigger_post_to_slack_dlqs_not_empty" {
   sns_trigger_arn      = "${var.dlq_alarm_arn}"
 }
 
-module "trigger_post_to_slack_server_error_alb" {
+module "trigger_post_to_slack_server_error_gateway" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
 
   lambda_function_name = "${module.lambda_post_to_slack.function_name}"
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
-  sns_trigger_arn      = "${var.alb_server_error_alarm_arn}"
+  sns_trigger_arn      = "${var.gateway_server_error_alarm_arn}"
 }
 
 module "trigger_post_to_slack_lambda_error" {
