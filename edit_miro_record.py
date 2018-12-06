@@ -12,6 +12,7 @@ import sys
 import tempfile
 
 import boto3
+from boto3.dynamodb.types import TypeDeserializer
 import click
 
 
@@ -70,6 +71,19 @@ def edit_miro_vhs_record(miro_id, reason):
 
     print(f"Updating DynamoDB item {miro_id}")
     dynamodb.put_item(TableName="vhs-sourcedata-miro", Item=item)
+
+    print(f"Sending message to SNS topic")
+    sns = boto3.client("sns")
+    deserialized_item = {
+        k: TypeDeserializer().deserialize(v)
+        for k, v in item.items()
+    }
+    deserialized_item["version"] = int(deserialized_item["version"])
+    sns.publish(
+        TopicArn="arn:aws:sns:eu-west-1:760097843905:vhs_sourcedata_miro_updates",
+        Subject=f"Sent by {__file__}",
+        Message=json.dumps(deserialized_item)
+    )
 
 
 @click.command()
