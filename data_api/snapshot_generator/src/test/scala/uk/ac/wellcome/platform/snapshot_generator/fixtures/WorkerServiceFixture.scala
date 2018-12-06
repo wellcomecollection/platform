@@ -13,8 +13,18 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends AkkaS3 with SnapshotServiceFixture with SNS with SQS { this: Suite =>
-  def withWorkerService[R](queue: Queue, topic: Topic, indexV1: Index, indexV2: Index)(testWith: TestWith[SnapshotGeneratorWorkerService, R])(implicit actorSystem: ActorSystem, materializer: ActorMaterializer): R =
+trait WorkerServiceFixture
+    extends AkkaS3
+    with SnapshotServiceFixture
+    with SNS
+    with SQS { this: Suite =>
+  def withWorkerService[R](
+    queue: Queue,
+    topic: Topic,
+    indexV1: Index,
+    indexV2: Index)(testWith: TestWith[SnapshotGeneratorWorkerService, R])(
+    implicit actorSystem: ActorSystem,
+    materializer: ActorMaterializer): R =
     withS3AkkaClient { s3AkkaClient =>
       withSnapshotService(s3AkkaClient, indexV1, indexV2) { snapshotService =>
         withSQSStream[NotificationMessage, R](queue) { sqsStream =>

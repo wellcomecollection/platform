@@ -13,7 +13,8 @@ class SnapshotGeneratorWorkerService(
   snapshotService: SnapshotService,
   sqsStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter
-)(implicit ec: ExecutionContext) extends Runnable {
+)(implicit ec: ExecutionContext)
+    extends Runnable {
 
   def run(): Future[Done] =
     sqsStream.foreach(this.getClass.getSimpleName, processMessage)

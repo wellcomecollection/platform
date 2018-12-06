@@ -11,7 +11,8 @@ import uk.ac.wellcome.test.fixtures.TestWith
 trait AkkaS3 extends S3 {
 
   def withS3AkkaClient[R](endpoint: String)(testWith: TestWith[S3Client, R])(
-    implicit actorSystem: ActorSystem, materializer: ActorMaterializer): R = {
+    implicit actorSystem: ActorSystem,
+    materializer: ActorMaterializer): R = {
     val s3AkkaClient = AkkaS3Builder.buildAkkaS3Client(
       awsClientConfig = AWSClientConfig(
         accessKey = Some(accessKey),
@@ -25,7 +26,8 @@ trait AkkaS3 extends S3 {
   }
 
   def withS3AkkaClient[R](testWith: TestWith[S3Client, R])(
-    implicit actorSystem: ActorSystem, materializer: ActorMaterializer): R =
+    implicit actorSystem: ActorSystem,
+    materializer: ActorMaterializer): R =
     withS3AkkaClient(endpoint = localS3EndpointUrl) { s3AkkaClient =>
       testWith(s3AkkaClient)
     }

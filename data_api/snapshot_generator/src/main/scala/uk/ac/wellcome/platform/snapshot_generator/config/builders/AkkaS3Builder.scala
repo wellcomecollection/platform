@@ -5,7 +5,12 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.impl.ListBucketVersion2
 import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.{
+  AWSCredentialsProvider,
+  AWSStaticCredentialsProvider,
+  BasicAWSCredentials,
+  DefaultAWSCredentialsProviderChain
+}
 import com.amazonaws.regions.AwsRegionProvider
 import com.typesafe.config.Config
 import grizzled.slf4j.Logging
@@ -14,7 +19,9 @@ import uk.ac.wellcome.config.core.models.AWSClientConfig
 
 object AkkaS3Builder extends AWSClientConfigBuilder with Logging {
 
-  def buildAkkaS3Client(config: Config)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer): S3Client =
+  def buildAkkaS3Client(config: Config)(
+    implicit actorSystem: ActorSystem,
+    materializer: ActorMaterializer): S3Client =
     buildAkkaS3Client(
       buildAWSClientConfig(config, namespace = "s3")
     )
@@ -33,7 +40,8 @@ object AkkaS3Builder extends AWSClientConfigBuilder with Logging {
     )
 
   def buildAkkaS3Client(awsClientConfig: AWSClientConfig)(
-    implicit actorSystem: ActorSystem, materializer: ActorMaterializer): S3Client = {
+    implicit actorSystem: ActorSystem,
+    materializer: ActorMaterializer): S3Client = {
     val regionProvider =
       new AwsRegionProvider {
         def getRegion: String = awsClientConfig.region
@@ -43,13 +51,15 @@ object AkkaS3Builder extends AWSClientConfigBuilder with Logging {
       DefaultAWSCredentialsProviderChain.getInstance()
     } else {
       new AWSStaticCredentialsProvider(
-        new BasicAWSCredentials(awsClientConfig.accessKey.get, awsClientConfig.secretKey.get)
+        new BasicAWSCredentials(
+          awsClientConfig.accessKey.get,
+          awsClientConfig.secretKey.get)
       )
     }
 
     val endpointUrl = awsClientConfig.endpoint match {
       case Some(e) => if (e.isEmpty) None else Some(e)
-      case None => None
+      case None    => None
     }
 
     val settings = akkaS3Settings(
