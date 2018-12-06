@@ -8,7 +8,7 @@ resource "aws_service_discovery_private_dns_namespace" "namespace" {
 }
 
 module "cluster_hosts" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/ondemand?ref=v17.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/nvm?ref=d78a91b22fdbd0938943a5d403407a96b62b12f3"
 
   vpc_id   = "${var.vpc_id}"
   key_name = "${var.ssh_key_name}"
@@ -17,9 +17,6 @@ module "cluster_hosts" {
   subnets = "${var.private_subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-
-  instance_type = "${var.instance_type}"
-  image_id      = "ami-0627e141ce928067c"
 
   asg_min     = "1"
   asg_desired = "1"

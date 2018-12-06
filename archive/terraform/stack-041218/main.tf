@@ -21,16 +21,34 @@ module "archivist" {
 
   env_vars_length = 4
 
-  min_capacity = "4"
-  max_capacity = "4"
+  container_image = "${var.archivist_container_image}"
+}
+
+module "archivist-nvm" {
+  source = "../modules/service/worker+nvm"
+
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
+  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
+  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets                          = "${var.private_subnets}"
+  vpc_id                           = "${var.vpc_id}"
+  service_name                     = "${var.namespace}-archivist-nvm"
+  aws_region                       = "${var.aws_region}"
+
+  env_vars = {
+    queue_url           = "${module.archivist_queue.url}"
+    archive_bucket      = "${var.archive_bucket_name}"
+    registrar_topic_arn = "${module.bags_topic.arn}"
+    progress_topic_arn  = "${module.ingests_topic.arn}"
+  }
+
+  env_vars_length = 4
 
   cpu    = "1900"
   memory = "14000"
 
   container_image = "${var.archivist_container_image}"
-
-  # The maximum number of tasks is limited by the availability of network interfaces
-  launch_type = "EC2"
 }
 
 # bags aka registrar-async
