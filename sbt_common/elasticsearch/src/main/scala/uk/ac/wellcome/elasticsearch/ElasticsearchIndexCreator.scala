@@ -25,9 +25,21 @@ class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
                      mappingDefinition: MappingDefinition): Future[Unit] =
     elasticClient
       .execute {
-        createIndex(indexName).mappings {
-          mappingDefinition
-        }
+        createIndex(indexName)
+          .mappings { mappingDefinition }
+
+          // Because we have a relatively small number of records (compared
+          // to what Elasticsearch usually expects), we can get weird results
+          // if our records are split across multiple shards.
+          //
+          // e.g. searching for the same query multiple times gets varying results
+          //
+          // This forces all our records to be indexed into a single shard,
+          // which should avoid this problem.
+          //
+          // If/when we index more records, we should revisit this.
+          //
+          .shards(1)
       }
       .flatMap { response: Response[CreateIndexResponse] =>
         if (response.isError) {

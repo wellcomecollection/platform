@@ -9,7 +9,7 @@ import com.sksamuel.elastic4s.http.{ElasticClient, ElasticError, Response}
 import com.sksamuel.elastic4s.searches.queries.term.TermsQuery
 import com.sksamuel.elastic4s.searches.queries.{BoolQuery, Query}
 import com.sksamuel.elastic4s.searches.sort.{FieldSort, SortOrder}
-import com.sksamuel.elastic4s.searches.{SearchRequest, SearchType}
+import com.sksamuel.elastic4s.searches.SearchRequest
 import uk.ac.wellcome.platform.api.models.{
   ItemLocationTypeFilter,
   WorkFilter,
@@ -69,7 +69,6 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
 
     val searchRequest: SearchRequest =
       search(index)
-        .searchType(SearchType.DFS_QUERY_THEN_FETCH)
         .query(queryDefinition)
         .sortBy(sortDefinitions)
         .limit(queryOptions.limit)
