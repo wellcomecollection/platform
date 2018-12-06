@@ -17,10 +17,10 @@ def guess_cloudwatch_log_group(alarm_name):
         return "platform/loris"
 
     if alarm_name.startswith("catalogue-api-romulus"):
-        return "ecs/catalogue-api-romulus"
+        return "ecs/catalogue_api_gw-romulus"
 
     if alarm_name.startswith("catalogue-api-remus"):
-        return "ecs/catalogue-api-remus"
+        return "ecs/catalogue_api_gw-remus"
 
     if alarm_name.startswith("lambda-") and alarm_name.endswith("-errors"):
         # e.g. lambda-ecs_ec2_instance_tagger-errors
@@ -38,7 +38,7 @@ def guess_cloudwatch_search_terms(alarm_name):
     if alarm_name.startswith("lambda"):
         return ["Traceback", "Task timed out after"]
 
-    if alarm_name.startswith("catalogue-api") and alarm_name.endswith("-500-errors"):
+    if alarm_name.startswith("catalogue-api") and alarm_name.endswith("-5xx-alarm"):
         return ['"HTTP 500"']
 
     return []
@@ -55,7 +55,7 @@ def is_critical_error(alarm_name):
         (
             "-not-enough-healthy-hosts",
             "-unhealthy-hosts",
-            "-5xx_alarm",
+            "-5xx-alarm",
             "_TerminalFailure",
         )
     ):
