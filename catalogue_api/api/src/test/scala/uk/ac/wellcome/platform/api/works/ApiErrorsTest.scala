@@ -33,7 +33,8 @@ class ApiErrorsTest extends ApiWorksTestBase {
   }
 
   private def withServer[R](testWith: TestWith[EmbeddedHttpServer, R]): R =
-    withServer(indexV1 = Index("index-v1"), indexV2 = Index("index-v2")) { server =>
-      testWith(server)
+    withServer(indexV1 = Index("index-v1"), indexV2 = Index("index-v2")) {
+      server =>
+        testWith(server)
     }
 }

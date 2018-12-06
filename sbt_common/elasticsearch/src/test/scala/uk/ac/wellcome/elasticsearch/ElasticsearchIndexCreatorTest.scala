@@ -116,44 +116,43 @@ class ElasticsearchIndexCreatorTest
 
   it("updates an already existing index with a compatible mapping") {
     withLocalElasticsearchIndex(TestIndex) { index =>
-      withLocalElasticsearchIndex(CompatibleTestIndex, index = index) {
-        _ =>
-          val compatibleTestObject = CompatibleTestObject(
-            id = "id",
-            description = "description",
-            count = 5,
-            visible = true
-          )
+      withLocalElasticsearchIndex(CompatibleTestIndex, index = index) { _ =>
+        val compatibleTestObject = CompatibleTestObject(
+          id = "id",
+          description = "description",
+          count = 5,
+          visible = true
+        )
 
-          val compatibleTestObjectJson = toJson(compatibleTestObject).get
+        val compatibleTestObjectJson = toJson(compatibleTestObject).get
 
-          val futureInsert: Future[Response[IndexResponse]] =
-            elasticClient
-              .execute {
-                indexInto(index.name / index.name)
-                  .doc(compatibleTestObjectJson)
-              }
-
-          whenReady(futureInsert) { response =>
-            if (response.isError) { println(response) }
-            response.isError shouldBe false
-
-            eventually {
-              val response: Response[SearchResponse] =
-                elasticClient.execute {
-                  search(index).matchAllQuery()
-                }.await
-
-              val hits = response.result.hits.hits
-
-              hits should have size 1
-
-              assertJsonStringsAreEqual(
-                hits.head.sourceAsString,
-                compatibleTestObjectJson
-              )
+        val futureInsert: Future[Response[IndexResponse]] =
+          elasticClient
+            .execute {
+              indexInto(index.name / index.name)
+                .doc(compatibleTestObjectJson)
             }
+
+        whenReady(futureInsert) { response =>
+          if (response.isError) { println(response) }
+          response.isError shouldBe false
+
+          eventually {
+            val response: Response[SearchResponse] =
+              elasticClient.execute {
+                search(index).matchAllQuery()
+              }.await
+
+            val hits = response.result.hits.hits
+
+            hits should have size 1
+
+            assertJsonStringsAreEqual(
+              hits.head.sourceAsString,
+              compatibleTestObjectJson
+            )
           }
+        }
       }
     }
   }

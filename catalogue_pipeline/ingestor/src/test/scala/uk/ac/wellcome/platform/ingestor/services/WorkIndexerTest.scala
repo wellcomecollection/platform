@@ -222,12 +222,8 @@ class WorkIndexerTest
       )
 
       whenReady(future) { result =>
-        assertElasticsearchEventuallyHasWork(
-          index = index,
-          validWorks: _*)
-        assertElasticsearchNeverHasWork(
-          index = index,
-          notMatchingMappingWork)
+        assertElasticsearchEventuallyHasWork(index = index, validWorks: _*)
+        assertElasticsearchNeverHasWork(index = index, notMatchingMappingWork)
         result.left.get should contain(notMatchingMappingWork)
       }
     }

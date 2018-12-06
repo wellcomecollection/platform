@@ -82,8 +82,7 @@ class SnapshotServiceTest
                 withSnapshotService(s3Client, indexV1, indexV2) {
                   snapshotService =>
                     {
-                      testWith(
-                        (snapshotService, indexV1, indexV2, bucket))
+                      testWith((snapshotService, indexV1, indexV2, bucket))
                     }
                 }
               }

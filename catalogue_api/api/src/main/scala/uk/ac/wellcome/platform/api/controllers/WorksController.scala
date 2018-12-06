@@ -85,7 +85,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
 
       val index: Index = request._index match {
         case Some(indexName) => Index(name = indexName)
-        case None => defaultIndex
+        case None            => defaultIndex
       }
 
       val contextUri =
@@ -117,7 +117,7 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
     pageSize: Int): Future[Either[ElasticError, ResultList]] = {
     val index: Index = request._index match {
       case Some(indexName) => Index(name = indexName)
-      case None => defaultIndex
+      case None            => defaultIndex
     }
 
     val worksSearchOptions = WorksSearchOptions(

@@ -185,9 +185,7 @@ class IngestorWorkerServiceTest
               sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
             }
 
-            assertElasticsearchEventuallyHasWork(
-              index = index,
-              works: _*)
+            assertElasticsearchEventuallyHasWork(index = index, works: _*)
 
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)

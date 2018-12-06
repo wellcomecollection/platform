@@ -303,15 +303,14 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
   // TODO figure out what the correct behaviour should be in this case
   ignore(
     "returns a Not Found error if you try to get a version that doesn't exist") {
-    withServer(indexV1 = "not-important", indexV2 = "not-important") {
-      server =>
-        server.httpGet(
-          path = "/catalogue/v567/works?pageSize=100&page=101",
-          andExpect = Status.NotFound,
-          withJsonBody = badRequest(
-            s"catalogue/${ApiVersions.default.toString}",
-            "v567 is not a valid API version")
-        )
+    withServer(indexV1 = "not-important", indexV2 = "not-important") { server =>
+      server.httpGet(
+        path = "/catalogue/v567/works?pageSize=100&page=101",
+        andExpect = Status.NotFound,
+        withJsonBody = badRequest(
+          s"catalogue/${ApiVersions.default.toString}",
+          "v567 is not a valid API version")
+      )
     }
   }
 }

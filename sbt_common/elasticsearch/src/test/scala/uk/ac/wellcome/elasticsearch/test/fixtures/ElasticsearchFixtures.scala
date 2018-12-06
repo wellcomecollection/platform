@@ -122,11 +122,9 @@ trait ElasticsearchFixtures
       val workJson = toJson(work).get
 
       eventually {
-        val response: Response[GetResponse] = elasticClient
-          .execute {
-            get(work.canonicalId).from(index.name)
-          }
-          .await
+        val response: Response[GetResponse] = elasticClient.execute {
+          get(work.canonicalId).from(index.name)
+        }.await
 
         val getResponse = response.result
 

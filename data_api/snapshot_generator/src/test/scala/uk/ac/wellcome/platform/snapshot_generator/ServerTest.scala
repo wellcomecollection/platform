@@ -33,7 +33,8 @@ class ServerTest
         withLocalWorksIndex { indexV1 =>
           withLocalWorksIndex { indexV2 =>
             val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
-              indexV1, indexV2)
+              indexV1,
+              indexV2)
             withServer(flags) { server =>
               testWith(server)
             }
