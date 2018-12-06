@@ -1,3 +1,4 @@
+variable "launch_type" {}
 module "service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling?ref=5c6261da46d7108bc02b0fc262eda29e27db1edf"
 
@@ -23,5 +24,5 @@ module "service" {
   min_capacity = "${var.min_capacity}"
   max_capacity = "${var.max_capacity}"
 
-  launch_type = "EC2"
+  launch_type = "${var.launch_type}"
 }

@@ -77,7 +77,7 @@ resource "aws_api_gateway_base_path_mapping" "api-gw-mapping-041218" {
 }
 
 module "stack-041218" {
-  source = "stack_new"
+  source = "stack-041218"
 
   namespace = "storage-041218"
 

@@ -22,6 +22,8 @@ module "archivist" {
   env_vars_length = 4
 
   container_image = "${var.archivist_container_image}"
+
+  launch_type = "EC2"
 }
 
 # bags aka registrar-async
@@ -49,6 +51,8 @@ module "bags" {
   env_vars_length = 5
 
   container_image = "${var.registrar_async_container_image}"
+
+  launch_type = "FARGATE"
 }
 
 # notifier
@@ -57,7 +61,7 @@ module "notifier" {
   source = "../modules/service/worker"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  security_group_ids               = ["${var.interservice_security_group_id}"]
+
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   cluster_id                       = "${aws_ecs_cluster.cluster.id}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
@@ -75,6 +79,8 @@ module "notifier" {
   env_vars_length = 3
 
   container_image = "${var.notifier_container_image}"
+
+  launch_type = "FARGATE"
 }
 
 # ingests aka progress-async
@@ -101,6 +107,8 @@ module "ingests" {
   env_vars_length = 3
 
   container_image = "${var.progress_async_container_image}"
+
+  launch_type = "FARGATE"
 }
 
 # Storage API

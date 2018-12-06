@@ -46,7 +46,9 @@ variable "private_subnets" {
 }
 
 variable "vpc_id" {}
-variable "vpc_cidr" {}
+variable "vpc_cidr" {
+  type = "list"
+}
 
 variable "aws_region" {
   default = "eu-west-1"
