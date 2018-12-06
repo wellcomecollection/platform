@@ -393,7 +393,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           eventually {
             server.httpGet(
               path =
-                s"/$apiPrefix/works/${altWork.canonicalId}?_index=$altIndex",
+                s"/$apiPrefix/works/${altWork.canonicalId}?_index=${altIndex.name}",
               andExpect = Status.Ok,
               withJsonBody = s"""
                    |{
@@ -454,7 +454,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
           eventually {
             server.httpGet(
-              path = s"/$apiPrefix/works?query=wombles&_index=$altIndex",
+              path = s"/$apiPrefix/works?query=wombles&_index=${altIndex.name}",
               andExpect = Status.Ok,
               withJsonBody = s"""
                    |{
