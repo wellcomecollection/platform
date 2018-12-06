@@ -21,6 +21,7 @@ def build_bib_record():
     }
     return bib_record
 
+
 def build_sierra_transformable():
     bib_record = build_bib_record()
     sierra_transformable = {
