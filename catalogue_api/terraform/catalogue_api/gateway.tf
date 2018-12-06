@@ -42,6 +42,8 @@ module "remus" {
   ]
 }
 
+# Base path mappings
+
 resource "aws_api_gateway_base_path_mapping" "stage" {
   api_id      = "${aws_api_gateway_rest_api.api.id}"
   stage_name  = "${var.stage_api}"
