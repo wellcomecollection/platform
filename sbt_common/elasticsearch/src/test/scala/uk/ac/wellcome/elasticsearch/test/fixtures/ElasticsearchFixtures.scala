@@ -183,7 +183,6 @@ trait ElasticsearchFixtures
     indexV1name: String,
     indexV2name: String): DisplayElasticConfig =
     DisplayElasticConfig(
-      documentType = documentType,
       indexV1 = Index(indexV1name),
       indexV2 = Index(indexV2name)
     )

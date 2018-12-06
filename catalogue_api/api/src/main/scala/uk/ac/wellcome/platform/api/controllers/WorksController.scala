@@ -28,7 +28,6 @@ abstract class WorksController[M <: MultipleResultsRequest[W],
                                S <: SingleWorkRequest[W],
                                W <: WorksIncludes](
   apiConfig: ApiConfig,
-  documentType: String,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
