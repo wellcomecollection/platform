@@ -70,17 +70,17 @@ class ElasticsearchIndexCreatorTest
   }
 
   it("creates an index into which doc of the expected type can be put") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
+    withLocalElasticsearchIndex(TestIndex) { index =>
       val testObject = TestObject("id", "description", true)
       val testObjectJson = toJson(testObject).get
 
       eventually {
         for {
           _ <- elasticClient.execute(
-            indexInto(indexName / testType).doc(testObjectJson))
+            indexInto(index.name / index.name).doc(testObjectJson))
           response: Response[SearchResponse] <- elasticClient
             .execute {
-              search(s"$indexName/$testType").matchAllQuery()
+              search(index).matchAllQuery()
             }
         } yield {
           val hits = response.result.hits.hits
@@ -96,14 +96,14 @@ class ElasticsearchIndexCreatorTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
+    withLocalElasticsearchIndex(TestIndex) { index =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
       val future: Future[Response[IndexResponse]] =
         elasticClient
           .execute {
-            indexInto(indexName / testType)
+            indexInto(index.name / index.name)
               .doc(badTestObjectJson)
           }
 
@@ -115,8 +115,8 @@ class ElasticsearchIndexCreatorTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    withLocalElasticsearchIndex(TestIndex) { indexName =>
-      withLocalElasticsearchIndex(CompatibleTestIndex, indexName = indexName) {
+    withLocalElasticsearchIndex(TestIndex) { index =>
+      withLocalElasticsearchIndex(CompatibleTestIndex, index = index) {
         _ =>
           val compatibleTestObject = CompatibleTestObject(
             id = "id",
@@ -130,7 +130,7 @@ class ElasticsearchIndexCreatorTest
           val futureInsert: Future[Response[IndexResponse]] =
             elasticClient
               .execute {
-                indexInto(indexName / testType)
+                indexInto(index.name / index.name)
                   .doc(compatibleTestObjectJson)
               }
 
@@ -141,7 +141,7 @@ class ElasticsearchIndexCreatorTest
             eventually {
               val response: Response[SearchResponse] =
                 elasticClient.execute {
-                  search(s"$indexName/$testType").matchAllQuery()
+                  search(index).matchAllQuery()
                 }.await
 
               val hits = response.result.hits.hits

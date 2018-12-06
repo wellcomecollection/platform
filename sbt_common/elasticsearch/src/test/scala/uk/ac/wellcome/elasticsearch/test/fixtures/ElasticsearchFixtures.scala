@@ -65,8 +65,8 @@ trait ElasticsearchFixtures
     implicitly[Position])
 
   def withLocalWorksIndex[R](testWith: TestWith[String, R]): R =
-    withLocalElasticsearchIndex[R](WorksIndex) { indexName =>
-      testWith(indexName)
+    withLocalElasticsearchIndex[R](WorksIndex) { index =>
+      testWith(index.name)
     }
 
   private val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
@@ -75,30 +75,33 @@ trait ElasticsearchFixtures
 
   def withLocalElasticsearchIndex[R](
     mappingDefinitionBuilder: MappingDefinitionBuilder,
-    indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
+    index: Index = createIndex)(testWith: TestWith[Index, R]): R = {
     elasticsearchIndexCreator
       .create(
-        index = Index(indexName),
+        index = index,
         mappingDefinitionBuilder = mappingDefinitionBuilder
       )
       .await
 
     // Elasticsearch is eventually consistent, so the future
     // completing doesn't actually mean that the index exists yet
-    eventuallyIndexExists(indexName)
+    eventuallyIndexExists(index)
 
     try {
-      testWith(indexName)
+      testWith(index)
     } finally {
-      elasticClient.execute(deleteIndex(indexName))
+      elasticClient.execute(deleteIndex(index.name))
     }
   }
 
   def eventuallyIndexExists(indexName: String): Assertion =
+    eventuallyIndexExists(Index(indexName))
+
+  def eventuallyIndexExists(index: Index): Assertion =
     eventually {
       val response: Response[IndexExistsResponse] =
         elasticClient
-          .execute(indexExists(indexName))
+          .execute(indexExists(index.name))
           .await
 
       response.result.isExists shouldBe true
@@ -179,5 +182,8 @@ trait ElasticsearchFixtures
   }
 
   def createIndexName: String =
-    (Random.alphanumeric take 10 mkString) toLowerCase
+    createIndex.name
+
+  def createIndex: Index =
+    Index(name = (Random.alphanumeric take 10 mkString) toLowerCase)
 }
