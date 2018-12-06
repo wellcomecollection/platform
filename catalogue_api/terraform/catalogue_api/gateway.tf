@@ -11,7 +11,7 @@ resource "aws_api_gateway_rest_api" "api" {
 # Stages
 
 module "romulus" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v17.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v17.0.0"
 
   stage_name = "romulus"
   api_id     = "${aws_api_gateway_rest_api.api.id}"
@@ -27,7 +27,7 @@ module "romulus" {
 }
 
 module "remus" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v17.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v17.0.0"
 
   stage_name = "remus"
   api_id     = "${aws_api_gateway_rest_api.api.id}"
@@ -48,14 +48,14 @@ resource "aws_api_gateway_base_path_mapping" "stage" {
   api_id      = "${aws_api_gateway_rest_api.api.id}"
   stage_name  = "${var.stage_api}"
   domain_name = "api-stage.wellcomecollection.org"
-  base_path = "catalogue"
+  base_path   = "catalogue"
 }
 
 resource "aws_api_gateway_base_path_mapping" "prod" {
   api_id      = "${aws_api_gateway_rest_api.api.id}"
   stage_name  = "${var.production_api}"
   domain_name = "api.wellcomecollection.org"
-  base_path = "catalogue"
+  base_path   = "catalogue"
 }
 
 # Resources

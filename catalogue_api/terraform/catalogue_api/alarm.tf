@@ -10,8 +10,8 @@ resource "aws_cloudwatch_metric_alarm" "5xx_alarm" {
 
   dimensions {
     ApiName = "${aws_api_gateway_rest_api.api.name}"
-    Stage  = "${var.production_api}"
+    Stage   = "${var.production_api}"
   }
 
-  alarm_actions     = ["${var.alarm_topic_arn}"]
+  alarm_actions = ["${var.alarm_topic_arn}"]
 }
