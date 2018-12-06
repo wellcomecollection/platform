@@ -38,8 +38,7 @@ trait ElasticsearchFixtures
       "es.host" -> esHost,
       "es.port" -> esPort.toString,
       "es.index.v1" -> indexV1.name,
-      "es.index.v2" -> indexV2.name,
-      "es.type" -> documentType
+      "es.index.v2" -> indexV2.name
     )
 
   val elasticClient: ElasticClient = ElasticClientBuilder.create(
