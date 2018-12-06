@@ -7,23 +7,18 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import com.twitter.inject.Logging
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
+import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.platform.snapshot_generator.flow.{
-  DisplayWorkToJsonStringFlow,
-  IdentifiedWorkToVisibleDisplayWork,
-  StringToGzipFlow
-}
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.flow.{DisplayWorkToJsonStringFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSource
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,12 +26,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class SnapshotService(
   akkaS3Client: S3Client,
   elasticClient: ElasticClient,
-  elasticConfig: DisplayElasticConfig,
-  objectMapper: ObjectMapper)(
+  elasticConfig: DisplayElasticConfig)(
   implicit actorSystem: ActorSystem,
   materializer: ActorMaterializer,
   ec: ExecutionContext
 ) extends Logging {
+  val objectMapper: ObjectMapper with ScalaObjectMapper =
+    DisplayJacksonModule.provideScalaObjectMapper(injector = null)
+
   val s3Endpoint = akkaS3Client.s3Settings.endpointUrl.getOrElse("s3:/")
 
   def buildLocation(bucketName: String, objectKey: String): Uri =

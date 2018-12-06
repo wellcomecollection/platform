@@ -16,6 +16,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SnapshotServiceFixture extends ElasticsearchFixtures { this: Suite =>
+
   val mapper = new ObjectMapper with ScalaObjectMapper
 
   def withSnapshotService[R](
@@ -35,8 +36,7 @@ trait SnapshotServiceFixture extends ElasticsearchFixtures { this: Suite =>
     val snapshotService = new SnapshotService(
       elasticClient = elasticClient,
       elasticConfig = elasticConfig,
-      akkaS3Client = s3AkkaClient,
-      objectMapper = mapper
+      akkaS3Client = s3AkkaClient
     )
 
     testWith(snapshotService)

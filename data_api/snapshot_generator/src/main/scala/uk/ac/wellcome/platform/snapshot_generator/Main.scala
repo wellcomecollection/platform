@@ -7,7 +7,6 @@ import uk.ac.wellcome.config.core.WellcomeTypesafeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.elasticsearch.builders.ElasticBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
-import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.snapshot_generator.config.builders.AkkaS3Builder
 import uk.ac.wellcome.platform.snapshot_generator.services.{SnapshotGeneratorWorkerService, SnapshotService}
@@ -23,9 +22,7 @@ object Main extends WellcomeTypesafeApp {
     val snapshotService = new SnapshotService(
       akkaS3Client = AkkaS3Builder.buildAkkaS3Client(config),
       elasticClient = ElasticBuilder.buildElasticClient(config),
-      elasticConfig = ElasticBuilder.buildElasticConfig(config),
-      objectMapper = DisplayJacksonModule.provideScalaObjectMapper(
-        injector = null)
+      elasticConfig = ElasticBuilder.buildElasticConfig(config)
     )
 
     new SnapshotGeneratorWorkerService(

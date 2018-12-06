@@ -9,6 +9,8 @@ import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.{ElasticClient, JavaClientExceptionWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.display.json.DisplayJsonUtil
+import uk.ac.wellcome.display.json.DisplayJsonUtil._
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes, V2WorksIncludes}
@@ -87,7 +89,7 @@ class SnapshotServiceTest
               DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
             }
             .map {
-              mapper.writeValueAsString(_)
+              DisplayJsonUtil.toJson(_)
             }
             .mkString("\n") + "\n"
 
@@ -135,7 +137,7 @@ class SnapshotServiceTest
               DisplayWorkV2(_, includes = V2WorksIncludes.includeAll())
             }
             .map {
-              mapper.writeValueAsString(_)
+              DisplayJsonUtil.toJson(_)
             }
             .mkString("\n") + "\n"
 
@@ -184,7 +186,7 @@ class SnapshotServiceTest
               DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
             }
             .map {
-              mapper.writeValueAsString(_)
+              DisplayJsonUtil.toJson(_)
             }
             .mkString("\n") + "\n"
 

@@ -81,6 +81,7 @@ class SnapshotGeneratorFeatureTest
 
           actualJsonLines.sorted.zip(expectedJsonLines).foreach {
             case (actualLine, expectedLine) =>
+              println(s"actualLine = <<$actualLine>>")
               assertJsonStringsAreEqual(actualLine, expectedLine)
           }
 
