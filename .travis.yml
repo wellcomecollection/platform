@@ -51,8 +51,6 @@ cache:
     - sbt_common/finatra_akka/target
     - sbt_common/finatra_controllers/target
     - sbt_common/finatra_elasticsearch/target
-    - sbt_common/finatra_messaging/target
-    - sbt_common/finatra_monitoring/target
     - sbt_common/internal_model/target
     - sbt_common/messaging/target
 

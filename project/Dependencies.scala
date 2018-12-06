@@ -160,8 +160,6 @@ object Dependencies {
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
-  val finatraMonitoringDependencies = finatraDependencies ++ WellcomeDependencies.monitoringLibrary
-
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe
   )
