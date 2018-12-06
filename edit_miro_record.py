@@ -27,8 +27,7 @@ def edit_miro_vhs_record(miro_id, reason):
     s3 = boto3.client("s3")
 
     resp = dynamodb.get_item(
-        TableName="vhs-sourcedata-miro",
-        Key={"id": {"S": miro_id}}
+        TableName="vhs-sourcedata-miro", Key={"id": {"S": miro_id}}
     )
 
     try:
@@ -36,10 +35,12 @@ def edit_miro_vhs_record(miro_id, reason):
     except KeyError:
         raise ValueError(f"Unable to find Miro ID {miro_id!r}")
 
-    existing_record = json.loads(s3.get_object(
-        Bucket=item["location"]["M"]["namespace"]["S"],
-        Key=item["location"]["M"]["key"]["S"]
-    )["Body"].read())
+    existing_record = json.loads(
+        s3.get_object(
+            Bucket=item["location"]["M"]["namespace"]["S"],
+            Key=item["location"]["M"]["key"]["S"],
+        )["Body"].read()
+    )
 
     record = copy.deepcopy(existing_record)
     yield record
@@ -64,23 +65,18 @@ def edit_miro_vhs_record(miro_id, reason):
     s3.put_object(
         Bucket=item["location"]["M"]["namespace"]["S"],
         Key=item["location"]["M"]["key"]["S"],
-        Body=json_string
+        Body=json_string,
     )
 
     print(f"Updating DynamoDB item {miro_id}")
-    dynamodb.put_item(
-        TableName="vhs-sourcedata-miro",
-        Item=item
-    )
+    dynamodb.put_item(TableName="vhs-sourcedata-miro", Item=item)
 
 
 @click.command()
 @click.option(
     "--miro-id", required=True, prompt="Which Miro record do you want to edit?"
 )
-@click.option(
-    "--reason", required=True, prompt="Why are you editing this Miro record?"
-)
+@click.option("--reason", required=True, prompt="Why are you editing this Miro record?")
 def edit_miro_record(miro_id, reason):
     with edit_miro_vhs_record(miro_id=miro_id, reason=reason) as r:
         r_saved = copy.deepcopy(r)
@@ -95,7 +91,7 @@ def edit_miro_record(miro_id, reason):
         r.update(json.load(open(tmp_path)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Allows us to omit the '--miro-id' argument and click is still happy.
     if len(sys.argv) == 2:
         sys.argv = [sys.argv[0], "--miro-id", sys.argv[1]]
