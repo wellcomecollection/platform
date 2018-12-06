@@ -20,6 +20,18 @@ resource "aws_iam_role_policy" "archivist_task_get_s3_workflow" {
   policy = "${var.ingest_get_policy_json}"
 }
 
+# bags aka registrar-async
+
+resource "aws_iam_role_policy" "bags_archive_get" {
+  role   = "${module.bags.task_role_name}"
+  policy = "${var.archive_get_policy_json}"
+}
+
+resource "aws_iam_role_policy" "bags_vhs_write" {
+  role   = "${module.bags.task_role_name}"
+  policy = "${var.vhs_archive_manifest_full_access_policy_json}"
+}
+
 # archivist-nvm
 
 resource "aws_iam_role_policy" "archivist-nvm_task_store_s3" {
