@@ -2,8 +2,8 @@ from transform import transform
 
 
 def test_cleans_simple_date():
-    test_dict = {"all_amendment_date": "01/01/1970"}
-    assert transform(test_dict) == {"all_amendment_date": "1970-01-01"}
+    test_dict = {"all_amendment_date": "01/02/2003"}
+    assert transform(test_dict) == {"all_amendment_date": "2003-01-02"}
 
 
 def test_handles_null_date():
