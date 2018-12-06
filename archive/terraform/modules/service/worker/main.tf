@@ -1,6 +1,5 @@
-variable "launch_type" {}
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling?ref=5c6261da46d7108bc02b0fc262eda29e27db1edf"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling?ref=f8377cc803854d84c29fa30da76629d052916ed2"
 
   service_name    = "${var.service_name}"
   container_image = "${var.container_image}"
@@ -14,6 +13,11 @@ module "service" {
   cluster_name = "${var.cluster_name}"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
+
+  cpu = "${var.cpu}"
+  memory = "${var.memory}"
+
+  security_group_ids = ["${var.security_group_ids}"]
 
   metric_namespace = "${var.metric_namespace}"
   high_metric_name = "${var.high_metric_name}"

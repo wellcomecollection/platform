@@ -40,3 +40,20 @@ variable "min_capacity" {
 variable "max_capacity" {
   default = "1"
 }
+
+variable "launch_type" {
+  default = "FARGATE"
+}
+
+variable "security_group_ids" {
+  type = "list"
+  default = []
+}
+
+variable "cpu" {
+  default = 512
+}
+
+variable "memory" {
+  default = 1024
+}

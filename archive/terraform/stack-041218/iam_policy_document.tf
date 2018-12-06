@@ -22,3 +22,16 @@ data "aws_iam_policy_document" "archive_progress_table_read_write_policy" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "bagger_queue_discovery" {
+  statement {
+    actions = [
+      "sqs:ChangeMessageVisibility",
+      "sqs:GetQueueUrl",
+    ]
+
+    resources = [
+      "${module.bagger_queue.arn}",
+    ]
+  }
+}

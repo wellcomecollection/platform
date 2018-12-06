@@ -21,8 +21,15 @@ module "archivist" {
 
   env_vars_length = 4
 
+  min_capacity = "4"
+  max_capacity = "4"
+
+  cpu    = "1900"
+  memory = "14000"
+
   container_image = "${var.archivist_container_image}"
 
+  # The maximum number of tasks is limited by the availability of network interfaces
   launch_type = "EC2"
 }
 
@@ -51,8 +58,6 @@ module "bags" {
   env_vars_length = 5
 
   container_image = "${var.registrar_async_container_image}"
-
-  launch_type = "FARGATE"
 }
 
 # notifier
@@ -61,6 +66,7 @@ module "notifier" {
   source = "../modules/service/worker"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
+  security_group_ids = ["${var.interservice_security_group_id}"]
 
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   cluster_id                       = "${aws_ecs_cluster.cluster.id}"
@@ -79,8 +85,6 @@ module "notifier" {
   env_vars_length = 3
 
   container_image = "${var.notifier_container_image}"
-
-  launch_type = "FARGATE"
 }
 
 # ingests aka progress-async
@@ -107,8 +111,6 @@ module "ingests" {
   env_vars_length = 3
 
   container_image = "${var.progress_async_container_image}"
-
-  launch_type = "FARGATE"
 }
 
 # Storage API

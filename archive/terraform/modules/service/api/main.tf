@@ -1,5 +1,5 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/rest/tcp?ref=5c6261da46d7108bc02b0fc262eda29e27db1edf"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/rest/tcp?ref=f8377cc803854d84c29fa30da76629d052916ed2"
 
   vpc_id  = "${var.vpc_id}"
   subnets = ["${var.subnets}"]
@@ -23,7 +23,7 @@ module "service" {
 }
 
 module "task" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=5c6261da46d7108bc02b0fc262eda29e27db1edf"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=f8377cc803854d84c29fa30da76629d052916ed2"
 
   task_name = "${var.namespace}"
 

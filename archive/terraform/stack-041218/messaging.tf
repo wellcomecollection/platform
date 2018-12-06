@@ -15,9 +15,9 @@ module "ingests_topic" {
   namespace = "${var.namespace}_ingests"
 
   role_names = [
-    "${module.ingests.name}",
-    "${module.archivist.name}",
-    "${module.notifier.name}",
+    "${module.ingests.task_role_name}",
+    "${module.archivist.task_role_name}",
+    "${module.notifier.task_role_name}",
   ]
 }
 
@@ -32,7 +32,7 @@ module "ingests_queue" {
   account_id = "${var.current_account_id}"
 
   role_names = [
-    "${module.ingests.name}",
+    "${module.ingests.task_role_name}",
   ]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
@@ -44,7 +44,7 @@ module "archivist_topic" {
   source = "../modules/topic"
 
   namespace  = "${var.namespace}_archivist"
-  role_names = ["${module.archivist.name}"]
+  role_names = ["${module.archivist.task_role_name}"]
 }
 
 module "archivist_queue" {
@@ -56,7 +56,7 @@ module "archivist_queue" {
 
   aws_region = "${var.aws_region}"
   account_id = "${var.current_account_id}"
-  role_names = ["${module.archivist.name}"]
+  role_names = ["${module.archivist.task_role_name}"]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
@@ -67,7 +67,7 @@ module "bags_topic" {
   source = "../modules/topic"
 
   namespace  = "${var.namespace}_bags"
-  role_names = ["${module.archivist.name}"]
+  role_names = ["${module.archivist.task_role_name}"]
 }
 
 module "bags_queue" {
@@ -79,7 +79,7 @@ module "bags_queue" {
 
   aws_region = "${var.aws_region}"
   account_id = "${var.current_account_id}"
-  role_names = ["${module.bags.name}"]
+  role_names = ["${module.bags.task_role_name}"]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
@@ -90,7 +90,7 @@ module "notifier_topic" {
   source = "../modules/topic"
 
   namespace  = "${var.namespace}_notifier"
-  role_names = ["${module.ingests.name}"]
+  role_names = ["${module.ingests.task_role_name}"]
 }
 
 module "notifier_queue" {
@@ -102,7 +102,7 @@ module "notifier_queue" {
 
   aws_region = "${var.aws_region}"
   account_id = "${var.current_account_id}"
-  role_names = ["${module.notifier.name}"]
+  role_names = ["${module.notifier.task_role_name}"]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
@@ -125,7 +125,7 @@ module "bagger_queue" {
 
   aws_region = "${var.aws_region}"
   account_id = "${var.current_account_id}"
-  role_names = ["${module.bagger.name}"]
+  role_names = ["${module.bagger.task_role_name}"]
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
@@ -134,5 +134,5 @@ module "bagging_complete_topic" {
   source = "../modules/topic"
 
   namespace  = "${var.namespace}_bagging_complete"
-  role_names = ["${module.bagger.name}"]
+  role_names = ["${module.bagger.task_role_name}"]
 }
