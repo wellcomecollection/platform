@@ -66,15 +66,15 @@ module "notifier" {
   source = "../modules/service/worker"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  security_group_ids = ["${var.interservice_security_group_id}"]
+  security_group_ids               = ["${var.interservice_security_group_id}"]
 
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${var.private_subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}-notifier"
-  aws_region                       = "${var.aws_region}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets      = "${var.private_subnets}"
+  vpc_id       = "${var.vpc_id}"
+  service_name = "${var.namespace}-notifier"
+  aws_region   = "${var.aws_region}"
 
   env_vars = {
     context_url        = "https://api.wellcomecollection.org/storage/v1/context.json"

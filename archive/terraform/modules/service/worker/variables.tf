@@ -46,7 +46,7 @@ variable "launch_type" {
 }
 
 variable "security_group_ids" {
-  type = "list"
+  type    = "list"
   default = []
 }
 

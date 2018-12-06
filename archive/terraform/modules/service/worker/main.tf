@@ -14,7 +14,7 @@ module "service" {
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
 
-  cpu = "${var.cpu}"
+  cpu    = "${var.cpu}"
   memory = "${var.memory}"
 
   security_group_ids = ["${var.security_group_ids}"]

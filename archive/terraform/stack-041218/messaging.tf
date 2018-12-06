@@ -44,7 +44,7 @@ module "archivist_queue" {
   namespace = "${replace(var.namespace,"-","")}_archivist"
 
   topic_names = [
-    "${module.ingest_requests_topic.name}"
+    "${module.ingest_requests_topic.name}",
   ]
 
   aws_region = "${var.aws_region}"

@@ -19,7 +19,7 @@ module "bags" {
     "${aws_security_group.service_lb_ingress_security_group.id}",
     "${var.interservice_security_group_id}",
   ]
-  
+
   subnets = ["${var.subnets}"]
 
   nginx_container_port  = "${var.bags_nginx_container_port}"
