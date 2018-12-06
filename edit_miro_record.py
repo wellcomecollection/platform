@@ -79,7 +79,6 @@ def edit_miro_vhs_record(miro_id, reason):
 @click.option("--reason", required=True, prompt="Why are you editing this Miro record?")
 def edit_miro_record(miro_id, reason):
     with edit_miro_vhs_record(miro_id=miro_id, reason=reason) as r:
-        r_saved = copy.deepcopy(r)
         tmp_path = os.path.join(tempfile.mkdtemp(), f"{miro_id}.json")
 
         with open(tmp_path, "w") as outfile:
