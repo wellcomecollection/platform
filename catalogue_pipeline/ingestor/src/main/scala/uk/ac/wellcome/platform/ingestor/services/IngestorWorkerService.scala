@@ -29,7 +29,7 @@ class IngestorWorkerService(elasticClient: ElasticClient,
   )
 
   elasticsearchIndexCreator.create(
-    indexName = ingestorConfig.elasticConfig.indexName,
+    index = ingestorConfig.index,
     mappingDefinitionBuilder = WorksIndex
   )
 
@@ -57,7 +57,7 @@ class IngestorWorkerService(elasticClient: ElasticClient,
       works <- Future.successful(messageBundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
         works = works,
-        indexName = ingestorConfig.elasticConfig.indexName
+        index = ingestorConfig.index
       )
     } yield {
       val failedWorks = either.left.getOrElse(Nil)

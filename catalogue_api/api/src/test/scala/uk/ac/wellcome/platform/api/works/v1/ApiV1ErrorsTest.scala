@@ -253,9 +253,9 @@ class ApiV1ErrorsTest extends ApiV1WorksTestBase {
     // to sort on.  Trying to query this index of these will trigger one such exception!
     withV1Api {
       case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-        withEmptyIndex { indexName =>
+        withEmptyIndex { index =>
           server.httpGet(
-            path = s"/$apiPrefix/works?_index=$indexName",
+            path = s"/$apiPrefix/works?_index=${index.name}",
             andExpect = Status.InternalServerError,
             withJsonBody = s"""
                  |{

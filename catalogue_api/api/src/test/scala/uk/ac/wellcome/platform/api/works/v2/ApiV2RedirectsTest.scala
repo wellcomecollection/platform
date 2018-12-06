@@ -8,8 +8,8 @@ class ApiV2RedirectsTest extends ApiV2WorksTestBase {
     val redirectedWork = createIdentifiedRedirectedWork
 
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
-        insertIntoElasticsearch(indexNameV2, redirectedWork)
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+        insertIntoElasticsearch(indexV2, redirectedWork)
         server.httpGet(
           path = s"/$apiPrefix/works/${redirectedWork.canonicalId}",
           andExpect = Status.Found,
@@ -24,8 +24,8 @@ class ApiV2RedirectsTest extends ApiV2WorksTestBase {
     val redirectedWork = createIdentifiedRedirectedWork
 
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
-        insertIntoElasticsearch(indexNameV2, redirectedWork)
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+        insertIntoElasticsearch(indexV2, redirectedWork)
         server.httpGet(
           path =
             s"/$apiPrefix/works/${redirectedWork.canonicalId}?include=identifiers",

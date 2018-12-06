@@ -8,6 +8,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Inject
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import com.twitter.inject.Logging
 import uk.ac.wellcome.display.models._
@@ -54,14 +55,14 @@ class SnapshotService @Inject()(akkaS3Client: S3Client,
         runStream(
           publicBucketName = publicBucketName,
           publicObjectKey = publicObjectKey,
-          indexName = elasticConfig.indexV1name,
+          index = elasticConfig.indexV1,
           toDisplayWork = DisplayWorkV1.apply(_, V1WorksIncludes.includeAll())
         )
       case ApiVersions.v2 =>
         runStream(
           publicBucketName = publicBucketName,
           publicObjectKey = publicObjectKey,
-          indexName = elasticConfig.indexV2name,
+          index = elasticConfig.indexV2,
           toDisplayWork = DisplayWorkV2.apply(_, V2WorksIncludes.includeAll())
         )
     }
@@ -81,15 +82,13 @@ class SnapshotService @Inject()(akkaS3Client: S3Client,
 
   private def runStream(publicBucketName: String,
                         publicObjectKey: String,
-                        indexName: String,
+                        index: Index,
                         toDisplayWork: IdentifiedWork => DisplayWork)
     : Future[MultipartUploadResult] = {
 
     // This source outputs DisplayWorks in the elasticsearch index.
     val displayWorks: Source[DisplayWork, Any] =
-      ElasticsearchWorksSource(
-        elasticClient = elasticClient,
-        indexName = indexName)
+      ElasticsearchWorksSource(elasticClient = elasticClient, index = index)
         .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
 
     // This source generates JSON strings of DisplayWork instances, which

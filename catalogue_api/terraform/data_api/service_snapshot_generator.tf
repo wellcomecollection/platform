@@ -25,11 +25,10 @@ module "snapshot_generator" {
     es_protocol       = "${var.es_cluster_credentials["protocol"]}"
     es_index_v1       = "${var.es_config_snapshot["index_v1"]}"
     es_index_v2       = "${var.es_config_snapshot["index_v2"]}"
-    es_doc_type       = "${var.es_config_snapshot["doc_type"]}"
     metrics_namespace = "snapshot_generator"
   }
 
-  env_vars_length = 11
+  env_vars_length = 10
 
   memory = 4096
   cpu    = 2048

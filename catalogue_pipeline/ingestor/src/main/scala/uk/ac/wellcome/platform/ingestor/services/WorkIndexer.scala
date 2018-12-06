@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.Indexable
+import com.sksamuel.elastic4s.{Index, Indexable}
 import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
@@ -28,7 +28,7 @@ class WorkIndexer(
       toJson(t).get
   }
 
-  def indexWorks(works: Seq[IdentifiedBaseWork], indexName: String)
+  def indexWorks(works: Seq[IdentifiedBaseWork], index: Index)
     : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
@@ -39,7 +39,7 @@ class WorkIndexer(
       //
       // Our prod cluster is already creating a single "type" with the same name
       // as the index, so do the same here.
-      indexInto(indexName / indexName)
+      indexInto(index.name / index.name)
         .version(calculateEsVersion(work))
         .versionType(ExternalGte)
         .id(work.canonicalId)

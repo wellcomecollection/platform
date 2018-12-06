@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.api.works
 
-import com.sksamuel.elastic4s.Indexable
+import com.sksamuel.elastic4s.{Index, Indexable}
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
@@ -24,14 +24,14 @@ trait ApiWorksTestBase
       toJson(t).get
   }
 
-  def withServer[R](indexNameV1: String, indexNameV2: String)(
+  def withServer[R](indexV1: Index, indexV2: Index)(
     testWith: TestWith[EmbeddedHttpServer, R]): R = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
       flags = displayEsLocalFlags(
-        indexNameV1 = indexNameV1,
-        indexNameV2 = indexNameV2
+        indexV1 = indexV1,
+        indexV2 = indexV2
       )
     )
 
@@ -46,7 +46,7 @@ trait ApiWorksTestBase
 
   def withApiFixtures[R](apiVersion: ApiVersions.Value,
                          apiName: String = "catalogue/")(
-    testWith: TestWith[(String, String, String, EmbeddedHttpServer), R]): R =
+    testWith: TestWith[(String, Index, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV1 =>
       withLocalWorksIndex { indexV2 =>
         withServer(indexV1, indexV2) { server =>
@@ -103,16 +103,16 @@ trait ApiWorksTestBase
       "description": "This work has been deleted"
     }"""
 
-  def withEmptyIndex[R]: Fixture[String, R] =
-    fixture[String, R](
+  def withEmptyIndex[R]: Fixture[Index, R] =
+    fixture[Index, R](
       create = {
-        val indexName = createIndexName
+        val index = Index(randomAlphanumeric(length = 10))
         elasticClient
           .execute {
-            createIndex(indexName)
+            createIndex(index.name)
           }
-        eventuallyIndexExists(indexName)
-        indexName
+        eventuallyIndexExists(index)
+        index
       },
       destroy = eventuallyDeleteIndex
     )
