@@ -16,7 +16,7 @@ object ElasticConfigModule extends TwitterModule {
   def providesElasticConfig(): DisplayElasticConfig =
     DisplayElasticConfig(
       documentType = documentType(),
-      indexV1name = indexV1name(),
-      indexV2name = indexV2name()
+      indexNameV1 = indexV1name(),
+      indexNameV2 = indexV2name()
     )
 }
