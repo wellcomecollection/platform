@@ -1,4 +1,4 @@
-package uk.ac.wellcome.finatra.akka
+package uk.ac.wellcome.platform.api.akka
 
 import akka.actor.ActorSystem
 import com.google.inject.{Injector, Provides, Singleton}

@@ -44,16 +44,6 @@ lazy val messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
 
-lazy val finatra_akka = doSharedLibrarySetup(project, "sbt_common/finatra_akka")
-  .settings(libraryDependencies ++= Dependencies.finatraAkkaDependencies)
-
-lazy val finatra_controllers = doSharedLibrarySetup(project, "sbt_common/finatra_controllers")
-  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
-
-lazy val finatra_elasticsearch = doSharedLibrarySetup(project, "sbt_common/finatra_elasticsearch")
-  .dependsOn(elasticsearch % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.finatraAkkaDependencies)
-
 lazy val config_core = doSharedLibrarySetup(project, "sbt_common/config/core")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
@@ -81,9 +71,8 @@ lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(display % "compile->compile;test->test")
-  .dependsOn(finatra_akka % "compile->compile;test->test")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_elasticsearch % "compile->compile;test->test")
+  .dependsOn(elasticsearch % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.apiDependencies)
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
 
@@ -214,10 +203,6 @@ lazy val root = (project in file("."))
     display,
     elasticsearch,
     messaging,
-
-    finatra_akka,
-    finatra_controllers,
-    finatra_elasticsearch,
 
     config_core,
     config_messaging,
