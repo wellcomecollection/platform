@@ -9,11 +9,11 @@ import uk.ac.wellcome.models.work.internal.BaseWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.merger.services._
 import uk.ac.wellcome.storage.fixtures.S3
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends LocalWorksVhs with Messaging with S3 {
+trait WorkerServiceFixture extends LocalWorksVhs with Akka with Messaging with S3 {
   def withWorkerService[R](vhs: TransformedBaseWorkVHS,
                            topic: Topic,
                            queue: Queue,
