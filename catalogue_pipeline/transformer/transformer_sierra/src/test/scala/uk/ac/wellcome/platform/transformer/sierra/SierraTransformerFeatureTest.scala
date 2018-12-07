@@ -15,13 +15,14 @@ import uk.ac.wellcome.platform.transformer.sierra.fixtures.HybridRecordReceiverF
 import uk.ac.wellcome.platform.transformer.sierra.services.SierraTransformerWorkerService
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraTransformerFeatureTest
     extends FunSpec
     with Matchers
+    with Akka
     with SQS
     with SNS
     with S3

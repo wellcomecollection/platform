@@ -14,13 +14,14 @@ import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWr
 import uk.ac.wellcome.platform.transformer.miro.services.MiroTransformerWorkerService
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class MiroTransformerFeatureTest
     extends FunSpec
     with Matchers
+    with Akka
     with SQS
     with SNS
     with S3
