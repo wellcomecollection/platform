@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.idminter
 
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.json.JsonUtil._

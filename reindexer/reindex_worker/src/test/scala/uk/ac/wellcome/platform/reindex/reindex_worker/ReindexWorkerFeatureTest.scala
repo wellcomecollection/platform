@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.reindex.reindex_worker
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.{SNS, SQS}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.WorkerServiceFixture

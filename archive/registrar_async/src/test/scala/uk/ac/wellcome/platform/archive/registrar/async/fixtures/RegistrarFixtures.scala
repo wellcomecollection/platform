@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.model._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.fixtures.ArchiveMessaging
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar

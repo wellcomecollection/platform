@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.archive.notifier.fixtures
 import java.net.{URI, URL}
 
 import com.amazonaws.services.sns.model.PublishResult
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.platform.archive.notifier.Notifier
 import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagIt}
 import uk.ac.wellcome.platform.archive.common.models.NotificationMessage

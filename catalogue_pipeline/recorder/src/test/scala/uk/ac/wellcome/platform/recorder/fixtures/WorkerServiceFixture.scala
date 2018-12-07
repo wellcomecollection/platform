@@ -1,9 +1,9 @@
 package uk.ac.wellcome.platform.recorder.fixtures
 
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.recorder.services.RecorderWorkerService

@@ -4,7 +4,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.json.{
   URIConverters,

@@ -4,9 +4,9 @@ import java.io.File
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.Archivist
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.common.fixtures.{

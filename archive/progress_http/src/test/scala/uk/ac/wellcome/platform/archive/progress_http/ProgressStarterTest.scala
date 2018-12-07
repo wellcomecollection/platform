@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.archive.progress_http
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SNS
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.common.models.{
   IngestBagRequest,
   StorageSpace

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.FunSpec
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.platform.sierra_item_merger.fixtures.SierraItemMergerFixtures
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table

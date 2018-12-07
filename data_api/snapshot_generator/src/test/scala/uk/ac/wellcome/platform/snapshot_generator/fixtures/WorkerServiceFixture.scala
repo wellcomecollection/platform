@@ -5,9 +5,9 @@ import akka.stream.ActorMaterializer
 import com.sksamuel.elastic4s.Index
 import org.scalatest.Suite
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.snapshot_generator.services.SnapshotGeneratorWorkerService
 import uk.ac.wellcome.test.fixtures.TestWith
 

@@ -7,7 +7,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
