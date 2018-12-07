@@ -19,6 +19,10 @@ variable "container_port" {
   default = "80"
 }
 
+variable "health_check_path" {}
+
+variable "application_path" {}
+
 variable "service_discovery_namespace" {
   default = "labs"
 }
@@ -26,8 +30,6 @@ variable "service_discovery_namespace" {
 variable "aws_region" {
   default = "eu-west-1"
 }
-
-variable "health_check_path" {}
 
 variable "memory" {
   default = "2048"
