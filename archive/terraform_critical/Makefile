@@ -10,7 +10,7 @@ SBT_NO_DOCKER_LIBRARIES =
 ECS_TASKS 	=
 LAMBDAS 	=
 
-TF_NAME 	= archive_critical
+TF_NAME 	= critical_archive
 TF_PATH 	= $(STACK_ROOT)
 
 TF_IS_PUBLIC_FACING = false
