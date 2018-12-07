@@ -1,4 +1,4 @@
-package uk.ac.wellcome.finatra.elasticsearch
+package uk.ac.wellcome.platform.api.elasticsearch
 
 import com.google.inject.{Provides, Singleton}
 import com.sksamuel.elastic4s.http.ElasticClient

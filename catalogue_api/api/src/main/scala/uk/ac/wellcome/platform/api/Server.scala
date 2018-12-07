@@ -9,12 +9,12 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.finatra.akka.ExecutionContextModule
-import uk.ac.wellcome.finatra.elasticsearch.{
+import uk.ac.wellcome.platform.api.akka.ExecutionContextModule
+import uk.ac.wellcome.platform.api.controllers._
+import uk.ac.wellcome.platform.api.elasticsearch.{
   ElasticClientModule,
   ElasticConfigModule
 }
-import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.{
   CaseClassMappingExceptionWrapper,
   GeneralExceptionMapper
