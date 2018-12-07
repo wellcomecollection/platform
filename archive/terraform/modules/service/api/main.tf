@@ -1,5 +1,5 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/rest/tcp?ref=8037d31e4277fdd253b57182c4a54ca312b624be"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/rest/tcp?ref=fe2fd3808864566da29cee87136e8b68da77f2e9"
 
   vpc_id  = "${var.vpc_id}"
   subnets = ["${var.subnets}"]

@@ -1,5 +1,5 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling+nvm?ref=8037d31e4277fdd253b57182c4a54ca312b624be"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling+nvm?ref=fe2fd3808864566da29cee87136e8b68da77f2e9"
 
   service_name    = "${var.service_name}"
   container_image = "${var.container_image}"
