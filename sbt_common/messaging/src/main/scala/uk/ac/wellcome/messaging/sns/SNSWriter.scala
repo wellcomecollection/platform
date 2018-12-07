@@ -9,8 +9,7 @@ import scala.concurrent.Future
   * `snsConfig`, and writes to the same topic on every request.
   *
   */
-class SNSWriter(snsMessageWriter: SNSMessageWriter,
-                snsConfig: SNSConfig)
+class SNSWriter(snsMessageWriter: SNSMessageWriter, snsConfig: SNSConfig)
     extends Logging {
 
   def writeMessage(message: String, subject: String): Future[PublishAttempt] =

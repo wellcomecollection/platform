@@ -12,8 +12,7 @@ import scala.concurrent.{blocking, ExecutionContext, Future}
   * every request.
   *
   */
-class SNSMessageWriter(snsClient: AmazonSNS)(
-  implicit ec: ExecutionContext)
+class SNSMessageWriter(snsClient: AmazonSNS)(implicit ec: ExecutionContext)
     extends Logging {
   def writeMessage(message: String,
                    subject: String,

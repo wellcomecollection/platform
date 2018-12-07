@@ -35,7 +35,8 @@ trait Messaging
 
   case class ExampleObject(name: String)
 
-  def withLocalStackSubscription[R](queue: Queue, topic: Topic): Fixture[SubscribeResult, R] =
+  def withLocalStackSubscription[R](queue: Queue,
+                                    topic: Topic): Fixture[SubscribeResult, R] =
     fixture[SubscribeResult, R](
       create = {
         val subRequest = new SubscribeRequest(topic.arn, "sqs", queue.arn)
@@ -54,8 +55,9 @@ trait Messaging
                                         topic: Topic,
                                         writerSnsClient: AmazonSNS = snsClient)(
     testWith: TestWith[MessageWriter[ExampleObject], R]): R =
-    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient) { messageWriter =>
-      testWith(messageWriter)
+    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient) {
+      messageWriter =>
+        testWith(messageWriter)
     }
 
   def withMessageWriter[T, R](bucket: Bucket,
