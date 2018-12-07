@@ -89,7 +89,11 @@ module "notifier" {
   source = "../modules/service/worker"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  security_group_ids               = ["${var.interservice_security_group_id}"]
+
+  security_group_ids               = [
+    "${var.interservice_security_group_id}",
+    "${var.service_egress_security_group_id}"
+  ]
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
