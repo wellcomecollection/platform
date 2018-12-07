@@ -1,32 +1,29 @@
-import WellcomeDependencies.versions
 import sbt._
 
 object WellcomeDependencies {
-  private lazy val versions = new {
-    val json = "1.1.1"
-    val messaging = "0.0.1"
-    val monitoring = "1.1.0"
-    val storage = "2.7.0"
-  }
-
-  val jsonLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "json" % versions.json,
-    "uk.ac.wellcome" %% "json" % versions.json % "test" classifier "tests"
+  val jsonLibrary: Seq[ModuleID] = library(
+    name = "json",
+    version = "1.1.1"
   )
 
-  val messagingLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "monitoring" % versions.monitoring,
-    "uk.ac.wellcome" %% "monitoring" % versions.monitoring % "test" classifier "tests"
+  val messagingLibrary: Seq[ModuleID] = library(
+    name = "messaging",
+    version = "0.0.1"
   )
 
-  val monitoringLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "monitoring" % versions.monitoring,
-    "uk.ac.wellcome" %% "monitoring" % versions.monitoring % "test" classifier "tests"
+  val monitoringLibrary: Seq[ModuleID] = library(
+    name = "monitoring",
+    version = "1.1.1"
   )
 
-  val storageLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "storage" % versions.storage,
-    "uk.ac.wellcome" %% "storage" % versions.storage % "test" classifier "tests"
+  val storageLibrary: Seq[ModuleID] = library(
+    name = "storage",
+    version = "2.7.0"
+  )
+
+  private def library(name: String, version: String): Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" %% name % version,
+    "uk.ac.wellcome" %% name % version % "test" classifier "tests"
   )
 }
 
