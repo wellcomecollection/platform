@@ -15,7 +15,10 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-trait WorkerServiceFixture extends ElasticsearchFixtures with Messaging with Akka {
+trait WorkerServiceFixture
+    extends ElasticsearchFixtures
+    with Messaging
+    with Akka {
   this: Suite =>
   def withWorkerService[R](queue: Queue,
                            index: Index,
