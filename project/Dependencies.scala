@@ -4,6 +4,7 @@ import sbt._
 object WellcomeDependencies {
   private lazy val versions = new {
     val json = "1.1.1"
+    val messaging = "0.0.1"
     val monitoring = "1.1.0"
     val storage = "2.7.0"
   }
@@ -11,6 +12,11 @@ object WellcomeDependencies {
   val jsonLibrary: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "json" % versions.json,
     "uk.ac.wellcome" %% "json" % versions.json % "test" classifier "tests"
+  )
+
+  val messagingLibrary: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" %% "monitoring" % versions.monitoring,
+    "uk.ac.wellcome" %% "monitoring" % versions.monitoring % "test" classifier "tests"
   )
 
   val monitoringLibrary: Seq[ModuleID] = Seq(
@@ -150,19 +156,13 @@ object Dependencies {
       guiceDependencies ++
       scalacheckDependencies
 
-  val commonMessagingDependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
-    "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
-    "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka,
-    "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ testDependencies
-
   val apiDependencies: Seq[ModuleID] = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe
   )
+
+  val configMessagingDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.messagingLibrary
 
   val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
 
