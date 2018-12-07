@@ -2,7 +2,6 @@ package uk.ac.wellcome.messaging.sns
 
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Encoder
 import uk.ac.wellcome.json.JsonUtil._
@@ -13,7 +12,7 @@ import scala.concurrent.{blocking, ExecutionContext, Future}
   * every request.
   *
   */
-class SNSMessageWriter @Inject()(snsClient: AmazonSNS)(
+class SNSMessageWriter(snsClient: AmazonSNS)(
   implicit ec: ExecutionContext)
     extends Logging {
   def writeMessage(message: String,
