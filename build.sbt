@@ -71,6 +71,8 @@ lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(display % "compile->compile;test->test")
+  .dependsOn(elasticsearch % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.apiDependencies)
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
 

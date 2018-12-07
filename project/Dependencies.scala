@@ -158,7 +158,7 @@ object Dependencies {
     "io.circe" %% "circe-yaml" % "0.8.0"
   ) ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ testDependencies
 
-  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
+  val apiDependencies: Seq[ModuleID] = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe
