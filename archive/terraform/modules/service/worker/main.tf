@@ -1,5 +1,5 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling?ref=bc90a72acbedfc47ab1d5f9f91b57d739fbb03b5"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling?ref=8037d31e4277fdd253b57182c4a54ca312b624be"
 
   service_name    = "${var.service_name}"
   container_image = "${var.container_image}"
