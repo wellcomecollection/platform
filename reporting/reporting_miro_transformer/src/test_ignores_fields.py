@@ -1,8 +1,10 @@
+import json
 from transform import transform
 
 
 def raw_data():
-    return """{
+    return json.loads(
+        """{
                 \"an_array\": [
                     \"a value\",
                     \"another value\"
@@ -18,6 +20,7 @@ def raw_data():
                   },
                 \"image_source\": \"ignored field\"
             }"""
+    )
 
 
 def transformed_data():
@@ -32,5 +35,4 @@ def transformed_data():
 
 
 def test_ignores_bad_fields():
-    test_dict = {"data": raw_data()}
-    assert transform(test_dict) == transformed_data()
+    assert transform(raw_data()) == transformed_data()

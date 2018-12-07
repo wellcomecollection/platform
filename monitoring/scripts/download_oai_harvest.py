@@ -51,7 +51,7 @@ def fetch_calm_records():
                 "token"
             )
         except Exception:
-            raise StopIteration
+            break
 
         if "resumptionToken" in params and "metadataPrefix" in params:
             del params["metadataPrefix"]
