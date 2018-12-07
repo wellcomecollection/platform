@@ -1,6 +1,5 @@
 package uk.ac.wellcome.messaging.sns
 
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Encoder
 
@@ -10,8 +9,7 @@ import scala.concurrent.Future
   * `snsConfig`, and writes to the same topic on every request.
   *
   */
-class SNSWriter @Inject()(snsMessageWriter: SNSMessageWriter,
-                          snsConfig: SNSConfig)
+class SNSWriter(snsMessageWriter: SNSMessageWriter, snsConfig: SNSConfig)
     extends Logging {
 
   def writeMessage(message: String, subject: String): Future[PublishAttempt] =

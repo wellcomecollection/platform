@@ -42,17 +42,6 @@ trait SNS extends Matchers with Logging {
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  def snsLocalFlags(topic: Topic) = snsLocalClientFlags ++ Map(
-    "aws.sns.topic.arn" -> topic.arn
-  )
-
-  def snsLocalClientFlags = Map(
-    "aws.sns.endpoint" -> localSNSEndpointUrl,
-    "aws.sns.accessKey" -> accessKey,
-    "aws.sns.secretKey" -> secretKey,
-    "aws.sns.region" -> regionName
-  )
-
   val snsClient: AmazonSNS = SNSClientFactory.create(
     region = regionName,
     endpoint = localSNSEndpointUrl,
@@ -60,7 +49,7 @@ trait SNS extends Matchers with Logging {
     secretKey = secretKey
   )
 
-  def withLocalSnsTopic[R] = fixture[Topic, R](
+  def withLocalSnsTopic[R]: Fixture[Topic, R] = fixture[Topic, R](
     create = {
       val topicName = Random.alphanumeric take 10 mkString
       val arn = snsClient.createTopic(topicName).getTopicArn
@@ -78,7 +67,7 @@ trait SNS extends Matchers with Logging {
     secretKey = secretKey
   )
 
-  def withLocalStackSnsTopic[R] = fixture[Topic, R](
+  def withLocalStackSnsTopic[R]: Fixture[Topic, R] = fixture[Topic, R](
     create = {
       val topicName = Random.alphanumeric take 10 mkString
       val arn = localStackSnsClient.createTopic(topicName).getTopicArn

@@ -156,11 +156,9 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
+  ) ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ testDependencies
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
-
-  val finatraMonitoringDependencies = finatraDependencies ++ WellcomeDependencies.monitoringLibrary
 
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe

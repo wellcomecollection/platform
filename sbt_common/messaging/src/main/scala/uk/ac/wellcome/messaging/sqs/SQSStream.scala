@@ -9,7 +9,6 @@ import akka.stream.scaladsl.{Keep, Source}
 import akka.{Done, NotUsed}
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
-import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
@@ -35,7 +34,7 @@ import scala.concurrent.Future
 //        process = processMessage
 //      )
 //
-class SQSStream[T] @Inject()(
+class SQSStream[T](
   sqsClient: AmazonSQSAsync,
   sqsConfig: SQSConfig,
   metricsSender: MetricsSender)(implicit val actorSystem: ActorSystem)

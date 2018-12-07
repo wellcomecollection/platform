@@ -48,17 +48,6 @@ trait SQS extends Matchers with Logging with MetricsSenderFixture {
   def localStackEndpoint(queue: Queue) =
     s"sqs://${queue.name}"
 
-  def sqsLocalFlags(queue: Queue) = sqsLocalClientFlags ++ Map(
-    "aws.sqs.queue.url" -> queue.url,
-  )
-
-  def sqsLocalClientFlags = Map(
-    "aws.sqs.endpoint" -> sqsEndpointUrl,
-    "aws.sqs.accessKey" -> accessKey,
-    "aws.sqs.secretKey" -> secretKey,
-    "aws.sqs.region" -> regionName
-  )
-
   val sqsClient: AmazonSQS = SQSClientFactory.createSyncClient(
     region = regionName,
     endpoint = sqsEndpointUrl,

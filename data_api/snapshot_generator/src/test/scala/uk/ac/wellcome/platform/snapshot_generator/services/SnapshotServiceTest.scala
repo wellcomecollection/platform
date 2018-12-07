@@ -2,28 +2,28 @@ package uk.ac.wellcome.platform.snapshot_generator.services
 
 import java.io.File
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
 import akka.stream.alpakka.s3.S3Exception
-import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.{ElasticClient, JavaClientExceptionWrapper}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.display.json.DisplayJsonUtil
+import uk.ac.wellcome.display.json.DisplayJsonUtil._
+import uk.ac.wellcome.display.models.v1.DisplayWorkV1
+import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{
   ApiVersions,
   V1WorksIncludes,
   V2WorksIncludes
 }
-import uk.ac.wellcome.display.models.v1.DisplayWorkV1
-import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.elasticsearch.{DisplayElasticConfig, ElasticClientBuilder}
-import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.elasticsearch.ElasticClientBuilder
 import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
+import uk.ac.wellcome.platform.snapshot_generator.fixtures.{
+  AkkaS3,
+  SnapshotServiceFixture
+}
 import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedSnapshotJob,
   SnapshotJob
@@ -32,8 +32,6 @@ import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SnapshotServiceTest
     extends FunSpec
@@ -44,32 +42,8 @@ class SnapshotServiceTest
     with S3
     with GzipUtils
     with IntegrationPatience
-    with ElasticsearchFixtures
+    with SnapshotServiceFixture
     with WorksGenerators {
-
-  val mapper = new ObjectMapper with ScalaObjectMapper
-
-  private def withSnapshotService[R](s3AkkaClient: S3Client,
-                                     indexV1: Index,
-                                     indexV2: Index,
-                                     elasticClient: ElasticClient =
-                                       elasticClient)(
-    testWith: TestWith[SnapshotService, R])(
-    implicit actorSystem: ActorSystem): R = {
-    val elasticConfig = DisplayElasticConfig(
-      indexV1 = indexV1,
-      indexV2 = indexV2
-    )
-
-    val snapshotService = new SnapshotService(
-      elasticClient = elasticClient,
-      elasticConfig = elasticConfig,
-      akkaS3Client = s3AkkaClient,
-      objectMapper = mapper
-    )
-
-    testWith(snapshotService)
-  }
 
   def withFixtures[R](
     testWith: TestWith[(SnapshotService, Index, Index, Bucket), R]): R =
@@ -125,7 +99,7 @@ class SnapshotServiceTest
               DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
             }
             .map {
-              mapper.writeValueAsString(_)
+              DisplayJsonUtil.toJson(_)
             }
             .mkString("\n") + "\n"
 
@@ -173,7 +147,7 @@ class SnapshotServiceTest
               DisplayWorkV2(_, includes = V2WorksIncludes.includeAll())
             }
             .map {
-              mapper.writeValueAsString(_)
+              DisplayJsonUtil.toJson(_)
             }
             .mkString("\n") + "\n"
 
@@ -222,7 +196,7 @@ class SnapshotServiceTest
               DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
             }
             .map {
-              mapper.writeValueAsString(_)
+              DisplayJsonUtil.toJson(_)
             }
             .mkString("\n") + "\n"
 
