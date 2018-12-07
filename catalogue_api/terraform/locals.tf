@@ -7,7 +7,7 @@ locals {
   pinned_remus_api   = "966a00af5552b4c6e0b816ba296b7bc4f898206a"
   pinned_romulus_api = "0441419ebc483bceaafe9f6340a866184f725b39"
 
-  romulus_es_cluster_credentials = "${var.es_cluster_credentials}"
+  romulus_es_cluster_credentials = "${var.es_cluster_credentials_v6}"
   remus_es_cluster_credentials   = "${var.es_cluster_credentials_v6}"
 
   romulus_es_config = {

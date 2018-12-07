@@ -27,10 +27,6 @@ variable "api_stage_host" {
   default     = "api-stage.wellcomecollection.org"
 }
 
-variable "es_cluster_credentials" {
-  description = "Credentials for the Elasticsearch cluster"
-  type        = "map"
-}
 
 variable "es_cluster_credentials_v6" {
   type = "map"
