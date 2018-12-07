@@ -16,9 +16,12 @@ module "reporting_lambda" {
 }
 
 module "reporting_lambda_trigger" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v10.2.2"
+  source = "./trigger_sns_subscriptions"
+
+  aws_region = "${var.aws_region}"
+  account_id = "${var.account_id}"
 
   lambda_function_name = "${module.reporting_lambda.function_name}"
-  sns_trigger_arn      = "${var.trigger_topic_arn}"
+  sns_trigger_arns     = "${var.topic_names}"
   lambda_function_arn  = "${module.reporting_lambda.arn}"
 }
