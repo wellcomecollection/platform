@@ -17,6 +17,7 @@ module "lambda_miro_transformer" {
 
   vhs_read_policy       = "${local.miro_vhs_read_policy}"
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+
   trigger_topic_arns = [
     "${local.miro_reindex_topic_arn}",
   ]
@@ -41,10 +42,10 @@ module "lambda_miro_inventory_transformer" {
 
   vhs_read_policy       = "${local.miro_inventory_vhs_read_policy}"
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
-  trigger_topic_arns = [
-    "${local.miro_inventory_topic_arn}"
-  ]
 
+  trigger_topic_arns = [
+    "${local.miro_inventory_topic_arn}",
+  ]
 }
 
 module "lambda_sierra_transformer" {
@@ -66,7 +67,8 @@ module "lambda_sierra_transformer" {
 
   vhs_read_policy       = "${local.sierra_vhs_read_policy}"
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+
   trigger_topic_arns = [
-    "${local.sierra_topic_arn}"
+    "${local.sierra_topic_arn}",
   ]
 }

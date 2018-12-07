@@ -22,7 +22,6 @@ variable "log_retention_in_days" {
 
 variable "vhs_read_policy" {}
 
-
 variable "aws_region" {
   description = "AWS region to create queue in"
 }
