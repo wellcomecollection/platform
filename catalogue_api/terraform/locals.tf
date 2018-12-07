@@ -5,14 +5,14 @@ locals {
 
   pinned_nginx       = "bad0dbfa548874938d16496e313b05adb71268b7"
   pinned_remus_api   = "966a00af5552b4c6e0b816ba296b7bc4f898206a"
-  pinned_romulus_api = "0441419ebc483bceaafe9f6340a866184f725b39"
+  pinned_romulus_api = ""
 
   romulus_es_cluster_credentials = "${var.es_cluster_credentials_v6}"
   remus_es_cluster_credentials   = "${var.es_cluster_credentials_v6}"
 
   romulus_es_config = {
-    index_v1 = "v1-2018-11-29-merge-versioning"
-    index_v2 = "v2-2018-11-29-merge-versioning"
+    index_v1 = "v1-2018-12-6-single-shard"
+    index_v2 = "v2-2018-12-6-single-shard"
     doc_type = "work"
   }
 
