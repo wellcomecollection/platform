@@ -22,6 +22,5 @@ module "reporting_lambda_trigger" {
   account_id = "${var.account_id}"
 
   lambda_function_name = "${module.reporting_lambda.function_name}"
-  sns_trigger_arns     = "${var.topic_names}"
-  lambda_function_arn  = "${module.reporting_lambda.arn}"
+  topic_names     = "${var.topic_names}"
 }

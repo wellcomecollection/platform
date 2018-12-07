@@ -12,12 +12,14 @@ data "aws_lambda_function" "function" {
   function_name = "${var.lambda_function_name}"
 }
 
+
 resource "aws_lambda_permission" "allow_sns_trigger" {
+  count     = "${var.topic_count}"
   statement_id  = "${random_id.statement_id.hex}"
   action        = "lambda:InvokeFunction"
-  function_name = "${data.aws_lambda_function.function.function_name}"
+  function_name = "${data.aws_lambda_function.function.arn}"
   principal     = "sns.amazonaws.com"
-  source_arn    = "${var.sns_trigger_arn}"
+  source_arn    = "${format("arn:aws:sns:%s:%s:%s", var.aws_region, var.account_id, element(var.topic_names, count.index))}"
   depends_on    = ["aws_sns_topic_subscription.topic_lambda"]
 }
 
