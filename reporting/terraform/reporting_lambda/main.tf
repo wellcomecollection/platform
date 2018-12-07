@@ -19,5 +19,5 @@ module "reporting_lambda_trigger" {
   source = "./trigger_sns_subscriptions"
 
   lambda_function_name = "${module.reporting_lambda.function_name}"
-  topic_arns     = "${var.topic_arns}"
+  topic_arns           = "${var.topic_arns}"
 }
