@@ -18,9 +18,6 @@ module "reporting_lambda" {
 module "reporting_lambda_trigger" {
   source = "./trigger_sns_subscriptions"
 
-  aws_region = "${var.aws_region}"
-  account_id = "${var.account_id}"
-
   lambda_function_name = "${module.reporting_lambda.function_name}"
-  topic_names     = "${var.topic_names}"
+  topic_arns     = "${var.topic_arns}"
 }
