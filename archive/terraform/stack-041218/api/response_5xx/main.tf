@@ -1,9 +1,8 @@
 variable "rest_api_id" {}
 variable "response_type" {}
 variable "status_code" {
-  default = 400
+  default = 500
 }
-variable "label" {}
 variable "context_url" {}
 
 data "template_file" "error" {
@@ -12,8 +11,7 @@ data "template_file" "error" {
 "@context":"${var.context_url}",
 "errorType":"http",
 "httpStatus":"${var.status_code}",
-"label":"${var.label}",
-"description":$context.error.messageString,
+"label":"Server Error",
 "type":"Error"
 }
 EOF
