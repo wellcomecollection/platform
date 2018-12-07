@@ -14,11 +14,12 @@ import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.fixtures.ArchiveMessaging
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 class MessageStreamTest
     extends FunSpec
     with Matchers
+    with Akka
     with ScalaFutures
     with ArchiveMessaging
     with Messaging
