@@ -13,10 +13,10 @@ data "aws_lambda_function" "function" {
 }
 
 resource "aws_lambda_permission" "allow_sns_trigger" {
-  count     = "${var.topic_count}"
+  count         = "${var.topic_count}"
   statement_id  = "${random_id.statement_id.hex}"
   action        = "lambda:InvokeFunction"
-  function_name = "${data.aws_lambda_function.function.arn}"
+  function_name = "${data.aws_lambda_function.function.function_name}"
   principal     = "sns.amazonaws.com"
   source_arn    = "${element(var.topic_arns, count.index)}"
   depends_on    = ["aws_sns_topic_subscription.topic_lambda"]
