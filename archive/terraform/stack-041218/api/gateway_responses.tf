@@ -11,7 +11,6 @@ module "response_default_5xx" {
   context_url = "${local.context_url}"
 }
 
-
 module "response_default_4xx" {
   source = "./response_4xx"
 

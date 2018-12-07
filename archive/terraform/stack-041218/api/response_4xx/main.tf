@@ -1,8 +1,10 @@
 variable "rest_api_id" {}
 variable "response_type" {}
+
 variable "status_code" {
   default = 400
 }
+
 variable "label" {}
 variable "context_url" {}
 
