@@ -21,10 +21,11 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 trait ArchivistFixtures
     extends Messaging
+    with Akka
     with ZipBagItFixture
     with ArchiveMessaging
     with BagUploaderConfigGenerators
