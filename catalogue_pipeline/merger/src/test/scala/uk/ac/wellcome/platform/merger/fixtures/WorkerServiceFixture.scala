@@ -13,7 +13,11 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends LocalWorksVhs with Akka with Messaging with S3 {
+trait WorkerServiceFixture
+    extends LocalWorksVhs
+    with Akka
+    with Messaging
+    with S3 {
   def withWorkerService[R](vhs: TransformedBaseWorkVHS,
                            topic: Topic,
                            queue: Queue,

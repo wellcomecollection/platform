@@ -12,7 +12,11 @@ import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Namespace
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
-trait NotifierFixture extends Akka with ArchiveMessaging with Messaging with BagIt {
+trait NotifierFixture
+    extends Akka
+    with ArchiveMessaging
+    with Messaging
+    with BagIt {
 
   protected val callbackHost = "localhost"
   protected val callbackPort = 8080
