@@ -18,7 +18,7 @@ object WellcomeDependencies {
 
   val storageLibrary: Seq[ModuleID] = library(
     name = "storage",
-    version = "2.7.0"
+    version = "3.1.0"
   )
 
   private def library(name: String, version: String): Seq[ModuleID] = Seq(

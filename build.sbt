@@ -124,6 +124,7 @@ lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
 lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= WellcomeDependencies.jsonLibrary)
 
 lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")
   .dependsOn(internal_model % "compile->compile;test->test")
