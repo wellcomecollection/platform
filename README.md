@@ -24,7 +24,11 @@ Everything we create will be open-source, under an MIT license. We will package 
 
 ## Other repos
 
-Code for the platform is split across multiple repositories:
+Code for the platform is split across multiple repositories.
+
+You can see a list of all our repositories by [searching for the `wellcome-digital-platform` tag](https://github.com/search?type=Repositories&q=org%3Awellcometrust%20topic%3Awellcome-digital-platform).
+
+These repositories include:
 
 *   [wellcometrust/aws_utils][awsutils] is a Python library containing AWS-related utilities that we use in our AWS Lambdas
 
