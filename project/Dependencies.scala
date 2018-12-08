@@ -8,7 +8,7 @@ object WellcomeDependencies {
 
   val messagingLibrary: Seq[ModuleID] = library(
     name = "messaging",
-    version = "0.0.2"
+    version = "0.2.0"
   )
 
   val monitoringLibrary: Seq[ModuleID] = library(
