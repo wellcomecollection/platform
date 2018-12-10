@@ -18,3 +18,15 @@ module "lambda_terraform_tracker" {
 
   log_retention_in_days = 30
 }
+
+data "aws_sns_topic" "trigger_topic" {
+  name = "${var.terraform_apply_topic_name}"
+}
+
+module "trigger_terraform_tracker" {
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+
+  lambda_function_name = "${module.lambda_terraform_tracker.function_name}"
+  lambda_function_arn  = "${module.lambda_terraform_tracker.arn}"
+  sns_trigger_arn      = "${data.aws_sns_topic.trigger_topic.arn}"
+}
