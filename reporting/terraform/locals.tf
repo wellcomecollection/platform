@@ -2,6 +2,7 @@ locals {
   cloudfront_logs_bucket_domain_name = "${data.terraform_remote_state.shared_infra.cloudfront_logs_bucket_domain_name}"
 
   miro_reindex_topic_arn = "${data.terraform_remote_state.shared_infra.reporting_miro_reindex_topic_arn}"
+  miro_updates_topic_arn = "${data.terraform_remote_state.shared_infra.miro_updates_topic_arn}"
 
   miro_inventory_topic_arn = "${data.terraform_remote_state.shared_infra.reporting_miro_inventory_reindex_topic_arn}"
 

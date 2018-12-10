@@ -16,6 +16,7 @@ module "lambda_miro_transformer" {
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
   topic_arns = [
     "${local.miro_reindex_topic_arn}",
+    "${local.miro_updates_topic_arn}",
   ]
 }
 
