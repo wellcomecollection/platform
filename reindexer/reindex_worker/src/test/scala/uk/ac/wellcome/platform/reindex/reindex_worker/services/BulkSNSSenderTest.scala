@@ -4,8 +4,8 @@ import com.amazonaws.SdkClientException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SNS
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.BulkSNSSenderFixture
 
