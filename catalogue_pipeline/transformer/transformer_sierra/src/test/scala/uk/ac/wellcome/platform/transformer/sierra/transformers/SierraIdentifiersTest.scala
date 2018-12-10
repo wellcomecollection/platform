@@ -22,7 +22,9 @@ class SierraIdentifiersTest
       )
     )
 
-    transformer.getOtherIdentifiers(bibId) shouldBe expectedIdentifiers
+    val otherIdentifiers = transformer.getOtherIdentifiers(bibId, bibData = createSierraBibData)
+
+    otherIdentifiers shouldBe expectedIdentifiers
   }
 
   it("passes through an ISBN identifier if present") {

@@ -16,7 +16,7 @@ trait SierraIdentifiers {
   //
   //    Adding other identifiers is out-of-scope for now.
   //
-  def getOtherIdentifiers(bibId: SierraBibNumber): List[SourceIdentifier] =
+  def getOtherIdentifiers(bibId: SierraBibNumber, bibData: SierraBibData): List[SourceIdentifier] =
     List(
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
@@ -24,7 +24,4 @@ trait SierraIdentifiers {
         value = bibId.withoutCheckDigit
       )
     )
-
-  def getOtherIdentifiers(bibId: SierraBibNumber, bibData: SierraBibData): List[SourceIdentifier] =
-    getOtherIdentifiers(bibId)
 }
