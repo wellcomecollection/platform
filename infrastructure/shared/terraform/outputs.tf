@@ -38,7 +38,6 @@ output "infra_bucket" {
   value = "${var.infra_bucket}"
 }
 
-
 # Source data update topics
 
 ## miro
