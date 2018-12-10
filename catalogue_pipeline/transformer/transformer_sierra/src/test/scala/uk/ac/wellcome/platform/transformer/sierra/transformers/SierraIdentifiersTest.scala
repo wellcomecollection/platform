@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.transformer.sierra.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
-import uk.ac.wellcome.platform.transformer.sierra.generators.{MarcGenerators, SierraDataGenerators}
+import uk.ac.wellcome.platform.transformer.sierra.generators.{
+  MarcGenerators,
+  SierraDataGenerators
+}
 import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 
 class SierraIdentifiersTest
@@ -22,7 +25,8 @@ class SierraIdentifiersTest
       )
     )
 
-    val otherIdentifiers = transformer.getOtherIdentifiers(bibId, bibData = createSierraBibData)
+    val otherIdentifiers =
+      transformer.getOtherIdentifiers(bibId, bibData = createSierraBibData)
 
     otherIdentifiers shouldBe expectedIdentifiers
   }
@@ -46,11 +50,12 @@ class SierraIdentifiersTest
       bibData = bibData
     )
 
-    otherIdentifiers should contain(SourceIdentifier(
-      identifierType = IdentifierType("isbn"),
-      ontologyType = "Work",
-      value = isbn
-    ))
+    otherIdentifiers should contain(
+      SourceIdentifier(
+        identifierType = IdentifierType("isbn"),
+        ontologyType = "Work",
+        value = isbn
+      ))
   }
 
   it("passes through multiple ISBN identifiers if present") {
@@ -79,17 +84,19 @@ class SierraIdentifiersTest
       bibData = bibData
     )
 
-    otherIdentifiers should contain(SourceIdentifier(
-      identifierType = IdentifierType("isbn"),
-      ontologyType = "Work",
-      value = isbn10
-    ))
+    otherIdentifiers should contain(
+      SourceIdentifier(
+        identifierType = IdentifierType("isbn"),
+        ontologyType = "Work",
+        value = isbn10
+      ))
 
-    otherIdentifiers should contain(SourceIdentifier(
-      identifierType = IdentifierType("isbn"),
-      ontologyType = "Work",
-      value = isbn13
-    ))
+    otherIdentifiers should contain(
+      SourceIdentifier(
+        identifierType = IdentifierType("isbn"),
+        ontologyType = "Work",
+        value = isbn13
+      ))
   }
 
   val transformer = new Object with SierraIdentifiers

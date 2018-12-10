@@ -18,7 +18,8 @@ trait SierraIdentifiers extends MarcUtils {
   //
   //    Adding other identifiers is out-of-scope for now.
   //
-  def getOtherIdentifiers(bibId: SierraBibNumber, bibData: SierraBibData): List[SourceIdentifier] = {
+  def getOtherIdentifiers(bibId: SierraBibNumber,
+                          bibData: SierraBibData): List[SourceIdentifier] = {
     val sierraIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-identifier"),
       ontologyType = "Work",
@@ -30,8 +31,7 @@ trait SierraIdentifiers extends MarcUtils {
         bibData = bibData,
         marcTag = "020",
         marcSubfieldTag = "a"
-      )
-        .flatten
+      ).flatten
         .map { _.content }
         .map { value =>
           SourceIdentifier(
