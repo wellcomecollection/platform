@@ -64,8 +64,9 @@ trait ElasticsearchFixtures
     implicitly[Position])
 
   def withLocalWorksIndex[R](testWith: TestWith[Index, R]): R =
-    withLocalElasticsearchIndex[R](fields = WorksIndex.rootIndexFields) { index =>
-      testWith(index)
+    withLocalElasticsearchIndex[R](fields = WorksIndex.rootIndexFields) {
+      index =>
+        testWith(index)
     }
 
   private val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
@@ -86,8 +87,8 @@ trait ElasticsearchFixtures
 
       index
     },
-    destroy = {
-      index => elasticClient.execute(deleteIndex(index.name))
+    destroy = { index =>
+      elasticClient.execute(deleteIndex(index.name))
     }
   )
 

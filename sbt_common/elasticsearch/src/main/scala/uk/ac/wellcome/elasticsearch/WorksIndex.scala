@@ -68,8 +68,7 @@ object WorksIndex {
 
   val rootConcept = concept ++ agent
 
-  def identified(fieldName: String,
-                 fields: Seq[FieldDefinition]): ObjectField =
+  def identified(fieldName: String, fields: Seq[FieldDefinition]): ObjectField =
     objectField(fieldName).fields(
       textField("type"),
       objectField("agent").fields(fields),

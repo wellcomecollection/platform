@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.http.ElasticDsl.{intField, keywordField, objectField}
+import com.sksamuel.elastic4s.http.ElasticDsl.{
+  intField,
+  keywordField,
+  objectField
+}
 import com.sksamuel.elastic4s.mappings.FieldDefinition
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
@@ -237,7 +241,8 @@ class WorkIndexerTest
 
     val works = validWorks :+ notMatchingMappingWork
 
-    withLocalElasticsearchIndex(fields = OnlyInvisibleWorksIndex.rootIndexFields) { index =>
+    withLocalElasticsearchIndex(
+      fields = OnlyInvisibleWorksIndex.rootIndexFields) { index =>
       val future = workIndexer.indexWorks(
         works = works,
         index = index
