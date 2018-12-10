@@ -40,10 +40,6 @@ lazy val elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
-lazy val messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
-  .dependsOn(common % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
-
 lazy val config_core = doSharedLibrarySetup(project, "sbt_common/config/core")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
@@ -60,8 +56,7 @@ lazy val config_messaging = doSharedLibrarySetup(project, "sbt_common/config/mes
   .dependsOn(config_core % "compile->compile")
   .dependsOn(config_monitoring % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
-  .dependsOn(messaging % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.typesafeDependencies)
+  .settings(libraryDependencies ++= Dependencies.configMessagingDependencies)
 
 lazy val config_elasticsearch = doSharedLibrarySetup(project, "sbt_common/config/elasticsearch")
   .dependsOn(config_core % "compile->compile;test->test")
@@ -129,6 +124,7 @@ lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
 lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= WellcomeDependencies.jsonLibrary)
 
 lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")
   .dependsOn(internal_model % "compile->compile;test->test")
@@ -202,7 +198,6 @@ lazy val root = (project in file("."))
     internal_model,
     display,
     elasticsearch,
-    messaging,
 
     config_core,
     config_messaging,

@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.archive.progress_async.fixtures
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.fixtures.{
   ArchiveMessaging,
   RandomThings
@@ -21,10 +21,11 @@ import uk.ac.wellcome.platform.archive.progress_async.ProgressAsync
 import uk.ac.wellcome.platform.archive.progress_async.flows.ProgressUpdateFlow
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 trait ProgressAsyncFixture
     extends S3
+    with Akka
     with LocalDynamoDb
     with RandomThings
     with ArchiveMessaging

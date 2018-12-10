@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.sierra_reader.fixtures
 
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_reader.config.models.{
   ReaderConfig,
   SierraAPIConfig

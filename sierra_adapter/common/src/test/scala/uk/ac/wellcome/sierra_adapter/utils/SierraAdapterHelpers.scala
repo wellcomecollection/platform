@@ -2,8 +2,8 @@ package uk.ac.wellcome.sierra_adapter.utils
 
 import io.circe.Decoder
 import org.scalatest.Assertion
-import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging}
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.{MessageInfo, Messaging}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.storage.ObjectStore
