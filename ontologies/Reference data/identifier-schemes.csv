@@ -12,5 +12,5 @@ nlm-mesh,Medical Subject Headings (MESH) identifier
 calm-record-id,CALM record identifier
 preservica-guid,Perservica GUID
 calm-authority-code,CALM authority code
-isbn,ISBN
+isbn,International Standard Book Number
 issn,ISSN
