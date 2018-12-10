@@ -74,7 +74,10 @@ class SierraTransformableTransformer
             if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
               UnidentifiedWork(
                 sourceIdentifier = sourceIdentifier,
-                otherIdentifiers = getOtherIdentifiers(bibId),
+                otherIdentifiers = getOtherIdentifiers(
+                  bibId = bibId,
+                  bibData = sierraBibData
+                ),
                 mergeCandidates = getMergeCandidates(sierraBibData),
                 title = getTitle(sierraBibData),
                 workType = getWorkType(sierraBibData),

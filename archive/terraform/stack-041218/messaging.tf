@@ -55,6 +55,9 @@ module "archivist_queue" {
     "${module.archivist-nvm.task_role_name}",
   ]
 
+  visibility_timeout_seconds = "3600"
+  max_receive_count          = "1"
+
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 }
 

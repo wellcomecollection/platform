@@ -8,7 +8,7 @@ resource "aws_service_discovery_private_dns_namespace" "namespace" {
 }
 
 module "cluster_hosts" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/nvm?ref=d78a91b22fdbd0938943a5d403407a96b62b12f3"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/nvm?ref=v17.1.0"
 
   vpc_id   = "${var.vpc_id}"
   key_name = "${var.ssh_key_name}"
@@ -26,7 +26,7 @@ module "cluster_hosts" {
 }
 
 module "bastion" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/bastion?ref=v17.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/bastion?ref=v17.1.0"
 
   vpc_id = "${var.vpc_id}"
 
