@@ -61,6 +61,7 @@ module "lambda_sierra_transformer" {
   error_alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 
   topic_arns = [
-    "${local.sierra_topic_arn}",
+    "${local.sierra_reindex_topic_arn}",
+    "${local.sierra_updates_topic_arn}",
   ]
 }

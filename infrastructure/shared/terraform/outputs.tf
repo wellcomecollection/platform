@@ -40,6 +40,8 @@ output "infra_bucket" {
 
 
 # Source data update topics
+
+## miro
 output "miro_updates_topic_arn" {
   value = "${module.miro_updates_topic.arn}"
 }
