@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticDsl.{intField, keywordField, objectField}
+import com.sksamuel.elastic4s.mappings.FieldDefinition
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -15,8 +17,7 @@ class WorkIndexerTest
     with ScalaFutures
     with Matchers
     with ElasticsearchFixtures
-    with WorksGenerators
-    with CustomElasticsearchMapping {
+    with WorksGenerators {
 
   val workIndexer = new WorkIndexer(elasticClient = elasticClient)
 
@@ -205,6 +206,27 @@ class WorkIndexerTest
         successfullyInserted.right.get should contain theSameElementsAs works
       }
     }
+  }
+
+  object OnlyInvisibleWorksIndex {
+    def sourceIdentifierFields = Seq(
+      keywordField("ontologyType"),
+      objectField("identifierType").fields(
+        keywordField("id"),
+        keywordField("label"),
+        keywordField("ontologyType")
+      ),
+      keywordField("value")
+    )
+
+    val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
+      Seq(
+        keywordField("canonicalId"),
+        intField("version"),
+        objectField("sourceIdentifier")
+          .fields(sourceIdentifierFields),
+        keywordField("type")
+      )
   }
 
   it("returns a list of Works that weren't indexed correctly") {
