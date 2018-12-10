@@ -215,7 +215,7 @@ class WorkIndexerTest
 
     val works = validWorks :+ notMatchingMappingWork
 
-    withLocalElasticsearchIndex(OnlyInvisibleWorksIndex) { index =>
+    withLocalElasticsearchIndex(fields = OnlyInvisibleWorksIndex.rootIndexFields) { index =>
       val future = workIndexer.indexWorks(
         works = works,
         index = index
