@@ -5,19 +5,33 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 beautifulsoup4==4.6.0
-cycler==0.10.0            # via matplotlib
+certifi==2018.11.29       # via requests
+chardet==3.0.4            # via requests
+cymem==2.0.2              # via preshed, spacy, thinc
+cytoolz==0.9.0.1          # via thinc
 decorator==4.3.0          # via networkx
-kiwisolver==1.0.1         # via matplotlib
-matplotlib==2.2.2         # via seaborn
+dill==0.2.8.2             # via spacy, thinc
+idna==2.8                 # via requests
+msgpack-numpy==0.4.3.2    # via spacy, thinc
+msgpack==0.5.6            # via msgpack-numpy, thinc
+murmurhash==1.0.1         # via spacy, thinc
 networkx==2.1
-numpy==1.14.5             # via matplotlib, pandas, scipy, seaborn
-pandas==0.23.1            # via seaborn
+nltk==3.3.0
+numpy==1.15.4             # via msgpack-numpy, spacy, thinc, torchvision
 pillow==5.1.0
-pyparsing==2.2.0          # via matplotlib
-python-dateutil==2.7.3    # via matplotlib, pandas
-pytz==2018.4              # via matplotlib, pandas
+plac==0.9.6               # via spacy, thinc
+preshed==2.0.1            # via spacy, thinc
+regex==2018.01.10         # via spacy
+requests==2.21.0          # via spacy
 scikit-learn==0.19.1
-scipy==1.1.0              # via seaborn
 seaborn==0.8.1
-six==1.11.0               # via cycler, matplotlib, python-dateutil
+six==1.11.0               # via nltk, thinc, torchvision
+spacy==2.0.16
+thinc==6.12.1             # via spacy
+toolz==0.9.0              # via cytoolz
+torch==1.0.0              # via torchvision
+torchvision==0.2.1
 tqdm==4.19.7
+ujson==1.35               # via spacy
+urllib3==1.24.1           # via requests
+wrapt==1.10.11            # via thinc

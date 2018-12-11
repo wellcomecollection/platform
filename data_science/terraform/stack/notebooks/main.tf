@@ -8,7 +8,7 @@ module "p2_compute" {
   instance_type = "p2.xlarge"
   spot_price    = "0.5"
 
-  default_environment = "tensorflow_p36"
+  default_environment = "pytorch_p36"
 
   vpc_id      = "${var.vpc_id}"
   subnet_list = "${var.subnets}"
@@ -31,7 +31,7 @@ module "t2_compute" {
 
   spot_price = "0.4"
 
-  default_environment = "tensorflow_p36"
+  default_environment = "pytorch_p36"
 
   vpc_id      = "${var.vpc_id}"
   subnet_list = "${var.subnets}"

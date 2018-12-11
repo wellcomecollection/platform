@@ -4,3 +4,6 @@ pillow==5.1.0
 scikit-learn==0.19.1
 seaborn==0.8.1
 tqdm==4.19.7
+torchvision==0.2.1
+nltk==3.3.0
+spacy==2.0.16
