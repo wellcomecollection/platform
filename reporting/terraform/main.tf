@@ -19,6 +19,7 @@ module "lambda_miro_transformer" {
     "${local.miro_reindex_topic_arn}",
     "${local.miro_updates_topic_arn}",
   ]
+  topic_count = 2
 }
 
 module "lambda_miro_inventory_transformer" {
@@ -64,4 +65,5 @@ module "lambda_sierra_transformer" {
     "${local.sierra_reindex_topic_arn}",
     "${local.sierra_updates_topic_arn}",
   ]
+  topic_count = 2
 }

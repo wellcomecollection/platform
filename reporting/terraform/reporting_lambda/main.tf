@@ -20,4 +20,5 @@ module "reporting_lambda_trigger" {
 
   lambda_function_name = "${module.reporting_lambda.function_name}"
   topic_arns           = "${var.topic_arns}"
+  topic_count          = "${var.topic_count}"
 }

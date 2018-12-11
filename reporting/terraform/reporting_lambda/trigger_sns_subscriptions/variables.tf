@@ -3,7 +3,7 @@ variable "lambda_function_name" {
 }
 
 variable "topic_count" {
-  default = "1"
+  default = 1
 }
 
 variable "topic_arns" {

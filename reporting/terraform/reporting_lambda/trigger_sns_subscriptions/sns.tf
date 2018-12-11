@@ -1,12 +1,7 @@
 /* Configures an SNS trigger for a Lambda */
-resource "random_id" "statement_id" {
-  keepers = {
-    # Generate a new id each time we switch to a new topic subscription
-    aws_sns_topic_subscription = "${aws_sns_topic_subscription.topic_lambda.id}"
-  }
 
-  byte_length = 8
-}
+# Removed statement id from the original in `terraform-modules`.
+# Should probably come back to this to figure out what we're losing without it.
 
 data "aws_lambda_function" "function" {
   function_name = "${var.lambda_function_name}"
@@ -14,7 +9,6 @@ data "aws_lambda_function" "function" {
 
 resource "aws_lambda_permission" "allow_sns_trigger" {
   count         = "${var.topic_count}"
-  statement_id  = "${random_id.statement_id.hex}"
   action        = "lambda:InvokeFunction"
   function_name = "${data.aws_lambda_function.function.function_name}"
   principal     = "sns.amazonaws.com"

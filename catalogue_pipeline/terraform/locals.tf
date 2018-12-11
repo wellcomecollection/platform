@@ -17,7 +17,7 @@ locals {
   vhs_sierra_read_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_read_policy}"
   vhs_sierra_bucket_name = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_bucket_name}"
 
-  miro_updates_topic_name = "${data.terraform_remote_state.infra_critical.miro_updates_topic_name}"
+  miro_updates_topic_name = "${data.terraform_remote_state.shared_infra.miro_updates_topic_name}"
   vhs_miro_read_policy    = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_read_policy}"
 
   identifiers_rds_cluster_password = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_password}"
