@@ -16,6 +16,7 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerF
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.display._
 import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
+import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
 import uk.ac.wellcome.storage.ObjectLocation
 
 class ProgressHttpFeatureTest
@@ -211,6 +212,118 @@ class ProgressHttpFeatureTest
                     archiveCompleteCallbackUrl = Some(testCallbackUri),
                     zippedBagLocation = ObjectLocation("bucket", "key.txt")
                   ))
+              }
+            }
+          }
+      }
+    }
+
+    it("returns a json error if the ingest request doesn't have a sourceLocation") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`application/json`,
+              """|{
+                 |  "type": "Ingest",
+                 |  "ingestType": {
+                 |    "id": "create",
+                 |    "type": "IngestType"
+                 |  },
+                 |  "space": {
+                 |    "id": "bcnfgh",
+                 |    "type": "Space"
+                 |  },
+                 |  "callback": {
+                 |  	"url": "{{callback_url}}"
+                 |  }
+                 |}""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.BadRequest
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+
+                actualError shouldBe ErrorResponse(400, "Required property sourceLocation not supplied", "Bad Request", "Error")
+                val requests =
+                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
+                    fromJson[IngestBagRequest](messageInfo.message).get)
+
+                requests shouldBe empty
+              }
+            }
+          }
+      }
+    }
+
+    it("returns a json error if the sourceLocation doesn't have a bucket field") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`application/json`,
+              """|{
+                 |  "type": "Ingest",
+                 |  "ingestType": {
+                 |    "id": "create",
+                 |    "type": "IngestType"
+                 |  },
+                 |  "sourceLocation":{
+                 |    "type": "Location",
+                 |    "provider": {
+                 |      "type": "Provider",
+                 |      "id": "aws-s3-standard"
+                 |    },
+                 |    "path": "b22454408.zip"
+                 |  },
+                 |  "space": {
+                 |    "id": "bcnfgh",
+                 |    "type": "Space"
+                 |  },
+                 |  "callback": {
+                 |  	"url": "{{callback_url}}"
+                 |  }
+                 |}""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.BadRequest
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+
+                actualError shouldBe ErrorResponse(400, "Required property bucket not supplied on sourceLocation", "Bad Request", "Error")
+                val requests =
+                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
+                    fromJson[IngestBagRequest](messageInfo.message).get)
+
+                requests shouldBe empty
               }
             }
           }
