@@ -8,7 +8,7 @@ SBT_DOCKER_LIBRARIES = archive_common progress_common
 SBT_NO_DOCKER_LIBRARIES = registrar_common archive_display
 
 ECS_TASKS   = bagger callback_stub_server
-LAMBDAS     = migrator
+LAMBDAS     =
 
 TF_NAME     = archive
 TF_PATH     = $(STACK_ROOT)/terraform

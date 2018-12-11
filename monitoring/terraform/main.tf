@@ -53,6 +53,10 @@ module "monitoring-271118" {
   critical_slack_webhook         = "${var.critical_slack_webhook}"
   bitly_access_token             = "${var.bitly_access_token}"
 
+  # terraform_tracker
+
+  terraform_apply_topic_name = "${local.terraform_apply_topic_name}"
+
   # IAM
 
   allow_cloudwatch_read_metrics_policy_json = "${data.aws_iam_policy_document.allow_cloudwatch_read_metrics.json}"

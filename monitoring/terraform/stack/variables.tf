@@ -58,6 +58,10 @@ variable "cloudfront_errors_topic_arn" {}
 variable "critical_slack_webhook" {}
 variable "bitly_access_token" {}
 
+# terraform_tracker
+
+variable "terraform_apply_topic_name" {}
+
 # IAM
 
 variable "allow_cloudwatch_read_metrics_policy_json" {}
