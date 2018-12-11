@@ -53,8 +53,7 @@ object MessagingBuilder {
 
     new MessageWriter[T](
       messageConfig = buildMessageWriterConfig(config),
-      snsClient = SNSBuilder.buildSNSClient(config),
-      s3Client = S3Builder.buildS3Client(config)
+      snsClient = SNSBuilder.buildSNSClient(config)
     )
   }
 }

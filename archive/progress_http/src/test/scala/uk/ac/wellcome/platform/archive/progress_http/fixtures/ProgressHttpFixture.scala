@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.archive.progress_http.fixtures
 import java.net.URL
 
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.{
   HttpFixtures,

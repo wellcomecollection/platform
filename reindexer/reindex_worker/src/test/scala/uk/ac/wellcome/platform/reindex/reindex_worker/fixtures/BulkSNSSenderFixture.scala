@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.fixtures
 
-import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.platform.reindex.reindex_worker.services.BulkSNSSender
 import uk.ac.wellcome.test.fixtures.TestWith
 

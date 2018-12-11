@@ -1,34 +1,5 @@
 # archivist
 
-module "archivist" {
-  source = "../modules/service/worker"
-
-  service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${var.private_subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}-archivist"
-  aws_region                       = "${var.aws_region}"
-
-  env_vars = {
-    queue_url           = "${module.archivist_queue.url}"
-    archive_bucket      = "${var.archive_bucket_name}"
-    registrar_topic_arn = "${module.bags_topic.arn}"
-    progress_topic_arn  = "${module.ingests_topic.arn}"
-  }
-
-  min_capacity = "0"
-  max_capacity = "1"
-
-  desired_task_count = "0"
-
-  env_vars_length = 4
-
-  container_image = "${var.archivist_container_image}"
-}
-
 module "archivist-nvm" {
   source = "../modules/service/worker+nvm"
 
@@ -89,7 +60,11 @@ module "notifier" {
   source = "../modules/service/worker"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
-  security_group_ids               = ["${var.interservice_security_group_id}"]
+
+  security_group_ids = [
+    "${var.interservice_security_group_id}",
+    "${var.service_egress_security_group_id}",
+  ]
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
@@ -193,8 +168,8 @@ module "api" {
 
 # Migration services
 
-module "bagger" {
-  source = "../modules/service/worker"
+module "bagger-nvm" {
+  source = "../modules/service/worker+nvm"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
@@ -202,7 +177,7 @@ module "bagger" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}-bagger"
+  service_name                     = "${var.namespace}-bagger-nvm"
   aws_region                       = "${var.aws_region}"
 
   env_vars = {
@@ -234,41 +209,8 @@ module "bagger" {
 
   env_vars_length = 19
 
+  cpu    = "1900"
+  memory = "14000"
+
   container_image = "${var.bagger_container_image}"
-}
-
-module "migrator" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/prebuilt/vpc?ref=v16.1.2"
-
-  name        = "${var.namespace}-migrator"
-  description = "Passes on the location of a successfully bagged set of METS and objects to the Archive Ingest API"
-
-  timeout = 25
-
-  environment_variables = {
-    # Private DNS
-    INGEST_API_URL = "http://storage-api-ingests.archive-storage:9000/progress"
-    ARCHIVE_SPACE  = "digitised"
-  }
-
-  alarm_topic_arn = "${var.lambda_error_alarm_arn}"
-
-  s3_bucket = "${var.infra_bucket}"
-  s3_key    = "lambdas/archive/migrator.zip"
-
-  security_group_ids = [
-    "${var.interservice_security_group_id}",
-    "${var.service_egress_security_group_id}",
-  ]
-
-  subnet_ids = "${var.private_subnets}"
-
-  log_retention_in_days = 30
-}
-
-module "trigger_migrator" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/modules/triggers/sns?ref=v16.1.2"
-
-  lambda_function_name = "${module.migrator.function_name}"
-  sns_trigger_arn      = "${module.bagging_complete_topic.arn}"
 }
