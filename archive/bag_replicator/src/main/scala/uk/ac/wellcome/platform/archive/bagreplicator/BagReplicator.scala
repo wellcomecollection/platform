@@ -14,9 +14,15 @@ import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
 import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.NotificationParsingFailed
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
+  BagStorage,
+  S3Copier
+}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  NotificationMessage
+}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -52,24 +58,28 @@ class BagReplicator(
     val flow = Flow[NotificationMessage]
       .log("received notification message")
       .map(parseReplicateBagMessage)
-      .mapAsync(bagReplicatorConfig.parallelism)(duplicateBagItems(bagReplicatorConfig.destination))
+      .mapAsync(bagReplicatorConfig.parallelism)(
+        duplicateBagItems(bagReplicatorConfig.destination))
       .map(completeBagReplication)
       .log("completed")
 
     messageStream.run("bag_replicator", flow)
   }
 
-  private def parseReplicateBagMessage(notificationMessage: NotificationMessage) :
-    Either[Throwable, BagReplicationRequest[ArchiveComplete]] = {
-      fromJson[ArchiveComplete](notificationMessage.body) match {
-        case Success(archiveComplete) =>
-          Right(BagReplicationRequest(archiveComplete, archiveComplete.bagLocation))
-        case Failure(error) =>
-          Left(NotificationParsingFailed(s"Failed to parse Notification error: $error body: ${notificationMessage.body}"))
-      }
+  private def parseReplicateBagMessage(notificationMessage: NotificationMessage)
+    : Either[Throwable, BagReplicationRequest[ArchiveComplete]] = {
+    fromJson[ArchiveComplete](notificationMessage.body) match {
+      case Success(archiveComplete) =>
+        Right(
+          BagReplicationRequest(archiveComplete, archiveComplete.bagLocation))
+      case Failure(error) =>
+        Left(NotificationParsingFailed(
+          s"Failed to parse Notification error: $error body: ${notificationMessage.body}"))
     }
+  }
 
-  private def completeBagReplication(in: Either[Throwable, CompletedBagReplication[ArchiveComplete]]): Unit = {
+  private def completeBagReplication(
+    in: Either[Throwable, CompletedBagReplication[ArchiveComplete]]): Unit = {
     in match {
       case Left(exception) =>
         error(exception.toString)
@@ -80,17 +90,24 @@ class BagReplicator(
 
   private def duplicateBagItems(storageDestination: StorageLocation)(
     in: Either[Throwable, BagReplicationRequest[ArchiveComplete]])(
-      implicit s3Client: AmazonS3, s3Copier: S3Copier, ex: ExecutionContext): Future[Either[Throwable, CompletedBagReplication[ArchiveComplete]]] = {
+    implicit s3Client: AmazonS3,
+    s3Copier: S3Copier,
+    ex: ExecutionContext)
+    : Future[Either[Throwable, CompletedBagReplication[ArchiveComplete]]] = {
     in.fold(
       left => Future(Left(left)),
       bagReplicationRequest =>
-        BagStorage.duplicateBag(bagReplicationRequest.sourceBagLocation, storageDestination)
-          .transformWith[Either[Throwable, CompletedBagReplication[ArchiveComplete]]] {
-            case Success(_) => Future(Right(CompletedBagReplication(bagReplicationRequest.context)))
+        BagStorage
+          .duplicateBag(
+            bagReplicationRequest.sourceBagLocation,
+            storageDestination)
+          .transformWith[Either[Throwable,
+                                CompletedBagReplication[ArchiveComplete]]] {
+            case Success(_) =>
+              Future(
+                Right(CompletedBagReplication(bagReplicationRequest.context)))
             case Failure(e) => Future(Left(e))
         }
     )
   }
 }
-
-

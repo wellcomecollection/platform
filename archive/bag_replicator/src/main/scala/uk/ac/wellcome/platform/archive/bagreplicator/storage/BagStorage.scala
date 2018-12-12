@@ -11,13 +11,18 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object BagStorage extends Logging {
 
-  def duplicateBag(sourceBagLocation: BagLocation, storageDestination: StorageLocation)(implicit s3Client: AmazonS3, s3Copier: S3Copier, executionContext: ExecutionContext) = Future {
+  def duplicateBag(sourceBagLocation: BagLocation,
+                   storageDestination: StorageLocation)(
+    implicit s3Client: AmazonS3,
+    s3Copier: S3Copier,
+    executionContext: ExecutionContext) = Future {
     debug(s"duplicating bag from $sourceBagLocation to $storageDestination")
     val sourceBagItems = listBagItems(sourceBagLocation)
     duplicateBagItems(sourceBagItems, storageDestination)
   }
 
-  private def listBagItems(bagLocation: BagLocation)(implicit s3Client: AmazonS3) = {
+  private def listBagItems(bagLocation: BagLocation)(
+    implicit s3Client: AmazonS3) = {
     // TODO: limit size of the returned List and use Marker to paginate(?), but needs care if bag contents can change during copy.
     debug(s"listing items in $bagLocation")
     val objectListing: ObjectListing =
@@ -25,13 +30,19 @@ object BagStorage extends Logging {
         bagLocation.storageNamespace,
         bagLocation.bagPathInStorage)
 
-    objectListing.getObjectSummaries.asScala.map(summary => {
-      val itemPathInBag = summary.getKey.stripPrefix(s"${bagLocation.bagPathInStorage}/")
-      BagItemLocation(bagLocation, itemPathInBag)
-    }).toList
+    objectListing.getObjectSummaries.asScala
+      .map(summary => {
+        val itemPathInBag =
+          summary.getKey.stripPrefix(s"${bagLocation.bagPathInStorage}/")
+        BagItemLocation(bagLocation, itemPathInBag)
+      })
+      .toList
   }
 
-  private def duplicateBagItems(sourceBagItems: List[BagItemLocation], storageDestination: StorageLocation)(implicit s3Copier: S3Copier, executionContext: ExecutionContext) = {
+  private def duplicateBagItems(sourceBagItems: List[BagItemLocation],
+                                storageDestination: StorageLocation)(
+    implicit s3Copier: S3Copier,
+    executionContext: ExecutionContext) = {
     debug(s"duplicating bag items: $sourceBagItems")
     Future.sequence(
       sourceBagItems.map { sourceBagItem =>
@@ -40,14 +51,22 @@ object BagStorage extends Logging {
     )
   }
 
-  private def duplicateBagItem(sourceBagItem: BagItemLocation, storageDestination: StorageLocation)(implicit s3Copier: S3Copier) = {
+  private def duplicateBagItem(
+    sourceBagItem: BagItemLocation,
+    storageDestination: StorageLocation)(implicit s3Copier: S3Copier) = {
     val sourceNamespace = sourceBagItem.bagLocation.storageNamespace
-    val sourceItemKey = s"${sourceBagItem.bagLocation.bagPathInStorage}/${sourceBagItem.itemPath}"
+    val sourceItemKey =
+      s"${sourceBagItem.bagLocation.bagPathInStorage}/${sourceBagItem.itemPath}"
     val destinationNamespace = storageDestination.namespace
-    val destinationItemKey = s"${storageDestination.rootPath}/${sourceBagItem.bagLocation.bagPath}/${sourceBagItem.itemPath}"
+    val destinationItemKey =
+      s"${storageDestination.rootPath}/${sourceBagItem.bagLocation.bagPath}/${sourceBagItem.itemPath}"
 
-    debug(s"duplicating bag item $sourceNamespace/$sourceItemKey -> $destinationNamespace/$destinationItemKey")
-    s3Copier.copy(sourceNamespace, sourceItemKey,
-            destinationNamespace, destinationItemKey)
+    debug(
+      s"duplicating bag item $sourceNamespace/$sourceItemKey -> $destinationNamespace/$destinationItemKey")
+    s3Copier.copy(
+      sourceNamespace,
+      sourceItemKey,
+      destinationNamespace,
+      destinationItemKey)
   }
 }

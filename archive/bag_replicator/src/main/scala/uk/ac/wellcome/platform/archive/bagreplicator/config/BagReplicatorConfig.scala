@@ -4,16 +4,19 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
 
-case class BagReplicatorConfig(parallelism: Int,
-                               destination: StorageLocation)
+case class BagReplicatorConfig(parallelism: Int, destination: StorageLocation)
 
 object BagReplicatorConfig {
   def buildBagUploaderConfig(config: Config) = {
     BagReplicatorConfig(
-      parallelism = config.getOrElse[Int]("bag-replicator.parallelism")(default = 10),
+      parallelism =
+        config.getOrElse[Int]("bag-replicator.parallelism")(default = 10),
       destination = StorageLocation(
-        namespace = config.required[String]("bag-replicator.storage.destination.namespace"),
-        rootPath = config.required[String]("bag-replicator.storage.destination.rootpath"))
+        namespace = config.required[String](
+          "bag-replicator.storage.destination.namespace"),
+        rootPath =
+          config.required[String]("bag-replicator.storage.destination.rootpath")
+      )
     )
   }
 }
