@@ -52,7 +52,7 @@ object StorageManifestFactory extends Logging {
           StorageProvider("aws-s3-ia"),
           ObjectLocation(
             archiveComplete.bagLocation.storageNamespace,
-            s"${archiveComplete.bagLocation.storagePath}/${archiveComplete.bagLocation.bagPath.value}")
+            s"${archiveComplete.bagLocation.storageRootPath}/${archiveComplete.bagLocation.bagPath.value}")
         ),
         createdDate = Instant.now()
       )
@@ -94,7 +94,7 @@ object StorageManifestFactory extends Logging {
     ObjectLocation(
       bagLocation.storageNamespace,
       List(
-        bagLocation.storagePath,
+        bagLocation.storageRootPath,
         bagLocation.bagPath.value,
         name
       ).mkString("/")

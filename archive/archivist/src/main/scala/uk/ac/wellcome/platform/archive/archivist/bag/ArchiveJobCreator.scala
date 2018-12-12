@@ -28,7 +28,7 @@ object ArchiveJobCreator {
           zipFile,
           BagLocation(
             storageNamespace = config.uploadConfig.uploadNamespace,
-            storagePath = config.uploadConfig.uploadPrefix,
+            storageRootPath = config.uploadConfig.uploadPrefix,
             bagPath =
               BagPath(s"${ingestBagRequest.storageSpace}/$externalIdentifier")
           ),
