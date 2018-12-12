@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8
 """
-Create a request to archive a bag
+Create a request to ingest a bag into storage
 
-Usage: trigger_archive_bag.py <BAG>... [--oauth-credentials=<OAUTH_CREDENTIALS>] [--bucket=<BUCKET_NAME>] [--storage-space=<SPACE_NAME>]  [--api=<API>]
-       trigger_archive_bag.py -h | --help
+Usage: ingest_bag.py <BAG>... [--oauth-credentials=<OAUTH_CREDENTIALS>] [--bucket=<BUCKET_NAME>] [--storage-space=<SPACE_NAME>]  [--api=<API>]
+       ingest_bag.py -h | --help
 
 Arguments:
     BAG                    paths to BagIt locations to ingest
 
 Examples:
-    trigger_archive_bag.py b22454408.zip
+    ingest_bag.py b22454408.zip
 
 Options:
     --oauth-credentials=<OAUTH_CREDENTIALS> The location of the oauth credentials
