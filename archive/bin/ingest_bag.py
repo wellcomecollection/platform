@@ -45,7 +45,7 @@ def oauth_details_from_file(filepath):
     """
     Obtain OAuth details from a file
     """
-    with open(filepath, 'r') as f:
+    with open(filepath, "r") as f:
         oauth_credentials = json.load(f)
     return oauth_credentials
 
@@ -56,9 +56,9 @@ def oauth_session(token_url, client_id, client_secret):
     """
     client = BackendApplicationClient(client_id=client_id)
     api_session = OAuth2Session(client=client)
-    api_session.fetch_token(token_url=token_url,
-                            client_id=client_id,
-                            client_secret=client_secret)
+    api_session.fetch_token(
+        token_url=token_url, client_id=client_id, client_secret=client_secret
+    )
     return api_session
 
 
@@ -69,23 +69,14 @@ def archive_bag_api_messages(bag_paths, space, ingest_bucket):
     for bag_path in bag_paths:
         yield {
             "type": "Ingest",
-            "ingestType": {
-                "id": "create",
-                "type": "IngestType"
-            },
-            "space": {
-                "id": space,
-                "type": "Space"
-            },
+            "ingestType": {"id": "create", "type": "IngestType"},
+            "space": {"id": space, "type": "Space"},
             "sourceLocation": {
                 "type": "Location",
-                "provider": {
-                    "type": "Provider",
-                    "id": "aws-s3-standard"
-                },
+                "provider": {"type": "Provider", "id": "aws-s3-standard"},
                 "bucket": ingest_bucket,
-                "path": bag_path
-            }
+                "path": bag_path,
+            },
         }
 
 
@@ -122,9 +113,11 @@ def main():
 
     oauth_filepath = os.path.expanduser(args["--oauth-credentials"])
     oauth_details = oauth_details_from_file(oauth_filepath)
-    api_session = oauth_session(oauth_details['token_url'],
-                                oauth_details['client_id'],
-                                oauth_details['client_secret'])
+    api_session = oauth_session(
+        oauth_details["token_url"],
+        oauth_details["client_id"],
+        oauth_details["client_secret"],
+    )
 
     ingest_bucket_name = args["--bucket"]
     ingests_endpoint = args["--api"]
@@ -137,4 +130,5 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         import sys
+
         sys.exit(1)
