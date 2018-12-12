@@ -3,109 +3,113 @@
 """
 Create a request to archive a bag
 
-Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>] [--topic=<TOPIC_NAME>|--api=<API>] [--sns] [--insecure]
+Usage: trigger_archive_bag.py <BAG>... [--oauth-credentials=<OAUTH_CREDENTIALS>] [--bucket=<BUCKET_NAME>] [--storage-space=<SPACE_NAME>]  [--api=<API>]
        trigger_archive_bag.py -h | --help
 
 Arguments:
-    BAG                    BagIt files to ingest
+    BAG                    paths to BagIt locations to ingest
 
 Examples:
     trigger_archive_bag.py b22454408.zip
-    trigger_archive_bag.py b22454408.zip --sns
 
 Options:
-    --bucket=<BUCKET_NAME>  The S3 bucket containing the bags.
-                            [default: wellcomecollection-assets-archive-ingest]
-    --topic=<TOPIC_NAME>    The archivist topic.
-                            [default: archive-storage_archivist]
-    --api=<API>             The API endpoint to use
-                            [default: http://api.wellcomecollection.org/storage/v1/ingests]
-    --sns                   Send directly to SNS rather than through the API
-    --insecure              Allow insecure connections to the API
+    --oauth-credentials=<OAUTH_CREDENTIALS> The location of the oauth credentials
+                                            [default: ~/.wellcome-storage/oauth-credentials.json]
+    --bucket=<BUCKET_NAME>                  The S3 bucket containing the bags.
+                                            [default: wellcomecollection-assets-archive-ingest]
+    --storage-space=<SPACE_NAME>            The space to use when storing the bag
+                                            [default: test-space]
+    --api=<API>                             The ingests API endpoint to use
+                                            [default: https://api.wellcomecollection.org/storage/v1/ingests]
     -h --help               Print this help message
-"""
-import uuid
 
-import boto3
+OAuth details:
+  Credentials are supplied in a file (default ~/.wellcome-storage/oauth-credentials.json) with the following Json
+
+  {
+    "token_url": "https://auth.wellcomecollection.org/oauth2/token"
+    "client_id": "YOUR-CLIENT-ID"
+    "client_secret": "YOUR-CLIENT-SECRET"
+  }
+"""
+
+import os
+
 import docopt
 import json
-import requests
+from requests_oauthlib import OAuth2Session
+from oauthlib.oauth2 import BackendApplicationClient
 
 
-def archive_bag_sns_messages(bags, bucket):
+def oauth_details_from_file(filepath):
     """
-    Generates bag archive request messages.
+    Obtain OAuth details from a file
     """
-    for bag in bags:
-        request_id = str(uuid.uuid4())
-        yield {
-            "archiveRequestId": request_id,
-            "zippedBagLocation": {"namespace": bucket, "key": bag},
-        }
+    with open(filepath, 'r') as f:
+        oauth_credentials = json.load(f)
+    return oauth_credentials
 
 
-def archive_bag_api_messages(bags, bucket):
+def oauth_session(token_url, client_id, client_secret):
+    """
+    Create a simple OAuth session
+    """
+    client = BackendApplicationClient(client_id=client_id)
+    api_session = OAuth2Session(client=client)
+    api_session.fetch_token(token_url=token_url,
+                            client_id=client_id,
+                            client_secret=client_secret)
+    return api_session
+
+
+def archive_bag_api_messages(bag_paths, space, ingest_bucket):
     """
     Generates bag archive messages.
     """
-    for bag in bags:
+    for bag_path in bag_paths:
         yield {
             "type": "Ingest",
-            "ingestType": {"id": "create", "type": "IngestType"},
-            "space": {"id": "wellcome-test", "type": "Space"},
-            "uploadUrl": f"s3://{bucket}/{bag}",
+            "ingestType": {
+                "id": "create",
+                "type": "IngestType"
+            },
+            "space": {
+                "id": space,
+                "type": "Space"
+            },
+            "sourceLocation": {
+                "type": "Location",
+                "provider": {
+                    "type": "Provider",
+                    "id": "aws-s3-standard"
+                },
+                "bucket": ingest_bucket,
+                "path": bag_path
+            }
         }
 
 
-def build_topic_arn(topic_name):
-    """Given a topic name, return the topic ARN."""
-    # https://stackoverflow.com/a/37723278/1558022
-    sts_client = boto3.client("sts")
-    account_id = sts_client.get_caller_identity().get("Account")
-
-    return f"arn:aws:sns:eu-west-1:{account_id}:{topic_name}"
-
-
-def publish_messages(topic_arn, messages):
-    """Publish a sequence of messages to an SNS topic."""
-    sns_client = boto3.client("sns")
-    for m in messages:
-        message_as_json = json.dumps(m)
-        response = sns_client.publish(
-            TopicArn=topic_arn,
-            MessageStructure="json",
-            Message=json.dumps({"default": message_as_json}),
-            Subject=f"Source: {__file__}",
-        )
-        response_status = response["ResponseMetadata"]["HTTPStatusCode"]
-        print(f"{message_as_json} -> {topic_arn} [{response_status}]")
-        assert response_status == 200, response
-
-
-def publish_to_sns(bucket_name, bags, topic_name):
-    topic_arn = build_topic_arn(topic_name)
-
-    publish_messages(
-        topic_arn=topic_arn, messages=archive_bag_sns_messages(bags, bucket_name)
-    )
-
-
-def call_ingest_api(bucket_name, bags, api, verify_ssl_certificate=True):
-    session = requests.Session()
-    for message in archive_bag_api_messages(bags, bucket_name):
-        response = session.post(api, json=message, verify=verify_ssl_certificate)
+def call_ingest_api(ingest_bucket_name, bag_paths, space, ingests_endpoint, session):
+    """
+    Call the storage ingests api to ingest bags
+    """
+    for message in archive_bag_api_messages(bag_paths, space, ingest_bucket_name):
+        response = session.post(ingests_endpoint, json=message)
         status_code = response.status_code
         if status_code != 201:
-            print_result(f"ERROR calling {api}", response)
+            print_result(f"ERROR calling {ingests_endpoint}", response)
         else:
-            print(f"{message} -> {api} [{status_code}]")
+            print(f"{message} -> {ingests_endpoint} [{status_code}]")
             location = response.headers.get("Location")
-            ingest = session.get(location, verify=verify_ssl_certificate)
+            ingest = session.get(location)
             if location:
                 print_result(location, ingest)
 
 
 def print_result(description, result):
+    """
+    pretty print the result an ingest request
+    """
     print(description)
     dumped_json = json.dumps(result.json(), indent=2)
     print(dumped_json)
@@ -113,17 +117,19 @@ def print_result(description, result):
 
 def main():
     args = docopt.docopt(__doc__)
-    bags = args["<BAG>"]
-    bucket_name = args["--bucket"]
-    use_sns_directly = args["--sns"]
-    insecure_api = args["--insecure"]
+    bag_paths = args["<BAG>"]
+    space = args["--storage-space"]
 
-    if use_sns_directly:
-        topic_name = args["--topic"]
-        publish_to_sns(bucket_name, bags, topic_name)
-    else:
-        api = args["--api"]
-        call_ingest_api(bucket_name, bags, api, not insecure_api)
+    oauth_filepath = os.path.expanduser(args["--oauth-credentials"])
+    oauth_details = oauth_details_from_file(oauth_filepath)
+    api_session = oauth_session(oauth_details['token_url'],
+                                oauth_details['client_id'],
+                                oauth_details['client_secret'])
+
+    ingest_bucket_name = args["--bucket"]
+    ingests_endpoint = args["--api"]
+
+    call_ingest_api(ingest_bucket_name, bag_paths, space, ingests_endpoint, api_session)
 
 
 if __name__ == "__main__":
@@ -131,5 +137,4 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         import sys
-
         sys.exit(1)
