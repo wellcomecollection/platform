@@ -1,0 +1,3 @@
+wellcome_aws_utils==2.2.1
+requests-oauthlib==1.0.0
+daiquiri==1.5.0

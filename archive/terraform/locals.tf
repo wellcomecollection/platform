@@ -5,6 +5,7 @@ locals {
   private_subnets = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_private_subnets}"
   public_subnets  = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_public_subnets}"
   vpc_cidr        = ["172.30.0.0/16"]
+  account_id      = "${data.aws_caller_identity.current.account_id}"
 
   //vpc_cidr       = ["${data.terraform_remote_state.shared_infra.storage_cidr_block_vpc}"]
 
