@@ -6,8 +6,7 @@ import java.util.UUID
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.server.{MalformedRequestContentRejection, RejectionHandler, Route}
-import io.circe.CursorOp.DownField
-import io.circe.{DecodingFailure, Printer}
+import io.circe.{CursorOp, DecodingFailure, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
@@ -28,13 +27,17 @@ class Router(
   import uk.ac.wellcome.platform.archive.display.DisplayProvider._
 
   implicit val rejectionHandler = RejectionHandler.newBuilder()
-    .handle { case MalformedRequestContentRejection(_, cause: DecodingFailure) =>
-    val keys = cause.history.map{ op => op.asInstanceOf[DownField].k}
+    .handle { case MalformedRequestContentRejection(err, cause: DecodingFailure) =>
 
-    val message = keys match {
-      case List(key) => s"Required property $key not supplied"
-      case _ => s"Required property ${keys.reduce((key1, key2) => s"$key1 not supplied on $key2")}"
-    }
+      val path = CursorOp.opsToPath(cause.history)
+
+      val reason = cause.message match {
+        case s if s.contains("failed cursor") => "required property not supplied."
+        case s if s.contains("invalid") => s
+        case s => s"should be a $s."
+      }
+
+      val message = s"Invalid value at $path: $reason"
 
     complete(BadRequest -> ErrorResponse(BadRequest.intValue, message, BadRequest.reason))
   }.result()

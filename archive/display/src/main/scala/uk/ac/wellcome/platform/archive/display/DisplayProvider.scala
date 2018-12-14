@@ -36,7 +36,9 @@ object DisplayProvider {
       provider <- id match {
         case StandardDisplayProvider.id => Right(StandardDisplayProvider)
         case InfrequentAccessDisplayProvider.id => Right(InfrequentAccessDisplayProvider)
-        case _ => Left(DecodingFailure("", List(DownField("id"))))
+        case _ =>
+          val fields = DownField("id") +: cursor.history
+          Left(DecodingFailure(s"invalid value supplied, valid values are: ${StandardDisplayProvider.id}, ${InfrequentAccessDisplayProvider.id}.", fields))
       }
   } yield {
     provider

@@ -299,7 +299,7 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
 
-                actualError shouldBe ErrorResponse(400, "Required property sourceLocation not supplied", "Bad Request", "Error")
+                actualError shouldBe ErrorResponse(400, "Invalid value at .sourceLocation: required property not supplied.", "Bad Request", "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)
@@ -356,7 +356,7 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
 
-                actualError shouldBe ErrorResponse(400, "Required property bucket not supplied on sourceLocation", "Bad Request", "Error")
+                actualError shouldBe ErrorResponse(400, "Invalid value at .sourceLocation.bucket: required property not supplied.", "Bad Request", "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)
@@ -367,6 +367,65 @@ class ProgressHttpFeatureTest
           }
       }
     }
+
+    it("returns a json error if the sourceLocation has an invalid bucket field") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`application/json`,
+              s"""|{
+                  |  "type": "Ingest",
+                  |  "ingestType": {
+                  |    "id": "create",
+                  |    "type": "IngestType"
+                  |  },
+                  |  "sourceLocation":{
+                  |    "type": "Location",
+                  |    "provider": {
+                  |      "type": "Provider",
+                  |      "id": "${StandardDisplayProvider.id}"
+                  |    },
+                  |    "bucket": {"name": "bucket"},
+                  |    "path": "b22454408.zip"
+                  |  },
+                  |  "space": {
+                  |    "id": "bcnfgh",
+                  |    "type": "Space"
+                  |  }
+                  |}""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.BadRequest
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+
+                actualError shouldBe ErrorResponse(400, "Invalid value at .sourceLocation.bucket: should be a String.", "Bad Request", "Error")
+                val requests =
+                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
+                    fromJson[IngestBagRequest](messageInfo.message).get)
+
+                requests shouldBe empty
+              }
+            }
+          }
+      }
+    }
+
 
     it("returns a json error if the provider doesn't have a valid id field") {
       withConfiguredApp {
@@ -414,7 +473,7 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
 
-                actualError shouldBe ErrorResponse(400, "Invalid value supplied for id on provider on sourceLocation, valid values are: aws-s3-standard, aws-s3-ia", "Bad Request", "Error")
+                actualError shouldBe ErrorResponse(400, "Invalid value at .sourceLocation.provider.id: invalid value supplied, valid values are: aws-s3-standard, aws-s3-ia.", "Bad Request", "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)
