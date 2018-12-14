@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.display
 
 import io.circe.CursorOp.DownField
-import io.circe.{Decoder, DecodingFailure}
+import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import uk.ac.wellcome.platform.archive.common.progress.models.{InfrequentAccessStorageProvider, StandardStorageProvider, StorageProvider}
 
 sealed trait DisplayProvider{
@@ -41,4 +41,8 @@ object DisplayProvider {
   } yield {
     provider
   })
+
+  implicit val encoder: Encoder[DisplayProvider] = Encoder.instance[DisplayProvider] { provider =>
+    Json.obj("id" -> Json.fromString(provider.id), "type" -> Json.fromString("Provider"))
+  }
 }

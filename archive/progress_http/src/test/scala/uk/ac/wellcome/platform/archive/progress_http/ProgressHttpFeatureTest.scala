@@ -35,6 +35,8 @@ class ProgressHttpFeatureTest
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
+  import uk.ac.wellcome.storage.dynamo._
+  import Progress._
 
   val contextUrl = "http://api.wellcomecollection.org/storage/v1/context.json"
   describe("GET /progress/:id") {
@@ -52,7 +54,7 @@ class ProgressHttpFeatureTest
       "type": "Provider"
     },
     "bucket": "${progress.sourceLocation.location.namespace}",
-    "path": ""${progress.sourceLocation.location.key}"",
+    "path": "${progress.sourceLocation.location.key}",
     "type": "Location"
   }""".stripMargin
 
@@ -228,22 +230,19 @@ class ProgressHttpFeatureTest
                     actualCallbackStatus shouldBe "processing"
                     actualSpaceId shouldBe spaceName
 
-                    assertTableOnlyHasItem(
-                      Progress(
-                        id,
-                        StorageLocation(
-                          StandardStorageProvider,
-                          ObjectLocation(bucketName, s3key)),
-                        Namespace(spaceName),
-                        Some(Callback(testCallbackUri, Callback.Pending)),
-                        Progress.Accepted,
-                        None,
-                        Instant.parse(actualCreatedDate),
-                        Instant.parse(actualLastModifiedDate),
-                        Nil
-                      ),
-                      table
-                    )
+                    assertTableOnlyHasItem[Progress](Progress(
+                      id,
+                      StorageLocation(
+                        StandardStorageProvider,
+                        ObjectLocation(bucketName, s3key)),
+                      Namespace(spaceName),
+                      Some(Callback(testCallbackUri, Callback.Pending)),
+                      Progress.Accepted,
+                      None,
+                      Instant.parse(actualCreatedDate),
+                      Instant.parse(actualLastModifiedDate),
+                      Nil
+                    ), table)
                 }
 
                 val requests =
