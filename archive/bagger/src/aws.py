@@ -77,9 +77,15 @@ def get_bagging_messages():
 
 
 def get_error_for_b_number(bnumber):
-    obj = get_s3().Object(settings.DROP_BUCKET_NAME_ERRORS, bnumber + ".json")
-    content = obj.get()["Body"].read().decode("utf-8")
-    return json.loads(content)
+    try:
+        obj = get_s3().Object(settings.DROP_BUCKET_NAME_ERRORS, bnumber + ".json")
+        content = obj.get()["Body"].read().decode("utf-8")
+        b_error = json.loads(content)
+        b_error["last_modified"] = str(obj.last_modified)
+        return b_error
+    except ClientError as ce:
+        print("Unable to get s3 obj for " + bnumber)
+        raise ce
 
 
 def get_all_errors():
