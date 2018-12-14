@@ -128,16 +128,13 @@ class RegistrarHttpFeatureTest
                 s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") {
                 response =>
                   response.status shouldBe StatusCodes.OK
-                  val value =
-                    response.entity.dataBytes.runWith(Sink.fold("") {
-                      case (acc, byteString) => acc + byteString.utf8String
-                    })
-                  whenReady(value) { jsonString =>
-                    val infoJson =
-                      root.info.json
-                        .getOption(parse(jsonString).right.get)
-                        .get
-                    infoJson.findAllByKey("externalDescription") shouldBe empty
+
+                  withStringEntity(response.entity) {jsonString =>
+                      val infoJson =
+                        root.info.json
+                          .getOption(parse(jsonString).right.get)
+                          .get
+                      infoJson.findAllByKey("externalDescription") shouldBe empty
                   }
               }
             }

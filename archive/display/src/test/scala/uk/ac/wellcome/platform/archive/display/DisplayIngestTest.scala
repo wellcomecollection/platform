@@ -32,7 +32,7 @@ class DisplayIngestTest
     val progress: Progress = Progress(
       id,
       StorageLocation(
-        StorageProvider("s3"),
+        StandardStorageProvider,
         ObjectLocation("bukkit", "key.txt")),
       Namespace(spaceId),
       Some(Callback(new URI(callbackUrl))),
@@ -48,7 +48,7 @@ class DisplayIngestTest
 
     ingest.id shouldBe id
     ingest.sourceLocation shouldBe DisplayLocation(
-      DisplayProvider("s3"),
+      StandardDisplayProvider,
       bucket = "bukkit",
       path = "key.txt")
     ingest.callback shouldBe Some(
@@ -64,7 +64,7 @@ class DisplayIngestTest
   }
 
   it("transforms itself into a progress") {
-    val displayProvider = DisplayProvider("s3", "Amazon s3")
+    val displayProvider = InfrequentAccessDisplayProvider
     val bucket = "ingest-bucket"
     val path = "bag.zip"
     val progressCreateRequest = RequestDisplayIngest(
@@ -79,7 +79,7 @@ class DisplayIngestTest
 
     progress.id shouldBe a[UUID]
     progress.sourceLocation shouldBe StorageLocation(
-      StorageProvider(displayProvider.id),
+      InfrequentAccessStorageProvider,
       ObjectLocation(bucket, path))
     progress.callback shouldBe Some(
       Callback(URI.create(progressCreateRequest.callback.get.url)))

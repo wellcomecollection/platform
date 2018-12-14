@@ -60,14 +60,6 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
 
-  val circeDependencies = Seq(
-    "io.circe" %% "circe-core" % versions.circeVersion,
-    "io.circe" %% "circe-generic"% versions.circeVersion,
-    "io.circe" %% "circe-generic-extras"% versions.circeVersion,
-    "io.circe" %% "circe-parser"% versions.circeVersion,
-    "io.circe" %% "circe-java8" % versions.circeVersion
-  )
-
   val circeOpticsDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
@@ -201,4 +193,5 @@ object Dependencies {
   ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 
   val registrarHttpDependencies: Seq[ModuleID] = circeOpticsDependencies
+  val progressHttpDependencies: Seq[ModuleID] = circeOpticsDependencies
 }

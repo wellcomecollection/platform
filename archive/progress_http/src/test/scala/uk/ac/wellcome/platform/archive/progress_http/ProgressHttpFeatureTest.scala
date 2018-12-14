@@ -5,10 +5,11 @@ import java.util.UUID
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.scaladsl.Sink
+import io.circe.optics.JsonPath.root
 import io.circe.parser._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
+import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
@@ -28,13 +29,12 @@ class ProgressHttpFeatureTest
     with ProgressHttpFixture
     with RandomThings
     with Inside
-    with IntegrationPatience {
+    with IntegrationPatience
+    with JsonAssertions{
 
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
-  import uk.ac.wellcome.storage.dynamo._
-  import Progress._
 
   val contextUrl = "http://api.wellcomecollection.org/storage/v1/context.json"
   describe("GET /progress/:id") {
@@ -44,27 +44,67 @@ class ProgressHttpFeatureTest
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
+
+              val expectedSourceLocationJson =
+                s"""{
+    "provider": {
+      "id": "${StandardDisplayProvider.id}",
+      "type": "Provider"
+    },
+    "bucket": "${progress.sourceLocation.location.namespace}",
+    "path": ""${progress.sourceLocation.location.key}"",
+    "type": "Location"
+  }""".stripMargin
+
+              val expectedCallbackJson =
+                s"""{
+    "url": "${progress.callback.get.uri}",
+    "status": {
+      "id": "processing",
+      "type": "Status"
+    },
+    "type": "Callback"
+  }""".stripMargin
+
+              val expectedIngestTypeJson = s"""{
+    "id": "create",
+    "type": "IngestType"
+  }""".stripMargin
+
+              val expectedSpaceJson = s"""{
+    "id": "${progress.space.underlying}",
+    "type": "Space"
+  }""".stripMargin
+
+              val expectedStatusJson = s"""{
+    "id": "accepted",
+    "type": "Status"
+  }""".stripMargin
+
               whenReady(progressTracker.initialise(progress)) { _ =>
                 whenGetRequestReady(s"$baseUrl/progress/${progress.id}") {
                   result =>
                     result.status shouldBe StatusCodes.OK
-                    getT[ResponseDisplayIngest](result.entity) shouldBe ResponseDisplayIngest(
-                      contextUrl,
-                      progress.id,
-                      DisplayLocation(
-                        DisplayProvider(progress.sourceLocation.provider.id),
-                        progress.sourceLocation.location.namespace,
-                        progress.sourceLocation.location.key),
-                      progress.callback.map(DisplayCallback(_)),
-                      DisplayIngestType("create"),
-                      DisplayStorageSpace(progress.space.underlying),
-                      DisplayStatus(progress.status.toString),
-                      None,
-                      Nil,
-                      progress.createdDate.toString,
-                      progress.lastModifiedDate.toString
-                    )
 
+                    withStringEntity(result.entity){ jsonString=>
+                      val json = parse(jsonString).right.get
+                      root.`@context`.string.getOption(json).get shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
+                      root.id.string.getOption(json).get shouldBe progress.id.toString
+
+
+                      assertJsonStringsAreEqual(root.sourceLocation.json.getOption(json).get.noSpaces, expectedSourceLocationJson)
+
+                      assertJsonStringsAreEqual(root.callback.json.getOption(json).get.noSpaces, expectedCallbackJson)
+                      assertJsonStringsAreEqual(root.ingestType.json.getOption(json).get.noSpaces, expectedIngestTypeJson)
+                      assertJsonStringsAreEqual(root.space.json.getOption(json).get.noSpaces, expectedSpaceJson)
+                      assertJsonStringsAreEqual(root.status.json.getOption(json).get.noSpaces, expectedStatusJson)
+                      assertJsonStringsAreEqual(root.events.json.getOption(json).get.noSpaces, "[]")
+
+                      root.`type`.string.getOption(json).get shouldBe "Ingest"
+
+                      assertRecent(Instant.parse(root.createdDate.string.getOption(json).get))
+                      assertRecent(Instant.parse(root.lastModifiedDate.string.getOption(json).get))
+                    }
                 }
               }
             }
@@ -82,16 +122,10 @@ class ProgressHttpFeatureTest
                 whenGetRequestReady(s"$baseUrl/progress/${progress.id}") {
                   result =>
                     result.status shouldBe StatusCodes.OK
-                    val value =
-                      result.entity.dataBytes.runWith(Sink.fold("") {
-                        case (acc, byteString) =>
-                          acc + byteString.utf8String
-                      })
-                    whenReady(value) { jsonString =>
-                      val infoJson = parse(jsonString).right.get
-                      infoJson.findAllByKey("callback") shouldBe empty
-                    }
-
+                    withStringEntity(result.entity) {jsonString =>
+                        val infoJson = parse(jsonString).right.get
+                        infoJson.findAllByKey("callback") shouldBe empty
+                      }
                 }
               }
             }
@@ -116,23 +150,34 @@ class ProgressHttpFeatureTest
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
-            val someCallback = Some(
-              DisplayCallback(url = testCallbackUri.toString, status = None))
-            val storageSpace = DisplayStorageSpace(id = "somespace")
-            val displayIngestType = DisplayIngestType(id = "create")
-            val displayProvider = DisplayProvider("s3")
-            val displayLocation =
-              DisplayLocation(displayProvider, "bucket", "key.txt")
-            val createProgressRequest = RequestDisplayIngest(
-              sourceLocation = displayLocation,
-              callback = someCallback,
-              space = storageSpace,
-              ingestType = displayIngestType
-            )
-
+            val bucketName = "bucket"
+            val s3key = "key.txt"
+            val spaceName = "somespace"
             val entity = HttpEntity(
               ContentTypes.`application/json`,
-              toJson(createProgressRequest).get
+              s"""|{
+                 |  "type": "Ingest",
+                 |  "ingestType": {
+                 |    "id": "create",
+                 |    "type": "IngestType"
+                 |  },
+                 |  "sourceLocation":{
+                 |    "type": "Location",
+                 |    "provider": {
+                 |      "type": "Provider",
+                 |      "id": "${StandardDisplayProvider.id}"
+                 |    },
+                 |    "bucket": "$bucketName",
+                 |    "path": "$s3key"
+                 |  },
+                 |  "space": {
+                 |    "id": "$spaceName",
+                 |    "type": "Space"
+                 |  },
+                 |  "callback": {
+                 |    "url": "${testCallbackUri.toString}"
+                 |  }
+                 |}""".stripMargin
             )
 
             val request = HttpRequest(
@@ -178,18 +223,18 @@ class ProgressHttpFeatureTest
                       "Ingest") =>
                     actualContextUrl shouldBe contextUrl
                     actualId shouldBe id
-                    actualSourceLocation shouldBe displayLocation
+                    actualSourceLocation shouldBe DisplayLocation(StandardDisplayProvider, bucketName, s3key)
                     actualCallbackUrl shouldBe testCallbackUri.toString
                     actualCallbackStatus shouldBe "processing"
-                    actualSpaceId shouldBe storageSpace.id
+                    actualSpaceId shouldBe spaceName
 
                     assertTableOnlyHasItem(
                       Progress(
                         id,
                         StorageLocation(
-                          StorageProvider("s3"),
-                          ObjectLocation("bucket", "key.txt")),
-                        Namespace(storageSpace.id),
+                          StandardStorageProvider,
+                          ObjectLocation(bucketName, s3key)),
+                        Namespace(spaceName),
                         Some(Callback(testCallbackUri, Callback.Pending)),
                         Progress.Accepted,
                         None,
@@ -208,7 +253,7 @@ class ProgressHttpFeatureTest
                 requests shouldBe List(
                   IngestBagRequest(
                     id,
-                    storageSpace = StorageSpace(storageSpace.id),
+                    storageSpace = StorageSpace(spaceName),
                     archiveCompleteCallbackUrl = Some(testCallbackUri),
                     zippedBagLocation = ObjectLocation("bucket", "key.txt")
                   ))
@@ -235,9 +280,6 @@ class ProgressHttpFeatureTest
                  |  "space": {
                  |    "id": "bcnfgh",
                  |    "type": "Space"
-                 |  },
-                 |  "callback": {
-                 |  	"url": "{{callback_url}}"
                  |  }
                  |}""".stripMargin
             )
@@ -278,7 +320,7 @@ class ProgressHttpFeatureTest
 
             val entity = HttpEntity(
               ContentTypes.`application/json`,
-              """|{
+              s"""|{
                  |  "type": "Ingest",
                  |  "ingestType": {
                  |    "id": "create",
@@ -288,16 +330,13 @@ class ProgressHttpFeatureTest
                  |    "type": "Location",
                  |    "provider": {
                  |      "type": "Provider",
-                 |      "id": "aws-s3-standard"
+                 |      "id": "${StandardDisplayProvider.id}"
                  |    },
                  |    "path": "b22454408.zip"
                  |  },
                  |  "space": {
                  |    "id": "bcnfgh",
                  |    "type": "Space"
-                 |  },
-                 |  "callback": {
-                 |  	"url": "{{callback_url}}"
                  |  }
                  |}""".stripMargin
             )
@@ -319,6 +358,64 @@ class ProgressHttpFeatureTest
               whenReady(progressFuture) { actualError =>
 
                 actualError shouldBe ErrorResponse(400, "Required property bucket not supplied on sourceLocation", "Bad Request", "Error")
+                val requests =
+                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
+                    fromJson[IngestBagRequest](messageInfo.message).get)
+
+                requests shouldBe empty
+              }
+            }
+          }
+      }
+    }
+
+    it("returns a json error if the provider doesn't have a valid id field") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`application/json`,
+              """|{
+                 |  "type": "Ingest",
+                 |  "ingestType": {
+                 |    "id": "create",
+                 |    "type": "IngestType"
+                 |  },
+                 |  "sourceLocation":{
+                 |    "type": "Location",
+                 |    "provider": {
+                 |      "type": "Provider",
+                 |      "id": "blipbloop"
+                 |    },
+                 |    "bucket": "bucket",
+                 |    "path": "b22454408.zip"
+                 |  },
+                 |  "space": {
+                 |    "id": "bcnfgh",
+                 |    "type": "Space"
+                 |  }
+                 |}""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.BadRequest
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+
+                actualError shouldBe ErrorResponse(400, "Invalid value supplied for id on provider on sourceLocation, valid values are: aws-s3-standard, aws-s3-ia", "Bad Request", "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)

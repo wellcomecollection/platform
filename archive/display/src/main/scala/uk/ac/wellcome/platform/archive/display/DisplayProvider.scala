@@ -1,13 +1,44 @@
 package uk.ac.wellcome.platform.archive.display
 
-import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.common.progress.models.StorageProvider
+import io.circe.CursorOp.DownField
+import io.circe.{Decoder, DecodingFailure}
+import uk.ac.wellcome.platform.archive.common.progress.models.{InfrequentAccessStorageProvider, StandardStorageProvider, StorageProvider}
 
-case class DisplayProvider(id: String,
-                           @JsonKey("type") ontologyType: String = "Provider") {
-  def toStorageProvider: StorageProvider = StorageProvider(id)
+sealed trait DisplayProvider{
+  val id: String
+  final val ontologyType: String = "Provider"
+
+  def toStorageProvider: StorageProvider
 }
+
+case object StandardDisplayProvider extends DisplayProvider {
+  override val id: String = "aws-s3-standard"
+
+  override def toStorageProvider: StorageProvider = StandardStorageProvider
+}
+
+case object InfrequentAccessDisplayProvider extends DisplayProvider {
+  override val id: String = "aws-s3-ia"
+
+  override def toStorageProvider: StorageProvider = InfrequentAccessStorageProvider
+}
+
 object DisplayProvider {
   def apply(provider: StorageProvider): DisplayProvider =
-    DisplayProvider(id = provider.id)
+    provider match {
+      case StandardStorageProvider => StandardDisplayProvider
+      case InfrequentAccessStorageProvider => InfrequentAccessDisplayProvider
+    }
+
+  implicit val decoder: Decoder[DisplayProvider] = Decoder.instance[DisplayProvider](cursor =>
+    for {
+    id <- cursor.downField("id").as[String]
+      provider <- id match {
+        case StandardDisplayProvider.id => Right(StandardDisplayProvider)
+        case InfrequentAccessDisplayProvider.id => Right(InfrequentAccessDisplayProvider)
+        case _ => Left(DecodingFailure("", List(DownField("id"))))
+      }
+  } yield {
+    provider
+  })
 }

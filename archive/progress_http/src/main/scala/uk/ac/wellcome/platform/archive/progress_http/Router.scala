@@ -25,8 +25,10 @@ class Router(
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
   implicit val printer = Printer.noSpaces.copy(dropNullValues = true)
+  import uk.ac.wellcome.platform.archive.display.DisplayProvider._
 
-  implicit val rejectionHandler = RejectionHandler.newBuilder().handle { case MalformedRequestContentRejection(_, cause: DecodingFailure) =>
+  implicit val rejectionHandler = RejectionHandler.newBuilder()
+    .handle { case MalformedRequestContentRejection(_, cause: DecodingFailure) =>
     val keys = cause.history.map{ op => op.asInstanceOf[DownField].k}
 
     val message = keys match {
@@ -43,15 +45,16 @@ class Router(
   def routes: Route = {
     pathPrefix("progress") {
       post {
-        entity(as[RequestDisplayIngest]) { progressCreateRequest =>
-          onSuccess(
-            progressStarter.initialise(progressCreateRequest.toProgress)) {
-            progress =>
-              respondWithHeaders(List(createLocationHeader(progress))) {
-                complete(Created -> ResponseDisplayIngest(progress, contextURL))
-              }
+        entity(as[RequestDisplayIngest]) { requestDisplayIngest =>
+            onSuccess(
+              progressStarter.initialise(requestDisplayIngest.toProgress)) {
+              progress =>
+                respondWithHeaders(List(createLocationHeader(progress))) {
+                  complete(Created -> ResponseDisplayIngest(progress, contextURL))
+                }
+            }
           }
-        }
+
       } ~ path(JavaUUID) { id: UUID =>
         get {
           onSuccess(monitor.get(id)) {
