@@ -129,12 +129,12 @@ class RegistrarHttpFeatureTest
                 response =>
                   response.status shouldBe StatusCodes.OK
 
-                  withStringEntity(response.entity) {jsonString =>
-                      val infoJson =
-                        root.info.json
-                          .getOption(parse(jsonString).right.get)
-                          .get
-                      infoJson.findAllByKey("externalDescription") shouldBe empty
+                  withStringEntity(response.entity) { jsonString =>
+                    val infoJson =
+                      root.info.json
+                        .getOption(parse(jsonString).right.get)
+                        .get
+                    infoJson.findAllByKey("externalDescription") shouldBe empty
                   }
               }
             }

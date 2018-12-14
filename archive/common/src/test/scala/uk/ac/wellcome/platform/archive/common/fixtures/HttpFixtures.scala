@@ -44,7 +44,8 @@ trait HttpFixtures extends Akka with ScalaFutures {
     fromJson[T](stringBody).get
   }
 
-  def withStringEntity[R](httpEntity: HttpEntity)(testWith: TestWith[String, R])(implicit materializer: ActorMaterializer) = {
+  def withStringEntity[R](httpEntity: HttpEntity)(
+    testWith: TestWith[String, R])(implicit materializer: ActorMaterializer) = {
     val value =
       httpEntity.dataBytes.runWith(Sink.fold("") {
         case (acc, byteString) =>

@@ -30,7 +30,7 @@ class ProgressHttpFeatureTest
     with RandomThings
     with Inside
     with IntegrationPatience
-    with JsonAssertions{
+    with JsonAssertions {
 
   import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
@@ -88,24 +88,41 @@ class ProgressHttpFeatureTest
                   result =>
                     result.status shouldBe StatusCodes.OK
 
-                    withStringEntity(result.entity){ jsonString=>
+                    withStringEntity(result.entity) { jsonString =>
                       val json = parse(jsonString).right.get
-                      root.`@context`.string.getOption(json).get shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
-                      root.id.string.getOption(json).get shouldBe progress.id.toString
+                      root.`@context`.string
+                        .getOption(json)
+                        .get shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
+                      root.id.string
+                        .getOption(json)
+                        .get shouldBe progress.id.toString
 
+                      assertJsonStringsAreEqual(
+                        root.sourceLocation.json.getOption(json).get.noSpaces,
+                        expectedSourceLocationJson)
 
-                      assertJsonStringsAreEqual(root.sourceLocation.json.getOption(json).get.noSpaces, expectedSourceLocationJson)
-
-                      assertJsonStringsAreEqual(root.callback.json.getOption(json).get.noSpaces, expectedCallbackJson)
-                      assertJsonStringsAreEqual(root.ingestType.json.getOption(json).get.noSpaces, expectedIngestTypeJson)
-                      assertJsonStringsAreEqual(root.space.json.getOption(json).get.noSpaces, expectedSpaceJson)
-                      assertJsonStringsAreEqual(root.status.json.getOption(json).get.noSpaces, expectedStatusJson)
-                      assertJsonStringsAreEqual(root.events.json.getOption(json).get.noSpaces, "[]")
+                      assertJsonStringsAreEqual(
+                        root.callback.json.getOption(json).get.noSpaces,
+                        expectedCallbackJson)
+                      assertJsonStringsAreEqual(
+                        root.ingestType.json.getOption(json).get.noSpaces,
+                        expectedIngestTypeJson)
+                      assertJsonStringsAreEqual(
+                        root.space.json.getOption(json).get.noSpaces,
+                        expectedSpaceJson)
+                      assertJsonStringsAreEqual(
+                        root.status.json.getOption(json).get.noSpaces,
+                        expectedStatusJson)
+                      assertJsonStringsAreEqual(
+                        root.events.json.getOption(json).get.noSpaces,
+                        "[]")
 
                       root.`type`.string.getOption(json).get shouldBe "Ingest"
 
-                      assertRecent(Instant.parse(root.createdDate.string.getOption(json).get))
-                      assertRecent(Instant.parse(root.lastModifiedDate.string.getOption(json).get))
+                      assertRecent(Instant.parse(
+                        root.createdDate.string.getOption(json).get))
+                      assertRecent(Instant.parse(
+                        root.lastModifiedDate.string.getOption(json).get))
                     }
                 }
               }
@@ -124,10 +141,10 @@ class ProgressHttpFeatureTest
                 whenGetRequestReady(s"$baseUrl/progress/${progress.id}") {
                   result =>
                     result.status shouldBe StatusCodes.OK
-                    withStringEntity(result.entity) {jsonString =>
-                        val infoJson = parse(jsonString).right.get
-                        infoJson.findAllByKey("callback") shouldBe empty
-                      }
+                    withStringEntity(result.entity) { jsonString =>
+                      val infoJson = parse(jsonString).right.get
+                      infoJson.findAllByKey("callback") shouldBe empty
+                    }
                 }
               }
             }
@@ -225,24 +242,30 @@ class ProgressHttpFeatureTest
                       "Ingest") =>
                     actualContextUrl shouldBe contextUrl
                     actualId shouldBe id
-                    actualSourceLocation shouldBe DisplayLocation(StandardDisplayProvider, bucketName, s3key)
+                    actualSourceLocation shouldBe DisplayLocation(
+                      StandardDisplayProvider,
+                      bucketName,
+                      s3key)
                     actualCallbackUrl shouldBe testCallbackUri.toString
                     actualCallbackStatus shouldBe "processing"
                     actualSpaceId shouldBe spaceName
 
-                    assertTableOnlyHasItem[Progress](Progress(
-                      id,
-                      StorageLocation(
-                        StandardStorageProvider,
-                        ObjectLocation(bucketName, s3key)),
-                      Namespace(spaceName),
-                      Some(Callback(testCallbackUri, Callback.Pending)),
-                      Progress.Accepted,
-                      None,
-                      Instant.parse(actualCreatedDate),
-                      Instant.parse(actualLastModifiedDate),
-                      Nil
-                    ), table)
+                    assertTableOnlyHasItem[Progress](
+                      Progress(
+                        id,
+                        StorageLocation(
+                          StandardStorageProvider,
+                          ObjectLocation(bucketName, s3key)),
+                        Namespace(spaceName),
+                        Some(Callback(testCallbackUri, Callback.Pending)),
+                        Progress.Accepted,
+                        None,
+                        Instant.parse(actualCreatedDate),
+                        Instant.parse(actualLastModifiedDate),
+                        Nil
+                      ),
+                      table
+                    )
                 }
 
                 val requests =
@@ -262,7 +285,8 @@ class ProgressHttpFeatureTest
       }
     }
 
-    it("returns a json error if the ingest request doesn't have a sourceLocation") {
+    it(
+      "returns a json error if the ingest request doesn't have a sourceLocation") {
       withConfiguredApp {
         case (_, topic, baseUrl) =>
           withMaterializer { implicit materialiser =>
@@ -298,8 +322,11 @@ class ProgressHttpFeatureTest
                 Unmarshal(response.entity).to[ErrorResponse]
 
               whenReady(progressFuture) { actualError =>
-
-                actualError shouldBe ErrorResponse(400, "Invalid value at .sourceLocation: required property not supplied.", "Bad Request", "Error")
+                actualError shouldBe ErrorResponse(
+                  400,
+                  "Invalid value at .sourceLocation: required property not supplied.",
+                  "Bad Request",
+                  "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)
@@ -355,8 +382,11 @@ class ProgressHttpFeatureTest
                 Unmarshal(response.entity).to[ErrorResponse]
 
               whenReady(progressFuture) { actualError =>
-
-                actualError shouldBe ErrorResponse(400, "Invalid value at .sourceLocation.bucket: required property not supplied.", "Bad Request", "Error")
+                actualError shouldBe ErrorResponse(
+                  400,
+                  "Invalid value at .sourceLocation.bucket: required property not supplied.",
+                  "Bad Request",
+                  "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)
@@ -413,8 +443,11 @@ class ProgressHttpFeatureTest
                 Unmarshal(response.entity).to[ErrorResponse]
 
               whenReady(progressFuture) { actualError =>
-
-                actualError shouldBe ErrorResponse(400, "Invalid value at .sourceLocation.bucket: should be a String.", "Bad Request", "Error")
+                actualError shouldBe ErrorResponse(
+                  400,
+                  "Invalid value at .sourceLocation.bucket: should be a String.",
+                  "Bad Request",
+                  "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)
@@ -425,7 +458,6 @@ class ProgressHttpFeatureTest
           }
       }
     }
-
 
     it("returns a json error if the provider doesn't have a valid id field") {
       withConfiguredApp {
@@ -472,8 +504,11 @@ class ProgressHttpFeatureTest
                 Unmarshal(response.entity).to[ErrorResponse]
 
               whenReady(progressFuture) { actualError =>
-
-                actualError shouldBe ErrorResponse(400, "Invalid value at .sourceLocation.provider.id: invalid value supplied, valid values are: aws-s3-standard, aws-s3-ia.", "Bad Request", "Error")
+                actualError shouldBe ErrorResponse(
+                  400,
+                  "Invalid value at .sourceLocation.provider.id: invalid value supplied, valid values are: aws-s3-standard, aws-s3-ia.",
+                  "Bad Request",
+                  "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)
