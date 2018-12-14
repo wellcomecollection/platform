@@ -32,4 +32,3 @@ resource "aws_lambda_function" "lambda_trigger_bag_ingest_monitoring" {
     }
   }
 }
-

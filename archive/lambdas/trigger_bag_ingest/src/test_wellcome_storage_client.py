@@ -8,4 +8,4 @@ def test_ingest(storage_client):
 
 def test_get_ingest(storage_client):
     response = storage_client.get_ingest("123456")
-    assert response['id'] == "123456"
+    assert response["id"] == "123456"

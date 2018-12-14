@@ -20,6 +20,6 @@ def test_lambda(storage_client):
     trigger_bag_ingest.main(event=None, context=None)
 
     r = requests.get(f"http://{wiremock_server}/__admin/requests?since={start_time}Z")
-    assert(r.status_code == 200)
-    ingest_requests = r.json()['requests']
-    assert(len(ingest_requests) == 1)
+    assert r.status_code == 200
+    ingest_requests = r.json()["requests"]
+    assert len(ingest_requests) == 1

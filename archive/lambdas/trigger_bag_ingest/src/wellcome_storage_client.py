@@ -8,12 +8,15 @@ class WellcomeStorageClient:
     """
     Client for the Wellcome Storage API
     """
+
     def __init__(self, api_url, oauth_details=None):
         self.api_url = api_url
         if oauth_details:
-            self.session = self.oauth_session(oauth_details['token_url'],
-                                              oauth_details['client_id'],
-                                              oauth_details['client_secret'])
+            self.session = self.oauth_session(
+                oauth_details["token_url"],
+                oauth_details["client_id"],
+                oauth_details["client_secret"],
+            )
         else:
             self.session = requests.Session()
 
@@ -41,7 +44,7 @@ class WellcomeStorageClient:
                 "provider": {"type": "Provider", "id": "aws-s3-standard"},
                 "bucket": ingest_bucket_name,
                 "path": bag_path,
-            }
+            },
         }
 
     def ingests_endpoint(self):
@@ -57,7 +60,8 @@ class WellcomeStorageClient:
         ingests_endpoint = self.ingests_endpoint()
         response = self.session.post(
             ingests_endpoint,
-            json=self.ingest_payload(bag_path, ingest_bucket_name, space))
+            json=self.ingest_payload(bag_path, ingest_bucket_name, space),
+        )
         status_code = response.status_code
         if status_code == 201:
             return response.headers.get("Location")

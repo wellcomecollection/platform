@@ -10,4 +10,3 @@ module "lambda_trigger_bag_ingest" {
   ingest_bucket_name     = "${local.ingest_bucket_name}"
   account_id             = "${local.account_id}"
 }
-

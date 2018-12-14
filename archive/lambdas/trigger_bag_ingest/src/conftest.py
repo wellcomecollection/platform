@@ -9,10 +9,7 @@ def storage_client(docker_services, docker_ip):
     docker_services.wait_until_responsive(
         timeout=10.0,
         pause=0.1,
-        check=_is_responsive(
-            endpoint_url,
-            lambda r: r.status_code == 403,
-        ),
+        check=_is_responsive(endpoint_url, lambda r: r.status_code == 403),
     )
     yield WellcomeStorageClient(endpoint_url)
 
