@@ -1,12 +1,12 @@
 package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.Index
-import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.http.ElasticDsl.{createIndex, _}
 import com.sksamuel.elastic4s.http.index.CreateIndexResponse
 import com.sksamuel.elastic4s.http.index.mappings.PutMappingResponse
-import com.sksamuel.elastic4s.mappings.MappingDefinition
+import com.sksamuel.elastic4s.http.{ElasticClient, Response}
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
+import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import grizzled.slf4j.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,13 +14,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class ElasticsearchIndexCreator(elasticClient: ElasticClient)(
   implicit ec: ExecutionContext)
     extends Logging {
-  def create(index: Index,
-             mappingDefinitionBuilder: MappingDefinitionBuilder): Future[Unit] =
-    create(
-      index = index,
-      mappingDefinition =
-        mappingDefinitionBuilder.buildMappingDefinition(index.name)
-    )
+  def create(index: Index, fields: Seq[FieldDefinition]): Future[Unit] = {
+    val mappingDefinition: MappingDefinition =
+      mapping(index.name)
+        .dynamic(DynamicMapping.Strict)
+        .as(fields)
+
+    create(index = index, mappingDefinition = mappingDefinition)
+  }
 
   private def create(index: Index,
                      mappingDefinition: MappingDefinition): Future[Unit] =

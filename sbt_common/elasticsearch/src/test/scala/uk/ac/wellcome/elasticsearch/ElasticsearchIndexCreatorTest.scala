@@ -4,8 +4,6 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.{RequestFailure, Response}
 import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.sksamuel.elastic4s.mappings.MappingDefinition
-import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
@@ -42,33 +40,14 @@ class ElasticsearchIndexCreatorTest
     with JsonAssertions
     with BeforeAndAfterEach {
 
-  object TestIndex extends MappingDefinitionBuilder {
-    def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
-      mapping(rootIndexType)
-        .dynamic(DynamicMapping.Strict)
-        .as(
-          keywordField("id"),
-          textField("description"),
-          booleanField("visible")
-        )
-    }
-  }
-
-  object CompatibleTestIndex extends MappingDefinitionBuilder {
-    def buildMappingDefinition(rootIndexType: String): MappingDefinition = {
-      mapping(rootIndexType)
-        .dynamic(DynamicMapping.Strict)
-        .as(
-          keywordField("id"),
-          textField("description"),
-          booleanField("visible"),
-          intField("count")
-        )
-    }
-  }
+  val indexFields = Seq(
+    keywordField("id"),
+    textField("description"),
+    booleanField("visible")
+  )
 
   it("creates an index into which doc of the expected type can be put") {
-    withLocalElasticsearchIndex(TestIndex) { index =>
+    withLocalElasticsearchIndex(indexFields) { index =>
       val testObject = TestObject("id", "description", true)
       val testObjectJson = toJson(testObject).get
 
@@ -94,7 +73,7 @@ class ElasticsearchIndexCreatorTest
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
-    withLocalElasticsearchIndex(TestIndex) { index =>
+    withLocalElasticsearchIndex(indexFields) { index =>
       val badTestObject = BadTestObject("id", 5)
       val badTestObjectJson = toJson(badTestObject).get
 
@@ -113,8 +92,10 @@ class ElasticsearchIndexCreatorTest
   }
 
   it("updates an already existing index with a compatible mapping") {
-    withLocalElasticsearchIndex(TestIndex) { index =>
-      withLocalElasticsearchIndex(CompatibleTestIndex, index = index) { _ =>
+    withLocalElasticsearchIndex(indexFields) { index =>
+      val compatibleIndexFields = indexFields :+ intField("count")
+
+      withLocalElasticsearchIndex(compatibleIndexFields, index = index) { _ =>
         val compatibleTestObject = CompatibleTestObject(
           id = "id",
           description = "description",

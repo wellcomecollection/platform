@@ -8,6 +8,7 @@ import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.index.admin.IndexExistsResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.http.{ElasticClient, Response}
+import com.sksamuel.elastic4s.mappings.FieldDefinition
 import org.scalactic.source.Position
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -16,7 +17,7 @@ import uk.ac.wellcome.elasticsearch._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
@@ -63,8 +64,9 @@ trait ElasticsearchFixtures
     implicitly[Position])
 
   def withLocalWorksIndex[R](testWith: TestWith[Index, R]): R =
-    withLocalElasticsearchIndex[R](WorksIndex) { index =>
-      testWith(index)
+    withLocalElasticsearchIndex[R](fields = WorksIndex.rootIndexFields) {
+      index =>
+        testWith(index)
     }
 
   private val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
@@ -72,25 +74,23 @@ trait ElasticsearchFixtures
   )
 
   def withLocalElasticsearchIndex[R](
-    mappingDefinitionBuilder: MappingDefinitionBuilder,
-    index: Index = createIndex)(testWith: TestWith[Index, R]): R = {
-    elasticsearchIndexCreator
-      .create(
-        index = index,
-        mappingDefinitionBuilder = mappingDefinitionBuilder
-      )
-      .await
+    fields: Seq[FieldDefinition],
+    index: Index = createIndex): Fixture[Index, R] = fixture[Index, R](
+    create = {
+      elasticsearchIndexCreator
+        .create(index = index, fields = fields)
+        .await
 
-    // Elasticsearch is eventually consistent, so the future
-    // completing doesn't actually mean that the index exists yet
-    eventuallyIndexExists(index)
+      // Elasticsearch is eventually consistent, so the future
+      // completing doesn't actually mean that the index exists yet
+      eventuallyIndexExists(index)
 
-    try {
-      testWith(index)
-    } finally {
+      index
+    },
+    destroy = { index =>
       elasticClient.execute(deleteIndex(index.name))
     }
-  }
+  )
 
   def eventuallyIndexExists(index: Index): Assertion =
     eventually {
