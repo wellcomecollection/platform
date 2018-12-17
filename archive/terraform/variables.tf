@@ -55,3 +55,6 @@ variable "bagger_dds_asset_prefix" {}
 variable "api_alb_cdir_blocks" {
   type = "list"
 }
+
+# Archive test ingest trigger
+variable "archive_oauth_details_enc" {}
