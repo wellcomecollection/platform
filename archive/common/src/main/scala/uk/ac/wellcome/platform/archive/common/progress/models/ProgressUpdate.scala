@@ -2,7 +2,8 @@ package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.models.BagId
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
+import uk.ac.wellcome.platform.archive.common.models.{BagId, IngestBagRequest}
 
 sealed trait ProgressUpdate {
   val id: UUID

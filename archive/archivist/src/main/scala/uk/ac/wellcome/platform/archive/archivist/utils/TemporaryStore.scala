@@ -15,7 +15,7 @@ object TemporaryStore extends Logging {
   import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   implicit class TemporaryStoreOps(location: ObjectLocation) {
-    def storeTemporarily(implicit s3Client: AmazonS3): Try[File] = {
+    def downloadTempFile(implicit s3Client: AmazonS3): Try[File] = {
       location.toInputStream.flatMap { inputStream =>
 
         val tmpFile = File.createTempFile(

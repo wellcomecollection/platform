@@ -26,7 +26,7 @@ class TemporaryStoreTest
 
           s3Client.putObject(bucket.name, key, content)
 
-          val testTempFile = ObjectLocation(bucket.name, key).storeTemporarily
+          val testTempFile = ObjectLocation(bucket.name, key).downloadTempFile
 
           testTempFile shouldBe a[Success[_]]
 
@@ -40,7 +40,7 @@ class TemporaryStoreTest
       it("returns a Failure[_]") {
         val key = randomAlphanumeric()
 
-        val testTempFile = ObjectLocation("invalid_bucket", key).storeTemporarily
+        val testTempFile = ObjectLocation("invalid_bucket", key).downloadTempFile
 
         testTempFile shouldBe a[Failure[_]]
       }
