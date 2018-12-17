@@ -5,19 +5,12 @@ import java.util.UUID
 
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
-import akka.http.scaladsl.server.{
-  MalformedRequestContentRejection,
-  RejectionHandler,
-  Route
-}
-import io.circe.{CursorOp, DecodingFailure, Printer}
+import akka.http.scaladsl.server.{MalformedRequestContentRejection, RejectionHandler, Route}
+import io.circe.{CursorOp, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.display.{
-  RequestDisplayIngest,
-  ResponseDisplayIngest
-}
+import uk.ac.wellcome.platform.archive.display.{RequestDisplayIngest, ResponseDisplayIngest}
 import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
 
 class Router(
@@ -28,7 +21,7 @@ class Router(
 ) {
 
   import akka.http.scaladsl.server.Directives._
-  import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+  import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
   implicit val printer = Printer.noSpaces.copy(dropNullValues = true)
   import uk.ac.wellcome.platform.archive.display.DisplayProvider._
@@ -36,22 +29,32 @@ class Router(
   implicit val rejectionHandler = RejectionHandler
     .newBuilder()
     .handle {
-      case MalformedRequestContentRejection(err, cause: DecodingFailure) =>
+      case MalformedRequestContentRejection(err, causes: DecodingFailures) =>
+        val message = causes.failures.map{cause =>
+
         val path = CursorOp.opsToPath(cause.history)
 
+        // Error messages returned by Circe are somewhat inconsistent and we also return our
+        // own error messages when decoding enums (DisplayIngestType and DisplayStorageProvider).
         val reason = cause.message match {
-          case s if s.contains("failed cursor") =>
-            "required property not supplied."
-          case s if s.contains("invalid") => s
+          // "Attempt to decode on failed cursor" seems to mean in circeworld
+          // that a required field was not present.
+          case s if s.contains("failed cursor") => "required property not supplied."
+          // These are errors returned by our custom decoders for enum.
+          case s if s.contains("invalid value") => s
+          // If a field exists in the JSON but it's of the wrong format
+          // (for example the schema says it should be a String but an object has
+          // been supplied instead), the error message returned by Circe only
+          // contains the expected type.
           case s                          => s"should be a $s."
         }
 
-        val message = s"Invalid value at $path: $reason"
+        s"Invalid value at $path: $reason"}
 
         complete(
           BadRequest -> ErrorResponse(
             BadRequest.intValue,
-            message,
+            message.toList.mkString("\n"),
             BadRequest.reason))
     }
     .result()

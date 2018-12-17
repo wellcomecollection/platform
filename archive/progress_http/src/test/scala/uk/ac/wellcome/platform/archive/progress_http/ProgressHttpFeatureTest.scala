@@ -49,39 +49,39 @@ class ProgressHttpFeatureTest
 
               val expectedSourceLocationJson =
                 s"""{
-    "provider": {
-      "id": "${StandardDisplayProvider.id}",
-      "type": "Provider"
-    },
-    "bucket": "${progress.sourceLocation.location.namespace}",
-    "path": "${progress.sourceLocation.location.key}",
-    "type": "Location"
-  }""".stripMargin
+                  "provider": {
+                    "id": "${StandardDisplayProvider.id}",
+                    "type": "Provider"
+                  },
+                  "bucket": "${progress.sourceLocation.location.namespace}",
+                  "path": "${progress.sourceLocation.location.key}",
+                  "type": "Location"
+                }""".stripMargin
 
               val expectedCallbackJson =
                 s"""{
-    "url": "${progress.callback.get.uri}",
-    "status": {
-      "id": "processing",
-      "type": "Status"
-    },
-    "type": "Callback"
-  }""".stripMargin
+                  "url": "${progress.callback.get.uri}",
+                  "status": {
+                    "id": "processing",
+                    "type": "Status"
+                  },
+                  "type": "Callback"
+                }""".stripMargin
 
               val expectedIngestTypeJson = s"""{
-    "id": "create",
-    "type": "IngestType"
-  }""".stripMargin
+                "id": "create",
+                "type": "IngestType"
+              }""".stripMargin
 
               val expectedSpaceJson = s"""{
-    "id": "${progress.space.underlying}",
-    "type": "Space"
-  }""".stripMargin
+                "id": "${progress.space.underlying}",
+                "type": "Space"
+              }""".stripMargin
 
               val expectedStatusJson = s"""{
-    "id": "accepted",
-    "type": "Status"
-  }""".stripMargin
+                "id": "accepted",
+                "type": "Status"
+              }""".stripMargin
 
               whenReady(progressTracker.initialise(progress)) { _ =>
                 whenGetRequestReady(s"$baseUrl/progress/${progress.id}") {
@@ -232,7 +232,7 @@ class ProgressHttpFeatureTest
                           actualCallbackUrl,
                           Some(DisplayStatus(actualCallbackStatus, "Status")),
                           "Callback")),
-                      DisplayIngestType("create", "IngestType"),
+                      CreateDisplayIngestType,
                       DisplayStorageSpace(actualSpaceId, "Space"),
                       DisplayStatus("accepted", "Status"),
                       None,
@@ -315,6 +315,8 @@ class ProgressHttpFeatureTest
             )
 
             whenRequestReady(request) { response: HttpResponse =>
+
+              println(response)
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -325,6 +327,56 @@ class ProgressHttpFeatureTest
                 actualError shouldBe ErrorResponse(
                   400,
                   "Invalid value at .sourceLocation: required property not supplied.",
+                  "Bad Request",
+                  "Error")
+                val requests =
+                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
+                    fromJson[IngestBagRequest](messageInfo.message).get)
+
+                requests shouldBe empty
+              }
+            }
+          }
+      }
+    }
+
+    it(
+      "returns a json error if the ingest request doesn't have a sourceLocation and it doesn't have an ingestType") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`application/json`,
+              """|{
+                 |  "type": "Ingest",
+                 |  "space": {
+                 |    "id": "bcnfgh",
+                 |    "type": "Space"
+                 |  }
+                 |}""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.BadRequest
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+                actualError shouldBe ErrorResponse(
+                  400,
+                  """|Invalid value at .sourceLocation: required property not supplied.
+                     |Invalid value at .ingestType: required property not supplied.""".stripMargin,
                   "Bad Request",
                   "Error")
                 val requests =
@@ -509,6 +561,64 @@ class ProgressHttpFeatureTest
                   "Invalid value at .sourceLocation.provider.id: invalid value supplied, valid values are: aws-s3-standard, aws-s3-ia.",
                   "Bad Request",
                   "Error")
+                val requests =
+                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
+                    fromJson[IngestBagRequest](messageInfo.message).get)
+
+                requests shouldBe empty
+              }
+            }
+          }
+      }
+    }
+
+    it("returns a json error if the ingestType doesn't have a valid id field") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`application/json`,
+              """|{
+                 |  "type": "Ingest",
+                 |  "ingestType": {
+                 |    "id": "baboop",
+                 |    "type": "IngestType"
+                 |  },
+                 |  "sourceLocation":{
+                 |    "type": "Location",
+                 |    "provider": {
+                 |      "type": "Provider",
+                 |      "id": "aws-s3-standard"
+                 |    },
+                 |    "bucket": "bucket",
+                 |    "path": "b22454408.zip"
+                 |  },
+                 |  "space": {
+                 |    "id": "bcnfgh",
+                 |    "type": "Space"
+                 |  }
+                 |}""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.BadRequest
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+
+                actualError shouldBe ErrorResponse(400, "Invalid value at .ingestType.id: invalid value supplied, valid values are: create.", "Bad Request", "Error")
                 val requests =
                   listMessagesReceivedFromSNS(topic).map(messageInfo =>
                     fromJson[IngestBagRequest](messageInfo.message).get)

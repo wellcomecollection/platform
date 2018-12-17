@@ -5,7 +5,6 @@ import java.time.Instant
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 import uk.ac.wellcome.platform.archive.common.progress.models._
@@ -44,7 +43,6 @@ class DisplayIngestTest
     )
 
     val ingest = ResponseDisplayIngest(progress, contextUrl)
-    println(toJson(ingest))
 
     ingest.id shouldBe id
     ingest.sourceLocation shouldBe DisplayLocation(
@@ -71,7 +69,7 @@ class DisplayIngestTest
       DisplayLocation(displayProvider, bucket, path),
       Some(
         DisplayCallback("http://www.wellcomecollection.org/callback/ok", None)),
-      DisplayIngestType("create"),
+      CreateDisplayIngestType,
       DisplayStorageSpace("space-id")
     )
 
