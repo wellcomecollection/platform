@@ -15,6 +15,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.{
 import scala.util.{Failure, Success, Try}
 
 object DownloadAndVerifyDigestItemFlow extends Logging {
+  import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[ArchiveDigestItemJob,
@@ -24,13 +25,7 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
       .log("download to verify")
       .flatMapMerge(
         parallelism, { job =>
-          val triedInputStream = Try(
-            s3Client
-              .getObject(job.uploadLocation.namespace, job.uploadLocation.key)
-              .getObjectContent
-          )
-
-          triedInputStream match {
+          job.uploadLocation.toInputStream match {
             case Failure(exception) =>
               warn(
                 s"Failed downloading object ${job.uploadLocation} from S3",
