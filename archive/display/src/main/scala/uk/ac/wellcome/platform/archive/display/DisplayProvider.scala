@@ -10,8 +10,6 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 
 sealed trait DisplayProvider {
   val id: String
-  final val ontologyType: String = "Provider"
-
   def toStorageProvider: StorageProvider
 }
 
@@ -43,10 +41,10 @@ object DisplayProvider {
         case StandardDisplayProvider.id => Right(StandardDisplayProvider)
         case InfrequentAccessDisplayProvider.id =>
           Right(InfrequentAccessDisplayProvider)
-        case _ =>
+        case invalidId =>
           val fields = DownField("id") +: cursor.history
           Left(DecodingFailure(
-            s"invalid value supplied, valid values are: ${StandardDisplayProvider.id}, ${InfrequentAccessDisplayProvider.id}.",
+            s"""got "$invalidId", valid values are: ${StandardDisplayProvider.id}, ${InfrequentAccessDisplayProvider.id}.""",
             fields))
       }
     } yield {

@@ -29,7 +29,7 @@ class Router(
   implicit val rejectionHandler = RejectionHandler
     .newBuilder()
     .handle {
-      case MalformedRequestContentRejection(err, causes: DecodingFailures) =>
+      case MalformedRequestContentRejection(_, causes: DecodingFailures) =>
         val message = causes.failures.map{cause =>
 
         val path = CursorOp.opsToPath(cause.history)
@@ -37,11 +37,11 @@ class Router(
         // Error messages returned by Circe are somewhat inconsistent and we also return our
         // own error messages when decoding enums (DisplayIngestType and DisplayStorageProvider).
         val reason = cause.message match {
-          // "Attempt to decode on failed cursor" seems to mean in circeworld
+          // "Attempt to decode value on failed cursor" seems to mean in circeworld
           // that a required field was not present.
-          case s if s.contains("failed cursor") => "required property not supplied."
+          case s if s.contains("Attempt to decode value on failed cursor") => "required property not supplied."
           // These are errors returned by our custom decoders for enum.
-          case s if s.contains("invalid value") => s
+          case s if s.contains("valid values") => s
           // If a field exists in the JSON but it's of the wrong format
           // (for example the schema says it should be a String but an object has
           // been supplied instead), the error message returned by Circe only

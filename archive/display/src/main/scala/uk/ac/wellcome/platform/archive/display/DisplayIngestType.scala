@@ -16,9 +16,11 @@ object DisplayIngestType {
       id <- cursor.downField("id").as[String]
       ingestType <- id match {
         case CreateDisplayIngestType.id => Right(CreateDisplayIngestType)
-        case _ =>
+        case invalidId =>
           val fields = DownField("id") +: cursor.history
-          Left(DecodingFailure(s"invalid value supplied, valid values are: ${CreateDisplayIngestType.id}.", fields))
+          Left(DecodingFailure(
+            s"""got "$invalidId", valid values are: ${CreateDisplayIngestType.id}.""",
+            fields))
       }
     } yield {
       ingestType

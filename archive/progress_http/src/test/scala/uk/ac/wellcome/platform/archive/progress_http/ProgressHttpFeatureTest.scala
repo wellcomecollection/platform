@@ -317,7 +317,6 @@ class ProgressHttpFeatureTest
 
             whenRequestReady(request) { response: HttpResponse =>
 
-              println(response)
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -330,11 +329,7 @@ class ProgressHttpFeatureTest
                   "Invalid value at .sourceLocation: required property not supplied.",
                   "Bad Request",
                   "Error")
-                val requests =
-                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
-                    fromJson[IngestBagRequest](messageInfo.message).get)
-
-                requests shouldBe empty
+                assertSnsReceivesNothing(topic)
               }
             }
           }
@@ -380,11 +375,7 @@ class ProgressHttpFeatureTest
                      |Invalid value at .ingestType: required property not supplied.""".stripMargin,
                   "Bad Request",
                   "Error")
-                val requests =
-                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
-                    fromJson[IngestBagRequest](messageInfo.message).get)
-
-                requests shouldBe empty
+                assertSnsReceivesNothing(topic)
               }
             }
           }
@@ -440,11 +431,7 @@ class ProgressHttpFeatureTest
                   "Invalid value at .sourceLocation.bucket: required property not supplied.",
                   "Bad Request",
                   "Error")
-                val requests =
-                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
-                    fromJson[IngestBagRequest](messageInfo.message).get)
-
-                requests shouldBe empty
+                assertSnsReceivesNothing(topic)
               }
             }
           }
@@ -501,11 +488,7 @@ class ProgressHttpFeatureTest
                   "Invalid value at .sourceLocation.bucket: should be a String.",
                   "Bad Request",
                   "Error")
-                val requests =
-                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
-                    fromJson[IngestBagRequest](messageInfo.message).get)
-
-                requests shouldBe empty
+                assertSnsReceivesNothing(topic)
               }
             }
           }
@@ -559,14 +542,10 @@ class ProgressHttpFeatureTest
               whenReady(progressFuture) { actualError =>
                 actualError shouldBe ErrorResponse(
                   400,
-                  "Invalid value at .sourceLocation.provider.id: invalid value supplied, valid values are: aws-s3-standard, aws-s3-ia.",
+                  """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia.""",
                   "Bad Request",
                   "Error")
-                val requests =
-                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
-                    fromJson[IngestBagRequest](messageInfo.message).get)
-
-                requests shouldBe empty
+                assertSnsReceivesNothing(topic)
               }
             }
           }
@@ -619,12 +598,9 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
 
-                actualError shouldBe ErrorResponse(400, "Invalid value at .ingestType.id: invalid value supplied, valid values are: create.", "Bad Request", "Error")
-                val requests =
-                  listMessagesReceivedFromSNS(topic).map(messageInfo =>
-                    fromJson[IngestBagRequest](messageInfo.message).get)
+                actualError shouldBe ErrorResponse(400, """Invalid value at .ingestType.id: got "baboop", valid values are: create.""", "Bad Request", "Error")
 
-                requests shouldBe empty
+                assertSnsReceivesNothing(topic)
               }
             }
           }
