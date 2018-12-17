@@ -157,6 +157,7 @@ class ProgressHttpFeatureTest
         case (_, _, baseUrl) =>
           whenGetRequestReady(s"$baseUrl/progress/$randomUUID") { response =>
             response.status shouldBe StatusCodes.NotFound
+            response.entity.contentType shouldBe ContentTypes.`application/json`
           }
       }
     }

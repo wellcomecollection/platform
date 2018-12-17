@@ -3,10 +3,7 @@ import java.time.Instant
 
 import org.scalatest.{Inside, Matchers}
 import uk.ac.wellcome.platform.archive.common.models.{BagInfo, StorageSpace}
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  StorageLocation,
-  StorageProvider
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{InfrequentAccessStorageProvider, StorageLocation}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -33,7 +30,7 @@ trait StorageManifestAssertions extends Inside with Matchers {
         actualBagInfo shouldBe expectedBagInfo
         bagDigestFiles should have size filesNumber
 
-        provider shouldBe StorageProvider(id = "aws-s3-ia")
+        provider shouldBe InfrequentAccessStorageProvider
 
         actualNamespace shouldBe expectedNamespace
         actualPath shouldBe expectedPath
