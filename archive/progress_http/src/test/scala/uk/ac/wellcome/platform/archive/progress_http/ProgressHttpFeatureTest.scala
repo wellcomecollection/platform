@@ -328,7 +328,8 @@ class ProgressHttpFeatureTest
                   400,
                   "Invalid value at .sourceLocation: required property not supplied.",
                   "Bad Request",
-                  "Error")
+                  "Error"
+                )
                 assertSnsReceivesNothing(topic)
               }
             }
@@ -433,7 +434,8 @@ class ProgressHttpFeatureTest
                   400,
                   "Invalid value at .sourceLocation.bucket: required property not supplied.",
                   "Bad Request",
-                  "Error")
+                  "Error"
+                )
                 assertSnsReceivesNothing(topic)
               }
             }
@@ -549,7 +551,8 @@ class ProgressHttpFeatureTest
                   400,
                   """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia.""",
                   "Bad Request",
-                  "Error")
+                  "Error"
+                )
                 assertSnsReceivesNothing(topic)
               }
             }
@@ -602,13 +605,13 @@ class ProgressHttpFeatureTest
                 Unmarshal(response.entity).to[ErrorResponse]
 
               whenReady(progressFuture) { actualError =>
-
                 actualError shouldBe ErrorResponse(
                   "http://api.wellcomecollection.org/storage/v1/context.json",
                   400,
                   """Invalid value at .ingestType.id: got "baboop", valid values are: create.""",
                   "Bad Request",
-                  "Error")
+                  "Error"
+                )
 
                 assertSnsReceivesNothing(topic)
               }

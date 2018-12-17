@@ -4,7 +4,7 @@ import io.circe.generic.extras.JsonKey
 
 case class ErrorResponse(@JsonKey("@context")
                          context: String,
-                          httpStatus: Int,
+                         httpStatus: Int,
                          description: String,
                          label: String,
                          `type`: String = "Error")
