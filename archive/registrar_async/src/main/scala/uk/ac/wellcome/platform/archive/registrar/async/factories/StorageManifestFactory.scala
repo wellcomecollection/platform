@@ -25,7 +25,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 object StorageManifestFactory extends Logging {
   def create(archiveComplete: ArchiveComplete)(implicit s3Client: AmazonS3)
-    : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
+  : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
 
     val algorithm = "sha256"
 
@@ -61,7 +61,7 @@ object StorageManifestFactory extends Logging {
   private def getBagItems(archiveComplete: ArchiveComplete,
                           name: String,
                           delimiter: String)(implicit s3Client: AmazonS3)
-    : Either[ArchiveError[ArchiveComplete], List[BagDigestFile]] = {
+  : Either[ArchiveError[ArchiveComplete], List[BagDigestFile]] = {
     val triedLines = downloadFile(archiveComplete, name)
       .map(
         inputStream =>
@@ -104,7 +104,7 @@ object StorageManifestFactory extends Logging {
                                 delimiter: String,
                                 archiveComplete: ArchiveComplete,
                                 manifestName: String)
-    : Either[InvalidBagManifestError[ArchiveComplete], BagDigestFile] = {
+  : Either[InvalidBagManifestError[ArchiveComplete], BagDigestFile] = {
     val splitChunk = fileChunk.split(delimiter).map(_.trim)
 
     splitChunk match {
