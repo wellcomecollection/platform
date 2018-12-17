@@ -23,7 +23,6 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.util.Try
 
 object StorageManifestFactory extends Logging {
   def create(archiveComplete: ArchiveComplete)(implicit s3Client: AmazonS3)
