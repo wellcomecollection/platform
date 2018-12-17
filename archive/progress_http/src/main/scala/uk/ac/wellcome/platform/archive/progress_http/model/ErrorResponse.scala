@@ -1,6 +1,10 @@
 package uk.ac.wellcome.platform.archive.progress_http.model
 
-case class ErrorResponse(httpStatus: Int,
+import io.circe.generic.extras.JsonKey
+
+case class ErrorResponse(@JsonKey("@context")
+                         context: String,
+                          httpStatus: Int,
                          description: String,
                          label: String,
                          `type`: String = "Error")

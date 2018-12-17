@@ -324,6 +324,7 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
                 actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
                   400,
                   "Invalid value at .sourceLocation: required property not supplied.",
                   "Bad Request",
@@ -369,6 +370,7 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
                 actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
                   400,
                   """|Invalid value at .sourceLocation: required property not supplied.
                      |Invalid value at .ingestType: required property not supplied.""".stripMargin,
@@ -427,6 +429,7 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
                 actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
                   400,
                   "Invalid value at .sourceLocation.bucket: required property not supplied.",
                   "Bad Request",
@@ -484,6 +487,7 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
                 actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
                   400,
                   "Invalid value at .sourceLocation.bucket: should be a String.",
                   "Bad Request",
@@ -541,6 +545,7 @@ class ProgressHttpFeatureTest
 
               whenReady(progressFuture) { actualError =>
                 actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
                   400,
                   """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia.""",
                   "Bad Request",
@@ -597,7 +602,9 @@ class ProgressHttpFeatureTest
                 Unmarshal(response.entity).to[ErrorResponse]
 
               whenReady(progressFuture) { actualError =>
+
                 actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
                   400,
                   """Invalid value at .ingestType.id: got "baboop", valid values are: create.""",
                   "Bad Request",

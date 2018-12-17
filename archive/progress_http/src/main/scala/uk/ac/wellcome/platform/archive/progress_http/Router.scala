@@ -61,6 +61,7 @@ class Router(
 
         complete(
           BadRequest -> ErrorResponse(
+            contextURL.toString,
             BadRequest.intValue,
             message.toList.mkString("\n"),
             BadRequest.reason))
