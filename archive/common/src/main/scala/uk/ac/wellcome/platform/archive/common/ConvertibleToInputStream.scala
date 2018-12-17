@@ -8,7 +8,6 @@ import uk.ac.wellcome.storage.ObjectLocation
 import scala.util.Try
 
 object ConvertibleToInputStream {
-
   implicit class ConvertibleToInputStreamOps[T](t: T) {
     def toInputStream(implicit toInputStream: ToInputStream[T],
                       s3Client: AmazonS3): Try[InputStream] = {
