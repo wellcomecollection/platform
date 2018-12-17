@@ -4,7 +4,6 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 
 import akka.http.scaladsl.model._
-import akka.stream.scaladsl.Sink
 import io.circe.optics.JsonPath._
 import io.circe.parser._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -14,8 +13,8 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
 import uk.ac.wellcome.platform.archive.display.{
   DisplayLocation,
-  DisplayProvider,
-  DisplayStorageSpace
+  DisplayStorageSpace,
+  StandardDisplayProvider
 }
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
@@ -46,12 +45,10 @@ class RegistrarHttpFeatureTest
             val checksumAlgorithm = "sha256"
             val path = "path"
             val bucket = "bucket"
-            val providerId = "provider-id"
             val storageManifest = createStorageManifestWith(
               space = space,
               bagInfo = bagInfo,
               checksumAlgorithm = checksumAlgorithm,
-              providerId = providerId,
               bucket = bucket,
               path = path
             )
@@ -86,7 +83,7 @@ class RegistrarHttpFeatureTest
                           List(DisplayFileDigest("a", "bag-info.txt", "File")),
                           "BagManifest"),
                         DisplayLocation(
-                          DisplayProvider(actualProviderId, "Provider"),
+                          StandardDisplayProvider,
                           actualBucket,
                           actualPath,
                           "Location"),
@@ -103,7 +100,6 @@ class RegistrarHttpFeatureTest
 
                       actualDataManifestChecksumAlgorithm shouldBe checksumAlgorithm
                       actualTagManifestChecksumAlgorithm shouldBe checksumAlgorithm
-                      actualProviderId shouldBe providerId
                       actualBucket shouldBe bucket
                       actualPath shouldBe path
 
@@ -128,11 +124,8 @@ class RegistrarHttpFeatureTest
                 s"$baseUrl/registrar/${storageManifest.id.space.underlying}/${storageManifest.id.externalIdentifier.underlying}") {
                 response =>
                   response.status shouldBe StatusCodes.OK
-                  val value =
-                    response.entity.dataBytes.runWith(Sink.fold("") {
-                      case (acc, byteString) => acc + byteString.utf8String
-                    })
-                  whenReady(value) { jsonString =>
+
+                  withStringEntity(response.entity) { jsonString =>
                     val infoJson =
                       root.info.json
                         .getOption(parse(jsonString).right.get)

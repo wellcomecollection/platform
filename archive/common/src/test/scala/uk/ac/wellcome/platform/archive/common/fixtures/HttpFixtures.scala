@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.GET
 import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
-import akka.stream.Materializer
+import akka.stream.scaladsl.Sink
+import akka.stream.{ActorMaterializer, Materializer}
 import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil.fromJson
@@ -41,6 +42,18 @@ trait HttpFixtures extends Akka with ScalaFutures {
       .get
       .get
     fromJson[T](stringBody).get
+  }
+
+  def withStringEntity[R](httpEntity: HttpEntity)(
+    testWith: TestWith[String, R])(implicit materializer: ActorMaterializer) = {
+    val value =
+      httpEntity.dataBytes.runWith(Sink.fold("") {
+        case (acc, byteString) =>
+          acc + byteString.utf8String
+      })
+    whenReady(value) { string =>
+      testWith(string)
+    }
   }
 
   def createHTTPServerConfig: HTTPServerConfig =

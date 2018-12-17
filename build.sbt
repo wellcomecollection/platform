@@ -190,6 +190,7 @@ lazy val progress_async = doServiceSetup(project, "archive/progress_async")
 lazy val progress_http = doServiceSetup(project, "archive/progress_http")
   .dependsOn(progress_common % "compile->compile;test->test")
   .dependsOn(archive_display % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.progressHttpDependencies)
 
 lazy val root = (project in file("."))
   .aggregate(

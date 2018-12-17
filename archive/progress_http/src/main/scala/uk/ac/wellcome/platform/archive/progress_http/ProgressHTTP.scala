@@ -41,6 +41,7 @@ class ProgressHTTP(
     contextURL = contextURL
   )
 
+  implicit val rejectionHandler = router.rejectionHandler
   val bindingFuture: Future[Http.ServerBinding] = Http()
     .bindAndHandle(router.routes, httpServerConfig.host, httpServerConfig.port)
 

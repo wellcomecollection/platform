@@ -17,8 +17,8 @@ import uk.ac.wellcome.platform.archive.common.models.{
   BagLocation
 }
 import uk.ac.wellcome.platform.archive.common.progress.models.{
-  StorageLocation,
-  StorageProvider
+  InfrequentAccessStorageProvider,
+  StorageLocation
 }
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
@@ -49,7 +49,7 @@ object StorageManifestFactory extends Logging {
         manifest = FileManifest(checksumAlgorithm, manifestTuples),
         tagManifest = FileManifest(checksumAlgorithm, tagManifestTuples),
         accessLocation = StorageLocation(
-          StorageProvider("aws-s3-ia"),
+          InfrequentAccessStorageProvider,
           ObjectLocation(
             archiveComplete.bagLocation.storageNamespace,
             s"${archiveComplete.bagLocation.storagePath}/${archiveComplete.bagLocation.bagPath.value}")
