@@ -15,6 +15,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.{
 import scala.util.{Failure, Success}
 
 object DownloadAndVerifyDigestItemFlow extends Logging {
+  import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import java.io.File
+import java.io.{File, InputStream}
 import java.util.zip.ZipFile
 
 import akka.NotUsed
@@ -27,7 +27,9 @@ import scala.util.{Failure, Success}
   * original request on the Right.
   *
   */
+
 object ZipFileDownloadFlow extends Logging {
+  import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
