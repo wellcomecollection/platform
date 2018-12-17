@@ -11,7 +11,11 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
-import uk.ac.wellcome.platform.archive.display.{DisplayLocation, DisplayStorageSpace, StandardDisplayProvider}
+import uk.ac.wellcome.platform.archive.display.{
+  DisplayLocation,
+  DisplayStorageSpace,
+  StandardDisplayProvider
+}
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._

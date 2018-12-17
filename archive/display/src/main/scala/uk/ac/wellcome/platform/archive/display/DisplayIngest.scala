@@ -53,7 +53,6 @@ case class DisplayCallback(url: String,
                            @JsonKey("type")
                            ontologyType: String = "Callback")
 
-
 case class DisplayStorageSpace(id: String,
                                @JsonKey("type")
                                ontologyType: String = "Space")

@@ -316,7 +316,6 @@ class ProgressHttpFeatureTest
             )
 
             whenRequestReady(request) { response: HttpResponse =>
-
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -374,7 +373,8 @@ class ProgressHttpFeatureTest
                   """|Invalid value at .sourceLocation: required property not supplied.
                      |Invalid value at .ingestType: required property not supplied.""".stripMargin,
                   "Bad Request",
-                  "Error")
+                  "Error"
+                )
                 assertSnsReceivesNothing(topic)
               }
             }
@@ -597,8 +597,11 @@ class ProgressHttpFeatureTest
                 Unmarshal(response.entity).to[ErrorResponse]
 
               whenReady(progressFuture) { actualError =>
-
-                actualError shouldBe ErrorResponse(400, """Invalid value at .ingestType.id: got "baboop", valid values are: create.""", "Bad Request", "Error")
+                actualError shouldBe ErrorResponse(
+                  400,
+                  """Invalid value at .ingestType.id: got "baboop", valid values are: create.""",
+                  "Bad Request",
+                  "Error")
 
                 assertSnsReceivesNothing(topic)
               }
