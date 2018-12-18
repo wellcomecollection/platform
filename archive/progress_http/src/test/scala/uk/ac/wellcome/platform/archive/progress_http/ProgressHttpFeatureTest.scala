@@ -119,10 +119,14 @@ class ProgressHttpFeatureTest
 
                       root.`type`.string.getOption(json).get shouldBe "Ingest"
 
-                      assertRecent(Instant.parse(
-                        root.createdDate.string.getOption(json).get), 25)
-                      assertRecent(Instant.parse(
-                        root.lastModifiedDate.string.getOption(json).get), 25)
+                      assertRecent(
+                        Instant.parse(
+                          root.createdDate.string.getOption(json).get),
+                        25)
+                      assertRecent(
+                        Instant.parse(
+                          root.lastModifiedDate.string.getOption(json).get),
+                        25)
                     }
                 }
               }
