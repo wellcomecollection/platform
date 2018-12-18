@@ -6,8 +6,8 @@ import java.time.Instant
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.platform.goobi_reader.models.GoobiRecordMetadata
 import uk.ac.wellcome.platform.goobi_reader.services.GoobiReaderWorkerService
@@ -71,14 +71,14 @@ class GoobiReaderFeatureTest
 
   private def withWorkerService[R](queue: Queue, bucket: Bucket, table: Table)(
     testWith: TestWith[GoobiReaderWorkerService, R]): R =
-    withActorSystem { actorSystem =>
-      withSQSStream[NotificationMessage, R](actorSystem, queue) { sqsStream =>
+    withActorSystem { implicit actorSystem =>
+      withSQSStream[NotificationMessage, R](queue) { sqsStream =>
         withTypeVHS[InputStream, GoobiRecordMetadata, R](bucket, table) { vhs =>
           val workerService = new GoobiReaderWorkerService(
             s3Client = s3Client,
             sqsStream = sqsStream,
             versionedHybridStore = vhs
-          )(actorSystem = actorSystem)
+          )
 
           workerService.run()
 

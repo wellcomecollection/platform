@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.sierra_bib_merger.fixtures
 
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.platform.sierra_bib_merger.services.{
@@ -26,25 +26,23 @@ trait WorkerServiceFixture
     with SQS {
   def withApp[R](bucket: Bucket, table: Table, queue: Queue, topic: Topic)(
     testWith: TestWith[SierraBibMergerWorkerService, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withTypeVHS[SierraTransformable, EmptyMetadata, R](bucket, table) {
         versionedHybridStore =>
           val updaterService = new SierraBibMergerUpdaterService(
             versionedHybridStore = versionedHybridStore
           )
 
-          withSQSStream[NotificationMessage, R](actorSystem, queue) {
-            sqsStream =>
-              withSNSWriter(topic) { snsWriter =>
-                val workerService = new SierraBibMergerWorkerService(
-                  actorSystem = actorSystem,
-                  sqsStream = sqsStream,
-                  snsWriter = snsWriter,
-                  sierraBibMergerUpdaterService = updaterService
-                )
+          withSQSStream[NotificationMessage, R](queue) { sqsStream =>
+            withSNSWriter(topic) { snsWriter =>
+              val workerService = new SierraBibMergerWorkerService(
+                sqsStream = sqsStream,
+                snsWriter = snsWriter,
+                sierraBibMergerUpdaterService = updaterService
+              )
 
-                testWith(workerService)
-              }
+              testWith(workerService)
+            }
           }
       }
     }

@@ -5,7 +5,6 @@ import java.time.Instant
 import java.util.UUID
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.TimeTestFixture
 import uk.ac.wellcome.platform.archive.common.progress.models._
@@ -32,7 +31,7 @@ class DisplayIngestTest
     val progress: Progress = Progress(
       id,
       StorageLocation(
-        StorageProvider("s3"),
+        StandardStorageProvider,
         ObjectLocation("bukkit", "key.txt")),
       Namespace(spaceId),
       Some(Callback(new URI(callbackUrl))),
@@ -44,11 +43,10 @@ class DisplayIngestTest
     )
 
     val ingest = ResponseDisplayIngest(progress, contextUrl)
-    println(toJson(ingest))
 
     ingest.id shouldBe id
     ingest.sourceLocation shouldBe DisplayLocation(
-      DisplayProvider("s3"),
+      StandardDisplayProvider,
       bucket = "bukkit",
       path = "key.txt")
     ingest.callback shouldBe Some(
@@ -64,14 +62,14 @@ class DisplayIngestTest
   }
 
   it("transforms itself into a progress") {
-    val displayProvider = DisplayProvider("s3", "Amazon s3")
+    val displayProvider = InfrequentAccessDisplayProvider
     val bucket = "ingest-bucket"
     val path = "bag.zip"
     val progressCreateRequest = RequestDisplayIngest(
       DisplayLocation(displayProvider, bucket, path),
       Some(
         DisplayCallback("http://www.wellcomecollection.org/callback/ok", None)),
-      DisplayIngestType("create"),
+      CreateDisplayIngestType,
       DisplayStorageSpace("space-id")
     )
 
@@ -79,11 +77,11 @@ class DisplayIngestTest
 
     progress.id shouldBe a[UUID]
     progress.sourceLocation shouldBe StorageLocation(
-      StorageProvider(displayProvider.id),
+      InfrequentAccessStorageProvider,
       ObjectLocation(bucket, path))
     progress.callback shouldBe Some(
       Callback(URI.create(progressCreateRequest.callback.get.url)))
-    progress.status shouldBe Progress.Initialised
+    progress.status shouldBe Progress.Accepted
     assertRecent(progress.createdDate)
     assertRecent(progress.lastModifiedDate)
     progress.events shouldBe List.empty

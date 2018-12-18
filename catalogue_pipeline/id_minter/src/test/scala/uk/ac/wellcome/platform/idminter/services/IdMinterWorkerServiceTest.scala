@@ -4,7 +4,7 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.platform.idminter.database.{
   FieldDescription,
   IdentifiersDao

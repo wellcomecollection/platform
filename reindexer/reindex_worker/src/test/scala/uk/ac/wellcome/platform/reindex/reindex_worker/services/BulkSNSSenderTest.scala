@@ -1,21 +1,20 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
+import com.amazonaws.SdkClientException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SNS
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
-import uk.ac.wellcome.platform.reindex.reindex_worker.exceptions.ReindexerException
-import uk.ac.wellcome.test.fixtures.TestWith
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.BulkSNSSenderFixture
 
 class BulkSNSSenderTest
     extends FunSpec
     with Matchers
     with MockitoSugar
     with ScalaFutures
+    with BulkSNSSenderFixture
     with IdentifiersGenerators
     with IntegrationPatience
     with SNS {
@@ -26,8 +25,11 @@ class BulkSNSSenderTest
 
   it("sends messages for the provided IDs") {
     withLocalSnsTopic { topic =>
-      withBulkSNSSender(topic) { bulkSNSSender =>
-        val future = bulkSNSSender.sendToSNS(messages = messages)
+      withBulkSNSSender { bulkSNSSender =>
+        val future = bulkSNSSender.sendToSNS(
+          messages = messages,
+          snsConfig = createSNSConfigWith(topic)
+        )
 
         whenReady(future) { _ =>
           val actualRecords = listMessagesReceivedFromSNS(topic).map {
@@ -40,19 +42,17 @@ class BulkSNSSenderTest
     }
   }
 
-  it("returns a failed Future[ReindexerException] if there's an SNS error") {
-    withBulkSNSSender(Topic("no-such-topic")) { bulkSNSSender =>
-      val future = bulkSNSSender.sendToSNS(messages = messages)
+  it("returns a failed Future[SdkClientException] if there's an SNS error") {
+    val badTopic = Topic("no-such-topic")
+    withBulkSNSSender { bulkSNSSender =>
+      val future = bulkSNSSender.sendToSNS(
+        messages = messages,
+        snsConfig = createSNSConfigWith(badTopic)
+      )
+
       whenReady(future.failed) {
-        _ shouldBe a[ReindexerException]
+        _ shouldBe a[SdkClientException]
       }
     }
   }
-
-  private def withBulkSNSSender[R](topic: Topic)(
-    testWith: TestWith[BulkSNSSender, R]): R =
-    withSNSWriter(topic) { snsWriter =>
-      val bulkSNSSender = new BulkSNSSender(snsWriter = snsWriter)
-      testWith(bulkSNSSender)
-    }
 }

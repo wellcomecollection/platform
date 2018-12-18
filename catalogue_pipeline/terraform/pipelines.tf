@@ -1,13 +1,19 @@
-module "catalogue_pipelines" {
+module "miro_updates_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "vhs_sourcedata_miro_updates"
+}
+
+module "catalogue_pipeline_v6" {
   source = "pipelines"
 
-  namespace = "catalogue_pipeline"
+  namespace = "catalogue_20181203"
 
   miro_adapter_topic_names = [
     "${local.miro_reindexer_topic_name}",
+    "${module.miro_updates_topic.name}",
   ]
 
-  miro_adapter_topic_count = 1
+  miro_adapter_topic_count = 2
 
   sierra_adapter_topic_names = [
     "${local.sierra_reindexer_topic_name}",
@@ -17,8 +23,8 @@ module "catalogue_pipelines" {
 
   sierra_adapter_topic_count = 3
 
-  index_v1 = "v1-2018-11-21-thumbnails"
-  index_v2 = "v2-2018-11-21-thumbnails"
+  index_v1 = "v1-2018-12-03-elasticsearch6"
+  index_v2 = "v2-2018-12-03-elasticsearch6"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"
@@ -49,7 +55,7 @@ module "catalogue_pipelines" {
   identifiers_rds_cluster_port     = "${local.identifiers_rds_cluster_port}"
   identifiers_rds_cluster_host     = "${local.identifiers_rds_cluster_host}"
 
-  es_cluster_credentials = "${var.es_cluster_credentials}"
+  es_cluster_credentials = "${var.es_cluster_credentials_v6}"
   dlq_alarm_arn          = "${local.dlq_alarm_arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 

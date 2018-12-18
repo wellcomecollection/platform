@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.controllers
 
 import com.google.inject.{Inject, Singleton}
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class ManagementController @Inject()(
-  elasticClient: HttpClient
+  elasticClient: ElasticClient
 )(implicit ec: ExecutionContext)
     extends Controller {
 

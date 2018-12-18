@@ -1,3 +1,5 @@
+# Terraform
+
 terraform {
   required_version = ">= 0.9"
 
@@ -8,6 +10,8 @@ terraform {
     region         = "eu-west-1"
   }
 }
+
+# Data
 
 data "terraform_remote_state" "shared_infra" {
   backend = "s3"

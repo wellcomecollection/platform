@@ -8,9 +8,9 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.{
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.{
   ShouldNotTransformException,
-  TransformerException
+  SierraTransformerException
 }
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
@@ -74,7 +74,10 @@ class SierraTransformableTransformer
             if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
               UnidentifiedWork(
                 sourceIdentifier = sourceIdentifier,
-                otherIdentifiers = getOtherIdentifiers(bibId),
+                otherIdentifiers = getOtherIdentifiers(
+                  bibId = bibId,
+                  bibData = sierraBibData
+                ),
                 mergeCandidates = getMergeCandidates(sierraBibData),
                 title = getTitle(sierraBibData),
                 workType = getWorkType(sierraBibData),
@@ -106,7 +109,7 @@ class SierraTransformableTransformer
           }
           .recover {
             case e: JsonDecodingError =>
-              throw TransformerException(
+              throw SierraTransformerException(
                 s"Unable to parse bib data for ${bibRecord.id} as JSON: <<${bibRecord.data}>>"
               )
             case e: ShouldNotTransformException =>
@@ -141,7 +144,7 @@ class SierraTransformableTransformer
           fromJson[SierraItemData](jsonString) match {
             case Success(data) => id -> data
             case Failure(_) =>
-              throw TransformerException(
+              throw SierraTransformerException(
                 s"Unable to parse item data for $id as JSON: <<$jsonString>>")
           }
       }

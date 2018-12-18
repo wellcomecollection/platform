@@ -19,8 +19,6 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Progress.{
 }
 
 object CallbackNotificationFlow extends Logging {
-  import CallbackNotification._
-
   type Publication = Flow[Progress, Unit, NotUsed]
 
   def apply(snsClient: AmazonSNS, snsConfig: SNSConfig): Publication = {

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroTitleAndDescription extends MiroTransformableUtils {
   /*
@@ -32,27 +32,27 @@ trait MiroTitleAndDescription extends MiroTransformableUtils {
    *  here if there's nothing more useful in the other fields.
    */
   def getTitleAndDescription(
-    miroData: MiroTransformableData): (String, Option[String]) = {
-    val candidateDescription: String = miroData.description match {
+    miroRecord: MiroRecord): (String, Option[String]) = {
+    val candidateDescription: String = miroRecord.description match {
       case Some(s) =>
-        if (s == "--" || s == "-") miroData.academicDescription.getOrElse("")
+        if (s == "--" || s == "-") miroRecord.academicDescription.getOrElse("")
         else s
       case None => ""
     }
 
     val candidateTitle = candidateDescription.split("\n").head
-    val titleIsTruncatedDescription = miroData.title match {
+    val titleIsTruncatedDescription = miroRecord.title match {
       case Some(title) => candidateTitle.startsWith(title)
       case None        => true
     }
 
     val useDescriptionAsTitle =
       titleIsTruncatedDescription ||
-        (miroData.title.get == "-" || miroData.title.get == "--")
+        (miroRecord.title.get == "-" || miroRecord.title.get == "--")
 
     val title = if (useDescriptionAsTitle) {
       candidateTitle
-    } else miroData.title.get
+    } else miroRecord.title.get
 
     val rawDescription = if (useDescriptionAsTitle) {
       // Remove the first line from the description, and trim any extra
@@ -73,7 +73,7 @@ trait MiroTitleAndDescription extends MiroTransformableUtils {
     //
     // For now, any other award data gets discarded.
     val wiaAwardsData: List[(String, String)] =
-      zipMiroFields(keys = miroData.award, values = miroData.awardDate)
+      zipMiroFields(keys = miroRecord.award, values = miroRecord.awardDate)
         .collect {
           case (Some(label), Some(year))
               if label == "WIA Overall Winner" ||

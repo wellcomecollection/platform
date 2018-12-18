@@ -4,7 +4,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.json.{
   URIConverters,
@@ -39,30 +39,28 @@ class CallbackNotificationFlowTest
       (Progress.Completed, Callback.Pending)
     )
     forAll(sendsCallbackStatus) { (progressStatus, callbackStatus) =>
-      withActorSystem { actorSystem =>
-        withMaterializer(actorSystem) { materializer =>
-          withLocalSnsTopic { topic =>
-            val callbackNotificationFlow = CallbackNotificationFlow(
-              snsClient,
-              snsConfig = createSNSConfigWith(topic)
-            )
+      withMaterializer { implicit materializer =>
+        withLocalSnsTopic { topic =>
+          val callbackNotificationFlow = CallbackNotificationFlow(
+            snsClient,
+            snsConfig = createSNSConfigWith(topic)
+          )
 
-            val progress = createProgressWith(
-              status = progressStatus,
-              callback = Some(createCallbackWith(status = callbackStatus)))
+          val progress = createProgressWith(
+            status = progressStatus,
+            callback = Some(createCallbackWith(status = callbackStatus)))
 
-            val eventuallyResult = Source
-              .single(progress)
-              .via(callbackNotificationFlow)
-              .runWith(Sink.seq)(materializer)
+          val eventuallyResult = Source
+            .single(progress)
+            .via(callbackNotificationFlow)
+            .runWith(Sink.seq)
 
-            whenReady(eventuallyResult) { result =>
-              result should have size 1
-              val msg = notificationMessage[CallbackNotification](topic)
-              msg.id shouldBe progress.id
-              msg.callbackUri shouldBe progress.callback.get.uri
-              msg.payload shouldBe progress
-            }
+          whenReady(eventuallyResult) { result =>
+            result should have size 1
+            val msg = notificationMessage[CallbackNotification](topic)
+            msg.id shouldBe progress.id
+            msg.callbackUri shouldBe progress.callback.get.uri
+            msg.payload shouldBe progress
           }
         }
       }
@@ -72,9 +70,9 @@ class CallbackNotificationFlowTest
   it("doesn't send callbackNotifications") {
     val doesNotSendCallbackStatus = Table(
       ("progress-status", "callback-status"),
-      (Progress.Initialised, Callback.Pending),
-      (Progress.Initialised, Callback.Succeeded),
-      (Progress.Initialised, Callback.Failed),
+      (Progress.Accepted, Callback.Pending),
+      (Progress.Accepted, Callback.Succeeded),
+      (Progress.Accepted, Callback.Failed),
       (Progress.Processing, Callback.Pending),
       (Progress.Processing, Callback.Succeeded),
       (Progress.Processing, Callback.Failed),
@@ -83,33 +81,29 @@ class CallbackNotificationFlowTest
       (Progress.Completed, Callback.Succeeded),
       (Progress.Completed, Callback.Failed)
     )
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        withLocalSnsTopic { topic =>
-          forAll(doesNotSendCallbackStatus) {
-            (progressStatus, callbackStatus) =>
-              val callbackNotificationFlow = CallbackNotificationFlow(
-                snsClient,
-                snsConfig = createSNSConfigWith(topic)
-              )
+    withMaterializer { implicit materializer =>
+      withLocalSnsTopic { topic =>
+        forAll(doesNotSendCallbackStatus) { (progressStatus, callbackStatus) =>
+          val callbackNotificationFlow = CallbackNotificationFlow(
+            snsClient,
+            snsConfig = createSNSConfigWith(topic)
+          )
 
-              val progress = createProgressWith(
-                status = progressStatus,
-                callback = Some(createCallbackWith(status = callbackStatus)))
+          val progress = createProgressWith(
+            status = progressStatus,
+            callback = Some(createCallbackWith(status = callbackStatus)))
 
-              val eventuallyResult = Source
-                .single(progress)
-                .via(callbackNotificationFlow)
-                .runWith(Sink.seq)(materializer)
+          val eventuallyResult = Source
+            .single(progress)
+            .via(callbackNotificationFlow)
+            .runWith(Sink.seq)
 
-              whenReady(eventuallyResult) { result =>
-                result should have size 1
-                assertSnsReceivesNothing(topic)
-              }
+          whenReady(eventuallyResult) { result =>
+            result should have size 1
+            assertSnsReceivesNothing(topic)
           }
         }
       }
     }
   }
-
 }

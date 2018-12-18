@@ -5,15 +5,34 @@ STACK_ROOT  = monitoring
 
 SBT_APPS    =
 ECS_TASKS   = slack_budget_bot
-LAMBDAS     = post_to_slack terraform_tracker queue_watcher
+LAMBDAS     = post_to_slack terraform_tracker update_service_list
 
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
 TF_NAME     = monitoring
-TF_PATH     = $(STACK_ROOT)
+TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))
 
-include $(ROOT)/monitoring/ecs_dashboard/Makefile
+$(ROOT)/.docker/ecs_dashboard:
+	docker build \
+		-f client/Dockerfile client/ \
+		--tag ecs_dashboard
+
+	mkdir -p $(ROOT)/.docker; \
+	touch $(ROOT)/.docker/ecs_dashboard
+
+ecs_dashboard_client-publish: $(ROOT)/.docker/ecs_dashboard
+	$(ROOT)/docker_run.py --aws -- \
+		--volume $(ROOT)/ecs_dashboard:/dashboard \
+		--env BUCKET_NAME=wellcomecollection-platform-dashboard \
+		--env PATH_PREFIX=https://wellcomecollection-platform-dashboard.s3.amazonaws.com \
+		ecs_dashboard
+
+gatling_test:
+	docker run -it \
+		--volume $(ROOT)/monitoring/gatling/user-files:/opt/gatling/user-files \
+		--volume $(ROOT)/monitoring/gatling/results:/opt/gatling/results \
+		denvazh/gatling

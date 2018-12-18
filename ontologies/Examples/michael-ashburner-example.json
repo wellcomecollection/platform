@@ -45,7 +45,7 @@
       "year": "1990"
     }
   ],
-  "occupies/positions": [
+  "heldPositions": [
     {
       "label": "Cambridge Fellow",
       "type": "Position",

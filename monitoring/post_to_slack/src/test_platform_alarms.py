@@ -22,8 +22,7 @@ class Alarm:
     [
         ("loris-alb-target-500-errors", "platform/loris"),
         ("loris-alb-not-enough-healthy-hosts", "platform/loris"),
-        ("catalogue-api-romulus-alb-target-400-errors", "ecs/catalogue-api-romulus"),
-        ("catalogue-api-remus-alb-target-500-errors", "ecs/catalogue-api-remus"),
+        ("catalogue-api-remus-5xx-alarm", "ecs/catalogue_api_gw-remus"),
         (
             "lambda-ecs_ec2_instance_tagger-errors",
             "/aws/lambda/ecs_ec2_instance_tagger",
@@ -53,8 +52,7 @@ def test_unrecognised_log_group_name_is_valueerror(bad_alarm_name):
     [
         ("loris-alb-target-500-errors", ['"HTTP/1.0 500"']),
         ("loris-alb-not-enough-healthy-hosts", []),
-        ("catalogue-api-romulus-alb-target-400-errors", []),
-        ("catalogue-api-remus-alb-target-500-errors", ['"HTTP 500"']),
+        ("catalogue-api-remus-5xx-alarm", ['"HTTP 500"']),
         (
             "lambda-ecs_ec2_instance_tagger-errors",
             ["Traceback", "Task timed out after"],

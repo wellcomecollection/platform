@@ -1,10 +1,13 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import akka.Done
-import akka.actor.ActorSystem
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.platform.reindex.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
+  ReindexJobConfig,
+  ReindexRequest
+}
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -12,16 +15,29 @@ import scala.concurrent.{ExecutionContext, Future}
 class ReindexWorkerService(
   recordReader: RecordReader,
   bulkSNSSender: BulkSNSSender,
-  sqsStream: SQSStream[NotificationMessage]
-)(implicit val actorSystem: ActorSystem, ec: ExecutionContext) {
+  sqsStream: SQSStream[NotificationMessage],
+  reindexJobConfigMap: Map[String, ReindexJobConfig]
+)(implicit ec: ExecutionContext)
+    extends Runnable {
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexJob: ReindexJob <- Future.fromTry(
-        fromJson[ReindexJob](message.body))
+      reindexRequest: ReindexRequest <- Future.fromTry(
+        fromJson[ReindexRequest](message.body))
+      reindexJobConfig = reindexJobConfigMap.getOrElse(
+        reindexRequest.jobConfigId,
+        throw new RuntimeException(
+          s"No such job config: ${reindexRequest.jobConfigId}")
+      )
       recordsToSend: List[String] <- recordReader
-        .findRecordsForReindexing(reindexJob)
-      _ <- bulkSNSSender.sendToSNS(messages = recordsToSend)
+        .findRecordsForReindexing(
+          reindexParameters = reindexRequest.parameters,
+          dynamoConfig = reindexJobConfig.dynamoConfig
+        )
+      _ <- bulkSNSSender.sendToSNS(
+        messages = recordsToSend,
+        snsConfig = reindexJobConfig.snsConfig
+      )
     } yield ()
 
   def run(): Future[Done] =

@@ -15,10 +15,11 @@ import uk.ac.wellcome.storage.ObjectLocation
 trait ProgressGenerators extends RandomThings {
 
   val storageLocation = StorageLocation(
-    StorageProvider(randomAlphanumeric()),
+    StandardStorageProvider,
     ObjectLocation(randomAlphanumeric(), randomAlphanumeric()))
 
-  def createProgress(): Progress = createProgressWith()
+  def createProgress: Progress = createProgressWith()
+
   val testCallbackUri =
     new URI("http://www.wellcomecollection.org/callback/ok")
 
@@ -26,7 +27,7 @@ trait ProgressGenerators extends RandomThings {
                          sourceLocation: StorageLocation = storageLocation,
                          callback: Option[Callback] = Some(createCallback()),
                          space: Namespace = createSpace,
-                         status: Status = Progress.Initialised,
+                         status: Status = Progress.Accepted,
                          maybeBag: Option[BagId] = None,
                          events: List[ProgressEvent] = List.empty): Progress = {
     Progress(
@@ -43,22 +44,24 @@ trait ProgressGenerators extends RandomThings {
     ProgressEvent(randomAlphanumeric(15))
   }
 
-  def createProgressEventUpdateWith(id: UUID,
+  def createProgressEventUpdateWith(id: UUID = randomUUID,
                                     events: List[ProgressEvent] = List(
-                                      createProgressEvent)) = {
+                                      createProgressEvent))
+    : ProgressEventUpdate =
     ProgressEventUpdate(id, events)
-  }
+
+  def createProgressEventUpdate: ProgressEventUpdate =
+    createProgressEventUpdateWith()
 
   def createProgressStatusUpdateWith(
     id: UUID,
-    status: Status = Progress.Initialised,
+    status: Status = Progress.Accepted,
     maybeBag: Option[BagId] = Some(randomBagId),
     events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
     ProgressStatusUpdate(id, status, maybeBag, events)
   }
 
-  def createSpace =
-    Namespace(randomAlphanumeric())
+  def createSpace = Namespace(randomAlphanumeric())
 
   def createCallback(): Callback = createCallbackWith()
 
@@ -66,4 +69,5 @@ trait ProgressGenerators extends RandomThings {
     uri: URI = testCallbackUri,
     status: Callback.CallbackStatus = Callback.Pending): Callback =
     Callback(uri = uri, status = status)
+
 }

@@ -2,24 +2,12 @@ output "lambda_error_alarm_arn" {
   value = "${module.lambda_error_alarm.arn}"
 }
 
-output "ec2_instance_terminating_for_too_long_alarm_arn" {
-  value = "${module.ec2_instance_terminating_for_too_long_alarm.arn}"
-}
-
 output "dlq_alarm_arn" {
   value = "${module.dlq_alarm.arn}"
 }
 
-output "alb_server_error_alarm_arn" {
-  value = "${module.alb_server_error_alarm.arn}"
-}
-
-output "alb_client_error_alarm_arn" {
-  value = "${module.alb_client_error_alarm.arn}"
-}
-
-output "terminal_failure_alarm_arn" {
-  value = "${module.terminal_failure_alarm.arn}"
+output "gateway_server_error_alarm_arn" {
+  value = "${module.gateway_server_error_alarm.arn}"
 }
 
 output "ec2_terminating_topic_arn" {
@@ -62,10 +50,6 @@ output "reporting_miro_reindex_topic_name" {
   value = "${module.reporting_miro_reindex_topic.name}"
 }
 
-output "reporting_miro_reindex_topic_publish_policy" {
-  value = "${module.reporting_miro_reindex_topic.publish_policy}"
-}
-
 ## Reporting - miro inventory
 
 output "reporting_miro_inventory_reindex_topic_arn" {
@@ -74,10 +58,6 @@ output "reporting_miro_inventory_reindex_topic_arn" {
 
 output "reporting_miro_inventory_reindex_topic_name" {
   value = "${module.reporting_miro_inventory_reindex_topic.name}"
-}
-
-output "reporting_miro_inventory_reindex_topic_publish_policy" {
-  value = "${module.reporting_miro_inventory_reindex_topic.publish_policy}"
 }
 
 ## Reporting - sierra
@@ -90,10 +70,6 @@ output "reporting_sierra_reindex_topic_name" {
   value = "${module.reporting_sierra_reindex_topic.name}"
 }
 
-output "reporting_sierra_reindex_topic_publish_policy" {
-  value = "${module.reporting_sierra_reindex_topic.publish_policy}"
-}
-
 ## Catalogue - miro
 
 output "catalogue_miro_reindex_topic_arn" {
@@ -102,10 +78,6 @@ output "catalogue_miro_reindex_topic_arn" {
 
 output "catalogue_miro_reindex_topic_name" {
   value = "${module.catalogue_miro_reindex_topic.name}"
-}
-
-output "catalogue_miro_reindex_topic_publish_policy" {
-  value = "${module.catalogue_miro_reindex_topic.publish_policy}"
 }
 
 ## Catalogue - sierra
@@ -118,10 +90,6 @@ output "catalogue_sierra_reindex_topic_name" {
   value = "${module.catalogue_sierra_reindex_topic.name}"
 }
 
-output "catalogue_sierra_reindex_topic_publish_policy" {
-  value = "${module.catalogue_sierra_reindex_topic.publish_policy}"
-}
-
 ## Catalogue - sierra items
 
 output "catalogue_sierra_items_reindex_topic_arn" {
@@ -130,10 +98,6 @@ output "catalogue_sierra_items_reindex_topic_arn" {
 
 output "catalogue_sierra_items_reindex_topic_name" {
   value = "${module.catalogue_sierra_items_reindex_topic.name}"
-}
-
-output "catalogue_sierra_items_reindex_topic_publish_policy" {
-  value = "${module.catalogue_sierra_items_reindex_topic.publish_policy}"
 }
 
 # Catalogue VPC
@@ -162,4 +126,36 @@ output "storage_vpc_delta_public_subnets" {
 
 output "storage_vpc_delta_id" {
   value = "${module.storage_vpc_delta.vpc_id}"
+}
+
+output "storage_cidr_block_vpc" {
+  value = "${local.storage_cidr_block_vpc}"
+}
+
+# Monitoring VPC
+
+output "monitoring_vpc_delta_private_subnets" {
+  value = ["${module.monitoring_vpc_delta.private_subnets}"]
+}
+
+output "monitoring_vpc_delta_public_subnets" {
+  value = ["${module.monitoring_vpc_delta.public_subnets}"]
+}
+
+output "monitoring_vpc_delta_id" {
+  value = "${module.monitoring_vpc_delta.vpc_id}"
+}
+
+# Data science VPC
+
+output "datascience_vpc_delta_private_subnets" {
+  value = ["${module.datascience_vpc_delta.private_subnets}"]
+}
+
+output "datascience_vpc_delta_public_subnets" {
+  value = ["${module.datascience_vpc_delta.public_subnets}"]
+}
+
+output "datascience_vpc_delta_id" {
+  value = "${module.datascience_vpc_delta.vpc_id}"
 }

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.subjects
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   SierraBibData,
   VarField
@@ -51,7 +51,7 @@ trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
     // enough information to build the Organisation, so erroring out here is
     // the best we can do for now.
     if (label == "") {
-      throw TransformerException(
+      throw SierraTransformerException(
         s"Not enough information to build a label on $varField")
     }
 

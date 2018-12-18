@@ -1,26 +1,29 @@
-import WellcomeDependencies.versions
 import sbt._
 
 object WellcomeDependencies {
-  private lazy val versions = new {
-    val json = "1.0.0"
-    val monitoring = "1.1.0"
-    val storage = "2.6.0"
-  }
-
-  val jsonLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "json" % versions.json,
-    "uk.ac.wellcome" %% "json" % versions.json % "test" classifier "tests"
+  val jsonLibrary: Seq[ModuleID] = library(
+    name = "json",
+    version = "1.1.1"
   )
 
-  val monitoringLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "monitoring" % versions.monitoring,
-    "uk.ac.wellcome" %% "monitoring" % versions.monitoring % "test" classifier "tests"
+  val messagingLibrary: Seq[ModuleID] = library(
+    name = "messaging",
+    version = "0.2.0"
   )
 
-  val storageLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "storage" % versions.storage,
-    "uk.ac.wellcome" %% "storage" % versions.storage % "test" classifier "tests"
+  val monitoringLibrary: Seq[ModuleID] = library(
+    name = "monitoring",
+    version = "1.1.1"
+  )
+
+  val storageLibrary: Seq[ModuleID] = library(
+    name = "storage",
+    version = "3.1.0"
+  )
+
+  private def library(name: String, version: String): Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" %% name % version,
+    "uk.ac.wellcome" %% name % version % "test" classifier "tests"
   )
 }
 
@@ -32,13 +35,13 @@ object Dependencies {
     val akkaStreamAlpakka = "0.20"
     val aws = "1.11.95"
     val apacheLogging = "2.8.2"
-    val finatra = "18.4.0"
+    val finatra = "18.11.0"
     val guice = "4.2.0"
     val logback = "1.1.8"
     val mockito = "1.9.5"
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
-    val elastic4s = "5.6.5"
+    val elastic4s = "6.4.0"
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
@@ -60,13 +63,8 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
 
-  val circeDependencies = Seq(
-    "io.circe" %% "circe-core" % versions.circeVersion,
-    "io.circe" %% "circe-generic"% versions.circeVersion,
-    "io.circe" %% "circe-generic-extras"% versions.circeVersion,
-    "io.circe" %% "circe-parser"% versions.circeVersion,
-    "io.circe" %% "circe-optics" % versions.circeVersion,
-    "io.circe" %% "circe-java8" % versions.circeVersion
+  val circeOpticsDependencies = Seq(
+    "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
   val swaggerDependencies = Seq(
@@ -134,31 +132,26 @@ object Dependencies {
   // Internal Library dependency groups
   val commonDependencies =
     testDependencies ++
-      loggingDependencies ++
-      circeDependencies ++ Seq(
-    "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
-    "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
-  ) ++ apacheCommons
+      loggingDependencies ++ Seq(
+      "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
+      "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
+    ) ++ apacheCommons
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
-  val commonElasticsearchDependencies = elasticsearchDependencies ++ guiceDependencies ++ scalacheckDependencies
+  val commonElasticsearchDependencies: Seq[ModuleID] =
+    elasticsearchDependencies ++
+      circeOpticsDependencies ++
+      guiceDependencies ++
+      scalacheckDependencies
 
-  val commonMessagingDependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
-    "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
-    "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka,
-    "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
-
-  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
-
-  val finatraMonitoringDependencies = finatraDependencies ++ WellcomeDependencies.monitoringLibrary
+  val apiDependencies: Seq[ModuleID] = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe
   )
+
+  val configMessagingDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.messagingLibrary
 
   val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
 
@@ -169,12 +162,12 @@ object Dependencies {
   ) ++ WellcomeDependencies.jsonLibrary
 
   // Application specific dependency groups
-  val idminterDependencies = Seq(
+  val idminterDependencies: Seq[ModuleID] = Seq(
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
     "mysql" % "mysql-connector-java" % "6.0.6",
     "org.flywaydb" % "flyway-core" % "4.2.0",
     "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
-  )
+  ) ++ circeOpticsDependencies
 
   val miroTransformerDependencies: Seq[ModuleID] = Seq(
     "org.apache.commons" % "commons-lang3" % "3.1"
@@ -186,7 +179,7 @@ object Dependencies {
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
-  )
+  ) ++ circeOpticsDependencies
 
   val archiveCommonDependencies: Seq[ModuleID] = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
@@ -195,4 +188,7 @@ object Dependencies {
     "org.rogach" %% "scallop" % "3.1.3",
     "de.heikoseeberger" %% "akka-http-circe" % "1.21.1"
   ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
+
+  val registrarHttpDependencies: Seq[ModuleID] = circeOpticsDependencies
+  val progressHttpDependencies: Seq[ModuleID] = circeOpticsDependencies
 }

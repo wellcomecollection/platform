@@ -9,19 +9,19 @@ import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class ChecksumNotMatchedOnUploadError(expectedChecksum: String,
-                                           actualCheckSum: String,
+                                           actualChecksum: String,
                                            t: ArchiveDigestItemJob)
     extends ArchiveError[ArchiveDigestItemJob] {
   override def toString =
-    s"Calculated checksum $actualCheckSum was different from $expectedChecksum for item ${t.bagDigestItem.location} on upload"
+    s"Calculated checksum $actualChecksum was different from $expectedChecksum for item ${t.bagDigestItem.location} on upload"
 }
 
 case class ChecksumNotMatchedOnDownloadError(expectedChecksum: String,
-                                             actualCheckSum: String,
+                                             actualChecksum: String,
                                              t: ArchiveDigestItemJob)
     extends ArchiveError[ArchiveDigestItemJob] {
   override def toString =
-    s"Calculated checksum $actualCheckSum was different from $expectedChecksum for item ${t.bagDigestItem.location} on download"
+    s"Calculated checksum $actualChecksum was different from $expectedChecksum for item ${t.bagDigestItem.location} on download"
 }
 
 case class UploadDigestItemError(exception: Throwable, t: ArchiveDigestItemJob)

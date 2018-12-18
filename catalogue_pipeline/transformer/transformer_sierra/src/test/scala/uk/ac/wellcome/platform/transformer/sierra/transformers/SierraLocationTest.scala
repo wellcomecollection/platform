@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.work.internal.{
   LocationType,
   PhysicalLocation
 }
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
 import uk.ac.wellcome.platform.transformer.sierra.source.sierra.SierraSourceLocation
 import uk.ac.wellcome.platform.transformer.sierra.generators.SierraDataGenerators
 
@@ -67,7 +67,7 @@ class SierraLocationTest
     }
 
     it("throws an exception if no resource identifier is supplied") {
-      val caught = intercept[TransformerException] {
+      val caught = intercept[SierraTransformerException] {
         transformer.getDigitalLocation(identifier = "")
       }
       caught.e.getMessage shouldEqual "id required by DigitalLocation has not been provided"

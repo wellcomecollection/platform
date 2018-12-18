@@ -12,26 +12,24 @@ class DiscardLeftFlowTest
     with ScalaFutures {
 
   it("discards Left values") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        val leftList = List("fail", "flumps").map(Left(_))
+    withMaterializer { implicit materializer =>
+      val leftList = List("fail", "flumps").map(Left(_))
 
-        val sourceList = List("boomer", "bust", "banana")
-        val rightList = sourceList.map(Right(_))
+      val sourceList = List("boomer", "bust", "banana")
+      val rightList = sourceList.map(Right(_))
 
-        val list: List[Either[String, String]] = leftList ++ rightList
+      val list: List[Either[String, String]] = leftList ++ rightList
 
-        val source = Source(list)
-        val discardLeftFlow = DiscardLeftFlow[String, String]()
+      val source = Source(list)
+      val discardLeftFlow = DiscardLeftFlow[String, String]()
 
-        val eventualResult = source
-          .via(discardLeftFlow)
-          .async
-          .runWith(Sink.seq)(materializer)
+      val eventualResult = source
+        .via(discardLeftFlow)
+        .async
+        .runWith(Sink.seq)
 
-        whenReady(eventualResult) { result =>
-          result.toList shouldBe sourceList
-        }
+      whenReady(eventualResult) { result =>
+        result.toList shouldBe sourceList
       }
     }
   }

@@ -3,7 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= sbt_common
 
-SBT_DOCKER_LIBRARIES = elasticsearch messaging monitoring storage
+SBT_DOCKER_LIBRARIES = elasticsearch monitoring storage
 SBT_NO_DOCKER_LIBRARIES = common internal_model display
 
 $(foreach library,$(SBT_DOCKER_LIBRARIES),$(eval $(call __sbt_library_docker_template,$(library),$(STACK_ROOT)/$(library))))

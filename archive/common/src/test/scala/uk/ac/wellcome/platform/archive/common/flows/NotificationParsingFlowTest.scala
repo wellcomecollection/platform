@@ -16,38 +16,35 @@ class NotificationParsingFlowTest
     with IntegrationPatience {
 
   it("parses T from a message body") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        case class Character(id: String, age: Int)
+    withMaterializer { implicit materializer =>
+      case class Character(id: String, age: Int)
 
-        val characters = List(
-          Character("Dave", 34),
-          Character("Cat", 7),
-          Character("Arnold", 32),
-          Character("Holly", 3528591)
-        )
+      val characters = List(
+        Character("Dave", 34),
+        Character("Cat", 7),
+        Character("Arnold", 32),
+        Character("Holly", 3528591)
+      )
 
-        val jsonStrings = characters.map(toJson[Character](_).get)
-        val badStrings = List("gazpacho soup")
+      val jsonStrings = characters.map(toJson[Character](_).get)
+      val badStrings = List("gazpacho soup")
 
-        val messages = jsonStrings
-          .patch(2, badStrings, 0)
-          .map(body => NotificationMessage(body = body.toString))
+      val messages = jsonStrings
+        .patch(2, badStrings, 0)
+        .map(body => NotificationMessage(body = body.toString))
 
-        val source = Source(messages)
-        val parsingFlow = NotificationParsingFlow[Character]
+      val source = Source(messages)
+      val parsingFlow = NotificationParsingFlow[Character]
 
-        print(messages)
+      print(messages)
 
-        val eventualResult = source
-          .via(parsingFlow)
-          .async
-          .runWith(Sink.seq)(materializer)
+      val eventualResult = source
+        .via(parsingFlow)
+        .async
+        .runWith(Sink.seq)
 
-        whenReady(eventualResult) { result =>
-          result.toList shouldBe characters
-        }
-
+      whenReady(eventualResult) { result =>
+        result.toList shouldBe characters
       }
     }
   }

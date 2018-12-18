@@ -2,55 +2,47 @@ package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.model._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
+import uk.ac.wellcome.platform.archive.common.fixtures.ArchiveMessaging
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
-import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
-import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.fixtures.{
-  LocalDynamoDb,
-  LocalVersionedHybridStore,
-  S3
-}
-import uk.ac.wellcome.storage.s3.S3StorageBackend
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
-import uk.ac.wellcome.test.fixtures.TestWith
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 
 trait RegistrarFixtures
     extends S3
+    with Akka
     with Messaging
-    with LocalVersionedHybridStore
+    with ArchiveMessaging
     with BagLocationFixtures
-    with LocalDynamoDb {
+    with LocalDynamoDb
+    with StorageManifestVHSFixture {
 
-  def sendNotification(requestId: UUID,
-                       storageSpace: StorageSpace,
-                       bagLocation: BagLocation,
-                       queuePair: QueuePair) =
-    sendNotificationToSQS(
-      queuePair.queue,
-      ArchiveComplete(requestId, storageSpace, bagLocation)
-    )
+  def withBagNotification[R](
+    queuePair: QueuePair,
+    storageBucket: Bucket,
+    archiveRequestId: UUID = randomUUID,
+    storageSpace: StorageSpace = randomStorageSpace,
+    bagInfo: BagInfo = randomBagInfo
+  )(testWith: TestWith[BagLocation, R]): R =
+    withBag(storageBucket, bagInfo = bagInfo) { bagLocation =>
+      val archiveComplete = ArchiveComplete(
+        archiveRequestId = archiveRequestId,
+        space = storageSpace,
+        bagLocation = bagLocation
+      )
 
-  def withBagNotification[R](requestId: UUID,
-                             queuePair: QueuePair,
-                             storageBucket: Bucket,
-                             dataFileCount: Int = 1)(
-    testWith: TestWith[(BagLocation, BagInfo, BagId), R]) = {
-    withBag(storageBucket, dataFileCount) {
-      case (bagLocation, bagInfo, bagId) =>
-        sendNotification(requestId, bagId.space, bagLocation, queuePair)
-        testWith((bagLocation, bagInfo, bagId))
+      sendNotificationToSQS(
+        queuePair.queue,
+        archiveComplete
+      )
+      testWith(bagLocation)
     }
-  }
 
   override def createTable(table: Table) = {
     dynamoDbClient.createTable(
@@ -77,101 +69,73 @@ trait RegistrarFixtures
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
                  progressTopic: Topic)(testWith: TestWith[Registrar, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        val messageStream = new MessageStream[NotificationMessage, Unit](
-          actorSystem = actorSystem,
-          sqsClient = asyncSqsClient,
-          sqsConfig = createSQSConfigWith(queuePair.queue),
-          metricsSender = metricsSender
-        )
-        withTypeVHS[StorageManifest, EmptyMetadata, R](
-          bucket = hybridStoreBucket,
-          table = hybridStoreTable
-        ) { dataStore =>
-          val registrar = new Registrar(
-            snsClient = snsClient,
-            progressSnsConfig = createSNSConfigWith(progressTopic),
-            s3Client = s3Client,
-            messageStream = messageStream,
-            dataStore = dataStore,
-            actorSystem = actorSystem
-          )
+        withArchiveMessageStream[NotificationMessage, Unit, R](
+          queuePair.queue,
+          metricsSender) { messageStream =>
+          withStorageManifestVHS(hybridStoreTable, hybridStoreBucket) {
+            dataStore =>
+              val registrar = new Registrar(
+                snsClient = snsClient,
+                progressSnsConfig = createSNSConfigWith(progressTopic),
+                s3Client = s3Client,
+                messageStream = messageStream,
+                dataStore = dataStore
+              )
 
-          testWith(registrar)
+              registrar.run()
+
+              testWith(registrar)
+          }
         }
       }
     }
 
-  type ManifestVHS = VersionedHybridStore[StorageManifest,
-                                          EmptyMetadata,
-                                          ObjectStore[StorageManifest]]
-
   def withRegistrar[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, ManifestVHS), R])
+    testWith: TestWith[(Bucket, QueuePair, Topic, StorageManifestVHS), R])
     : R = {
-    withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalSnsTopic {
-        progressTopic =>
-          withLocalS3Bucket {
-            storageBucket =>
-              withLocalS3Bucket {
-                hybridStoreBucket =>
-                  withLocalDynamoDbTable {
-                    hybridDynamoTable =>
-                      withApp(
-                        hybridStoreBucket,
-                        hybridDynamoTable,
-                        queuePair,
-                        progressTopic) { registrar =>
-                        implicit val storageBackend =
-                          new S3StorageBackend(s3Client)
-
-                        withTypeVHS[StorageManifest, EmptyMetadata, R](
-                          hybridStoreBucket,
-                          hybridDynamoTable) { vhs =>
-                          testWith(
-                            (
-                              storageBucket,
-                              queuePair,
-                              progressTopic,
-                              registrar,
-                              vhs)
-                          )
-                        }
-                      }
-                  }
-              }
-
-          }
-
-      }
-    })
-  }
-
-  def withRegistrarAndBrokenVHS[R](
-    testWith: TestWith[(Bucket, QueuePair, Topic, Registrar, Bucket), R]) = {
-    withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
-      withLocalSnsTopic {
-        progressTopic =>
-          withLocalS3Bucket { storageBucket =>
-            withLocalS3Bucket { hybridStoreBucket =>
+    withLocalSqsQueueAndDlqAndTimeout(15) { queuePair =>
+      withLocalSnsTopic { progressTopic =>
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { hybridStoreBucket =>
+            withLocalDynamoDbTable { hybridDynamoTable =>
               withApp(
                 hybridStoreBucket,
-                Table("does-not-exist", ""),
+                hybridDynamoTable,
                 queuePair,
-                progressTopic) { registrar =>
-                testWith(
-                  (
-                    storageBucket,
-                    queuePair,
-                    progressTopic,
-                    registrar,
-                    hybridStoreBucket)
-                )
+                progressTopic) { _ =>
+                withStorageManifestVHS(hybridDynamoTable, hybridStoreBucket) {
+                  vhs =>
+                    testWith(
+                      (storageBucket, queuePair, progressTopic, vhs)
+                    )
+                }
               }
             }
           }
+        }
+      }
+    }
+  }
+
+  def withRegistrarAndBrokenVHS[R](
+    testWith: TestWith[(Bucket, QueuePair, Topic, Bucket), R]): R = {
+    withLocalSqsQueueAndDlqAndTimeout(5)(queuePair => {
+      withLocalSnsTopic { progressTopic =>
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { hybridStoreBucket =>
+            withApp(
+              hybridStoreBucket,
+              Table("does-not-exist", ""),
+              queuePair,
+              progressTopic) { _ =>
+              testWith(
+                (storageBucket, queuePair, progressTopic, hybridStoreBucket)
+              )
+            }
+          }
+        }
 
       }
     })

@@ -48,7 +48,7 @@ trait SierraContributors extends MarcUtils with SierraAgents {
     persons
       .flatMap { subfields: List[MarcSubfield] =>
         val roles = getContributionRoles(subfields)
-        val maybePerson = getPerson(subfields)
+        val maybePerson = getPerson(subfields, normalisePerson = true)
 
         maybePerson.map { person =>
           Contributor(

@@ -15,7 +15,7 @@ class TroubleshootArchivistLocalBagFileTest
 
   ignore("downloads, uploads and verifies a known BagIt bag") {
     withArchivist {
-      case (ingestBucket, storageBucket, queuePair, _, _, archivist) =>
+      case (ingestBucket, storageBucket, queuePair, _, _) =>
         sendBag(
           new ZipFile(
             List(
@@ -25,9 +25,7 @@ class TroubleshootArchivistLocalBagFileTest
             ).mkString("/")),
           ingestBucket,
           queuePair
-        ) { invalidBag =>
-          archivist.run()
-
+        ) { _ =>
           while (true) {
             Thread.sleep(10000)
             println(s"Uploaded: ${listKeysInBucket(storageBucket).size}")

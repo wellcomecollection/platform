@@ -18,19 +18,19 @@ case object Callback extends URIConverters {
     callbackUri.map(Callback(_))
   }
 
-  val processingString = "processing"
-  val successString = "success"
-  val failureString = "failure"
+  private val processingString = "processing"
+  private val succeededString = "succeeded"
+  private val failedString = "failed"
 
   case object Pending extends CallbackStatus {
     override def toString: String = processingString
   }
 
   case object Succeeded extends CallbackStatus {
-    override def toString: String = successString
+    override def toString: String = succeededString
   }
 
   case object Failed extends CallbackStatus {
-    override def toString: String = failureString
+    override def toString: String = failedString
   }
 }

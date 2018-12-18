@@ -1,9 +1,9 @@
 package uk.ac.wellcome.platform.recorder.fixtures
 
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.recorder.services.RecorderWorkerService
@@ -26,16 +26,15 @@ trait WorkerServiceFixture
     storageBucket: Bucket,
     topic: Topic,
     queue: Queue)(testWith: TestWith[RecorderWorkerService, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withSNSWriter(topic) { snsWriter =>
           withTypeVHS[TransformedBaseWork, EmptyMetadata, R](
             bucket = storageBucket,
             table = table) { versionedHybridStore =>
             withMessageStream[TransformedBaseWork, R](
-              actorSystem,
-              queue,
-              metricsSender) { messageStream =>
+              queue = queue,
+              metricsSender = metricsSender) { messageStream =>
               val workerService = new RecorderWorkerService(
                 versionedHybridStore = versionedHybridStore,
                 messageStream = messageStream,

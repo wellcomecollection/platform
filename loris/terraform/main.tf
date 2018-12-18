@@ -1,7 +1,7 @@
-module "loris" {
-  source = "loris"
+module "loris-031218" {
+  source = "stack"
 
-  namespace = "loris"
+  namespace = "loris-031218"
 
   certificate_domain = "api.wellcomecollection.org"
 

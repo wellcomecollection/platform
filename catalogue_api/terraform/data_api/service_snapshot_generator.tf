@@ -25,16 +25,15 @@ module "snapshot_generator" {
     es_protocol       = "${var.es_cluster_credentials["protocol"]}"
     es_index_v1       = "${var.es_config_snapshot["index_v1"]}"
     es_index_v2       = "${var.es_config_snapshot["index_v2"]}"
-    es_doc_type       = "${var.es_config_snapshot["doc_type"]}"
     metrics_namespace = "snapshot_generator"
   }
 
-  env_vars_length = 11
+  env_vars_length = 10
 
-  memory = 1024
-  cpu    = 256
+  memory = 4096
+  cpu    = 2048
 
-  vpc_id = "${local.vpc_id}"
+  vpc_id = "${var.vpc_id}"
 
   max_capacity = 2
 
@@ -46,8 +45,8 @@ module "snapshot_generator" {
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
 
   aws_region = "${var.aws_region}"
-  vpc_id     = "${local.vpc_id}"
-  subnets    = "${local.private_subnets}"
+  vpc_id     = "${var.vpc_id}"
+  subnets    = "${var.private_subnets}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 

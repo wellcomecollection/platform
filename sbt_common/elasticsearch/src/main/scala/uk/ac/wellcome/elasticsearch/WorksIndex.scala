@@ -2,25 +2,11 @@ package uk.ac.wellcome.elasticsearch
 
 import com.sksamuel.elastic4s.analyzers._
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
-import grizzled.slf4j.Logging
+import com.sksamuel.elastic4s.mappings.{FieldDefinition, ObjectField}
 
-import scala.concurrent.ExecutionContext
-
-class WorksIndex(client: HttpClient, rootIndexType: String)(
-  implicit val ec: ExecutionContext)
-    extends ElasticsearchIndex
-    with Logging {
-
-  val httpClient: HttpClient = client
-
+object WorksIndex {
   val license = objectField("license").fields(
-    keywordField("ontologyType"),
-    keywordField("id"),
-    textField("label"),
-    textField("url")
+    keywordField("id")
   )
 
   def sourceIdentifierFields = Seq(
@@ -66,6 +52,31 @@ class WorksIndex(client: HttpClient, rootIndexType: String)(
     keywordField("ontologyType")
   )
 
+  val concept = Seq(
+    textField("label"),
+    keywordField("ontologyType"),
+    keywordField("type")
+  )
+
+  val agent = Seq(
+    textField("label"),
+    keywordField("type"),
+    keywordField("prefix"),
+    keywordField("numeration"),
+    keywordField("ontologyType")
+  )
+
+  val rootConcept = concept ++ agent
+
+  def identified(fieldName: String, fields: Seq[FieldDefinition]): ObjectField =
+    objectField(fieldName).fields(
+      textField("type"),
+      objectField("agent").fields(fields),
+      keywordField("canonicalId"),
+      objectField("sourceIdentifier").fields(sourceIdentifierFields),
+      objectField("otherIdentifiers").fields(sourceIdentifierFields)
+    )
+
   def subject(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
     keywordField("ontologyType"),
@@ -78,37 +89,12 @@ class WorksIndex(client: HttpClient, rootIndexType: String)(
     identified("concepts", concept)
   )
 
-  val agent = Seq(
-    textField("label"),
-    keywordField("type"),
-    keywordField("prefix"),
-    keywordField("numeration"),
-    keywordField("ontologyType")
-  )
-
-  val concept = Seq(
-    textField("label"),
-    keywordField("ontologyType"),
-    keywordField("type")
-  )
-
-  val rootConcept = concept ++ agent
-
   def labelledTextField(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
     keywordField("ontologyType")
   )
 
   def period(fieldName: String) = labelledTextField(fieldName)
-
-  def identified(fieldName: String, fields: Seq[FieldDefinition]) =
-    objectField(fieldName).fields(
-      textField("type"),
-      objectField("agent").fields(fields),
-      keywordField("canonicalId"),
-      objectField("sourceIdentifier").fields(sourceIdentifierFields),
-      objectField("otherIdentifiers").fields(sourceIdentifierFields)
-    )
 
   def items(fieldName: String) = objectField(fieldName).fields(
     keywordField("canonicalId"),
@@ -117,6 +103,7 @@ class WorksIndex(client: HttpClient, rootIndexType: String)(
     keywordField("type"),
     objectField("agent").fields(location(), keywordField("ontologyType"))
   )
+
   val language = objectField("language").fields(
     keywordField("id"),
     textField("label"),
@@ -176,10 +163,7 @@ class WorksIndex(client: HttpClient, rootIndexType: String)(
       textField("dimensions"),
       objectField("redirect")
         .fields(sourceIdentifier, keywordField("canonicalId")),
-      keywordField("type")
+      keywordField("type"),
+      booleanField("merged")
     )
-
-  val mappingDefinition: MappingDefinition = mapping(rootIndexType)
-    .dynamic(DynamicMapping.Strict)
-    .as(rootIndexFields)
 }

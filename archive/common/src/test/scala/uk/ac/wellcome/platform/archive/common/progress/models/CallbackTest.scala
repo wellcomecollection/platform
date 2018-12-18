@@ -7,7 +7,7 @@ import org.scalatest.{FunSpec, Matchers}
 class CallbackTest extends FunSpec with Matchers {
   val callbackUri = new URI("http://www.wellcomecollection.org/callback/ok")
 
-  it("is initialised with status pending") {
+  it("is created with status pending") {
     val callback = Callback(callbackUri)
 
     callback.status shouldBe Callback.Pending
@@ -17,8 +17,8 @@ class CallbackTest extends FunSpec with Matchers {
   private val callbackStatus = Table(
     ("string-status", "parsed-status"),
     ("processing", Callback.Pending),
-    ("success", Callback.Succeeded),
-    ("failure", Callback.Failed),
+    ("succeeded", Callback.Succeeded),
+    ("failed", Callback.Failed),
   )
 
   it("converts all callback status values to strings") {

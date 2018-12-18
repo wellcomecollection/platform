@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.ElasticClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
@@ -8,8 +8,8 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType}
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
@@ -22,8 +22,7 @@ class IngestorWorkerServiceTest
     with ElasticsearchFixtures
     with SQS
     with WorkerServiceFixture
-    with WorksGenerators
-    with CustomElasticsearchMapping {
+    with WorksGenerators {
 
   it("indexes a Miro identified Work") {
     val miroSourceIdentifier = createSourceIdentifier
@@ -132,14 +131,14 @@ class IngestorWorkerServiceTest
 
     val work = createIdentifiedWork
 
-    withLocalElasticsearchIndex { indexName =>
+    withLocalWorksIndex { index =>
       withLocalSqsQueueAndDlq {
         case QueuePair(queue, dlq) =>
-          withWorkerService(queue, indexName) { _ =>
+          withWorkerService(queue, index) { _ =>
             sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
             sendMessage(queue = queue, obj = square)
 
-            assertElasticsearchEventuallyHasWork(indexName = indexName, work)
+            assertElasticsearchEventuallyHasWork(index = index, work)
 
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, 1)
@@ -157,12 +156,12 @@ class IngestorWorkerServiceTest
             new ElasticCredentials("elastic", "changeme"))
           .build()
 
-        val brokenElasticClient: HttpClient =
-          HttpClient.fromRestClient(brokenRestClient)
+        val brokenElasticClient: ElasticClient =
+          ElasticClient.fromRestClient(brokenRestClient)
 
         withWorkerService(
           queue,
-          indexName = "works-v1",
+          index = "works-v1",
           elasticClient = brokenElasticClient) { _ =>
           val work = createIdentifiedWork
 
@@ -178,17 +177,15 @@ class IngestorWorkerServiceTest
 
   private def assertWorksIndexedCorrectly(
     works: IdentifiedBaseWork*): Assertion =
-    withLocalElasticsearchIndex { indexName =>
+    withLocalWorksIndex { index =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>
-          withWorkerService(queue, indexName) { _ =>
+          withWorkerService(queue, index) { _ =>
             works.map { work =>
               sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
             }
 
-            assertElasticsearchEventuallyHasWork(
-              indexName = indexName,
-              works: _*)
+            assertElasticsearchEventuallyHasWork(index = index, works: _*)
 
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)

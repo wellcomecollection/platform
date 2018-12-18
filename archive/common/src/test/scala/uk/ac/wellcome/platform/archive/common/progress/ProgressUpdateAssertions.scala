@@ -4,18 +4,19 @@ import java.util.UUID
 import grizzled.slf4j.Logging
 import org.scalatest.{Assertion, Inside}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.models.BagId
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.util.Try
 
 trait ProgressUpdateAssertions extends SNS with Inside with Logging {
-  def assertTopicReceivesProgressStatusUpdate(requestId: UUID,
-                                              progressTopic: SNS.Topic,
-                                              status: Progress.Status,
-                                              expectedBag: Option[BagId])(
-    assert: Seq[ProgressEvent] => Assertion): Assertion = {
+  def assertTopicReceivesProgressStatusUpdate[R](requestId: UUID,
+                                                 progressTopic: SNS.Topic,
+                                                 status: Progress.Status,
+                                                 expectedBag: Option[BagId] =
+                                                   None)(
+    assert: Seq[ProgressEvent] => R): Assertion = {
     val messages = listMessagesReceivedFromSNS(progressTopic)
     val progressUpdates = messages.map { messageinfo =>
       fromJson[ProgressUpdate](messageinfo.message).get

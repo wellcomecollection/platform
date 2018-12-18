@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
@@ -22,7 +23,8 @@ class RegistrarHTTP(
 )(implicit val actorSystem: ActorSystem,
   materializer: ActorMaterializer,
   executionContext: ExecutionContext)
-    extends Logging {
+    extends Logging
+    with Runnable {
   val router = new Router(
     vhs = vhs,
     contextURL = contextURL

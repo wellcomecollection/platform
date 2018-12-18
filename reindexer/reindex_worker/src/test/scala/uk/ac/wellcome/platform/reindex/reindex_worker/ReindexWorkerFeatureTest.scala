@@ -3,14 +3,13 @@ package uk.ac.wellcome.platform.reindex.reindex_worker
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.{SNS, SQS}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
-  CompleteReindexJob,
-  PartialReindexJob,
-  ReindexJob
+  CompleteReindexParameters,
+  PartialReindexParameters
 }
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
@@ -57,11 +56,12 @@ class ReindexWorkerFeatureTest
           withWorkerService(queue, table, topic) { _ =>
             val testRecords = createReindexableData(table)
 
-            val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
+            val reindexParameters =
+              CompleteReindexParameters(segment = 0, totalSegments = 1)
 
-            sendNotificationToSQS[ReindexJob](
+            sendNotificationToSQS(
               queue = queue,
-              message = reindexJob
+              message = createReindexRequestWith(parameters = reindexParameters)
             )
 
             eventually {
@@ -86,11 +86,11 @@ class ReindexWorkerFeatureTest
           withWorkerService(queue, table, topic) { _ =>
             val testRecords = createReindexableData(table)
 
-            val reindexJob = PartialReindexJob(maxRecords = 1)
+            val reindexParameters = PartialReindexParameters(maxRecords = 1)
 
-            sendNotificationToSQS[ReindexJob](
+            sendNotificationToSQS(
               queue = queue,
-              message = reindexJob
+              message = createReindexRequestWith(parameters = reindexParameters)
             )
 
             eventually {
@@ -143,11 +143,14 @@ class ReindexWorkerFeatureTest
         }
         withLocalSnsTopic { topic =>
           withWorkerService(queue, table, topic) { _ =>
-            val reindexJob = CompleteReindexJob(segment = 0, totalSegments = 1)
+            val reindexParameters = CompleteReindexParameters(
+              segment = 0,
+              totalSegments = 1
+            )
 
-            sendNotificationToSQS[ReindexJob](
+            sendNotificationToSQS(
               queue = queue,
-              message = reindexJob
+              message = createReindexRequestWith(parameters = reindexParameters)
             )
 
             eventually {

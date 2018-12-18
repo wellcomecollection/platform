@@ -3,28 +3,29 @@ package uk.ac.wellcome.platform.snapshot_generator.source
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Sink, Source}
+import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl.{search, termQuery}
-import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.streams.ReactiveElastic._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 object ElasticsearchWorksSource extends Logging {
-  def apply(elasticClient: HttpClient, indexName: String, documentType: String)(
+  def apply(elasticClient: ElasticClient, index: Index)(
     implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] = {
     val loggingSink = Flow[IdentifiedWork]
       .grouped(10000)
       .map(works => {
-        logger.info(s"Received ${works.length} works from $indexName")
+        logger.info(s"Received ${works.length} works from $index")
         works
       })
       .to(Sink.ignore)
     Source
       .fromPublisher(
         elasticClient.publisher(
-          search(s"$indexName/$documentType")
+          search(index)
             .query(termQuery("type", "IdentifiedWork"))
             .scroll(keepAlive = "2m")
             // Increasing the size of each request from the
