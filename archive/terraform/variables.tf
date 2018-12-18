@@ -56,5 +56,4 @@ variable "api_alb_cdir_blocks" {
   type = "list"
 }
 
-variable "archive_oauth_details_enc" {
-}
+variable "archive_oauth_details_enc" {}
