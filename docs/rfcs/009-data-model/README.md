@@ -40,22 +40,30 @@ Transformation:
 
 **Core model**
 A model describing common and non-domain specific classses and properties used across our ontologies.
+
 ![](https://github.com/wellcometrust/platform/raw/master/ontologies/Documentation/Core-Ontology.png)
+
 [ttl file](https://github.com/wellcometrust/platform/raw/master/ontologies/Schema/core-ontology.ttl)
 
 **Work model**
 A model describing library and archive works, including their physical items and relationships.
+
 ![](https://github.com/wellcometrust/platform/raw/master/ontologies/Documentation/Work-Ontology.png)
+
 [ttl file](https://github.com/wellcometrust/platform/raw/master/ontologies/Schema/work-ontology.ttl)
 
 **Location model**
 A model describing how museum and library items can be accessed.
+
 ![](https://github.com/wellcometrust/platform/raw/master/ontologies/Documentation/Location-Ontology.png)
+
 [ttl file](https://github.com/wellcometrust/platform/raw/master/ontologies/Schema/location-ontology.ttl)
 
 **Concept model**
 A model describing concepts, their classification and relationships.
+
 ![](https://github.com/wellcometrust/platform/raw/master/ontologies/Documentation/Concept-Ontology.png)
+
 [ttl file](https://github.com/wellcometrust/platform/raw/master/ontologies/Schema/concept-ontology.ttl)
 
 
@@ -63,17 +71,23 @@ A model describing concepts, their classification and relationships.
 
 ** Article/Story model**
 A model describing editorial articles (stories) and their relationships.
+
 ![](https://github.com/wellcometrust/platform/raw/master/ontologies/Documentation/Article-Ontology.png)
+
 [ttl file](https://github.com/wellcometrust/platform/raw/master/ontologies/Schema/article-ontology.ttl)
 
 **Agency model**
 A model describing people, organisations and their relationships.
+
 ![](https://github.com/wellcometrust/platform/raw/master/ontologies/Documentation/Agency-Ontology.png)
+
 [ttl file](https://github.com/wellcometrust/platform/raw/master/ontologies/Schema/agency-ontology.ttl)
 
 **Public event model**
 A model describing museum and library events, exhibitions and installations.
+
 ![](https://github.com/wellcometrust/platform/raw/master/ontologies/Documentation/Public-Event-Ontology.png)
+
 [tt file](https://github.com/wellcometrust/platform/raw/master/ontologies/Schema/public-event-ontology.ttl)
 
 ## Authorities
