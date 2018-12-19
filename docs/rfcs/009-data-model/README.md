@@ -73,7 +73,7 @@ A model describing concepts, their classification and relationships.
 
 ## Other models representing Wellcome domains largely work in progress
 
-** Article/Story model**
+** Article Story model**
 
 A model describing editorial articles (stories) and their relationships.
 
