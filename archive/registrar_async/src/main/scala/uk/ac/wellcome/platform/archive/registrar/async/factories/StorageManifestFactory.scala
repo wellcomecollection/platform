@@ -23,11 +23,10 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.util.Try
-
 object StorageManifestFactory extends Logging {
   def create(archiveComplete: ArchiveComplete)(implicit s3Client: AmazonS3)
     : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
+
     val algorithm = "sha256"
 
     for {
@@ -80,13 +79,14 @@ object StorageManifestFactory extends Logging {
     }
   }
 
+  import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
+
   private def downloadFile(archiveComplete: ArchiveComplete, filename: String)(
     implicit s3Client: AmazonS3)
     : Either[DownloadError[ArchiveComplete], InputStream] = {
-    val location = getFileObjectLocation(archiveComplete.bagLocation, filename)
-    Try(s3Client.getObject(location.namespace, location.key))
-      .map(_.getObjectContent)
-      .toEither
+    val location: ObjectLocation =
+      getFileObjectLocation(archiveComplete.bagLocation, filename)
+    location.toInputStream.toEither
       .leftMap(ex => DownloadError(ex, location, archiveComplete))
   }
 

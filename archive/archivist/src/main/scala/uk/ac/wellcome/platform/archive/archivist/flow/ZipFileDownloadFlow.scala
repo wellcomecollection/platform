@@ -16,8 +16,9 @@ import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.progress.models._
+import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 /** This flow takes an ingest request, and downloads the entire ZIP file
   * associated with the request to a local (temporary) path.
@@ -27,6 +28,8 @@ import scala.util.{Failure, Success, Try}
   *
   */
 object ZipFileDownloadFlow extends Logging {
+
+  import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   def apply(parallelism: Int, snsConfig: SNSConfig)(implicit s3Client: AmazonS3,
                                                     snsClient: AmazonSNS)
@@ -38,12 +41,8 @@ object ZipFileDownloadFlow extends Logging {
       .log("download location")
       .flatMapMerge(
         parallelism, {
-          case request @ IngestBagRequest(_, location, _, _) =>
-            val triedInputStream =
-              Try(s3Client.getObject(location.namespace, location.key)).map(
-                response => response.getObjectContent)
-
-            triedInputStream match {
+          case request @ IngestBagRequest(_, location: ObjectLocation, _, _) =>
+            location.toInputStream match {
               case Failure(ex) =>
                 warn(s"Failed downloading zipFile from $location")
                 Source.single(Left(ZipFileDownloadingError(request, ex)))
