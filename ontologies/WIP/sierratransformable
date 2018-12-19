@@ -424,9 +424,8 @@
    * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "function" with "Manufacture".
    * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "function" with "Manufacture".       
    * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "function" with "Manufacture".
-   * 8. Retain order of each subfield as a list.
    *
-   * Example:
+   * Example: 
    *
    *  "production": 
    *   [
@@ -436,21 +435,17 @@
    *        {
    *          "label": "London",
    *          "type": "Place"
-   *        }
-   *      ],
-   *      "agents": [
-   *        {
-   *          "label": "Mac Keith Press",
-   *          "type": "Agent"
-   *        }
-   *      ], 
-   *     "places": [
+   *        } ,
    *        {
    *          "label": "NY",
    *          "type": "Place"
    *        }
    *      ],
    *      "agents": [
+   *        {
+   *          "label": "Mac Keith Press",
+   *          "type": "Agent"
+   *        } ,
    *        {
    *          "label": "HarperCollins",
    *          "type": "Agent"
@@ -481,7 +476,6 @@
    * 3. Populate "agents" from subfield "b" and type as "Agent"
    * 4. Populate "dates" from subfield "c" and type as "Periods"    
    * 5. For the second indicator populate "function" as follows. 0 = "Production", 1="Publication", 2="Distribution", 3="Manufacture". Type as "Concept". Function goes at the end of the list.
-   * 6. Retain order of each subfield as a list.
    *
    * Example:
    *

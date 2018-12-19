@@ -113,6 +113,13 @@
       "type": "WorkType",
       "label": "RecordSet"
     },
+    "identifiers": [
+      {
+        "value": "PP/MIA/H/1",
+        "type": "Identifier",
+        "identifierScheme": "ref-no"
+      }
+    ],
     "partOf": {
       "id": "83hdh99",
       "name": "Correspondence",
