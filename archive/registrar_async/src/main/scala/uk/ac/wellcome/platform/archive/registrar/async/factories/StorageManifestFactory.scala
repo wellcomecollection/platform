@@ -23,7 +23,6 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-
 object StorageManifestFactory extends Logging {
   def create(archiveComplete: ArchiveComplete)(implicit s3Client: AmazonS3)
     : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
@@ -85,10 +84,9 @@ object StorageManifestFactory extends Logging {
   private def downloadFile(archiveComplete: ArchiveComplete, filename: String)(
     implicit s3Client: AmazonS3)
     : Either[DownloadError[ArchiveComplete], InputStream] = {
-    val location: ObjectLocation = getFileObjectLocation(archiveComplete.bagLocation, filename)
-    location
-      .toInputStream
-      .toEither
+    val location: ObjectLocation =
+      getFileObjectLocation(archiveComplete.bagLocation, filename)
+    location.toInputStream.toEither
       .leftMap(ex => DownloadError(ex, location, archiveComplete))
   }
 

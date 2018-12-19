@@ -7,23 +7,25 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.util.Try
 
-
 object ConvertibleToInputStream {
 
   implicit class ConvertibleToInputStreamOps[T](t: T) {
-    def toInputStream(implicit toInputStream: ToInputStream[T], s3Client: AmazonS3): Try[InputStream] = {
+    def toInputStream(implicit toInputStream: ToInputStream[T],
+                      s3Client: AmazonS3): Try[InputStream] = {
       toInputStream.apply(t)
     }
   }
 
   implicit object ConvertibleToInputStreamObjectLocation
-    extends ToInputStream[ObjectLocation] {
+      extends ToInputStream[ObjectLocation] {
 
-    def apply(t: ObjectLocation)(implicit s3Client: AmazonS3): Try[InputStream] = Try(
-      s3Client.getObject(t.namespace, t.key)
-    ).map(
-      response => response.getObjectContent
-    )
+    def apply(t: ObjectLocation)(
+      implicit s3Client: AmazonS3): Try[InputStream] =
+      Try(
+        s3Client.getObject(t.namespace, t.key)
+      ).map(
+        response => response.getObjectContent
+      )
   }
 }
 
