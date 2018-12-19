@@ -1,0 +1,4 @@
+wellcome_aws_utils==2.2.1
+elasticsearch>=6.0.0,<7.0.0
+certifi==2018.10.15
+attrs==18.2.0

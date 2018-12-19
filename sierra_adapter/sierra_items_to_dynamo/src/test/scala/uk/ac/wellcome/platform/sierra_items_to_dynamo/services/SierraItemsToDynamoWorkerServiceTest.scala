@@ -4,8 +4,8 @@ import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -67,7 +67,6 @@ class SierraItemsToDynamoWorkerServiceTest
 
                 eventually {
                   assertStored[SierraItemRecord](
-                    bucket = bucket,
                     table = table,
                     id = record1.id.withoutCheckDigit,
                     record = expectedRecord

@@ -30,3 +30,9 @@ ecs_dashboard_client-publish: $(ROOT)/.docker/ecs_dashboard
 		--env BUCKET_NAME=wellcomecollection-platform-dashboard \
 		--env PATH_PREFIX=https://wellcomecollection-platform-dashboard.s3.amazonaws.com \
 		ecs_dashboard
+
+gatling_test:
+	docker run -it \
+		--volume $(ROOT)/monitoring/gatling/user-files:/opt/gatling/user-files \
+		--volume $(ROOT)/monitoring/gatling/results:/opt/gatling/results \
+		denvazh/gatling

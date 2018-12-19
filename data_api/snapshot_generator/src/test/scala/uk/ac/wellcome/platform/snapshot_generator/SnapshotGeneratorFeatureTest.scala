@@ -3,16 +3,15 @@ package uk.ac.wellcome.platform.snapshot_generator
 import java.io.File
 
 import com.amazonaws.services.s3.model.GetObjectRequest
+import com.sksamuel.elastic4s.Index
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v1.DisplayV1SerialisationTestBase
-import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.monitoring.fixtures.CloudWatch
-import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{SNS, SQS}
+import uk.ac.wellcome.platform.snapshot_generator.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedSnapshotJob,
   SnapshotJob
@@ -20,7 +19,7 @@ import uk.ac.wellcome.platform.snapshot_generator.models.{
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.generators.WorksGenerators
@@ -30,25 +29,22 @@ class SnapshotGeneratorFeatureTest
     with Eventually
     with Matchers
     with Akka
-    with AkkaS3
     with S3
     with SNS
     with SQS
-    with fixtures.Server
-    with CloudWatch
     with GzipUtils
     with JsonAssertions
     with IntegrationPatience
-    with ElasticsearchFixtures
     with DisplayV1SerialisationTestBase
+    with WorkerServiceFixture
     with WorksGenerators {
 
   it("completes a snapshot generation") {
     withFixtures {
-      case (queue, topic, indexNameV1, _, publicBucket: Bucket) =>
+      case (queue, topic, indexV1, _, publicBucket: Bucket) =>
         val works = createIdentifiedWorks(count = 3)
 
-        insertIntoElasticsearch(indexNameV1, works: _*)
+        insertIntoElasticsearch(indexV1, works: _*)
 
         val publicObjectKey = "target.txt.gz"
 
@@ -88,6 +84,7 @@ class SnapshotGeneratorFeatureTest
 
           actualJsonLines.sorted.zip(expectedJsonLines).foreach {
             case (actualLine, expectedLine) =>
+              println(s"actualLine = <<$actualLine>>")
               assertJsonStringsAreEqual(actualLine, expectedLine)
           }
 
@@ -108,22 +105,22 @@ class SnapshotGeneratorFeatureTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
-    withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalElasticsearchIndex { indexNameV1 =>
-          withLocalElasticsearchIndex { indexNameV2 =>
-            withLocalS3Bucket { bucket =>
-              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ displayEsLocalFlags(
-                indexNameV1,
-                indexNameV2) ++ s3ClientLocalFlags
-              withServer(flags) { _ =>
-                testWith((queue, topic, indexNameV1, indexNameV2, bucket))
+    testWith: TestWith[(Queue, Topic, Index, Index, Bucket), R]) =
+    withActorSystem { implicit actorSystem =>
+      withMaterializer(actorSystem) { implicit materializer =>
+        withLocalSqsQueue { queue =>
+          withLocalSnsTopic { topic =>
+            withLocalWorksIndex { indexV1 =>
+              withLocalWorksIndex { indexV2 =>
+                withLocalS3Bucket { bucket =>
+                  withWorkerService(queue, topic, indexV1, indexV2) { _ =>
+                    testWith((queue, topic, indexV1, indexV2, bucket))
+                  }
+                }
               }
             }
           }
         }
       }
     }
-
 }

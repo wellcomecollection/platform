@@ -40,30 +40,8 @@ lazy val elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
-lazy val messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
-  .dependsOn(common % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
-
-lazy val finatra_akka = doSharedLibrarySetup(project, "sbt_common/finatra_akka")
-  .settings(libraryDependencies ++= Dependencies.finatraAkkaDependencies)
-
-lazy val finatra_controllers = doSharedLibrarySetup(project, "sbt_common/finatra_controllers")
-  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
-
-lazy val finatra_elasticsearch = doSharedLibrarySetup(project, "sbt_common/finatra_elasticsearch")
-  .dependsOn(elasticsearch % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.finatraAkkaDependencies)
-
-lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra_messaging")
-  .dependsOn(messaging % "compile->compile;test->test")
-  .dependsOn(finatra_monitoring % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
-
-lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_monitoring")
-  .dependsOn(finatra_akka % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.finatraMonitoringDependencies)
-
 lazy val config_core = doSharedLibrarySetup(project, "sbt_common/config/core")
+  .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.typesafeStorageDependencies)
 
 lazy val config_storage = doSharedLibrarySetup(project, "sbt_common/config/storage")
@@ -78,8 +56,7 @@ lazy val config_messaging = doSharedLibrarySetup(project, "sbt_common/config/mes
   .dependsOn(config_core % "compile->compile")
   .dependsOn(config_monitoring % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
-  .dependsOn(messaging % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.typesafeDependencies)
+  .settings(libraryDependencies ++= Dependencies.configMessagingDependencies)
 
 lazy val config_elasticsearch = doSharedLibrarySetup(project, "sbt_common/config/elasticsearch")
   .dependsOn(config_core % "compile->compile;test->test")
@@ -89,9 +66,8 @@ lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(display % "compile->compile;test->test")
-  .dependsOn(finatra_akka % "compile->compile;test->test")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_elasticsearch % "compile->compile;test->test")
+  .dependsOn(elasticsearch % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.apiDependencies)
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
 
@@ -102,18 +78,18 @@ lazy val ingestor = doServiceSetup(project, "catalogue_pipeline/ingestor")
   .dependsOn(config_storage % "compile->compile;test->test")
   .settings(Search.settings: _*)
 
-lazy val transformer_common = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_common")
+lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
-
-lazy val transformer_miro = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_miro")
-  .dependsOn(transformer_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.miroTransformerDependencies)
 
 lazy val transformer_sierra = doServiceSetup(project, "catalogue_pipeline/transformer/transformer_sierra")
-  .dependsOn(transformer_common % "compile->compile;test->test")
+  .dependsOn(common % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile;test->test")
+  .dependsOn(config_storage % "compile->compile;test->test")
 
 lazy val merger = doServiceSetup(project, "catalogue_pipeline/merger")
   .dependsOn(common % "compile->compile;test->test")
@@ -148,6 +124,7 @@ lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
 lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= WellcomeDependencies.jsonLibrary)
 
 lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")
   .dependsOn(internal_model % "compile->compile;test->test")
@@ -171,9 +148,8 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(display % "compile->compile;test->test")
-  .dependsOn(finatra_controllers % "compile->compile;test->test")
-  .dependsOn(finatra_elasticsearch % "compile->compile;test->test")
-  .dependsOn(finatra_messaging % "compile->compile;test->test")
+  .dependsOn(config_elasticsearch % "compile->compile;test->test")
+  .dependsOn(config_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotGeneratorDependencies)
 
 lazy val archive_common = doServiceSetup(project, "archive/common")
@@ -202,6 +178,7 @@ lazy val registrar_async = doServiceSetup(project, "archive/registrar_async")
 lazy val registrar_http = doServiceSetup(project, "archive/registrar_http")
   .dependsOn(registrar_common % "compile->compile;test->test")
   .dependsOn(archive_display % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.registrarHttpDependencies)
 
 lazy val progress_common = doServiceSetup(project, "archive/progress_common")
   .dependsOn(archive_common % "compile->compile;test->test")
@@ -213,6 +190,7 @@ lazy val progress_async = doServiceSetup(project, "archive/progress_async")
 lazy val progress_http = doServiceSetup(project, "archive/progress_http")
   .dependsOn(progress_common % "compile->compile;test->test")
   .dependsOn(archive_display % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.progressHttpDependencies)
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -221,13 +199,6 @@ lazy val root = (project in file("."))
     internal_model,
     display,
     elasticsearch,
-    messaging,
-
-    finatra_akka,
-    finatra_controllers,
-    finatra_elasticsearch,
-    finatra_messaging,
-    finatra_monitoring,
 
     config_core,
     config_messaging,
@@ -236,7 +207,6 @@ lazy val root = (project in file("."))
 
     api,
     ingestor,
-    transformer_common,
     transformer_miro,
     transformer_sierra,
     id_minter,

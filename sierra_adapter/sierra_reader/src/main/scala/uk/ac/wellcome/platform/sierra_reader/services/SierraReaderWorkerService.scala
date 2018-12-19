@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.sierra_reader.services
 import java.time.Instant
 
 import akka.Done
-import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
@@ -18,6 +17,7 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.sierra.{
   AbstractSierraRecord,
@@ -30,7 +30,7 @@ import uk.ac.wellcome.platform.sierra_reader.config.models.{
   SierraAPIConfig
 }
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
@@ -40,10 +40,9 @@ class SierraReaderWorkerService(
   s3Config: S3Config,
   readerConfig: ReaderConfig,
   sierraAPIConfig: SierraAPIConfig
-)(implicit val actorSystem: ActorSystem)
-    extends Logging {
-  implicit val materialiser = ActorMaterializer()
-  implicit val executionContext = actorSystem.dispatcher
+)(implicit ec: ExecutionContext, materializer: ActorMaterializer)
+    extends Logging
+    with Runnable {
 
   val windowManager = new WindowManager(
     s3client = s3client,

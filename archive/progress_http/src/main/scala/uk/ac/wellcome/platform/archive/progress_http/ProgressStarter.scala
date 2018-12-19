@@ -1,11 +1,11 @@
 package uk.ac.wellcome.platform.archive.progress_http
+
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.archive.common.models.{
   IngestBagRequest,
   StorageSpace
 }
-import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest._
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.json.JsonUtil._

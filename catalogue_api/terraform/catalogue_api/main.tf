@@ -13,7 +13,8 @@ module "services" {
 
   container_port = "${var.container_port}"
 
-  es_cluster_credentials = "${var.es_cluster_credentials}"
+  remus_es_cluster_credentials   = "${var.remus_es_cluster_credentials}"
+  romulus_es_cluster_credentials = "${var.romulus_es_cluster_credentials}"
 
   remus_container_image = "${var.remus_container_image}"
   remus_es_config       = "${var.remus_es_config}"
@@ -26,8 +27,8 @@ module "services" {
   nginx_container_image = "${var.nginx_container_image}"
   nginx_container_port  = "${var.nginx_container_port}"
 
-  remus_task_number   = "${local.remus_task_number}"
-  romulus_task_number = "${local.romulus_task_number}"
+  remus_task_number   = "${var.remus_task_number}"
+  romulus_task_number = "${var.romulus_task_number}"
 }
 
 resource "aws_service_discovery_private_dns_namespace" "namespace" {

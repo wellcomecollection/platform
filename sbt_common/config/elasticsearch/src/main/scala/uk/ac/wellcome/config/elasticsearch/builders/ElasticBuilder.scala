@@ -1,12 +1,13 @@
 package uk.ac.wellcome.config.elasticsearch.builders
 
-import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.http.ElasticClient
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.elasticsearch.{DisplayElasticConfig, ElasticClientBuilder}
 
 object ElasticBuilder {
-  def buildHttpClient(config: Config): HttpClient = {
+  def buildElasticClient(config: Config): ElasticClient = {
     val hostname = config.getOrElse[String]("es.host")(default = "localhost")
     val port = config.getOrElse[Int]("es.port")(default = 9200)
     val protocol = config.getOrElse[String]("es.protocol")(default = "http")
@@ -24,8 +25,7 @@ object ElasticBuilder {
 
   def buildElasticConfig(config: Config): DisplayElasticConfig =
     DisplayElasticConfig(
-      documentType = config.getOrElse[String]("es.type")(default = "item"),
-      indexV1name = config.required[String]("es.index.v1"),
-      indexV2name = config.required[String]("es.index.v2")
+      indexV1 = Index(config.required[String]("es.index.v1")),
+      indexV2 = Index(config.required[String]("es.index.v2"))
     )
 }

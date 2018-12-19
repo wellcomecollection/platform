@@ -47,11 +47,15 @@ module "monitoring-271118" {
 
   # post_to_slack
 
-  dlq_alarm_arn               = "${local.dlq_alarm_arn}"
-  alb_server_error_alarm_arn  = "${local.alb_server_error_alarm_arn}"
-  cloudfront_errors_topic_arn = "${local.cloudfront_errors_topic_arn}"
-  critical_slack_webhook      = "${var.critical_slack_webhook}"
-  bitly_access_token          = "${var.bitly_access_token}"
+  dlq_alarm_arn                  = "${local.dlq_alarm_arn}"
+  gateway_server_error_alarm_arn = "${local.gateway_server_error_alarm_arn}"
+  cloudfront_errors_topic_arn    = "${local.cloudfront_errors_topic_arn}"
+  critical_slack_webhook         = "${var.critical_slack_webhook}"
+  bitly_access_token             = "${var.bitly_access_token}"
+
+  # terraform_tracker
+
+  terraform_apply_topic_name = "${local.terraform_apply_topic_name}"
 
   # IAM
 

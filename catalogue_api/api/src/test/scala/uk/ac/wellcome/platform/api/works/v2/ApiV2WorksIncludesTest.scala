@@ -8,7 +8,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of identifiers on a list endpoint if we pass ?include=identifiers") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val identifier0 = createSourceIdentifier
@@ -17,7 +17,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
         val work0 = works(0).copy(otherIdentifiers = List(identifier0))
         val work1 = works(1).copy(otherIdentifiers = List(identifier1))
 
-        insertIntoElasticsearch(indexNameV2, work0, work1)
+        insertIntoElasticsearch(indexV2, work0, work1)
 
         eventually {
           server.httpGet(
@@ -53,12 +53,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of identifiers on a single work endpoint if we pass ?include=identifiers") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val otherIdentifier = createSourceIdentifier
         val work = createIdentifiedWorkWith(
           otherIdentifiers = List(otherIdentifier)
         )
-        insertIntoElasticsearch(indexNameV2, work)
+        insertIntoElasticsearch(indexV2, work)
 
         eventually {
           server.httpGet(
@@ -82,12 +82,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
 
   it("renders the items if the items include is present") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           items = createIdentifiedItems(count = 1) :+ createUnidentifiableItemWith()
         )
 
-        insertIntoElasticsearch(indexNameV2, work)
+        insertIntoElasticsearch(indexV2, work)
 
         eventually {
           server.httpGet(
@@ -110,7 +110,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of subjects on a list endpoint if we pass ?include=subjects") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val subjects1 = List(
@@ -120,7 +120,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
         val work0 = works(0).copy(subjects = subjects1)
         val work1 = works(1).copy(subjects = subjects2)
 
-        insertIntoElasticsearch(indexNameV2, work0, work1)
+        insertIntoElasticsearch(indexV2, work0, work1)
 
         eventually {
           server.httpGet(
@@ -153,12 +153,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of subjects on a single work endpoint if we pass ?include=subjects") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val subject = List(
           Subject("ornithology", List(Unidentifiable(Concept("ornithology")))))
         val work = createIdentifiedWork.copy(subjects = subject)
 
-        insertIntoElasticsearch(indexNameV2, work)
+        insertIntoElasticsearch(indexV2, work)
 
         eventually {
           server.httpGet(
@@ -180,7 +180,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
 
   it("includes a list of genres on a list endpoint if we pass ?include=genres") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val genres1 = List(
@@ -190,7 +190,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
         val work0 = works(0).copy(genres = genres1)
         val work1 = works(1).copy(genres = genres2)
 
-        insertIntoElasticsearch(indexNameV2, work0, work1)
+        insertIntoElasticsearch(indexV2, work0, work1)
 
         eventually {
           server.httpGet(
@@ -223,12 +223,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of genres on a single work endpoint if we pass ?include=genres") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val genre = List(
           Genre("ornithology", List(Unidentifiable(Concept("ornithology")))))
         val work = createIdentifiedWork.copy(genres = genre)
 
-        insertIntoElasticsearch(indexNameV2, work)
+        insertIntoElasticsearch(indexV2, work)
 
         eventually {
           server.httpGet(
@@ -251,7 +251,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of contributors on a list endpoint if we pass ?include=contributors") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val contributors1 =
@@ -261,7 +261,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
         val work0 = works(0).copy(contributors = contributors1)
         val work1 = works(1).copy(contributors = contributors2)
 
-        insertIntoElasticsearch(indexNameV2, work0, work1)
+        insertIntoElasticsearch(indexV2, work0, work1)
 
         eventually {
           server.httpGet(
@@ -294,12 +294,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of contributors on a single work endpoint if we pass ?include=contributors") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val contributor =
           List(Contributor(Unidentifiable(Person("Ginger Rogers"))))
         val work = createIdentifiedWork.copy(contributors = contributor)
 
-        insertIntoElasticsearch(indexNameV2, work)
+        insertIntoElasticsearch(indexV2, work)
 
         eventually {
           server.httpGet(
@@ -322,7 +322,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of production events on a list endpoint if we pass ?include=production") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val productionEvents1 = List(
@@ -340,7 +340,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
         val work0 = works(0).copy(production = productionEvents1)
         val work1 = works(1).copy(production = productionEvents2)
 
-        insertIntoElasticsearch(indexNameV2, work0, work1)
+        insertIntoElasticsearch(indexV2, work0, work1)
 
         eventually {
           server.httpGet(
@@ -373,7 +373,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of production on a single work endpoint if we pass ?include=production") {
     withV2Api {
-      case (apiPrefix, _, indexNameV2, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val productionEvent = List(
           ProductionEvent(
             List(Place("London")),
@@ -382,7 +382,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
             None))
         val work = createIdentifiedWork.copy(production = productionEvent)
 
-        insertIntoElasticsearch(indexNameV2, work)
+        insertIntoElasticsearch(indexV2, work)
 
         eventually {
           server.httpGet(

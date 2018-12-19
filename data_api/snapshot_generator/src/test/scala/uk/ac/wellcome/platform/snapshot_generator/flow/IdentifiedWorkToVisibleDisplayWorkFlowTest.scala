@@ -18,45 +18,41 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
     with WorksGenerators {
 
   it("creates V1 DisplayWorks from IdentifiedWorks") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        val flow = IdentifiedWorkToVisibleDisplayWork(
-          toDisplayWork = DisplayWorkV1.apply(_, V1WorksIncludes.includeAll()))
+    withMaterializer { implicit materializer =>
+      val flow = IdentifiedWorkToVisibleDisplayWork(
+        toDisplayWork = DisplayWorkV1.apply(_, V1WorksIncludes.includeAll()))
 
-        val works = createIdentifiedWorks(count = 3).toList
+      val works = createIdentifiedWorks(count = 3).toList
 
-        val eventualDisplayWorks = Source(works)
-          .via(flow)
-          .runWith(Sink.seq)(materializer)
+      val eventualDisplayWorks = Source(works)
+        .via(flow)
+        .runWith(Sink.seq)
 
-        whenReady(eventualDisplayWorks) { displayWorks =>
-          val expectedDisplayWorks = works.map {
-            DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
-          }
-          displayWorks shouldBe expectedDisplayWorks
+      whenReady(eventualDisplayWorks) { displayWorks =>
+        val expectedDisplayWorks = works.map {
+          DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
         }
+        displayWorks shouldBe expectedDisplayWorks
       }
     }
   }
 
   it("creates V2 DisplayWorks from IdentifiedWorks") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        val flow = IdentifiedWorkToVisibleDisplayWork(
-          toDisplayWork = DisplayWorkV2.apply(_, V2WorksIncludes.includeAll()))
+    withMaterializer { implicit materializer =>
+      val flow = IdentifiedWorkToVisibleDisplayWork(
+        toDisplayWork = DisplayWorkV2.apply(_, V2WorksIncludes.includeAll()))
 
-        val works = createIdentifiedWorks(count = 3).toList
+      val works = createIdentifiedWorks(count = 3).toList
 
-        val eventualDisplayWorks = Source(works)
-          .via(flow)
-          .runWith(Sink.seq)(materializer)
+      val eventualDisplayWorks = Source(works)
+        .via(flow)
+        .runWith(Sink.seq)
 
-        whenReady(eventualDisplayWorks) { displayWorks =>
-          val expectedDisplayWorks = works.map {
-            DisplayWorkV2(_, includes = V2WorksIncludes.includeAll())
-          }
-          displayWorks shouldBe expectedDisplayWorks
+      whenReady(eventualDisplayWorks) { displayWorks =>
+        val expectedDisplayWorks = works.map {
+          DisplayWorkV2(_, includes = V2WorksIncludes.includeAll())
         }
+        displayWorks shouldBe expectedDisplayWorks
       }
     }
   }

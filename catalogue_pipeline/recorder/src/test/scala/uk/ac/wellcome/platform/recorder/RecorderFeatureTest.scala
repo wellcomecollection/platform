@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.recorder
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.recorder.fixtures.WorkerServiceFixture
@@ -30,10 +30,10 @@ class RecorderFeatureTest
 
               eventually {
                 assertStored[TransformedBaseWork](
-                  bucket,
-                  table,
+                  table = table,
                   id = work.sourceIdentifier.toString,
-                  record = work)
+                  record = work
+                )
               }
             }
           }

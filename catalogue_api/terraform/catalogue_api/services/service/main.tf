@@ -25,10 +25,9 @@ module "catalogue_api" {
     es_protocol = "${var.es_cluster_credentials["protocol"]}"
     es_index_v1 = "${var.es_config["index_v1"]}"
     es_index_v2 = "${var.es_config["index_v2"]}"
-    es_doc_type = "${var.es_config["doc_type"]}"
   }
 
-  app_env_vars_length = "9"
+  app_env_vars_length = 8
 
   sidecar_container_image = "${var.nginx_container_image}"
   sidecar_container_port  = "${var.nginx_container_port}"

@@ -24,6 +24,7 @@ variable "allow_s3_messages_put_json" {}
 variable "service_egress_security_group_id" {}
 
 variable "cluster_name" {}
+variable "cluster_id" {}
 
 variable "subnets" {
   type = "list"

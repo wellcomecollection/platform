@@ -51,8 +51,9 @@ class Alarm:
     @property
     def should_be_sent_to_main_channel(self):
         return self.name not in [
-            "lambda-miro_transformer-errors",
-            "lambda-miro_inventory_transformer-errors",
+            "lambda-reporting_miro_transformer-errors",
+            "lambda-reporting_miro_inventory_transformer-errors",
+            "lambda-reporting_sierra_transformer-errors",
         ]
 
     # Sometimes there's enough data in the alarm to make an educated guess

@@ -2,23 +2,22 @@ package uk.ac.wellcome.platform.merger.fixtures
 
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal.BaseWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.merger.services.{
-  Merger,
-  MergerManager,
-  MergerWorkerService,
-  RecorderPlaybackService
-}
+import uk.ac.wellcome.platform.merger.services._
 import uk.ac.wellcome.storage.fixtures.S3
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait WorkerServiceFixture extends LocalWorksVhs with Messaging with S3 {
+trait WorkerServiceFixture
+    extends LocalWorksVhs
+    with Akka
+    with Messaging
+    with S3 {
   def withWorkerService[R](vhs: TransformedBaseWorkVHS,
                            topic: Topic,
                            queue: Queue,
@@ -26,15 +25,14 @@ trait WorkerServiceFixture extends LocalWorksVhs with Messaging with S3 {
     testWith: TestWith[MergerWorkerService, R]): R =
     withLocalS3Bucket { messageBucket =>
       withMessageWriter[BaseWork, R](messageBucket, topic) { messageWriter =>
-        withActorSystem { actorSystem =>
+        withActorSystem { implicit actorSystem =>
           withSQSStream[NotificationMessage, R](
-            actorSystem,
-            queue,
-            metricsSender) { sqsStream =>
+            queue = queue,
+            metricsSender = metricsSender) { sqsStream =>
             val workerService = new MergerWorkerService(
               sqsStream = sqsStream,
               playbackService = new RecorderPlaybackService(vhs),
-              mergerManager = new MergerManager(new Merger()),
+              mergerManager = new MergerManager(PlatformMerger),
               messageWriter = messageWriter
             )
 

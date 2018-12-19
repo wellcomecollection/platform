@@ -4,24 +4,25 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.platform.transformer.fixtures.HybridRecordReceiverFixture
+import uk.ac.wellcome.platform.transformer.sierra.fixtures.HybridRecordReceiverFixture
 import uk.ac.wellcome.platform.transformer.sierra.services.SierraTransformerWorkerService
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraTransformerFeatureTest
     extends FunSpec
     with Matchers
+    with Akka
     with SQS
     with SNS
     with S3
@@ -102,18 +103,17 @@ class SierraTransformerFeatureTest
     testWith: TestWith[SierraTransformerWorkerService, R]): R =
     withHybridRecordReceiver[SierraTransformable, R](topic, bucket) {
       messageReceiver =>
-        withActorSystem { actorSystem =>
-          withSQSStream[NotificationMessage, R](actorSystem, queue) {
-            sqsStream =>
-              val workerService = new SierraTransformerWorkerService(
-                messageReceiver = messageReceiver,
-                sierraTransformer = new SierraTransformableTransformer,
-                sqsStream = sqsStream
-              )
+        withActorSystem { implicit actorSystem =>
+          withSQSStream[NotificationMessage, R](queue) { sqsStream =>
+            val workerService = new SierraTransformerWorkerService(
+              messageReceiver = messageReceiver,
+              sierraTransformer = new SierraTransformableTransformer,
+              sqsStream = sqsStream
+            )
 
-              workerService.run()
+            workerService.run()
 
-              testWith(workerService)
+            testWith(workerService)
           }
         }
     }

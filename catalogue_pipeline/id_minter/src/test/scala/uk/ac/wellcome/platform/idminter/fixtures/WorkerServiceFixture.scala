@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.idminter.fixtures
 
 import io.circe.Json
 import scalikejdbc.{ConnectionPool, DB}
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.idminter.config.models.IdentifiersTableConfig
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
@@ -28,26 +28,25 @@ trait WorkerServiceFixture
                            identifiersDao: IdentifiersDao,
                            identifiersTableConfig: IdentifiersTableConfig)(
     testWith: TestWith[IdMinterWorkerService, R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withMessageWriter[Json, R](bucket, topic, snsClient) { messageWriter =>
-          withMessageStream[Json, R](actorSystem, queue, metricsSender) {
-            messageStream =>
-              val workerService = new IdMinterWorkerService(
-                idEmbedder = new IdEmbedder(
-                  identifierGenerator = new IdentifierGenerator(
-                    identifiersDao = identifiersDao
-                  )
-                ),
-                writer = messageWriter,
-                messageStream = messageStream,
-                rdsClientConfig = rdsClientConfig,
-                identifiersTableConfig = identifiersTableConfig
-              )
+          withMessageStream[Json, R](queue, metricsSender) { messageStream =>
+            val workerService = new IdMinterWorkerService(
+              idEmbedder = new IdEmbedder(
+                identifierGenerator = new IdentifierGenerator(
+                  identifiersDao = identifiersDao
+                )
+              ),
+              writer = messageWriter,
+              messageStream = messageStream,
+              rdsClientConfig = rdsClientConfig,
+              identifiersTableConfig = identifiersTableConfig
+            )
 
-              workerService.run()
+            workerService.run()
 
-              testWith(workerService)
+            testWith(workerService)
           }
         }
       }

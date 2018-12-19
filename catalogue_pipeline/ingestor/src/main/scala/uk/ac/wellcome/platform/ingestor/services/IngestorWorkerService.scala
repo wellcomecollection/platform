@@ -2,8 +2,9 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import akka.Done
 import com.amazonaws.services.sqs.model.Message
-import com.sksamuel.elastic4s.http.HttpClient
-import uk.ac.wellcome.elasticsearch.WorksIndex
+import com.sksamuel.elastic4s.http.ElasticClient
+import uk.ac.wellcome.Runnable
+import uk.ac.wellcome.elasticsearch.{ElasticsearchIndexCreator, WorksIndex}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -11,10 +12,11 @@ import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IngestorWorkerService(elasticClient: HttpClient,
+class IngestorWorkerService(elasticClient: ElasticClient,
                             ingestorConfig: IngestorConfig,
                             messageStream: MessageStream[IdentifiedBaseWork])(
-  implicit ec: ExecutionContext) {
+  implicit ec: ExecutionContext)
+    extends Runnable {
 
   case class MessageBundle(message: Message, work: IdentifiedBaseWork)
 
@@ -22,13 +24,13 @@ class IngestorWorkerService(elasticClient: HttpClient,
     elasticClient = elasticClient
   )
 
-  val worksIndex = new WorksIndex(
-    client = elasticClient,
-    rootIndexType = ingestorConfig.elasticConfig.documentType
+  val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
+    elasticClient = elasticClient
   )
 
-  worksIndex.create(
-    indexName = ingestorConfig.elasticConfig.indexName
+  elasticsearchIndexCreator.create(
+    index = ingestorConfig.index,
+    fields = WorksIndex.rootIndexFields
   )
 
   def run(): Future[Done] =
@@ -55,8 +57,7 @@ class IngestorWorkerService(elasticClient: HttpClient,
       works <- Future.successful(messageBundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
         works = works,
-        indexName = ingestorConfig.elasticConfig.indexName,
-        documentType = ingestorConfig.elasticConfig.documentType
+        index = ingestorConfig.index
       )
     } yield {
       val failedWorks = either.left.getOrElse(Nil)

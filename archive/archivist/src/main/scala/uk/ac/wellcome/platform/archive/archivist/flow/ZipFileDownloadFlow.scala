@@ -97,7 +97,7 @@ object ZipFileDownloadFlow extends Logging {
       case Right(ZipFileDownloadComplete(_, ingestBagRequest)) =>
         ProgressEventUpdate(
           ingestBagRequest.archiveRequestId,
-          List(ProgressEvent("zipFile downloaded successfully")))
+          List(ProgressEvent("Source bag downloaded successfully")))
       case Left(archiveError) =>
         ProgressStatusUpdate(
           archiveError.t.archiveRequestId,

@@ -24,8 +24,6 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   *
   */
 object NotificationMessageFlow extends Logging {
-  import IngestBagRequest._
-
   def apply(parallelism: Int,
             snsClient: AmazonSNS,
             progressSnsConfig: SNSConfig)
@@ -39,7 +37,7 @@ object NotificationMessageFlow extends Logging {
             id = bagRequest.archiveRequestId,
             events = List(
               ProgressEvent(
-                s"Started working on ingestRequest: ${bagRequest.archiveRequestId}")
+                s"Started work on ingest: ${bagRequest.archiveRequestId}")
             )
           )
 

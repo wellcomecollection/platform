@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import com.github.tototoshi.csv.CSVReader
 import uk.ac.wellcome.models.work.internal.WorkType
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
 
 import scala.io.Source
 
@@ -47,11 +47,11 @@ object SierraMaterialTypes {
         workTypeMap.get(c) match {
           case Some(workType) => workType
           case None =>
-            throw TransformerException(
+            throw SierraTransformerException(
               new IllegalArgumentException(s"Unrecognised work type code: $c"))
         }
       case _ =>
-        throw TransformerException(
+        throw SierraTransformerException(
           new IllegalArgumentException(
             s"Work type code is not a single character: <<$code>>"))
     }

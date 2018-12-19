@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.dynamo
 
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
 
@@ -12,8 +11,7 @@ import scala.concurrent.Future
   *
   * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.ParallelScan
   */
-class ParallelScanner(scanSpecScanner: ScanSpecScanner,
-                      dynamoConfig: DynamoConfig) {
+class ParallelScanner(scanSpecScanner: ScanSpecScanner) {
 
   /** Run a Parallel Scan for a single worker.
     *
@@ -28,7 +26,8 @@ class ParallelScanner(scanSpecScanner: ScanSpecScanner,
     * Note that this returns a Future[List], so results will be cached in-memory.
     * Choose segment count accordingly.
     */
-  def scan(segment: Int, totalSegments: Int): Future[List[String]] = {
+  def scan(segment: Int, totalSegments: Int)(
+    tableName: String): Future[List[String]] = {
 
     // Create the ScanSpec configuration and the DynamoDB table.  This is
     // based on the Java example of a Parallel Scan from the AWS docs:
@@ -38,6 +37,6 @@ class ParallelScanner(scanSpecScanner: ScanSpecScanner,
       .withTotalSegments(totalSegments)
       .withSegment(segment)
 
-    scanSpecScanner.scan(scanSpec = scanSpec, tableName = dynamoConfig.table)
+    scanSpecScanner.scan(scanSpec = scanSpec, tableName = tableName)
   }
 }

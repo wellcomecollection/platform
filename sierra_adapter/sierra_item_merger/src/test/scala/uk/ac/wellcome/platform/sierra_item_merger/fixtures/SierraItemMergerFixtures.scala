@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.sierra_item_merger.fixtures
 
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.services.{
@@ -45,20 +45,18 @@ trait SierraItemMergerFixtures
     table: Table)(testWith: TestWith[SierraItemMergerWorkerService, R]): R =
     withSierraVHS(sierraDataBucket, table) { vhs =>
       withSierraUpdaterService(vhs) { updaterService =>
-        withActorSystem { actorSystem =>
-          withSQSStream[NotificationMessage, R](actorSystem, queue) {
-            sqsStream =>
-              withSNSWriter(topic) { snsWriter =>
-                val workerService = new SierraItemMergerWorkerService(
-                  actorSystem = actorSystem,
-                  sqsStream = sqsStream,
-                  sierraItemMergerUpdaterService = updaterService,
-                  objectStore = ObjectStore[SierraItemRecord],
-                  snsWriter = snsWriter
-                )
+        withActorSystem { implicit actorSystem =>
+          withSQSStream[NotificationMessage, R](queue) { sqsStream =>
+            withSNSWriter(topic) { snsWriter =>
+              val workerService = new SierraItemMergerWorkerService(
+                sqsStream = sqsStream,
+                sierraItemMergerUpdaterService = updaterService,
+                objectStore = ObjectStore[SierraItemRecord],
+                snsWriter = snsWriter
+              )
 
-                testWith(workerService)
-              }
+              testWith(workerService)
+            }
           }
         }
       }

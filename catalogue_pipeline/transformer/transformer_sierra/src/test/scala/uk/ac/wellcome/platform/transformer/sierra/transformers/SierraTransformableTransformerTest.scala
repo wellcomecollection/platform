@@ -11,8 +11,8 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.sierra.SierraTransformableTransformer
+import uk.ac.wellcome.platform.transformer.sierra.exceptions.SierraTransformerException
 import uk.ac.wellcome.platform.transformer.sierra.generators.MarcGenerators
 import uk.ac.wellcome.platform.transformer.sierra.source.MarcSubfield
 
@@ -201,7 +201,7 @@ class SierraTransformableTransformerTest
         marcTag = "260",
         subfields = List(
           MarcSubfield(tag = "b", content = "Peaceful Poetry"),
-          MarcSubfield(tag = "c", content = "1923.")
+          MarcSubfield(tag = "c", content = "1923")
         )
       )
     )
@@ -213,7 +213,7 @@ class SierraTransformableTransformerTest
           MarcSubfield(
             tag = "a",
             content = "A delightful description of a dead daisy."),
-          MarcSubfield(tag = "c", content = "1923.")
+          MarcSubfield(tag = "c", content = "1923")
         )
       )
     )
@@ -257,7 +257,7 @@ class SierraTransformableTransformerTest
         ProductionEvent(
           places = List(),
           agents = List(Unidentifiable(Agent(label = "Peaceful Poetry"))),
-          dates = List(Period("1923.")),
+          dates = List(Period("1923")),
           function = None
         )
       ),
@@ -801,9 +801,9 @@ class SierraTransformableTransformerTest
 
       val result = transformer.transform(transformable, version = 1)
       result.isFailure shouldBe true
-      result.failed.get shouldBe a[TransformerException]
+      result.failed.get shouldBe a[SierraTransformerException]
       result.failed.get
-        .asInstanceOf[TransformerException]
+        .asInstanceOf[SierraTransformerException]
         .e
         .getMessage should include("Unable to parse item data")
     }
@@ -823,9 +823,9 @@ class SierraTransformableTransformerTest
 
       val result = transformer.transform(transformable, version = 1)
       result.isFailure shouldBe true
-      result.failed.get shouldBe a[TransformerException]
+      result.failed.get shouldBe a[SierraTransformerException]
       result.failed.get
-        .asInstanceOf[TransformerException]
+        .asInstanceOf[SierraTransformerException]
         .e
         .getMessage should include("Unable to parse item data")
     }
@@ -840,9 +840,9 @@ class SierraTransformableTransformerTest
 
       val result = transformer.transform(transformable, version = 1)
       result.isFailure shouldBe true
-      result.failed.get shouldBe a[TransformerException]
+      result.failed.get shouldBe a[SierraTransformerException]
       result.failed.get
-        .asInstanceOf[TransformerException]
+        .asInstanceOf[SierraTransformerException]
         .e
         .getMessage should include("Unable to parse bib data")
     }

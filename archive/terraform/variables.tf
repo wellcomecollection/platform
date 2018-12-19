@@ -2,6 +2,10 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
+variable "key_name" {}
+
+variable "admin_cidr_ingress" {}
+
 variable "release_ids" {
   description = "Release tags for platform apps"
   type        = "map"
@@ -51,3 +55,5 @@ variable "bagger_dds_asset_prefix" {}
 variable "api_alb_cdir_blocks" {
   type = "list"
 }
+
+variable "archive_oauth_details_enc" {}

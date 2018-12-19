@@ -4,12 +4,11 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraGenerators
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
@@ -39,7 +38,6 @@ class SierraItemsToDynamoFeatureTest
                 assertStoredAndSent(
                   itemRecord = itemRecord,
                   topic = topic,
-                  bucket = bucket,
                   table = table
                 )
               }
@@ -52,13 +50,11 @@ class SierraItemsToDynamoFeatureTest
 
   private def assertStoredAndSent(itemRecord: SierraItemRecord,
                                   topic: Topic,
-                                  bucket: Bucket,
                                   table: Table): Assertion =
     assertStoredAndSent[SierraItemRecord](
       itemRecord,
       id = itemRecord.id.withoutCheckDigit,
       topic = topic,
-      bucket = bucket,
       table = table
     )
 }

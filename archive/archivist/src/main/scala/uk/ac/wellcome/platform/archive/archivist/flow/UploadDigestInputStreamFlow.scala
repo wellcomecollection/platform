@@ -55,7 +55,7 @@ object UploadDigestInputStreamFlow extends Logging {
                   Left(
                     ChecksumNotMatchedOnUploadError(
                       expectedChecksum = digest.value,
-                      actualCheckSum = calculatedDigest,
+                      actualChecksum = calculatedDigest,
                       t = job
                     )
                   )

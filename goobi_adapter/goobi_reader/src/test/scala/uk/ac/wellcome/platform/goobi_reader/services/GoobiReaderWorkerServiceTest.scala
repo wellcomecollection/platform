@@ -12,8 +12,8 @@ import org.scalatest.{Assertion, FunSpec, Inside}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
@@ -296,21 +296,20 @@ class GoobiReaderWorkerServiceTest
                                              GoobiRecordMetadata,
                                              ObjectStore[InputStream]]),
                        R]): R =
-    withActorSystem { actorSystem =>
+    withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, dlq) =>
           withMockMetricSender { mockMetricsSender =>
             withSQSStream[NotificationMessage, R](
-              actorSystem,
-              queue,
-              mockMetricsSender) { sqsStream =>
+              queue = queue,
+              metricsSender = mockMetricsSender) { sqsStream =>
               withS3StreamStoreFixtures {
                 case (bucket, table, versionedHybridStore) =>
                   val service = new GoobiReaderWorkerService(
                     s3Client = s3Client,
                     sqsStream = sqsStream,
                     versionedHybridStore = versionedHybridStore
-                  )(actorSystem = actorSystem)
+                  )
 
                   service.run()
 

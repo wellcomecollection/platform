@@ -1,22 +1,23 @@
 package uk.ac.wellcome.elasticsearch.test.fixtures
 
+import com.sksamuel.elastic4s.Index
+import com.sksamuel.elastic4s.VersionType.ExternalGte
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.HttpClient
-import org.elasticsearch.index.VersionType
+import com.sksamuel.elastic4s.http.cluster.ClusterHealthResponse
+import com.sksamuel.elastic4s.http.get.GetResponse
+import com.sksamuel.elastic4s.http.index.admin.IndexExistsResponse
+import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.sksamuel.elastic4s.http.{ElasticClient, Response}
+import com.sksamuel.elastic4s.mappings.FieldDefinition
 import org.scalactic.source.Position
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Assertion, Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.{
-  DisplayElasticConfig,
-  ElasticClientBuilder,
-  ElasticsearchIndex,
-  WorksIndex
-}
+import uk.ac.wellcome.elasticsearch._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
@@ -31,18 +32,15 @@ trait ElasticsearchFixtures
   private val esHost = "localhost"
   private val esPort = 9200
 
-  val documentType = "work"
-
-  def displayEsLocalFlags(indexNameV1: String, indexNameV2: String) =
+  def displayEsLocalFlags(indexV1: Index, indexV2: Index) =
     Map(
       "es.host" -> esHost,
       "es.port" -> esPort.toString,
-      "es.index.v1" -> indexNameV1,
-      "es.index.v2" -> indexNameV2,
-      "es.type" -> documentType
+      "es.index.v1" -> indexV1.name,
+      "es.index.v2" -> indexV2.name
     )
 
-  val elasticClient: HttpClient = ElasticClientBuilder.create(
+  val elasticClient: ElasticClient = ElasticClientBuilder.create(
     hostname = esHost,
     port = esPort,
     protocol = "http",
@@ -53,7 +51,11 @@ trait ElasticsearchFixtures
   // Elasticsearch takes a while to start up so check that it actually started
   // before running tests.
   eventually {
-    elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
+    val response: Response[ClusterHealthResponse] = elasticClient
+      .execute(clusterHealth())
+      .await
+
+    response.result.numberOfNodes shouldBe 1
   }(
     PatienceConfig(
       timeout = scaled(Span(40, Seconds)),
@@ -61,56 +63,70 @@ trait ElasticsearchFixtures
     ),
     implicitly[Position])
 
-  def withLocalElasticsearchIndex[R](testWith: TestWith[String, R]): R = {
-    val indexName = createIndexName
-
-    val elasticConfig = createDisplayElasticConfigWith(
-      indexV1name = indexName,
-      indexV2name = s"$indexName-v2"
-    )
-
-    val index = new WorksIndex(
-      client = elasticClient,
-      rootIndexType = elasticConfig.documentType
-    )
-
-    withLocalElasticsearchIndex(index, indexName) { indexName =>
-      testWith(indexName)
+  def withLocalWorksIndex[R](testWith: TestWith[Index, R]): R =
+    withLocalElasticsearchIndex[R](fields = WorksIndex.rootIndexFields) {
+      index =>
+        testWith(index)
     }
-  }
+
+  private val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
+    elasticClient = elasticClient
+  )
 
   def withLocalElasticsearchIndex[R](
-    index: ElasticsearchIndex,
-    indexName: String = createIndexName)(testWith: TestWith[String, R]): R = {
-
-    index.create(indexName).await
-
-    // Elasticsearch is eventually consistent, so the future
-    // completing doesn't actually mean that the index exists yet
-    eventually {
-      elasticClient
-        .execute(indexExists(indexName))
+    fields: Seq[FieldDefinition],
+    index: Index = createIndex): Fixture[Index, R] = fixture[Index, R](
+    create = {
+      elasticsearchIndexCreator
+        .create(index = index, fields = fields)
         .await
-        .isExists should be(true)
+
+      // Elasticsearch is eventually consistent, so the future
+      // completing doesn't actually mean that the index exists yet
+      eventuallyIndexExists(index)
+
+      index
+    },
+    destroy = { index =>
+      elasticClient.execute(deleteIndex(index.name))
+    }
+  )
+
+  def eventuallyIndexExists(index: Index): Assertion =
+    eventually {
+      val response: Response[IndexExistsResponse] =
+        elasticClient
+          .execute(indexExists(index.name))
+          .await
+
+      response.result.isExists shouldBe true
     }
 
-    try {
-      testWith(indexName)
-    } finally {
-      elasticClient.execute(deleteIndex(indexName))
+  def eventuallyDeleteIndex(index: Index): Assertion = {
+    elasticClient.execute(deleteIndex(index.name))
+
+    eventually {
+      val response: Response[IndexExistsResponse] =
+        elasticClient
+          .execute(indexExists(index.name))
+          .await
+
+      response.result.isExists shouldBe false
     }
   }
 
   def assertElasticsearchEventuallyHasWork(
-    indexName: String,
+    index: Index,
     works: IdentifiedBaseWork*): Seq[Assertion] =
     works.map { work =>
       val workJson = toJson(work).get
 
       eventually {
-        val getResponse = elasticClient
-          .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
-          .await
+        val response: Response[GetResponse] = elasticClient.execute {
+          get(work.canonicalId).from(index.name)
+        }.await
+
+        val getResponse = response.result
 
         getResponse.exists shouldBe true
 
@@ -118,31 +134,31 @@ trait ElasticsearchFixtures
       }
     }
 
-  def assertElasticsearchNeverHasWork(indexName: String,
-                                      works: IdentifiedBaseWork*) = {
+  def assertElasticsearchNeverHasWork(index: Index,
+                                      works: IdentifiedBaseWork*): Unit = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
     Thread.sleep(500)
 
     works.foreach { work =>
-      val hit = elasticClient
-        .execute(get(work.canonicalId).from(s"$indexName/$documentType"))
+      val response: Response[GetResponse] = elasticClient
+        .execute(get(work.canonicalId).from(index.name))
         .await
 
-      hit.found shouldBe false
+      response.result.found shouldBe false
     }
   }
 
-  def insertIntoElasticsearch(indexName: String,
+  def insertIntoElasticsearch(index: Index,
                               works: IdentifiedBaseWork*): Assertion = {
     val result = elasticClient.execute(
       bulk(
         works.map { work =>
           val jsonDoc = toJson(work).get
 
-          indexInto(indexName / documentType)
+          indexInto(index.name / index.name)
             .version(work.version)
-            .versionType(VersionType.EXTERNAL_GTE)
+            .versionType(ExternalGte)
             .id(work.canonicalId)
             .doc(jsonDoc)
         }
@@ -151,26 +167,15 @@ trait ElasticsearchFixtures
 
     whenReady(result) { _ =>
       eventually {
-        val hits = elasticClient
-          .execute {
-            search(indexName).matchAllQuery()
-          }
-          .await
-          .hits
-        hits.total shouldBe works.size
+        val response: Response[SearchResponse] = elasticClient.execute {
+          search(index.name).matchAllQuery()
+        }.await
+
+        response.result.hits.total shouldBe works.size
       }
     }
   }
 
-  def createDisplayElasticConfigWith(
-    indexV1name: String,
-    indexV2name: String): DisplayElasticConfig =
-    DisplayElasticConfig(
-      documentType = documentType,
-      indexV1name = indexV1name,
-      indexV2name = indexV2name
-    )
-
-  private def createIndexName: String =
-    (Random.alphanumeric take 10 mkString) toLowerCase
+  private def createIndex: Index =
+    Index(name = (Random.alphanumeric take 10 mkString) toLowerCase)
 }

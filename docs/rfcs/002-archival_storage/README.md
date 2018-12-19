@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 02 November 2018.**
+**Last updated: 04 December 2018.**
 
 ## Problem statement
 
@@ -117,7 +117,7 @@ grant_type=client_credentials
 
 This will return an access token:
 
-```
+```http
 Content-Type: application/json
 Cache-Control: no-store
 Pragma: no-cache
@@ -277,6 +277,13 @@ Updates should be processed as follows:
 - File versions should be updated to reflect their new underlying storage provider version
 - Bag version should be updated to reflect the new underlying storage version of the tagmanifest
 
+Partial updates, where files that are not changed are not resupplied, are supported through the use of `fetch.txt` in the supplied bag. These should be processed as follows:
+
+- Construct a complete bag from the supplied files and `fetch.txt`
+- Process as for a complete update
+
+An example of a bag that uses `fetch.txt` for updating digitised content is provided in later in this document.
+
 ### Bags
 
 Request:
@@ -296,7 +303,7 @@ See examples below
 
 Digitised content will be ingested using Goobi, which should provide the bag layout defined below.
 
-#### Bag
+#### Complete bag
 
 ```
 b24923333/
@@ -326,6 +333,42 @@ b24923333/
 |-- tagmanifest-sha256.txt
 |     791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e manifest-sha256.txt
 |     13f83db60db65c72bf5077662bca91ed7f69405b86e5be4824bb94ca439d56e7 bag-info.txt
+|     a39e0c061a400a5488b57a81d877c3aff36d9edd8d811d66060f45f39bf76d37 bagit.txt
+|-- bag-info.txt
+|     Source-Organization: Intranda GmbH
+|     Contact-Email: support@intranda.com
+|     External-Description: A account of a voyage to New South Wales    // title
+|     Bagging-Date: 2016-08-07
+|     External-Identifier: b24923333    // b number
+|     Payload-Oxum: 435255.8
+|     Internal-Sender-Identifier: 170131    // goobi process id
+|     Internal-Sender-Description: 12324_b_b24923333    // goobi process title
+\-- bagit.txt
+      BagIt-Version: 0.97
+      Tag-File-Character-Encoding: UTF-8
+```
+
+#### Partial bag
+
+Note that all files must be present the manifest and only files that are not supplied present in `fetch.txt`.
+
+```
+b24923333/
+|-- data
+|   |-- b24923333.xml
+|-- fetch.txt
+|     s3://wellcomecollection-storage-archive/digitised/b24923333/data/objects/b24923333_001.jp2 - data/objects/b24923333_001.jp2
+|     s3://wellcomecollection-storage-archive/digitised/b24923333/data/alto/b24923333_001.xml - data/alto/b24923333_001.xml
+|     ...
+|-- manifest-sha256.txt
+|     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b24923333.xml
+|     e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e data/objects/b24923333_001.jp2
+|     17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502 data/alto/b24923333_001.xml
+|     ...
+|-- tagmanifest-sha256.txt
+|     791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e manifest-sha256.txt
+|     13f83db60db65c72bf5077662bca91ed7f69405b86e5be4824bb94ca439d56e7 bag-info.txt
+|     bf5077662bca91ed7f69401d877cx3agf318d4e85d7b6716b4b496ded45cd44e fetch.txt
 |     a39e0c061a400a5488b57a81d877c3aff36d9edd8d811d66060f45f39bf76d37 bagit.txt
 |-- bag-info.txt
 |     Source-Organization: Intranda GmbH

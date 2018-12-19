@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.recorder
 
 import akka.actor.ActorSystem
-import com.typesafe.config.{Config, ConfigFactory}
-import grizzled.slf4j.Logging
+import com.typesafe.config.Config
+import uk.ac.wellcome.config.core.WellcomeTypesafeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SNSBuilder}
 import uk.ac.wellcome.config.storage.builders.VHSBuilder
@@ -11,35 +11,21 @@ import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.recorder.services.RecorderWorkerService
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 
-import scala.concurrent.{Await, ExecutionContext}
-import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext
 
-object Main extends App with Logging {
-  val config: Config = ConfigFactory.load()
+object Main extends WellcomeTypesafeApp {
+  runWithConfig { config: Config =>
+    implicit val actorSystem: ActorSystem =
+      AkkaBuilder.buildActorSystem()
+    implicit val executionContext: ExecutionContext =
+      AkkaBuilder.buildExecutionContext()
 
-  implicit val actorSystem: ActorSystem =
-    AkkaBuilder.buildActorSystem()
-  implicit val executionContext: ExecutionContext =
-    AkkaBuilder.buildExecutionContext()
-
-  val workerService = new RecorderWorkerService(
-    versionedHybridStore =
-      VHSBuilder.buildVHS[TransformedBaseWork, EmptyMetadata](config),
-    messageStream =
-      MessagingBuilder.buildMessageStream[TransformedBaseWork](config),
-    snsWriter = SNSBuilder.buildSNSWriter(config)
-  )
-
-  try {
-    info(s"Starting worker.")
-
-    val result = workerService.run()
-
-    Await.result(result, Duration.Inf)
-  } catch {
-    case e: Throwable =>
-      error("Fatal error:", e)
-  } finally {
-    info(s"Terminating worker.")
+    new RecorderWorkerService(
+      versionedHybridStore =
+        VHSBuilder.buildVHS[TransformedBaseWork, EmptyMetadata](config),
+      messageStream =
+        MessagingBuilder.buildMessageStream[TransformedBaseWork](config),
+      snsWriter = SNSBuilder.buildSNSWriter(config)
+    )
   }
 }

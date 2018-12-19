@@ -3,6 +3,8 @@ package uk.ac.wellcome.platform.merger.rules.singlepagemiro
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.logging.MergerLogging
+import uk.ac.wellcome.platform.merger.model.MergedWork
+import uk.ac.wellcome.platform.merger.rules.{MergerRule, WorkPairMerger}
 
 /** If we have a Miro work and a Sierra work with a single item,
   * the Sierra work replaces the Miro work (because this is metadata
@@ -17,29 +19,16 @@ import uk.ac.wellcome.platform.merger.logging.MergerLogging
   *     location for the thumbnail.
   *
   */
-object SierraMiroMergeRule extends SierraMiroMerger with SierraMiroPartitioner {
-  def mergeAndRedirectWorks(works: Seq[BaseWork]): Seq[BaseWork] = {
-    partitionWorks(works)
-      .map {
-        case Partition(sierraWork, miroWork, otherWorks) =>
-          val maybeResult = mergeAndRedirectWorkPair(
-            sierraWork = sierraWork,
-            miroWork = miroWork
-          )
-          maybeResult match {
-            case Some(result) =>
-              result ++ otherWorks
-            case _ => works
-          }
-      }
-      .getOrElse(works)
-  }
-}
+object SierraMiroMergeRule
+    extends MergerRule
+    with Logging
+    with MergerLogging
+    with WorkPairMerger
+    with SierraMiroPartitioner {
 
-trait SierraMiroMerger extends Logging with MergerLogging {
-  def mergeAndRedirectWorkPair(
+  override protected def mergeAndRedirectWorkPair(
     sierraWork: UnidentifiedWork,
-    miroWork: UnidentifiedWork): Option[List[BaseWork]] = {
+    miroWork: UnidentifiedWork): Option[MergedWork] = {
     (sierraWork.items, miroWork.items) match {
       case (
           List(sierraItem: MaybeDisplayable[Item]),
@@ -57,10 +46,11 @@ trait SierraMiroMerger extends Logging with MergerLogging {
         )
 
         Some(
-          List(
+          MergedWork(
             mergedWork,
             UnidentifiedRedirectedWork(miroWork, sierraWork)
-          ))
+          )
+        )
       case _ =>
         None
     }

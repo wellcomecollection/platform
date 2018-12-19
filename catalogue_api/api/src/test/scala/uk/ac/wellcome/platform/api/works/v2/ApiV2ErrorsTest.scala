@@ -186,11 +186,33 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
     }
   }
 
-  it("returns Not Found if you look up a non-existent index") {
+  it("returns Not Found if you list in a non-existent index") {
     withV2Api {
       case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?_index=foobarbaz",
+          andExpect = Status.NotFound,
+          withJsonBody = notFound(apiPrefix, "There is no index foobarbaz")
+        )
+    }
+  }
+
+  it("returns Not Found if you look up in a non-existent index") {
+    withV2Api {
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works/1234?_index=foobarbaz",
+          andExpect = Status.NotFound,
+          withJsonBody = notFound(apiPrefix, "There is no index foobarbaz")
+        )
+    }
+  }
+
+  it("returns Not Found if you search in a non-existent index") {
+    withV2Api {
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?_index=foobarbaz&query=foobar",
           andExpect = Status.NotFound,
           withJsonBody = notFound(apiPrefix, "There is no index foobarbaz")
         )
@@ -227,22 +249,25 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
     // We need to do something that reliably triggers an internal exception
     // in the Elasticsearch handler.
     //
-    // Elasticsearch has a number of "private" indexes, which don't have
-    // a canonicalId field to sort on.  Trying to query one of these will
-    // trigger one such exception!
+    // By creating an index without a mapping, we don't have a canonicalId field
+    // to sort on.  Trying to query this index of these will trigger one such exception!
     withV2Api {
       case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-        server.httpGet(
-          path = s"/$apiPrefix/works?_index=.watches",
-          andExpect = Status.InternalServerError,
-          withJsonBody = s"""{
-          "@context": "https://localhost:8888/$apiPrefix/context.json",
-          "type": "Error",
-          "errorType": "http",
-          "httpStatus": 500,
-          "label": "Internal Server Error"
-        }"""
-        )
+        withEmptyIndex { index =>
+          server.httpGet(
+            path = s"/$apiPrefix/works?_index=${index.name}",
+            andExpect = Status.InternalServerError,
+            withJsonBody = s"""
+                 |{
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Error",
+                 |  "errorType": "http",
+                 |  "httpStatus": 500,
+                 |  "label": "Internal Server Error"
+                 |}
+               """.stripMargin
+          )
+        }
     }
   }
 
@@ -278,15 +303,14 @@ class ApiV2ErrorsTest extends ApiV2WorksTestBase {
   // TODO figure out what the correct behaviour should be in this case
   ignore(
     "returns a Not Found error if you try to get a version that doesn't exist") {
-    withServer(indexNameV1 = "not-important", indexNameV2 = "not-important") {
-      server =>
-        server.httpGet(
-          path = "/catalogue/v567/works?pageSize=100&page=101",
-          andExpect = Status.NotFound,
-          withJsonBody = badRequest(
-            s"catalogue/${ApiVersions.default.toString}",
-            "v567 is not a valid API version")
-        )
+    withServer(indexV1 = "not-important", indexV2 = "not-important") { server =>
+      server.httpGet(
+        path = "/catalogue/v567/works?pageSize=100&page=101",
+        andExpect = Status.NotFound,
+        withJsonBody = badRequest(
+          s"catalogue/${ApiVersions.default.toString}",
+          "v567 is not a valid API version")
+      )
     }
   }
 }

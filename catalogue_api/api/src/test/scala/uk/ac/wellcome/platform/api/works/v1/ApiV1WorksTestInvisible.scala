@@ -8,10 +8,10 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV1Api {
-      case (apiPrefix, indexNameV1, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
         val work = createIdentifiedInvisibleWork
 
-        insertIntoElasticsearch(indexNameV1, work)
+        insertIntoElasticsearch(indexV1, work)
 
         eventually {
           server.httpGet(
@@ -25,12 +25,12 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
   it("excludes works with visible=false from list results") {
     withV1Api {
-      case (apiPrefix, indexNameV1, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
         val deletedWork = createIdentifiedInvisibleWork
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val worksToIndex = Seq[IdentifiedBaseWork](deletedWork) ++ works
-        insertIntoElasticsearch(indexNameV1, worksToIndex: _*)
+        insertIntoElasticsearch(indexV1, worksToIndex: _*)
 
         eventually {
           server.httpGet(
@@ -70,12 +70,12 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
   it("excludes works with visible=false from search results") {
     withV1Api {
-      case (apiPrefix, indexNameV1, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           title = "An upside-down umbrella"
         )
         val deletedWork = createIdentifiedInvisibleWork
-        insertIntoElasticsearch(indexNameV1, work, deletedWork)
+        insertIntoElasticsearch(indexV1, work, deletedWork)
 
         eventually {
           server.httpGet(

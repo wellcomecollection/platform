@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 trait MiroImageApiURL {
-  def buildImageApiURL(miroID: String, templateName: String): String = {
+  def buildImageApiURL(miroId: String, templateName: String): String = {
     val iiifImageApiBaseUri = "https://iiif.wellcomecollection.org"
 
     val imageUriTemplates = Map(
@@ -14,6 +14,6 @@ trait MiroImageApiURL {
       throw new Exception(
         s"Unrecognised Image API URI template ($templateName)!"))
 
-    imageUriTemplate.format(iiifImageApiBaseUri, miroID)
+    imageUriTemplate.format(iiifImageApiBaseUri, miroId)
   }
 }

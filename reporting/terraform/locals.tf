@@ -14,5 +14,6 @@ locals {
   miro_vhs_read_policy = "${data.terraform_remote_state.infra_critical.vhs_miro_read_policy}"
 
   miro_inventory_vhs_read_policy = "${data.terraform_remote_state.infra_critical.vhs_miro_inventory_read_policy}"
-  sierra_vhs_read_policy         = "${data.terraform_remote_state.infra_critical.vhs_sierra_read_policy}"
+
+  sierra_vhs_read_policy = "${data.terraform_remote_state.infra_critical.vhs_sierra_read_policy}"
 }

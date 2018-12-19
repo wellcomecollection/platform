@@ -49,7 +49,7 @@ class MergerManagerTest extends FunSpec with Matchers with WorksGenerators {
     result should contain theSameElementsAs expectedWorks
   }
 
-  val mergerRules: MergerRules = new MergerRules {
+  val mergerRules = new Merger(List()) {
 
     /** Make every work a redirect to the first work in the list, and leave
       * the first work intact.

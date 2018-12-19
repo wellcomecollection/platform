@@ -23,8 +23,7 @@ class V1WorksController @Inject()(
       V1SingleWorkRequest,
       V1WorksIncludes](
       apiConfig = apiConfig,
-      indexName = elasticConfig.indexV1name,
-      documentType = elasticConfig.documentType,
+      defaultIndex = elasticConfig.indexV1,
       worksService = worksService
     ) {
   implicit protected val swagger = ApiV1Swagger

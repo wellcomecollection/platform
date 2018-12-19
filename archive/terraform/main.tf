@@ -1,20 +1,29 @@
 # Stack
 
-resource "aws_api_gateway_base_path_mapping" "api-gw-mapping-241118" {
-  api_id      = "${module.stack-241118.api_gateway_id}"
+resource "aws_api_gateway_base_path_mapping" "api-gw-mapping-041218" {
+  api_id      = "${module.stack-041218.api_gateway_id}"
   domain_name = "api.wellcomecollection.org"
   base_path   = "storage"
 }
 
-module "stack-241118" {
-  source = "stack"
+module "stack-041218" {
+  source = "stack-041218"
 
-  namespace = "storage-241118"
+  namespace = "storage-041218"
 
   domain_name = "api.wellcomecollection.org"
 
-  vpc_id          = "${local.vpc_id}"
+  vpc_id   = "${local.vpc_id}"
+  vpc_cidr = "${local.vpc_cidr}"
+
   private_subnets = "${local.private_subnets}"
+  public_subnets  = "${local.public_subnets}"
+
+  ssh_key_name = "${var.key_name}"
+
+  instance_type = "i3.2xlarge"
+
+  controlled_access_cidr_ingress = ["${var.admin_cidr_ingress}"]
 
   current_account_id     = "${data.aws_caller_identity.current.account_id}"
   infra_bucket           = "${local.infra_bucket}"

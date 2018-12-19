@@ -10,15 +10,18 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.platform.archive.common.fixtures.ArchiveMessaging
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 class MessageStreamTest
     extends FunSpec
     with Matchers
+    with Akka
     with ScalaFutures
+    with ArchiveMessaging
     with Messaging
     with MockitoSugar
     with IntegrationPatience {
@@ -144,21 +147,16 @@ class MessageStreamTest
                         ActorSystem,
                         MetricsSender),
                        R]
-  ) = {
-    withActorSystem { actorSystem =>
+  ): R = {
+    withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
-          withMockMetricSender { metricsSender =>
-            val sqsConfig = createSQSConfigWith(queue)
-
-            val stream = new MessageStream[ExampleObject, Unit](
-              actorSystem = actorSystem,
-              sqsClient = asyncSqsClient,
-              sqsConfig = sqsConfig,
-              metricsSender = metricsSender
-            )
-
-            testWith((stream, queuePair, actorSystem, metricsSender))
+          withMockMetricSender { mockMetricsSender =>
+            withArchiveMessageStream[ExampleObject, Unit, R](
+              queue,
+              mockMetricsSender) { stream =>
+              testWith((stream, queuePair, actorSystem, mockMetricsSender))
+            }
           }
       }
     }

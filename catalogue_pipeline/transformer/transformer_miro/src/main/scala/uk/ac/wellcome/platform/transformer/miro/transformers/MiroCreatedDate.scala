@@ -1,16 +1,18 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import uk.ac.wellcome.models.work.internal.Period
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroCreatedDate {
-  def getCreatedDate(miroData: MiroTransformableData,
-                     miroId: String): Option[Period] =
-    if (collectionIsV(miroId)) {
-      miroData.artworkDate.map { Period }
+  def getCreatedDate(miroRecord: MiroRecord): Option[Period] =
+    if (collectionIsV(miroRecord.imageNumber)) {
+      miroRecord.artworkDate.map { date =>
+        Period(label = date)
+      }
     } else {
       None
     }
 
-  private def collectionIsV(miroId: String) = miroId.startsWith("V")
+  private def collectionIsV(imageNumber: String): Boolean =
+    imageNumber.startsWith("V")
 }

@@ -45,8 +45,6 @@ class NotifierFeatureTest
     with ProgressGenerators
     with TimeTestFixture {
 
-  import uk.ac.wellcome.platform.archive.common.progress.models.Progress._
-
   implicit val system: ActorSystem = ActorSystem("test")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
@@ -80,11 +78,11 @@ class NotifierFeatureTest
                     "http://localhost/context.json",
                     progress.id,
                     DisplayLocation(
-                      DisplayProvider(progress.sourceLocation.provider.id),
+                      StandardDisplayProvider,
                       progress.sourceLocation.location.namespace,
                       progress.sourceLocation.location.key),
                     progress.callback.map(DisplayCallback(_)),
-                    DisplayIngestType("create"),
+                    CreateDisplayIngestType,
                     DisplayStorageSpace(progress.space.underlying),
                     DisplayStatus(progress.status.toString),
                     progress.bag.map(bagId =>
@@ -152,11 +150,11 @@ class NotifierFeatureTest
                       "http://localhost/context.json",
                       progress.id,
                       DisplayLocation(
-                        DisplayProvider(progress.sourceLocation.provider.id),
+                        StandardDisplayProvider,
                         progress.sourceLocation.location.namespace,
                         progress.sourceLocation.location.key),
                       progress.callback.map(DisplayCallback(_)),
-                      DisplayIngestType("create"),
+                      CreateDisplayIngestType,
                       DisplayStorageSpace(progress.space.underlying),
                       DisplayStatus(progress.status.toString),
                       progress.bag.map(bagId =>

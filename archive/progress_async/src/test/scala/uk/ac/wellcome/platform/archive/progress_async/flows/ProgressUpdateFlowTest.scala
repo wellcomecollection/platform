@@ -29,109 +29,94 @@ class ProgressUpdateFlowTest
     with ScalaFutures {
 
   it("adds an event to a monitor with none") {
-    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
+    withProgressTrackerTable { table =>
       withProgressUpdateFlow(table) {
         case (flow, monitor) =>
-          withActorSystem(actorSystem => {
-            withMaterializer(actorSystem)(materializer => {
-              val progress = createProgress()
-              whenReady(monitor.initialise(progress)) {
-                _ =>
-                  val update =
-                    ProgressEventUpdate(
-                      progress.id,
-                      List(ProgressEvent("Wow.")))
-
-                  val updates = Source
-                    .single(update)
-                    .via(flow)
-                    .async
-                    .runWith(Sink.ignore)(materializer)
-
-                  whenReady(updates) { _ =>
-                    assertProgressCreated(
-                      progress.id,
-                      progress.sourceLocation,
-                      table)
-
-                    assertProgressRecordedRecentEvents(
-                      update.id,
-                      update.events.map(_.description),
-                      table)
-                  }
-              }
-            })
-          })
-      }
-    }
-  }
-
-  it("adds multiple events to a monitor") {
-    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
-      withProgressUpdateFlow(table) {
-        case (flow, monitor) =>
-          withActorSystem(actorSystem => {
-            withMaterializer(actorSystem)(materializer => {
-
-              val progress = createProgress
-              monitor.initialise(progress)
-
-              val progressUpdates = List(
-                ProgressEventUpdate(
-                  progress.id,
-                  List(ProgressEvent("It happened again."))),
-                ProgressEventUpdate(
-                  progress.id,
-                  List(ProgressEvent("Dammit Bobby.")))
-              )
-
-              val futureUpdates = Source
-                .fromIterator(() => progressUpdates.toIterator)
-                .via(flow)
-                .async
-                .runWith(Sink.ignore)(materializer)
-
-              whenReady(futureUpdates) { _ =>
-                assertProgressCreated(
-                  progress.id,
-                  progress.sourceLocation,
-                  table)
-
-                assertProgressRecordedRecentEvents(
-                  progress.id,
-                  progressUpdates.flatMap(_.events.map(_.description)),
-                  table)
-              }
-            })
-          })
-      }
-    }
-  }
-
-  it("continues on failure") {
-    withSpecifiedLocalDynamoDbTable(createProgressTrackerTable) { table =>
-      withProgressUpdateFlow(table) {
-        case (flow, monitor) =>
-          withActorSystem(actorSystem => {
-            withMaterializer(actorSystem)(materializer => {
-              val id = randomUUID
-
+          withMaterializer { implicit materializer =>
+            val progress = createProgress
+            whenReady(monitor.initialise(progress)) { _ =>
               val update =
-                ProgressEventUpdate(
-                  id,
-                  List(ProgressEvent("Such progress, much wow.")))
+                ProgressEventUpdate(progress.id, List(ProgressEvent("Wow.")))
 
               val updates = Source
                 .single(update)
                 .via(flow)
                 .async
-                .runWith(Sink.seq)(materializer)
+                .runWith(Sink.ignore)
 
-              whenReady(updates) { result =>
-                result shouldBe empty
+              whenReady(updates) { _ =>
+                assertProgressCreated(progress, table)
+
+                assertProgressRecordedRecentEvents(
+                  update.id,
+                  update.events.map(_.description),
+                  table)
               }
-            })
-          })
+            }
+          }
+      }
+    }
+  }
+
+  it("adds multiple events to a monitor") {
+    withProgressTrackerTable { table =>
+      withProgressUpdateFlow(table) {
+        case (flow, monitor) =>
+          withMaterializer { implicit materializer =>
+            val progress = createProgress
+            monitor.initialise(progress)
+
+            val progressUpdates = List(
+              ProgressEventUpdate(
+                progress.id,
+                List(ProgressEvent("It happened again."))),
+              ProgressEventUpdate(
+                progress.id,
+                List(ProgressEvent("Dammit Bobby.")))
+            )
+
+            val futureUpdates = Source
+              .fromIterator(() => progressUpdates.toIterator)
+              .via(flow)
+              .async
+              .runWith(Sink.ignore)
+
+            whenReady(futureUpdates) { _ =>
+              assertProgressCreated(progress, table)
+
+              assertProgressRecordedRecentEvents(
+                progress.id,
+                progressUpdates.flatMap(_.events.map(_.description)),
+                table)
+            }
+
+          }
+      }
+    }
+  }
+
+  it("continues on failure") {
+    withProgressTrackerTable { table =>
+      withProgressUpdateFlow(table) {
+        case (flow, _) =>
+          withMaterializer { implicit materializer =>
+            val id = randomUUID
+
+            val update =
+              ProgressEventUpdate(
+                id,
+                List(ProgressEvent("Such progress, much wow.")))
+
+            val updates = Source
+              .single(update)
+              .via(flow)
+              .async
+              .runWith(Sink.seq)
+
+            whenReady(updates) { result =>
+              result shouldBe empty
+            }
+          }
       }
     }
   }

@@ -31,7 +31,6 @@ cache:
     - catalogue_pipeline/matcher/target
     - catalogue_pipeline/merger/target
     - catalogue_pipeline/recorder/target
-    - catalogue_pipeline/transformer/transformer_common/target
     - catalogue_pipeline/transformer/transformer_miro/target
     - catalogue_pipeline/transformer/transformer_sierra/target
 
@@ -49,13 +48,7 @@ cache:
     - sbt_common/config/storage/target
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
-    - sbt_common/finatra_akka/target
-    - sbt_common/finatra_controllers/target
-    - sbt_common/finatra_elasticsearch/target
-    - sbt_common/finatra_messaging/target
-    - sbt_common/finatra_monitoring/target
     - sbt_common/internal_model/target
-    - sbt_common/messaging/target
 
     - sierra_adapter/common/target
     - sierra_adapter/sierra_reader/target
@@ -108,7 +101,6 @@ jobs:
 
     - stage: sbt-common-test
       env: TASK=elasticsearch-test
-    - env: TASK=messaging-test
     - env: TASK=internal_model-test
     - env: TASK=display-test
 
@@ -142,7 +134,6 @@ jobs:
     # - env: TASK=api_docs-build
 
     # Catalogue pipeline stack
-    - env: TASK=transformer_common-test
     - env: TASK=transformer_miro-test
     - env: TASK=transformer_sierra-test
     - env: TASK=ingestor-test

@@ -1,10 +1,3 @@
-# Provider
-
-provider "aws" {
-  region  = "${var.aws_region}"
-  version = "1.42.0"
-}
-
 # Terraform
 
 terraform {
@@ -39,5 +32,3 @@ data "terraform_remote_state" "infra_critical" {
     region = "eu-west-1"
   }
 }
-
-data "aws_caller_identity" "current" {}

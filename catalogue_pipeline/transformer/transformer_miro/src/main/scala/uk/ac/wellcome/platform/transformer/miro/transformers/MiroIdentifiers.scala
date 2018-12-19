@@ -1,11 +1,10 @@
 package uk.ac.wellcome.platform.transformer.miro.transformers
 
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
-import uk.ac.wellcome.platform.transformer.miro.source.MiroTransformableData
+import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 trait MiroIdentifiers extends MiroTransformableUtils {
-  def getOtherIdentifiers(miroData: MiroTransformableData,
-                          miroId: String): List[SourceIdentifier] = {
+  def getOtherIdentifiers(miroRecord: MiroRecord): List[SourceIdentifier] = {
 
     // Add the Sierra system number from the INNOPAC ID, if it's present.
     //
@@ -20,10 +19,10 @@ trait MiroIdentifiers extends MiroTransformableUtils {
     //
     // We fix that here, for this record only, so the change is documented.
     //
-    val innopacIdField = if (miroId == "L0035411") {
-      miroData.innopacID.map { _.replaceAll("L 35411 \n\n", "") }
+    val innopacIdField = if (miroRecord.imageNumber == "L0035411") {
+      miroRecord.innopacID.map { _.replaceAll("L 35411 \n\n", "") }
     } else {
-      miroData.innopacID
+      miroRecord.innopacID
     }
 
     val sierraList: List[SourceIdentifier] = innopacIdField match {
@@ -55,7 +54,7 @@ trait MiroIdentifiers extends MiroTransformableUtils {
             }
           case _ =>
             throw new RuntimeException(
-              s"Expected 8-digit INNOPAC ID or nothing, got ${miroData.innopacID}"
+              s"Expected 8-digit INNOPAC ID or nothing, got ${miroRecord.innopacID}"
             )
         }
       }
@@ -67,8 +66,8 @@ trait MiroIdentifiers extends MiroTransformableUtils {
     // any transformation or cleaning.
     val libraryRefsList: List[SourceIdentifier] =
       zipMiroFields(
-        keys = miroData.libraryRefDepartment,
-        values = miroData.libraryRefId)
+        keys = miroRecord.libraryRefDepartment,
+        values = miroRecord.libraryRefId)
         .collect {
           case (Some(label), Some(value)) =>
             SourceIdentifier(
