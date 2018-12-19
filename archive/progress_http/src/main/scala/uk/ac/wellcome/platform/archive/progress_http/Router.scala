@@ -7,14 +7,21 @@ import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
-import akka.http.scaladsl.server.{MalformedRequestContentRejection, RejectionHandler, Route}
+import akka.http.scaladsl.server.{
+  MalformedRequestContentRejection,
+  RejectionHandler,
+  Route
+}
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import io.circe.{CursorOp, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.display.{RequestDisplayIngest, ResponseDisplayIngest}
+import uk.ac.wellcome.platform.archive.display.{
+  RequestDisplayIngest,
+  ResponseDisplayIngest
+}
 import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
 
 import scala.concurrent.ExecutionContext
@@ -57,18 +64,24 @@ class Router(
     }
   }
 
-  def rejectionHandler: RejectionHandler = RejectionHandler
-    .newBuilder()
-    .handle {
-      case MalformedRequestContentRejection(_, causes: DecodingFailures) =>
-        handleDecodingFailures(causes)
-    }
-    .result().seal
-    .mapRejectionResponse{
-      case res @ HttpResponse(statusCode, _, HttpEntity.Strict(contentType,_), _) if contentType != ContentTypes.`application/json`=>
-        transformToJsonErrorResponse(statusCode,res)
-      case x => x
-    }
+  def rejectionHandler: RejectionHandler =
+    RejectionHandler
+      .newBuilder()
+      .handle {
+        case MalformedRequestContentRejection(_, causes: DecodingFailures) =>
+          handleDecodingFailures(causes)
+      }
+      .result()
+      .seal
+      .mapRejectionResponse {
+        case res @ HttpResponse(
+              statusCode,
+              _,
+              HttpEntity.Strict(contentType, _),
+              _) if contentType != ContentTypes.`application/json` =>
+          transformToJsonErrorResponse(statusCode, res)
+        case x => x
+      }
 
   private def createLocationHeader(progress: Progress) =
     Location(s"${httpServerConfig.externalBaseURL}/${progress.id}")
@@ -104,18 +117,23 @@ class Router(
         BadRequest.reason))
   }
 
-  private def transformToJsonErrorResponse(statusCode: StatusCode, res: HttpResponse) = {
-    val errorResponseMarshallingFlow = Flow[ByteString].mapAsync(1)(data => {
-      val message = data.utf8String
-      Marshal(ErrorResponse(
-        context = contextURL.toString,
-        httpStatus = statusCode.intValue,
-        description = message,
-        label = statusCode.reason)).to[MessageEntity]
-    }).flatMapConcat(_.dataBytes)
+  private def transformToJsonErrorResponse(statusCode: StatusCode,
+                                           res: HttpResponse) = {
+    val errorResponseMarshallingFlow = Flow[ByteString]
+      .mapAsync(1)(data => {
+        val message = data.utf8String
+        Marshal(
+          ErrorResponse(
+            context = contextURL.toString,
+            httpStatus = statusCode.intValue,
+            description = message,
+            label = statusCode.reason)).to[MessageEntity]
+      })
+      .flatMapConcat(_.dataBytes)
 
     res
       .transformEntityDataBytes(errorResponseMarshallingFlow)
-      .mapEntity(entity => entity.withContentType(ContentTypes.`application/json`))
+      .mapEntity(entity =>
+        entity.withContentType(ContentTypes.`application/json`))
   }
 }

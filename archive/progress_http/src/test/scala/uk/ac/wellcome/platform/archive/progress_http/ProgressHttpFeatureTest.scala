@@ -341,8 +341,7 @@ class ProgressHttpFeatureTest
       }
     }
 
-    it(
-      "returns a json error if the body of the request is not valid JSON") {
+    it("returns a json error if the body of the request is not valid JSON") {
       withConfiguredApp {
         case (_, topic, baseUrl) =>
           withMaterializer { implicit materialiser =>
