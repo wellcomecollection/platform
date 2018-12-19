@@ -17,7 +17,6 @@ object TemporaryStore extends Logging {
   implicit class TemporaryStoreOps(location: ObjectLocation) {
     def storeTemporarily(implicit s3Client: AmazonS3): Try[File] = {
       location.toInputStream.flatMap { inputStream =>
-
         val tmpFile = File.createTempFile(
           tmpFilePrefix,
           tmpFileSuffix
@@ -32,9 +31,9 @@ object TemporaryStore extends Logging {
 
         Try(
           Iterator
-            .continually (inputStream.read)
-            .takeWhile (-1 !=)
-            .foreach (outputStream.write)
+            .continually(inputStream.read)
+            .takeWhile(-1 !=)
+            .foreach(outputStream.write)
         ).map(_ => tmpFile)
       }
     }

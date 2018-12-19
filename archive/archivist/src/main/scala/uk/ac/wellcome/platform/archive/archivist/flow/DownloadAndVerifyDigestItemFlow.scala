@@ -7,7 +7,10 @@ import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveDigestItemJob
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ChecksumNotMatchedOnDownloadError
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  DownloadError
+}
 
 import scala.util.{Failure, Success}
 
@@ -18,9 +21,9 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
   import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
-  : Flow[ArchiveDigestItemJob,
-    Either[ArchiveError[ArchiveDigestItemJob], ArchiveDigestItemJob],
-    NotUsed] = {
+    : Flow[ArchiveDigestItemJob,
+           Either[ArchiveError[ArchiveDigestItemJob], ArchiveDigestItemJob],
+           NotUsed] = {
     Flow[ArchiveDigestItemJob]
       .log("download to verify")
       .flatMapMerge(
@@ -38,7 +41,7 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
                 .via(SHA256Flow())
                 .map {
                   case calculatedChecksum
-                    if job.bagDigestItem.checksum == calculatedChecksum =>
+                      if job.bagDigestItem.checksum == calculatedChecksum =>
                     Right(job)
                   case calculatedChecksum =>
                     warn(s"Failed validating checksum in download for job $job")

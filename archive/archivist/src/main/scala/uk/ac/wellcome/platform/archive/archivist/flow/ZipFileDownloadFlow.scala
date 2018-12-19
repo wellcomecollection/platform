@@ -26,7 +26,6 @@ import scala.util.{Failure, Success}
   * original request on the Right.
   *
   */
-
 object ZipFileDownloadFlow extends Logging {
 
   import TemporaryStore._
@@ -35,9 +34,9 @@ object ZipFileDownloadFlow extends Logging {
 
   def apply(parallelism: Int, snsConfig: SNSConfig)(implicit s3Client: AmazonS3,
                                                     snsClient: AmazonSNS)
-  : Flow[IngestBagRequest,
-    Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete],
-    NotUsed] = {
+    : Flow[IngestBagRequest,
+           Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete],
+           NotUsed] = {
 
     Flow[IngestBagRequest]
       .log("download location")
@@ -65,7 +64,7 @@ object ZipFileDownloadFlow extends Logging {
       .flatMapMerge(
         parallelism,
         (result: Either[ArchiveError[IngestBagRequest],
-          ZipFileDownloadComplete]) =>
+                        ZipFileDownloadComplete]) =>
           Source
             .single(toProgressUpdate(result))
             .log("sending to progress monitor")
@@ -80,8 +79,8 @@ object ZipFileDownloadFlow extends Logging {
   }
 
   private def toProgressUpdate(
-                                result: Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete])
-  : ProgressUpdate =
+    result: Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete])
+    : ProgressUpdate =
     result match {
       case Right(ZipFileDownloadComplete(_, ingestBagRequest)) =>
         ProgressEventUpdate(
