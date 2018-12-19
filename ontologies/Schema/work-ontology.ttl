@@ -40,17 +40,17 @@ wwork:Period rdf:type owl:Class ;
 
 wwork:Concept rdf:type owl:Class ;
     rdfs:label "Concept"@en ;
-    rdfs:comment "A broad concept that forms part of a thesaurus-based classification of human knowledge."@en ;
+    rdfs:comment "A concept that forms part of a controlled vocabulary."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
 
 wwork:Genre rdf:type owl:Class ;
     rdfs:label "Genre"@en ;
-    rdfs:comment "A the genre or technique of the work."@en ;
+    rdfs:comment "A genre or technique describing a work."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
 
 wwork:Agent rdf:type owl:Class ;
     rdfs:label "Agent"@en ;
-    rdfs:comment "A person, group, event or organisation."@en ;
+    rdfs:comment "A person, group, event or organisation asscoaited with a work."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
     
 wwork:Language rdf:type owl:Class ;
