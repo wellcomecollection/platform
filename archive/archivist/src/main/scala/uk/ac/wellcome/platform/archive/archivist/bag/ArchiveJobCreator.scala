@@ -18,10 +18,10 @@ import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
   */
 object ArchiveJobCreator {
   def create(
-              file: File,
-              config: BagUploaderConfig,
-              ingestBagRequest: IngestBagRequest
-            ): Either[ArchiveError[IngestBagRequest], ArchiveJob] = {
+    file: File,
+    config: BagUploaderConfig,
+    ingestBagRequest: IngestBagRequest
+  ): Either[ArchiveError[IngestBagRequest], ArchiveJob] = {
 
     val zipFile = new ZipFile(file)
 
@@ -61,11 +61,11 @@ object ArchiveJobCreator {
     */
   private def getBagIdentifier(zipFile: ZipFile,
                                ingestBagRequest: IngestBagRequest)
-  : Either[ArchiveError[IngestBagRequest], ExternalIdentifier] = {
+    : Either[ArchiveError[IngestBagRequest], ExternalIdentifier] = {
     ZipFileReader
       .maybeInputStream(ZipLocation(zipFile, EntryPath("bag-info.txt")))
       .toRight[ArchiveError[IngestBagRequest]](
-      FileNotFoundError("bag-info.txt", ingestBagRequest))
+        FileNotFoundError("bag-info.txt", ingestBagRequest))
       .flatMap { inputStream =>
         BagInfoParser
           .parseBagInfo(ingestBagRequest, inputStream)

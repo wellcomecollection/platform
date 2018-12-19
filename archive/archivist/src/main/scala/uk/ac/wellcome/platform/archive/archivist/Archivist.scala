@@ -12,24 +12,32 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
-import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, SupervisedMaterializer}
+import uk.ac.wellcome.platform.archive.common.flows.{
+  FoldEitherFlow,
+  SupervisedMaterializer
+}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{FileDownloadComplete, IngestBagRequest, NotificationMessage, Parallelism}
+import uk.ac.wellcome.platform.archive.common.models.{
+  FileDownloadComplete,
+  IngestBagRequest,
+  NotificationMessage,
+  Parallelism
+}
 
 import scala.concurrent.Future
 
 class Archivist(
-                 messageStream: MessageStream[NotificationMessage, Unit],
-                 bagUploaderConfig: BagUploaderConfig,
-                 snsRegistrarConfig: SNSConfig,
-                 snsProgressConfig: SNSConfig
-               )(
-                 implicit val actorSystem: ActorSystem,
-                 s3Client: AmazonS3,
-                 snsClient: AmazonSNS,
-               ) extends Logging
-  with Runnable {
+  messageStream: MessageStream[NotificationMessage, Unit],
+  bagUploaderConfig: BagUploaderConfig,
+  snsRegistrarConfig: SNSConfig,
+  snsProgressConfig: SNSConfig
+)(
+  implicit val actorSystem: ActorSystem,
+  s3Client: AmazonS3,
+  snsClient: AmazonSNS,
+) extends Logging
+    with Runnable {
 
   type IngestError = ArchiveError[IngestBagRequest]
 

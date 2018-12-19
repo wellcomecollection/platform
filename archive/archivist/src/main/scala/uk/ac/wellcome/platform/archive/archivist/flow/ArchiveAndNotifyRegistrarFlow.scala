@@ -6,12 +6,17 @@ import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, FileDownloadComplete, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  FileDownloadComplete,
+  IngestBagRequest
+}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 object ArchiveAndNotifyRegistrarFlow {
 
-  type BagDownload = Either[ArchiveError[IngestBagRequest], FileDownloadComplete]
+  type BagDownload =
+    Either[ArchiveError[IngestBagRequest], FileDownloadComplete]
 
   def apply(bagUploaderConfig: BagUploaderConfig,
             snsProgressConfig: SNSConfig,

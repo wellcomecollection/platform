@@ -11,6 +11,7 @@ object SupervisedMaterializer extends Logging {
   }
 
   def resumable(implicit actorSystem: ActorSystem) = ActorMaterializer(
-    ActorMaterializerSettings(actorSystem).withSupervisionStrategy(resumeDecider)
+    ActorMaterializerSettings(actorSystem).withSupervisionStrategy(
+      resumeDecider)
   )
 }

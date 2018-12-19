@@ -41,8 +41,10 @@ case class FileNotFoundError[T](path: String, t: T) extends ArchiveError[T] {
   override def toString = s"Failed reading file $path from zip file"
 }
 
-case class ZipFileReadError[T](exception: Throwable, t: T) extends ArchiveError[T] {
-  override def toString = s"There was an exception while reading from zip file: ${exception.getMessage}"
+case class ZipFileReadError[T](exception: Throwable, t: T)
+    extends ArchiveError[T] {
+  override def toString =
+    s"There was an exception while reading from zip file: ${exception.getMessage}"
 }
 
 case class ArchiveJobError(t: ArchiveJob,

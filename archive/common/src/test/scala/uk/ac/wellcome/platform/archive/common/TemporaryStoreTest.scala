@@ -8,10 +8,7 @@ import uk.ac.wellcome.storage.fixtures.S3
 import scala.io.Source
 import scala.util.{Failure, Success}
 
-class TemporaryStoreTest
-  extends FunSpec
-    with S3
-    with RandomThings {
+class TemporaryStoreTest extends FunSpec with S3 with RandomThings {
 
   import uk.ac.wellcome.platform.archive.common.TemporaryStore._
 
@@ -40,7 +37,8 @@ class TemporaryStoreTest
       it("returns a Failure[_]") {
         val key = randomAlphanumeric()
 
-        val testTempFile = ObjectLocation("invalid_bucket", key).downloadTempFile
+        val testTempFile =
+          ObjectLocation("invalid_bucket", key).downloadTempFile
 
         testTempFile shouldBe a[Failure[_]]
       }

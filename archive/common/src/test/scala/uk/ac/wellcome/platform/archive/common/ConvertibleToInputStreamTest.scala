@@ -7,10 +7,7 @@ import uk.ac.wellcome.storage.fixtures.S3
 
 import scala.util.{Failure, Success}
 
-class ConvertibleToInputStreamTest
-  extends FunSpec
-  with S3
-  with RandomThings {
+class ConvertibleToInputStreamTest extends FunSpec with S3 with RandomThings {
 
   implicit val implicitS3Client = s3Client
 
@@ -18,8 +15,8 @@ class ConvertibleToInputStreamTest
 
   describe("converts to a Try[InputStream]") {
     it("produces a failure from an invalid ObjectLocation") {
-        ObjectLocation("invalid_bucket", "invalid.key")
-          .toInputStream shouldBe a[Failure[_]]
+      ObjectLocation("invalid_bucket", "invalid.key").toInputStream shouldBe a[
+        Failure[_]]
     }
 
     it("produces a success from an valid ObjectLocation") {
@@ -33,9 +30,11 @@ class ConvertibleToInputStreamTest
 
         testInputStream shouldBe a[Success[_]]
 
-        scala.io.Source.fromInputStream(
-          testInputStream.get
-        ).mkString shouldEqual content
+        scala.io.Source
+          .fromInputStream(
+            testInputStream.get
+          )
+          .mkString shouldEqual content
       }
     }
   }

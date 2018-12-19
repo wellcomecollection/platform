@@ -62,25 +62,22 @@ class ArchivistFeatureTest
                 registrarTopic
               )
 
-              assertTopicReceivesProgressEventUpdate(
-                request.id,
-                progressTopic) { events =>
-                events should have size 1
-                events.head.description shouldBe s"Started work on ingest: ${request.id}"
+              assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
+                events =>
+                  events should have size 1
+                  events.head.description shouldBe s"Started work on ingest: ${request.id}"
               }
 
-              assertTopicReceivesProgressEventUpdate(
-                request.id,
-                progressTopic) { events =>
-                events should have size 1
-                events.head.description shouldBe "Source bag downloaded successfully"
+              assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
+                events =>
+                  events should have size 1
+                  events.head.description shouldBe "Source bag downloaded successfully"
               }
 
-              assertTopicReceivesProgressEventUpdate(
-                request.id,
-                progressTopic) { events =>
-                events should have size 1
-                events.head.description shouldBe "Bag uploaded and verified successfully"
+              assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
+                events =>
+                  events should have size 1
+                  events.head.description shouldBe "Bag uploaded and verified successfully"
               }
 
             }
