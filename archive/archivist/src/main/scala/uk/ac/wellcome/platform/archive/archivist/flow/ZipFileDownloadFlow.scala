@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import java.io.{File, InputStream}
+import java.io.File
 import java.util.zip.ZipFile
 
 import akka.NotUsed
@@ -29,15 +29,16 @@ import scala.util.{Failure, Success}
   */
 
 object ZipFileDownloadFlow extends Logging {
+
   import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   def apply(parallelism: Int, snsConfig: SNSConfig)(implicit s3Client: AmazonS3,
                                                     snsClient: AmazonSNS)
-    : Flow[IngestBagRequest,
-           Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete],
-           NotUsed] = {
+  : Flow[IngestBagRequest,
+    Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete],
+    NotUsed] = {
 
     Flow[IngestBagRequest]
       .log("download location")
@@ -77,7 +78,7 @@ object ZipFileDownloadFlow extends Logging {
       .flatMapMerge(
         parallelism,
         (result: Either[ArchiveError[IngestBagRequest],
-                        ZipFileDownloadComplete]) =>
+          ZipFileDownloadComplete]) =>
           Source
             .single(toProgressUpdate(result))
             .log("sending to progress monitor")
@@ -92,8 +93,8 @@ object ZipFileDownloadFlow extends Logging {
   }
 
   private def toProgressUpdate(
-    result: Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete])
-    : ProgressUpdate =
+                                result: Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete])
+  : ProgressUpdate =
     result match {
       case Right(ZipFileDownloadComplete(_, ingestBagRequest)) =>
         ProgressEventUpdate(
