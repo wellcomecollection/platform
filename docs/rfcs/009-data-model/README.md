@@ -25,7 +25,7 @@ This enables us to:
 * Identify the scope of the model to describe the domain.
 * Design a consistent representation of the core bibliographic properties. For example bridging MARC and ISAD(g).
 
-A csv file documents the list of properties identified in the domain modeling sessions. It also provides a summary of how this maps on MARC fields and whether it has been implmented yet.
+A csv file documents the list of properties identified in the domain modeling sessions. It also provides a summary of how this maps on to MARC fields and whether it has been implmented yet.
 * (https://github.com/wellcometrust/platform/raw/master/ontologies/WIP/list-of-transformation-tasks.csv)
 
 Reference data:
