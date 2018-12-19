@@ -12,14 +12,11 @@ import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
-import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
+import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, ZipFileDownloadComplete}
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
 
 import scala.concurrent.Future
 
