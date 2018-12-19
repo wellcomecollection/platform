@@ -342,6 +342,88 @@ class ProgressHttpFeatureTest
     }
 
     it(
+      "returns a json error if the body of the request is not valid JSON") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`application/json`,
+              """hgjh""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.BadRequest
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+                actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
+                  400,
+                  "expected json value got h (line 1, column 1)",
+                  "Bad Request",
+                  "Error"
+                )
+                assertSnsReceivesNothing(topic)
+              }
+            }
+          }
+      }
+    }
+
+    it(
+      "returns a json error if the content type of the request is not an accepted type") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`text/plain(UTF-8)`,
+              """hgjh""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.UnsupportedMediaType
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+                actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
+                  415,
+                  "expected json value got h (line 1, column 1)",
+                  "Unsupported Media Type",
+                  "Error"
+                )
+                assertSnsReceivesNothing(topic)
+              }
+            }
+          }
+      }
+    }
+
+    it(
       "returns a json error if the ingest request doesn't have a sourceLocation and it doesn't have an ingestType") {
       withConfiguredApp {
         case (_, topic, baseUrl) =>

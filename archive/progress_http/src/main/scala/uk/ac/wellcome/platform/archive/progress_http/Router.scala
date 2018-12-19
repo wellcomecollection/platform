@@ -5,19 +5,12 @@ import java.util.UUID
 
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
-import akka.http.scaladsl.server.{
-  MalformedRequestContentRejection,
-  RejectionHandler,
-  Route
-}
-import io.circe.{CursorOp, Printer}
+import akka.http.scaladsl.server.{MalformedRequestContentRejection, Rejection, RejectionHandler, Route}
+import io.circe.{CursorOp, ParsingFailure, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.display.{
-  RequestDisplayIngest,
-  ResponseDisplayIngest
-}
+import uk.ac.wellcome.platform.archive.display.{RequestDisplayIngest, ResponseDisplayIngest}
 import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
 
 class Router(
@@ -64,6 +57,13 @@ class Router(
             contextURL.toString,
             BadRequest.intValue,
             message.toList.mkString("\n"),
+            BadRequest.reason))
+      case MalformedRequestContentRejection(_, cause: ParsingFailure) =>
+        complete(
+          BadRequest -> ErrorResponse(
+            contextURL.toString,
+            BadRequest.intValue,
+            cause.message,
             BadRequest.reason))
     }
     .result()
