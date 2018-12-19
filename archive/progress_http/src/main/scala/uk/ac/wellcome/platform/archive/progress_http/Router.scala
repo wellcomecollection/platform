@@ -3,22 +3,28 @@ package uk.ac.wellcome.platform.archive.progress_http
 import java.net.URL
 import java.util.UUID
 
+import akka.http.scaladsl.marshalling.Marshal
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
-import akka.http.scaladsl.server.{MalformedRequestContentRejection, Rejection, RejectionHandler, Route}
-import io.circe.{CursorOp, ParsingFailure, Printer}
+import akka.http.scaladsl.server.{MalformedRequestContentRejection, RejectionHandler, Route}
+import akka.stream.scaladsl.Flow
+import akka.util.ByteString
+import io.circe.{CursorOp, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.display.{RequestDisplayIngest, ResponseDisplayIngest}
 import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
 
+import scala.concurrent.ExecutionContext
+
 class Router(
   monitor: ProgressTracker,
   progressStarter: ProgressStarter,
   httpServerConfig: HTTPServerConfig,
   contextURL: URL
-) {
+)(implicit ec: ExecutionContext) {
 
   import akka.http.scaladsl.server.Directives._
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
@@ -58,15 +64,26 @@ class Router(
             BadRequest.intValue,
             message.toList.mkString("\n"),
             BadRequest.reason))
-      case MalformedRequestContentRejection(_, cause: ParsingFailure) =>
-        complete(
-          BadRequest -> ErrorResponse(
-            contextURL.toString,
-            BadRequest.intValue,
-            cause.message,
-            BadRequest.reason))
     }
-    .result()
+    .result().seal
+    .mapRejectionResponse{
+      case res @ HttpResponse(statusCode, _, HttpEntity.Strict(contentType,_), _) if contentType != ContentTypes.`application/json`=>
+
+        val errorResponseMarshallingFlow = Flow[ByteString].mapAsync(1)(data => {
+          val message = data.utf8String
+          Marshal(ErrorResponse(
+            context = contextURL.toString,
+            httpStatus = statusCode.intValue,
+            description = message,
+            label = statusCode.reason)).to[MessageEntity]
+        }).flatMapConcat(_.dataBytes)
+
+        res
+          .transformEntityDataBytes(errorResponseMarshallingFlow)
+          .mapEntity(entity => entity.withContentType(ContentTypes.`application/json`))
+
+      case x => x
+  }
 
   private def createLocationHeader(progress: Progress) =
     Location(s"${httpServerConfig.externalBaseURL}/${progress.id}")

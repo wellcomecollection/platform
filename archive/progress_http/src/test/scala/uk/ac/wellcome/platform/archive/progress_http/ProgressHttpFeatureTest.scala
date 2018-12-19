@@ -371,7 +371,7 @@ class ProgressHttpFeatureTest
                 actualError shouldBe ErrorResponse(
                   "http://api.wellcomecollection.org/storage/v1/context.json",
                   400,
-                  "expected json value got h (line 1, column 1)",
+                  "The request content was malformed:\nexpected json value got h (line 1, column 1)",
                   "Bad Request",
                   "Error"
                 )
@@ -404,7 +404,7 @@ class ProgressHttpFeatureTest
             whenRequestReady(request) { response: HttpResponse =>
               response.status shouldBe StatusCodes.UnsupportedMediaType
               response.entity.contentType shouldBe ContentTypes.`application/json`
-
+              println(response)
               val progressFuture =
                 Unmarshal(response.entity).to[ErrorResponse]
 
@@ -412,7 +412,7 @@ class ProgressHttpFeatureTest
                 actualError shouldBe ErrorResponse(
                   "http://api.wellcomecollection.org/storage/v1/context.json",
                   415,
-                  "expected json value got h (line 1, column 1)",
+                  "The request's Content-Type is not supported. Expected:\napplication/json",
                   "Unsupported Media Type",
                   "Error"
                 )
