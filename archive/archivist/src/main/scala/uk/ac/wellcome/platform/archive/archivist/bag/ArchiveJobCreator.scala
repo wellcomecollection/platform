@@ -1,4 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.bag
+
+import java.io.File
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
@@ -16,10 +18,12 @@ import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
   */
 object ArchiveJobCreator {
   def create(
-    zipFile: ZipFile,
-    config: BagUploaderConfig,
-    ingestBagRequest: IngestBagRequest
-  ): Either[ArchiveError[IngestBagRequest], ArchiveJob] = {
+              file: File,
+              config: BagUploaderConfig,
+              ingestBagRequest: IngestBagRequest
+            ): Either[ArchiveError[IngestBagRequest], ArchiveJob] = {
+
+    val zipFile = new ZipFile(file)
 
     getBagIdentifier(zipFile, ingestBagRequest)
       .map { externalIdentifier =>
@@ -42,9 +46,9 @@ object ArchiveJobCreator {
   /** The ZIP files contain a "bag-info.txt" metadata file, with
     * lines of the form:
     *
-    *     Bagging-Date: 2018-08-24
-    *     Contact-Name: Henry Wellcome
-    *     External-Identifier: 1234
+    * Bagging-Date: 2018-08-24
+    * Contact-Name: Henry Wellcome
+    * External-Identifier: 1234
     *
     * This method extracts the "External-Identifier" field from this metadata,
     * if present.
@@ -57,11 +61,11 @@ object ArchiveJobCreator {
     */
   private def getBagIdentifier(zipFile: ZipFile,
                                ingestBagRequest: IngestBagRequest)
-    : Either[ArchiveError[IngestBagRequest], ExternalIdentifier] = {
+  : Either[ArchiveError[IngestBagRequest], ExternalIdentifier] = {
     ZipFileReader
       .maybeInputStream(ZipLocation(zipFile, EntryPath("bag-info.txt")))
       .toRight[ArchiveError[IngestBagRequest]](
-        FileNotFoundError("bag-info.txt", ingestBagRequest))
+      FileNotFoundError("bag-info.txt", ingestBagRequest))
       .flatMap { inputStream =>
         BagInfoParser
           .parseBagInfo(ingestBagRequest, inputStream)

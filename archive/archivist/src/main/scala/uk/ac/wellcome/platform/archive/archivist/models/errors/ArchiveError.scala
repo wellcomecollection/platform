@@ -4,7 +4,6 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveItemJob,
   ArchiveJob
 }
-import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -42,6 +41,10 @@ case class FileNotFoundError[T](path: String, t: T) extends ArchiveError[T] {
   override def toString = s"Failed reading file $path from zip file"
 }
 
+case class ZipFileReadError[T](exception: Throwable, t: T) extends ArchiveError[T] {
+  override def toString = s"There was an exception while reading from zip file: ${exception.getMessage}"
+}
+
 case class ArchiveJobError(t: ArchiveJob,
                            errors: List[ArchiveError[ArchiveDigestItemJob]])
     extends ArchiveError[ArchiveJob]
@@ -49,9 +52,3 @@ case class ArchiveJobError(t: ArchiveJob,
 case class ArchiveItemJobError(t: ArchiveJob,
                                errors: List[ArchiveError[ArchiveItemJob]])
     extends ArchiveError[ArchiveJob]
-
-case class ZipFileDownloadingError(t: IngestBagRequest, exception: Throwable)
-    extends ArchiveError[IngestBagRequest] {
-  override def toString =
-    s"Failed downloading zipFile ${t.zippedBagLocation.namespace}/${t.zippedBagLocation.key}: ${exception.getMessage}"
-}

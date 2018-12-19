@@ -11,49 +11,38 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
+import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  BagUploaderConfig
-}
-import uk.ac.wellcome.platform.archive.common.flows.{
-  FoldEitherFlow,
-  OnErrorFlow
-}
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  IngestBagRequest
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, FileDownloadComplete, IngestBagRequest, Parallelism}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object ArchiveZipFileFlow extends Logging {
 
+  type ArchiveBagJob = Either[ArchiveError[_], ArchiveComplete]
+  type BagDownload = Either[ArchiveError[IngestBagRequest], FileDownloadComplete]
+
   def apply(config: BagUploaderConfig, snsConfig: SNSConfig)(
     implicit s3Client: AmazonS3,
-    snsClient: AmazonSNS
-  ): Flow[ZipFileDownloadComplete,
-          Either[ArchiveError[_], ArchiveComplete],
-          NotUsed] =
-    Flow[ZipFileDownloadComplete].flatMapMerge(
-      config.parallelism, {
-        case ZipFileDownloadComplete(zipFile, ingestRequest) =>
+    snsClient: AmazonSNS,
+    parallelism: Parallelism
+  ): Flow[BagDownload, ArchiveBagJob, NotUsed] =
+    Flow[BagDownload].flatMapMerge(
+      parallelism.value, {
+        case Left(error) => Source.single(Left(error))
+        case Right(FileDownloadComplete(file, ingestRequest)) =>
+
+          val archiveJobFlow = ArchiveJobFlow(
+            delimiter = config.bagItConfig.digestDelimiterRegexp,
+            ingestBagRequest = ingestRequest
+          )
+
           Source
-            .single(zipFile)
-            .log("creating archive job")
+            .single(file)
             .map(ArchiveJobCreator.create(_, config, ingestRequest))
-            .via(
-              FoldEitherFlow[
-                ArchiveError[IngestBagRequest],
-                ArchiveJob,
-                Either[ArchiveError[_], ArchiveComplete]
-              ](ifLeft = OnErrorFlow())(
-                ifRight = ArchiveJobFlow(
-                  delimiter = config.bagItConfig.digestDelimiterRegexp,
-                  parallelism = config.parallelism,
-                  ingestBagRequest = ingestRequest)))
-            .map(deleteZipFile(_, zipFile))
+            .via(archiveJobFlow)
+            .map(deleteZipFile(_, new ZipFile(file)))
             .flatMapMerge(
               config.parallelism,
               (result: Either[ArchiveError[_], ArchiveComplete]) =>
@@ -67,20 +56,21 @@ object ArchiveZipFileFlow extends Logging {
                       subject = "archivist_progress"))
                   .map(_ => result)
             )
+
       }
     )
 
   private def deleteZipFile(
-    passContext: Either[ArchiveError[_], ArchiveComplete],
-    zipFile: ZipFile) = {
+                             passContext: Either[ArchiveError[_], ArchiveComplete],
+                             zipFile: ZipFile) = {
     debug(s"Deleting zipfile ${zipFile.getName}")
     new File(zipFile.getName).delete()
     passContext
   }
 
   private def toProgressUpdate(
-    result: Either[ArchiveError[_], ArchiveComplete],
-    ingestBagRequest: IngestBagRequest): ProgressUpdate =
+                                result: Either[ArchiveError[_], ArchiveComplete],
+                                ingestBagRequest: IngestBagRequest): ProgressUpdate =
     result match {
       case Right(ArchiveComplete(id, _, _)) =>
         ProgressEventUpdate(
@@ -88,13 +78,13 @@ object ArchiveZipFileFlow extends Logging {
           List(ProgressEvent("Bag uploaded and verified successfully")))
       case Left(ArchiveJobError(_, errors)) =>
         ProgressStatusUpdate(
-          ingestBagRequest.archiveRequestId,
+          ingestBagRequest.id,
           Progress.Failed,
           None,
           errors.map(error => ProgressEvent(error.toString)))
       case Left(archiveError) =>
         ProgressStatusUpdate(
-          ingestBagRequest.archiveRequestId,
+          ingestBagRequest.id,
           Progress.Failed,
           None,
           List(ProgressEvent(archiveError.toString)))

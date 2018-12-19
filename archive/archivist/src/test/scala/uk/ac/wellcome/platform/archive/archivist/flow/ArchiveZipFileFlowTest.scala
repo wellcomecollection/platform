@@ -67,7 +67,7 @@ class ArchiveZipFileFlowTest
               whenReady(verification) { result =>
                 listKeysInBucket(storageBucket) should have size 5
                 result shouldBe List(Right(ArchiveComplete(
-                  ingestContext.archiveRequestId,
+                  ingestContext.id,
                   ingestContext.storageSpace,
                   BagLocation(
                     storageBucket.name,
@@ -77,7 +77,7 @@ class ArchiveZipFileFlowTest
                 )))
 
                 assertTopicReceivesProgressEventUpdate(
-                  ingestContext.archiveRequestId,
+                  ingestContext.id,
                   reportingTopic) { events =>
                   inside(events) {
                     case List(event) =>
@@ -116,7 +116,7 @@ class ArchiveZipFileFlowTest
                 }
 
                 assertTopicReceivesProgressStatusUpdate(
-                  ingestContext.archiveRequestId,
+                  ingestContext.id,
                   reportingTopic,
                   Progress.Failed) { events =>
                   events should have size (zipFile
@@ -153,7 +153,7 @@ class ArchiveZipFileFlowTest
                   Left(FileNotFoundError("bag-info.txt", ingestContext)))
 
                 assertTopicReceivesProgressStatusUpdate(
-                  ingestContext.archiveRequestId,
+                  ingestContext.id,
                   reportingTopic,
                   Progress.Failed) { events =>
                   inside(events) {
@@ -207,7 +207,7 @@ class ArchiveZipFileFlowTest
                     }
 
                     assertTopicReceivesProgressStatusUpdate(
-                      ingestContext.archiveRequestId,
+                      ingestContext.id,
                       reportingTopic,
                       Progress.Failed) { events =>
                       inside(events) {

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.archivist.utils
+package uk.ac.wellcome.platform.archive.common
 
 import org.scalatest.FunSpec
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
@@ -13,7 +13,7 @@ class TemporaryStoreTest
     with S3
     with RandomThings {
 
-  import TemporaryStore._
+  import uk.ac.wellcome.platform.archive.common.TemporaryStore._
 
   implicit val implicitS3Client = s3Client
 

@@ -11,7 +11,7 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
-import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadingError
+import uk.ac.wellcome.platform.archive.archivist.models.errors.FileDownloadingError
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
@@ -93,12 +93,12 @@ class ZipFileDownloadFlowTest
 
           whenReady(download) { result =>
             inside(result.toList) {
-              case List(Left(ZipFileDownloadingError(actualBagRequest, _))) =>
+              case List(Left(FileDownloadingError(actualBagRequest, _))) =>
                 actualBagRequest shouldBe ingestBagRequest
             }
 
             assertTopicReceivesProgressStatusUpdate(
-              ingestBagRequest.archiveRequestId,
+              ingestBagRequest.id,
               progressTopic,
               Progress.Failed) { events =>
               events should have size 1

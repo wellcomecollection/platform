@@ -2,9 +2,8 @@ package uk.ac.wellcome.platform.archive.archivist
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
+import akka.event.Logging
 import akka.stream.scaladsl.Flow
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
@@ -12,68 +11,60 @@ import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.flow._
-import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, ZipFileDownloadComplete}
-import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
+import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
+import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, SupervisedMaterializer}
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{FileDownloadComplete, IngestBagRequest, NotificationMessage, Parallelism}
 
 import scala.concurrent.Future
 
 class Archivist(
-  s3Client: AmazonS3,
-  snsClient: AmazonSNS,
-  messageStream: MessageStream[NotificationMessage, Unit],
-  bagUploaderConfig: BagUploaderConfig,
-  snsRegistrarConfig: SNSConfig,
-  snsProgressConfig: SNSConfig
-)(implicit val actorSystem: ActorSystem)
-    extends Logging
-    with Runnable {
+                 messageStream: MessageStream[NotificationMessage, Unit],
+                 bagUploaderConfig: BagUploaderConfig,
+                 snsRegistrarConfig: SNSConfig,
+                 snsProgressConfig: SNSConfig
+               )(
+                 implicit val actorSystem: ActorSystem,
+                 s3Client: AmazonS3,
+                 snsClient: AmazonSNS,
+               ) extends Logging
+  with Runnable {
+
+  type IngestError = ArchiveError[IngestBagRequest]
 
   def run(): Future[Done] = {
-    implicit val adapter: LoggingAdapter =
-      Logging(actorSystem.eventStream, "customLogger")
-
-    val decider: Supervision.Decider = { e =>
-      {
-        error("Stream failure", e)
-        Supervision.Resume
-      }
-    }
-
-    implicit val materializer: ActorMaterializer = ActorMaterializer(
-      ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider)
-    )
+    implicit val adapter = Logging(actorSystem.eventStream, "custom")
+    implicit val parallelism = Parallelism(bagUploaderConfig.parallelism)
+    implicit val materializer = SupervisedMaterializer.resumable
 
     debug(s"registrar topic: $snsRegistrarConfig")
     debug(s"progress topic: $snsProgressConfig")
 
+    val notificationMessageFlow = NotificationMessageFlow(snsProgressConfig)
+    val zipFileDownloadFlow = ZipFileDownloadFlow(snsProgressConfig)
+
+    val unitFlow = Flow[ArchiveError[IngestBagRequest]].map(_ => ())
+
+    val archiveAndNotifyFlow = ArchiveAndNotifyRegistrarFlow(
+      bagUploaderConfig,
+      snsProgressConfig,
+      snsRegistrarConfig
+    )
+
+    val errorOrSucceedFlow =
+      FoldEitherFlow[IngestError, FileDownloadComplete, Unit](
+        ifLeft = unitFlow
+      )(
+        ifRight = archiveAndNotifyFlow
+      )
+
     val workFlow =
       Flow[NotificationMessage]
-        .log("notification message")
-        .via(
-          NotificationMessageFlow(
-            parallelism = bagUploaderConfig.parallelism,
-            snsClient = snsClient,
-            progressSnsConfig = snsProgressConfig
-          )
-        )
-        .log("download zip")
-        .via(ZipFileDownloadFlow(
-          bagUploaderConfig.parallelism,
-          snsProgressConfig)(s3Client, snsClient))
-        .log("archiving zip")
-        .via(
-          FoldEitherFlow[
-            ArchiveError[IngestBagRequest],
-            ZipFileDownloadComplete,
-            Unit
-          ](ifLeft = Flow[ArchiveError[IngestBagRequest]].map(_ => ()))(
-            ifRight = ArchiveAndNotifyRegistrarFlow(
-              bagUploaderConfig,
-              snsProgressConfig,
-              snsRegistrarConfig)(s3Client, snsClient)))
+        .via(notificationMessageFlow)
+        .via(zipFileDownloadFlow)
+        .via(archiveAndNotifyFlow)
+        .via(errorOrSucceedFlow)
 
     messageStream.run("archivist", workFlow)
   }

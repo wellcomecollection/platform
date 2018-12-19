@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import java.util.zip.ZipFile
-
 import akka.NotUsed
 import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, Source}
@@ -10,11 +8,8 @@ import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.platform.archive.archivist.models.ZipFileDownloadComplete
-import uk.ac.wellcome.platform.archive.archivist.models.errors.ZipFileDownloadingError
-import uk.ac.wellcome.platform.archive.archivist.utils.TemporaryStore
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
-import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
+import uk.ac.wellcome.platform.archive.common.models.{FileDownloadComplete, IngestBagRequest, Parallelism}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
@@ -28,15 +23,18 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object ZipFileDownloadFlow extends Logging {
 
-  import TemporaryStore._
+  type BagDownload = Either[ArchiveError[IngestBagRequest], FileDownloadComplete]
 
-  import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
+  def apply(snsConfig: SNSConfig)(
+    implicit s3Client: AmazonS3,
+    snsClient: AmazonSNS,
+    parallelism: Parallelism
+  )
+  : Flow[IngestBagRequest, BagDownload, NotUsed] = {
 
-  def apply(parallelism: Int, snsConfig: SNSConfig)(implicit s3Client: AmazonS3,
-                                                    snsClient: AmazonSNS)
-  : Flow[IngestBagRequest,
-    Either[ArchiveError[IngestBagRequest], ZipFileDownloadComplete],
-    NotUsed] = {
+    val materializerType = "akka.stream.materializer.blocking-io-dispatcher"
+    val actorAttributes = ActorAttributes.dispatcher(materializerType)
+    val downloadSuccessMessage = "Ingest bag file downloaded successfully."
 
     val snsPublishFlow = SnsPublishFlow[ProgressUpdate](
       snsClient,
@@ -46,31 +44,19 @@ object ZipFileDownloadFlow extends Logging {
 
     Flow[IngestBagRequest]
       .flatMapMerge(
-        parallelism, {
-          case request @ IngestBagRequest(_, location: ObjectLocation, _, _) =>
-            location.toInputStream match {
-              case Failure(ex) =>
-                warn(s"Failed downloading zipFile from $location with $ex")
-                Source.single(Left(ZipFileDownloadingError(request, ex)))
-              case Success(tmpFile) =>
-                Source.single(
-                  Right(
-                    ZipFileDownloadComplete(
-                      zipFile = new ZipFile(tmpFile),
-                      ingestBagRequest = request
-                    ))
-                )
-              )
+        parallelism.value, { request =>
+            val ingestJob = request.toIngestBagJob
+
+            val updates = ingestJob.bagDownload.fold(
+              error => ProgressUpdate.failed(request.id, error.exception),
+              _ => ProgressUpdate.event(request.id, downloadSuccessMessage)
             )
 
             Source
               .single(updates)
               .via(snsPublishFlow)
-              .map(_ => results)
-              .withAttributes(ActorAttributes.dispatcher(
-                "akka.stream.materializer.blocking-io-dispatcher")
-              )
-
+              .map(_ => ingestJob.bagDownload)
+              .withAttributes(actorAttributes)
         }
       )
   }
