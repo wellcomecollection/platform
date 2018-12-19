@@ -94,3 +94,5 @@ variable "bagger_dds_asset_prefix" {}
 
 variable "cognito_storage_api_identifier" {}
 variable "cognito_user_pool_arn" {}
+
+variable "alarm_topic_arn" {}
