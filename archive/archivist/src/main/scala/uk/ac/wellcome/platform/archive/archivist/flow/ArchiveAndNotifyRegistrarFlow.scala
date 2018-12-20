@@ -4,6 +4,7 @@ import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
@@ -14,16 +15,27 @@ object ArchiveAndNotifyRegistrarFlow {
             snsProgressConfig: SNSConfig,
             snsRegistrarConfig: SNSConfig)(
     implicit s3: AmazonS3,
-    snsClient: AmazonSNS): Flow[ZipFileDownloadComplete, Unit, NotUsed] = {
+    snsClient: AmazonSNS
+  ): Flow[BagDownload, Unit, NotUsed] = {
+
+    val registrarNotifierFlow = RegistrarNotifierFlow(
+      snsRegistrarConfig,
+      snsProgressConfig
+    ).map(_ => ())
+
+    val unitFlow = Flow[ArchiveError[_]].map(_ => ())
+
     ArchiveZipFileFlow(bagUploaderConfig, snsProgressConfig)
-      .log("archive verified")
       .via(
         FoldEitherFlow[
           ArchiveError[_],
           ArchiveComplete,
           Unit
-        ](ifLeft = Flow[ArchiveError[_]].map(_ => ()))(ifRight =
-          RegistrarNotifierFlow(snsRegistrarConfig, snsProgressConfig).map(_ =>
-            ())))
+        ](
+          ifLeft = unitFlow
+        )(
+          ifRight = registrarNotifierFlow
+        )
+      )
   }
 }

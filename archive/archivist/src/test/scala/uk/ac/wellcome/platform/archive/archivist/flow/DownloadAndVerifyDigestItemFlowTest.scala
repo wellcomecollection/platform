@@ -31,12 +31,12 @@ class DownloadAndVerifyDigestItemFlowTest
   it("passes through a correct right archive item job") {
     withLocalS3Bucket { bucket =>
       withMaterializer { implicit materializer =>
-        withZipFile(List()) { zipFile =>
+        withZipFile(List()) { file =>
           val fileContent = "bah buh bih beh"
           val fileName = "key.txt"
 
           val archiveItemJob = createArchiveDigestItemJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket,
             digest = sha256(fileContent),
             s3Key = fileName
@@ -61,13 +61,13 @@ class DownloadAndVerifyDigestItemFlowTest
   it("outputs a left of archive item job if the checksum doesn't match") {
     withLocalS3Bucket { bucket =>
       withMaterializer { implicit materializer =>
-        withZipFile(List()) { zipFile =>
+        withZipFile(List()) { file =>
           val fileContent = "bah buh bih beh"
           val digest = "bad-digest"
           val fileName = "key.txt"
 
           val archiveItemJob = createArchiveDigestItemJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket,
             digest = digest,
             s3Key = fileName
@@ -98,9 +98,9 @@ class DownloadAndVerifyDigestItemFlowTest
   it("returns a left of archive item job if the file does not exist") {
     withMaterializer { implicit materializer =>
       withLocalS3Bucket { bucket =>
-        withZipFile(List()) { zipFile =>
+        withZipFile(List()) { file =>
           val archiveItemJob = createArchiveDigestItemJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket
           )
           val source = Source.single(archiveItemJob)

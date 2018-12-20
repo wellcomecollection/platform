@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist
 
-import java.util.zip.ZipFile
+import java.io.File
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
@@ -14,10 +14,10 @@ class TroubleshootArchivistLocalBagFileTest
     with MetricsSenderFixture {
 
   ignore("downloads, uploads and verifies a known BagIt bag") {
-    withArchivist {
+    withArchivist() {
       case (ingestBucket, storageBucket, queuePair, _, _) =>
         sendBag(
-          new ZipFile(
+          new File(
             List(
               System.getProperty("user.home"),
               "git/platform",
