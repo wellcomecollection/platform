@@ -12,20 +12,11 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  BagUploaderConfig
-}
-import uk.ac.wellcome.platform.archive.common.flows.{
-  FoldEitherFlow,
-  OnErrorFlow
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagUploaderConfig, ZipFileDownloadComplete}
+import uk.ac.wellcome.platform.archive.common.flows.{FoldEitherFlow, OnErrorFlow}
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  IngestBagRequest
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, IngestBagRequest}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object ArchiveZipFileFlow extends Logging {
@@ -38,6 +29,8 @@ object ArchiveZipFileFlow extends Logging {
           NotUsed] =
     Flow[ZipFileDownloadComplete].flatMapMerge(
       config.parallelism, {
+
+
         case ZipFileDownloadComplete(zipFile, ingestRequest) =>
           Source
             .single(zipFile)
@@ -88,13 +81,13 @@ object ArchiveZipFileFlow extends Logging {
           List(ProgressEvent("Bag uploaded and verified successfully")))
       case Left(ArchiveJobError(_, errors)) =>
         ProgressStatusUpdate(
-          ingestBagRequest.archiveRequestId,
+          ingestBagRequest.id,
           Progress.Failed,
           None,
           errors.map(error => ProgressEvent(error.toString)))
       case Left(archiveError) =>
         ProgressStatusUpdate(
-          ingestBagRequest.archiveRequestId,
+          ingestBagRequest.id,
           Progress.Failed,
           None,
           List(ProgressEvent(archiveError.toString)))

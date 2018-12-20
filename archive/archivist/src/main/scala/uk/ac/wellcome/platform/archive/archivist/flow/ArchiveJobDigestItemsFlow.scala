@@ -70,7 +70,7 @@ object ArchiveJobDigestItemsFlow extends Logging {
         case (Nil, archiveJob) =>
           Right(
             ArchiveComplete(
-              ingestBagRequest.archiveRequestId,
+              ingestBagRequest.id,
               ingestBagRequest.storageSpace,
               archiveJob.bagLocation
             ))
