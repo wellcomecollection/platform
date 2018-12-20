@@ -33,5 +33,5 @@ case class IngestBagRequest(id: UUID,
 object IngestBagRequest extends URIConverters with UUIDConverters {}
 
 case class IngestBagJob(
-                         request: IngestBagRequest,
-                         bagDownload: Either[FileDownloadingError, FileDownloadComplete])
+  request: IngestBagRequest,
+  bagDownload: Either[FileDownloadingError, FileDownloadComplete])

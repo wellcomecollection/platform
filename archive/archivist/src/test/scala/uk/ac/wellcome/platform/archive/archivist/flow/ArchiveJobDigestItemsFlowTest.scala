@@ -224,22 +224,21 @@ class ArchiveJobDigestItemsFlowTest
   it("outputs a left of archive error if the tag manifest is missing") {
     withMaterializer { implicit materializer =>
       withLocalS3Bucket { bucket =>
-        withBagItZip(dataFileCount = 2, createTagManifest = _ => None) {
-          file =>
-            val ingestRequest = createIngestBagRequest
-            val archiveJob = createArchiveJobWith(
-              file = file,
-              bucket = bucket
-            )
-            val source = Source.single(archiveJob)
-            val flow = createFlow(ingestRequest)
+        withBagItZip(dataFileCount = 2, createTagManifest = _ => None) { file =>
+          val ingestRequest = createIngestBagRequest
+          val archiveJob = createArchiveJobWith(
+            file = file,
+            bucket = bucket
+          )
+          val source = Source.single(archiveJob)
+          val flow = createFlow(ingestRequest)
 
-            val eventualArchiveJobs = source via flow runWith Sink.seq
+          val eventualArchiveJobs = source via flow runWith Sink.seq
 
-            whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(
-                Left(FileNotFoundError("tagmanifest-sha256.txt", archiveJob)))
-            }
+          whenReady(eventualArchiveJobs) { archiveJobs =>
+            archiveJobs shouldBe List(
+              Left(FileNotFoundError("tagmanifest-sha256.txt", archiveJob)))
+          }
         }
       }
     }

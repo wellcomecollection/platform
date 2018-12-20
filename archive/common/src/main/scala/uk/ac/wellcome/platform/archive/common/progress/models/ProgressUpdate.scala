@@ -25,17 +25,17 @@ object ProgressUpdate {
 }
 
 case class ProgressEventUpdate(id: UUID, events: Seq[ProgressEvent])
-  extends ProgressUpdate
+    extends ProgressUpdate
 
 case class ProgressStatusUpdate(id: UUID,
                                 status: Progress.Status,
                                 affectedBag: Option[BagId],
                                 events: Seq[ProgressEvent] = List.empty)
-  extends ProgressUpdate
+    extends ProgressUpdate
 
 case class ProgressCallbackStatusUpdate(id: UUID,
                                         callbackStatus: Callback.CallbackStatus,
                                         events: Seq[ProgressEvent] = List.empty)
-  extends ProgressUpdate
+    extends ProgressUpdate
 
 case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)

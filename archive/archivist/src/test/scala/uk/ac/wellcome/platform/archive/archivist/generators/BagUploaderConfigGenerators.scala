@@ -8,7 +8,8 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 trait BagUploaderConfigGenerators {
-  def createBagUploaderConfigWith(bucket: Bucket, parallelism: Int = 10): BagUploaderConfig =
+  def createBagUploaderConfigWith(bucket: Bucket,
+                                  parallelism: Int = 10): BagUploaderConfig =
     BagUploaderConfig(
       uploadConfig = UploadConfig(
         uploadNamespace = bucket.name

@@ -8,9 +8,16 @@ import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.Archivist
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, FileEntry}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  ArchiveMessaging,
+  FileEntry
+}
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.{BagInfo, IngestBagRequest, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagInfo,
+  IngestBagRequest,
+  NotificationMessage
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -77,20 +84,19 @@ trait ArchivistFixtures
                  queuePair: QueuePair,
                  registrarTopic: Topic,
                  progressTopic: Topic,
-                 parallelism: Int = 10
-                )(testWith: TestWith[Archivist, R]): R =
+                 parallelism: Int = 10)(testWith: TestWith[Archivist, R]): R =
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withArchiveMessageStream[NotificationMessage, Unit, R](
           queuePair.queue,
           metricsSender) { messageStream =>
-
           implicit val s3 = s3Client
           implicit val sns = snsClient
 
           val archivist = new Archivist(
             messageStream = messageStream,
-            bagUploaderConfig = createBagUploaderConfigWith(storageBucket, parallelism),
+            bagUploaderConfig =
+              createBagUploaderConfigWith(storageBucket, parallelism),
             snsRegistrarConfig = createSNSConfigWith(registrarTopic),
             snsProgressConfig = createSNSConfigWith(progressTopic)
           )
@@ -109,15 +115,19 @@ trait ArchivistFixtures
         withLocalSnsTopic { progressTopic =>
           withLocalS3Bucket { ingestBucket =>
             withLocalS3Bucket { storageBucket =>
-              withApp(storageBucket, queuePair, registrarTopic, progressTopic, parallelism) {
-                _ =>
-                  testWith(
-                    (
-                      ingestBucket,
-                      storageBucket,
-                      queuePair,
-                      registrarTopic,
-                      progressTopic))
+              withApp(
+                storageBucket,
+                queuePair,
+                registrarTopic,
+                progressTopic,
+                parallelism) { _ =>
+                testWith(
+                  (
+                    ingestBucket,
+                    storageBucket,
+                    queuePair,
+                    registrarTopic,
+                    progressTopic))
               }
             }
           }

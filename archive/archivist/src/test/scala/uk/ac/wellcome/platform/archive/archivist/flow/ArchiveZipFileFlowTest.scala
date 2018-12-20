@@ -13,11 +13,23 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveJobError,
+  ChecksumNotMatchedOnUploadError,
+  FileNotFoundError
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, FileDownloadComplete}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  InvalidBagManifestError
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation,
+  BagPath,
+  FileDownloadComplete
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -26,7 +38,7 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import scala.collection.JavaConverters._
 
 class ArchiveZipFileFlowTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with ArchivistFixtures
@@ -118,9 +130,9 @@ class ArchiveZipFileFlowTest
                   ingestContext.id,
                   reportingTopic,
                   Progress.Failed) { events =>
-                    events should have size (zipFileEntriesSize - 1)
+                  events should have size (zipFileEntriesSize - 1)
 
-                    all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+                  all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                 }
               }
             }
@@ -190,9 +202,9 @@ class ArchiveZipFileFlowTest
                   whenReady(verification) { result =>
                     inside(result.toList) {
                       case List(
-                      Left(InvalidBagManifestError(
-                      archiveJob,
-                      "manifest-sha256.txt"))) =>
+                          Left(InvalidBagManifestError(
+                            archiveJob,
+                            "manifest-sha256.txt"))) =>
                         archiveJob shouldBe a[ArchiveJob]
                         archiveJob
                           .asInstanceOf[ArchiveJob]
@@ -244,9 +256,8 @@ class ArchiveZipFileFlowTest
   }
 
   private def withArchiveZipFileFlow[R](bucket: Bucket, topic: Topic)(
-    testWith: TestWith[Flow[BagDownload,
-      Either[ArchiveError[_], ArchiveComplete],
-      NotUsed],
+    testWith: TestWith[
+      Flow[BagDownload, Either[ArchiveError[_], ArchiveComplete], NotUsed],
       R]): R = {
     val bagUploaderConfig = createBagUploaderConfigWith(bucket)
     val flow = ArchiveZipFileFlow(

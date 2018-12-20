@@ -8,7 +8,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveItemJobError, UploadError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveItemJobError,
+  UploadError
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -43,8 +46,9 @@ class ArchiveTagManifestFlowTest
             result shouldBe Right(archiveJob)
 
             val expectedTagManifestStream =
-              fromInputStream(new ZipFile(file).getInputStream(
-                new ZipEntry("tagmanifest-sha256.txt"))).mkString
+              fromInputStream(
+                new ZipFile(file).getInputStream(
+                  new ZipEntry("tagmanifest-sha256.txt"))).mkString
 
             getContentFromS3(
               bucket,

@@ -12,11 +12,18 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
-import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{ArchiveCompletion, BagDownload}
+import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{
+  ArchiveCompletion,
+  BagDownload
+}
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, FileDownloadComplete, IngestBagRequest}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  FileDownloadComplete,
+  IngestBagRequest
+}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 object ArchiveZipFileFlow extends Logging {
@@ -35,14 +42,17 @@ object ArchiveZipFileFlow extends Logging {
             .flatMapMerge(
               config.parallelism, {
                 case Left(error) => Source.single(Left(error))
-                case Right(archiveJob) => Source.single(archiveJob)
-                  .via(ArchiveJobFlow(
-                    delimiter = config.bagItConfig.digestDelimiterRegexp,
-                    parallelism = config.parallelism,
-                    ingestBagRequest = ingestRequest)
-                  )
-                  .map(deleteFile(_, file))
-              })
+                case Right(archiveJob) =>
+                  Source
+                    .single(archiveJob)
+                    .via(
+                      ArchiveJobFlow(
+                        delimiter = config.bagItConfig.digestDelimiterRegexp,
+                        parallelism = config.parallelism,
+                        ingestBagRequest = ingestRequest))
+                    .map(deleteFile(_, file))
+              }
+            )
             .flatMapMerge(
               config.parallelism,
               (result: ArchiveCompletion) =>
@@ -55,13 +65,14 @@ object ArchiveZipFileFlow extends Logging {
                       subject = "archivist_progress"))
                   .map(_ => result)
             )
-      })
+      }
+    )
   }
 
   private def deleteFile(
-                          passContext: ArchiveCompletion,
-                          file: File
-                        ) = {
+    passContext: ArchiveCompletion,
+    file: File
+  ) = {
     debug(s"Deleting file ${file.getName}")
 
     file.delete()
@@ -70,8 +81,8 @@ object ArchiveZipFileFlow extends Logging {
   }
 
   private def toProgressUpdate(
-                                result: Either[ArchiveError[_], ArchiveComplete],
-                                ingestBagRequest: IngestBagRequest): ProgressUpdate = {
+    result: Either[ArchiveError[_], ArchiveComplete],
+    ingestBagRequest: IngestBagRequest): ProgressUpdate = {
     result match {
       case Right(ArchiveComplete(id, _, _)) =>
         ProgressEventUpdate(

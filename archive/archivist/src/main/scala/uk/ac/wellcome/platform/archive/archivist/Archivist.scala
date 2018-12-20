@@ -14,21 +14,24 @@ import uk.ac.wellcome.platform.archive.archivist.flow._
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{NotificationMessage, Parallelism}
+import uk.ac.wellcome.platform.archive.common.models.{
+  NotificationMessage,
+  Parallelism
+}
 
 import scala.concurrent.Future
 
 class Archivist(
-                 messageStream: MessageStream[NotificationMessage, Unit],
-                 bagUploaderConfig: BagUploaderConfig,
-                 snsRegistrarConfig: SNSConfig,
-                 snsProgressConfig: SNSConfig
-               )(
-                 implicit val actorSystem: ActorSystem,
-                 s3Client: AmazonS3,
-                 snsClient: AmazonSNS,
-               ) extends Logging
-  with Runnable {
+  messageStream: MessageStream[NotificationMessage, Unit],
+  bagUploaderConfig: BagUploaderConfig,
+  snsRegistrarConfig: SNSConfig,
+  snsProgressConfig: SNSConfig
+)(
+  implicit val actorSystem: ActorSystem,
+  s3Client: AmazonS3,
+  snsClient: AmazonSNS,
+) extends Logging
+    with Runnable {
 
   def run(): Future[Done] = {
     implicit val adapter = Logging(actorSystem.eventStream, "custom")

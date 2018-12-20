@@ -10,7 +10,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases._
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, Parallelism}
+import uk.ac.wellcome.platform.archive.common.models.{
+  IngestBagRequest,
+  Parallelism
+}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 /** This flow takes an ingest request, and downloads the entire ZIP file
@@ -20,15 +23,13 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
   * original request on the Right.
   *
   */
-
 object ZipFileDownloadFlow extends Logging {
 
   def apply(snsConfig: SNSConfig)(
     implicit s3Client: AmazonS3,
     snsClient: AmazonSNS,
     parallelism: Parallelism
-  )
-  : Flow[IngestBagRequest, BagDownload, NotUsed] = {
+  ): Flow[IngestBagRequest, BagDownload, NotUsed] = {
 
     val materializerType = "akka.stream.materializer.blocking-io-dispatcher"
     val actorAttributes = ActorAttributes.dispatcher(materializerType)
