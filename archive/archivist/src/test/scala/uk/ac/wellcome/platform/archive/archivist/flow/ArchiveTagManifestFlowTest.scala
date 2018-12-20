@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import java.util.zip.ZipEntry
+import java.util.zip.{ZipEntry, ZipFile}
 
 import akka.stream.scaladsl.{Sink, Source}
 import com.amazonaws.services.s3.model.AmazonS3Exception
@@ -8,10 +8,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveItemJobError,
-  UploadError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveItemJobError, UploadError}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -33,9 +30,9 @@ class ArchiveTagManifestFlowTest
   it("archives the tag manifest") {
     withLocalS3Bucket { bucket =>
       withMaterializer { implicit materializer =>
-        withBagItZip(dataFileCount = 2) { zipFile =>
+        withBagItZip(dataFileCount = 2) { file =>
           val archiveJob = createArchiveJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket
           )
 
@@ -46,7 +43,7 @@ class ArchiveTagManifestFlowTest
             result shouldBe Right(archiveJob)
 
             val expectedTagManifestStream =
-              fromInputStream(zipFile.getInputStream(
+              fromInputStream(new ZipFile(file).getInputStream(
                 new ZipEntry("tagmanifest-sha256.txt"))).mkString
 
             getContentFromS3(
@@ -60,11 +57,11 @@ class ArchiveTagManifestFlowTest
 
   it("fails uploading the tag manifest") {
     withMaterializer { implicit materializer =>
-      withBagItZip(dataFileCount = 2) { zipFile =>
+      withBagItZip(dataFileCount = 2) { file =>
         val bagIdentifier = createExternalIdentifier
 
         val archiveJob = createArchiveJobWith(
-          zipFile = zipFile,
+          file = file,
           bagIdentifier = bagIdentifier,
           bucket = Bucket("not-a-valid-bucket")
         )

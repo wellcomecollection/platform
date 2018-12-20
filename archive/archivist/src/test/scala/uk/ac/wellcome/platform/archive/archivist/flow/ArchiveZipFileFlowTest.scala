@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import java.io.File
+import java.util.zip.ZipFile
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
@@ -10,23 +11,13 @@ import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveJobError,
-  ChecksumNotMatchedOnUploadError,
-  FileNotFoundError
-}
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
+import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation, BagPath, FileDownloadComplete}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -35,7 +26,7 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import scala.collection.JavaConverters._
 
 class ArchiveZipFileFlowTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with ArchivistFixtures
@@ -60,14 +51,17 @@ class ArchiveZipFileFlowTest
               val (_, verification) =
                 uploader.runWith(
                   Source.single(
-                    ZipFileDownloadComplete(zipFile, ingestContext)),
+                    Right(
+                      FileDownloadComplete(zipFile, ingestContext)
+                    )
+                  ),
                   Sink.seq
                 )
 
               whenReady(verification) { result =>
                 listKeysInBucket(storageBucket) should have size 5
                 result shouldBe List(Right(ArchiveComplete(
-                  ingestContext.archiveRequestId,
+                  ingestContext.id,
                   ingestContext.storageSpace,
                   BagLocation(
                     storageBucket.name,
@@ -77,7 +71,7 @@ class ArchiveZipFileFlowTest
                 )))
 
                 assertTopicReceivesProgressEventUpdate(
-                  ingestContext.archiveRequestId,
+                  ingestContext.id,
                   reportingTopic) { events =>
                   inside(events) {
                     case List(event) =>
@@ -99,14 +93,19 @@ class ArchiveZipFileFlowTest
     withLocalS3Bucket { storageBucket =>
       withMaterializer { implicit materializer =>
         withLocalSnsTopic { reportingTopic =>
-          withBagItZip(createDigest = _ => "bad_digest") { zipFile =>
+          withBagItZip(createDigest = _ => "bad_digest") { file =>
             withArchiveZipFileFlow(storageBucket, reportingTopic) { uploader =>
               val ingestContext = createIngestBagRequest
+
+              val zipFileEntriesSize = new ZipFile(file)
+                .entries()
+                .asScala
+                .size
 
               val (_, verification) =
                 uploader.runWith(
                   Source.single(
-                    ZipFileDownloadComplete(zipFile, ingestContext)),
+                    Right(FileDownloadComplete(file, ingestContext))),
                   Sink.seq)
 
               whenReady(verification) { result =>
@@ -116,14 +115,12 @@ class ArchiveZipFileFlowTest
                 }
 
                 assertTopicReceivesProgressStatusUpdate(
-                  ingestContext.archiveRequestId,
+                  ingestContext.id,
                   reportingTopic,
                   Progress.Failed) { events =>
-                  events should have size (zipFile
-                    .entries()
-                    .asScala
-                    .size - 1)
-                  all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
+                    events should have size (zipFileEntriesSize - 1)
+
+                    all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                 }
               }
             }
@@ -145,7 +142,7 @@ class ArchiveZipFileFlowTest
               val (_, verification) =
                 uploader.runWith(
                   Source.single(
-                    ZipFileDownloadComplete(zipFile, ingestContext)),
+                    Right(FileDownloadComplete(zipFile, ingestContext))),
                   Sink.seq)
 
               whenReady(verification) { result =>
@@ -153,7 +150,7 @@ class ArchiveZipFileFlowTest
                   Left(FileNotFoundError("bag-info.txt", ingestContext)))
 
                 assertTopicReceivesProgressStatusUpdate(
-                  ingestContext.archiveRequestId,
+                  ingestContext.id,
                   reportingTopic,
                   Progress.Failed) { events =>
                   inside(events) {
@@ -187,15 +184,15 @@ class ArchiveZipFileFlowTest
                   val (_, verification) =
                     uploader.runWith(
                       Source.single(
-                        ZipFileDownloadComplete(zipFile, ingestContext)),
+                        Right(FileDownloadComplete(zipFile, ingestContext))),
                       Sink.seq)
 
                   whenReady(verification) { result =>
                     inside(result.toList) {
                       case List(
-                          Left(InvalidBagManifestError(
-                            archiveJob,
-                            "manifest-sha256.txt"))) =>
+                      Left(InvalidBagManifestError(
+                      archiveJob,
+                      "manifest-sha256.txt"))) =>
                         archiveJob shouldBe a[ArchiveJob]
                         archiveJob
                           .asInstanceOf[ArchiveJob]
@@ -207,7 +204,7 @@ class ArchiveZipFileFlowTest
                     }
 
                     assertTopicReceivesProgressStatusUpdate(
-                      ingestContext.archiveRequestId,
+                      ingestContext.id,
                       reportingTopic,
                       Progress.Failed) { events =>
                       inside(events) {
@@ -234,7 +231,7 @@ class ArchiveZipFileFlowTest
               val (_, verification) =
                 uploader.runWith(
                   Source.single(
-                    ZipFileDownloadComplete(zipFile, ingestContext)),
+                    Right(FileDownloadComplete(zipFile, ingestContext))),
                   Sink.seq)
 
               whenReady(verification) { result =>
@@ -247,10 +244,10 @@ class ArchiveZipFileFlowTest
   }
 
   private def withArchiveZipFileFlow[R](bucket: Bucket, topic: Topic)(
-    testWith: TestWith[Flow[ZipFileDownloadComplete,
-                            Either[ArchiveError[_], ArchiveComplete],
-                            NotUsed],
-                       R]): R = {
+    testWith: TestWith[Flow[BagDownload,
+      Either[ArchiveError[_], ArchiveComplete],
+      NotUsed],
+      R]): R = {
     val bagUploaderConfig = createBagUploaderConfigWith(bucket)
     val flow = ArchiveZipFileFlow(
       config = bagUploaderConfig,

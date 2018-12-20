@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.fixtures
 
 import java.io.File
-import java.util.zip.ZipFile
 
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.Messaging
@@ -9,16 +8,9 @@ import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.archivist.Archivist
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  ArchiveMessaging,
-  FileEntry
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, FileEntry}
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagInfo,
-  IngestBagRequest,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.{BagInfo, IngestBagRequest, NotificationMessage}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -31,7 +23,7 @@ trait ArchivistFixtures
     with BagUploaderConfigGenerators
     with IngestBagRequestGenerators {
 
-  def sendBag[R](zipFile: ZipFile, ingestBucket: Bucket, queuePair: QueuePair)(
+  def sendBag[R](file: File, ingestBucket: Bucket, queuePair: QueuePair)(
     testWith: TestWith[IngestBagRequest, R]): R = {
 
     val ingestBagRequest = createIngestBagRequestWith(
@@ -44,7 +36,7 @@ trait ArchivistFixtures
     val bucket = ingestBagRequest.zippedBagLocation.namespace
     val key = ingestBagRequest.zippedBagLocation.key
 
-    s3Client.putObject(bucket, key, new File(zipFile.getName))
+    s3Client.putObject(bucket, key, file)
 
     sendNotificationToSQS(
       queuePair.queue,
@@ -90,9 +82,11 @@ trait ArchivistFixtures
         withArchiveMessageStream[NotificationMessage, Unit, R](
           queuePair.queue,
           metricsSender) { messageStream =>
+
+          implicit val s3 = s3Client
+          implicit val sns = snsClient
+
           val archivist = new Archivist(
-            s3Client = s3Client,
-            snsClient = snsClient,
             messageStream = messageStream,
             bagUploaderConfig = createBagUploaderConfigWith(storageBucket),
             snsRegistrarConfig = createSNSConfigWith(registrarTopic),

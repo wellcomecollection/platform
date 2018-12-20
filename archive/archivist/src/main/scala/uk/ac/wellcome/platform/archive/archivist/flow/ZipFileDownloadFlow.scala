@@ -46,7 +46,7 @@ object ZipFileDownloadFlow extends Logging {
           val ingestJob = request.toIngestBagJob
 
           val updates = ingestJob.bagDownload.fold(
-            error => ProgressUpdate.failed(request.id, error.exception),
+            error => ProgressUpdate.failed(request.id, error),
             _ => ProgressUpdate.event(request.id, downloadSuccessMessage)
           )
 

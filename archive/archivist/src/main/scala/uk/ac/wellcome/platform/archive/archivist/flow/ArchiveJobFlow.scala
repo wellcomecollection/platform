@@ -20,7 +20,7 @@ object ArchiveJobFlow extends Logging {
             parallelism: Int,
             ingestBagRequest: IngestBagRequest)(implicit s3Client: AmazonS3)
     : Flow[ArchiveJob,
-           Either[ArchiveError[ArchiveJob], ArchiveComplete],
+           Either[ArchiveError[_], ArchiveComplete],
            NotUsed] =
     Flow[ArchiveJob]
       .log("archive job")

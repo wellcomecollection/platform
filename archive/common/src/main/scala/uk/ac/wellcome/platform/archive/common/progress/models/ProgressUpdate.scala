@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.archive.common.progress.models
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.models.BagId
+import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 sealed trait ProgressUpdate {
   val id: UUID
@@ -10,7 +11,7 @@ sealed trait ProgressUpdate {
 }
 object ProgressUpdate {
 
-  def failed(id: UUID, error: Throwable) =
+  def failed[T](id: UUID, error: ArchiveError[T]) =
     ProgressStatusUpdate(
       id,
       Progress.Failed,
