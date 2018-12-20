@@ -25,7 +25,7 @@ class ArchivistFeatureTest
     with ProgressUpdateAssertions {
 
   it("downloads, uploads and verifies a BagIt bag") {
-    withArchivist {
+    withArchivist() {
       case (
           ingestBucket,
           storageBucket,
@@ -89,7 +89,7 @@ class ArchivistFeatureTest
   }
 
   it("fails when ingesting an invalid bag") {
-    withArchivist {
+    withArchivist() {
       case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
@@ -111,7 +111,7 @@ class ArchivistFeatureTest
   }
 
   it("fails when ingesting a bag with no tag manifest") {
-    withArchivist {
+    withArchivist() {
       case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
           request =>
@@ -134,7 +134,9 @@ class ArchivistFeatureTest
     val bagInfo1 = randomBagInfo
     val bagInfo2 = randomBagInfo
 
-    withArchivist {
+    // Parallelism here is 1 as fake-sns can't deal with
+    // concurrent requests
+    withArchivist(1) {
       case (
           ingestBucket,
           storageBucket,
@@ -215,7 +217,7 @@ class ArchivistFeatureTest
     val bagInfo1 = randomBagInfo
     val bagInfo2 = randomBagInfo
 
-    withArchivist {
+    withArchivist() {
       case (
           ingestBucket,
           storageBucket,
@@ -307,7 +309,9 @@ class ArchivistFeatureTest
     val bagInfo1 = randomBagInfo
     val bagInfo2 = randomBagInfo
 
-    withArchivist {
+    // Parallelism here is 1 as fake-sns can't deal with
+    // concurrent requests
+    withArchivist(1) {
       case (
           ingestBucket,
           storageBucket,
@@ -336,10 +340,8 @@ class ArchivistFeatureTest
                   dataFileCount = 1,
                   createDataManifest = dataManifestWithNonExistingFile) {
                   invalidRequest2 =>
+
                     eventually {
-
-                      assertQueuePairSizes(queuePair, 0, 0)
-
                       assertSnsReceives(
                         Set(
                           ArchiveComplete(
@@ -389,7 +391,7 @@ class ArchivistFeatureTest
     val bagInfo1 = randomBagInfo
     val bagInfo2 = randomBagInfo
 
-    withArchivist {
+    withArchivist() {
       case (
           ingestBucket,
           storageBucket,

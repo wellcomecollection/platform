@@ -14,7 +14,7 @@ class TroubleshootArchivistLocalBagFileTest
     with MetricsSenderFixture {
 
   ignore("downloads, uploads and verifies a known BagIt bag") {
-    withArchivist {
+    withArchivist() {
       case (ingestBucket, storageBucket, queuePair, _, _) =>
         sendBag(
           new File(

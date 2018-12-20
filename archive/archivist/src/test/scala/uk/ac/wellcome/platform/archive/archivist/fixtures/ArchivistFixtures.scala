@@ -76,7 +76,9 @@ trait ArchivistFixtures
   def withApp[R](storageBucket: Bucket,
                  queuePair: QueuePair,
                  registrarTopic: Topic,
-                 progressTopic: Topic)(testWith: TestWith[Archivist, R]): R =
+                 progressTopic: Topic,
+                 parallelism: Int = 10
+                )(testWith: TestWith[Archivist, R]): R =
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withArchiveMessageStream[NotificationMessage, Unit, R](
@@ -88,7 +90,7 @@ trait ArchivistFixtures
 
           val archivist = new Archivist(
             messageStream = messageStream,
-            bagUploaderConfig = createBagUploaderConfigWith(storageBucket),
+            bagUploaderConfig = createBagUploaderConfigWith(storageBucket, parallelism),
             snsRegistrarConfig = createSNSConfigWith(registrarTopic),
             snsProgressConfig = createSNSConfigWith(progressTopic)
           )
@@ -100,14 +102,14 @@ trait ArchivistFixtures
       }
     }
 
-  def withArchivist[R](
+  def withArchivist[R](parallelism: Int = 10)(
     testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(5) { queuePair =>
       withLocalSnsTopic { registrarTopic =>
         withLocalSnsTopic { progressTopic =>
           withLocalS3Bucket { ingestBucket =>
             withLocalS3Bucket { storageBucket =>
-              withApp(storageBucket, queuePair, registrarTopic, progressTopic) {
+              withApp(storageBucket, queuePair, registrarTopic, progressTopic, parallelism) {
                 _ =>
                   testWith(
                     (
