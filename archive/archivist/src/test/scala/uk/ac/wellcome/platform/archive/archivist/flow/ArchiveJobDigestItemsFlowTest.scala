@@ -212,8 +212,9 @@ class ArchiveJobDigestItemsFlowTest
             val eventualArchiveJobs = source via flow runWith Sink.seq
 
             whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(
-                InvalidBagManifestError(archiveJob, "manifest-sha256.txt")))
+              inside(archiveJobs){case Vector(Left(InvalidBagManifestError(actualArchiveJob, "manifest-sha256.txt", _))) =>
+                actualArchiveJob shouldBe archiveJob
+              }
             }
         }
       }
@@ -262,8 +263,9 @@ class ArchiveJobDigestItemsFlowTest
             val eventualArchiveJobs = source via flow runWith Sink.seq
 
             whenReady(eventualArchiveJobs) { archiveJobs =>
-              archiveJobs shouldBe List(Left(
-                InvalidBagManifestError(archiveJob, "tagmanifest-sha256.txt")))
+              inside(archiveJobs){case Vector(Left(InvalidBagManifestError(actualArchiveJob, "tagmanifest-sha256.txt", _))) =>
+                actualArchiveJob shouldBe archiveJob
+              }
             }
         }
       }

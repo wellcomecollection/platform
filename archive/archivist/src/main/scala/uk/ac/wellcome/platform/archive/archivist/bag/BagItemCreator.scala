@@ -1,12 +1,10 @@
 package uk.ac.wellcome.platform.archive.archivist.bag
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  InvalidBagManifestError
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
 import uk.ac.wellcome.platform.archive.common.models.{BagItem, EntryPath}
 
-object BagItemCreator {
+object BagItemCreator extends Logging{
 
   /** Within a manifest, each entry in the bag is a single line, containing
     * a checksum and the location.  For example:
@@ -33,7 +31,7 @@ object BagItemCreator {
           location = EntryPath(key.trim)
         )
       )
-      case _ => Left(InvalidBagManifestError(job, manifestName))
+      case _ => Left(InvalidBagManifestError(job, manifestName, line))
     }
   }
 }

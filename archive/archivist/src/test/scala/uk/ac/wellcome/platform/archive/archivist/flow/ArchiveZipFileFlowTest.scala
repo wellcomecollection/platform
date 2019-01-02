@@ -204,7 +204,7 @@ class ArchiveZipFileFlowTest
                       case List(
                           Left(InvalidBagManifestError(
                             archiveJob,
-                            "manifest-sha256.txt"))) =>
+                            "manifest-sha256.txt", _))) =>
                         archiveJob shouldBe a[ArchiveJob]
                         archiveJob
                           .asInstanceOf[ArchiveJob]
