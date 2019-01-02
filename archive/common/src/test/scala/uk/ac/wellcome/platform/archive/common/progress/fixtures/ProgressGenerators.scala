@@ -5,9 +5,16 @@ import java.time.Instant
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{BagId, ExternalIdentifier, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagId,
+  ExternalIdentifier,
+  StorageSpace
+}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models.{StorageLocation, _}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  StorageLocation,
+  _
+}
 import uk.ac.wellcome.storage.ObjectLocation
 
 trait ProgressGenerators extends RandomThings {
@@ -45,7 +52,8 @@ trait ProgressGenerators extends RandomThings {
   }
 
   def createProgressEventUpdateWith(id: UUID = randomUUID,
-                                    events: List[ProgressEvent] = List(createProgressEvent))
+                                    events: List[ProgressEvent] = List(
+                                      createProgressEvent))
     : ProgressEventUpdate =
     ProgressEventUpdate(id, events)
 
@@ -63,7 +71,8 @@ trait ProgressGenerators extends RandomThings {
   def createProgressBagUpdateWith(id: UUID,
                                   bagId: BagId,
                                   status: Status = Progress.Processing,
-                                  events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
+                                  events: Seq[ProgressEvent] = List(
+                                    createProgressEvent)): ProgressUpdate = {
     ProgressStatusUpdate(id, status, Some(bagId), events)
   }
 
