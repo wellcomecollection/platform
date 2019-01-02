@@ -9,14 +9,34 @@ import uk.ac.wellcome.platform.archive.common.models.BagId
 case class Progress(id: UUID,
                     sourceLocation: StorageLocation,
                     space: Namespace,
-                    callback: Option[Callback] = None,
-                    status: Progress.Status = Progress.Accepted,
-                    bag: Option[BagId] = None,
-                    createdDate: Instant = Instant.now,
-                    lastModifiedDate: Instant = Instant.now,
-                    events: Seq[ProgressEvent] = Seq.empty)
+                    callback: Option[Callback],
+                    status: Progress.Status,
+                    bag: Option[BagId],
+                    createdDate: Instant,
+                    lastModifiedDate: Instant,
+                    events: Seq[ProgressEvent])
 
 case object Progress extends URIConverters {
+  def apply(id: UUID,
+            sourceLocation: StorageLocation,
+            space: Namespace,
+            callback: Option[Callback] = None,
+            status: Progress.Status = Progress.Accepted,
+            bag: Option[BagId] = None,
+            createdDate: Instant = Instant.now(),
+            events: Seq[ProgressEvent] = Seq.empty) : Progress = {
+    Progress(
+      id,
+      sourceLocation,
+      space,
+      callback,
+      status,
+      bag,
+      createdDate,
+      createdDate,
+      events)
+  }
+
   sealed trait Status
 
   private val acceptedString = "accepted"
