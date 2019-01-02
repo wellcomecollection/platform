@@ -24,7 +24,7 @@ case object Progress extends URIConverters {
             status: Progress.Status = Progress.Accepted,
             bag: Option[BagId] = None,
             createdDate: Instant = Instant.now(),
-            events: Seq[ProgressEvent] = Seq.empty) : Progress = {
+            events: Seq[ProgressEvent] = Seq.empty): Progress = {
     Progress(
       id,
       sourceLocation,
