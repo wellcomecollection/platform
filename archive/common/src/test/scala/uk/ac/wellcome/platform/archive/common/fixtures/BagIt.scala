@@ -148,12 +148,12 @@ trait BagIt extends RandomThings {
   private def createDataFiles(dataFileCount: Int) = {
     val subPathLength = Random.nextInt(3)
     val subPathDirectories = (0 to subPathLength).map { _ =>
-      randomAlphanumericWithSpaces()
+      randomAlphanumericWithSpace()
     }
     val subPath = subPathDirectories.mkString("/")
 
     (1 to dataFileCount).map { _ =>
-      val fileName = randomAlphanumericWithSpaces()
+      val fileName = randomAlphanumericWithSpace()
       val filePath = s"data/$subPath/$fileName.txt"
       val fileContents = Random.nextString(256)
       FileEntry(filePath, fileContents)

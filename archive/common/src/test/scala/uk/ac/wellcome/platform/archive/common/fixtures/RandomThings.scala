@@ -23,12 +23,13 @@ trait RandomThings {
     Random.alphanumeric take length mkString
   }
 
-  def randomAlphanumericWithSpaces(length: Int = 8) = {
+  def randomAlphanumericWithSpace(length: Int = 8) = {
     val str = randomAlphanumeric(length).toCharArray
 
+    // Randomly choose an index in the string to replace with a space,
+    // avoiding the beginning or the end.
     val spaceIndex = Random.nextInt(str.length - 2) + 1
-    str.update(spaceIndex, ' ')
-    str.toString
+    str.updated(spaceIndex, ' ')
   }
 
   def randomPort = {
