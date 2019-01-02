@@ -4,13 +4,13 @@ import java.net.URI
 import java.time.Instant
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{BagId, ExternalIdentifier, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.generators.ExternalIdentifierGenerators
+import uk.ac.wellcome.platform.archive.common.models.{BagId, StorageSpace}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
 import uk.ac.wellcome.platform.archive.common.progress.models.{StorageLocation, _}
 import uk.ac.wellcome.storage.ObjectLocation
 
-trait ProgressGenerators extends RandomThings {
+trait ProgressGenerators extends ExternalIdentifierGenerators {
 
   val storageLocation = StorageLocation(
     StandardStorageProvider,
@@ -70,8 +70,6 @@ trait ProgressGenerators extends RandomThings {
   def createBagId = BagId(createStorageSpace, createExternalIdentifier)
 
   def createStorageSpace = StorageSpace(randomAlphanumeric())
-
-  def createExternalIdentifier = ExternalIdentifier(randomAlphanumeric())
 
   def createSpace = Namespace(randomAlphanumeric())
 
