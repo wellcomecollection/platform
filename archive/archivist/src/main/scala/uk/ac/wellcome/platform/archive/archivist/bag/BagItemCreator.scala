@@ -22,21 +22,18 @@ object BagItemCreator {
   def create(
     line: String,
     job: ArchiveJob,
-    manifestName: String,
-    delimiter: String
+    manifestName: String
   ): Either[ArchiveError[ArchiveJob], BagItem] = {
-    val splitChunk = line.split(delimiter).map(_.trim)
+    val checksumLineRegex = """(.+?)\s+(.+)""".r
 
-    splitChunk match {
-      case Array(checksum: String, key: String) =>
-        Right(
-          BagItem(
-            checksum = checksum,
-            location = EntryPath(key)
-          )
+    line match {
+      case checksumLineRegex(checksum, key) => Right(
+        BagItem(
+          checksum = checksum.trim,
+          location = EntryPath(key.trim)
         )
-      case _ =>
-        Left(InvalidBagManifestError(job, manifestName))
+      )
+      case _ => Left(InvalidBagManifestError(job, manifestName))
     }
   }
 }

@@ -16,8 +16,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 
 object ArchiveJobFlow extends Logging {
-  def apply(delimiter: String,
-            parallelism: Int,
+  def apply(parallelism: Int,
             ingestBagRequest: IngestBagRequest)(implicit s3Client: AmazonS3)
     : Flow[ArchiveJob, Either[ArchiveError[_], ArchiveComplete], NotUsed] =
     Flow[ArchiveJob]
@@ -31,6 +30,6 @@ object ArchiveJobFlow extends Logging {
           OnErrorFlow()
         )(
           ifRight =
-            ArchiveJobDigestItemsFlow(delimiter, parallelism, ingestBagRequest)
+            ArchiveJobDigestItemsFlow(parallelism, ingestBagRequest)
         ))
 }

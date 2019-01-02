@@ -21,14 +21,14 @@ object ArchiveItemJobCreator extends Logging {
     * If any of the manifests are incorrectly formatted, it returns an error.
     *
     */
-  def createArchiveDigestItemJobs(job: ArchiveJob, delimiter: String)
+  def createArchiveDigestItemJobs(job: ArchiveJob)
     : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] =
     job.bagManifestLocations
       .map { manifestLocation =>
         ZipLocation(job.zipFile, manifestLocation.toEntryPath)
       }
       .traverse { zipLocation =>
-        parseArchiveDigestItemJobs(job, zipLocation, delimiter)
+        parseArchiveDigestItemJobs(job, zipLocation)
       }
       .map { _.flatten }
 
@@ -40,8 +40,7 @@ object ArchiveItemJobCreator extends Logging {
     *
     */
   private def parseArchiveDigestItemJobs(job: ArchiveJob,
-                                         zipLocation: ZipLocation,
-                                         delimiter: String)
+                                         zipLocation: ZipLocation)
     : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] = {
     val value: Either[ArchiveError[ArchiveJob], InputStream] = ZipFileReader
       .maybeInputStream(zipLocation)
@@ -58,7 +57,7 @@ object ArchiveItemJobCreator extends Logging {
         .filter { _.nonEmpty }
         .traverse { line =>
           BagItemCreator
-            .create(line.trim(), job, zipLocation.entryPath.path, delimiter)
+            .create(line.trim(), job, zipLocation.entryPath.path)
             .map { bagItem =>
               ArchiveDigestItemJob(archiveJob = job, bagDigestItem = bagItem)
             }

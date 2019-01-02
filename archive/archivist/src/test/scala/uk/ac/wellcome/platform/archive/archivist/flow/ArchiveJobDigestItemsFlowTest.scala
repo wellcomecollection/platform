@@ -8,7 +8,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.ArchiveJobGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.BagItConfig
 import uk.ac.wellcome.platform.archive.archivist.models.errors._
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
@@ -273,7 +272,6 @@ class ArchiveJobDigestItemsFlowTest
 
   private def createFlow(ingestRequest: IngestBagRequest) =
     ArchiveJobDigestItemsFlow(
-      delimiter = BagItConfig().digestDelimiterRegexp,
       parallelism = 10,
       ingestBagRequest = ingestRequest
     )
