@@ -9,6 +9,26 @@ resource "aws_dynamodb_table" "archive_progress_table" {
     type = "S"
   }
 
+  attribute {
+    name = "bagIdIndex"
+    type = "S"
+  }
+
+  attribute {
+    name = "createdDate"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "${var.namespace}-bag-progress-index"
+    hash_key        = "bagIdIndex"
+    range_key       = "createdDate"
+    write_capacity  = 1
+    read_capacity   = 1
+    projection_type = "INCLUDE"
+    non_key_attributes = ["bagIdIndex", "id", "createdDate"]
+  }
+
   lifecycle {
     prevent_destroy = true
 

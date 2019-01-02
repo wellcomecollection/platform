@@ -44,6 +44,11 @@ case class ResponseDisplayIngest(@JsonKey("@context")
                                  ontologyType: String = "Ingest")
     extends DisplayIngest
 
+case class DisplayIngestMinimal(id: UUID,
+                                createdDate: String,
+                                @JsonKey("type")
+                                ontologyType: String = "Ingest")
+
 case class IngestDisplayBag(id: String,
                             @JsonKey("type")
                             ontologyType: String = "Bag")
@@ -88,6 +93,13 @@ object DisplayProgressEvent {
     DisplayProgressEvent(
       progressEvent.description,
       progressEvent.createdDate.toString)
+}
+
+object DisplayIngestMinimal {
+  def apply(bagIngest: BagIngest): DisplayIngestMinimal =
+    DisplayIngestMinimal(
+      bagIngest.id,
+      bagIngest.createdDate.toString)
 }
 
 object DisplayStatus {

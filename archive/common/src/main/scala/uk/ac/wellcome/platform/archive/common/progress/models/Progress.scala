@@ -41,3 +41,5 @@ case object Progress extends URIConverters {
   }
 
 }
+
+case class BagIngest(bagIdIndex: String, id: UUID, createdDate: Instant)
