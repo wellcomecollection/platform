@@ -77,10 +77,11 @@ class Router( progressTracker: ProgressTracker,
     } else if (results.isEmpty) {
       complete(NotFound -> List[DisplayIngestMinimal]())
     } else {
+      info(s"""errors fetching ingests for $bagId: ${results.mkString(" ")}""")
       complete(InternalServerError -> ErrorResponse(
         context = contextURL.toString,
         httpStatus = InternalServerError.intValue,
-        description = results.mkString("\n"),
+        description = "Internal server error",
         label = InternalServerError.reason
       ))
     }
