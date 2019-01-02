@@ -97,9 +97,7 @@ object DisplayProgressEvent {
 
 object DisplayIngestMinimal {
   def apply(bagIngest: BagIngest): DisplayIngestMinimal =
-    DisplayIngestMinimal(
-      bagIngest.id,
-      bagIngest.createdDate.toString)
+    DisplayIngestMinimal(bagIngest.id, bagIngest.createdDate.toString)
 }
 
 object DisplayStatus {

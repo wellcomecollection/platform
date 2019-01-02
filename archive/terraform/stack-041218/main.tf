@@ -154,10 +154,11 @@ module "api" {
   ingests_container_image = "${var.progress_http_container_image}"
   ingests_container_port  = "9001"
   ingests_env_vars = {
-    context_url                     = "https://api.wellcomecollection.org/storage/v1/context.json"
-    app_base_url                    = "https://api.wellcomecollection.org/storage/v1/ingests"
-    topic_arn                       = "${module.ingest_requests_topic.arn}"
-    archive_progress_table_name     = "${aws_dynamodb_table.archive_progress_table.name}"
+    context_url                 = "https://api.wellcomecollection.org/storage/v1/context.json"
+    app_base_url                = "https://api.wellcomecollection.org/storage/v1/ingests"
+    topic_arn                   = "${module.ingest_requests_topic.arn}"
+    archive_progress_table_name = "${aws_dynamodb_table.archive_progress_table.name}"
+
     // archive_bag_progress_index_name = "${aws_dynamodb_table.archive_progress_table.global_secondary_index.name}"
     // ${...global_secondary_index.name} seems to return '1' not sure why, so
     archive_bag_progress_index_name = "${var.namespace}-bag-progress-index"
