@@ -80,7 +80,7 @@ class ArchiveJobDigestItemsFlowTest
                         "this/does/not/exists.jpg",
                         archiveItemJob))))) =>
                 actualArchiveJob shouldBe archiveJob
-                archiveItemJob.bagDigestItem.location shouldBe EntryPath(
+                archiveItemJob.bagDigestItem.path shouldBe BagFilePath(
                   "this/does/not/exists.jpg")
                 archiveItemJob.archiveJob shouldBe archiveJob
             }
@@ -119,7 +119,7 @@ class ArchiveJobDigestItemsFlowTest
                 case List(Left(ArchiveJobError(actualArchiveJob, errors))) =>
                   actualArchiveJob shouldBe archiveJob
                   all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
-                  errors.map(_.t.bagDigestItem.location.path) should contain theSameElementsAs failedFiles
+                  errors.map(_.t.bagDigestItem.path.value) should contain theSameElementsAs failedFiles
                   errors.map(_.t.archiveJob).distinct shouldBe List(archiveJob)
               }
             }
@@ -159,7 +159,7 @@ class ArchiveJobDigestItemsFlowTest
                 val checksumNotMatchedOnUploadError =
                   error.asInstanceOf[ChecksumNotMatchedOnUploadError]
                 checksumNotMatchedOnUploadError.t.archiveJob shouldBe archiveJob
-                checksumNotMatchedOnUploadError.t.bagDigestItem.location shouldBe EntryPath(
+                checksumNotMatchedOnUploadError.t.bagDigestItem.path shouldBe BagFilePath(
                   filepath)
                 job shouldBe archiveJob
             }

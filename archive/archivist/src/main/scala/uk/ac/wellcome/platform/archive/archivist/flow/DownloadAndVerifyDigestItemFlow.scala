@@ -39,13 +39,13 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
                 .via(SHA256Flow())
                 .map {
                   case calculatedChecksum
-                      if job.bagDigestItem.checksum == calculatedChecksum =>
+                      if job.bagDigestItem.checksum.value == calculatedChecksum =>
                     Right(job)
                   case calculatedChecksum =>
                     warn(s"Failed validating checksum in download for job $job")
                     Left(
                       ChecksumNotMatchedOnDownloadError(
-                        expectedChecksum = job.bagDigestItem.checksum,
+                        expectedChecksum = job.bagDigestItem.checksum.value,
                         actualChecksum = calculatedChecksum,
                         t = job
                       )

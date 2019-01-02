@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models.{BagItem, EntryPath}
+import uk.ac.wellcome.platform.archive.common.models._
 
 object BagItemCreator extends Logging{
 
@@ -21,14 +21,14 @@ object BagItemCreator extends Logging{
     line: String,
     job: ArchiveJob,
     manifestName: String
-  ): Either[ArchiveError[ArchiveJob], BagItem] = {
+  ): Either[ArchiveError[ArchiveJob], BagDigestFile] = {
     val checksumLineRegex = """(.+?)\s+(.+)""".r
 
     line match {
       case checksumLineRegex(checksum, key) => Right(
-        BagItem(
-          checksum = checksum.trim,
-          location = EntryPath(key.trim)
+        BagDigestFile(
+          checksum = Checksum(checksum.trim),
+          path = BagFilePath(key.trim)
         )
       )
       case _ => Left(InvalidBagManifestError(job, manifestName, line))

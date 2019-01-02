@@ -25,7 +25,7 @@ object ArchiveItemJobCreator extends Logging {
     : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] =
     job.bagManifestLocations
       .map { manifestLocation =>
-        ZipLocation(job.zipFile, manifestLocation.toEntryPath)
+        ZipLocation(job.zipFile, manifestLocation.toBagFilePath)
       }
       .traverse { zipLocation =>
         parseArchiveDigestItemJobs(job, zipLocation)
@@ -44,7 +44,7 @@ object ArchiveItemJobCreator extends Logging {
     : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] = {
     val value: Either[ArchiveError[ArchiveJob], InputStream] = ZipFileReader
       .maybeInputStream(zipLocation)
-      .toRight(FileNotFoundError(zipLocation.entryPath.path, job))
+      .toRight(FileNotFoundError(zipLocation.bagFilePath.value, job))
 
     value.flatMap { inputStream =>
       val manifestFileLines: List[String] =
@@ -57,7 +57,7 @@ object ArchiveItemJobCreator extends Logging {
         .filter { _.nonEmpty }
         .traverse { line =>
           BagItemCreator
-            .create(line.trim(), job, zipLocation.entryPath.path)
+            .create(line.trim(), job, zipLocation.bagFilePath.value)
             .map { bagItem =>
               ArchiveDigestItemJob(archiveJob = job, bagDigestItem = bagItem)
             }
