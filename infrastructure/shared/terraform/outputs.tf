@@ -128,6 +128,20 @@ output "storage_vpc_delta_id" {
   value = "${module.storage_vpc_delta.vpc_id}"
 }
 
+# TODO: Remove storage_vpc_delta
+
+output "storage_vpc_private_subnets" {
+  value = ["${module.storage_vpc.private_subnets}"]
+}
+
+output "storage_vpc_public_subnets" {
+  value = ["${module.storage_vpc.public_subnets}"]
+}
+
+output "storage_vpc_id" {
+  value = "${module.storage_vpc.vpc_id}"
+}
+
 output "storage_cidr_block_vpc" {
   value = "${local.storage_cidr_block_vpc}"
 }
