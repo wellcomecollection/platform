@@ -1,4 +1,5 @@
 aws.dynamo.tableName="${archive_progress_table_name}"
+aws.dynamo.tableIndex="${archive_bag_progress_index_name}"
 metrics.namespace=progress_http
 http.externalBaseURL="${app_base_url}"
 http.host="0.0.0.0"

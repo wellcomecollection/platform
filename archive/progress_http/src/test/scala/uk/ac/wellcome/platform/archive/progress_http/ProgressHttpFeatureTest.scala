@@ -705,4 +705,89 @@ class ProgressHttpFeatureTest
       }
     }
   }
+
+  describe("GET /progress/find-by-bag-id/:bag-id") {
+    it("returns a list of progresses for the given bag id") {
+      withConfiguredApp {
+        case (table, _, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            withProgressTracker(table) { progressTracker =>
+              val progress = createProgress
+              whenReady(progressTracker.initialise(progress)) { _ =>
+                val bagId = createBagId
+                val bagIngest =
+                  BagIngest(bagId.toString, randomUUID, Instant.now)
+                givenTableHasItem(bagIngest, table)
+
+                whenGetRequestReady(s"$baseUrl/progress/find-by-bag-id/$bagId") {
+                  response =>
+                    response.status shouldBe StatusCodes.OK
+                    response.entity.contentType shouldBe ContentTypes.`application/json`
+                    val displayBagProgressFutures =
+                      Unmarshal(response.entity).to[List[DisplayIngestMinimal]]
+
+                    whenReady(displayBagProgressFutures) {
+                      displayBagProgresses =>
+                        displayBagProgresses shouldBe List(
+                          DisplayIngestMinimal(bagIngest))
+                    }
+                }
+              }
+            }
+          }
+      }
+    }
+
+    it(
+      "returns a list of progresses for the given bag id with : separated parts") {
+      withConfiguredApp {
+        case (table, _, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            withProgressTracker(table) { progressTracker =>
+              val progress = createProgress
+              whenReady(progressTracker.initialise(progress)) { _ =>
+                val bagId = createBagId
+                val bagIngest =
+                  BagIngest(bagId.toString, randomUUID, Instant.now)
+                givenTableHasItem(bagIngest, table)
+
+                whenGetRequestReady(
+                  s"$baseUrl/progress/find-by-bag-id/${bagId.space}:${bagId.externalIdentifier}") {
+                  response =>
+                    response.status shouldBe StatusCodes.OK
+                    response.entity.contentType shouldBe ContentTypes.`application/json`
+                    val displayBagProgressFutures =
+                      Unmarshal(response.entity).to[List[DisplayIngestMinimal]]
+
+                    whenReady(displayBagProgressFutures) {
+                      displayBagProgresses =>
+                        displayBagProgresses shouldBe List(
+                          DisplayIngestMinimal(bagIngest))
+                    }
+                }
+              }
+            }
+          }
+      }
+    }
+
+    it("returns 'Not Found' if there are no progresses for the given bag id") {
+      withConfiguredApp {
+        case (table, _, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            whenGetRequestReady(s"$baseUrl/progress/find-by-bag-id/$randomUUID") {
+              response =>
+                response.status shouldBe StatusCodes.NotFound
+                response.entity.contentType shouldBe ContentTypes.`application/json`
+                val displayBagProgressFutures =
+                  Unmarshal(response.entity).to[List[DisplayIngestMinimal]]
+                whenReady(displayBagProgressFutures) { displayBagProgresses =>
+                  displayBagProgresses shouldBe List.empty
+                }
+            }
+          }
+      }
+    }
+
+  }
 }
