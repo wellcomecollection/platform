@@ -41,6 +41,10 @@ variable "max_capacity" {
   default = "1"
 }
 
+variable "desired_task_count" {
+  default = "1"
+}
+
 variable "security_group_ids" {
   type    = "list"
   default = []

@@ -15,7 +15,7 @@ resource "aws_api_gateway_resource" "resource" {
 }
 
 module "root_resource_method_static" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/prebuilt/method/static?ref=v16.1.5"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/prebuilt/method/static?ref=v18.2.3"
 
   api_id      = "${aws_api_gateway_rest_api.api.id}"
   resource_id = "${aws_api_gateway_resource.resource.id}"
@@ -37,7 +37,7 @@ resource "aws_api_gateway_authorizer" "cognito" {
 # Stages
 
 module "v1" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v16.1.5"
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v18.2.3"
 
   stage_name = "v1"
 
@@ -52,6 +52,7 @@ module "v1" {
   depends_on = [
     "${module.root_resource_method_static.integration_id}",
     "${concat(module.bags.integration_uris,module.ingests.integration_uris)}",
+    "${module.root_resource_method_static.integration_response_resource_id}",
   ]
 }
 
