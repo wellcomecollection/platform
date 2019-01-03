@@ -40,12 +40,12 @@ class UploadDigestItemFlowTest
         val fileContent = "bah buh bih beh"
 
         val fileName = "key.txt"
-        withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+        withZipFile(List(FileEntry(s"$fileName", fileContent))) { file =>
           val digest =
             "52dbe81fda7f771f83ed4afc9a7c156d3bf486f8d654970fa5c5dbebb4ff7b73"
 
           val archiveItemJob = createArchiveDigestItemJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket,
             digest = digest,
             s3Key = fileName
@@ -78,11 +78,11 @@ class UploadDigestItemFlowTest
         val fileContent = "bah buh bih beh"
 
         val fileName = "key.txt"
-        withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+        withZipFile(List(FileEntry(s"$fileName", fileContent))) { file =>
           val digest = "wrong!"
 
           val archiveItemJob = createArchiveDigestItemJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket,
             digest = digest,
             s3Key = fileName
@@ -110,12 +110,12 @@ class UploadDigestItemFlowTest
     "sends a left of archive item job when uploading a file fails because the file does not exist") {
     withLocalS3Bucket { bucket =>
       withMaterializer { implicit materializer =>
-        withZipFile(List()) { zipFile =>
+        withZipFile(List()) { file =>
           val fileName = "key.txt"
           val bagIdentifier = createExternalIdentifier
 
           val archiveItemJob = createArchiveDigestItemJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket,
             bagIdentifier = bagIdentifier,
             s3Key = fileName
@@ -147,9 +147,9 @@ class UploadDigestItemFlowTest
       val fileContent = new String(bytes, StandardCharsets.UTF_8)
 
       val fileName = "key.txt"
-      withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+      withZipFile(List(FileEntry(s"$fileName", fileContent))) { file =>
         val failingArchiveItemJob = createArchiveDigestItemJobWith(
-          zipFile = zipFile,
+          file = file,
           bucket = Bucket("does-not-exist"),
           s3Key = fileName
         )

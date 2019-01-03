@@ -75,8 +75,11 @@ cat << EOF > /home/${notebook_user}/requirements.txt
 ${requirements}
 EOF
 
-$PIP install --upgrade pip
-$PIP install --requirement /home/${notebook_user}/requirements.txt > /home/${notebook_user}/pip_install.log 2>&1
+#$PIP install --upgrade pip
+# commenting out the pip upgrade for the reasons below as well
+# adding --ignore-installed to get around the preinstalled clashes
+# https://stackoverflow.com/questions/42020151/cannot-remove-entries-from-nonexistent-file
+$PIP install --requirement /home/${notebook_user}/requirements.txt --ignore-installed > /home/${notebook_user}/pip_install.log 2>&1
 
 # Install s3contents.  This needs to be installed in the top-level anaconda
 # environment, or it won't be available to Jupyter, and it will fail to start.

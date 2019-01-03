@@ -48,7 +48,7 @@ endef
 define build_image
 	$(ROOT)/docker_run.py \
 	    --dind -- \
-	    wellcome/image_builder:latest \
+	    wellcome/image_builder:23 \
             --project=$(1) \
             --file=$(2)
 endef

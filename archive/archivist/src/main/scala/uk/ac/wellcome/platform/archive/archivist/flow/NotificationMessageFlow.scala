@@ -11,7 +11,8 @@ import uk.ac.wellcome.platform.archive.common.messaging.{
 }
 import uk.ac.wellcome.platform.archive.common.models.{
   IngestBagRequest,
-  NotificationMessage
+  NotificationMessage,
+  Parallelism
 }
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   ProgressEvent,
@@ -24,20 +25,19 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   *
   */
 object NotificationMessageFlow extends Logging {
-  def apply(parallelism: Int,
-            snsClient: AmazonSNS,
-            progressSnsConfig: SNSConfig)
-    : Flow[NotificationMessage, IngestBagRequest, NotUsed] = {
+  def apply(progressSnsConfig: SNSConfig)(
+    implicit snsClient: AmazonSNS,
+    parallelism: Parallelism
+  ): Flow[NotificationMessage, IngestBagRequest, NotUsed] = {
     Flow[NotificationMessage]
       .via(NotificationParsingFlow[IngestBagRequest])
       .flatMapMerge(
-        breadth = parallelism,
+        breadth = parallelism.value,
         bagRequest => {
           val progressUpdate = ProgressEventUpdate(
-            id = bagRequest.archiveRequestId,
+            id = bagRequest.id,
             events = List(
-              ProgressEvent(
-                s"Started work on ingest: ${bagRequest.archiveRequestId}")
+              ProgressEvent(s"Started work on ingest: ${bagRequest.id}")
             )
           )
 
