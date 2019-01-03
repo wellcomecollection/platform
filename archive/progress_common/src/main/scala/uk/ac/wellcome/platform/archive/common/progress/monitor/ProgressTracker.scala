@@ -109,10 +109,14 @@ class ProgressTracker @Inject()(
   /** Find stored progress given a bagId, uses the secondary index to link a bag to the ingest(s)
     * that created it.
     *
+    * This is intended to meet a particular use case for DLCS during migration and not as part of the
+    * public/documented API.  Consider either removing this functionality or enhancing it to be fully
+    * featured if a use case arises after migration.
+    *
     * return a list of Either BagIngest or error querying DynamoDb
     *
-    * Returns at most 30 associated ingests with most recent first -- to simplify the code by avoiding pagination,
-    * but still fulfilling DLCS's requirements.
+    * Returns at most 30 associated ingests with most recent first -- to simplify the code by avoiding
+    * pagination, but still fulfilling DLCS's requirements.
     */
   def findByBagId(bagId: BagId)= {
     val query = Table[BagIngest](dynamoConfig.table)

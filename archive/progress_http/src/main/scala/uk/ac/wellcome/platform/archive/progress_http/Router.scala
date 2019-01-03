@@ -74,6 +74,8 @@ class Router(progressTracker: ProgressTracker,
         findProgress(bagId)
       }
     } ~ path("find-by-bag-id" / Segment / Segment) { (space, id) =>
+      // Route used by DLCS to find ingests for a bag, not part of the public/documented API.  Either remove
+      // if no longer needed after migration or enhance and document as part of the API.
       get {
         val bagId = BagId(StorageSpace(space), ExternalIdentifier(id))
         findProgress(bagId)
