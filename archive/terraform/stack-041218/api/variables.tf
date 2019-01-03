@@ -42,8 +42,8 @@ variable "cognito_user_pool_arn" {}
 variable "auth_scopes" {
   type = "list"
 }
-variable "alarm_topic_arn" {
-}
+
+variable "alarm_topic_arn" {}
 
 variable "storage_static_content_bucket_name" {}
 variable "interservice_security_group_id" {}
