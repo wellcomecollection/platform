@@ -168,6 +168,7 @@ module "api" {
   ingests_nginx_container_port       = "9000"
   storage_static_content_bucket_name = "${var.storage_static_content_bucket_name}"
   interservice_security_group_id     = "${var.interservice_security_group_id}"
+  alarm_topic_arn                    = "${var.alarm_topic_arn}"
 }
 
 # Migration services
