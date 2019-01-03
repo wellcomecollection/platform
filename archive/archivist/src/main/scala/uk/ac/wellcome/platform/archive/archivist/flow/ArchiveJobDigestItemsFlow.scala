@@ -21,15 +21,14 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 
 object ArchiveJobDigestItemsFlow extends Logging {
-  def apply(parallelism: Int,
-            ingestBagRequest: IngestBagRequest)(implicit s3Client: AmazonS3)
+  def apply(parallelism: Int, ingestBagRequest: IngestBagRequest)(
+    implicit s3Client: AmazonS3)
     : Flow[ArchiveJob,
            Either[ArchiveError[ArchiveJob], ArchiveComplete],
            NotUsed] =
     Flow[ArchiveJob]
       .log("creating archive item jobs")
-      .map(job =>
-        ArchiveItemJobCreator.createArchiveDigestItemJobs(job))
+      .map(job => ArchiveItemJobCreator.createArchiveDigestItemJobs(job))
       .via(
         FoldEitherFlow[
           ArchiveError[ArchiveJob],

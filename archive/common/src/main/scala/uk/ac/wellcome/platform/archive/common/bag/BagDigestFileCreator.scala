@@ -1,7 +1,14 @@
 package uk.ac.wellcome.platform.archive.common.bag
 
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models.{BagDigestFile, BagFilePath, Checksum}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  InvalidBagManifestError
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagDigestFile,
+  BagFilePath,
+  Checksum
+}
 
 object BagDigestFileCreator {
 
@@ -24,12 +31,13 @@ object BagDigestFileCreator {
     val checksumLineRegex = """(.+?)\s+(.+)""".r
 
     line match {
-      case checksumLineRegex(checksum, key) => Right(
-        BagDigestFile(
-          checksum = Checksum(checksum.trim),
-          path = BagFilePath(key.trim)
+      case checksumLineRegex(checksum, key) =>
+        Right(
+          BagDigestFile(
+            checksum = Checksum(checksum.trim),
+            path = BagFilePath(key.trim)
+          )
         )
-      )
       case _ => Left(InvalidBagManifestError(job, manifestName, line))
     }
   }

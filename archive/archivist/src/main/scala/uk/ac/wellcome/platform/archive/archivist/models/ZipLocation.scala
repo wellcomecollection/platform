@@ -5,8 +5,8 @@ import java.util.zip.ZipFile
 import uk.ac.wellcome.platform.archive.common.models.BagFilePath
 
 case class ZipLocation(
-                        zipFile: ZipFile,
-                        bagFilePath: BagFilePath
+  zipFile: ZipFile,
+  bagFilePath: BagFilePath
 )
 
 object ZipLocation {
