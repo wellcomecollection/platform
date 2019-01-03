@@ -5,12 +5,9 @@ import java.io.InputStream
 import cats.implicits._
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveDigestItemJob,
-  ArchiveJob,
-  ZipLocation
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ArchiveJob, ZipLocation}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
+import uk.ac.wellcome.platform.archive.common.bag.BagDigestFileCreator
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 object ArchiveItemJobCreator extends Logging {
@@ -56,7 +53,7 @@ object ArchiveItemJobCreator extends Logging {
       manifestFileLines
         .filter { _.nonEmpty }
         .traverse { line =>
-          BagItemCreator
+          BagDigestFileCreator
             .create(line.trim(), job, zipLocation.bagFilePath.value)
             .map { bagItem =>
               ArchiveDigestItemJob(archiveJob = job, bagDigestItem = bagItem)

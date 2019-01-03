@@ -1,10 +1,9 @@
-package uk.ac.wellcome.platform.archive.archivist.bag
-import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models._
+package uk.ac.wellcome.platform.archive.common.bag
 
-object BagItemCreator extends Logging{
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.{BagDigestFile, BagFilePath, Checksum}
+
+object BagDigestFileCreator {
 
   /** Within a manifest, each entry in the bag is a single line, containing
     * a checksum and the location.  For example:
@@ -17,11 +16,11 @@ object BagItemCreator extends Logging{
     * location, or returns an error if the line is incorrectly formatted.
     *
     */
-  def create(
+  def create[T](
     line: String,
-    job: ArchiveJob,
+    job: T,
     manifestName: String
-  ): Either[ArchiveError[ArchiveJob], BagDigestFile] = {
+  ): Either[ArchiveError[T], BagDigestFile] = {
     val checksumLineRegex = """(.+?)\s+(.+)""".r
 
     line match {

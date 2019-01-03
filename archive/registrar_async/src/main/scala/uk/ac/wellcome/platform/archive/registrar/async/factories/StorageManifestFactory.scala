@@ -6,20 +6,10 @@ import java.time.Instant
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.bag.BagInfoParser
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  DownloadError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation
-}
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  InfrequentAccessStorageProvider,
-  StorageLocation
-}
+import uk.ac.wellcome.platform.archive.common.bag.{BagDigestFileCreator, BagInfoParser}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagDigestFile, BagLocation}
+import uk.ac.wellcome.platform.archive.common.progress.models.{InfrequentAccessStorageProvider, StorageLocation}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -74,7 +64,7 @@ object StorageManifestFactory extends Logging {
 
     triedLines.flatMap { lines: List[String] =>
       lines.traverse { line =>
-        parseManifestLine(line, delimiter, archiveComplete, name)
+        BagDigestFileCreator.create(line, archiveComplete, name)
       }
     }
   }
@@ -99,23 +89,4 @@ object StorageManifestFactory extends Logging {
         name
       ).mkString("/")
     )
-
-  private def parseManifestLine(fileChunk: String,
-                                delimiter: String,
-                                archiveComplete: ArchiveComplete,
-                                manifestName: String)
-    : Either[InvalidBagManifestError[ArchiveComplete], BagDigestFile] = {
-    val splitChunk = fileChunk.split(delimiter).map(_.trim)
-
-    splitChunk match {
-      case Array(checksum: String, key: String) =>
-        Right(
-          BagDigestFile(
-            Checksum(checksum),
-            BagFilePath(key)
-          ))
-      case _ =>
-        Left(InvalidBagManifestError(archiveComplete, manifestName))
-    }
-  }
 }
