@@ -47,7 +47,6 @@ object ArchiveZipFileFlow extends Logging {
                     .single(archiveJob)
                     .via(
                       ArchiveJobFlow(
-                        delimiter = config.bagItConfig.digestDelimiterRegexp,
                         parallelism = config.parallelism,
                         ingestBagRequest = ingestRequest))
                     .map(deleteFile(_, file))

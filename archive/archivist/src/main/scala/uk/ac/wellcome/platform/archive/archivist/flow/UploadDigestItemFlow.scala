@@ -41,7 +41,7 @@ object UploadDigestItemFlow extends Logging {
       .map {
         case (job, option) =>
           option
-            .toRight(FileNotFoundError(job.bagDigestItem.location.path, job))
+            .toRight(FileNotFoundError(job.bagDigestItem.path.value, job))
             .map(inputStream => (job, inputStream))
       }
       .via(

@@ -14,8 +14,9 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveJob
 }
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
-import uk.ac.wellcome.platform.archive.common.models.{BagItem, EntryPath}
+import uk.ac.wellcome.platform.archive.common.models
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
+import uk.ac.wellcome.platform.archive.common.models.{BagFilePath, Checksum}
 
 /** This flow extracts a tag manifest from a ZIP file, and uploads it to S3
   *
@@ -52,14 +53,14 @@ object ArchiveTagManifestFlow extends Logging {
   private def archiveTagManifestItemJob(
     archiveJob: ArchiveJob): ArchiveItemJob = {
     val tagManifestFileName = archiveJob.config.tagManifestFileName
-    ArchiveItemJob(archiveJob, EntryPath(tagManifestFileName))
+    ArchiveItemJob(archiveJob, BagFilePath(tagManifestFileName))
   }
 
   private def archiveDigestItemJob(archiveItemJob: ArchiveItemJob,
                                    digest: String): ArchiveDigestItemJob =
     ArchiveDigestItemJob(
       archiveItemJob.archiveJob,
-      BagItem(digest, archiveItemJob.itemLocation))
+      models.BagDigestFile(Checksum(digest), archiveItemJob.itemLocation))
 
   private def extractArchiveJobFlow = {
     FoldEitherFlow[

@@ -16,10 +16,7 @@ object BagUploaderConfigBuilder {
         uploadPrefix =
           config.getOrElse[String]("upload.prefix")(default = "archive")
       ),
-      bagItConfig = BagItConfig(
-        digestDelimiterRegexp =
-          config.getOrElse[String]("digest.delimiterRegexp")(default = " +")
-      ),
+      bagItConfig = BagItConfig(),
       parallelism = config.getOrElse[Int]("uploader.parallelism")(default = 10)
     )
   }

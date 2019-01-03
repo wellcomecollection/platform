@@ -5,6 +5,7 @@ import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.common.generators.ExternalIdentifierGenerators
+import uk.ac.wellcome.platform.archive.common.models
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -19,7 +20,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
   ): ArchiveItemJob =
     ArchiveItemJob(
       archiveJob = createArchiveJobWith(file, bagIdentifier, bucket),
-      itemLocation = EntryPath(s3Key)
+      itemLocation = BagFilePath(s3Key)
     )
 
   def createArchiveDigestItemJobWith(
@@ -35,7 +36,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
         bagIdentifier = bagIdentifier,
         bucket = bucket
       ),
-      bagDigestItem = BagItem(digest, EntryPath(s3Key))
+      bagDigestItem = models.BagDigestFile(Checksum(digest), BagFilePath(s3Key))
     )
 
   def createArchiveJobWith(

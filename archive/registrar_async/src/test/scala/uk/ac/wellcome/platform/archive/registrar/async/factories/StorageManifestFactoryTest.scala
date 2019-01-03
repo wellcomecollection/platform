@@ -89,8 +89,14 @@ class StorageManifestFactoryTest
               bagLocation = bagLocation
             )
             val value = StorageManifestFactory.create(archiveComplete)
-            value shouldBe Left(
-              InvalidBagManifestError(archiveComplete, "manifest-sha256.txt"))
+            inside(value) {
+              case Left(
+                  InvalidBagManifestError(
+                    actualArchiveComplete,
+                    "manifest-sha256.txt",
+                    _)) =>
+                actualArchiveComplete shouldBe archiveComplete
+            }
         }
       }
     }
@@ -106,10 +112,14 @@ class StorageManifestFactoryTest
               bagLocation = bagLocation
             )
             val value = StorageManifestFactory.create(archiveComplete)
-            value shouldBe Left(
-              InvalidBagManifestError(
-                archiveComplete,
-                "tagmanifest-sha256.txt"))
+            inside(value) {
+              case Left(
+                  InvalidBagManifestError(
+                    actualArchiveComplete,
+                    "tagmanifest-sha256.txt",
+                    _)) =>
+                actualArchiveComplete shouldBe archiveComplete
+            }
         }
       }
     }

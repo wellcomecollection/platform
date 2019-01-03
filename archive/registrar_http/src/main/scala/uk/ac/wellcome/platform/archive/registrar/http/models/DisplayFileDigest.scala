@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar.http.models
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.registrar.common.models.BagDigestFile
+import uk.ac.wellcome.platform.archive.common.models.BagDigestFile
 
 case class DisplayFileDigest(checksum: String,
                              path: String,
