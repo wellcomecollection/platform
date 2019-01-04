@@ -1,5 +1,5 @@
-FROM wellcome/typesafe_config_base:2
+FROM wellcome/typesafe_config_base:25
 
-ADD ../archivist/target/universal/stage /opt/docker
+ADD target/universal/stage /opt/docker
 
 ENV PROJECT bag_replicator

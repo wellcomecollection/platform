@@ -12,7 +12,7 @@ object BagReplicatorConfig {
     BagReplicatorConfig(
       parallelism = config.getOrElse[Int]("bag-replicator.parallelism")(default = 10),
       destination = StorageLocation(
-        namespace = config.required[String]("bag-replicator.storage.destination.namespace"),
+        namespace = config.required[String]("bag-replicator.storage.destination.bucket"),
         rootPath = config.required[String]("bag-replicator.storage.destination.rootpath"))
     )
   }
