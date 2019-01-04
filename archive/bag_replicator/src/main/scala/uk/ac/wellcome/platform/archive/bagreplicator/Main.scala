@@ -15,8 +15,6 @@ object Main extends WellcomeTypesafeApp {
 
     implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
 
-    warn(s"Config: $config")
-
     new BagReplicator(
       s3Client = S3Builder.buildS3Client(config),
       snsClient = SNSBuilder.buildSNSClient(config),
