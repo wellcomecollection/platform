@@ -27,15 +27,19 @@ class BagReplicatorFeatureTest
           requestId,
           storageSpace,
           bagInfo = bagInfo) { bagLocation =>
-
-          val sourceItems = s3Client.listObjects(bagLocation.storageNamespace, bagLocation.bagPathInStorage)
-          val sourceKeys = sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
+          val sourceItems = s3Client.listObjects(
+            bagLocation.storageNamespace,
+            bagLocation.bagPathInStorage)
+          val sourceKeys =
+            sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
           eventually {
             val bagName = bagLocation.bagPath.value.split("/").last
             val destinationBagPath = s"storage-root/space/$bagName"
-            val destinationItems = s3Client.listObjects(destinationBucket.name, destinationBagPath)
-            val destinationKeys = destinationItems.getObjectSummaries.asScala.toList.map(_.getETag)
+            val destinationItems =
+              s3Client.listObjects(destinationBucket.name, destinationBagPath)
+            val destinationKeys =
+              destinationItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
             destinationKeys should contain theSameElementsAs sourceKeys
           }
