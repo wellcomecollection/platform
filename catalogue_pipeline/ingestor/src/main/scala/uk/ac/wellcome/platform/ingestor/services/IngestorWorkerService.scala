@@ -30,7 +30,7 @@ class IngestorWorkerService(elasticClient: ElasticClient,
 
   elasticsearchIndexCreator.create(
     index = ingestorConfig.index,
-    mappingDefinitionBuilder = WorksIndex
+    fields = WorksIndex.rootIndexFields
   )
 
   def run(): Future[Done] =

@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.bag
 
+import java.util.zip.ZipFile
+
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
@@ -20,13 +22,13 @@ class ArchiveJobCreatorTest
     with Inside
     with IngestBagRequestGenerators {
   it("creates an archive job") {
-    withBagItZip() { zipFile =>
+    withBagItZip() { file =>
       val bucketName = "bucket"
       val ingestRequest = createIngestBagRequest
       inside(
         ArchiveJobCreator
           .create(
-            zipFile,
+            new ZipFile(file),
             createBagUploaderConfigWith(Bucket(bucketName)),
             ingestRequest
           )) {
@@ -37,7 +39,7 @@ class ArchiveJobCreatorTest
               bagLocation,
               bagItConfig,
               bagManifestLocations)) =>
-          actualZipFile shouldBe zipFile
+          actualZipFile.size() shouldBe (new ZipFile(file)).size()
           bagLocation shouldBe BagLocation(
             bucketName,
             "archive",

@@ -197,7 +197,7 @@
    * 5. For other subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield,
    *    "y" type as "Period", "v" as "Concept" and "z" as "Place".
    *
-   * Note: for genre a concept might have a authority but no assocaited id. We should still capture it as an id with no value. 
+   * Note: for genre a concept might have a authority but no associated id. We should still capture it as an id with no value. 
    *
    *{
    *  "genres": [
@@ -241,7 +241,7 @@
    *    order, seperated by a hyphen ' - '  and type as "Subject".
    * 3. Populate platform "concepts" "label" with subfield "a" and type as "Concept" for "650", "Period" for "648"
    *    and "Place" for "651".
-   * 4. When this concept has associated identifiers populate "identifiers" with value from subfield 0 and identity scheme
+   * 4. When this field has associated identifiers populate subject "identifiers" with value from subfield 0 and identity scheme
    *    from second indicator (0=lcsh 2=mesh) or if indicator 7 do not include subject.
    * 5. For subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield,
    *    "y" type as "Period", "v" as "Concept" and "z" as "Place".
@@ -251,12 +251,7 @@
    *    {
    *      "label": "Tuberculosis - prevention & control - Paris - 1850 - bibliography.",
    *      "type": "Subject",
-   *      "concepts": [
-   *        {
-   *          "id": "hd2891f",
-   *          "label": "Tuberculosis",
-   *          "type": "Concept",
-   *        "identifiers": [  
+   *      "identifiers": [  
    *           "indentifierType":
    *              {
    *              "id" : "mesh" ,
@@ -267,6 +262,11 @@
    *           "type": "Identifier"
    *           }
    *        ]
+   *      "concepts": [
+   *        {
+   *          "id": "hd2891f",
+   *          "label": "Tuberculosis",
+   *          "type": "Concept",
    *        },
    *        {
    *          "label": "Paris",
@@ -289,12 +289,7 @@
    *    {
    *      "label": "Paris",
    *      "type": "Subject",
-   *      "concepts": [
-   *        {
-   *          "id": "h388hh",
-   *          "label": "Paris",
-   *          "type": "Place",
-   *        "identifiers" : [
+   *     "identifiers" : [
    *           {
    *           "indentifierType":
    *              {
@@ -306,6 +301,11 @@
    *           "type": "Identifier"
    *           }
    *        ] 
+   *      "concepts": [
+   *        {
+   *          "id": "h388hh",
+   *          "label": "Paris",
+   *          "type": "Place",
    *        }
    *      ]
    *},
@@ -329,7 +329,7 @@
    * 1. For all bibliographic records use "marcTag": "600".
    * 2. Populate platform "label" for "600" concatenated with subfields "c", "a", "b", "d", "e"  type as "Subject".
    * 3. Populate platform "concepts" "label" with subfield "a" and type as "Person" for "600".
-   * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh) or if second indicator 7 do not include subject.
+   * 4. When this field has associated identifiers populate subject "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh) or if second indicator 7 do not include subject.
    * 5. For "600" subfield "b" populates "numeration", "d" populate "dates" and subfield "c" populates "prefixes".
    *
    *
@@ -340,15 +340,7 @@
    *    {
    *      "label": "Sir Jacobs, Philiips. II, author.",
    *      "type": "Subject",
-   *      "concepts": [
-   *        {
-   *          "id": "hd2891f",
-   *          "label": "Jacobs, Philip P.",
-   *          "prefixes": ["Sir"],
-   *          "numeration": "II",
-   *          "dates" : "1800's" ,
-   *          "type": "Person",
-   *          "identifiers" : [
+   *      "identifiers" : [
    *              {
    *              "indentifierType":
    *                 {
@@ -360,6 +352,14 @@
    *              "type": "Identifier"
    *              }
    *        ] 
+   *      "concepts": [
+   *        {
+   *          "id": "hd2891f",
+   *          "label": "Jacobs, Philip P.",
+   *          "prefixes": ["Sir"],
+   *          "numeration": "II",
+   *          "dates" : "1800's" ,
+   *          "type": "Person",
    *        } ,
    *        {
    *          "label": "author .",
@@ -375,11 +375,6 @@
    *    {
    *      "label": "Wellcome Trust, sponsor.",
    *      "type": "Subject",
-   *      "concepts": [
-   *        {
-   *          "id": "hd2891f",
-   *          "label": "Wellcome Trust.",
-   *          "type": "Organisation",
    *          "identifiers" : [
    *              {
    *              "indentifierType":
@@ -392,6 +387,11 @@
    *              "type": "Identifier"
    *              }
    *        ] 
+   *      "concepts": [
+   *        {
+   *          "id": "hd2891f",
+   *          "label": "Wellcome Trust.",
+   *          "type": "Organisation",
    *        }
    *      ]
    *    }
@@ -417,7 +417,7 @@
 
    /* Populate wwork: production 260
    * 
-   * 1. For bibliographic records where "260" is populated
+   * 1. For bibliographic records where "260" is populated. Take production event label from entire field concatenating all sub-fields.
    * 2. Populate "places" from subfield "a" and type as "Place". 
    * 3. Populate "agents" from subfield "b" and type as "Agent". 
    * 4. Populate "dates" from subfield "c" and type as "Periods" 
@@ -425,57 +425,42 @@
    * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "function" with "Manufacture".       
    * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "function" with "Manufacture".
    *
-   * Example:
+   * Example: 
    *
-   *  "production": [
+   *  "production": 
+   *   [
    *    {
-   *      "places": [
+   *     "label" : "London : Mac Keith Press, NY : HarperCollins, 1998", 
+   *     "places": [
    *        {
    *          "label": "London",
    *          "type": "Place"
+   *        } ,
+   *        {
+   *          "label": "NY",
+   *          "type": "Place"
+   *        }
+   *      ],
+   *      "agents": [
+   *        {
+   *          "label": "Mac Keith Press",
+   *          "type": "Agent"
+   *        } ,
+   *        {
+   *          "label": "HarperCollins",
+   *          "type": "Agent"
+   *        }
+   *      ],   
+   *      "dates": [
+   *        {
+   *          "label": "1998",
+   *          "type": "Period"
    *        }
    *      ],
    *      "function": {
    *        "label": "Publication",
    *        "type": "Concept"
    *      },
-   *      "dates": [
-   *        {
-   *          "label": "2 May 2018",
-   *          "type": "Period"
-   *        }
-   *      ],
-   *      "agents": [
-   *        {
-   *          "label": "Amazon",
-   *          "type": "Agent"
-   *        }
-   *      ],
-   *      "type": "ProductionEvent"
-   *    },
-   *    {
-   *      "places": [
-   *        {
-   *          "label": "UK",
-   *          "type": "Place"
-   *        }
-   *      ],
-   *      "function": {
-   *        "label": "Manufacture",
-   *        "type": "Concept"
-   *      },
-   *      "dates": [
-   *        {
-   *          "label": "2 May 2018",
-   *          "type": "Period"
-   *        }
-   *      ],
-   *      "agents": [
-   *        {
-   *          "label": "Harper Collins",
-   *          "type": "Agent"
-   *        }
-   *      ],
    *      "type": "ProductionEvent"
    *    }
    *  ]
@@ -486,15 +471,18 @@
 
    /* Populate wwork:production 264
    * 
-   * 1. For bibliographic records where "264" is populated
+   * 1. For bibliographic records where "264" is populated. Take production event label from entire field concatenating all sub-fields.
    * 2. Populate "places" from subfield "a" and type as "Place".
    * 3. Populate "agents" from subfield "b" and type as "Agent"
    * 4. Populate "dates" from subfield "c" and type as "Periods"    
-   * 5. For the second indicator populate "function" as follows. 0 = "Production", 1="Publication", 2="Distribution", 3="Manufacture". Type as "Concept".
+   * 5. For the second indicator populate "function" as follows. 0 = "Production", 1="Publication", 2="Distribution", 3="Manufacture". Type as "Concept". Function goes at the end of the list.
    *
    * Example:
    *
-   *  "production": [
+   *  "production": 
+   *  [
+   *  "label" : "London, 2 May 2018, Amazon, UK" ,
+   *    [
    *    {
    *      "places": [
    *        {
@@ -502,10 +490,6 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "function": {
-   *        "label": "Publication",
-   *        "type": "Concept"
-   *      },
    *      "dates": [
    *        {
    *          "label": "2 May 2018",
@@ -518,31 +502,10 @@
    *          "type": "Agent"
    *        }
    *      ],
-   *      "type": "ProductionEvent"
-   *    },
-   *    {
-   *      "places": [
-   *        {
-   *          "label": "UK",
-   *          "type": "Place"
-   *        }
-   *      ],
    *      "function": {
-   *        "label": "Manufacture",
-   *        "type": "Function"
+   *        "label": "Publication",
+   *        "type": "Concept"
    *      },
-   *      "dates": [
-   *        {
-   *          "label": "2 May 2018",
-   *          "type": "Period"
-   *        }
-   *      ],
-   *      "agents": [
-   *        {
-   *          "label": "Harper Collins",
-   *          "type": "Agent"
-   *        }
-   *      ],
    *      "type": "ProductionEvent"
    *    }
    *  ]

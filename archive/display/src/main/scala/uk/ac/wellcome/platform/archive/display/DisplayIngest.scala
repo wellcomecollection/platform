@@ -44,6 +44,11 @@ case class ResponseDisplayIngest(@JsonKey("@context")
                                  ontologyType: String = "Ingest")
     extends DisplayIngest
 
+case class DisplayIngestMinimal(id: UUID,
+                                createdDate: String,
+                                @JsonKey("type")
+                                ontologyType: String = "Ingest")
+
 case class IngestDisplayBag(id: String,
                             @JsonKey("type")
                             ontologyType: String = "Bag")
@@ -52,10 +57,6 @@ case class DisplayCallback(url: String,
                            status: Option[DisplayStatus],
                            @JsonKey("type")
                            ontologyType: String = "Callback")
-
-case class DisplayIngestType(id: String = "create",
-                             @JsonKey("type")
-                             ontologyType: String = "IngestType")
 
 case class DisplayStorageSpace(id: String,
                                @JsonKey("type")
@@ -70,7 +71,7 @@ case class DisplayProgressEvent(description: String,
                                 @JsonKey("type")
                                 ontologyType: String = "ProgressEvent")
 
-case object ResponseDisplayIngest {
+object ResponseDisplayIngest {
   def apply(progress: Progress, contextUrl: URL): ResponseDisplayIngest =
     ResponseDisplayIngest(
       context = contextUrl.toString,
@@ -78,7 +79,7 @@ case object ResponseDisplayIngest {
       sourceLocation = DisplayLocation(progress.sourceLocation),
       callback = progress.callback.map(DisplayCallback(_)),
       space = DisplayStorageSpace(progress.space.toString),
-      ingestType = DisplayIngestType(),
+      ingestType = CreateDisplayIngestType,
       bag = progress.bag.map(IngestDisplayBag(_)),
       status = DisplayStatus(progress.status),
       events = progress.events.map(DisplayProgressEvent(_)),
@@ -87,14 +88,19 @@ case object ResponseDisplayIngest {
     )
 }
 
-case object DisplayProgressEvent {
+object DisplayProgressEvent {
   def apply(progressEvent: ProgressEvent): DisplayProgressEvent =
     DisplayProgressEvent(
       progressEvent.description,
       progressEvent.createdDate.toString)
 }
 
-case object DisplayStatus {
+object DisplayIngestMinimal {
+  def apply(bagIngest: BagIngest): DisplayIngestMinimal =
+    DisplayIngestMinimal(bagIngest.id, bagIngest.createdDate.toString)
+}
+
+object DisplayStatus {
   def apply(progressStatus: Progress.Status): DisplayStatus =
     DisplayStatus(progressStatus.toString)
 
@@ -102,7 +108,7 @@ case object DisplayStatus {
     DisplayStatus(callbackStatus.toString)
 }
 
-case object DisplayCallback {
+object DisplayCallback {
   def apply(callback: Callback): DisplayCallback = DisplayCallback(
     callback.uri.toString,
     Some(DisplayStatus(callback.status))

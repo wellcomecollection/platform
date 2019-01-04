@@ -21,32 +21,29 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 
 object ArchiveJobDigestItemsFlow extends Logging {
-  def apply(delimiter: String,
-            parallelism: Int,
-            ingestBagRequest: IngestBagRequest)(implicit s3Client: AmazonS3)
+  def apply(parallelism: Int, ingestBagRequest: IngestBagRequest)(
+    implicit s3Client: AmazonS3)
     : Flow[ArchiveJob,
            Either[ArchiveError[ArchiveJob], ArchiveComplete],
            NotUsed] =
     Flow[ArchiveJob]
       .log("creating archive item jobs")
-      .map(job =>
-        ArchiveItemJobCreator.createArchiveDigestItemJobs(job, delimiter))
+      .map(job => ArchiveItemJobCreator.createArchiveDigestItemJobs(job))
       .via(
         FoldEitherFlow[
           ArchiveError[ArchiveJob],
           List[ArchiveDigestItemJob],
           Either[ArchiveError[ArchiveJob], ArchiveComplete]](OnErrorFlow())(
-          mapReduceArchiveItemJobs(delimiter, parallelism, ingestBagRequest)))
+          mapReduceArchiveItemJobs(parallelism, ingestBagRequest)))
 
-  private def mapReduceArchiveItemJobs(delimiter: String,
-                                       parallelism: Int,
+  private def mapReduceArchiveItemJobs(parallelism: Int,
                                        ingestBagRequest: IngestBagRequest)(
     implicit s3Client: AmazonS3): Flow[List[ArchiveDigestItemJob],
                                        Either[ArchiveJobError, ArchiveComplete],
                                        NotUsed] =
     Flow[List[ArchiveDigestItemJob]]
       .mapConcat(identity)
-      .via(ArchiveDigestItemJobFlow(delimiter, parallelism))
+      .via(ArchiveDigestItemJobFlow(parallelism))
       .groupBy(Int.MaxValue, {
         case Right(archiveItemJob) => archiveItemJob.archiveJob
         case Left(error)           => error.t.archiveJob
@@ -70,7 +67,7 @@ object ArchiveJobDigestItemsFlow extends Logging {
         case (Nil, archiveJob) =>
           Right(
             ArchiveComplete(
-              ingestBagRequest.archiveRequestId,
+              ingestBagRequest.id,
               ingestBagRequest.storageSpace,
               archiveJob.bagLocation
             ))

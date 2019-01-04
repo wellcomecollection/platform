@@ -3,10 +3,10 @@ package uk.ac.wellcome.platform.archive.registrar.generators
 import java.time.Instant
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{BagInfo, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.models.{
-  StorageLocation,
-  StorageProvider
+  StandardStorageProvider,
+  StorageLocation
 }
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
@@ -16,7 +16,6 @@ trait StorageManifestGenerators extends RandomThings {
     space: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo,
     checksumAlgorithm: String = "sha256",
-    providerId: String = "providerId",
     bucket: String = "bukkit",
     path: String = "path"
   ): StorageManifest =
@@ -31,9 +30,7 @@ trait StorageManifestGenerators extends RandomThings {
         checksumAlgorithm = ChecksumAlgorithm(checksumAlgorithm),
         files = List(BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))
       ),
-      StorageLocation(
-        StorageProvider(providerId),
-        ObjectLocation(bucket, path)),
+      StorageLocation(StandardStorageProvider, ObjectLocation(bucket, path)),
       Instant.now
     )
 

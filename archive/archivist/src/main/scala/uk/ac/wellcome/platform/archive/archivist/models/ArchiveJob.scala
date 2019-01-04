@@ -23,6 +23,4 @@ case class ArchiveJob(
   bagLocation: BagLocation,
   config: BagItConfig,
   bagManifestLocations: List[BagManifestLocation]
-) {
-  def digestDelimiter = config.digestDelimiterRegexp
-}
+)

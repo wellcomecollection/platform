@@ -25,7 +25,7 @@ object Main extends WellcomeTypesafeApp {
       messageStream =
         MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config),
       progressTracker = new ProgressTracker(
-        dynamoClient = DynamoBuilder.buildDynamoClient(config),
+        dynamoDbClient = DynamoBuilder.buildDynamoClient(config),
         dynamoConfig = DynamoBuilder.buildDynamoConfig(config)
       ),
       snsClient = SNSBuilder.buildSNSClient(config),

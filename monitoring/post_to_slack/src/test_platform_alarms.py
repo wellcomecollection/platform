@@ -69,6 +69,7 @@ def test_guess_cloudwatch_search_terms(alarm_name, expected_search_terms):
     [
         ("catalogue-api-romulus-alb-target-400-errors", True),
         ("catalogue-api-remus-alb-target-500-errors", True),
+        ("storage-api-5xx-alarm", True),
         ("loris-alb-not-enough-healthy-hosts", True),
         ("id_minter-alb-unhealthy-hosts", True),
         ("ingestor-alb-unhealthy-hosts", True),

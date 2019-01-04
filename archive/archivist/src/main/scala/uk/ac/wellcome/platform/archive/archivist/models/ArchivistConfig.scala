@@ -3,8 +3,7 @@ package uk.ac.wellcome.platform.archive.archivist.models
 case class UploadConfig(uploadNamespace: String,
                         uploadPrefix: String = "archive")
 
-case class BagItConfig(digestDelimiterRegexp: String = " +",
-                       tagManifestFilePattern: String = "tagmanifest-%s.txt",
+case class BagItConfig(tagManifestFilePattern: String = "tagmanifest-%s.txt",
                        manifestFilePattern: String = "manifest-%s.txt",
                        algorithm: String = "sha256") {
 

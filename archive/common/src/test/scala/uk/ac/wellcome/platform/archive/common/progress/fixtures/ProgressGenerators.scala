@@ -1,10 +1,11 @@
 package uk.ac.wellcome.platform.archive.common.progress.fixtures
 
 import java.net.URI
+import java.time.Instant
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.BagId
+import uk.ac.wellcome.platform.archive.common.generators.ExternalIdentifierGenerators
+import uk.ac.wellcome.platform.archive.common.models.{BagId, StorageSpace}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   StorageLocation,
@@ -12,10 +13,10 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 }
 import uk.ac.wellcome.storage.ObjectLocation
 
-trait ProgressGenerators extends RandomThings {
+trait ProgressGenerators extends ExternalIdentifierGenerators {
 
   val storageLocation = StorageLocation(
-    StorageProvider(randomAlphanumeric()),
+    StandardStorageProvider,
     ObjectLocation(randomAlphanumeric(), randomAlphanumeric()))
 
   def createProgress: Progress = createProgressWith()
@@ -29,6 +30,7 @@ trait ProgressGenerators extends RandomThings {
                          space: Namespace = createSpace,
                          status: Status = Progress.Accepted,
                          maybeBag: Option[BagId] = None,
+                         createdDate: Instant = Instant.now,
                          events: List[ProgressEvent] = List.empty): Progress = {
     Progress(
       id = id,
@@ -37,6 +39,7 @@ trait ProgressGenerators extends RandomThings {
       space = space,
       status = status,
       bag = maybeBag,
+      createdDate = createdDate,
       events = events)
   }
 
@@ -60,6 +63,18 @@ trait ProgressGenerators extends RandomThings {
     events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
     ProgressStatusUpdate(id, status, maybeBag, events)
   }
+
+  def createProgressBagUpdateWith(id: UUID,
+                                  bagId: BagId,
+                                  status: Status = Progress.Processing,
+                                  events: Seq[ProgressEvent] = List(
+                                    createProgressEvent)): ProgressUpdate = {
+    ProgressStatusUpdate(id, status, Some(bagId), events)
+  }
+
+  def createBagId = BagId(createStorageSpace, createExternalIdentifier)
+
+  def createStorageSpace = StorageSpace(randomAlphanumeric())
 
   def createSpace = Namespace(randomAlphanumeric())
 

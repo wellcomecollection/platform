@@ -12,9 +12,11 @@ import uk.ac.wellcome.platform.archive.common.models.error.{
   DownloadError
 }
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 object DownloadAndVerifyDigestItemFlow extends Logging {
+
+  import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
   def apply(parallelism: Int)(implicit s3Client: AmazonS3)
     : Flow[ArchiveDigestItemJob,
@@ -24,13 +26,7 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
       .log("download to verify")
       .flatMapMerge(
         parallelism, { job =>
-          val triedInputStream = Try(
-            s3Client
-              .getObject(job.uploadLocation.namespace, job.uploadLocation.key)
-              .getObjectContent
-          )
-
-          triedInputStream match {
+          job.uploadLocation.toInputStream match {
             case Failure(exception) =>
               warn(
                 s"Failed downloading object ${job.uploadLocation} from S3",
@@ -43,13 +39,13 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
                 .via(SHA256Flow())
                 .map {
                   case calculatedChecksum
-                      if job.bagDigestItem.checksum == calculatedChecksum =>
+                      if job.bagDigestItem.checksum.value == calculatedChecksum =>
                     Right(job)
                   case calculatedChecksum =>
                     warn(s"Failed validating checksum in download for job $job")
                     Left(
                       ChecksumNotMatchedOnDownloadError(
-                        expectedChecksum = job.bagDigestItem.checksum,
+                        expectedChecksum = job.bagDigestItem.checksum.value,
                         actualChecksum = calculatedChecksum,
                         t = job
                       )

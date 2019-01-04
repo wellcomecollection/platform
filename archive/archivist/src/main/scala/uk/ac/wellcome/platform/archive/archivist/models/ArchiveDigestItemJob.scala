@@ -1,29 +1,29 @@
 package uk.ac.wellcome.platform.archive.archivist.models
 
 import uk.ac.wellcome.platform.archive.common.models.{
-  BagItem,
-  BagLocation,
-  EntryPath
+  BagDigestFile,
+  BagFilePath,
+  BagLocation
 }
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class ArchiveDigestItemJob(archiveJob: ArchiveJob,
-                                bagDigestItem: BagItem) {
+                                bagDigestItem: BagDigestFile) {
   def bagName = archiveJob.bagLocation.bagPath
 
   def uploadLocation =
-    createUploadLocation(archiveJob.bagLocation, bagDigestItem.location)
+    createUploadLocation(archiveJob.bagLocation, bagDigestItem.path)
 
   private def createUploadLocation(
     bagLocation: BagLocation,
-    itemLocation: EntryPath
+    itemLocation: BagFilePath
   ) =
     ObjectLocation(
       bagLocation.storageNamespace,
       List(
         bagLocation.storageRootPath,
         bagLocation.bagPath.value,
-        itemLocation.path
+        itemLocation.value
       ).mkString("/")
     )
 }

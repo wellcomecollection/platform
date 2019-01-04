@@ -77,4 +77,6 @@ module "stack-041218" {
   ingest_get_policy_json                       = "${data.aws_iam_policy_document.ingest_get.json}"
   vhs_archive_manifest_full_access_policy_json = "${module.vhs_archive_manifest.full_access_policy}"
   vhs_archive_manifest_read_policy_json        = "${module.vhs_archive_manifest.read_policy}"
+
+  alarm_topic_arn = "${local.gateway_server_error_alarm_arn}"
 }

@@ -32,6 +32,7 @@ object SnsPublishFlow extends Logging {
           new PublishRequest(snsConfig.topicArn, messageString, subject)
         }
         .flatMap(publishRequest => Try(snsClient.publish(publishRequest)))
+
     ProcessLogDiscardFlow[T, PublishResult]("sns_publish")(publish)
       .withAttributes(
         ActorAttributes.dispatcher(

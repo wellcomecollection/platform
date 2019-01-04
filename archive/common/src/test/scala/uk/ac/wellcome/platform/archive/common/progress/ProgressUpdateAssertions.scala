@@ -35,6 +35,7 @@ trait ProgressUpdateAssertions extends SNS with Inside with Logging {
         })
       }
       .partition(_.isSuccess)
+
     success should have size 1
   }
 

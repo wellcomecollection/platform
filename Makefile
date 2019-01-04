@@ -20,7 +20,6 @@ include sbt_common/Makefile
 include sierra_adapter/Makefile
 include nginx/Makefile
 include archive/Makefile
-include archive/terraform_critical/Makefile
 include reporting/Makefile
 
 

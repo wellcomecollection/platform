@@ -3,20 +3,18 @@
   "type": "Person",
   "label": "Honor Fell",
   "gender": "Female",
-  "dateOfBirth": "1900-05-22" ,
-  "dateOfDeath": "1986-04-22" ,
-  "nationality":
-    {
-      "id": "x2n20d1io",
-      "label": "United Kingdom" ,
-      "type": "Place"	
-    } ,
-  "placeOfBirth":
-      {
-      "id": "02sd2jh5",
-      "label": "Fowthorpe" ,
-      "type": "Place"	
-      } ,
+  "dateOfBirth": "1900-05-22",
+  "dateOfDeath": "1986-04-22",
+  "nationality": {
+    "id": "x2n20d1io",
+    "label": "United Kingdom",
+    "type": "Place"
+  },
+  "placeOfBirth": {
+    "id": "02sd2jh5",
+    "label": "Fowthorpe",
+    "type": "Place"
+  },
   "occupation": [
     {
       "id": "x2n0x290",
@@ -47,12 +45,11 @@
     {
       "label": "Director",
       "start": "1929",
-      "end": "1970" ,
+      "end": "1970",
       "positionAt": "Strangeways Research Laboratory"
     },
     {
       "label": "Senior Beit Fellow",
-      "start": "1928",
       "start": "1928",
       "positionAt": "Strangeways Research Laboratory"
     }

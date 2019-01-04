@@ -5,6 +5,7 @@ locals {
   private_subnets = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_private_subnets}"
   public_subnets  = "${data.terraform_remote_state.shared_infra.storage_vpc_delta_public_subnets}"
   vpc_cidr        = ["172.30.0.0/16"]
+  account_id      = "${data.aws_caller_identity.current.account_id}"
 
   //vpc_cidr       = ["${data.terraform_remote_state.shared_infra.storage_cidr_block_vpc}"]
 
@@ -27,4 +28,5 @@ locals {
   api_ecs_container_image              = "${module.ecr_repository_archive_api.repository_url}:${var.release_ids["archive_api"]}"
   infra_bucket                         = "${data.terraform_remote_state.shared_infra.infra_bucket}"
   nginx_container_image                = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
+  gateway_server_error_alarm_arn       = "${data.terraform_remote_state.shared_infra.gateway_server_error_alarm_arn}"
 }
