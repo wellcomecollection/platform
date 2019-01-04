@@ -1,5 +1,9 @@
-FROM wellcome/typesafe_config_base:21
+FROM openjdk
+
+RUN mkdir -p /opt/docker
+
+EXPOSE 8888
 
 ADD target/universal/stage /opt/docker
 
-ENV PROJECT archivist
+ENTRYPOINT ["/opt/docker/bin/archivist"]
