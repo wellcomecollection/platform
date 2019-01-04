@@ -1,4 +1,4 @@
-FROM wellcome/typesafe_config_base:25
+FROM wellcome/typesafe_config_base:2
 
 ADD target/universal/stage /opt/docker
 

@@ -1,13 +1,14 @@
 package uk.ac.wellcome.platform.archive.bagreplicator
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
-import akka.Done
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
@@ -15,6 +16,7 @@ import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
 import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.NotificationParsingFailed
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
 import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
+import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
 
@@ -27,26 +29,13 @@ class BagReplicator(
   messageStream: MessageStream[NotificationMessage, Unit],
   bagReplicatorConfig: BagReplicatorConfig,
   snsProgressConfig: SNSConfig)(implicit val actorSystem: ActorSystem)
-    extends Logging {
+    extends Logging with Runnable {
+
   def run(): Future[Done] = {
-    implicit val adapter: LoggingAdapter =
-      Logging(actorSystem.eventStream, "customLogger")
-
-    val decider: Supervision.Decider = { e =>
-      {
-        error("Stream failure", e)
-        Supervision.Resume
-      }
-    }
-
-    implicit val materializer: ActorMaterializer = ActorMaterializer(
-      ActorMaterializerSettings(actorSystem).withSupervisionStrategy(decider)
-    )
-
+    implicit val adapter: LoggingAdapter = Logging(actorSystem.eventStream, "customLogger")
+    implicit val materializer: ActorMaterializer = SupervisedMaterializer.resumable
     implicit val s3client: AmazonS3 = s3Client
-
     implicit val ex: ExecutionContext = actorSystem.dispatcher
-
     implicit val s3Copier: S3Copier = new S3Copier()
 
     val flow = Flow[NotificationMessage]
