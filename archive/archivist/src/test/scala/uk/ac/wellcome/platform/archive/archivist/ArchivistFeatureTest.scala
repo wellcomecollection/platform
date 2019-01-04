@@ -51,7 +51,7 @@ class ArchivistFeatureTest
 
               assertSnsReceivesOnly(
                 ArchiveComplete(
-                  request.archiveRequestId,
+                  request.id,
                   request.storageSpace,
                   BagLocation(
                     storageBucket.name,
@@ -63,21 +63,21 @@ class ArchivistFeatureTest
               )
 
               assertTopicReceivesProgressEventUpdate(
-                request.archiveRequestId,
+                request.id,
                 progressTopic) { events =>
                 events should have size 1
-                events.head.description shouldBe s"Started work on ingest: ${request.archiveRequestId}"
+                events.head.description shouldBe s"Started work on ingest: ${request.id}"
               }
 
               assertTopicReceivesProgressEventUpdate(
-                request.archiveRequestId,
+                request.id,
                 progressTopic) { events =>
                 events should have size 1
                 events.head.description shouldBe "Source bag downloaded successfully"
               }
 
               assertTopicReceivesProgressEventUpdate(
-                request.archiveRequestId,
+                request.id,
                 progressTopic) { events =>
                 events should have size 1
                 events.head.description shouldBe "Bag uploaded and verified successfully"
@@ -100,7 +100,7 @@ class ArchivistFeatureTest
             assertSnsReceivesNothing(registrarTopic)
 
             assertTopicReceivesProgressStatusUpdate(
-              request.archiveRequestId,
+              request.id,
               progressTopic,
               Progress.Failed)({ events =>
               all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
@@ -120,7 +120,7 @@ class ArchivistFeatureTest
               assertSnsReceivesNothing(registrarTopic)
 
               assertTopicReceivesProgressStatusUpdate(
-                request.archiveRequestId,
+                request.id,
                 progressTopic,
                 Progress.Failed)({ events =>
                 all(events.map(_.description)) should include regex "Failed reading file tagmanifest-sha256.txt from zip file"
@@ -168,7 +168,7 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       ArchiveComplete(
-                        validRequest1.archiveRequestId,
+                        validRequest1.id,
                         validRequest1.storageSpace,
                         BagLocation(
                           storageBucket.name,
@@ -177,7 +177,7 @@ class ArchivistFeatureTest
                             s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                       ),
                       ArchiveComplete(
-                        validRequest2.archiveRequestId,
+                        validRequest2.id,
                         validRequest2.storageSpace,
                         BagLocation(
                           storageBucket.name,
@@ -190,14 +190,14 @@ class ArchivistFeatureTest
                   )
 
                   assertTopicReceivesProgressStatusUpdate(
-                    invalidRequest1.archiveRequestId,
+                    invalidRequest1.id,
                     progressTopic,
                     Progress.Failed) { events =>
                     all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                   }
 
                   assertTopicReceivesProgressStatusUpdate(
-                    invalidRequest2.archiveRequestId,
+                    invalidRequest2.id,
                     progressTopic,
                     Progress.Failed) { events =>
                     all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
@@ -231,7 +231,7 @@ class ArchivistFeatureTest
           sendNotificationToSQS(
             queuePair.queue,
             IngestBagRequest(
-              archiveRequestId = invalidRequestId1,
+              id = invalidRequestId1,
               zippedBagLocation =
                 ObjectLocation(ingestBucket.name, "non-existing1.zip"),
               storageSpace = StorageSpace("not_a_real_one")
@@ -248,7 +248,7 @@ class ArchivistFeatureTest
             sendNotificationToSQS(
               queuePair.queue,
               IngestBagRequest(
-                archiveRequestId = invalidRequestId2,
+                id = invalidRequestId2,
                 zippedBagLocation =
                   ObjectLocation(ingestBucket.name, "non-existing2.zip"),
                 storageSpace = StorageSpace("not_a_real_one")
@@ -262,7 +262,7 @@ class ArchivistFeatureTest
               assertSnsReceives(
                 Set(
                   ArchiveComplete(
-                    validRequest1.archiveRequestId,
+                    validRequest1.id,
                     validRequest1.storageSpace,
                     BagLocation(
                       storageBucket.name,
@@ -271,7 +271,7 @@ class ArchivistFeatureTest
                         s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                   ),
                   ArchiveComplete(
-                    validRequest2.archiveRequestId,
+                    validRequest2.id,
                     validRequest2.storageSpace,
                     BagLocation(
                       storageBucket.name,
@@ -343,7 +343,7 @@ class ArchivistFeatureTest
                       assertSnsReceives(
                         Set(
                           ArchiveComplete(
-                            validRequest1.archiveRequestId,
+                            validRequest1.id,
                             validRequest2.storageSpace,
                             BagLocation(
                               storageBucket.name,
@@ -352,7 +352,7 @@ class ArchivistFeatureTest
                                 s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                           ),
                           ArchiveComplete(
-                            validRequest2.archiveRequestId,
+                            validRequest2.id,
                             validRequest2.storageSpace,
                             BagLocation(
                               storageBucket.name,
@@ -365,14 +365,14 @@ class ArchivistFeatureTest
                       )
 
                       assertTopicReceivesFailedProgress(
-                        requestId = invalidRequest1.archiveRequestId,
+                        requestId = invalidRequest1.id,
                         expectedDescription =
                           "Failed reading file this/does/not/exists.jpg from zip file",
                         progressTopic = progressTopic
                       )
 
                       assertTopicReceivesFailedProgress(
-                        requestId = invalidRequest2.archiveRequestId,
+                        requestId = invalidRequest2.id,
                         expectedDescription =
                           "Failed reading file this/does/not/exists.jpg from zip file",
                         progressTopic = progressTopic
@@ -423,7 +423,7 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       ArchiveComplete(
-                        validRequest1.archiveRequestId,
+                        validRequest1.id,
                         validRequest2.storageSpace,
                         BagLocation(
                           storageBucket.name,
@@ -432,7 +432,7 @@ class ArchivistFeatureTest
                             s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                       ),
                       ArchiveComplete(
-                        validRequest2.archiveRequestId,
+                        validRequest2.id,
                         validRequest2.storageSpace,
                         BagLocation(
                           storageBucket.name,
@@ -445,14 +445,14 @@ class ArchivistFeatureTest
                   )
 
                   assertTopicReceivesFailedProgress(
-                    requestId = invalidRequest1.archiveRequestId,
+                    requestId = invalidRequest1.id,
                     expectedDescription =
                       "Failed reading file bag-info.txt from zip file",
                     progressTopic = progressTopic
                   )
 
                   assertTopicReceivesFailedProgress(
-                    requestId = invalidRequest2.archiveRequestId,
+                    requestId = invalidRequest2.id,
                     expectedDescription =
                       "Failed reading file bag-info.txt from zip file",
                     progressTopic = progressTopic

@@ -34,10 +34,10 @@ object NotificationMessageFlow extends Logging {
         breadth = parallelism,
         bagRequest => {
           val progressUpdate = ProgressEventUpdate(
-            id = bagRequest.archiveRequestId,
+            id = bagRequest.id,
             events = List(
               ProgressEvent(
-                s"Started work on ingest: ${bagRequest.archiveRequestId}")
+                s"Started work on ingest: ${bagRequest.id}")
             )
           )
 

@@ -98,7 +98,7 @@ class ZipFileDownloadFlowTest
             }
 
             assertTopicReceivesProgressStatusUpdate(
-              ingestBagRequest.archiveRequestId,
+              ingestBagRequest.id,
               progressTopic,
               Progress.Failed) { events =>
               events should have size 1

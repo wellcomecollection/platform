@@ -88,13 +88,13 @@ object ArchiveZipFileFlow extends Logging {
           List(ProgressEvent("Bag uploaded and verified successfully")))
       case Left(ArchiveJobError(_, errors)) =>
         ProgressStatusUpdate(
-          ingestBagRequest.archiveRequestId,
+          ingestBagRequest.id,
           Progress.Failed,
           None,
           errors.map(error => ProgressEvent(error.toString)))
       case Left(archiveError) =>
         ProgressStatusUpdate(
-          ingestBagRequest.archiveRequestId,
+          ingestBagRequest.id,
           Progress.Failed,
           None,
           List(ProgressEvent(archiveError.toString)))

@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.archive.common.json.{
 }
 import uk.ac.wellcome.storage.ObjectLocation
 
-case class IngestBagRequest(archiveRequestId: UUID,
+case class IngestBagRequest(id: UUID,
                             zippedBagLocation: ObjectLocation,
                             archiveCompleteCallbackUrl: Option[URI] = None,
                             storageSpace: StorageSpace)
