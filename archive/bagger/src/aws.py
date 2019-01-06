@@ -98,3 +98,24 @@ def get_all_errors():
 def remove_error(bnumber):
     obj = get_s3().Object(settings.DROP_BUCKET_NAME_ERRORS, bnumber + ".json")
     obj.delete()
+
+
+def get_dropped_bag_info(bnumber):
+    key = "{0}.zip".format(bnumber)
+    bag_info = {
+        "exists": False
+    }
+    try:
+        client = get_boto_session().client("s3")
+        bag_head = client.head_object(Bucket=settings.DROP_BUCKET_NAME, Key=key)
+    except ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            return bag_info
+        else:
+            raise  # Something else has gone wrong.
+    else:
+        bag_info["exists"] = True
+        bag_info["last_modified"] = bag_head["LastModified"]
+        bag_info["size"] = bag_head["ContentLength"]
+
+    return bag_info
