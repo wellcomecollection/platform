@@ -1,9 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
 import akka.NotUsed
-import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, Source}
-import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.transfer.TransferManager
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
@@ -16,6 +15,8 @@ import uk.ac.wellcome.platform.archive.common.models.{
 }
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
+import scala.concurrent.ExecutionContext
+
 /** This flow takes an ingest request, and downloads the entire ZIP file
   * associated with the request to a local (temporary) path.
   *
@@ -26,13 +27,12 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
 object ZipFileDownloadFlow extends Logging {
 
   def apply(snsConfig: SNSConfig)(
-    implicit s3Client: AmazonS3,
+    implicit transferManager: TransferManager,
+    ec: ExecutionContext,
     snsClient: AmazonSNS,
     parallelism: Parallelism
   ): Flow[IngestBagRequest, BagDownload, NotUsed] = {
 
-    val materializerType = "akka.stream.materializer.blocking-io-dispatcher"
-    val actorAttributes = ActorAttributes.dispatcher(materializerType)
     val downloadSuccessMessage = "Ingest bag file downloaded successfully."
 
     val snsPublishFlow = SnsPublishFlow[ProgressUpdate](
@@ -41,22 +41,25 @@ object ZipFileDownloadFlow extends Logging {
       subject = "archivist_progress"
     )
 
-    Flow[IngestBagRequest]
-      .flatMapMerge(
-        parallelism.value, { request =>
-          val ingestJob = request.toIngestBagJob
+    Flow[IngestBagRequest].flatMapMerge(
+      parallelism.value,
+      request => {
+        val bagDownload = request.toIngestBagJob.bagDownload
+        Source
+          .fromFuture(bagDownload)
+          .map { either =>
+            {
+              either.fold(
+                error => ProgressUpdate.failed(request.id, error),
+                _ => ProgressUpdate.event(request.id, downloadSuccessMessage)
+              )
+            }
+          }
+          .via(snsPublishFlow)
+          .mapAsync(parallelism.value)(_ => bagDownload)
+      }
+    )
 
-          val updates = ingestJob.bagDownload.fold(
-            error => ProgressUpdate.failed(request.id, error),
-            _ => ProgressUpdate.event(request.id, downloadSuccessMessage)
-          )
-
-          Source
-            .single(updates)
-            .via(snsPublishFlow)
-            .map(_ => ingestJob.bagDownload)
-            .withAttributes(actorAttributes)
-        }
-      )
   }
+
 }
