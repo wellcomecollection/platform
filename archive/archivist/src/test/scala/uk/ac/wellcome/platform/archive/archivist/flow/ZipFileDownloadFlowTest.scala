@@ -6,6 +6,7 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.fixtures.SNS
@@ -14,11 +15,7 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
 import uk.ac.wellcome.platform.archive.common.errors.FileDownloadingError
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.{
-  FileDownloadComplete,
-  IngestBagRequest,
-  Parallelism
-}
+import uk.ac.wellcome.platform.archive.common.models.{FileDownloadComplete, IngestBagRequest, Parallelism}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
@@ -38,6 +35,7 @@ class ZipFileDownloadFlowTest
     with ProgressUpdateAssertions {
 
   implicit val system = ActorSystem("test")
+  implicit val ec = system.dispatcher
   implicit val materializer = ActorMaterializer()
   implicit val s3client = s3Client
   implicit val snsclient = snsClient
@@ -126,6 +124,8 @@ class ZipFileDownloadFlowTest
   private def withZipFileDownloadFlow[R](topic: Topic)(
     testWith: TestWith[ZipFileDownloadFlow, R]): R = {
     implicit val parallelism = Parallelism(10)
+
+    implicit val tf = TransferManagerBuilder.standard().withS3Client(s3Client).build()
 
     val downloadZipFlow: Flow[IngestBagRequest, BagDownload, NotUsed] =
       ZipFileDownloadFlow(

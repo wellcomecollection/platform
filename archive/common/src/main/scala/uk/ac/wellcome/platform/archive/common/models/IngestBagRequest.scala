@@ -3,28 +3,26 @@ package uk.ac.wellcome.platform.archive.common.models
 import java.net.URI
 import java.util.UUID
 
-import com.amazonaws.services.s3.AmazonS3
-import uk.ac.wellcome.platform.archive.common.json.{
-  URIConverters,
-  UUIDConverters
-}
+import com.amazonaws.services.s3.transfer.TransferManager
+import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.platform.archive.common.TemporaryStore
 import uk.ac.wellcome.platform.archive.common.errors.FileDownloadingError
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 case class IngestBagRequest(id: UUID,
                             zippedBagLocation: ObjectLocation,
                             archiveCompleteCallbackUrl: Option[URI] = None,
                             storageSpace: StorageSpace) {
-  def toIngestBagJob(implicit s3Client: AmazonS3): IngestBagJob = {
+  def toIngestBagJob(implicit transferManager: TransferManager, ec: ExecutionContext): IngestBagJob = {
     import TemporaryStore._
 
-    val either = zippedBagLocation.downloadTempFile.toEither
-
-    val bagDownload = either.fold(
-      error => Left(FileDownloadingError(this, error)),
-      file => Right(FileDownloadComplete(file, this))
-    )
+    val bagDownload = zippedBagLocation.downloadTempFile.transform{ triedFile =>  triedFile.fold(
+      error => Success(Left(FileDownloadingError(this, error))),
+      file => Success(Right(FileDownloadComplete(file, this)))
+    )}
 
     IngestBagJob(this, bagDownload)
   }
@@ -34,4 +32,4 @@ object IngestBagRequest extends URIConverters with UUIDConverters {}
 
 case class IngestBagJob(
   request: IngestBagRequest,
-  bagDownload: Either[FileDownloadingError, FileDownloadComplete])
+  bagDownload: Future[Either[FileDownloadingError, FileDownloadComplete]])
