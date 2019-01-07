@@ -22,9 +22,13 @@ case class IngestBagRequest(id: UUID,
                      ec: ExecutionContext): IngestBagJob = {
     import TemporaryStore._
 
-    val bagDownload = zippedBagLocation.downloadTempFile.map {
-      file => Right(FileDownloadComplete(file, this))}
-        .recover{case error: Throwable => Left(FileDownloadingError(this, error))}
+    val bagDownload = zippedBagLocation.downloadTempFile
+      .map { file =>
+        Right(FileDownloadComplete(file, this))
+      }
+      .recover {
+        case error: Throwable => Left(FileDownloadingError(this, error))
+      }
 
     IngestBagJob(this, bagDownload)
   }

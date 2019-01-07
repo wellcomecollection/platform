@@ -34,15 +34,17 @@ object TemporaryStore extends Logging {
       val promise = Promise[File]()
       triedDownload match {
         case Success(download) =>
-        download.addProgressListener(new ProgressListener {
-          override def progressChanged(progressEvent: ProgressEvent): Unit =
-            if (transferSuccessfulEvents.contains(progressEvent.getEventType)) {
-              promise success tmpFile
-            } else if (transferFailedEvents.contains(
-                         progressEvent.getEventType)) {
-              promise failure download.waitForException()
-            }
-        })
+          download.addProgressListener(
+            new ProgressListener {
+              override def progressChanged(progressEvent: ProgressEvent): Unit =
+                if (transferSuccessfulEvents.contains(
+                      progressEvent.getEventType)) {
+                  promise success tmpFile
+                } else if (transferFailedEvents.contains(
+                             progressEvent.getEventType)) {
+                  promise failure download.waitForException()
+                }
+            })
         case Failure(exception) => promise failure exception
       }
       promise.future
