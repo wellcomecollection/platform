@@ -13,7 +13,6 @@ import uk.ac.wellcome.platform.archive.common.TemporaryStore
 import uk.ac.wellcome.platform.archive.common.errors.FileDownloadingError
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Success
 
 case class IngestBagRequest(id: UUID,
                             zippedBagLocation: ObjectLocation,
@@ -23,13 +22,9 @@ case class IngestBagRequest(id: UUID,
                      ec: ExecutionContext): IngestBagJob = {
     import TemporaryStore._
 
-    val bagDownload = zippedBagLocation.downloadTempFile.transform {
-      triedFile =>
-        triedFile.fold(
-          error => Success(Left(FileDownloadingError(this, error))),
-          file => Success(Right(FileDownloadComplete(file, this)))
-        )
-    }
+    val bagDownload = zippedBagLocation.downloadTempFile.map {
+      file => Right(FileDownloadComplete(file, this))}
+        .recover{case error: Throwable => Left(FileDownloadingError(this, error))}
 
     IngestBagJob(this, bagDownload)
   }

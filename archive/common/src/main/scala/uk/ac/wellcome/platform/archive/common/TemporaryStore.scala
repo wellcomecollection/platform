@@ -8,6 +8,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.{Future, Promise}
+import scala.util.{Failure, Success, Try}
 
 object TemporaryStore extends Logging {
   val tmpFilePrefix = "wellcome-tmp-"
@@ -26,20 +27,22 @@ object TemporaryStore extends Logging {
         tmpFilePrefix,
         tmpFileSuffix
       )
-      val download =
-        transferManager.download(location.namespace, location.key, tmpFile)
-
+      val triedDownload =
+        Try(transferManager.download(location.namespace, location.key, tmpFile))
       val promise = Promise[File]()
-      download.addProgressListener(
-        new ProgressListener {
+      triedDownload match {
+        case Success(download) =>
+        download.addProgressListener(new ProgressListener {
           override def progressChanged(progressEvent: ProgressEvent): Unit =
             if (transferSuccessfulEvents.contains(progressEvent.getEventType)) {
-              promise trySuccess tmpFile
+              promise success tmpFile
             } else if (transferFailedEvents.contains(
                          progressEvent.getEventType)) {
               promise failure download.waitForException()
             }
         })
+        case Failure(exception) => promise failure exception
+      }
       promise.future
 
     }
