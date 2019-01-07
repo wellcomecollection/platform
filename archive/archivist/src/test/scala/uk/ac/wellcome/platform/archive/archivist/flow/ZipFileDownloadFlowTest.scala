@@ -15,7 +15,11 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
 import uk.ac.wellcome.platform.archive.common.errors.FileDownloadingError
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.{FileDownloadComplete, IngestBagRequest, Parallelism}
+import uk.ac.wellcome.platform.archive.common.models.{
+  FileDownloadComplete,
+  IngestBagRequest,
+  Parallelism
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.ObjectLocation
@@ -125,7 +129,8 @@ class ZipFileDownloadFlowTest
     testWith: TestWith[ZipFileDownloadFlow, R]): R = {
     implicit val parallelism = Parallelism(10)
 
-    implicit val tf = TransferManagerBuilder.standard().withS3Client(s3Client).build()
+    implicit val tf =
+      TransferManagerBuilder.standard().withS3Client(s3Client).build()
 
     val downloadZipFlow: Flow[IngestBagRequest, BagDownload, NotUsed] =
       ZipFileDownloadFlow(

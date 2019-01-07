@@ -4,7 +4,10 @@ import java.net.URI
 import java.util.UUID
 
 import com.amazonaws.services.s3.transfer.TransferManager
-import uk.ac.wellcome.platform.archive.common.json.{URIConverters, UUIDConverters}
+import uk.ac.wellcome.platform.archive.common.json.{
+  URIConverters,
+  UUIDConverters
+}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.platform.archive.common.TemporaryStore
 import uk.ac.wellcome.platform.archive.common.errors.FileDownloadingError
@@ -16,13 +19,17 @@ case class IngestBagRequest(id: UUID,
                             zippedBagLocation: ObjectLocation,
                             archiveCompleteCallbackUrl: Option[URI] = None,
                             storageSpace: StorageSpace) {
-  def toIngestBagJob(implicit transferManager: TransferManager, ec: ExecutionContext): IngestBagJob = {
+  def toIngestBagJob(implicit transferManager: TransferManager,
+                     ec: ExecutionContext): IngestBagJob = {
     import TemporaryStore._
 
-    val bagDownload = zippedBagLocation.downloadTempFile.transform{ triedFile =>  triedFile.fold(
-      error => Success(Left(FileDownloadingError(this, error))),
-      file => Success(Right(FileDownloadComplete(file, this)))
-    )}
+    val bagDownload = zippedBagLocation.downloadTempFile.transform {
+      triedFile =>
+        triedFile.fold(
+          error => Success(Left(FileDownloadingError(this, error))),
+          file => Success(Right(FileDownloadComplete(file, this)))
+        )
+    }
 
     IngestBagJob(this, bagDownload)
   }

@@ -9,7 +9,10 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases._
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
-import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, Parallelism}
+import uk.ac.wellcome.platform.archive.common.models.{
+  IngestBagRequest,
+  Parallelism
+}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.concurrent.ExecutionContext
@@ -38,18 +41,23 @@ object ZipFileDownloadFlow extends Logging {
       subject = "archivist_progress"
     )
 
-    Flow[IngestBagRequest].flatMapMerge(parallelism.value, request => {
-      val bagDownload = request.toIngestBagJob.bagDownload
-      Source.fromFuture(bagDownload).map {
-        either => {
-          either.fold(
-            error => ProgressUpdate.failed(request.id, error),
-            _ => ProgressUpdate.event(request.id, downloadSuccessMessage)
-          )
-        }
+    Flow[IngestBagRequest].flatMapMerge(
+      parallelism.value,
+      request => {
+        val bagDownload = request.toIngestBagJob.bagDownload
+        Source
+          .fromFuture(bagDownload)
+          .map { either =>
+            {
+              either.fold(
+                error => ProgressUpdate.failed(request.id, error),
+                _ => ProgressUpdate.event(request.id, downloadSuccessMessage)
+              )
+            }
+          }
+          .via(snsPublishFlow)
+          .mapAsync(parallelism.value)(_ => bagDownload)
       }
-        .via(snsPublishFlow).mapAsync(parallelism.value)(_ => bagDownload)
-    }
     )
 
   }
