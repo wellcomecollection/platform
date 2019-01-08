@@ -6,7 +6,8 @@ data "aws_acm_certificate" "api_wc_org" {
 
 locals {
   catalogue_domain_name = "catalogue.api.wellcomecollection.org"
-  storage_domain_name   = "storage.api.wellcomecollection.org"
+  // TODO: Migrate to storage service un new account
+  storage_domain_name   = "d-ykjd2uidc5.execute-api.eu-west-1.amazonaws.com"
 }
 
 resource "aws_cloudfront_distribution" "api_root" {
