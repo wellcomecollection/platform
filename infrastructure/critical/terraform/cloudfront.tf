@@ -6,8 +6,9 @@ data "aws_acm_certificate" "api_wc_org" {
 
 locals {
   catalogue_domain_name = "catalogue.api.wellcomecollection.org"
+
   // TODO: Migrate to storage service un new account
-  storage_domain_name   = "d-ykjd2uidc5.execute-api.eu-west-1.amazonaws.com"
+  storage_domain_name = "d-ykjd2uidc5.execute-api.eu-west-1.amazonaws.com"
 }
 
 resource "aws_cloudfront_distribution" "api_root" {
@@ -127,8 +128,8 @@ resource "aws_cloudfront_distribution" "api_root" {
 
   // shared config
 
-  enabled         = true
-  is_ipv6_enabled = true
+  enabled             = true
+  is_ipv6_enabled     = true
   default_root_object = "index.html"
   aliases = [
     "api.wellcomecollection.org",
