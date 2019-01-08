@@ -9,13 +9,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases._
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  Parallelism
-}
+import uk.ac.wellcome.platform.archive.common.models.{IngestBagRequest, Parallelism}
 import uk.ac.wellcome.platform.archive.common.progress.models._
-
-import scala.concurrent.ExecutionContext
 
 /** This flow takes an ingest request, and downloads the entire ZIP file
   * associated with the request to a local (temporary) path.
@@ -28,7 +23,6 @@ object ZipFileDownloadFlow extends Logging {
 
   def apply(snsConfig: SNSConfig)(
     implicit transferManager: TransferManager,
-    ec: ExecutionContext,
     snsClient: AmazonSNS,
     parallelism: Parallelism
   ): Flow[IngestBagRequest, BagDownload, NotUsed] = {
@@ -41,22 +35,18 @@ object ZipFileDownloadFlow extends Logging {
       subject = "archivist_progress"
     )
 
-    Flow[IngestBagRequest].flatMapMerge(
+    Flow[IngestBagRequest].via(S3DownloadFlow(transferManager)).flatMapMerge(
       parallelism.value,
-      request => {
-        val bagDownload = request.toIngestBagJob.bagDownload
+      either => {
+        val updates = either.fold(
+          error => ProgressUpdate.failed(error.t.id, error),
+          download => ProgressUpdate.event(download.ingestBagRequest.id, downloadSuccessMessage)
+        )
         Source
-          .fromFuture(bagDownload)
-          .map { either =>
-            {
-              either.fold(
-                error => ProgressUpdate.failed(request.id, error),
-                _ => ProgressUpdate.event(request.id, downloadSuccessMessage)
-              )
-            }
-          }
+          .single(updates)
+
           .via(snsPublishFlow)
-          .mapAsync(parallelism.value)(_ => bagDownload)
+          .map(_ => either)
       }
     )
 

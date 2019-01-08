@@ -214,7 +214,6 @@ class S3UploadFlow(
         }
       }
 
-      // TODO: How does this work???
       private def getUploadId: Try[String] = maybeUploadId match {
         case None =>
           val triedUploadId =

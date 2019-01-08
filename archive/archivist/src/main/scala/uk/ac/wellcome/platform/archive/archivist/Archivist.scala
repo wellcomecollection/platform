@@ -39,7 +39,6 @@ class Archivist(
     implicit val adapter = Logging(actorSystem.eventStream, "custom")
     implicit val parallelism = Parallelism(bagUploaderConfig.parallelism)
     implicit val materializer = SupervisedMaterializer.resumable
-    implicit val executionContext = actorSystem.dispatcher
 
     debug(s"registrar topic: $snsRegistrarConfig")
     debug(s"progress topic: $snsProgressConfig")
