@@ -5,6 +5,7 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.transfer.TransferManager
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.Runnable
@@ -28,6 +29,7 @@ class Archivist(
   snsProgressConfig: SNSConfig
 )(
   implicit val actorSystem: ActorSystem,
+  transferManager: TransferManager,
   s3Client: AmazonS3,
   snsClient: AmazonSNS,
 ) extends Logging
@@ -37,6 +39,7 @@ class Archivist(
     implicit val adapter = Logging(actorSystem.eventStream, "custom")
     implicit val parallelism = Parallelism(bagUploaderConfig.parallelism)
     implicit val materializer = SupervisedMaterializer.resumable
+    implicit val executionContext = actorSystem.dispatcher
 
     debug(s"registrar topic: $snsRegistrarConfig")
     debug(s"progress topic: $snsProgressConfig")

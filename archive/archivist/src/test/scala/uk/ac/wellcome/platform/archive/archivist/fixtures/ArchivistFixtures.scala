@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist.fixtures
 
 import java.io.File
 
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
@@ -92,6 +93,8 @@ trait ArchivistFixtures
           metricsSender) { messageStream =>
           implicit val s3 = s3Client
           implicit val sns = snsClient
+          implicit val tf =
+            TransferManagerBuilder.standard().withS3Client(s3Client).build()
 
           val archivist = new Archivist(
             messageStream = messageStream,
