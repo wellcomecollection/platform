@@ -10,7 +10,6 @@ locals {
 }
 
 resource "aws_cloudfront_distribution" "api_root" {
-
   // root
 
   origin {
@@ -49,12 +48,14 @@ resource "aws_cloudfront_distribution" "api_root" {
       http_port              = 80
       https_port             = 443
       origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = [
-        "TLSv1", "TLSv1.1", "TLSv1.2"
+
+      origin_ssl_protocols = [
+        "TLSv1",
+        "TLSv1.1",
+        "TLSv1.2",
       ]
     }
   }
-
   ordered_cache_behavior {
     path_pattern = "/catalogue/*"
 
@@ -90,12 +91,14 @@ resource "aws_cloudfront_distribution" "api_root" {
       http_port              = 80
       https_port             = 443
       origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = [
-        "TLSv1", "TLSv1.1", "TLSv1.2"
+
+      origin_ssl_protocols = [
+        "TLSv1",
+        "TLSv1.1",
+        "TLSv1.2",
       ]
     }
   }
-
   ordered_cache_behavior {
     path_pattern = "/storage/*"
 
@@ -125,21 +128,16 @@ resource "aws_cloudfront_distribution" "api_root" {
 
   enabled         = true
   is_ipv6_enabled = true
-
   default_root_object = "index.html"
-
   aliases = [
     "api.wellcomecollection.org",
   ]
-
   price_class = "PriceClass_100"
-
   viewer_certificate {
     acm_certificate_arn      = "${data.aws_acm_certificate.api_wc_org.arn}"
     minimum_protocol_version = "TLSv1"
     ssl_support_method       = "sni-only"
   }
-
   restrictions {
     geo_restriction {
       restriction_type = "none"
