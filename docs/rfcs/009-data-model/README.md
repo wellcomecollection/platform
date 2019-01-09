@@ -1,4 +1,4 @@
-# RFC 009: Data model
+# RFC 010: Data model
 
 **Last updated: 19 December 2018.**
 
