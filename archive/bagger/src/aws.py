@@ -102,14 +102,12 @@ def remove_error(bnumber):
 
 def get_dropped_bag_info(bnumber):
     key = "{0}.zip".format(bnumber)
-    bag_info = {
-        "exists": False
-    }
+    bag_info = {"exists": False}
     try:
         client = get_boto_session().client("s3")
         bag_head = client.head_object(Bucket=settings.DROP_BUCKET_NAME, Key=key)
     except ClientError as e:
-        if e.response['Error']['Code'] == "404":
+        if e.response["Error"]["Code"] == "404":
             return bag_info
         else:
             raise  # Something else has gone wrong.

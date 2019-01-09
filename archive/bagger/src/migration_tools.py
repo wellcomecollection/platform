@@ -17,17 +17,16 @@ def json_default(o):
 
 
 class MigrationTool(object):
-
-    def populate_initial(self, filter=''):
+    def populate_initial(self, filter=""):
         populate_initial(filter)
 
-    def update_status(self, delay, filter=''):
+    def update_status(self, delay, filter=""):
         update_bag_and_ingest_status(delay, filter)
 
-    def ingest(self, delay, filter=''):
+    def ingest(self, delay, filter=""):
         do_ingest(delay, filter)
 
-    def simulate_goobi_call(self, delay, filter=''):
+    def simulate_goobi_call(self, delay, filter=""):
         call_dds(delay, filter)
 
 
@@ -58,14 +57,8 @@ def update_bag_and_ingest_status(delay, filter):
     table = get_table()
     no_ingest = {
         "id": "-",
-        "status": {
-            "id": "no-ingest"
-        },
-        "events": [
-            {
-                "createdDate": "-"
-            }
-        ]
+        "status": {"id": "no-ingest"},
+        "events": [{"createdDate": "-"}],
     }
 
     print("[")
@@ -91,15 +84,11 @@ def update_bag_and_ingest_status(delay, filter):
                 ":bsz": bag_size,
                 ":idt": ingest["events"][0]["createdDate"],
                 ":iid": ingest["id"],
-                ":ist": ingest["status"]["id"]
+                ":ist": ingest["status"]["id"],
             },
-            UpdateExpression="SET bag_date = :bdt, bag_size = :bsz, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist"
+            UpdateExpression="SET bag_date = :bdt, bag_size = :bsz, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist",
         )
-        output = {
-            "identifier": bnumber,
-            "bag_zip": bag_zip,
-            "ingest": ingest
-        }
+        output = {"identifier": bnumber, "bag_zip": bag_zip, "ingest": ingest}
         print(json.dumps(output, default=json_default, indent=4))
         print(",")
         if delay > 0:
@@ -116,7 +105,7 @@ def bnumber_generator(filter_expression):
 
 
 def get_table():
-    dynamodb = boto3.resource('dynamodb', region_name=settings.AWS_DEFAULT_REGION)
+    dynamodb = boto3.resource("dynamodb", region_name=settings.AWS_DEFAULT_REGION)
     table = dynamodb.Table(settings.DYNAMO_TABLE)
     return table
 
@@ -142,7 +131,7 @@ def empty_item(bnumber):
         "bag_date": None,
         "ingest_started": None,
         "ingest_id": None,
-        "ingest_status": None
+        "ingest_status": None,
     }
 
 
@@ -173,10 +162,8 @@ def call_dds(delay, filter):
         # now update the dynamodb record
         table.update_item(
             Key={"bnumber": bnumber},
-            ExpressionAttributeValues={
-                ":dc": now
-            },
-            UpdateExpression="SET dds_called = :dc"
+            ExpressionAttributeValues={":dc": now},
+            UpdateExpression="SET dds_called = :dc",
         )
 
         if delay > 0:
@@ -186,5 +173,5 @@ def call_dds(delay, filter):
     print("]")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     fire.Fire(MigrationTool)

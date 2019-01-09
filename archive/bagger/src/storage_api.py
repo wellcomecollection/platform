@@ -7,23 +7,14 @@ from copy import deepcopy
 storage_api_tokens = {}
 ingest_template = {
     "type": "Ingest",
-    "ingestType": {
-        "id": "create",
-        "type": "IngestType"
-    },
-    "space": {
-        "id": "digitised",
-        "type": "Space"
-    },
+    "ingestType": {"id": "create", "type": "IngestType"},
+    "space": {"id": "digitised", "type": "Space"},
     "sourceLocation": {
         "type": "Location",
-        "provider": {
-            "type": "Provider",
-            "id": "aws-s3-standard"
-        },
+        "provider": {"type": "Provider", "id": "aws-s3-standard"},
         "bucket": settings.DROP_BUCKET_NAME,
-        "path": None
-    }
+        "path": None,
+    },
 }
 
 
@@ -35,7 +26,7 @@ def get_api_token(scope):
             "grant_type": "client_credentials",
             "client_id": settings.WELLCOME_API_CLIENT_ID,
             "client_secret": settings.WELLCOME_API_CLIENT_SECRET,
-            "scope": scope
+            "scope": scope,
         }
         resp = requests.post(settings.WELLCOME_API_TOKEN_ENDPOINT, data=data)
         token = resp.json()
