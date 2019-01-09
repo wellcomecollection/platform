@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.archive.progress_http
 
-import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.archive.common.models.{
   IngestBagRequest,
@@ -12,7 +11,7 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProgressStarter @Inject()(
+class ProgressStarter(
   progressTracker: ProgressTracker,
   snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
   def initialise(progress: Progress): Future[Progress] =
