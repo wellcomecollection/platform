@@ -192,6 +192,9 @@ lazy val progress_http = doServiceSetup(project, "archive/progress_http")
   .dependsOn(archive_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.progressHttpDependencies)
 
+lazy val bag_replicator = doServiceSetup(project, "archive/bag_replicator")
+  .dependsOn(archive_common % "compile->compile;test->test")
+
 lazy val root = (project in file("."))
   .aggregate(
     common,
@@ -227,10 +230,11 @@ lazy val root = (project in file("."))
     archive_common,
     archive_display,
     archivist,
+    bag_replicator,
     notifier,
     registrar_async,
     progress_async,
-      registrar_common,
+    registrar_common,
     progress_http,
     registrar_http
   )
