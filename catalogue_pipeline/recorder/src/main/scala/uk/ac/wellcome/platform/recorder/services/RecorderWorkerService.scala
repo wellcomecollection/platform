@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.recorder.services
 
 import akka.Done
-import com.google.inject.Inject
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.{
@@ -21,7 +20,7 @@ import uk.ac.wellcome.storage.vhs.{
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RecorderWorkerService @Inject()(
+class RecorderWorkerService(
   versionedHybridStore: VersionedHybridStore[TransformedBaseWork,
                                              EmptyMetadata,
                                              ObjectStore[TransformedBaseWork]],
@@ -41,7 +40,7 @@ class RecorderWorkerService @Inject()(
     } yield ()
 
   private def storeInVhs(
-    work: TransformedBaseWork): Future[VHSIndexEntry[EmptyMetadata]] = {
+    work: TransformedBaseWork): Future[VHSIndexEntry[EmptyMetadata]] =
     versionedHybridStore.updateRecord(work.sourceIdentifier.toString)(
       (work, EmptyMetadata()))(
       (existingWork, existingMetadata) =>
@@ -51,5 +50,4 @@ class RecorderWorkerService @Inject()(
           (work, EmptyMetadata())
       }
     )
-  }
 }

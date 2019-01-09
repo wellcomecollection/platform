@@ -4,7 +4,6 @@ import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
-import com.google.inject.Inject
 import com.gu.scanamo._
 import com.gu.scanamo.error.ConditionNotMet
 import com.gu.scanamo.syntax._
@@ -16,9 +15,9 @@ import uk.ac.wellcome.storage.dynamo._
 import scala.concurrent.{ExecutionContext, Future, blocking}
 import scala.util.{Failure, Success, Try}
 
-class ProgressTracker @Inject()(
-                                 dynamoDbClient: AmazonDynamoDB,
-                                 dynamoConfig: DynamoConfig
+class ProgressTracker(
+  dynamoDbClient: AmazonDynamoDB,
+  dynamoConfig: DynamoConfig
 )(implicit ec: ExecutionContext) extends Logging {
 
   import Progress._
