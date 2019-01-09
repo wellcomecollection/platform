@@ -16,7 +16,7 @@ case class ArchiveItemJob(archiveJob: ArchiveJob, itemLocation: BagFilePath) {
     ObjectLocation(
       bagLocation.storageNamespace,
       List(
-        bagLocation.storagePath,
+        bagLocation.storageRootPath,
         bagLocation.bagPath.value,
         itemLocation.value
       ).mkString("/")

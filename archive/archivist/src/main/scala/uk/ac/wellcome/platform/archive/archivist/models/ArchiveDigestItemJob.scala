@@ -21,7 +21,7 @@ case class ArchiveDigestItemJob(archiveJob: ArchiveJob,
     ObjectLocation(
       bagLocation.storageNamespace,
       List(
-        bagLocation.storagePath,
+        bagLocation.storageRootPath,
         bagLocation.bagPath.value,
         itemLocation.value
       ).mkString("/")
