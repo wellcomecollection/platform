@@ -1,6 +1,6 @@
-# RFC 009: Network Architechture
+# RFC 011: Network Architecture
 
-**Last updated: 07 DEceember 2018.**
+**Last updated: 09 January 2019.**
 
 ## Background
 
@@ -38,7 +38,12 @@ The services we are currently resonsible for are as follows:
 
 ## Proposed network infrastructure
 
-Networks should be split along project lines, using a consistent IP CIDR scheme that is non-overlapping with other Wellcome infrastructure. Network access to 3rd party ...
+Networks should be split along project lines, using a consistent IP CIDR scheme that is non-overlapping with other Wellcome infrastructure. Network access to 3rd parties should be made available via a transit VPC.
 
+- `transit-10-90-4-0-23`: 10.90.4.0/23 - Transit VPC: IP range within Wellcome internal network, contains VPN connection to Wellcome via internal firewall. (owned by Platform AWS account)
+- `storage-172-30-0-0-16`: 172.30.0.0/16 - Storage service infrastructure (owned by Storage AWS account)
+- `monitoring-172-28-0-0-16`: 172.28.0.0/16 - Monitoring infrastructure (owned by Platform AWS account)
+- `datascience-172-27-0-0-16`: 172.26.0.0/16 - Data science infrastructure & Labs (owned by Collection Data AWS account)
+- `catalogue-172-31-0-0-16`: 172.31.0.0/16 - Catalogue service infrastructure (owned by Catalogue AWS account)
 
-WIP
+The default VPC has been removed.

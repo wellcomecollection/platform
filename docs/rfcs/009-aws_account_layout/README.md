@@ -35,4 +35,5 @@ The assumable roles help reduce mistakes, because our default day-to-day credent
 These roles/accounts will be managed entirely in Terraform, stored in a private GitHub repo.
 
 All accounts need 2FA, and we need a password store for the root account passwords.
-We'll use a Yubikey for 2FA on the root accounts.
+
+Hardware MFA devices will be used.
