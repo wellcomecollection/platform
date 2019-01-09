@@ -16,7 +16,7 @@ object Main extends WellcomeTypesafeApp {
     implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
     implicit val s3Client = S3Builder.buildS3Client(config)
     implicit val transferManager =
-      TransferManagerBuilder.buildTransferManager(s3Client)
+      TransferManagerBuilder.buildTransferManager(S3Builder.buildS3Client(config))
     implicit val snsClient = SNSBuilder.buildSNSClient(config)
 
     new Archivist(
