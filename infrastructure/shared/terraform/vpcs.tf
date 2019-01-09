@@ -89,7 +89,7 @@ module "monitoring_vpc_delta" {
 # - Labs apps & data scientist infra
 
 module "datascience_vpc_delta" {
-  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.8"
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=9789aa3"
 
   name = "datascience-172-27-0-0-16"
 
