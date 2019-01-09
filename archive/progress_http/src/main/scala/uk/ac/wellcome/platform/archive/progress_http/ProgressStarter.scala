@@ -11,9 +11,8 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProgressStarter(
-  progressTracker: ProgressTracker,
-  snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
+class ProgressStarter(progressTracker: ProgressTracker, snsWriter: SNSWriter)(
+  implicit ec: ExecutionContext) {
   def initialise(progress: Progress): Future[Progress] =
     for {
       progress <- progressTracker.initialise(progress)
