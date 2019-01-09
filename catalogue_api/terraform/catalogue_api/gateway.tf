@@ -58,6 +58,20 @@ resource "aws_api_gateway_base_path_mapping" "prod" {
   base_path   = "catalogue"
 }
 
+resource "aws_api_gateway_base_path_mapping" "catalogue_stage" {
+  api_id      = "${aws_api_gateway_rest_api.api.id}"
+  stage_name  = "${var.stage_api}"
+  domain_name = "catalogue.api-stage.wellcomecollection.org"
+  base_path   = "catalogue"
+}
+
+resource "aws_api_gateway_base_path_mapping" "catalogue_prod" {
+  api_id      = "${aws_api_gateway_rest_api.api.id}"
+  stage_name  = "${var.production_api}"
+  domain_name = "catalogue.api.wellcomecollection.org"
+  base_path   = "catalogue"
+}
+
 # Resources
 
 module "root_resource_method" {

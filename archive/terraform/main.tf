@@ -2,7 +2,7 @@
 
 resource "aws_api_gateway_base_path_mapping" "api-gw-mapping-041218" {
   api_id      = "${module.stack-041218.api_gateway_id}"
-  domain_name = "api.wellcomecollection.org"
+  domain_name = "storage.api.wellcomecollection.org"
   base_path   = "storage"
 }
 
