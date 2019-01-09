@@ -26,7 +26,7 @@ trait ProgressTrackerFixture
   def withProgressTracker[R](table: Table, dynamoDbClient: AmazonDynamoDB = dynamoDbClient)(
     testWith: TestWith[ProgressTracker, R]): R = {
     val progressTracker = new ProgressTracker(
-      dynamoClient = dynamoDbClient,
+      dynamoDbClient = dynamoDbClient,
       dynamoConfig = createDynamoConfigWith(table)
     )
     testWith(progressTracker)
@@ -50,4 +50,5 @@ trait ProgressTrackerFixture
     progress.events.foreach(event =>
       assertRecent(event.createdDate, recentSeconds = 45))
   }
+
 }

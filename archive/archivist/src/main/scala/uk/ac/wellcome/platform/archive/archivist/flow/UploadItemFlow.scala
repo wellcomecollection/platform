@@ -47,7 +47,7 @@ object UploadItemFlow extends Logging {
           option
             .toRight(
               FileNotFoundError(
-                archiveItemJob.itemLocation.path,
+                archiveItemJob.itemLocation.value,
                 archiveItemJob))
             .map(inputStream => (archiveItemJob, inputStream))
       }

@@ -28,7 +28,7 @@ object ArchiveJobCreator {
           zipFile,
           BagLocation(
             storageNamespace = config.uploadConfig.uploadNamespace,
-            storagePath = config.uploadConfig.uploadPrefix,
+            storageRootPath = config.uploadConfig.uploadPrefix,
             bagPath =
               BagPath(s"${ingestBagRequest.storageSpace}/$externalIdentifier")
           ),
@@ -59,7 +59,7 @@ object ArchiveJobCreator {
                                ingestBagRequest: IngestBagRequest)
     : Either[ArchiveError[IngestBagRequest], ExternalIdentifier] = {
     ZipFileReader
-      .maybeInputStream(ZipLocation(zipFile, EntryPath("bag-info.txt")))
+      .maybeInputStream(ZipLocation(zipFile, BagFilePath("bag-info.txt")))
       .toRight[ArchiveError[IngestBagRequest]](
         FileNotFoundError("bag-info.txt", ingestBagRequest))
       .flatMap { inputStream =>

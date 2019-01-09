@@ -341,6 +341,87 @@ class ProgressHttpFeatureTest
       }
     }
 
+    it("returns a json error if the body of the request is not valid JSON") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`application/json`,
+              """hgjh""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.BadRequest
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+                actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
+                  400,
+                  "The request content was malformed:\nexpected json value got h (line 1, column 1)",
+                  "Bad Request",
+                  "Error"
+                )
+                assertSnsReceivesNothing(topic)
+              }
+            }
+          }
+      }
+    }
+
+    it(
+      "returns a json error if the content type of the request is not an accepted type") {
+      withConfiguredApp {
+        case (_, topic, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            val url = s"$baseUrl/progress"
+
+            val entity = HttpEntity(
+              ContentTypes.`text/plain(UTF-8)`,
+              """hgjh""".stripMargin
+            )
+
+            val request = HttpRequest(
+              method = POST,
+              uri = url,
+              headers = Nil,
+              entity = entity
+            )
+
+            whenRequestReady(request) { response: HttpResponse =>
+              response.status shouldBe StatusCodes.UnsupportedMediaType
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+              println(response)
+              val progressFuture =
+                Unmarshal(response.entity).to[ErrorResponse]
+
+              whenReady(progressFuture) { actualError =>
+                actualError shouldBe ErrorResponse(
+                  "http://api.wellcomecollection.org/storage/v1/context.json",
+                  415,
+                  "The request's Content-Type is not supported. Expected:\napplication/json",
+                  "Unsupported Media Type",
+                  "Error"
+                )
+                assertSnsReceivesNothing(topic)
+              }
+            }
+          }
+      }
+    }
+
     it(
       "returns a json error if the ingest request doesn't have a sourceLocation and it doesn't have an ingestType") {
       withConfiguredApp {
@@ -623,5 +704,90 @@ class ProgressHttpFeatureTest
           }
       }
     }
+  }
+
+  describe("GET /progress/find-by-bag-id/:bag-id") {
+    it("returns a list of progresses for the given bag id") {
+      withConfiguredApp {
+        case (table, _, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            withProgressTracker(table) { progressTracker =>
+              val progress = createProgress
+              whenReady(progressTracker.initialise(progress)) { _ =>
+                val bagId = createBagId
+                val bagIngest =
+                  BagIngest(bagId.toString, randomUUID, Instant.now)
+                givenTableHasItem(bagIngest, table)
+
+                whenGetRequestReady(s"$baseUrl/progress/find-by-bag-id/$bagId") {
+                  response =>
+                    response.status shouldBe StatusCodes.OK
+                    response.entity.contentType shouldBe ContentTypes.`application/json`
+                    val displayBagProgressFutures =
+                      Unmarshal(response.entity).to[List[DisplayIngestMinimal]]
+
+                    whenReady(displayBagProgressFutures) {
+                      displayBagProgresses =>
+                        displayBagProgresses shouldBe List(
+                          DisplayIngestMinimal(bagIngest))
+                    }
+                }
+              }
+            }
+          }
+      }
+    }
+
+    it(
+      "returns a list of progresses for the given bag id with : separated parts") {
+      withConfiguredApp {
+        case (table, _, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            withProgressTracker(table) { progressTracker =>
+              val progress = createProgress
+              whenReady(progressTracker.initialise(progress)) { _ =>
+                val bagId = createBagId
+                val bagIngest =
+                  BagIngest(bagId.toString, randomUUID, Instant.now)
+                givenTableHasItem(bagIngest, table)
+
+                whenGetRequestReady(
+                  s"$baseUrl/progress/find-by-bag-id/${bagId.space}:${bagId.externalIdentifier}") {
+                  response =>
+                    response.status shouldBe StatusCodes.OK
+                    response.entity.contentType shouldBe ContentTypes.`application/json`
+                    val displayBagProgressFutures =
+                      Unmarshal(response.entity).to[List[DisplayIngestMinimal]]
+
+                    whenReady(displayBagProgressFutures) {
+                      displayBagProgresses =>
+                        displayBagProgresses shouldBe List(
+                          DisplayIngestMinimal(bagIngest))
+                    }
+                }
+              }
+            }
+          }
+      }
+    }
+
+    it("returns 'Not Found' if there are no progresses for the given bag id") {
+      withConfiguredApp {
+        case (table, _, baseUrl) =>
+          withMaterializer { implicit materialiser =>
+            whenGetRequestReady(s"$baseUrl/progress/find-by-bag-id/$randomUUID") {
+              response =>
+                response.status shouldBe StatusCodes.NotFound
+                response.entity.contentType shouldBe ContentTypes.`application/json`
+                val displayBagProgressFutures =
+                  Unmarshal(response.entity).to[List[DisplayIngestMinimal]]
+                whenReady(displayBagProgressFutures) { displayBagProgresses =>
+                  displayBagProgresses shouldBe List.empty
+                }
+            }
+          }
+      }
+    }
+
   }
 }

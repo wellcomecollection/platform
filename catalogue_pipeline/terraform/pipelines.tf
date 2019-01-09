@@ -1,8 +1,3 @@
-module "miro_updates_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "vhs_sourcedata_miro_updates"
-}
-
 module "catalogue_pipeline_v6" {
   source = "pipelines"
 
@@ -10,7 +5,7 @@ module "catalogue_pipeline_v6" {
 
   miro_adapter_topic_names = [
     "${local.miro_reindexer_topic_name}",
-    "${module.miro_updates_topic.name}",
+    "${local.miro_updates_topic_name}",
   ]
 
   miro_adapter_topic_count = 2

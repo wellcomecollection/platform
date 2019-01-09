@@ -4,6 +4,7 @@ import java.net.URL
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.RejectionHandler
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import grizzled.slf4j.Logging
@@ -27,12 +28,12 @@ class ProgressHTTP(
     extends Logging
     with Runnable {
   val progressTracker = new ProgressTracker(
-    dynamoClient = dynamoClient,
+    dynamoDbClient = dynamoClient,
     dynamoConfig = dynamoConfig
   )
 
   val router = new Router(
-    monitor = progressTracker,
+    progressTracker = progressTracker,
     progressStarter = new ProgressStarter(
       progressTracker = progressTracker,
       snsWriter = snsWriter
@@ -41,7 +42,7 @@ class ProgressHTTP(
     contextURL = contextURL
   )
 
-  implicit val rejectionHandler = router.rejectionHandler
+  implicit val rejectionHandler: RejectionHandler = router.rejectionHandler
   val bindingFuture: Future[Http.ServerBinding] = Http()
     .bindAndHandle(router.routes, httpServerConfig.host, httpServerConfig.port)
 

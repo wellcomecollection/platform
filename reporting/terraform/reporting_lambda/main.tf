@@ -16,9 +16,9 @@ module "reporting_lambda" {
 }
 
 module "reporting_lambda_trigger" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v10.2.2"
+  source = "./trigger_sns_subscriptions"
 
   lambda_function_name = "${module.reporting_lambda.function_name}"
-  sns_trigger_arn      = "${var.trigger_topic_arn}"
-  lambda_function_arn  = "${module.reporting_lambda.arn}"
+  topic_arns           = "${var.topic_arns}"
+  topic_count          = "${var.topic_count}"
 }

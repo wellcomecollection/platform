@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.fixtures
 
 import java.io.{File, FileOutputStream}
-import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
+import java.util.zip.{ZipEntry, ZipOutputStream}
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
@@ -10,8 +10,8 @@ import uk.ac.wellcome.test.fixtures._
 
 trait ZipBagItFixture extends BagIt with Logging {
 
-  def withZipFile[R](files: Seq[FileEntry]): Fixture[ZipFile, R] =
-    fixture[ZipFile, R](
+  def withZipFile[R](files: Seq[FileEntry]): Fixture[File, R] =
+    fixture[File, R](
       create = {
         val file = File.createTempFile(randomAlphanumeric(), ".zip")
         val zipFileOutputStream = new FileOutputStream(file)
@@ -25,14 +25,11 @@ trait ZipBagItFixture extends BagIt with Logging {
             zipOutputStream.closeEntry()
         }
         zipOutputStream.close()
-        val zipFile = new ZipFile(file)
 
         info(s"zipfile full path: ${file.getAbsolutePath}")
-        zipFile
+        file
       },
-      destroy = { zf: ZipFile =>
-        new File(zf.getName).delete()
-      }
+      destroy = { _.delete() }
     )
 
   def withBagItZip[R](
@@ -45,7 +42,7 @@ trait ZipBagItFixture extends BagIt with Logging {
       createValidTagManifest,
     createBagItFile: => Option[FileEntry] = createValidBagItFile,
     createBagInfoFile: BagInfo => Option[FileEntry] = createValidBagInfoFile
-  )(testWith: TestWith[ZipFile, R]): R = {
+  )(testWith: TestWith[File, R]): R = {
     info(s"Creating bag ${bagInfo.externalIdentifier}")
 
     val allFiles = createBag(

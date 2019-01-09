@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.models
-import uk.ac.wellcome.platform.archive.common.models.EntryPath
+import uk.ac.wellcome.platform.archive.common.models.{BagFilePath}
 
 case class BagManifestLocation(name: String) {
-  def toEntryPath = EntryPath(name)
+  def toBagFilePath = BagFilePath(name)
 }
 
 object BagManifestLocation {

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
 
-import akka.stream.{ActorAttributes, Supervision}
 import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.{ActorAttributes, Supervision}
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -36,9 +36,9 @@ class UploadItemFlowTest
       withMaterializer { implicit materializer =>
         val fileContent = "bah buh bih beh"
         val fileName = "key.txt"
-        withZipFile(List(FileEntry(fileName, fileContent))) { zipFile =>
+        withZipFile(List(FileEntry(fileName, fileContent))) { file =>
           val archiveItemJob = createArchiveItemJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket,
             s3Key = fileName
           )
@@ -64,12 +64,12 @@ class UploadItemFlowTest
     "sends a left of archive item job when uploading a file fails because the file does not exist") {
     withLocalS3Bucket { bucket =>
       withMaterializer { implicit materializer =>
-        withZipFile(List()) { zipFile =>
+        withZipFile(List()) { file =>
           val fileName = "key.txt"
           val bagIdentifier = createExternalIdentifier
 
           val archiveItemJob = createArchiveItemJobWith(
-            zipFile = zipFile,
+            file = file,
             bucket = bucket,
             bagIdentifier = bagIdentifier,
             s3Key = fileName
@@ -98,9 +98,9 @@ class UploadItemFlowTest
     withMaterializer { implicit materializer =>
       val fileContent = "bah buh bih beh"
       val fileName = "key.txt"
-      withZipFile(List(FileEntry(s"$fileName", fileContent))) { zipFile =>
+      withZipFile(List(FileEntry(s"$fileName", fileContent))) { file =>
         val failingArchiveItemJob = createArchiveItemJobWith(
-          zipFile = zipFile,
+          file = file,
           bucket = Bucket("does-not-exist"),
           s3Key = fileName
         )

@@ -25,7 +25,7 @@ class ArchivistFeatureTest
     with ProgressUpdateAssertions {
 
   it("downloads, uploads and verifies a BagIt bag") {
-    withArchivist {
+    withArchivist() {
       case (
           ingestBucket,
           storageBucket,
@@ -51,7 +51,7 @@ class ArchivistFeatureTest
 
               assertSnsReceivesOnly(
                 ArchiveComplete(
-                  request.archiveRequestId,
+                  request.id,
                   request.storageSpace,
                   BagLocation(
                     storageBucket.name,
@@ -62,25 +62,22 @@ class ArchivistFeatureTest
                 registrarTopic
               )
 
-              assertTopicReceivesProgressEventUpdate(
-                request.archiveRequestId,
-                progressTopic) { events =>
-                events should have size 1
-                events.head.description shouldBe s"Started work on ingest: ${request.archiveRequestId}"
+              assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
+                events =>
+                  events should have size 1
+                  events.head.description shouldBe s"Started work on ingest: ${request.id}"
               }
 
-              assertTopicReceivesProgressEventUpdate(
-                request.archiveRequestId,
-                progressTopic) { events =>
-                events should have size 1
-                events.head.description shouldBe "Source bag downloaded successfully"
+              assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
+                events =>
+                  events should have size 1
+                  events.head.description shouldBe "Ingest bag file downloaded successfully."
               }
 
-              assertTopicReceivesProgressEventUpdate(
-                request.archiveRequestId,
-                progressTopic) { events =>
-                events should have size 1
-                events.head.description shouldBe "Bag uploaded and verified successfully"
+              assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
+                events =>
+                  events should have size 1
+                  events.head.description shouldBe "Bag uploaded and verified successfully"
               }
 
             }
@@ -89,7 +86,7 @@ class ArchivistFeatureTest
   }
 
   it("fails when ingesting an invalid bag") {
-    withArchivist {
+    withArchivist() {
       case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
@@ -100,7 +97,7 @@ class ArchivistFeatureTest
             assertSnsReceivesNothing(registrarTopic)
 
             assertTopicReceivesProgressStatusUpdate(
-              request.archiveRequestId,
+              request.id,
               progressTopic,
               Progress.Failed)({ events =>
               all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
@@ -111,7 +108,7 @@ class ArchivistFeatureTest
   }
 
   it("fails when ingesting a bag with no tag manifest") {
-    withArchivist {
+    withArchivist() {
       case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
           request =>
@@ -120,7 +117,7 @@ class ArchivistFeatureTest
               assertSnsReceivesNothing(registrarTopic)
 
               assertTopicReceivesProgressStatusUpdate(
-                request.archiveRequestId,
+                request.id,
                 progressTopic,
                 Progress.Failed)({ events =>
                 all(events.map(_.description)) should include regex "Failed reading file tagmanifest-sha256.txt from zip file"
@@ -134,7 +131,9 @@ class ArchivistFeatureTest
     val bagInfo1 = randomBagInfo
     val bagInfo2 = randomBagInfo
 
-    withArchivist {
+    // Parallelism here is 1 as fake-sns can't deal with
+    // concurrent requests
+    withArchivist(1) {
       case (
           ingestBucket,
           storageBucket,
@@ -168,7 +167,7 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       ArchiveComplete(
-                        validRequest1.archiveRequestId,
+                        validRequest1.id,
                         validRequest1.storageSpace,
                         BagLocation(
                           storageBucket.name,
@@ -177,7 +176,7 @@ class ArchivistFeatureTest
                             s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                       ),
                       ArchiveComplete(
-                        validRequest2.archiveRequestId,
+                        validRequest2.id,
                         validRequest2.storageSpace,
                         BagLocation(
                           storageBucket.name,
@@ -190,14 +189,14 @@ class ArchivistFeatureTest
                   )
 
                   assertTopicReceivesProgressStatusUpdate(
-                    invalidRequest1.archiveRequestId,
+                    invalidRequest1.id,
                     progressTopic,
                     Progress.Failed) { events =>
                     all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
                   }
 
                   assertTopicReceivesProgressStatusUpdate(
-                    invalidRequest2.archiveRequestId,
+                    invalidRequest2.id,
                     progressTopic,
                     Progress.Failed) { events =>
                     all(events.map(_.description)) should include regex "Calculated checksum .+ was different from bad_digest"
@@ -215,7 +214,7 @@ class ArchivistFeatureTest
     val bagInfo1 = randomBagInfo
     val bagInfo2 = randomBagInfo
 
-    withArchivist {
+    withArchivist() {
       case (
           ingestBucket,
           storageBucket,
@@ -231,7 +230,7 @@ class ArchivistFeatureTest
           sendNotificationToSQS(
             queuePair.queue,
             IngestBagRequest(
-              archiveRequestId = invalidRequestId1,
+              id = invalidRequestId1,
               zippedBagLocation =
                 ObjectLocation(ingestBucket.name, "non-existing1.zip"),
               storageSpace = StorageSpace("not_a_real_one")
@@ -248,7 +247,7 @@ class ArchivistFeatureTest
             sendNotificationToSQS(
               queuePair.queue,
               IngestBagRequest(
-                archiveRequestId = invalidRequestId2,
+                id = invalidRequestId2,
                 zippedBagLocation =
                   ObjectLocation(ingestBucket.name, "non-existing2.zip"),
                 storageSpace = StorageSpace("not_a_real_one")
@@ -262,7 +261,7 @@ class ArchivistFeatureTest
               assertSnsReceives(
                 Set(
                   ArchiveComplete(
-                    validRequest1.archiveRequestId,
+                    validRequest1.id,
                     validRequest1.storageSpace,
                     BagLocation(
                       storageBucket.name,
@@ -271,7 +270,7 @@ class ArchivistFeatureTest
                         s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                   ),
                   ArchiveComplete(
-                    validRequest2.archiveRequestId,
+                    validRequest2.id,
                     validRequest2.storageSpace,
                     BagLocation(
                       storageBucket.name,
@@ -286,14 +285,14 @@ class ArchivistFeatureTest
               assertTopicReceivesFailedProgress(
                 requestId = invalidRequestId1,
                 expectedDescriptionPrefix =
-                  s"Failed downloading zipFile ${ingestBucket.name}/non-existing1.zip",
+                  s"Failed downloading file ${ingestBucket.name}/non-existing1.zip",
                 progressTopic = progressTopic
               )
 
               assertTopicReceivesFailedProgress(
                 requestId = invalidRequestId2,
                 expectedDescriptionPrefix =
-                  s"Failed downloading zipFile ${ingestBucket.name}/non-existing2.zip",
+                  s"Failed downloading file ${ingestBucket.name}/non-existing2.zip",
                 progressTopic = progressTopic
               )
             }
@@ -307,7 +306,9 @@ class ArchivistFeatureTest
     val bagInfo1 = randomBagInfo
     val bagInfo2 = randomBagInfo
 
-    withArchivist {
+    // Parallelism here is 1 as fake-sns can't deal with
+    // concurrent requests
+    withArchivist(1) {
       case (
           ingestBucket,
           storageBucket,
@@ -337,13 +338,10 @@ class ArchivistFeatureTest
                   createDataManifest = dataManifestWithNonExistingFile) {
                   invalidRequest2 =>
                     eventually {
-
-                      assertQueuePairSizes(queuePair, 0, 0)
-
                       assertSnsReceives(
                         Set(
                           ArchiveComplete(
-                            validRequest1.archiveRequestId,
+                            validRequest1.id,
                             validRequest2.storageSpace,
                             BagLocation(
                               storageBucket.name,
@@ -352,7 +350,7 @@ class ArchivistFeatureTest
                                 s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                           ),
                           ArchiveComplete(
-                            validRequest2.archiveRequestId,
+                            validRequest2.id,
                             validRequest2.storageSpace,
                             BagLocation(
                               storageBucket.name,
@@ -365,14 +363,14 @@ class ArchivistFeatureTest
                       )
 
                       assertTopicReceivesFailedProgress(
-                        requestId = invalidRequest1.archiveRequestId,
+                        requestId = invalidRequest1.id,
                         expectedDescription =
                           "Failed reading file this/does/not/exists.jpg from zip file",
                         progressTopic = progressTopic
                       )
 
                       assertTopicReceivesFailedProgress(
-                        requestId = invalidRequest2.archiveRequestId,
+                        requestId = invalidRequest2.id,
                         expectedDescription =
                           "Failed reading file this/does/not/exists.jpg from zip file",
                         progressTopic = progressTopic
@@ -389,7 +387,7 @@ class ArchivistFeatureTest
     val bagInfo1 = randomBagInfo
     val bagInfo2 = randomBagInfo
 
-    withArchivist {
+    withArchivist() {
       case (
           ingestBucket,
           storageBucket,
@@ -423,7 +421,7 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       ArchiveComplete(
-                        validRequest1.archiveRequestId,
+                        validRequest1.id,
                         validRequest2.storageSpace,
                         BagLocation(
                           storageBucket.name,
@@ -432,7 +430,7 @@ class ArchivistFeatureTest
                             s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
                       ),
                       ArchiveComplete(
-                        validRequest2.archiveRequestId,
+                        validRequest2.id,
                         validRequest2.storageSpace,
                         BagLocation(
                           storageBucket.name,
@@ -445,14 +443,14 @@ class ArchivistFeatureTest
                   )
 
                   assertTopicReceivesFailedProgress(
-                    requestId = invalidRequest1.archiveRequestId,
+                    requestId = invalidRequest1.id,
                     expectedDescription =
                       "Failed reading file bag-info.txt from zip file",
                     progressTopic = progressTopic
                   )
 
                   assertTopicReceivesFailedProgress(
-                    requestId = invalidRequest2.archiveRequestId,
+                    requestId = invalidRequest2.id,
                     expectedDescription =
                       "Failed reading file bag-info.txt from zip file",
                     progressTopic = progressTopic

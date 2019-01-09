@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.fixtures
 
 import java.io.File
-import java.util.zip.ZipFile
 
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
@@ -31,7 +31,7 @@ trait ArchivistFixtures
     with BagUploaderConfigGenerators
     with IngestBagRequestGenerators {
 
-  def sendBag[R](zipFile: ZipFile, ingestBucket: Bucket, queuePair: QueuePair)(
+  def sendBag[R](file: File, ingestBucket: Bucket, queuePair: QueuePair)(
     testWith: TestWith[IngestBagRequest, R]): R = {
 
     val ingestBagRequest = createIngestBagRequestWith(
@@ -44,7 +44,7 @@ trait ArchivistFixtures
     val bucket = ingestBagRequest.zippedBagLocation.namespace
     val key = ingestBagRequest.zippedBagLocation.key
 
-    s3Client.putObject(bucket, key, new File(zipFile.getName))
+    s3Client.putObject(bucket, key, file)
 
     sendNotificationToSQS(
       queuePair.queue,
@@ -84,17 +84,22 @@ trait ArchivistFixtures
   def withApp[R](storageBucket: Bucket,
                  queuePair: QueuePair,
                  registrarTopic: Topic,
-                 progressTopic: Topic)(testWith: TestWith[Archivist, R]): R =
+                 progressTopic: Topic,
+                 parallelism: Int = 10)(testWith: TestWith[Archivist, R]): R =
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withArchiveMessageStream[NotificationMessage, Unit, R](
           queuePair.queue,
           metricsSender) { messageStream =>
+          implicit val s3 = s3Client
+          implicit val sns = snsClient
+          implicit val tf =
+            TransferManagerBuilder.standard().withS3Client(s3Client).build()
+
           val archivist = new Archivist(
-            s3Client = s3Client,
-            snsClient = snsClient,
             messageStream = messageStream,
-            bagUploaderConfig = createBagUploaderConfigWith(storageBucket),
+            bagUploaderConfig =
+              createBagUploaderConfigWith(storageBucket, parallelism),
             snsRegistrarConfig = createSNSConfigWith(registrarTopic),
             snsProgressConfig = createSNSConfigWith(progressTopic)
           )
@@ -106,22 +111,26 @@ trait ArchivistFixtures
       }
     }
 
-  def withArchivist[R](
+  def withArchivist[R](parallelism: Int = 10)(
     testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(5) { queuePair =>
       withLocalSnsTopic { registrarTopic =>
         withLocalSnsTopic { progressTopic =>
           withLocalS3Bucket { ingestBucket =>
             withLocalS3Bucket { storageBucket =>
-              withApp(storageBucket, queuePair, registrarTopic, progressTopic) {
-                _ =>
-                  testWith(
-                    (
-                      ingestBucket,
-                      storageBucket,
-                      queuePair,
-                      registrarTopic,
-                      progressTopic))
+              withApp(
+                storageBucket,
+                queuePair,
+                registrarTopic,
+                progressTopic,
+                parallelism) { _ =>
+                testWith(
+                  (
+                    ingestBucket,
+                    storageBucket,
+                    queuePair,
+                    registrarTopic,
+                    progressTopic))
               }
             }
           }

@@ -1,9 +1,11 @@
 package uk.ac.wellcome.platform.archive.archivist.generators
 
+import java.io.File
 import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.common.generators.ExternalIdentifierGenerators
+import uk.ac.wellcome.platform.archive.common.models
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -11,22 +13,18 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
 
   def createArchiveItemJobWith(
-    zipFile: ZipFile,
+    file: File,
     bucket: S3.Bucket,
     bagIdentifier: ExternalIdentifier = createExternalIdentifier,
     s3Key: String
   ): ArchiveItemJob =
     ArchiveItemJob(
-      archiveJob = createArchiveJobWith(
-        zipFile = zipFile,
-        bagIdentifier = bagIdentifier,
-        bucket = bucket
-      ),
-      itemLocation = EntryPath(s3Key)
+      archiveJob = createArchiveJobWith(file, bagIdentifier, bucket),
+      itemLocation = BagFilePath(s3Key)
     )
 
   def createArchiveDigestItemJobWith(
-    zipFile: ZipFile,
+    file: File,
     bucket: S3.Bucket,
     digest: String = randomAlphanumeric(),
     bagIdentifier: ExternalIdentifier = createExternalIdentifier,
@@ -34,15 +32,15 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
   ): ArchiveDigestItemJob =
     ArchiveDigestItemJob(
       archiveJob = createArchiveJobWith(
-        zipFile = zipFile,
+        file = file,
         bagIdentifier = bagIdentifier,
         bucket = bucket
       ),
-      bagDigestItem = BagItem(digest, EntryPath(s3Key))
+      bagDigestItem = models.BagDigestFile(Checksum(digest), BagFilePath(s3Key))
     )
 
   def createArchiveJobWith(
-    zipFile: ZipFile,
+    file: File,
     bagIdentifier: ExternalIdentifier = createExternalIdentifier,
     bucket: Bucket
   ): ArchiveJob = {
@@ -51,7 +49,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
     val bagLocation = BagLocation(bucket.name, "archive", bagPath)
     ArchiveJob(
       externalIdentifier = bagIdentifier,
-      zipFile = zipFile,
+      zipFile = new ZipFile(file),
       bagLocation = bagLocation,
       config = BagItConfig(),
       bagManifestLocations = List(

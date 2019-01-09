@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
+import java.time.Instant
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest, UpdateItemRequest}
 import org.mockito.Matchers.any
@@ -7,10 +9,7 @@ import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
-  ProgressGenerators,
-  ProgressTrackerFixture
-}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.common.progress.monitor.IdConstraintError
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
@@ -127,6 +126,33 @@ class ProgressTrackerTest
   }
 
   describe("update") {
+    it("sets the bag id to a progress monitor with none") {
+      withProgressTrackerTable { table =>
+        withProgressTracker(table) { progressTracker =>
+          whenReady(progressTracker.initialise(createProgress)) { progress =>
+            val bagId = createBagId
+
+            val progressUpdate = ProgressStatusUpdate(
+              progress.id,
+              Progress.Processing,
+              Some(bagId)
+            )
+
+            progressTracker.update(progressUpdate)
+
+            val storedProgress = getExistingTableItem[Progress](progress.id.toString, table)
+
+            assertRecent(storedProgress.createdDate)
+            assertRecent(storedProgress.lastModifiedDate)
+            storedProgress.events.map(_.description) should contain theSameElementsAs progressUpdate.events.map(_.description)
+            storedProgress.events.foreach(event => assertRecent(event.createdDate))
+
+            storedProgress.bag shouldBe Some(bagId)
+          }
+        }
+      }
+    }
+
     it("adds a single event to a monitor with no events") {
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
@@ -264,6 +290,64 @@ class ProgressTrackerTest
           val failedException = result.failed.get
           failedException shouldBe a[RuntimeException]
           failedException shouldBe expectedException
+        }
+      }
+    }
+  }
+
+  describe("find progress by BagId") {
+    it("query for multiple progresses for a same bag are returned in order of createdDate") {
+      withProgressTrackerTable { table =>
+        withProgressTracker(table) { progressTracker =>
+          val beforeTime = Instant.parse("2018-12-01T11:50:00.00Z")
+          val time       = Instant.parse("2018-12-01T12:00:00.00Z")
+          val afterTime  = Instant.parse("2018-12-01T12:10:00.00Z")
+          whenReady(progressTracker.initialise(createProgressWith(createdDate=beforeTime))) { progressA =>
+            whenReady(progressTracker.initialise(createProgressWith(createdDate=time))) { progressB =>
+              whenReady(progressTracker.initialise(createProgressWith(createdDate=afterTime))) { progressC =>
+                val bagId = createBagId
+
+                val progressAUpdate = createProgressBagUpdateWith(progressA.id, bagId)
+                progressTracker.update(progressAUpdate)
+                val progressBUpdate = createProgressBagUpdateWith(progressB.id, bagId)
+                progressTracker.update(progressBUpdate)
+                val progressCUpdate = createProgressBagUpdateWith(progressC.id, bagId)
+                progressTracker.update(progressCUpdate)
+
+                val bagProgresses = progressTracker.findByBagId(bagId)
+
+                bagProgresses shouldBe List(
+                  Right(BagIngest(bagId.toString, progressC.id, afterTime)),
+                  Right(BagIngest(bagId.toString, progressB.id, time)),
+                  Right(BagIngest(bagId.toString, progressA.id, beforeTime)))
+              }
+            }
+          }
+        }
+      }
+    }
+
+    it("only returns the most recent 30 progress entries") {
+      withProgressTrackerTable { table =>
+        withProgressTracker(table) { progressTracker =>
+          val start = Instant.parse("2018-12-01T12:00:00.00Z")
+          val eventualProgresses: Seq[Future[Progress]] =
+            for (i <- 0 to 33) yield
+              progressTracker.initialise(createProgressWith(createdDate=start.plusSeconds(i)))
+
+          val bagId = createBagId
+
+          eventualProgresses.map( eventualProgress =>
+            eventualProgress.map { progress =>
+              val progressUpdate = createProgressBagUpdateWith(progress.id, bagId)
+              progressTracker.update(progressUpdate)
+            })
+
+          eventually {
+            val bagProgresses = progressTracker.findByBagId(bagId)
+
+            bagProgresses should have size 30
+          }
         }
       }
     }

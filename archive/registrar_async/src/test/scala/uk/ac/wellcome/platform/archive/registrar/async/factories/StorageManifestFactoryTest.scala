@@ -2,14 +2,17 @@ package uk.ac.wellcome.platform.archive.registrar.async.factories
 
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.{FunSpec, Inside}
-import uk.ac.wellcome.platform.archive.common.fixtures.{FileEntry, RandomThings}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  BagLocationFixtures,
+  FileEntry,
+  RandomThings
+}
 import uk.ac.wellcome.platform.archive.common.generators.ArchiveCompleteGenerators
 import uk.ac.wellcome.platform.archive.common.models.error.{
   DownloadError,
   InvalidBagManifestError
 }
 import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
-import uk.ac.wellcome.platform.archive.registrar.async.fixtures.BagLocationFixtures
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 
 class StorageManifestFactoryTest
@@ -89,8 +92,14 @@ class StorageManifestFactoryTest
               bagLocation = bagLocation
             )
             val value = StorageManifestFactory.create(archiveComplete)
-            value shouldBe Left(
-              InvalidBagManifestError(archiveComplete, "manifest-sha256.txt"))
+            inside(value) {
+              case Left(
+                  InvalidBagManifestError(
+                    actualArchiveComplete,
+                    "manifest-sha256.txt",
+                    _)) =>
+                actualArchiveComplete shouldBe archiveComplete
+            }
         }
       }
     }
@@ -106,10 +115,14 @@ class StorageManifestFactoryTest
               bagLocation = bagLocation
             )
             val value = StorageManifestFactory.create(archiveComplete)
-            value shouldBe Left(
-              InvalidBagManifestError(
-                archiveComplete,
-                "tagmanifest-sha256.txt"))
+            inside(value) {
+              case Left(
+                  InvalidBagManifestError(
+                    actualArchiveComplete,
+                    "tagmanifest-sha256.txt",
+                    _)) =>
+                actualArchiveComplete shouldBe archiveComplete
+            }
         }
       }
     }

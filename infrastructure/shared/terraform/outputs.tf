@@ -38,6 +38,17 @@ output "infra_bucket" {
   value = "${var.infra_bucket}"
 }
 
+# Source data update topics
+
+## miro
+output "miro_updates_topic_arn" {
+  value = "${module.miro_updates_topic.arn}"
+}
+
+output "miro_updates_topic_name" {
+  value = "${module.miro_updates_topic.name}"
+}
+
 # Reindexing topics
 
 ## Reporting - miro
@@ -126,6 +137,20 @@ output "storage_vpc_delta_public_subnets" {
 
 output "storage_vpc_delta_id" {
   value = "${module.storage_vpc_delta.vpc_id}"
+}
+
+# TODO: Remove storage_vpc_delta
+
+output "storage_vpc_private_subnets" {
+  value = ["${module.storage_vpc.private_subnets}"]
+}
+
+output "storage_vpc_public_subnets" {
+  value = ["${module.storage_vpc.public_subnets}"]
+}
+
+output "storage_vpc_id" {
+  value = "${module.storage_vpc.vpc_id}"
 }
 
 output "storage_cidr_block_vpc" {

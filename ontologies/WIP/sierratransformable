@@ -327,10 +327,10 @@
    /* Populate wwork:subjects people. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "600".
-   * 2. Populate platform "label" for "600" concatenated with subfields "c", "a", "b", "d", "e"  type as "Subject".
+   * 2. Populate platform "label" for "600" concatenated with subfields "c", "a", "b", "d", "e","t","v","x","y","z"  type as "Subject".
    * 3. Populate platform "concepts" "label" with subfield "a" and type as "Person" for "600".
    * 4. When this field has associated identifiers populate subject "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh) or if second indicator 7 do not include subject.
-   * 5. For "600" subfield "b" populates "numeration", "d" populate "dates" and subfield "c" populates "prefixes".
+   * 5. For "600" subfield "b" populates "numeration", "d" populate "dates" and subfield "c" populates "prefixes". "t","v","x"  type as "concepts", "y" type as "Period","z" type as "Place".
    *
    *
    *
@@ -364,6 +364,10 @@
    *        {
    *          "label": "author .",
    *          "type": "ContributionRole"
+   *        }
+   *        {
+   *          "label" : "" ,
+   *          "type" : "Concept"
    *        }
    *      ]
    *    }
@@ -424,9 +428,8 @@
    * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "function" with "Manufacture".
    * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "function" with "Manufacture".       
    * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "function" with "Manufacture".
-   * 8. Retain order of each subfield as a list.
    *
-   * Example:
+   * Example: 
    *
    *  "production": 
    *   [
@@ -436,21 +439,17 @@
    *        {
    *          "label": "London",
    *          "type": "Place"
-   *        }
-   *      ],
-   *      "agents": [
-   *        {
-   *          "label": "Mac Keith Press",
-   *          "type": "Agent"
-   *        }
-   *      ], 
-   *     "places": [
+   *        } ,
    *        {
    *          "label": "NY",
    *          "type": "Place"
    *        }
    *      ],
    *      "agents": [
+   *        {
+   *          "label": "Mac Keith Press",
+   *          "type": "Agent"
+   *        } ,
    *        {
    *          "label": "HarperCollins",
    *          "type": "Agent"
@@ -481,7 +480,6 @@
    * 3. Populate "agents" from subfield "b" and type as "Agent"
    * 4. Populate "dates" from subfield "c" and type as "Periods"    
    * 5. For the second indicator populate "function" as follows. 0 = "Production", 1="Publication", 2="Distribution", 3="Manufacture". Type as "Concept". Function goes at the end of the list.
-   * 6. Retain order of each subfield as a list.
    *
    * Example:
    *

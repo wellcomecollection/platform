@@ -11,6 +11,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   ZipLocation
 }
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
+import uk.ac.wellcome.platform.archive.common.bag.BagDigestFileCreator
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 object ArchiveItemJobCreator extends Logging {
@@ -21,14 +22,14 @@ object ArchiveItemJobCreator extends Logging {
     * If any of the manifests are incorrectly formatted, it returns an error.
     *
     */
-  def createArchiveDigestItemJobs(job: ArchiveJob, delimiter: String)
+  def createArchiveDigestItemJobs(job: ArchiveJob)
     : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] =
     job.bagManifestLocations
       .map { manifestLocation =>
-        ZipLocation(job.zipFile, manifestLocation.toEntryPath)
+        ZipLocation(job.zipFile, manifestLocation.toBagFilePath)
       }
       .traverse { zipLocation =>
-        parseArchiveDigestItemJobs(job, zipLocation, delimiter)
+        parseArchiveDigestItemJobs(job, zipLocation)
       }
       .map { _.flatten }
 
@@ -40,12 +41,11 @@ object ArchiveItemJobCreator extends Logging {
     *
     */
   private def parseArchiveDigestItemJobs(job: ArchiveJob,
-                                         zipLocation: ZipLocation,
-                                         delimiter: String)
+                                         zipLocation: ZipLocation)
     : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] = {
     val value: Either[ArchiveError[ArchiveJob], InputStream] = ZipFileReader
       .maybeInputStream(zipLocation)
-      .toRight(FileNotFoundError(zipLocation.entryPath.path, job))
+      .toRight(FileNotFoundError(zipLocation.bagFilePath.value, job))
 
     value.flatMap { inputStream =>
       val manifestFileLines: List[String] =
@@ -57,8 +57,8 @@ object ArchiveItemJobCreator extends Logging {
       manifestFileLines
         .filter { _.nonEmpty }
         .traverse { line =>
-          BagItemCreator
-            .create(line.trim(), job, zipLocation.entryPath.path, delimiter)
+          BagDigestFileCreator
+            .create(line.trim(), job, zipLocation.bagFilePath.value)
             .map { bagItem =>
               ArchiveDigestItemJob(archiveJob = job, bagDigestItem = bagItem)
             }

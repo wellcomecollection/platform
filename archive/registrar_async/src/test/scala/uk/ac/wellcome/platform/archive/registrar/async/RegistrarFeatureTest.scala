@@ -77,7 +77,7 @@ class RegistrarFeatureTest
                 expectedBagInfo = bagInfo,
                 expectedNamespace = storageBucket.name,
                 expectedPath =
-                  s"${bagLocation.storagePath}/${bagLocation.bagPath.value}",
+                  s"${bagLocation.storageRootPath}/${bagLocation.bagPath.value}",
                 filesNumber = 1,
                 createdDateAfter = createdAfterDate
               )
