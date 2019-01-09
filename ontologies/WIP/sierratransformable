@@ -327,10 +327,10 @@
    /* Populate wwork:subjects people. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "600".
-   * 2. Populate platform "label" for "600" concatenated with subfields "c", "a", "b", "d", "e"  type as "Subject".
+   * 2. Populate platform "label" for "600" concatenated with subfields "c", "a", "b", "d", "e","t","v","x","y","z"  type as "Subject".
    * 3. Populate platform "concepts" "label" with subfield "a" and type as "Person" for "600".
    * 4. When this field has associated identifiers populate subject "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh) or if second indicator 7 do not include subject.
-   * 5. For "600" subfield "b" populates "numeration", "d" populate "dates" and subfield "c" populates "prefixes".
+   * 5. For "600" subfield "b" populates "numeration", "d" populate "dates" and subfield "c" populates "prefixes". "t","v","x"  type as "concepts", "y" type as "Period","z" type as "Place".
    *
    *
    *
@@ -364,6 +364,10 @@
    *        {
    *          "label": "author .",
    *          "type": "ContributionRole"
+   *        }
+   *        {
+   *          "label" : "" ,
+   *          "type" : "Concept"
    *        }
    *      ]
    *    }
