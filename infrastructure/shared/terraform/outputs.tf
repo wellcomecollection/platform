@@ -38,6 +38,17 @@ output "infra_bucket" {
   value = "${var.infra_bucket}"
 }
 
+# Source data update topics
+
+## miro
+output "miro_updates_topic_arn" {
+  value = "${module.miro_updates_topic.arn}"
+}
+
+output "miro_updates_topic_name" {
+  value = "${module.miro_updates_topic.name}"
+}
+
 # Reindexing topics
 
 ## Reporting - miro

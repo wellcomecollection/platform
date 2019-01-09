@@ -62,3 +62,9 @@ module "catalogue_sierra_items_reindex_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
   name   = "catalogue_sierra_items_reindex_topic"
 }
+
+# Shared topics for updates to VHS source data
+module "miro_updates_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "vhs_sourcedata_miro_updates_topic"
+}
