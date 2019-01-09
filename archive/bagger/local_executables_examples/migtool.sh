@@ -19,6 +19,9 @@ export WELLCOME_API_CLIENT_SECRET=''
 export WELLCOME_API_TOKEN_ENDPOINT=''
 export STORAGE_API_BAGS=''
 export STORAGE_API_INGESTS=''
+export DDS_GOOBI_NOTIFICATION=''
+
+export DDS_PACKAGE_FILEINFO=''
 
 
 python ../src/migration_tools.py "$@"

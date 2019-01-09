@@ -5,8 +5,15 @@ import datetime
 import dateutil
 import boto3
 import settings
+import requests
+import json
 import storage_api
 from mets_filesource import b_numbers_from_s3
+
+
+def json_default(o):
+    if isinstance(o, datetime.datetime):
+        return o.isoformat()
 
 
 class MigrationTool(object):
@@ -19,6 +26,9 @@ class MigrationTool(object):
 
     def ingest(self, delay, filter=''):
         do_ingest(delay, filter)
+
+    def simulate_goobi_call(self, delay, filter=''):
+        call_dds(delay, filter)
 
 
 def populate_initial(filter):
@@ -58,18 +68,19 @@ def update_bag_and_ingest_status(delay, filter):
         ]
     }
 
+    print("[")
+
     for bnumber in bnumber_generator(filter):
-        print("updating db for " + bnumber)
         bag_date = "-"
+        bag_size = 0
 
         # check for bag
         bag_zip = aws.get_dropped_bag_info(bnumber)
-        print(bag_zip)
         if bag_zip["exists"]:  # and bag_zip["last_modified"] > min_bag_date:
             bag_date = bag_zip["last_modified"].isoformat()
+            bag_size = bag_zip["size"]
 
         ingest = storage_api.get_ingest_for_identifier(bnumber)
-        print(ingest)
         if ingest is None:
             ingest = no_ingest
 
@@ -77,15 +88,24 @@ def update_bag_and_ingest_status(delay, filter):
             Key={"bnumber": bnumber},
             ExpressionAttributeValues={
                 ":bdt": bag_date,
+                ":bsz": bag_size,
                 ":idt": ingest["events"][0]["createdDate"],
                 ":iid": ingest["id"],
                 ":ist": ingest["status"]["id"]
             },
-            UpdateExpression="SET bag_date = :bdt, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist"
+            UpdateExpression="SET bag_date = :bdt, bag_size = :bsz, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist"
         )
-
+        output = {
+            "identifier": bnumber,
+            "bag_zip": bag_zip,
+            "ingest": ingest
+        }
+        print(json.dumps(output, default=json_default, indent=4))
+        print(",")
         if delay > 0:
             time.sleep(delay)
+
+    print("]")
 
 
 def bnumber_generator(filter_expression):
@@ -127,13 +147,43 @@ def empty_item(bnumber):
 
 
 def do_ingest(delay, filter):
+    print("[")
     for bnumber in bnumber_generator(filter):
-        print("sending ingest instruction for " + bnumber)
         ingest = storage_api.ingest(bnumber)
-        print(ingest)
+        print(json.dumps(ingest, default=json_default, indent=4))
+        print(",")
+        if delay > 0:
+            time.sleep(delay)
+
+    print('"end"')
+    print("]")
+
+
+def call_dds(delay, filter):
+    table = get_table()
+    for bnumber in bnumber_generator(filter):
+        now = datetime.datetime.now().isoformat
+        print("[")
+        url = settings.DDS_GOOBI_NOTIFICATION.format(bnumber)
+        r = requests.get(url)
+        j = r.json()
+        print(json.dumps(j, indent=4))
+        print(",")
+
+        # now update the dynamodb record
+        table.update_item(
+            Key={"bnumber": bnumber},
+            ExpressionAttributeValues={
+                ":dc": now
+            },
+            UpdateExpression="SET dds_called = :dc"
+        )
 
         if delay > 0:
             time.sleep(delay)
+
+    print('{ "finished": "' + datetime.datetime.now().isoformat + '" }')
+    print("]")
 
 
 if __name__ == '__main__':
