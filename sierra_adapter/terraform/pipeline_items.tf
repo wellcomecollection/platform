@@ -54,12 +54,9 @@ module "items_to_dynamo" {
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id       = "${local.vpc_id}"
 
-  dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   account_id = "${data.aws_caller_identity.current.account_id}"
-
-  infra_bucket = "${var.infra_bucket}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets      = ["${local.private_subnets}"]

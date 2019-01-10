@@ -34,7 +34,6 @@ module "devise_search_service" {
   vpc_id             = "${var.vpc_id}"
   container_image    = "harrisonpim/devise_search:v4"
   ecs_cluster_id     = "${aws_ecs_cluster.cluster.id}"
-  vpc_cidr_block     = "${var.vpc_cidr_block}"
   subnets            = "${var.private_subnets}"
   memory             = "5120"
   cpu                = "1024"
@@ -56,7 +55,6 @@ module "palette_service" {
   vpc_id          = "${var.vpc_id}"
   container_image = "harrisonpim/palette:v2"
   ecs_cluster_id  = "${aws_ecs_cluster.cluster.id}"
-  vpc_cidr_block  = "${var.vpc_cidr_block}"
   subnets         = "${var.private_subnets}"
 
   service_discovery_namespace  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
@@ -74,7 +72,6 @@ module "image_similarity_service" {
   vpc_id          = "${var.vpc_id}"
   container_image = "harrisonpim/image_similarity:v1"
   ecs_cluster_id  = "${aws_ecs_cluster.cluster.id}"
-  vpc_cidr_block  = "${var.vpc_cidr_block}"
   subnets         = "${var.private_subnets}"
 
   service_discovery_namespace  = "${aws_service_discovery_private_dns_namespace.namespace.id}"

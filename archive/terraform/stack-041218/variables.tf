@@ -2,14 +2,11 @@ variable "namespace" {}
 
 variable "domain_name" {}
 
-variable "lambda_error_alarm_arn" {}
 variable "dlq_alarm_arn" {}
 
-variable "infra_bucket" {}
 variable "current_account_id" {}
 
 variable "ssh_key_name" {}
-variable "instance_type" {}
 
 # IAM
 
@@ -62,7 +59,6 @@ variable "registrar_async_container_image" {}
 variable "notifier_container_image" {}
 variable "progress_async_container_image" {}
 variable "bagger_container_image" {}
-variable "callback_stub_server_container_image" {}
 variable "registrar_http_container_image" {}
 
 variable "nginx_container_image" {}

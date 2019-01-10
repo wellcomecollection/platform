@@ -9,14 +9,11 @@ module "v1_pipeline" {
   id_minter_container_image = "${var.id_minter_container_image}"
   ingestor_container_image  = "${var.ingestor_container_image}"
 
-  vhs_miro_read_policy = "${var.vhs_miro_read_policy}"
-
   subnets         = ["${var.private_subnets}"]
   vpc_id          = "${var.vpc_id}"
   account_id      = "${var.account_id}"
   aws_region      = "${var.aws_region}"
   messages_bucket = "${var.messages_bucket}"
-  infra_bucket    = "${var.infra_bucket}"
 
   rds_access_security_group_id     = "${var.rds_access_security_group_id}"
   identifiers_rds_cluster_password = "${var.identifiers_rds_cluster_password}"
@@ -26,7 +23,6 @@ module "v1_pipeline" {
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
   dlq_alarm_arn          = "${var.dlq_alarm_arn}"
-  lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
 
@@ -52,9 +48,6 @@ module "v2_pipeline" {
   merger_container_image    = "${var.merger_container_image}"
   id_minter_container_image = "${var.id_minter_container_image}"
   ingestor_container_image  = "${var.ingestor_container_image}"
-
-  vhs_miro_read_policy   = "${var.vhs_miro_read_policy}"
-  vhs_sierra_read_policy = "${var.vhs_sierra_read_policy}"
 
   vhs_bucket_name = "${var.vhs_bucket_name}"
 

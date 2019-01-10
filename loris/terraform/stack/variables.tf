@@ -17,14 +17,6 @@ variable "healthcheck_path" {
   default = "/image/"
 }
 
-variable "ebs_container_path" {
-  default = "/mnt/loris"
-}
-
-variable "ebs_volume_size" {
-  default = "180"
-}
-
 variable "log_group_prefix" {
   description = "Cloudwatch log group name prefix"
   default     = "ecs"
@@ -99,6 +91,10 @@ variable "sidecar_env_vars" {
   description = "Environment variables to pass to the container"
   type        = "map"
   default     = {}
+}
+
+variable "ebs_container_path" {
+  default = "/mnt/loris"
 }
 
 variable "ebs_size" {

@@ -5,15 +5,12 @@ variable "cluster_name" {}
 variable "vpc_id" {}
 
 variable "dlq_alarm_arn" {}
-variable "lambda_error_alarm_arn" {}
 
 variable "aws_region" {
   default = "eu-west-1"
 }
 
 variable "account_id" {}
-
-variable "infra_bucket" {}
 
 variable "subnets" {
   type = "list"
