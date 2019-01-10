@@ -126,7 +126,7 @@ resource "aws_cloudfront_distribution" "api_root" {
 
   // shared config
 
-  comment = "${var.description}"
+  comment             = "${var.description}"
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
