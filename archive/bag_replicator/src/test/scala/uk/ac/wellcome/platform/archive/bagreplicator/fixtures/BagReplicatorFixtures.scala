@@ -50,6 +50,7 @@ trait BagReplicatorFixtures
   def withApp[R](
     queuePair: QueuePair,
     progressTopic: Topic,
+    outgoingTopic: Topic,
     destinationBucket: Bucket)(testWith: TestWith[BagReplicator, R]): R =
     withActorSystem { implicit actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
@@ -63,7 +64,8 @@ trait BagReplicatorFixtures
             bagReplicatorConfig = BagReplicatorConfig(
               parallelism = 10,
               StorageLocation(destinationBucket.name, "storage-root")),
-            snsProgressConfig = createSNSConfigWith(progressTopic)
+            progressSnsConfig = createSNSConfigWith(progressTopic),
+            outgoingSnsConfig = createSNSConfigWith(outgoingTopic)
           )
 
           bagReplicator.run()
@@ -74,14 +76,16 @@ trait BagReplicatorFixtures
     }
 
   def withBagReplicator[R](
-    testWith: TestWith[(Bucket, QueuePair, Bucket, Topic), R]): R = {
+    testWith: TestWith[(Bucket, QueuePair, Bucket, Topic, Topic), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(15) { queuePair =>
       withLocalSnsTopic { progressTopic =>
-        withLocalS3Bucket { sourceBucket =>
-          withLocalS3Bucket { destinationBucket =>
-            withApp(queuePair, progressTopic, destinationBucket) { _ =>
-              testWith(
-                (sourceBucket, queuePair, destinationBucket, progressTopic))
+        withLocalSnsTopic { outgoingTopic =>
+          withLocalS3Bucket { sourceBucket =>
+            withLocalS3Bucket { destinationBucket =>
+              withApp(queuePair, progressTopic, outgoingTopic, destinationBucket) { _ =>
+                testWith(
+                  (sourceBucket, queuePair, destinationBucket, progressTopic, outgoingTopic))
+              }
             }
           }
         }

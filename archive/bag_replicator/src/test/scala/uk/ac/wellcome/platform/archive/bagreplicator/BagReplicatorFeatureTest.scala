@@ -5,6 +5,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
+
 import scala.collection.JavaConverters._
 
 class BagReplicatorFeatureTest
@@ -17,7 +19,7 @@ class BagReplicatorFeatureTest
 
   it("receives a notification") {
     withBagReplicator {
-      case (sourceBucket, queuePair, destinationBucket, progressTopic) =>
+      case (sourceBucket, queuePair, destinationBucket, progressTopic, outgoingTopic) =>
         val requestId = randomUUID
         val storageSpace = randomStorageSpace
         val bagInfo = randomBagInfo
@@ -30,7 +32,7 @@ class BagReplicatorFeatureTest
           val sourceItems = s3Client.listObjects(
             bagLocation.storageNamespace,
             bagLocation.bagPathInStorage)
-          val sourceKeys =
+          val sourceKeyEtags =
             sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
           eventually {
@@ -38,10 +40,19 @@ class BagReplicatorFeatureTest
             val destinationBagPath = s"storage-root/space/$bagName"
             val destinationItems =
               s3Client.listObjects(destinationBucket.name, destinationBagPath)
-            val destinationKeys =
+            val destinationKeyEtags =
               destinationItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
-            destinationKeys should contain theSameElementsAs sourceKeys
+            destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
+
+            assertSnsReceivesOnly(
+              ArchiveComplete(
+                requestId,
+                storageSpace,
+                bagLocation
+              ),
+              outgoingTopic
+            )
           }
         }
     }
