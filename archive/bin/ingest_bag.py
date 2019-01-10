@@ -16,12 +16,12 @@ Options:
     --oauth-credentials=<OAUTH_CREDENTIALS> The location of the oauth credentials
                                             [default: ~/.wellcome-storage/oauth-credentials.json]
     --bucket=<BUCKET_NAME>                  The S3 bucket containing the bags.
-                                            [default: wellcomecollection-assets-archive-ingest]
+                                            [default: wellcomecollection-storage-ingests]
     --storage-space=<SPACE_NAME>            The space to use when storing the bag
-                                            [default: test-space]
+                                            [default: test]
     --api=<API>                             The ingests API endpoint to use
-                                            [default: https://api.wellcomecollection.org/storage/v1/ingests]
-    -h --help               Print this help message
+                                            [default: stage]
+    -h --help                               Print this help message
 
 OAuth details:
   Credentials are supplied in a file (default ~/.wellcome-storage/oauth-credentials.json) with the following Json
@@ -88,7 +88,7 @@ def call_ingest_api(ingest_bucket_name, bag_paths, space, ingests_endpoint, sess
         response = session.post(ingests_endpoint, json=message)
         status_code = response.status_code
         if status_code != 201:
-            print_result(f"ERROR calling {ingests_endpoint}", response)
+            print_result(f"ERROR calling {ingests_endpoint} with {message}", response)
         else:
             print(f"{message} -> {ingests_endpoint} [{status_code}]")
             location = response.headers.get("Location")
@@ -108,6 +108,7 @@ def print_result(description, result):
 
 def main():
     args = docopt.docopt(__doc__)
+
     bag_paths = args["<BAG>"]
     space = args["--storage-space"]
 
@@ -121,6 +122,12 @@ def main():
 
     ingest_bucket_name = args["--bucket"]
     ingests_endpoint = args["--api"]
+    api_lookup = {
+        'production': 'https://api.wellcomecollection.org/storage/v1/ingests',
+        'stage': 'https://api-stage.wellcomecollection.org/storage/v1/ingests'
+    }
+    if ingests_endpoint in api_lookup:
+        ingests_endpoint = api_lookup[ingests_endpoint]
 
     call_ingest_api(ingest_bucket_name, bag_paths, space, ingests_endpoint, api_session)
 
