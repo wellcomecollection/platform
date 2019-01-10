@@ -1,7 +1,7 @@
 # EC2 ECS Host
 
 module "ec2_efs_host" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/efs?ref=v11.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/efs?ref=8f733b7"
 
   cluster_name = "${var.cluster_name}"
   vpc_id       = "${var.vpc_id}"

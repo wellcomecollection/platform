@@ -6,7 +6,7 @@
 # - Sierra Adapter
 
 module "catalogue_vpc_delta" {
-  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.8"
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=d92bce2"
 
   name = "catalogue-172-31-0-0-16"
 
@@ -29,7 +29,7 @@ locals {
 }
 
 module "storage_vpc_delta" {
-  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.8"
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=d92bce2"
 
   name = "storage-172-30-0-0-16"
 
@@ -45,7 +45,7 @@ module "storage_vpc_delta" {
 }
 
 module "storage_vpc" {
-  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.8"
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=d92bce2"
 
   name = "storage-172-30-0-0-16"
 
@@ -69,7 +69,7 @@ module "storage_vpc" {
 # - Various monitoring lambdas
 
 module "monitoring_vpc_delta" {
-  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.8"
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=d92bce2"
 
   name = "monitoring-172-28-0-0-16"
 
@@ -89,7 +89,7 @@ module "monitoring_vpc_delta" {
 # - Labs apps & data scientist infra
 
 module "datascience_vpc_delta" {
-  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=9789aa3"
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=d92bce2"
 
   name = "datascience-172-27-0-0-16"
 
