@@ -8,12 +8,12 @@ object WellcomeDependencies {
 
   val messagingLibrary: Seq[ModuleID] = library(
     name = "messaging",
-    version = "0.2.0"
+    version = "1.1.0"
   )
 
   val monitoringLibrary: Seq[ModuleID] = library(
     name = "monitoring",
-    version = "1.1.1"
+    version = "1.2.0"
   )
 
   val storageLibrary: Seq[ModuleID] = library(
