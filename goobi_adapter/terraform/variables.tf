@@ -6,7 +6,3 @@ variable "aws_region" {
 variable "release_ids" {
   type = "map"
 }
-
-variable "key_name" {
-  description = "Name of AWS key pair"
-}
