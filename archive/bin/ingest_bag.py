@@ -123,8 +123,8 @@ def main():
     ingest_bucket_name = args["--bucket"]
     ingests_endpoint = args["--api"]
     api_lookup = {
-        'production': 'https://api.wellcomecollection.org/storage/v1/ingests',
-        'stage': 'https://api-stage.wellcomecollection.org/storage/v1/ingests'
+        "production": "https://api.wellcomecollection.org/storage/v1/ingests",
+        "stage": "https://api-stage.wellcomecollection.org/storage/v1/ingests",
     }
     if ingests_endpoint in api_lookup:
         ingests_endpoint = api_lookup[ingests_endpoint]
