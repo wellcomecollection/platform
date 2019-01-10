@@ -2,12 +2,10 @@ variable "subnets" {
   type = "list"
 }
 
-variable "cluster_name" {}
 variable "cluster_id" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
-variable "namespace_tld" {}
 
 variable "vpc_id" {}
 

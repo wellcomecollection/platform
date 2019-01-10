@@ -21,14 +21,10 @@ module "stack-041218" {
 
   ssh_key_name = "${var.key_name}"
 
-  instance_type = "i3.2xlarge"
-
   controlled_access_cidr_ingress = ["${var.admin_cidr_ingress}"]
 
-  current_account_id     = "${data.aws_caller_identity.current.account_id}"
-  infra_bucket           = "${local.infra_bucket}"
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-  dlq_alarm_arn          = "${local.dlq_alarm_arn}"
+  current_account_id = "${data.aws_caller_identity.current.account_id}"
+  dlq_alarm_arn      = "${local.dlq_alarm_arn}"
 
   service_egress_security_group_id = "${aws_security_group.service_egress.id}"
   interservice_security_group_id   = "${aws_security_group.interservice.id}"
@@ -36,15 +32,14 @@ module "stack-041218" {
   cognito_user_pool_arn          = "${local.cognito_user_pool_arn}"
   cognito_storage_api_identifier = "${local.cognito_storage_api_identifier}"
 
-  registrar_async_container_image      = "${local.registrar_async_container_image}"
-  progress_async_container_image       = "${local.progress_async_container_image}"
-  callback_stub_server_container_image = "${local.callback_stub_server_container_image}"
-  progress_http_container_image        = "${local.progress_http_container_image}"
-  registrar_http_container_image       = "${local.registrar_http_container_image}"
-  archivist_container_image            = "${local.archivist_container_image}"
-  notifier_container_image             = "${local.notifier_container_image}"
-  nginx_container_image                = "${local.nginx_container_image}"
-  bagger_container_image               = "${local.bagger_container_image}"
+  registrar_async_container_image = "${local.registrar_async_container_image}"
+  progress_async_container_image  = "${local.progress_async_container_image}"
+  progress_http_container_image   = "${local.progress_http_container_image}"
+  registrar_http_container_image  = "${local.registrar_http_container_image}"
+  archivist_container_image       = "${local.archivist_container_image}"
+  notifier_container_image        = "${local.notifier_container_image}"
+  nginx_container_image           = "${local.nginx_container_image}"
+  bagger_container_image          = "${local.bagger_container_image}"
 
   archive_bucket_name                = "${aws_s3_bucket.archive_storage.bucket}"
   storage_static_content_bucket_name = "${aws_s3_bucket.storage_static_content.bucket}"

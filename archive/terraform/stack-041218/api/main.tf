@@ -3,14 +3,12 @@ module "services" {
 
   namespace = "${var.namespace}"
 
-  namespace_id  = "${var.namespace_id}"
-  namespace_tld = "${var.namespace_tld}"
+  namespace_id = "${var.namespace_id}"
 
-  subnets      = ["${var.subnets}"]
-  cluster_name = "${var.cluster_name}"
-  cluster_id   = "${var.cluster_id}"
-  vpc_id       = "${var.vpc_id}"
-  nlb_arn      = "${module.nlb.arn}"
+  subnets    = ["${var.subnets}"]
+  cluster_id = "${var.cluster_id}"
+  vpc_id     = "${var.vpc_id}"
+  nlb_arn    = "${module.nlb.arn}"
 
   # Bags endpoint
 

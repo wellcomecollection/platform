@@ -5,7 +5,3 @@ locals {
 
   namespace = "datascience"
 }
-
-data "aws_vpc" "datascience" {
-  id = "${local.vpc_id}"
-}

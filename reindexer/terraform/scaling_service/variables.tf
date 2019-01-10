@@ -6,14 +6,6 @@ variable "max_capacity" {
   default = 3
 }
 
-variable "scale_up_period_in_minutes" {
-  default = 1
-}
-
-variable "scale_down_period_in_minutes" {
-  default = 10
-}
-
 variable "vpc_id" {}
 variable "ecs_cluster_id" {}
 variable "ecs_cluster_name" {}

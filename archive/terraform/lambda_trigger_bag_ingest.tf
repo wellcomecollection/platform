@@ -8,5 +8,4 @@ module "lambda_trigger_bag_ingest" {
   oauth_details_enc      = "${var.archive_oauth_details_enc}"
   bag_paths              = "b22454408.zip"
   ingest_bucket_name     = "${local.ingest_bucket_name}"
-  account_id             = "${local.account_id}"
 }

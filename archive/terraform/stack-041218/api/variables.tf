@@ -8,12 +8,10 @@ variable "aws_region" {
 
 variable "vpc_id" {}
 
-variable "cluster_name" {}
 variable "cluster_id" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
-variable "namespace_tld" {}
 
 variable "bags_container_image" {}
 variable "bags_container_port" {}

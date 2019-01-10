@@ -3,8 +3,7 @@ module "services" {
 
   namespace = "${var.namespace}"
 
-  namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
   subnets      = ["${var.subnets}"]
   cluster_name = "${var.cluster_name}"

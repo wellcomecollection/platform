@@ -21,10 +21,7 @@ module "miro_transformer" {
   namespace    = "${var.namespace}"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
-  dlq_alarm_arn          = "${var.dlq_alarm_arn}"
-  lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
-
-  infra_bucket = "${var.infra_bucket}"
+  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   allow_s3_messages_put_json         = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
   allow_cloudwatch_push_metrics_json = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
@@ -58,10 +55,7 @@ module "sierra_transformer" {
   namespace    = "${var.namespace}"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
-  dlq_alarm_arn          = "${var.dlq_alarm_arn}"
-  lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
-
-  infra_bucket = "${var.infra_bucket}"
+  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   allow_s3_messages_put_json         = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
   allow_cloudwatch_push_metrics_json = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
