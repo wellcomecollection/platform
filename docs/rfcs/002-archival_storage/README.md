@@ -17,7 +17,7 @@ This service should:
 
 We will build a storage service based on Amazon S3 and DynamoDB.
 
-![archival storage service - page 1](storageservice-20181017-2.png)
+![archival storage service - page 1](storageservice-20190109.png)
 
 -   New assets are uploaded to an Ingest bucket in S3.
     These assets are gzip-compressed files in the [BagIt format][bagit], a Library of Congress standard for storing collections of digital files.
@@ -28,7 +28,7 @@ We will build a storage service based on Amazon S3 and DynamoDB.
     2.  Decompresses the BagIt file and copies it to a short-term Processing bucket
     3.  Validates the file -- i.e., checks that the contents match those described by the BagIt metadata
     4.  Assuming the contents are valid, copies the files to a long-term Storage bucket
-    4.  Compares checksums between the short-term and long-term storage, to check the transfer was successful
+    4.  Replicates content into the access bucket
     5.  Creates a description of the stored bag and saves it to the Versioned Hybrid Store (a transactional store for large objects using S3 and DynamoDB)
 
 [bagit]: https://en.wikipedia.org/wiki/BagIt
@@ -37,7 +37,6 @@ We will build a storage service based on Amazon S3 and DynamoDB.
 
 We'll need to integrate with other services such as:
 
-- [Archivematica](https://www.archivematica.org/en/) - for born-digital workflow
 - [Goobi](https://www.intranda.com/en/digiverso/goobi/goobi-overview/) - for digitisation workflow
 
 These services will need to provide accessions in the BagIt bag format, gzip-compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
