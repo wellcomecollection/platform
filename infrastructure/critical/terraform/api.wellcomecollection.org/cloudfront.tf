@@ -1,19 +1,19 @@
 data "aws_acm_certificate" "api_wc_org" {
-  domain   = "api.wellcomecollection.org"
+  domain   = "${var.cert_domain}.wellcomecollection.org"
   statuses = ["ISSUED"]
   provider = "aws.us-east-1"
 }
 
 locals {
-  catalogue_domain_name = "catalogue.api.wellcomecollection.org"
-  storage_domain_name   = "storage.api.wellcomecollection.org"
+  catalogue_domain_name = "catalogue.${var.subdomain}.wellcomecollection.org"
+  storage_domain_name   = "storage.${var.subdomain}.wellcomecollection.org"
 }
 
 resource "aws_cloudfront_distribution" "api_root" {
   // root
 
   origin {
-    domain_name = "${aws_s3_bucket.public_api.bucket_domain_name}"
+    domain_name = "${var.public_api_bucket_domain_name}"
     origin_id   = "root"
   }
 
@@ -126,11 +126,12 @@ resource "aws_cloudfront_distribution" "api_root" {
 
   // shared config
 
+  comment             = "${var.description}"
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   aliases = [
-    "api.wellcomecollection.org",
+    "${var.subdomain}.wellcomecollection.org",
   ]
   price_class = "PriceClass_100"
   viewer_certificate {
@@ -143,40 +144,4 @@ resource "aws_cloudfront_distribution" "api_root" {
       restriction_type = "none"
     }
   }
-}
-
-// Root redirect to developers.wc
-
-resource "aws_s3_bucket" "public_api" {
-  bucket = "wellcomecollection-public-api"
-  acl    = "public-read"
-
-  website {
-    index_document = "index.html"
-  }
-
-  policy = <<EOF
-{
-  "Version": "2008-10-17",
-  "Statement": [
-    {
-      "Sid": "PublicReadForGetBucketObjects",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "*"
-      },
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::wellcomecollection-public-api/*"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_s3_bucket_object" "object" {
-  bucket       = "${aws_s3_bucket.public_api.bucket}"
-  key          = "index.html"
-  source       = "${path.module}/s3_objects/index.html"
-  etag         = "${md5(file("${path.module}/s3_objects/index.html"))}"
-  content_type = "text/html"
 }

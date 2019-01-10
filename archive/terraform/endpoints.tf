@@ -21,7 +21,10 @@ resource "aws_vpc_endpoint" "pl-winslow" {
     "${aws_security_group.interservice.id}",
   ]
 
-  subnet_ids          = ["${local.eu-west-1a-subnet}"]
+  subnet_ids = [
+    "${local.eu-west-1a-subnet}",
+  ]
+
   private_dns_enabled = false
 }
 
@@ -30,7 +33,10 @@ resource "aws_route53_record" "pl-winslow" {
   name    = "pl-winslow.${aws_route53_zone.internal.name}"
   type    = "CNAME"
   ttl     = "300"
-  records = ["${lookup(aws_vpc_endpoint.pl-winslow.dns_entry[0], "dns_name")}"]
+
+  records = [
+    "${lookup(aws_vpc_endpoint.pl-winslow.dns_entry[0], "dns_name")}",
+  ]
 }
 
 # wt-winnipeg
@@ -44,7 +50,10 @@ resource "aws_vpc_endpoint" "wt-winnipeg" {
     "${aws_security_group.interservice.id}",
   ]
 
-  subnet_ids          = ["${local.eu-west-1a-subnet}"]
+  subnet_ids = [
+    "${local.eu-west-1a-subnet}",
+  ]
+
   private_dns_enabled = false
 }
 
@@ -53,5 +62,8 @@ resource "aws_route53_record" "wt-winnipeg" {
   name    = "wt-winnipeg.${aws_route53_zone.internal.name}"
   type    = "CNAME"
   ttl     = "300"
-  records = ["${lookup(aws_vpc_endpoint.wt-winnipeg.dns_entry[0], "dns_name")}"]
+
+  records = [
+    "${lookup(aws_vpc_endpoint.wt-winnipeg.dns_entry[0], "dns_name")}",
+  ]
 }
