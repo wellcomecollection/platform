@@ -6,9 +6,9 @@ module "remus" {
   container_image = "${var.remus_container_image}"
   container_port  = "${var.container_port}"
 
-  namespace_id  = "${var.namespace_id}"
-  cluster_name  = "${var.cluster_name}"
-  vpc_id        = "${var.vpc_id}"
+  namespace_id = "${var.namespace_id}"
+  cluster_name = "${var.cluster_name}"
+  vpc_id       = "${var.vpc_id}"
 
   security_group_ids = [
     "${aws_security_group.service_lb_ingress_security_group.id}",
