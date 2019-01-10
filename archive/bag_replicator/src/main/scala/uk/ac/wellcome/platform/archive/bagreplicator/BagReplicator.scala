@@ -17,21 +17,27 @@ import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
 import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.NotificationParsingFailed
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
+  BagStorage,
+  S3Copier
+}
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  NotificationMessage
+}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class BagReplicator(
-                     s3Client: AmazonS3,
-                     snsClient: AmazonSNS,
-                     messageStream: MessageStream[NotificationMessage, Unit],
-                     bagReplicatorConfig: BagReplicatorConfig,
-                     progressSnsConfig: SNSConfig,
-                     outgoingSnsConfig: SNSConfig)(implicit val actorSystem: ActorSystem)
+  s3Client: AmazonS3,
+  snsClient: AmazonSNS,
+  messageStream: MessageStream[NotificationMessage, Unit],
+  bagReplicatorConfig: BagReplicatorConfig,
+  progressSnsConfig: SNSConfig,
+  outgoingSnsConfig: SNSConfig)(implicit val actorSystem: ActorSystem)
     extends Logging
     with Runnable {
 
@@ -94,24 +100,27 @@ class BagReplicator(
 
   private def notifyOutgoingTopic(snsConfig: SNSConfig, subject: String)(
     in: Either[Throwable, CompletedBagReplication[ArchiveComplete]])(
-    implicit encoder: Encoder[ArchiveComplete], snsClient: AmazonSNS) = {
+    implicit encoder: Encoder[ArchiveComplete],
+    snsClient: AmazonSNS) = {
     in.fold[Either[Throwable, PublishedToOutgoingTopic[ArchiveComplete]]](
-      left =>
-        Left(left),
+      left => Left(left),
       (completedBagReplication: CompletedBagReplication[ArchiveComplete]) => {
         toJson[ArchiveComplete](completedBagReplication.context)
           .map { messageString =>
             debug(s"snsPublishMessage: $messageString")
             new PublishRequest(snsConfig.topicArn, messageString, subject)
-          }.flatMap(publishRequest => Try(snsClient.publish(publishRequest)))
-        match {
-          case Success(_) => Right(PublishedToOutgoingTopic(completedBagReplication.context))
+          }
+          .flatMap(publishRequest => Try(snsClient.publish(publishRequest))) match {
+          case Success(_) =>
+            Right(PublishedToOutgoingTopic(completedBagReplication.context))
           case Failure(e) => Left(e)
         }
-      })
+      }
+    )
   }
 
-  private def completeBagReplication(in: Either[Throwable, PublishedToOutgoingTopic[ArchiveComplete]]): Unit = {
+  private def completeBagReplication(
+    in: Either[Throwable, PublishedToOutgoingTopic[ArchiveComplete]]): Unit = {
     in match {
       case Left(exception) =>
         error(exception.toString)

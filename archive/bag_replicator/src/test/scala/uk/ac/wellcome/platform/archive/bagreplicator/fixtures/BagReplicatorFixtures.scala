@@ -82,9 +82,18 @@ trait BagReplicatorFixtures
         withLocalSnsTopic { outgoingTopic =>
           withLocalS3Bucket { sourceBucket =>
             withLocalS3Bucket { destinationBucket =>
-              withApp(queuePair, progressTopic, outgoingTopic, destinationBucket) { _ =>
+              withApp(
+                queuePair,
+                progressTopic,
+                outgoingTopic,
+                destinationBucket) { _ =>
                 testWith(
-                  (sourceBucket, queuePair, destinationBucket, progressTopic, outgoingTopic))
+                  (
+                    sourceBucket,
+                    queuePair,
+                    destinationBucket,
+                    progressTopic,
+                    outgoingTopic))
               }
             }
           }

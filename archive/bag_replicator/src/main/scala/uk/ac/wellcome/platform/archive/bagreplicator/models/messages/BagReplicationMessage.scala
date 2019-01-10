@@ -12,4 +12,4 @@ case class CompletedBagReplication[T](context: T)
     extends BagReplicationContext[T]
 
 case class PublishedToOutgoingTopic[T](context: T)
-  extends BagReplicationContext[T]
+    extends BagReplicationContext[T]

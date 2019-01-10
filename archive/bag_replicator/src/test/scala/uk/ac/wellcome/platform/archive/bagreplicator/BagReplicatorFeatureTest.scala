@@ -19,7 +19,12 @@ class BagReplicatorFeatureTest
 
   it("receives a notification") {
     withBagReplicator {
-      case (sourceBucket, queuePair, destinationBucket, progressTopic, outgoingTopic) =>
+      case (
+          sourceBucket,
+          queuePair,
+          destinationBucket,
+          progressTopic,
+          outgoingTopic) =>
         val requestId = randomUUID
         val storageSpace = randomStorageSpace
         val bagInfo = randomBagInfo
