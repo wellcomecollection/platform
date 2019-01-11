@@ -64,37 +64,59 @@ def update_bag_and_ingest_status(delay, filter):
     print("[")
 
     for bnumber in bnumber_generator(filter):
-        bag_date = "-"
-        bag_size = 0
-
-        # check for bag
-        bag_zip = aws.get_dropped_bag_info(bnumber)
-        if bag_zip["exists"]:  # and bag_zip["last_modified"] > min_bag_date:
-            bag_date = bag_zip["last_modified"].isoformat()
-            bag_size = bag_zip["size"]
-
-        ingest = storage_api.get_ingest_for_identifier(bnumber)
-        if ingest is None:
-            ingest = no_ingest
-
-        table.update_item(
-            Key={"bnumber": bnumber},
-            ExpressionAttributeValues={
-                ":bdt": bag_date,
-                ":bsz": bag_size,
-                ":idt": ingest["events"][0]["createdDate"],
-                ":iid": ingest["id"],
-                ":ist": ingest["status"]["id"],
-            },
-            UpdateExpression="SET bag_date = :bdt, bag_size = :bsz, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist",
-        )
-        output = {"identifier": bnumber, "bag_zip": bag_zip, "ingest": ingest}
+        try:
+            output = update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest)
+        except Exception as e:
+            err_obj = {"ERROR": bnumber, "error": e}
+            print(err_obj)
+            raise
         print(json.dumps(output, default=json_default, indent=4))
         print(",")
         if delay > 0:
             time.sleep(delay)
 
     print("]")
+
+
+def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest):
+    bag_date = "-"
+    bag_size = 0
+    bag_error = "-"
+
+    # check for bag
+    bag_zip = aws.get_dropped_bag_info(bnumber)
+    if bag_zip["exists"]:  # and bag_zip["last_modified"] > min_bag_date:
+        bag_date = bag_zip["last_modified"].isoformat()
+        bag_size = bag_zip["size"]
+    else:
+        error_obj = aws.get_error_for_b_number(bnumber)
+        if error_obj is not None:
+            message = error_obj["error"].splitlines()[-1]
+            last_modified = error_obj["last_modified"]
+            bag_error = "{0} {1}".format(last_modified, message)
+
+    ingest = storage_api.get_ingest_for_identifier(bnumber)
+    if ingest is None:
+        ingest = no_ingest
+
+    table.update_item(
+        Key={"bnumber": bnumber},
+        ExpressionAttributeValues={
+            ":bdt": bag_date,
+            ":bsz": bag_size,
+            ":bge": bag_error,
+            ":idt": ingest["events"][0]["createdDate"],
+            ":iid": ingest["id"],
+            ":ist": ingest["status"]["id"],
+        },
+        UpdateExpression="SET bag_date = :bdt, bag_size = :bsz, mets_error = :bge, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist",
+    )
+    return {
+        "identifier": bnumber,
+        "bag_zip": bag_zip,
+        "mets_error": bag_error,
+        "ingest": ingest
+    }
 
 
 def bnumber_generator(filter_expression):

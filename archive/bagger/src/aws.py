@@ -83,9 +83,10 @@ def get_error_for_b_number(bnumber):
         b_error = json.loads(content)
         b_error["last_modified"] = str(obj.last_modified)
         return b_error
-    except ClientError as ce:
-        print("Unable to get s3 obj for " + bnumber)
-        raise ce
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            return None
+        raise
 
 
 def get_all_errors():
