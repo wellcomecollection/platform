@@ -84,7 +84,7 @@ def get_error_for_b_number(bnumber):
         b_error["last_modified"] = str(obj.last_modified)
         return b_error
     except ClientError as e:
-        if e.response['Error']['Code'] == 'NoSuchKey':
+        if e.response["Error"]["Code"] == "NoSuchKey":
             return None
         raise
 
