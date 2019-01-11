@@ -54,7 +54,7 @@ module "catalogue_pipeline_v6" {
   dlq_alarm_arn          = "${local.dlq_alarm_arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
-  service_egress_security_group_id = "${module.service_egress_security_group.sg_id}"
+  service_egress_security_group_id = "${module.egress_security_group.sg_id}"
 
   vhs_bucket_name = "${aws_s3_bucket.vhs_bucket.id}"
 }
