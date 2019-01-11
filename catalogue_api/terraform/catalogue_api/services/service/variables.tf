@@ -10,7 +10,6 @@ variable "cluster_name" {}
 
 variable "namespace" {}
 variable "namespace_id" {}
-variable "namespace_tld" {}
 
 data "template_file" "es_cluster_host" {
   template = "$${name}.$${region}.aws.found.io"
@@ -38,14 +37,6 @@ variable "security_group_ids" {
 }
 
 variable "service_egress_security_group_id" {}
-
-variable "cpu" {
-  default = "2048"
-}
-
-variable "memory" {
-  default = "4096"
-}
 
 variable "lb_arn" {}
 variable "listener_port" {}

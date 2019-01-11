@@ -2,8 +2,6 @@ variable "name" {}
 
 variable "bag_paths" {}
 
-variable "account_id" {}
-
 variable "storage_space" {
   default = "test"
 }

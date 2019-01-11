@@ -7,8 +7,6 @@ variable "notebook_bucket_name" {}
 variable "notebook_bucket_arn" {}
 
 variable "key_name" {}
-variable "aws_region" {}
-variable "vpc_cidr_block" {}
 variable "vpc_id" {}
 variable "admin_cidr_ingress" {}
 

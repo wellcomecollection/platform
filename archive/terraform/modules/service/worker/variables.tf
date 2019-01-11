@@ -10,10 +10,6 @@ variable "subnets" {
   type = "list"
 }
 
-variable "aws_region" {
-  default = "eu-west-1"
-}
-
 variable "container_image" {}
 
 variable "namespace_id" {}

@@ -3,10 +3,6 @@ variable "release_ids" {
   type        = "map"
 }
 
-variable "key_name" {
-  description = "Name of AWS key pair"
-}
-
 variable "infra_bucket" {
   description = "S3 bucket storing our configuration"
 }
@@ -23,14 +19,4 @@ variable "es_cluster_credentials" {
 
 variable "es_cluster_credentials_v6" {
   type = "map"
-}
-
-variable "matcher_graph_table_index" {
-  description = "Name of the GSI in the matcher graph table"
-  default     = "work-sets-index"
-}
-
-variable "matcher_lock_table_index" {
-  description = "Name of the GSI in the matcher lock table"
-  default     = "context-ids-index"
 }

@@ -10,7 +10,6 @@ module "archivist-nvm" {
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}-archivist-nvm"
-  aws_region                       = "${var.aws_region}"
 
   env_vars = {
     queue_url           = "${module.archivist_queue.url}"
@@ -39,7 +38,6 @@ module "bags" {
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}-bags_async"
-  aws_region                       = "${var.aws_region}"
 
   env_vars = {
     queue_url          = "${module.bags_queue.url}"
@@ -72,7 +70,6 @@ module "notifier" {
   subnets      = "${var.private_subnets}"
   vpc_id       = "${var.vpc_id}"
   service_name = "${var.namespace}-notifier"
-  aws_region   = "${var.aws_region}"
 
   env_vars = {
     context_url        = "https://api.wellcomecollection.org/storage/v1/context.json"
@@ -98,7 +95,6 @@ module "ingests" {
   subnets      = "${var.private_subnets}"
   vpc_id       = "${var.vpc_id}"
   service_name = "${var.namespace}-ingests_async"
-  aws_region   = "${var.aws_region}"
 
   env_vars = {
     queue_url                   = "${module.ingests_queue.url}"
@@ -116,16 +112,14 @@ module "ingests" {
 module "api" {
   source = "api"
 
-  vpc_id       = "${var.vpc_id}"
-  cluster_id   = "${aws_ecs_cluster.cluster.id}"
-  cluster_name = "${aws_ecs_cluster.cluster.name}"
-  subnets      = "${var.private_subnets}"
+  vpc_id     = "${var.vpc_id}"
+  cluster_id = "${aws_ecs_cluster.cluster.id}"
+  subnets    = "${var.private_subnets}"
 
   domain_name = "${var.domain_name}"
 
-  namespace     = "${var.namespace}-api"
-  namespace_id  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  namespace_tld = "${aws_service_discovery_private_dns_namespace.namespace.name}"
+  namespace    = "${var.namespace}-api"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
   # Auth
 
@@ -183,7 +177,6 @@ module "bagger-nvm" {
   subnets                          = "${var.private_subnets}"
   vpc_id                           = "${var.vpc_id}"
   service_name                     = "${var.namespace}-bagger-nvm"
-  aws_region                       = "${var.aws_region}"
 
   env_vars = {
     METS_BUCKET_NAME            = "${var.bagger_mets_bucket_name}"

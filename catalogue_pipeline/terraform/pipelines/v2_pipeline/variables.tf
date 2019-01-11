@@ -16,10 +16,6 @@ variable "dlq_alarm_arn" {}
 
 variable "account_id" {}
 
-variable "vhs_miro_read_policy" {}
-
-variable "vhs_sierra_read_policy" {}
-
 variable "messages_bucket" {}
 
 variable "matcher_graph_table_index" {

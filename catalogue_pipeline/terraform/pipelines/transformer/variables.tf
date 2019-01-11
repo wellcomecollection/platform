@@ -3,10 +3,6 @@ variable "namespace" {}
 variable "namespace_id" {}
 variable "source_name" {}
 
-variable "lambda_error_alarm_arn" {}
-
-variable "infra_bucket" {}
-
 variable "aws_region" {}
 
 variable "account_id" {}

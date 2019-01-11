@@ -6,11 +6,9 @@ module "bags" {
   container_image = "${var.bags_container_image}"
   container_port  = "${var.bags_container_port}"
 
-  namespace_id  = "${var.namespace_id}"
-  namespace_tld = "${var.namespace_tld}"
+  namespace_id = "${var.namespace_id}"
 
-  cluster_id   = "${var.cluster_id}"
-  cluster_name = "${var.cluster_name}"
+  cluster_id = "${var.cluster_id}"
 
   vpc_id = "${var.vpc_id}"
 

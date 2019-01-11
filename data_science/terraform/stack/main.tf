@@ -8,11 +8,8 @@ module "harrison_pim_notebook" {
 
   key_name = "${var.key_name}"
 
-  aws_region = "${var.aws_region}"
-
-  vpc_cidr_block = "${var.vpc_cidr_block}"
-  subnets        = "${var.public_subnets}"
-  vpc_id         = "${var.vpc_id}"
+  subnets = "${var.public_subnets}"
+  vpc_id  = "${var.vpc_id}"
 
   controlled_access_cidr_ingress = ["${var.admin_cidr_ingress}"]
 
@@ -24,8 +21,6 @@ module "labs" {
   source = "labs"
 
   namespace = "${var.namespace}-labs"
-
-  vpc_cidr_block = "${var.vpc_cidr_block}"
 
   vpc_id = "${var.vpc_id}"
 

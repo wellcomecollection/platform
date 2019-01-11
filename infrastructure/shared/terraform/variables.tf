@@ -6,11 +6,3 @@ variable "aws_region" {
 variable "infra_bucket" {
   description = "S3 bucket storing our configuration"
 }
-
-variable "release_ids" {
-  description = "Release tags for platform apps"
-  type        = "map"
-}
-
-variable "admin_cidr_ingress" {}
-variable "key_name" {}

@@ -16,13 +16,7 @@ variable "dlq_alarm_arn" {}
 
 variable "account_id" {}
 
-variable "vhs_miro_read_policy" {}
-
 variable "messages_bucket" {}
-
-variable "infra_bucket" {}
-
-variable "lambda_error_alarm_arn" {}
 
 variable "identifiers_rds_cluster_host" {}
 

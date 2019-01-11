@@ -32,7 +32,6 @@ module "data_api" {
 
   aws_region   = "${var.aws_region}"
   infra_bucket = "${var.infra_bucket}"
-  key_name     = "${var.key_name}"
 
   es_cluster_credentials = "${var.es_cluster_credentials_v6}"
 

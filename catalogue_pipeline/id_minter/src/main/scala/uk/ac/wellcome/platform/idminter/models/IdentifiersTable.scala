@@ -1,10 +1,9 @@
 package uk.ac.wellcome.platform.idminter.models
 
-import com.google.inject.Inject
 import scalikejdbc._
 import uk.ac.wellcome.platform.idminter.config.models.IdentifiersTableConfig
 
-class IdentifiersTable @Inject()(identifiersTableConfig: IdentifiersTableConfig)
+class IdentifiersTable(identifiersTableConfig: IdentifiersTableConfig)
     extends SQLSyntaxSupport[Identifier] {
   override val schemaName = Some(identifiersTableConfig.database)
   override val tableName = identifiersTableConfig.tableName

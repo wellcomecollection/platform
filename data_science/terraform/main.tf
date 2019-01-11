@@ -3,11 +3,9 @@ module "stack-281118" {
 
   namespace = "datascience-281118"
 
-  vpc_id         = "${local.vpc_id}"
-  vpc_cidr_block = "${data.aws_vpc.datascience.cidr_block}"
+  vpc_id = "${local.vpc_id}"
 
-  key_name   = "${var.key_name}"
-  aws_region = "${var.aws_region}"
+  key_name = "${var.key_name}"
 
   public_subnets  = "${local.public_subnets}"
   private_subnets = "${local.private_subnets}"
