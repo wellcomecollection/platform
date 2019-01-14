@@ -25,23 +25,9 @@ module "catalogue_vpc_delta" {
 # - Storage service
 
 locals {
-  storage_cidr_block_vpc = "172.30.0.0/16"
-}
-
-module "storage_vpc_delta" {
-  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v16.1.8"
-
-  name = "storage-172-30-0-0-16"
-
-  cidr_block_vpc = "${local.storage_cidr_block_vpc}"
-
-  public_az_count           = "3"
-  cidr_block_public         = "172.30.0.0/17"
-  cidrsubnet_newbits_public = "2"
-
-  private_az_count           = "3"
-  cidr_block_private         = "172.30.128.0/17"
-  cidrsubnet_newbits_private = "2"
+  storage_cidr_block_vpc     = "172.30.0.0/16"
+  storage_cidr_block_public  = "172.30.0.0/17"
+  storage_cidr_block_private = "172.30.128.0/17"
 }
 
 module "storage_vpc" {
@@ -52,11 +38,11 @@ module "storage_vpc" {
   cidr_block_vpc = "${local.storage_cidr_block_vpc}"
 
   public_az_count           = "3"
-  cidr_block_public         = "172.30.0.0/17"
+  cidr_block_public         = "${local.storage_cidr_block_public}"
   cidrsubnet_newbits_public = "2"
 
   private_az_count           = "3"
-  cidr_block_private         = "172.30.128.0/17"
+  cidr_block_private         = "${local.storage_cidr_block_private}"
   cidrsubnet_newbits_private = "2"
 
   providers = {
