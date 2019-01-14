@@ -5,6 +5,7 @@ a report in Slack
 """
 
 import datetime as dt
+import itertools
 import json
 import os
 
@@ -83,18 +84,56 @@ def process_report(s3_client, bucket, resource_type):
             raise IncompleteReportError(resource_type)
 
 
-def prepare_report(s3_client, bucket, resource_type):
-    lines = ["", f"*{resource_type} windows*"]
+def prepare_present_report(s3_client, bucket, resource_type):
+    """
+    Generate a report for windows that are present.
+    """
+    yield ""
+    yield f"*{resource_type} windows*"
 
     for iv in get_consolidated_report(s3_client, bucket, resource_type):
-        lines.append(f"{iv.start.isoformat()} – {iv.end.isoformat()}")
+        yield f"{iv.start.isoformat()} – {iv.end.isoformat()}"
 
-    lines.append("")
-    return lines
+    yield ""
+
+
+# https://stackoverflow.com/q/6822725/1558022
+def window(seq, n=2):
+    """
+    Returns a sliding window (of width n) over data from the iterable
+
+        s -> (s0,s1,...s[n-1]), (s1,s2,...,sn),
+
+    """
+    it = iter(seq)
+    result = tuple(itertools.islice(it, n))
+    if len(result) == n:
+        yield result
+    for elem in it:
+        result = result[1:] + (elem,)
+        yield result
+
+
+def prepare_missing_report(s3_client, bucket, resource_type):
+    """
+    Generate a report for windows that are missing.
+    """
+    yield ""
+    yield f"*missing {resource_type} windows*"
+
+    for iv1, iv2 in window(get_consolidated_report(s3_client, bucket, resource_type)):
+        missing_start = iv1.end
+        missing_end = iv2.start
+        if missing_start.date() == missing_end.date():
+            yield f"{missing_start.date()}: {missing_start.strftime('%H:%M:%S')} — {missing_end.strftime('%H:%M:%S')}"
+        else:
+            yield f"{missing_start.strftime('%Y-%m-%d %H:%M:%S')} — {missing_end.strftime('%Y-%m-%d %H:%M:%S')}"
+
+    yield ""
 
 
 def print_report(s3_client, bucket, resource_type):
-    print("\n".join(prepare_report(s3_client, bucket, resource_type)))
+    print("\n".join(prepare_present_report(s3_client, bucket, resource_type)))
 
 
 def main(event=None, _ctxt=None):
@@ -112,7 +151,7 @@ def main(event=None, _ctxt=None):
             )
         except IncompleteReportError:
             error_lines.extend(
-                prepare_report(
+                prepare_missing_report(
                     s3_client=s3_client, bucket=bucket, resource_type=resource_type
                 )
             )

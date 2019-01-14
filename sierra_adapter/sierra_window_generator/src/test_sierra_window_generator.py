@@ -10,7 +10,7 @@ from sierra_window_generator import build_window, main
 
 class patched_datetime(dt.datetime):
     @classmethod
-    def utcnow(cls):
+    def now(cls):
         return dt.datetime(2011, 6, 21, 0, 0, 0, 0)
 
 
