@@ -2,10 +2,8 @@ FROM alpine:3.6
 
 RUN apk add --update --no-cache --virtual=run-deps \
   python3 \
-  ca-certificates
-
-# Need to get env vars in ????
-ENV EXAMPLE_VARIABLE example_value
+  ca-certificates \
+  parallel
 
 WORKDIR /opt/app
 
