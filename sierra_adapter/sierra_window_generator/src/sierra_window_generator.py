@@ -7,19 +7,20 @@ import datetime as dt
 import os
 
 import boto3
-import pytz
 from wellcome_aws_utils.lambda_utils import log_on_error
 from wellcome_aws_utils.sns_utils import publish_sns_message
+
+from build_windows import generate_windows
 
 
 def build_window(minutes):
     """Construct the Sierra update window."""
     seconds = minutes * 60
 
-    end = pytz.utc.localize(dt.datetime.utcnow())
+    end = dt.datetime.now()
     start = end - dt.timedelta(seconds=seconds)
 
-    return {"start": start.isoformat(), "end": end.isoformat()}
+    return next(generate_windows(start=start, end=end, minutes=minutes))
 
 
 @log_on_error
