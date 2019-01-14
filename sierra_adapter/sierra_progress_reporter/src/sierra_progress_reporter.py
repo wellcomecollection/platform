@@ -197,4 +197,3 @@ if __name__ == "__main__":
 
     for resource_type in ("bibs", "items"):
         print_report(s3_client=s3_client, bucket=bucket, resource_type=resource_type)
-
