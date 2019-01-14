@@ -1,7 +1,3 @@
-data "aws_ecr_repository" "ecr_repository_nginx_services" {
-  name = "uk.ac.wellcome/nginx_services"
-}
-
 module "ecr_repository_archivist" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "archivist"
@@ -37,14 +33,14 @@ module "ecr_repository_bag_replicator" {
   name   = "bag_replicator"
 }
 
-module "ecr_repository_callback_stub_server" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "callback_stub_server"
-}
-
 module "ecr_repository_bagger" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "bagger"
+}
+
+module "ecr_repository_callback_stub_server" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "callback_stub_server"
 }
 
 module "ecr_repository_archive_api" {

@@ -42,14 +42,12 @@ import json
 import math
 
 import boto3
-import docopt
-import maya
-import tqdm
+import pytz
 
 
 def generate_windows(start, end, minutes):
-    current = start
-    end = end
+    current = pytz.utc.localize(start)
+    end = pytz.utc.localize(end)
     while current <= end:
         yield {
             "start": current.isoformat(),
@@ -59,6 +57,10 @@ def generate_windows(start, end, minutes):
 
 
 if __name__ == "__main__":
+    import docopt
+    import maya
+    import tqdm
+
     args = docopt.docopt(__doc__)
 
     start = maya.parse(args["--start"]).datetime()

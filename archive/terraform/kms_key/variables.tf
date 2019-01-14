@@ -1,1 +1,0 @@
-variable "account_id" {}
