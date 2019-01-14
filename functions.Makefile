@@ -103,8 +103,7 @@ endef
 #   $1 - Name of the project.
 #
 define sbt_build
-	$(ROOT)/docker_run.py --dind --sbt --root -- \
-		--net host \
+	$(ROOT)/docker_run.py --sbt --root -- \
 		wellcome/sbt_wrapper \
 		"project $(1)" ";stage"
 endef
