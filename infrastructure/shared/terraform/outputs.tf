@@ -170,3 +170,13 @@ output "datascience_vpc_delta_public_subnets" {
 output "datascience_vpc_delta_id" {
   value = "${module.datascience_vpc_delta.vpc_id}"
 }
+
+# Endpoint Services
+
+output "service-pl-winslow" {
+  value = "${aws_vpc_endpoint_service.pl-winslow.service_name}"
+}
+
+output "service-wt-winnipeg" {
+  value = "${aws_vpc_endpoint_service.wt-winnipeg.service_name}"
+}
