@@ -26,8 +26,6 @@
 export METS_FILESYSTEM_ROOT=''
 export METS_BUCKET_NAME=''
 # aws
-export AWS_ACCESS_KEY_ID=''
-export AWS_SECRET_ACCESS_KEY=''
 export AWS_DEFAULT_REGION=''
 
 python ../src/mets_queuer.py $1 $2

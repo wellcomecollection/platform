@@ -17,8 +17,6 @@
 # > .error_report.sh delete b12345678
 # Remove the S3 object for this specific error
 
-export AWS_ACCESS_KEY_ID=''
-export AWS_SECRET_ACCESS_KEY=''
 export AWS_DEFAULT_REGION=''
 export DROP_BUCKET_NAME_ERRORS=''
 
