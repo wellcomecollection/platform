@@ -93,7 +93,7 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
     //
     val willOverflow =
       (worksSearchOptions.pageNumber > Int.MaxValue) ||
-      (worksSearchOptions.pageSize > Int.MaxValue / worksSearchOptions.pageNumber)
+        (worksSearchOptions.pageSize > Int.MaxValue / worksSearchOptions.pageNumber)
 
     val from = if (willOverflow) {
       Int.MaxValue
