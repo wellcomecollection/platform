@@ -49,12 +49,12 @@ data "aws_iam_policy_document" "working_storage" {
 
     principals {
       identifiers = ["arn:aws:iam::975596993436:root"]
-      type = "AWS"
+      type        = "AWS"
     }
 
     resources = [
       "${aws_s3_bucket.working_storage.arn}",
-      "${aws_s3_bucket.working_storage.arn}/*"
+      "${aws_s3_bucket.working_storage.arn}/*",
     ]
   }
 }
