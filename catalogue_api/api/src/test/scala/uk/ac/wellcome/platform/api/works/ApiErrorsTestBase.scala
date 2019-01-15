@@ -22,7 +22,8 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
         val pageSize = 101
         assertIsBadRequest(
           s"/works?pageSize=$pageSize",
-          description = s"pageSize: [$pageSize] is not less than or equal to 100"
+          description =
+            s"pageSize: [$pageSize] is not less than or equal to 100"
         )
       }
 
@@ -30,7 +31,8 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
         val pageSize = 0
         assertIsBadRequest(
           s"/works?pageSize=$pageSize",
-          description = s"pageSize: [$pageSize] is not greater than or equal to 1"
+          description =
+            s"pageSize: [$pageSize] is not greater than or equal to 1"
         )
       }
 
@@ -38,7 +40,8 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
         val pageSize = 100000
         assertIsBadRequest(
           s"/works?pageSize=$pageSize",
-          description = s"pageSize: [$pageSize] is not less than or equal to 100"
+          description =
+            s"pageSize: [$pageSize] is not less than or equal to 100"
         )
       }
 
@@ -46,7 +49,8 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
         val pageSize = -50
         assertIsBadRequest(
           s"/works?pageSize=$pageSize",
-          description = s"pageSize: [$pageSize] is not greater than or equal to 1"
+          description =
+            s"pageSize: [$pageSize] is not greater than or equal to 1"
         )
       }
     }
@@ -166,26 +170,28 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
   }
 
   def assertIsBadRequest(path: String, description: String): Response =
-    withApi { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix$path",
-        andExpect = Status.BadRequest,
-        withJsonBody = badRequest(
-          apiPrefix = apiPrefix,
-          description = description
+    withApi {
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix$path",
+          andExpect = Status.BadRequest,
+          withJsonBody = badRequest(
+            apiPrefix = apiPrefix,
+            description = description
+          )
         )
-      )
     }
 
   def assertIsNotFound(path: String, description: String): Response =
-    withApi { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix$path",
-        andExpect = Status.NotFound,
-        withJsonBody = notFound(
-          apiPrefix = apiPrefix,
-          description = description
+    withApi {
+      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix$path",
+          andExpect = Status.NotFound,
+          withJsonBody = notFound(
+            apiPrefix = apiPrefix,
+            description = description
+          )
         )
-      )
     }
 }
