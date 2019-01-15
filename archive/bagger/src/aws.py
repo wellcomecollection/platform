@@ -11,6 +11,7 @@ sns_client = boto3.client("sns")
 def publish(message, topic_arn):
     return sns_client.publish(Message=message, TopicArn=topic_arn)
 
+
 def get_boto_session():
     global boto_session
     if boto_session is None:
