@@ -81,6 +81,14 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
         )
       }
 
+      // https://github.com/wellcometrust/platform/issues/3233
+      it("so many pages that Elasticsearch errors out") {
+        assertIsBadRequest(
+          s"/works?page=2000000000&pageSize=100",
+          description = "Only the first 10000 works are available in the API."
+        )
+      }
+
       it("the 101th page with 100 results per page") {
         assertIsBadRequest(
           s"/works?page=101&pageSize=100",
