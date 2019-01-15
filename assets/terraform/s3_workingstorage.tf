@@ -34,3 +34,27 @@ resource "aws_s3_bucket" "working_storage" {
     enabled = true
   }
 }
+
+resource "aws_s3_bucket_policy" "working_storage" {
+  bucket = "${aws_s3_bucket.working_storage.id}"
+
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::975596993436:root"
+            },
+            "Action": "s3:Get*",
+            "Action": "s3:List*",
+            "Resource": [
+                "arn:aws:s3:::wellcomecollection-assets-workingstorage",
+                "arn:aws:s3:::wellcomecollection-assets-workingstorage/*"
+            ]
+        }
+    ]
+}
+POLICY
+}
