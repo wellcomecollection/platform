@@ -101,6 +101,11 @@ class WorksService @Inject()(searchService: ElasticsearchService)(
       (worksSearchOptions.pageNumber - 1) * worksSearchOptions.pageSize
     }
 
+    assert(
+      from >= 0,
+      message = s"from = $from < 0, which is daft.  Has something overflowed?"
+    )
+
     ElasticsearchQueryOptions(
       filters = worksSearchOptions.filters,
       limit = worksSearchOptions.pageSize,
