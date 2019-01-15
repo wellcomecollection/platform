@@ -39,7 +39,7 @@ module "bibs_reader" {
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets      = ["${local.private_subnets}"]
 
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${module.egress_security_group.sg_id}"
   interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 
   sierra_reader_ecr_repository_url = "${module.ecr_repository_sierra_reader.repository_url}"
@@ -70,6 +70,6 @@ module "bibs_merger" {
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets      = ["${local.private_subnets}"]
 
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${module.egress_security_group.sg_id}"
   interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 }

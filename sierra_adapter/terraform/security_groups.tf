@@ -1,18 +1,10 @@
-resource "aws_security_group" "service_egress_security_group" {
-  name        = "${var.namespace}_service_egress_security_group"
-  description = "Allow traffic between services"
-  vpc_id      = "${local.vpc_id}"
+module "egress_security_group" {
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/egress_security_group?ref=bc8f95f"
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  name = "${var.namespace}"
 
-  tags {
-    Name = "${var.namespace}-egress"
-  }
+  vpc_id     = "${local.vpc_id}"
+  subnet_ids = "${local.private_subnets}"
 }
 
 resource "aws_security_group" "interservice_security_group" {
