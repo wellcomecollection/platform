@@ -26,7 +26,7 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
         )
       }
 
-      it("just below the minimum") {
+      it("just below the minimum (zero)") {
         val pageSize = 0
         assertIsBadRequest(
           s"/works?pageSize=$pageSize",
@@ -67,8 +67,6 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
           description = s"page: [$page] is not greater than or equal to 1"
         )
       }
-
-
     }
 
     describe("trying to get more works than ES allows") {
