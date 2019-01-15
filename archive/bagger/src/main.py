@@ -41,7 +41,9 @@ def process_message(message):
     print("processing " + identifier)
     result = bagger_processor.process_bagging_message(body)
     error = result.get("error", None)
-    if error is not None:
+    if error is None:
+        aws.remove_error(identifier)
+    else:
         print("Could not process {0}".format(identifier))
         aws.log_processing_error(result)
     time_taken = time.time() - start

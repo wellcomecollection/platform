@@ -11,6 +11,13 @@ terraform {
   }
 }
 
+provider "aws" {
+  region  = "eu-west-1"
+  version = "1.42.0"
+
+  profile = "platform-admin"
+}
+
 # Data
 
 data "terraform_remote_state" "shared_infra" {

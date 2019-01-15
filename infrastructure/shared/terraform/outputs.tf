@@ -127,20 +127,6 @@ output "catalogue_vpc_delta_id" {
 
 # Storage VPC
 
-output "storage_vpc_delta_private_subnets" {
-  value = ["${module.storage_vpc_delta.private_subnets}"]
-}
-
-output "storage_vpc_delta_public_subnets" {
-  value = ["${module.storage_vpc_delta.public_subnets}"]
-}
-
-output "storage_vpc_delta_id" {
-  value = "${module.storage_vpc_delta.vpc_id}"
-}
-
-# TODO: Remove storage_vpc_delta
-
 output "storage_vpc_private_subnets" {
   value = ["${module.storage_vpc.private_subnets}"]
 }
@@ -183,4 +169,14 @@ output "datascience_vpc_delta_public_subnets" {
 
 output "datascience_vpc_delta_id" {
   value = "${module.datascience_vpc_delta.vpc_id}"
+}
+
+# Endpoint Services
+
+output "service-pl-winslow" {
+  value = "${aws_vpc_endpoint_service.pl-winslow.service_name}"
+}
+
+output "service-wt-winnipeg" {
+  value = "${aws_vpc_endpoint_service.wt-winnipeg.service_name}"
 }

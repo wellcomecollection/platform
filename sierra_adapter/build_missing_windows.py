@@ -9,11 +9,14 @@ import sys
 
 import boto3
 
-from build_windows import generate_windows
-
 sys.path.append(
     os.path.join(os.path.dirname(__file__), "sierra_progress_reporter", "src")
 )
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), "sierra_window_generator", "src")
+)
+
+from build_windows import generate_windows  # noqa
 from sierra_progress_reporter import build_report  # noqa
 
 
@@ -44,7 +47,7 @@ def get_missing_windows(report):
         missing_start = window_1.end - dt.timedelta(seconds=1)
         missing_end = window_2.start + dt.timedelta(seconds=1)
 
-        yield from generate_windows(start=missing_start, end=missing_end, minutes=5)
+        yield from generate_windows(start=missing_start, end=missing_end, minutes=2)
 
 
 if __name__ == "__main__":

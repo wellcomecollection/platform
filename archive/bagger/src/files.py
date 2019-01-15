@@ -102,12 +102,12 @@ def process_assets(root, bag_details, assets, skip_file_download):
             continue
 
         image_info = dlcs.get_image(pres_uuid)
-        origin = image_info["origin"]
-        logging.info("DLCS reports origin " + origin)
+        origin = image_info.get("origin", None)
+        logging.info("DLCS reports origin " + str(origin))
         # if the origin is wellcomelibrary.org, the object is LIKELY to be in the DLCS's
         # storage bucket. So we should try that first, then fall back to the wellcomelibrary
         # origin (using the creds) if for whatever reason it isn't in the DLCS bucket.
-        origin_info = storage.analyse_origin(origin)
+        origin_info = storage.analyse_origin(origin, pres_uuid)
         bucket_name = origin_info["bucket_name"]
         asset_downloaded = False
         if bucket_name is not None:
@@ -136,7 +136,7 @@ def process_assets(root, bag_details, assets, skip_file_download):
         web_url = origin_info["web_url"]
         if not asset_downloaded and web_url is not None:
             # This will probably fail, if the DLCS hasn't got it.
-            # But worth a try,
+            # But it is the only way of getting restricted files out.
             user, password = settings.DDS_API_KEY, settings.DDS_API_SECRET
             # This is horribly slow, why?
             resp = requests.get(
@@ -148,7 +148,8 @@ def process_assets(root, bag_details, assets, skip_file_download):
                         f.write(chunk)
                 asset_downloaded = True
 
-        assert asset_downloaded, "Couldn't fetch asset"
+        message = "Unable to find asset {0}".format(pres_uuid)
+        assert asset_downloaded, message
 
         logging.info("TODO: doing checksums on " + destination)
         logging.info("validate " + checksum)
