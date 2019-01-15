@@ -34,3 +34,27 @@ resource "aws_s3_bucket" "working_storage" {
     enabled = true
   }
 }
+
+resource "aws_s3_bucket_policy" "working_storage" {
+  bucket = "${aws_s3_bucket.working_storage.id}"
+  policy = "${data.aws_iam_policy_document.working_storage.json}"
+}
+
+data "aws_iam_policy_document" "working_storage" {
+  statement {
+    actions = [
+      "s3:List*",
+      "s3:Get*",
+    ]
+
+    principals {
+      identifiers = ["arn:aws:iam::975596993436:root"]
+      type        = "AWS"
+    }
+
+    resources = [
+      "${aws_s3_bucket.working_storage.arn}",
+      "${aws_s3_bucket.working_storage.arn}/*",
+    ]
+  }
+}

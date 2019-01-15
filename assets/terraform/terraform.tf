@@ -8,3 +8,9 @@ terraform {
     region         = "eu-west-1"
   }
 }
+
+provider "aws" {
+  profile = "platform-admin"
+  region  = "${var.aws_region}"
+  version = "1.7.0"
+}
