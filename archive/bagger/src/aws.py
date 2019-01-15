@@ -16,14 +16,18 @@ def publish(message, topic_arn):
 def get_boto_session_storage():
     global boto_session_storage
     if boto_session_storage is None:
-        boto_session_storage = boto3.Session(region_name=settings.AWS_DEFAULT_REGION, profile_name="storage")
+        boto_session_storage = boto3.Session(
+            region_name=settings.AWS_DEFAULT_REGION, profile_name="storage"
+        )
     return boto_session_storage
 
 
 def get_boto_session_platform():
     global boto_session_platform
     if boto_session_platform is None:
-        boto_session_platform = boto3.Session(region_name=settings.AWS_DEFAULT_REGION, profile_name="platform")
+        boto_session_platform = boto3.Session(
+            region_name=settings.AWS_DEFAULT_REGION, profile_name="platform"
+        )
     return boto_session_platform
 
 
