@@ -163,9 +163,7 @@ def main(event, _):
     bucket_name = os.environ["BUCKET_NAME"]
     object_key = os.environ["OBJECT_KEY"]
 
-    ecs_clients = (
-        [create_boto_client("ecs", role_arn) for role_arn in assumable_roles]
-    )
+    ecs_clients = [create_boto_client("ecs", role_arn) for role_arn in assumable_roles]
 
     try:
         cluster_lists = [get_cluster_list(ecs_client) for ecs_client in ecs_clients]
