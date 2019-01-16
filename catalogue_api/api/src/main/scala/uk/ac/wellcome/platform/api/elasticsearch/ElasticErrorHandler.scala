@@ -36,9 +36,10 @@ object ElasticErrorHandler extends Logging {
             val size = s.group(1)
             userError(
               s"Only the first $size works are available in the API. " +
-              "If you want more works, you can download a snapshot of the complete catalogue: " +
-              "https://developers.wellcomecollection.org/datasets",
-              elasticError)
+                "If you want more works, you can download a snapshot of the complete catalogue: " +
+                "https://developers.wellcomecollection.org/datasets",
+              elasticError
+            )
           case _ =>
             serverError(
               s"Unknown error in search phase execution: $reason",
