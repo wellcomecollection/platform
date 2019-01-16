@@ -18,7 +18,7 @@ module "miro_transformer" {
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
-  namespace    = "${var.namespace}"
+  namespace    = "${local.namespace}"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
@@ -52,7 +52,7 @@ module "sierra_transformer" {
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
-  namespace    = "${var.namespace}"
+  namespace    = "${local.namespace}"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"

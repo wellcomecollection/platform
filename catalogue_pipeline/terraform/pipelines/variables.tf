@@ -1,4 +1,5 @@
-variable "namespace" {}
+variable "date_created" {}
+variable "name" {}
 
 variable "account_id" {}
 
@@ -7,10 +8,6 @@ variable "aws_region" {}
 variable "messages_bucket" {}
 
 variable "infra_bucket" {}
-
-variable "index_v1" {}
-
-variable "index_v2" {}
 
 variable "es_cluster_credentials" {
   type = "map"
