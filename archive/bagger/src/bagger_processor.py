@@ -1,4 +1,5 @@
 import time
+import datetime
 
 import logging
 import traceback
@@ -16,6 +17,7 @@ def process_bagging_message(message):
         "upload_location": None,
         "duration": -1,
         "error": None,
+        "created": str(datetime.datetime.now()),
     }
 
     if identifier is not None:

@@ -36,7 +36,7 @@ def main():
         skip = sys.argv[2] != "bag"
         start = time.time()
         counter = 0
-        for b_number in b_numbers_from_s3(filter):
+        for b_number in bnumber_generator(filter):
             logging.info("processing " + b_number)
             message = {"identifier": b_number, "do_not_bag": skip}
             result = bagger_processor.process_bagging_message(message)
@@ -47,6 +47,13 @@ def main():
         time_taken = time.time() - start
         print("----------------")
         print("{0} items in {1} seconds.".format(counter, time_taken))
+
+
+def bnumber_generator(filter_expression):
+    if filter_expression.startswith("b"):
+        return (b for b in [filter_expression])
+    else:
+        return b_numbers_from_s3(filter_expression)
 
 
 if __name__ == "__main__":

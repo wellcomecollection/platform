@@ -43,7 +43,8 @@ def main():
         for error in aws.get_all_errors():
             message = error["error"].splitlines()[-1]
             bnumber = error["identifier"]
-            print("{0}: {1}".format(bnumber, message))
+            last_modified = error["last_modified"]
+            print("{0}: {1} - {2}".format(bnumber, message, last_modified))
 
 
 if __name__ == "__main__":
