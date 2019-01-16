@@ -5,7 +5,6 @@ import java.time.Instant
 
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.bag.{
   BagDigestFileCreator,
   BagInfoParser
@@ -26,7 +25,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
-object StorageManifestFactory extends Logging {
+object StorageManifestFactory {
   def create(archiveComplete: ArchiveComplete)(implicit s3Client: AmazonS3)
     : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
 

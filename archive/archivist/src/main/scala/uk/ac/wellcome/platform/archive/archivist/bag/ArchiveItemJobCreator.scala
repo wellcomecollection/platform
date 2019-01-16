@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archive.archivist.bag
 import java.io.InputStream
 
 import cats.implicits._
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveDigestItemJob,
@@ -14,7 +13,7 @@ import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.bag.BagDigestFileCreator
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
-object ArchiveItemJobCreator extends Logging {
+object ArchiveItemJobCreator {
 
   /** Returns a list of all the items inside a bag that the manifest(s)
     * refer to.

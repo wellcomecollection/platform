@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.exceptions.SierraItemMergerException
@@ -20,8 +19,7 @@ class SierraItemMergerUpdaterService(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              EmptyMetadata,
                                              ObjectStore[SierraTransformable]]
-)(implicit ec: ExecutionContext)
-    extends Logging {
+)(implicit ec: ExecutionContext) {
 
   def update(itemRecord: SierraItemRecord)
     : Future[List[VHSIndexEntry[EmptyMetadata]]] = {

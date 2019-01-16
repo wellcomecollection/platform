@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.platform.sierra_bib_merger.merger.BibMerger
@@ -18,7 +17,7 @@ class SierraBibMergerUpdaterService(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              EmptyMetadata,
                                              ObjectStore[SierraTransformable]]
-) extends Logging {
+) {
 
   def update(bibRecord: SierraBibRecord): Future[VHSIndexEntry[EmptyMetadata]] =
     versionedHybridStore
