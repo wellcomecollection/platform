@@ -165,7 +165,7 @@ def main(event, _):
 
     ecs_clients = (
         [create_boto_client("ecs", role_arn) for role_arn in assumable_roles]
-    ) + [boto3.client("ecs")]
+    )
 
     try:
         cluster_lists = [get_cluster_list(ecs_client) for ecs_client in ecs_clients]

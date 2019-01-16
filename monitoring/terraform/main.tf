@@ -42,8 +42,20 @@ module "monitoring-271118" {
 
   # update_service_list
 
-  dashboard_bucket          = "${aws_s3_bucket.dashboard.bucket}"
-  dashboard_assumable_roles = "${var.dashboard_assumable_roles}"
+  dashboard_bucket = "${aws_s3_bucket.dashboard.bucket}"
+  dashboard_assumable_roles = [
+    // Experience
+    "arn:aws:iam::130871440101:role/platform-team-assume-role",
+
+    // Workflow
+    "arn:aws:iam::299497370133:role/monitoring",
+
+    // Storage
+    "arn:aws:iam::975596993436:role/monitoring",
+
+    // Platform
+    "arn:aws:iam::760097843905:role/monitoring",
+  ]
 
   # post_to_slack
 
