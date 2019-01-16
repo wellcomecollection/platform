@@ -135,14 +135,14 @@ def publish_messages(job_config_id, topic_arn, parameters):
     "--src",
     type=click.Choice(SOURCES),
     required=True,
-    prompt="Which source do you want to reindex? (%s)" % ", ".join(SOURCES),
+    prompt="Which source do you want to reindex?",
     help="Name of the source to reindex",
 )
 @click.option(
     "--dst",
     type=click.Choice(DESTINATIONS),
     required=True,
-    prompt="Which pipeline are you sending this to? (%s)" % ", ".join(DESTINATIONS),
+    prompt="Which pipeline are you sending this to?",
     help="Name of the pipeline to receive the reindexed records",
 )
 @click.option(
