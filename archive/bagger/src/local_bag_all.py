@@ -55,5 +55,6 @@ def bnumber_generator(filter_expression):
     else:
         return b_numbers_from_s3(filter_expression)
 
+
 if __name__ == "__main__":
     main()
