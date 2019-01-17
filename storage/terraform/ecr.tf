@@ -13,9 +13,9 @@ module "ecr_repository_bags_api" {
   name   = "bags_api"
 }
 
-module "ecr_repository_progress_async" {
+module "ecr_repository_ingests" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "progress_async"
+  name   = "ingests"
 }
 
 module "ecr_repository_progress_http" {

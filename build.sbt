@@ -183,7 +183,7 @@ lazy val bags_api = doServiceSetup(project, "storage/bags_api")
 lazy val progress_common = doServiceSetup(project, "storage/progress_common")
   .dependsOn(storage_common % "compile->compile;test->test")
 
-lazy val progress_async = doServiceSetup(project, "storage/progress_async")
+lazy val progress_async = doServiceSetup(project, "storage/ingests")
   .dependsOn(progress_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
