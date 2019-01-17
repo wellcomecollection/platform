@@ -8,9 +8,9 @@ module "ecr_repository_bags" {
   name   = "bags"
 }
 
-module "ecr_repository_registrar_http" {
+module "ecr_repository_bags_api" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "registrar_http"
+  name   = "bags_api"
 }
 
 module "ecr_repository_progress_async" {

@@ -175,7 +175,7 @@ lazy val bags_common = doServiceSetup(project, "storage/bags_common")
 lazy val bags = doServiceSetup(project, "storage/bags")
   .dependsOn(bags_common % "compile->compile;test->test")
 
-lazy val registrar_http = doServiceSetup(project, "storage/registrar_http")
+lazy val bags_api = doServiceSetup(project, "storage/bags_api")
   .dependsOn(bags_common % "compile->compile;test->test")
   .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.registrarHttpDependencies)
@@ -236,5 +236,5 @@ lazy val root = (project in file("."))
     progress_async,
     bags_common,
     progress_http,
-    registrar_http
+    bags_api
   )

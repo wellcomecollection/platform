@@ -65,7 +65,7 @@ cache:
     - archive/progress_http/target
     - archive/bags/target
     - archive/bags_common/target
-    - archive/registrar_http/target
+    - archive/bags_api/target
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
@@ -166,7 +166,7 @@ jobs:
     - env: TASK=progress_http-test
     - env: TASK=bags_common-test
     - env: TASK=bags-test
-    - env: TASK=registrar_http-test
+    - env: TASK=bags_api-test
     - env: TASK=notifier-test
     - env: TASK=callback_stub_server-publish
 
