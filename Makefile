@@ -4,7 +4,6 @@ include formatting.Makefile
 include infrastructure/critical/Makefile
 include infrastructure/shared/Makefile
 
-include storage/Makefile
 include assets/Makefile
 include builds/Makefile
 include loris/Makefile
@@ -20,6 +19,7 @@ include sbt_common/Makefile
 include sierra_adapter/Makefile
 include nginx/Makefile
 include reporting/Makefile
+include storage/Makefile
 
 travis-lambda-test:
 	python run_travis_lambdas.py test
