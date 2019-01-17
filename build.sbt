@@ -180,15 +180,15 @@ lazy val bags_api = doServiceSetup(project, "storage/bags_api")
   .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.registrarHttpDependencies)
 
-lazy val progress_common = doServiceSetup(project, "storage/progress_common")
+lazy val ingests_common = doServiceSetup(project, "storage/ingests_common")
   .dependsOn(storage_common % "compile->compile;test->test")
 
 lazy val ingests = doServiceSetup(project, "storage/ingests")
-  .dependsOn(progress_common % "compile->compile;test->test")
+  .dependsOn(ingests_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
 lazy val ingests_api = doServiceSetup(project, "storage/ingests_api")
-  .dependsOn(progress_common % "compile->compile;test->test")
+  .dependsOn(ingests_common % "compile->compile;test->test")
   .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.progressHttpDependencies)
 
