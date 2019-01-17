@@ -63,7 +63,7 @@ cache:
     - archive/progress_async/target
     - archive/progress_common/target
     - archive/progress_http/target
-    - archive/registrar_async/target
+    - archive/bags/target
     - archive/registrar_common/target
     - archive/registrar_http/target
 
@@ -165,7 +165,7 @@ jobs:
     - env: TASK=progress_async-test
     - env: TASK=progress_http-test
     - env: TASK=registrar_common-test
-    - env: TASK=registrar_async-test
+    - env: TASK=bags-test
     - env: TASK=registrar_http-test
     - env: TASK=notifier-test
     - env: TASK=callback_stub_server-publish

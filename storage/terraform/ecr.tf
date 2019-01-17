@@ -3,9 +3,9 @@ module "ecr_repository_archivist" {
   name   = "archivist"
 }
 
-module "ecr_repository_registrar_async" {
+module "ecr_repository_bags" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "registrar_async"
+  name   = "bags"
 }
 
 module "ecr_repository_registrar_http" {

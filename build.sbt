@@ -172,7 +172,7 @@ lazy val notifier = doServiceSetup(project, "storage/notifier")
 lazy val registrar_common = doServiceSetup(project, "storage/registrar_common")
   .dependsOn(storage_common % "compile->compile;test->test")
 
-lazy val registrar_async = doServiceSetup(project, "storage/registrar_async")
+lazy val bags = doServiceSetup(project, "storage/bags")
   .dependsOn(registrar_common % "compile->compile;test->test")
 
 lazy val registrar_http = doServiceSetup(project, "storage/registrar_http")
@@ -232,7 +232,7 @@ lazy val root = (project in file("."))
     archivist,
     bag_replicator,
     notifier,
-    registrar_async,
+    bags,
     progress_async,
     registrar_common,
     progress_http,
