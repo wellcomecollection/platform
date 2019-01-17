@@ -1,12 +1,10 @@
 include functions.Makefile
-
 include formatting.Makefile
-
-include archive/Makefile
 
 include infrastructure/critical/Makefile
 include infrastructure/shared/Makefile
 
+include storage/Makefile
 include assets/Makefile
 include builds/Makefile
 include loris/Makefile
