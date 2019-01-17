@@ -169,14 +169,14 @@ lazy val notifier = doServiceSetup(project, "storage/notifier")
   .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
-lazy val registrar_common = doServiceSetup(project, "storage/registrar_common")
+lazy val bags_common = doServiceSetup(project, "storage/bags_common")
   .dependsOn(storage_common % "compile->compile;test->test")
 
 lazy val bags = doServiceSetup(project, "storage/bags")
-  .dependsOn(registrar_common % "compile->compile;test->test")
+  .dependsOn(bags_common % "compile->compile;test->test")
 
 lazy val registrar_http = doServiceSetup(project, "storage/registrar_http")
-  .dependsOn(registrar_common % "compile->compile;test->test")
+  .dependsOn(bags_common % "compile->compile;test->test")
   .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.registrarHttpDependencies)
 
@@ -234,7 +234,7 @@ lazy val root = (project in file("."))
     notifier,
     bags,
     progress_async,
-    registrar_common,
+    bags_common,
     progress_http,
     registrar_http
   )

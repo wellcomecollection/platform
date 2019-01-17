@@ -6,7 +6,7 @@ STACK_ROOT 	= archive
 SBT_SSM_APPS = notifier
 SBT_APPS = archivist progress_async progress_http bags registrar_http bag_replicator
 SBT_DOCKER_LIBRARIES = archive_common progress_common
-SBT_NO_DOCKER_LIBRARIES = registrar_common archive_display
+SBT_NO_DOCKER_LIBRARIES = bags_common archive_display
 
 ECS_TASKS   = bagger callback_stub_server
 LAMBDAS     = lambdas/trigger_bag_ingest
