@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "travis_permissions" {
 
   statement {
     actions = [
-      "ssm:PutParameter"
+      "ssm:PutParameter",
     ]
 
     resources = [
