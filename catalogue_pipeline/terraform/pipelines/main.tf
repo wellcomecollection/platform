@@ -1,10 +1,10 @@
 module "v1_pipeline" {
   source = "v1_pipeline"
 
-  namespace = "${var.namespace}_v1"
+  namespace = "${local.namespace}_v1"
 
   transformed_works_topic_name = "${module.transformed_miro_works_topic.name}"
-  index                        = "${var.index_v1}"
+  index                        = "${local.es_index_v1}"
 
   id_minter_container_image = "${var.id_minter_container_image}"
   ingestor_container_image  = "${var.ingestor_container_image}"
@@ -37,11 +37,11 @@ module "v1_pipeline" {
 module "v2_pipeline" {
   source = "v2_pipeline"
 
-  namespace = "${var.namespace}_v2"
+  namespace = "${local.namespace}_v2"
 
   transformed_works_topic_names = ["${module.transformed_miro_works_topic.name}", "${module.transformed_sierra_works_topic.name}"]
   transformed_works_topic_count = 2
-  index                         = "${var.index_v2}"
+  index                         = "${local.es_index_v2}"
 
   recorder_container_image  = "${var.recorder_container_image}"
   matcher_container_image   = "${var.matcher_container_image}"

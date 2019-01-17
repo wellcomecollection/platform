@@ -1,7 +1,8 @@
 module "catalogue_pipeline_v6" {
   source = "pipelines"
 
-  namespace = "catalogue_20181203"
+  date_created = "2019-01-16"
+  name         = "new-isbsns"
 
   miro_adapter_topic_names = [
     "${local.miro_reindexer_topic_name}",
@@ -17,9 +18,6 @@ module "catalogue_pipeline_v6" {
   ]
 
   sierra_adapter_topic_count = 3
-
-  index_v1 = "v1-2018-12-03-elasticsearch6"
-  index_v2 = "v2-2018-12-03-elasticsearch6"
 
   transformer_miro_container_image   = "${local.transformer_miro_container_image}"
   transformer_sierra_container_image = "${local.transformer_sierra_container_image}"

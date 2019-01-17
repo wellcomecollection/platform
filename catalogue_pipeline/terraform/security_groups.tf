@@ -1,5 +1,5 @@
 module "egress_security_group" {
-  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/egress_security_group?ref=c71887b"
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/egress_security_group?ref=v19.5.0"
 
   name = "catalogue_pipeline_services"
 
