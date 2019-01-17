@@ -10,3 +10,6 @@ case class BagReplicationRequest[T](context: T, sourceBagLocation: BagLocation)
 
 case class CompletedBagReplication[T](context: T)
     extends BagReplicationContext[T]
+
+case class PublishedToOutgoingTopic[T](context: T)
+    extends BagReplicationContext[T]
