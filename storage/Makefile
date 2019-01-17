@@ -4,7 +4,7 @@ include $(ROOT)/functions.Makefile
 STACK_ROOT 	= archive
 
 SBT_SSM_APPS = notifier
-SBT_APPS = archivist ingests progress_http bags bags_api bag_replicator
+SBT_APPS = archivist ingests ingests_api bags bags_api bag_replicator
 SBT_DOCKER_LIBRARIES = archive_common progress_common
 SBT_NO_DOCKER_LIBRARIES = bags_common archive_display
 

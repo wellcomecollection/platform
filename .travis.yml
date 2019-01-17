@@ -60,9 +60,9 @@ cache:
     - archive/commmon/target
     - archive/display/target
     - archive/notifier/target
-    - archive/progress_async/target
+    - archive/ingests/target
     - archive/progress_common/target
-    - archive/progress_http/target
+    - archive/ingests_api/target
     - archive/bags/target
     - archive/bags_common/target
     - archive/bags_api/target
@@ -162,8 +162,8 @@ jobs:
     - env: TASK=archive_common-test
     - env: TASK=archivist-test
     - env: TASK=progress_common-test
-    - env: TASK=progress_async-test
-    - env: TASK=progress_http-test
+    - env: TASK=ingests-test
+    - env: TASK=ingests_api-test
     - env: TASK=bags_common-test
     - env: TASK=bags-test
     - env: TASK=bags_api-test

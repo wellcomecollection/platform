@@ -18,9 +18,9 @@ module "ecr_repository_ingests" {
   name   = "ingests"
 }
 
-module "ecr_repository_progress_http" {
+module "ecr_repository_ingests_api" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "progress_http"
+  name   = "ingests_api"
 }
 
 module "ecr_repository_notifier" {

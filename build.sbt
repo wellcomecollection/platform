@@ -183,11 +183,11 @@ lazy val bags_api = doServiceSetup(project, "storage/bags_api")
 lazy val progress_common = doServiceSetup(project, "storage/progress_common")
   .dependsOn(storage_common % "compile->compile;test->test")
 
-lazy val progress_async = doServiceSetup(project, "storage/ingests")
+lazy val ingests = doServiceSetup(project, "storage/ingests")
   .dependsOn(progress_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
-lazy val progress_http = doServiceSetup(project, "storage/progress_http")
+lazy val ingests_api = doServiceSetup(project, "storage/ingests_api")
   .dependsOn(progress_common % "compile->compile;test->test")
   .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.progressHttpDependencies)
@@ -232,9 +232,9 @@ lazy val root = (project in file("."))
     archivist,
     bag_replicator,
     notifier,
-    bags,
-    progress_async,
+    ingests_api,
+    ingests,
     bags_common,
-    progress_http,
-    bags_api
+    bags_api,
+    bags
   )
