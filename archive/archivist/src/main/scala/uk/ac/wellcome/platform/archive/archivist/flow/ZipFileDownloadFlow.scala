@@ -4,7 +4,6 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.s3.transfer.TransferManager
 import com.amazonaws.services.sns.AmazonSNS
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases._
@@ -24,7 +23,7 @@ import scala.concurrent.ExecutionContext
   * original request on the Right.
   *
   */
-object ZipFileDownloadFlow extends Logging {
+object ZipFileDownloadFlow {
 
   def apply(snsConfig: SNSConfig)(
     implicit transferManager: TransferManager,

@@ -10,6 +10,7 @@ import com.sksamuel.elastic4s.searches.queries.term.TermsQuery
 import com.sksamuel.elastic4s.searches.queries.{BoolQuery, Query}
 import com.sksamuel.elastic4s.searches.sort.{FieldSort, SortOrder}
 import com.sksamuel.elastic4s.searches.SearchRequest
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.api.models.{
   ItemLocationTypeFilter,
   WorkFilter,
@@ -27,7 +28,7 @@ case class ElasticsearchQueryOptions(
 @Singleton
 class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
   implicit ec: ExecutionContext
-) {
+) extends Logging {
 
   def findResultById(canonicalId: String)(
     index: Index): Future[Either[ElasticError, GetResponse]] =
@@ -73,6 +74,8 @@ class ElasticsearchService @Inject()(elasticClient: ElasticClient)(
         .sortBy(sortDefinitions)
         .limit(queryOptions.limit)
         .from(queryOptions.from)
+
+    debug(s"Sending ES request: $searchRequest")
 
     elasticClient
       .execute { searchRequest }

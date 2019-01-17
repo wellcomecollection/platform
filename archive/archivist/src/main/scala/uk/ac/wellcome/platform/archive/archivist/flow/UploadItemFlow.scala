@@ -5,7 +5,6 @@ import java.io.InputStream
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveItemJob,
@@ -27,7 +26,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
   *   - The upload to S3 fails
   *
   */
-object UploadItemFlow extends Logging {
+object UploadItemFlow {
   def apply(parallelism: Int)(
     implicit s3Client: AmazonS3
   ): Flow[ArchiveItemJob,

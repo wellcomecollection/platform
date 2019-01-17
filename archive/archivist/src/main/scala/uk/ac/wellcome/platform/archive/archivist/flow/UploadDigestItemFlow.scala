@@ -5,7 +5,6 @@ import java.io.InputStream
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveDigestItemJob,
@@ -29,7 +28,7 @@ import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
   *   - The checksums don't match
   *
   */
-object UploadDigestItemFlow extends Logging {
+object UploadDigestItemFlow {
   def apply(parallelism: Int)(
     implicit s3Client: AmazonS3
   ): Flow[ArchiveDigestItemJob,

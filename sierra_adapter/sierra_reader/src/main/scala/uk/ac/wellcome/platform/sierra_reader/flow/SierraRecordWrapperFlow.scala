@@ -5,12 +5,11 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import grizzled.slf4j.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
 import uk.ac.wellcome.models.transformable.sierra.AbstractSierraRecord
 
-object SierraRecordWrapperFlow extends Logging {
+object SierraRecordWrapperFlow {
   def apply[T <: AbstractSierraRecord](
     createRecord: (String, String, Instant) => T): Flow[Json, T, NotUsed] =
     Flow.fromFunction({ json =>

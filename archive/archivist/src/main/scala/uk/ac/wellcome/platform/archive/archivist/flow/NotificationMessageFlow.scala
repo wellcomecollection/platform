@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.archive.archivist.flow
+
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.sns.AmazonSNS
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.{
@@ -24,7 +24,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.{
   * progress service that it's done so, and emits the bag request.
   *
   */
-object NotificationMessageFlow extends Logging {
+object NotificationMessageFlow {
   def apply(progressSnsConfig: SNSConfig)(
     implicit snsClient: AmazonSNS,
     parallelism: Parallelism

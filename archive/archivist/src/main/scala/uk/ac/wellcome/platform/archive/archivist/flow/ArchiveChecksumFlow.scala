@@ -5,7 +5,6 @@ import java.security.MessageDigest
 import akka.stream._
 import akka.stream.stage._
 import akka.util.ByteString
-import grizzled.slf4j.Logging
 
 /** This is a custom graph stage that receives a single stream of bytes in,
   * and emits two streams: the bytes for uploading to another service, and
@@ -20,8 +19,7 @@ import grizzled.slf4j.Logging
   *
   */
 class ArchiveChecksumFlow(algorithm: String)
-    extends GraphStage[FanOutShape2[ByteString, ByteString, String]]
-    with Logging {
+    extends GraphStage[FanOutShape2[ByteString, ByteString, String]] {
 
   val in = Inlet[ByteString]("DigestCalculator.in")
   val out = Outlet[ByteString]("DigestCalculator.out")

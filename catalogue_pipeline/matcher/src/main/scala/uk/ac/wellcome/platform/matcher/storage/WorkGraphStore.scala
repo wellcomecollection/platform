@@ -1,14 +1,12 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import com.gu.scanamo.error.DynamoReadError
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WorkGraphStore(workNodeDao: WorkNodeDao)(implicit ec: ExecutionContext)
-    extends Logging {
+class WorkGraphStore(workNodeDao: WorkNodeDao)(implicit ec: ExecutionContext) {
 
   def findAffectedWorks(workUpdate: WorkUpdate): Future[WorkGraph] = {
     val directlyAffectedWorkIds = workUpdate.referencedWorkIds + workUpdate.workId
