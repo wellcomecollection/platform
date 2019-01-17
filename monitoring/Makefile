@@ -3,6 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT  = monitoring
 
+SBT_SSM_APPS =
 SBT_APPS    =
 ECS_TASKS   = slack_budget_bot
 LAMBDAS     = post_to_slack terraform_tracker update_service_list

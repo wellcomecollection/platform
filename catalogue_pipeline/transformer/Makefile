@@ -3,6 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= catalogue_pipeline/transformer
 
+SBT_SSM_APPS =
 SBT_APPS 	= transformer_miro transformer_sierra
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =

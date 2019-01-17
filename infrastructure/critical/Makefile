@@ -3,6 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT = infrastructure/critical
 
+SBT_SSM_APPS =
 SBT_APPS 	=
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =

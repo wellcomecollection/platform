@@ -6,6 +6,7 @@ STACK_ROOT = infrastructure/shared
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
+SBT_SSM_APPS =
 SBT_APPS    =
 ECS_TASKS   =
 LAMBDAS     = lambdas/drain_ecs_container_instance \
