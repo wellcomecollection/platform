@@ -181,7 +181,7 @@ object Dependencies {
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   ) ++ circeOpticsDependencies
 
-  val archiveCommonDependencies: Seq[ModuleID] = Seq(
+  val storageCommonDependencies: Seq[ModuleID] = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
     "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
     "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,

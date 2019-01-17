@@ -152,48 +152,48 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .dependsOn(config_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotGeneratorDependencies)
 
-lazy val archive_common = doServiceSetup(project, "archive/common")
+lazy val storage_common = doServiceSetup(project, "storage/common")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(config_messaging % "compile->compile;test->test")
   .dependsOn(config_storage % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.archiveCommonDependencies)
+  .settings(libraryDependencies ++= Dependencies.storageCommonDependencies)
 
-lazy val archive_display = doServiceSetup(project, "archive/display")
-  .dependsOn(archive_common % "compile->compile;test->test")
+lazy val storage_display = doServiceSetup(project, "storage/display")
+  .dependsOn(storage_common % "compile->compile;test->test")
 
-lazy val archivist = doServiceSetup(project, "archive/archivist")
-  .dependsOn(archive_common % "compile->compile;test->test")
+lazy val archivist = doServiceSetup(project, "storage/archivist")
+  .dependsOn(storage_common % "compile->compile;test->test")
 
-lazy val notifier = doServiceSetup(project, "archive/notifier")
-  .dependsOn(archive_common % "compile->compile;test->test")
-  .dependsOn(archive_display % "compile->compile;test->test")
+lazy val notifier = doServiceSetup(project, "storage/notifier")
+  .dependsOn(storage_common % "compile->compile;test->test")
+  .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
-lazy val registrar_common = doServiceSetup(project, "archive/registrar_common")
-  .dependsOn(archive_common % "compile->compile;test->test")
+lazy val registrar_common = doServiceSetup(project, "storage/registrar_common")
+  .dependsOn(storage_common % "compile->compile;test->test")
 
-lazy val registrar_async = doServiceSetup(project, "archive/registrar_async")
+lazy val registrar_async = doServiceSetup(project, "storage/registrar_async")
   .dependsOn(registrar_common % "compile->compile;test->test")
 
-lazy val registrar_http = doServiceSetup(project, "archive/registrar_http")
+lazy val registrar_http = doServiceSetup(project, "storage/registrar_http")
   .dependsOn(registrar_common % "compile->compile;test->test")
-  .dependsOn(archive_display % "compile->compile;test->test")
+  .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.registrarHttpDependencies)
 
-lazy val progress_common = doServiceSetup(project, "archive/progress_common")
-  .dependsOn(archive_common % "compile->compile;test->test")
+lazy val progress_common = doServiceSetup(project, "storage/progress_common")
+  .dependsOn(storage_common % "compile->compile;test->test")
 
-lazy val progress_async = doServiceSetup(project, "archive/progress_async")
+lazy val progress_async = doServiceSetup(project, "storage/progress_async")
   .dependsOn(progress_common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.wiremockDependencies)
 
-lazy val progress_http = doServiceSetup(project, "archive/progress_http")
+lazy val progress_http = doServiceSetup(project, "storage/progress_http")
   .dependsOn(progress_common % "compile->compile;test->test")
-  .dependsOn(archive_display % "compile->compile;test->test")
+  .dependsOn(storage_display % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.progressHttpDependencies)
 
-lazy val bag_replicator = doServiceSetup(project, "archive/bag_replicator")
-  .dependsOn(archive_common % "compile->compile;test->test")
+lazy val bag_replicator = doServiceSetup(project, "storage/bag_replicator")
+  .dependsOn(storage_common % "compile->compile;test->test")
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -227,8 +227,8 @@ lazy val root = (project in file("."))
     sierra_item_merger,
     snapshot_generator,
 
-    archive_common,
-    archive_display,
+    storage_common,
+    storage_display,
     archivist,
     bag_replicator,
     notifier,
