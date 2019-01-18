@@ -291,10 +291,10 @@ class MiroTransformableTransformerTest
     work.items shouldBe List(Unidentifiable(Item(List(expectedLocation))))
   }
 
-  it("sets the WorkType as 'Digital images'") {
+  it("sets the WorkType as 'Digital Images'") {
     val work = transformWork(createMiroRecord)
     work.workType.isDefined shouldBe true
-    work.workType.get.label shouldBe "Digital images"
+    work.workType.get.label shouldBe "Digital Images"
   }
 
   it("sets the thumbnail with the IIIF Image URL") {
