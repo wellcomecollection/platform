@@ -95,7 +95,7 @@ class BagReplicator(
     )
   }
 
-  private def notifyOutgoingTopic(snsConfig: SNSConfig)(
+  private def notifyOutgoingTopic(outgoingSnsConfig: SNSConfig)(
     in: Either[BagReplicationError, CompletedBagReplication])(
     implicit encoder: Encoder[ArchiveComplete],
     snsClient: AmazonSNS) = {
@@ -103,7 +103,7 @@ class BagReplicator(
       bagReplicationError =>
         Left(bagReplicationError),
       (completedBagReplication: CompletedBagReplication) =>
-        publishNotification(completedBagReplication.context, snsConfig) match {
+        publishNotification(completedBagReplication.context, outgoingSnsConfig) match {
           case Success(_) =>
             Right(PublishedToOutgoingTopic(completedBagReplication.context))
           case Failure(e) =>
@@ -112,10 +112,10 @@ class BagReplicator(
     )
   }
 
-  private def notifyProgress(snsConfig: SNSConfig)(
+  private def notifyProgress(progressSnsConfig: SNSConfig)(
     in: Either[BagReplicationError, PublishedToOutgoingTopic])(
     implicit encoder: Encoder[ProgressUpdate], snsClient: AmazonSNS) = {
-    in match {
+    val result = in match {
       case Left(bagReplicationError) =>
         error(bagReplicationError.errorMessage)
         bagReplicationError match {
@@ -126,14 +126,17 @@ class BagReplicator(
                 Progress.Failed,
                 None,
                 List(ProgressEvent("Failed to replicate bag"))),
-              snsConfig)
+              progressSnsConfig)
+          case error =>
+            warn(s"Unable to notify progress for error without context $error")
         }
       case Right(PublishedToOutgoingTopic(archiveComplete)) =>
+        val progressEventUpdate = ProgressEventUpdate(
+          archiveComplete.archiveRequestId,
+          List(ProgressEvent("Bag replicated successfully")))
         publishNotification[ProgressUpdate](
-          ProgressEventUpdate(
-            archiveComplete.archiveRequestId,
-            List(ProgressEvent("Bag replicated successfully"))),
-          snsConfig)
+          progressEventUpdate,
+          progressSnsConfig)
     }
     ()
   }
