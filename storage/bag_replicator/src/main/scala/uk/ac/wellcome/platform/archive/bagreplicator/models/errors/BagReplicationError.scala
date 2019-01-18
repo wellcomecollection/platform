@@ -13,10 +13,12 @@ trait BagReplicationContext {
 abstract class BagReplicationError extends ErrorMessage
 
 case class NotificationParsingFailed(errorMessage: String)
-  extends BagReplicationError
+    extends BagReplicationError
 
 case class DuplicationFailed(errorMessage: String, context: ArchiveComplete)
-  extends BagReplicationError with BagReplicationContext
+    extends BagReplicationError
+    with BagReplicationContext
 
 case class NotificationFailed(errorMessage: String, context: ArchiveComplete)
-  extends BagReplicationError with BagReplicationContext
+    extends BagReplicationError
+    with BagReplicationContext

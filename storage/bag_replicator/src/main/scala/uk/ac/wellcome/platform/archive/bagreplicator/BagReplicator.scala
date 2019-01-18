@@ -15,25 +15,36 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
-import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{BagReplicationError, DuplicationFailed, NotificationFailed, NotificationParsingFailed}
+import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{
+  BagReplicationError,
+  DuplicationFailed,
+  NotificationFailed,
+  NotificationParsingFailed
+}
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
+  BagStorage,
+  S3Copier
+}
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  NotificationMessage
+}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class BagReplicator(
-                     s3Client: AmazonS3,
-                     snsClient: AmazonSNS,
-                     messageStream: MessageStream[NotificationMessage, Unit],
-                     bagReplicatorConfig: BagReplicatorConfig,
-                     progressSnsConfig: SNSConfig,
-                     outgoingSnsConfig: SNSConfig)(implicit val actorSystem: ActorSystem)
-  extends Logging
+  s3Client: AmazonS3,
+  snsClient: AmazonSNS,
+  messageStream: MessageStream[NotificationMessage, Unit],
+  bagReplicatorConfig: BagReplicatorConfig,
+  progressSnsConfig: SNSConfig,
+  outgoingSnsConfig: SNSConfig)(implicit val actorSystem: ActorSystem)
+    extends Logging
     with Runnable {
 
   def run(): Future[Done] = {
@@ -59,7 +70,7 @@ class BagReplicator(
   }
 
   private def parseReplicateBagMessage(notificationMessage: NotificationMessage)
-  : Either[BagReplicationError, BagReplicationRequest] = {
+    : Either[BagReplicationError, BagReplicationRequest] = {
     fromJson[ArchiveComplete](notificationMessage.body) match {
       case Success(archiveComplete) =>
         Right(
@@ -72,10 +83,10 @@ class BagReplicator(
 
   private def duplicateBagItems(storageDestination: StorageLocation)(
     in: Either[BagReplicationError, BagReplicationRequest])(
-                                 implicit s3Client: AmazonS3,
-                                 s3Copier: S3Copier,
-                                 ex: ExecutionContext)
-  : Future[Either[BagReplicationError, CompletedBagReplication]] = {
+    implicit s3Client: AmazonS3,
+    s3Copier: S3Copier,
+    ex: ExecutionContext)
+    : Future[Either[BagReplicationError, CompletedBagReplication]] = {
     in.fold(
       left => Future(Left(left)),
       bagReplicationRequest =>
@@ -83,38 +94,38 @@ class BagReplicator(
           .duplicateBag(
             bagReplicationRequest.sourceBagLocation,
             storageDestination)
-          .transformWith[Either[BagReplicationError,
-          CompletedBagReplication]] {
-          case Success(_) =>
-            Future(
-              Right(CompletedBagReplication(bagReplicationRequest.context)))
-          case Failure(e) =>
-            Future(
-              Left(DuplicationFailed(e.getMessage, bagReplicationRequest.context)))
+          .transformWith[Either[BagReplicationError, CompletedBagReplication]] {
+            case Success(_) =>
+              Future(
+                Right(CompletedBagReplication(bagReplicationRequest.context)))
+            case Failure(e) =>
+              Future(Left(
+                DuplicationFailed(e.getMessage, bagReplicationRequest.context)))
         }
     )
   }
 
   private def notifyOutgoingTopic(outgoingSnsConfig: SNSConfig)(
     in: Either[BagReplicationError, CompletedBagReplication])(
-                                   implicit encoder: Encoder[ArchiveComplete],
-                                   snsClient: AmazonSNS) = {
+    implicit encoder: Encoder[ArchiveComplete],
+    snsClient: AmazonSNS) = {
     in.fold[Either[BagReplicationError, PublishedToOutgoingTopic]](
-      bagReplicationError =>
-        Left(bagReplicationError),
+      bagReplicationError => Left(bagReplicationError),
       (completedBagReplication: CompletedBagReplication) =>
         publishNotification(completedBagReplication.context, outgoingSnsConfig) match {
           case Success(_) =>
             Right(PublishedToOutgoingTopic(completedBagReplication.context))
           case Failure(e) =>
-            Left(NotificationFailed(e.getMessage, completedBagReplication.context))
-        }
+            Left(
+              NotificationFailed(e.getMessage, completedBagReplication.context))
+      }
     )
   }
 
   private def notifyProgress(progressSnsConfig: SNSConfig)(
     in: Either[BagReplicationError, PublishedToOutgoingTopic])(
-                              implicit encoder: Encoder[ProgressUpdate], snsClient: AmazonSNS) = {
+    implicit encoder: Encoder[ProgressUpdate],
+    snsClient: AmazonSNS) = {
     in match {
       case Left(bagReplicationError) =>
         error(bagReplicationError.errorMessage)
@@ -142,7 +153,8 @@ class BagReplicator(
   }
 
   private def publishNotification[T](msg: T, snsConfig: SNSConfig)(
-    implicit encoder: Encoder[T], snsClient: AmazonSNS) = {
+    implicit encoder: Encoder[T],
+    snsClient: AmazonSNS) = {
     toJson[T](msg)
       .map { messageString =>
         debug(s"snsPublishMessage: $messageString")
