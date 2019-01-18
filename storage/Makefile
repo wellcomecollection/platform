@@ -5,8 +5,8 @@ STACK_ROOT 	= storage
 
 SBT_SSM_APPS = notifier
 SBT_APPS = archivist ingests ingests_api bags bags_api bag_replicator
-SBT_DOCKER_LIBRARIES = archive_common ingests_common
-SBT_NO_DOCKER_LIBRARIES = bags_common archive_display
+SBT_DOCKER_LIBRARIES = storage_common ingests_common
+SBT_NO_DOCKER_LIBRARIES = bags_common storage_display
 
 ECS_TASKS   = bagger callback_stub_server
 LAMBDAS     = lambdas/trigger_bag_ingest

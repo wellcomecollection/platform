@@ -170,7 +170,6 @@ jobs:
     - env: TASK=notifier-test
     - env: TASK=callback_stub_server-publish
 
-
     # (not under active development)
 
     # nginx stack
