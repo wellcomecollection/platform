@@ -15,18 +15,13 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
-import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.NotificationParsingFailed
+import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{BagReplicationError, DuplicationFailed, NotificationFailed, NotificationParsingFailed}
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
-  BagStorage,
-  S3Copier
-}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, NotificationMessage}
+import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -56,15 +51,15 @@ class BagReplicator(
       .map(parseReplicateBagMessage)
       .mapAsync(bagReplicatorConfig.parallelism)(
         duplicateBagItems(bagReplicatorConfig.destination))
-      .map(notifyOutgoingTopic(outgoingSnsConfig, "replicated"))
-      .map(completeBagReplication)
+      .map(notifyOutgoingTopic(outgoingSnsConfig))
+      .map(notifyProgress(progressSnsConfig))
       .log("completed")
 
     messageStream.run("bag_replicator", flow)
   }
 
   private def parseReplicateBagMessage(notificationMessage: NotificationMessage)
-    : Either[Throwable, BagReplicationRequest[ArchiveComplete]] = {
+    : Either[BagReplicationError, BagReplicationRequest] = {
     fromJson[ArchiveComplete](notificationMessage.body) match {
       case Success(archiveComplete) =>
         Right(
@@ -76,11 +71,11 @@ class BagReplicator(
   }
 
   private def duplicateBagItems(storageDestination: StorageLocation)(
-    in: Either[Throwable, BagReplicationRequest[ArchiveComplete]])(
+    in: Either[BagReplicationError, BagReplicationRequest])(
     implicit s3Client: AmazonS3,
     s3Copier: S3Copier,
     ex: ExecutionContext)
-    : Future[Either[Throwable, CompletedBagReplication[ArchiveComplete]]] = {
+    : Future[Either[BagReplicationError, CompletedBagReplication]] = {
     in.fold(
       left => Future(Left(left)),
       bagReplicationRequest =>
@@ -88,44 +83,68 @@ class BagReplicator(
           .duplicateBag(
             bagReplicationRequest.sourceBagLocation,
             storageDestination)
-          .transformWith[Either[Throwable,
-                                CompletedBagReplication[ArchiveComplete]]] {
+          .transformWith[Either[BagReplicationError,
+                                CompletedBagReplication]] {
             case Success(_) =>
               Future(
                 Right(CompletedBagReplication(bagReplicationRequest.context)))
-            case Failure(e) => Future(Left(e))
+            case Failure(e) =>
+              Future(
+                Left(DuplicationFailed(e.getMessage, bagReplicationRequest.context)))
         }
     )
   }
 
-  private def notifyOutgoingTopic(snsConfig: SNSConfig, subject: String)(
-    in: Either[Throwable, CompletedBagReplication[ArchiveComplete]])(
+  private def notifyOutgoingTopic(snsConfig: SNSConfig)(
+    in: Either[BagReplicationError, CompletedBagReplication])(
     implicit encoder: Encoder[ArchiveComplete],
     snsClient: AmazonSNS) = {
-    in.fold[Either[Throwable, PublishedToOutgoingTopic[ArchiveComplete]]](
-      left => Left(left),
-      (completedBagReplication: CompletedBagReplication[ArchiveComplete]) => {
-        toJson[ArchiveComplete](completedBagReplication.context)
-          .map { messageString =>
-            debug(s"snsPublishMessage: $messageString")
-            new PublishRequest(snsConfig.topicArn, messageString, subject)
-          }
-          .flatMap(publishRequest => Try(snsClient.publish(publishRequest))) match {
+    in.fold[Either[BagReplicationError, PublishedToOutgoingTopic]](
+      bagReplicationError =>
+        Left(bagReplicationError),
+      (completedBagReplication: CompletedBagReplication) =>
+        publishNotification(completedBagReplication.context, snsConfig) match {
           case Success(_) =>
             Right(PublishedToOutgoingTopic(completedBagReplication.context))
-          case Failure(e) => Left(e)
+          case Failure(e) =>
+            Left(NotificationFailed(e.getMessage, completedBagReplication.context))
         }
-      }
     )
   }
 
-  private def completeBagReplication(
-    in: Either[Throwable, PublishedToOutgoingTopic[ArchiveComplete]]): Unit = {
+  private def notifyProgress(snsConfig: SNSConfig)(
+    in: Either[BagReplicationError, PublishedToOutgoingTopic])(
+    implicit encoder: Encoder[ProgressUpdate], snsClient: AmazonSNS) = {
     in match {
-      case Left(exception) =>
-        error(exception.toString)
-        ()
-      case _ => ()
+      case Left(bagReplicationError) =>
+        error(bagReplicationError.errorMessage)
+        bagReplicationError match {
+          case errorWithContext: BagReplicationError with BagReplicationContext =>
+            publishNotification[ProgressUpdate](
+              ProgressStatusUpdate(
+                errorWithContext.context.archiveRequestId,
+                Progress.Failed,
+                None,
+                List(ProgressEvent("Failed to replicate bag"))),
+              snsConfig)
+        }
+      case Right(PublishedToOutgoingTopic(archiveComplete)) =>
+        publishNotification[ProgressUpdate](
+          ProgressEventUpdate(
+            archiveComplete.archiveRequestId,
+            List(ProgressEvent("Bag replicated successfully"))),
+          snsConfig)
     }
+    ()
+  }
+
+  private def publishNotification[T](msg: T, snsConfig: SNSConfig)(
+    implicit encoder: Encoder[T], snsClient: AmazonSNS) = {
+    toJson[T](msg)
+      .map { messageString =>
+        debug(s"snsPublishMessage: $messageString")
+        new PublishRequest(snsConfig.topicArn, messageString, "bag_replicator")
+      }
+      .flatMap(publishRequest => Try(snsClient.publish(publishRequest)))
   }
 }
