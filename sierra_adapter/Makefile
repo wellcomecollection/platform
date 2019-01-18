@@ -3,6 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT  = sierra_adapter
 
+SBT_SSM_APPS =
 SBT_APPS    = sierra_bib_merger \
               sierra_item_merger \
 			  sierra_items_to_dynamo \

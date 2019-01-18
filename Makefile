@@ -1,5 +1,4 @@
 include functions.Makefile
-
 include formatting.Makefile
 
 include infrastructure/critical/Makefile
@@ -19,9 +18,8 @@ include reindexer/Makefile
 include sbt_common/Makefile
 include sierra_adapter/Makefile
 include nginx/Makefile
-include archive/Makefile
 include reporting/Makefile
-
+include storage/Makefile
 
 travis-lambda-test:
 	python run_travis_lambdas.py test

@@ -29,4 +29,20 @@ data "aws_iam_policy_document" "travis_permissions" {
       "${var.bucket_arn}/uk/ac/wellcome/*",
     ]
   }
+
+  statement {
+    actions = [
+      "ssm:PutParameter",
+    ]
+
+    resources = [
+      "arn:aws:ssm:eu-west-1:${local.account_id}:parameter/releases/*",
+    ]
+  }
 }
+
+locals {
+  account_id = "${data.aws_caller_identity.current.account_id}"
+}
+
+data "aws_caller_identity" "current" {}

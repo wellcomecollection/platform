@@ -148,30 +148,30 @@ def does_file_affect_build_task(path, task):
                 if project.exclusive_path.startswith(("catalogue_api/",)):
                     raise ChangeToUnusedLibrary("messaging")
 
-    # We have a library for common archive code.
+    # We have a library for common storage code.
     #
-    # Only apps in the archive stack use this code.
-    if path.startswith("archive/common"):
+    # Only apps in the storage stack use this code.
+    if path.startswith("storage/common"):
         for project in PROJECTS:
             if task.startswith(project.name) and (project.type == "sbt_app"):
-                if not project.exclusive_path.startswith("archive/"):
-                    raise ChangeToUnusedLibrary("archive_common")
+                if not project.exclusive_path.startswith("storage/"):
+                    raise ChangeToUnusedLibrary("storage_common")
 
-    if path.startswith("archive/progress_common"):
+    if path.startswith("storage/ingests_common"):
         for project in PROJECTS:
             if task.startswith(project.name) and (project.type == "sbt_app"):
-                if not project.exclusive_path.startswith("archive/"):
-                    raise ChangeToUnusedLibrary("progress_common")
-                elif not task.startswith("progress"):
-                    raise ChangeToUnusedLibrary("progress_common")
+                if not project.exclusive_path.startswith("storage/"):
+                    raise ChangeToUnusedLibrary("ingests_common")
+                elif not task.startswith("ingests"):
+                    raise ChangeToUnusedLibrary("ingests_common")
 
-    if path.startswith("archive/registrar_common"):
+    if path.startswith("storage/bags_common"):
         for project in PROJECTS:
             if task.startswith(project.name) and (project.type == "sbt_app"):
-                if not project.exclusive_path.startswith("archive/"):
-                    raise ChangeToUnusedLibrary("registrar_common")
-                elif not task.startswith("registrar"):
-                    raise ChangeToUnusedLibrary("registrar_common")
+                if not project.exclusive_path.startswith("storage/"):
+                    raise ChangeToUnusedLibrary("bags_common")
+                elif not task.startswith("bags"):
+                    raise ChangeToUnusedLibrary("bags_common")
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.

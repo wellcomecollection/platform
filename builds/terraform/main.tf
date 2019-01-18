@@ -37,3 +37,10 @@ module "scala_storage" {
   name       = "storage"
   bucket_arn = "${aws_s3_bucket.releases.arn}"
 }
+
+module "scala_messaging" {
+  source = "./scala_library"
+
+  name       = "messaging"
+  bucket_arn = "${aws_s3_bucket.releases.arn}"
+}

@@ -60,12 +60,12 @@ cache:
     - archive/commmon/target
     - archive/display/target
     - archive/notifier/target
-    - archive/progress_async/target
-    - archive/progress_common/target
-    - archive/progress_http/target
-    - archive/registrar_async/target
-    - archive/registrar_common/target
-    - archive/registrar_http/target
+    - archive/ingests/target
+    - archive/ingests_common/target
+    - archive/ingests_api/target
+    - archive/bags/target
+    - archive/bags_common/target
+    - archive/bags_api/target
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
@@ -158,18 +158,17 @@ jobs:
     - env: TASK=sierra_item_merger-test
 
     # Archive
-    - env: TASK=archive_display-test
-    - env: TASK=archive_common-test
+    - env: TASK=storage_display-test
+    - env: TASK=storage_common-test
     - env: TASK=archivist-test
-    - env: TASK=progress_common-test
-    - env: TASK=progress_async-test
-    - env: TASK=progress_http-test
-    - env: TASK=registrar_common-test
-    - env: TASK=registrar_async-test
-    - env: TASK=registrar_http-test
+    - env: TASK=ingests_common-test
+    - env: TASK=ingests-test
+    - env: TASK=ingests_api-test
+    - env: TASK=bags_common-test
+    - env: TASK=bags-test
+    - env: TASK=bags_api-test
     - env: TASK=notifier-test
     - env: TASK=callback_stub_server-publish
-
 
     # (not under active development)
 
