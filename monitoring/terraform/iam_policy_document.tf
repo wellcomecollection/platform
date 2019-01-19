@@ -55,7 +55,9 @@ data "aws_iam_policy_document" "assume_roles" {
 
     resources = [
       "arn:aws:iam::130871440101:role/platform-team-assume-role",
-      "arn:aws:iam::299497370133:role/platform-team-assume-role",
+      "arn:aws:iam::299497370133:role/monitoring",
+      "arn:aws:iam::975596993436:role/monitoring",
+      "arn:aws:iam::760097843905:role/monitoring"
     ]
   }
 }
