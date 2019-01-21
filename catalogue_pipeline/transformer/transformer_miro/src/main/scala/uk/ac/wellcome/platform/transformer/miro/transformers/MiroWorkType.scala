@@ -13,6 +13,6 @@ trait MiroWorkType {
     Some(
       WorkType(
         id = "q",
-        label = "Digital images"
+        label = "Digital Images"
       ))
 }
