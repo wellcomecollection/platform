@@ -56,20 +56,17 @@ trait ProgressAsyncFixture
     testWith: TestWith[ProgressAsync, R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withMetricsSender(actorSystem) { metricsSender =>
-          withArchiveMessageStream[NotificationMessage, Unit, R](
-            queuePair.queue,
-            metricsSender) { messageStream =>
-            withProgressTracker(table) { progressTracker =>
-              val progressAsync = new ProgressAsync(
-                messageStream = messageStream,
-                progressTracker = progressTracker,
-                snsClient = snsClient,
-                snsConfig = createSNSConfigWith(topic)
-              )
+        withArchiveMessageStream[NotificationMessage, Unit, R](
+          queuePair.queue) { messageStream =>
+          withProgressTracker(table) { progressTracker =>
+            val progressAsync = new ProgressAsync(
+              messageStream = messageStream,
+              progressTracker = progressTracker,
+              snsClient = snsClient,
+              snsConfig = createSNSConfigWith(topic)
+            )
 
-              testWith(progressAsync)
-            }
+            testWith(progressAsync)
           }
         }
       }

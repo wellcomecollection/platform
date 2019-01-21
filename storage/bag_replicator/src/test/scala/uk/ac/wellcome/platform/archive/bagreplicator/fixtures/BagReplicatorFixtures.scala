@@ -53,25 +53,22 @@ trait BagReplicatorFixtures
     outgoingTopic: Topic,
     destinationBucket: Bucket)(testWith: TestWith[BagReplicator, R]): R =
     withActorSystem { implicit actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withArchiveMessageStream[NotificationMessage, Unit, R](
-          queuePair.queue,
-          metricsSender) { messageStream =>
-          val bagReplicator = new BagReplicator(
-            s3Client = s3Client,
-            snsClient = snsClient,
-            messageStream = messageStream,
-            bagReplicatorConfig = BagReplicatorConfig(
-              parallelism = 10,
-              StorageLocation(destinationBucket.name, "storage-root")),
-            progressSnsConfig = createSNSConfigWith(progressTopic),
-            outgoingSnsConfig = createSNSConfigWith(outgoingTopic)
-          )
+      withArchiveMessageStream[NotificationMessage, Unit, R](
+        queuePair.queue) { messageStream =>
+        val bagReplicator = new BagReplicator(
+          s3Client = s3Client,
+          snsClient = snsClient,
+          messageStream = messageStream,
+          bagReplicatorConfig = BagReplicatorConfig(
+            parallelism = 10,
+            StorageLocation(destinationBucket.name, "storage-root")),
+          progressSnsConfig = createSNSConfigWith(progressTopic),
+          outgoingSnsConfig = createSNSConfigWith(outgoingTopic)
+        )
 
-          bagReplicator.run()
+        bagReplicator.run()
 
-          testWith(bagReplicator)
-        }
+        testWith(bagReplicator)
       }
     }
 

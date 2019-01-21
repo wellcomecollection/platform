@@ -87,27 +87,24 @@ trait ArchivistFixtures
                  progressTopic: Topic,
                  parallelism: Int = 10)(testWith: TestWith[Archivist, R]): R =
     withActorSystem { implicit actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withArchiveMessageStream[NotificationMessage, Unit, R](
-          queuePair.queue,
-          metricsSender) { messageStream =>
-          implicit val s3 = s3Client
-          implicit val sns = snsClient
-          implicit val tf =
-            TransferManagerBuilder.standard().withS3Client(s3Client).build()
+      withArchiveMessageStream[NotificationMessage, Unit, R](
+        queuePair.queue) { messageStream =>
+        implicit val s3 = s3Client
+        implicit val sns = snsClient
+        implicit val tf =
+          TransferManagerBuilder.standard().withS3Client(s3Client).build()
 
-          val archivist = new Archivist(
-            messageStream = messageStream,
-            bagUploaderConfig =
-              createBagUploaderConfigWith(storageBucket, parallelism),
-            snsRegistrarConfig = createSNSConfigWith(registrarTopic),
-            snsProgressConfig = createSNSConfigWith(progressTopic)
-          )
+        val archivist = new Archivist(
+          messageStream = messageStream,
+          bagUploaderConfig =
+            createBagUploaderConfigWith(storageBucket, parallelism),
+          snsRegistrarConfig = createSNSConfigWith(registrarTopic),
+          snsProgressConfig = createSNSConfigWith(progressTopic)
+        )
 
-          archivist.run()
+        archivist.run()
 
-          testWith(archivist)
-        }
+        testWith(archivist)
       }
     }
 
