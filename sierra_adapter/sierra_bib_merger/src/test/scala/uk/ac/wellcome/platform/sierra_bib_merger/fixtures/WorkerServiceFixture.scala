@@ -36,6 +36,8 @@ trait WorkerServiceFixture
               sierraBibMergerUpdaterService = updaterService
             )
 
+            workerService.run()
+
             testWith(workerService)
           }
         }
