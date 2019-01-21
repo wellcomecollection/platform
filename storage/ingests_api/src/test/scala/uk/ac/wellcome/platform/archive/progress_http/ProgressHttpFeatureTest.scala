@@ -32,7 +32,6 @@ class ProgressHttpFeatureTest
     with IntegrationPatience
     with JsonAssertions {
 
-  import HttpMethods._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
   import uk.ac.wellcome.storage.dynamo._
@@ -204,16 +203,9 @@ class ProgressHttpFeatureTest
                  |}""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
             val expectedLocationR = s"$baseUrl/(.+)".r
 
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.Created
 
               val maybeId = response.headers.collectFirst {
@@ -312,14 +304,7 @@ class ProgressHttpFeatureTest
                  |}""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -352,14 +337,7 @@ class ProgressHttpFeatureTest
               """hgjh""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -393,14 +371,7 @@ class ProgressHttpFeatureTest
               """hgjh""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.UnsupportedMediaType
               response.entity.contentType shouldBe ContentTypes.`application/json`
               println(response)
@@ -440,14 +411,7 @@ class ProgressHttpFeatureTest
                  |}""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -499,14 +463,7 @@ class ProgressHttpFeatureTest
                  |}""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -558,14 +515,7 @@ class ProgressHttpFeatureTest
                   |}""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -616,14 +566,7 @@ class ProgressHttpFeatureTest
                  |}""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 
@@ -675,14 +618,7 @@ class ProgressHttpFeatureTest
                  |}""".stripMargin
             )
 
-            val request = HttpRequest(
-              method = POST,
-              uri = url,
-              headers = Nil,
-              entity = entity
-            )
-
-            whenRequestReady(request) { response: HttpResponse =>
+            whenPostRequestReady(url, entity) { response: HttpResponse =>
               response.status shouldBe StatusCodes.BadRequest
               response.entity.contentType shouldBe ContentTypes.`application/json`
 

@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.archive.common.fixtures
 
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.HttpMethods.GET
-import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.HttpMethods.{GET, POST}
+import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse, RequestEntity}
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorMaterializer, Materializer}
 import io.circe.Decoder
@@ -15,11 +15,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 trait HttpFixtures extends Akka with ScalaFutures {
-  def whenRequestReady[R](r: HttpRequest)(
+  private def whenRequestReady[R](r: HttpRequest)(
     testWith: TestWith[HttpResponse, R]): R =
     withActorSystem { implicit actorSystem =>
       val request = Http().singleRequest(r)
-      whenReady(request) { (response: HttpResponse) =>
+      whenReady(request) { response: HttpResponse =>
         testWith(response)
       }
     }
@@ -29,6 +29,19 @@ trait HttpFixtures extends Akka with ScalaFutures {
     whenRequestReady(HttpRequest(GET, path)) { response =>
       testWith(response)
     }
+
+  def whenPostRequestReady[R](url: String, entity: RequestEntity)(
+    testWith: TestWith[HttpResponse, R]): R = {
+    val request = HttpRequest(
+      method = POST,
+      uri = url,
+      headers = Nil,
+      entity = entity
+    )
+
+    whenRequestReady(request) { response => testWith(response) }
+  }
+
 
   def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T],
                                   materializer: Materializer): T = {
