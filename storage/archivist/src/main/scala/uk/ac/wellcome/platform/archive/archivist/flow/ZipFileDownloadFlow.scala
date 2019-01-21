@@ -32,7 +32,7 @@ object ZipFileDownloadFlow {
     parallelism: Parallelism
   ): Flow[IngestBagRequest, BagDownload, NotUsed] = {
 
-    val downloadSuccessMessage = "Ingest bag file downloaded successfully."
+    val downloadSuccessMessage = "Ingest bag file downloaded successfully"
 
     val snsPublishFlow = SnsPublishFlow[ProgressUpdate](
       snsClient,

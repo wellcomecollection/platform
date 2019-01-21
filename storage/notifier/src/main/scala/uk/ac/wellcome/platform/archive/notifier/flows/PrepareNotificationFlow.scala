@@ -25,7 +25,7 @@ object PrepareNotificationFlow extends Logging {
           id,
           Some(Success(HttpResponse(status, _, _, _)))) =>
         if (status.isSuccess()) {
-          info(s"Callback fulfilled for: $id")
+          debug(s"Callback fulfilled for: $id")
 
           ProgressCallbackStatusUpdate(
             id,
@@ -33,7 +33,7 @@ object PrepareNotificationFlow extends Logging {
             List(ProgressEvent("Callback fulfilled.")),
           )
         } else {
-          info(s"Callback failed for: $id, got $status!")
+          debug(s"Callback failed for: $id, got $status!")
 
           ProgressCallbackStatusUpdate(
             id,
