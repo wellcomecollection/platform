@@ -28,16 +28,16 @@ trait NotifierFixture
     testWith: TestWith[Notifier, R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withArchiveMessageStream[NotificationMessage, PublishResult, R](
-          queue) { messageStream =>
-          val notifier = new Notifier(
-            messageStream = messageStream,
-            snsClient = snsClient,
-            snsConfig = createSNSConfigWith(topic),
-            contextUrl = new URL("http://localhost/context.json")
-          )
+        withArchiveMessageStream[NotificationMessage, PublishResult, R](queue) {
+          messageStream =>
+            val notifier = new Notifier(
+              messageStream = messageStream,
+              snsClient = snsClient,
+              snsConfig = createSNSConfigWith(topic),
+              contextUrl = new URL("http://localhost/context.json")
+            )
 
-          testWith(notifier)
+            testWith(notifier)
         }
       }
     }

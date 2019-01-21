@@ -2,7 +2,12 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.{GET, POST}
-import akka.http.scaladsl.model.{HttpEntity, HttpRequest, HttpResponse, RequestEntity}
+import akka.http.scaladsl.model.{
+  HttpEntity,
+  HttpRequest,
+  HttpResponse,
+  RequestEntity
+}
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorMaterializer, Materializer}
 import io.circe.Decoder
@@ -39,9 +44,10 @@ trait HttpFixtures extends Akka with ScalaFutures {
       entity = entity
     )
 
-    whenRequestReady(request) { response => testWith(response) }
+    whenRequestReady(request) { response =>
+      testWith(response)
+    }
   }
-
 
   def getT[T](entity: HttpEntity)(implicit decoder: Decoder[T],
                                   materializer: Materializer): T = {
