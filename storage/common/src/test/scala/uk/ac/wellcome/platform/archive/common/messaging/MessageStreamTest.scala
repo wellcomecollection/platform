@@ -134,12 +134,8 @@ class MessageStreamTest
     withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
-          withMockMetricSender { mockMetricsSender =>
-            withArchiveMessageStream[ExampleObject, Unit, R](
-              queue,
-              mockMetricsSender) { stream =>
-              testWith((stream, queuePair, actorSystem))
-            }
+          withArchiveMessageStream[ExampleObject, Unit, R](queue) { stream =>
+            testWith((stream, queuePair, actorSystem))
           }
       }
     }
