@@ -55,7 +55,7 @@ class SierraBibMergerWorkerServiceTest
           case queuePair @ QueuePair(queue, _) =>
             withLocalDynamoDbTable { table =>
               withLocalS3Bucket { storageBucket =>
-                withApp(storageBucket, table, queue, topic) { service =>
+                withWorkerService(storageBucket, table, queue, topic) { service =>
                   testWith((metricsSender, queuePair))
                 }
               }

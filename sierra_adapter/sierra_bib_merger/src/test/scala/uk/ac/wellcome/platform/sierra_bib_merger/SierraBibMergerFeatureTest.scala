@@ -31,7 +31,7 @@ class SierraBibMergerFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
-            withApp(bucket, table, queue, topic) { app =>
+            withWorkerService(bucket, table, queue, topic) { app =>
               app.run()
 
               val bibRecord = createSierraBibRecord
@@ -60,7 +60,7 @@ class SierraBibMergerFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
-            withApp(bucket, table, queue, topic) { app =>
+            withWorkerService(bucket, table, queue, topic) { app =>
               app.run()
               withSierraVHS(bucket, table) { _ =>
                 val record1 = createSierraBibRecord
@@ -101,7 +101,7 @@ class SierraBibMergerFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
-            withApp(bucket, table, queue, topic) { app =>
+            withWorkerService(bucket, table, queue, topic) { app =>
               app.run()
               withSierraVHS(bucket, table) { hybridStore =>
                 val oldBibRecord = createSierraBibRecordWith(
@@ -146,7 +146,7 @@ class SierraBibMergerFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
-            withApp(bucket, table, queue, topic) { app =>
+            withWorkerService(bucket, table, queue, topic) { app =>
               app.run()
               withSierraVHS(bucket, table) { hybridStore =>
                 val newBibRecord = createSierraBibRecordWith(
@@ -190,7 +190,7 @@ class SierraBibMergerFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withLocalDynamoDbTable { table =>
-            withApp(bucket, table, queue, topic) { app =>
+            withWorkerService(bucket, table, queue, topic) { app =>
               app.run()
               withSierraVHS(bucket, table) { hybridStore =>
                 val transformable = createSierraTransformableWith(

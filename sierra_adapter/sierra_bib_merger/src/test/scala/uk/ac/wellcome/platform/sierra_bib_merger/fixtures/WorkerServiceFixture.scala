@@ -20,7 +20,7 @@ trait WorkerServiceFixture
     with SierraAdapterHelpers
     with SNS
     with SQS {
-  def withApp[R](bucket: Bucket, table: Table, queue: Queue, topic: Topic)(
+  def withWorkerService[R](bucket: Bucket, table: Table, queue: Queue, topic: Topic)(
     testWith: TestWith[SierraBibMergerWorkerService, R]): R =
     withActorSystem { implicit actorSystem =>
       withSierraVHS(bucket, table) { versionedHybridStore =>
