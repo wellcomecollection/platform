@@ -8,6 +8,7 @@ import settings
 import requests
 import json
 import storage_api
+from pathlib import Path
 from mets_filesource import b_numbers_from_s3
 
 
@@ -120,7 +121,12 @@ def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest):
 
 
 def bnumber_generator(filter_expression):
-    if filter_expression.startswith("b"):
+    source_list = Path(filter_expression)
+    if source_list.is_file():
+        with open(filter_expression) as f:
+            bnumbers = f.readlines()
+        return [b.strip() for b in bnumbers if not b.strip() == ""]
+    elif filter_expression.startswith("b"):
         return (b for b in [filter_expression])
     else:
         return b_numbers_from_s3(filter_expression)
