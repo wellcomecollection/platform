@@ -2,10 +2,19 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.models.work.generators.{ProductionEventGenerators, WorksGenerators}
+import uk.ac.wellcome.models.work.generators.{
+  ProductionEventGenerators,
+  SubjectGenerators,
+  WorksGenerators
+}
 import uk.ac.wellcome.models.work.internal._
 
-class DisplayWorkV1Test extends FunSpec with Matchers with ProductionEventGenerators with WorksGenerators {
+class DisplayWorkV1Test
+  extends FunSpec
+    with Matchers
+    with ProductionEventGenerators
+    with SubjectGenerators
+    with WorksGenerators {
 
   it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
@@ -167,17 +176,15 @@ class DisplayWorkV1Test extends FunSpec with Matchers with ProductionEventGenera
       Concept("a second generic concept")
     )
 
-    val subjects = List[Subject[Displayable[AbstractConcept]]](
-      Subject(
-        label = "a subject created by DisplayWorkV1Test",
+    val subjects = List(
+      createSubjectWith(
         concepts = List(
           Unidentifiable(concepts(0)),
           Unidentifiable(concepts(1)),
           Unidentifiable(concepts(2))
         )
       ),
-      Subject(
-        label = "a second subject created for DisplayWorkV1Test",
+      createSubjectWith(
         concepts = List(
           Unidentifiable(concepts(3))
         )
