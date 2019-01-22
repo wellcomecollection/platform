@@ -22,9 +22,6 @@
 # . queue_for_bagging.sh b18035978 no-bag
 # Same but METS only.
 
-# asset sources
-export METS_BUCKET_NAME=''
-export WORKING_DIRECTORY=''
 # aws
 export AWS_ACCESS_KEY_ID=''
 export AWS_SECRET_ACCESS_KEY=''
