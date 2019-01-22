@@ -125,7 +125,7 @@ def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest):
         "bag_zip": bag_zip,
         "mets_error": bag_error,
         "ingest": ingest,
-        "dds_package_date": dds_package_date
+        "dds_package_date": dds_package_date,
     }
 
 
