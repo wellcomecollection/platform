@@ -2,10 +2,10 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.models.work.generators.{ProductionEventGenerators, WorksGenerators}
 import uk.ac.wellcome.models.work.internal._
 
-class DisplayWorkV1Test extends FunSpec with Matchers with WorksGenerators {
+class DisplayWorkV1Test extends FunSpec with Matchers with ProductionEventGenerators with WorksGenerators {
 
   it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
@@ -198,14 +198,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksGenerators {
 
   it("errors if you try to convert a work with non-empty production field") {
     val work = createIdentifiedWorkWith(
-      production = List(
-        ProductionEvent(
-          places = List(),
-          agents = List(),
-          dates = List(),
-          function = Some(Concept("Manufacture"))
-        )
-      )
+      production = createProductionEventList()
     )
 
     val caught = intercept[IllegalArgumentException] {

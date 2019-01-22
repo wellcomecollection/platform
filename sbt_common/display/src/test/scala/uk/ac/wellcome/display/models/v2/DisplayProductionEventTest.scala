@@ -1,9 +1,10 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.generators.ProductionEventGenerators
 import uk.ac.wellcome.models.work.internal._
 
-class DisplayProductionEventTest extends FunSpec with Matchers {
+class DisplayProductionEventTest extends FunSpec with Matchers with ProductionEventGenerators {
   it("serialises a DisplayProductionEvent from a ProductionEvent") {
     val productionEvent = ProductionEvent(
       places = List(Place("London")),

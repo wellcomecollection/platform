@@ -2,9 +2,10 @@ package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
+import uk.ac.wellcome.models.work.generators.ProductionEventGenerators
 import uk.ac.wellcome.models.work.internal._
 
-class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
+class ApiV2WorksIncludesTest extends ApiV2WorksTestBase with ProductionEventGenerators {
   it(
     "includes a list of identifiers on a list endpoint if we pass ?include=identifiers") {
     withV2Api {
@@ -325,18 +326,8 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
       case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
-        val productionEvents1 = List(
-          ProductionEvent(
-            List(Place("London")),
-            List(Unidentifiable(Person("Bumblebee"))),
-            List(Period("1984")),
-            None))
-        val productionEvents2 = List(
-          ProductionEvent(
-            List(Place("Madrid")),
-            List(Unidentifiable(Person("Bumblebee"))),
-            List(Period("1984")),
-            None))
+        val productionEvents1 = createProductionEventList(count = 1)
+        val productionEvents2 = createProductionEventList(count = 2)
         val work0 = works(0).copy(production = productionEvents1)
         val work1 = works(1).copy(production = productionEvents2)
 
@@ -374,13 +365,9 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
     "includes a list of production on a single work endpoint if we pass ?include=production") {
     withV2Api {
       case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
-        val productionEvent = List(
-          ProductionEvent(
-            List(Place("London")),
-            List(Unidentifiable(Person("Bumblebee"))),
-            List(Period("1984")),
-            None))
-        val work = createIdentifiedWork.copy(production = productionEvent)
+        val work = createIdentifiedWorkWith(
+          production = createProductionEventList(count = 1)
+        )
 
         insertIntoElasticsearch(indexV2, work)
 
