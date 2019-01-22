@@ -195,8 +195,22 @@ trait SierraProduction {
     }
   }
 
+  // @@AWLC: I'm joining these with a space because that seems more appropriate
+  // given our catalogue, but the MARC spec isn't entirely clear on what to do.
+  //
+  // The convention used in the current Library website is to use a string.
+  // Two examples, both retrieved 22 January 2019:
+  //
+  // bib 1548327:
+  //    MARC        260    [Horsham] :|cCats Protection League,|c[ca.1990?]
+  //    Website     [Horsham] : Cats Protection League, [ca.1990?]
+  //
+  // bib 2847879:
+  //    MARC        264  0 [Netherne, Surrey],|c[ca. 1966]
+  //    Website     [Netherne, Surrey], [ca. 1966]
+  //
   private def labelFromSubFields(vf: VarField): String =
-    vf.subfields.map { _.content }.mkString("")
+    vf.subfields.map { _.content }.mkString(" ")
 
   private def placesFromSubfields(vf: VarField,
                                   subfieldTag: String): List[Place] =
