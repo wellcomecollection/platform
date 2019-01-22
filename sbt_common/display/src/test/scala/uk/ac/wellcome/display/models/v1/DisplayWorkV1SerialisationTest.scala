@@ -148,8 +148,8 @@ class DisplayWorkV1SerialisationTest
 
     val workWithSubjects = createIdentifiedWorkWith(
       subjects = List(
-        Subject("label", List(concept0)),
-        Subject("label", List(concept1))
+        createSubjectWith(concepts = List(concept0)),
+        createSubjectWith(concepts = List(concept1)),
       )
     )
 

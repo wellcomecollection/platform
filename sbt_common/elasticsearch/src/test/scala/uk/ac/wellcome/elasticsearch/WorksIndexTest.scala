@@ -14,13 +14,8 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.json.JsonUtil._
 import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.json.utils.JsonAssertions
-import uk.ac.wellcome.models.work.generators.WorksGenerators
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedBaseWork,
-  Person,
-  Subject,
-  Unidentifiable
-}
+import uk.ac.wellcome.models.work.generators.{SubjectGenerators, WorksGenerators}
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Person, Subject, Unidentifiable}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,6 +28,7 @@ class WorksIndexTest
     with Matchers
     with JsonAssertions
     with PropertyChecks
+    with SubjectGenerators
     with WorksGenerators {
 
   // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
@@ -51,20 +47,21 @@ class WorksIndexTest
 
   // Possibly because the number of variations in the work model is too big,
   // a bug in the mapping related to person subjects wasn't caught by the above test.
-  // So let's add a specific one
+  // So let's add a specific one.
+  // https://github.com/wellcometrust/platform/pull/2544
   it("puts a work with a person subject") {
     withLocalWorksIndex { index =>
       val sampleWork = createIdentifiedWorkWith(
         subjects = List(
-          Subject(
-            label = "Daredevil",
+          createSubjectWith(
             concepts = List(
               Unidentifiable(
                 Person(
                   label = "Daredevil",
                   prefix = Some("Superhero"),
                   numeration = Some("I")
-                ))
+                )
+              )
             )
           )
         )
