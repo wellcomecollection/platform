@@ -414,6 +414,29 @@ class SierraContributorsTest
         varFields = varFields,
         expectedContributors = expectedContributors)
     }
+
+    it("returns an Agent if MARC tag 700 has a subfield t") {
+      val name = "William Shakespeare"
+      val varFields = List(
+        createVarFieldWith(
+          marcTag = "700",
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "t", content = "Hamlet")
+          )
+        )
+      )
+
+      val expectedContributors = List(
+        Contributor(
+          agent = Unidentifiable(Agent(label = name))
+        )
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
   }
 
   describe("Organisation") {
