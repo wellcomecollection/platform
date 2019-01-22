@@ -14,16 +14,22 @@ export DROP_BUCKET_NAME_ERRORS=''
 export CURRENT_PRESERVATION_BUCKET=''
 export DLCS_SOURCE_BUCKET=''
 export BAGGING_QUEUE=''
+
+# Dynamo
+export DYNAMO_TABLE=''
+
 # aws
 export AWS_ACCESS_KEY_ID=''
 export AWS_SECRET_ACCESS_KEY=''
 export AWS_DEFAULT_REGION=''
+
 # DLCS config
 export DLCS_ENTRY=''
 export DLCS_API_KEY=''
 export DLCS_API_SECRET=''
 export DLCS_CUSTOMER_ID=''
 export DLCS_SPACE=''
+
 # DDS credentials
 export DDS_API_KEY=''
 export DDS_API_SECRET=''
