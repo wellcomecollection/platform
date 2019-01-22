@@ -187,7 +187,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
       }
       .mkString(",")
 
-  def subject(s: Subject[Displayable[AbstractRootConcept]]) =
+  private def subject(s: Subject[Displayable[AbstractRootConcept]]): String =
     s"""
     {
       "label": "${s.label}",
@@ -196,9 +196,9 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def subjects(subjects: List[Subject[Displayable[AbstractRootConcept]]]) =
+  def subjects(subjects: List[Displayable[Subject[Displayable[AbstractRootConcept]]]]): String =
     subjects
-      .map { subject(_) }
+      .map { s => identifiedOrUnidentifiable(s, subject) }
       .mkString(",")
 
   def genre(g: Genre[Displayable[AbstractConcept]]) =

@@ -6,7 +6,9 @@ sealed trait MaybeDisplayable[+T] extends IdentityState[T] {
   val agent: T
 }
 
-sealed trait Displayable[+T] extends IdentityState[T]
+sealed trait Displayable[+T] extends IdentityState[T] {
+  val agent: T
+}
 
 case class Identified[T](agent: T,
                          canonicalId: String,

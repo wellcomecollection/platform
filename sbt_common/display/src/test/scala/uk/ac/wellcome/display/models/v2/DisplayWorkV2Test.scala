@@ -231,6 +231,10 @@ class DisplayWorkV2Test
       ontologyType = "Agent"
     )
 
+    val subjectSourceIdentifier = createSourceIdentifierWith(
+      ontologyType = "Subject"
+    )
+
     val conceptSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Concept"
     )
@@ -272,25 +276,29 @@ class DisplayWorkV2Test
       ),
       items = createIdentifiedItems(count = 1),
       subjects = List(
-        Subject(
-          label = "Beryllium-Boron Bonding",
-          concepts = List(
-            Identified(
-              Concept("Bonding"),
-              canonicalId = createCanonicalId,
-              sourceIdentifier = conceptSourceIdentifier
-            ),
-            Identified(
-              Period("Before"),
-              canonicalId = createCanonicalId,
-              sourceIdentifier = periodSourceIdentifier
-            ),
-            Identified(
-              Place("Bulgaria"),
-              canonicalId = createCanonicalId,
-              sourceIdentifier = placeSourceIdentifier
+        Identified(
+          Subject(
+            label = "Beryllium-Boron Bonding",
+            concepts = List(
+              Identified(
+                Concept("Bonding"),
+                canonicalId = createCanonicalId,
+                sourceIdentifier = conceptSourceIdentifier
+              ),
+              Identified(
+                Period("Before"),
+                canonicalId = createCanonicalId,
+                sourceIdentifier = periodSourceIdentifier
+              ),
+              Identified(
+                Place("Bulgaria"),
+                canonicalId = createCanonicalId,
+                sourceIdentifier = placeSourceIdentifier
+              )
             )
-          )
+          ),
+          canonicalId = createCanonicalId,
+          sourceIdentifier = subjectSourceIdentifier
         )
       ),
       genres = List(
@@ -332,7 +340,10 @@ class DisplayWorkV2Test
       it("subjects") {
         val displayWork =
           DisplayWorkV2(work, includes = V2WorksIncludes(subjects = true))
-        val concepts = displayWork.subjects.get.head.concepts
+        val subject = displayWork.subjects.get.head
+        subject.identifiers shouldBe None
+
+        val concepts = subject.concepts
         concepts.map { _.identifiers } shouldBe List(None, None, None)
       }
 
@@ -394,7 +405,10 @@ class DisplayWorkV2Test
           .map { List(_) }
           .map { Some(_) }
 
-        val concepts = displayWork.subjects.get.head.concepts
+        val subject = displayWork.subjects.get.head
+        subject.identifiers shouldBe Some(List(DisplayIdentifierV2(subjectSourceIdentifier)))
+
+        val concepts = subject.concepts
         concepts.map { _.identifiers } shouldBe expectedIdentifiers
       }
 

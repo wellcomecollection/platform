@@ -4,13 +4,17 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.display.json.DisplayJsonUtil._
 import uk.ac.wellcome.display.models.V1WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
-import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.models.work.generators.{
+  SubjectGenerators,
+  WorksGenerators
+}
 import uk.ac.wellcome.models.work.internal._
 
 class DisplayWorkV1SerialisationTest
     extends FunSpec
     with DisplayV1SerialisationTestBase
     with JsonMapperTestUtil
+    with SubjectGenerators
     with WorksGenerators {
 
   it("serialises a DisplayWorkV1") {
@@ -148,8 +152,8 @@ class DisplayWorkV1SerialisationTest
 
     val workWithSubjects = createIdentifiedWorkWith(
       subjects = List(
-        Subject("label", List(concept0)),
-        Subject("label", List(concept1))
+        createSubjectWith(concepts = List(concept0)),
+        createSubjectWith(concepts = List(concept1))
       )
     )
 
