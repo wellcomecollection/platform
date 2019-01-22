@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
 import uk.ac.wellcome.platform.transformer.miro.models.MiroMetadata
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
-class MiroTransformableTransformerTest
+class MiroRecordTransformerTest
     extends FunSpec
     with Matchers
     with IdentifiersGenerators

@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
   *  The rules around this heuristic are somewhat fiddly, and we need to be
   *  careful that we're extracting the right fields from the Miro metadata.
   */
-class MiroTransformableTransformerTitleAndDescriptionTest
+class MiroRecordTransformerTitleAndDescriptionTest
     extends FunSpec
     with Matchers
     with MiroRecordGenerators

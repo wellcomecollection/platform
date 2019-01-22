@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
 import scala.util.Try
 
-class MiroTransformableTransformer
+class MiroRecordTransformer
     extends transformers.MiroContributors
     with transformers.MiroCreatedDate
     with transformers.MiroItems

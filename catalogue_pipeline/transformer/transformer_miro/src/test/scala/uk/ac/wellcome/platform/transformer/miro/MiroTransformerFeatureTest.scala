@@ -129,7 +129,7 @@ class MiroTransformerFeatureTest
         withSQSStream[NotificationMessage, R](queue) { sqsStream =>
           val workerService = new MiroTransformerWorkerService(
             vhsRecordReceiver = recordReceiver,
-            miroTransformer = new MiroTransformableTransformer,
+            miroTransformer = new MiroRecordTransformer,
             sqsStream = sqsStream
           )
 

@@ -32,7 +32,7 @@ object Main extends WellcomeTypesafeApp {
 
     new MiroTransformerWorkerService(
       vhsRecordReceiver = vhsRecordReceiver,
-      miroTransformer = new MiroTransformableTransformer,
+      miroTransformer = new MiroRecordTransformer,
       sqsStream = SQSBuilder.buildSQSStream[NotificationMessage](config)
     )
   }
