@@ -8,5 +8,5 @@ import scala.util.Try
 
 case class CallbackFlowResult(
   id: UUID,
-  httpResponse: Option[Try[HttpResponse]]
+  httpResponse: Try[HttpResponse]
 )
