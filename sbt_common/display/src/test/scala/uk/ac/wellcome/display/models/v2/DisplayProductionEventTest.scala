@@ -1,11 +1,16 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.generators.ProductionEventGenerators
 import uk.ac.wellcome.models.work.internal._
 
-class DisplayProductionEventTest extends FunSpec with Matchers {
+class DisplayProductionEventTest
+    extends FunSpec
+    with Matchers
+    with ProductionEventGenerators {
   it("serialises a DisplayProductionEvent from a ProductionEvent") {
     val productionEvent = ProductionEvent(
+      label = "London, Macmillan, 2005",
       places = List(Place("London")),
       agents = List(Unidentifiable(Agent("Macmillan"))),
       dates = List(Period("2005")),
@@ -17,6 +22,7 @@ class DisplayProductionEventTest extends FunSpec with Matchers {
       includesIdentifiers = false
     )
     displayProductionEvent shouldBe DisplayProductionEvent(
+      label = "London, Macmillan, 2005",
       places = List(DisplayPlace(label = "London")),
       agents = List(
         DisplayAgentV2(
@@ -30,10 +36,7 @@ class DisplayProductionEventTest extends FunSpec with Matchers {
   }
 
   it("serialises a DisplayProductionEvent without a function") {
-    val productionEvent = ProductionEvent(
-      places = List(Place("New York")),
-      agents = List(Unidentifiable(Agent("US GPO"))),
-      dates = List(Period("2010")),
+    val productionEvent = createProductionEventWith(
       function = None
     )
 

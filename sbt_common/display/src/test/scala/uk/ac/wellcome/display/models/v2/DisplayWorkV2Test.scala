@@ -5,11 +5,15 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import org.scalacheck.ScalacheckShapeless._
-import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.models.work.generators.{
+  ProductionEventGenerators,
+  WorksGenerators
+}
 
 class DisplayWorkV2Test
     extends FunSpec
     with Matchers
+    with ProductionEventGenerators
     with WorksGenerators
     with PropertyChecks {
 
@@ -188,12 +192,7 @@ class DisplayWorkV2Test
   }
 
   it("extracts production events from a work with the production include") {
-    val productionEvent = ProductionEvent(
-      places = List(Place("London")),
-      agents = List(Unidentifiable(Agent("Macmillan"))),
-      dates = List(Period("2005")),
-      function = Some(Concept("Manufacture"))
-    )
+    val productionEvent = createProductionEvent
 
     val work = createIdentifiedWorkWith(
       production = List(productionEvent)
