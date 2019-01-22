@@ -59,8 +59,8 @@ trait SierraContributors extends MarcUtils with SierraAgents {
       }
   }
 
-  private def getMarcTag700Contributors(
-    bibData: SierraBibData): List[Contributor[MaybeDisplayable[AbstractAgent]]] = {
+  private def getMarcTag700Contributors(bibData: SierraBibData)
+    : List[Contributor[MaybeDisplayable[AbstractAgent]]] = {
     val agents = getMatchingSubfields(
       bibData,
       marcTag = "700",
@@ -72,14 +72,19 @@ trait SierraContributors extends MarcUtils with SierraAgents {
         val roles = getContributionRoles(subfields)
         val hasSubfieldT = subfields.exists { _.tag == "t" }
 
-        val maybeAgent: Option[MaybeDisplayable[AbstractAgent]] = if (hasSubfieldT) {
-          getLabel(subfields)
-            .map { Agent(_) }
-            .map { agent => identify(subfields, agent, "Agent") }
-        } else {
-          getPerson(subfields, normalisePerson = true)
-            .map { person => identify(subfields, person, "Person") }
-        }
+        val maybeAgent: Option[MaybeDisplayable[AbstractAgent]] =
+          if (hasSubfieldT) {
+            getLabel(subfields)
+              .map { Agent(_) }
+              .map { agent =>
+                identify(subfields, agent, "Agent")
+              }
+          } else {
+            getPerson(subfields, normalisePerson = true)
+              .map { person =>
+                identify(subfields, person, "Person")
+              }
+          }
 
         maybeAgent.map { agent =>
           Contributor(
