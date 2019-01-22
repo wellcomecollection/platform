@@ -255,7 +255,7 @@ class SierraTransformableTransformerTest
       description = Some("A delightful description of a dead daisy."),
       production = List(
         ProductionEvent(
-          label = "Peaceful Poetry1923",
+          label = "Peaceful Poetry 1923",
           places = List(),
           agents = List(Unidentifiable(Agent(label = "Peaceful Poetry"))),
           dates = List(Period("1923")),

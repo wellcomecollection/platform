@@ -134,26 +134,26 @@ class SierraProductionTest
         createVarFieldWith(
           marcTag = "260",
           subfields = List(
-            MarcSubfield(tag = "a", content = "London"),
-            MarcSubfield(tag = "b", content = "Arts Council of Great Britain"),
-            MarcSubfield(tag = "c", content = "1976"),
-            MarcSubfield(tag = "e", content = "Twickenham"),
-            MarcSubfield(tag = "f", content = "CTD Printers"),
+            MarcSubfield(tag = "a", content = "London :"),
+            MarcSubfield(tag = "b", content = "Arts Council of Great Britain,"),
+            MarcSubfield(tag = "c", content = "1976;"),
+            MarcSubfield(tag = "e", content = "Twickenham :"),
+            MarcSubfield(tag = "f", content = "CTD Printers,"),
             MarcSubfield(tag = "g", content = "1974")
           )
         ),
         createVarFieldWith(
           marcTag = "260",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Bethesda, Md"),
+            MarcSubfield(tag = "a", content = "Bethesda, Md. :"),
             MarcSubfield(
               tag = "b",
               content =
-                "Toxicology Information Program, National Library of Medicine"),
-            MarcSubfield(tag = "a", content = "Springfield, Va"),
+                "Toxicology Information Program, National Library of Medicine [producer] ;"),
+            MarcSubfield(tag = "a", content = "Springfield, Va. :"),
             MarcSubfield(
               tag = "b",
-              content = "National Technical Information Service"),
+              content = "National Technical Information Service [distributor],"),
             MarcSubfield(tag = "c", content = "1974-")
           )
         )
@@ -161,22 +161,25 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
-          label = "LondonArts Council of Great Britain1976TwickenhamCTD Printers1974",
+          label =
+            "London : Arts Council of Great Britain, 1976; Twickenham : CTD Printers, 1974",
           places = List(Place("London"), Place("Twickenham")),
           agents = List(
             Unidentifiable(Agent("Arts Council of Great Britain")),
             Unidentifiable(Agent("CTD Printers"))
           ),
-          dates = List(Period("1976"), Period("1974")),
+          dates = List(Period("1976;"), Period("1974")),
           function = Some(Concept("Manufacture"))
         ),
         ProductionEvent(
-          label = "Bethesda, MdToxicology Information Program, National Library of MedicineSpringfield, VaNational Technical Information Service1974-",
-          places = List(Place("Bethesda, Md"), Place("Springfield, Va")),
+          label =
+            "Bethesda, Md. : Toxicology Information Program, National Library of Medicine [producer] ; Springfield, Va. : National Technical Information Service [distributor], 1974-",
+          places = List(Place("Bethesda, Md."), Place("Springfield, Va.")),
           agents = List(
             Unidentifiable(Agent(
-              "Toxicology Information Program, National Library of Medicine")),
-            Unidentifiable(Agent("National Technical Information Service"))
+              "Toxicology Information Program, National Library of Medicine [producer] ;")),
+            Unidentifiable(
+              Agent("National Technical Information Service [distributor]"))
           ),
           dates = List(Period("1974-")),
           function = None
@@ -308,7 +311,7 @@ class SierraProductionTest
           marcTag = "264",
           indicator2 = "3",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Cambridge"),
+            MarcSubfield(tag = "a", content = "Cambridge :"),
             MarcSubfield(tag = "b", content = "Kinsey Printing Company")
           )
         )
@@ -316,7 +319,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
-          label = "CambridgeKinsey Printing Company",
+          label = "Cambridge : Kinsey Printing Company",
           places = List(Place("Cambridge")),
           agents = List(Unidentifiable(Agent("Kinsey Printing Company"))),
           dates = List(),
@@ -340,7 +343,7 @@ class SierraProductionTest
           marcTag = "264",
           indicator2 = "3",
           subfields = List(
-            MarcSubfield(tag = "a", content = "London"),
+            MarcSubfield(tag = "a", content = "London :"),
             MarcSubfield(tag = "b", content = "Wellcome Collection Publishing")
           )
         )
@@ -348,7 +351,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
-          label = "LondonWellcome Collection Publishing",
+          label = "London : Wellcome Collection Publishing",
           places = List(Place("London")),
           agents = List(Unidentifiable(Agent("Wellcome Collection Publishing"))),
           dates = List(),
@@ -365,8 +368,8 @@ class SierraProductionTest
           marcTag = "264",
           indicator2 = "1",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Columbia, S.C."),
-            MarcSubfield(tag = "b", content = "H.W. Williams Co."),
+            MarcSubfield(tag = "a", content = "Columbia, S.C. :"),
+            MarcSubfield(tag = "b", content = "H.W. Williams Co.,"),
             MarcSubfield(tag = "c", content = "1982")
           )
         ),
@@ -374,8 +377,8 @@ class SierraProductionTest
           marcTag = "264",
           indicator2 = "2",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Washington"),
-            MarcSubfield(tag = "b", content = "U.S. G.P.O."),
+            MarcSubfield(tag = "a", content = "Washington :"),
+            MarcSubfield(tag = "b", content = "U.S. G.P.O.,"),
             MarcSubfield(tag = "c", content = "1981-")
           )
         )
@@ -383,14 +386,14 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
-          label = "Columbia, S.C.H.W. Williams Co.1982",
+          label = "Columbia, S.C. : H.W. Williams Co., 1982",
           places = List(Place("Columbia, S.C.")),
           agents = List(Unidentifiable(Agent("H.W. Williams Co."))),
           dates = List(Period("1982")),
           function = Some(Concept("Publication"))
         ),
         ProductionEvent(
-          label = "WashingtonU.S. G.P.O.1981-",
+          label = "Washington : U.S. G.P.O., 1981-",
           places = List(Place("Washington")),
           agents = List(Unidentifiable(Agent("U.S. G.P.O."))),
           dates = List(Period("1981-")),
@@ -455,8 +458,8 @@ class SierraProductionTest
         createVarFieldWith(
           marcTag = "260",
           subfields = List(
-            MarcSubfield(tag = "a", content = "San Francisco"),
-            MarcSubfield(tag = "b", content = "Morgan Kaufmann Publishers"),
+            MarcSubfield(tag = "a", content = "San Francisco :"),
+            MarcSubfield(tag = "b", content = "Morgan Kaufmann Publishers,"),
             MarcSubfield(tag = "c", content = "2004")
           )
         ),
@@ -470,7 +473,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
-          label = "San FranciscoMorgan Kaufmann Publishers2004",
+          label = "San Francisco : Morgan Kaufmann Publishers, 2004",
           places = List(Place("San Francisco")),
           agents = List(
             Unidentifiable(Agent("Morgan Kaufmann Publishers"))
@@ -485,8 +488,8 @@ class SierraProductionTest
 
     it("returns correctly if 260 and 264 contain the same subfields") {
       val subfields = List(
-        MarcSubfield(tag = "a", content = "London"),
-        MarcSubfield(tag = "b", content = "Wellcome Trust"),
+        MarcSubfield(tag = "a", content = "London :"),
+        MarcSubfield(tag = "b", content = "Wellcome Trust,"),
         MarcSubfield(tag = "c", content = "1992")
       )
 
@@ -503,7 +506,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
-          label = "LondonWellcome Trust1992",
+          label = "London : Wellcome Trust, 1992",
           places = List(Place("London")),
           agents = List(
             Unidentifiable(Agent("Wellcome Trust"))
