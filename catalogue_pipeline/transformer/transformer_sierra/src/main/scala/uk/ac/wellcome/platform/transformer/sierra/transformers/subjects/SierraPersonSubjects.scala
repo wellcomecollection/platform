@@ -26,8 +26,8 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   // The person can be identified if there is an identifier in subfield $0 and the second indicator is "0".
   // If second indicator is anything other than 0, we don't expose the identifier for now.
   //
-  def getSubjectsWithPerson(
-    bibData: SierraBibData): List[Subject[MaybeDisplayable[AbstractRootConcept]]] = {
+  def getSubjectsWithPerson(bibData: SierraBibData)
+    : List[Subject[MaybeDisplayable[AbstractRootConcept]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = "600")
 
     // Second indicator 7 means that the subject authority is something other
@@ -62,13 +62,17 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
       .mkString(" ")
   }
 
-  private def getConcepts(person: Person, varField: VarField): List[MaybeDisplayable[AbstractRootConcept]] = {
+  private def getConcepts(
+    person: Person,
+    varField: VarField): List[MaybeDisplayable[AbstractRootConcept]] = {
     val personConcept = identifyPersonConcept(person, varField)
 
     val generalSubdivisionConcepts =
       varField.subfields
         .collect { case MarcSubfield("x", content) => content }
-        .map { label => Unidentifiable(Concept(label)) }
+        .map { label =>
+          Unidentifiable(Concept(label))
+        }
 
     personConcept +: generalSubdivisionConcepts
   }
