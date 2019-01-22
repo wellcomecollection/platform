@@ -17,7 +17,7 @@ trait MiroSubjects {
    *  have enough information in Miro to determine which ones those are.
    */
   def getSubjects(
-    miroRecord: MiroRecord): List[Subject[Unidentifiable[Concept]]] = {
+    miroRecord: MiroRecord): List[Unidentifiable[Subject[Unidentifiable[Concept]]]] = {
     val keywords: List[String] = miroRecord.keywords.getOrElse(List())
 
     val keywordsUnauth: List[String] =
@@ -28,9 +28,11 @@ trait MiroSubjects {
 
     (keywords ++ keywordsUnauth).map { keyword =>
       val normalisedLabel = sentenceCase(keyword)
-      Subject[Unidentifiable[Concept]](
-        label = normalisedLabel,
-        concepts = List(Unidentifiable(Concept(normalisedLabel)))
+      Unidentifiable(
+        Subject[Unidentifiable[Concept]](
+          label = normalisedLabel,
+          concepts = List(Unidentifiable(Concept(normalisedLabel)))
+        )
       )
     }
   }
