@@ -56,10 +56,8 @@ trait ProgressAsyncFixture
     testWith: TestWith[ProgressAsync, R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withMetricsSender(actorSystem) { metricsSender =>
-          withArchiveMessageStream[NotificationMessage, Unit, R](
-            queuePair.queue,
-            metricsSender) { messageStream =>
+        withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue) {
+          messageStream =>
             withProgressTracker(table) { progressTracker =>
               val progressAsync = new ProgressAsync(
                 messageStream = messageStream,
@@ -70,7 +68,6 @@ trait ProgressAsyncFixture
 
               testWith(progressAsync)
             }
-          }
         }
       }
     }

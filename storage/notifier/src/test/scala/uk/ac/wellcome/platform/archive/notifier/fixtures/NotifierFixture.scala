@@ -28,10 +28,8 @@ trait NotifierFixture
     testWith: TestWith[Notifier, R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withMetricsSender(actorSystem) { metricsSender =>
-          withArchiveMessageStream[NotificationMessage, PublishResult, R](
-            queue,
-            metricsSender) { messageStream =>
+        withArchiveMessageStream[NotificationMessage, PublishResult, R](queue) {
+          messageStream =>
             val notifier = new Notifier(
               messageStream = messageStream,
               snsClient = snsClient,
@@ -40,7 +38,6 @@ trait NotifierFixture
             )
 
             testWith(notifier)
-          }
         }
       }
     }

@@ -12,7 +12,6 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.fixtures.ArchiveMessaging
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
@@ -28,7 +27,7 @@ class MessageStreamTest
 
   it("does not delete failing messages") {
     withMessageStreamFixtures[Unit] {
-      case (messageStream, queuePair, actorSystem, metricsSender) =>
+      case (messageStream, queuePair, actorSystem) =>
         implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
@@ -51,19 +50,13 @@ class MessageStreamTest
           received shouldBe empty
 
           assertQueuePairSizes(queuePair, 0, 1)
-          //
-          //          verify(metricsSender, never)
-          //            .countSuccess(endsWith("_ProcessMessage"))
-          //
-          //          verify(metricsSender, atLeastOnce)
-          //            .countFailure(endsWith("_ProcessMessage"))
         }
     }
   }
 
   it("continues to process messages after a workflow failure") {
     withMessageStreamFixtures[Unit] {
-      case (messageStream, QueuePair(queue, dlq), actorSystem, metricsSender) =>
+      case (messageStream, QueuePair(queue, dlq), actorSystem) =>
         implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
 
         val numberOfMessages = 10
@@ -97,19 +90,13 @@ class MessageStreamTest
 
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, 1)
-
-          //          verify(metricsSender, times(numberOfMessages - 1))
-          //            .countSuccess(endsWith("_ProcessMessage"))
-          //
-          //          verify(metricsSender, atLeastOnce)
-          //            .countFailure(endsWith("_ProcessMessage"))
         }
     }
   }
 
   it("reads messages off a queue, processes it and deletes them") {
     withMessageStreamFixtures[Unit] {
-      case (messageStream, QueuePair(queue, dlq), actorSystem, metricsSender) =>
+      case (messageStream, QueuePair(queue, dlq), actorSystem) =>
         implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
 
         val numberOfMessages = 3
@@ -134,9 +121,6 @@ class MessageStreamTest
 
           assertQueueEmpty(queue)
           assertQueueEmpty(dlq)
-
-          //          verify(metricsSender, times(numberOfMessages))
-          //            .countSuccess(endsWith("_ProcessMessage"))
         }
     }
   }
@@ -144,23 +128,17 @@ class MessageStreamTest
   def withMessageStreamFixtures[R](
     testWith: TestWith[(MessageStream[ExampleObject, Unit],
                         QueuePair,
-                        ActorSystem,
-                        MetricsSender),
+                        ActorSystem),
                        R]
-  ): R = {
+  ): R =
     withActorSystem { implicit actorSystem =>
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
-          withMockMetricSender { mockMetricsSender =>
-            withArchiveMessageStream[ExampleObject, Unit, R](
-              queue,
-              mockMetricsSender) { stream =>
-              testWith((stream, queuePair, actorSystem, mockMetricsSender))
-            }
+          withArchiveMessageStream[ExampleObject, Unit, R](queue) { stream =>
+            testWith((stream, queuePair, actorSystem))
           }
       }
     }
-  }
 
   private def sendExampleObjects(queue: Queue, count: Int) = {
     (1 to count)

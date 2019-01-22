@@ -73,10 +73,8 @@ trait RegistrarFixtures
                  queuePair: QueuePair,
                  progressTopic: Topic)(testWith: TestWith[Registrar, R]): R =
     withActorSystem { implicit actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withArchiveMessageStream[NotificationMessage, Unit, R](
-          queuePair.queue,
-          metricsSender) { messageStream =>
+      withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue) {
+        messageStream =>
           withStorageManifestVHS(hybridStoreTable, hybridStoreBucket) {
             dataStore =>
               val registrar = new Registrar(
@@ -91,7 +89,6 @@ trait RegistrarFixtures
 
               testWith(registrar)
           }
-        }
       }
     }
 
