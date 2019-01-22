@@ -34,7 +34,7 @@ object CallbackUrlFlow extends Logging {
         case (tryHttpResponse, id) =>
           CallbackFlowResult(
             id = id,
-            httpResponse = Some(tryHttpResponse)
+            httpResponse = tryHttpResponse
           )
       }
 
