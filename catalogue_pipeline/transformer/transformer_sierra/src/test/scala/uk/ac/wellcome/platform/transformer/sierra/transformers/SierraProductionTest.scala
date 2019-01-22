@@ -161,6 +161,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
+          label = "LondonArts Council of Great Britain1976TwickenhamCTD Printers1974",
           places = List(Place("London"), Place("Twickenham")),
           agents = List(
             Unidentifiable(Agent("Arts Council of Great Britain")),
@@ -170,6 +171,7 @@ class SierraProductionTest
           function = Some(Concept("Manufacture"))
         ),
         ProductionEvent(
+          label = "Bethesda, MdToxicology Information Program, National Library of MedicineSpringfield, VaNational Technical Information Service1974-",
           places = List(Place("Bethesda, Md"), Place("Springfield, Va")),
           agents = List(
             Unidentifiable(Agent(
@@ -314,6 +316,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
+          label = "CambridgeKinsey Printing Company",
           places = List(Place("Cambridge")),
           agents = List(Unidentifiable(Agent("Kinsey Printing Company"))),
           dates = List(),
@@ -345,6 +348,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
+          label = "LondonWellcome Collection Publishing",
           places = List(Place("London")),
           agents = List(Unidentifiable(Agent("Wellcome Collection Publishing"))),
           dates = List(),
@@ -379,12 +383,14 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
+          label = "Columbia, S.C.H.W. Williams Co.1982",
           places = List(Place("Columbia, S.C.")),
           agents = List(Unidentifiable(Agent("H.W. Williams Co."))),
           dates = List(Period("1982")),
           function = Some(Concept("Publication"))
         ),
         ProductionEvent(
+          label = "WashingtonU.S. G.P.O.1981-",
           places = List(Place("Washington")),
           agents = List(Unidentifiable(Agent("U.S. G.P.O."))),
           dates = List(Period("1981-")),
@@ -464,6 +470,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
+          label = "San FranciscoMorgan Kaufmann Publishers2004",
           places = List(Place("San Francisco")),
           agents = List(
             Unidentifiable(Agent("Morgan Kaufmann Publishers"))
@@ -496,6 +503,7 @@ class SierraProductionTest
 
       val expectedProductions = List(
         ProductionEvent(
+          label = "LondonWellcome Trust1992",
           places = List(Place("London")),
           agents = List(
             Unidentifiable(Agent("Wellcome Trust"))
