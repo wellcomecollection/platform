@@ -37,7 +37,8 @@ object PrepareNotificationFlow extends Logging {
               ProgressCallbackStatusUpdate(
                 id = id,
                 callbackStatus = Failed,
-                events = List(ProgressEvent(s"Callback failed for: $id, got $status!"))
+                events =
+                  List(ProgressEvent(s"Callback failed for: $id, got $status!"))
               )
             }
           case Failure(e) =>
@@ -46,7 +47,8 @@ object PrepareNotificationFlow extends Logging {
             ProgressCallbackStatusUpdate(
               id = id,
               callbackStatus = Failed,
-              events = List(ProgressEvent(s"Callback failed for: $id (${e.getMessage})"))
+              events = List(
+                ProgressEvent(s"Callback failed for: $id (${e.getMessage})"))
             )
         }
     }
