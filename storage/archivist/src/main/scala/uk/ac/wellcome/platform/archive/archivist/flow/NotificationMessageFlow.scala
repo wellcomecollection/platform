@@ -37,7 +37,7 @@ object NotificationMessageFlow {
           val progressUpdate = ProgressEventUpdate(
             id = bagRequest.id,
             events = List(
-              ProgressEvent(s"Started work on ingest")
+              ProgressEvent("Started work on ingest")
             )
           )
 
