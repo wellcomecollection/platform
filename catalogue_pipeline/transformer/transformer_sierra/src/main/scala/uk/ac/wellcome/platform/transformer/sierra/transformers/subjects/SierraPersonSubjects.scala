@@ -1,11 +1,6 @@
 package uk.ac.wellcome.platform.transformer.sierra.transformers.subjects
 
-import uk.ac.wellcome.models.work.internal.{
-  MaybeDisplayable,
-  Person,
-  Subject,
-  Unidentifiable
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.sierra.source.{
   MarcSubfield,
   SierraBibData,
@@ -22,16 +17,17 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   //
   // Use MARC field "600" where the second indicator is not 7.
   //
-  // Within this MARC tag we have one concept which we always type as a Person
+  // Within this MARC tag we have one concept (the Person), and we also use
+  // the contents of subfield $x (general subdivision) as other Concepts.
   //
   // The label is constructed concatenating subfields $a, $b, $c, $d, $e,
-  // where $d and $e represent the person's dates and roles respectively
+  // where $d and $e represent the person's dates and roles respectively.
   //
   // The person can be identified if there is an identifier in subfield $0 and the second indicator is "0".
-  // If second indicator is anything other than 0, we don't expose the identifier for now
+  // If second indicator is anything other than 0, we don't expose the identifier for now.
   //
-  def getSubjectsWithPerson(
-    bibData: SierraBibData): List[Subject[MaybeDisplayable[Person]]] = {
+  def getSubjectsWithPerson(bibData: SierraBibData)
+    : List[Subject[MaybeDisplayable[AbstractRootConcept]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = "600")
 
     // Second indicator 7 means that the subject authority is something other
@@ -53,7 +49,7 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
           )
           Subject(
             label = label,
-            concepts = List(identifyPersonConcept(person, varField))
+            concepts = getConcepts(person, varField)
           )
         }
       }
@@ -64,6 +60,21 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
                                     dates: Option[String]) = {
     (List(person.label) ++ person.numeration ++ person.prefix ++ dates ++ roles)
       .mkString(" ")
+  }
+
+  private def getConcepts(
+    person: Person,
+    varField: VarField): List[MaybeDisplayable[AbstractRootConcept]] = {
+    val personConcept = identifyPersonConcept(person, varField)
+
+    val generalSubdivisionConcepts =
+      varField.subfields
+        .collect { case MarcSubfield("x", content) => content }
+        .map { label =>
+          Unidentifiable(Concept(label))
+        }
+
+    personConcept +: generalSubdivisionConcepts
   }
 
   private def identifyPersonConcept(
