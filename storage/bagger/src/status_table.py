@@ -14,5 +14,5 @@ def record_bagger_activity(bnumber, field):
     get_table().update_item(
         Key={"bnumber": bnumber},
         ExpressionAttributeValues={":bga": datetime.datetime.now().isoformat()},
-        UpdateExpression=update_expression
+        UpdateExpression=update_expression,
     )
