@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.internal.{Agent, Contributor, Unidentifiable}
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
-class MiroTransformableTransformerContributorsTest
+class MiroRecordTransformerContributorsTest
     extends FunSpec
     with MiroRecordGenerators
     with MiroTransformableWrapper {
