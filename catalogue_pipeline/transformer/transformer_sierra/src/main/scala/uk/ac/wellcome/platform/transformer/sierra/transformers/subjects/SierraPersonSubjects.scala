@@ -17,8 +17,11 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   //
   // Use MARC field "600" where the second indicator is not 7.
   //
-  // Within this MARC tag we have one concept (the Person), and we also use
-  // the contents of subfield $x (general subdivision) as other Concepts.
+  // The concepts come from:
+  //
+  //    - The person
+  //    - The contents of subfields $t and $x (title and general subdivision),
+  //      both as Concepts
   //
   // The label is constructed concatenating subfields $a, $b, $c, $d, $e,
   // where $d and $e represent the person's dates and roles respectively.
@@ -57,10 +60,9 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
 
   private def getPersonSubjectLabel(person: Person,
                                     roles: List[String],
-                                    dates: Option[String]) = {
+                                    dates: Option[String]): String =
     (List(person.label) ++ person.numeration ++ person.prefix ++ dates ++ roles)
       .mkString(" ")
-  }
 
   private def getConcepts(
     person: Person,
@@ -69,7 +71,10 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
 
     val generalSubdivisionConcepts =
       varField.subfields
-        .collect { case MarcSubfield("x", content) => content }
+        .collect {
+          case MarcSubfield("t", content) => content
+          case MarcSubfield("x", content) => content
+        }
         .map { label =>
           Unidentifiable(Concept(label))
         }
