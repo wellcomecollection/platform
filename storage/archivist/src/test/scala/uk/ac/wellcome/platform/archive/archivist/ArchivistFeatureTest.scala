@@ -65,7 +65,7 @@ class ArchivistFeatureTest
               assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
                 events =>
                   events should have size 1
-                  events.head.description shouldBe s"Started work on ingest"
+                  events.head.description shouldBe "Started work on ingest"
               }
 
               assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
