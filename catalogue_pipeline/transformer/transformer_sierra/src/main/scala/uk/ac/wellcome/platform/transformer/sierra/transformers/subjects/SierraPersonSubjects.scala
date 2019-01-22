@@ -30,7 +30,7 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   // If second indicator is anything other than 0, we don't expose the identifier for now.
   //
   def getSubjectsWithPerson(bibData: SierraBibData)
-    : List[Subject[MaybeDisplayable[AbstractRootConcept]]] = {
+    : List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractRootConcept]]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = "600")
 
     // Second indicator 7 means that the subject authority is something other
@@ -50,10 +50,16 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
             roles = getRoles(subfields),
             dates = getDates(subfields)
           )
-          Subject(
+
+          val subject = Subject(
             label = label,
             concepts = getConcepts(person, varField)
           )
+
+          varField.indicator2 match {
+            case Some("0") => identify(varField.subfields, subject, "Subject")
+            case _         => Unidentifiable(subject)
+          }
         }
       }
   }
@@ -67,7 +73,7 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   private def getConcepts(
     person: Person,
     varField: VarField): List[MaybeDisplayable[AbstractRootConcept]] = {
-    val personConcept = identifyPersonConcept(person, varField)
+    val personConcept = Unidentifiable(person)
 
     val generalSubdivisionConcepts =
       varField.subfields
@@ -80,15 +86,6 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
         }
 
     personConcept +: generalSubdivisionConcepts
-  }
-
-  private def identifyPersonConcept(
-    person: Person,
-    varfield: VarField): MaybeDisplayable[Person] = {
-    varfield.indicator2 match {
-      case Some("0") => identify(varfield.subfields, person, "Person")
-      case _         => Unidentifiable(person)
-    }
   }
 
   private def getRoles(secondarySubfields: List[MarcSubfield]) =

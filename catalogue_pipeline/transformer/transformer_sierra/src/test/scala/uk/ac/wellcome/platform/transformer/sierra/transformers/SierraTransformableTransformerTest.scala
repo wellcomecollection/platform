@@ -532,7 +532,10 @@ class SierraTransformableTransformerTest
 
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.subjects shouldBe List(
-      Subject(content, List(Unidentifiable(Concept(content)))))
+      Unidentifiable(
+        Subject(content, List(Unidentifiable(Concept(content))))
+      )
+    )
   }
 
   it("extracts person subjects if present") {
@@ -563,7 +566,10 @@ class SierraTransformableTransformerTest
 
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.subjects shouldBe List(
-      Subject(content, List(Unidentifiable(Person(content)))))
+      Unidentifiable(
+        Subject(content, List(Unidentifiable(Person(content))))
+      )
+    )
   }
 
   it("extracts organisation subjects if present") {
@@ -594,9 +600,11 @@ class SierraTransformableTransformerTest
 
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.subjects shouldBe List(
-      Subject(
-        label = content,
-        List(Unidentifiable(Organisation(content)))
+      Unidentifiable(
+        Subject(
+          label = content,
+          List(Unidentifiable(Organisation(content)))
+        )
       )
     )
   }

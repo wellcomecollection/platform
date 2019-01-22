@@ -56,7 +56,7 @@ trait SierraConcepts extends MarcUtils {
   //
   // Note that some identifiers have an identifier scheme in
   // indicator 2, but no ID.  In this case, we just ignore it.
-  def identifyPrimaryConcept[T <: AbstractConcept](
+  def identifyConcept[T](
     concept: T,
     varField: VarField): MaybeDisplayable[T] =
     getIdentifierSubfieldContents(varField) match {
@@ -71,7 +71,7 @@ trait SierraConcepts extends MarcUtils {
 
   // If there's exactly one subfield $0 on the VarField, add an identifier
   // if possible.
-  private def maybeAddIdentifier[T <: AbstractConcept](
+  private def maybeAddIdentifier[T](
     concept: T,
     varField: VarField,
     identifierSubfieldContent: String): MaybeDisplayable[T] = {

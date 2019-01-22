@@ -49,20 +49,21 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts {
   //      else is unidentified.
   //
   def getSubjectswithAbstractConcepts(
-    bibData: SierraBibData): List[Subject[MaybeDisplayable[AbstractConcept]]] =
+    bibData: SierraBibData): List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractConcept]]]] =
     getSubjectsForMarcTag(bibData, "650") ++
       getSubjectsForMarcTag(bibData, "648") ++
       getSubjectsForMarcTag(bibData, "651")
 
   private def getSubjectsForMarcTag(
     bibData: SierraBibData,
-    marcTag: String): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
+    marcTag: String): List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractConcept]]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
     // Second indicator 7 means that the subject authority is something other
     // than library of congress or mesh. Some MARC records have duplicated subjects
     // when the same subject has more than one authority (for example mesh and FAST),
     // which causes duplicated subjects to appear in the API.
+    //
     // So let's filter anything that is from another authority for now.
     marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
       val subfields = filterSubfields(varField, List("a", "v", "x", "y", "z"))
@@ -75,10 +76,12 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts {
         primarySubfields,
         varField = varField) ++ getSubdivisions(subdivisionSubfields)
 
-      Subject(
+      val subject = Subject(
         label = label,
         concepts = concepts
       )
+
+      identifyConcept(subject, varField = varField)
     }
   }
 
@@ -92,24 +95,13 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts {
     primarySubfields: List[MarcSubfield],
     varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
-      varField.marcTag.get match {
-        case "650" =>
-          identifyPrimaryConcept(
-            concept = Concept(label = subfield.content),
-            varField = varField
-          )
-        case "648" =>
-          identifyPrimaryConcept(
-            concept = Period(label = subfield.content),
-            varField = varField
-          )
-        case "651" =>
-          identifyPrimaryConcept(
-            concept = Place(label = subfield.content),
-            varField = varField
-          )
+      val concept = varField.marcTag.get match {
+        case "650" => Concept(label = subfield.content)
+        case "648" => Period(label = subfield.content)
+        case "651" => Place(label = subfield.content)
       }
 
+      Unidentifiable(concept)
     }
   }
 }
