@@ -233,9 +233,11 @@ trait DisplaySerialisationTestBase { this: Suite =>
     production: List[ProductionEvent[Displayable[AbstractAgent]]]) =
     production.map(productionEvent).mkString(",")
 
-  def productionEvent(event: ProductionEvent[Displayable[AbstractAgent]]) =
+  def productionEvent(
+    event: ProductionEvent[Displayable[AbstractAgent]]): String =
     s"""
        |{
+       |  "label": "${event.label}",
        |  "dates": [${event.dates.map(period).mkString(",")}],
        |  "agents": [${event.agents
          .map(identifiedOrUnidentifiable(_, abstractAgent))

@@ -11,6 +11,7 @@ import uk.ac.wellcome.models.work.internal._
     "An event contributing to the production, publishing or distribution of a work."
 )
 case class DisplayProductionEvent(
+  @ApiModelProperty label: String,
   @ApiModelProperty places: List[DisplayPlace],
   @ApiModelProperty agents: List[DisplayAbstractAgentV2],
   @ApiModelProperty dates: List[DisplayPeriod],
@@ -25,6 +26,7 @@ object DisplayProductionEvent {
   def apply(productionEvent: ProductionEvent[Displayable[AbstractAgent]],
             includesIdentifiers: Boolean): DisplayProductionEvent = {
     DisplayProductionEvent(
+      label = productionEvent.label,
       places = productionEvent.places.map { DisplayPlace(_) },
       agents = productionEvent.agents.map {
         DisplayAbstractAgentV2(_, includesIdentifiers = includesIdentifiers)

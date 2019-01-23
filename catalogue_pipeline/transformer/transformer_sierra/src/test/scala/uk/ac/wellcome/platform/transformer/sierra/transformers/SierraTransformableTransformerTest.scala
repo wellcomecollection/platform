@@ -255,6 +255,7 @@ class SierraTransformableTransformerTest
       description = Some("A delightful description of a dead daisy."),
       production = List(
         ProductionEvent(
+          label = "Peaceful Poetry 1923",
           places = List(),
           agents = List(Unidentifiable(Agent(label = "Peaceful Poetry"))),
           dates = List(Period("1923")),
@@ -629,6 +630,7 @@ class SierraTransformableTransformerTest
     val work = transformDataToUnidentifiedWork(id = id, data = data)
     work.production shouldBe List(
       ProductionEvent(
+        label = placeLabel,
         places = List(Place(placeLabel)),
         agents = List(),
         dates = List(),
