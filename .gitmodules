@@ -1,0 +1,3 @@
+[submodule "build-tooling"]
+	path = build-tooling
+	url = git@github.com:wellcometrust/platform-build-tooling.git
