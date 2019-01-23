@@ -4,13 +4,17 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.display.json.DisplayJsonUtil._
 import uk.ac.wellcome.display.models.V2WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
-import uk.ac.wellcome.models.work.generators.WorksGenerators
+import uk.ac.wellcome.models.work.generators.{
+  ProductionEventGenerators,
+  WorksGenerators
+}
 import uk.ac.wellcome.models.work.internal._
 
 class DisplayWorkV2SerialisationTest
     extends FunSpec
     with DisplayV2SerialisationTestBase
     with JsonMapperTestUtil
+    with ProductionEventGenerators
     with WorksGenerators {
 
   it("serialises a DisplayWorkV2") {
@@ -150,26 +154,17 @@ class DisplayWorkV2SerialisationTest
   it(
     "includes production information in DisplayWorkV2 serialisation with the production include") {
     val workWithProduction = createIdentifiedWorkWith(
-      production = List(
-        ProductionEvent(
-          List(Place("London")),
-          List(Unidentifiable(Person("Bumblebee"))),
-          List(Period("1984")),
-          None),
-        ProductionEvent(
-          List(Place("Spain")),
-          List(Unidentifiable(Person("Bumblebee"))),
-          List(Period("1984")),
-          None)
-      ))
+      production = createProductionEventList(count = 3)
+    )
 
-    val expectedJson = s"""{
-                          |     "type": "Work",
-                          |     "id": "${workWithProduction.canonicalId}",
-                          |     "title": "${workWithProduction.title}",
-                          |     "production": [ ${production(
-                            workWithProduction.production)} ]
-                          |   }""".stripMargin
+    val expectedJson = s"""
+      |{
+      |  "type": "Work",
+      |  "id": "${workWithProduction.canonicalId}",
+      |  "title": "${workWithProduction.title}",
+      |  "production": [ ${production(workWithProduction.production)} ]
+      |}
+      |""".stripMargin
 
     assertObjectMapsToJson(
       DisplayWorkV2(

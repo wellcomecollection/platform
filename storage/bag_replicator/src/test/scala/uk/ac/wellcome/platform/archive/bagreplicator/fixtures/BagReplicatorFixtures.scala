@@ -53,10 +53,8 @@ trait BagReplicatorFixtures
     outgoingTopic: Topic,
     destinationBucket: Bucket)(testWith: TestWith[BagReplicator, R]): R =
     withActorSystem { implicit actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withArchiveMessageStream[NotificationMessage, Unit, R](
-          queuePair.queue,
-          metricsSender) { messageStream =>
+      withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue) {
+        messageStream =>
           val bagReplicator = new BagReplicator(
             s3Client = s3Client,
             snsClient = snsClient,
@@ -71,7 +69,6 @@ trait BagReplicatorFixtures
           bagReplicator.run()
 
           testWith(bagReplicator)
-        }
       }
     }
 

@@ -27,12 +27,3 @@ case class StorageManifest(
 
 case class FileManifest(checksumAlgorithm: ChecksumAlgorithm,
                         files: List[BagDigestFile])
-
-case class SourceIdentifier(identifierType: IdentifierType,
-                            ontologyType: String = "Identifier",
-                            value: String)
-
-case class IdentifierType(
-  id: String,
-  label: String,
-)

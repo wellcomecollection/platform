@@ -28,7 +28,7 @@ object TemporaryStore extends Logging {
         tmpFileSuffix
       )
       tmpFile.deleteOnExit()
-      info(s"Storing $location @ ${tmpFile.getAbsolutePath}")
+      debug(s"Storing $location @ ${tmpFile.getAbsolutePath}")
       val triedDownload =
         Try(transferManager.download(location.namespace, location.key, tmpFile))
       val promise = Promise[File]()

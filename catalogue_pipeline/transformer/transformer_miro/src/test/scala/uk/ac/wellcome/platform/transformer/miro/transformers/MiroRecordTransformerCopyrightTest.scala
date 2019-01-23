@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.internal.DigitalLocation
 import uk.ac.wellcome.platform.transformer.miro.generators.MiroRecordGenerators
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
 
-class MiroTransformableTransformerCopyrightTest
+class MiroRecordTransformerCopyrightTest
     extends FunSpec
     with Matchers
     with MiroRecordGenerators

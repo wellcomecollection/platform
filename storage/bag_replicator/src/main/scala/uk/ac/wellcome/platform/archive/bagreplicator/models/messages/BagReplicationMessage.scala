@@ -1,15 +1,20 @@
 package uk.ac.wellcome.platform.archive.bagreplicator.models.messages
 
-import uk.ac.wellcome.platform.archive.common.models.BagLocation
-
-trait BagReplicationContext[T] {
-  val context: T
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagLocation
 }
-case class BagReplicationRequest[T](context: T, sourceBagLocation: BagLocation)
-    extends BagReplicationContext[T]
 
-case class CompletedBagReplication[T](context: T)
-    extends BagReplicationContext[T]
+trait BagReplicationContext {
+  val context: ArchiveComplete
+}
 
-case class PublishedToOutgoingTopic[T](context: T)
-    extends BagReplicationContext[T]
+case class BagReplicationRequest(context: ArchiveComplete,
+                                 sourceBagLocation: BagLocation)
+    extends BagReplicationContext
+
+case class CompletedBagReplication(context: ArchiveComplete)
+    extends BagReplicationContext
+
+case class PublishedToOutgoingTopic(context: ArchiveComplete)
+    extends BagReplicationContext

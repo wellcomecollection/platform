@@ -87,10 +87,8 @@ trait ArchivistFixtures
                  progressTopic: Topic,
                  parallelism: Int = 10)(testWith: TestWith[Archivist, R]): R =
     withActorSystem { implicit actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withArchiveMessageStream[NotificationMessage, Unit, R](
-          queuePair.queue,
-          metricsSender) { messageStream =>
+      withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue) {
+        messageStream =>
           implicit val s3 = s3Client
           implicit val sns = snsClient
           implicit val tf =
@@ -107,7 +105,6 @@ trait ArchivistFixtures
           archivist.run()
 
           testWith(archivist)
-        }
       }
     }
 

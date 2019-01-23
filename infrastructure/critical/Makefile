@@ -3,16 +3,18 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT = infrastructure/critical
 
+SBT_APPS 	 =
 SBT_SSM_APPS =
-SBT_APPS 	=
-SBT_DOCKER_LIBRARIES =
+
+SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
-ECS_TASKS 	=
-LAMBDAS 	= lambdas/dynamo_write_heartbeat
+PYTHON_APPS     =
+PYTHON_SSM_APPS =
+LAMBDAS 	    = lambdas/dynamo_write_heartbeat
 
-TF_NAME 	= infra_critical
-TF_PATH 	= $(STACK_ROOT)/terraform
+TF_NAME = infra_critical
+TF_PATH = $(STACK_ROOT)/terraform
 
 TF_IS_PUBLIC_FACING = false
 

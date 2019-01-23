@@ -3,15 +3,18 @@ STACK_ROOT 	= catalogue_pipeline
 
 include $(ROOT)/functions.Makefile
 
-SBT_APPS 	= id_minter ingestor recorder matcher merger
-SBT_DOCKER_LIBRARIES =
+SBT_APPS 	 = id_minter ingestor recorder matcher merger
+SBT_SSM_APPS =
+
+SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
-ECS_TASKS 	=
-LAMBDAS 	=
+PYTHON_APPS     =
+PYTHON_SSM_APPS =
+LAMBDAS 	    =
 
-TF_NAME 	= catalogue_pipeline
-TF_PATH 	= $(STACK_ROOT)/terraform
+TF_NAME = catalogue_pipeline
+TF_PATH = $(STACK_ROOT)/terraform
 
 TF_IS_PUBLIC_FACING = false
 

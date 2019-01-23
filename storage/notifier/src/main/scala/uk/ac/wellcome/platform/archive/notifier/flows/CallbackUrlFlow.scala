@@ -34,7 +34,7 @@ object CallbackUrlFlow extends Logging {
         case (tryHttpResponse, id) =>
           CallbackFlowResult(
             id = id,
-            httpResponse = Some(tryHttpResponse)
+            httpResponse = tryHttpResponse
           )
       }
 
@@ -49,7 +49,7 @@ object CallbackUrlFlow extends Logging {
       toJson(ResponseDisplayIngest(progress, contextUrl)).get
     )
 
-    info(s"POST to $callbackUri request:$entity")
+    debug(s"POST to $callbackUri request:$entity")
     HttpRequest(
       method = HttpMethods.POST,
       uri = callbackUri.toString,

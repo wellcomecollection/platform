@@ -144,31 +144,5 @@ class PrepareNotificationFlowTest
         }
       }
     }
-
-    it("returns a failed ProgressUpdate when a callback returns nothing") {
-      withMaterializer { implicit materializer =>
-        val id = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
-        val callbackResult = createEmptyCallbackResultWith(id = id)
-
-        val eventualResult =
-          Source
-            .single(callbackResult)
-            .via(PrepareNotificationFlow())
-            .runWith(Sink.seq)
-
-        whenReady(eventualResult) { result =>
-          inside(result.head) {
-            case ProgressCallbackStatusUpdate(
-                actualId,
-                callbackStatus,
-                List(progressEvent)) =>
-              actualId shouldBe id
-              progressEvent.description shouldBe "Unexpected callback failure for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe"
-              callbackStatus shouldBe Callback.Failed
-              assertRecent(progressEvent.createdDate)
-          }
-        }
-      }
-    }
   }
 }
