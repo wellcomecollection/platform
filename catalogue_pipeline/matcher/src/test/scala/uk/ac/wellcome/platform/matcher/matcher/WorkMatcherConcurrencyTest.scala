@@ -3,10 +3,10 @@ package uk.ac.wellcome.platform.matcher.matcher
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.MatcherResult
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.MergeCandidate
+import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -50,11 +50,11 @@ class WorkMatcherConcurrencyTest
 
                     val eventualResults = for {
                       resultA <- eventualResultA recoverWith {
-                        case e: GracefulFailureException =>
+                        case e: MatcherException =>
                           Future.successful(e)
                       }
                       resultB <- eventualResultB recoverWith {
-                        case e: GracefulFailureException =>
+                        case e: MatcherException =>
                           Future.successful(e)
                       }
                     } yield (resultA, resultB)
@@ -62,7 +62,7 @@ class WorkMatcherConcurrencyTest
                     whenReady(eventualResults) { results =>
                       val resultsList = results.productIterator.toList
                       val failure = resultsList.collect({
-                        case e: GracefulFailureException => e
+                        case e: MatcherException => e
                       })
                       val result = resultsList.collect({
                         case r: MatcherResult => r

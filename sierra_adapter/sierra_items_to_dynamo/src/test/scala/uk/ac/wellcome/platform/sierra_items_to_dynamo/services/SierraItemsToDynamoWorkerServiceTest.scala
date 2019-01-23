@@ -80,7 +80,7 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
-  it("returns a GracefulFailureException if it receives an invalid message") {
+  it("records a failure if it receives an invalid message") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
         withLocalSqsQueueAndDlq {
