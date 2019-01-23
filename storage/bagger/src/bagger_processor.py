@@ -17,7 +17,7 @@ def process_bagging_message(message):
         "upload_location": None,
         "duration": -1,
         "error": None,
-        "created": str(datetime.datetime.now()),
+        "created": datetime.datetime.now().isoformat(),
     }
 
     if identifier is not None:
@@ -26,15 +26,13 @@ def process_bagging_message(message):
             result["upload_location"] = bagger.bag_from_identifier(
                 identifier, do_not_bag
             )
-            end = time.time()
-            result["duration"] = end - start
-
+            result["duration"] = time.time() - start
             notifier.bagging_complete(result)
-
         except Exception:
             # catch any kind of error
             tb = traceback.format_exc()
             logging.warning(tb)
             result["error"] = tb
+            result["duration"] = time.time() - start
 
     return result

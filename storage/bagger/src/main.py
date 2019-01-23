@@ -9,9 +9,9 @@ The message body is JSON, like this:
 
 """
 import json
-import time
 import bagger_processor
 import aws
+import status_table
 
 
 def main():
@@ -20,34 +20,28 @@ def main():
         for message in messages:
             if message is not None:
                 try:
-                    # THIS IS POTENTIALLY VERY LONG RUNNING
-                    # LARGE BAGGING OPERATION, MINUTES OF I/O
-                    print("-------")
-                    # print(json.dumps(message, indent=4))
-                    print(message)
-                    process_message(message)
+                    body = json.loads(message.body)
+                    bnumber = body["identifier"]
+                    status_table.record_bagger_activity(bnumber, "bagger_start")
+                    message.delete()
+                    process_message(body)
+                    status_table.record_bagger_activity(bnumber, "bagger_end")
                 except Exception as e:
                     print("Unhandled exception {0}".format(e))
-                finally:
-                    message.delete()
 
 
-def process_message(message):
-    start = time.time()
-    body = json.loads(message.body)
-    print(body)
-    print("-------------------")
-    identifier = body.get("identifier", "NO-IDENTIFIER")
-    print("processing " + identifier)
-    result = bagger_processor.process_bagging_message(body)
+def process_message(message_body):
+    identifier = message_body["identifier"]
+    result = bagger_processor.process_bagging_message(message_body)
     error = result.get("error", None)
     if error is None:
-        aws.remove_error(identifier)
+        mets_only = message_body.get("do_not_bag", True)
+        if not mets_only:
+            # Only remove errors when a full bag has occurred
+            aws.remove_error(identifier)
     else:
         print("Could not process {0}".format(identifier))
         aws.log_processing_error(result)
-    time_taken = time.time() - start
-    print("{0} took {1} seconds".format(identifier, time_taken))
 
 
 if __name__ == "__main__":

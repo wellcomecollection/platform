@@ -157,7 +157,7 @@ jobs:
     - env: TASK=sierra_bib_merger-test
     - env: TASK=sierra_item_merger-test
 
-    # Archive
+    # Storage
     - env: TASK=storage_display-test
     - env: TASK=storage_common-test
     - env: TASK=archivist-test
@@ -169,6 +169,7 @@ jobs:
     - env: TASK=bags_api-test
     - env: TASK=notifier-test
     - env: TASK=callback_stub_server-publish
+    - env: TASK=bagger-publish
 
     # (not under active development)
 

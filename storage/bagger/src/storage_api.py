@@ -54,7 +54,7 @@ def get_ingest_for_identifier(bnumber):
     ingests = get_oauthed_json(url, scope)
     by_date = sorted(ingests, key=lambda ingest: ingest["createdDate"])
     if len(by_date) > 0:
-        url = "{0}/{1}".format(scope, ingests[-1]["id"])
+        url = "{0}/{1}".format(scope, by_date[-1]["id"])
         return get_oauthed_json(url, scope)
     return None
 

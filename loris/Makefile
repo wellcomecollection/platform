@@ -2,20 +2,23 @@ ROOT = $(shell git rev-parse --show-toplevel)
 include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= loris
-SBT_DOCKER_LIBRARIES =
+
+SBT_APPS 	 =
+SBT_SSM_APPS =
+
+SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
-SBT_SSM_APPS =
-SBT_APPS 	=
-ECS_TASKS 	= loris cache_cleaner
-LAMBDAS 	=
+PYTHON_APPS     = loris cache_cleaner
+PYTHON_SSM_APPS =
+LAMBDAS 	    =
 
-TF_NAME 	= loris
-TF_PATH 	= loris/terraform
+TF_NAME = loris
+TF_PATH = $(STACK_ROOT)/terraform
+
 TF_IS_PUBLIC_FACING = true
 
 $(val $(call stack_setup))
-
 
 # TODO: Flip this to using micktwomey/pip-tools when that's updated
 # with a newer version of pip-tools.

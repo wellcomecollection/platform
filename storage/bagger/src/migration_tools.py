@@ -3,12 +3,14 @@ import aws
 import time
 import datetime
 import dateutil
-import boto3
 import settings
 import requests
 import json
 import storage_api
+import dds
+from pathlib import Path
 from mets_filesource import b_numbers_from_s3
+from status_table import get_table
 
 
 def json_default(o):
@@ -82,6 +84,7 @@ def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest):
     bag_date = "-"
     bag_size = 0
     bag_error = "-"
+    package_date = "-"
 
     # check for bag
     bag_zip = aws.get_dropped_bag_info(bnumber)
@@ -99,37 +102,43 @@ def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest):
     if ingest is None:
         ingest = no_ingest
 
+    dds_package_date = dds.get_package_file_modified(bnumber)
+    if dds_package_date is not None:
+        package_date = dds_package_date
+
     table.update_item(
         Key={"bnumber": bnumber},
         ExpressionAttributeValues={
+            ":upd": now_as_string(),
             ":bdt": bag_date,
             ":bsz": bag_size,
             ":bge": bag_error,
             ":idt": ingest["events"][0]["createdDate"],
             ":iid": ingest["id"],
             ":ist": ingest["status"]["id"],
+            ":pkg": package_date,
         },
-        UpdateExpression="SET bag_date = :bdt, bag_size = :bsz, mets_error = :bge, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist",
+        UpdateExpression="SET updated = :upd, bag_date = :bdt, bag_size = :bsz, mets_error = :bge, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist, package_date = :pkg",
     )
     return {
         "identifier": bnumber,
         "bag_zip": bag_zip,
         "mets_error": bag_error,
         "ingest": ingest,
+        "dds_package_date": dds_package_date,
     }
 
 
 def bnumber_generator(filter_expression):
-    if filter_expression.startswith("b"):
+    source_list = Path(filter_expression)
+    if source_list.is_file():
+        with open(filter_expression) as f:
+            bnumbers = f.readlines()
+        return [b.strip() for b in bnumbers if not b.strip() == ""]
+    elif filter_expression.startswith("b"):
         return (b for b in [filter_expression])
     else:
         return b_numbers_from_s3(filter_expression)
-
-
-def get_table():
-    dynamodb = boto3.resource("dynamodb", region_name=settings.AWS_DEFAULT_REGION)
-    table = dynamodb.Table(settings.DYNAMO_TABLE)
-    return table
 
 
 def batch(bnumbers):
@@ -173,7 +182,6 @@ def do_ingest(delay, filter):
 def call_dds(delay, filter):
     table = get_table()
     for bnumber in bnumber_generator(filter):
-        now = datetime.datetime.now().isoformat
         print("[")
         url = settings.DDS_GOOBI_NOTIFICATION.format(bnumber)
         r = requests.get(url)
@@ -184,15 +192,19 @@ def call_dds(delay, filter):
         # now update the dynamodb record
         table.update_item(
             Key={"bnumber": bnumber},
-            ExpressionAttributeValues={":dc": now},
+            ExpressionAttributeValues={":dc": now_as_string()},
             UpdateExpression="SET dds_called = :dc",
         )
 
         if delay > 0:
             time.sleep(delay)
 
-    print('{ "finished": "' + datetime.datetime.now().isoformat + '" }')
+    print('{ "finished": "' + now_as_string() + '" }')
     print("]")
+
+
+def now_as_string():
+    return datetime.datetime.now().isoformat()
 
 
 if __name__ == "__main__":
