@@ -56,16 +56,16 @@ cache:
     - sierra_adapter/sierra_bib_merger/target
     - sierra_adapter/sierra_item_merger/target
 
-    - archive/archivist/target
-    - archive/commmon/target
-    - archive/display/target
-    - archive/notifier/target
-    - archive/ingests/target
-    - archive/ingests_common/target
-    - archive/ingests_api/target
-    - archive/bags/target
-    - archive/bags_common/target
-    - archive/bags_api/target
+    - storage/archivist/target
+    - storage/commmon/target
+    - storage/display/target
+    - storage/notifier/target
+    - storage/ingests/target
+    - storage/ingests_common/target
+    - storage/ingests_api/target
+    - storage/bags/target
+    - storage/bags_common/target
+    - storage/bags_api/target
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
