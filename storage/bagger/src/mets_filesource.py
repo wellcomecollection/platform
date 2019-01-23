@@ -1,6 +1,7 @@
 import os
 import re
 import settings
+from pathlib import Path
 from s3_keys import get_matching_s3_keys
 
 # Unlike the DDS implementation of this, only get b numbers that are correctly arranged
@@ -45,3 +46,15 @@ def b_numbers_from_s3(filter=""):
         m = b_number_pattern.match(key)
         if m:
             yield m.group(1)
+
+
+def bnumber_generator(filter_expression):
+    source_list = Path(filter_expression)
+    if source_list.is_file():
+        with open(filter_expression) as f:
+            bnumbers = f.readlines()
+        return [b.strip() for b in bnumbers if not b.strip() == ""]
+    elif filter_expression.startswith("b"):
+        return (b for b in [filter_expression])
+    else:
+        return b_numbers_from_s3(filter_expression)

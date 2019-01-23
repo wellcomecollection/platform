@@ -8,8 +8,7 @@ import requests
 import json
 import storage_api
 import dds
-from pathlib import Path
-from mets_filesource import b_numbers_from_s3
+from mets_filesource import bnumber_generator
 from status_table import get_table
 
 
@@ -22,8 +21,8 @@ class MigrationTool(object):
     def populate_initial(self, filter=""):
         populate_initial(filter)
 
-    def update_status(self, delay, filter=""):
-        update_bag_and_ingest_status(delay, filter)
+    def update_status(self, delay, filter="", check_package=False, check_alto=False):
+        update_bag_and_ingest_status(delay, filter, check_package, check_alto)
 
     def ingest(self, delay, filter=""):
         do_ingest(delay, filter)
@@ -55,7 +54,7 @@ def get_min_bag_date():
     return min_bag_date
 
 
-def update_bag_and_ingest_status(delay, filter):
+def update_bag_and_ingest_status(delay, filter, check_package, check_alto):
     table = get_table()
     no_ingest = {
         "id": "-",
@@ -67,7 +66,9 @@ def update_bag_and_ingest_status(delay, filter):
 
     for bnumber in bnumber_generator(filter):
         try:
-            output = update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest)
+            output = update_bag_and_ingest_status_bnumber(
+                bnumber, table, no_ingest, check_package, check_alto
+            )
         except Exception as e:
             err_obj = {"ERROR": bnumber, "error": e}
             print(err_obj)
@@ -80,11 +81,14 @@ def update_bag_and_ingest_status(delay, filter):
     print("]")
 
 
-def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest):
+def update_bag_and_ingest_status_bnumber(
+    bnumber, table, no_ingest, check_package, check_alto
+):
     bag_date = "-"
     bag_size = 0
     bag_error = "-"
     package_date = "-"
+    dds_package_date = None
 
     # check for bag
     bag_zip = aws.get_dropped_bag_info(bnumber)
@@ -102,9 +106,10 @@ def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest):
     if ingest is None:
         ingest = no_ingest
 
-    dds_package_date = dds.get_package_file_modified(bnumber)
-    if dds_package_date is not None:
-        package_date = dds_package_date
+    if check_package:
+        dds_package_date = dds.get_package_file_modified(bnumber)
+        if dds_package_date is not None:
+            package_date = dds_package_date
 
     table.update_item(
         Key={"bnumber": bnumber},
@@ -127,18 +132,6 @@ def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest):
         "ingest": ingest,
         "dds_package_date": dds_package_date,
     }
-
-
-def bnumber_generator(filter_expression):
-    source_list = Path(filter_expression)
-    if source_list.is_file():
-        with open(filter_expression) as f:
-            bnumbers = f.readlines()
-        return [b.strip() for b in bnumbers if not b.strip() == ""]
-    elif filter_expression.startswith("b"):
-        return (b for b in [filter_expression])
-    else:
-        return b_numbers_from_s3(filter_expression)
 
 
 def batch(bnumbers):

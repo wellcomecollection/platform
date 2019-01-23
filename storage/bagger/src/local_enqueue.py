@@ -24,7 +24,7 @@ import sys
 import time
 import logging
 import aws
-from mets_filesource import b_numbers_from_s3
+from mets_filesource import bnumber_generator
 
 
 def main():
@@ -40,12 +40,8 @@ def main():
             info = "METS only"
         start = time.time()
         counter = 0
-        if to_process.startswith("b"):
-            generator = (b for b in [to_process])
-        else:
-            generator = b_numbers_from_s3(to_process)
 
-        for b_number in generator:
+        for b_number in bnumber_generator(to_process):
             counter = counter + 1
             logging.info("processing " + b_number)
             message = {"identifier": b_number, "do_not_bag": skip}

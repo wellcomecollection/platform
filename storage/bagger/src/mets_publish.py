@@ -26,7 +26,7 @@ import time
 import boto3
 import os
 import json
-from mets_filesource import b_numbers_from_fileshare, b_numbers_from_s3
+from mets_filesource import b_numbers_from_fileshare, bnumber_generator
 
 
 def main():
@@ -54,16 +54,10 @@ def main():
         publish_from_s3(filter)
 
 
-def process_filter(filter):
-    if filter[0] == "b":
-        yield filter
-    return b_numbers_from_s3(filter)
-
-
 def publish_from_s3(filter):
     start = time.time()
     counter = 1
-    for b in process_filter(filter):
+    for b in bnumber_generator(filter):
         print("{0: <6} | {1}".format(counter, b))
         counter = counter + 1
         publish(b)
