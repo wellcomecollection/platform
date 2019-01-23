@@ -56,3 +56,13 @@ To reduce build times in the main repo, we've pushed out some of our libraries i
 [monitoring]: https://github.com/wellcometrust/scala-monitoring
 [storage]: https://github.com/wellcometrust/scala-storage
 [sierra]: https://techdocs.iii.com/sierraapi/Default.htm
+
+## Getting started
+
+Some of our shared code is brought into the project using Git submodules.
+Once you have a clone of the repo, you can set up the submodules as follows:
+
+```console
+$ git submodule init
+$ git submodule update
+```
