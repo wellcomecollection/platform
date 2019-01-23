@@ -24,7 +24,7 @@ import time
 import logging
 import bagger_processor
 import aws
-from mets_filesource import b_numbers_from_s3
+from mets_filesource import bnumber_generator
 
 
 def main():
@@ -47,13 +47,6 @@ def main():
         time_taken = time.time() - start
         print("----------------")
         print("{0} items in {1} seconds.".format(counter, time_taken))
-
-
-def bnumber_generator(filter_expression):
-    if filter_expression.startswith("b"):
-        return (b for b in [filter_expression])
-    else:
-        return b_numbers_from_s3(filter_expression)
 
 
 if __name__ == "__main__":
