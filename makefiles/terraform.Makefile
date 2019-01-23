@@ -43,15 +43,7 @@ endif
 #
 define terraform_plan
 	make uptodate-git
-	$(ROOT)/docker_run.py --aws -- \
-		--volume $(ROOT):$(ROOT) \
-		--workdir $(ROOT)/$(1) \
-		--env OP=plan \
-		--env GET_TFVARS=true \
-		--env BUCKET_NAME=$(TFVARS_BUCKET) \
-		--env OBJECT_KEY=$(TFVARS_KEY) \
-		--env IS_PUBLIC_FACING=$(2) \
-		$(TERRAFORM_WRAPPER_IMAGE)
+	python $(ROOT)/build-tooling/terraform_plan.py $(1) --profile=platform-admin
 endef
 
 
