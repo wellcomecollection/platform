@@ -2,12 +2,13 @@ package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
-import uk.ac.wellcome.models.work.generators.ProductionEventGenerators
+import uk.ac.wellcome.models.work.generators.{ProductionEventGenerators, SubjectGenerators}
 import uk.ac.wellcome.models.work.internal._
 
 class ApiV2WorksIncludesTest
     extends ApiV2WorksTestBase
-    with ProductionEventGenerators {
+    with ProductionEventGenerators
+    with SubjectGenerators {
   it(
     "includes a list of identifiers on a list endpoint if we pass ?include=identifiers") {
     withV2Api {
@@ -116,10 +117,8 @@ class ApiV2WorksIncludesTest
       case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
-        val subjects1 = List(
-          Subject("ornithology", List(Unidentifiable(Concept("ornithology")))))
-        val subjects2 = List(
-          Subject("flying cars", List(Unidentifiable(Concept("flying cars")))))
+        val subjects1 = List(createSubject)
+        val subjects2 = List(createSubject)
         val work0 = works(0).copy(subjects = subjects1)
         val work1 = works(1).copy(subjects = subjects2)
 
@@ -157,8 +156,7 @@ class ApiV2WorksIncludesTest
     "includes a list of subjects on a single work endpoint if we pass ?include=subjects") {
     withV2Api {
       case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
-        val subject = List(
-          Subject("ornithology", List(Unidentifiable(Concept("ornithology")))))
+        val subject = List(createSubject)
         val work = createIdentifiedWork.copy(subjects = subject)
 
         insertIntoElasticsearch(indexV2, work)
