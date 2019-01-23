@@ -66,7 +66,9 @@ def update_bag_and_ingest_status(delay, filter, check_package, check_alto):
 
     for bnumber in bnumber_generator(filter):
         try:
-            output = update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest, check_package, check_alto)
+            output = update_bag_and_ingest_status_bnumber(
+                bnumber, table, no_ingest, check_package, check_alto
+            )
         except Exception as e:
             err_obj = {"ERROR": bnumber, "error": e}
             print(err_obj)
@@ -79,7 +81,9 @@ def update_bag_and_ingest_status(delay, filter, check_package, check_alto):
     print("]")
 
 
-def update_bag_and_ingest_status_bnumber(bnumber, table, no_ingest, check_package, check_alto):
+def update_bag_and_ingest_status_bnumber(
+    bnumber, table, no_ingest, check_package, check_alto
+):
     bag_date = "-"
     bag_size = 0
     bag_error = "-"
