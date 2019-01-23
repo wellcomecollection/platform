@@ -3,17 +3,20 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT  = monitoring
 
+SBT_APPS 	 =
 SBT_SSM_APPS =
-SBT_APPS    =
-ECS_TASKS   = slack_budget_bot
-LAMBDAS     = post_to_slack terraform_tracker update_service_list
 
-SBT_DOCKER_LIBRARIES =
+SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
-TF_NAME     = monitoring
-TF_PATH     = $(STACK_ROOT)/terraform
-TF_IS_PUBLIC_FACING = false
+PYTHON_APPS     = slack_budget_bot
+PYTHON_SSM_APPS =
+LAMBDAS 	    = post_to_slack terraform_tracker update_service_list
+
+TF_NAME = monitoring
+TF_PATH = $(STACK_ROOT)/terraform
+
+TF_IS_PUBLIC_FACING = true
 
 $(val $(call stack_setup))
 

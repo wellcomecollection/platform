@@ -3,19 +3,22 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= catalogue_api
 
-SBT_APPS    = api
-SBT_DOCKER_LIBRARIES =
+SBT_APPS 	 = api
+SBT_SSM_APPS =
+
+SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
-ECS_TASKS   = update_api_docs
-LAMBDAS     =
+PYTHON_APPS     = update_api_docs
+PYTHON_SSM_APPS =
+LAMBDAS 	    =
 
-TF_NAME     = catalogue_api
-TF_PATH     = $(STACK_ROOT)/terraform
+TF_NAME = catalogue_api
+TF_PATH = $(STACK_ROOT)/terraform
+
 TF_IS_PUBLIC_FACING = true
 
 $(val $(call stack_setup))
-
 
 SWITCH_API_PINS = $(ROOT)/catalogue_api/switch_api_pins
 

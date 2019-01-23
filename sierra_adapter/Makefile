@@ -3,20 +3,25 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT  = sierra_adapter
 
+SBT_APPS 	 = sierra_bib_merger \
+               sierra_item_merger \
+               sierra_items_to_dynamo \
+               sierra_reader
 SBT_SSM_APPS =
-SBT_APPS    = sierra_bib_merger \
-              sierra_item_merger \
-			  sierra_items_to_dynamo \
-			  sierra_reader
-SBT_DOCKER_LIBRARIES =
+
+SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES = sierra_adapter_common
 
-ECS_TASKS   =
-LAMBDAS     = s3_demultiplexer sierra_progress_reporter sierra_window_generator
+PYTHON_APPS     =
+PYTHON_SSM_APPS =
+LAMBDAS 	    = s3_demultiplexer \
+                  sierra_progress_reporter \
+                  sierra_window_generator
 
-TF_NAME     = sierra_adapter
-TF_PATH     = $(STACK_ROOT)/terraform
-TF_IS_PUBLIC_FACING = false
+TF_NAME = sierra_adapter
+TF_PATH = $(STACK_ROOT)/terraform
+
+TF_IS_PUBLIC_FACING = true
 
 $(val $(call stack_setup))
 

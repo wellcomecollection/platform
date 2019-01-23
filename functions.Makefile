@@ -309,8 +309,17 @@ endef
 # Args:
 #	$1 - Name of the ECS service.
 #	$2 - Path to the associated Dockerfile.
+#	$3 - Stack name
 #
-define __ecs_target_template
+define __python_target
+$(1)-build:
+	$(call build_image,$(1),$(2))
+
+$(1)-test:
+	$(call test_python,$(STACK_ROOT)/$(1))
+endef
+
+define __python_ssm_target
 $(1)-build:
 	$(call build_image,$(1),$(2))
 
@@ -318,7 +327,7 @@ $(1)-test:
 	$(call test_python,$(STACK_ROOT)/$(1))
 
 $(1)-publish: $(1)-build
-	$(call publish_service,$(1))
+	$(call publish_service_ssm,$(1),$(3))
 endef
 
 
@@ -331,7 +340,7 @@ endef
 #	$SBT_APPS               A space delimited list of sbt apps in this stack
 #	$SBT_DOCKER_LIBRARIES   A space delimited list of sbt libraries  in this stack that use docker compose for tests
 #	$SBT_NO_DOCKER_LIBRARIES   A space delimited list of sbt libraries  in this stack that use docker compose for tests
-#	$ECS_TASKS              A space delimited list of ECS services
+#	$PYTHON_APPS              A space delimited list of ECS services
 #	$LAMBDAS                A space delimited list of Lambdas in this stack
 #
 #	$TF_NAME                Name of the associated Terraform stack
@@ -355,7 +364,8 @@ $(foreach proj,$(SBT_APPS),$(eval $(call __sbt_target_template,$(proj),$(STACK_R
 $(foreach proj,$(SBT_SSM_APPS),$(eval $(call __sbt_ssm_target_template,$(proj),$(STACK_ROOT)/$(proj),$(STACK_ROOT))))
 $(foreach library,$(SBT_DOCKER_LIBRARIES),$(eval $(call __sbt_library_docker_template,$(library),$(STACK_ROOT)/$(library))))
 $(foreach library,$(SBT_NO_DOCKER_LIBRARIES),$(eval $(call __sbt_library_template,$(library))))
-$(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
+$(foreach task,$(PYTHON_APPS),$(eval $(call __python_target,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
+$(foreach task,$(PYTHON_SSM_APPS),$(eval $(call __python_ssm_target,$(task),$(STACK_ROOT)/$(task)/Dockerfile,$(STACK_ROOT))))
 $(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
 $(foreach name,$(TF_NAME),$(eval $(call __terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING))))
 endef
