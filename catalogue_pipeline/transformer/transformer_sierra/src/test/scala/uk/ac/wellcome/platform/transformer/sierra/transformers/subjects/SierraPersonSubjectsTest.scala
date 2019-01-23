@@ -249,4 +249,27 @@ class SierraPersonSubjectsTest
       Unidentifiable(Concept("Hamlet"))
     )
   }
+
+  it("includes the contents of subfield t in the concepts") {
+    // Based on https://search.wellcomelibrary.org/iii/encore/record/C__Rb1190271?marcData=Y
+    // as retrieved 22 January 2019.
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        createVarFieldWith(
+          marcTag = "600",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Aristophanes"),
+            MarcSubfield(tag = "t", content = "Birds")
+          )
+        )
+      )
+    )
+
+    val subjects = transformer.getSubjectsWithPerson(bibData)
+    subjects should have size 1
+    subjects.head.concepts shouldBe List(
+      Unidentifiable(Person("Aristophanes")),
+      Unidentifiable(Concept("Birds"))
+    )
+  }
 }
