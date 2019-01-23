@@ -23,7 +23,7 @@ The spread of b numbers is fairly even:
 
 import sys
 import time
-from mets_filesource import b_numbers_from_fileshare, b_numbers_from_s3
+from mets_filesource import b_numbers_from_fileshare, bnumber_generator
 
 
 def main():
@@ -39,7 +39,7 @@ def main():
 def print_from_s3(filter):
     start = time.time()
     counter = 1
-    for b in b_numbers_from_s3(filter):
+    for b in bnumber_generator(filter):
         print("{0: <6} | {1}".format(counter, b))
         counter = counter + 1
     end = time.time()
