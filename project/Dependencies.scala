@@ -192,6 +192,8 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-cloudwatchmetrics" % versions.aws
   ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 
+  val goobiReaderDependencies: Seq[ModuleID] = WellcomeDependencies.jsonLibrary
+
   val bagsApiDependencies: Seq[ModuleID] = circeOpticsDependencies
   val ingestsApiDependencies: Seq[ModuleID] = circeOpticsDependencies
 }
