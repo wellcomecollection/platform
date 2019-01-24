@@ -16,7 +16,7 @@ class Project:
             type(self).__name__,
             self.name,
             self.folder,
-            ",".join(sorted(d.name for d in self.dependencies))
+            ",".join(sorted(d.name for d in self.dependencies)),
         )
 
     def all_folders(self):
@@ -44,7 +44,7 @@ class Repository:
             project = Project(
                 name=data["id"],
                 folder=data["folder"],
-                dependencies=[self.get_project(d) for d in data["dependencyIds"]]
+                dependencies=[self.get_project(d) for d in data["dependencyIds"]],
             )
 
             self.projects[name] = project

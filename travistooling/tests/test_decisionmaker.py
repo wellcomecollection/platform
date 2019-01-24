@@ -51,33 +51,21 @@ test_cases = [
     # Ontology/misc are significant, but only in the travis-format task
     ("misc/myscript.py", "sierra_reader-build", IgnoredPath, False),
     ("ontologies/work.ttl", "monitoring-publish", IgnoredPath, False),
-
     # At some point, we should really be building/publishing Loris in Travis
     # again, at which point these tests wake up.
     ("loris/loris/Dockerfile", "loris-build", UnrecognisedFile, True),
     ("loris/loris/Dockerfile", "ingestor-test", UnrecognisedFile, True),
-
     (
         "sierra_adapter/sierra_reader/foo.scala",
         "sierra_reader-publish",
         SignificantFile,
         True,
     ),
-    (
-        "catalogue_pipeline/ingestor/bar.scala",
-        "api-test",
-        InsignificantFile,
-        False,
-    ),
+    ("catalogue_pipeline/ingestor/bar.scala", "api-test", InsignificantFile, False),
     ("run_autoformat.py", "travistooling-test", ExclusivelyAffectsAnotherTask, False),
     ("run_autoformat.py", "travis-format", CheckedByTravisFormat, True),
     # Anything in the sierra_adapter directory/common lib
-    (
-        "sierra_adapter/common/main.scala",
-        "loris-test",
-        UnrecognisedFile,
-        True,
-    ),
+    ("sierra_adapter/common/main.scala", "loris-test", UnrecognisedFile, True),
     (
         "sierra_adapter/common/main.scala",
         "s3_demultiplexer-test",
@@ -90,50 +78,15 @@ test_cases = [
         UnrecognisedFile,
         True,
     ),
-    (
-        "sierra_adapter/common/main.scala",
-        "travistooling-test",
-        UnrecognisedFile,
-        True,
-    ),
-    (
-        "sbt_common/elasticsearch/model.scala",
-        "loris-test",
-        UnrecognisedFile,
-        True,
-    ),
-    (
-        "sbt_common/display/model.scala",
-        "loris-publish",
-        UnrecognisedFile,
-        True,
-    ),
-    (
-        "sbt_common/display/model.scala",
-        "travis-lambda-test",
-        UnrecognisedFile,
-        True,
-    ),
+    ("sierra_adapter/common/main.scala", "travistooling-test", UnrecognisedFile, True),
+    ("sbt_common/elasticsearch/model.scala", "loris-test", UnrecognisedFile, True),
+    ("sbt_common/display/model.scala", "loris-publish", UnrecognisedFile, True),
+    ("sbt_common/display/model.scala", "travis-lambda-test", UnrecognisedFile, True),
     # Changes to the display models don't affect all of the stacks
     ("sbt_common/display/model.scala", "id_minter-test", InsignificantFile, False),
-    (
-        "sbt_common/display/model.scala",
-        "reindex_worker-test",
-        InsignificantFile,
-        False,
-    ),
-    (
-        "sbt_common/display/model.scala",
-        "goobi_reader-test",
-        InsignificantFile,
-        False,
-    ),
-    (
-        "sbt_common/display/model.scala",
-        "sierra_reader-test",
-        InsignificantFile,
-        False,
-    ),
+    ("sbt_common/display/model.scala", "reindex_worker-test", InsignificantFile, False),
+    ("sbt_common/display/model.scala", "goobi_reader-test", InsignificantFile, False),
+    ("sbt_common/display/model.scala", "sierra_reader-test", InsignificantFile, False),
     ("sbt_common/display/model.scala", "api-test", SignificantFile, True),
     # Changes to the elasticsearch lib don't affect all of the stacks
     (
@@ -160,12 +113,7 @@ test_cases = [
         InsignificantFile,
         False,
     ),
-    (
-        "sbt_common/elasticsearch/model.scala",
-        "api-test",
-        SignificantFile,
-        True,
-    ),
+    ("sbt_common/elasticsearch/model.scala", "api-test", SignificantFile, True),
     # Changes to messaging-config don't affect the catalogue API but do affect
     # the pipeline apps.
     ("sbt_common/config/messaging/foo.scala", "api-test", InsignificantFile, False),
@@ -250,16 +198,10 @@ test_cases = [
         ExclusivelyAffectsAnotherTask,
         False,
     ),
-    (
-        "reindexer/trigger_reindex.py",
-        "ingestor-test",
-        PythonChangeAndIsScalaApp,
-        False,
-    ),
+    ("reindexer/trigger_reindex.py", "ingestor-test", PythonChangeAndIsScalaApp, False),
     # Chnages to Python files shouldn't trigger a Scala app
     ("shared_conftest.py", "ingestor-test", PythonChangeAndIsScalaApp, False),
     ("shared_conftest.py", "loris-test", UnrecognisedFile, True),
-
     # And now a grab bag of cases I've noticed actually happening in CI
     # where we ran tests we didn't need to, that I'll just keep adding as
     # regression tests.
@@ -307,9 +249,7 @@ def test_should_not_run_job_with_no_relevant_changes():
     assert result == (
         True,
         {
-            True: {
-                SignificantFile.message: set(["sierra_adapter/common/main.scala"])
-            },
+            True: {SignificantFile.message: set(["sierra_adapter/common/main.scala"])},
             False: {},
         },
     )
@@ -317,8 +257,7 @@ def test_should_not_run_job_with_no_relevant_changes():
 
 def test_should_run_build_task_with_relevant_changes():
     result = should_run_build_task(
-        changed_paths=["sierra_adapter/common/main.scala"],
-        task="ingestor-test",
+        changed_paths=["sierra_adapter/common/main.scala"], task="ingestor-test"
     )
     assert result == (
         False,
