@@ -30,12 +30,12 @@ from travistooling.decisions import (
     UnrecognisedFile,
 )
 from travistooling.git_utils import ROOT
-from travistooling.parse_makefiles import get_projects
+from travistooling.sbt_dependency_tree import Repository
 
 
 # Cache the Makefile information in a global variable, so we only have to
 # load it once.
-PROJECTS = list(get_projects(ROOT))
+SBT_REPO = Repository(metadata_dir=os.path.join(ROOT, "builds", "sbt_metadata"))
 
 
 def does_file_affect_build_task(path, task):
@@ -44,11 +44,6 @@ def does_file_affect_build_task(path, task):
         (".scala", ".tf", ".py", ".json", ".ttl")
     ):
         raise CheckedByTravisFormat()
-
-    # And a quick catch-all of file types that might signify a change for
-    # travis-lambda-{test, publish}
-    if task.startswith("travis-lambda-") and path.endswith(("requirements.txt", ".py")):
-        raise CheckedByTravisLambda()
 
     # These extensions and paths never have an effect on tests.
     if path.endswith(
@@ -75,133 +70,31 @@ def does_file_affect_build_task(path, task):
     ):
         raise ChangesToTestsDontGetPublished()
 
-    # Some directories only affect one task.
-    #
-    # For example, the ``catalogue_api/api`` directory only contains code
-    # for the api Scala app, so changes in this directory cannot affect
-    # any other task.
-    exclusive_directories = {proj.exclusive_path: proj.name for proj in PROJECTS}
+    # And a quick catch-all of file types that might signify a change for
+    # travis-lambda-{test, publish}
+    if task.startswith("travis-lambda-") and path.endswith(("requirements.txt", ".py")):
+        raise CheckedByTravisLambda()
 
-    for dir_name, task_prefix in exclusive_directories.items():
-        if path.startswith(dir_name):
-            if task.startswith(task_prefix):
-                raise ExclusivelyAffectsThisTask()
-            else:
-                raise ExclusivelyAffectsAnotherTask(task_prefix)
+    # Okay, so now we need to see if this is a Scala task, and if so, whether the
+    # path is one that affects this task.
+    project_name = task.split("-")[0]
+    if project_name in SBT_REPO.projects and path.endswith((".scala", ".sbt")):
 
-    # We have a library containing pipeline models in sbt_common/display.
-    #
-    # Not every application uses these display models -- in particular,
-    # all our pipeline applications.  So a change to the display models
-    # can be safely ignored here.
-    #
-    if path.startswith("sbt_common/internal_model"):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == "sbt_app"):
-                if project.exclusive_path.startswith("storage/"):
-                    raise ChangeToUnusedLibrary("internal_model")
-                elif project.exclusive_path.startswith(("catalogue_", "sierra_")):
-                    raise ChangeToDependency("internal_model")
+        if path.endswith(".sbt"):
+            raise SignificantFile("build.sbt affects all Scala apps")
+        if path.startswith("project/"):
+            raise SignificantFile("Changes in project/ affect all Scala apps")
 
-    # We have a library containing display models in sbt_common/display.
-    #
-    # Not every application uses these display models -- in particular,
-    # all our pipeline applications.  So a change to the display models
-    # can be safely ignored here.
-    #
-    if path.startswith("sbt_common/display"):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == "sbt_app"):
-                if project.exclusive_path.startswith(
-                    (
-                        "catalogue_pipeline/",
-                        "reindexer/",
-                        "goobi_adapter/",
-                        "sierra_adapter/",
-                        "storage/",
-                    )
-                ):
-                    raise ChangeToUnusedLibrary("display")
+        project = SBT_REPO.get_project(project_name)
+        for f in project.all_folders():
+            if path.startswith(f):
+                raise SignificantFile("%s depends on %s" % (project_name, f))
+        else:
+            raise InsignificantFile()
 
-    # We have a library for elasticsearch code.
-    #
-    # Not every application uses these display models -- in particular,
-    # quite a bit of the pipeline, and some of the adapters.  So a change
-    # to the elasticsearch code can safely be ignored.
-    #
-    if path.startswith("sbt_common/elasticsearch"):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == "sbt_app"):
-                if project.exclusive_path.startswith(
-                    (
-                        "catalogue_pipeline/id_minter",
-                        "catalogue_pipeline/matcher",
-                        "catalogue_pipeline/merger",
-                        "catalogue_pipeline/recorder",
-                        "reindexer/",
-                        "goobi_adapter/",
-                        "sierra_adapter/",
-                        "storage/",
-                    )
-                ):
-                    raise ChangeToUnusedLibrary("elasticsearch")
+        if path.endswith(".py"):
+            raise PythonChangeAndIsScalaApp()
 
-    # We have a library for messaging code.
-    #
-    # The catalogue API doesn't use this code, because it's not SQS-driven.
-    #
-    if path.startswith("sbt_common/config/messaging"):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == "sbt_app"):
-                if project.exclusive_path.startswith(("catalogue_api/",)):
-                    raise ChangeToUnusedLibrary("config-messaging")
-                elif project.exclusive_path.startswith(
-                    (
-                        "catalogue_pipeline/",
-                        "sierra_adapter/",
-                        "reindexer/",
-                        "data_api/",
-                    )
-                ):
-                    raise ChangeToDependency("config-messaging")
-
-    # We have a library for common storage code.
-    #
-    # Only apps in the storage stack use this code.
-    if path.startswith("storage/common"):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == "sbt_app"):
-                if not project.exclusive_path.startswith("storage/"):
-                    raise ChangeToUnusedLibrary("storage_common")
-
-    if path.startswith("storage/ingests_common"):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == "sbt_app"):
-                if not project.exclusive_path.startswith("storage/"):
-                    raise ChangeToUnusedLibrary("ingests_common")
-                elif not task.startswith("ingests"):
-                    raise ChangeToUnusedLibrary("ingests_common")
-
-    if path.startswith("storage/bags_common"):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == "sbt_app"):
-                if not project.exclusive_path.startswith("storage/"):
-                    raise ChangeToUnusedLibrary("bags_common")
-                elif not task.startswith("bags"):
-                    raise ChangeToUnusedLibrary("bags_common")
-
-    # We have a couple of sbt common libs and files scattered around the
-    # repository; changes to any of these don't affect non-sbt applications.
-    if path.endswith((".scala", ".sbt")):
-        if (task in "travistooling-test") or task.startswith("travis-lambda"):
-            raise ScalaChangeAndNotScalaApp()
-
-        for project in PROJECTS:
-            if task.startswith(project.name):
-                if project.type == "sbt_app":
-                    raise ScalaChangeAndIsScalaApp()
-                else:
-                    raise ScalaChangeAndNotScalaApp()
 
     # Changes made in the travistooling directory only ever affect the
     # travistooling tests (but they're not defined in a Makefile).
@@ -228,10 +121,6 @@ def does_file_affect_build_task(path, task):
         raise ExclusivelyAffectsAnotherTask("travis-format")
 
     # Changes to Python files only affect Scala apps.
-    if path.endswith(".py"):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == "sbt_app"):
-                raise PythonChangeAndIsScalaApp()
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
