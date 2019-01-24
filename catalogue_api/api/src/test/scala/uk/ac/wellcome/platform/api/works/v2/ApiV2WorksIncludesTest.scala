@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
-import uk.ac.wellcome.models.work.generators.{ProductionEventGenerators, SubjectGenerators}
+import uk.ac.wellcome.models.work.generators.{
+  ProductionEventGenerators,
+  SubjectGenerators
+}
 import uk.ac.wellcome.models.work.internal._
 
 class ApiV2WorksIncludesTest

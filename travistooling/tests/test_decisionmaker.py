@@ -55,12 +55,7 @@ test_cases = [
     ("ontologies/work.ttl", "monitoring-publish", IgnoredPath, False),
     # Changes that belong exclusively to a single task
     ("loris/loris/Dockerfile", "loris-build", ExclusivelyAffectsThisTask, True),
-    (
-        "loris/loris/Dockerfile",
-        "ingestor-test",
-        ExclusivelyAffectsAnotherTask,
-        False,
-    ),
+    ("loris/loris/Dockerfile", "ingestor-test", ExclusivelyAffectsAnotherTask, False),
     (
         "sierra_adapter/sierra_reader/foo.scala",
         "sierra_reader-publish",
@@ -73,12 +68,7 @@ test_cases = [
         ExclusivelyAffectsAnotherTask,
         False,
     ),
-    (
-        "run_autoformat.py",
-        "travistooling-test",
-        ExclusivelyAffectsAnotherTask,
-        False,
-    ),
+    ("run_autoformat.py", "travistooling-test", ExclusivelyAffectsAnotherTask, False),
     ("run_autoformat.py", "travis-format", CheckedByTravisFormat, True),
     # Anything in the sierra_adapter directory/common lib
     (
@@ -124,12 +114,7 @@ test_cases = [
         False,
     ),
     # Changes to the display models don't affect all of the stacks
-    (
-        "sbt_common/display/model.scala",
-        "id_minter-test",
-        ChangeToUnusedLibrary,
-        False,
-    ),
+    ("sbt_common/display/model.scala", "id_minter-test", ChangeToUnusedLibrary, False),
     (
         "sbt_common/display/model.scala",
         "reindex_worker-test",
@@ -180,16 +165,13 @@ test_cases = [
         ScalaChangeAndIsScalaApp,
         True,
     ),
-
     # Changes to messaging-config don't affect the catalogue API but do affect
     # the pipeline apps.
     ("sbt_common/config/messaging", "api-test", ChangeToUnusedLibrary, False),
     ("sbt_common/config/messaging", "ingestor-test", ChangeToDependency, True),
-
     # Changes to storage common don't affect all the stacks
     ("storage/common/foo.scala", "api-test", ChangeToUnusedLibrary, False),
     ("storage/common/foo.scala", "notifier-test", ScalaChangeAndIsScalaApp, True),
-
     # Changes to Scala test files trigger a -test Scala task, but not
     # a -publish task.
     (
@@ -276,7 +258,6 @@ test_cases = [
     # Chnages to Python files shouldn't trigger a Scala app
     ("shared_conftest.py", "ingestor-test", PythonChangeAndIsScalaApp, False),
     ("shared_conftest.py", "loris-test", UnrecognisedFile, True),
-
     # And now a grab bag of cases I've noticed actually happening in CI
     # where we ran tests we didn't need to, that I'll just keep adding as
     # regression tests.

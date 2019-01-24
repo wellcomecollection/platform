@@ -100,10 +100,7 @@ def does_file_affect_build_task(path, task):
             if task.startswith(project.name) and (project.type == "sbt_app"):
                 if project.exclusive_path.startswith("storage/"):
                     raise ChangeToUnusedLibrary("internal_model")
-                elif project.exclusive_path.startswith((
-                    "catalogue_",
-                    "sierra_",
-                )):
+                elif project.exclusive_path.startswith(("catalogue_", "sierra_")):
                     raise ChangeToDependency("internal_model")
 
     # We have a library containing display models in sbt_common/display.
@@ -158,12 +155,14 @@ def does_file_affect_build_task(path, task):
             if task.startswith(project.name) and (project.type == "sbt_app"):
                 if project.exclusive_path.startswith(("catalogue_api/",)):
                     raise ChangeToUnusedLibrary("config-messaging")
-                elif project.exclusive_path.startswith((
-                    "catalogue_pipeline/",
-                    "sierra_adapter/",
-                    "reindexer/",
-                    "data_api/",
-                )):
+                elif project.exclusive_path.startswith(
+                    (
+                        "catalogue_pipeline/",
+                        "sierra_adapter/",
+                        "reindexer/",
+                        "data_api/",
+                    )
+                ):
                     raise ChangeToDependency("config-messaging")
 
     # We have a library for common storage code.

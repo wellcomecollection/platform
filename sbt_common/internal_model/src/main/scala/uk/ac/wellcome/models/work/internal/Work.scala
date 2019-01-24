@@ -50,7 +50,8 @@ case class UnidentifiedWork(
   extent: Option[String],
   lettering: Option[String],
   createdDate: Option[Period],
-  subjects: List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractRootConcept]]]],
+  subjects: List[
+    MaybeDisplayable[Subject[MaybeDisplayable[AbstractRootConcept]]]],
   genres: List[Genre[MaybeDisplayable[AbstractConcept]]],
   contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]],
   thumbnail: Option[Location],

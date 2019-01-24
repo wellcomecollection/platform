@@ -101,7 +101,8 @@ class SierraOrganisationSubjectsTest
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
 
       val subject = subjects.head
-      val identifiableSubject = subject.asInstanceOf[Identifiable[Subject[Unidentifiable[Organisation]]]]
+      val identifiableSubject = subject
+        .asInstanceOf[Identifiable[Subject[Unidentifiable[Organisation]]]]
 
       identifiableSubject.sourceIdentifier shouldBe SourceIdentifier(
         identifierType = IdentifierType("lc-names"),
@@ -124,7 +125,8 @@ class SierraOrganisationSubjectsTest
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
 
       val subject = subjects.head
-      val identifiableSubject = subject.asInstanceOf[Identifiable[Subject[Unidentifiable[Organisation]]]]
+      val identifiableSubject = subject
+        .asInstanceOf[Identifiable[Subject[Unidentifiable[Organisation]]]]
 
       identifiableSubject.sourceIdentifier shouldBe SourceIdentifier(
         identifierType = IdentifierType("lc-names"),

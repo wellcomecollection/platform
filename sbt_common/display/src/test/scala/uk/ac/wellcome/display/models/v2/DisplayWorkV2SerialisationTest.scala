@@ -130,7 +130,9 @@ class DisplayWorkV2SerialisationTest
   it(
     "includes subject information in DisplayWorkV2 serialisation with the subjects include") {
     val workWithSubjects = createIdentifiedWorkWith(
-      subjects = (1 to 3).map { _ => createSubject }.toList
+      subjects = (1 to 3).map { _ =>
+        createSubject
+      }.toList
     )
 
     val expectedJson = s"""{

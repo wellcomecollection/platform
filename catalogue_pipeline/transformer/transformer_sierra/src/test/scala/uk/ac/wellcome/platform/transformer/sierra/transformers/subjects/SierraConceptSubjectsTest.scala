@@ -310,7 +310,11 @@ class SierraConceptSubjectsTest
     val actualSourceIdentifiers = transformer
       .getSubjectswithAbstractConcepts(bibData)
       .map {
-        case Identifiable(_: Subject[MaybeDisplayable[AbstractConcept]], sourceIdentifier, _, _) =>
+        case Identifiable(
+            _: Subject[MaybeDisplayable[AbstractConcept]],
+            sourceIdentifier,
+            _,
+            _) =>
           sourceIdentifier
         case other => assert(false, other)
       }

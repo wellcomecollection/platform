@@ -29,8 +29,8 @@ trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
   //
   // https://www.loc.gov/marc/bibliographic/bd610.html
   //
-  def getSubjectsWithOrganisation(
-    bibData: SierraBibData): List[MaybeDisplayable[Subject[MaybeDisplayable[Organisation]]]] =
+  def getSubjectsWithOrganisation(bibData: SierraBibData)
+    : List[MaybeDisplayable[Subject[MaybeDisplayable[Organisation]]]] =
     getMatchingVarFields(bibData, marcTag = "610").map { varField =>
       val label =
         createLabel(varField, subfieldTags = List("a", "b", "c", "d", "e"))
@@ -44,7 +44,7 @@ trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
 
       varField.indicator2 match {
         case Some("0") => identify(varField.subfields, subject, "Subject")
-        case _ => Unidentifiable(subject)
+        case _         => Unidentifiable(subject)
       }
     }
 

@@ -19,7 +19,9 @@ trait SubjectGenerators extends RandomStrings {
 
   private def createConcepts: List[Displayable[AbstractRootConcept]] =
     (1 to 3)
-      .map { _ => Unidentifiable(Concept(randomAlphanumeric(15))) }
+      .map { _ =>
+        Unidentifiable(Concept(randomAlphanumeric(15)))
+      }
       .toList
       .asInstanceOf[List[Displayable[AbstractRootConcept]]]
 }

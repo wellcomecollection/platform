@@ -196,9 +196,13 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def subjects(subjects: List[Displayable[Subject[Displayable[AbstractRootConcept]]]]): String =
+  def subjects(
+    subjects: List[Displayable[Subject[Displayable[AbstractRootConcept]]]])
+    : String =
     subjects
-      .map { s => identifiedOrUnidentifiable(s, subject) }
+      .map { s =>
+        identifiedOrUnidentifiable(s, subject)
+      }
       .mkString(",")
 
   def genre(g: Genre[Displayable[AbstractConcept]]) =

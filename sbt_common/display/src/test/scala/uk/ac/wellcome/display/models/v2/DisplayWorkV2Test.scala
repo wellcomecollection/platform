@@ -406,7 +406,8 @@ class DisplayWorkV2Test
           .map { Some(_) }
 
         val subject = displayWork.subjects.get.head
-        subject.identifiers shouldBe Some(List(DisplayIdentifierV2(subjectSourceIdentifier)))
+        subject.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(subjectSourceIdentifier)))
 
         val concepts = subject.concepts
         concepts.map { _.identifiers } shouldBe expectedIdentifiers

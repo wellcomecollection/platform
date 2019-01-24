@@ -59,9 +59,10 @@ class SierraPersonSubjectsTest
       Unidentifiable(
         Subject(
           label = "Larrey, D. J. baron",
-          concepts = List(Unidentifiable(
-            Person(label = "Larrey, D. J.", prefix = Some("baron"))
-          ))
+          concepts = List(
+            Unidentifiable(
+              Person(label = "Larrey, D. J.", prefix = Some("baron"))
+            ))
         )
       )
     )
@@ -109,8 +110,9 @@ class SierraPersonSubjectsTest
       Unidentifiable(
         Subject(
           label = "David Attenborough II",
-          concepts = List(Unidentifiable(
-            Person(label = "David Attenborough", numeration = Some("II"))))
+          concepts = List(
+            Unidentifiable(
+              Person(label = "David Attenborough", numeration = Some("II"))))
         )
       )
     )
@@ -158,7 +160,8 @@ class SierraPersonSubjectsTest
       Unidentifiable(
         Subject(
           label = "Rita Levi Montalcini, 22 April 1909 – 30 December 2012",
-          concepts = List(Unidentifiable(Person(label = "Rita Levi Montalcini,")))
+          concepts =
+            List(Unidentifiable(Person(label = "Rita Levi Montalcini,")))
         )
       )
     )

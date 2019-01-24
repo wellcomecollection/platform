@@ -19,8 +19,9 @@ case class DisplaySubject(
 )
 
 object DisplaySubject {
-  def apply(displayableSubject: Displayable[Subject[Displayable[AbstractRootConcept]]],
-            includesIdentifiers: Boolean): DisplaySubject = {
+  def apply(
+    displayableSubject: Displayable[Subject[Displayable[AbstractRootConcept]]],
+    includesIdentifiers: Boolean): DisplaySubject = {
     displayableSubject match {
       case Unidentifiable(subject: Subject[Displayable[AbstractRootConcept]]) =>
         DisplaySubject(
@@ -28,12 +29,17 @@ object DisplaySubject {
           identifiers = None,
           label = subject.label,
           concepts = subject.concepts.map {
-            DisplayAbstractRootConcept(_, includesIdentifiers = includesIdentifiers)
+            DisplayAbstractRootConcept(
+              _,
+              includesIdentifiers = includesIdentifiers)
           },
           ontologyType = subject.ontologyType
         )
       case Identified(
-        subject: Subject[Displayable[AbstractRootConcept]], canonicalId, sourceIdentifier, otherIdentifiers) =>
+          subject: Subject[Displayable[AbstractRootConcept]],
+          canonicalId,
+          sourceIdentifier,
+          otherIdentifiers) =>
         DisplaySubject(
           id = Some(canonicalId),
           identifiers =
@@ -44,7 +50,9 @@ object DisplaySubject {
             else None,
           label = subject.label,
           concepts = subject.concepts.map {
-            DisplayAbstractRootConcept(_, includesIdentifiers = includesIdentifiers)
+            DisplayAbstractRootConcept(
+              _,
+              includesIdentifiers = includesIdentifiers)
           },
           ontologyType = subject.ontologyType
         )

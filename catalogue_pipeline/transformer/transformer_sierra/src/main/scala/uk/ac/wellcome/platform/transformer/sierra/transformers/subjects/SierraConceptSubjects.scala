@@ -48,15 +48,14 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts {
   //      Note that only concepts from subfield $a are identified; everything
   //      else is unidentified.
   //
-  def getSubjectswithAbstractConcepts(
-    bibData: SierraBibData): List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractConcept]]]] =
+  def getSubjectswithAbstractConcepts(bibData: SierraBibData)
+    : List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractConcept]]]] =
     getSubjectsForMarcTag(bibData, "650") ++
       getSubjectsForMarcTag(bibData, "648") ++
       getSubjectsForMarcTag(bibData, "651")
 
-  private def getSubjectsForMarcTag(
-    bibData: SierraBibData,
-    marcTag: String): List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractConcept]]]] = {
+  private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String)
+    : List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractConcept]]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
     // Second indicator 7 means that the subject authority is something other

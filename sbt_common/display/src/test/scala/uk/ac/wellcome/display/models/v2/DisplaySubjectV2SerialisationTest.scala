@@ -3,7 +3,10 @@ package uk.ac.wellcome.display.models.v2
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.json.DisplayJsonUtil._
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
-import uk.ac.wellcome.models.work.generators.{IdentifiersGenerators, SubjectGenerators}
+import uk.ac.wellcome.models.work.generators.{
+  IdentifiersGenerators,
+  SubjectGenerators
+}
 import uk.ac.wellcome.models.work.internal._
 
 class DisplaySubjectV2SerialisationTest

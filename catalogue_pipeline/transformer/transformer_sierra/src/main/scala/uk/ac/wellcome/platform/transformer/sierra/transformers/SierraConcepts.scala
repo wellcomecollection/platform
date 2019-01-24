@@ -56,9 +56,7 @@ trait SierraConcepts extends MarcUtils {
   //
   // Note that some identifiers have an identifier scheme in
   // indicator 2, but no ID.  In this case, we just ignore it.
-  def identifyConcept[T](
-    concept: T,
-    varField: VarField): MaybeDisplayable[T] =
+  def identifyConcept[T](concept: T, varField: VarField): MaybeDisplayable[T] =
     getIdentifierSubfieldContents(varField) match {
       case Seq(subfieldContent) =>
         maybeAddIdentifier[T](
