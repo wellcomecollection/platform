@@ -119,7 +119,7 @@ def bag_from_identifier(identifier, skip_file_download):
 
     bag_assembly.cleanup_bnumber_files(b_number)
 
-    logging.info("Finished bagging {0}".format(b_number))
+    logging.info("#### Finished bagging {0}".format(b_number))
 
     return upload_location
 
