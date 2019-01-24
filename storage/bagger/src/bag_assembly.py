@@ -3,6 +3,7 @@ import shutil
 import settings
 import logging
 
+
 def clean_working_dir():
     for f in os.listdir(settings.WORKING_DIRECTORY):
         path = os.path.join(settings.WORKING_DIRECTORY, f)

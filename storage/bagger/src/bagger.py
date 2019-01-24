@@ -19,8 +19,11 @@ import aws
 import tech_md
 from xml_help import load_from_disk, load_from_string
 
-logging.basicConfig(format="%(process)d - %(threadName)s - %(levelname)s: %(message)s", level=logging.INFO)
-logging.getLogger('bagit').setLevel(logging.ERROR)
+logging.basicConfig(
+    format="%(process)d - %(threadName)s - %(levelname)s: %(message)s",
+    level=logging.INFO,
+)
+logging.getLogger("bagit").setLevel(logging.ERROR)
 
 
 def bag_from_identifier(identifier, skip_file_download):
