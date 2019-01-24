@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.matcher.workgraph
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models._
@@ -220,7 +219,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
       val existingVersion = 2
       val updateVersion = 2
 
-      val thrown = intercept[GracefulFailureException] {
+      val thrown = intercept[VersionUnexpectedConflictException] {
         WorkGraphUpdater
           .update(
             workUpdate = WorkUpdate("A", updateVersion, Set("A")),
@@ -230,7 +229,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
                 WorkNode("B", 0, List(), hashed_AB)))
           )
       }
-      thrown.message shouldBe "update failed, work:A v2 already exists with different content! update-ids:Set(A) != existing-ids:Set(B)"
+      thrown.getMessage shouldBe "update failed, work:A v2 already exists with different content! update-ids:Set(A) != existing-ids:Set(B)"
     }
   }
 
