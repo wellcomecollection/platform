@@ -138,7 +138,8 @@ lazy val reindex_worker = setupProject(project, "reindexer/reindex_worker",
 )
 
 lazy val goobi_reader = setupProject(project, "goobi_adapter/goobi_reader",
-  localDependencies = Seq(config_messaging, config_storage)
+  localDependencies = Seq(config_messaging, config_storage),
+  externalDependencies = Dependencies.goobiReaderDependencies
 )
 
 lazy val sierra_adapter_common = setupProject(project, "sierra_adapter/common",

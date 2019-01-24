@@ -9,6 +9,8 @@ import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.BulkSNSSenderFixture
 
+import scala.util.Random
+
 class BulkSNSSenderTest
     extends FunSpec
     with Matchers
@@ -20,7 +22,7 @@ class BulkSNSSenderTest
     with SNS {
 
   val messages: List[String] = (1 to 3).map { _ =>
-    randomAlphanumeric(15)
+    Random.alphanumeric take 15 mkString
   }.toList
 
   it("sends messages for the provided IDs") {
