@@ -78,23 +78,23 @@ def does_file_affect_build_task(path, task):
     # Okay, so now we need to see if this is a Scala task, and if so, whether the
     # path is one that affects this task.
     project_name = task.split("-")[0]
-    if project_name in SBT_REPO.projects and path.endswith((".scala", ".sbt")):
+    if project_name in SBT_REPO.projects:
+
+        if path.endswith(".py"):
+            raise PythonChangeAndIsScalaApp()
 
         if path.endswith(".sbt"):
             raise SignificantFile("build.sbt affects all Scala apps")
         if path.startswith("project/"):
             raise SignificantFile("Changes in project/ affect all Scala apps")
 
-        project = SBT_REPO.get_project(project_name)
-        for f in project.all_folders():
-            if path.startswith(f):
-                raise SignificantFile("%s depends on %s" % (project_name, f))
-        else:
-            raise InsignificantFile()
-
-        if path.endswith(".py"):
-            raise PythonChangeAndIsScalaApp()
-
+        if path.endswith(".scala"):
+            project = SBT_REPO.get_project(project_name)
+            for f in project.all_folders():
+                if path.startswith(f):
+                    raise SignificantFile("%s depends on %s" % (project_name, f))
+            else:
+                raise InsignificantFile()
 
     # Changes made in the travistooling directory only ever affect the
     # travistooling tests (but they're not defined in a Makefile).
