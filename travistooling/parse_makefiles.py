@@ -28,7 +28,9 @@ def _get_projects_from_makefile(root, path):
 
     for make_variable, project_type in [
         ("SBT_APPS", "sbt_app"),
+        ("SBT_SSM_APPS", "sbt_app"),
         ("PYTHON_APPS", "ecs_task"),
+        ("ECS_TASKS", "ecs_task"),
         ("LAMBDAS", "python_lambda"),
     ]:
         matching_lines = [l for l in lines if l.startswith(make_variable)]
