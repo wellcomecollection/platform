@@ -5,7 +5,7 @@ import os
 import pytest
 
 from travistooling.git_utils import ROOT
-from travistooling.sbt_dependency_tree import Project, Repository
+from travistooling.sbt_dependency_tree import Repository
 
 
 @pytest.fixture()

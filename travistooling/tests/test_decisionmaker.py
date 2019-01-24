@@ -8,8 +8,6 @@ from travistooling.decisionmaker import (
 )
 from travistooling.decisions import (
     ChangesToTestsDontGetPublished,
-    ChangeToDependency,
-    ChangeToUnusedLibrary,
     CheckedByTravisFormat,
     CheckedByTravisLambda,
     ExclusivelyAffectsAnotherTask,
@@ -18,8 +16,6 @@ from travistooling.decisions import (
     IgnoredPath,
     InsignificantFile,
     PythonChangeAndIsScalaApp,
-    ScalaChangeAndIsScalaApp,
-    ScalaChangeAndNotScalaApp,
     SignificantFile,
     UnrecognisedFile,
 )

@@ -4,8 +4,6 @@
 import json
 import os
 
-from travistooling.git_utils import ROOT
-
 
 class Project:
     def __init__(self, name, folder, dependencies):

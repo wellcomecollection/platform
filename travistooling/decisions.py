@@ -41,12 +41,6 @@ class ExclusivelyAffectsThisTask(SignificantFile):
     message = "Path is an exclusive dependency of this build task"
 
 
-class ChangeToDependency(SignificantFile):
-    def __init__(self, library):
-        self.message = "The %s library is a dependency of this task" % library
-        super(ChangeToDependency, self).__init__()
-
-
 class ExclusivelyAffectsAnotherTask(InsignificantFile):
     def __init__(self, other_task):
         self.message = (
@@ -78,9 +72,3 @@ class ScalaChangeAndNotScalaApp(InsignificantFile):
 
 class ChangesToTestsDontGetPublished(InsignificantFile):
     message = "Changes to test files don't need to be published"
-
-
-class ChangeToUnusedLibrary(InsignificantFile):
-    def __init__(self, library):
-        self.message = "Changes to the %s library don't affect this task" % library
-        super(ChangeToUnusedLibrary, self).__init__()
