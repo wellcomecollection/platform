@@ -77,11 +77,13 @@ object WorksIndex {
       objectField("otherIdentifiers").fields(sourceIdentifierFields)
     )
 
-  def subject(fieldName: String) = objectField(fieldName).fields(
+  val subject: Seq[FieldDefinition] = Seq(
     textField("label"),
     keywordField("ontologyType"),
     identified("concepts", rootConcept)
   )
+
+  def subjects: ObjectField = identified("subjects", subject)
 
   def genre(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
@@ -154,7 +156,7 @@ object WorksIndex {
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       date("createdDate"),
       contributors,
-      subject("subjects"),
+      subjects,
       genre("genres"),
       items("items"),
       items("itemsV1"),

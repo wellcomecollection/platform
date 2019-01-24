@@ -174,19 +174,23 @@ class DisplayWorkV1Test
       Concept("a second generic concept")
     )
 
-    val subjects = List[Subject[Displayable[AbstractConcept]]](
-      Subject(
-        label = "a subject created by DisplayWorkV1Test",
-        concepts = List(
-          Unidentifiable(concepts(0)),
-          Unidentifiable(concepts(1)),
-          Unidentifiable(concepts(2))
+    val subjects = List[Displayable[Subject[Displayable[AbstractConcept]]]](
+      Unidentifiable(
+        Subject(
+          label = "a subject created by DisplayWorkV1Test",
+          concepts = List(
+            Unidentifiable(concepts(0)),
+            Unidentifiable(concepts(1)),
+            Unidentifiable(concepts(2))
+          )
         )
       ),
-      Subject(
-        label = "a second subject created for DisplayWorkV1Test",
-        concepts = List(
-          Unidentifiable(concepts(3))
+      Unidentifiable(
+        Subject(
+          label = "a second subject created for DisplayWorkV1Test",
+          concepts = List(
+            Unidentifiable(concepts(3))
+          )
         )
       )
     )

@@ -23,7 +23,7 @@ sealed trait Work extends BaseWork with MultipleSourceIdentifiers {
   val extent: Option[String]
   val lettering: Option[String]
   val createdDate: Option[Period]
-  val subjects: List[Subject[IdentityState[AbstractRootConcept]]]
+  val subjects: List[IdentityState[Subject[IdentityState[AbstractRootConcept]]]]
   val genres: List[Genre[IdentityState[AbstractConcept]]]
   val contributors: List[Contributor[IdentityState[AbstractAgent]]]
   val thumbnail: Option[Location]
@@ -50,7 +50,8 @@ case class UnidentifiedWork(
   extent: Option[String],
   lettering: Option[String],
   createdDate: Option[Period],
-  subjects: List[Subject[MaybeDisplayable[AbstractRootConcept]]],
+  subjects: List[
+    MaybeDisplayable[Subject[MaybeDisplayable[AbstractRootConcept]]]],
   genres: List[Genre[MaybeDisplayable[AbstractConcept]]],
   contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]],
   thumbnail: Option[Location],
@@ -78,7 +79,7 @@ case class IdentifiedWork(
   extent: Option[String],
   lettering: Option[String],
   createdDate: Option[Period],
-  subjects: List[Subject[Displayable[AbstractRootConcept]]],
+  subjects: List[Displayable[Subject[Displayable[AbstractRootConcept]]]],
   genres: List[Genre[Displayable[AbstractConcept]]],
   contributors: List[Contributor[Displayable[AbstractAgent]]],
   thumbnail: Option[Location],

@@ -17,7 +17,7 @@ trait SierraSubjects
     with SierraPersonSubjects
     with SierraOrganisationSubjects {
   def getSubjects(bibData: SierraBibData)
-    : List[Subject[MaybeDisplayable[AbstractRootConcept]]] =
+    : List[MaybeDisplayable[Subject[MaybeDisplayable[AbstractRootConcept]]]] =
     getSubjectswithAbstractConcepts(bibData) ++
       getSubjectsWithPerson(bibData) ++
       getSubjectsWithOrganisation(bibData)

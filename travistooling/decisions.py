@@ -41,6 +41,12 @@ class ExclusivelyAffectsThisTask(SignificantFile):
     message = "Path is an exclusive dependency of this build task"
 
 
+class ChangeToDependency(SignificantFile):
+    def __init__(self, library):
+        self.message = "The %s library is a dependency of this task" % library
+        super(ChangeToDependency, self).__init__()
+
+
 class ExclusivelyAffectsAnotherTask(InsignificantFile):
     def __init__(self, other_task):
         self.message = (

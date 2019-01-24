@@ -80,7 +80,7 @@ trait SierraGenres extends MarcUtils with SierraConcepts {
     primarySubfields: List[MarcSubfield],
     varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
-      identifyPrimaryConcept(
+      identifyConcept(
         concept = Concept(label = subfield.content),
         varField = varField
       )

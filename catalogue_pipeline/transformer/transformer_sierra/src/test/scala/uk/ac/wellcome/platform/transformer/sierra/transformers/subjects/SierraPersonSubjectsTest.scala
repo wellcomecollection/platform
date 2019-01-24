@@ -33,10 +33,13 @@ class SierraPersonSubjectsTest
     )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
-      Subject(
-        label = "A Content",
-        concepts = List(Unidentifiable(Person(label = "A Content")))))
-
+      Unidentifiable(
+        Subject(
+          label = "A Content",
+          concepts = List(Unidentifiable(Person(label = "A Content")))
+        )
+      )
+    )
   }
 
   it("returns subjects for tag 600 with only subfields a and c") {
@@ -53,10 +56,16 @@ class SierraPersonSubjectsTest
     )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
-      Subject(
-        label = "Larrey, D. J. baron",
-        concepts = List(Unidentifiable(
-          Person(label = "Larrey, D. J.", prefix = Some("baron"))))))
+      Unidentifiable(
+        Subject(
+          label = "Larrey, D. J. baron",
+          concepts = List(
+            Unidentifiable(
+              Person(label = "Larrey, D. J.", prefix = Some("baron"))
+            ))
+        )
+      )
+    )
   }
 
   it("returns subjects for tag 600 with only subfields a and multiple c") {
@@ -74,10 +83,14 @@ class SierraPersonSubjectsTest
     )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
-      Subject(
-        label = "David Attenborough sir doctor",
-        concepts = List(Unidentifiable(
-          Person(label = "David Attenborough", prefix = Some("sir doctor"))))))
+      Unidentifiable(
+        Subject(
+          label = "David Attenborough sir doctor",
+          concepts = List(Unidentifiable(
+            Person(label = "David Attenborough", prefix = Some("sir doctor"))))
+        )
+      )
+    )
   }
 
   it("returns subjects for tag 600 with only subfields a and b") {
@@ -94,10 +107,15 @@ class SierraPersonSubjectsTest
     )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
-      Subject(
-        label = "David Attenborough II",
-        concepts = List(Unidentifiable(
-          Person(label = "David Attenborough", numeration = Some("II"))))))
+      Unidentifiable(
+        Subject(
+          label = "David Attenborough II",
+          concepts = List(
+            Unidentifiable(
+              Person(label = "David Attenborough", numeration = Some("II"))))
+        )
+      )
+    )
   }
 
   it("returns subjects for tag 600 with subfields a and e") {
@@ -114,9 +132,13 @@ class SierraPersonSubjectsTest
     )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
-      Subject(
-        label = "David Attenborough, author",
-        concepts = List(Unidentifiable(Person(label = "David Attenborough,")))))
+      Unidentifiable(
+        Subject(
+          label = "David Attenborough, author",
+          concepts = List(Unidentifiable(Person(label = "David Attenborough,")))
+        )
+      )
+    )
   }
 
   it("returns subjects for tag 600 with subfields a and d") {
@@ -134,9 +156,15 @@ class SierraPersonSubjectsTest
       )
     )
 
-    transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(Subject(
-      label = "Rita Levi Montalcini, 22 April 1909 – 30 December 2012",
-      concepts = List(Unidentifiable(Person(label = "Rita Levi Montalcini,")))))
+    transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
+      Unidentifiable(
+        Subject(
+          label = "Rita Levi Montalcini, 22 April 1909 – 30 December 2012",
+          concepts =
+            List(Unidentifiable(Person(label = "Rita Levi Montalcini,")))
+        )
+      )
+    )
   }
 
   it("returns subjects for tag 600 with subfields a and multiple e") {
@@ -154,9 +182,13 @@ class SierraPersonSubjectsTest
     )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
-      Subject(
-        label = "David Attenborough, author, editor",
-        concepts = List(Unidentifiable(Person(label = "David Attenborough,")))))
+      Unidentifiable(
+        Subject(
+          label = "David Attenborough, author, editor",
+          concepts = List(Unidentifiable(Person(label = "David Attenborough,")))
+        )
+      )
+    )
   }
 
   // There's nothing useful we can do here.  Arguably it's a cataloguing
@@ -193,15 +225,23 @@ class SierraPersonSubjectsTest
       )
     )
 
+    val sourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lc-names"),
+      ontologyType = "Subject",
+      value = lcshCode
+    )
+
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
-      Subject(
-        label = "Gerry the Garlic",
-        concepts = List(
-          Identifiable(
-            Person(label = "Gerry the Garlic"),
-            sourceIdentifier =
-              SourceIdentifier(IdentifierType("lc-names"), "Person", lcshCode)))
-      ))
+      Identifiable(
+        Subject(
+          label = "Gerry the Garlic",
+          concepts = List(
+            Unidentifiable(Person(label = "Gerry the Garlic"))
+          )
+        ),
+        sourceIdentifier = sourceIdentifier
+      )
+    )
   }
 
   it("creates an unidentifiable person concept if second indicator is not 0") {
@@ -220,9 +260,13 @@ class SierraPersonSubjectsTest
     )
 
     transformer.getSubjectsWithPerson(sierraBibData) shouldBe List(
-      Subject(
-        label = "Gerry the Garlic",
-        concepts = List(Unidentifiable(Person(label = "Gerry the Garlic")))))
+      Unidentifiable(
+        Subject(
+          label = "Gerry the Garlic",
+          concepts = List(Unidentifiable(Person(label = "Gerry the Garlic")))
+        )
+      )
+    )
   }
 
   it("includes the contents of subfield x in the concepts") {
@@ -243,7 +287,7 @@ class SierraPersonSubjectsTest
 
     val subjects = transformer.getSubjectsWithPerson(bibData)
     subjects should have size 1
-    subjects.head.concepts shouldBe List(
+    subjects.head.agent.concepts shouldBe List(
       Unidentifiable(Person("Shakespeare, William")),
       Unidentifiable(Concept("Characters")),
       Unidentifiable(Concept("Hamlet"))
@@ -267,7 +311,7 @@ class SierraPersonSubjectsTest
 
     val subjects = transformer.getSubjectsWithPerson(bibData)
     subjects should have size 1
-    subjects.head.concepts shouldBe List(
+    subjects.head.agent.concepts shouldBe List(
       Unidentifiable(Person("Aristophanes")),
       Unidentifiable(Concept("Birds"))
     )

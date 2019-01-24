@@ -129,7 +129,7 @@ case object DisplayWorkV1 {
           DisplayAgentV1(contributor.agent)
       },
       subjects = work.subjects.flatMap { subject =>
-        subject.concepts.map { DisplayConceptV1(_) }
+        subject.agent.concepts.map { DisplayConceptV1(_) }
       },
       genres = work.genres.flatMap { genre =>
         genre.concepts.map { DisplayConceptV1(_) }

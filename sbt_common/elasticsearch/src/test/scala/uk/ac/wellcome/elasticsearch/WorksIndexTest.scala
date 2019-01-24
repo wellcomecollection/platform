@@ -56,15 +56,17 @@ class WorksIndexTest
     withLocalWorksIndex { index =>
       val sampleWork = createIdentifiedWorkWith(
         subjects = List(
-          Subject(
-            label = "Daredevil",
-            concepts = List(
-              Unidentifiable(
-                Person(
-                  label = "Daredevil",
-                  prefix = Some("Superhero"),
-                  numeration = Some("I")
-                ))
+          Unidentifiable(
+            Subject(
+              label = "Daredevil",
+              concepts = List(
+                Unidentifiable(
+                  Person(
+                    label = "Daredevil",
+                    prefix = Some("Superhero"),
+                    numeration = Some("I")
+                  ))
+              )
             )
           )
         )

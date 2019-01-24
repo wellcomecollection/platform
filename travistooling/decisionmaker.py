@@ -14,6 +14,7 @@ import os
 
 from travistooling.decisions import (
     ChangesToTestsDontGetPublished,
+    ChangeToDependency,
     ChangeToUnusedLibrary,
     CheckedByTravisFormat,
     CheckedByTravisLambda,
@@ -88,17 +89,25 @@ def does_file_affect_build_task(path, task):
             else:
                 raise ExclusivelyAffectsAnotherTask(task_prefix)
 
+    # We have a library containing pipeline models in sbt_common/display.
+    #
+    # Not every application uses these display models -- in particular,
+    # all our pipeline applications.  So a change to the display models
+    # can be safely ignored here.
+    #
+    if path.startswith("sbt_common/internal_model"):
+        for project in PROJECTS:
+            if task.startswith(project.name) and (project.type == "sbt_app"):
+                if project.exclusive_path.startswith("storage/"):
+                    raise ChangeToUnusedLibrary("internal_model")
+                elif project.exclusive_path.startswith(("catalogue_", "sierra_")):
+                    raise ChangeToDependency("internal_model")
+
     # We have a library containing display models in sbt_common/display.
     #
     # Not every application uses these display models -- in particular,
     # all our pipeline applications.  So a change to the display models
-    # can be safely ignored here.  Specifically, applications in the
-    # following stacks:
-    #
-    #   - catalogue_pipeline
-    #   - reindexer
-    #   - goobi_adapter
-    #   - sierra_adapter
+    # can be safely ignored here.
     #
     if path.startswith("sbt_common/display"):
         for project in PROJECTS:
@@ -109,6 +118,7 @@ def does_file_affect_build_task(path, task):
                         "reindexer/",
                         "goobi_adapter/",
                         "sierra_adapter/",
+                        "storage/",
                     )
                 ):
                     raise ChangeToUnusedLibrary("display")
@@ -119,9 +129,7 @@ def does_file_affect_build_task(path, task):
     # quite a bit of the pipeline, and some of the adapters.  So a change
     # to the elasticsearch code can safely be ignored.
     #
-    if path.startswith(
-        ("sbt_common/elasticsearch", "sbt_common/finatra_elasticsearch")
-    ):
+    if path.startswith("sbt_common/elasticsearch"):
         for project in PROJECTS:
             if task.startswith(project.name) and (project.type == "sbt_app"):
                 if project.exclusive_path.startswith(
@@ -130,10 +138,10 @@ def does_file_affect_build_task(path, task):
                         "catalogue_pipeline/matcher",
                         "catalogue_pipeline/merger",
                         "catalogue_pipeline/recorder",
-                        "catalogue_pipeline/relater",
                         "reindexer/",
                         "goobi_adapter/",
                         "sierra_adapter/",
+                        "storage/",
                     )
                 ):
                     raise ChangeToUnusedLibrary("elasticsearch")
@@ -142,11 +150,20 @@ def does_file_affect_build_task(path, task):
     #
     # The catalogue API doesn't use this code, because it's not SQS-driven.
     #
-    if path.startswith(("sbt_common/messaging", "sbt_common/finatra_messaging")):
+    if path.startswith("sbt_common/config/messaging"):
         for project in PROJECTS:
             if task.startswith(project.name) and (project.type == "sbt_app"):
                 if project.exclusive_path.startswith(("catalogue_api/",)):
-                    raise ChangeToUnusedLibrary("messaging")
+                    raise ChangeToUnusedLibrary("config-messaging")
+                elif project.exclusive_path.startswith(
+                    (
+                        "catalogue_pipeline/",
+                        "sierra_adapter/",
+                        "reindexer/",
+                        "data_api/",
+                    )
+                ):
+                    raise ChangeToDependency("config-messaging")
 
     # We have a library for common storage code.
     #

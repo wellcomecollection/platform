@@ -34,7 +34,7 @@ class SierraOrganisationSubjectsTest
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
       subjects should have size 1
 
-      subjects.head.label shouldBe "United States. Supreme Court, Washington, DC. September 29, 2005, pictured."
+      subjects.head.agent.label shouldBe "United States. Supreme Court, Washington, DC. September 29, 2005, pictured."
     }
 
     it("uses repeated subfields for the label if necessary") {
@@ -52,7 +52,7 @@ class SierraOrganisationSubjectsTest
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
       subjects should have size 1
 
-      subjects.head.label shouldBe "United States. Army. Cavalry, 7th. Company E, depicted."
+      subjects.head.agent.label shouldBe "United States. Army. Cavalry, 7th. Company E, depicted."
     }
   }
 
@@ -65,7 +65,7 @@ class SierraOrganisationSubjectsTest
       )
 
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
-      val concepts = subjects.head.concepts
+      val concepts = subjects.head.agent.concepts
       concepts should have size 1
 
       val maybeDisplayableOrganisation = concepts.head
@@ -83,7 +83,7 @@ class SierraOrganisationSubjectsTest
       )
 
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
-      val concepts = subjects.head.concepts
+      val concepts = subjects.head.agent.concepts
       val organisation = concepts.head.agent
       organisation.label shouldBe "Wellcome Trust. Facilities, Health & Safety"
     }
@@ -99,18 +99,15 @@ class SierraOrganisationSubjectsTest
       )
 
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
-      val concepts = subjects.head.concepts
-      val maybeDisplayableOrganisation = concepts.head
-      maybeDisplayableOrganisation shouldBe a[Identifiable[_]]
 
-      val identifiableOrganisation = maybeDisplayableOrganisation
-        .asInstanceOf[Identifiable[Organisation]]
-      identifiableOrganisation.identifiers shouldBe List(
-        SourceIdentifier(
-          identifierType = IdentifierType("lc-names"),
-          ontologyType = "Organisation",
-          value = lcNamesCode
-        )
+      val subject = subjects.head
+      val identifiableSubject = subject
+        .asInstanceOf[Identifiable[Subject[Unidentifiable[Organisation]]]]
+
+      identifiableSubject.sourceIdentifier shouldBe SourceIdentifier(
+        identifierType = IdentifierType("lc-names"),
+        ontologyType = "Subject",
+        value = lcNamesCode
       )
     }
 
@@ -126,18 +123,15 @@ class SierraOrganisationSubjectsTest
       )
 
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
-      val concepts = subjects.head.concepts
-      val maybeDisplayableOrganisation = concepts.head
-      maybeDisplayableOrganisation shouldBe a[Identifiable[_]]
 
-      val identifiableOrganisation = maybeDisplayableOrganisation
-        .asInstanceOf[Identifiable[Organisation]]
-      identifiableOrganisation.identifiers shouldBe List(
-        SourceIdentifier(
-          identifierType = IdentifierType("lc-names"),
-          ontologyType = "Organisation",
-          value = "n1234"
-        )
+      val subject = subjects.head
+      val identifiableSubject = subject
+        .asInstanceOf[Identifiable[Subject[Unidentifiable[Organisation]]]]
+
+      identifiableSubject.sourceIdentifier shouldBe SourceIdentifier(
+        identifierType = IdentifierType("lc-names"),
+        ontologyType = "Subject",
+        value = "n1234"
       )
     }
 
@@ -152,7 +146,7 @@ class SierraOrganisationSubjectsTest
       )
 
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
-      val concepts = subjects.head.concepts
+      val concepts = subjects.head.agent.concepts
       val maybeDisplayableOrganisation = concepts.head
       maybeDisplayableOrganisation shouldBe a[Unidentifiable[_]]
     }
@@ -167,7 +161,7 @@ class SierraOrganisationSubjectsTest
       )
 
       val subjects = transformer.getSubjectsWithOrganisation(bibData)
-      val concepts = subjects.head.concepts
+      val concepts = subjects.head.agent.concepts
       val maybeDisplayableOrganisation = concepts.head
       maybeDisplayableOrganisation shouldBe a[Unidentifiable[_]]
     }

@@ -6,6 +6,7 @@ import uk.ac.wellcome.display.models.V2WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.generators.{
   ProductionEventGenerators,
+  SubjectGenerators,
   WorksGenerators
 }
 import uk.ac.wellcome.models.work.internal._
@@ -15,6 +16,7 @@ class DisplayWorkV2SerialisationTest
     with DisplayV2SerialisationTestBase
     with JsonMapperTestUtil
     with ProductionEventGenerators
+    with SubjectGenerators
     with WorksGenerators {
 
   it("serialises a DisplayWorkV2") {
@@ -128,10 +130,9 @@ class DisplayWorkV2SerialisationTest
   it(
     "includes subject information in DisplayWorkV2 serialisation with the subjects include") {
     val workWithSubjects = createIdentifiedWorkWith(
-      subjects = List(
-        Subject("label", List(Unidentifiable(Concept("fish")))),
-        Subject("label", List(Unidentifiable(Concept("gardening"))))
-      )
+      subjects = (1 to 3).map { _ =>
+        createSubject
+      }.toList
     )
 
     val expectedJson = s"""{

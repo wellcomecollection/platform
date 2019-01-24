@@ -29,18 +29,23 @@ trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
   //
   // https://www.loc.gov/marc/bibliographic/bd610.html
   //
-  def getSubjectsWithOrganisation(
-    bibData: SierraBibData): List[Subject[MaybeDisplayable[Organisation]]] =
+  def getSubjectsWithOrganisation(bibData: SierraBibData)
+    : List[MaybeDisplayable[Subject[MaybeDisplayable[Organisation]]]] =
     getMatchingVarFields(bibData, marcTag = "610").map { varField =>
       val label =
         createLabel(varField, subfieldTags = List("a", "b", "c", "d", "e"))
 
       val organisation = createOrganisation(varField)
 
-      Subject(
+      val subject = Subject(
         label = label,
         concepts = List(organisation)
       )
+
+      varField.indicator2 match {
+        case Some("0") => identify(varField.subfields, subject, "Subject")
+        case _         => Unidentifiable(subject)
+      }
     }
 
   private def createOrganisation(
@@ -55,13 +60,7 @@ trait SierraOrganisationSubjects extends SierraAgents with MarcUtils {
         s"Not enough information to build a label on $varField")
     }
 
-    val organisation = Organisation(label = label)
-
-    varField.indicator2 match {
-      case Some("0") =>
-        identify(varField.subfields, organisation, "Organisation")
-      case _ => Unidentifiable(organisation)
-    }
+    Unidentifiable(Organisation(label = label))
   }
 
   /** Given a varField and a list of subfield tags, create a label by

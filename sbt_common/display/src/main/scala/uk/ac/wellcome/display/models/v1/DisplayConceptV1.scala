@@ -3,7 +3,7 @@ package uk.ac.wellcome.display.models.v1
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.circe.generic.extras.JsonKey
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{AbstractRootConcept, Displayable}
 
 @ApiModel(
   value = "Concept",
@@ -18,10 +18,7 @@ case class DisplayConceptV1(
 
 case object DisplayConceptV1 {
   def apply(concept: Displayable[AbstractRootConcept]): DisplayConceptV1 = {
-    val label = concept match {
-      case Identified(c: AbstractRootConcept, _, _, _) => c.label
-      case Unidentifiable(c: AbstractRootConcept)      => c.label
-    }
+    val label = concept.agent.label
     DisplayConceptV1(label = label)
   }
 }
