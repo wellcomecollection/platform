@@ -167,13 +167,17 @@ def start_reindex(src, dst, mode, reason):
         max_records = click.prompt("How many records do you want to send?", default=10)
         parameters = partial_reindex_parameters(max_records)
 
-    username = boto3.client("iam").get_user()["User"]["UserName"]
-    slack_message = (
-        f"*{username}* started a {mode} reindex *{src!r}* ~> *{dst!r}*\n"
-        f"Reason: *{reason}*"
-    )
+    # TODO: This was broken by the move to AssumeRole, because the GetUser call
+    # doesn't work in an IAM role.  When we agree a replacement, we should apply
+    # it globally, including here.
 
-    post_to_slack(slack_message)
+    # username = boto3.client("iam").get_user()["User"]["UserName"]
+    # slack_message = (
+    #     f"*{username}* started a {mode} reindex *{src!r}* ~> *{dst!r}*\n"
+    #     f"Reason: *{reason}*"
+    # )
+
+    # post_to_slack(slack_message)
 
     topic_arn = get_reindexer_topic_arn()
 
