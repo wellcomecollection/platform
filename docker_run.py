@@ -40,12 +40,13 @@ def _aws_credentials_args():
     # https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html
     try:
         cmd = [
-            "--env", "AWS_PROFILE=%s" % os.environ["AWS_PROFILE"],
-
+            "--env",
+            "AWS_PROFILE=%s" % os.environ["AWS_PROFILE"],
             # We need this environment variable or Terraform doesn't pick up
             # the AWS_PROFILE variable.  See:
             # https://github.com/terraform-providers/terraform-provider-aws/issues/233
-            "--env", "AWS_SDK_LOAD_CONFIG=1",
+            "--env",
+            "AWS_SDK_LOAD_CONFIG=1",
         ]
     except KeyError:
         cmd = []
