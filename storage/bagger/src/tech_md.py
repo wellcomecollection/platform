@@ -20,7 +20,7 @@ def add_premis_significant_prop(premis_file, p_type, value):
 
 
 def remodel_file_technical_metadata(root, id_map):
-    logging.info("transforming Tessella techMD")
+    logging.debug("transforming Tessella techMD")
     x_path = ".//mets:xmlData[tessella:File]"
     tessella_file_xmldata = root.findall(x_path, namespaces)
     for xmldata in tessella_file_xmldata:
@@ -52,7 +52,7 @@ def remodel_file_technical_metadata(root, id_map):
                 premis_name = mappings.SIGNIFICANT_PROPERTIES[name]
                 add_premis_significant_prop(premis_file, premis_name, value)
             elif name in mappings.IGNORED_PROPERTIES:
-                logging.info("Ignoring property name {0}".format(name))
+                logging.debug("Ignoring property name {0}".format(name))
             else:
                 message = "Unknown file property: {0}".format(name)
                 raise ValueError(message)

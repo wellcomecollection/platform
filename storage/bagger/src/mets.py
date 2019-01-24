@@ -52,11 +52,11 @@ def get_file_pointer_link(struct_div):
     xlink_href = expand("xlink", "href")
     link = struct_div[0].get(xlink_href)
     if not link.endswith(".xml"):
-        logging.info("Adding .xml to mets file pointer")
+        logging.debug("Adding .xml to mets file pointer")
         link = link + ".xml"
         struct_div[0].set(xlink_href, link)
 
-    logging.info("obtained link from pointer: " + link)
+    logging.debug("obtained link from pointer: " + link)
     return link
 
 
@@ -77,7 +77,7 @@ the AMD to start at _0001
 
     :param root: The METS file
     """
-    logging.info("Looking at DeliverableUnit")
+    logging.debug("Looking at DeliverableUnit")
     x_path = ".//mets:xmlData[tessella:DeliverableUnit]"
     du_xmldata = root.findall(x_path, namespaces)
     if len(du_xmldata) != 1:
@@ -118,13 +118,13 @@ def is_ignorable_file(tech_md):
         "./mets:mdWrap/mets:xmlData/tessella:File/tessella:FileName", namespaces
     )
     if len(file_name_els) == 1:
-        logging.info("ignoring techMd file " + file_name_els[0].text)
+        logging.debug("ignoring techMd file " + file_name_els[0].text)
         return file_name_els[0].text in mappings.IGNORED_TECHMD_FILENAMES
     return False
 
 
 def remodel_file_section(root):
-    logging.info("transforming file section")
+    logging.debug("transforming file section")
     sdb_file_group = root.find("./mets:fileSec/mets:fileGrp[@USE='SDB']", namespaces)
     sdb_file_group.set("USE", "OBJECTS")
     for sdb_file in sdb_file_group:
@@ -144,24 +144,24 @@ def remodel_file_section(root):
 
 
 def get_physical_file_maps(root):
-    logging.info("building a map of the physical files to simplify lookups")
+    logging.debug("building a map of the physical files to simplify lookups")
     physical_struct_map = root.find("./mets:structMap[@TYPE='PHYSICAL']", namespaces)
     if physical_struct_map is None:
-        logging.info("No physical struct map (may be anchor file)")
+        logging.debug("No physical struct map (may be anchor file)")
         return None
 
     tech_file_infos = {}
     amds = root.find("./mets:amdSec[@ID='AMD']", namespaces)
-    logging.info("{0} tech mds to process".format(len(amds)))
+    logging.debug("{0} tech mds to process".format(len(amds)))
     for tech_md in amds:
         adm_id = tech_md.get("ID")
         premis_object = tech_md.find(".//premis:object", namespaces)
         if premis_object is None:
-            logging.info("No premis:object element for " + adm_id)
+            logging.debug("No premis:object element for " + adm_id)
 
         else:
             adm_id = tech_md.get("ID")
-            logging.info("adding " + adm_id + " to map")
+            logging.debug("adding " + adm_id + " to map")
             uuid_el = premis_object.find(
                 "./premis:objectIdentifier[premis:objectIdentifierType='uuid']",
                 namespaces,
