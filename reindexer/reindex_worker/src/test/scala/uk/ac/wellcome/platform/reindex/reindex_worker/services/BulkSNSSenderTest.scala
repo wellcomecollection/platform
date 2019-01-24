@@ -6,8 +6,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
-import uk.ac.wellcome.models.work.generators.IdentifiersGenerators
 import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.BulkSNSSenderFixture
+
+import scala.util.Random
 
 class BulkSNSSenderTest
     extends FunSpec
@@ -15,12 +16,11 @@ class BulkSNSSenderTest
     with MockitoSugar
     with ScalaFutures
     with BulkSNSSenderFixture
-    with IdentifiersGenerators
     with IntegrationPatience
     with SNS {
 
   val messages: List[String] = (1 to 3).map { _ =>
-    randomAlphanumeric(15)
+    Random.alphanumeric take 15 mkString
   }.toList
 
   it("sends messages for the provided IDs") {

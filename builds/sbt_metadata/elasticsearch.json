@@ -1,0 +1,8 @@
+{
+  "id": "elasticsearch",
+  "folder": "sbt_common/elasticsearch",
+  "dependencyIds": [
+    "common",
+    "internal_model"
+  ]
+}

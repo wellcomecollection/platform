@@ -1,0 +1,10 @@
+{
+  "id": "matcher",
+  "folder": "catalogue_pipeline/matcher",
+  "dependencyIds": [
+    "common",
+    "internal_model",
+    "config_messaging",
+    "config_storage"
+  ]
+}

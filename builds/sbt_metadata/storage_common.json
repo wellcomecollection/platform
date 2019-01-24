@@ -1,0 +1,9 @@
+{
+  "id": "storage_common",
+  "folder": "storage/common",
+  "dependencyIds": [
+    "common",
+    "config_messaging",
+    "config_storage"
+  ]
+}

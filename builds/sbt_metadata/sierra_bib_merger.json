@@ -1,0 +1,8 @@
+{
+  "id": "sierra_bib_merger",
+  "folder": "sierra_adapter/sierra_bib_merger",
+  "dependencyIds": [
+    "common",
+    "sierra_adapter_common"
+  ]
+}

@@ -25,7 +25,6 @@ cache:
 
     - catalogue_api/api/target
 
-    - catalogue_pipeline/common/target
     - catalogue_pipeline/id_minter/target
     - catalogue_pipeline/ingestor/target
     - catalogue_pipeline/matcher/target
@@ -38,7 +37,7 @@ cache:
 
     - goobi_adapter/goobi_reader/target
 
-    - reindexer/reindex_request_creator/target
+    - reindexer/reindex_worker/target
 
     - sbt_common/common/target
     - sbt_common/config/core/target
@@ -57,7 +56,7 @@ cache:
     - sierra_adapter/sierra_item_merger/target
 
     - storage/archivist/target
-    - storage/commmon/target
+    - storage/common/target
     - storage/display/target
     - storage/notifier/target
     - storage/ingests/target
@@ -66,6 +65,7 @@ cache:
     - storage/bags/target
     - storage/bags_common/target
     - storage/bags_api/target
+    - storage/bag_replicator/target
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching

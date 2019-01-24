@@ -151,6 +151,8 @@ object Dependencies {
     "com.typesafe" % "config" % versions.typesafe
   )
 
+  val typesafeCoreDependencies: Seq[ModuleID] = typesafeDependencies ++ akkaDependencies
+
   val configMessagingDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.messagingLibrary
 
   val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
@@ -190,6 +192,8 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-cloudwatchmetrics" % versions.aws
   ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 
-  val registrarHttpDependencies: Seq[ModuleID] = circeOpticsDependencies
-  val progressHttpDependencies: Seq[ModuleID] = circeOpticsDependencies
+  val goobiReaderDependencies: Seq[ModuleID] = WellcomeDependencies.jsonLibrary
+
+  val bagsApiDependencies: Seq[ModuleID] = circeOpticsDependencies
+  val ingestsApiDependencies: Seq[ModuleID] = circeOpticsDependencies
 }
