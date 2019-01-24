@@ -53,7 +53,7 @@ def does_file_affect_build_task(path, task):
         ".travis.yml",
         "run_travis_task.py",
         "run_travis_lambdas.py",
-    ] or path.startswith(("misc/", "ontologies/", "data_science/scripts/")):
+    ] or path.startswith(("misc/", "ontologies/", "data_science/scripts/", "builds/sbt_metadata/")):
         raise IgnoredPath()
 
     # If this is a test file and we're in a publish task, we can skip

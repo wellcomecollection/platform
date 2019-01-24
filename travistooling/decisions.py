@@ -13,7 +13,6 @@ class SignificantFile(Decision):
     """
     This file might an effect on the outcome of the current build task.
     """
-
     is_significant = True
 
 
@@ -21,7 +20,6 @@ class InsignificantFile(Decision):
     """
     This file does not have an effect on the outcome of the current build task.
     """
-
     is_significant = False
 
 
