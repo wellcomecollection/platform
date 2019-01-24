@@ -283,6 +283,8 @@ test_cases = [
     ),
     ("build.sbt", "ingestor-test", SignificantFile, True),
     ("project/Dependencies.scala", "ingestor-test", SignificantFile, True),
+    ("builds/sbt_metadata/api.json", "goobi_reader-test", IgnoredPath, False),
+    ("storage/bagger/src/tech_md.py", "bagger-publish", UnrecognisedFile, True),
 ]
 
 
