@@ -285,6 +285,8 @@ test_cases = [
         InsignificantFile,
         False,
     ),
+    ("build.sbt", "ingestor-test", SignificantFile, True),
+    ("project/Dependencies.scala", "ingestor-test", SignificantFile, True),
 ]
 
 
@@ -308,9 +310,7 @@ def test_should_not_run_job_with_no_relevant_changes():
         True,
         {
             True: {
-                SignificantFile.message: set(
-                    ["sierra_adapter/common/main.scala"]
-                )
+                SignificantFile.message: set(["sierra_adapter/common/main.scala"])
             },
             False: {},
         },
@@ -319,17 +319,15 @@ def test_should_not_run_job_with_no_relevant_changes():
 
 def test_should_run_build_task_with_relevant_changes():
     result = should_run_build_task(
-        changed_paths=["sierra_adapter/common/main.scala", "loris/loris/Dockerfile"],
-        task="loris-test",
+        changed_paths=["sierra_adapter/common/main.scala"],
+        task="ingestor-test",
     )
     assert result == (
-        True,
+        False,
         {
-            True: {
-                UnrecognisedFile.message: set(
-                    ["sierra_adapter/common/main.scala", "loris/loris/Dockerfile"]
-                )
+            False: {
+                InsignificantFile.message: set(["sierra_adapter/common/main.scala"])
             },
-            False: {},
+            True: {},
         },
     )
