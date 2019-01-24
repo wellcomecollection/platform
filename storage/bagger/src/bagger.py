@@ -35,7 +35,7 @@ def bag_from_identifier(identifier, skip_file_download):
     root = tree.getroot()
     title = mets.get_title(root)
 
-    logging.info("#### Bagging {0}: {1}".format(b_number, title))
+    logging.info("-> started bagging {0}: {1}".format(b_number, title))
     logging.debug(
         "We will transform xml that involves Preservica, and the tessella namespace"
     )
