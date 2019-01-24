@@ -1,1 +1,8 @@
-{"id" : "config_elasticsearch", "folder" : "sbt_common\/config\/elasticsearch", "dependencyIds" : ["config_core", "elasticsearch"]}
+{
+  "id": "config_elasticsearch",
+  "folder": "sbt_common/config/elasticsearch",
+  "dependencyIds": [
+    "config_core",
+    "elasticsearch"
+  ]
+}

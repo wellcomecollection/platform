@@ -1,1 +1,10 @@
-{"id" : "recorder", "folder" : "catalogue_pipeline\/recorder", "dependencyIds" : ["common", "internal_model", "config_messaging", "config_storage"]}
+{
+  "id": "recorder",
+  "folder": "catalogue_pipeline/recorder",
+  "dependencyIds": [
+    "common",
+    "internal_model",
+    "config_messaging",
+    "config_storage"
+  ]
+}

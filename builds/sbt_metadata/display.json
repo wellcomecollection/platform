@@ -1,1 +1,7 @@
-{"id" : "display", "folder" : "sbt_common\/display", "dependencyIds" : ["internal_model"]}
+{
+  "id": "display",
+  "folder": "sbt_common/display",
+  "dependencyIds": [
+    "internal_model"
+  ]
+}

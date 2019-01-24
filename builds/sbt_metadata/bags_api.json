@@ -1,1 +1,8 @@
-{"id" : "bags_api", "folder" : "storage\/bags_api", "dependencyIds" : ["bags_common", "storage_display"]}
+{
+  "id": "bags_api",
+  "folder": "storage/bags_api",
+  "dependencyIds": [
+    "bags_common",
+    "storage_display"
+  ]
+}

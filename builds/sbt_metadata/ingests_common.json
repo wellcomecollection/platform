@@ -1,1 +1,7 @@
-{"id" : "ingests_common", "folder" : "storage\/ingests_common", "dependencyIds" : ["storage_common"]}
+{
+  "id": "ingests_common",
+  "folder": "storage/ingests_common",
+  "dependencyIds": [
+    "storage_common"
+  ]
+}

@@ -1,1 +1,7 @@
-{"id" : "config_core", "folder" : "sbt_common\/config\/core", "dependencyIds" : ["common"]}
+{
+  "id": "config_core",
+  "folder": "sbt_common/config/core",
+  "dependencyIds": [
+    "common"
+  ]
+}

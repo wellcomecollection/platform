@@ -1,1 +1,10 @@
-{"id" : "api", "folder" : "catalogue_api\/api", "dependencyIds" : ["common", "internal_model", "display", "elasticsearch"]}
+{
+  "id": "api",
+  "folder": "catalogue_api/api",
+  "dependencyIds": [
+    "common",
+    "internal_model",
+    "display",
+    "elasticsearch"
+  ]
+}
