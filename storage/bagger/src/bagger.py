@@ -189,7 +189,9 @@ def main():
 
     skip_file_download = False
     if len(sys.argv) == 3 and sys.argv[2] == "no-bag":
-        logging.debug("skipping copying and bagging operations, will just process METS.")
+        logging.debug(
+            "skipping copying and bagging operations, will just process METS."
+        )
         skip_file_download = True
 
     identifier = sys.argv[1]
