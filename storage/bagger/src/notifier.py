@@ -13,5 +13,5 @@ def _publish_notification(result):
 
 
 def bagging_complete(result):
-    logging.info("Bagging complete for %s", result["identifier"])
+    logging.info("#### Bagging complete for %s in %s secs", result["identifier"], "{0:.1f}".format(result["duration"]))
     _publish_notification(result)
