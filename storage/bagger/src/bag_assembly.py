@@ -1,6 +1,7 @@
 import os
 import shutil
 import settings
+import logging
 
 
 def clean_working_dir():
@@ -14,11 +15,11 @@ def clean_working_dir():
 
 def cleanup_bnumber_files(b_number):
     directory = os.path.join(settings.WORKING_DIRECTORY, b_number)
-    print("deleting " + directory)
+    logging.debug("deleting %s", directory)
     if os.path.isdir(directory):
         shutil.rmtree(directory)
     zipfile = os.path.join(settings.WORKING_DIRECTORY, b_number + ".zip")
-    print("deleting " + zipfile)
+    logging.debug("deleting %s", zipfile)
     if os.path.isfile(zipfile):
         os.remove(zipfile)
 

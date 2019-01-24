@@ -37,7 +37,7 @@ def main():
         start = time.time()
         counter = 0
         for b_number in bnumber_generator(filter):
-            logging.info("processing " + b_number)
+            logging.debug("processing " + b_number)
             message = {"identifier": b_number, "do_not_bag": skip}
             result = bagger_processor.process_bagging_message(message)
             error = result.get("error", None)

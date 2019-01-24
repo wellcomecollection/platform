@@ -43,7 +43,7 @@ def main():
 
         for b_number in bnumber_generator(to_process):
             counter = counter + 1
-            logging.info("processing " + b_number)
+            logging.debug("processing " + b_number)
             message = {"identifier": b_number, "do_not_bag": skip}
             print("{0}: enqueueing {1}, {2}".format(counter, b_number, info))
             response = aws.send_bag_instruction(message)

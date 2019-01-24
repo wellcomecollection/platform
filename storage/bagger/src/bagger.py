@@ -19,7 +19,11 @@ import aws
 import tech_md
 from xml_help import load_from_disk, load_from_string
 
-logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+logging.basicConfig(
+    format="%(process)d - %(threadName)s - %(levelname)s: %(message)s",
+    level=logging.INFO,
+)
+logging.getLogger("bagit").setLevel(logging.ERROR)
 
 
 def bag_from_identifier(identifier, skip_file_download):
@@ -28,14 +32,14 @@ def bag_from_identifier(identifier, skip_file_download):
     id_map = collections.OrderedDict()
     mets_path = "{0}{1}.xml".format(bag_details["mets_partial_path"], b_number)
 
-    logging.info("process METS or anchor file at %s", mets_path)
+    logging.debug("process METS or anchor file at %s", mets_path)
 
     tree = load_xml(mets_path)
     root = tree.getroot()
     title = mets.get_title(root)
 
-    logging.info("#### {0}: {1}".format(b_number, title))
-    logging.info(
+    logging.info("-> started bagging {0}: {1}".format(b_number, title))
+    logging.debug(
         "We will transform xml that involves Preservica, and the tessella namespace"
     )
 
@@ -48,8 +52,8 @@ def bag_from_identifier(identifier, skip_file_download):
     struct_type = struct_div.get("TYPE")
     struct_label = struct_div.get("LABEL")
 
-    logging.info("Found structDiv with TYPE " + struct_type)
-    logging.info("LABEL: " + struct_label)
+    logging.debug("Found structDiv with TYPE " + struct_type)
+    logging.debug("LABEL: " + struct_label)
 
     root_mets_file = os.path.join(bag_details["directory"], "{0}.xml".format(b_number))
 
@@ -59,8 +63,8 @@ def bag_from_identifier(identifier, skip_file_download):
     # agree with each other, etc.
 
     if mets.is_collection(struct_type):
-        logging.info("This root METS file is an _anchor_ file.")
-        logging.info("It points to multiple manifestations.")
+        logging.debug("This root METS file is an _anchor_ file.")
+        logging.debug("It points to multiple manifestations.")
         # probably don't need other transforms as no reference to assets
         # That is, nothing will change if the assets are stored elsewhere
         manifestation_relative_paths = []
@@ -71,29 +75,29 @@ def bag_from_identifier(identifier, skip_file_download):
             assert int(order) > 0, "ORDER {0} <= 0".format(order)  # can it be 0?
             assert len(div) == 1, "one and only one child element"
             file_pointer_href = mets.get_file_pointer_link(div)
-            logging.info("link to manifestation file: " + file_pointer_href)
+            logging.debug("link to manifestation file: " + file_pointer_href)
             manifestation_relative_paths.append((file_pointer_href, order))
 
         # TODO - we have stored the order, we could validate that the manifestation files match this order
 
-        logging.info("writing new anchor file to bag")
+        logging.debug("writing new anchor file to bag")
         tree.write(root_mets_file, encoding="utf-8", xml_declaration=True)
         aws.save_mets_to_side(b_number, root_mets_file)
         # then go through the linked files _0001 etc
         for rel_path in manifestation_relative_paths:
             full_path = bag_details["mets_partial_path"] + rel_path[0]
-            logging.info("loading manifestation " + full_path)
-            logging.info("ORDER: {0}".format(rel_path[1]))
+            logging.debug("loading manifestation " + full_path)
+            logging.debug("ORDER: {0}".format(rel_path[1]))
             mf_tree = load_xml(full_path)
             mf_root = mf_tree.getroot()
             manif_struct_div = mets.get_logical_struct_div(mf_root)
             link_to_anchor = mets.get_file_pointer_link(manif_struct_div)
-            logging.info("{0} should be link back to anchor".format(link_to_anchor))
+            logging.debug("{0} should be link back to anchor".format(link_to_anchor))
             process_manifestation(mf_root, bag_details, skip_file_download, id_map)
             # not os separator, this is in the METS; always /
             parts = rel_path[0].split("/")
             manifestation_file = os.path.join(bag_details["directory"], *parts)
-            logging.info("writing manifestation to bag: " + manifestation_file)
+            logging.debug("writing manifestation to bag: " + manifestation_file)
             mf_tree.write(manifestation_file, encoding="utf-8", xml_declaration=True)
             aws.save_mets_to_side(b_number, manifestation_file)
 
@@ -119,7 +123,7 @@ def bag_from_identifier(identifier, skip_file_download):
 
     bag_assembly.cleanup_bnumber_files(b_number)
 
-    logging.info("Finished {0}".format(b_number))
+    logging.debug("Finished bagging {0}".format(b_number))
 
     return upload_location
 
@@ -135,29 +139,29 @@ def process_manifestation(root, bag_details, skip_file_download, id_map):
 
 def load_xml(path):
     if settings.READ_METS_FROM_FILESHARE:
-        logging.info("Reading METS from Windows Fileshare")
+        logging.debug("Reading METS from Windows Fileshare")
         return load_from_disk(settings.METS_FILESYSTEM_ROOT + path)
 
-    logging.info("Reading METS from S3")
+    logging.debug("Reading METS from S3")
     xml_string = aws.get_mets_xml(path)
     return load_from_string(xml_string)
 
 
 def dispatch_bag(bag_details):
     # now zip this bag in a way that will be efficient for the archiver
-    logging.info("creating zip file for " + bag_details["b_number"])
+    logging.debug("creating zip file for " + bag_details["b_number"])
 
     shutil.make_archive(
         bag_details["zip_file_path"][0:-4], "zip", bag_details["directory"]
     )
 
-    logging.info("uploading " + bag_details["zip_file_name"] + " to S3")
+    logging.debug("uploading " + bag_details["zip_file_name"] + " to S3")
 
     upload_location = aws.upload(
         bag_details["zip_file_path"], bag_details["zip_file_name"]
     )
 
-    logging.info("upload completed")
+    logging.debug("upload completed")
 
     return upload_location
 
@@ -188,7 +192,9 @@ def main():
 
     skip_file_download = False
     if len(sys.argv) == 3 and sys.argv[2] == "no-bag":
-        logging.info("skipping copying and bagging operations, will just process METS.")
+        logging.debug(
+            "skipping copying and bagging operations, will just process METS."
+        )
         skip_file_download = True
 
     identifier = sys.argv[1]
