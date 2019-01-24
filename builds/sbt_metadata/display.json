@@ -1,0 +1,5 @@
+{
+  "id": "display",
+  "folder": "sbt_common/display",
+  "dependsOn": ["internal_model"]
+}

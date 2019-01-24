@@ -1,0 +1,5 @@
+{
+  "id": "notifier",
+  "folder": "storage/notifier",
+  "dependsOn": ["storage_common", "storage_display"]
+}

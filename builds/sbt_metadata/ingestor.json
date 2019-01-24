@@ -1,0 +1,5 @@
+{
+  "id": "ingestor",
+  "folder": "catalogue_pipeline/ingestor",
+  "dependsOn": ["common", "config_elasticsearch", "config_messaging"]
+}

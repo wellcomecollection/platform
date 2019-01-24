@@ -1,0 +1,5 @@
+{
+  "id": "merger",
+  "folder": "catalogue_pipeline/merger",
+  "dependsOn": ["common", "internal_model", "config_messaging"]
+}

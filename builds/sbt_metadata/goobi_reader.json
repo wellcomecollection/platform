@@ -1,0 +1,5 @@
+{
+  "id": "goobi_reader",
+  "folder": "goobi_adapter/goobi_reader",
+  "dependsOn": ["config_messaging", "config_storage"]
+}

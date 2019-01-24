@@ -1,0 +1,5 @@
+{
+  "id": "config_messaging",
+  "folder": "sbt_common/config/messaging",
+  "dependsOn": ["config_core", "config_monitoring", "config_storage"]
+}

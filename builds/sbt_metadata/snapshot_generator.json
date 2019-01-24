@@ -1,0 +1,5 @@
+{
+  "id": "snapshot_generator",
+  "folder": "data_api/snapshot_generator",
+  "dependsOn": ["common", "internal_model", "display", "config_elasticsearch", "config_messaging"]
+}

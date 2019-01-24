@@ -1,0 +1,5 @@
+{
+  "id": "reindex_worker",
+  "folder": "reindexer/reindex_worker",
+  "dependsOn": ["common", "config_messaging", "config_storage"]
+}

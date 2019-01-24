@@ -1,0 +1,5 @@
+{
+  "id": "bag_replicator",
+  "folder": "storage/bag_replicator",
+  "dependsOn": ["storage_common"]
+}

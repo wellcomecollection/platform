@@ -1,0 +1,5 @@
+{
+  "id": "archivist",
+  "folder": "storage/archivist",
+  "dependsOn": ["storage_common"]
+}

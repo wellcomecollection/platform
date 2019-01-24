@@ -1,0 +1,5 @@
+{
+  "id": "ingests_api",
+  "folder": "storage/ingests_api",
+  "dependsOn": ["ingests_common", "storage_display"]
+}

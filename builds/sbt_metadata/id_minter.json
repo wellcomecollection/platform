@@ -1,0 +1,5 @@
+{
+  "id": "id_minter",
+  "folder": "catalogue_pipeline/id_minter",
+  "dependsOn": ["common", "internal_model", "config_messaging"]
+}

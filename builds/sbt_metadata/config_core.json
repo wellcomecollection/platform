@@ -1,0 +1,5 @@
+{
+  "id": "config_core",
+  "folder": "sbt_common/config/core",
+  "dependsOn": ["common"]
+}

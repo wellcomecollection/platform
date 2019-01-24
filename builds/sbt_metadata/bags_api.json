@@ -1,0 +1,5 @@
+{
+  "id": "bags_api",
+  "folder": "storage/bags_api",
+  "dependsOn": ["bags_common", "storage_display"]
+}
