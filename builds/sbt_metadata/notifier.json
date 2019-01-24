@@ -1,5 +1,1 @@
-{
-  "id": "notifier",
-  "folder": "storage/notifier",
-  "dependsOn": ["storage_common", "storage_display"]
-}
+{"id" : "notifier", "folder" : "storage\/notifier", "dependencyIds" : ["storage_common", "storage_display"]}

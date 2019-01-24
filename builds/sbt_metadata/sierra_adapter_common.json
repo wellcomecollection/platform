@@ -1,5 +1,1 @@
-{
-  "id": "sierra_adapter_common",
-  "folder": "sierra_adapter/common",
-  "dependsOn": ["internal_model", "config_messaging", "config_storage"]
-}
+{"id" : "sierra_adapter_common", "folder" : "sierra_adapter\/common", "dependencyIds" : ["internal_model", "config_messaging", "config_storage"]}

@@ -1,5 +1,1 @@
-{
-  "id": "bags",
-  "folder": "storage/bags",
-  "dependsOn": ["bags_common"]
-}
+{"id" : "bags", "folder" : "storage\/bags", "dependencyIds" : ["bags_common"]}

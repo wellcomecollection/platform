@@ -1,5 +1,1 @@
-{
-  "id": "common",
-  "folder": "sbt_common/common",
-  "dependsOn": []
-}
+{"id" : "common", "folder" : "sbt_common\/common", "dependencyIds" : []}

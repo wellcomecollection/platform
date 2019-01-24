@@ -1,5 +1,1 @@
-{
-  "id": "config_monitoring",
-  "folder": "sbt_common/config/monitoring",
-  "dependsOn": ["config_core"]
-}
+{"id" : "config_monitoring", "folder" : "sbt_common\/config\/monitoring", "dependencyIds" : ["config_core"]}

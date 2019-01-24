@@ -1,5 +1,1 @@
-{
-  "id": "transformer_miro",
-  "folder": "catalogue_pipeline/transformer/transformer_miro",
-  "dependsOn": ["common", "internal_model", "config_messaging"]
-}
+{"id" : "transformer_miro", "folder" : "catalogue_pipeline\/transformer\/transformer_miro", "dependencyIds" : ["common", "internal_model", "config_messaging"]}

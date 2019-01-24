@@ -2,6 +2,8 @@ import sbt.Keys._
 
 import java.io.File
 
+import scala.util.parsing.json.{JSONArray, JSONObject}
+
 def setupProject(
   project: Project,
   folder: String,
@@ -15,18 +17,17 @@ def setupProject(
   // up-to-date project graph.
   // See https://www.scala-sbt.org/release/docs/Howto-Generating-Files.html
   val file = new File(s"builds/sbt_metadata/${project.id}.json")
-  val dependenciesJson = localDependencies
+  val dependencyIds: List[String] = localDependencies
     .map { p: Project => p.id }
-    .map { id: String => s""""$id""""}
-    .mkString(", ")
+    .toList
 
-  IO.write(file, s"""
-    |{
-    |  "id": "${project.id}",
-    |  "folder": "${folder}",
-    |  "dependsOn": [${dependenciesJson}]
-    |}
-  """.stripMargin.trim)
+  val metadata = Map(
+    "id" -> project.id,
+    "folder" -> folder,
+    "dependencyIds" -> JSONArray(dependencyIds)
+  )
+
+  IO.write(file, JSONObject(metadata).toString())
 
   // And here we actually create the project, with a few convenience wrappers
   // to make defining projects below cleaner.
