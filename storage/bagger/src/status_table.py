@@ -10,9 +10,13 @@ def get_table():
 
 
 def record_bagger_activity(bnumber, field):
-    update_expression = "SET {0} = :bga".format(field)
+    record_bagger_data(bnumber, field, datetime.datetime.now().isoformat())
+
+
+def record_bagger_data(bnumber, field, value):
+    update_expression = "SET {0} = :v".format(field)
     get_table().update_item(
         Key={"bnumber": bnumber},
-        ExpressionAttributeValues={":bga": datetime.datetime.now().isoformat()},
+        ExpressionAttributeValues={":v": value},
         UpdateExpression=update_expression,
     )
