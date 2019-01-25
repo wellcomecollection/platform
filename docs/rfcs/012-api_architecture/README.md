@@ -1,4 +1,4 @@
-# RFC 011: API Architecture
+# RFC 012: API Architecture
 
 **Last updated: 09 January 2019.**
 
