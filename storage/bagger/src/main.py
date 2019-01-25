@@ -22,16 +22,17 @@ def main():
                 try:
                     body = json.loads(message.body)
                     bnumber = body["identifier"]
-                    status_table.record_bagger_activity(bnumber, "bagger_start")
-                    status_table.record_bagger_data(
-                        bnumber, "bagger_batch_id", body["bagger_batch_id"]
-                    )
-                    status_table.record_bagger_data(
-                        bnumber, "bagger_filter", body["bagger_filter"]
+                    status_table.record_data(
+                        bnumber,
+                        {
+                            "bagger_start": status_table.activity_timestamp(),
+                            "bagger_batch_id": body["bagger_batch_id"],
+                            "bagger_filter": body["bagger_filter"],
+                        },
                     )
                     message.delete()
                     process_message(body)
-                    status_table.record_bagger_activity(bnumber, "bagger_end")
+                    status_table.record_activity(bnumber, "bagger_end")
                 except Exception as e:
                     print("Unhandled exception {0}".format(e))
 

@@ -1,6 +1,7 @@
 import fire
 import aws
 import time
+import uuid
 import datetime
 import dateutil
 import settings
@@ -8,8 +9,8 @@ import requests
 import json
 import storage_api
 import dds
+import status_table
 from mets_filesource import bnumber_generator
-from status_table import get_table
 
 
 def json_default(o):
@@ -38,7 +39,7 @@ def get_min_bag_date():
 
 
 def update_bag_and_ingest_status(delay, filter, check_package, check_alto):
-    table = get_table()
+    table = status_table.get_table()
     no_ingest = {
         "id": "-",
         "status": {"id": "no-ingest"},
@@ -143,9 +144,13 @@ def empty_item(bnumber):
 
 
 def do_ingest(delay, filter):
+    batch_id = str(uuid.uuid4())
     print("[")
     for bnumber in bnumber_generator(filter):
         ingest = storage_api.ingest(bnumber)
+        status_table.record_data(
+            bnumber, {"ingest_batch_id": batch_id, "ingest_filter": filter}
+        )
         print(json.dumps(ingest, default=json_default, indent=4))
         print(",")
         if delay > 0:
@@ -155,7 +160,7 @@ def do_ingest(delay, filter):
 
 
 def call_dds(delay, filter):
-    table = get_table()
+    table = status_table.get_table()
     for bnumber in bnumber_generator(filter):
         print("[")
         url = settings.DDS_GOOBI_NOTIFICATION.format(bnumber)
