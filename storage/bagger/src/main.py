@@ -23,8 +23,12 @@ def main():
                     body = json.loads(message.body)
                     bnumber = body["identifier"]
                     status_table.record_bagger_activity(bnumber, "bagger_start")
-                    status_table.record_bagger_data(bnumber, "bagger_batch_id", body["bagger_batch_id"])
-                    status_table.record_bagger_data(bnumber, "bagger_filter", body["bagger_filter"])
+                    status_table.record_bagger_data(
+                        bnumber, "bagger_batch_id", body["bagger_batch_id"]
+                    )
+                    status_table.record_bagger_data(
+                        bnumber, "bagger_filter", body["bagger_filter"]
+                    )
                     message.delete()
                     process_message(body)
                     status_table.record_bagger_activity(bnumber, "bagger_end")
