@@ -18,9 +18,6 @@ def json_default(o):
 
 
 class MigrationTool(object):
-    def populate_initial(self, filter=""):
-        populate_initial(filter)
-
     def update_status(self, delay, filter="", check_package=False, check_alto=False):
         update_bag_and_ingest_status(delay, filter, check_package, check_alto)
 
@@ -29,20 +26,6 @@ class MigrationTool(object):
 
     def simulate_goobi_call(self, delay, filter=""):
         call_dds(delay, filter)
-
-
-def populate_initial(filter):
-    table = get_table()
-    chunk_counter = 0
-    b_counter = 0
-    for chunk in batch(bnumber_generator(filter)):
-        chunk_counter = chunk_counter + 1
-        print("...inserting chunk {0}".format(chunk_counter))
-        with table.batch_writer() as db_batch:
-            for bnumber in chunk:
-                b_counter = b_counter + 1
-                db_batch.put_item(Item={"bnumber": bnumber})
-    print("FINISHED, inserted {0} b numbers in {1} chunks.", b_counter, chunk_counter)
 
 
 def get_min_bag_date():
@@ -167,7 +150,6 @@ def do_ingest(delay, filter):
         print(",")
         if delay > 0:
             time.sleep(delay)
-
     print('"end"')
     print("]")
 

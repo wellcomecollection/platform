@@ -24,6 +24,7 @@ import sys
 import time
 import logging
 import aws
+import uuid
 from mets_filesource import bnumber_generator
 
 
@@ -41,10 +42,15 @@ def main():
         start = time.time()
         counter = 0
 
+        batch_id = str(uuid.uuid4())
+
         for b_number in bnumber_generator(to_process):
             counter = counter + 1
             logging.debug("processing " + b_number)
-            message = {"identifier": b_number, "do_not_bag": skip}
+            message = {"identifier": b_number,
+                       "bagger_batch_id": batch_id,
+                       "bagger_filter": to_process,
+                       "do_not_bag": skip}
             print("{0}: enqueueing {1}, {2}".format(counter, b_number, info))
             response = aws.send_bag_instruction(message)
             message["MessageId"] = response.get("MessageId", "NO-MESSAGE-ID")
