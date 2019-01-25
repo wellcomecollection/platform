@@ -9,14 +9,22 @@ def get_table():
     return table
 
 
-def record_bagger_activity(bnumber, field):
-    record_bagger_data(bnumber, field, datetime.datetime.now().isoformat())
+def record_activity(bnumber, field):
+    record_data(bnumber, {field: activity_timestamp()})
 
 
-def record_bagger_data(bnumber, field, value):
-    update_expression = "SET {0} = :v".format(field)
+def activity_timestamp():
+    datetime.datetime.now().isoformat()
+
+
+def record_data(bnumber, data):
+    placeholders = [f":v{x+1}" for x in range(len(data))]
+    key_to_placeholder = dict(zip(data.keys(), placeholders))
+    expression_attribute_values = dict((key_to_placeholder[key], value) for (key, value) in data.items())
+    placeholder_updates = ", ".join({f"{k}={p}" for k,p in key_to_placeholder.items()})
+
     get_table().update_item(
         Key={"bnumber": bnumber},
-        ExpressionAttributeValues={":v": value},
-        UpdateExpression=update_expression,
+        ExpressionAttributeValues=expression_attribute_values,
+        UpdateExpression=f"SET {placeholder_updates}",
     )
