@@ -148,9 +148,9 @@ def do_ingest(delay, filter):
     print("[")
     for bnumber in bnumber_generator(filter):
         ingest = storage_api.ingest(bnumber)
-        status_table.record_data(bnumber,
-                                 { "ingest_batch_id": batch_id,
-                                   "ingest_filter": filter })
+        status_table.record_data(
+            bnumber, {"ingest_batch_id": batch_id, "ingest_filter": filter}
+        )
         print(json.dumps(ingest, default=json_default, indent=4))
         print(",")
         if delay > 0:

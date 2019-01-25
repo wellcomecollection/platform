@@ -22,10 +22,14 @@ def main():
                 try:
                     body = json.loads(message.body)
                     bnumber = body["identifier"]
-                    status_table.record_data(bnumber, {
-                        "bagger_start": status_table.activity_timestamp(),
-                        "bagger_batch_id": body["bagger_batch_id"],
-                        "bagger_filter": body["bagger_filter"] })
+                    status_table.record_data(
+                        bnumber,
+                        {
+                            "bagger_start": status_table.activity_timestamp(),
+                            "bagger_batch_id": body["bagger_batch_id"],
+                            "bagger_filter": body["bagger_filter"],
+                        },
+                    )
                     message.delete()
                     process_message(body)
                     status_table.record_activity(bnumber, "bagger_end")

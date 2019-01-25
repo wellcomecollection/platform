@@ -20,8 +20,10 @@ def activity_timestamp():
 def record_data(bnumber, data):
     placeholders = [f":v{x+1}" for x in range(len(data))]
     key_to_placeholder = dict(zip(data.keys(), placeholders))
-    expression_attribute_values = dict((key_to_placeholder[key], value) for (key, value) in data.items())
-    placeholder_updates = ", ".join({f"{k}={p}" for k,p in key_to_placeholder.items()})
+    expression_attribute_values = dict(
+        (key_to_placeholder[key], value) for (key, value) in data.items()
+    )
+    placeholder_updates = ", ".join({f"{k}={p}" for k, p in key_to_placeholder.items()})
 
     get_table().update_item(
         Key={"bnumber": bnumber},
