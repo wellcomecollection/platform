@@ -160,7 +160,7 @@ def do_ingest(delay, filter):
 
 
 def call_dds(delay, filter):
-    table = get_table()
+    table = status_table.get_table()
     for bnumber in bnumber_generator(filter):
         print("[")
         url = settings.DDS_GOOBI_NOTIFICATION.format(bnumber)
