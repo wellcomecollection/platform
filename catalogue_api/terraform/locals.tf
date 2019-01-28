@@ -7,8 +7,8 @@ locals {
   pinned_remus_api   = "966a00af5552b4c6e0b816ba296b7bc4f898206a"
   pinned_romulus_api = ""
 
-  romulus_es_cluster_credentials = "${var.es_cluster_credentials_v6}"
-  remus_es_cluster_credentials   = "${var.es_cluster_credentials_v6}"
+  romulus_es_cluster_credentials = "${local.es_cluster_credentials}"
+  remus_es_cluster_credentials   = "${local.es_cluster_credentials}"
 
   romulus_es_config = {
     index_v1 = "v1-2018-12-6-single-shard"
