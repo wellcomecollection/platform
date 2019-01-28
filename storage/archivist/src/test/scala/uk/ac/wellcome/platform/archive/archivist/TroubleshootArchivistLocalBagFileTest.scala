@@ -13,15 +13,15 @@ class TroubleshootArchivistLocalBagFileTest
     with ArchivistFixtures
     with MetricsSenderFixture {
 
-  ignore("downloads, uploads and verifies a known BagIt bag") {
+  it("downloads, uploads and verifies a known BagIt bag") {
     withArchivist() {
       case (ingestBucket, storageBucket, queuePair, _, _) =>
         sendBag(
           new File(
             List(
               System.getProperty("user.home"),
-              "git/platform",
-              "b22454408.zip"
+              "Desktop",
+              "b30529943.zip"
             ).mkString("/")),
           ingestBucket,
           queuePair

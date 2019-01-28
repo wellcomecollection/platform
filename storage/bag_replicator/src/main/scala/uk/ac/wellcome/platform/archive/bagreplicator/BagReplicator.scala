@@ -99,6 +99,18 @@ class BagReplicator(
               Future(
                 Right(CompletedBagReplication(bagReplicationRequest.context)))
             case Failure(e) =>
+              val stackTrace = e.getStackTrace.mkString("\n")
+
+              error(
+                List(
+                  "Failed bag replication for",
+                  bagReplicationRequest.context.bagLocation,
+                  s"from ${bagReplicationRequest.sourceBagLocation}",
+                  s"to ${storageDestination.namespace}/${storageDestination.rootPath}",
+                  s"with error: ${e.getMessage}\n",
+                  stackTrace
+                ).mkString(" ")
+              )
               Future(Left(
                 DuplicationFailed(e.getMessage, bagReplicationRequest.context)))
         }
