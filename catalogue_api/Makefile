@@ -3,8 +3,8 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= catalogue_api
 
-SBT_APPS 	 = api
-SBT_SSM_APPS =
+SBT_APPS 	 =
+SBT_SSM_APPS = api
 
 SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
