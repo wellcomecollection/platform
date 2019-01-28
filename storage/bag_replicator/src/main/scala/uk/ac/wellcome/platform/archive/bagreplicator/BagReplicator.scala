@@ -52,6 +52,7 @@ class BagReplicator(
       Logging(actorSystem.eventStream, "customLogger")
     implicit val materializer: ActorMaterializer =
       SupervisedMaterializer.resumable
+
     implicit val s3client: AmazonS3 = s3Client
     implicit val amazonSNS: AmazonSNS = snsClient
     implicit val ex: ExecutionContext = actorSystem.dispatcher
