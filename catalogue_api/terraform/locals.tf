@@ -11,8 +11,8 @@ locals {
   remus_es_cluster_credentials   = "${local.es_cluster_credentials}"
 
   romulus_es_config = {
-    index_v1 = "v1-2018-12-6-single-shard"
-    index_v2 = "v2-2018-12-6-single-shard"
+    index_v1 = "v2-2019-01-24-production-changes"
+    index_v2 = "v2-2019-01-24-production-changes"
     doc_type = "work"
   }
 
