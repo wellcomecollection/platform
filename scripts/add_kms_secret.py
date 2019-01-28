@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8
+"""
+Store a config variable in SSM under the key structure
+
+    /{project_id}/secrets/{label}/{config_key}
+
+This script can store a regular config key (unencrypted) or an encrypted key.
+
+"""
+
+import getpass
+import sys
+
+import boto3
+from botocore.exceptions import ClientError
+import click
+
+
+secrets_client = boto3.client("secretsmanager")
+
+
+@click.command()
+@click.option("--project_id", prompt="What is the project ID?", required=True)
+@click.option("--label", default="prod", required=True)
+@click.option("--config_key", prompt="What is the config key?", required=True)
+def store_config_key(project_id, label, config_key):
+    name = f"{project_id}/secrets/{label}/{config_key}"
+    config_value = getpass.getpass()
+
+    try:
+        resp = secrets_client.create_secret(
+            Name=name,
+            Description=f"Config secret populated by {__file__}",
+            SecretString=config_value,
+        )
+    except ClientError as err:
+        if err.response["Error"]["Code"] == "ResourceExistsException":
+            resp = secrets_client.put_secret_value(
+                SecretId=name, SecretString=config_value
+            )
+
+            if resp["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                print(f"Updated secret {name} -> [secret]")
+            else:
+                print(f"Unexpected error from PutSecretValue: {resp}")
+                sys.exit(1)
+        else:
+            raise
+    else:
+        if resp["ResponseMetadata"]["HTTPStatusCode"] == 200:
+            print(f"Created secret {name} -> [secret]")
+        else:
+            print(f"Unexpected error from CreateSecret: {resp}")
+            sys.exit(1)
+
+
+if __name__ == "__main__":
+    store_config_key()
