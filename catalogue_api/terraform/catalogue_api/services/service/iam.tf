@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 locals {
-  ssm_arn_prefix = "arn:aws:ssm:eu-west-1:${data.aws_caller_identity.current.account_id}:parameter/aws/reference/secretsmanager"
+  ssm_arn_prefix     = "arn:aws:ssm:eu-west-1:${data.aws_caller_identity.current.account_id}:parameter/aws/reference/secretsmanager"
   secrets_arn_prefix = "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret"
 }
 
@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "read_es_cluster_credentials" {
     ]
 
     resources = [
-      "${local.secrets_arn_prefix}:catalogue/secrets/prod/es_cluster_username*"
+      "${local.secrets_arn_prefix}:catalogue/secrets/prod/es_cluster_username*",
     ]
   }
 }
