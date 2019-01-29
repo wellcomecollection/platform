@@ -1,56 +1,56 @@
 {
-  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
-  "id": "watu9tbc",
-  "type": "Story",
-  "storyType": {
-    "id": "article",
-    "type": "StoryType",
-    "label": "Article"
+  "@context" : "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id" : "watu9tbc",
+  "type" : "Story",
+  "storyType" : {
+    "id" : "article",
+    "type" : "StoryType",
+    "label" : "Article"
   },
-  "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
-  "thumbnail": {
-    "type": "Location",
-    "locationType": "thumbnail-image",
-    "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
-    "license": {
-      "type": "License",
-      "licenseType": "CC-BY",
-      "label": "Attribution 4.0 International (CC BY 4.0)",
-      "url": "http://creativecommons.org/licenses/by/4.0/"
+  "url" : "https://wellcomecollection.org/articles/outsiders-the-stranger",
+  "thumbnail" : {
+    "type" : "Location",
+    "locationType" : "thumbnail-image",
+    "url" : "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
+    "license" : {
+      "type" : "License",
+      "licenseType" : "CC-BY",
+      "label" : "Attribution 4.0 International (CC BY 4.0)",
+      "url" : "http://creativecommons.org/licenses/by/4.0/"
     }
   },
-  "title": "Inside the minds of Teeth\u2019s two curators, James Peto and Emily Scott-Dearing",
-  "description": "Why did they pick that topic, and what are the best stories within? The exhibition's curators open up.",
-  "contributors": [
+  "title" : "Inside the minds of Teeth\u2019s two curators, James Peto and Emily Scott-Dearing",
+  "description" : "Why did they pick that topic, and what are the best stories within? The exhibition's curators open up.",
+  "contributors" : [
     {
-      "type": "Contributor",
-      "agent": {
-        "id": "a24s7qf3",
-        "label": "Gwen Smith",
-        "type": "Person",
-        "roles": [
+      "type" : "Contributor",
+      "agent" : {
+        "id" : "a24s7qf3",
+        "label" : "Gwen Smith",
+        "type" : "Person",
+        "roles" : [
           {
-            "label": "Author",
-            "type": "ContributionRole"
+            "label" : "Author",
+            "type" : "ContributionRole"
           }
         ]
       }
     }
   ],
-  "created": {
-    "label": "25-07-2018",
-    "type": "Date"
+  "created" : {
+    "label" : "25-07-2018",
+    "type" : "Date"
   },
-  "about": {
-    "id": "e32y8y",
-    "type": "Exhibition",
-    "title": "Teeth"
+  "about" : {
+    "id" : "e32y8y",
+    "type" : "Exhibition",
+    "title" : "Teeth"
   },
-  "storyFormat": [
+  "storyFormat" : [
     {
-      "id": "a24s7qf3",
-      "label": "Interview",
-      "type": "Concept"
+      "id" : "a24s7qf3",
+      "label" : "Interview",
+      "type" : "Concept"
     }
   ]
 }

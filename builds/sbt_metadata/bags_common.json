@@ -1,7 +1,7 @@
 {
-  "id": "bags_common",
-  "folder": "storage/bags_common",
-  "dependencyIds": [
+  "id" : "bags_common",
+  "folder" : "storage/bags_common",
+  "dependencyIds" : [
     "storage_common"
   ]
 }

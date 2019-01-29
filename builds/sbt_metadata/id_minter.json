@@ -1,7 +1,7 @@
 {
-  "id": "id_minter",
-  "folder": "catalogue_pipeline/id_minter",
-  "dependencyIds": [
+  "id" : "id_minter",
+  "folder" : "catalogue_pipeline/id_minter",
+  "dependencyIds" : [
     "common",
     "internal_model",
     "config_messaging"

@@ -1,7 +1,7 @@
 {
-  "id": "storage_display",
-  "folder": "storage/display",
-  "dependencyIds": [
+  "id" : "storage_display",
+  "folder" : "storage/display",
+  "dependencyIds" : [
     "storage_common"
   ]
 }

@@ -1,7 +1,7 @@
 {
-  "id": "matcher",
-  "folder": "catalogue_pipeline/matcher",
-  "dependencyIds": [
+  "id" : "matcher",
+  "folder" : "catalogue_pipeline/matcher",
+  "dependencyIds" : [
     "common",
     "internal_model",
     "config_messaging",

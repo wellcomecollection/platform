@@ -1,71 +1,71 @@
 {
-  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
-  "id": "watu9tbc",
-  "type": "Story",
-  "storyType": {
-    "id": "image-gallery",
-    "type": "StoryType",
-    "label": "Image gallery"
+  "@context" : "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id" : "watu9tbc",
+  "type" : "Story",
+  "storyType" : {
+    "id" : "image-gallery",
+    "type" : "StoryType",
+    "label" : "Image gallery"
   },
-  "thumbnail": {
-    "type": "Location",
-    "locationType": "thumbnail-image",
-    "url": "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
-    "license": {
-      "type": "License",
-      "licenseType": "CC-BY",
-      "label": "Attribution 4.0 International (CC BY 4.0)",
-      "url": "http://creativecommons.org/licenses/by/4.0/"
+  "thumbnail" : {
+    "type" : "Location",
+    "locationType" : "thumbnail-image",
+    "url" : "https://iiif.wellcomecollection.org/image/wordpress:2017/06/to-02-01-v0010604.jpg/full/2000,/0/default.jpg",
+    "license" : {
+      "type" : "License",
+      "licenseType" : "CC-BY",
+      "label" : "Attribution 4.0 International (CC BY 4.0)",
+      "url" : "http://creativecommons.org/licenses/by/4.0/"
     }
   },
-  "title": "Exhibition highlights from Ayurvedic Man",
-  "description": "Whether you\u2019re planning your visit or seeking a taste of our exhibition from afar, take a look at this selection of objects and consider the influence of global traditions on medical knowledge.",
-  "contributors": [
+  "title" : "Exhibition highlights from Ayurvedic Man",
+  "description" : "Whether you\u2019re planning your visit or seeking a taste of our exhibition from afar, take a look at this selection of objects and consider the influence of global traditions on medical knowledge.",
+  "contributors" : [
     {
-      "type": "Contributor",
-      "agent": {
-        "id": "a24s7qf3",
-        "label": "Gwen Smith",
-        "type": "Person",
-        "roles": [
+      "type" : "Contributor",
+      "agent" : {
+        "id" : "a24s7qf3",
+        "label" : "Gwen Smith",
+        "type" : "Person",
+        "roles" : [
           {
-            "label": "Author",
-            "type": "ContributionRole"
+            "label" : "Author",
+            "type" : "ContributionRole"
           }
         ]
       }
     }
   ],
-  "created": {
-    "label": "21-12-2017",
-    "type": "Date"
+  "created" : {
+    "label" : "21-12-2017",
+    "type" : "Date"
   },
-  "about": {
-    "id": "e32y8y",
-    "type": "Work",
-    "title": "Bombay plague"
+  "about" : {
+    "id" : "e32y8y",
+    "type" : "Work",
+    "title" : "Bombay plague"
   },
-  "storyFormat": [
+  "storyFormat" : [
     {
-      "id": "interview",
-      "label": "Interview",
-      "type": "Concept"
+      "id" : "interview",
+      "label" : "Interview",
+      "type" : "Concept"
     }
   ],
-  "items": [
+  "items" : [
     {
-      "id": "b28gh7z4n",
-      "type": "Item",
-      "locations": [
+      "id" : "b28gh7z4n",
+      "type" : "Item",
+      "locations" : [
         {
-          "type": "Location",
-          "locationType": "web",
-          "url": "https://wellcomecollection.org/articles/outsiders-the-stranger",
-          "license": {
-            "type": "License",
-            "licenseType": "CC-BY",
-            "label": "Attribution 4.0 International (CC BY 4.0)",
-            "url": "http://creativecommons.org/licenses/by/4.0/"
+          "type" : "Location",
+          "locationType" : "web",
+          "url" : "https://wellcomecollection.org/articles/outsiders-the-stranger",
+          "license" : {
+            "type" : "License",
+            "licenseType" : "CC-BY",
+            "label" : "Attribution 4.0 International (CC BY 4.0)",
+            "url" : "http://creativecommons.org/licenses/by/4.0/"
           }
         }
       ]

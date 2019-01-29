@@ -1,7 +1,7 @@
 {
-  "id": "reindex_worker",
-  "folder": "reindexer/reindex_worker",
-  "dependencyIds": [
+  "id" : "reindex_worker",
+  "folder" : "reindexer/reindex_worker",
+  "dependencyIds" : [
     "common",
     "config_messaging",
     "config_storage"

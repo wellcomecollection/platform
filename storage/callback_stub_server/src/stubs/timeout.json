@@ -1,16 +1,16 @@
 {
-  "request": {
-    "method": "POST",
-    "url": "/callback/timeout"
+  "request" : {
+    "method" : "POST",
+    "url" : "/callback/timeout"
   },
-  "response": {
-    "status": 200,
-    "jsonBody": {
-      "state": "success"
+  "response" : {
+    "status" : 200,
+    "jsonBody" : {
+      "state" : "success"
     },
-    "headers": {
-      "Content-Type": "application/json"
+    "headers" : {
+      "Content-Type" : "application/json"
     },
-    "fixedDelayMilliseconds": 80000
+    "fixedDelayMilliseconds" : 80000
   }
 }
