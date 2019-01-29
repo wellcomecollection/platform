@@ -1,5 +1,6 @@
 locals {
   api_release_uri                = "${data.aws_ssm_parameter.api_release_uri.value}"
+  api_nginx_release_uri          = "${data.aws_ssm_parameter.api_nginx_release_uri.value}"
   snapshot_generator_release_uri = "${data.aws_ssm_parameter.snapshot_generator_release_uri.value}"
   update_api_docs_release_uri    = "${data.aws_ssm_parameter.update_api_docs_release_uri.value}"
 
@@ -7,7 +8,7 @@ locals {
 
   production_api = "remus"
 
-  pinned_nginx       = "bad0dbfa548874938d16496e313b05adb71268b7"
+  pinned_nginx       = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
   pinned_remus_api   = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/api:966a00af5552b4c6e0b816ba296b7bc4f898206a"
   pinned_romulus_api = ""
 
@@ -41,7 +42,7 @@ locals {
   vpc_id                         = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
   private_subnets                = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
   namespace                      = "catalogue-api"
-  nginx_container_uri            = "${module.ecr_repository_nginx_api-gw.repository_url}:${local.pinned_nginx}"
+  nginx_container_uri            = "${local.pinned_nginx}"
   gateway_server_error_alarm_arn = "${data.terraform_remote_state.shared_infra.gateway_server_error_alarm_arn}"
 
   # Data API
