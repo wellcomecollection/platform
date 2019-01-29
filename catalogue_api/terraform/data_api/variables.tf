@@ -24,7 +24,7 @@ variable "namespace" {
   default = "data_api"
 }
 
-variable "snapshot_generator_release_id" {}
+variable "snapshot_generator_release_uri" {}
 
 variable "critical_slack_webhook" {}
 

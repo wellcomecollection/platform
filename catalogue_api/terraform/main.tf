@@ -37,7 +37,7 @@ module "data_api" {
 
   es_config_snapshot = "${local.prod_es_config}"
 
-  snapshot_generator_release_id = "${local.release_id}"
+  snapshot_generator_release_uri = "${local.snapshot_generator_release_uri}"
 
   critical_slack_webhook = "${local.critical_slack_webhook}"
 

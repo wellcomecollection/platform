@@ -1,5 +1,7 @@
 locals {
-  api_release_uri = "${data.aws_ssm_parameter.api_release_uri.value}"
+  api_release_uri                = "${data.aws_ssm_parameter.api_release_uri.value}"
+
+  snapshot_generator_release_uri = "${data.aws_ssm_parameter.snapshot_generator_release_uri.value}"
 
   # API pins
 
@@ -50,6 +52,7 @@ locals {
     index_v2 = "${local.romulus_is_prod == "true" ? local.romulus_es_config["index_v2"] : local.remus_es_config["index_v2"]}"
     doc_type = "${local.romulus_is_prod == "true" ? local.romulus_es_config["doc_type"] : local.remus_es_config["doc_type"]}"
   }
+
   release_id = "${local.romulus_is_prod == "true" ? local.pinned_romulus_api : local.pinned_remus_api}"
 
   # Update API docs
