@@ -1,4 +1,6 @@
 locals {
+  api_release_uri = "${data.aws_ssm_parameter.api_release_uri.value}"
+
   # API pins
 
   production_api = "remus"
@@ -11,7 +13,7 @@ locals {
   remus_es_cluster_credentials   = "${local.es_cluster_credentials}"
 
   romulus_es_config = {
-    index_v1 = "v2-2019-01-24-production-changes"
+    index_v1 = "v1-2019-01-24-production-changes"
     index_v2 = "v2-2019-01-24-production-changes"
     doc_type = "work"
   }
@@ -26,9 +28,8 @@ locals {
 
   romulus_is_prod        = "${local.production_api == "romulus" ? "true" : "false"}"
   remus_is_prod          = "${local.production_api == "remus" ? "true" : "false"}"
-  romulus_api_release_id = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : var.release_ids["api"]}"
-  remus_api_release_id   = "${local.pinned_remus_api != "" ? local.pinned_remus_api : var.release_ids["api"]}"
-  romulus_app_uri        = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
+  romulus_app_uri        = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : local.api_release_uri}"
+  remus_api_release_id   = "${local.pinned_remus_api != "" ? local.pinned_remus_api : local.api_release_uri}"
   remus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
   stage_api              = "${local.remus_is_prod == "false" ? "remus" : "romulus"}"
   remus_task_number      = "${local.remus_is_prod == "true" ? 3 : 1}"
