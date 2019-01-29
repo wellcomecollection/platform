@@ -6,11 +6,11 @@ locals {
 
   # API pins
 
-  production_api = "remus"
+  production_api = "romulus"
 
   pinned_nginx       = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/nginx_api-gw:bad0dbfa548874938d16496e313b05adb71268b7"
-  pinned_remus_api   = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/api:966a00af5552b4c6e0b816ba296b7bc4f898206a"
-  pinned_romulus_api = ""
+  pinned_remus_api   = ""
+  pinned_romulus_api = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/api:bc67ea53369f7255ffca55e72f04d19102e8c419"
 
   romulus_es_cluster_credentials = "${local.es_cluster_credentials}"
   remus_es_cluster_credentials   = "${local.es_cluster_credentials}"
