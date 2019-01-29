@@ -5,16 +5,21 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
+  BagStorage,
+  S3Copier
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagLocation,
+  ExternalIdentifier
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 class BagStorageTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with RandomThings
@@ -29,7 +34,6 @@ class BagStorageTest
           storageBucket = sourceBucket,
           bagInfo = randomBagInfo
         ) { bagSource: BagLocation =>
-
           implicit val _s3Client = s3Client
           implicit val _s3Copier = S3Copier()
 
@@ -63,18 +67,15 @@ class BagStorageTest
           withBag(
             storageBucket = sourceBucket,
             bagInfo = randomBagInfo.copy(
-              externalIdentifier =
-                ExternalIdentifier("prefix")
+              externalIdentifier = ExternalIdentifier("prefix")
             )
           ) { bagSource: BagLocation =>
             withBag(
               storageBucket = sourceBucket,
               bagInfo = randomBagInfo.copy(
-                externalIdentifier =
-                  ExternalIdentifier("prefix_suffix")
+                externalIdentifier = ExternalIdentifier("prefix_suffix")
               )
             ) { _ =>
-
               implicit val _s3Client = s3Client
               implicit val _s3Copier = S3Copier()
 

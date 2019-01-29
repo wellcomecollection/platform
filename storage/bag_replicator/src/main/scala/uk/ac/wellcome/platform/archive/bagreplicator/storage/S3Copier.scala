@@ -20,8 +20,7 @@ class S3Copier(implicit s3Client: AmazonS3) extends Logging {
     destinationNamespace: String,
     destinationItemKey: String
   )(implicit
-      ctx: ExecutionContext
-  ): Future[CopyResult] = Future {
+    ctx: ExecutionContext): Future[CopyResult] = Future {
 
     val copyTransfer = transferManager.copy(
       sourceNamespace,

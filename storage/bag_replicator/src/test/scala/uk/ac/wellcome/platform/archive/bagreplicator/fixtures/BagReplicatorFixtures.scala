@@ -19,7 +19,6 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import scala.collection.JavaConverters._
 
-
 trait BagReplicatorFixtures
     extends S3
     with RandomThings
@@ -36,9 +35,8 @@ trait BagReplicatorFixtures
       sourceLocation.storageNamespace,
       sourceLocation.bagPathInStorage)
 
-    val sourceKeyEtags = sourceItems
-      .getObjectSummaries.asScala
-      .toList.map(_.getETag)
+    val sourceKeyEtags =
+      sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
     val bagPath = List(
       storageDestination.rootPath,
@@ -51,8 +49,7 @@ trait BagReplicatorFixtures
     )
 
     val destinationKeyEtags =
-      destinationItems.getObjectSummaries.asScala
-        .toList.map(_.getETag)
+      destinationItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
     destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
   }
