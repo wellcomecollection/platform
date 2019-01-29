@@ -45,15 +45,11 @@ module "task" {
 
   app_env_vars = {
     api_host    = "api.wellcomecollection.org"
-    es_host     = "${data.template_file.es_cluster_host.rendered}"
-    es_port     = "${var.es_cluster_credentials["port"]}"
-    es_password = "${var.es_cluster_credentials["password"]}"
-    es_protocol = "${var.es_cluster_credentials["protocol"]}"
     es_index_v1 = "${var.es_config["index_v1"]}"
     es_index_v2 = "${var.es_config["index_v2"]}"
   }
 
-  app_env_vars_length = 7
+  app_env_vars_length = 3
 
   sidecar_env_vars = {
     APP_HOST = "localhost"
@@ -63,10 +59,14 @@ module "task" {
   sidecar_env_vars_length = 2
 
   secret_app_env_vars = {
-    es_username = "catalogue/secrets/prod/es_cluster_username"
+    es_host     = "catalogue/api/es_host"
+    es_port     = "catalogue/api/es_port"
+    es_protocol = "catalogue/api/es_protocol"
+    es_username = "catalogue/api/es_username"
+    es_password = "catalogue/api/es_password"
   }
 
-  secret_app_env_vars_length = 1
+  secret_app_env_vars_length = 5
 
   aws_region = "eu-west-1"
   task_name  = "${var.namespace}"

@@ -3,7 +3,7 @@
 """
 Store a config variable in SSM under the key structure
 
-    /{project_id}/secrets/{label}/{config_key}
+    /{project_id}/{config_key}
 
 This script can store a regular config key (unencrypted) or an encrypted key.
 
@@ -22,11 +22,10 @@ secrets_client = boto3.client("secretsmanager")
 
 @click.command()
 @click.option("--project_id", prompt="What is the project ID?", required=True)
-@click.option("--label", default="prod", required=True)
 @click.option("--config_key", prompt="What is the config key?", required=True)
-def store_config_key(project_id, label, config_key):
-    name = f"{project_id}/secrets/{label}/{config_key}"
-    config_value = getpass.getpass()
+def store_config_key(project_id, config_key):
+    name = f"{project_id}/{config_key}"
+    config_value = getpass.getpass("Config value: ")
 
     try:
         resp = secrets_client.create_secret(
