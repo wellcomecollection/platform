@@ -1,6 +1,6 @@
 {
   "id": "bags",
-  "folder": "storage\/bags",
+  "folder": "storage/bags",
   "dependencyIds": [
     "bags_common"
   ]
