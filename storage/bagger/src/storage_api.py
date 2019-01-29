@@ -63,5 +63,6 @@ def ingest(bnumber):
     global ingest_template
     body = deepcopy(ingest_template)
     body["sourceLocation"]["path"] = bnumber + ".zip"
-    scope = settings.STORAGE_API_INGESTS
-    return get_oauthed_json(scope, scope, method="POST", data=json.dumps(body))
+    url = settings.STORAGE_API_INGESTS
+    scope = settings.WELLCOME_API_SCOPE
+    return get_oauthed_json(url or scope, scope, method="POST", data=json.dumps(body))
