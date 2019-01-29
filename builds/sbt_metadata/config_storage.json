@@ -1,6 +1,6 @@
 {
   "id": "config_storage",
-  "folder": "sbt_common/config/storage",
+  "folder": "sbt_common\/config\/storage",
   "dependencyIds": [
     "config_core"
   ]
