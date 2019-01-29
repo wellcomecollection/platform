@@ -1,167 +1,167 @@
 {
-  "@context": "/v0/context.json",
-  "id": "f4uu00",
-  "type": "Work",
-  "workType": {
-    "id": "record-set",
-    "type": "WorkType",
-    "label": "RecordSet"
+  "@context" : "/v0/context.json",
+  "id" : "f4uu00",
+  "type" : "Work",
+  "workType" : {
+    "id" : "record-set",
+    "type" : "WorkType",
+    "label" : "RecordSet"
   },
-  "identifiers": [
+  "identifiers" : [
     {
-      "value": "PPMIA/H/1/1",
-      "type": "Identifier",
-      "indentifierType": {
-        "id": "ref-no",
-        "label": "CALM reference Number",
-        "type": "IdentifierType"
+      "value" : "PPMIA/H/1/1",
+      "type" : "Identifier",
+      "indentifierType" : {
+        "id" : "ref-no",
+        "label" : "CALM reference Number",
+        "type" : "IdentifierType"
       }
     }
   ],
-  "title": "Correspondence: A 1977",
-  "hasCreatedDate": "December 1967-May 1978",
-  "production": [
+  "title" : "Correspondence: A 1977",
+  "hasCreatedDate" : "December 1967-May 1978",
+  "production" : [
     {
-      "places": [
+      "places" : [
         {
-          "label": "",
-          "type": "Place"
+          "label" : "",
+          "type" : "Place"
         }
       ],
-      "function": {
-        "label": "Production/Creation",
-        "type": "Concept"
+      "function" : {
+        "label" : "Production/Creation",
+        "type" : "Concept"
       },
-      "dates": [
+      "dates" : [
         {
-          "label": "December 1967-May 1978",
-          "type": "Period"
+          "label" : "December 1967-May 1978",
+          "type" : "Period"
         }
       ],
-      "agents": [
+      "agents" : [
         {
-          "id": "a24s7qf3",
-          "label": "Michael Ashburner",
-          "type": "Person"
+          "id" : "a24s7qf3",
+          "label" : "Michael Ashburner",
+          "type" : "Person"
         }
       ],
-      "type": "ProductionEvent"
+      "type" : "ProductionEvent"
     }
   ],
-  "physicalExtent": "1 file",
-  "contributors": [
+  "physicalExtent" : "1 file",
+  "contributors" : [
     {
-      "type": "Contributor",
-      "agent": {
-        "id": "a24s7qf3",
-        "label": "Michael Ashburner",
-        "type": "Person",
-        "roles": [
+      "type" : "Contributor",
+      "agent" : {
+        "id" : "a24s7qf3",
+        "label" : "Michael Ashburner",
+        "type" : "Person",
+        "roles" : [
           {
-            "id": "author",
-            "label": "Author",
-            "type": "ContributionRole"
+            "id" : "author",
+            "label" : "Author",
+            "type" : "ContributionRole"
           }
         ]
       }
     }
   ],
-  "subjects": [
+  "subjects" : [
     {
-      "id": "90820",
-      "label": "Genetics",
-      "type": "Concept"
+      "id" : "90820",
+      "label" : "Genetics",
+      "type" : "Concept"
     },
     {
-      "id": "9uud9d",
-      "label": "Genomics",
-      "type": "Concept"
+      "id" : "9uud9d",
+      "label" : "Genomics",
+      "type" : "Concept"
     }
   ],
-  "genres": [
+  "genres" : [
     {
-      "id": "letters",
-      "label": "Letters",
-      "type": "Concept"
+      "id" : "letters",
+      "label" : "Letters",
+      "type" : "Concept"
     }
   ],
-  "isAssociatedWith": [
+  "isAssociatedWith" : [
     {
-      "id": "j9wq9xs",
-      "label": "University lecturer",
-      "type": "Position",
-      "start": "1973",
-      "end": "1980",
-      "positionAt": {
-        "id": "e28y1y9",
-        "label": "Department of Genetics at the University of Cambridge",
-        "type": "Group"
+      "id" : "j9wq9xs",
+      "label" : "University lecturer",
+      "type" : "Position",
+      "start" : "1973",
+      "end" : "1980",
+      "positionAt" : {
+        "id" : "e28y1y9",
+        "label" : "Department of Genetics at the University of Cambridge",
+        "type" : "Group"
       },
-      "heldBy": {
-        "id": "a24s7qf3",
-        "label": "Michael Ashburner",
-        "type": "Person"
+      "heldBy" : {
+        "id" : "a24s7qf3",
+        "label" : "Michael Ashburner",
+        "type" : "Person"
       }
     }
   ],
-  "partOf": {
-    "id": "83hdh99",
-    "title": "Correspondence pre-1977",
-    "type": "Work",
-    "workType": {
-      "id": "record-set",
-      "type": "WorkType",
-      "label": "RecordSet"
+  "partOf" : {
+    "id" : "83hdh99",
+    "title" : "Correspondence pre-1977",
+    "type" : "Work",
+    "workType" : {
+      "id" : "record-set",
+      "type" : "WorkType",
+      "label" : "RecordSet"
     },
-    "identifiers": [
+    "identifiers" : [
       {
-        "value": "PP/MIA/H/1",
-        "type": "Identifier",
-        "identifierScheme": "ref-no"
+        "value" : "PP/MIA/H/1",
+        "type" : "Identifier",
+        "identifierScheme" : "ref-no"
       }
     ],
-    "partOf": {
-      "id": "83hdh99",
-      "name": "Correspondence",
-      "type": "Work",
-      "workType": {
-        "id": "record-set",
-        "type": "WorkType",
-        "label": "RecordSet"
+    "partOf" : {
+      "id" : "83hdh99",
+      "name" : "Correspondence",
+      "type" : "Work",
+      "workType" : {
+        "id" : "record-set",
+        "type" : "WorkType",
+        "label" : "RecordSet"
       },
-      "identifiers": [
+      "identifiers" : [
         {
-          "value": "PP/MIA/H",
-          "type": "Identifier",
-          "identifierScheme": "ref-no"
+          "value" : "PP/MIA/H",
+          "type" : "Identifier",
+          "identifierScheme" : "ref-no"
         }
       ],
-      "partOf": {
-        "id": "73189",
-        "name": "Professor Michael Ashburner: archives",
-        "type": "Work",
-        "workType": {
-          "id": "record-set",
-          "type": "WorkType",
-          "label": "RecordSet"
+      "partOf" : {
+        "id" : "73189",
+        "name" : "Professor Michael Ashburner: archives",
+        "type" : "Work",
+        "workType" : {
+          "id" : "record-set",
+          "type" : "WorkType",
+          "label" : "RecordSet"
         },
-        "identifiers": [
+        "identifiers" : [
           {
-            "value": "PP/MIA",
-            "type": "Identifier",
-            "identifierScheme": "ref-no"
+            "value" : "PP/MIA",
+            "type" : "Identifier",
+            "identifierScheme" : "ref-no"
           }
         ]
       }
     }
   },
-  "locations": [
+  "locations" : [
     {
-      "type": "Location",
-      "locationType": {
-        "id": "online",
-        "label": "Online",
-        "type": "LocationType"
+      "type" : "Location",
+      "locationType" : {
+        "id" : "online",
+        "label" : "Online",
+        "type" : "LocationType"
       }
     }
   ]

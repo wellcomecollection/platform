@@ -1,22 +1,22 @@
 {
-  "id": "8be78772-0670-4bf7-bc54-dd9997eb6c74",
-  "name": "token",
-  "request": {
-    "url": "/token",
-    "method": "POST",
-    "headers": {
-      "Authorization": {
-        "equalTo": "Basic a2V5OnNlY3JldA=="
+  "id" : "8be78772-0670-4bf7-bc54-dd9997eb6c74",
+  "name" : "token",
+  "request" : {
+    "url" : "/token",
+    "method" : "POST",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Basic a2V5OnNlY3JldA=="
       }
     }
   },
-  "response": {
-    "status": 200,
-    "body": "{\"access_token\":\"fake-token\",\"token_type\":\"bearer\",\"expires_in\":3600}",
-    "headers": {
-      "Date": "Fri, 17 Nov 2017 13:18:23 GMT",
-      "Content-Type": "application/json;charset=UTF-8",
-      "Set-Cookie": [
+  "response" : {
+    "status" : 200,
+    "body" : "{\"access_token\":\"fake-token\",\"token_type\":\"bearer\",\"expires_in\":3600}",
+    "headers" : {
+      "Date" : "Fri, 17 Nov 2017 13:18:23 GMT",
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Set-Cookie" : [
         "jcontainerId=.jcontainer-public2; path=/iii/stage",
         "jcontainerId=.jcontainer-public2; path=/iii/patronio",
         "jcontainerId=.jcontainer-public2; path=/iii/rss",
@@ -29,11 +29,11 @@
         "jcontainerId=.jcontainer-public2; path=/iii/ws/extlink",
         "jcontainerId=.jcontainer-public2; path=/sierra/ws/summit"
       ],
-      "Vary": "User-Agent",
-      "Keep-Alive": "timeout=5, max=100",
-      "Connection": "Keep-Alive"
+      "Vary" : "User-Agent",
+      "Keep-Alive" : "timeout=5, max=100",
+      "Connection" : "Keep-Alive"
     }
   },
-  "uuid": "8be78772-0670-4bf7-bc54-dd9997eb6c74",
-  "persistent": true
+  "uuid" : "8be78772-0670-4bf7-bc54-dd9997eb6c74",
+  "persistent" : true
 }

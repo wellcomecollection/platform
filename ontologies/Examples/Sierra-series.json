@@ -1,33 +1,33 @@
 {
-  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
-  "id": "watu9tbc",
-  "type": "Series",
-  "seriesType": {
-    "id": "bibliographic-series",
-    "type": "seriesType",
-    "label": "Bibliographic Series"
+  "@context" : "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id" : "watu9tbc",
+  "type" : "Series",
+  "seriesType" : {
+    "id" : "bibliographic-series",
+    "type" : "seriesType",
+    "label" : "Bibliographic Series"
   },
-  "identifiers": [
+  "identifiers" : [
     {
-      "value": "b9781999809003",
-      "type": "Identifier",
-      "identifierScheme": "sierra-system-number"
+      "value" : "b9781999809003",
+      "type" : "Identifier",
+      "identifierScheme" : "sierra-system-number"
     }
   ],
-  "title": "Huntingdon Library lists",
-  "numberInSeries": "10",
-  "works": [
+  "title" : "Huntingdon Library lists",
+  "numberInSeries" : "10",
+  "works" : [
     {
-      "id": "dh8191d8",
-      "type": "Work",
-      "workType": {
-        "id": "books",
-        "type": "WorkType",
-        "label": "Books"
+      "id" : "dh8191d8",
+      "type" : "Work",
+      "workType" : {
+        "id" : "books",
+        "type" : "WorkType",
+        "label" : "Books"
       },
-      "title": "Incunabula in the Huntington library",
-      "positionInSeries": "5",
-      "description": "The City of London, 1665. As the Great Plague hits the capital, John New faces a deadly dilemma."
+      "title" : "Incunabula in the Huntington library",
+      "positionInSeries" : "5",
+      "description" : "The City of London, 1665. As the Great Plague hits the capital, John New faces a deadly dilemma."
     }
   ]
 }

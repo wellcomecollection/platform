@@ -1,124 +1,124 @@
 {
-  "id": "j921s9j21",
-  "type": "Work",
-  "title": "The lancet",
-  "workType": {
-    "id": "journal",
-    "type": "WorkType",
-    "label": "Journal"
+  "id" : "j921s9j21",
+  "type" : "Work",
+  "title" : "The lancet",
+  "workType" : {
+    "id" : "journal",
+    "type" : "WorkType",
+    "label" : "Journal"
   },
-  "description": "Subtitle: <1917- , A journal of British and foreign medicine, surgery, obstetrics, physiology, chemistry, pharmacology, public health, and news",
-  "subjects": [
+  "description" : "Subtitle: <1917- , A journal of British and foreign medicine, surgery, obstetrics, physiology, chemistry, pharmacology, public health, and news",
+  "subjects" : [
     {
-      "label": "Medicine",
-      "type": "Subject",
-      "concepts": [
+      "label" : "Medicine",
+      "type" : "Subject",
+      "concepts" : [
         {
-          "id": "hd2891f",
-          "label": "Medicine",
-          "type": "Concept",
-          "identifiers": [
+          "id" : "hd2891f",
+          "label" : "Medicine",
+          "type" : "Concept",
+          "identifiers" : [
             {
-              "indentifierType": {
-                "id": "mesh",
-                "label": "MESH",
-                "type": "IdentifierType"
+              "indentifierType" : {
+                "id" : "mesh",
+                "label" : "MESH",
+                "type" : "IdentifierType"
               },
-              "value": "D008511",
-              "type": "Identifier"
+              "value" : "D008511",
+              "type" : "Identifier"
             }
           ]
         }
       ]
     }
   ],
-  "genres": [
+  "genres" : [
     {
-      "label": "Periodicals",
-      "type": "Genre",
-      "concepts": [
+      "label" : "Periodicals",
+      "type" : "Genre",
+      "concepts" : [
         {
-          "label": " Periodicals",
-          "type": "Concept"
+          "label" : " Periodicals",
+          "type" : "Concept"
         }
       ]
     }
   ],
-  "production": [
+  "production" : [
     {
-      "places": [
+      "places" : [
         {
-          "label": "London",
-          "type": "Place"
+          "label" : "London",
+          "type" : "Place"
         }
       ],
-      "function": {
-        "label": "Publication",
-        "type": "Concept"
+      "function" : {
+        "label" : "Publication",
+        "type" : "Concept"
       },
-      "dates": [
+      "dates" : [
         {
-          "label": "1823-",
-          "type": "Period"
+          "label" : "1823-",
+          "type" : "Period"
         }
       ],
-      "agents": [
+      "agents" : [
         {
-          "label": "J. Onwhyn",
-          "type": "Agent"
+          "label" : "J. Onwhyn",
+          "type" : "Agent"
         }
       ],
-      "type": "ProductionEvent"
+      "type" : "ProductionEvent"
     }
   ],
-  "parts": [
+  "parts" : [
     {
-      "id": "1u90d2u",
-      "type": "Work",
-      "title": "The lancet v.392 no.10150",
-      "issueNumber": "10150",
-      "volumeNumber": "392",
-      "workType": {
-        "id": "journal-issue",
-        "type": "WorkType",
-        "label": "Journal Issue"
+      "id" : "1u90d2u",
+      "type" : "Work",
+      "title" : "The lancet v.392 no.10150",
+      "issueNumber" : "10150",
+      "volumeNumber" : "392",
+      "workType" : {
+        "id" : "journal-issue",
+        "type" : "WorkType",
+        "label" : "Journal Issue"
       }
     },
     {
-      "id": "1u90d2u",
-      "type": "Work",
-      "title": "The lancet v.392 no.10151",
-      "issueNumber": "10151",
-      "volumeNumber": "392",
-      "workType": {
-        "id": "journal-issue",
-        "type": "WorkType",
-        "label": "Journal Issue"
+      "id" : "1u90d2u",
+      "type" : "Work",
+      "title" : "The lancet v.392 no.10151",
+      "issueNumber" : "10151",
+      "volumeNumber" : "392",
+      "workType" : {
+        "id" : "journal-issue",
+        "type" : "WorkType",
+        "label" : "Journal Issue"
       }
     },
     {
-      "id": "1u90d2u",
-      "type": "Work",
-      "title": "The lancet v.392 no.10152",
-      "issueNumber": "10152",
-      "volumeNumber": "392",
-      "workType": {
-        "id": "journal-issue",
-        "type": "WorkType",
-        "label": "Journal Issue"
+      "id" : "1u90d2u",
+      "type" : "Work",
+      "title" : "The lancet v.392 no.10152",
+      "issueNumber" : "10152",
+      "volumeNumber" : "392",
+      "workType" : {
+        "id" : "journal-issue",
+        "type" : "WorkType",
+        "label" : "Journal Issue"
       }
     }
   ],
-  "locations": [
+  "locations" : [
     {
-      "type": "Location",
-      "locationType": {
-        "id": "open-shelves",
-        "label": "Open Shelves",
-        "type": "LocationType"
+      "type" : "Location",
+      "locationType" : {
+        "id" : "open-shelves",
+        "label" : "Open Shelves",
+        "type" : "LocationType"
       },
-      "label": "/LAN",
-      "shelfmark": "/LAN"
+      "label" : "/LAN",
+      "shelfmark" : "/LAN"
     }
   ]
 }

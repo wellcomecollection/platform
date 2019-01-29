@@ -1,74 +1,74 @@
 {
-  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
-  "id": "watu9tbc",
-  "type": "Work",
-  "workType": {
-    "id": "article",
-    "type": "WorkType",
-    "label": "Article"
+  "@context" : "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id" : "watu9tbc",
+  "type" : "Work",
+  "workType" : {
+    "id" : "article",
+    "type" : "WorkType",
+    "label" : "Article"
   },
-  "thumbnail": {
-    "type": "Location",
-    "locationType": "thumbnail-image",
-    "url": "https://mosaicscience.com/sites/default/files/styles/hero_extralarge/public/HERO_parent-school-leaving-for-school-16-9_0.jpg?itok=LrQQK1ih",
-    "license": {
-      "type": "License",
-      "licenseType": "CC-BY",
-      "label": "Attribution 4.0 International (CC BY 4.0)",
-      "url": "http://creativecommons.org/licenses/by/4.0/"
+  "thumbnail" : {
+    "type" : "Location",
+    "locationType" : "thumbnail-image",
+    "url" : "https://mosaicscience.com/sites/default/files/styles/hero_extralarge/public/HERO_parent-school-leaving-for-school-16-9_0.jpg?itok=LrQQK1ih",
+    "license" : {
+      "type" : "License",
+      "licenseType" : "CC-BY",
+      "label" : "Attribution 4.0 International (CC BY 4.0)",
+      "url" : "http://creativecommons.org/licenses/by/4.0/"
     }
   },
-  "title": "A brief history of childcare advice",
-  "description": "From the wisdom of family to doctors\u2019 advice from the late 19th century, trends in parenting have waxed and waned.",
-  "creators": [
+  "title" : "A brief history of childcare advice",
+  "description" : "From the wisdom of family to doctors\u2019 advice from the late 19th century, trends in parenting have waxed and waned.",
+  "creators" : [
     {
-      "id": "2dh819d",
-      "label": "Linda Geddes",
-      "Type": "People"
+      "id" : "2dh819d",
+      "label" : "Linda Geddes",
+      "Type" : "People"
     },
     {
-      "id": "d9j20d9j",
-      "label": "Kirsty Strawbridge",
-      "Type": "People"
+      "id" : "d9j20d9j",
+      "label" : "Kirsty Strawbridge",
+      "Type" : "People"
     },
     {
-      "id": "j9ssbnn",
-      "label": "Mun-Keat Looi",
-      "Type": "People"
+      "id" : "j9ssbnn",
+      "label" : "Mun-Keat Looi",
+      "Type" : "People"
     }
   ],
-  "publicationDate": {
-    "label": "03 February 2015",
-    "type": "Period"
+  "publicationDate" : {
+    "label" : "03 February 2015",
+    "type" : "Period"
   },
-  "genres": [
+  "genres" : [
     {
-      "id": "a24s7qf3",
-      "label": "Long Read",
-      "type": "Concept"
+      "id" : "a24s7qf3",
+      "label" : "Long Read",
+      "type" : "Concept"
     }
   ],
-  "series": [
+  "series" : [
     {
-      "id": "j9s11j9j",
-      "label": "Do you need to go to parent school?",
-      "type": "Series"
+      "id" : "j9s11j9j",
+      "label" : "Do you need to go to parent school?",
+      "type" : "Series"
     }
   ],
-  "items": [
+  "items" : [
     {
-      "id": "b28gh7z4n",
-      "type": "Item",
-      "locations": [
+      "id" : "b28gh7z4n",
+      "type" : "Item",
+      "locations" : [
         {
-          "type": "Location",
-          "locationType": "web",
-          "url": "https://mosaicscience.com/extra/brief-history-childcare-advice",
-          "license": {
-            "type": "License",
-            "licenseType": "CC-BY",
-            "label": "Attribution 4.0 International (CC BY 4.0)",
-            "url": "http://creativecommons.org/licenses/by/4.0/"
+          "type" : "Location",
+          "locationType" : "web",
+          "url" : "https://mosaicscience.com/extra/brief-history-childcare-advice",
+          "license" : {
+            "type" : "License",
+            "licenseType" : "CC-BY",
+            "label" : "Attribution 4.0 International (CC BY 4.0)",
+            "url" : "http://creativecommons.org/licenses/by/4.0/"
           }
         }
       ]

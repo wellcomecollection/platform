@@ -1,88 +1,88 @@
 {
-  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
-  "id": "298yw4g",
-  "type": "Work",
-  "workType": {
-    "id": "books",
-    "type": "WorkType",
-    "label": "Books"
+  "@context" : "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id" : "298yw4g",
+  "type" : "Work",
+  "workType" : {
+    "id" : "books",
+    "type" : "WorkType",
+    "label" : "Books"
   },
-  "identifiers": [
+  "identifiers" : [
     {
-      "label": "b1265600",
-      "authority": "Sierra"
+      "label" : "b1265600",
+      "authority" : "Sierra"
     }
   ],
-  "title": "A dictionary of archaic and provincial words, obsolete phrases, proverbs, and ancient customs, from the fourteenth century / ",
-  "publishers": [
+  "title" : "A dictionary of archaic and provincial words, obsolete phrases, proverbs, and ancient customs, from the fourteenth century / ",
+  "publishers" : [
     {
-      "label": "Reeves and Turner",
-      "type": "Organisation"
+      "label" : "Reeves and Turner",
+      "type" : "Organisation"
     }
   ],
-  "placeOfPublication": [
+  "placeOfPublication" : [
     {
-      "label": "London",
-      "type": "Place"
+      "label" : "London",
+      "type" : "Place"
     }
   ],
-  "publicationDate": {
-    "label": "1889",
-    "type": "Period"
+  "publicationDate" : {
+    "label" : "1889",
+    "type" : "Period"
   },
-  "designation": "11th ed",
-  "genre": {
-    "label": "Dictionary",
-    "type": "Concept"
+  "designation" : "11th ed",
+  "genre" : {
+    "label" : "Dictionary",
+    "type" : "Concept"
   },
-  "subjects": [
+  "subjects" : [
     {
-      "label": "English Language--Provincialisms",
-      "type": "QualifiedConcept",
-      "concept": {
-        "label": "English Language",
-        "type": "Concept",
-        "identifiers": {
-          "id": "D81290",
-          "type": "Identifier",
-          "authority": "mesh"
+      "label" : "English Language--Provincialisms",
+      "type" : "QualifiedConcept",
+      "concept" : {
+        "label" : "English Language",
+        "type" : "Concept",
+        "identifiers" : {
+          "id" : "D81290",
+          "type" : "Identifier",
+          "authority" : "mesh"
         }
       },
-      "qualifiers": {
-        "label": "Provincialisms",
-        "type": "Concept"
+      "qualifiers" : {
+        "label" : "Provincialisms",
+        "type" : "Concept"
       }
     }
   ],
-  "creators": [
+  "creators" : [
     {
-      "label": "James Orchard Halliwell"
+      "label" : "James Orchard Halliwell"
     }
   ],
-  "items": [
+  "items" : [
     {
-      "id": "dhu458qh",
-      "type": "Holding",
-      "label": "Complete set",
-      "identifiers": [
+      "id" : "dhu458qh",
+      "type" : "Holding",
+      "label" : "Complete set",
+      "identifiers" : [
         {
-          "label": "c13328396",
-          "authority": "Sierra"
+          "label" : "c13328396",
+          "authority" : "Sierra"
         }
       ],
-      "locations": [
+      "locations" : [
         {
-          "type": "Location",
-          "locationType": "open-shelves",
-          "label": "Open shelves",
-          "accessStatus": {
-            "id": "Available",
-            "type": "AccessStatus"
+          "type" : "Location",
+          "locationType" : "open-shelves",
+          "label" : "Open shelves",
+          "accessStatus" : {
+            "id" : "Available",
+            "type" : "AccessStatus"
           },
-          "accessProcess": {
-            "id": "open-shelves",
-            "label": "Open Shelves",
-            "type": "AccessProcess"
+          "accessProcess" : {
+            "id" : "open-shelves",
+            "label" : "Open Shelves",
+            "type" : "AccessProcess"
           }
         }
       ]

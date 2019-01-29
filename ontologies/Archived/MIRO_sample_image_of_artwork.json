@@ -1,91 +1,91 @@
 {
-  "@context": "https://api.wellcomecollection.org/catalogue/v1/context.json",
-  "id": "watu9tbc",
-  "type": "Work",
-  "identifiers": [
+  "@context" : "https://api.wellcomecollection.org/catalogue/v1/context.json",
+  "id" : "watu9tbc",
+  "type" : "Work",
+  "identifiers" : [
     {
-      "label": "V0006724",
-      "authority": "MIRO"
+      "label" : "V0006724",
+      "authority" : "MIRO"
     },
     {
-      "label": "ICV No 6939",
-      "authority": "Videodisk"
+      "label" : "ICV No 6939",
+      "authority" : "Videodisk"
     },
     {
-      "label": "b11579328",
-      "authority": "Sierra"
+      "label" : "b11579328",
+      "authority" : "Sierra"
     }
   ],
-  "label": "A lecture on pneumatics at the Royal Institution, London. Co",
-  "description": "A lecture on pneumatics at the Royal Institution, London. Coloured etching by J. Gillray, 1802.",
-  "lettering": "Scientific researches! -New discoveries in pneumaticks! -or- an experimental lecture on the powers of air.- Js. Gillray inv. & fect.",
-  "creators": [
+  "label" : "A lecture on pneumatics at the Royal Institution, London. Co",
+  "description" : "A lecture on pneumatics at the Royal Institution, London. Coloured etching by J. Gillray, 1802.",
+  "lettering" : "Scientific researches! -New discoveries in pneumaticks! -or- an experimental lecture on the powers of air.- Js. Gillray inv. & fect.",
+  "creators" : [
     {
-      "label": "James Gillray",
-      "type": "Agent"
+      "label" : "James Gillray",
+      "type" : "Agent"
     }
   ],
-  "publishers": [
+  "publishers" : [
     {
-      "label": "H. Humphrey,",
-      "type": "Agent"
+      "label" : "H. Humphrey,",
+      "type" : "Agent"
     }
   ],
-  "placeOfPublication": [
+  "placeOfPublication" : [
     {
-      "label": "[London] (St. James's Street)",
-      "type": "Place"
+      "label" : "[London] (St. James's Street)",
+      "type" : "Place"
     }
   ],
-  "createdDate": {
-    "label": "1802",
-    "type": "Period"
+  "createdDate" : {
+    "label" : "1802",
+    "type" : "Period"
   },
-  "publicationDate": {
-    "label": "May 23 1802",
-    "type": "Period"
+  "publicationDate" : {
+    "label" : "May 23 1802",
+    "type" : "Period"
   },
-  "format": "etching, with watercolour",
-  "physicalDescription": "Paper",
-  "genre": "Caricatures",
-  "subjects": [
+  "format" : "etching, with watercolour",
+  "physicalDescription" : "Paper",
+  "genre" : "Caricatures",
+  "subjects" : [
     {
-      "label": "Caricatures",
-      "authority": "MeSH"
+      "label" : "Caricatures",
+      "authority" : "MeSH"
     },
     {
-      "label": "Thomas Young [1773  - 1829 ]",
-      "authority": "MIRO keywords"
+      "label" : "Thomas Young [1773  - 1829 ]",
+      "authority" : "MIRO keywords"
     },
     {
-      "label": "Count von Rumford Sir Benjamin Thompson [1753  - 1814 ]",
-      "authority": "MIRO keywords"
+      "label" : "Count von Rumford Sir Benjamin Thompson [1753  - 1814 ]",
+      "authority" : "MIRO keywords"
     },
     {
-      "label": "Sir Humphry Davy [1778  - 1829 ]",
-      "authority": "MIRO keywords"
+      "label" : "Sir Humphry Davy [1778  - 1829 ]",
+      "authority" : "MIRO keywords"
     },
     {
-      "label": "Sir John Coxe Hippisley [1748  - 1825 ]",
-      "authority": "MIRO keywords"
+      "label" : "Sir John Coxe Hippisley [1748  - 1825 ]",
+      "authority" : "MIRO keywords"
     },
     {
-      "label": "Royal Institution of Great Britain [ - ]",
-      "authority": "MIRO keywords"
+      "label" : "Royal Institution of Great Britain [ - ]",
+      "authority" : "MIRO keywords"
     }
   ],
-  "items": [
+  "items" : [
     {
-      "id": "b28gh7z4n",
-      "type": "item",
-      "licence": "CC-BY-4.0",
-      "identifiers": [
+      "id" : "b28gh7z4n",
+      "type" : "item",
+      "licence" : "CC-BY-4.0",
+      "identifiers" : [
         {
-          "label": "V0006724",
-          "authority": "MIRO"
+          "label" : "V0006724",
+          "authority" : "MIRO"
         }
       ],
-      "status": "Open"
+      "status" : "Open"
     }
   ]
 }
