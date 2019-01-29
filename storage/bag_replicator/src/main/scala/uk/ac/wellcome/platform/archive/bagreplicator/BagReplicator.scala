@@ -48,8 +48,10 @@ class BagReplicator(
     with Runnable {
 
   def run(): Future[Done] = {
+
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
+
     implicit val materializer: ActorMaterializer =
       SupervisedMaterializer.resumable
 

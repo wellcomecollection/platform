@@ -24,6 +24,8 @@ locals {
 
   # Blue / Green config
 
+
+
   romulus_is_prod        = "${local.production_api == "romulus" ? "true" : "false"}"
   remus_is_prod          = "${local.production_api == "remus" ? "true" : "false"}"
   romulus_api_release_id = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : var.release_ids["api"]}"

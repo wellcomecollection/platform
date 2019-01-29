@@ -17,6 +17,8 @@ import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import scala.collection.JavaConverters._
+
 
 trait BagReplicatorFixtures
     extends S3
@@ -25,6 +27,35 @@ trait BagReplicatorFixtures
     with Akka
     with BagLocationFixtures
     with ArchiveMessaging {
+
+  def verifyBagCopied(
+    sourceLocation: BagLocation,
+    storageDestination: StorageLocation
+  ) = {
+    val sourceItems = s3Client.listObjects(
+      sourceLocation.storageNamespace,
+      sourceLocation.bagPathInStorage)
+
+    val sourceKeyEtags = sourceItems
+      .getObjectSummaries.asScala
+      .toList.map(_.getETag)
+
+    val bagPath = List(
+      storageDestination.rootPath,
+      sourceLocation.bagPath
+    ).mkString("/")
+
+    val destinationItems = s3Client.listObjects(
+      storageDestination.namespace,
+      bagPath
+    )
+
+    val destinationKeyEtags =
+      destinationItems.getObjectSummaries.asScala
+        .toList.map(_.getETag)
+
+    destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
+  }
 
   def withBagNotification[R](
     queuePair: QueuePair,
@@ -44,10 +75,11 @@ trait BagReplicatorFixtures
         queuePair.queue,
         archiveComplete
       )
+
       testWith(bagLocation)
     }
 
-  def withApp[R](
+  def withBagReplicator[R](
     queuePair: QueuePair,
     progressTopic: Topic,
     outgoingTopic: Topic,
@@ -72,14 +104,14 @@ trait BagReplicatorFixtures
       }
     }
 
-  def withBagReplicator[R](
+  def withApp[R](
     testWith: TestWith[(Bucket, QueuePair, Bucket, Topic, Topic), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(15) { queuePair =>
       withLocalSnsTopic { progressTopic =>
         withLocalSnsTopic { outgoingTopic =>
           withLocalS3Bucket { sourceBucket =>
             withLocalS3Bucket { destinationBucket =>
-              withApp(
+              withBagReplicator(
                 queuePair,
                 progressTopic,
                 outgoingTopic,

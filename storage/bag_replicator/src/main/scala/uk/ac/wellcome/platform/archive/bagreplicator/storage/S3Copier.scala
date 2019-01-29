@@ -1,43 +1,41 @@
 package uk.ac.wellcome.platform.archive.bagreplicator.storage
 
-import com.amazonaws.event.{ProgressEvent, ProgressEventType, ProgressListener}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.transfer.model.CopyResult
+import grizzled.slf4j.Logging
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future}
 
-class S3Copier(implicit s3Client: AmazonS3) {
+class S3Copier(implicit s3Client: AmazonS3) extends Logging {
+
   import com.amazonaws.services.s3.transfer.TransferManagerBuilder
+
   private val transferManager = TransferManagerBuilder.standard
     .withS3Client(s3Client)
     .build // Fixed thread pool
-  private val transferSuccessfulEvents = Set(
-    ProgressEventType.TRANSFER_COMPLETED_EVENT)
-  private val transferFailedEvents = Set(
-    ProgressEventType.TRANSFER_CANCELED_EVENT,
-    ProgressEventType.TRANSFER_FAILED_EVENT)
 
-  def copy(sourceNamespace: String,
-           sourceItemKey: String,
-           destinationNamespace: String,
-           destinationItemKey: String): Future[CopyResult] = {
-    val copyTransfer =
-      transferManager.copy(
-        sourceNamespace,
-        sourceItemKey,
-        destinationNamespace,
-        destinationItemKey)
+  def copy(
+    sourceNamespace: String,
+    sourceItemKey: String,
+    destinationNamespace: String,
+    destinationItemKey: String
+  )(implicit
+      ctx: ExecutionContext
+  ): Future[CopyResult] = Future {
 
-    val promisedCopy = Promise[CopyResult]()
-    copyTransfer.addProgressListener(new ProgressListener {
-      override def progressChanged(progressEvent: ProgressEvent): Unit = {
-        if (transferSuccessfulEvents.contains(progressEvent.getEventType)) {
-          promisedCopy trySuccess copyTransfer.waitForCopyResult()
-        } else if (transferFailedEvents.contains(progressEvent.getEventType)) {
-          promisedCopy failure copyTransfer.waitForException()
-        }
-      }
-    })
-    promisedCopy.future
+    val copyTransfer = transferManager.copy(
+      sourceNamespace,
+      sourceItemKey,
+      destinationNamespace,
+      destinationItemKey
+    )
+
+    copyTransfer.waitForCopyResult()
+  }
+}
+
+object S3Copier {
+  def apply()(implicit s3Client: AmazonS3) = {
+    new S3Copier()
   }
 }

@@ -21,7 +21,7 @@ class BagReplicatorFeatureTest
     with ProgressUpdateAssertions {
 
   it("receives a notification") {
-    withBagReplicator {
+    withApp {
       case (
           sourceBucket,
           queuePair,
