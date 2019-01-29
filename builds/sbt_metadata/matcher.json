@@ -1,6 +1,6 @@
 {
   "id": "matcher",
-  "folder": "catalogue_pipeline\/matcher",
+  "folder": "catalogue_pipeline/matcher",
   "dependencyIds": [
     "common",
     "internal_model",
