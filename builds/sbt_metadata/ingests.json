@@ -1,6 +1,6 @@
 {
   "id": "ingests",
-  "folder": "storage/ingests",
+  "folder": "storage\/ingests",
   "dependencyIds": [
     "ingests_common"
   ]

@@ -1,6 +1,6 @@
 {
   "id": "config_monitoring",
-  "folder": "sbt_common/config/monitoring",
+  "folder": "sbt_common\/config\/monitoring",
   "dependencyIds": [
     "config_core"
   ]
