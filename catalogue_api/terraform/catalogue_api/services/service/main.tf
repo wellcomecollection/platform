@@ -30,7 +30,7 @@ module "service" {
 }
 
 module "task" {
-  source = "git::github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=3dbb61a36f9d20ea071033b97fdf086a1bc17905"
+  source = "git::github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=a0defab67aab310b934c2bd1debc39d3cffd3684"
 
   cpu    = 1024
   memory = 2048
@@ -63,7 +63,7 @@ module "task" {
   sidecar_env_vars_length = 2
 
   secret_app_env_vars = {
-    es_username = "/aws/reference/secretsmanager/catalogue/secrets/prod/es_cluster_username"
+    es_username = "catalogue/secrets/prod/es_cluster_username"
   }
 
   secret_app_env_vars_length = 1
