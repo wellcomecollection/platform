@@ -1,7 +1,7 @@
 {
-  "id": "sierra_items_to_dynamo",
-  "folder": "sierra_adapter/sierra_items_to_dynamo",
-  "dependencyIds": [
+  "id" : "sierra_items_to_dynamo",
+  "folder" : "sierra_adapter/sierra_items_to_dynamo",
+  "dependencyIds" : [
     "common",
     "sierra_adapter_common"
   ]

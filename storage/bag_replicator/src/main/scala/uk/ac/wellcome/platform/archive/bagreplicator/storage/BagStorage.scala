@@ -25,8 +25,7 @@ object BagStorage extends Logging {
     // We must terminate the prefix with "/" to search only under that
     // "folder" and not other keys that match that prefix.
     // e.g. prefix "foo" matches "foo/bar" and "foo_baz/bar"
-    val absolutePathInStorage = bagLocation
-      .bagPathInStorage
+    val absolutePathInStorage = bagLocation.bagPathInStorage
       .replaceAll("/*$", "") + "/"
 
     s3Client.listObjects(
@@ -39,7 +38,7 @@ object BagStorage extends Logging {
     implicit s3Client: AmazonS3) = {
     // TODO: limit size of the returned List and use Marker to paginate(?), but needs care if bag contents can change during copy.
     debug(s"listing items in $bagLocation")
-    
+
     val objectListing = listObjects(s3Client, bagLocation)
 
     objectListing.getObjectSummaries.asScala

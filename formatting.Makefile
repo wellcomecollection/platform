@@ -39,7 +39,7 @@ format-json:
 	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/src \
 		--workdir /src \
-		wellcome/format_json:latest
+		wellcome/format_json:39
 
 format: format-terraform format-scala format-python format-json
 

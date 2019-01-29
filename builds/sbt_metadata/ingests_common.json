@@ -1,7 +1,7 @@
 {
-  "id": "ingests_common",
-  "folder": "storage/ingests_common",
-  "dependencyIds": [
+  "id" : "ingests_common",
+  "folder" : "storage/ingests_common",
+  "dependencyIds" : [
     "storage_common"
   ]
 }

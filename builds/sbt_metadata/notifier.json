@@ -1,7 +1,7 @@
 {
-  "id": "notifier",
-  "folder": "storage/notifier",
-  "dependencyIds": [
+  "id" : "notifier",
+  "folder" : "storage/notifier",
+  "dependencyIds" : [
     "storage_common",
     "storage_display"
   ]

@@ -1,7 +1,7 @@
 {
-  "id": "sierra_item_merger",
-  "folder": "sierra_adapter/sierra_item_merger",
-  "dependencyIds": [
+  "id" : "sierra_item_merger",
+  "folder" : "sierra_adapter/sierra_item_merger",
+  "dependencyIds" : [
     "common",
     "sierra_adapter_common"
   ]

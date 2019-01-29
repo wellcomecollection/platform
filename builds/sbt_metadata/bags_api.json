@@ -1,7 +1,7 @@
 {
-  "id": "bags_api",
-  "folder": "storage/bags_api",
-  "dependencyIds": [
+  "id" : "bags_api",
+  "folder" : "storage/bags_api",
+  "dependencyIds" : [
     "bags_common",
     "storage_display"
   ]
