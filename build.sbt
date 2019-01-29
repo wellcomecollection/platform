@@ -2,7 +2,30 @@ import sbt.Keys._
 
 import java.io.File
 
-import scala.util.parsing.json.{JSONArray, JSONObject}
+import scala.util.parsing.json.{JSONArray, JSONFormat, JSONObject}
+
+// We use a custom formatter so the JSON produced by these metadata files
+// doesn't get scrambled by the autoformatting scripts.
+// Based on https://stackoverflow.com/q/21388624/1558022
+def prettyJson(t: Any, indent: Int = 0): String =
+  t match {
+    case obj: JSONObject =>
+      obj.obj
+        .map { case (k, v) =>
+          "  " * (indent + 1) + JSONFormat.defaultFormatter(k) + ": " + prettyJson(v, indent+1)
+        }
+        .mkString("{\n", ",\n", "\n" + "  " * indent + "}")
+
+    case arr: JSONArray =>
+      if (arr.list.isEmpty)
+        "[]"
+      else
+        arr.list
+          .map { entry => "  " * (indent + 1) + prettyJson(entry, indent + 1) }
+          .mkString("[\n", ",\n", "\n" + "  " * indent + "]")
+
+    case _ => JSONFormat.defaultFormatter(t)
+  }
 
 def setupProject(
   project: Project,
@@ -27,7 +50,7 @@ def setupProject(
     "dependencyIds" -> JSONArray(dependencyIds)
   )
 
-  IO.write(file, JSONObject(metadata).toString())
+  IO.write(file, prettyJson(JSONObject(metadata)) + "\n")
 
   // And here we actually create the project, with a few convenience wrappers
   // to make defining projects below cleaner.
