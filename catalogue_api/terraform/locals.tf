@@ -8,7 +8,7 @@ locals {
   production_api = "remus"
 
   pinned_nginx       = "bad0dbfa548874938d16496e313b05adb71268b7"
-  pinned_remus_api   = "966a00af5552b4c6e0b816ba296b7bc4f898206a"
+  pinned_remus_api   = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/api:966a00af5552b4c6e0b816ba296b7bc4f898206a"
   pinned_romulus_api = ""
 
   romulus_es_cluster_credentials = "${local.es_cluster_credentials}"
@@ -28,14 +28,13 @@ locals {
 
   # Blue / Green config
 
-  romulus_is_prod        = "${local.production_api == "romulus" ? "true" : "false"}"
-  remus_is_prod          = "${local.production_api == "remus" ? "true" : "false"}"
-  romulus_app_uri        = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : local.api_release_uri}"
-  remus_api_release_id   = "${local.pinned_remus_api != "" ? local.pinned_remus_api : local.api_release_uri}"
-  remus_app_uri          = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
-  stage_api              = "${local.remus_is_prod == "false" ? "remus" : "romulus"}"
-  remus_task_number      = "${local.remus_is_prod == "true" ? 3 : 1}"
-  romulus_task_number    = "${local.romulus_is_prod == "true" ? 3 : 1}"
+  romulus_is_prod     = "${local.production_api == "romulus" ? "true" : "false"}"
+  remus_is_prod       = "${local.production_api == "remus" ? "true" : "false"}"
+  romulus_app_uri     = "${local.pinned_romulus_api != "" ? local.pinned_romulus_api : local.api_release_uri}"
+  remus_app_uri       = "${local.pinned_remus_api != "" ? local.pinned_remus_api : local.api_release_uri}"
+  stage_api           = "${local.remus_is_prod == "false" ? "remus" : "romulus"}"
+  remus_task_number   = "${local.remus_is_prod == "true" ? 3 : 1}"
+  romulus_task_number = "${local.romulus_is_prod == "true" ? 3 : 1}"
 
   # Catalogue API
 
