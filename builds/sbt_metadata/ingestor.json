@@ -1,6 +1,6 @@
 {
   "id": "ingestor",
-  "folder": "catalogue_pipeline\/ingestor",
+  "folder": "catalogue_pipeline/ingestor",
   "dependencyIds": [
     "common",
     "config_elasticsearch",
