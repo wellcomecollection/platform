@@ -1,6 +1,6 @@
 {
   "id": "config_elasticsearch",
-  "folder": "sbt_common/config/elasticsearch",
+  "folder": "sbt_common\/config\/elasticsearch",
   "dependencyIds": [
     "config_core",
     "elasticsearch"
