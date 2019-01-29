@@ -12,9 +12,6 @@ locals {
   pinned_remus_api   = ""
   pinned_romulus_api = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/api:bc67ea53369f7255ffca55e72f04d19102e8c419"
 
-  romulus_es_cluster_credentials = "${local.es_cluster_credentials}"
-  remus_es_cluster_credentials   = "${local.es_cluster_credentials}"
-
   romulus_es_config = {
     index_v1 = "v1-2019-01-24-production-changes"
     index_v2 = "v2-2019-01-24-production-changes"
