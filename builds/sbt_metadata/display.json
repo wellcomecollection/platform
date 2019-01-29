@@ -1,6 +1,6 @@
 {
   "id": "display",
-  "folder": "sbt_common/display",
+  "folder": "sbt_common\/display",
   "dependencyIds": [
     "internal_model"
   ]

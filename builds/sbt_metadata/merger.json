@@ -1,6 +1,6 @@
 {
   "id": "merger",
-  "folder": "catalogue_pipeline/merger",
+  "folder": "catalogue_pipeline\/merger",
   "dependencyIds": [
     "common",
     "internal_model",
