@@ -1,7 +1,7 @@
 locals {
   api_release_uri                = "${data.aws_ssm_parameter.api_release_uri.value}"
-
   snapshot_generator_release_uri = "${data.aws_ssm_parameter.snapshot_generator_release_uri.value}"
+  update_api_docs_release_uri    = "${data.aws_ssm_parameter.update_api_docs_release_uri.value}"
 
   # API pins
 
@@ -54,8 +54,4 @@ locals {
   }
 
   release_id = "${local.romulus_is_prod == "true" ? local.pinned_romulus_api : local.pinned_remus_api}"
-
-  # Update API docs
-
-  update_api_docs_container_uri = "${module.ecr_repository_update_api_docs.repository_url}:${var.release_ids["update_api_docs"]}"
 }

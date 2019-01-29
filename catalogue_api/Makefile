@@ -9,8 +9,8 @@ SBT_SSM_APPS = api
 SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
-PYTHON_APPS     = update_api_docs
-PYTHON_SSM_APPS =
+PYTHON_APPS     =
+PYTHON_SSM_APPS = update_api_docs
 LAMBDAS 	    =
 
 TF_NAME = catalogue_api

@@ -48,5 +48,5 @@ module "data_api" {
 module "api_docs" {
   source = "api_docs"
 
-  container_uri = "${local.update_api_docs_container_uri}"
+  update_api_docs_release_uri = "${local.update_api_docs_release_uri}"
 }
