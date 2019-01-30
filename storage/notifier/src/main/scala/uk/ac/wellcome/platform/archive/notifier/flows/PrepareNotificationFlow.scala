@@ -8,11 +8,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models.Callback.{
   Failed,
   Succeeded
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressCallbackStatusUpdate,
-  ProgressEvent,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
 import uk.ac.wellcome.platform.archive.notifier.models.CallbackFlowResult
 
 import scala.util.{Failure, Success}
@@ -26,29 +22,27 @@ object PrepareNotificationFlow extends Logging {
             if (status.isSuccess()) {
               debug(s"Callback fulfilled for: $id")
 
-              ProgressCallbackStatusUpdate(
+              ProgressUpdate.callback(
                 id = id,
-                callbackStatus = Succeeded,
-                events = List(ProgressEvent("Callback fulfilled."))
+                status = Succeeded,
+                description = "Callback fulfilled."
               )
             } else {
               debug(s"Callback failed for: $id, got $status!")
 
-              ProgressCallbackStatusUpdate(
+              ProgressUpdate.callback(
                 id = id,
-                callbackStatus = Failed,
-                events =
-                  List(ProgressEvent(s"Callback failed for: $id, got $status!"))
+                status = Failed,
+                description = s"Callback failed for: $id, got $status!"
               )
             }
           case Failure(e) =>
             error(s"Callback failed for: $id", e)
 
-            ProgressCallbackStatusUpdate(
+            ProgressUpdate.callback(
               id = id,
-              callbackStatus = Failed,
-              events = List(
-                ProgressEvent(s"Callback failed for: $id (${e.getMessage})"))
+              status = Failed,
+              description = s"Callback failed for: $id (${e.getMessage})"
             )
         }
     }

@@ -204,9 +204,9 @@ class ProgressTrackerTest
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
             val progressUpdate = ProgressCallbackStatusUpdate(
-              progress.id,
-              Callback.Succeeded,
-              List(createProgressEvent)
+              id = progress.id,
+              callbackStatus = Callback.Succeeded,
+              events = List(createProgressEvent)
             )
 
             progressTracker.update(progressUpdate)

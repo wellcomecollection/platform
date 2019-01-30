@@ -9,8 +9,8 @@ sealed trait ProgressUpdate {
   val id: UUID
   val events: Seq[ProgressEvent]
 }
-object ProgressUpdate {
 
+object ProgressUpdate {
   def failed[T](id: UUID, error: ArchiveError[T]) =
     ProgressStatusUpdate(
       id,
@@ -22,6 +22,13 @@ object ProgressUpdate {
   def event(id: UUID, description: String) =
     ProgressEventUpdate(
       id = id,
+      events = Seq(ProgressEvent(description))
+    )
+
+  def callback(id: UUID, status: Callback.CallbackStatus, description: String) =
+    ProgressCallbackStatusUpdate(
+      id = id,
+      callbackStatus = status,
       events = Seq(ProgressEvent(description))
     )
 }
