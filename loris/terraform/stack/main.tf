@@ -21,16 +21,14 @@ module "task" {
   app_container_image = "${var.app_container_image}"
   app_container_port  = "${var.app_container_port}"
 
-  app_cpu      = "${var.app_cpu}"
-  app_memory   = "${var.app_memory}"
-  app_env_vars = "${var.app_env_vars}"
+  app_cpu    = "${var.app_cpu}"
+  app_memory = "${var.app_memory}"
 
   sidecar_container_image = "${var.sidecar_container_image}"
   sidecar_container_port  = "${var.sidecar_container_port}"
 
-  sidecar_cpu      = "${var.sidecar_cpu}"
-  sidecar_memory   = "${var.sidecar_memory}"
-  sidecar_env_vars = "${var.sidecar_env_vars}"
+  sidecar_cpu    = "${var.sidecar_cpu}"
+  sidecar_memory = "${var.sidecar_memory}"
 
   ebs_host_path      = "/ebs/loris"
   ebs_container_path = "${var.ebs_container_path}"

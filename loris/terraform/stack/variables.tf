@@ -67,12 +67,6 @@ variable "app_memory" {
   default = "6144"
 }
 
-variable "app_env_vars" {
-  description = "Environment variables to pass to the container"
-  type        = "map"
-  default     = {}
-}
-
 variable "sidecar_container_image" {}
 
 variable "sidecar_container_port" {
@@ -85,12 +79,6 @@ variable "sidecar_cpu" {
 
 variable "sidecar_memory" {
   default = "128"
-}
-
-variable "sidecar_env_vars" {
-  description = "Environment variables to pass to the container"
-  type        = "map"
-  default     = {}
 }
 
 variable "ebs_container_path" {
