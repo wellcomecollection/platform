@@ -35,7 +35,8 @@ def store_config_key(project_id, label, config_key, config_value):
     )
 
     if resp["ResponseMetadata"]["HTTPStatusCode"] == 200:
-        print(f"""
+        print(
+            f"""
 {ssm_name} -> {config_value!r}
 
 You can reference this config value in Terraform:
@@ -47,7 +48,8 @@ You can reference this config value in Terraform:
 locals {{
   {config_key}_value = "${{data.aws_ssm_parameter.{config_key}.value}}"
 }}
-""".strip())
+""".strip()
+        )
     else:
         print(f"Unexpected error: {resp}")
         sys.exit(1)

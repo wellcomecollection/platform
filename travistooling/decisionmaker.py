@@ -54,7 +54,13 @@ def does_file_affect_build_task(path, task):
         "run_travis_task.py",
         "run_travis_lambdas.py",
     ] or path.startswith(
-        ("misc/", "ontologies/", "data_science/scripts/", "builds/sbt_metadata/", "nginx/")
+        (
+            "misc/",
+            "ontologies/",
+            "data_science/scripts/",
+            "builds/sbt_metadata/",
+            "nginx/",
+        )
     ):
         raise IgnoredPath()
 

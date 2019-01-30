@@ -49,7 +49,8 @@ def store_config_key(project_id, config_key):
             print(f"Unexpected error from CreateSecret: {resp}")
             sys.exit(1)
 
-    print(f"""
+    print(
+        f"""
 {name} -> [secret]
 
 You can reference this secret in an ECS task definition in Terraform:
@@ -59,7 +60,8 @@ You can reference this secret in an ECS task definition in Terraform:
 }}
 
 secret_app_env_vars_length = 1
-""".strip())
+""".strip()
+    )
 
 
 if __name__ == "__main__":
