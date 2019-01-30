@@ -37,5 +37,3 @@ case class ProgressCallbackStatusUpdate(id: UUID,
                                         callbackStatus: Callback.CallbackStatus,
                                         events: Seq[ProgressEvent] = List.empty)
     extends ProgressUpdate
-
-case class FailedProgressUpdate(e: Throwable, update: ProgressUpdate)
