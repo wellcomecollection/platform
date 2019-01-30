@@ -152,7 +152,8 @@ class BagReplicator(
                 status = Progress.Failed,
                 events = List(ProgressEvent("Failed to replicate bag"))
               ),
-              progressSnsConfig)
+              progressSnsConfig
+            )
           case error =>
             warn(s"Unable to notify progress for error without context $error")
         }

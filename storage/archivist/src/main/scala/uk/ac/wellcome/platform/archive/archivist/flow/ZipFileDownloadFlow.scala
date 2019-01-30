@@ -50,9 +50,10 @@ object ZipFileDownloadFlow {
             {
               either.fold(
                 error => ProgressUpdate.failed(request.id, error),
-                _ => ProgressUpdate.event(
-                  id = request.id,
-                  description = downloadSuccessMessage
+                _ =>
+                  ProgressUpdate.event(
+                    id = request.id,
+                    description = downloadSuccessMessage
                 )
               )
             }

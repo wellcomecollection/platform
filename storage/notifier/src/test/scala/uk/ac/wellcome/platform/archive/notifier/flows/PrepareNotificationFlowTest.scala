@@ -74,7 +74,8 @@ class PrepareNotificationFlowTest
       }
     }
 
-    val failedStatusUUID = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
+    val failedStatusUUID =
+      UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
 
     val failedStatusCodes =
       Table(
