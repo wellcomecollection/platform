@@ -28,7 +28,8 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
         parallelism, { job =>
           job.uploadLocation.toInputStream match {
             case Failure(exception) =>
-              warn(s"Failed downloading object ${job.uploadLocation} from S3 : ${exception.getMessage}")
+              warn(
+                s"Failed downloading object ${job.uploadLocation} from S3 : ${exception.getMessage}")
               Source.single(
                 Left(DownloadError(exception, job.uploadLocation, job)))
             case Success(inputStream) =>
