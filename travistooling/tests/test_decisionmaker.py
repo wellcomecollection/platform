@@ -239,6 +239,7 @@ test_cases = [
         ExclusivelyAffectsAnotherTask,
         False,
     ),
+    ("api/catalogue_api/docker-compose.yml", "api-publish", ChangesToTestsDontGetPublished, False),
 ]
 
 

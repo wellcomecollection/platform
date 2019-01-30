@@ -64,7 +64,7 @@ def does_file_affect_build_task(path, task):
         # Scala test files
         "src/test/scala/uk/ac/wellcome" in path
         # Python test files
-        or path.endswith(("conftest.py", ".coveragerc"))
+        or path.endswith(("conftest.py", ".coveragerc", "docker-compose.yml"))
     ):
         raise ChangesToTestsDontGetPublished()
 
