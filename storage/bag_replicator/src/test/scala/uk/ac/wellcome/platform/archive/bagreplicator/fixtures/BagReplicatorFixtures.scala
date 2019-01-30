@@ -5,6 +5,7 @@ import java.util.UUID
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.bagreplicator.BagReplicator
 import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
@@ -13,10 +14,16 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{
   BagLocationFixtures,
   RandomThings
 }
-import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.{
+  ArchiveComplete,
+  BagInfo,
+  BagLocation,
+  StorageSpace
+}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+
 import scala.collection.JavaConverters._
 
 trait BagReplicatorFixtures

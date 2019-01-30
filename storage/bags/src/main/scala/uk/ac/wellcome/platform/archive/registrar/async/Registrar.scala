@@ -15,17 +15,14 @@ import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.messaging.{
   MessageStream,
   NotificationParsingFlow
 }
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 import uk.ac.wellcome.platform.archive.registrar.async.factories.StorageManifestFactory
 import uk.ac.wellcome.platform.archive.registrar.async.flows.{
   NotifyFailureFlow,

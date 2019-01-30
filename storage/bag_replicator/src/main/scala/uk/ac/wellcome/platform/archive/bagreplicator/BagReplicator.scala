@@ -12,7 +12,7 @@ import grizzled.slf4j.Logging
 import io.circe.Encoder
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
 import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{
@@ -28,10 +28,7 @@ import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
 }
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  NotificationMessage
-}
+import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.concurrent.{ExecutionContext, Future}
