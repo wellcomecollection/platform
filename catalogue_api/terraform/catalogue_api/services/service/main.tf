@@ -30,10 +30,12 @@ module "service" {
 }
 
 module "task" {
-  source = "git::github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=6fe560d"
+  source = "git::github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=a1cfa42"
 
   cpu    = 1024
   memory = 2048
+
+  launch_types = ["FARGATE"]
 
   app_cpu    = 512
   app_memory = 1024
@@ -45,14 +47,13 @@ module "task" {
     api_host    = "api.wellcomecollection.org"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
     es_port     = "${var.es_cluster_credentials["port"]}"
-    es_username = "${var.es_cluster_credentials["username"]}"
     es_password = "${var.es_cluster_credentials["password"]}"
     es_protocol = "${var.es_cluster_credentials["protocol"]}"
     es_index_v1 = "${var.es_config["index_v1"]}"
     es_index_v2 = "${var.es_config["index_v2"]}"
   }
 
-  app_env_vars_length = 8
+  app_env_vars_length = 7
 
   sidecar_env_vars = {
     APP_HOST = "localhost"
@@ -60,6 +61,12 @@ module "task" {
   }
 
   sidecar_env_vars_length = 2
+
+  secret_app_env_vars = {
+    es_username = "/aws/reference/secretsmanager/catalogue/secrets/prod/es_cluster_username"
+  }
+
+  secret_app_env_vars_length = 1
 
   aws_region = "eu-west-1"
   task_name  = "${var.namespace}"
