@@ -41,7 +41,7 @@ if __name__ == "__main__":
         (".tf", "format-terraform"),
         ((".sbt", ".scala"), "format-scala"),
         (".py", "format-python"),
-        (".json", "format-json"),
+        # (".json", "format-json"),
     ]
 
     for extension, format_task in extension_to_format_task:
