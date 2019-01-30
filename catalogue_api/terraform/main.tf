@@ -31,13 +31,11 @@ module "data_api" {
   aws_region   = "${var.aws_region}"
   infra_bucket = "${local.infra_bucket}"
 
-  es_cluster_credentials = "${local.es_cluster_credentials}"
-
   es_config_snapshot = "${local.prod_es_config}"
 
   snapshot_generator_release_uri = "${local.snapshot_generator_release_uri}"
 
-  critical_slack_webhook = "${local.critical_slack_webhook}"
+  critical_slack_webhook = ""
 
   vpc_id          = "${local.vpc_id}"
   private_subnets = ["${local.private_subnets}"]

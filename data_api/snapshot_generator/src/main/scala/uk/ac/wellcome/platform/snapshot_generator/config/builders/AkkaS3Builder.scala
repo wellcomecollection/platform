@@ -47,7 +47,9 @@ object AkkaS3Builder extends AWSClientConfigBuilder with Logging {
         def getRegion: String = awsClientConfig.region
       }
 
-    val credentialsProvider = if (awsClientConfig.endpoint.get.isEmpty) {
+    val credentialsProvider = if (
+      awsClientConfig.endpoint.isEmpty
+    ) {
       DefaultAWSCredentialsProviderChain.getInstance()
     } else {
       new AWSStaticCredentialsProvider(
