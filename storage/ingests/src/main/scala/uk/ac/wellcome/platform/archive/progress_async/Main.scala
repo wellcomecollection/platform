@@ -6,9 +6,9 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.WellcomeTypesafeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.SNSBuilder
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders._
-import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 
 import scala.concurrent.ExecutionContext
