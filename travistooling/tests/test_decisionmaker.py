@@ -240,6 +240,7 @@ test_cases = [
         False,
     ),
     ("api/catalogue_api/docker-compose.yml", "api-publish", ChangesToTestsDontGetPublished, False),
+    ("nginx/api-delta.nginx.conf", "ingestor-test", IgnoredPath, False),
 ]
 
 
