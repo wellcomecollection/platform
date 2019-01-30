@@ -56,12 +56,13 @@ We propose the following structure:
 {
   "project": {
     "id": "id",
-    "name": "project_name"
+    "name": "project_name",
+    "profile": "aws_profile"
   },
-  "services" : [
+  "environments" : [
     {
-      "id": "service_id",
-      "name": "service_name"
+      "id": "environment_id",
+      "name": "environment_name"
     }
   ]
 }
