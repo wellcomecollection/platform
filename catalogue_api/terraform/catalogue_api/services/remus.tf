@@ -19,8 +19,7 @@ module "remus" {
 
   subnets = ["${var.subnets}"]
 
-  es_cluster_credentials = "${var.remus_es_cluster_credentials}"
-  es_config              = "${var.remus_es_config}"
+  es_config = "${var.remus_es_config}"
 
   nginx_container_image = "${var.nginx_container_image}"
   nginx_container_port  = "${var.nginx_container_port}"

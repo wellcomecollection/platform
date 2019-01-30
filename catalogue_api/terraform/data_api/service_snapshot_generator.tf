@@ -39,7 +39,7 @@ module "snapshot_generator" {
 
   scale_down_period_in_minutes = 30
 
-  container_image = "${module.ecr_repository_snapshot_generator.repository_url}:${var.snapshot_generator_release_id}"
+  container_image = "${var.snapshot_generator_release_uri}"
 
   ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"

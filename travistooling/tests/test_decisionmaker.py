@@ -54,7 +54,7 @@ test_cases = [
     # At some point, we should really be building/publishing Loris in Travis
     # again, at which point these tests wake up.
     ("loris/loris/Dockerfile", "loris-build", UnrecognisedFile, True),
-    ("loris/loris/Dockerfile", "ingestor-test", UnrecognisedFile, True),
+    ("loris/loris/Dockerfile", "ingestor-test", InsignificantFile, False),
     (
         "sierra_adapter/sierra_reader/foo.scala",
         "sierra_reader-publish",
@@ -239,6 +239,23 @@ test_cases = [
         ExclusivelyAffectsAnotherTask,
         False,
     ),
+    (
+        "api/catalogue_api/docker-compose.yml",
+        "api-publish",
+        ChangesToTestsDontGetPublished,
+        False,
+    ),
+    (
+        "catalogue_api/api/docker-compose.yml",
+        "api-publish",
+        ChangesToTestsDontGetPublished,
+        False,
+    ),
+    ("catalogue_api/api/docker-compose.yml", "api-test", SignificantFile, True),
+    ("catalogue_api/api/docker-compose.yml", "ingestor-test", InsignificantFile, False),
+    ("nginx/api-delta.nginx.conf", "ingestor-test", IgnoredPath, False),
+    ("catalogue_api/api/Dockerfile", "api-publish", SignificantFile, True),
+    ("catalogue_api/api/Dockerfile", "bags-publish", InsignificantFile, False),
 ]
 
 

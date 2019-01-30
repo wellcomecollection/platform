@@ -10,14 +10,11 @@ include $(ROOT)/functions.Makefile
 define nginx_build_image
 	$(ROOT)/docker_run.py \
 		--dind -- \
-		wellcome/image_builder:latest \
+		wellcome/image_builder:23 \
             --project=nginx \
             --variant=$(1) \
             --file=nginx/$(2)
 endef
-
-nginx-build-api-delta:
-	$(call nginx_build_image,api-delta,Dockerfile)
 
 nginx-build-api-gw:
 	$(call nginx_build_image,api-gw,api-gw.Dockerfile.template)
@@ -34,13 +31,10 @@ nginx-build-loris-delta:
 nginx-build-grafana:
 	$(call nginx_build_image,grafana,Dockerfile)
 
-nginx-build: nginx-build-api-delta nginx-build-loris nginx-build-services nginx-build-loris-delta nginx-build-grafana nginx-build-api-gw
-
-nginx-publish-api-delta: nginx-build-api-delta
-	$(call publish_service,nginx_api-delta)
+nginx-build: nginx-build-loris nginx-build-services nginx-build-loris-delta nginx-build-grafana nginx-build-api-gw
 
 nginx-publish-api-gw: nginx-build-api-gw
-	$(call publish_service,nginx_api-gw)
+	$(call publish_service_ssm,nginx_api-gw,catalogue_api)
 
 nginx-publish-loris: nginx-build-loris
 	$(call publish_service,nginx_loris)
@@ -54,4 +48,4 @@ nginx-publish-loris-delta: nginx-build-loris-delta
 nginx-publish-grafana: nginx-build-grafana
 	$(call publish_service,nginx_grafana)
 
-nginx-publish: nginx-publish-api-delta nginx-publish-loris nginx-publish-services nginx-publish-loris-delta nginx-publish-grafana nginx-publish-api-gw
+nginx-publish: nginx-publish-loris nginx-publish-services nginx-publish-loris-delta nginx-publish-grafana nginx-publish-api-gw

@@ -9,15 +9,13 @@ module "catalogue_api" {
   container_port = "8888"
   cluster_name   = "${aws_ecs_cluster.cluster.name}"
 
-  remus_container_image        = "${local.remus_app_uri}"
-  remus_es_cluster_credentials = "${local.remus_es_cluster_credentials}"
-  remus_es_config              = "${local.remus_es_config}"
-  remus_task_number            = "${local.remus_task_number}"
+  remus_container_image = "${local.remus_app_uri}"
+  remus_es_config       = "${local.remus_es_config}"
+  remus_task_number     = "${local.remus_task_number}"
 
-  romulus_container_image        = "${local.romulus_app_uri}"
-  romulus_es_cluster_credentials = "${local.romulus_es_cluster_credentials}"
-  romulus_es_config              = "${local.romulus_es_config}"
-  romulus_task_number            = "${local.romulus_task_number}"
+  romulus_container_image = "${local.romulus_app_uri}"
+  romulus_es_config       = "${local.romulus_es_config}"
+  romulus_task_number     = "${local.romulus_task_number}"
 
   nginx_container_image = "${local.nginx_container_uri}"
 
@@ -31,15 +29,15 @@ module "data_api" {
   source = "data_api"
 
   aws_region   = "${var.aws_region}"
-  infra_bucket = "${var.infra_bucket}"
+  infra_bucket = "${local.infra_bucket}"
 
-  es_cluster_credentials = "${var.es_cluster_credentials_v6}"
+  es_cluster_credentials = "${local.es_cluster_credentials}"
 
   es_config_snapshot = "${local.prod_es_config}"
 
-  snapshot_generator_release_id = "${local.release_id}"
+  snapshot_generator_release_uri = "${local.snapshot_generator_release_uri}"
 
-  critical_slack_webhook = "${var.critical_slack_webhook}"
+  critical_slack_webhook = "${local.critical_slack_webhook}"
 
   vpc_id          = "${local.vpc_id}"
   private_subnets = ["${local.private_subnets}"]
@@ -48,5 +46,5 @@ module "data_api" {
 module "api_docs" {
   source = "api_docs"
 
-  container_uri = "${local.update_api_docs_container_uri}"
+  update_api_docs_release_uri = "${local.update_api_docs_release_uri}"
 }

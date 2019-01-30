@@ -1,4 +1,4 @@
-TERRAFORM_WRAPPER_IMAGE = wellcome/terraform_wrapper:13
+TERRAFORM_WRAPPER_IMAGE = wellcome/terraform_wrapper:36
 
 ifndef UPTODATE_GIT_DEFINED
 
@@ -47,10 +47,6 @@ define terraform_plan
 		--volume $(ROOT):$(ROOT) \
 		--workdir $(ROOT)/$(1) \
 		--env OP=plan \
-		--env GET_TFVARS=true \
-		--env BUCKET_NAME=$(TFVARS_BUCKET) \
-		--env OBJECT_KEY=$(TFVARS_KEY) \
-		--env IS_PUBLIC_FACING=$(2) \
 		$(TERRAFORM_WRAPPER_IMAGE)
 endef
 

@@ -6,14 +6,6 @@ variable "romulus_es_config" {
   type = "map"
 }
 
-variable "romulus_es_cluster_credentials" {
-  type = "map"
-}
-
-variable "remus_es_cluster_credentials" {
-  type = "map"
-}
-
 variable "subnets" {
   type = "list"
 }
