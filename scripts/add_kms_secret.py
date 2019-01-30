@@ -40,19 +40,27 @@ def store_config_key(project_id, label, config_key):
                 SecretId=name, SecretString=config_value
             )
 
-            if resp["ResponseMetadata"]["HTTPStatusCode"] == 200:
-                print(f"Updated secret {name} -> [secret]")
-            else:
+            if resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
                 print(f"Unexpected error from PutSecretValue: {resp}")
                 sys.exit(1)
         else:
             raise
     else:
-        if resp["ResponseMetadata"]["HTTPStatusCode"] == 200:
-            print(f"Created secret {name} -> [secret]")
-        else:
+        if resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
             print(f"Unexpected error from CreateSecret: {resp}")
             sys.exit(1)
+
+    print(f"""
+{name} -> [secret]
+
+You can reference this secret in an ECS task definition in Terraform:
+
+\033[91msecret_app_env_vars = {{
+  {config_key} = "{name}
+}}
+
+secret_app_env_vars_length = 1
+""".strip())
 
 
 if __name__ == "__main__":
