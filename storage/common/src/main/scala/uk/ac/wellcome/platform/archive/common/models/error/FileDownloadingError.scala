@@ -1,7 +1,6 @@
-package uk.ac.wellcome.platform.archive.common.errors
+package uk.ac.wellcome.platform.archive.common.models.error
 
 import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
-import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 case class FileDownloadingError(t: IngestBagRequest, exception: Throwable)
     extends ArchiveError[IngestBagRequest] {

@@ -6,7 +6,7 @@ import java.util.UUID
 import com.amazonaws.services.s3.transfer.TransferManager
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.platform.archive.common.TemporaryStore
-import uk.ac.wellcome.platform.archive.common.errors.FileDownloadingError
+import uk.ac.wellcome.platform.archive.common.models.error.FileDownloadingError
 
 import scala.concurrent.{ExecutionContext, Future}
 
