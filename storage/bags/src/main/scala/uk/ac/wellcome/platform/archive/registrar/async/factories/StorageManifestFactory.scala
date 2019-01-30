@@ -87,18 +87,8 @@ object StorageManifestFactory {
     implicit s3Client: AmazonS3)
     : Either[DownloadError[ArchiveComplete], InputStream] = {
     val location: ObjectLocation =
-      getFileObjectLocation(archiveComplete.bagLocation, filename)
+      archiveComplete.bagLocation.getFileObjectLocation(filename)
     location.toInputStream.toEither
       .leftMap(ex => DownloadError(ex, location, archiveComplete))
   }
-
-  private def getFileObjectLocation(bagLocation: BagLocation, name: String) =
-    ObjectLocation(
-      bagLocation.storageNamespace,
-      List(
-        bagLocation.storageRootPath,
-        bagLocation.bagPath.value,
-        name
-      ).mkString("/")
-    )
 }
