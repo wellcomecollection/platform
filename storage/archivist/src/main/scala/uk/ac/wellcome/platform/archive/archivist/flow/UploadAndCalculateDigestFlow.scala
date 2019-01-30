@@ -13,7 +13,7 @@ import scala.util.Try
 
 object UploadAndCalculateDigestFlow {
   def apply(uploadLocation: ObjectLocation,
-            maybeObjectMetadata: Option[ObjectMetadata] = None)(
+            objectMetadata: ObjectMetadata = ObjectMetadata(Map.empty))(
     implicit s3Client: AmazonS3): Flow[ByteString, Try[String], NotUsed] = {
     Flow.fromGraph(
       GraphDSL.create() { implicit b =>
@@ -21,7 +21,7 @@ object UploadAndCalculateDigestFlow {
 
         val verify = b.add(ArchiveChecksumFlow("SHA-256"))
         val flow = b.add(Flow[ByteString])
-        val upload = b.add(S3UploadFlow(uploadLocation, maybeObjectMetadata))
+        val upload = b.add(S3UploadFlow(uploadLocation, objectMetadata))
         val zip = b.add(Zip[Try[CompleteMultipartUploadResult], String])
 
         flow.out.log("calculating checksum") ~> verify.inlets.head

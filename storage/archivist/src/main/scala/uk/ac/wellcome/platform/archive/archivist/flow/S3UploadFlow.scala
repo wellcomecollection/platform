@@ -18,14 +18,14 @@ import scala.util.{Failure, Success, Try}
 
 object S3UploadFlow extends Logging {
   def apply(uploadLocation: ObjectLocation,
-            maybeUploadMetadata: Option[ObjectMetadata] = None)(
-    implicit s3Client: AmazonS3) =
-    new S3UploadFlow(uploadLocation, maybeUploadMetadata)(s3Client)
+            uploadMetadata: ObjectMetadata = ObjectMetadata(Map.empty))(
+             implicit s3Client: AmazonS3): S3UploadFlow =
+    new S3UploadFlow(uploadLocation, uploadMetadata)(s3Client)
 }
 
 class S3UploadFlow(
   uploadLocation: ObjectLocation,
-  maybeUploadMetadata: Option[ObjectMetadata])(implicit s3Client: AmazonS3)
+  uploadMetadata: ObjectMetadata)(implicit s3Client: AmazonS3)
     extends GraphStage[
       FlowShape[ByteString, Try[CompleteMultipartUploadResult]]]
     with Logging {
@@ -218,8 +218,7 @@ class S3UploadFlow(
       // TODO: How does this work???
       private def getUploadId: Try[String] = maybeUploadId match {
         case None =>
-          val triedUploadId =
-            initializeUpload(uploadLocation, maybeUploadMetadata)
+          val triedUploadId = initializeUpload
           triedUploadId.foreach(uploadId => maybeUploadId = Some(uploadId))
           triedUploadId
         case Some(initializedId) => Try(initializedId)
@@ -230,26 +229,15 @@ class S3UploadFlow(
         * (if successful).
         *
         */
-      private def initializeUpload(
-        uploadLocation: ObjectLocation,
-        maybeUploadMetadata: Option[ObjectMetadata]): Try[String] = {
-
+      private def initializeUpload: Try[String] = {
         debug(s"initializeUpload: $uploadLocation")
 
-        val initiateRequest = maybeUploadMetadata match {
-          case None =>
-            new InitiateMultipartUploadRequest(
-              uploadLocation.namespace,
-              uploadLocation.key
-            )
-          case Some(objectMetadata) =>
-            debug(s"upload with metadata: $objectMetadata")
-            new InitiateMultipartUploadRequest(
-              uploadLocation.namespace,
-              uploadLocation.key,
-              objectMetadata.toS3ObjectMetadata
-            )
-        }
+        val initiateRequest = new InitiateMultipartUploadRequest(
+          uploadLocation.namespace,
+          uploadLocation.key,
+          uploadMetadata.toS3ObjectMetadata
+        )
+
         Try(
           s3Client
             .initiateMultipartUpload(initiateRequest)

@@ -240,7 +240,7 @@ class S3UploadFlowTest
           ObjectMetadata(userMetadata = Map("metadata" -> "1234"))
         val futureResult = StreamConverters
           .fromInputStream(() => new ByteArrayInputStream(content.getBytes()))
-          .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key), Some(metadata))(
+          .via(S3UploadFlow(ObjectLocation(bucket.name, s3Key), metadata)(
             s3Client))
           .runWith(Sink.head)
 
