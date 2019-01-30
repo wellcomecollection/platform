@@ -227,8 +227,18 @@ test_cases = [
     ("project/Dependencies.scala", "ingestor-test", SignificantFile, True),
     ("builds/sbt_metadata/api.json", "goobi_reader-test", IgnoredPath, False),
     ("storage/bagger/src/tech_md.py", "bagger-publish", SignificantFile, True),
-    ("storage/bagger/local_executables_examples/migtool.sh", "bagger-publish", SignificantFile, True),
-    ("storage/bagger/local_executables_examples/migtool.sh", "elasticsearch-test", ExclusivelyAffectsAnotherTask, False),
+    (
+        "storage/bagger/local_executables_examples/migtool.sh",
+        "bagger-publish",
+        SignificantFile,
+        True,
+    ),
+    (
+        "storage/bagger/local_executables_examples/migtool.sh",
+        "elasticsearch-test",
+        ExclusivelyAffectsAnotherTask,
+        False,
+    ),
 ]
 
 
