@@ -39,7 +39,8 @@ object UploadInputStreamFlow extends Logging {
                 case Success(digest) =>
                   Right((archiveItemJob, digest))
                 case Failure(exception) =>
-                  warn(s"UploadInputStreamFlow failed with exception : ${exception.getMessage}")
+                  warn(
+                    s"UploadInputStreamFlow failed with exception : ${exception.getMessage}")
                   Left(
                     UploadError(
                       archiveItemJob.uploadLocation,

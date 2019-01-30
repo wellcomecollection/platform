@@ -164,7 +164,8 @@ class S3UploadFlow(
             debug(s"Upload completed successfully: $uploadLocation")
             push(out, Try(result))
           case Failure(ex) =>
-            warn(s"Exception while completing upload: $uploadLocation : ${ex.getMessage}")
+            warn(
+              s"Exception while completing upload: $uploadLocation : ${ex.getMessage}")
             handleInternalFailure(ex)
         }
       }
