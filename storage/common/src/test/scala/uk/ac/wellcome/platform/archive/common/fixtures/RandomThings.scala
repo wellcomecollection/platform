@@ -73,4 +73,8 @@ trait RandomThings {
     randomStorageSpace,
     randomExternalIdentifier
   )
+
+  def randomBagPath = BagPath(
+    randomAlphanumeric()
+  )
 }

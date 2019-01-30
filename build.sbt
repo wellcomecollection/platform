@@ -1,31 +1,7 @@
-import sbt.Keys._
-
 import java.io.File
-
-import scala.util.parsing.json.{JSONArray, JSONFormat, JSONObject}
-
-// We use a custom formatter so the JSON produced by these metadata files
-// doesn't get scrambled by the autoformatting scripts.
-// Based on https://stackoverflow.com/q/21388624/1558022
-def prettyJson(t: Any, indent: Int = 0): String =
-  t match {
-    case obj: JSONObject =>
-      obj.obj
-        .map { case (k, v) =>
-          "  " * (indent + 1) + JSONFormat.defaultFormatter(k) + ": " + prettyJson(v, indent+1)
-        }
-        .mkString("{\n", ",\n", "\n" + "  " * indent + "}")
-
-    case arr: JSONArray =>
-      if (arr.list.isEmpty)
-        "[]"
-      else
-        arr.list
-          .map { entry => "  " * (indent + 1) + prettyJson(entry, indent + 1) }
-          .mkString("[\n", ",\n", "\n" + "  " * indent + "]")
-
-    case _ => JSONFormat.defaultFormatter(t)
-  }
+import _root_.io.circe.syntax._
+import _root_.io.circe.generic.auto._
+import _root_.sbt.IO
 
 def setupProject(
   project: Project,
@@ -44,13 +20,19 @@ def setupProject(
     .map { p: Project => p.id }
     .toList
 
-  val metadata = Map(
-    "id" -> project.id,
-    "folder" -> folder,
-    "dependencyIds" -> JSONArray(dependencyIds)
+  case class ProjectMetadata(
+                            id: String,
+                            folder: String,
+                            dependencyIds: List[String]
+                            )
+
+  val metadata = ProjectMetadata(
+    id = project.id,
+    folder = folder,
+    dependencyIds = dependencyIds
   )
 
-  IO.write(file, prettyJson(JSONObject(metadata)) + "\n")
+  IO.write(file, metadata.asJson.spaces2)
 
   // And here we actually create the project, with a few convenience wrappers
   // to make defining projects below cleaner.

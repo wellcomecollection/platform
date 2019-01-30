@@ -48,10 +48,13 @@ class BagReplicator(
     with Runnable {
 
   def run(): Future[Done] = {
+
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
+
     implicit val materializer: ActorMaterializer =
       SupervisedMaterializer.resumable
+
     implicit val s3client: AmazonS3 = s3Client
     implicit val amazonSNS: AmazonSNS = snsClient
     implicit val ex: ExecutionContext = actorSystem.dispatcher
@@ -99,6 +102,18 @@ class BagReplicator(
               Future(
                 Right(CompletedBagReplication(bagReplicationRequest.context)))
             case Failure(e) =>
+              val stackTrace = e.getStackTrace.mkString("\n")
+
+              error(
+                List(
+                  "Failed bag replication for",
+                  bagReplicationRequest.context.bagLocation,
+                  s"from ${bagReplicationRequest.sourceBagLocation}",
+                  s"to ${storageDestination.namespace}/${storageDestination.rootPath}",
+                  s"with error: ${e.getMessage}\n",
+                  stackTrace
+                ).mkString(" ")
+              )
               Future(Left(
                 DuplicationFailed(e.getMessage, bagReplicationRequest.context)))
         }

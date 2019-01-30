@@ -20,8 +20,8 @@ class TroubleshootArchivistLocalBagFileTest
           new File(
             List(
               System.getProperty("user.home"),
-              "git/platform",
-              "b22454408.zip"
+              "Desktop",
+              "b30529943.zip"
             ).mkString("/")),
           ingestBucket,
           queuePair
