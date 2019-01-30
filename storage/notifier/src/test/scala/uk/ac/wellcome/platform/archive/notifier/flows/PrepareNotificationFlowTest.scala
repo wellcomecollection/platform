@@ -48,10 +48,9 @@ class PrepareNotificationFlowTest
     it("returns a successful ProgressUpdate when a callback succeeds") {
       withMaterializer { implicit materializer =>
         forAll(successfulStatuscodes) { responseStatus: Int =>
-          val id = randomUUID
           val callbackResult = createCallbackResultWith(
-            id = id,
-            response = HttpResponse(responseStatus))
+            response = HttpResponse(responseStatus)
+          )
 
           val eventualResult =
             Source
@@ -65,7 +64,7 @@ class PrepareNotificationFlowTest
                   actualId,
                   callbackStatus,
                   List(progressEvent)) =>
-                actualId shouldBe id
+                actualId shouldBe callbackResult.id
                 progressEvent.description shouldBe "Callback fulfilled."
                 callbackStatus shouldBe Callback.Succeeded
                 assertRecent(progressEvent.createdDate)
@@ -75,25 +74,27 @@ class PrepareNotificationFlowTest
       }
     }
 
+    val failedStatusUUID = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
+
     val failedStatusCodes =
       Table(
         ("failed status code", "msg"),
         (
           500,
-          "Callback failed for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe, got 500 Internal Server Error!"),
+          s"Callback failed for: ${failedStatusUUID.toString}, got 500 Internal Server Error!"),
         (
           400,
-          "Callback failed for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe, got 400 Bad Request!")
+          "Callback failed for: ${failedStatusUUID.toString}, got 400 Bad Request!")
       )
     it(
       "returns a failed ProgressUpdate when a callback returns with a failed status code") {
       withMaterializer { implicit materializer =>
         forAll(failedStatusCodes) {
           (responseStatus: Int, expectedMsg: String) =>
-            val id = UUID.fromString("12f251b8-c4a9-4afa-85de-c34ec3ed71fe")
             val callbackResult = createCallbackResultWith(
-              id = id,
-              response = HttpResponse(responseStatus))
+              id = failedStatusUUID,
+              response = HttpResponse(responseStatus)
+            )
 
             val eventualResult =
               Source
@@ -137,7 +138,7 @@ class PrepareNotificationFlowTest
                 callbackStatus,
                 List(progressEvent)) =>
               actualId shouldBe id
-              progressEvent.description shouldBe "Callback failed for: 12f251b8-c4a9-4afa-85de-c34ec3ed71fe (Callback exception)"
+              progressEvent.description shouldBe s"Callback failed for: ${id.toString} (Callback exception)"
               callbackStatus shouldBe Callback.Failed
               assertRecent(progressEvent.createdDate)
           }

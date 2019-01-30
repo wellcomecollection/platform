@@ -14,7 +14,7 @@ trait NotifierGenerators extends RandomThings {
                                response: HttpResponse): CallbackFlowResult =
     CallbackFlowResult(id, httpResponse = Success(response))
 
-  def createFailedCallbackResultWith(id: UUID = randomUUID,
+  def createFailedCallbackResultWith(id: UUID,
                                      exception: Throwable): CallbackFlowResult =
     CallbackFlowResult(id, httpResponse = Failure(exception))
 }
