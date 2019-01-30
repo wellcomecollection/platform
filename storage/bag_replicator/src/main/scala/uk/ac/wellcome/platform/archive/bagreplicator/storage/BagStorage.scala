@@ -21,13 +21,7 @@ object BagStorage extends Logging {
     s3Client: AmazonS3,
     s3Copier: S3Copier,
     ctx: ExecutionContext): Future[List[CopyResult]] = {
-    debug(
-      List(
-        s"duplicating bag from",
-        sourceBagLocation.toString,
-        s"to $storageDestination"
-      ).mkString(" ")
-    )
+    debug(s"duplicating bag from ${sourceBagLocation.toString} to $storageDestination")
 
     for {
       sourceBagItems <- listBagItems(
