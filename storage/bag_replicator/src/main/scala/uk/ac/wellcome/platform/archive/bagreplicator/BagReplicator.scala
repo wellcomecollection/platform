@@ -148,10 +148,10 @@ class BagReplicator(
           case errorWithContext: BagReplicationError with BagReplicationContext =>
             publishNotification[ProgressUpdate](
               ProgressStatusUpdate(
-                errorWithContext.context.archiveRequestId,
-                Progress.Failed,
-                None,
-                List(ProgressEvent("Failed to replicate bag"))),
+                id = errorWithContext.context.archiveRequestId,
+                status = Progress.Failed,
+                events = List(ProgressEvent("Failed to replicate bag"))
+              ),
               progressSnsConfig)
           case error =>
             warn(s"Unable to notify progress for error without context $error")

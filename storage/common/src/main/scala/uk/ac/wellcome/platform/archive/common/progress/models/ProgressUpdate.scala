@@ -29,7 +29,7 @@ case class ProgressEventUpdate(id: UUID, events: Seq[ProgressEvent])
 
 case class ProgressStatusUpdate(id: UUID,
                                 status: Progress.Status,
-                                affectedBag: Option[BagId],
+                                affectedBag: Option[BagId] = None,
                                 events: Seq[ProgressEvent] = List.empty)
     extends ProgressUpdate
 
