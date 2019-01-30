@@ -16,27 +16,12 @@ trait ReindexableTable extends LocalDynamoDb {
         .withAttributeDefinitions(
           new AttributeDefinition()
             .withAttributeName("id")
-            .withAttributeType("S"),
-          new AttributeDefinition()
-            .withAttributeName("reindexShard")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
           .withWriteCapacityUnits(1L))
-        .withGlobalSecondaryIndexes(
-          new GlobalSecondaryIndex()
-            .withIndexName(table.index)
-            .withProjection(
-              new Projection().withProjectionType(ProjectionType.ALL))
-            .withKeySchema(
-              new KeySchemaElement()
-                .withAttributeName("reindexShard")
-                .withKeyType(KeyType.HASH)
-            )
-            .withProvisionedThroughput(new ProvisionedThroughput()
-              .withReadCapacityUnits(1L)
-              .withWriteCapacityUnits(1L))))
+    )
 
     eventually {
       waitUntilActive(dynamoDbClient, table.name)
