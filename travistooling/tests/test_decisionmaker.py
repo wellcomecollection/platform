@@ -260,13 +260,13 @@ test_cases = [
         "storage/archivist/src/main/resources/application.conf",
         "api-test",
         InsignificantFile,
-        False
+        False,
     ),
     (
         "storage/archivist/src/main/resources/application.conf",
         "archivist-test",
         SignificantFile,
-        True
+        True,
     ),
 ]
 
