@@ -15,7 +15,7 @@ object LogLeftFlow extends Logging {
         val t = event.t
         val e = event.e
 
-        error(s"Failed processing $t@$name", e)
+        warn(s"Failed processing $t@$name : ${e.getMessage}")
 
         left
       }

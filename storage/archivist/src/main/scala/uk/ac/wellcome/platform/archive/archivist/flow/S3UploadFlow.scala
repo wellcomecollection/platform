@@ -164,7 +164,8 @@ class S3UploadFlow(
             debug(s"Upload completed successfully: $uploadLocation")
             push(out, Try(result))
           case Failure(ex) =>
-            error(s"Failure while completing upload: $uploadLocation", ex)
+            warn(
+              s"Exception while completing upload: $uploadLocation : ${ex.getMessage}")
             handleInternalFailure(ex)
         }
       }
@@ -183,7 +184,7 @@ class S3UploadFlow(
         *
         */
       private def handleFailure(ex: Throwable): Unit = {
-        error("There was a failure uploading to s3!", ex)
+        warn(s"There was an exception while uploading to s3 : ${ex.getMessage}")
         abortUpload()
         val supervisionStrategy = inheritedAttributes.get[SupervisionStrategy](
           SupervisionStrategy(_ => Supervision.Stop))
