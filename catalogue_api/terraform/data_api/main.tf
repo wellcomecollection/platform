@@ -24,11 +24,11 @@ module "snapshot_generator" {
   env_vars_length = "5"
 
   secret_env_vars = {
-    es_host     = "catalogue/ingestor/es_host"
-    es_port     = "catalogue/ingestor/es_port"
-    es_protocol = "catalogue/ingestor/es_protocol"
-    es_username = "catalogue/ingestor/es_username"
-    es_password = "catalogue/ingestor/es_password"
+    es_host     = "catalogue/api/es_host"
+    es_port     = "catalogue/api/es_port"
+    es_protocol = "catalogue/api/es_protocol"
+    es_username = "catalogue/api/es_username"
+    es_password = "catalogue/api/es_password"
   }
 
   secret_env_vars_length = "5"
