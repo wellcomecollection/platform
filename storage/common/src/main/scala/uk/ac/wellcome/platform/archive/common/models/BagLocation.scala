@@ -13,5 +13,3 @@ case class BagLocation(storageNamespace: String,
       List(storageRootPath, bagPath.value, filename).mkString("/")
     )
 }
-
-

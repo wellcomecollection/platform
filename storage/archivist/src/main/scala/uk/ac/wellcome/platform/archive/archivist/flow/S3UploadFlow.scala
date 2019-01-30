@@ -19,13 +19,12 @@ import scala.util.{Failure, Success, Try}
 object S3UploadFlow extends Logging {
   def apply(uploadLocation: ObjectLocation,
             uploadMetadata: ObjectMetadata = ObjectMetadata(Map.empty))(
-             implicit s3Client: AmazonS3): S3UploadFlow =
+    implicit s3Client: AmazonS3): S3UploadFlow =
     new S3UploadFlow(uploadLocation, uploadMetadata)(s3Client)
 }
 
-class S3UploadFlow(
-  uploadLocation: ObjectLocation,
-  uploadMetadata: ObjectMetadata)(implicit s3Client: AmazonS3)
+class S3UploadFlow(uploadLocation: ObjectLocation,
+                   uploadMetadata: ObjectMetadata)(implicit s3Client: AmazonS3)
     extends GraphStage[
       FlowShape[ByteString, Try[CompleteMultipartUploadResult]]]
     with Logging {
