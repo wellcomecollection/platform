@@ -157,9 +157,10 @@ class BagReplicator(
             warn(s"Unable to notify progress for error without context $error")
         }
       case Right(PublishedToOutgoingTopic(archiveComplete)) =>
-        val progressEventUpdate = ProgressEventUpdate(
-          archiveComplete.archiveRequestId,
-          List(ProgressEvent("Bag replicated successfully")))
+        val progressEventUpdate = ProgressUpdate.event(
+          id = archiveComplete.archiveRequestId,
+          description = "Bag replicated successfully"
+        )
         publishNotification[ProgressUpdate](
           progressEventUpdate,
           progressSnsConfig)

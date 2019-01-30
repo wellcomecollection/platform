@@ -9,10 +9,6 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressEvent,
-  ProgressEventUpdate
-}
 import uk.ac.wellcome.platform.archive.progress_async.fixtures.ProgressAsyncFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.fixtures.Akka
@@ -35,8 +31,7 @@ class ProgressUpdateFlowTest
           withMaterializer { implicit materializer =>
             val progress = createProgress
             whenReady(monitor.initialise(progress)) { _ =>
-              val update =
-                ProgressEventUpdate(progress.id, List(ProgressEvent("Wow.")))
+              val update = createProgressEventUpdateWith(id = progress.id)
 
               val updates = Source
                 .single(update)
@@ -67,12 +62,8 @@ class ProgressUpdateFlowTest
             monitor.initialise(progress)
 
             val progressUpdates = List(
-              ProgressEventUpdate(
-                progress.id,
-                List(ProgressEvent("It happened again."))),
-              ProgressEventUpdate(
-                progress.id,
-                List(ProgressEvent("Dammit Bobby.")))
+              createProgressEventUpdateWith(id = progress.id),
+              createProgressEventUpdateWith(id = progress.id)
             )
 
             val futureUpdates = Source
@@ -100,12 +91,7 @@ class ProgressUpdateFlowTest
       withProgressUpdateFlow(table) {
         case (flow, _) =>
           withMaterializer { implicit materializer =>
-            val id = randomUUID
-
-            val update =
-              ProgressEventUpdate(
-                id,
-                List(ProgressEvent("Such progress, much wow.")))
+            val update = createProgressEventUpdate
 
             val updates = Source
               .single(update)

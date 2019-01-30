@@ -34,11 +34,9 @@ object NotificationMessageFlow {
       .flatMapMerge(
         breadth = parallelism.value,
         bagRequest => {
-          val progressUpdate = ProgressEventUpdate(
+          val progressUpdate = ProgressUpdate.event(
             id = bagRequest.id,
-            events = List(
-              ProgressEvent("Started work on ingest")
-            )
+            description = "Started work on ingest"
           )
 
           Source

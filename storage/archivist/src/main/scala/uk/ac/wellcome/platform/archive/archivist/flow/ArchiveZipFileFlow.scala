@@ -84,9 +84,10 @@ object ArchiveZipFileFlow extends Logging {
     ingestBagRequest: IngestBagRequest): ProgressUpdate = {
     result match {
       case Right(ArchiveComplete(id, _, _)) =>
-        ProgressEventUpdate(
-          id,
-          List(ProgressEvent("Bag uploaded and verified successfully")))
+        ProgressUpdate.event(
+          id = id,
+          description = "Bag uploaded and verified successfully"
+        )
       case Left(ArchiveJobError(_, errors)) =>
         ProgressStatusUpdate(
           ingestBagRequest.id,

@@ -20,8 +20,10 @@ object ProgressUpdate {
     )
 
   def event(id: UUID, description: String) =
-    ProgressEventUpdate(id, Seq(ProgressEvent(description)))
-
+    ProgressEventUpdate(
+      id = id,
+      events = Seq(ProgressEvent(description))
+    )
 }
 
 case class ProgressEventUpdate(id: UUID, events: Seq[ProgressEvent])

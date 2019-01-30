@@ -157,9 +157,8 @@ class ProgressTrackerTest
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
 
-            val progressUpdate = ProgressEventUpdate(
-              progress.id,
-              List(createProgressEvent)
+            val progressUpdate = createProgressEventUpdateWith(
+              id = progress.id
             )
 
             progressTracker.update(progressUpdate)
@@ -231,8 +230,8 @@ class ProgressTrackerTest
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
             val progressUpdate = ProgressEventUpdate(
-              progress.id,
-              List(createProgressEvent, createProgressEvent)
+              id = progress.id,
+              events = List(createProgressEvent, createProgressEvent)
             )
 
             progressTracker.update(progressUpdate)
