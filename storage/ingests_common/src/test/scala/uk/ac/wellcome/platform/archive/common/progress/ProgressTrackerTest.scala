@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
 import java.time.Instant
+import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest, UpdateItemRequest}
@@ -9,6 +10,7 @@ import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.platform.archive.common.models.BagId
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.common.progress.monitor.IdConstraintError
@@ -352,4 +354,11 @@ class ProgressTrackerTest
       }
     }
   }
+
+  def createProgressBagUpdateWith(id: UUID, bagId: BagId): ProgressStatusUpdate =
+    createProgressStatusUpdateWith(
+      id = id,
+      status = Progress.Processing,
+      bagId = Some(bagId)
+    )
 }

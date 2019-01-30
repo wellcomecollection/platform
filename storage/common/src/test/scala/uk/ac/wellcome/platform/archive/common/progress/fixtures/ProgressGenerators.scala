@@ -58,19 +58,15 @@ trait ProgressGenerators extends ExternalIdentifierGenerators {
 
   def createProgressStatusUpdateWith(
     id: UUID,
-    status: Status = Progress.Accepted,
-    maybeBag: Option[BagId] = Some(randomBagId),
-    events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressUpdate = {
-    ProgressStatusUpdate(id, status, maybeBag, events)
-  }
-
-  def createProgressBagUpdateWith(id: UUID,
-                                  bagId: BagId,
-                                  status: Status = Progress.Processing,
-                                  events: Seq[ProgressEvent] = List(
-                                    createProgressEvent)): ProgressUpdate = {
-    ProgressStatusUpdate(id, status, Some(bagId), events)
-  }
+    status: Status,
+    bagId: Option[BagId] = Some(randomBagId),
+  ): ProgressStatusUpdate =
+    ProgressStatusUpdate(
+      id = id,
+      status = status,
+      affectedBag = Some(randomBagId),
+      events = List(createProgressEvent)
+    )
 
   def createBagId = BagId(createStorageSpace, createExternalIdentifier)
 
