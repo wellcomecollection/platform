@@ -13,7 +13,7 @@ module "loris-031218" {
 
   key_name = "${var.key_name}"
 
-  sidecar_container_image = "${module.ecr_nginx_loris_delta.repository_url}:${var.release_ids["nginx_loris-delta"]}"
+  sidecar_container_image = "${local.nginx_loris_release_uri}"
   app_container_image     = "${local.loris_release_uri}"
 
   asg_desired        = 4
