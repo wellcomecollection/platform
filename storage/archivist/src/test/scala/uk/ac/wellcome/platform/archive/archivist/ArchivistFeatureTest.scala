@@ -26,12 +26,7 @@ class ArchivistFeatureTest
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist() {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          nextTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         val bagInfo = randomBagInfo
         createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo) {
           request =>
@@ -134,12 +129,7 @@ class ArchivistFeatureTest
     // Parallelism here is 1 as fake-sns can't deal with
     // concurrent requests
     withArchivist(1) {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          nextTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
@@ -215,12 +205,7 @@ class ArchivistFeatureTest
     val bagInfo2 = randomBagInfo
 
     withArchivist() {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          nextTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
@@ -309,12 +294,7 @@ class ArchivistFeatureTest
     // Parallelism here is 1 as fake-sns can't deal with
     // concurrent requests
     withArchivist(1) {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          nextTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
@@ -388,12 +368,7 @@ class ArchivistFeatureTest
     val bagInfo2 = randomBagInfo
 
     withArchivist() {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          nextTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,

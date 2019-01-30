@@ -25,8 +25,7 @@ object Main extends WellcomeTypesafeApp {
         MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config),
       bagUploaderConfig =
         BagUploaderConfigBuilder.buildBagUploaderConfig(config),
-      snsNextConfig =
-        SNSBuilder.buildSNSConfig(config, namespace = "next"),
+      snsNextConfig = SNSBuilder.buildSNSConfig(config, namespace = "next"),
       snsProgressConfig =
         SNSBuilder.buildSNSConfig(config, namespace = "progress")
     )

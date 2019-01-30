@@ -23,10 +23,10 @@ import uk.ac.wellcome.platform.archive.common.models.{
 import scala.concurrent.Future
 
 class Archivist(
-                 messageStream: MessageStream[NotificationMessage, Unit],
-                 bagUploaderConfig: BagUploaderConfig,
-                 snsNextConfig: SNSConfig,
-                 snsProgressConfig: SNSConfig
+  messageStream: MessageStream[NotificationMessage, Unit],
+  bagUploaderConfig: BagUploaderConfig,
+  snsNextConfig: SNSConfig,
+  snsProgressConfig: SNSConfig
 )(
   implicit val actorSystem: ActorSystem,
   transferManager: TransferManager,
