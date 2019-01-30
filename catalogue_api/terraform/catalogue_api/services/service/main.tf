@@ -30,7 +30,7 @@ module "service" {
 }
 
 module "task" {
-  source = "git::github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=a0defab67aab310b934c2bd1debc39d3cffd3684"
+  source = "git::github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=v19.6.0"
 
   cpu    = 1024
   memory = 2048
