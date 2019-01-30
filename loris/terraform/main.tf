@@ -1,7 +1,7 @@
-module "loris-031218" {
+module "loris-2019_01_30" {
   source = "stack"
 
-  namespace = "loris-031218"
+  namespace = "loris-2019-01-30"
 
   certificate_domain = "api.wellcomecollection.org"
 
@@ -10,8 +10,6 @@ module "loris-031218" {
   vpc_id          = "${local.vpc_id}"
   private_subnets = "${local.private_subnets}"
   public_subnets  = "${local.public_subnets}"
-
-  key_name = "${var.key_name}"
 
   sidecar_container_image = "${local.nginx_loris_release_uri}"
   app_container_image     = "${local.loris_release_uri}"

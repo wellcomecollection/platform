@@ -10,7 +10,6 @@ variable "public_subnets" {
   type = "list"
 }
 
-variable "key_name" {}
 variable "certificate_domain" {}
 
 variable "healthcheck_path" {
