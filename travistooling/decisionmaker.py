@@ -100,14 +100,14 @@ def does_file_affect_build_task(path, task):
             else:
                 raise InsignificantFile()
 
-        for name in ("Dockerfile", "docker-compose.yml"):
+        for name in ("application.conf", "Dockerfile", "docker-compose.yml"):
             if os.path.basename(path) == name:
-                if os.path.join(project.folder, name) == path:
+                if path.startswith(project.folder):
                     raise SignificantFile(
                         "%s depends on %s" % (project_name, project.folder)
                     )
                 else:
-                    raise InsignificantFile()
+                    raise ExclusivelyAffectsAnotherTask()
 
     # Changes made in the travistooling directory only ever affect the
     # travistooling tests (but they're not defined in a Makefile).

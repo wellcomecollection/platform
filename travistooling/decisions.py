@@ -42,11 +42,14 @@ class ExclusivelyAffectsThisTask(SignificantFile):
 
 
 class ExclusivelyAffectsAnotherTask(InsignificantFile):
-    def __init__(self, other_task):
-        self.message = (
-            "Path is an exclusive dependency of a different build task (%s)"
-            % (other_task,)
-        )
+    def __init__(self, other_task=None):
+        if other_task is None:
+            self.message = "Path is an exclusive dependency of a different build task"
+        else:
+            self.message = (
+                "Path is an exclusive dependency of a different build task (%s)"
+                % (other_task,)
+            )
         super(ExclusivelyAffectsAnotherTask, self).__init__()
 
 

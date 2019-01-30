@@ -256,6 +256,18 @@ test_cases = [
     ("nginx/api-delta.nginx.conf", "ingestor-test", IgnoredPath, False),
     ("catalogue_api/api/Dockerfile", "api-publish", SignificantFile, True),
     ("catalogue_api/api/Dockerfile", "bags-publish", InsignificantFile, False),
+    (
+        "storage/archivist/src/main/resources/application.conf",
+        "api-test",
+        InsignificantFile,
+        False
+    ),
+    (
+        "storage/archivist/src/main/resources/application.conf",
+        "archivist-test",
+        SignificantFile,
+        True
+    ),
 ]
 
 
