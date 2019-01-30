@@ -132,12 +132,9 @@ class ProgressTrackerTest
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
-            val bagId = createBagId
-
-            val progressUpdate = ProgressStatusUpdate(
-              progress.id,
-              Progress.Processing,
-              Some(bagId)
+            val progressUpdate = createProgressStatusUpdateWith(
+              id = progress.id,
+              status = Progress.Processing
             )
 
             progressTracker.update(progressUpdate)
@@ -149,7 +146,7 @@ class ProgressTrackerTest
             storedProgress.events.map(_.description) should contain theSameElementsAs progressUpdate.events.map(_.description)
             storedProgress.events.foreach(event => assertRecent(event.createdDate))
 
-            storedProgress.bag shouldBe Some(bagId)
+            storedProgress.bag shouldBe progressUpdate.affectedBag
           }
         }
       }
@@ -182,12 +179,9 @@ class ProgressTrackerTest
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
-            val someBagId = Some(randomBagId)
-            val progressUpdate = ProgressStatusUpdate(
-              progress.id,
-              Progress.Completed,
-              affectedBag = someBagId,
-              List(createProgressEvent)
+            val progressUpdate = createProgressStatusUpdateWith(
+              id = progress.id,
+              status = Progress.Completed
             )
 
             progressTracker.update(progressUpdate)
@@ -195,7 +189,7 @@ class ProgressTrackerTest
             val actualProgress = assertProgressCreated(progress, table)
 
             actualProgress.status shouldBe Progress.Completed
-            actualProgress.bag shouldBe someBagId
+            actualProgress.bag shouldBe progressUpdate.affectedBag
 
             assertProgressRecordedRecentEvents(
               progressUpdate.id,
