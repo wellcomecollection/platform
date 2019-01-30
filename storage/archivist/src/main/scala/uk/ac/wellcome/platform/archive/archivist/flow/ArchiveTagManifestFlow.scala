@@ -40,7 +40,6 @@ object ArchiveTagManifestFlow extends Logging {
           (ArchiveItemJob, String),
           Either[ArchiveError[ArchiveJob], ArchiveJob]](
           ifLeft = Flow[ArchiveError[ArchiveItemJob]].map { error =>
-            warn(error.toString)
             Left(ArchiveItemJobError(error.t.archiveJob, List(error)))
           })(
           ifRight = Flow[(ArchiveItemJob, String)]
@@ -68,7 +67,6 @@ object ArchiveTagManifestFlow extends Logging {
       ArchiveDigestItemJob,
       Either[ArchiveError[ArchiveJob], ArchiveJob]](
       ifLeft = Flow[ArchiveError[ArchiveDigestItemJob]].map { error =>
-        warn(error.toString)
         Left(ArchiveJobError(error.t.archiveJob, List(error)))
       })(ifRight = Flow[ArchiveDigestItemJob].map { archiveDigestItemJob =>
       Right(archiveDigestItemJob.archiveJob)

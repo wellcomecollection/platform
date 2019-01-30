@@ -6,14 +6,8 @@ import akka.stream.ActorAttributes
 import akka.stream.scaladsl.{Flow, StreamConverters}
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveDigestItemJob,
-  ItemDigest
-}
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ChecksumNotMatchedOnUploadError,
-  UploadDigestItemError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ItemDigest}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ChecksumNotMatchedOnUploadError, UploadDigestItemError}
 import uk.ac.wellcome.platform.archive.archivist.models.storage.ObjectMetadata
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
@@ -60,7 +54,7 @@ object UploadDigestInputStreamFlow extends Logging {
                     )
                   )
                 case Failure(exception) =>
-                  warn("There was an exception!", exception)
+                  warn(s"UploadDigestInputStreamFlow failed with exception : ${exception.getMessage}")
                   Left(UploadDigestItemError(exception, job))
               }
         }

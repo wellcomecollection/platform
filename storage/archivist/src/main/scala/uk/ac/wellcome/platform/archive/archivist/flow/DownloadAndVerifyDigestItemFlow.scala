@@ -28,9 +28,7 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
         parallelism, { job =>
           job.uploadLocation.toInputStream match {
             case Failure(exception) =>
-              warn(
-                s"Failed downloading object ${job.uploadLocation} from S3",
-                exception)
+              warn(s"Failed downloading object ${job.uploadLocation} from S3 : ${exception.getMessage}")
               Source.single(
                 Left(DownloadError(exception, job.uploadLocation, job)))
             case Success(inputStream) =>
@@ -42,7 +40,7 @@ object DownloadAndVerifyDigestItemFlow extends Logging {
                       if job.bagDigestItem.checksum.value == calculatedChecksum =>
                     Right(job)
                   case calculatedChecksum =>
-                    warn(s"Failed validating checksum in download for job $job")
+                    warn(s"Failed checksum validation in download for job $job")
                     Left(
                       ChecksumNotMatchedOnDownloadError(
                         expectedChecksum = job.bagDigestItem.checksum.value,
