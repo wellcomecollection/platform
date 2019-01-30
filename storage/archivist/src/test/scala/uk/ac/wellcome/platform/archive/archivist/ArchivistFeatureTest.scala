@@ -26,12 +26,7 @@ class ArchivistFeatureTest
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchivist() {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          registrarTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         val bagInfo = randomBagInfo
         createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo) {
           request =>
@@ -59,7 +54,7 @@ class ArchivistFeatureTest
                     BagPath(
                       s"${request.storageSpace}/${bagInfo.externalIdentifier}"))
                 ),
-                registrarTopic
+                nextTopic
               )
 
               assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
@@ -87,14 +82,14 @@ class ArchivistFeatureTest
 
   it("fails when ingesting an invalid bag") {
     withArchivist() {
-      case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
+      case (ingestBucket, _, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
           createDigest = _ => "bad_digest") { request =>
           eventually {
             assertQueuePairSizes(queuePair, 0, 0)
-            assertSnsReceivesNothing(registrarTopic)
+            assertSnsReceivesNothing(nextTopic)
 
             assertTopicReceivesProgressStatusUpdate(
               request.id,
@@ -109,12 +104,12 @@ class ArchivistFeatureTest
 
   it("fails when ingesting a bag with no tag manifest") {
     withArchivist() {
-      case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
+      case (ingestBucket, _, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
           request =>
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
-              assertSnsReceivesNothing(registrarTopic)
+              assertSnsReceivesNothing(nextTopic)
 
               assertTopicReceivesProgressStatusUpdate(
                 request.id,
@@ -134,12 +129,7 @@ class ArchivistFeatureTest
     // Parallelism here is 1 as fake-sns can't deal with
     // concurrent requests
     withArchivist(1) {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          registrarTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
@@ -185,7 +175,7 @@ class ArchivistFeatureTest
                             s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                       )
                     ),
-                    registrarTopic
+                    nextTopic
                   )
 
                   assertTopicReceivesProgressStatusUpdate(
@@ -215,12 +205,7 @@ class ArchivistFeatureTest
     val bagInfo2 = randomBagInfo
 
     withArchivist() {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          registrarTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
@@ -279,7 +264,7 @@ class ArchivistFeatureTest
                         s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                   )
                 ),
-                registrarTopic
+                nextTopic
               )
 
               assertTopicReceivesFailedProgress(
@@ -309,12 +294,7 @@ class ArchivistFeatureTest
     // Parallelism here is 1 as fake-sns can't deal with
     // concurrent requests
     withArchivist(1) {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          registrarTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
@@ -359,7 +339,7 @@ class ArchivistFeatureTest
                                 s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                           )
                         ),
-                        registrarTopic
+                        nextTopic
                       )
 
                       assertTopicReceivesFailedProgress(
@@ -388,12 +368,7 @@ class ArchivistFeatureTest
     val bagInfo2 = randomBagInfo
 
     withArchivist() {
-      case (
-          ingestBucket,
-          storageBucket,
-          queuePair,
-          registrarTopic,
-          progressTopic) =>
+      case (ingestBucket, storageBucket, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
@@ -439,7 +414,7 @@ class ArchivistFeatureTest
                             s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                       )
                     ),
-                    registrarTopic
+                    nextTopic
                   )
 
                   assertTopicReceivesFailedProgress(

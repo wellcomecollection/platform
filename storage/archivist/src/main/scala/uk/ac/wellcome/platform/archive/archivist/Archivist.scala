@@ -25,7 +25,7 @@ import scala.concurrent.Future
 class Archivist(
   messageStream: MessageStream[NotificationMessage, Unit],
   bagUploaderConfig: BagUploaderConfig,
-  snsRegistrarConfig: SNSConfig,
+  snsNextConfig: SNSConfig,
   snsProgressConfig: SNSConfig
 )(
   implicit val actorSystem: ActorSystem,
@@ -41,16 +41,16 @@ class Archivist(
     implicit val materializer = SupervisedMaterializer.resumable
     implicit val executionContext = actorSystem.dispatcher
 
-    debug(s"registrar topic: $snsRegistrarConfig")
+    debug(s"next topic: $snsNextConfig")
     debug(s"progress topic: $snsProgressConfig")
 
     val notificationMessageFlow = NotificationMessageFlow(snsProgressConfig)
     val zipFileDownloadFlow = ZipFileDownloadFlow(snsProgressConfig)
 
-    val archiveAndNotifyFlow = ArchiveAndNotifyRegistrarFlow(
+    val archiveAndNotifyFlow = ArchiveAndNotifyNextFlow(
       bagUploaderConfig,
       snsProgressConfig,
-      snsRegistrarConfig
+      snsNextConfig
     )
 
     val workFlow =

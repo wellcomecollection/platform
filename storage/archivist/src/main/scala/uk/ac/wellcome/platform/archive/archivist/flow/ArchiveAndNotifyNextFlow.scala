@@ -10,16 +10,16 @@ import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
-object ArchiveAndNotifyRegistrarFlow {
+object ArchiveAndNotifyNextFlow {
   def apply(bagUploaderConfig: BagUploaderConfig,
             snsProgressConfig: SNSConfig,
-            snsRegistrarConfig: SNSConfig)(
+            snsNextConfig: SNSConfig)(
     implicit s3: AmazonS3,
     snsClient: AmazonSNS
   ): Flow[BagDownload, Unit, NotUsed] = {
 
-    val registrarNotifierFlow = RegistrarNotifierFlow(
-      snsRegistrarConfig,
+    val nextNotifierFlow = NextNotifierFlow(
+      snsNextConfig,
       snsProgressConfig
     ).map(_ => ())
 
@@ -34,7 +34,7 @@ object ArchiveAndNotifyRegistrarFlow {
         ](
           ifLeft = unitFlow
         )(
-          ifRight = registrarNotifierFlow
+          ifRight = nextNotifierFlow
         )
       )
   }
