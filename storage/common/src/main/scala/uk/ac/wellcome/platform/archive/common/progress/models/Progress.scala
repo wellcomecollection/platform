@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archive.common.progress.models
 import java.time.Instant
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.json.URIConverters
 import uk.ac.wellcome.platform.archive.common.models.BagId
 
 case class Progress(id: UUID,
@@ -16,7 +15,7 @@ case class Progress(id: UUID,
                     lastModifiedDate: Instant,
                     events: Seq[ProgressEvent])
 
-case object Progress extends URIConverters {
+case object Progress {
   def apply(id: UUID,
             sourceLocation: StorageLocation,
             space: Namespace,
