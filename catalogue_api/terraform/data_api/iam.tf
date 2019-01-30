@@ -15,7 +15,27 @@ resource "aws_iam_role_policy" "snapshot_generator_cloudwatch" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
+resource "aws_iam_role_policy" "snapshot_generator_read_from_q" {
+  role   = "${module.snapshot_generator.task_role_name}"
+  policy = "${data.aws_iam_policy_document.snapshot_generator_read_from_q.json}"
+}
+
+
 # Policy documents
+
+data "aws_iam_policy_document" "snapshot_generator_read_from_q" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+    ]
+
+    resources = [
+      "${module.snapshot_generator_queue.arn}",
+    ]
+  }
+}
+
 
 data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   statement {
