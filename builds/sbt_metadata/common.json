@@ -1,6 +1,5 @@
 {
   "id" : "common",
   "folder" : "sbt_common/common",
-  "dependencyIds" : [
-  ]
+  "dependencyIds" : []
 }
