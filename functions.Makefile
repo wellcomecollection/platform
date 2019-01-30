@@ -77,7 +77,7 @@ endef
 #   $2 - Stack name
 #
 define publish_service_ssm
-	$(ROOT)/docker_run.py \
+	AWS_PROFILE=platform-dev $(ROOT)/docker_run.py \
 	    --aws --dind -- \
 	    wellcome/publish_service:32 \
 	        --project_name=$(2) \
