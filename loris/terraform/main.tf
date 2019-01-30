@@ -7,9 +7,9 @@ module "loris-031218" {
 
   aws_region = "${var.aws_region}"
 
-  vpc_id          = "${local.vpc_id_new}"
-  private_subnets = "${local.private_subnets_new}"
-  public_subnets  = "${local.public_subnets_new}"
+  vpc_id          = "${local.vpc_id}"
+  private_subnets = "${local.private_subnets}"
+  public_subnets  = "${local.public_subnets}"
 
   key_name = "${var.key_name}"
 
