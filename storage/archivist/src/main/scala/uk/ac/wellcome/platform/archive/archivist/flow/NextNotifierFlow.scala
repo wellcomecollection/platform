@@ -8,9 +8,9 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 
-object RegistrarNotifierFlow {
+object NextNotifierFlow {
 
-  def apply(snsRegistrarConfig: SNSConfig, snsProgressConfig: SNSConfig)(
+  def apply(snsNextConfig: SNSConfig, snsProgressConfig: SNSConfig)(
     implicit snsClient: AmazonSNS)
     : Flow[ArchiveComplete, PublishResult, NotUsed] = {
 
@@ -18,7 +18,7 @@ object RegistrarNotifierFlow {
       .via(
         SnsPublishFlow[ArchiveComplete](
           snsClient,
-          snsRegistrarConfig,
+          snsNextConfig,
           subject = "archive_completed"))
       .log("published notification")
   }

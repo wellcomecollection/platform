@@ -30,7 +30,7 @@ class ArchivistFeatureTest
           ingestBucket,
           storageBucket,
           queuePair,
-          registrarTopic,
+          nextTopic,
           progressTopic) =>
         val bagInfo = randomBagInfo
         createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo) {
@@ -59,7 +59,7 @@ class ArchivistFeatureTest
                     BagPath(
                       s"${request.storageSpace}/${bagInfo.externalIdentifier}"))
                 ),
-                registrarTopic
+                nextTopic
               )
 
               assertTopicReceivesProgressEventUpdate(request.id, progressTopic) {
@@ -87,14 +87,14 @@ class ArchivistFeatureTest
 
   it("fails when ingesting an invalid bag") {
     withArchivist() {
-      case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
+      case (ingestBucket, _, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(
           ingestBucket,
           queuePair,
           createDigest = _ => "bad_digest") { request =>
           eventually {
             assertQueuePairSizes(queuePair, 0, 0)
-            assertSnsReceivesNothing(registrarTopic)
+            assertSnsReceivesNothing(nextTopic)
 
             assertTopicReceivesProgressStatusUpdate(
               request.id,
@@ -109,12 +109,12 @@ class ArchivistFeatureTest
 
   it("fails when ingesting a bag with no tag manifest") {
     withArchivist() {
-      case (ingestBucket, _, queuePair, registrarTopic, progressTopic) =>
+      case (ingestBucket, _, queuePair, nextTopic, progressTopic) =>
         createAndSendBag(ingestBucket, queuePair, createTagManifest = _ => None) {
           request =>
             eventually {
               assertQueuePairSizes(queuePair, 0, 0)
-              assertSnsReceivesNothing(registrarTopic)
+              assertSnsReceivesNothing(nextTopic)
 
               assertTopicReceivesProgressStatusUpdate(
                 request.id,
@@ -138,7 +138,7 @@ class ArchivistFeatureTest
           ingestBucket,
           storageBucket,
           queuePair,
-          registrarTopic,
+          nextTopic,
           progressTopic) =>
         createAndSendBag(
           ingestBucket,
@@ -185,7 +185,7 @@ class ArchivistFeatureTest
                             s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                       )
                     ),
-                    registrarTopic
+                    nextTopic
                   )
 
                   assertTopicReceivesProgressStatusUpdate(
@@ -219,7 +219,7 @@ class ArchivistFeatureTest
           ingestBucket,
           storageBucket,
           queuePair,
-          registrarTopic,
+          nextTopic,
           progressTopic) =>
         createAndSendBag(
           ingestBucket,
@@ -279,7 +279,7 @@ class ArchivistFeatureTest
                         s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                   )
                 ),
-                registrarTopic
+                nextTopic
               )
 
               assertTopicReceivesFailedProgress(
@@ -313,7 +313,7 @@ class ArchivistFeatureTest
           ingestBucket,
           storageBucket,
           queuePair,
-          registrarTopic,
+          nextTopic,
           progressTopic) =>
         createAndSendBag(
           ingestBucket,
@@ -359,7 +359,7 @@ class ArchivistFeatureTest
                                 s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                           )
                         ),
-                        registrarTopic
+                        nextTopic
                       )
 
                       assertTopicReceivesFailedProgress(
@@ -392,7 +392,7 @@ class ArchivistFeatureTest
           ingestBucket,
           storageBucket,
           queuePair,
-          registrarTopic,
+          nextTopic,
           progressTopic) =>
         createAndSendBag(
           ingestBucket,
@@ -439,7 +439,7 @@ class ArchivistFeatureTest
                             s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
                       )
                     ),
-                    registrarTopic
+                    nextTopic
                   )
 
                   assertTopicReceivesFailedProgress(

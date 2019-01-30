@@ -83,7 +83,7 @@ trait ArchivistFixtures
 
   def withApp[R](storageBucket: Bucket,
                  queuePair: QueuePair,
-                 registrarTopic: Topic,
+                 nextTopic: Topic,
                  progressTopic: Topic,
                  parallelism: Int = 10)(testWith: TestWith[Archivist, R]): R =
     withActorSystem { implicit actorSystem =>
@@ -98,7 +98,7 @@ trait ArchivistFixtures
             messageStream = messageStream,
             bagUploaderConfig =
               createBagUploaderConfigWith(storageBucket, parallelism),
-            snsRegistrarConfig = createSNSConfigWith(registrarTopic),
+            snsNextConfig = createSNSConfigWith(nextTopic),
             snsProgressConfig = createSNSConfigWith(progressTopic)
           )
 
@@ -111,14 +111,14 @@ trait ArchivistFixtures
   def withArchivist[R](parallelism: Int = 10)(
     testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, Topic), R]): R = {
     withLocalSqsQueueAndDlqAndTimeout(5) { queuePair =>
-      withLocalSnsTopic { registrarTopic =>
+      withLocalSnsTopic { nextTopic =>
         withLocalSnsTopic { progressTopic =>
           withLocalS3Bucket { ingestBucket =>
             withLocalS3Bucket { storageBucket =>
               withApp(
                 storageBucket,
                 queuePair,
-                registrarTopic,
+                nextTopic,
                 progressTopic,
                 parallelism) { _ =>
                 testWith(
@@ -126,7 +126,7 @@ trait ArchivistFixtures
                     ingestBucket,
                     storageBucket,
                     queuePair,
-                    registrarTopic,
+                    nextTopic,
                     progressTopic))
               }
             }
