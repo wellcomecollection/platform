@@ -10,7 +10,6 @@ variable "public_subnets" {
   type = "list"
 }
 
-variable "key_name" {}
 variable "certificate_domain" {}
 
 variable "healthcheck_path" {
@@ -67,12 +66,6 @@ variable "app_memory" {
   default = "6144"
 }
 
-variable "app_env_vars" {
-  description = "Environment variables to pass to the container"
-  type        = "map"
-  default     = {}
-}
-
 variable "sidecar_container_image" {}
 
 variable "sidecar_container_port" {
@@ -85,12 +78,6 @@ variable "sidecar_cpu" {
 
 variable "sidecar_memory" {
   default = "128"
-}
-
-variable "sidecar_env_vars" {
-  description = "Environment variables to pass to the container"
-  type        = "map"
-  default     = {}
 }
 
 variable "ebs_container_path" {
@@ -125,6 +112,4 @@ variable "ebs_cache_cleaner_daemon_clean_interval" {
   default = "10m"
 }
 
-variable "ebs_cache_cleaner_daemon_image_version" {
-  default = "latest"
-}
+variable "ebs_cache_cleaner_daemon_image_version" {}

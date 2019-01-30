@@ -9,8 +9,8 @@ SBT_SSM_APPS =
 SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
-PYTHON_APPS     = loris cache_cleaner
-PYTHON_SSM_APPS =
+PYTHON_APPS     =
+PYTHON_SSM_APPS = loris
 LAMBDAS 	    =
 
 TF_NAME = loris
