@@ -84,7 +84,7 @@ module "cache_cleaner_task" {
   ebs_host_path      = "/ebs/loris"
   ebs_container_path = "/data"
 
-  container_image = "wellcome/cache-cleaner:${var.ebs_cache_cleaner_daemon_image_version}"
+  container_image = "wellcome/cache_cleaner:${var.ebs_cache_cleaner_daemon_image_version}"
 
   cpu    = "${var.ebs_cache_cleaner_daemon_cpu}"
   memory = "${var.ebs_cache_cleaner_daemon_memory}"

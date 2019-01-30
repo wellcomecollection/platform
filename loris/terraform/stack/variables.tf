@@ -113,6 +113,4 @@ variable "ebs_cache_cleaner_daemon_clean_interval" {
   default = "10m"
 }
 
-variable "ebs_cache_cleaner_daemon_image_version" {
-  default = "latest"
-}
+variable "ebs_cache_cleaner_daemon_image_version" {}
