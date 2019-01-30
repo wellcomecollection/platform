@@ -108,6 +108,14 @@ def does_file_affect_build_task(path, task):
     if path == "run_autoformat.py" and task != "travis-format":
         raise ExclusivelyAffectsAnotherTask("travis-format")
 
+    # The bagger code is a bit of an oddity; for now I've hard-coded an
+    # exception but we should really handle it properly.
+    if path.startswith("storage/bagger"):
+        if task == "bagger-publish":
+            raise SignificantFile()
+        else:
+            raise ExclusivelyAffectsAnotherTask("bagger-publish")
+
     # We have a number of scripts that live in the top of a stack, which
     # contain useful code for that stack, but which aren't part of another
     # task.  They should be checked by travis-format, but that's it.
