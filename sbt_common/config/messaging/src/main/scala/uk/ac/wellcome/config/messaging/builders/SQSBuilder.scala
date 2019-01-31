@@ -14,7 +14,8 @@ object SQSBuilder extends AWSClientConfigBuilder {
     val queueUrl = config
       .required[String](s"aws.$namespace.sqs.queue.url")
     val parallelism = config
-      .getOrElse[String](s"aws.$namespace.sqs.queue.parallelism")(default = "10")
+      .getOrElse[String](s"aws.$namespace.sqs.queue.parallelism")(
+        default = "10")
     // TODO: revisit to support default and config.getInt, cannot cast String to Integer here
     SQSConfig(
       queueUrl = queueUrl,
