@@ -21,16 +21,14 @@ module "task" {
   app_container_image = "${var.app_container_image}"
   app_container_port  = "${var.app_container_port}"
 
-  app_cpu      = "${var.app_cpu}"
-  app_memory   = "${var.app_memory}"
-  app_env_vars = "${var.app_env_vars}"
+  app_cpu    = "${var.app_cpu}"
+  app_memory = "${var.app_memory}"
 
   sidecar_container_image = "${var.sidecar_container_image}"
   sidecar_container_port  = "${var.sidecar_container_port}"
 
-  sidecar_cpu      = "${var.sidecar_cpu}"
-  sidecar_memory   = "${var.sidecar_memory}"
-  sidecar_env_vars = "${var.sidecar_env_vars}"
+  sidecar_cpu    = "${var.sidecar_cpu}"
+  sidecar_memory = "${var.sidecar_memory}"
 
   ebs_host_path      = "/ebs/loris"
   ebs_container_path = "${var.ebs_container_path}"
@@ -86,7 +84,7 @@ module "cache_cleaner_task" {
   ebs_host_path      = "/ebs/loris"
   ebs_container_path = "/data"
 
-  container_image = "wellcome/cache-cleaner:${var.ebs_cache_cleaner_daemon_image_version}"
+  container_image = "wellcome/cache_cleaner:${var.ebs_cache_cleaner_daemon_image_version}"
 
   cpu    = "${var.ebs_cache_cleaner_daemon_cpu}"
   memory = "${var.ebs_cache_cleaner_daemon_memory}"
