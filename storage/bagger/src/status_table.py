@@ -14,7 +14,7 @@ def record_activity(bnumber, field):
 
 
 def activity_timestamp():
-    datetime.datetime.now().isoformat()
+    return datetime.datetime.now().isoformat()
 
 
 def record_data(bnumber, data):

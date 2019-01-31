@@ -48,13 +48,18 @@ def get_oauthed_json(url, scope, method="GET", data=None):
     return resp.json()
 
 
+def get_ingest_scope():
+    return settings.WELLCOME_API_SCOPE or settings.STORAGE_API_INGESTS
+
+
 def get_ingest_for_identifier(bnumber):
-    scope = settings.STORAGE_API_INGESTS
-    url = "{0}/find-by-bag-id/digitised:{1}".format(scope, bnumber)
+    base_url = settings.STORAGE_API_INGESTS
+    scope = get_ingest_scope()
+    url = "{0}/find-by-bag-id/digitised:{1}".format(base_url, bnumber)
     ingests = get_oauthed_json(url, scope)
     by_date = sorted(ingests, key=lambda ingest: ingest["createdDate"])
     if len(by_date) > 0:
-        url = "{0}/{1}".format(scope, by_date[-1]["id"])
+        url = "{0}/{1}".format(base_url, by_date[-1]["id"])
         return get_oauthed_json(url, scope)
     return None
 
@@ -64,5 +69,5 @@ def ingest(bnumber):
     body = deepcopy(ingest_template)
     body["sourceLocation"]["path"] = bnumber + ".zip"
     url = settings.STORAGE_API_INGESTS
-    scope = settings.WELLCOME_API_SCOPE
-    return get_oauthed_json(url or scope, scope, method="POST", data=json.dumps(body))
+    scope = get_ingest_scope()
+    return get_oauthed_json(url, scope, method="POST", data=json.dumps(body))

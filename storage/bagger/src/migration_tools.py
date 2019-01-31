@@ -28,6 +28,23 @@ class MigrationTool(object):
     def simulate_goobi_call(self, delay, filter=""):
         call_dds(delay, filter)
 
+    def ensure_population(self, filter=""):
+        populate_table(filter)
+
+
+def populate_table(filter):
+    # no dynamo batch upsert, unforch...
+    counter = 0
+    start = time.time()
+    for bnumber in bnumber_generator(filter):
+        counter = counter + 1
+        if counter % 100 == 0:
+            t = int(round(time.time() - start))
+            print("...{0} b numbers registered after {1} seconds..".format(counter, t))
+        status_table.record_activity(bnumber, "registered")
+    t = int(round(time.time() - start))
+    print("Registered {0} b numbers for filter {1} in {2} s".format(counter, filter, t))
+
 
 def get_min_bag_date():
     min_bag_date = datetime.datetime(2018, 12, 1)
