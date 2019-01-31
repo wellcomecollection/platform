@@ -4,11 +4,6 @@ variable "aws_region" {
 
 variable "infra_bucket" {}
 
-variable "es_cluster_credentials" {
-  description = "Credentials for the Elasticsearch cluster"
-  type        = "map"
-}
-
 variable "es_config_snapshot" {
   description = "Elasticcloud config for the snapshot generator"
   type        = "map"
@@ -32,4 +27,8 @@ variable "vpc_id" {}
 
 variable "private_subnets" {
   type = "list"
+}
+
+data "aws_vpc" "vpc" {
+  id = "${var.vpc_id}"
 }
