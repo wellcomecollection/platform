@@ -1,6 +1,6 @@
 resource "aws_dynamodb_table" "matcher_graph_table" {
-  name           = "${var.namespace}_works-graph"
-  hash_key       = "id"
+  name     = "${var.namespace}_works-graph"
+  hash_key = "id"
 
   attribute {
     name = "id"
@@ -22,8 +22,8 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
 }
 
 resource "aws_dynamodb_table" "matcher_lock_table" {
-  name           = "${var.namespace}_matcher-lock-table"
-  hash_key       = "id"
+  name     = "${var.namespace}_matcher-lock-table"
+  hash_key = "id"
 
   billing_mode = "PAY_PER_REQUEST"
 

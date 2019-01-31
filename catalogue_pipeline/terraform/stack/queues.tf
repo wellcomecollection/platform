@@ -25,13 +25,14 @@ module "id_minter_queue" {
 }
 
 module "recorder_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v9.1.0"
-  queue_name  = "${var.namespace}_recorder_queue"
-  aws_region  = "${var.aws_region}"
-  account_id  = "${var.account_id}"
+  source     = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v9.1.0"
+  queue_name = "${var.namespace}_recorder_queue"
+  aws_region = "${var.aws_region}"
+  account_id = "${var.account_id}"
+
   topic_names = [
     "${module.transformed_miro_works_topic.name}",
-    "${module.transformed_sierra_works_topic.name}"
+    "${module.transformed_sierra_works_topic.name}",
   ]
 
   topic_count = "2"

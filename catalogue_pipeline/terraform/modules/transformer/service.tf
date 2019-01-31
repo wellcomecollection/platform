@@ -3,13 +3,13 @@ module "transformer" {
 
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
 
-  cluster_name                     = "${var.cluster_name}"
-  cluster_id                       = "${var.cluster_id}"
-  namespace_id                     = "${var.namespace_id}"
-  subnets                          = "${var.subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}_${var.source_name}_transformer"
-  aws_region                       = "${var.aws_region}"
+  cluster_name = "${var.cluster_name}"
+  cluster_id   = "${var.cluster_id}"
+  namespace_id = "${var.namespace_id}"
+  subnets      = "${var.subnets}"
+  vpc_id       = "${var.vpc_id}"
+  service_name = "${var.namespace}_${var.source_name}_transformer"
+  aws_region   = "${var.aws_region}"
 
   env_vars = {
     sns_arn              = "${var.transformed_works_topic_arn}"

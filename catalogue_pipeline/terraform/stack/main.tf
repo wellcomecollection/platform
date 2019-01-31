@@ -3,13 +3,13 @@ module "recorder" {
 
   service_egress_security_group_id = "${module.egress_security_group.sg_id}"
 
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${var.subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}_recorder"
-  aws_region                       = "${var.aws_region}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets      = "${var.subnets}"
+  vpc_id       = "${var.vpc_id}"
+  service_name = "${var.namespace}_recorder"
+  aws_region   = "${var.aws_region}"
 
   env_vars = {
     recorder_queue_url  = "${module.recorder_queue.id}"
@@ -34,13 +34,13 @@ module "matcher" {
 
   service_egress_security_group_id = "${module.egress_security_group.sg_id}"
 
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${var.subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}_matcher"
-  aws_region                       = "${var.aws_region}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets      = "${var.subnets}"
+  vpc_id       = "${var.vpc_id}"
+  service_name = "${var.namespace}_matcher"
+  aws_region   = "${var.aws_region}"
 
   env_vars = {
     queue_url               = "${module.matcher_queue.id}"
@@ -65,13 +65,13 @@ module "merger" {
 
   service_egress_security_group_id = "${module.egress_security_group.sg_id}"
 
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${var.subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}_merger"
-  aws_region                       = "${var.aws_region}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets      = "${var.subnets}"
+  vpc_id       = "${var.vpc_id}"
+  service_name = "${var.namespace}_merger"
+  aws_region   = "${var.aws_region}"
 
   env_vars = {
     metrics_namespace        = "${var.namespace}_merger"
@@ -95,26 +95,26 @@ module "id_minter" {
 
   service_egress_security_group_id = "${module.egress_security_group.sg_id}"
 
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${var.subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}_id_minter"
-  aws_region                       = "${var.aws_region}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets      = "${var.subnets}"
+  vpc_id       = "${var.vpc_id}"
+  service_name = "${var.namespace}_id_minter"
+  aws_region   = "${var.aws_region}"
 
   env_vars = {
     metrics_namespace   = "${var.namespace}_id_minter"
     message_bucket_name = "${var.messages_bucket_id}"
 
-    cluster_url         = "${var.rds_ids_credentials["host"]}"
-    db_port             = "${var.rds_ids_credentials["port"]}"
-    db_username         = "${var.rds_ids_credentials["username"]}"
-    db_password         = "${var.rds_ids_credentials["password"]}"
+    cluster_url = "${var.rds_ids_credentials["host"]}"
+    db_port     = "${var.rds_ids_credentials["port"]}"
+    db_username = "${var.rds_ids_credentials["username"]}"
+    db_password = "${var.rds_ids_credentials["password"]}"
 
-    queue_url           = "${module.id_minter_queue.id}"
-    topic_arn           = "${module.es_ingest_topic.arn}"
-    max_connections     = 8
+    queue_url       = "${module.id_minter_queue.id}"
+    topic_arn       = "${module.es_ingest_topic.arn}"
+    max_connections = 8
   }
 
   env_vars_length   = 9
@@ -136,26 +136,26 @@ module "ingestor" {
 
   service_egress_security_group_id = "${module.egress_security_group.sg_id}"
 
-  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
-  cluster_id                       = "${aws_ecs_cluster.cluster.id}"
-  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets                          = "${var.subnets}"
-  vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}_ingestor"
-  aws_region                       = "${var.aws_region}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets      = "${var.subnets}"
+  vpc_id       = "${var.vpc_id}"
+  service_name = "${var.namespace}_ingestor"
+  aws_region   = "${var.aws_region}"
 
   env_vars = {
     metrics_namespace   = "${var.namespace}_ingestor"
     message_bucket_name = "${var.messages_bucket_id}"
 
-    es_host             = "${var.es_works_credentials["host"]}"
-    es_port             = "${var.es_works_credentials["port"]}"
-    es_username         = "${var.es_works_credentials["username"]}"
-    es_password         = "${var.es_works_credentials["password"]}"
-    es_protocol         = "${var.es_works_credentials["protocol"]}"
+    es_host     = "${var.es_works_credentials["host"]}"
+    es_port     = "${var.es_works_credentials["port"]}"
+    es_username = "${var.es_works_credentials["username"]}"
+    es_password = "${var.es_works_credentials["password"]}"
+    es_protocol = "${var.es_works_credentials["protocol"]}"
 
-    es_index            = "${var.es_works_index}"
-    ingest_queue_id     = "${module.es_ingest_queue.id}"
+    es_index        = "${var.es_works_index}"
+    ingest_queue_id = "${module.es_ingest_queue.id}"
   }
 
   env_vars_length   = 9
@@ -180,8 +180,8 @@ module "miro_transformer" {
   namespace    = "${var.namespace}"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
-  adapter_topic_names                    = ["${var.miro_adapter_topic_names}"]
-  adapter_topic_count                    = "${var.miro_adapter_topic_count}"
+  adapter_topic_names = ["${var.miro_adapter_topic_names}"]
+  adapter_topic_count = "${var.miro_adapter_topic_count}"
 
   transformed_works_topic_publish_policy = "${module.transformed_miro_works_topic.publish_policy}"
   transformed_works_topic_arn            = "${module.transformed_miro_works_topic.arn}"
@@ -190,12 +190,12 @@ module "miro_transformer" {
 
   message_bucket_name = "${var.messages_bucket_id}"
 
-  transformer_container_image      = "${local.transformer_image}"
-  subnets                          = "${var.subnets}"
+  transformer_container_image = "${local.transformer_image}"
+  subnets                     = "${var.subnets}"
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
-  allow_s3_messages_put_json         = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
+  allow_s3_messages_put_json = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
 
   allow_cloudwatch_push_metrics_json = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 
@@ -217,19 +217,19 @@ module "sierra_transformer" {
   namespace    = "${var.namespace}"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
-  adapter_topic_names                    = ["${var.sierra_adapter_topic_names}"]
-  adapter_topic_count                    = "${var.sierra_adapter_topic_count}"
+  adapter_topic_names = ["${var.sierra_adapter_topic_names}"]
+  adapter_topic_count = "${var.sierra_adapter_topic_count}"
 
   transformed_works_topic_publish_policy = "${module.transformed_sierra_works_topic.publish_policy}"
 
-  transformed_works_topic_arn            = "${module.transformed_sierra_works_topic.arn}"
+  transformed_works_topic_arn = "${module.transformed_sierra_works_topic.arn}"
 
   vhs_read_policy = "${var.vhs_sierra_read_policy}"
 
   message_bucket_name = "${var.messages_bucket_id}"
 
-  transformer_container_image      = "${local.transformer_image}"
-  subnets                          = "${var.subnets}"
+  transformer_container_image = "${local.transformer_image}"
+  subnets                     = "${var.subnets}"
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 

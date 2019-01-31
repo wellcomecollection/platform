@@ -1,12 +1,11 @@
 locals {
-  lambda_error_alarm_arn             = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
+  lambda_error_alarm_arn = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
 
-  dlq_alarm_arn                      = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
-  vpc_id                             = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
+  vpc_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
 
-  private_subnets                    = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
-
+  private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 
   sierra_merged_items_topic_name = "${data.terraform_remote_state.sierra_adapter.merged_items_topic_name}"
   sierra_merged_bibs_topic_name  = "${data.terraform_remote_state.sierra_adapter.merged_bibs_topic_name}"

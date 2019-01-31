@@ -3,6 +3,7 @@ variable "namespace" {}
 variable "subnets" {
   type = "list"
 }
+
 variable "vpc_id" {}
 variable "aws_region" {}
 
@@ -20,6 +21,7 @@ variable "rds_ids_credentials" {
 }
 
 variable "es_works_index" {}
+
 variable "es_works_credentials" {
   type = "map"
 }
@@ -32,9 +34,11 @@ variable "release_label" {}
 variable "miro_adapter_topic_names" {
   type = "list"
 }
+
 variable "miro_adapter_topic_count" {}
 
 variable "sierra_adapter_topic_count" {}
+
 variable "sierra_adapter_topic_names" {
   type = "list"
 }
