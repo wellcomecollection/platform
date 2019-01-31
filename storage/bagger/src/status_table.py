@@ -9,6 +9,18 @@ def get_table():
     return table
 
 
+def all_items():
+    table = get_table()
+    response = table.scan()
+    for item in response["Items"]:
+        yield item
+
+    while "LastEvaluatedKey" in response:
+        response = table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
+        for item in response["Items"]:
+            yield item
+
+
 def record_activity(bnumber, field):
     record_data(bnumber, {field: activity_timestamp()})
 

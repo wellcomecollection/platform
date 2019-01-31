@@ -47,6 +47,12 @@ def save_id_map(b_number, id_map):
     obj.put(Body=json.dumps(id_map, indent=4))
 
 
+def save_migration_report(migration_report):
+    s3_path = "_migration_report/report.json"
+    obj = get_s3().Object(settings.DROP_BUCKET_NAME_METS_ONLY, s3_path)
+    obj.put(Body=json.dumps(migration_report, indent=4))
+
+
 def log_processing_error(message):
     s3_path = "{0}.json".format(message["identifier"])
     obj = get_s3().Object(settings.DROP_BUCKET_NAME_ERRORS, s3_path)
