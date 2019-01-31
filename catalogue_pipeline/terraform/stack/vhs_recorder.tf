@@ -8,5 +8,5 @@ module "vhs_recorder" {
   prevent_destroy = "false"
 
   account_id  = "${var.account_id}"
-  bucket_name = "${var.vhs_bucket_name}"
+  bucket_name = "${var.vhs_recorder_bucket_id}"
 }

@@ -2,12 +2,12 @@
 
 resource "aws_iam_role_policy" "ecs_ingestor_task_cloudwatch_metric" {
   role   = "${module.ingestor.task_role_name}"
-  policy = "${var.allow_cloudwatch_push_metrics_json}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
 resource "aws_iam_role_policy" "ingestor_s3_messages_get" {
   role   = "${module.ingestor.task_role_name}"
-  policy = "${var.allow_s3_messages_get_json}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_get.json}"
 }
 
 # Role policies for the ID minter
@@ -19,29 +19,29 @@ resource "aws_iam_role_policy" "ecs_id_minter_task_sns" {
 
 resource "aws_iam_role_policy" "id_minter_cloudwatch" {
   role   = "${module.id_minter.task_role_name}"
-  policy = "${var.allow_cloudwatch_push_metrics_json}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
 resource "aws_iam_role_policy" "id_minter_s3_messages_get" {
   role   = "${module.id_minter.task_role_name}"
-  policy = "${var.allow_s3_messages_get_json}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_get.json}"
 }
 
 resource "aws_iam_role_policy" "id_minter_s3_messages_put" {
   role   = "${module.id_minter.task_role_name}"
-  policy = "${var.allow_s3_messages_put_json}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
 }
 
 # Role policies for the Recorder
 
 resource "aws_iam_role_policy" "recorder_cloudwatch" {
   role   = "${module.recorder.task_role_name}"
-  policy = "${var.allow_cloudwatch_push_metrics_json}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
 resource "aws_iam_role_policy" "recorder_s3_messages_get" {
   role   = "${module.recorder.task_role_name}"
-  policy = "${var.allow_s3_messages_get_json}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_get.json}"
 }
 
 resource "aws_iam_role_policy" "ecs_recorder_task_vhs" {
@@ -58,7 +58,7 @@ resource "aws_iam_role_policy" "recorder_task_sns" {
 
 resource "aws_iam_role_policy" "matcher_cloudwatch" {
   role   = "${module.matcher.task_role_name}"
-  policy = "${var.allow_cloudwatch_push_metrics_json}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
 resource "aws_iam_role_policy" "matcher_task_vhs" {
@@ -85,7 +85,7 @@ resource "aws_iam_role_policy" "matcher_read_write_lock_dynamo" {
 
 resource "aws_iam_role_policy" "merger_cloudwatch" {
   role   = "${module.merger.task_role_name}"
-  policy = "${var.allow_cloudwatch_push_metrics_json}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
 resource "aws_iam_role_policy" "merger_task_sns" {
@@ -100,5 +100,5 @@ resource "aws_iam_role_policy" "merger_task_read_recorder_vhs" {
 
 resource "aws_iam_role_policy" "merger_s3_messages" {
   role   = "${module.merger.task_role_name}"
-  policy = "${var.allow_s3_messages_put_json}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
 }

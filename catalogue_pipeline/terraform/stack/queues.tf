@@ -29,8 +29,12 @@ module "recorder_queue" {
   queue_name  = "${var.namespace}_recorder_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
-  topic_names = "${var.transformed_works_topic_names}"
-  topic_count = "${var.transformed_works_topic_count}"
+  topic_names = [
+    "${module.transformed_miro_works_topic.name}",
+    "${module.transformed_sierra_works_topic.name}"
+  ]
+
+  topic_count = "2"
 
   visibility_timeout_seconds = 60
   max_receive_count          = 8

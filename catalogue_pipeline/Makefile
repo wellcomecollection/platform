@@ -3,8 +3,8 @@ STACK_ROOT 	= catalogue_pipeline
 
 include $(ROOT)/functions.Makefile
 
-SBT_APPS 	 = id_minter ingestor recorder matcher merger
-SBT_SSM_APPS =
+SBT_APPS 	 =
+SBT_SSM_APPS = id_minter ingestor recorder matcher merger
 
 SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =

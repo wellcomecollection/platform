@@ -1,3 +1,8 @@
+provider "aws" {
+  region  = "${local.aws_region}"
+  version = "1.52.0"
+}
+
 terraform {
   required_version = ">= 0.9"
 
@@ -38,3 +43,5 @@ data "terraform_remote_state" "sierra_adapter" {
     region = "eu-west-1"
   }
 }
+
+data "aws_caller_identity" "current" {}

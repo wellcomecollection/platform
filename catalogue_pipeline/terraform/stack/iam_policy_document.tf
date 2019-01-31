@@ -1,3 +1,39 @@
+data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "allow_s3_messages_put" {
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${var.messages_bucket_arn}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "allow_s3_messages_get" {
+  statement {
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${var.messages_bucket_arn}/*",
+    ]
+  }
+}
+
 data "aws_iam_policy_document" "graph_table_read_write_policy" {
   statement {
     actions = [
