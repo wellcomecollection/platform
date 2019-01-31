@@ -28,7 +28,6 @@ module "snapshot_generator_queue" {
   visibility_timeout_seconds = 1800
 }
 
-
 # We'll get alarms from the snapshot generator DLQ
 # it's also a problem if the main queue starts backfilling
 # it means snapshots aren't being created correctly.
