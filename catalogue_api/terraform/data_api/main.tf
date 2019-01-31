@@ -1,5 +1,5 @@
 module "snapshot_generator" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling?ref=80431fa63064fe75bfb08b4ca902a831e3159dc0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling?ref=v19.7.2"
 
   service_name = "snapshot_generator"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
