@@ -6,7 +6,7 @@ module "drain_ecs_container_instance" {
 
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 
-  infra_bucket = "${var.infra_bucket}"
+  infra_bucket = "${local.infra_bucket}"
 }
 
 module "ecs_ec2_instance_tagger" {
@@ -17,5 +17,5 @@ module "ecs_ec2_instance_tagger" {
 
   lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
 
-  infra_bucket = "${var.infra_bucket}"
+  infra_bucket = "${local.infra_bucket}"
 }

@@ -2,6 +2,8 @@ terraform {
   required_version = ">= 0.9"
 
   backend "s3" {
+    role_arn = "arn:aws:iam::760097843905:role/developer"
+
     bucket         = "wellcomecollection-platform-infra"
     key            = "terraform/shared_infra.tfstate"
     dynamodb_table = "terraform-locktable"
@@ -12,13 +14,17 @@ terraform {
 # Providers
 
 provider "aws" {
-  region  = "${var.aws_region}"
+  region  = "${local.aws_region}"
   version = "1.10.0"
+
+  assume_role {
+    role_arn = "arn:aws:iam::760097843905:role/developer"
+  }
 }
 
 provider "aws" {
   alias   = "storage"
-  region  = "${var.aws_region}"
+  region  = "${local.aws_region}"
   version = "1.10.0"
 
   assume_role {
