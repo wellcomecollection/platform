@@ -4,6 +4,7 @@ module "sierra_transformer_queue" {
   source = "../modules/queue"
 
   topic_names = ["${var.sierra_adapter_topic_names}"]
+
   role_names = ["${module.sierra_transformer.task_role_name}"]
 
   namespace = "${var.namespace}_sierra_transformer"
