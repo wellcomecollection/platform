@@ -1,5 +1,5 @@
 module "queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v11.6.0"
+  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v19.7.2"
   queue_name  = "${replace(var.namespace,"-","_")}"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
