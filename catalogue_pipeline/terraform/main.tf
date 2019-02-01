@@ -23,12 +23,10 @@ module "catalogue_pipeline_2019_01_24" {
 
   # Elasticsearch
 
-  es_works_credentials = {}
-  es_works_index = ""
+  es_works_index = "v2-2019-02-01-pipeline-update"
 
   # RDS
 
-  rds_ids_credentials = {}
   rds_ids_access_security_group_id = "${local.rds_access_security_group_id}"
 
   # Messaging

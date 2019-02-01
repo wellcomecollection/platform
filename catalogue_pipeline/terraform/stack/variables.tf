@@ -16,15 +16,7 @@ variable "vhs_recorder_bucket_id" {}
 
 variable "dlq_alarm_arn" {}
 
-variable "rds_ids_credentials" {
-  type = "map"
-}
-
 variable "es_works_index" {}
-
-variable "es_works_credentials" {
-  type = "map"
-}
 
 variable "rds_ids_access_security_group_id" {}
 variable "vhs_sierra_read_policy" {}

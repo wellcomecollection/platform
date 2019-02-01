@@ -1,36 +1,31 @@
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/prebuilt/scaling?ref=v19.7.2"
 
-  service_name       = "${var.service_name}"
-  task_desired_count = "0"
+  service_name = "${var.service_name}"
 
   container_image = "${var.container_image}"
 
-  security_group_ids = "${local.security_group_ids}"
+  cluster_id   = "${var.cluster_id}"
+  cluster_name = "${var.cluster_name}"
 
-  source_queue_name = "${var.source_queue_name}"
-  source_queue_arn  = "${var.source_queue_arn}"
+  vpc_id     = "${var.vpc_id}"
+  subnets    = "${var.subnets}"
+  aws_region = "${var.aws_region}"
 
-  ecs_cluster_id   = "${var.cluster_id}"
-  ecs_cluster_name = "${var.cluster_name}"
+  namespace_id = "${var.namespace_id}"
 
-  cpu    = 256
-  memory = 512
+  cpu    = "256"
+  memory = "512"
+
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
 
   env_vars        = "${var.env_vars}"
   env_vars_length = "${var.env_vars_length}"
 
-  aws_region = "${var.aws_region}"
-  vpc_id     = "${var.vpc_id}"
-  subnets    = "${var.subnets}"
+  secret_env_vars        = "${var.secret_env_vars}"
+  secret_env_vars_length = "${var.secret_env_vars_length}"
 
-  namespace_id = "${var.namespace_id}"
-
-  launch_type = "FARGATE"
-
-  max_capacity = "${var.max_capacity}"
-}
-
-locals {
-  security_group_ids = "${concat(list(var.service_egress_security_group_id), var.security_group_ids)}"
+  metric_namespace = "AWS/SQS"
+  high_metric_name = "foo"
+  low_metric_name  = "bar"
 }

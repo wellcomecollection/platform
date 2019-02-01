@@ -1,6 +1,6 @@
 module "transformer_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${var.namespace}_${var.source_name}_transformer_queue"
+  queue_name  = "${var.namespace}_transformer_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
   topic_names = "${var.adapter_topic_names}"

@@ -1,10 +1,9 @@
 variable "namespace" {}
-
 variable "namespace_id" {}
-variable "source_name" {}
+
+variable "container_image" {}
 
 variable "aws_region" {}
-
 variable "account_id" {}
 
 variable "dlq_alarm_arn" {}
@@ -22,15 +21,13 @@ variable "service_egress_security_group_id" {}
 variable "cluster_name" {}
 variable "cluster_id" {}
 
+variable "vpc_id" {}
+
 variable "subnets" {
   type = "list"
 }
 
-variable "vpc_id" {}
-
 variable "transformed_works_topic_arn" {}
-
-variable "transformer_container_image" {}
 
 variable "message_bucket_name" {}
 

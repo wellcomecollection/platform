@@ -24,6 +24,10 @@ module "recorder" {
 
   env_vars_length = 6
 
+  secret_env_vars = {}
+
+  secret_env_vars_length = "0"
+
   container_image   = "${local.recorder_image}"
   source_queue_name = "${module.recorder_queue.name}"
   source_queue_arn  = "${module.recorder_queue.arn}"
@@ -55,6 +59,10 @@ module "matcher" {
 
   env_vars_length = 8
 
+  secret_env_vars = {}
+
+  secret_env_vars_length = "0"
+
   container_image   = "${local.matcher_image}"
   source_queue_name = "${module.matcher_queue.name}"
   source_queue_arn  = "${module.matcher_queue.arn}"
@@ -85,6 +93,10 @@ module "merger" {
 
   env_vars_length = 7
 
+  secret_env_vars = {}
+
+  secret_env_vars_length = "0"
+
   container_image   = "${local.merger_image}"
   source_queue_name = "${module.merger_queue.name}"
   source_queue_arn  = "${module.merger_queue.arn}"
@@ -107,17 +119,22 @@ module "id_minter" {
     metrics_namespace   = "${var.namespace}_id_minter"
     message_bucket_name = "${var.messages_bucket_id}"
 
-    cluster_url = "${var.rds_ids_credentials["host"]}"
-    db_port     = "${var.rds_ids_credentials["port"]}"
-    db_username = "${var.rds_ids_credentials["username"]}"
-    db_password = "${var.rds_ids_credentials["password"]}"
-
     queue_url       = "${module.id_minter_queue.id}"
     topic_arn       = "${module.es_ingest_topic.arn}"
     max_connections = 8
   }
 
-  env_vars_length   = 9
+  env_vars_length = 5
+
+  secret_env_vars = {
+    cluster_url = "catalogue/id_minter/rds_host"
+    db_port     = "catalogue/id_minter/rds_port"
+    db_username = "catalogue/id_minter/rds_username"
+    db_password = "catalogue/id_minter/rds_password"
+  }
+
+  secret_env_vars_length = "4"
+
   container_image   = "${local.id_minter_image}"
   source_queue_name = "${module.id_minter_queue.name}"
   source_queue_arn  = "${module.id_minter_queue.arn}"
@@ -147,18 +164,22 @@ module "ingestor" {
   env_vars = {
     metrics_namespace   = "${var.namespace}_ingestor"
     message_bucket_name = "${var.messages_bucket_id}"
-
-    es_host     = "${var.es_works_credentials["host"]}"
-    es_port     = "${var.es_works_credentials["port"]}"
-    es_username = "${var.es_works_credentials["username"]}"
-    es_password = "${var.es_works_credentials["password"]}"
-    es_protocol = "${var.es_works_credentials["protocol"]}"
-
-    es_index        = "${var.es_works_index}"
-    ingest_queue_id = "${module.es_ingest_queue.id}"
+    es_index            = "${var.es_works_index}"
+    ingest_queue_id     = "${module.es_ingest_queue.id}"
   }
 
-  env_vars_length   = 9
+  env_vars_length = 4
+
+  secret_env_vars = {
+    es_host     = "catalogue/ingestor/es_host"
+    es_port     = "catalogue/ingestor/es_port"
+    es_username = "catalogue/ingestor/es_username"
+    es_password = "catalogue/ingestor/es_password"
+    es_protocol = "catalogue/ingestor/es_protocol"
+  }
+
+  secret_env_vars_length = "5"
+
   container_image   = "${local.ingestor_image}"
   source_queue_name = "${module.es_ingest_queue.name}"
   source_queue_arn  = "${module.es_ingest_queue.arn}"
@@ -171,7 +192,8 @@ module "ingestor" {
 module "miro_transformer" {
   source = "../modules/transformer"
 
-  source_name = "miro"
+  source_name     = "miro"
+  container_image = "${local.transformer_miro_image}"
 
   service_egress_security_group_id = "${module.egress_security_group.sg_id}"
 
@@ -190,8 +212,7 @@ module "miro_transformer" {
 
   message_bucket_name = "${var.messages_bucket_id}"
 
-  transformer_container_image = "${local.transformer_miro_image}"
-  subnets                     = "${var.subnets}"
+  subnets = "${var.subnets}"
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
@@ -208,13 +229,13 @@ module "miro_transformer" {
 module "sierra_transformer" {
   source = "../modules/transformer"
 
-  source_name = "sierra"
+  container_image = "${local.transformer_sierra_image}"
 
   service_egress_security_group_id = "${module.egress_security_group.sg_id}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
-  namespace    = "${var.namespace}"
+  namespace    = "${var.namespace}_sierra"
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
   adapter_topic_names = ["${var.sierra_adapter_topic_names}"]
@@ -228,9 +249,6 @@ module "sierra_transformer" {
 
   message_bucket_name = "${var.messages_bucket_id}"
 
-  transformer_container_image = "${local.transformer_sierra_image}"
-  subnets                     = "${var.subnets}"
-
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   allow_s3_messages_put_json         = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
@@ -239,5 +257,6 @@ module "sierra_transformer" {
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"
 
-  vpc_id = "${var.vpc_id}"
+  vpc_id  = "${var.vpc_id}"
+  subnets = "${var.subnets}"
 }

@@ -1,37 +1,25 @@
-variable "cluster_name" {}
-variable "cluster_id" {}
-
 variable "service_name" {}
-
-variable "container_image" {}
-
-variable "service_egress_security_group_id" {}
-
-variable "env_vars" {
-  type = "map"
-}
-
-variable "env_vars_length" {}
-
-variable "aws_region" {}
-
+variable "cluster_id" {}
+variable "cluster_name" {}
 variable "vpc_id" {}
 
 variable "subnets" {
   type = "list"
 }
 
+variable "aws_region" {}
 variable "namespace_id" {}
+variable "container_image" {}
+variable "service_egress_security_group_id" {}
 
-variable "source_queue_name" {}
-
-variable "source_queue_arn" {}
-
-variable "max_capacity" {
-  default = 5
+variable "secret_env_vars" {
+  type = "map"
 }
 
-variable "security_group_ids" {
-  type    = "list"
-  default = []
+variable "secret_env_vars_length" {}
+
+variable "env_vars" {
+  type = "map"
 }
+
+variable "env_vars_length" {}
