@@ -190,7 +190,7 @@ module "miro_transformer" {
 
   message_bucket_name = "${var.messages_bucket_id}"
 
-  transformer_container_image = "${local.transformer_image}"
+  transformer_container_image = "${local.transformer_miro_image}"
   subnets                     = "${var.subnets}"
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
@@ -228,7 +228,7 @@ module "sierra_transformer" {
 
   message_bucket_name = "${var.messages_bucket_id}"
 
-  transformer_container_image = "${local.transformer_image}"
+  transformer_container_image = "${local.transformer_sierra_image}"
   subnets                     = "${var.subnets}"
 
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
