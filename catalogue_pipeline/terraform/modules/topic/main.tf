@@ -1,5 +1,5 @@
 module "topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v19.7.2"
   name   = "${var.name}"
 }
 

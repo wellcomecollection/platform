@@ -4,6 +4,7 @@ module "id_minter_queue" {
   source = "../modules/queue"
 
   topic_names = ["${module.merger_topic.name}"]
+
   role_names = ["${module.id_minter.task_role_name}"]
 
   namespace = "${var.namespace}_id_minter"
