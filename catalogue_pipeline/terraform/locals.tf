@@ -1,6 +1,4 @@
 locals {
-  lambda_error_alarm_arn = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
-
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   vpc_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"
@@ -11,9 +9,9 @@ locals {
   sierra_merged_bibs_topic_name  = "${data.terraform_remote_state.sierra_adapter.merged_bibs_topic_name}"
 
   vhs_sierra_read_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_read_policy}"
-  vhs_sierra_bucket_name = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_bucket_name}"
 
   miro_updates_topic_name = "${data.terraform_remote_state.shared_infra.miro_updates_topic_name}"
+
   vhs_miro_read_policy    = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_read_policy}"
 
   rds_access_security_group_id = "${data.terraform_remote_state.catalogue_pipeline_data.rds_access_security_group_id}"

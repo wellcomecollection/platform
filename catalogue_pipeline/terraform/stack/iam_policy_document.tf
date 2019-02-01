@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "allow_s3_messages_put" {
     ]
 
     resources = [
-      "${var.messages_bucket_arn}/*",
+      "${aws_s3_bucket.messages.arn}/*",
     ]
   }
 }
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "allow_s3_messages_get" {
     ]
 
     resources = [
-      "${var.messages_bucket_arn}/*",
+      "${aws_s3_bucket.messages.arn}/*",
     ]
   }
 }

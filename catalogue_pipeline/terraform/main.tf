@@ -1,16 +1,7 @@
-module "critical" {
-  source = "critical"
-
-  vpc_id  = "${local.vpc_id}"
-  subnets = ["${local.private_subnets}"]
-
-  namespace = "catalogue"
-}
-
-module "catalogue_pipeline_2019_01_24" {
+module "catalogue_pipeline_20190201" {
   source = "stack"
 
-  namespace = "catalogue-2019-01-24"
+  namespace = "catalogue-20190201"
 
   release_label = "latest"
 
@@ -29,17 +20,6 @@ module "catalogue_pipeline_2019_01_24" {
 
   rds_ids_access_security_group_id = "${local.rds_access_security_group_id}"
 
-  # Messaging
-
-  messages_bucket_id  = "${module.critical.messages_bucket_id}"
-  messages_bucket_arn = "${module.critical.messages_bucket_arn}"
-
-  # VHS
-
-  vhs_recorder_bucket_id = "${module.critical.recorder_vhs_bucket_id}"
-  vhs_miro_read_policy   = "${local.vhs_miro_read_policy}"
-  vhs_sierra_read_policy = "${local.vhs_sierra_read_policy}"
-
   # Transformer config
 
   sierra_adapter_topic_names = [
@@ -47,10 +27,14 @@ module "catalogue_pipeline_2019_01_24" {
     "${local.sierra_merged_bibs_topic_name}",
     "${local.sierra_merged_items_topic_name}",
   ]
-  sierra_adapter_topic_count = 3
+
   miro_adapter_topic_names = [
     "${local.miro_reindexer_topic_name}",
     "${local.miro_updates_topic_name}",
   ]
-  miro_adapter_topic_count = "2"
+
+  # Adapter VHS
+
+  vhs_sierra_read_policy = "${local.vhs_sierra_read_policy}"
+  vhs_miro_read_policy = "${local.vhs_miro_read_policy}"
 }

@@ -8,7 +8,6 @@ module "service" {
   cluster_id   = "${var.cluster_id}"
   cluster_name = "${var.cluster_name}"
 
-  vpc_id     = "${var.vpc_id}"
   subnets    = "${var.subnets}"
   aws_region = "${var.aws_region}"
 
@@ -17,6 +16,7 @@ module "service" {
   cpu    = "256"
   memory = "512"
 
+  security_group_ids = ["${var.security_group_ids}"]
   service_egress_security_group_id = "${var.service_egress_security_group_id}"
 
   env_vars        = "${var.env_vars}"

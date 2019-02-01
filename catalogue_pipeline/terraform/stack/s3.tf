@@ -1,11 +1,3 @@
-resource "aws_s3_bucket" "recorder_vhs" {
-  bucket = "wellcomecollection-${var.namespace}-recorder-vhs"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
 resource "aws_s3_bucket" "messages" {
   bucket = "wellcomecollection-${var.namespace}-messages"
   acl    = "private"

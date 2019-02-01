@@ -1,7 +1,6 @@
 variable "service_name" {}
 variable "cluster_id" {}
 variable "cluster_name" {}
-variable "vpc_id" {}
 
 variable "subnets" {
   type = "list"
@@ -23,3 +22,8 @@ variable "env_vars" {
 }
 
 variable "env_vars_length" {}
+
+variable "security_group_ids" {
+  default = []
+  type = "list"
+}

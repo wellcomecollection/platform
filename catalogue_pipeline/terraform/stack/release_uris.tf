@@ -29,14 +29,10 @@ data "aws_ssm_parameter" "ingestor_release_uri" {
   name = "/releases/catalogue_pipeline/${var.release_label}/ingestor"
 }
 
-data "aws_ssm_parameter" "transformer_release_uri" {
-  name = "/releases/catalogue_pipeline/${var.release_label}/transformer"
-}
-
 data "aws_ssm_parameter" "transformer_miro_release_uri" {
-  name = "/releases/catalogue_pipeline/${var.release_label}/transformer_miro"
+  name = "/releases/catalogue_pipeline/transformer/${var.release_label}/transformer_miro"
 }
 
 data "aws_ssm_parameter" "transformer_sierra_release_uri" {
-  name = "/releases/catalogue_pipeline/${var.release_label}/transformer_sierra"
+  name = "/releases/catalogue_pipeline/transformer/${var.release_label}/transformer_sierra"
 }
