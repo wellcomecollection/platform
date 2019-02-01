@@ -63,6 +63,10 @@ resource "aws_iam_role_policy" "sierra_transformer_vhs_sierra_adapter_read" {
 # Output topic
 
 module "sierra_transformer_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "${var.namespace}_sierra_transformer"
+  source = "../modules/topic"
+
+  name = "${var.namespace}_sierra_transformer"
+  role_names = ["${module.sierra_transformer.task_role_name}"]
+
+  messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
 }

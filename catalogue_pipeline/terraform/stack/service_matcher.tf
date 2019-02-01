@@ -76,6 +76,10 @@ resource "aws_iam_role_policy" "matcher_lock_readwrite" {
 # Output topic
 
 module "matcher_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "${var.namespace}_matcher"
+  source = "../modules/topic"
+
+  name = "${var.namespace}_matcher"
+  role_names = ["${module.matcher.task_role_name}"]
+
+  messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
 }

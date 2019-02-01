@@ -65,6 +65,10 @@ resource "aws_iam_role_policy" "merger_vhs_recorder_read" {
 # Output topic
 
 module "merger_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "${var.namespace}_merger"
+  source = "../modules/topic"
+
+  name = "${var.namespace}_merger"
+  role_names = ["${module.merger.task_role_name}"]
+
+  messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
 }

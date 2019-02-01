@@ -62,6 +62,10 @@ module "id_minter" {
 # Output topic
 
 module "id_minter_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "${var.namespace}_id_minter"
+  source = "../modules/topic"
+
+  name = "${var.namespace}_id_minter"
+  role_names = ["${module.id_minter.task_role_name}"]
+
+  messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
 }

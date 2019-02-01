@@ -63,6 +63,10 @@ resource "aws_iam_role_policy" "miro_transformer_vhs_miro_adapter_read" {
 # Output topic
 
 module "miro_transformer_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "${var.namespace}_miro_transformer"
+  source = "../modules/topic"
+
+  name = "${var.namespace}_miro_transformer"
+  role_names = ["${module.miro_transformer.task_role_name}"]
+
+  messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
 }
