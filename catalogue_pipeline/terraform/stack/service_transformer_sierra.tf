@@ -23,7 +23,7 @@ module "sierra_transformer_queue" {
 module "sierra_transformer" {
   source = "../modules/service"
 
-  service_name = "sierra_transformer"
+  service_name = "${var.namespace}_sierra_transformer"
 
   container_image = "${local.transformer_sierra_image}"
 

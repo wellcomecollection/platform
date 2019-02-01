@@ -23,7 +23,7 @@ module "miro_transformer_queue" {
 module "miro_transformer" {
   source = "../modules/service"
 
-  service_name = "miro_transformer"
+  service_name = "${var.namespace}_miro_transformer"
 
   container_image = "${local.transformer_miro_image}"
 

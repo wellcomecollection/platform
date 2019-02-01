@@ -49,7 +49,7 @@ module "id_minter" {
   secret_env_vars = {
     cluster_url = "catalogue/id_minter/rds_host"
     db_port     = "catalogue/id_minter/rds_port"
-    db_username = "catalogue/id_minter/rds_username"
+    db_username = "catalogue/id_minter/rds_user"
     db_password = "catalogue/id_minter/rds_password"
   }
 

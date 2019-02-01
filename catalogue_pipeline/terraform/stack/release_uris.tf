@@ -1,6 +1,6 @@
 locals {
   id_minter_image = "${data.aws_ssm_parameter.id_minter_release_uri.value}"
-  recorder_image  = "${data.aws_ssm_parameter.id_minter_release_uri.value}"
+  recorder_image  = "${data.aws_ssm_parameter.recorder_release_uri.value}"
   matcher_image   = "${data.aws_ssm_parameter.matcher_release_uri.value}"
   merger_image    = "${data.aws_ssm_parameter.merger_release_uri.value}"
   ingestor_image  = "${data.aws_ssm_parameter.ingestor_release_uri.value}"
