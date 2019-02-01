@@ -23,7 +23,10 @@ module "matcher_queue" {
 module "matcher" {
   source = "../modules/service"
 
-  service_egress_security_group_id = "${module.egress_security_group.sg_id}"
+  security_group_ids = [
+    "${module.egress_security_group.sg_id}",
+    "${var.rds_ids_access_security_group_id}"
+  ]
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
@@ -62,12 +65,12 @@ resource "aws_iam_role_policy" "matcher_vhs_recorder_read" {
 
 resource "aws_iam_role_policy" "matcher_graph_readwrite" {
   role   = "${module.matcher.task_role_name}"
-  policy = "${data.aws_iam_policy_document.graph_table_read_write_policy.json}"
+  policy = "${data.aws_iam_policy_document.graph_table_readwrite.json}"
 }
 
 resource "aws_iam_role_policy" "matcher_lock_readwrite" {
   role   = "${module.matcher.task_role_name}"
-  policy = "${data.aws_iam_policy_document.lock_table_read_write_policy.json}"
+  policy = "${data.aws_iam_policy_document.lock_table_readwrite.json}"
 }
 
 # Output topic

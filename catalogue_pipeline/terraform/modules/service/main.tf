@@ -17,7 +17,7 @@ module "service" {
   memory = "512"
 
   security_group_ids = ["${var.security_group_ids}"]
-  service_egress_security_group_id = "${var.service_egress_security_group_id}"
+  service_egress_security_group_id = ""
 
   env_vars        = "${var.env_vars}"
   env_vars_length = "${var.env_vars_length}"

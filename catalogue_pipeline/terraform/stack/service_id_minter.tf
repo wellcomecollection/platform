@@ -27,7 +27,10 @@ module "id_minter" {
 
   container_image   = "${local.id_minter_image}"
 
-  service_egress_security_group_id = "${module.egress_security_group.sg_id}"
+  security_group_ids = [
+    "${module.egress_security_group.sg_id}",
+    "${var.rds_ids_access_security_group_id}"
+  ]
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
@@ -54,8 +57,6 @@ module "id_minter" {
   }
 
   secret_env_vars_length = "4"
-
-  security_group_ids = ["${var.rds_ids_access_security_group_id}"]
 }
 
 # Output topic

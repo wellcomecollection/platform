@@ -9,7 +9,6 @@ variable "subnets" {
 variable "aws_region" {}
 variable "namespace_id" {}
 variable "container_image" {}
-variable "service_egress_security_group_id" {}
 
 variable "secret_env_vars" {
   type = "map"

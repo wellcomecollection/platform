@@ -1,3 +1,5 @@
+# Graph table
+
 resource "aws_dynamodb_table" "matcher_graph_table" {
   name     = "${var.namespace}_works-graph"
   hash_key = "id"
@@ -20,6 +22,33 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
     projection_type = "ALL"
   }
 }
+
+data "aws_iam_policy_document" "graph_table_readwrite" {
+  statement {
+    actions = [
+      "dynamodb:UpdateItem",
+      "dynamodb:PutItem",
+      "dynamodb:BatchGetItem",
+      "dynamodb:GetItem",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.matcher_graph_table.arn}",
+    ]
+  }
+
+  statement {
+    actions = [
+      "dynamodb:Query",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.matcher_graph_table.arn}/index/*",
+    ]
+  }
+}
+
+# Lock table
 
 resource "aws_dynamodb_table" "matcher_lock_table" {
   name     = "${var.namespace}_matcher-lock-table"
@@ -46,5 +75,30 @@ resource "aws_dynamodb_table" "matcher_lock_table" {
   ttl {
     attribute_name = "expires"
     enabled        = true
+  }
+}
+
+data "aws_iam_policy_document" "lock_table_readwrite" {
+  statement {
+    actions = [
+      "dynamodb:UpdateItem",
+      "dynamodb:PutItem",
+      "dynamodb:GetItem",
+      "dynamodb:DeleteItem",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.matcher_lock_table.arn}",
+    ]
+  }
+
+  statement {
+    actions = [
+      "dynamodb:Query",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.matcher_lock_table.arn}/index/*",
+    ]
   }
 }
