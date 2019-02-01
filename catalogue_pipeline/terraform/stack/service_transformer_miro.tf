@@ -29,7 +29,6 @@ module "miro_transformer" {
 
   security_group_ids = [
     "${module.egress_security_group.sg_id}",
-    "${var.rds_ids_access_security_group_id}"
   ]
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
