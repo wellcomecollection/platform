@@ -39,7 +39,7 @@ module "sierra_transformer" {
 
   env_vars = {
     sns_arn              = "${module.sierra_transformer_topic.arn}"
-    transformer_queue_id = "${module.sierra_transformer_queue.arn}"
+    transformer_queue_id = "${module.sierra_transformer_queue.url}"
     metrics_namespace    = "sierra_transformer"
     message_bucket_name = "${aws_s3_bucket.messages.id}"
   }
