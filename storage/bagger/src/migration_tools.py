@@ -10,6 +10,7 @@ import json
 import storage_api
 import dds
 import status_table
+import migration_report
 from mets_filesource import bnumber_generator
 
 
@@ -30,6 +31,13 @@ class MigrationTool(object):
 
     def ensure_population(self, filter=""):
         populate_table(filter)
+
+    def make_report(self):
+        make_migration_report()
+
+
+def make_migration_report():
+    migration_report.make_report()
 
 
 def populate_table(filter):
@@ -126,6 +134,12 @@ def update_bag_and_ingest_status_bnumber(
         },
         UpdateExpression="SET updated = :upd, bag_date = :bdt, bag_size = :bsz, mets_error = :bge, ingest_date = :idt, ingest_id = :iid, ingest_status = :ist, package_date = :pkg",
     )
+
+    # TODO - fields for status table
+    # "texts_expected" - the number of cached TextObjs there should be in DDS
+    # "texts_cached" - the number actually present
+    # "dlcs_mismatch" - the sum across all manifestations of assets with sync issues
+
     return {
         "identifier": bnumber,
         "bag_zip": bag_zip,
@@ -166,7 +180,12 @@ def do_ingest(delay, filter):
     for bnumber in bnumber_generator(filter):
         ingest = storage_api.ingest(bnumber)
         status_table.record_data(
-            bnumber, {"ingest_batch_id": batch_id, "ingest_filter": filter}
+            bnumber,
+            {
+                "ingest_start": status_table.activity_timestamp(),
+                "ingest_batch_id": batch_id,
+                "ingest_filter": filter,
+            },
         )
         print(json.dumps(ingest, default=json_default, indent=4))
         print(",")
