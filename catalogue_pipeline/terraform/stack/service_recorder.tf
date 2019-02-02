@@ -11,8 +11,8 @@ module "recorder_queue" {
 
   namespace = "${var.namespace}_recorder"
 
-  visibility_timeout_seconds = 30
-  max_receive_count          = 3
+  visibility_timeout_seconds = 60
+  max_receive_count          = 8
 
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"

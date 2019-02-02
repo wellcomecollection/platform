@@ -8,8 +8,12 @@ module "matcher_queue" {
 
   namespace = "${var.namespace}_matcher"
 
-  visibility_timeout_seconds = 30
-  max_receive_count          = 3
+  // The records in the locktable expire after 3 minutes
+  // The matcher is able to override locks that have expired
+  // Wait slightly longer to make sure locks are expired
+  visibility_timeout_seconds = 210
+
+  max_receive_count = 5
 
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"

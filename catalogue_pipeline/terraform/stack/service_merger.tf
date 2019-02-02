@@ -10,7 +10,7 @@ module "merger_queue" {
   namespace = "${var.namespace}_merger"
 
   visibility_timeout_seconds = 30
-  max_receive_count          = 3
+  max_receive_count          = 4
 
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"
