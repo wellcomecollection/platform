@@ -13,7 +13,8 @@ import uk.ac.wellcome.json.JsonUtil._
 
 object NotifyFailureFlow {
   def apply[T](subject: String, snsConfig: SNSConfig)(toRequestId: T => UUID)(
-    implicit snsClient: AmazonSNS): Flow[ArchiveError[T], PublishResult, NotUsed] =
+    implicit snsClient: AmazonSNS)
+    : Flow[ArchiveError[T], PublishResult, NotUsed] =
     Flow[ArchiveError[T]]
       .map { error =>
         ProgressUpdate.failed(

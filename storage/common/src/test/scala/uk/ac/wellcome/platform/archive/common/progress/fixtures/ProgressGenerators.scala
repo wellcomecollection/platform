@@ -59,7 +59,8 @@ trait ProgressGenerators extends ExternalIdentifierGenerators {
     id: UUID,
     status: Status = Progress.Accepted,
     maybeBag: Option[BagId] = Some(randomBagId),
-    events: Seq[ProgressEvent] = List(createProgressEvent)): ProgressStatusUpdate =
+    events: Seq[ProgressEvent] = List(createProgressEvent))
+    : ProgressStatusUpdate =
     ProgressStatusUpdate(
       id = id,
       status = status,
