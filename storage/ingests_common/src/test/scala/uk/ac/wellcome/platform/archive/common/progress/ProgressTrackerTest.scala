@@ -10,7 +10,6 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
-import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.common.progress.monitor.IdConstraintError
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
@@ -27,7 +26,7 @@ class ProgressTrackerTest
     with ScalaFutures {
 
   import uk.ac.wellcome.storage.dynamo._
-  import Progress._
+  import uk.ac.wellcome.platform.archive.common.progress.models.Progress._
 
   describe("create") {
     it("creates a progress monitor") {
@@ -158,10 +157,7 @@ class ProgressTrackerTest
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
 
-            val progressUpdate = ProgressEventUpdate(
-              progress.id,
-              List(createProgressEvent)
-            )
+            val progressUpdate = createProgressEventUpdateWith(progress.id)
 
             progressTracker.update(progressUpdate)
 
@@ -234,9 +230,9 @@ class ProgressTrackerTest
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
-            val progressUpdate = ProgressEventUpdate(
-              progress.id,
-              List(createProgressEvent, createProgressEvent)
+            val progressUpdate = createProgressEventUpdateWith(
+              id = progress.id,
+              events = List(createProgressEvent, createProgressEvent)
             )
 
             progressTracker.update(progressUpdate)

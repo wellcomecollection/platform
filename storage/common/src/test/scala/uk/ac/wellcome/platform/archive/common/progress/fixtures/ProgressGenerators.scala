@@ -43,15 +43,14 @@ trait ProgressGenerators extends ExternalIdentifierGenerators {
       events = events)
   }
 
-  def createProgressEvent: ProgressEvent = {
+  def createProgressEvent: ProgressEvent =
     ProgressEvent(randomAlphanumeric(15))
-  }
 
   def createProgressEventUpdateWith(id: UUID = randomUUID,
                                     events: List[ProgressEvent] = List(
                                       createProgressEvent))
     : ProgressEventUpdate =
-    ProgressEventUpdate(id, events)
+    ProgressEventUpdate(id = id, events = events)
 
   def createProgressEventUpdate: ProgressEventUpdate =
     createProgressEventUpdateWith()

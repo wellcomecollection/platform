@@ -14,11 +14,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   NotificationMessage,
   Parallelism
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  ProgressEvent,
-  ProgressEventUpdate,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.ProgressUpdate
 
 /** Parses a NotificationMessage as an IngestBagRequest, tells the
   * progress service that it's done so, and emits the bag request.
@@ -34,11 +30,9 @@ object NotificationMessageFlow {
       .flatMapMerge(
         breadth = parallelism.value,
         bagRequest => {
-          val progressUpdate = ProgressEventUpdate(
+          val progressUpdate = ProgressUpdate.event(
             id = bagRequest.id,
-            events = List(
-              ProgressEvent("Started work on ingest")
-            )
+            description = "Started work on ingest"
           )
 
           Source
