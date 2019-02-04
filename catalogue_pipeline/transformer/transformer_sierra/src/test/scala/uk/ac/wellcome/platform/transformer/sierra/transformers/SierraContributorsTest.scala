@@ -436,7 +436,8 @@ class SierraContributorsTest
     val contributor = contributors.head
 
     it("creates an Agent, not a Person") {
-      contributor.agent shouldBe Unidentifiable(Agent(label = "Shakespeare, William,"))
+      contributor.agent shouldBe Unidentifiable(
+        Agent(label = "Shakespeare, William,"))
     }
   }
 

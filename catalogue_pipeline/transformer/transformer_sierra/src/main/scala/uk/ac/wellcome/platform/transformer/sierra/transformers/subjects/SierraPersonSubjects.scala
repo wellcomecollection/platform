@@ -79,9 +79,8 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
     (List(person.label) ++ person.numeration ++ person.prefix ++ dates ++ roles ++ generalSubdivisions)
       .mkString(" ")
 
-  private def getConcepts(
-    person: Person,
-    generalSubdivisions: List[String]): List[MaybeDisplayable[AbstractRootConcept]] = {
+  private def getConcepts(person: Person, generalSubdivisions: List[String])
+    : List[MaybeDisplayable[AbstractRootConcept]] = {
     val personConcept = Unidentifiable(person)
 
     val generalSubdivisionConcepts =
