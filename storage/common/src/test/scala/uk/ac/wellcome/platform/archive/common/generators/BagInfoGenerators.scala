@@ -1,17 +1,15 @@
 package uk.ac.wellcome.platform.archive.common.generators
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagInfo,
-  ExternalDescription
-}
+import uk.ac.wellcome.platform.archive.common.models.{ExternalDescription, bagit}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagInfo, ExternalDescription}
 
 trait BagInfoGenerators extends RandomThings {
   def createBagInfoWith(
     externalDescription: Option[ExternalDescription] = Some(
       randomExternalDescription)
   ): BagInfo =
-    BagInfo(
+    bagit.BagInfo(
       externalIdentifier = randomExternalIdentifier,
       sourceOrganisation = randomSourceOrganisation,
       payloadOxum = randomPayloadOxum,

@@ -9,6 +9,7 @@ import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagLocationFixtures}
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagInfo, BagLocation}
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket

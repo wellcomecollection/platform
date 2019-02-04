@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.archive.common.bag
 import org.apache.commons.io.IOUtils
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, RandomThings}
-import uk.ac.wellcome.platform.archive.common.models.BagInfo
+import uk.ac.wellcome.platform.archive.common.models.bagit
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagInfo
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagInfo
 
 class BagInfoParserTest
@@ -29,7 +30,7 @@ class BagInfoParserTest
       None)
 
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
-      BagInfo(externalIdentifier, sourceOrganisation, payloadOxum, baggingDate))
+      bagit.BagInfo(externalIdentifier, sourceOrganisation, payloadOxum, baggingDate))
   }
 
   it(
@@ -53,7 +54,7 @@ class BagInfoParserTest
     )
 
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
-      BagInfo(
+      bagit.BagInfo(
         externalIdentifier,
         sourceOrganisation,
         payloadOxum,

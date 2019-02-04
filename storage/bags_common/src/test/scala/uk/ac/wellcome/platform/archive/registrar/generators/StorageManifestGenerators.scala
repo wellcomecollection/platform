@@ -4,10 +4,8 @@ import java.time.Instant
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  StandardStorageProvider,
-  StorageLocation
-}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagDigestFile, BagInfo, BagItemPath}
+import uk.ac.wellcome.platform.archive.common.progress.models.{StandardStorageProvider, StorageLocation}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -28,7 +26,7 @@ trait StorageManifestGenerators extends RandomThings {
       ),
       tagManifest = FileManifest(
         checksumAlgorithm = ChecksumAlgorithm(checksumAlgorithm),
-        files = List(BagDigestFile(Checksum("a"), NeeeeeewBagItemPath("bag-info.txt")))
+        files = List(BagDigestFile("a", BagItemPath("bag-info.txt")))
       ),
       StorageLocation(StandardStorageProvider, ObjectLocation(bucket, path)),
       Instant.now

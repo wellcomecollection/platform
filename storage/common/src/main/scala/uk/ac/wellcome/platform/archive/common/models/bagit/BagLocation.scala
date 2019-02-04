@@ -1,4 +1,6 @@
-package uk.ac.wellcome.platform.archive.common.models
+package uk.ac.wellcome.platform.archive.common.models.bagit
+
+import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 
 /** Represents the complete location of a Bag in S3.
   *

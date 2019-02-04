@@ -4,8 +4,9 @@ import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagLocationFixtures, FileEntry, RandomThings}
 import uk.ac.wellcome.platform.archive.common.generators.ArchiveCompleteGenerators
+import uk.ac.wellcome.platform.archive.common.models.bagit
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagLocation
 import uk.ac.wellcome.platform.archive.common.models.error.{DownloadError, InvalidBagManifestError}
-import uk.ac.wellcome.platform.archive.common.models.BagLocation
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 
 class StorageManifestFactoryTest
@@ -54,7 +55,7 @@ class StorageManifestFactoryTest
   describe("returning a left of registrar error ...") {
     it("if no files are at the BagLocation") {
       withLocalS3Bucket { bucket =>
-        val bagLocation = BagLocation(
+        val bagLocation = bagit.BagLocation(
           storageNamespace = bucket.name,
           storagePrefix = "archive",
           storageSpace = randomStorageSpace,

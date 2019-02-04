@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.fixtures
 
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagInfo, BagLocation, BagPath}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith

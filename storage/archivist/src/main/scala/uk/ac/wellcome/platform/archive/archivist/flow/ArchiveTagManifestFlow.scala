@@ -7,9 +7,8 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveItemJobError, ArchiveJobError}
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ArchiveItemJob, ArchiveJob}
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
-import uk.ac.wellcome.platform.archive.common.models
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagDigestFile, BagItemPath}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.{Checksum, NeeeeeewBagItemPath}
 
 /** This flow extracts a tag manifest from a ZIP file, and uploads it to S3
   *
@@ -47,15 +46,16 @@ object ArchiveTagManifestFlow extends Logging {
     val tagManifestFileName = archiveJob.config.tagManifestFileName
     ArchiveItemJob(
       archiveJob = archiveJob,
-      bagItemPath = NeeeeeewBagItemPath(tagManifestFileName)
+      bagItemPath = BagItemPath(tagManifestFileName)
     )
   }
 
   private def archiveDigestItemJob(archiveItemJob: ArchiveItemJob,
                                    digest: String): ArchiveDigestItemJob =
     ArchiveDigestItemJob(
-      archiveItemJob.archiveJob,
-      models.BagDigestFile(Checksum(digest), archiveItemJob.bagItemPath))
+      archiveJob = archiveItemJob.archiveJob,
+      bagDigestItem = BagDigestFile(digest, archiveItemJob.bagItemPath)
+    )
 
   private def extractArchiveJobFlow = {
     FoldEitherFlow[

@@ -5,12 +5,10 @@ import java.time.Instant
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.generators.ExternalIdentifierGenerators
-import uk.ac.wellcome.platform.archive.common.models.{BagId, StorageSpace}
+import uk.ac.wellcome.platform.archive.common.models.StorageSpace
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagId
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress.Status
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  StorageLocation,
-  _
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{StorageLocation, _}
 import uk.ac.wellcome.storage.ObjectLocation
 
 trait ProgressGenerators extends ExternalIdentifierGenerators {

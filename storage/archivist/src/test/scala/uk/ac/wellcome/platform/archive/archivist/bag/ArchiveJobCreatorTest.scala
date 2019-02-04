@@ -7,7 +7,8 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagItConfig}
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath, NeeeeeewBagItemPath}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, BagPath, BagItemPath}
+import uk.ac.wellcome.platform.archive.common.models.{BagPath, NeeeeeewBagItemPath}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest
@@ -43,8 +44,8 @@ class ArchiveJobCreatorTest
             bagPath = BagPath(bagIdentifier)
           )
           bagItConfig shouldBe BagItConfig()
-          bagManifestLocations should contain only (NeeeeeewBagItemPath(
-            "tagmanifest-sha256.txt"), NeeeeeewBagItemPath(
+          bagManifestLocations should contain only (BagItemPath(
+            "tagmanifest-sha256.txt"), BagItemPath(
             "manifest-sha256.txt"))
       }
     }

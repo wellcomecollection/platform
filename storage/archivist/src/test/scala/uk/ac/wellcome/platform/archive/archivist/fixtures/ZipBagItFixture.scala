@@ -5,7 +5,7 @@ import java.util.zip.{ZipEntry, ZipOutputStream}
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.BagInfo
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagInfo
 import uk.ac.wellcome.test.fixtures._
 
 trait ZipBagItFixture extends BagIt with Logging {

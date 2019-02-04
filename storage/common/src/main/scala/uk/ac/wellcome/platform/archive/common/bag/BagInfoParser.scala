@@ -6,10 +6,8 @@ import java.time.LocalDate
 import cats.data._
 import cats.implicits._
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  InvalidBagInfo
-}
+import uk.ac.wellcome.platform.archive.common.models.bagit._
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagInfo}
 
 import scala.util.Try
 

@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.archive.common.generators
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagLocation
 
 trait ArchiveCompleteGenerators extends RandomThings {
   def createArchiveCompleteWith(

@@ -7,10 +7,10 @@ import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.bagreplicator.BagReplicator
-import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
-import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
+import uk.ac.wellcome.platform.archive.bagreplicator.config.{BagReplicatorConfig, ReplicatorDestinationConfig}
 import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagLocationFixtures, RandomThings}
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagInfo, BagLocation}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -27,7 +27,7 @@ trait BagReplicatorFixtures
 
   def verifyBagCopied(
                        sourceLocation: BagLocation,
-                       storageDestination: StorageLocation
+                       storageDestination: ReplicatorDestinationConfig
   ) = {
     val sourceItems = s3Client.listObjects(
       sourceLocation.storageNamespace,
@@ -87,7 +87,7 @@ trait BagReplicatorFixtures
             messageStream = messageStream,
             bagReplicatorConfig = BagReplicatorConfig(
               parallelism = 10,
-              StorageLocation(destinationBucket.name, "storage-root")),
+              ReplicatorDestinationConfig(destinationBucket.name, "storage-root")),
             progressSnsConfig = createSNSConfigWith(progressTopic),
             outgoingSnsConfig = createSNSConfigWith(outgoingTopic)
           )

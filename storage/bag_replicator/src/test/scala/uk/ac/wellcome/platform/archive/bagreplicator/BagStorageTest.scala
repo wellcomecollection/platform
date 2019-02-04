@@ -3,11 +3,12 @@ package uk.ac.wellcome.platform.archive.bagreplicator
 import com.amazonaws.services.s3.transfer.model.CopyResult
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinationConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
-import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
 import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{ExternalIdentifier, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.ExternalIdentifier
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, ExternalIdentifier}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -32,7 +33,7 @@ class BagStorageTest
           implicit val _s3Client = s3Client
           implicit val _s3Copier = S3Copier()
 
-          val destinationLocation = StorageLocation(
+          val destinationLocation = ReplicatorDestinationConfig(
             namespace = destinationBucket.name,
             rootPath = randomAlphanumeric()
           )
@@ -74,7 +75,7 @@ class BagStorageTest
               implicit val _s3Client = s3Client
               implicit val _s3Copier = S3Copier()
 
-              val destinationLocation = StorageLocation(
+              val destinationLocation = ReplicatorDestinationConfig(
                 namespace = destinationBucket.name,
                 rootPath = randomAlphanumeric()
               )

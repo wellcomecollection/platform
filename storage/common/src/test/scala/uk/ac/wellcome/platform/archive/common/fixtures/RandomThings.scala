@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit._
 
 import scala.util.Random
 

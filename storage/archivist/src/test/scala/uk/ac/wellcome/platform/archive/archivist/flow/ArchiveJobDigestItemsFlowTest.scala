@@ -12,6 +12,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors._
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagItemPath
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.Akka
@@ -79,7 +80,7 @@ class ArchiveJobDigestItemsFlowTest
                         "this/does/not/exists.jpg",
                         archiveItemJob))))) =>
                 actualArchiveJob shouldBe archiveJob
-                archiveItemJob.bagDigestItem.path shouldBe NeeeeeewBagItemPath(
+                archiveItemJob.bagDigestItem.path shouldBe BagItemPath(
                   "this/does/not/exists.jpg")
                 archiveItemJob.archiveJob shouldBe archiveJob
             }
@@ -158,7 +159,7 @@ class ArchiveJobDigestItemsFlowTest
                 val checksumNotMatchedOnUploadError =
                   error.asInstanceOf[ChecksumNotMatchedOnUploadError]
                 checksumNotMatchedOnUploadError.t.archiveJob shouldBe archiveJob
-                checksumNotMatchedOnUploadError.t.bagDigestItem.path shouldBe NeeeeeewBagItemPath(
+                checksumNotMatchedOnUploadError.t.bagDigestItem.path shouldBe BagItemPath(
                   filepath)
                 job shouldBe archiveJob
             }

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar.http.models
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.platform.archive.common.models.BagInfo
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagInfo
 
 case class DisplayBagInfo(
   externalIdentifier: String,

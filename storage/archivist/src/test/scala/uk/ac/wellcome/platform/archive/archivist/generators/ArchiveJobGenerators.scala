@@ -7,6 +7,7 @@ import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.common.generators.ExternalIdentifierGenerators
 import uk.ac.wellcome.platform.archive.common.models
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
@@ -20,7 +21,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
   ): ArchiveItemJob =
     ArchiveItemJob(
       archiveJob = createArchiveJobWith(file, bagIdentifier, bucket),
-      bagItemPath = NeeeeeewBagItemPath(s3Key)
+      bagItemPath = BagItemPath(s3Key)
     )
 
   def createArchiveDigestItemJobWith(
@@ -37,8 +38,8 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
         bucket = bucket
       ),
       bagDigestItem = BagDigestFile(
-        checksum = Checksum(digest),
-        path = NeeeeeewBagItemPath(s3Key)
+        checksum = digest,
+        path = BagItemPath(s3Key)
       )
     )
 
@@ -60,8 +61,8 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
       bagLocation = bagLocation,
       config = BagItConfig(),
       bagManifestLocations = List(
-        NeeeeeewBagItemPath("manifest-sha256.txt"),
-        NeeeeeewBagItemPath("tagmanifest-sha256.txt")
+        BagItemPath("manifest-sha256.txt"),
+        BagItemPath("tagmanifest-sha256.txt")
       )
     )
   }
