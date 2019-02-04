@@ -20,8 +20,6 @@ class ProgressTracker(
   dynamoConfig: DynamoConfig
 )(implicit ec: ExecutionContext) extends Logging {
 
-  import Progress._
-
   def get(id: UUID): Future[Option[Progress]] = Future {
     blocking(Scanamo.get[Progress](dynamoDbClient)(dynamoConfig.table)(
       'id -> id
