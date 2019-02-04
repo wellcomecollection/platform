@@ -4,6 +4,7 @@ import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.json.JsonUtil.{fromJson, toJson}
+import uk.ac.wellcome.storage.ObjectLocation
 
 case class NeeeeeewBagItemPath(underlying: String) extends AnyVal {
   override def toString: String = underlying
@@ -33,4 +34,10 @@ case class NeeeeeeewBagItemLocation(
 ) {
   def completePath: String =
     List(bagLocation.completeFilepath, bagItemPath).mkString("/")
+
+  def objectLocation: ObjectLocation =
+    ObjectLocation(
+      namespace = bagLocation.storageNamespace,
+      key = completePath
+    )
 }

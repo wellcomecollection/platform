@@ -1,14 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.bag
 
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagDigestFile,
-  BagFilePath,
-  Checksum
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.{BagDigestFile, Checksum, NeeeeeewBagItemPath}
 
 object BagDigestFileCreator {
 
@@ -35,7 +28,7 @@ object BagDigestFileCreator {
         Right(
           BagDigestFile(
             checksum = Checksum(checksum.trim),
-            path = BagFilePath(key.trim)
+            path = NeeeeeewBagItemPath(key.trim)
           )
         )
       case _ => Left(InvalidBagManifestError(job, manifestName, line))

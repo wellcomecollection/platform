@@ -2,18 +2,17 @@ package uk.ac.wellcome.platform.archive.archivist.models
 
 import java.util.zip.ZipFile
 
-import uk.ac.wellcome.platform.archive.common.models.BagFilePath
+import uk.ac.wellcome.platform.archive.common.models.NeeeeeewBagItemPath
 
 case class ZipLocation(
   zipFile: ZipFile,
-  bagFilePath: BagFilePath
+  bagItemPath: NeeeeeewBagItemPath
 )
 
 object ZipLocation {
-  def apply(archiveItemJob: ArchiveDigestItemJob): ZipLocation = {
+  def apply(archiveItemJob: ArchiveDigestItemJob): ZipLocation =
     ZipLocation(
       archiveItemJob.archiveJob.zipFile,
       archiveItemJob.bagDigestItem.path
     )
-  }
 }

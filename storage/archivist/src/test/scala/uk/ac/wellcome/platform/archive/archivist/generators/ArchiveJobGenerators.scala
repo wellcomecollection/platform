@@ -20,7 +20,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
   ): ArchiveItemJob =
     ArchiveItemJob(
       archiveJob = createArchiveJobWith(file, bagIdentifier, bucket),
-      itemLocation = BagFilePath(s3Key)
+      bagItemPath = NeeeeeewBagItemPath(s3Key)
     )
 
   def createArchiveDigestItemJobWith(
@@ -36,7 +36,10 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
         bagIdentifier = bagIdentifier,
         bucket = bucket
       ),
-      bagDigestItem = models.BagDigestFile(Checksum(digest), BagFilePath(s3Key))
+      bagDigestItem = BagDigestFile(
+        checksum = Checksum(digest),
+        path = NeeeeeewBagItemPath(s3Key)
+      )
     )
 
   def createArchiveJobWith(
@@ -57,8 +60,8 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
       bagLocation = bagLocation,
       config = BagItConfig(),
       bagManifestLocations = List(
-        BagManifestLocation("manifest-sha256.txt"),
-        BagManifestLocation("tagmanifest-sha256.txt")
+        NeeeeeewBagItemPath("manifest-sha256.txt"),
+        NeeeeeewBagItemPath("tagmanifest-sha256.txt")
       )
     )
   }

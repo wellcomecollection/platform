@@ -28,7 +28,7 @@ trait StorageManifestGenerators extends RandomThings {
       ),
       tagManifest = FileManifest(
         checksumAlgorithm = ChecksumAlgorithm(checksumAlgorithm),
-        files = List(BagDigestFile(Checksum("a"), BagFilePath("bag-info.txt")))
+        files = List(BagDigestFile(Checksum("a"), NeeeeeewBagItemPath("bag-info.txt")))
       ),
       StorageLocation(StandardStorageProvider, ObjectLocation(bucket, path)),
       Instant.now

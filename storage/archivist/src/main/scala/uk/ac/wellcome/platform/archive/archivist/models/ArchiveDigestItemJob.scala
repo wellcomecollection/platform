@@ -5,15 +5,12 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 case class ArchiveDigestItemJob(archiveJob: ArchiveJob,
                                 bagDigestItem: BagDigestFile) {
-  def uploadLocation: ObjectLocation =
-    createUploadLocation(archiveJob.bagLocation, bagDigestItem.path)
-
-  private def createUploadLocation(
-                                    bagLocation: BagLocation,
-                                    itemLocation: BagFilePath
-  ) =
-    ObjectLocation(
-      namespace = bagLocation.storageNamespace,
-      key = List(bagLocation.completeFilepath, itemLocation.value).mkString("/")
+  def uploadLocation: ObjectLocation = {
+    val bagItemLocation = NeeeeeeewBagItemLocation(
+      bagLocation = archiveJob.bagLocation,
+      bagItemPath = bagDigestItem.path
     )
+
+    bagItemLocation.objectLocation
+  }
 }

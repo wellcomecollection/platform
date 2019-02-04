@@ -79,7 +79,7 @@ class ArchiveJobDigestItemsFlowTest
                         "this/does/not/exists.jpg",
                         archiveItemJob))))) =>
                 actualArchiveJob shouldBe archiveJob
-                archiveItemJob.bagDigestItem.path shouldBe BagFilePath(
+                archiveItemJob.bagDigestItem.path shouldBe NeeeeeewBagItemPath(
                   "this/does/not/exists.jpg")
                 archiveItemJob.archiveJob shouldBe archiveJob
             }
@@ -158,7 +158,7 @@ class ArchiveJobDigestItemsFlowTest
                 val checksumNotMatchedOnUploadError =
                   error.asInstanceOf[ChecksumNotMatchedOnUploadError]
                 checksumNotMatchedOnUploadError.t.archiveJob shouldBe archiveJob
-                checksumNotMatchedOnUploadError.t.bagDigestItem.path shouldBe BagFilePath(
+                checksumNotMatchedOnUploadError.t.bagDigestItem.path shouldBe NeeeeeewBagItemPath(
                   filepath)
                 job shouldBe archiveJob
             }

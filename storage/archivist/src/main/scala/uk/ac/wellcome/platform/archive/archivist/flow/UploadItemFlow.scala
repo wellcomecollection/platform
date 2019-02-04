@@ -40,13 +40,13 @@ object UploadItemFlow {
             ZipFileReader.maybeInputStream(
               ZipLocation(
                 archiveItemJob.archiveJob.zipFile,
-                archiveItemJob.itemLocation))))
+                archiveItemJob.bagItemPath))))
       .map {
         case (archiveItemJob, option) =>
           option
             .toRight(
               FileNotFoundError(
-                archiveItemJob.itemLocation.value,
+                archiveItemJob.bagItemPath.value,
                 archiveItemJob))
             .map(inputStream => (archiveItemJob, inputStream))
       }

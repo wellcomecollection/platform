@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.archivist.models
 
 import java.util.zip.ZipFile
 
-import uk.ac.wellcome.platform.archive.common.models.{ExternalIdentifier, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.{BagLocation, ExternalIdentifier, NeeeeeewBagItemPath}
 
 /** Used internally by an archivist flow.
   *
@@ -19,5 +19,5 @@ case class ArchiveJob(
   zipFile: ZipFile,
   bagLocation: BagLocation,
   config: BagItConfig,
-  bagManifestLocations: List[BagManifestLocation]
+  bagManifestLocations: List[NeeeeeewBagItemPath]
 )
