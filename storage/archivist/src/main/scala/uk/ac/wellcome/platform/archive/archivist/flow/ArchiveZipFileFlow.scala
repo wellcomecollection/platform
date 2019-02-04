@@ -83,7 +83,7 @@ object ArchiveZipFileFlow extends Logging {
     result: Either[ArchiveError[_], ArchiveComplete],
     ingestBagRequest: IngestBagRequest): ProgressUpdate = {
     result match {
-      case Right(ArchiveComplete(id, _, _)) =>
+      case Right(ArchiveComplete(id, _)) =>
         ProgressEventUpdate(
           id,
           List(ProgressEvent("Bag uploaded and verified successfully")))

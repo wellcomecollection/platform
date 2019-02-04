@@ -43,9 +43,8 @@ class ArchiveJobDigestItemsFlowTest
             archiveJobs shouldBe List(
               Right(
                 ArchiveComplete(
-                  ingestRequest.id,
-                  ingestRequest.storageSpace,
-                  archiveJob.bagLocation
+                  archiveRequestId = ingestRequest.id,
+                  bagLocation = archiveJob.bagLocation
                 )
               )
             )

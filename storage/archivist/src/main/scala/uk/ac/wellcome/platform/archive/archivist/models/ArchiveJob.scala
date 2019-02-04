@@ -15,9 +15,9 @@ import uk.ac.wellcome.platform.archive.common.models.{ExternalIdentifier, BagLoc
   * @param bagManifestLocations A list of manifest locations inside the bag.
   */
 case class ArchiveJob(
-                       externalIdentifier: ExternalIdentifier,
-                       zipFile: ZipFile,
-                       bagLocation: BagLocation,
-                       config: BagItConfig,
-                       bagManifestLocations: List[BagManifestLocation]
+  externalIdentifier: ExternalIdentifier,
+  zipFile: ZipFile,
+  bagLocation: BagLocation,
+  config: BagItConfig,
+  bagManifestLocations: List[BagManifestLocation]
 )

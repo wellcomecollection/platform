@@ -75,6 +75,6 @@ trait RandomThings {
   )
 
   def randomBagPath = BagPath(
-    randomAlphanumeric()
+    randomExternalIdentifier
   )
 }

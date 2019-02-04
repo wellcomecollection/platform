@@ -1,10 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.models
 
-case class BagPath(value: String) {
-  override def toString: String = value
+// TODO: This should take in a string, not an ExternalIdentifier
+case class BagPath(value: ExternalIdentifier) {
+  override def toString: String = value.toString
 }
 
-case object BagPath {
-  def apply(externalIdentifier: ExternalIdentifier): BagPath =
-    BagPath(externalIdentifier.toString)
-}
