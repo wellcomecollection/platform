@@ -9,8 +9,8 @@ module "id_minter_queue" {
 
   namespace = "${var.namespace}_id_minter"
 
-  visibility_timeout_seconds = 30
-  max_receive_count          = 3
+  visibility_timeout_seconds = 60
+  max_receive_count          = 5
 
   aws_region = "${var.aws_region}"
   account_id = "${var.account_id}"
@@ -40,8 +40,8 @@ module "id_minter" {
   aws_region   = "${var.aws_region}"
 
   env_vars = {
-    metrics_namespace   = "${var.namespace}_id_minter"
-    message_bucket_name = "${aws_s3_bucket.messages.id}"
+    metrics_namespace    = "${var.namespace}_id_minter"
+    messages_bucket_name = "${aws_s3_bucket.messages.id}"
 
     queue_url       = "${module.id_minter_queue.url}"
     topic_arn       = "${module.id_minter_topic.arn}"

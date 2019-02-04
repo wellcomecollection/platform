@@ -7,5 +7,5 @@ aws.rds.username="${db_username}"
 aws.rds.maxConnections=${max_connections}
 aws.metrics.namespace="${metrics_namespace}"
 aws.message.writer.sns.topic.arn="${topic_arn}"
-aws.message.writer.s3.bucketName="${message_bucket_name}"
+aws.message.writer.s3.bucketName="${messages_bucket_name}"
 aws.message.reader.sqs.queue.url="${queue_url}"

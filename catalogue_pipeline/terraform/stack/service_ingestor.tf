@@ -38,10 +38,9 @@ module "ingestor" {
   aws_region   = "${var.aws_region}"
 
   env_vars = {
-    metrics_namespace   = "${var.namespace}_ingestor"
-    message_bucket_name = "${aws_s3_bucket.messages.id}"
-    es_index            = "${var.es_works_index}"
-    ingest_queue_id     = "${module.ingestor_queue.url}"
+    metrics_namespace    = "${var.namespace}_ingestor"
+    es_index             = "${var.es_works_index}"
+    ingest_queue_id      = "${module.ingestor_queue.url}"
   }
 
   env_vars_length = 4

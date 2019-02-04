@@ -37,7 +37,7 @@ module "merger" {
 
   env_vars = {
     metrics_namespace        = "${var.namespace}_merger"
-    message_bucket_name = "${aws_s3_bucket.messages.id}"
+    messages_bucket_name     = "${aws_s3_bucket.messages.id}"
     topic_arn                = "${module.matcher_topic.arn}"
     merger_queue_id          = "${module.merger_queue.url}"
     merger_topic_arn         = "${module.merger_topic.arn}"

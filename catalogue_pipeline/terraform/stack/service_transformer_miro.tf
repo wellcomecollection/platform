@@ -40,7 +40,7 @@ module "miro_transformer" {
     sns_arn              = "${module.miro_transformer_topic.arn}"
     transformer_queue_id = "${module.miro_transformer_queue.url}"
     metrics_namespace    = "miro_transformer"
-    message_bucket_name = "${aws_s3_bucket.messages.id}"
+    messages_bucket_name = "${aws_s3_bucket.messages.id}"
   }
 
   env_vars_length = 4
