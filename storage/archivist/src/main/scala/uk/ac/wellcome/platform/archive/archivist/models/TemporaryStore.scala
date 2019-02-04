@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common
+package uk.ac.wellcome.platform.archive.archivist.models
 
 import java.io.File
 

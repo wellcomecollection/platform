@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.archive.archivist.models
 
-import uk.ac.wellcome.platform.archive.common.models.NeeeeeeewBagItemLocation
 import uk.ac.wellcome.platform.archive.common.models.bagit.{BagItemLocation, BagItemPath}
 import uk.ac.wellcome.storage.ObjectLocation
 

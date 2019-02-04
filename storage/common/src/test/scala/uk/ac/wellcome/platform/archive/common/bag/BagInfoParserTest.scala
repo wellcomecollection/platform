@@ -4,7 +4,6 @@ import org.apache.commons.io.IOUtils
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagIt, RandomThings}
 import uk.ac.wellcome.platform.archive.common.models.bagit
-import uk.ac.wellcome.platform.archive.common.models.bagit.BagInfo
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagInfo
 
 class BagInfoParserTest

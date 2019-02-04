@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, FileDownloadComplete}
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry

@@ -38,7 +38,7 @@ object UploadDigestInputStreamFlow extends Logging {
       .flatMapMerge(
         parallelism, {
           case (job, inputStream) =>
-            val digest = ItemDigest(job.bagDigestItem.checksum.value)
+            val digest = ItemDigest(job.bagDigestItem.checksum)
             StreamConverters
               .fromInputStream(() => inputStream)
               .log("upload bytestring")

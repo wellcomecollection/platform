@@ -46,7 +46,7 @@ object UploadItemFlow {
           option
             .toRight(
               FileNotFoundError(
-                archiveItemJob.bagItemPath.value,
+                archiveItemJob.bagItemPath.toString,
                 archiveItemJob))
             .map(inputStream => (archiveItemJob, inputStream))
       }
