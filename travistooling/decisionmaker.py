@@ -100,7 +100,12 @@ def does_file_affect_build_task(path, task):
             else:
                 raise InsignificantFile()
 
-        for name in ("application.conf", "application.conf.template", "Dockerfile", "docker-compose.yml"):
+        for name in (
+            "application.conf",
+            "application.conf.template",
+            "Dockerfile",
+            "docker-compose.yml",
+        ):
             if os.path.basename(path) == name:
                 if path.startswith(project.folder):
                     raise SignificantFile(
