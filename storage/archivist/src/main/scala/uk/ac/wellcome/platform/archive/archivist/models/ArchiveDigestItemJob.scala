@@ -5,8 +5,6 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 case class ArchiveDigestItemJob(archiveJob: ArchiveJob,
                                 bagDigestItem: BagDigestFile) {
-  def bagName: BagPath = archiveJob.bagLocation.bagPath
-
   def uploadLocation: ObjectLocation =
     createUploadLocation(archiveJob.bagLocation, bagDigestItem.path)
 
