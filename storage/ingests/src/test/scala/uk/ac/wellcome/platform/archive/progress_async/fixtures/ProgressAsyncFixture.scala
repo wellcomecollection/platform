@@ -5,17 +5,11 @@ import akka.stream.scaladsl.Flow
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  ArchiveMessaging,
-  RandomThings
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, RandomThings}
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  Progress,
-  ProgressUpdate
-}
+import uk.ac.wellcome.platform.archive.common.progress.models.{Progress, ProgressUpdate}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.progress_async.ProgressAsync
 import uk.ac.wellcome.platform.archive.progress_async.flows.ProgressUpdateFlow
@@ -66,6 +60,8 @@ trait ProgressAsyncFixture
                 snsConfig = createSNSConfigWith(topic)
               )
 
+              progressAsync.run()
+
               testWith(progressAsync)
             }
         }
@@ -73,12 +69,12 @@ trait ProgressAsyncFixture
     }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(QueuePair, Topic, Table, ProgressAsync), R]): R = {
-    withLocalSqsQueueAndDlqAndTimeout(15) { qPair =>
+    testWith: TestWith[(Queue, Topic, Table, ProgressAsync), R]): R = {
+    withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withProgressTrackerTable { table =>
-          withApp(qPair, topic, table) { progressAsync =>
-            testWith((qPair, topic, table, progressAsync))
+          withApp(queue, topic, table) { progressAsync =>
+            testWith((queue, topic, table, progressAsync))
           }
         }
       }
