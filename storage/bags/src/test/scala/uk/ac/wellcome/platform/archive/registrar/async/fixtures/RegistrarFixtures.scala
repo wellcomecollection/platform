@@ -7,9 +7,15 @@ import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagLocationFixtures}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  ArchiveMessaging,
+  BagLocationFixtures
+}
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagInfo, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagInfo,
+  BagLocation
+}
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -33,17 +39,18 @@ trait RegistrarFixtures
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
   )(testWith: TestWith[BagLocation, R]): R =
-    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) { bagLocation =>
-      val archiveComplete = ArchiveComplete(
-        archiveRequestId = archiveRequestId,
-        bagLocation = bagLocation
-      )
+    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) {
+      bagLocation =>
+        val archiveComplete = ArchiveComplete(
+          archiveRequestId = archiveRequestId,
+          bagLocation = bagLocation
+        )
 
-      sendNotificationToSQS(
-        queuePair.queue,
-        archiveComplete
-      )
-      testWith(bagLocation)
+        sendNotificationToSQS(
+          queuePair.queue,
+          archiveComplete
+        )
+        testWith(bagLocation)
     }
 
   override def createTable(table: Table) = {

@@ -11,14 +11,27 @@ import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, FileDownloadComplete}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  FileDownloadComplete
+}
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveJobError,
+  ChecksumNotMatchedOnUploadError,
+  FileNotFoundError
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  InvalidBagManifestError
+}
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -200,11 +213,11 @@ class ArchiveZipFileFlowTest
                         archiveJob
                           .asInstanceOf[ArchiveJob]
                           .bagLocation shouldBe BagLocation(
-                            storageNamespace = storageBucket.name,
-                            storagePrefix = "archive",
-                            storageSpace = ingestContext.storageSpace,
-                            bagPath = BagPath(bagInfo.externalIdentifier.toString)
-                          )
+                          storageNamespace = storageBucket.name,
+                          storagePrefix = "archive",
+                          storageSpace = ingestContext.storageSpace,
+                          bagPath = BagPath(bagInfo.externalIdentifier.toString)
+                        )
                     }
 
                     assertTopicReceivesProgressStatusUpdate(

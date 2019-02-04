@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.archive.common.models
 import org.scalatest.FunSpec
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagId, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagId,
+  ExternalIdentifier
+}
 
 class BagIdTest extends FunSpec with JsonAssertions {
   it("serialises space and external identifier as strings") {

@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.archive.archivist.models
 
 import java.util.zip.ZipFile
 
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, ExternalIdentifier, BagItemPath}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagItemPath,
+  BagLocation,
+  ExternalIdentifier
+}
 
 /** Used internally by an archivist flow.
   *

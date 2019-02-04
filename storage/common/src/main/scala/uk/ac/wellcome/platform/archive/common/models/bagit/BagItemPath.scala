@@ -15,8 +15,9 @@ object BagItemPath {
       Json.fromString(space.toString)
   }
 
-  implicit val decoder: Decoder[BagItemPath] = Decoder.instance[BagItemPath](cursor =>
-    cursor.value.as[String].map(BagItemPath(_)))
+  implicit val decoder: Decoder[BagItemPath] =
+    Decoder.instance[BagItemPath](cursor =>
+      cursor.value.as[String].map(BagItemPath(_)))
 
   implicit def fmtSpace: DynamoFormat[BagItemPath] =
     DynamoFormat.xmap[BagItemPath, String](

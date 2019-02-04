@@ -9,15 +9,26 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
-import akka.http.scaladsl.server.{MalformedRequestContentRejection, RejectionHandler, Route}
+import akka.http.scaladsl.server.{
+  MalformedRequestContentRejection,
+  RejectionHandler,
+  Route
+}
 import grizzled.slf4j.Logging
 import io.circe.{CursorOp, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagId, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagId,
+  ExternalIdentifier
+}
 import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.display.{DisplayIngestMinimal, RequestDisplayIngest, ResponseDisplayIngest}
+import uk.ac.wellcome.platform.archive.display.{
+  DisplayIngestMinimal,
+  RequestDisplayIngest,
+  ResponseDisplayIngest
+}
 import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
 
 import scala.concurrent.ExecutionContext

@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.archive.registrar.common.models
 
 import java.time.Instant
 
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagDigestFile, BagId, BagInfo}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagDigestFile,
+  BagId,
+  BagInfo
+}
 import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.models.StorageLocation
 

@@ -5,9 +5,15 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinationConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
+  BagStorage,
+  S3Copier
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagLocation,
+  ExternalIdentifier
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

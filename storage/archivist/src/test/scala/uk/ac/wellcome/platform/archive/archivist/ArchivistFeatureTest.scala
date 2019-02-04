@@ -11,7 +11,10 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 
@@ -162,7 +165,8 @@ class ArchivistFeatureTest
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest1.storageSpace,
-                          bagPath = BagPath(bagInfo1.externalIdentifier.toString)
+                          bagPath =
+                            BagPath(bagInfo1.externalIdentifier.toString)
                         )
                       ),
                       ArchiveComplete(
@@ -171,7 +175,8 @@ class ArchivistFeatureTest
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest2.storageSpace,
-                          bagPath = BagPath(bagInfo2.externalIdentifier.toString)
+                          bagPath =
+                            BagPath(bagInfo2.externalIdentifier.toString)
                         )
                       )
                     ),
@@ -326,7 +331,8 @@ class ArchivistFeatureTest
                               storageNamespace = storageBucket.name,
                               storagePrefix = "archive",
                               storageSpace = validRequest1.storageSpace,
-                              bagPath = BagPath(bagInfo1.externalIdentifier.toString)
+                              bagPath =
+                                BagPath(bagInfo1.externalIdentifier.toString)
                             )
                           ),
                           ArchiveComplete(
@@ -335,7 +341,8 @@ class ArchivistFeatureTest
                               storageNamespace = storageBucket.name,
                               storagePrefix = "archive",
                               storageSpace = validRequest2.storageSpace,
-                              bagPath = BagPath(bagInfo2.externalIdentifier.toString)
+                              bagPath =
+                                BagPath(bagInfo2.externalIdentifier.toString)
                             )
                           )
                         ),
@@ -401,7 +408,8 @@ class ArchivistFeatureTest
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest1.storageSpace,
-                          bagPath = BagPath(bagInfo1.externalIdentifier.toString)
+                          bagPath =
+                            BagPath(bagInfo1.externalIdentifier.toString)
                         )
                       ),
                       ArchiveComplete(
@@ -410,7 +418,8 @@ class ArchivistFeatureTest
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest2.storageSpace,
-                          bagPath = BagPath(bagInfo2.externalIdentifier.toString)
+                          bagPath =
+                            BagPath(bagInfo2.externalIdentifier.toString)
                         )
                       )
                     ),

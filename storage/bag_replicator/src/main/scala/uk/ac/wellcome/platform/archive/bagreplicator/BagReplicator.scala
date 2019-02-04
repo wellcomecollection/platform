@@ -13,10 +13,21 @@ import io.circe.Encoder
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
-import uk.ac.wellcome.platform.archive.bagreplicator.config.{BagReplicatorConfig, ReplicatorDestinationConfig}
-import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{BagReplicationError, DuplicationFailed, NotificationFailed, NotificationParsingFailed}
+import uk.ac.wellcome.platform.archive.bagreplicator.config.{
+  BagReplicatorConfig,
+  ReplicatorDestinationConfig
+}
+import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{
+  BagReplicationError,
+  DuplicationFailed,
+  NotificationFailed,
+  NotificationParsingFailed
+}
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
+  BagStorage,
+  S3Copier
+}
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
@@ -72,7 +83,8 @@ class BagReplicator(
     }
   }
 
-  private def duplicateBagItems(storageDestination: ReplicatorDestinationConfig)(
+  private def duplicateBagItems(
+    storageDestination: ReplicatorDestinationConfig)(
     in: Either[BagReplicationError, BagReplicationRequest])(
     implicit s3Client: AmazonS3,
     s3Copier: S3Copier,

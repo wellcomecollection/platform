@@ -29,7 +29,11 @@ class BagInfoParserTest
       None)
 
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
-      bagit.BagInfo(externalIdentifier, sourceOrganisation, payloadOxum, baggingDate))
+      bagit.BagInfo(
+        externalIdentifier,
+        sourceOrganisation,
+        payloadOxum,
+        baggingDate))
   }
 
   it(

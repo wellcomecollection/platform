@@ -6,7 +6,12 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.bag.BagInfoParser
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, BagPath, ExternalIdentifier, BagItemPath}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagItemPath,
+  BagLocation,
+  BagPath,
+  ExternalIdentifier
+}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 /** This flow extracts the external identifier from the metadata inside
@@ -34,7 +39,9 @@ object ArchiveJobCreator {
             bagPath = BagPath(externalIdentifier.toString)
           ),
           config = config.bagItConfig,
-          bagManifestLocations = config.bagItConfig.digestNames.map { BagItemPath(_) }
+          bagManifestLocations = config.bagItConfig.digestNames.map {
+            BagItemPath(_)
+          }
         )
       }
 

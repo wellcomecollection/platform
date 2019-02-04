@@ -8,7 +8,8 @@ trait IngestBagRequestGenerators extends RandomThings {
   def createIngestBagRequest: IngestBagRequest = createIngestBagRequestWith()
 
   def createIngestBagRequestWith(
-    ingestBagLocation: ObjectLocation = ObjectLocation("testNamespace", "testKey")) =
+    ingestBagLocation: ObjectLocation =
+      ObjectLocation("testNamespace", "testKey")) =
     IngestBagRequest(
       id = randomUUID,
       zippedBagLocation = ingestBagLocation,

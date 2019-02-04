@@ -61,10 +61,10 @@ object ZipFileDownloadFlow {
 
   }
 
-  def downloadFiles(
-    request: IngestBagRequest)(
+  def downloadFiles(request: IngestBagRequest)(
     implicit transferManager: TransferManager,
-    ec: ExecutionContext): Future[Either[FileDownloadingError, FileDownloadComplete]] = {
+    ec: ExecutionContext)
+    : Future[Either[FileDownloadingError, FileDownloadComplete]] = {
     import uk.ac.wellcome.platform.archive.archivist.models.TemporaryStore._
 
     request.zippedBagLocation.downloadTempFile

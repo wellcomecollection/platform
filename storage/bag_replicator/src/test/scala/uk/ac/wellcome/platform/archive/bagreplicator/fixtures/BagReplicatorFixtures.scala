@@ -8,10 +8,20 @@ import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.bagreplicator.BagReplicator
-import uk.ac.wellcome.platform.archive.bagreplicator.config.{BagReplicatorConfig, ReplicatorDestinationConfig}
-import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagLocationFixtures, RandomThings}
+import uk.ac.wellcome.platform.archive.bagreplicator.config.{
+  BagReplicatorConfig,
+  ReplicatorDestinationConfig
+}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  ArchiveMessaging,
+  BagLocationFixtures,
+  RandomThings
+}
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagInfo, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagInfo,
+  BagLocation
+}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -59,18 +69,19 @@ trait BagReplicatorFixtures
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
   )(testWith: TestWith[BagLocation, R]): R =
-    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) { bagLocation =>
-      val archiveComplete = ArchiveComplete(
-        archiveRequestId = archiveRequestId,
-        bagLocation = bagLocation
-      )
+    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) {
+      bagLocation =>
+        val archiveComplete = ArchiveComplete(
+          archiveRequestId = archiveRequestId,
+          bagLocation = bagLocation
+        )
 
-      sendNotificationToSQS(
-        queuePair.queue,
-        archiveComplete
-      )
+        sendNotificationToSQS(
+          queuePair.queue,
+          archiveComplete
+        )
 
-      testWith(bagLocation)
+        testWith(bagLocation)
     }
 
   def withBagReplicator[R](
@@ -87,7 +98,9 @@ trait BagReplicatorFixtures
             messageStream = messageStream,
             bagReplicatorConfig = BagReplicatorConfig(
               parallelism = 10,
-              ReplicatorDestinationConfig(destinationBucket.name, "storage-root")),
+              ReplicatorDestinationConfig(
+                destinationBucket.name,
+                "storage-root")),
             progressSnsConfig = createSNSConfigWith(progressTopic),
             outgoingSnsConfig = createSNSConfigWith(outgoingTopic)
           )
