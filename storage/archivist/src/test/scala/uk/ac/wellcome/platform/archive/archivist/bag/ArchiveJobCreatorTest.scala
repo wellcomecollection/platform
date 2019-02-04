@@ -8,7 +8,6 @@ import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGen
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagItConfig}
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, BagPath, BagItemPath}
-import uk.ac.wellcome.platform.archive.common.models.{BagPath, NeeeeeewBagItemPath}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest

@@ -119,7 +119,7 @@ class ArchiveJobDigestItemsFlowTest
                 case List(Left(ArchiveJobError(actualArchiveJob, errors))) =>
                   actualArchiveJob shouldBe archiveJob
                   all(errors) shouldBe a[ChecksumNotMatchedOnUploadError]
-                  errors.map(_.t.bagDigestItem.path.value) should contain theSameElementsAs failedFiles
+                  errors.map { _.t.bagDigestItem.path.toString } should contain theSameElementsAs failedFiles
                   errors.map(_.t.archiveJob).distinct shouldBe List(archiveJob)
               }
             }

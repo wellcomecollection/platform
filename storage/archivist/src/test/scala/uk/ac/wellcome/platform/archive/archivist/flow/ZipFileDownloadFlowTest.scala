@@ -12,6 +12,7 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
+import uk.ac.wellcome.platform.archive.archivist.models.FileDownloadComplete
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
 import uk.ac.wellcome.platform.archive.common.config.models.Parallelism
 import uk.ac.wellcome.platform.archive.common.errors.FileDownloadingError
