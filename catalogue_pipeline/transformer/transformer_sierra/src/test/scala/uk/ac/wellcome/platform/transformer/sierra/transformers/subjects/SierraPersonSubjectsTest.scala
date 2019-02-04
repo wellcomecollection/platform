@@ -269,7 +269,7 @@ class SierraPersonSubjectsTest
     )
   }
 
-  it("includes the contents of subfield x in the concepts") {
+  describe("includes the contents of subfield x") {
     // Based on https://search.wellcomelibrary.org/iii/encore/record/C__Rb1159639?marcData=Y
     // as retrieved 22 January 2019.
     val bibData = createSierraBibDataWith(
@@ -277,24 +277,32 @@ class SierraPersonSubjectsTest
         createVarFieldWith(
           marcTag = "600",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Shakespeare, William"),
+            MarcSubfield(tag = "a", content = "Shakespeare, William,"),
             MarcSubfield(tag = "x", content = "Characters"),
-            MarcSubfield(tag = "x", content = "Hamlet")
+            MarcSubfield(tag = "x", content = "Hamlet.")
           )
         )
       )
     )
 
-    val subjects = transformer.getSubjectsWithPerson(bibData)
-    subjects should have size 1
-    subjects.head.agent.concepts shouldBe List(
-      Unidentifiable(Person("Shakespeare, William")),
-      Unidentifiable(Concept("Characters")),
-      Unidentifiable(Concept("Hamlet"))
-    )
+    val actualSubjects = transformer.getSubjectsWithPerson(bibData)
+    actualSubjects should have size 1
+    val subject = actualSubjects.head
+
+    it("in the concepts") {
+      subject.agent.concepts shouldBe List(
+        Unidentifiable(Person("Shakespeare, William,")),
+        Unidentifiable(Concept("Characters")),
+        Unidentifiable(Concept("Hamlet."))
+      )
+    }
+
+    it("in the label") {
+      subject.agent.label shouldBe "Shakespeare, William, Characters Hamlet."
+    }
   }
 
-  it("includes the contents of subfield t in the concepts") {
+  describe("includes the contents of subfield t") {
     // Based on https://search.wellcomelibrary.org/iii/encore/record/C__Rb1190271?marcData=Y
     // as retrieved 22 January 2019.
     val bibData = createSierraBibDataWith(
@@ -302,18 +310,26 @@ class SierraPersonSubjectsTest
         createVarFieldWith(
           marcTag = "600",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Aristophanes"),
-            MarcSubfield(tag = "t", content = "Birds")
+            MarcSubfield(tag = "a", content = "Aristophanes."),
+            MarcSubfield(tag = "t", content = "Birds.")
           )
         )
       )
     )
 
-    val subjects = transformer.getSubjectsWithPerson(bibData)
-    subjects should have size 1
-    subjects.head.agent.concepts shouldBe List(
-      Unidentifiable(Person("Aristophanes")),
-      Unidentifiable(Concept("Birds"))
-    )
+    val actualSubjects = transformer.getSubjectsWithPerson(bibData)
+    actualSubjects should have size 1
+    val subject = actualSubjects.head
+
+    it("in the concepts") {
+      subject.agent.concepts shouldBe List(
+        Unidentifiable(Person("Aristophanes.")),
+        Unidentifiable(Concept("Birds."))
+      )
+    }
+
+    it("in the label") {
+      subject.agent.label shouldBe "Aristophanes. Birds."
+    }
   }
 }
