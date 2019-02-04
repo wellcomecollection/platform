@@ -33,7 +33,9 @@ class ProgressAsyncFeatureTest
               status = Completed
             )
 
-            sendNotificationToSQS[ProgressUpdate](qPair.queue, progressStatusUpdate)
+            sendNotificationToSQS[ProgressUpdate](
+              qPair.queue,
+              progressStatusUpdate)
 
             eventually {
               val actualMessage =
