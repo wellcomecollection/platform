@@ -67,7 +67,7 @@ class ArchiveZipFileFlowTest
                     storageNamespace = storageBucket.name,
                     storagePrefix = "archive",
                     storageSpace = ingestContext.storageSpace,
-                    bagPath = BagPath(bagInfo.externalIdentifier)
+                    bagPath = BagPath(bagInfo.externalIdentifier.toString)
                   )
                 )))
 
@@ -203,7 +203,7 @@ class ArchiveZipFileFlowTest
                             storageNamespace = storageBucket.name,
                             storagePrefix = "archive",
                             storageSpace = ingestContext.storageSpace,
-                            bagPath = BagPath(bagInfo.externalIdentifier)
+                            bagPath = BagPath(bagInfo.externalIdentifier.toString)
                           )
                     }
 

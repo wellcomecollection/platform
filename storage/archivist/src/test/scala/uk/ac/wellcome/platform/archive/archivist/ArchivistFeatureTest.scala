@@ -51,7 +51,7 @@ class ArchivistFeatureTest
                     storageNamespace = storageBucket.name,
                     storagePrefix = "archive",
                     storageSpace = request.storageSpace,
-                    bagPath = BagPath(bagInfo.externalIdentifier)
+                    bagPath = BagPath(bagInfo.externalIdentifier.toString)
                   )
                 ),
                 nextTopic
@@ -162,7 +162,7 @@ class ArchivistFeatureTest
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest1.storageSpace,
-                          bagPath = BagPath(bagInfo1.externalIdentifier)
+                          bagPath = BagPath(bagInfo1.externalIdentifier.toString)
                         )
                       ),
                       ArchiveComplete(
@@ -171,7 +171,7 @@ class ArchivistFeatureTest
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest2.storageSpace,
-                          bagPath = BagPath(bagInfo2.externalIdentifier)
+                          bagPath = BagPath(bagInfo2.externalIdentifier.toString)
                         )
                       )
                     ),
@@ -251,7 +251,7 @@ class ArchivistFeatureTest
                       storageNamespace = storageBucket.name,
                       storagePrefix = "archive",
                       storageSpace = validRequest1.storageSpace,
-                      bagPath = BagPath(bagInfo1.externalIdentifier)
+                      bagPath = BagPath(bagInfo1.externalIdentifier.toString)
                     )
                   ),
                   ArchiveComplete(
@@ -260,7 +260,7 @@ class ArchivistFeatureTest
                       storageNamespace = storageBucket.name,
                       storagePrefix = "archive",
                       storageSpace = validRequest2.storageSpace,
-                      bagPath = BagPath(bagInfo2.externalIdentifier)
+                      bagPath = BagPath(bagInfo2.externalIdentifier.toString)
                     )
                   )
                 ),
@@ -326,7 +326,7 @@ class ArchivistFeatureTest
                               storageNamespace = storageBucket.name,
                               storagePrefix = "archive",
                               storageSpace = validRequest1.storageSpace,
-                              bagPath = BagPath(bagInfo1.externalIdentifier)
+                              bagPath = BagPath(bagInfo1.externalIdentifier.toString)
                             )
                           ),
                           ArchiveComplete(
@@ -335,7 +335,7 @@ class ArchivistFeatureTest
                               storageNamespace = storageBucket.name,
                               storagePrefix = "archive",
                               storageSpace = validRequest2.storageSpace,
-                              bagPath = BagPath(bagInfo2.externalIdentifier)
+                              bagPath = BagPath(bagInfo2.externalIdentifier.toString)
                             )
                           )
                         ),
@@ -401,7 +401,7 @@ class ArchivistFeatureTest
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest1.storageSpace,
-                          bagPath = BagPath(bagInfo1.externalIdentifier)
+                          bagPath = BagPath(bagInfo1.externalIdentifier.toString)
                         )
                       ),
                       ArchiveComplete(
@@ -410,7 +410,7 @@ class ArchivistFeatureTest
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest2.storageSpace,
-                          bagPath = BagPath(bagInfo2.externalIdentifier)
+                          bagPath = BagPath(bagInfo2.externalIdentifier.toString)
                         )
                       )
                     ),

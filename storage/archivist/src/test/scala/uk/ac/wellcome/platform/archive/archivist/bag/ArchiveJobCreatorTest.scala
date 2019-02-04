@@ -40,7 +40,7 @@ class ArchiveJobCreatorTest
             storageNamespace = bucketName,
             storagePrefix = "archive",
             storageSpace = ingestRequest.storageSpace,
-            bagPath = BagPath(bagIdentifier)
+            bagPath = BagPath(bagIdentifier.toString)
           )
           bagItConfig shouldBe BagItConfig()
           bagManifestLocations should contain only (BagItemPath(

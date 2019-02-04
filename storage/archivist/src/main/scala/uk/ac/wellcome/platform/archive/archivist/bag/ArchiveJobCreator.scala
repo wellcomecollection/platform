@@ -31,7 +31,7 @@ object ArchiveJobCreator {
             storageNamespace = config.uploadConfig.uploadNamespace,
             storagePrefix = config.uploadConfig.uploadPrefix,
             storageSpace = ingestBagRequest.storageSpace,
-            bagPath = BagPath(externalIdentifier)
+            bagPath = BagPath(externalIdentifier.toString)
           ),
           config = config.bagItConfig,
           bagManifestLocations = config.bagItConfig.digestNames.map { BagItemPath(_) }

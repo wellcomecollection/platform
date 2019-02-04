@@ -41,6 +41,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
       )
     )
 
+  // todo
   def createArchiveJobWith(
     file: File,
     bagIdentifier: ExternalIdentifier = createExternalIdentifier,
@@ -50,7 +51,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
       storageNamespace = bucket.name,
       storagePrefix = "archive",
       storageSpace = randomStorageSpace,
-      bagPath = BagPath(bagIdentifier)
+      bagPath = BagPath(bagIdentifier.toString)
     )
 
     ArchiveJob(

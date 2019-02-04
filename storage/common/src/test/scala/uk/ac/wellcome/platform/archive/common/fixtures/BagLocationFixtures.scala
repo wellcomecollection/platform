@@ -31,7 +31,7 @@ trait BagLocationFixtures extends S3 with BagIt {
       storageNamespace = storageBucket.name,
       storagePrefix = storagePrefix,
       storageSpace = storageSpace,
-      bagPath = BagPath(bagIdentifier)
+      bagPath = BagPath(bagIdentifier.toString)
     )
 
     fileEntries.map((entry: FileEntry) => {
