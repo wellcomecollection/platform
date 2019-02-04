@@ -16,9 +16,3 @@ case class FuzzyWuzzy(
 ) {
   def completeFilepath = s"$storagePrefix/$storageSpace/$bagPath"
 }
-
-case class BagLocation(storageNamespace: String,
-                       storageRootPath: String,
-                       bagPath: BagPath) {
-  def bagPathInStorage = s"$storageRootPath/$bagPath"
-}
