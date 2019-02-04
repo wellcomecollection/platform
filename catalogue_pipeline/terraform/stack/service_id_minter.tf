@@ -12,8 +12,8 @@ module "id_minter_queue" {
   visibility_timeout_seconds = 60
   max_receive_count          = 5
 
-  aws_region = "${var.aws_region}"
-  account_id = "${var.account_id}"
+  aws_region    = "${var.aws_region}"
+  account_id    = "${var.account_id}"
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
@@ -26,11 +26,11 @@ module "id_minter" {
 
   service_name = "${var.namespace}_id_minter"
 
-  container_image   = "${local.id_minter_image}"
+  container_image = "${local.id_minter_image}"
 
   security_group_ids = [
     "${module.egress_security_group.sg_id}",
-    "${var.rds_ids_access_security_group_id}"
+    "${var.rds_ids_access_security_group_id}",
   ]
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
@@ -65,7 +65,7 @@ module "id_minter" {
 module "id_minter_topic" {
   source = "../modules/topic"
 
-  name = "${var.namespace}_id_minter"
+  name       = "${var.namespace}_id_minter"
   role_names = ["${module.id_minter.task_role_name}"]
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"

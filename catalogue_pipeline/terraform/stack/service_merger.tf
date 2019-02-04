@@ -5,15 +5,15 @@ module "merger_queue" {
 
   # Reads from merger
   topic_names = ["${module.matcher_topic.name}"]
-  role_names = ["${module.merger.task_role_name}"]
+  role_names  = ["${module.merger.task_role_name}"]
 
   namespace = "${var.namespace}_merger"
 
   visibility_timeout_seconds = 30
   max_receive_count          = 4
 
-  aws_region = "${var.aws_region}"
-  account_id = "${var.account_id}"
+  aws_region    = "${var.aws_region}"
+  account_id    = "${var.account_id}"
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
@@ -51,7 +51,7 @@ module "merger" {
 
   secret_env_vars_length = "0"
 
-  container_image   = "${local.merger_image}"
+  container_image = "${local.merger_image}"
 }
 
 # Permissions
@@ -66,7 +66,7 @@ resource "aws_iam_role_policy" "merger_vhs_recorder_read" {
 module "merger_topic" {
   source = "../modules/topic"
 
-  name = "${var.namespace}_merger"
+  name       = "${var.namespace}_merger"
   role_names = ["${module.merger.task_role_name}"]
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"

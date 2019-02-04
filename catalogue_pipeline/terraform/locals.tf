@@ -12,7 +12,7 @@ locals {
 
   miro_updates_topic_name = "${data.terraform_remote_state.shared_infra.miro_updates_topic_name}"
 
-  vhs_miro_read_policy    = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_read_policy}"
+  vhs_miro_read_policy = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_miro_read_policy}"
 
   rds_access_security_group_id = "${data.terraform_remote_state.catalogue_pipeline_data.rds_access_security_group_id}"
 

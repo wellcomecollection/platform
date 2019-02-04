@@ -30,9 +30,7 @@ def main(event=None, _ctxt=None, sns_client=None):
     public_bucket_name = os.environ["PUBLIC_BUCKET_NAME"]
     public_object_key_v2 = os.environ["PUBLIC_OBJECT_KEY_V2"]
 
-    for (api_version, public_object_key) in [
-        ("v2", public_object_key_v2),
-    ]:
+    for (api_version, public_object_key) in [("v2", public_object_key_v2)]:
         snapshot_request_message = SnapshotRequest(
             apiVersion=api_version,
             publicBucketName=public_bucket_name,

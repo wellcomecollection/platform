@@ -24,5 +24,5 @@ variable "env_vars_length" {}
 
 variable "security_group_ids" {
   default = []
-  type = "list"
+  type    = "list"
 }

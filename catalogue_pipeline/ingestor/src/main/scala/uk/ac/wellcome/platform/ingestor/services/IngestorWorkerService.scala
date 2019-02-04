@@ -14,12 +14,13 @@ import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 import scala.concurrent.{ExecutionContext, Future}
 
 class IngestorWorkerService(
-                             elasticClient: ElasticClient,
-                             ingestorConfig: IngestorConfig,
-                             messageStream: MessageStream[IdentifiedBaseWork]
-                           )(implicit
-                             ec: ExecutionContext
-                           ) extends Runnable with Logging {
+  elasticClient: ElasticClient,
+  ingestorConfig: IngestorConfig,
+  messageStream: MessageStream[IdentifiedBaseWork]
+)(implicit
+  ec: ExecutionContext)
+    extends Runnable
+    with Logging {
 
   type FutureBundles = Future[List[Bundle]]
   case class Bundle(message: Message, work: IdentifiedBaseWork)
@@ -48,21 +49,24 @@ class IngestorWorkerService(
     }
 
   private def runStream(): Future[Done] = {
-    messageStream.runStream(className, _
-        .map { case (msg, work) => Bundle(msg, work) }
+    messageStream.runStream(
+      className,
+      _.map { case (msg, work) => Bundle(msg, work) }
         .groupedWithin(
-          ingestorConfig.batchSize, 
+          ingestorConfig.batchSize,
           ingestorConfig.flushInterval
         )
         .mapAsyncUnordered(10) { msgs =>
-          for {bundles <- processMessages(msgs.toList)}
-            yield bundles.map(_.message)
-        }.mapConcat(identity)
+          for { bundles <- processMessages(msgs.toList) } yield
+            bundles.map(_.message)
+        }
+        .mapConcat(identity)
     )
   }
 
-  def run(): Future[Done] = for {
-    _ <- indexCreated
-    result <- runStream()
-  } yield result
+  def run(): Future[Done] =
+    for {
+      _ <- indexCreated
+      result <- runStream()
+    } yield result
 }

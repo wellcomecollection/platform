@@ -4,15 +4,15 @@ module "ingestor_queue" {
   source = "../modules/queue"
 
   topic_names = ["${module.id_minter_topic.name}"]
-  role_names = ["${module.ingestor.task_role_name}"]
+  role_names  = ["${module.ingestor.task_role_name}"]
 
   namespace = "${var.namespace}_ingestor"
 
   visibility_timeout_seconds = 30
   max_receive_count          = 6
 
-  aws_region = "${var.aws_region}"
-  account_id = "${var.account_id}"
+  aws_region    = "${var.aws_region}"
+  account_id    = "${var.account_id}"
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
@@ -25,7 +25,7 @@ module "ingestor" {
 
   service_name = "${var.namespace}_ingestor"
 
-  container_image   = "${local.ingestor_image}"
+  container_image = "${local.ingestor_image}"
 
   security_group_ids = [
     "${module.egress_security_group.sg_id}",
@@ -38,9 +38,9 @@ module "ingestor" {
   aws_region   = "${var.aws_region}"
 
   env_vars = {
-    metrics_namespace    = "${var.namespace}_ingestor"
-    es_index             = "${var.es_works_index}"
-    ingest_queue_id      = "${module.ingestor_queue.url}"
+    metrics_namespace = "${var.namespace}_ingestor"
+    es_index          = "${var.es_works_index}"
+    ingest_queue_id   = "${module.ingestor_queue.url}"
   }
 
   env_vars_length = 4

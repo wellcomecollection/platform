@@ -12,7 +12,7 @@ module "queue" {
 }
 
 resource "aws_sns_topic_subscription" "sns_topic" {
-  count     = "${length(var.topic_names)}"
+  count = "${length(var.topic_names)}"
 
   protocol  = "sqs"
   topic_arn = "${format("arn:aws:sns:%s:%s:%s", var.aws_region, var.account_id, element(var.topic_names, count.index))}"

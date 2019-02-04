@@ -4,7 +4,7 @@ module "matcher_queue" {
   source = "../modules/queue"
 
   topic_names = ["${module.recorder_topic.name}"]
-  role_names = ["${module.matcher.task_role_name}"]
+  role_names  = ["${module.matcher.task_role_name}"]
 
   namespace = "${var.namespace}_matcher"
 
@@ -15,8 +15,8 @@ module "matcher_queue" {
 
   max_receive_count = 5
 
-  aws_region = "${var.aws_region}"
-  account_id = "${var.account_id}"
+  aws_region    = "${var.aws_region}"
+  account_id    = "${var.account_id}"
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
@@ -39,10 +39,10 @@ module "matcher" {
   aws_region   = "${var.aws_region}"
 
   env_vars = {
-    queue_url               = "${module.matcher_queue.url}"
-    metrics_namespace       = "${var.namespace}_matcher"
-    vhs_bucket_name         = "${module.vhs_recorder.bucket_name}"
-    topic_arn               = "${module.matcher_topic.arn}"
+    queue_url         = "${module.matcher_queue.url}"
+    metrics_namespace = "${var.namespace}_matcher"
+    vhs_bucket_name   = "${module.vhs_recorder.bucket_name}"
+    topic_arn         = "${module.matcher_topic.arn}"
 
     dynamo_table            = "${aws_dynamodb_table.matcher_graph_table.id}"
     dynamo_index            = "work-sets-index"
@@ -56,7 +56,7 @@ module "matcher" {
 
   secret_env_vars_length = "0"
 
-  container_image   = "${local.matcher_image}"
+  container_image = "${local.matcher_image}"
 }
 
 # Permissions
@@ -81,7 +81,7 @@ resource "aws_iam_role_policy" "matcher_lock_readwrite" {
 module "matcher_topic" {
   source = "../modules/topic"
 
-  name = "${var.namespace}_matcher"
+  name       = "${var.namespace}_matcher"
   role_names = ["${module.matcher.task_role_name}"]
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"

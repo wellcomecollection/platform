@@ -12,8 +12,8 @@ module "sierra_transformer_queue" {
   visibility_timeout_seconds = 30
   max_receive_count          = 3
 
-  aws_region = "${var.aws_region}"
-  account_id = "${var.account_id}"
+  aws_region    = "${var.aws_region}"
+  account_id    = "${var.account_id}"
   dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"
@@ -49,7 +49,7 @@ module "sierra_transformer" {
   secret_env_vars        = {}
   secret_env_vars_length = "0"
 
-  subnets = ["${var.subnets}"]
+  subnets    = ["${var.subnets}"]
   aws_region = "${var.aws_region}"
 }
 
@@ -65,7 +65,7 @@ resource "aws_iam_role_policy" "sierra_transformer_vhs_sierra_adapter_read" {
 module "sierra_transformer_topic" {
   source = "../modules/topic"
 
-  name = "${var.namespace}_sierra_transformer"
+  name       = "${var.namespace}_sierra_transformer"
   role_names = ["${module.sierra_transformer.task_role_name}"]
 
   messages_bucket_arn = "${aws_s3_bucket.messages.arn}"

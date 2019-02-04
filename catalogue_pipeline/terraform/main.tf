@@ -27,7 +27,6 @@ module "catalogue_pipeline_20190201" {
     "${local.sierra_merged_bibs_topic_name}",
     "${local.sierra_merged_items_topic_name}",
   ]
-
   miro_adapter_topic_names = [
     "${local.miro_reindexer_topic_name}",
     "${local.miro_updates_topic_name}",
@@ -36,5 +35,5 @@ module "catalogue_pipeline_20190201" {
   # Adapter VHS
 
   vhs_sierra_read_policy = "${local.vhs_sierra_read_policy}"
-  vhs_miro_read_policy = "${local.vhs_miro_read_policy}"
+  vhs_miro_read_policy   = "${local.vhs_miro_read_policy}"
 }

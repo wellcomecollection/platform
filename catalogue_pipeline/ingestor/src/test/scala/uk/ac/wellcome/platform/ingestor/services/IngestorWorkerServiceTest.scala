@@ -18,7 +18,7 @@ import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class IngestorWorkerServiceTest
-  extends FunSpec
+    extends FunSpec
     with ScalaFutures
     with Matchers
     with Messaging
@@ -137,7 +137,6 @@ class IngestorWorkerServiceTest
               queue = queue,
               metricsSender = metricsSender
             ) { messageStream =>
-
               import scala.concurrent.duration._
 
               val brokenRestClient: RestClient = RestClient
@@ -149,9 +148,7 @@ class IngestorWorkerServiceTest
                   )
                 )
                 .setHttpClientConfigCallback(
-                  new ElasticCredentials(
-                    "elastic",
-                    "changeme")
+                  new ElasticCredentials("elastic", "changeme")
                 )
                 .build()
 
@@ -181,7 +178,7 @@ class IngestorWorkerServiceTest
   }
 
   private def assertWorksIndexedCorrectly(
-                                           works: IdentifiedBaseWork*): Assertion =
+    works: IdentifiedBaseWork*): Assertion =
     withLocalWorksIndex { index =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>

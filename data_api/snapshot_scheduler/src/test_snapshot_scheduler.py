@@ -36,5 +36,5 @@ def test_writes_message_to_sqs(sns_client, topic_arn):
             "publicBucketName": public_bucket_name,
             "publicObjectKey": public_object_key_v2,
             "apiVersion": "v2",
-        },
+        }
     ]
