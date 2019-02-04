@@ -1,26 +1,18 @@
 package uk.ac.wellcome.platform.archive.common.generators
 
-import java.net.URI
-import java.util.UUID
-
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  StorageSpace
-}
+import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.storage.ObjectLocation
 
 trait IngestBagRequestGenerators extends RandomThings {
   def createIngestBagRequest: IngestBagRequest = createIngestBagRequestWith()
 
-  def createIngestBagRequestWith(requestId: UUID = randomUUID,
-                                 ingestBagLocation: ObjectLocation =
-                                   ObjectLocation("testNamespace", "testKey"),
-                                 callbackUri: Option[URI] = None) =
+  def createIngestBagRequestWith(
+    ingestBagLocation: ObjectLocation = ObjectLocation("testNamespace", "testKey")) =
     IngestBagRequest(
-      requestId,
-      ingestBagLocation,
-      callbackUri,
-      // TODO: Don't hard code a value here!
-      StorageSpace("fake"))
+      id = randomUUID,
+      zippedBagLocation = ingestBagLocation,
+      archiveCompleteCallbackUrl = None,
+      storageSpace = randomStorageSpace
+    )
 }

@@ -48,7 +48,7 @@ class ArchiveZipFileFlowTest
           val bagInfo = randomBagInfo
           withBagItZip(bagInfo) { zipFile =>
             withArchiveZipFileFlow(storageBucket, reportingTopic) { uploader =>
-              val ingestContext = createIngestBagRequestWith()
+              val ingestContext = createIngestBagRequest
               val (_, verification) =
                 uploader.runWith(
                   Source.single(
