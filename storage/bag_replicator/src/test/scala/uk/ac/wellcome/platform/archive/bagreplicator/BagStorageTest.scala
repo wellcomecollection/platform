@@ -5,15 +5,9 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
-  BagStorage,
-  S3Copier
-}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.{BagStorage, S3Copier}
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagLocation,
-  ExternalIdentifier
-}
+import uk.ac.wellcome.platform.archive.common.models.{ExternalIdentifier, FuzzyWuzzy}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,7 +27,8 @@ class BagStorageTest
         withBag(
           storageBucket = sourceBucket,
           bagInfo = randomBagInfo
-        ) { bagSource: BagLocation =>
+        ) { bagLocation: FuzzyWuzzy =>
+          // TODO: Move these implicits to the top level
           implicit val _s3Client = s3Client
           implicit val _s3Copier = S3Copier()
 
@@ -44,14 +39,14 @@ class BagStorageTest
 
           val result: Future[List[CopyResult]] =
             BagStorage.duplicateBag(
-              bagSource,
-              destinationLocation
+              sourceBagLocation = bagLocation,
+              storageDestination = destinationLocation
             )
 
           whenReady(result) { _ =>
             verifyBagCopied(
-              bagSource,
-              destinationLocation
+              sourceLocation = bagLocation,
+              storageDestination = destinationLocation
             )
           }
         }
@@ -69,7 +64,7 @@ class BagStorageTest
             bagInfo = randomBagInfo.copy(
               externalIdentifier = ExternalIdentifier("prefix")
             )
-          ) { bagSource: BagLocation =>
+          ) { bagLocation: FuzzyWuzzy =>
             withBag(
               storageBucket = sourceBucket,
               bagInfo = randomBagInfo.copy(
@@ -86,14 +81,14 @@ class BagStorageTest
 
               val result: Future[List[CopyResult]] =
                 BagStorage.duplicateBag(
-                  bagSource,
-                  destinationLocation
+                  sourceBagLocation = bagLocation,
+                  storageDestination = destinationLocation
                 )
 
               whenReady(result) { _ =>
                 verifyBagCopied(
-                  bagSource,
-                  destinationLocation
+                  sourceLocation = bagLocation,
+                  storageDestination = destinationLocation
                 )
               }
             }

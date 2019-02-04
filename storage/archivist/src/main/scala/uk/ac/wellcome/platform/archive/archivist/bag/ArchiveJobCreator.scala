@@ -26,11 +26,11 @@ object ArchiveJobCreator {
         ArchiveJob(
           externalIdentifier,
           zipFile,
-          BagLocation(
+          FuzzyWuzzy(
             storageNamespace = config.uploadConfig.uploadNamespace,
-            storageRootPath = config.uploadConfig.uploadPrefix,
-            bagPath =
-              BagPath(s"${ingestBagRequest.storageSpace}/$externalIdentifier")
+            storagePrefix = config.uploadConfig.uploadPrefix,
+            storageSpace = ingestBagRequest.storageSpace,
+            bagPath = BagPath(externalIdentifier)
           ),
           config = config.bagItConfig,
           bagManifestLocations = BagManifestLocation.create(config.bagItConfig)

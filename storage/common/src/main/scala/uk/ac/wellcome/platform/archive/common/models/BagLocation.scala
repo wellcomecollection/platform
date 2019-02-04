@@ -11,9 +11,11 @@ package uk.ac.wellcome.platform.archive.common.models
 case class FuzzyWuzzy(
   storageNamespace: String,
   storagePrefix: String,
-  storageSpace: String,
-  bagPath: String
-)
+  storageSpace: StorageSpace,
+  bagPath: BagPath
+) {
+  def completeFilepath = s"$storagePrefix/$storageSpace/$bagPath"
+}
 
 case class BagLocation(storageNamespace: String,
                        storageRootPath: String,

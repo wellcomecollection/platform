@@ -31,7 +31,6 @@ class ArchivistFeatureTest
         createAndSendBag(ingestBucket, queuePair, bagInfo = bagInfo) {
           request =>
             eventually {
-
               val archivedObjects = listKeysInBucket(storageBucket)
               archivedObjects should have size 16
               val archivedObjectNames = archivedObjects.map(_.split("/").last)
@@ -46,13 +45,13 @@ class ArchivistFeatureTest
 
               assertSnsReceivesOnly(
                 ArchiveComplete(
-                  request.id,
-                  request.storageSpace,
-                  BagLocation(
-                    storageBucket.name,
-                    "archive",
-                    BagPath(
-                      s"${request.storageSpace}/${bagInfo.externalIdentifier}"))
+                  archiveRequestId = request.id,
+                  bagLocation = FuzzyWuzzy(
+                    storageNamespace = storageBucket.name,
+                    storagePrefix = "archive",
+                    storageSpace = request.storageSpace,
+                    bagPath = BagPath(bagInfo.externalIdentifier)
+                  )
                 ),
                 nextTopic
               )
@@ -157,22 +156,22 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       ArchiveComplete(
-                        validRequest1.id,
-                        validRequest1.storageSpace,
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(
-                            s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
+                        archiveRequestId = validRequest1.id,
+                        bagLocation = FuzzyWuzzy(
+                          storageNamespace = storageBucket.name,
+                          storagePrefix = "archive",
+                          storageSpace = validRequest1.storageSpace,
+                          bagPath = BagPath(bagInfo1.externalIdentifier)
+                        )
                       ),
                       ArchiveComplete(
-                        validRequest2.id,
-                        validRequest2.storageSpace,
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(
-                            s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
+                        archiveRequestId = validRequest2.id,
+                        bagLocation = FuzzyWuzzy(
+                          storageNamespace = storageBucket.name,
+                          storagePrefix = "archive",
+                          storageSpace = validRequest2.storageSpace,
+                          bagPath = BagPath(bagInfo2.externalIdentifier)
+                        )
                       )
                     ),
                     nextTopic
@@ -246,22 +245,22 @@ class ArchivistFeatureTest
               assertSnsReceives(
                 Set(
                   ArchiveComplete(
-                    validRequest1.id,
-                    validRequest1.storageSpace,
-                    BagLocation(
-                      storageBucket.name,
-                      "archive",
-                      BagPath(
-                        s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
+                    archiveRequestId = validRequest1.id,
+                    bagLocation = FuzzyWuzzy(
+                      storageNamespace = storageBucket.name,
+                      storagePrefix = "archive",
+                      storageSpace = validRequest1.storageSpace,
+                      bagPath = BagPath(bagInfo1.externalIdentifier)
+                    )
                   ),
                   ArchiveComplete(
-                    validRequest2.id,
-                    validRequest2.storageSpace,
-                    BagLocation(
-                      storageBucket.name,
-                      "archive",
-                      BagPath(
-                        s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
+                    archiveRequestId = validRequest2.id,
+                    bagLocation = FuzzyWuzzy(
+                      storageNamespace = storageBucket.name,
+                      storagePrefix = "archive",
+                      storageSpace = validRequest2.storageSpace,
+                      bagPath = BagPath(bagInfo2.externalIdentifier)
+                    )
                   )
                 ),
                 nextTopic
@@ -321,22 +320,22 @@ class ArchivistFeatureTest
                       assertSnsReceives(
                         Set(
                           ArchiveComplete(
-                            validRequest1.id,
-                            validRequest2.storageSpace,
-                            BagLocation(
-                              storageBucket.name,
-                              "archive",
-                              BagPath(
-                                s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
+                            archiveRequestId = validRequest1.id,
+                            bagLocation = FuzzyWuzzy(
+                              storageNamespace = storageBucket.name,
+                              storagePrefix = "archive",
+                              storageSpace = validRequest1.storageSpace,
+                              bagPath = BagPath(bagInfo1.externalIdentifier)
+                            )
                           ),
                           ArchiveComplete(
-                            validRequest2.id,
-                            validRequest2.storageSpace,
-                            BagLocation(
-                              storageBucket.name,
-                              "archive",
-                              BagPath(
-                                s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
+                            archiveRequestId = validRequest2.id,
+                            bagLocation = FuzzyWuzzy(
+                              storageNamespace = storageBucket.name,
+                              storagePrefix = "archive",
+                              storageSpace = validRequest2.storageSpace,
+                              bagPath = BagPath(bagInfo2.externalIdentifier)
+                            )
                           )
                         ),
                         nextTopic
@@ -396,22 +395,22 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       ArchiveComplete(
-                        validRequest1.id,
-                        validRequest2.storageSpace,
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(
-                            s"${validRequest1.storageSpace}/${bagInfo1.externalIdentifier}"))
+                        archiveRequestId = validRequest1.id,
+                        bagLocation = FuzzyWuzzy(
+                          storageNamespace = storageBucket.name,
+                          storagePrefix = "archive",
+                          storageSpace = validRequest1.storageSpace,
+                          bagPath = BagPath(bagInfo1.externalIdentifier)
+                        )
                       ),
                       ArchiveComplete(
-                        validRequest2.id,
-                        validRequest2.storageSpace,
-                        BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(
-                            s"${validRequest2.storageSpace}/${bagInfo2.externalIdentifier}"))
+                        archiveRequestId = validRequest2.id,
+                        bagLocation = FuzzyWuzzy(
+                          storageNamespace = storageBucket.name,
+                          storagePrefix = "archive",
+                          storageSpace = validRequest2.storageSpace,
+                          bagPath = BagPath(bagInfo2.externalIdentifier)
+                        )
                       )
                     ),
                     nextTopic

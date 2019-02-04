@@ -5,23 +5,10 @@ import java.time.Instant
 
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
-import uk.ac.wellcome.platform.archive.common.bag.{
-  BagDigestFileCreator,
-  BagInfoParser
-}
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  DownloadError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagDigestFile,
-  BagLocation
-}
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  InfrequentAccessStorageProvider,
-  StorageLocation
-}
+import uk.ac.wellcome.platform.archive.common.bag.{BagDigestFileCreator, BagInfoParser}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagDigestFile, FuzzyWuzzy}
+import uk.ac.wellcome.platform.archive.common.progress.models.{InfrequentAccessStorageProvider, StorageLocation}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -92,13 +79,9 @@ object StorageManifestFactory {
       .leftMap(ex => DownloadError(ex, location, archiveComplete))
   }
 
-  private def getFileObjectLocation(bagLocation: BagLocation, name: String) =
+  private def getFileObjectLocation(bagLocation: FuzzyWuzzy, name: String) =
     ObjectLocation(
-      bagLocation.storageNamespace,
-      List(
-        bagLocation.storageRootPath,
-        bagLocation.bagPath.value,
-        name
-      ).mkString("/")
+      namespace = bagLocation.storageNamespace,
+      key = List(bagLocation.completeFilepath, name).mkString("/")
     )
 }

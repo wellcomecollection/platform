@@ -44,9 +44,13 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
     bagIdentifier: ExternalIdentifier = createExternalIdentifier,
     bucket: Bucket
   ): ArchiveJob = {
-    val bagPath = BagPath(s"space/$bagIdentifier")
+    val bagLocation = FuzzyWuzzy(
+      storageNamespace = bucket.name,
+      storagePrefix = "archive",
+      storageSpace = randomStorageSpace,
+      bagPath = BagPath(bagIdentifier)
+    )
 
-    val bagLocation = BagLocation(bucket.name, "archive", bagPath)
     ArchiveJob(
       externalIdentifier = bagIdentifier,
       zipFile = new ZipFile(file),

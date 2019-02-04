@@ -9,17 +9,8 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.bagreplicator.BagReplicator
 import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  ArchiveMessaging,
-  BagLocationFixtures,
-  RandomThings
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagInfo,
-  BagLocation,
-  StorageSpace
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagLocationFixtures, RandomThings}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -35,12 +26,12 @@ trait BagReplicatorFixtures
     with ArchiveMessaging {
 
   def verifyBagCopied(
-    sourceLocation: BagLocation,
+    sourceLocation: FuzzyWuzzy,
     storageDestination: StorageLocation
   ) = {
     val sourceItems = s3Client.listObjects(
       sourceLocation.storageNamespace,
-      sourceLocation.bagPathInStorage)
+      sourceLocation.completeFilepath)
 
     val sourceKeyEtags =
       sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
@@ -67,11 +58,10 @@ trait BagReplicatorFixtures
     archiveRequestId: UUID = randomUUID,
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
-  )(testWith: TestWith[BagLocation, R]): R =
-    withBag(storageBucket, bagInfo = bagInfo) { bagLocation =>
+  )(testWith: TestWith[FuzzyWuzzy, R]): R =
+    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) { bagLocation =>
       val archiveComplete = ArchiveComplete(
         archiveRequestId = archiveRequestId,
-        space = storageSpace,
         bagLocation = bagLocation
       )
 

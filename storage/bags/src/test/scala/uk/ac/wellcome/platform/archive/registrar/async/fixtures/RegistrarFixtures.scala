@@ -7,16 +7,8 @@ import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  ArchiveMessaging,
-  BagLocationFixtures
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagInfo,
-  BagLocation,
-  StorageSpace
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagLocationFixtures}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -39,11 +31,10 @@ trait RegistrarFixtures
     archiveRequestId: UUID = randomUUID,
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
-  )(testWith: TestWith[BagLocation, R]): R =
-    withBag(storageBucket, bagInfo = bagInfo) { bagLocation =>
+  )(testWith: TestWith[FuzzyWuzzy, R]): R =
+    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) { bagLocation =>
       val archiveComplete = ArchiveComplete(
         archiveRequestId = archiveRequestId,
-        space = storageSpace,
         bagLocation = bagLocation
       )
 

@@ -3,11 +3,9 @@ package uk.ac.wellcome.platform.archive.bagreplicator.storage
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{ObjectListing, S3ObjectSummary}
 import com.amazonaws.services.s3.transfer.model.CopyResult
-
 import grizzled.slf4j.Logging
-
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
-import uk.ac.wellcome.platform.archive.common.models.BagLocation
+import uk.ac.wellcome.platform.archive.common.models.FuzzyWuzzy
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -15,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 object BagStorage extends Logging {
 
   def duplicateBag(
-    sourceBagLocation: BagLocation,
+    sourceBagLocation: FuzzyWuzzy,
     storageDestination: StorageLocation
   )(implicit
     s3Client: AmazonS3,
@@ -43,11 +41,11 @@ object BagStorage extends Logging {
 
   private def listObjects(
     s3Client: AmazonS3,
-    bagLocation: BagLocation
+    bagLocation: FuzzyWuzzy
   )(implicit
     ctx: ExecutionContext): Future[ObjectListing] = Future {
 
-    val absolutePathInStorage = bagLocation.bagPathInStorage
+    val absolutePathInStorage = bagLocation.completeFilepath
       .replaceAll("(.*[^/]+)/*", "$1/")
 
     s3Client.listObjects(
@@ -65,10 +63,10 @@ object BagStorage extends Logging {
 
   private def getObjectSummaries(
     listing: ObjectListing,
-    bagLocation: BagLocation
+    bagLocation: FuzzyWuzzy
   )(implicit
     ctx: ExecutionContext): Future[List[BagItemLocation]] = Future {
-    val prefix = s"${bagLocation.bagPathInStorage}/"
+    val prefix = s"${bagLocation.completeFilepath}/"
 
     listing.getObjectSummaries.asScala
       .map(getItemInPath(_, prefix))
@@ -77,7 +75,7 @@ object BagStorage extends Logging {
   }
 
   private def listBagItems(
-    location: BagLocation
+    location: FuzzyWuzzy
   )(implicit
     s3Client: AmazonS3,
     ctx: ExecutionContext): Future[List[BagItemLocation]] = {
@@ -116,7 +114,7 @@ object BagStorage extends Logging {
 
     val sourceNamespace = sourceBagItem.bagLocation.storageNamespace
     val sourceItemKey = List(
-      sourceBagItem.bagLocation.bagPathInStorage,
+      sourceBagItem.bagLocation.completeFilepath,
       sourceBagItem.itemPath
     ).mkString("/")
 

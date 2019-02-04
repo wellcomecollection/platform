@@ -13,23 +13,11 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveJobError,
-  ChecksumNotMatchedOnUploadError,
-  FileNotFoundError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, ChecksumNotMatchedOnUploadError, FileNotFoundError}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  InvalidBagManifestError
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation,
-  BagPath,
-  FileDownloadComplete
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -73,13 +61,13 @@ class ArchiveZipFileFlowTest
               whenReady(verification) { result =>
                 listKeysInBucket(storageBucket) should have size 5
                 result shouldBe List(Right(ArchiveComplete(
-                  ingestContext.id,
-                  ingestContext.storageSpace,
-                  BagLocation(
-                    storageBucket.name,
-                    "archive",
-                    BagPath(
-                      s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
+                  archiveRequestId = ingestContext.id,
+                  bagLocation = FuzzyWuzzy(
+                    storageNamespace = storageBucket.name,
+                    storagePrefix = "archive",
+                    storageSpace = ingestContext.storageSpace,
+                    bagPath = BagPath(bagInfo.externalIdentifier)
+                  )
                 )))
 
                 assertTopicReceivesProgressEventUpdate(
@@ -210,11 +198,12 @@ class ArchiveZipFileFlowTest
                         archiveJob shouldBe a[ArchiveJob]
                         archiveJob
                           .asInstanceOf[ArchiveJob]
-                          .bagLocation shouldBe BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(
-                            s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
+                          .bagLocation shouldBe FuzzyWuzzy(
+                            storageNamespace = storageBucket.name,
+                            storagePrefix = "archive",
+                            storageSpace = ingestContext.storageSpace,
+                            bagPath = BagPath(bagInfo.externalIdentifier)
+                          )
                     }
 
                     assertTopicReceivesProgressStatusUpdate(

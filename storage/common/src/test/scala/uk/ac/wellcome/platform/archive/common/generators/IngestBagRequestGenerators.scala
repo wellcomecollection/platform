@@ -21,5 +21,6 @@ trait IngestBagRequestGenerators extends RandomThings {
       requestId,
       ingestBagLocation,
       callbackUri,
+      // TODO: Don't hard code a value here!
       StorageSpace("fake"))
 }
