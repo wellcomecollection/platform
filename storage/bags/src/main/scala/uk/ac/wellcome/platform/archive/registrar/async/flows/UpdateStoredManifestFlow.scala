@@ -26,10 +26,10 @@ object UpdateStoredManifestFlow {
       .map {
         case (requestId, bagId) =>
           ProgressStatusUpdate(
-            requestId,
-            Progress.Completed,
-            Some(bagId),
-            List(ProgressEvent("Bag registered successfully"))
+            id = requestId,
+            status = Progress.Completed,
+            affectedBag = Some(bagId),
+            events = List(ProgressEvent("Bag registered successfully"))
           )
       }
       .via(

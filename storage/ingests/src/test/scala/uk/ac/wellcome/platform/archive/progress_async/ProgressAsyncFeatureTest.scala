@@ -28,12 +28,10 @@ class ProgressAsyncFeatureTest
 
         withProgressTracker(table) { monitor =>
           withProgress(monitor) { progress =>
-            val someBagId = Some(randomBagId)
-            val progressStatusUpdate =
-              createProgressStatusUpdateWith(
-                id = progress.id,
-                status = Completed,
-                maybeBag = someBagId)
+            val progressStatusUpdate = createProgressStatusUpdateWith(
+              id = progress.id,
+              status = Completed
+            )
 
             sendNotificationToSQS(qPair.queue, progressStatusUpdate)
 
@@ -46,7 +44,7 @@ class ProgressAsyncFeatureTest
               val expectedProgress = progress.copy(
                 status = Completed,
                 events = progressStatusUpdate.events,
-                bag = someBagId
+                bag = progressStatusUpdate.affectedBag
               )
               actualMessage.payload shouldBe expectedProgress
 

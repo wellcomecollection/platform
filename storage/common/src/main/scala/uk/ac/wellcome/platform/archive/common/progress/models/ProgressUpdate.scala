@@ -10,13 +10,11 @@ sealed trait ProgressUpdate {
   val events: Seq[ProgressEvent]
 }
 object ProgressUpdate {
-
   def failed[T](id: UUID, error: ArchiveError[T]) =
     ProgressStatusUpdate(
-      id,
-      Progress.Failed,
-      None,
-      List(ProgressEvent(error.toString))
+      id = id,
+      status = Progress.Failed,
+      events = List(ProgressEvent(error.toString))
     )
 
   def event(id: UUID, description: String) =
@@ -31,7 +29,7 @@ case class ProgressEventUpdate(id: UUID, events: Seq[ProgressEvent])
 
 case class ProgressStatusUpdate(id: UUID,
                                 status: Progress.Status,
-                                affectedBag: Option[BagId],
+                                affectedBag: Option[BagId] = None,
                                 events: Seq[ProgressEvent] = List.empty)
     extends ProgressUpdate
 

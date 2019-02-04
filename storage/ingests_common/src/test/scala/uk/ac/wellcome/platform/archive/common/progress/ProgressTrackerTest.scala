@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.progress
 
 import java.time.Instant
+import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, PutItemRequest, UpdateItemRequest}
@@ -9,7 +10,9 @@ import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
+import uk.ac.wellcome.platform.archive.common.models.BagId
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.common.progress.monitor.IdConstraintError
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
@@ -129,12 +132,8 @@ class ProgressTrackerTest
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
-            val bagId = createBagId
-
-            val progressUpdate = ProgressStatusUpdate(
-              progress.id,
-              Progress.Processing,
-              Some(bagId)
+            val progressUpdate = createProgressBagUpdateWith(
+              id = progress.id
             )
 
             progressTracker.update(progressUpdate)
@@ -146,7 +145,7 @@ class ProgressTrackerTest
             storedProgress.events.map(_.description) should contain theSameElementsAs progressUpdate.events.map(_.description)
             storedProgress.events.foreach(event => assertRecent(event.createdDate))
 
-            storedProgress.bag shouldBe Some(bagId)
+            storedProgress.bag shouldBe progressUpdate.affectedBag
           }
         }
       }
@@ -176,12 +175,9 @@ class ProgressTrackerTest
       withProgressTrackerTable { table =>
         withProgressTracker(table) { progressTracker =>
           whenReady(progressTracker.initialise(createProgress)) { progress =>
-            val someBagId = Some(randomBagId)
-            val progressUpdate = ProgressStatusUpdate(
-              progress.id,
-              Progress.Completed,
-              affectedBag = someBagId,
-              List(createProgressEvent)
+            val progressUpdate = createProgressStatusUpdateWith(
+              id = progress.id,
+              status = Progress.Completed
             )
 
             progressTracker.update(progressUpdate)
@@ -189,7 +185,7 @@ class ProgressTrackerTest
             val actualProgress = assertProgressCreated(progress, table)
 
             actualProgress.status shouldBe Progress.Completed
-            actualProgress.bag shouldBe someBagId
+            actualProgress.bag shouldBe progressUpdate.affectedBag
 
             assertProgressRecordedRecentEvents(
               progressUpdate.id,
@@ -348,4 +344,11 @@ class ProgressTrackerTest
       }
     }
   }
+
+  private def createProgressBagUpdateWith(id: UUID, bagId: BagId = createBagId): ProgressStatusUpdate =
+    createProgressStatusUpdateWith(
+      id = id,
+      maybeBag = Some(bagId),
+      status = Progress.Processing
+    )
 }
