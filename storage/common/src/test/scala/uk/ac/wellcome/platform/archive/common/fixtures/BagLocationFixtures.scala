@@ -38,7 +38,7 @@ trait BagLocationFixtures extends S3 with BagIt {
       s3Client
         .putObject(
           bagLocation.storageNamespace,
-          s"${bagLocation.completeFilepath}/${entry.name}",
+          s"${bagLocation.completePath}/${entry.name}",
           entry.contents
         )
     })

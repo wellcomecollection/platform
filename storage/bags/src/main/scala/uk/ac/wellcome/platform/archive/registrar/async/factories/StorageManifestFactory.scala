@@ -33,15 +33,13 @@ object StorageManifestFactory {
     } yield {
       val checksumAlgorithm = ChecksumAlgorithm(algorithm)
       StorageManifest(
-        space = archiveComplete.space,
+        space = archiveComplete.bagLocation.storageSpace,
         info = bagInfo,
         manifest = FileManifest(checksumAlgorithm, manifestTuples),
         tagManifest = FileManifest(checksumAlgorithm, tagManifestTuples),
         accessLocation = StorageLocation(
-          InfrequentAccessStorageProvider,
-          ObjectLocation(
-            archiveComplete.bagLocation.storageNamespace,
-            s"${archiveComplete.bagLocation.storageRootPath}/${archiveComplete.bagLocation.bagPath.value}")
+          provider = InfrequentAccessStorageProvider,
+          location = archiveComplete.bagLocation.objectLocation
         ),
         createdDate = Instant.now()
       )
@@ -83,6 +81,6 @@ object StorageManifestFactory {
   private def getFileObjectLocation(bagLocation: BagLocation, name: String) =
     ObjectLocation(
       namespace = bagLocation.storageNamespace,
-      key = List(bagLocation.completeFilepath, name).mkString("/")
+      key = List(bagLocation.completePath, name).mkString("/")
     )
 }

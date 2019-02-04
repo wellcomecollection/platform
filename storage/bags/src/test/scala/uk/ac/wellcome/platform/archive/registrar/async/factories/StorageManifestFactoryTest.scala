@@ -5,7 +5,6 @@ import org.scalatest.{FunSpec, Inside}
 import uk.ac.wellcome.platform.archive.common.fixtures.{BagLocationFixtures, FileEntry, RandomThings}
 import uk.ac.wellcome.platform.archive.common.generators.ArchiveCompleteGenerators
 import uk.ac.wellcome.platform.archive.common.models.bagit
-import uk.ac.wellcome.platform.archive.common.models.bagit.BagLocation
 import uk.ac.wellcome.platform.archive.common.models.error.{DownloadError, InvalidBagManifestError}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 
@@ -43,7 +42,7 @@ class StorageManifestFactoryTest
             actualBagInfo shouldBe bagInfo
             bagDigestFiles should have size 1
             tagManifestDigestFiles should have size 3
-            tagManifestDigestFiles.map(_.path.value) should contain theSameElementsAs List(
+            tagManifestDigestFiles.map { _.path.toString } should contain theSameElementsAs List(
               "manifest-sha256.txt",
               "bag-info.txt",
               "bagit.txt")

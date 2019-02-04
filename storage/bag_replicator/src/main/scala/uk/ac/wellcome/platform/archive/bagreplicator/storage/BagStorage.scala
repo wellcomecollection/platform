@@ -45,7 +45,7 @@ object BagStorage extends Logging {
   )(implicit
     ctx: ExecutionContext): Future[ObjectListing] = Future {
 
-    val absolutePathInStorage = bagLocation.completeFilepath
+    val absolutePathInStorage = bagLocation.completePath
       .replaceAll("(.*[^/]+)/*", "$1/")
 
     s3Client.listObjects(
@@ -66,7 +66,7 @@ object BagStorage extends Logging {
     bagLocation: BagLocation
   )(implicit
     ctx: ExecutionContext): Future[List[BagItemLocation]] = Future {
-    val prefix = s"${bagLocation.completeFilepath}/"
+    val prefix = s"${bagLocation.completePath}/"
 
     listing.getObjectSummaries.asScala
       .map(getItemInPath(_, prefix))

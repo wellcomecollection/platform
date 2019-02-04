@@ -52,7 +52,7 @@ class UploadItemFlowTest
 
             getContentFromS3(
               bucket,
-              s"${archiveItemJob.archiveJob.bagLocation.completeFilepath}/$fileName") shouldBe fileContent
+              s"${archiveItemJob.archiveJob.bagLocation.completePath}/$fileName") shouldBe fileContent
           }
 
         }

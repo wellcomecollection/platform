@@ -32,7 +32,7 @@ trait BagReplicatorFixtures
   ): Assertion = {
     val sourceItems = s3Client.listObjects(
       sourceLocation.storageNamespace,
-      sourceLocation.completeFilepath)
+      sourceLocation.completePath)
 
     val sourceKeyEtags =
       sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)

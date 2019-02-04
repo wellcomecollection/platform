@@ -39,7 +39,7 @@ class BagReplicatorFeatureTest
           bagInfo = bagInfo) { bagLocation =>
           val sourceItems = s3Client.listObjects(
             bagLocation.storageNamespace,
-            bagLocation.completeFilepath)
+            bagLocation.completePath)
           val sourceKeyEtags =
             sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
 

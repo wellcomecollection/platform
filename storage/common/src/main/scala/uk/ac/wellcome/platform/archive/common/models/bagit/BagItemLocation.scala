@@ -7,7 +7,7 @@ case class BagItemLocation(
   bagItemPath: BagItemPath
 ) {
   def completePath: String =
-    List(bagLocation.completeFilepath, bagItemPath).mkString("/")
+    List(bagLocation.completePath, bagItemPath).mkString("/")
 
   def objectLocation: ObjectLocation =
     ObjectLocation(

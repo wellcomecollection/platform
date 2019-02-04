@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.models.bagit
 
 import uk.ac.wellcome.platform.archive.common.models.StorageSpace
+import uk.ac.wellcome.storage.ObjectLocation
 
 /** Represents the complete location of a Bag in S3.
   *
@@ -16,5 +17,11 @@ case class BagLocation(
   storageSpace: StorageSpace,
   bagPath: BagPath
 ) {
-  def completeFilepath = s"$storagePrefix/$storageSpace/$bagPath"
+  def completePath = s"$storagePrefix/$storageSpace/$bagPath"
+
+  def objectLocation: ObjectLocation =
+    ObjectLocation(
+      namespace = storageNamespace,
+      key = completePath
+    )
 }

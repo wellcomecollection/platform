@@ -57,7 +57,7 @@ class UploadDigestItemFlowTest
           whenReady(futureResult) { result =>
             result shouldBe Right(archiveItemJob)
             val s3Key =
-              s"${archiveItemJob.archiveJob.bagLocation.completeFilepath}/$fileName"
+              s"${archiveItemJob.archiveJob.bagLocation.completePath}/$fileName"
 
             val storedObject = s3Client.getObject(bucket.name, s3Key)
             storedObject.getObjectMetadata.getUserMetadata should contain only Entry(
@@ -98,7 +98,7 @@ class UploadDigestItemFlowTest
               archiveItemJob))
             getContentFromS3(
               bucket,
-              s"${archiveItemJob.archiveJob.bagLocation.completeFilepath}/$fileName") shouldBe fileContent
+              s"${archiveItemJob.archiveJob.bagLocation.completePath}/$fileName") shouldBe fileContent
           }
 
         }
