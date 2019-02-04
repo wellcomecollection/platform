@@ -6,9 +6,9 @@ import com.amazonaws.services.sns.model.PublishResult
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.notifier.Notifier
 import uk.ac.wellcome.platform.archive.common.fixtures.{ArchiveMessaging, BagIt}
-import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.progress.models.Namespace
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 

@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.archive.common.flows
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import uk.ac.wellcome.platform.archive.common.models.NotificationMessage
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.messaging.NotificationParsingFlow
 
 class NotificationParsingFlowTest
