@@ -4,10 +4,6 @@ import java.net.URI
 import java.util.UUID
 
 import com.amazonaws.services.s3.transfer.TransferManager
-import uk.ac.wellcome.platform.archive.common.json.{
-  URIConverters,
-  UUIDConverters
-}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.platform.archive.common.TemporaryStore
 import uk.ac.wellcome.platform.archive.common.errors.FileDownloadingError
@@ -33,8 +29,6 @@ case class IngestBagRequest(id: UUID,
     IngestBagJob(this, bagDownload)
   }
 }
-
-object IngestBagRequest extends URIConverters with UUIDConverters {}
 
 case class IngestBagJob(
   request: IngestBagRequest,

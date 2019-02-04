@@ -2,12 +2,11 @@ package uk.ac.wellcome.platform.archive.common.progress.models
 
 import java.net.URI
 
-import uk.ac.wellcome.platform.archive.common.json.URIConverters
 import uk.ac.wellcome.platform.archive.common.progress.models.Callback.Pending
 
 case class Callback(uri: URI, status: Callback.CallbackStatus = Pending)
 
-case object Callback extends URIConverters {
+case object Callback {
   sealed trait CallbackStatus
 
   def apply(callbackUri: URI): Callback = {
