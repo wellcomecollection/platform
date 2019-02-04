@@ -39,15 +39,12 @@ class BagReplicatorFeatureTest
           bagInfo = bagInfo) { bagLocation =>
           val sourceItems = s3Client.listObjects(
             bagLocation.storageNamespace,
-            bagLocation.bagPathInStorage)
+            bagLocation.completeFilepath)
           val sourceKeyEtags =
             sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
           eventually {
-            val bagName = bagLocation.bagPath.value.split("/").last
-            val destinationBagPath = s"storage-root/space/$bagName"
-            val destinationItems =
-              s3Client.listObjects(destinationBucket.name, destinationBagPath)
+            val destinationItems = s3Client.listObjects(destinationBucket.name)
             val destinationKeyEtags =
               destinationItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
@@ -55,9 +52,8 @@ class BagReplicatorFeatureTest
 
             assertSnsReceivesOnly(
               ArchiveComplete(
-                requestId,
-                storageSpace,
-                bagLocation
+                archiveRequestId = requestId,
+                bagLocation = bagLocation
               ),
               outgoingTopic
             )

@@ -2,12 +2,14 @@ package uk.ac.wellcome.platform.archive.bagreplicator.config
 
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
-import ReplicatorDestinationConfig
 
-case class BagReplicatorConfig(parallelism: Int, destination: ReplicatorDestinationConfig)
+case class BagReplicatorConfig(
+  parallelism: Int,
+  destination: ReplicatorDestinationConfig
+)
 
 object BagReplicatorConfig {
-  def buildBagUploaderConfig(config: Config) = {
+  def buildBagReplicatorConfig(config: Config): BagReplicatorConfig = {
     BagReplicatorConfig(
       parallelism =
         config.getOrElse[Int]("bag-replicator.parallelism")(default = 10),

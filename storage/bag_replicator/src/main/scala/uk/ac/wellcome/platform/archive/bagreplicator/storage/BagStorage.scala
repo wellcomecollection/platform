@@ -6,7 +6,6 @@ import com.amazonaws.services.s3.transfer.model.CopyResult
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinationConfig
 import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, BagItemLocation, BagItemPath}
-import uk.ac.wellcome.platform.archive.common.models.{NeeeeeeewBagItemLocation, NeeeeeewBagItemPath}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}

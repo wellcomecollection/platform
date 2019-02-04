@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archive.bagreplicator.fixtures
 
 import java.util.UUID
 
+import org.scalatest.Assertion
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
@@ -26,9 +27,9 @@ trait BagReplicatorFixtures
     with ArchiveMessaging {
 
   def verifyBagCopied(
-                       sourceLocation: BagLocation,
-                       storageDestination: ReplicatorDestinationConfig
-  ) = {
+    sourceLocation: BagLocation,
+    storageDestination: ReplicatorDestinationConfig
+  ): Assertion = {
     val sourceItems = s3Client.listObjects(
       sourceLocation.storageNamespace,
       sourceLocation.completeFilepath)
@@ -36,14 +37,13 @@ trait BagReplicatorFixtures
     val sourceKeyEtags =
       sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
-    val bagPath = List(
-      storageDestination.rootPath,
-      sourceLocation.bagPath
-    ).mkString("/")
+//    val bagPath = List(
+//      storageDestination.rootPath,
+//      sourceLocation.bagPath
+//    ).mkString("/")
 
     val destinationItems = s3Client.listObjects(
-      storageDestination.namespace,
-      bagPath
+      storageDestination.namespace
     )
 
     val destinationKeyEtags =
