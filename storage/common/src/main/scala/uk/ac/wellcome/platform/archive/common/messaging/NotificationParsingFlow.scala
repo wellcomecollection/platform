@@ -12,7 +12,8 @@ import uk.ac.wellcome.platform.archive.common.flows.ProcessLogDiscardFlow
   *
   */
 object NotificationParsingFlow {
-  def apply[T]()(implicit dec: Decoder[T]): Flow[NotificationMessage, T, NotUsed] =
+  def apply[T]()(
+    implicit dec: Decoder[T]): Flow[NotificationMessage, T, NotUsed] =
     ProcessLogDiscardFlow[NotificationMessage, T]("parse_notification") {
       notificationMessage: NotificationMessage =>
         fromJson[T](notificationMessage.body)

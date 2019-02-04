@@ -15,10 +15,7 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{
   FileEntry
 }
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagInfo,
-  IngestBagRequest
-}
+import uk.ac.wellcome.platform.archive.common.models.{BagInfo, IngestBagRequest}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
