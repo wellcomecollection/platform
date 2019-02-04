@@ -62,7 +62,7 @@ class ArchiveZipFileFlowTest
                 listKeysInBucket(storageBucket) should have size 5
                 result shouldBe List(Right(ArchiveComplete(
                   archiveRequestId = ingestContext.id,
-                  bagLocation = FuzzyWuzzy(
+                  bagLocation = BagLocation(
                     storageNamespace = storageBucket.name,
                     storagePrefix = "archive",
                     storageSpace = ingestContext.storageSpace,
@@ -198,7 +198,7 @@ class ArchiveZipFileFlowTest
                         archiveJob shouldBe a[ArchiveJob]
                         archiveJob
                           .asInstanceOf[ArchiveJob]
-                          .bagLocation shouldBe FuzzyWuzzy(
+                          .bagLocation shouldBe BagLocation(
                             storageNamespace = storageBucket.name,
                             storagePrefix = "archive",
                             storageSpace = ingestContext.storageSpace,

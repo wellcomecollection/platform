@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.bagreplicator.storage
 
-import uk.ac.wellcome.platform.archive.common.models.FuzzyWuzzy
+import uk.ac.wellcome.platform.archive.common.models.BagLocation
 
-case class BagItemLocation(bagLocation: FuzzyWuzzy, itemPath: String)
+// TODO: Move this into top level later
+case class BagItemLocation(bagLocation: BagLocation, itemPath: String)

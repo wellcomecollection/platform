@@ -8,7 +8,7 @@ package uk.ac.wellcome.platform.archive.common.models
   * @param storageSpace The namespace from the ingest request (e.g. "digitised")
   * @param bagPath The relative path to the bag (e.g. "b12345.zip")
   */
-case class FuzzyWuzzy(
+case class BagLocation(
   storageNamespace: String,
   storagePrefix: String,
   storageSpace: StorageSpace,

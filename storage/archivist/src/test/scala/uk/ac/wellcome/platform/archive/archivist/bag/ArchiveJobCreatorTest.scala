@@ -7,7 +7,7 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, BagItConfig, BagManifestLocation}
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.{BagPath, FuzzyWuzzy}
+import uk.ac.wellcome.platform.archive.common.models.{BagPath, BagLocation}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest
@@ -36,7 +36,7 @@ class ArchiveJobCreatorTest
               bagItConfig,
               bagManifestLocations)) =>
           actualZipFile.size() shouldBe (new ZipFile(file)).size()
-          bagLocation shouldBe FuzzyWuzzy(
+          bagLocation shouldBe BagLocation(
             storageNamespace = bucketName,
             storagePrefix = "archive",
             storageSpace = ingestRequest.storageSpace,

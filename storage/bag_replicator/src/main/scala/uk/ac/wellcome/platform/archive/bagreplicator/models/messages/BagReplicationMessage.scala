@@ -1,13 +1,13 @@
 package uk.ac.wellcome.platform.archive.bagreplicator.models.messages
 
-import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, FuzzyWuzzy}
+import uk.ac.wellcome.platform.archive.common.models.{ArchiveComplete, BagLocation}
 
 trait BagReplicationContext {
   val context: ArchiveComplete
 }
 
 case class BagReplicationRequest(context: ArchiveComplete,
-                                 sourceBagLocation: FuzzyWuzzy)
+                                 sourceBagLocation: BagLocation)
     extends BagReplicationContext
 
 case class CompletedBagReplication(context: ArchiveComplete)

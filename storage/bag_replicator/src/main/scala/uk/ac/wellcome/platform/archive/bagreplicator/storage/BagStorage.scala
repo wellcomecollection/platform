@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.model.{ObjectListing, S3ObjectSummary}
 import com.amazonaws.services.s3.transfer.model.CopyResult
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
-import uk.ac.wellcome.platform.archive.common.models.FuzzyWuzzy
+import uk.ac.wellcome.platform.archive.common.models.BagLocation
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,8 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 object BagStorage extends Logging {
 
   def duplicateBag(
-    sourceBagLocation: FuzzyWuzzy,
-    storageDestination: StorageLocation
+                    sourceBagLocation: BagLocation,
+                    storageDestination: StorageLocation
   )(implicit
     s3Client: AmazonS3,
     s3Copier: S3Copier,
@@ -41,7 +41,7 @@ object BagStorage extends Logging {
 
   private def listObjects(
     s3Client: AmazonS3,
-    bagLocation: FuzzyWuzzy
+    bagLocation: BagLocation
   )(implicit
     ctx: ExecutionContext): Future[ObjectListing] = Future {
 
@@ -63,7 +63,7 @@ object BagStorage extends Logging {
 
   private def getObjectSummaries(
     listing: ObjectListing,
-    bagLocation: FuzzyWuzzy
+    bagLocation: BagLocation
   )(implicit
     ctx: ExecutionContext): Future[List[BagItemLocation]] = Future {
     val prefix = s"${bagLocation.completeFilepath}/"
@@ -75,7 +75,7 @@ object BagStorage extends Logging {
   }
 
   private def listBagItems(
-    location: FuzzyWuzzy
+    location: BagLocation
   )(implicit
     s3Client: AmazonS3,
     ctx: ExecutionContext): Future[List[BagItemLocation]] = {

@@ -11,8 +11,8 @@ case class ArchiveDigestItemJob(archiveJob: ArchiveJob,
     createUploadLocation(archiveJob.bagLocation, bagDigestItem.path)
 
   private def createUploadLocation(
-    bagLocation: FuzzyWuzzy,
-    itemLocation: BagFilePath
+                                    bagLocation: BagLocation,
+                                    itemLocation: BagFilePath
   ) =
     ObjectLocation(
       namespace = bagLocation.storageNamespace,

@@ -26,8 +26,8 @@ trait BagReplicatorFixtures
     with ArchiveMessaging {
 
   def verifyBagCopied(
-    sourceLocation: FuzzyWuzzy,
-    storageDestination: StorageLocation
+                       sourceLocation: BagLocation,
+                       storageDestination: StorageLocation
   ) = {
     val sourceItems = s3Client.listObjects(
       sourceLocation.storageNamespace,
@@ -58,7 +58,7 @@ trait BagReplicatorFixtures
     archiveRequestId: UUID = randomUUID,
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
-  )(testWith: TestWith[FuzzyWuzzy, R]): R =
+  )(testWith: TestWith[BagLocation, R]): R =
     withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) { bagLocation =>
       val archiveComplete = ArchiveComplete(
         archiveRequestId = archiveRequestId,

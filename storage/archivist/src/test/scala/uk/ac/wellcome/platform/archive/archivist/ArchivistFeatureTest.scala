@@ -46,7 +46,7 @@ class ArchivistFeatureTest
               assertSnsReceivesOnly(
                 ArchiveComplete(
                   archiveRequestId = request.id,
-                  bagLocation = FuzzyWuzzy(
+                  bagLocation = BagLocation(
                     storageNamespace = storageBucket.name,
                     storagePrefix = "archive",
                     storageSpace = request.storageSpace,
@@ -157,7 +157,7 @@ class ArchivistFeatureTest
                     Set(
                       ArchiveComplete(
                         archiveRequestId = validRequest1.id,
-                        bagLocation = FuzzyWuzzy(
+                        bagLocation = BagLocation(
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest1.storageSpace,
@@ -166,7 +166,7 @@ class ArchivistFeatureTest
                       ),
                       ArchiveComplete(
                         archiveRequestId = validRequest2.id,
-                        bagLocation = FuzzyWuzzy(
+                        bagLocation = BagLocation(
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest2.storageSpace,
@@ -246,7 +246,7 @@ class ArchivistFeatureTest
                 Set(
                   ArchiveComplete(
                     archiveRequestId = validRequest1.id,
-                    bagLocation = FuzzyWuzzy(
+                    bagLocation = BagLocation(
                       storageNamespace = storageBucket.name,
                       storagePrefix = "archive",
                       storageSpace = validRequest1.storageSpace,
@@ -255,7 +255,7 @@ class ArchivistFeatureTest
                   ),
                   ArchiveComplete(
                     archiveRequestId = validRequest2.id,
-                    bagLocation = FuzzyWuzzy(
+                    bagLocation = BagLocation(
                       storageNamespace = storageBucket.name,
                       storagePrefix = "archive",
                       storageSpace = validRequest2.storageSpace,
@@ -321,7 +321,7 @@ class ArchivistFeatureTest
                         Set(
                           ArchiveComplete(
                             archiveRequestId = validRequest1.id,
-                            bagLocation = FuzzyWuzzy(
+                            bagLocation = BagLocation(
                               storageNamespace = storageBucket.name,
                               storagePrefix = "archive",
                               storageSpace = validRequest1.storageSpace,
@@ -330,7 +330,7 @@ class ArchivistFeatureTest
                           ),
                           ArchiveComplete(
                             archiveRequestId = validRequest2.id,
-                            bagLocation = FuzzyWuzzy(
+                            bagLocation = BagLocation(
                               storageNamespace = storageBucket.name,
                               storagePrefix = "archive",
                               storageSpace = validRequest2.storageSpace,
@@ -396,7 +396,7 @@ class ArchivistFeatureTest
                     Set(
                       ArchiveComplete(
                         archiveRequestId = validRequest1.id,
-                        bagLocation = FuzzyWuzzy(
+                        bagLocation = BagLocation(
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest1.storageSpace,
@@ -405,7 +405,7 @@ class ArchivistFeatureTest
                       ),
                       ArchiveComplete(
                         archiveRequestId = validRequest2.id,
-                        bagLocation = FuzzyWuzzy(
+                        bagLocation = BagLocation(
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = validRequest2.storageSpace,

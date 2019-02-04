@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archive.archivist.models
 
-import uk.ac.wellcome.platform.archive.common.models.{BagFilePath, BagPath, FuzzyWuzzy}
+import uk.ac.wellcome.platform.archive.common.models.{BagFilePath, BagPath, BagLocation}
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class ArchiveItemJob(archiveJob: ArchiveJob, itemLocation: BagFilePath) {
@@ -10,8 +10,8 @@ case class ArchiveItemJob(archiveJob: ArchiveJob, itemLocation: BagFilePath) {
     createUploadLocation(archiveJob.bagLocation, itemLocation)
 
   private def createUploadLocation(
-    bagLocation: FuzzyWuzzy,
-    itemLocation: BagFilePath
+                                    bagLocation: BagLocation,
+                                    itemLocation: BagFilePath
   ) =
     ObjectLocation(
       namespace = bagLocation.storageNamespace,

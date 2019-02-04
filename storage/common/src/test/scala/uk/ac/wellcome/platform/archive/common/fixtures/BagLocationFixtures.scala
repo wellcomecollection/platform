@@ -14,7 +14,7 @@ trait BagLocationFixtures extends S3 with BagIt {
     createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
     createTagManifest: List[(String, String)] => Option[FileEntry] =
-      createValidTagManifest)(testWith: TestWith[FuzzyWuzzy, R]): R = {
+      createValidTagManifest)(testWith: TestWith[BagLocation, R]): R = {
     val bagIdentifier = randomAlphanumeric()
 
     info(s"Creating bag $bagIdentifier")
@@ -26,7 +26,7 @@ trait BagLocationFixtures extends S3 with BagIt {
       createTagManifest = createTagManifest)
     val storagePrefix = "archive"
 
-    val bagLocation = FuzzyWuzzy(
+    val bagLocation = BagLocation(
       storageNamespace = storageBucket.name,
       storagePrefix = storagePrefix,
       storageSpace = storageSpace,

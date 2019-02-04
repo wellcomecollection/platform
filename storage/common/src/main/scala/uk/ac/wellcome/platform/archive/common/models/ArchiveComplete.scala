@@ -7,7 +7,7 @@ import uk.ac.wellcome.json.JsonUtil._
 
 case class ArchiveComplete(
   archiveRequestId: UUID,
-  bagLocation: FuzzyWuzzy
+  bagLocation: BagLocation
 )
 
 object ArchiveComplete {

@@ -26,7 +26,7 @@ object ArchiveJobCreator {
         ArchiveJob(
           externalIdentifier,
           zipFile,
-          FuzzyWuzzy(
+          BagLocation(
             storageNamespace = config.uploadConfig.uploadNamespace,
             storagePrefix = config.uploadConfig.uploadPrefix,
             storageSpace = ingestBagRequest.storageSpace,

@@ -93,7 +93,7 @@ class RegistrarFeatureTest
         val requestId = randomUUID
         val bagId = randomBagId
 
-        val bagLocation = FuzzyWuzzy(
+        val bagLocation = BagLocation(
           storageNamespace = storageBucket.name,
           storagePrefix = "archive",
           storageSpace = bagId.space,

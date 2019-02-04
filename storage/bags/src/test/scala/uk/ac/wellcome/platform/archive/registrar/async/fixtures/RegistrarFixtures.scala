@@ -31,7 +31,7 @@ trait RegistrarFixtures
     archiveRequestId: UUID = randomUUID,
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
-  )(testWith: TestWith[FuzzyWuzzy, R]): R =
+  )(testWith: TestWith[BagLocation, R]): R =
     withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) { bagLocation =>
       val archiveComplete = ArchiveComplete(
         archiveRequestId = archiveRequestId,
