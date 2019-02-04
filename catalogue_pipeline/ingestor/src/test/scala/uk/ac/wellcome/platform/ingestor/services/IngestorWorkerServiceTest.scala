@@ -12,10 +12,13 @@ import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.generators.WorksGenerators
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType}
+import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkerServiceFixture
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class IngestorWorkerServiceTest
-    extends FunSpec
+  extends FunSpec
     with ScalaFutures
     with Matchers
     with Messaging
@@ -125,58 +128,60 @@ class IngestorWorkerServiceTest
     assertWorksIndexedCorrectly(works: _*)
   }
 
-  ignore("only deletes successfully ingested works from the queue") {
-    case class Shape(sides: Int, colour: String)
-    val square = Shape(sides = 4, colour = "red")
-
-    val work = createIdentifiedWork
-
+  it("when we cannot verify an index exists throw an exception") {
     withLocalWorksIndex { index =>
-      withLocalSqsQueueAndDlq {
-        case QueuePair(queue, dlq) =>
-          withWorkerService(queue, index) { _ =>
-            sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
-            sendMessage(queue = queue, obj = square)
+      withLocalSqsQueue { queue =>
+        withActorSystem { implicit actorSystem =>
+          withMetricsSender(actorSystem) { metricsSender =>
+            withMessageStream[IdentifiedBaseWork, Any](
+              queue = queue,
+              metricsSender = metricsSender
+            ) { messageStream =>
 
-            assertElasticsearchEventuallyHasWork(index = index, work)
+              import scala.concurrent.duration._
 
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
+              val brokenRestClient: RestClient = RestClient
+                .builder(
+                  new HttpHost(
+                    "localhost",
+                    9800,
+                    "http"
+                  )
+                )
+                .setHttpClientConfigCallback(
+                  new ElasticCredentials(
+                    "elastic",
+                    "changeme")
+                )
+                .build()
+
+              val brokenClient: ElasticClient =
+                ElasticClient.fromRestClient(brokenRestClient)
+
+              val config = IngestorConfig(
+                batchSize = 100,
+                flushInterval = 5.seconds,
+                index = index
+              )
+
+              val service = new IngestorWorkerService(
+                elasticClient = brokenClient,
+                ingestorConfig = config,
+                messageStream = messageStream
+              )
+
+              whenReady(service.run.failed) { e =>
+                e shouldBe a[RuntimeException]
+              }
+            }
           }
+        }
       }
     }
   }
 
-  it("returns a failed Future if indexing into Elasticsearch fails") {
-    withLocalSqsQueueAndDlq {
-      case QueuePair(queue, dlq) =>
-        val brokenRestClient: RestClient = RestClient
-          .builder(new HttpHost("localhost", 9800, "http"))
-          .setHttpClientConfigCallback(
-            new ElasticCredentials("elastic", "changeme"))
-          .build()
-
-        val brokenElasticClient: ElasticClient =
-          ElasticClient.fromRestClient(brokenRestClient)
-
-        withWorkerService(
-          queue,
-          index = "works-v1",
-          elasticClient = brokenElasticClient) { _ =>
-          val work = createIdentifiedWork
-
-          sendMessage[IdentifiedBaseWork](queue = queue, obj = work)
-
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
-          }
-        }
-    }
-  }
-
   private def assertWorksIndexedCorrectly(
-    works: IdentifiedBaseWork*): Assertion =
+                                           works: IdentifiedBaseWork*): Assertion =
     withLocalWorksIndex { index =>
       withLocalSqsQueueAndDlqAndTimeout(visibilityTimeout = 10) {
         case QueuePair(queue, dlq) =>

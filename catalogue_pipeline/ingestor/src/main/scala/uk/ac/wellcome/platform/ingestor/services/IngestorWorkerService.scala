@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.ingestor.services
 import akka.Done
 import com.amazonaws.services.sqs.model.Message
 import com.sksamuel.elastic4s.http.ElasticClient
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.elasticsearch.{ElasticsearchIndexCreator, WorksIndex}
 import uk.ac.wellcome.json.JsonUtil._
@@ -12,57 +13,56 @@ import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IngestorWorkerService(elasticClient: ElasticClient,
-                            ingestorConfig: IngestorConfig,
-                            messageStream: MessageStream[IdentifiedBaseWork])(
-  implicit ec: ExecutionContext)
-    extends Runnable {
+class IngestorWorkerService(
+                             elasticClient: ElasticClient,
+                             ingestorConfig: IngestorConfig,
+                             messageStream: MessageStream[IdentifiedBaseWork]
+                           )(implicit
+                             ec: ExecutionContext
+                           ) extends Runnable with Logging {
 
-  case class MessageBundle(message: Message, work: IdentifiedBaseWork)
+  type FutureBundles = Future[List[Bundle]]
+  case class Bundle(message: Message, work: IdentifiedBaseWork)
 
-  val identifiedWorkIndexer = new WorkIndexer(
-    elasticClient = elasticClient
-  )
+  private val className = this.getClass.getSimpleName
+  private val identifiedWorkIndexer = new WorkIndexer(elasticClient)
+  private val indexCreator = new ElasticsearchIndexCreator(elasticClient)
 
-  val elasticsearchIndexCreator = new ElasticsearchIndexCreator(
-    elasticClient = elasticClient
-  )
-
-  elasticsearchIndexCreator.create(
+  private val indexCreated = indexCreator.create(
     index = ingestorConfig.index,
     fields = WorksIndex.rootIndexFields
   )
 
-  def run(): Future[Done] =
-    messageStream.runStream(
-      this.getClass.getSimpleName,
-      source =>
-        source
-          .map {
-            case (message, identifiedWork) =>
-              MessageBundle(message, identifiedWork)
-          }
-          .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval)
-          .mapAsyncUnordered(10) { messages =>
-            for {
-              successfulMessageBundles <- processMessages(messages.toList)
-            } yield successfulMessageBundles.map(_.message)
-          }
-          .mapConcat(identity)
-    )
-
-  private def processMessages(
-    messageBundles: List[MessageBundle]): Future[List[MessageBundle]] =
+  private def processMessages(bundles: List[Bundle]): FutureBundles =
     for {
-      works <- Future.successful(messageBundles.map(m => m.work))
+      works <- Future.successful(bundles.map(m => m.work))
       either <- identifiedWorkIndexer.indexWorks(
         works = works,
         index = ingestorConfig.index
       )
     } yield {
       val failedWorks = either.left.getOrElse(Nil)
-      messageBundles.filterNot {
-        case MessageBundle(_, work) => failedWorks.contains(work)
+      bundles.filterNot {
+        case Bundle(_, work) => failedWorks.contains(work)
       }
     }
+
+  private def runStream(): Future[Done] = {
+    messageStream.runStream(className, _
+        .map { case (msg, work) => Bundle(msg, work) }
+        .groupedWithin(
+          ingestorConfig.batchSize, 
+          ingestorConfig.flushInterval
+        )
+        .mapAsyncUnordered(10) { msgs =>
+          for {bundles <- processMessages(msgs.toList)}
+            yield bundles.map(_.message)
+        }.mapConcat(identity)
+    )
+  }
+
+  def run(): Future[Done] = for {
+    _ <- indexCreated
+    result <- runStream()
+  } yield result
 }
