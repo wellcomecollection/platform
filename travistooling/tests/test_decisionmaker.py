@@ -268,6 +268,18 @@ test_cases = [
         SignificantFile,
         True,
     ),
+    (
+        "catalogue_pipeline/id_minter/src/universal/conf/application.conf.template",
+        "matcher-test",
+        InsignificantFile,
+        False
+    ),
+    (
+        "catalogue_pipeline/id_minter/src/universal/conf/application.conf.template",
+        "id_minter-test",
+        SignificantFile,
+        True
+    ),
 ]
 
 
