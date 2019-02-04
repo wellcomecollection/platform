@@ -44,16 +44,24 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
       .flatMap { varField: VarField =>
         val subfields = varField.subfields
         val maybePerson = getPerson(subfields)
+        val generalSubdivisions =
+          varField.subfields
+            .collect {
+              case MarcSubfield("t", content) => content
+              case MarcSubfield("x", content) => content
+            }
+
         maybePerson.map { person =>
           val label = getPersonSubjectLabel(
             person = person,
             roles = getRoles(subfields),
-            dates = getDates(subfields)
+            dates = getDates(subfields),
+            generalSubdivisions = generalSubdivisions
           )
 
           val subject = Subject(
             label = label,
-            concepts = getConcepts(person, varField)
+            concepts = getConcepts(person, generalSubdivisions)
           )
 
           varField.indicator2 match {
@@ -66,21 +74,18 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
 
   private def getPersonSubjectLabel(person: Person,
                                     roles: List[String],
-                                    dates: Option[String]): String =
-    (List(person.label) ++ person.numeration ++ person.prefix ++ dates ++ roles)
+                                    dates: Option[String],
+                                    generalSubdivisions: List[String]): String =
+    (List(person.label) ++ person.numeration ++ person.prefix ++ dates ++ roles ++ generalSubdivisions)
       .mkString(" ")
 
   private def getConcepts(
     person: Person,
-    varField: VarField): List[MaybeDisplayable[AbstractRootConcept]] = {
+    generalSubdivisions: List[String]): List[MaybeDisplayable[AbstractRootConcept]] = {
     val personConcept = Unidentifiable(person)
 
     val generalSubdivisionConcepts =
-      varField.subfields
-        .collect {
-          case MarcSubfield("t", content) => content
-          case MarcSubfield("x", content) => content
-        }
+      generalSubdivisions
         .map { label =>
           Unidentifiable(Concept(label))
         }
