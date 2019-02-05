@@ -3,10 +3,6 @@ package uk.ac.wellcome.platform.archive.common.models
 import java.net.URI
 import java.util.UUID
 
-import uk.ac.wellcome.platform.archive.common.json.{
-  URIConverters,
-  UUIDConverters
-}
 import uk.ac.wellcome.storage.ObjectLocation
 
 case class IngestBagRequest(
@@ -15,5 +11,3 @@ case class IngestBagRequest(
   archiveCompleteCallbackUrl: Option[URI] = None,
   storageSpace: StorageSpace
 )
-
-object IngestBagRequest extends URIConverters with UUIDConverters {}

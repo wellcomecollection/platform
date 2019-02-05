@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.archive.bagreplicator.fixtures
 import java.util.UUID
 
 import org.scalatest.Assertion
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair

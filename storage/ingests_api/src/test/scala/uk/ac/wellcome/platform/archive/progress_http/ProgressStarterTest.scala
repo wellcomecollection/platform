@@ -13,7 +13,6 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
 }
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
