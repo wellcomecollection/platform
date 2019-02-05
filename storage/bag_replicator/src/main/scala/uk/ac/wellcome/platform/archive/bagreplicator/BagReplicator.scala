@@ -13,21 +13,13 @@ import io.circe.Encoder
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
-import uk.ac.wellcome.platform.archive.bagreplicator.config.{
-  BagReplicatorConfig,
-  ReplicatorDestinationConfig
-}
-import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{
-  BagReplicationError,
-  DuplicationFailed,
-  NotificationFailed,
-  NotificationParsingFailed
-}
+import uk.ac.wellcome.platform.archive.bagreplicator.config.{BagReplicatorConfig, ReplicatorDestinationConfig}
+import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{BagReplicationError, DuplicationFailed, NotificationFailed, NotificationParsingFailed}
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
 import uk.ac.wellcome.platform.archive.bagreplicator.storage.BagStorage
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
+import uk.ac.wellcome.platform.archive.common.models.{ReplicationRequest, ReplicationResult}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -73,11 +65,11 @@ class BagReplicator(
   }
 
   private def parseReplicateBagMessage(notificationMessage: NotificationMessage)
-    : Either[BagReplicationError, BagReplicationRequest] = {
-    fromJson[ArchiveComplete](notificationMessage.body) match {
-      case Success(archiveComplete) =>
+    : Either[BagReplicationError, InternalReplicationRequest] = {
+    fromJson[ReplicationRequest](notificationMessage.body) match {
+      case Success(replicationRequest) =>
         Right(
-          BagReplicationRequest(archiveComplete, archiveComplete.bagLocation))
+          InternalReplicationRequest(replicationRequest, replicationRequest.srcBagLocation))
       case Failure(error) =>
         Left(NotificationParsingFailed(
           s"Failed to parse Notification error: $error body: ${notificationMessage.body}"))
@@ -87,7 +79,7 @@ class BagReplicator(
   private def duplicateBagItems(
     bagStorage: BagStorage,
     storageDestination: ReplicatorDestinationConfig)(
-    in: Either[BagReplicationError, BagReplicationRequest])(
+    in: Either[BagReplicationError, InternalReplicationRequest])(
     implicit ec: ExecutionContext)
     : Future[Either[BagReplicationError, CompletedBagReplication]] = {
     in.fold(
@@ -107,7 +99,7 @@ class BagReplicator(
               error(
                 List(
                   "Failed bag replication for",
-                  bagReplicationRequest.context.bagLocation,
+                  bagReplicationRequest.context.srcBagLocation,
                   s"from ${bagReplicationRequest.sourceBagLocation}",
                   s"to ${storageDestination.namespace}/${storageDestination.rootPath}",
                   s"with error: ${e.getMessage}\n",
@@ -122,17 +114,20 @@ class BagReplicator(
 
   private def notifyOutgoingTopic(outgoingSnsConfig: SNSConfig)(
     in: Either[BagReplicationError, CompletedBagReplication])(
-    implicit encoder: Encoder[ArchiveComplete],
-    snsClient: AmazonSNS) = {
+    implicit snsClient: AmazonSNS) = {
     in.fold[Either[BagReplicationError, PublishedToOutgoingTopic]](
       bagReplicationError => Left(bagReplicationError),
-      (completedBagReplication: CompletedBagReplication) =>
-        publishNotification(completedBagReplication.context, outgoingSnsConfig) match {
+      (completedBagReplication: CompletedBagReplication) => {
+        val replicationResult = ReplicationResult(
+          completedBagReplication.context.archiveRequestId,
+          completedBagReplication.context.srcBagLocation)
+        publishNotification(replicationResult, outgoingSnsConfig) match {
           case Success(_) =>
             Right(PublishedToOutgoingTopic(completedBagReplication.context))
           case Failure(e) =>
             Left(
               NotificationFailed(e.getMessage, completedBagReplication.context))
+        }
       }
     )
   }

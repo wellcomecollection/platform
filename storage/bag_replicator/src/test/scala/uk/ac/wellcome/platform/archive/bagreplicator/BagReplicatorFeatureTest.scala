@@ -6,9 +6,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.models.ReplicationResult
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-
-import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 
 import scala.collection.JavaConverters._
 
@@ -52,9 +51,9 @@ class BagReplicatorFeatureTest
             destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
 
             assertSnsReceivesOnly(
-              ArchiveComplete(
+              ReplicationResult(
                 archiveRequestId = requestId,
-                bagLocation = bagLocation
+                srcBagLocation = bagLocation
               ),
               outgoingTopic
             )

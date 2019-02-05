@@ -61,7 +61,7 @@ class StorageManifestFactoryTest
           bagPath = randomBagPath
         )
         val bagManifestUpdate = createBagManifestUpdateWith(
-          bagLocation = bagLocation
+          archiveBagLocation = bagLocation
         )
         val value = StorageManifestFactory.create(bagManifestUpdate)
 
@@ -83,8 +83,8 @@ class StorageManifestFactoryTest
           createDataManifest =
             _ => Some(FileEntry("manifest-sha256.txt", "bleeergh!"))) {
           bagLocation =>
-            val archiveComplete = createArchiveCompleteWith(
-              bagLocation = bagLocation
+            val archiveComplete = createBagManifestUpdateWith(
+              archiveBagLocation = bagLocation
             )
             val value = StorageManifestFactory.create(archiveComplete)
             inside(value) {
@@ -106,8 +106,8 @@ class StorageManifestFactoryTest
           createTagManifest =
             _ => Some(FileEntry("tagmanifest-sha256.txt", "blaaargh!"))) {
           bagLocation =>
-            val archiveComplete = createArchiveCompleteWith(
-              bagLocation = bagLocation
+            val archiveComplete = createBagManifestUpdateWith(
+              archiveBagLocation = bagLocation
             )
             val value = StorageManifestFactory.create(archiveComplete)
             inside(value) {

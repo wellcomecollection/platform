@@ -43,14 +43,14 @@ trait BagReplicatorFixtures
   )(testWith: TestWith[BagLocation, R]): R =
     withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) {
       bagLocation =>
-        val archiveComplete = ArchiveComplete(
+        val replicationRequest = ReplicationRequest(
           archiveRequestId = archiveRequestId,
-          bagLocation = bagLocation
+          srcBagLocation = bagLocation
         )
 
         sendNotificationToSQS(
           queuePair.queue,
-          archiveComplete
+          replicationRequest
         )
 
         testWith(bagLocation)
