@@ -31,7 +31,7 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext)
 
     for {
       sourceBagItems <- listBagItems(sourceBagLocation)
-      copyResults <- duplicateBagItems(
+      _ <- duplicateBagItems(
         sourceBagItems = sourceBagItems,
         dstBagLocation = dstBagLocation
       )

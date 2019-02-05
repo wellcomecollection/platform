@@ -11,7 +11,8 @@ case class InternalReplicationRequest(context: ReplicationRequest,
                                       sourceBagLocation: BagLocation)
     extends BagReplicationContext
 
-case class CompletedBagReplication(context: ReplicationRequest)
+case class CompletedBagReplication(context: ReplicationRequest,
+                                   dstBagLocation: BagLocation)
     extends BagReplicationContext
 
 case class PublishedToOutgoingTopic(context: ReplicationRequest)

@@ -9,8 +9,6 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models.ReplicationResult
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 
-import scala.collection.JavaConverters._
-
 class BagReplicatorFeatureTest
     extends FunSpec
     with Matchers
@@ -26,6 +24,7 @@ class BagReplicatorFeatureTest
           sourceBucket,
           queuePair,
           destinationBucket,
+          dstRootPath,
           progressTopic,
           outgoingTopic) =>
         val requestId = randomUUID
@@ -36,24 +35,20 @@ class BagReplicatorFeatureTest
           sourceBucket,
           requestId,
           storageSpace,
-          bagInfo = bagInfo) { bagLocation =>
-          val sourceItems = s3Client.listObjects(
-            bagLocation.storageNamespace,
-            bagLocation.completePath)
-          val sourceKeyEtags =
-            sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
+          bagInfo = bagInfo) { srcBagLocation =>
 
           eventually {
-            val destinationItems = s3Client.listObjects(destinationBucket.name)
-            val destinationKeyEtags =
-              destinationItems.getObjectSummaries.asScala.toList.map(_.getETag)
+            val dstBagLocation = srcBagLocation.copy(
+              storageNamespace = destinationBucket.name,
+              storagePrefix = dstRootPath
+            )
 
-            destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
-
+            verifyBagCopied(srcBagLocation, dstBagLocation)
             assertSnsReceivesOnly(
               ReplicationResult(
                 archiveRequestId = requestId,
-                srcBagLocation = bagLocation
+                srcBagLocation = srcBagLocation,
+                dstBagLocation = dstBagLocation
               ),
               outgoingTopic
             )

@@ -103,9 +103,9 @@ class BagReplicator(
             bagReplicationRequest.sourceBagLocation,
             storageDestination)
           .transformWith[Either[BagReplicationError, CompletedBagReplication]] {
-            case Success(_) =>
+            case Success(dstBagLocation) =>
               Future(
-                Right(CompletedBagReplication(bagReplicationRequest.context)))
+                Right(CompletedBagReplication(bagReplicationRequest.context, dstBagLocation)))
             case Failure(e) =>
               val stackTrace = e.getStackTrace.mkString("\n")
 
@@ -132,8 +132,10 @@ class BagReplicator(
       bagReplicationError => Left(bagReplicationError),
       (completedBagReplication: CompletedBagReplication) => {
         val replicationResult = ReplicationResult(
-          completedBagReplication.context.archiveRequestId,
-          completedBagReplication.context.srcBagLocation)
+          archiveRequestId = completedBagReplication.context.archiveRequestId,
+          srcBagLocation = completedBagReplication.context.srcBagLocation,
+          dstBagLocation = completedBagReplication.dstBagLocation
+        )
         publishNotification(replicationResult, outgoingSnsConfig) match {
           case Success(_) =>
             Right(PublishedToOutgoingTopic(completedBagReplication.context))

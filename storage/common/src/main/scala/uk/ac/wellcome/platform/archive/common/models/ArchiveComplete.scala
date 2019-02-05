@@ -12,5 +12,6 @@ case class ReplicationRequest(
 
 case class ReplicationResult(
   archiveRequestId: UUID,
-  srcBagLocation: BagLocation
+  srcBagLocation: BagLocation,
+  dstBagLocation: BagLocation
 )
