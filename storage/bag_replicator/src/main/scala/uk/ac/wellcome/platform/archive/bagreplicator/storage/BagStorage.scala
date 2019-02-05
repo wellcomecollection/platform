@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.archive.bagreplicator.storage
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{ObjectListing, S3ObjectSummary}
-import com.amazonaws.services.s3.transfer.model.CopyResult
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinationConfig
 import uk.ac.wellcome.platform.archive.common.models.bagit.{
@@ -21,7 +20,7 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
   def duplicateBag(
     sourceBagLocation: BagLocation,
     storageDestination: ReplicatorDestinationConfig
-  ): Future[List[CopyResult]] = {
+  ): Future[List[BagItemLocation]] = {
     debug(s"duplicating bag from $sourceBagLocation to $storageDestination")
 
     val dstBagLocation = sourceBagLocation.copy(
@@ -89,7 +88,7 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
   private def duplicateBagItems(
     sourceBagItems: List[BagItemLocation],
     dstBagLocation: BagLocation
-  ): Future[List[CopyResult]] = {
+  ): Future[List[BagItemLocation]] = {
     debug(s"duplicating bag items: $sourceBagItems")
 
     Future.sequence(
@@ -98,10 +97,12 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
           bagLocation = dstBagLocation
         )
 
-        s3Copier.copy(
+        val future = s3Copier.copy(
           src = srcBagItemLocation.objectLocation,
           dst = dstBagItemLocation.objectLocation
         )
+
+        future.map { _ => dstBagItemLocation }
       }
     )
   }

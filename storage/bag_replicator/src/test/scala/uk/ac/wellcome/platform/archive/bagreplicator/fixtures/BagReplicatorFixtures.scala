@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.archive.bagreplicator.fixtures
 
 import java.util.UUID
 
-import org.scalatest.Assertion
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
@@ -27,8 +26,6 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
-import scala.collection.JavaConverters._
-
 trait BagReplicatorFixtures
     extends S3
     with RandomThings
@@ -36,33 +33,6 @@ trait BagReplicatorFixtures
     with Akka
     with BagLocationFixtures
     with ArchiveMessaging {
-
-  def verifyBagCopied(
-    sourceLocation: BagLocation,
-    storageDestination: ReplicatorDestinationConfig
-  ): Assertion = {
-    val sourceItems = s3Client.listObjects(
-      sourceLocation.storageNamespace,
-      sourceLocation.completePath)
-
-    val sourceKeyEtags =
-      sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
-
-//    val bagPath = List(
-//      storageDestination.rootPath,
-//      sourceLocation.bagPath
-//    ).mkString("/")
-
-    val destinationItems = s3Client.listObjects(
-      storageDestination.namespace,
-      storageDestination.rootPath
-    )
-
-    val destinationKeyEtags =
-      destinationItems.getObjectSummaries.asScala.toList.map(_.getETag)
-
-    destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
-  }
 
   def withBagNotification[R](
     queuePair: QueuePair,
