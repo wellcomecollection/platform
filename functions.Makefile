@@ -78,11 +78,10 @@ endef
 #   $3 - ECR Repository URI
 #   $4 - Registry ID
 #
-# TODO: Update to correct image label
 define publish_service_ssm
 	$(ROOT)/docker_run.py \
 	    --aws --dind -- \
-	    publish_service:ac2378a7959a09cecdd065423e2b4a3f442c4a92 \
+	    wellcome/publish_service:51 \
 	        --project_name=$(2) \
 	        --registry_id=$(4) \
 	        --label=latest \
