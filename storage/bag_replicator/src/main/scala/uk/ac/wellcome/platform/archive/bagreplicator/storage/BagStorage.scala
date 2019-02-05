@@ -22,19 +22,10 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
     sourceBagLocation: BagLocation,
     storageDestination: ReplicatorDestinationConfig
   ): Future[List[CopyResult]] = {
-    debug(
-      List(
-        s"duplicating bag from",
-        sourceBagLocation.toString,
-        s"to $storageDestination"
-      ).mkString(" ")
-    )
+    debug(s"duplicating bag from $sourceBagLocation to $storageDestination")
 
     for {
-      sourceBagItems <- listBagItems(
-        sourceBagLocation
-      )
-
+      sourceBagItems <- listBagItems(sourceBagLocation)
       copyResults <- duplicateBagItems(
         sourceBagItems,
         storageDestination
