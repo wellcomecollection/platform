@@ -54,7 +54,8 @@ trait BagReplicatorFixtures
 //    ).mkString("/")
 
     val destinationItems = s3Client.listObjects(
-      storageDestination.namespace
+      storageDestination.namespace,
+      storageDestination.rootPath
     )
 
     val destinationKeyEtags =

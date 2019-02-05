@@ -11,7 +11,6 @@ import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagLocation,
   ExternalIdentifier
 }
-import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -24,31 +23,51 @@ class BagStorageTest
     with IntegrationPatience
     with BagReplicatorFixtures {
 
-  it("should duplicate a bag into a given location") {
+  val bagStorage = new BagStorage(s3Client = s3Client)
+
+  it("duplicates a bag within the same bucket") {
+    withLocalS3Bucket { bucket =>
+      withBag(bucket) { bagLocation =>
+        val destinationConfig = ReplicatorDestinationConfig(
+          namespace = bucket.name,
+          rootPath = randomAlphanumeric()
+        )
+
+        val result = bagStorage.duplicateBag(
+          sourceBagLocation = bagLocation,
+          storageDestination = destinationConfig
+        )
+
+        whenReady(result) { _ =>
+          verifyBagCopied(
+            sourceLocation = bagLocation,
+            storageDestination = destinationConfig
+          )
+        }
+      }
+    }
+  }
+
+  it("duplicates a bag across different buckets") {
     withLocalS3Bucket { sourceBucket =>
       withLocalS3Bucket { destinationBucket =>
-        withBag(
-          storageBucket = sourceBucket,
-          bagInfo = randomBagInfo
-        ) { bagLocation: BagLocation =>
-          withBagStorage { bagStorage =>
-            val destinationLocation = ReplicatorDestinationConfig(
-              namespace = destinationBucket.name,
-              rootPath = randomAlphanumeric()
+        withBag(sourceBucket) { bagLocation =>
+          val destinationLocation = ReplicatorDestinationConfig(
+            namespace = destinationBucket.name,
+            rootPath = randomAlphanumeric()
+          )
+
+          val result: Future[List[CopyResult]] =
+            bagStorage.duplicateBag(
+              sourceBagLocation = bagLocation,
+              storageDestination = destinationLocation
             )
 
-            val result: Future[List[CopyResult]] =
-              bagStorage.duplicateBag(
-                sourceBagLocation = bagLocation,
-                storageDestination = destinationLocation
-              )
-
-            whenReady(result) { _ =>
-              verifyBagCopied(
-                sourceLocation = bagLocation,
-                storageDestination = destinationLocation
-              )
-            }
+          whenReady(result) { _ =>
+            verifyBagCopied(
+              sourceLocation = bagLocation,
+              storageDestination = destinationLocation
+            )
           }
         }
       }
@@ -60,45 +79,38 @@ class BagStorageTest
       withLocalS3Bucket { sourceBucket =>
         withLocalS3Bucket { destinationBucket =>
           withBag(
-            storageBucket = sourceBucket,
+            bucket = sourceBucket,
             bagInfo = randomBagInfo.copy(
               externalIdentifier = ExternalIdentifier("prefix")
             )
           ) { bagLocation: BagLocation =>
             withBag(
-              storageBucket = sourceBucket,
+              bucket = sourceBucket,
               bagInfo = randomBagInfo.copy(
                 externalIdentifier = ExternalIdentifier("prefix_suffix")
               )
             ) { _ =>
-              withBagStorage { bagStorage =>
-                val destinationLocation = ReplicatorDestinationConfig(
-                  namespace = destinationBucket.name,
-                  rootPath = randomAlphanumeric()
+              val destinationLocation = ReplicatorDestinationConfig(
+                namespace = destinationBucket.name,
+                rootPath = randomAlphanumeric()
+              )
+
+              val result: Future[List[CopyResult]] =
+                bagStorage.duplicateBag(
+                  sourceBagLocation = bagLocation,
+                  storageDestination = destinationLocation
                 )
 
-                val result: Future[List[CopyResult]] =
-                  bagStorage.duplicateBag(
-                    sourceBagLocation = bagLocation,
-                    storageDestination = destinationLocation
-                  )
-
-                whenReady(result) { _ =>
-                  verifyBagCopied(
-                    sourceLocation = bagLocation,
-                    storageDestination = destinationLocation
-                  )
-                }
+              whenReady(result) { _ =>
+                verifyBagCopied(
+                  sourceLocation = bagLocation,
+                  storageDestination = destinationLocation
+                )
               }
             }
           }
         }
       }
     }
-  }
-
-  private def withBagStorage[R](testWith: TestWith[BagStorage, R]): R = {
-    val bagStorage = new BagStorage(s3Client = s3Client)
-    testWith(bagStorage)
   }
 }
