@@ -20,7 +20,7 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
   def duplicateBag(
     sourceBagLocation: BagLocation,
     storageDestination: ReplicatorDestinationConfig
-  ): Future[List[BagItemLocation]] = {
+  ): Future[BagLocation] = {
     debug(s"duplicating bag from $sourceBagLocation to $storageDestination")
 
     val dstBagLocation = sourceBagLocation.copy(
@@ -34,7 +34,7 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
         sourceBagItems = sourceBagItems,
         dstBagLocation = dstBagLocation
       )
-    } yield copyResults
+    } yield dstBagLocation
   }
 
   private def listObjects(bagLocation: BagLocation): Future[ObjectListing] = Future {
