@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit._
 
 import scala.util.Random
 
@@ -74,7 +75,5 @@ trait RandomThings {
     randomExternalIdentifier
   )
 
-  def randomBagPath = BagPath(
-    randomAlphanumeric()
-  )
+  def randomBagPath = BagPath(randomAlphanumeric(15))
 }

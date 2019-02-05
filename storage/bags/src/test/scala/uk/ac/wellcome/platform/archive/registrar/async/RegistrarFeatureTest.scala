@@ -12,12 +12,8 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagId,
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagId, BagLocation}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.registrar.async.fixtures.StorageManifestAssertions
@@ -76,8 +72,7 @@ class RegistrarFeatureTest
                 expectedStorageSpace = bagId.space,
                 expectedBagInfo = bagInfo,
                 expectedNamespace = storageBucket.name,
-                expectedPath =
-                  s"${bagLocation.storageRootPath}/${bagLocation.bagPath.value}",
+                expectedPath = bagLocation.completePath,
                 filesNumber = 1,
                 createdDateAfter = createdAfterDate
               )
@@ -103,13 +98,15 @@ class RegistrarFeatureTest
         val bagId = randomBagId
 
         val bagLocation = BagLocation(
-          storageBucket.name,
-          "archive",
-          BagPath(s"space/does-not-exist"))
+          storageNamespace = storageBucket.name,
+          storagePrefix = "archive",
+          storageSpace = bagId.space,
+          bagPath = randomBagPath
+        )
 
         sendNotificationToSQS(
           queuePair.queue,
-          ArchiveComplete(requestId, bagId.space, bagLocation)
+          ArchiveComplete(requestId, bagLocation)
         )
 
         eventually {

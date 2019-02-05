@@ -11,7 +11,10 @@ import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.ArchiveJob
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  FileDownloadComplete
+}
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ArchiveJobError,
@@ -24,11 +27,10 @@ import uk.ac.wellcome.platform.archive.common.models.error.{
   ArchiveError,
   InvalidBagManifestError
 }
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
+import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagLocation,
-  BagPath,
-  FileDownloadComplete
+  BagPath
 }
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -59,7 +61,7 @@ class ArchiveZipFileFlowTest
           val bagInfo = randomBagInfo
           withBagItZip(bagInfo) { zipFile =>
             withArchiveZipFileFlow(storageBucket, reportingTopic) { uploader =>
-              val ingestContext = createIngestBagRequestWith()
+              val ingestContext = createIngestBagRequest
               val (_, verification) =
                 uploader.runWith(
                   Source.single(
@@ -73,13 +75,13 @@ class ArchiveZipFileFlowTest
               whenReady(verification) { result =>
                 listKeysInBucket(storageBucket) should have size 5
                 result shouldBe List(Right(ArchiveComplete(
-                  ingestContext.id,
-                  ingestContext.storageSpace,
-                  BagLocation(
-                    storageBucket.name,
-                    "archive",
-                    BagPath(
-                      s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
+                  archiveRequestId = ingestContext.id,
+                  bagLocation = BagLocation(
+                    storageNamespace = storageBucket.name,
+                    storagePrefix = "archive",
+                    storageSpace = ingestContext.storageSpace,
+                    bagPath = BagPath(bagInfo.externalIdentifier.toString)
+                  )
                 )))
 
                 assertTopicReceivesProgressEventUpdate(
@@ -211,10 +213,11 @@ class ArchiveZipFileFlowTest
                         archiveJob
                           .asInstanceOf[ArchiveJob]
                           .bagLocation shouldBe BagLocation(
-                          storageBucket.name,
-                          "archive",
-                          BagPath(
-                            s"${ingestContext.storageSpace}/${bagInfo.externalIdentifier}"))
+                          storageNamespace = storageBucket.name,
+                          storagePrefix = "archive",
+                          storageSpace = ingestContext.storageSpace,
+                          bagPath = BagPath(bagInfo.externalIdentifier.toString)
+                        )
                     }
 
                     assertTopicReceivesProgressStatusUpdate(

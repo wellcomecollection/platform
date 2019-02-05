@@ -11,6 +11,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
 }
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.bag.BagDigestFileCreator
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagItemPath
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 object ArchiveItemJobCreator {
@@ -24,8 +25,11 @@ object ArchiveItemJobCreator {
   def createArchiveDigestItemJobs(job: ArchiveJob)
     : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] =
     job.bagManifestLocations
-      .map { manifestLocation =>
-        ZipLocation(job.zipFile, manifestLocation.toBagFilePath)
+      .map { manifestLocation: BagItemPath =>
+        ZipLocation(
+          zipFile = job.zipFile,
+          bagItemPath = manifestLocation
+        )
       }
       .traverse { zipLocation =>
         parseArchiveDigestItemJobs(job, zipLocation)
@@ -44,7 +48,7 @@ object ArchiveItemJobCreator {
     : Either[ArchiveError[ArchiveJob], List[ArchiveDigestItemJob]] = {
     val value: Either[ArchiveError[ArchiveJob], InputStream] = ZipFileReader
       .maybeInputStream(zipLocation)
-      .toRight(FileNotFoundError(zipLocation.bagFilePath.value, job))
+      .toRight(FileNotFoundError(zipLocation.bagItemPath.toString, job))
 
     value.flatMap { inputStream =>
       val manifestFileLines: List[String] =
@@ -57,7 +61,7 @@ object ArchiveItemJobCreator {
         .filter { _.nonEmpty }
         .traverse { line =>
           BagDigestFileCreator
-            .create(line.trim(), job, zipLocation.bagFilePath.value)
+            .create(line.trim(), job, zipLocation.bagItemPath.toString)
             .map { bagItem =>
               ArchiveDigestItemJob(archiveJob = job, bagDigestItem = bagItem)
             }

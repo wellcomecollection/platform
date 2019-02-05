@@ -1,17 +1,9 @@
-package uk.ac.wellcome.platform.archive.common.models
+package uk.ac.wellcome.platform.archive.common.models.bagit
+
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.TypeCoercionError
 import io.circe.{Decoder, Encoder, Json}
-import uk.ac.wellcome.json.JsonUtil._
-
-case class BagId(
-  space: StorageSpace,
-  externalIdentifier: ExternalIdentifier
-) {
-  override def toString: String =
-    s"$space/$externalIdentifier"
-
-}
+import uk.ac.wellcome.json.JsonUtil.{fromJson, toJson}
 
 case class ExternalIdentifier(underlying: String) extends AnyVal {
   override def toString: String = underlying
@@ -26,7 +18,7 @@ object ExternalIdentifier {
   implicit val spaceDec = Decoder.instance[ExternalIdentifier](cursor =>
     cursor.value.as[String].map(ExternalIdentifier(_)))
 
-  implicit def fmtSpace =
+  implicit def fmtSpace: DynamoFormat[ExternalIdentifier] =
     DynamoFormat.xmap[ExternalIdentifier, String](
       fromJson[ExternalIdentifier](_)(spaceDec).toEither.left
         .map(TypeCoercionError)

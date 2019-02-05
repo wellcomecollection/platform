@@ -1,6 +1,11 @@
 package uk.ac.wellcome.platform.archive.common.fixtures
 
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagInfo,
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -10,11 +15,12 @@ trait BagLocationFixtures extends S3 with BagIt {
     storageBucket: Bucket,
     dataFileCount: Int = 1,
     bagInfo: BagInfo = randomBagInfo,
+    storageSpace: StorageSpace = randomStorageSpace,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
     createTagManifest: List[(String, String)] => Option[FileEntry] =
       createValidTagManifest)(testWith: TestWith[BagLocation, R]): R = {
-    val bagIdentifier = ExternalIdentifier(randomAlphanumeric())
+    val bagIdentifier = randomExternalIdentifier
 
     info(s"Creating bag $bagIdentifier")
 
@@ -26,15 +32,17 @@ trait BagLocationFixtures extends S3 with BagIt {
     val storagePrefix = "archive"
 
     val bagLocation = BagLocation(
-      storageBucket.name,
-      storagePrefix,
-      BagPath(s"space/$bagIdentifier"))
+      storageNamespace = storageBucket.name,
+      storagePrefix = storagePrefix,
+      storageSpace = storageSpace,
+      bagPath = BagPath(bagIdentifier.toString)
+    )
 
     fileEntries.map((entry: FileEntry) => {
       s3Client
         .putObject(
           bagLocation.storageNamespace,
-          s"$storagePrefix/${bagLocation.bagPath}/${entry.name}",
+          s"${bagLocation.completePath}/${entry.name}",
           entry.contents
         )
     })

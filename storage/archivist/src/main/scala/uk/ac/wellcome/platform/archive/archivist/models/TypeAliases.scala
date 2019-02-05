@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.archive.archivist.models
 
 import uk.ac.wellcome.platform.archive.common.models.{
   ArchiveComplete,
-  FileDownloadComplete,
   IngestBagRequest
 }
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError

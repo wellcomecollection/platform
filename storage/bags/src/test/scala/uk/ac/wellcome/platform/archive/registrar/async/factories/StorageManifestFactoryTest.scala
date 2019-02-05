@@ -8,11 +8,11 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{
   RandomThings
 }
 import uk.ac.wellcome.platform.archive.common.generators.ArchiveCompleteGenerators
+import uk.ac.wellcome.platform.archive.common.models.bagit
 import uk.ac.wellcome.platform.archive.common.models.error.{
   DownloadError,
   InvalidBagManifestError
 }
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 
 class StorageManifestFactoryTest
@@ -24,12 +24,10 @@ class StorageManifestFactoryTest
   implicit val _ = s3Client
 
   it("returns a right of storage manifest if reading a bag location succeeds") {
-    val storageSpace = randomStorageSpace
     withLocalS3Bucket { bucket =>
       val bagInfo = randomBagInfo
       withBag(bucket, bagInfo = bagInfo) { bagLocation =>
         val archiveComplete = createArchiveCompleteWith(
-          space = storageSpace,
           bagLocation = bagLocation
         )
 
@@ -47,11 +45,11 @@ class StorageManifestFactoryTest
                   tagManifestDigestFiles),
                 _,
                 _)) =>
-            actualStorageSpace shouldBe storageSpace
+            actualStorageSpace shouldBe bagLocation.storageSpace
             actualBagInfo shouldBe bagInfo
             bagDigestFiles should have size 1
             tagManifestDigestFiles should have size 3
-            tagManifestDigestFiles.map(_.path.value) should contain theSameElementsAs List(
+            tagManifestDigestFiles.map { _.path.toString } should contain theSameElementsAs List(
               "manifest-sha256.txt",
               "bag-info.txt",
               "bagit.txt")
@@ -63,8 +61,12 @@ class StorageManifestFactoryTest
   describe("returning a left of registrar error ...") {
     it("if no files are at the BagLocation") {
       withLocalS3Bucket { bucket =>
-        val bagLocation =
-          BagLocation(bucket.name, "archive", BagPath(s"space/b1234567"))
+        val bagLocation = bagit.BagLocation(
+          storageNamespace = bucket.name,
+          storagePrefix = "archive",
+          storageSpace = randomStorageSpace,
+          bagPath = randomBagPath
+        )
         val archiveComplete = createArchiveCompleteWith(
           bagLocation = bagLocation
         )

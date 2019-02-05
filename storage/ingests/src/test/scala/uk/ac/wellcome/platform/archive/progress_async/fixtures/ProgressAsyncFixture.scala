@@ -5,7 +5,7 @@ import akka.stream.scaladsl.Flow
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.fixtures.{
   ArchiveMessaging,
@@ -52,11 +52,11 @@ trait ProgressAsyncFixture
       testWith((ProgressUpdateFlow(progressTracker), progressTracker))
     }
 
-  def withApp[R](queuePair: QueuePair, topic: Topic, table: Table)(
+  def withApp[R](queue: Queue, topic: Topic, table: Table)(
     testWith: TestWith[ProgressAsync, R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
-        withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue) {
+        withArchiveMessageStream[NotificationMessage, Unit, R](queue) {
           messageStream =>
             withProgressTracker(table) { progressTracker =>
               val progressAsync = new ProgressAsync(
@@ -66,6 +66,8 @@ trait ProgressAsyncFixture
                 snsConfig = createSNSConfigWith(topic)
               )
 
+              progressAsync.run()
+
               testWith(progressAsync)
             }
         }
@@ -73,12 +75,12 @@ trait ProgressAsyncFixture
     }
 
   def withConfiguredApp[R](
-    testWith: TestWith[(QueuePair, Topic, Table, ProgressAsync), R]): R = {
-    withLocalSqsQueueAndDlqAndTimeout(15) { qPair =>
+    testWith: TestWith[(Queue, Topic, Table, ProgressAsync), R]): R = {
+    withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withProgressTrackerTable { table =>
-          withApp(qPair, topic, table) { progressAsync =>
-            testWith((qPair, topic, table, progressAsync))
+          withApp(queue, topic, table) { progressAsync =>
+            testWith((queue, topic, table, progressAsync))
           }
         }
       }

@@ -4,10 +4,12 @@ import java.net.{URI, URISyntaxException}
 import java.util.UUID
 
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagLocation
 
-case class ArchiveComplete(archiveRequestId: UUID,
-                           space: StorageSpace,
-                           bagLocation: BagLocation)
+case class ArchiveComplete(
+  archiveRequestId: UUID,
+  bagLocation: BagLocation
+)
 
 object ArchiveComplete {
 

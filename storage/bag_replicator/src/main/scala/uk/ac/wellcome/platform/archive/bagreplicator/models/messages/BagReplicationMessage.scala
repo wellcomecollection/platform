@@ -1,9 +1,7 @@
 package uk.ac.wellcome.platform.archive.bagreplicator.models.messages
 
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagLocation
-}
+import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
+import uk.ac.wellcome.platform.archive.common.models.bagit.BagLocation
 
 trait BagReplicationContext {
   val context: ArchiveComplete

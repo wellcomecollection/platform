@@ -3,11 +3,13 @@ package uk.ac.wellcome.platform.archive.bagreplicator.storage
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{ObjectListing, S3ObjectSummary}
 import com.amazonaws.services.s3.transfer.model.CopyResult
-
 import grizzled.slf4j.Logging
-
-import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
-import uk.ac.wellcome.platform.archive.common.models.BagLocation
+import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinationConfig
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagItemLocation,
+  BagItemPath,
+  BagLocation
+}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,7 +18,7 @@ object BagStorage extends Logging {
 
   def duplicateBag(
     sourceBagLocation: BagLocation,
-    storageDestination: StorageLocation
+    storageDestination: ReplicatorDestinationConfig
   )(implicit
     s3Client: AmazonS3,
     s3Copier: S3Copier,
@@ -47,7 +49,7 @@ object BagStorage extends Logging {
   )(implicit
     ctx: ExecutionContext): Future[ObjectListing] = Future {
 
-    val absolutePathInStorage = bagLocation.bagPathInStorage
+    val absolutePathInStorage = bagLocation.completePath
       .replaceAll("(.*[^/]+)/*", "$1/")
 
     s3Client.listObjects(
@@ -68,11 +70,16 @@ object BagStorage extends Logging {
     bagLocation: BagLocation
   )(implicit
     ctx: ExecutionContext): Future[List[BagItemLocation]] = Future {
-    val prefix = s"${bagLocation.bagPathInStorage}/"
+    val prefix = s"${bagLocation.completePath}/"
 
     listing.getObjectSummaries.asScala
       .map(getItemInPath(_, prefix))
-      .map(BagItemLocation(bagLocation, _))
+      .map { path: String =>
+        BagItemLocation(
+          bagLocation = bagLocation,
+          bagItemPath = BagItemPath(path)
+        )
+      }
       .toList
   }
 
@@ -94,7 +101,7 @@ object BagStorage extends Logging {
 
   private def duplicateBagItems(
     sourceBagItems: List[BagItemLocation],
-    storageDestination: StorageLocation
+    storageDestination: ReplicatorDestinationConfig
   )(implicit
     s3Copier: S3Copier,
     ctx: ExecutionContext): Future[List[CopyResult]] = {
@@ -108,24 +115,24 @@ object BagStorage extends Logging {
   }
 
   private def duplicateBagItem(
-    sourceBagItem: BagItemLocation,
-    storageDestination: StorageLocation
+    sourceBagItemLocation: BagItemLocation,
+    storageDestination: ReplicatorDestinationConfig
   )(implicit
     s3Copier: S3Copier,
     ctx: ExecutionContext): Future[CopyResult] = {
 
-    val sourceNamespace = sourceBagItem.bagLocation.storageNamespace
-    val sourceItemKey = List(
-      sourceBagItem.bagLocation.bagPathInStorage,
-      sourceBagItem.itemPath
-    ).mkString("/")
+    val sourceNamespace = sourceBagItemLocation.bagLocation.storageNamespace
+    val sourceItemKey = sourceBagItemLocation.completePath
+
+    val destinationBagLocation = sourceBagItemLocation.bagLocation.copy(
+      storagePrefix = storageDestination.rootPath
+    )
+    val destinationBagItem = sourceBagItemLocation.copy(
+      bagLocation = destinationBagLocation
+    )
 
     val destinationNamespace = storageDestination.namespace
-    val destinationItemKey = List(
-      storageDestination.rootPath,
-      sourceBagItem.bagLocation.bagPath,
-      sourceBagItem.itemPath
-    ).mkString("/")
+    val destinationItemKey = destinationBagItem.completePath
 
     debug(
       List(

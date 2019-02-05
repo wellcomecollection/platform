@@ -9,15 +9,15 @@ import uk.ac.wellcome.platform.archive.common.bag.{
   BagDigestFileCreator,
   BagInfoParser
 }
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagDigestFile,
+  BagLocation
+}
 import uk.ac.wellcome.platform.archive.common.models.error.{
   ArchiveError,
   DownloadError
 }
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  BagDigestFile,
-  BagLocation
-}
+import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   InfrequentAccessStorageProvider,
   StorageLocation
@@ -45,15 +45,13 @@ object StorageManifestFactory {
     } yield {
       val checksumAlgorithm = ChecksumAlgorithm(algorithm)
       StorageManifest(
-        space = archiveComplete.space,
+        space = archiveComplete.bagLocation.storageSpace,
         info = bagInfo,
         manifest = FileManifest(checksumAlgorithm, manifestTuples),
         tagManifest = FileManifest(checksumAlgorithm, tagManifestTuples),
         accessLocation = StorageLocation(
-          InfrequentAccessStorageProvider,
-          ObjectLocation(
-            archiveComplete.bagLocation.storageNamespace,
-            s"${archiveComplete.bagLocation.storageRootPath}/${archiveComplete.bagLocation.bagPath.value}")
+          provider = InfrequentAccessStorageProvider,
+          location = archiveComplete.bagLocation.objectLocation
         ),
         createdDate = Instant.now()
       )
@@ -94,11 +92,7 @@ object StorageManifestFactory {
 
   private def getFileObjectLocation(bagLocation: BagLocation, name: String) =
     ObjectLocation(
-      bagLocation.storageNamespace,
-      List(
-        bagLocation.storageRootPath,
-        bagLocation.bagPath.value,
-        name
-      ).mkString("/")
+      namespace = bagLocation.storageNamespace,
+      key = List(bagLocation.completePath, name).mkString("/")
     )
 }

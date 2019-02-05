@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.common.fixtures
 import java.security.MessageDigest
 import java.time.LocalDate
 
-import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit._
 
 import scala.util.Random
 

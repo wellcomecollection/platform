@@ -6,6 +6,12 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.FileNotFoundError
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.bag.BagInfoParser
 import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagItemPath,
+  BagLocation,
+  BagPath,
+  ExternalIdentifier
+}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 /** This flow extracts the external identifier from the metadata inside
@@ -28,12 +34,14 @@ object ArchiveJobCreator {
           zipFile,
           BagLocation(
             storageNamespace = config.uploadConfig.uploadNamespace,
-            storageRootPath = config.uploadConfig.uploadPrefix,
-            bagPath =
-              BagPath(s"${ingestBagRequest.storageSpace}/$externalIdentifier")
+            storagePrefix = config.uploadConfig.uploadPrefix,
+            storageSpace = ingestBagRequest.storageSpace,
+            bagPath = BagPath(externalIdentifier.toString)
           ),
           config = config.bagItConfig,
-          bagManifestLocations = BagManifestLocation.create(config.bagItConfig)
+          bagManifestLocations = config.bagItConfig.digestNames.map {
+            BagItemPath(_)
+          }
         )
       }
 
@@ -59,7 +67,7 @@ object ArchiveJobCreator {
                                ingestBagRequest: IngestBagRequest)
     : Either[ArchiveError[IngestBagRequest], ExternalIdentifier] = {
     ZipFileReader
-      .maybeInputStream(ZipLocation(zipFile, BagFilePath("bag-info.txt")))
+      .maybeInputStream(ZipLocation(zipFile, BagItemPath("bag-info.txt")))
       .toRight[ArchiveError[IngestBagRequest]](
         FileNotFoundError("bag-info.txt", ingestBagRequest))
       .flatMap { inputStream =>

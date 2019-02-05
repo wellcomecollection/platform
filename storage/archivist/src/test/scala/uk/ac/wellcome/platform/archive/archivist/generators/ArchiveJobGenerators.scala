@@ -5,8 +5,7 @@ import java.util.zip.ZipFile
 
 import uk.ac.wellcome.platform.archive.archivist.models._
 import uk.ac.wellcome.platform.archive.common.generators.ExternalIdentifierGenerators
-import uk.ac.wellcome.platform.archive.common.models
-import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
@@ -20,7 +19,7 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
   ): ArchiveItemJob =
     ArchiveItemJob(
       archiveJob = createArchiveJobWith(file, bagIdentifier, bucket),
-      itemLocation = BagFilePath(s3Key)
+      bagItemPath = BagItemPath(s3Key)
     )
 
   def createArchiveDigestItemJobWith(
@@ -36,25 +35,33 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
         bagIdentifier = bagIdentifier,
         bucket = bucket
       ),
-      bagDigestItem = models.BagDigestFile(Checksum(digest), BagFilePath(s3Key))
+      bagDigestItem = BagDigestFile(
+        checksum = digest,
+        path = BagItemPath(s3Key)
+      )
     )
 
+  // todo
   def createArchiveJobWith(
     file: File,
     bagIdentifier: ExternalIdentifier = createExternalIdentifier,
     bucket: Bucket
   ): ArchiveJob = {
-    val bagPath = BagPath(s"space/$bagIdentifier")
+    val bagLocation = BagLocation(
+      storageNamespace = bucket.name,
+      storagePrefix = "archive",
+      storageSpace = randomStorageSpace,
+      bagPath = BagPath(bagIdentifier.toString)
+    )
 
-    val bagLocation = BagLocation(bucket.name, "archive", bagPath)
     ArchiveJob(
       externalIdentifier = bagIdentifier,
       zipFile = new ZipFile(file),
       bagLocation = bagLocation,
       config = BagItConfig(),
       bagManifestLocations = List(
-        BagManifestLocation("manifest-sha256.txt"),
-        BagManifestLocation("tagmanifest-sha256.txt")
+        BagItemPath("manifest-sha256.txt"),
+        BagItemPath("tagmanifest-sha256.txt")
       )
     )
   }

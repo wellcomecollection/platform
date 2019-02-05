@@ -2,17 +2,15 @@ package uk.ac.wellcome.platform.archive.registrar.common.models
 
 import java.time.Instant
 
-import uk.ac.wellcome.platform.archive.common.models.{
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagDigestFile,
   BagId,
-  BagInfo,
-  StorageSpace
+  BagInfo
 }
+import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.models.StorageLocation
 
 case class ChecksumAlgorithm(value: String)
-
-case class BagDescription(value: String)
 
 case class StorageManifest(
   space: StorageSpace,

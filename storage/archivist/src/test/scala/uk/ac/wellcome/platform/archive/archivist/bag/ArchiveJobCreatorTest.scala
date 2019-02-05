@@ -7,11 +7,14 @@ import uk.ac.wellcome.platform.archive.archivist.fixtures.ZipBagItFixture
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveJob,
-  BagItConfig,
-  BagManifestLocation
+  BagItConfig
 }
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagItemPath,
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 class ArchiveJobCreatorTest
@@ -41,13 +44,14 @@ class ArchiveJobCreatorTest
               bagManifestLocations)) =>
           actualZipFile.size() shouldBe (new ZipFile(file)).size()
           bagLocation shouldBe BagLocation(
-            bucketName,
-            "archive",
-            BagPath(s"${ingestRequest.storageSpace}/$bagIdentifier"))
+            storageNamespace = bucketName,
+            storagePrefix = "archive",
+            storageSpace = ingestRequest.storageSpace,
+            bagPath = BagPath(bagIdentifier.toString)
+          )
           bagItConfig shouldBe BagItConfig()
-          bagManifestLocations should contain only (BagManifestLocation(
-            "tagmanifest-sha256.txt"), BagManifestLocation(
-            "manifest-sha256.txt"))
+          bagManifestLocations should contain only (BagItemPath(
+            "tagmanifest-sha256.txt"), BagItemPath("manifest-sha256.txt"))
       }
     }
   }

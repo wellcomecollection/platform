@@ -15,10 +15,10 @@ object ZipFileReader extends Logging {
     */
   def maybeInputStream(zipLocation: ZipLocation): Option[InputStream] = {
     val zipFile = zipLocation.zipFile
-    debug(s"Getting ZipEntry ${zipLocation.bagFilePath}")
+    debug(s"Getting ZipEntry ${zipLocation.bagItemPath}")
 
     val maybeInputStream = for {
-      zipEntry <- Option(zipFile.getEntry(zipLocation.bagFilePath.value))
+      zipEntry <- Option(zipFile.getEntry(zipLocation.bagItemPath.toString))
       zipStream <- Option(zipFile.getInputStream(zipEntry))
     } yield zipStream
 

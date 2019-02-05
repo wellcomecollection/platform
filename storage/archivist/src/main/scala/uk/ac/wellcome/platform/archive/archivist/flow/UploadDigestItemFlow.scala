@@ -40,7 +40,7 @@ object UploadDigestItemFlow {
       .map {
         case (job, option) =>
           option
-            .toRight(FileNotFoundError(job.bagDigestItem.path.value, job))
+            .toRight(FileNotFoundError(job.bagDigestItem.path.toString, job))
             .map(inputStream => (job, inputStream))
       }
       .via(

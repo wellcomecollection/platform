@@ -2,7 +2,8 @@ package uk.ac.wellcome.platform.archive.archivist.models
 
 import java.util.zip.ZipFile
 
-import uk.ac.wellcome.platform.archive.common.models.{
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagItemPath,
   BagLocation,
   ExternalIdentifier
 }
@@ -22,5 +23,5 @@ case class ArchiveJob(
   zipFile: ZipFile,
   bagLocation: BagLocation,
   config: BagItConfig,
-  bagManifestLocations: List[BagManifestLocation]
+  bagManifestLocations: List[BagItemPath]
 )

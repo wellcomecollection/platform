@@ -5,14 +5,12 @@ import akka.stream.scaladsl.{Flow, Source}
 import com.amazonaws.services.sns.AmazonSNS
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
+import uk.ac.wellcome.platform.archive.common.config.models.Parallelism
 import uk.ac.wellcome.platform.archive.common.messaging.{
   NotificationParsingFlow,
   SnsPublishFlow
 }
-import uk.ac.wellcome.platform.archive.common.models.{
-  IngestBagRequest,
-  Parallelism
-}
+import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.progress.models.{
   ProgressEvent,
   ProgressEventUpdate,

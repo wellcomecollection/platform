@@ -52,7 +52,7 @@ class ArchiveTagManifestFlowTest
 
             getContentFromS3(
               bucket,
-              s"archive/${archiveJob.bagLocation.bagPath}/tagmanifest-sha256.txt") shouldBe expectedTagManifestStream
+              s"${archiveJob.bagLocation.completePath}/tagmanifest-sha256.txt") shouldBe expectedTagManifestStream
           }
         }
       }
@@ -86,7 +86,7 @@ class ArchiveTagManifestFlowTest
                     .getErrorCode shouldBe "NoSuchBucket"
                   location shouldBe ObjectLocation(
                     "not-a-valid-bucket",
-                    s"archive/space/$bagIdentifier/tagmanifest-sha256.txt")
+                    s"${archiveJob.bagLocation.completePath}/tagmanifest-sha256.txt")
               }
           }
         }

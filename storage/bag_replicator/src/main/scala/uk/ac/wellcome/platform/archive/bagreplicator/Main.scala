@@ -19,7 +19,7 @@ object Main extends WellcomeTypesafeApp {
       snsClient = SNSBuilder.buildSNSClient(config),
       messageStream =
         MessagingBuilder.buildMessageStream[NotificationMessage, Unit](config),
-      bagReplicatorConfig = BagReplicatorConfig.buildBagUploaderConfig(config),
+      bagReplicatorConfig = BagReplicatorConfig.buildBagReplicatorConfig(config),
       progressSnsConfig =
         SNSBuilder.buildSNSConfig(config, namespace = "progress"),
       outgoingSnsConfig =

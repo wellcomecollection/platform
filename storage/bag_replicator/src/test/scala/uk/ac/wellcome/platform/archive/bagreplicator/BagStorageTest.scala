@@ -3,14 +3,14 @@ package uk.ac.wellcome.platform.archive.bagreplicator
 import com.amazonaws.services.s3.transfer.model.CopyResult
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinationConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
-import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
 import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
   BagStorage,
   S3Copier
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.{
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagLocation,
   ExternalIdentifier
 }
@@ -33,25 +33,26 @@ class BagStorageTest
         withBag(
           storageBucket = sourceBucket,
           bagInfo = randomBagInfo
-        ) { bagSource: BagLocation =>
+        ) { bagLocation: BagLocation =>
+          // TODO: Move these implicits to the top level
           implicit val _s3Client = s3Client
           implicit val _s3Copier = S3Copier()
 
-          val destinationLocation = StorageLocation(
+          val destinationLocation = ReplicatorDestinationConfig(
             namespace = destinationBucket.name,
             rootPath = randomAlphanumeric()
           )
 
           val result: Future[List[CopyResult]] =
             BagStorage.duplicateBag(
-              bagSource,
-              destinationLocation
+              sourceBagLocation = bagLocation,
+              storageDestination = destinationLocation
             )
 
           whenReady(result) { _ =>
             verifyBagCopied(
-              bagSource,
-              destinationLocation
+              sourceLocation = bagLocation,
+              storageDestination = destinationLocation
             )
           }
         }
@@ -69,7 +70,7 @@ class BagStorageTest
             bagInfo = randomBagInfo.copy(
               externalIdentifier = ExternalIdentifier("prefix")
             )
-          ) { bagSource: BagLocation =>
+          ) { bagLocation: BagLocation =>
             withBag(
               storageBucket = sourceBucket,
               bagInfo = randomBagInfo.copy(
@@ -79,21 +80,21 @@ class BagStorageTest
               implicit val _s3Client = s3Client
               implicit val _s3Copier = S3Copier()
 
-              val destinationLocation = StorageLocation(
+              val destinationLocation = ReplicatorDestinationConfig(
                 namespace = destinationBucket.name,
                 rootPath = randomAlphanumeric()
               )
 
               val result: Future[List[CopyResult]] =
                 BagStorage.duplicateBag(
-                  bagSource,
-                  destinationLocation
+                  sourceBagLocation = bagLocation,
+                  storageDestination = destinationLocation
                 )
 
               whenReady(result) { _ =>
                 verifyBagCopied(
-                  bagSource,
-                  destinationLocation
+                  sourceLocation = bagLocation,
+                  storageDestination = destinationLocation
                 )
               }
             }

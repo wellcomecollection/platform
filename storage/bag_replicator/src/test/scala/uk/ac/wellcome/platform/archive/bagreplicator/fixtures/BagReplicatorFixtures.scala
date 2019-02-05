@@ -2,23 +2,25 @@ package uk.ac.wellcome.platform.archive.bagreplicator.fixtures
 
 import java.util.UUID
 
+import org.scalatest.Assertion
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.bagreplicator.BagReplicator
-import uk.ac.wellcome.platform.archive.bagreplicator.config.BagReplicatorConfig
-import uk.ac.wellcome.platform.archive.bagreplicator.models.StorageLocation
+import uk.ac.wellcome.platform.archive.bagreplicator.config.{
+  BagReplicatorConfig,
+  ReplicatorDestinationConfig
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.{
   ArchiveMessaging,
   BagLocationFixtures,
   RandomThings
 }
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
+import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagInfo,
-  BagLocation,
-  StorageSpace
+  BagLocation
 }
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -36,23 +38,22 @@ trait BagReplicatorFixtures
 
   def verifyBagCopied(
     sourceLocation: BagLocation,
-    storageDestination: StorageLocation
-  ) = {
+    storageDestination: ReplicatorDestinationConfig
+  ): Assertion = {
     val sourceItems = s3Client.listObjects(
       sourceLocation.storageNamespace,
-      sourceLocation.bagPathInStorage)
+      sourceLocation.completePath)
 
     val sourceKeyEtags =
       sourceItems.getObjectSummaries.asScala.toList.map(_.getETag)
 
-    val bagPath = List(
-      storageDestination.rootPath,
-      sourceLocation.bagPath
-    ).mkString("/")
+//    val bagPath = List(
+//      storageDestination.rootPath,
+//      sourceLocation.bagPath
+//    ).mkString("/")
 
     val destinationItems = s3Client.listObjects(
-      storageDestination.namespace,
-      bagPath
+      storageDestination.namespace
     )
 
     val destinationKeyEtags =
@@ -68,19 +69,19 @@ trait BagReplicatorFixtures
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
   )(testWith: TestWith[BagLocation, R]): R =
-    withBag(storageBucket, bagInfo = bagInfo) { bagLocation =>
-      val archiveComplete = ArchiveComplete(
-        archiveRequestId = archiveRequestId,
-        space = storageSpace,
-        bagLocation = bagLocation
-      )
+    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) {
+      bagLocation =>
+        val archiveComplete = ArchiveComplete(
+          archiveRequestId = archiveRequestId,
+          bagLocation = bagLocation
+        )
 
-      sendNotificationToSQS(
-        queuePair.queue,
-        archiveComplete
-      )
+        sendNotificationToSQS(
+          queuePair.queue,
+          archiveComplete
+        )
 
-      testWith(bagLocation)
+        testWith(bagLocation)
     }
 
   def withBagReplicator[R](
@@ -97,7 +98,9 @@ trait BagReplicatorFixtures
             messageStream = messageStream,
             bagReplicatorConfig = BagReplicatorConfig(
               parallelism = 10,
-              StorageLocation(destinationBucket.name, "storage-root")),
+              ReplicatorDestinationConfig(
+                destinationBucket.name,
+                "storage-root")),
             progressSnsConfig = createSNSConfigWith(progressTopic),
             outgoingSnsConfig = createSNSConfigWith(outgoingTopic)
           )

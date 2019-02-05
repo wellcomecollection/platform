@@ -11,11 +11,10 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{
   ArchiveMessaging,
   BagLocationFixtures
 }
-import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
+import uk.ac.wellcome.platform.archive.common.models._
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagInfo,
-  BagLocation,
-  StorageSpace
+  BagLocation
 }
 import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -40,18 +39,18 @@ trait RegistrarFixtures
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
   )(testWith: TestWith[BagLocation, R]): R =
-    withBag(storageBucket, bagInfo = bagInfo) { bagLocation =>
-      val archiveComplete = ArchiveComplete(
-        archiveRequestId = archiveRequestId,
-        space = storageSpace,
-        bagLocation = bagLocation
-      )
+    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) {
+      bagLocation =>
+        val archiveComplete = ArchiveComplete(
+          archiveRequestId = archiveRequestId,
+          bagLocation = bagLocation
+        )
 
-      sendNotificationToSQS(
-        queuePair.queue,
-        archiveComplete
-      )
-      testWith(bagLocation)
+        sendNotificationToSQS(
+          queuePair.queue,
+          archiveComplete
+        )
+        testWith(bagLocation)
     }
 
   override def createTable(table: Table) = {

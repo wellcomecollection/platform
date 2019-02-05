@@ -1,4 +1,5 @@
-package uk.ac.wellcome.platform.archive.common.models
+package uk.ac.wellcome.platform.archive.common.models.bagit
+
 import java.time.LocalDate
 
 case class BagInfo(

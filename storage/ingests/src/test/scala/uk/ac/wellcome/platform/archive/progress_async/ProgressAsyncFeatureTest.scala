@@ -22,10 +22,7 @@ class ProgressAsyncFeatureTest
 
   it("updates an existing progress status to Completed") {
     withConfiguredApp {
-      case (qPair, topic, table, app) => {
-
-        app.run()
-
+      case (queue, topic, table, app) => {
         withProgressTracker(table) { monitor =>
           withProgress(monitor) { progress =>
             val someBagId = Some(randomBagId)
@@ -35,7 +32,7 @@ class ProgressAsyncFeatureTest
                 status = Completed,
                 maybeBag = someBagId)
 
-            sendNotificationToSQS(qPair.queue, progressStatusUpdate)
+            sendNotificationToSQS(queue, progressStatusUpdate)
 
             eventually {
               val actualMessage =
