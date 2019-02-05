@@ -82,9 +82,9 @@ endef
 define publish_service_ssm
 	$(ROOT)/docker_run.py \
 	    --aws --dind -- \
-	    publish_service:928de898df2a6f92b39e68e447a341859c2f0c90 \
+	    publish_service:ac2378a7959a09cecdd065423e2b4a3f442c4a92 \
 	        --project_name=$(2) \
-	        --registry_id=$(2) \
+	        --registry_id=$(4) \
 	        --label=latest \
 	        --image_name="$(1)" \
 	        --repo_uri="$(3)" \
