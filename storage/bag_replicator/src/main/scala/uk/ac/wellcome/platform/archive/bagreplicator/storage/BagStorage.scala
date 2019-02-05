@@ -105,12 +105,12 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
     val destinationBagLocation = sourceBagItemLocation.bagLocation.copy(
       storagePrefix = storageDestination.rootPath
     )
-    val destinationBagItem = sourceBagItemLocation.copy(
+    val destinationBagItemLocation = sourceBagItemLocation.copy(
       bagLocation = destinationBagLocation
     )
 
     val destinationNamespace = storageDestination.namespace
-    val destinationItemKey = destinationBagItem.completePath
+    val destinationItemKey = destinationBagItemLocation.completePath
 
     debug(
       List(
@@ -121,10 +121,8 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
     )
 
     s3Copier.copy(
-      sourceNamespace,
-      sourceItemKey,
-      destinationNamespace,
-      destinationItemKey
+      src = sourceBagItemLocation.objectLocation,
+      dst = destinationBagItemLocation.objectLocation
     )
   }
 }
