@@ -5,7 +5,6 @@ module "snapshot_generator" {
   cluster_id   = "${aws_ecs_cluster.cluster.id}"
   cluster_name = "${aws_ecs_cluster.cluster.name}"
 
-  vpc_id  = "${var.vpc_id}"
   subnets = "${var.private_subnets}"
 
   namespace_id    = "${local.service_discovery_namespace}"

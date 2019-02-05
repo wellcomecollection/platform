@@ -35,7 +35,7 @@ output "infra_bucket_arn" {
 }
 
 output "infra_bucket" {
-  value = "${var.infra_bucket}"
+  value = "${aws_s3_bucket.platform_infra.id}"
 }
 
 # Source data update topics
