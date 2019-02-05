@@ -26,33 +26,39 @@ class StorageManifestFactoryTest
   it("returns a right of storage manifest if reading a bag location succeeds") {
     withLocalS3Bucket { bucket =>
       val bagInfo = randomBagInfo
-      withBag(bucket, bagInfo = bagInfo) { archiveBagLocation =>
-        val bagManifestUpdate = createBagManifestUpdateWith(
-          archiveBagLocation = archiveBagLocation
-        )
+      withBag(bucket, bagInfo = bagInfo, storagePrefix = "archive") { archiveBagLocation =>
+        withBag(bucket, bagInfo = bagInfo, storagePrefix = "access") { accessBagLocation =>
+          val bagManifestUpdate = createBagManifestUpdateWith(
+            archiveBagLocation = archiveBagLocation,
+            accessBagLocation = accessBagLocation
+          )
 
-        val storageManifest =
-          StorageManifestFactory.create(bagManifestUpdate)
+          val storageManifest =
+            StorageManifestFactory.create(bagManifestUpdate)
 
-        inside(storageManifest) {
-          case Right(
-              StorageManifest(
-                actualStorageSpace,
-                actualBagInfo,
-                FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
-                FileManifest(
-                  ChecksumAlgorithm("sha256"),
-                  tagManifestDigestFiles),
-                _,
-                _)) =>
-            actualStorageSpace shouldBe archiveBagLocation.storageSpace
-            actualBagInfo shouldBe bagInfo
-            bagDigestFiles should have size 1
-            tagManifestDigestFiles should have size 3
-            tagManifestDigestFiles.map { _.path.toString } should contain theSameElementsAs List(
-              "manifest-sha256.txt",
-              "bag-info.txt",
-              "bagit.txt")
+          inside(storageManifest) {
+            case Right(
+            StorageManifest(
+            actualStorageSpace,
+            actualBagInfo,
+            FileManifest(ChecksumAlgorithm("sha256"), bagDigestFiles),
+            FileManifest(
+            ChecksumAlgorithm("sha256"),
+            tagManifestDigestFiles),
+            actualAccessLocation,
+            _)) =>
+              actualStorageSpace shouldBe archiveBagLocation.storageSpace
+              actualBagInfo shouldBe bagInfo
+              bagDigestFiles should have size 1
+              tagManifestDigestFiles should have size 3
+              tagManifestDigestFiles.map {
+                _.path.toString
+              } should contain theSameElementsAs List(
+                "manifest-sha256.txt",
+                "bag-info.txt",
+                "bagit.txt")
+              actualAccessLocation.location shouldBe accessBagLocation.objectLocation
+          }
         }
       }
     }
@@ -68,7 +74,8 @@ class StorageManifestFactoryTest
           bagPath = randomBagPath
         )
         val bagManifestUpdate = createBagManifestUpdateWith(
-          archiveBagLocation = bagLocation
+          archiveBagLocation = bagLocation,
+          accessBagLocation = bagLocation
         )
         val value = StorageManifestFactory.create(bagManifestUpdate)
 
@@ -91,7 +98,8 @@ class StorageManifestFactoryTest
             _ => Some(FileEntry("manifest-sha256.txt", "bleeergh!"))) {
           bagLocation =>
             val archiveComplete = createBagManifestUpdateWith(
-              archiveBagLocation = bagLocation
+              archiveBagLocation = bagLocation,
+              accessBagLocation = bagLocation
             )
             val value = StorageManifestFactory.create(archiveComplete)
             inside(value) {
@@ -114,7 +122,8 @@ class StorageManifestFactoryTest
             _ => Some(FileEntry("tagmanifest-sha256.txt", "blaaargh!"))) {
           bagLocation =>
             val archiveComplete = createBagManifestUpdateWith(
-              archiveBagLocation = bagLocation
+              archiveBagLocation = bagLocation,
+              accessBagLocation = bagLocation
             )
             val value = StorageManifestFactory.create(archiveComplete)
             inside(value) {

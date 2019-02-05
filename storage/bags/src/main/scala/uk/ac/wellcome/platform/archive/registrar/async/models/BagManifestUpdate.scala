@@ -10,5 +10,6 @@ import uk.ac.wellcome.platform.archive.common.models.bagit.BagLocation
   */
 case class BagManifestUpdate(
   archiveRequestId: UUID,
-  archiveBagLocation: BagLocation
+  archiveBagLocation: BagLocation,
+  accessBagLocation: BagLocation
 )

@@ -53,7 +53,7 @@ object StorageManifestFactory {
         tagManifest = FileManifest(checksumAlgorithm, tagManifestTuples),
         accessLocation = StorageLocation(
           provider = InfrequentAccessStorageProvider,
-          location = bagManifestUpdate.archiveBagLocation.objectLocation
+          location = bagManifestUpdate.accessBagLocation.objectLocation
         ),
         createdDate = Instant.now()
       )

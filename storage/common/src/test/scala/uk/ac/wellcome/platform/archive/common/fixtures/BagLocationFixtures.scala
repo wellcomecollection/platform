@@ -15,6 +15,7 @@ trait BagLocationFixtures extends S3 with BagIt {
     bucket: Bucket,
     dataFileCount: Int = 1,
     bagInfo: BagInfo = randomBagInfo,
+    storagePrefix: String = "archive",
     storageSpace: StorageSpace = randomStorageSpace,
     createDataManifest: List[(String, String)] => Option[FileEntry] =
       createValidDataManifest,
@@ -29,7 +30,6 @@ trait BagLocationFixtures extends S3 with BagIt {
       dataFileCount = dataFileCount,
       createDataManifest = createDataManifest,
       createTagManifest = createTagManifest)
-    val storagePrefix = "archive"
 
     val bagLocation = BagLocation(
       storageNamespace = bucket.name,

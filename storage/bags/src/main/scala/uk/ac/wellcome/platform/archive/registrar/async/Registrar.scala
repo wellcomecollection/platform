@@ -70,7 +70,8 @@ class Registrar(
       .map { result: ReplicationResult =>
         BagManifestUpdate(
           archiveRequestId = result.archiveRequestId,
-          archiveBagLocation = result.srcBagLocation
+          archiveBagLocation = result.srcBagLocation,
+          accessBagLocation = result.dstBagLocation
         )
       }
       .map(createStorageManifest)

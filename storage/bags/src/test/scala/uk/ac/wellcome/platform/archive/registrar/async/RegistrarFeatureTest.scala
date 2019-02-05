@@ -42,7 +42,7 @@ class RegistrarFeatureTest
   implicit val _ = s3Client
 
   it(
-    "registers an archived BagIt bag from S3 and notifies the progress tracker") {
+    "registers an access BagIt bag from S3 and notifies the progress tracker") {
     withRegistrar {
       case (storageBucket, queuePair, progressTopic, vhs) =>
         val requestId = randomUUID
@@ -55,7 +55,7 @@ class RegistrarFeatureTest
           storageBucket,
           requestId,
           storageSpace,
-          bagInfo = bagInfo) { bagLocation =>
+          bagInfo = bagInfo) { case(archiveBagLocation, accessBagLocation) =>
           val bagId = BagId(
             space = storageSpace,
             externalIdentifier = bagInfo.externalIdentifier
@@ -73,7 +73,7 @@ class RegistrarFeatureTest
                 expectedStorageSpace = bagId.space,
                 expectedBagInfo = bagInfo,
                 expectedNamespace = storageBucket.name,
-                expectedPath = bagLocation.completePath,
+                expectedPath = accessBagLocation.completePath,
                 filesNumber = 1,
                 createdDateAfter = createdAfterDate
               )
@@ -98,18 +98,23 @@ class RegistrarFeatureTest
         val requestId = randomUUID
         val bagId = randomBagId
 
-        val bagLocation = BagLocation(
+        val srcBagLocation = BagLocation(
           storageNamespace = storageBucket.name,
           storagePrefix = "archive",
           storageSpace = bagId.space,
           bagPath = randomBagPath
         )
 
+        val dstBagLocation = srcBagLocation.copy(
+          storagePrefix = "access"
+        )
+
         sendNotificationToSQS(
           queuePair.queue,
           ReplicationResult(
             archiveRequestId = requestId,
-            srcBagLocation = bagLocation
+            srcBagLocation = srcBagLocation,
+            dstBagLocation = dstBagLocation
           )
         )
 
