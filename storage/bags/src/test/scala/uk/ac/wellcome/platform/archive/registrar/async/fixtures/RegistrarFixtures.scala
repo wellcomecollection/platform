@@ -42,9 +42,9 @@ trait RegistrarFixtures
   )(testWith: TestWith[BagLocation, R]): R =
     withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) {
       bagLocation =>
-        val archiveComplete = ArchiveComplete(
+        val archiveComplete = ReplicationResult(
           archiveRequestId = archiveRequestId,
-          bagLocation = bagLocation
+          srcBagLocation = bagLocation
         )
 
         sendNotificationToSQS(

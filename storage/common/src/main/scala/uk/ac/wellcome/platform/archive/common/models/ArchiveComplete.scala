@@ -9,6 +9,7 @@ case class ArchiveComplete(
   bagLocation: BagLocation
 )
 
+// TODO: Agree upon these names
 case class ReplicationRequest(
   archiveRequestId: UUID,
   srcBagLocation: BagLocation

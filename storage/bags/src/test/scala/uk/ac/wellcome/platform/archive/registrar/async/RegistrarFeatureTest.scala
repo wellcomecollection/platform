@@ -107,7 +107,10 @@ class RegistrarFeatureTest
 
         sendNotificationToSQS(
           queuePair.queue,
-          ArchiveComplete(requestId, bagLocation)
+          ReplicationResult(
+            archiveRequestId = requestId,
+            srcBagLocation = bagLocation
+          )
         )
 
         eventually {

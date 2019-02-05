@@ -5,64 +5,52 @@ import java.time.Instant
 
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
-import uk.ac.wellcome.platform.archive.common.bag.{
-  BagDigestFileCreator,
-  BagInfoParser
-}
-import uk.ac.wellcome.platform.archive.common.models.bagit.{
-  BagDigestFile,
-  BagLocation
-}
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  DownloadError
-}
-import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
-import uk.ac.wellcome.platform.archive.common.progress.models.{
-  InfrequentAccessStorageProvider,
-  StorageLocation
-}
+import uk.ac.wellcome.platform.archive.common.bag.{BagDigestFileCreator, BagInfoParser}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagDigestFile, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError}
+import uk.ac.wellcome.platform.archive.common.progress.models.{InfrequentAccessStorageProvider, StorageLocation}
+import uk.ac.wellcome.platform.archive.registrar.async.models.BagManifestUpdate
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
 
 object StorageManifestFactory {
-  def create(archiveComplete: ArchiveComplete)(implicit s3Client: AmazonS3)
-    : Either[ArchiveError[ArchiveComplete], StorageManifest] = {
+  def create(bagManifestUpdate: BagManifestUpdate)(implicit s3Client: AmazonS3)
+    : Either[ArchiveError[BagManifestUpdate], StorageManifest] = {
 
     val algorithm = "sha256"
 
     for {
-      bagInfoInputStream <- downloadFile(archiveComplete, "bag-info.txt")
-      bagInfo <- BagInfoParser.parseBagInfo(archiveComplete, bagInfoInputStream)
+      bagInfoInputStream <- downloadFile(bagManifestUpdate, "bag-info.txt")
+      bagInfo <- BagInfoParser.parseBagInfo(bagManifestUpdate, bagInfoInputStream)
       manifestTuples <- getBagItems(
-        archiveComplete,
+        bagManifestUpdate,
         s"manifest-$algorithm.txt",
         " +")
       tagManifestTuples <- getBagItems(
-        archiveComplete,
+        bagManifestUpdate,
         s"tagmanifest-$algorithm.txt",
         " +")
     } yield {
       val checksumAlgorithm = ChecksumAlgorithm(algorithm)
       StorageManifest(
-        space = archiveComplete.bagLocation.storageSpace,
+        space = bagManifestUpdate.archiveBagLocation.storageSpace,
         info = bagInfo,
         manifest = FileManifest(checksumAlgorithm, manifestTuples),
         tagManifest = FileManifest(checksumAlgorithm, tagManifestTuples),
         accessLocation = StorageLocation(
           provider = InfrequentAccessStorageProvider,
-          location = archiveComplete.bagLocation.objectLocation
+          location = bagManifestUpdate.archiveBagLocation.objectLocation
         ),
         createdDate = Instant.now()
       )
     }
   }
 
-  private def getBagItems(archiveComplete: ArchiveComplete,
+  private def getBagItems(bagManifestUpdate: BagManifestUpdate,
                           name: String,
                           delimiter: String)(implicit s3Client: AmazonS3)
-    : Either[ArchiveError[ArchiveComplete], List[BagDigestFile]] = {
-    val triedLines = downloadFile(archiveComplete, name)
+    : Either[ArchiveError[BagManifestUpdate], List[BagDigestFile]] = {
+    val triedLines = downloadFile(bagManifestUpdate, name)
       .map(
         inputStream =>
           scala.io.Source
@@ -74,20 +62,20 @@ object StorageManifestFactory {
 
     triedLines.flatMap { lines: List[String] =>
       lines.traverse { line =>
-        BagDigestFileCreator.create(line, archiveComplete, name)
+        BagDigestFileCreator.create(line, bagManifestUpdate, name)
       }
     }
   }
 
   import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
-  private def downloadFile(archiveComplete: ArchiveComplete, filename: String)(
+  private def downloadFile(bagManifestUpdate: BagManifestUpdate, filename: String)(
     implicit s3Client: AmazonS3)
-    : Either[DownloadError[ArchiveComplete], InputStream] = {
+    : Either[DownloadError[BagManifestUpdate], InputStream] = {
     val location: ObjectLocation =
-      getFileObjectLocation(archiveComplete.bagLocation, filename)
+      getFileObjectLocation(bagManifestUpdate.archiveBagLocation, filename)
     location.toInputStream.toEither
-      .leftMap(ex => DownloadError(ex, location, archiveComplete))
+      .leftMap(ex => DownloadError(ex, location, bagManifestUpdate))
   }
 
   private def getFileObjectLocation(bagLocation: BagLocation, name: String) =

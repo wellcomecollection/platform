@@ -2,23 +2,16 @@ package uk.ac.wellcome.platform.archive.registrar.async.factories
 
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.{FunSpec, Inside}
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  BagLocationFixtures,
-  FileEntry,
-  RandomThings
-}
-import uk.ac.wellcome.platform.archive.common.generators.ArchiveCompleteGenerators
+import uk.ac.wellcome.platform.archive.common.fixtures.{BagLocationFixtures, FileEntry, RandomThings}
 import uk.ac.wellcome.platform.archive.common.models.bagit
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  DownloadError,
-  InvalidBagManifestError
-}
+import uk.ac.wellcome.platform.archive.common.models.error.{DownloadError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.registrar.async.generators.BagManifestUpdateGenerators
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 
 class StorageManifestFactoryTest
     extends FunSpec
-    with ArchiveCompleteGenerators
     with BagLocationFixtures
+    with BagManifestUpdateGenerators
     with RandomThings
     with Inside {
   implicit val _ = s3Client
@@ -26,13 +19,13 @@ class StorageManifestFactoryTest
   it("returns a right of storage manifest if reading a bag location succeeds") {
     withLocalS3Bucket { bucket =>
       val bagInfo = randomBagInfo
-      withBag(bucket, bagInfo = bagInfo) { bagLocation =>
-        val archiveComplete = createArchiveCompleteWith(
-          bagLocation = bagLocation
+      withBag(bucket, bagInfo = bagInfo) { archiveBagLocation =>
+        val bagManifestUpdate = createBagManifestUpdateWith(
+          archiveBagLocation = archiveBagLocation
         )
 
         val storageManifest =
-          StorageManifestFactory.create(archiveComplete)
+          StorageManifestFactory.create(bagManifestUpdate)
 
         inside(storageManifest) {
           case Right(
@@ -45,7 +38,7 @@ class StorageManifestFactoryTest
                   tagManifestDigestFiles),
                 _,
                 _)) =>
-            actualStorageSpace shouldBe bagLocation.storageSpace
+            actualStorageSpace shouldBe archiveBagLocation.storageSpace
             actualBagInfo shouldBe bagInfo
             bagDigestFiles should have size 1
             tagManifestDigestFiles should have size 3
@@ -67,14 +60,14 @@ class StorageManifestFactoryTest
           storageSpace = randomStorageSpace,
           bagPath = randomBagPath
         )
-        val archiveComplete = createArchiveCompleteWith(
+        val bagManifestUpdate = createBagManifestUpdateWith(
           bagLocation = bagLocation
         )
-        val value = StorageManifestFactory.create(archiveComplete)
+        val value = StorageManifestFactory.create(bagManifestUpdate)
 
         inside(value) {
           case Left(DownloadError(exception, _, actualArchiveComplete)) =>
-            actualArchiveComplete shouldBe archiveComplete
+            actualArchiveComplete shouldBe bagManifestUpdate
             exception shouldBe a[AmazonS3Exception]
             exception
               .asInstanceOf[AmazonS3Exception]
