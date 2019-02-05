@@ -6,7 +6,7 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinationConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
 import uk.ac.wellcome.platform.archive.bagreplicator.storage.BagStorage
-import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
 import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagLocation,
   ExternalIdentifier
@@ -20,8 +20,8 @@ class BagStorageTest
     extends FunSpec
     with Matchers
     with ScalaFutures
-    with RandomThings
     with IntegrationPatience
+    with BagInfoGenerators
     with BagReplicatorFixtures {
 
   val bagStorage = new BagStorage(s3Client = s3Client)
@@ -77,11 +77,11 @@ class BagStorageTest
 
   describe("when other bags have the same prefix") {
     it("should duplicate a bag into a given location") {
-      val bagInfo1 = randomBagInfo.copy(
+      val bagInfo1 = createBagInfoWith(
         externalIdentifier = ExternalIdentifier("prefix")
       )
 
-      val bagInfo2 = randomBagInfo.copy(
+      val bagInfo2 = createBagInfoWith(
         externalIdentifier = ExternalIdentifier("prefix_suffix")
       )
 
