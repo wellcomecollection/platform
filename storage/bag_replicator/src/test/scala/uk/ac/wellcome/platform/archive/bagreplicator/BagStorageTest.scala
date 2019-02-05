@@ -6,7 +6,10 @@ import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinatio
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
 import uk.ac.wellcome.platform.archive.bagreplicator.storage.BagStorage
 import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagLocation,
+  ExternalIdentifier
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

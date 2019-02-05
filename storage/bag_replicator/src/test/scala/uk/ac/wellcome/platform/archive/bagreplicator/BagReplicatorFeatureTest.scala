@@ -36,7 +36,6 @@ class BagReplicatorFeatureTest
           requestId,
           storageSpace,
           bagInfo = bagInfo) { srcBagLocation =>
-
           eventually {
             val dstBagLocation = srcBagLocation.copy(
               storageNamespace = destinationBucket.name,

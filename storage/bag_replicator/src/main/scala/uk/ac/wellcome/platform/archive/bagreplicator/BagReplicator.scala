@@ -105,7 +105,10 @@ class BagReplicator(
           .transformWith[Either[BagReplicationError, CompletedBagReplication]] {
             case Success(dstBagLocation) =>
               Future(
-                Right(CompletedBagReplication(bagReplicationRequest.context, dstBagLocation)))
+                Right(
+                  CompletedBagReplication(
+                    bagReplicationRequest.context,
+                    dstBagLocation)))
             case Failure(e) =>
               val stackTrace = e.getStackTrace.mkString("\n")
 

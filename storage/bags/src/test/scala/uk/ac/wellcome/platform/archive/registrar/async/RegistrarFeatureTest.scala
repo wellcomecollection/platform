@@ -41,8 +41,7 @@ class RegistrarFeatureTest
 
   implicit val _ = s3Client
 
-  it(
-    "registers an access BagIt bag from S3 and notifies the progress tracker") {
+  it("registers an access BagIt bag from S3 and notifies the progress tracker") {
     withRegistrar {
       case (storageBucket, queuePair, progressTopic, vhs) =>
         val requestId = randomUUID
@@ -55,39 +54,40 @@ class RegistrarFeatureTest
           storageBucket,
           requestId,
           storageSpace,
-          bagInfo = bagInfo) { case(archiveBagLocation, accessBagLocation) =>
-          val bagId = BagId(
-            space = storageSpace,
-            externalIdentifier = bagInfo.externalIdentifier
-          )
+          bagInfo = bagInfo) {
+          case (archiveBagLocation, accessBagLocation) =>
+            val bagId = BagId(
+              space = storageSpace,
+              externalIdentifier = bagInfo.externalIdentifier
+            )
 
-          eventually {
-            val futureMaybeManifest = vhs.getRecord(bagId.toString)
+            eventually {
+              val futureMaybeManifest = vhs.getRecord(bagId.toString)
 
-            whenReady(futureMaybeManifest) { maybeStorageManifest =>
-              maybeStorageManifest shouldBe defined
+              whenReady(futureMaybeManifest) { maybeStorageManifest =>
+                maybeStorageManifest shouldBe defined
 
-              val storageManifest = maybeStorageManifest.get
+                val storageManifest = maybeStorageManifest.get
 
-              assertStorageManifest(storageManifest)(
-                expectedStorageSpace = bagId.space,
-                expectedBagInfo = bagInfo,
-                expectedNamespace = storageBucket.name,
-                expectedPath = accessBagLocation.completePath,
-                filesNumber = 1,
-                createdDateAfter = createdAfterDate
-              )
+                assertStorageManifest(storageManifest)(
+                  expectedStorageSpace = bagId.space,
+                  expectedBagInfo = bagInfo,
+                  expectedNamespace = storageBucket.name,
+                  expectedPath = accessBagLocation.completePath,
+                  filesNumber = 1,
+                  createdDateAfter = createdAfterDate
+                )
 
-              assertTopicReceivesProgressStatusUpdate(
-                requestId,
-                progressTopic,
-                Progress.Completed,
-                expectedBag = Some(bagId)) { events =>
-                events should have size 1
-                events.head.description shouldBe "Bag registered successfully"
+                assertTopicReceivesProgressStatusUpdate(
+                  requestId,
+                  progressTopic,
+                  Progress.Completed,
+                  expectedBag = Some(bagId)) { events =>
+                  events should have size 1
+                  events.head.description shouldBe "Bag registered successfully"
+                }
               }
             }
-          }
         }
     }
   }

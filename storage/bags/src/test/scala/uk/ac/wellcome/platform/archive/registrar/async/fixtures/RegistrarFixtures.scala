@@ -40,20 +40,23 @@ trait RegistrarFixtures
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
   )(testWith: TestWith[(BagLocation, BagLocation), R]): R =
-    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace, storagePrefix = "archive") {
-      srcBagLocation =>
-        val dstBagLocation = srcBagLocation.copy(storagePrefix = "access")
-        val replicationResult = ReplicationResult(
-          archiveRequestId = archiveRequestId,
-          srcBagLocation = srcBagLocation,
-          dstBagLocation = dstBagLocation
-        )
+    withBag(
+      storageBucket,
+      bagInfo = bagInfo,
+      storageSpace = storageSpace,
+      storagePrefix = "archive") { srcBagLocation =>
+      val dstBagLocation = srcBagLocation.copy(storagePrefix = "access")
+      val replicationResult = ReplicationResult(
+        archiveRequestId = archiveRequestId,
+        srcBagLocation = srcBagLocation,
+        dstBagLocation = dstBagLocation
+      )
 
-        sendNotificationToSQS(
-          queuePair.queue,
-          replicationResult
-        )
-        testWith((srcBagLocation, dstBagLocation))
+      sendNotificationToSQS(
+        queuePair.queue,
+        replicationResult
+      )
+      testWith((srcBagLocation, dstBagLocation))
     }
 
   override def createTable(table: Table) = {

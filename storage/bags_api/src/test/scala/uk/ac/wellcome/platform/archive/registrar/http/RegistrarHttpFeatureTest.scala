@@ -11,7 +11,11 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
-import uk.ac.wellcome.platform.archive.display.{DisplayLocation, DisplayStorageSpace, StandardDisplayProvider}
+import uk.ac.wellcome.platform.archive.display.{
+  DisplayLocation,
+  DisplayStorageSpace,
+  StandardDisplayProvider
+}
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
@@ -49,7 +53,8 @@ class RegistrarHttpFeatureTest
               bagInfo = bagInfo,
               checksumAlgorithm = checksumAlgorithm,
               accessLocation = ObjectLocation(namespace = bucket, key = path),
-              archiveLocations = List(ObjectLocation(archiveBucket, archivePath))
+              archiveLocations =
+                List(ObjectLocation(archiveBucket, archivePath))
             )
             val future = storeSingleManifest(vhs, storageManifest)
             whenReady(future) { _ =>
@@ -86,11 +91,12 @@ class RegistrarHttpFeatureTest
                           actualBucket,
                           actualPath,
                           "Location"),
-                        List(DisplayLocation(
-                        StandardDisplayProvider,
-                        archiveBucket,
-                        archivePath,
-                        "Location")),
+                        List(
+                          DisplayLocation(
+                            StandardDisplayProvider,
+                            archiveBucket,
+                            archivePath,
+                            "Location")),
                         createdDateString,
                         "Bag") =>
                       actualContextUrl shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
