@@ -11,8 +11,14 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveJobCreator
-import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, FileDownloadComplete}
-import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{ArchiveCompletion, BagDownload}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagUploaderConfig,
+  FileDownloadComplete
+}
+import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{
+  ArchiveCompletion,
+  BagDownload
+}
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
 import uk.ac.wellcome.platform.archive.common.messaging.SnsPublishFlow
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError

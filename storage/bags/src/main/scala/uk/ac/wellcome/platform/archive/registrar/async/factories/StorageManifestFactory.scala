@@ -5,10 +5,22 @@ import java.time.Instant
 
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3
-import uk.ac.wellcome.platform.archive.common.bag.{BagDigestFileCreator, BagInfoParser}
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagDigestFile, BagLocation}
-import uk.ac.wellcome.platform.archive.common.models.error.{ArchiveError, DownloadError}
-import uk.ac.wellcome.platform.archive.common.progress.models.{InfrequentAccessStorageProvider, StorageLocation}
+import uk.ac.wellcome.platform.archive.common.bag.{
+  BagDigestFileCreator,
+  BagInfoParser
+}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagDigestFile,
+  BagLocation
+}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  ArchiveError,
+  DownloadError
+}
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  InfrequentAccessStorageProvider,
+  StorageLocation
+}
 import uk.ac.wellcome.platform.archive.registrar.async.models.BagManifestUpdate
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 import uk.ac.wellcome.storage.ObjectLocation
@@ -21,7 +33,9 @@ object StorageManifestFactory {
 
     for {
       bagInfoInputStream <- downloadFile(bagManifestUpdate, "bag-info.txt")
-      bagInfo <- BagInfoParser.parseBagInfo(bagManifestUpdate, bagInfoInputStream)
+      bagInfo <- BagInfoParser.parseBagInfo(
+        bagManifestUpdate,
+        bagInfoInputStream)
       manifestTuples <- getBagItems(
         bagManifestUpdate,
         s"manifest-$algorithm.txt",
@@ -69,8 +83,8 @@ object StorageManifestFactory {
 
   import uk.ac.wellcome.platform.archive.common.ConvertibleToInputStream._
 
-  private def downloadFile(bagManifestUpdate: BagManifestUpdate, filename: String)(
-    implicit s3Client: AmazonS3)
+  private def downloadFile(bagManifestUpdate: BagManifestUpdate,
+                           filename: String)(implicit s3Client: AmazonS3)
     : Either[DownloadError[BagManifestUpdate], InputStream] = {
     val location: ObjectLocation =
       getFileObjectLocation(bagManifestUpdate.archiveBagLocation, filename)

@@ -13,13 +13,24 @@ import io.circe.Encoder
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
-import uk.ac.wellcome.platform.archive.bagreplicator.config.{BagReplicatorConfig, ReplicatorDestinationConfig}
-import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{BagReplicationError, DuplicationFailed, NotificationFailed, NotificationParsingFailed}
+import uk.ac.wellcome.platform.archive.bagreplicator.config.{
+  BagReplicatorConfig,
+  ReplicatorDestinationConfig
+}
+import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{
+  BagReplicationError,
+  DuplicationFailed,
+  NotificationFailed,
+  NotificationParsingFailed
+}
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
 import uk.ac.wellcome.platform.archive.bagreplicator.storage.BagStorage
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
-import uk.ac.wellcome.platform.archive.common.models.{ReplicationRequest, ReplicationResult}
+import uk.ac.wellcome.platform.archive.common.models.{
+  ReplicationRequest,
+  ReplicationResult
+}
 import uk.ac.wellcome.platform.archive.common.progress.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -69,7 +80,9 @@ class BagReplicator(
     fromJson[ReplicationRequest](notificationMessage.body) match {
       case Success(replicationRequest) =>
         Right(
-          InternalReplicationRequest(replicationRequest, replicationRequest.srcBagLocation))
+          InternalReplicationRequest(
+            replicationRequest,
+            replicationRequest.srcBagLocation))
       case Failure(error) =>
         Left(NotificationParsingFailed(
           s"Failed to parse Notification error: $error body: ${notificationMessage.body}"))

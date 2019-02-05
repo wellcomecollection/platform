@@ -2,9 +2,16 @@ package uk.ac.wellcome.platform.archive.registrar.async.factories
 
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.{FunSpec, Inside}
-import uk.ac.wellcome.platform.archive.common.fixtures.{BagLocationFixtures, FileEntry, RandomThings}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  BagLocationFixtures,
+  FileEntry,
+  RandomThings
+}
 import uk.ac.wellcome.platform.archive.common.models.bagit
-import uk.ac.wellcome.platform.archive.common.models.error.{DownloadError, InvalidBagManifestError}
+import uk.ac.wellcome.platform.archive.common.models.error.{
+  DownloadError,
+  InvalidBagManifestError
+}
 import uk.ac.wellcome.platform.archive.registrar.async.generators.BagManifestUpdateGenerators
 import uk.ac.wellcome.platform.archive.registrar.common.models._
 

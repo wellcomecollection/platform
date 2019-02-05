@@ -23,10 +23,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
 
 object ArchiveJobDigestItemsFlow extends Logging {
   def apply(parallelism: Int, ingestBagRequest: IngestBagRequest)(
-    implicit s3Client: AmazonS3)
-    : Flow[ArchiveJob,
-           ArchiveCompletion,
-           NotUsed] =
+    implicit s3Client: AmazonS3): Flow[ArchiveJob, ArchiveCompletion, NotUsed] =
     Flow[ArchiveJob]
       .log("creating archive item jobs")
       .map(job => ArchiveItemJobCreator.createArchiveDigestItemJobs(job))
@@ -37,11 +34,10 @@ object ArchiveJobDigestItemsFlow extends Logging {
           ArchiveCompletion](OnErrorFlow())(
           mapReduceArchiveItemJobs(parallelism, ingestBagRequest)))
 
-  private def mapReduceArchiveItemJobs(parallelism: Int,
-                                       ingestBagRequest: IngestBagRequest)(
-    implicit s3Client: AmazonS3): Flow[List[ArchiveDigestItemJob],
-                                       ArchiveCompletion,
-                                       NotUsed] =
+  private def mapReduceArchiveItemJobs(
+    parallelism: Int,
+    ingestBagRequest: IngestBagRequest)(implicit s3Client: AmazonS3)
+    : Flow[List[ArchiveDigestItemJob], ArchiveCompletion, NotUsed] =
     Flow[List[ArchiveDigestItemJob]]
       .mapConcat(identity)
       .via(ArchiveDigestItemJobFlow(parallelism))

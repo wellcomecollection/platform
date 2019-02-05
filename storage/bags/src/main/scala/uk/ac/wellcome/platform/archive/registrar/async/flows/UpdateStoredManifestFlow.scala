@@ -47,11 +47,14 @@ object UpdateStoredManifestFlow {
                                     EmptyMetadata,
                                     ObjectStore[StorageManifest]],
     storageManifest: StorageManifest,
-    bagManifestUpdate: BagManifestUpdate)(implicit ec: ExecutionContext): Future[(UUID, BagId)] =
+    bagManifestUpdate: BagManifestUpdate)(
+    implicit ec: ExecutionContext): Future[(UUID, BagId)] =
     dataStore
       .updateRecord(storageManifest.id.toString)(
         ifNotExisting = (storageManifest, EmptyMetadata()))(
         ifExisting = (_, _) => (storageManifest, EmptyMetadata())
       )
-      .map { _ => (bagManifestUpdate.archiveRequestId, storageManifest.id) }
+      .map { _ =>
+        (bagManifestUpdate.archiveRequestId, storageManifest.id)
+      }
 }
