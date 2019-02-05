@@ -8,3 +8,13 @@ case class ArchiveComplete(
   archiveRequestId: UUID,
   bagLocation: BagLocation
 )
+
+case class ReplicationRequest(
+  archiveRequestId: UUID,
+  srcBagLocation: BagLocation
+)
+
+case class ReplicationResult(
+  archiveRequestId: UUID,
+  srcBagLocation: BagLocation
+)
