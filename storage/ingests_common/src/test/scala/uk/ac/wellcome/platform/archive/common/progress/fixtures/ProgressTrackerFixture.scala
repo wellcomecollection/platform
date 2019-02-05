@@ -19,7 +19,6 @@ trait ProgressTrackerFixture
     with TimeTestFixture {
 
   import uk.ac.wellcome.storage.dynamo._
-  import Progress._
 
   def createTable(table: LocalDynamoDb.Table): Table = Table("table", "index")
 

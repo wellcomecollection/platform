@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.archive.registrar.async.fixtures
 import java.util.UUID
 
 import com.amazonaws.services.dynamodbv2.model._
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair

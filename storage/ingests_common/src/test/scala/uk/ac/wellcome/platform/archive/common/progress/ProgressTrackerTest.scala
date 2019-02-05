@@ -27,7 +27,6 @@ class ProgressTrackerTest
     with ScalaFutures {
 
   import uk.ac.wellcome.storage.dynamo._
-  import Progress._
 
   describe("create") {
     it("creates a progress monitor") {

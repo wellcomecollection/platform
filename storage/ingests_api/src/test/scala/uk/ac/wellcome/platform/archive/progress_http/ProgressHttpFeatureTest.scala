@@ -35,7 +35,6 @@ class ProgressHttpFeatureTest
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
   import uk.ac.wellcome.storage.dynamo._
-  import Progress._
 
   val contextUrl = "http://api.wellcomecollection.org/storage/v1/context.json"
   describe("GET /progress/:id") {

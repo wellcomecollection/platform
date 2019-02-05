@@ -6,10 +6,6 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.json.{
-  URIConverters,
-  UUIDConverters
-}
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressGenerators
 import uk.ac.wellcome.platform.archive.common.progress.models.{
@@ -27,8 +23,6 @@ class CallbackNotificationFlowTest
     with IntegrationPatience
     with Eventually
     with RandomThings
-    with UUIDConverters
-    with URIConverters
     with ProgressGenerators
     with SNS {
 
