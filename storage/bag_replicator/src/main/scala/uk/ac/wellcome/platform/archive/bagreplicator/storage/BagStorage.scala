@@ -14,15 +14,14 @@ import uk.ac.wellcome.platform.archive.common.models.bagit.{
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
-object BagStorage extends Logging {
+class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logging {
+
+  val s3Copier = new S3Copier(s3Client)
 
   def duplicateBag(
     sourceBagLocation: BagLocation,
     storageDestination: ReplicatorDestinationConfig
-  )(implicit
-    s3Client: AmazonS3,
-    s3Copier: S3Copier,
-    ctx: ExecutionContext): Future[List[CopyResult]] = {
+  ): Future[List[CopyResult]] = {
     debug(
       List(
         s"duplicating bag from",
@@ -43,12 +42,7 @@ object BagStorage extends Logging {
     } yield copyResults
   }
 
-  private def listObjects(
-    s3Client: AmazonS3,
-    bagLocation: BagLocation
-  )(implicit
-    ctx: ExecutionContext): Future[ObjectListing] = Future {
-
+  private def listObjects(bagLocation: BagLocation): Future[ObjectListing] = Future {
     val absolutePathInStorage = bagLocation.completePath
       .replaceAll("(.*[^/]+)/*", "$1/")
 
@@ -61,15 +55,14 @@ object BagStorage extends Logging {
   private def getItemInPath(
     summary: S3ObjectSummary,
     prefix: String
-  ) =
+  ): String =
     summary.getKey
       .stripPrefix(prefix)
 
   private def getObjectSummaries(
     listing: ObjectListing,
     bagLocation: BagLocation
-  )(implicit
-    ctx: ExecutionContext): Future[List[BagItemLocation]] = Future {
+  ): Future[List[BagItemLocation]] = Future {
     val prefix = s"${bagLocation.completePath}/"
 
     listing.getObjectSummaries.asScala
@@ -85,16 +78,14 @@ object BagStorage extends Logging {
 
   private def listBagItems(
     location: BagLocation
-  )(implicit
-    s3Client: AmazonS3,
-    ctx: ExecutionContext): Future[List[BagItemLocation]] = {
+  ): Future[List[BagItemLocation]] = {
     // TODO: limit size of the returned List
     // use Marker to paginate(?)
     // needs care if bag contents can change during copy.
     debug(s"listing items in $location")
 
     for {
-      listing <- listObjects(s3Client, location)
+      listing <- listObjects(location)
       summaries <- getObjectSummaries(listing, location)
     } yield summaries
   }
@@ -102,9 +93,7 @@ object BagStorage extends Logging {
   private def duplicateBagItems(
     sourceBagItems: List[BagItemLocation],
     storageDestination: ReplicatorDestinationConfig
-  )(implicit
-    s3Copier: S3Copier,
-    ctx: ExecutionContext): Future[List[CopyResult]] = {
+  ): Future[List[CopyResult]] = {
     debug(s"duplicating bag items: $sourceBagItems")
 
     Future.sequence(
@@ -117,9 +106,7 @@ object BagStorage extends Logging {
   private def duplicateBagItem(
     sourceBagItemLocation: BagItemLocation,
     storageDestination: ReplicatorDestinationConfig
-  )(implicit
-    s3Copier: S3Copier,
-    ctx: ExecutionContext): Future[CopyResult] = {
+  ): Future[CopyResult] = {
 
     val sourceNamespace = sourceBagItemLocation.bagLocation.storageNamespace
     val sourceItemKey = sourceBagItemLocation.completePath
