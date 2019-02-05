@@ -12,7 +12,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 trait BagLocationFixtures extends S3 with BagIt {
   def withBag[R](
-    storageBucket: Bucket,
+    bucket: Bucket,
     dataFileCount: Int = 1,
     bagInfo: BagInfo = randomBagInfo,
     storageSpace: StorageSpace = randomStorageSpace,
@@ -32,7 +32,7 @@ trait BagLocationFixtures extends S3 with BagIt {
     val storagePrefix = "archive"
 
     val bagLocation = BagLocation(
-      storageNamespace = storageBucket.name,
+      storageNamespace = bucket.name,
       storagePrefix = storagePrefix,
       storageSpace = storageSpace,
       bagPath = BagPath(bagIdentifier.toString)

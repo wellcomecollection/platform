@@ -24,10 +24,7 @@ import uk.ac.wellcome.platform.archive.bagreplicator.models.errors.{
   NotificationParsingFailed
 }
 import uk.ac.wellcome.platform.archive.bagreplicator.models.messages._
-import uk.ac.wellcome.platform.archive.bagreplicator.storage.{
-  BagStorage,
-  S3Copier
-}
+import uk.ac.wellcome.platform.archive.bagreplicator.storage.BagStorage
 import uk.ac.wellcome.platform.archive.common.flows.SupervisedMaterializer
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
@@ -54,16 +51,20 @@ class BagReplicator(
     implicit val materializer: ActorMaterializer =
       SupervisedMaterializer.resumable
 
-    implicit val s3client: AmazonS3 = s3Client
     implicit val amazonSNS: AmazonSNS = snsClient
-    implicit val ex: ExecutionContext = actorSystem.dispatcher
-    implicit val s3Copier: S3Copier = new S3Copier()
+    implicit val ec: ExecutionContext = actorSystem.dispatcher
+
+    val bagStorage = new BagStorage(s3Client = s3Client)
 
     val flow = Flow[NotificationMessage]
       .log("received notification message")
       .map(parseReplicateBagMessage)
       .mapAsync(bagReplicatorConfig.parallelism)(
-        duplicateBagItems(bagReplicatorConfig.destination))
+        duplicateBagItems(
+          bagStorage = bagStorage,
+          storageDestination = bagReplicatorConfig.destination
+        )
+      )
       .map(notifyOutgoingTopic(outgoingSnsConfig))
       .map(notifyProgress(progressSnsConfig))
       .log("completed")
@@ -84,16 +85,15 @@ class BagReplicator(
   }
 
   private def duplicateBagItems(
+    bagStorage: BagStorage,
     storageDestination: ReplicatorDestinationConfig)(
     in: Either[BagReplicationError, BagReplicationRequest])(
-    implicit s3Client: AmazonS3,
-    s3Copier: S3Copier,
-    ex: ExecutionContext)
+    implicit ec: ExecutionContext)
     : Future[Either[BagReplicationError, CompletedBagReplication]] = {
     in.fold(
       left => Future(Left(left)),
       bagReplicationRequest =>
-        BagStorage
+        bagStorage
           .duplicateBag(
             bagReplicationRequest.sourceBagLocation,
             storageDestination)

@@ -3,10 +3,11 @@ package uk.ac.wellcome.platform.archive.bagreplicator.storage
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.transfer.model.CopyResult
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class S3Copier(implicit s3Client: AmazonS3) extends Logging {
+class S3Copier(s3Client: AmazonS3) extends Logging {
 
   import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 
@@ -15,26 +16,22 @@ class S3Copier(implicit s3Client: AmazonS3) extends Logging {
     .build // Fixed thread pool
 
   def copy(
-    sourceNamespace: String,
-    sourceItemKey: String,
-    destinationNamespace: String,
-    destinationItemKey: String
+    src: ObjectLocation,
+    dst: ObjectLocation
   )(implicit
-    ctx: ExecutionContext): Future[CopyResult] = Future {
+    ec: ExecutionContext): Future[CopyResult] = Future {
+    debug(s"Copying ${s3Uri(src)} -> ${s3Uri(dst)}")
 
     val copyTransfer = transferManager.copy(
-      sourceNamespace,
-      sourceItemKey,
-      destinationNamespace,
-      destinationItemKey
+      src.namespace,
+      src.key,
+      dst.namespace,
+      dst.key
     )
 
     copyTransfer.waitForCopyResult()
   }
-}
 
-object S3Copier {
-  def apply()(implicit s3Client: AmazonS3) = {
-    new S3Copier()
-  }
+  private def s3Uri(objectLocation: ObjectLocation): String =
+    s"s3://${objectLocation.namespace}/${objectLocation.key}"
 }
