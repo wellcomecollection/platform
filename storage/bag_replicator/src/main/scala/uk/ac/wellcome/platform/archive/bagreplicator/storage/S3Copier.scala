@@ -20,6 +20,7 @@ class S3Copier(s3Client: AmazonS3) extends Logging {
     dst: ObjectLocation
   )(implicit
     ec: ExecutionContext): Future[CopyResult] = Future {
+    debug(s"Copying ${s3Uri(src)} -> ${s3Uri(dst)}")
 
     val copyTransfer = transferManager.copy(
       src.namespace,
@@ -30,4 +31,7 @@ class S3Copier(s3Client: AmazonS3) extends Logging {
 
     copyTransfer.waitForCopyResult()
   }
+
+  private def s3Uri(objectLocation: ObjectLocation): String =
+    s"s3://${objectLocation.namespace}/${objectLocation.key}"
 }

@@ -98,26 +98,11 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
     sourceBagItemLocation: BagItemLocation,
     storageDestination: ReplicatorDestinationConfig
   ): Future[CopyResult] = {
-
-    val sourceNamespace = sourceBagItemLocation.bagLocation.storageNamespace
-    val sourceItemKey = sourceBagItemLocation.completePath
-
     val destinationBagLocation = sourceBagItemLocation.bagLocation.copy(
       storagePrefix = storageDestination.rootPath
     )
     val destinationBagItemLocation = sourceBagItemLocation.copy(
       bagLocation = destinationBagLocation
-    )
-
-    val destinationNamespace = storageDestination.namespace
-    val destinationItemKey = destinationBagItemLocation.completePath
-
-    debug(
-      List(
-        "duplicating bag item",
-        s"$sourceNamespace/$sourceItemKey",
-        s"-> $destinationNamespace/$destinationItemKey"
-      ).mkString(" ")
     )
 
     s3Copier.copy(
