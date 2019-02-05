@@ -46,6 +46,7 @@ class StorageManifestFactoryTest
             ChecksumAlgorithm("sha256"),
             tagManifestDigestFiles),
             actualAccessLocation,
+            actualArchiveLocations,
             _)) =>
               actualStorageSpace shouldBe archiveBagLocation.storageSpace
               actualBagInfo shouldBe bagInfo
@@ -58,6 +59,7 @@ class StorageManifestFactoryTest
                 "bag-info.txt",
                 "bagit.txt")
               actualAccessLocation.location shouldBe accessBagLocation.objectLocation
+              actualArchiveLocations.map(_.location) shouldBe List(archiveBagLocation.objectLocation)
           }
         }
       }

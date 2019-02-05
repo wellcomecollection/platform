@@ -55,6 +55,9 @@ object StorageManifestFactory {
           provider = InfrequentAccessStorageProvider,
           location = bagManifestUpdate.accessBagLocation.objectLocation
         ),
+        archiveLocations = List(StorageLocation(
+          provider = InfrequentAccessStorageProvider,
+          location = bagManifestUpdate.archiveBagLocation.objectLocation)),
         createdDate = Instant.now()
       )
     }

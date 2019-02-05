@@ -17,6 +17,7 @@ case class DisplayBag(
   manifest: DisplayBagManifest,
   tagManifest: DisplayBagManifest,
   accessLocation: DisplayLocation,
+  archiveLocations: List[DisplayLocation],
   createdDate: String,
   @JsonKey("type")
   ontologyType: String = "Bag"
@@ -32,6 +33,7 @@ object DisplayBag {
       DisplayBagManifest(storageManifest.manifest),
       DisplayBagManifest(storageManifest.tagManifest),
       DisplayLocation(storageManifest.accessLocation),
+      storageManifest.archiveLocations.map(DisplayLocation(_)),
       storageManifest.createdDate.toString
     )
 }
